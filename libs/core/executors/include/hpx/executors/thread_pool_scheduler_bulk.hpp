@@ -22,6 +22,7 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/executors/thread_pool_scheduler.hpp>
 #include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/iterator_support/counting_iterator.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -56,11 +57,11 @@ namespace hpx::execution::experimental {
         /// thread (the completion scheduler is a thread_pool_scheduler;
         /// otherwise the customization defined in this file is not chosen) it
         /// will be reused as one of the worker threads.
-        template <typename Sender, typename Shape, typename F>
+        template <typename Policy, typename Sender, typename Shape, typename F>
         class thread_pool_bulk_sender
         {
         private:
-            thread_pool_scheduler scheduler;
+            thread_pool_policy_scheduler<Policy> scheduler;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
@@ -69,7 +70,8 @@ namespace hpx::execution::experimental {
 
         public:
             template <typename Sender_, typename Shape_, typename F_>
-            thread_pool_bulk_sender(thread_pool_scheduler&& scheduler,
+            thread_pool_bulk_sender(
+                thread_pool_policy_scheduler<Policy>&& scheduler,
                 Sender_&& sender, Shape_&& shape, F_&& f)
               : scheduler(HPX_MOVE(scheduler))
               , sender(HPX_FORWARD(Sender_, sender))
@@ -185,7 +187,7 @@ namespace hpx::execution::experimental {
                                     task_f->n);
                             auto it = hpx::util::begin(op_state->shape);
                             std::advance(it, i_begin);
-                            for (std::uint32_t i = i_begin; i < i_end; ++i)
+                            for (size_type i = i_begin; i < i_end; ++i)
                             {
                                 hpx::util::invoke_fused(
                                     hpx::bind_front(op_state->f, *it), ts);
@@ -453,9 +455,11 @@ namespace hpx::execution::experimental {
 
                                 // Calculate chunk size and number of chunks
                                 auto const chunk_size = get_chunk_size(
-                                    r.op_state->num_worker_threads, n);
-                                auto const num_chunks =
-                                    (n + chunk_size - 1) / chunk_size;
+                                    std::uint32_t(
+                                        r.op_state->num_worker_threads),
+                                    n);
+                                auto const num_chunks = std::uint32_t(
+                                    (n + chunk_size - 1) / chunk_size);
 
                                 // Store sent values in the operation state
                                 r.op_state->ts
@@ -465,7 +469,7 @@ namespace hpx::execution::experimental {
                                 // Initialize the queues for all worker threads
                                 // so that worker threads can start stealing
                                 // immediately when they start.
-                                for (std::size_t worker_thread = 0;
+                                for (std::uint32_t worker_thread = 0;
                                      worker_thread <
                                      r.op_state->num_worker_threads;
                                      ++worker_thread)
@@ -475,9 +479,9 @@ namespace hpx::execution::experimental {
 
                                 // Spawn the worker threads for all except the
                                 // local queue.
-                                auto const local_worker_thread =
-                                    hpx::get_local_worker_thread_num();
-                                for (std::size_t worker_thread = 0;
+                                auto const local_worker_thread = std::uint32_t(
+                                    hpx::get_local_worker_thread_num());
+                                for (std::uint32_t worker_thread = 0;
                                      worker_thread <
                                      r.op_state->num_worker_threads;
                                      ++worker_thread)
@@ -509,7 +513,7 @@ namespace hpx::execution::experimental {
                     hpx::execution::experimental::connect_result_t<Sender,
                         bulk_receiver>;
 
-                thread_pool_scheduler scheduler;
+                thread_pool_policy_scheduler<Policy> scheduler;
                 operation_state_type op_state;
                 std::size_t num_worker_threads =
                     scheduler.get_thread_pool()->get_os_thread_count();
@@ -531,7 +535,8 @@ namespace hpx::execution::experimental {
 
                 template <typename Sender_, typename Shape_, typename F_,
                     typename Receiver_>
-                operation_state(thread_pool_scheduler&& scheduler,
+                operation_state(
+                    thread_pool_policy_scheduler<Policy>&& scheduler,
                     Sender_&& sender, Shape_&& shape, F_&& f,
                     Receiver_&& receiver)
                   : scheduler(HPX_MOVE(scheduler))
@@ -571,32 +576,42 @@ namespace hpx::execution::experimental {
     }    // namespace detail
 
     // clang-format off
-    template <typename Sender, typename Shape, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            std::is_integral_v<std::decay_t<Shape>>
-        )>
-    // clang-format on
-    constexpr auto tag_invoke(bulk_t, thread_pool_scheduler scheduler,
-        Sender&& sender, Shape&& shape, F&& f)
-    {
-        return detail::thread_pool_bulk_sender<std::decay_t<Sender>,
-            hpx::util::detail::counting_shape_type<std::decay_t<Shape>>,
-            std::decay_t<F>>{HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender),
-            hpx::util::detail::make_counting_shape(shape), HPX_FORWARD(F, f)};
-    }
-
-    // clang-format off
-    template <typename Sender, typename Shape, typename F,
+    template <typename Policy, typename Sender, typename Shape, typename F,
         HPX_CONCEPT_REQUIRES_(
             !std::is_integral_v<std::decay_t<Shape>>
         )>
     // clang-format on
-    constexpr auto tag_invoke(bulk_t, thread_pool_scheduler scheduler,
-        Sender&& sender, Shape&& shape, F&& f)
+    constexpr auto tag_invoke(bulk_t,
+        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
+        Shape&& shape, F&& f)
     {
-        return detail::thread_pool_bulk_sender<std::decay_t<Sender>,
-            std::decay_t<Shape>, std::decay_t<F>>{HPX_MOVE(scheduler),
-            HPX_FORWARD(Sender, sender), HPX_FORWARD(Shape, shape),
-            HPX_FORWARD(F, f)};
+        if constexpr (std::is_same_v<Policy, launch::sync_policy>)
+        {
+            return hpx::functional::detail::tag_fallback_invoke(bulk_t{},
+                HPX_FORWARD(Sender, sender), HPX_FORWARD(Shape, shape),
+                HPX_FORWARD(F, f));
+        }
+        else
+        {
+            return detail::thread_pool_bulk_sender<Policy, std::decay_t<Sender>,
+                std::decay_t<Shape>, std::decay_t<F>>{HPX_MOVE(scheduler),
+                HPX_FORWARD(Sender, sender), HPX_FORWARD(Shape, shape),
+                HPX_FORWARD(F, f)};
+        }
+    }
+
+    // clang-format off
+    template <typename Policy, typename Sender, typename Shape, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            std::is_integral_v<std::decay_t<Shape>>
+        )>
+    // clang-format on
+    constexpr decltype(auto) tag_invoke(bulk_t,
+        thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
+        Shape&& shape, F&& f)
+    {
+        return tag_invoke(bulk_t{}, HPX_MOVE(scheduler),
+            HPX_FORWARD(Sender, sender),
+            hpx::util::detail::make_counting_shape(shape), HPX_FORWARD(F, f));
     }
 }    // namespace hpx::execution::experimental

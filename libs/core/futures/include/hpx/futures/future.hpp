@@ -500,10 +500,7 @@ namespace hpx { namespace lcos { namespace detail {
                             "the future has no valid shared state");
                     }
 
-                    // The operation state has to be kept alive until set_value is
-                    // called, which means that we don't need to move receiver and
-                    // future into the on_completed callback.
-                    state->set_on_completed([this]() mutable {
+                    auto on_completed = [this]() mutable {
                         if (future_.has_value())
                         {
                             if constexpr (std::is_void_v<result_type>)
@@ -523,7 +520,30 @@ namespace hpx { namespace lcos { namespace detail {
                                 HPX_MOVE(receiver_),
                                 future_.get_exception_ptr());
                         }
-                    });
+                    };
+
+                    if (!state->is_ready())
+                    {
+                        state->execute_deferred();
+
+                        // execute_deferred might have made the future ready
+                        if (!state->is_ready())
+                        {
+                            // The operation state has to be kept alive until
+                            // set_value is called, which means that we don't
+                            // need to move receiver and future into the
+                            // on_completed callback.
+                            state->set_on_completed(HPX_MOVE(on_completed));
+                        }
+                        else
+                        {
+                            on_completed();
+                        }
+                    }
+                    else
+                    {
+                        on_completed();
+                    }
                 },
                 [&](std::exception_ptr ep) {
                     hpx::execution::experimental::set_error(

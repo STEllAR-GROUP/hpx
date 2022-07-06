@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2020 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution_base/traits/is_executor.hpp>
 
 #include <type_traits>
 
@@ -178,5 +179,25 @@ namespace hpx {
     template <typename T>
     inline constexpr bool is_vectorpack_execution_policy_v =
         is_vectorpack_execution_policy<T>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // execution_policy_has_scheduler_executor evaluates to true if the executor
+    // the given policy contains returns senders from its scheduling functions
+    template <typename T, typename Enable = void>
+    struct execution_policy_has_scheduler_executor : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct execution_policy_has_scheduler_executor<T,
+        std::void_t<typename std::decay_t<T>::executor_type>>
+      : hpx::traits::is_scheduler_executor<
+            typename std::decay_t<T>::executor_type>
+    {
+    };
+
+    template <typename T>
+    inline constexpr bool execution_policy_has_scheduler_executor_v =
+        execution_policy_has_scheduler_executor<T>::value;
     /// \endcond
 }    // namespace hpx

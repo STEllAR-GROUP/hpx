@@ -47,6 +47,7 @@ set(tests
     foreach_adapt
     foreach_range
     foreach_range_projection
+    foreach_range_sender
     generate_range
     includes_range
     inclusive_scan_range

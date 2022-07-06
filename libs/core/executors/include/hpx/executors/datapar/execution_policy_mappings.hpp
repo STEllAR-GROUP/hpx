@@ -22,9 +22,10 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the matching non-simd (vectorpack) execution policy
-    inline constexpr struct to_non_simd_t
+    inline constexpr struct to_non_simd_t final
       : hpx::functional::detail::tag_fallback<to_non_simd_t>
     {
+    private:
         // any non-simd policy just returns itself
         template <typename ExPolicy>
         friend constexpr decltype(auto) tag_fallback_invoke(
@@ -42,9 +43,10 @@ namespace hpx::execution::experimental {
     };
 
     // Return the matching simd (vectorpack) execution policy
-    inline constexpr struct to_simd_t
+    inline constexpr struct to_simd_t final
       : hpx::functional::detail::tag_fallback<to_simd_t>
     {
+    private:
         // any simd policy just returns itself
         template <typename ExPolicy>
         friend constexpr decltype(auto) tag_fallback_invoke(

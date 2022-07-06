@@ -88,8 +88,10 @@ namespace hpx { namespace execution {
     struct parallel_policy_executor
     {
         /// Associate the parallel_execution_tag executor tag type as a default
-        /// with this executor.
-        using execution_category = parallel_execution_tag;
+        /// with this executor, except if the given launch policy is synch.
+        using execution_category =
+            std::conditional_t<std::is_same_v<Policy, launch::sync_policy>,
+                sequenced_execution_tag, parallel_execution_tag>;
 
         /// Associate the static_chunk_size executor parameters type as a default
         /// with this executor.

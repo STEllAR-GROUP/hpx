@@ -81,8 +81,8 @@ namespace hpx::execution::experimental {
                     template <typename...> typename Variant = meta::pack>
                 using sender_types =
                     meta::apply<
-                        meta::transform<meta::uncurry<meta::unique<
-                                meta::func<successor_sender_types>>>,
+                        meta::transform<meta::uncurry<
+                            meta::func<successor_sender_types>>,
                             meta::func<Variant>>,
                         predecessor_value_types<Tuple>>;
 

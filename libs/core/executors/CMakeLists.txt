@@ -21,6 +21,7 @@ set(executors_headers
     hpx/executors/execution_policy_mappings.hpp
     hpx/executors/execution_policy_parameters.hpp
     hpx/executors/execution_policy.hpp
+    hpx/executors/explicit_scheduler_executor.hpp
     hpx/executors/fork_join_executor.hpp
     hpx/executors/limiting_executor.hpp
     hpx/executors/parallel_executor_aggregated.hpp

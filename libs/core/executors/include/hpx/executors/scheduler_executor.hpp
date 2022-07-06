@@ -107,18 +107,15 @@ namespace hpx::execution::experimental {
             return *this;
         }
 
-    private:
-        // property implementations
-
-        // support all properties exposed by the embedded scheduler
+        // support all properties exposed by the wrapped scheduler
         template <typename Tag, typename Property,
             typename Enable = std::enable_if_t<hpx::functional::
                     is_tag_invocable_v<Tag, BaseScheduler, Property>>>
         friend scheduler_executor tag_invoke(
             Tag, scheduler_executor const& exec, Property&& prop)
         {
-            return scheduler_executor(
-                Tag{}(exec.sched_, HPX_FORWARD(Property, prop)));
+            return scheduler_executor(hpx::functional::tag_invoke(
+                Tag{}, exec.sched_, HPX_FORWARD(Property, prop)));
         }
 
         template <typename Tag,
@@ -126,10 +123,9 @@ namespace hpx::execution::experimental {
                 hpx::functional::is_tag_invocable_v<Tag, BaseScheduler>>>
         friend decltype(auto) tag_invoke(Tag, scheduler_executor const& exec)
         {
-            return Tag{}(exec.sched_);
+            return hpx::functional::tag_invoke(Tag{}, exec.sched_);
         }
 
-    public:
         // Associate the parallel_execution_tag executor tag type as a default
         // with this executor.
         using execution_category = parallel_execution_tag;
@@ -310,7 +306,7 @@ namespace hpx::execution::experimental {
         }
 
     private:
-        BaseScheduler sched_;
+        std::decay_t<BaseScheduler> sched_;
         /// \endcond
     };
 

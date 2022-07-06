@@ -49,6 +49,7 @@ set(tests
     findif
     findifnot
     foreach
+    foreach_sender
     foreach_executors
     foreach_prefetching
     foreachn
