@@ -1,0 +1,165 @@
+//  Copyright (c) 2022 Shreyas Atre
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include "hpx/execution_base/traits/coroutine_traits.hpp"
+#include <hpx/modules/testing.hpp>
+
+struct awaiter_1
+{
+    bool await_ready()
+    {
+        return false;
+    }
+    void await_suspend(std::coroutine_handle<>) {}
+    void await_resume() {}
+};
+
+struct awaiter_2
+{
+    void await_ready() {}
+    void await_suspend(std::coroutine_handle<>) {}
+    void await_resume() {}
+};
+
+struct awaiter_3
+{
+    void await_ready() {}
+    void await_suspend() {}
+    void await_resume() {}
+};
+
+struct awaiter_4
+{
+    void await_ready() {}
+    bool await_suspend()
+    {
+        return false;
+    }
+    void await_resume() {}
+};
+
+struct awaiter_5
+{
+    void await_ready() {}
+    bool await_suspend()
+    {
+        return false;
+    }
+    bool await_resume()
+    {
+        return false;
+    }
+};
+
+struct promise;
+
+template <typename Promise>
+struct awaiter_6
+{
+    bool await_ready()
+    {
+        return false;
+    }
+    void await_suspend(std::coroutine_handle<Promise>) {}
+    void await_resume() {}
+};
+
+struct non_awaiter_1
+{
+    bool await_suspend()
+    {
+        return false;
+    }
+    void await_resume() {}
+};
+
+struct non_awaiter_2
+{
+    bool await_suspend()
+    {
+        return false;
+    }
+};
+
+struct non_awaiter_3
+{
+    void await_ready() {}
+};
+
+struct non_awaiter_4
+{
+};
+
+struct promise
+{
+    std::coroutine_handle<promise> get_return_object()
+    {
+        return {std::coroutine_handle<promise>::from_promise(*this)};
+    }
+    std::suspend_always initial_suspend() noexcept
+    {
+        return {};
+    }
+    std::suspend_always final_suspend() noexcept
+    {
+        return {};
+    }
+    void return_void() {}
+    void unhandled_exception() {}
+};
+
+int main()
+{
+    using namespace hpx::execution::experimental;
+
+    static_assert(detail::has_await_resume<awaiter_1>);
+    static_assert(detail::has_await_resume<awaiter_2>);
+    static_assert(detail::has_await_resume<awaiter_3>);
+    static_assert(detail::has_await_resume<awaiter_4>);
+    static_assert(detail::has_await_resume<awaiter_5>);
+    static_assert(detail::has_await_resume<awaiter_6<promise>>);
+    static_assert(detail::has_await_resume<non_awaiter_1>);
+    static_assert(!detail::has_await_resume<non_awaiter_2>);
+    static_assert(!detail::has_await_resume<non_awaiter_3>);
+    static_assert(!detail::has_await_resume<non_awaiter_4>);
+
+    static_assert(detail::has_await_ready<awaiter_1>);
+    static_assert(detail::has_await_ready<awaiter_2>);
+    static_assert(detail::has_await_ready<awaiter_3>);
+    static_assert(detail::has_await_ready<awaiter_4>);
+    static_assert(detail::has_await_ready<awaiter_5>);
+    static_assert(detail::has_await_ready<awaiter_6<promise>>);
+    static_assert(!detail::has_await_ready<non_awaiter_1>);
+    static_assert(!detail::has_await_ready<non_awaiter_2>);
+    static_assert(detail::has_await_ready<non_awaiter_3>);
+    static_assert(!detail::has_await_ready<non_awaiter_4>);
+
+    static_assert(detail::has_await_suspend_coro_handle<awaiter_1, void>);
+    static_assert(detail::has_await_suspend_coro_handle<awaiter_2, void>);
+    static_assert(
+        detail::has_await_suspend_coro_handle<awaiter_6<promise>, promise>);
+    static_assert(detail::has_await_suspend<awaiter_3>);
+    static_assert(detail::has_await_suspend<awaiter_4>);
+    static_assert(detail::has_await_suspend<awaiter_5>);
+
+    static_assert(detail::has_await_suspend<non_awaiter_1>);
+    static_assert(detail::has_await_suspend<non_awaiter_2>);
+    static_assert(!detail::has_await_suspend<non_awaiter_3>);
+    static_assert(!detail::has_await_suspend<non_awaiter_4>);
+
+    static_assert(is_awaiter_v<awaiter_1>);
+    static_assert(is_awaiter_v<awaiter_2>);
+    static_assert(is_awaiter_v<awaiter_3>);
+    static_assert(is_awaiter_v<awaiter_4>);
+    static_assert(is_awaiter_v<awaiter_5>);
+    static_assert(is_awaiter_v<awaiter_6<promise>, promise>);
+    static_assert(!is_awaiter_v<non_awaiter_1>);
+    static_assert(!is_awaiter_v<non_awaiter_2>);
+    static_assert(!is_awaiter_v<non_awaiter_3>);
+    static_assert(!is_awaiter_v<non_awaiter_4>);
+
+    return hpx::util::report_errors();
+}

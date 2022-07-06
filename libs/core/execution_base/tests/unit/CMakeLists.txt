@@ -15,6 +15,7 @@ set(tests
     execution_context
     get_env
     execute_may_block_caller
+    coroutine_traits
 )
 
 foreach(test ${tests})
