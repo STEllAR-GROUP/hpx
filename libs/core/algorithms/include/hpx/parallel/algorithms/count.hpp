@@ -84,8 +84,7 @@ namespace hpx {
     ///           satisfying the given criteria.
     ///
     template <typename InIter, typename T>
-    typename util::detail::algorithm_result<ExPolicy,
-        typename std::iterator_traits<InIter>::difference_type>::type
+    typename std::iterator_traits<InIter>::difference_type
     count(InIter first, InIter last, T const& value);
     
     /// Returns the number of elements in the range [first, last) satisfying
@@ -193,7 +192,7 @@ namespace hpx {
     ///           satisfying the given criteria.
     ///
     template <typename InIter, typename F>
-        typename std::iterator_traits<InIter>::difference_type>::type
+        typename std::iterator_traits<InIter>::difference_type
     count_if(InIter first, InIter last, F&& f);
 
     // clang-format on
