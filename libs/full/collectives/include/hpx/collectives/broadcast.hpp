@@ -233,7 +233,11 @@ namespace hpx { namespace traits {
                 // step function (invoked for each get)
                 nullptr,
                 // finalizer (invoked after all sites have checked in)
-                [](auto& data, bool&) { return data[0]; }, 1);
+                [](auto& data, bool&) {
+                    return Communicator::template handle_bool<data_type>(
+                        data[0]);
+                },
+                1);
         }
 
         template <typename Result, typename T>
@@ -245,7 +249,11 @@ namespace hpx { namespace traits {
                 // step function (invoked once for set)
                 [&](auto& data) { data[0] = HPX_FORWARD(T, t); },
                 // finalizer (invoked after all sites have checked in)
-                [](auto& data, bool&) { return data[0]; }, 1);
+                [](auto& data, bool&) {
+                    return Communicator::template handle_bool<std::decay_t<T>>(
+                        data[0]);
+                },
+                1);
         }
     };
 }}    // namespace hpx::traits

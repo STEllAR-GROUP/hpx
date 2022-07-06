@@ -164,7 +164,8 @@ namespace hpx { namespace traits {
                             data[0], HPX_FORWARD(F, op));
                         data_available = true;
                     }
-                    return data[0];
+                    return Communicator::template handle_bool<std::decay_t<T>>(
+                        data[0]);
                 });
         }
     };

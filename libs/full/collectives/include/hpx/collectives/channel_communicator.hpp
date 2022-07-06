@@ -14,7 +14,8 @@
 // clang-format off
 namespace hpx { namespace collectives {
 
-    /// Create a new communicator object usable with peer-to-peer channel-based operations
+    /// Create a new communicator object usable with peer-to-peer
+    /// channel-based operations
     ///
     /// This functions creates a new communicator object that can be called in
     /// order to pre-allocate a communicator object usable with multiple
@@ -35,7 +36,8 @@ namespace hpx { namespace collectives {
         num_sites_arg num_sites = num_sites_arg(),
         this_site_arg this_site = this_site_arg());
 
-    /// Create a new communicator object usable with peer-to-peer channel-based operations
+    /// Create a new communicator object usable with peer-to-peer
+    /// channel-based operations
     ///
     /// This functions creates a new communicator object that can be called in
     /// order to pre-allocate a communicator object usable with multiple
@@ -61,17 +63,18 @@ namespace hpx { namespace collectives {
     /// This function sends a value to the given site based on the given
     /// communicator.
     ///
-    /// \param comm     The channel communicator object to use for the data transfer
+    /// \param comm     The channel communicator object to use for the data
+    ///                 transfer
     /// \param site     The destination site
     /// \param value    The value to send
     /// \param tag      The (optional) tag identifying the concrete operation
     ///
-    /// \returns    This function returns a future<void> that becomes ready once the
-    ///             data transfer operation has finished.
+    /// \returns    This function returns a future<void> that becomes ready
+    ///             once the data transfer operation has finished.
     ///
     template <typename T>
     hpx::future<void> set(channel_communicator comm,
-        that_site_arg site, T&& value, tag_arg tag = 0);
+        that_site_arg site, T&& value, tag_arg tag = tag_arg());
 
     /// Send a value to the given site
     ///
@@ -87,7 +90,7 @@ namespace hpx { namespace collectives {
     ///
     template <typename T>
     hpx::future<T> get(channel_communicator comm, that_site_arg site,
-        tag_arg tag = 0);
+        tag_arg tag = tag_arg());
 
 }}
 // clang-format on
@@ -118,11 +121,11 @@ namespace hpx { namespace collectives {
 
     template <typename T>
     hpx::future<T> get(
-        channel_communicator, that_site_arg, tag_arg = tag_arg(0));
+        channel_communicator, that_site_arg, tag_arg = tag_arg());
 
     template <typename T>
     hpx::future<void> set(
-        channel_communicator, that_site_arg, T&&, tag_arg = tag_arg(0));
+        channel_communicator, that_site_arg, T&&, tag_arg = tag_arg());
 
     ///////////////////////////////////////////////////////////////////////////
     class channel_communicator
