@@ -9,13 +9,15 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/datastructures/optional.hpp>
+#include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/functional/detail/tag_priority_invoke.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/meta.hpp>
@@ -57,26 +59,14 @@ namespace hpx::execution::experimental::detail {
         using predecessor_error_types =
             error_types_of_t<Sender, empty_env, Variant>;
 
-        // The type of the single void or non-void result that we store. If
-        // there are multiple variants or multiple values sync_wait will
-        // fail to compile.
-        using result_type = std::decay_t<
-            single_result_t<predecessor_value_types<meta::pack, meta::pack>>>;
+        // forcing static_assert ensuring variant has exactly one tuple
+        using is_single = typename single_variant<
+            predecessor_value_types<meta::pack, meta::pack>>::type;
 
-        // Constant to indicate if the type of the result from the
-        // predecessor sender is void or not
-        static constexpr bool is_void_result =
-            std::is_same_v<result_type, void>;
-
-        // Dummy type to indicate that set_value with void has been called
-        struct void_value_type
-        {
-        };
-
-        // The type of the value to store in the variant, void_value_type if
-        // result_type is void, or result_type if it is not
-        using value_type =
-            std::conditional_t<is_void_result, void_value_type, result_type>;
+        // The template should compute the result type of whatever returned from
+        // sync_wait, which should be optional of the variant of the tuples. The
+        // sync_wait works when the variant has one tuple.
+        using result_type = predecessor_value_types<hpx::tuple, hpx::variant>;
 
         // The type of errors to store in the variant. This in itself is a
         // variant.
@@ -94,7 +84,7 @@ namespace hpx::execution::experimental::detail {
             hpx::condition_variable cond_var;
             mutex_type mtx;
             std::atomic<bool> set_called = false;
-            hpx::variant<hpx::monostate, error_type, value_type> value;
+            hpx::variant<hpx::monostate, error_type, result_type> value;
 
             void wait()
             {
@@ -110,16 +100,12 @@ namespace hpx::execution::experimental::detail {
 
             auto get_value()
             {
-                if (hpx::holds_alternative<value_type>(value))
+                if (hpx::holds_alternative<result_type>(value))
                 {
-                    if constexpr (is_void_result)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        return HPX_MOVE(hpx::get<value_type>(value));
-                    }
+                    // pull the tuple out of the variant and wrap it into an
+                    // optional
+                    return hpx::make_optional(
+                        hpx::get<0>(hpx::get<result_type>(HPX_MOVE(value))));
                 }
                 else if (hpx::holds_alternative<error_type>(value))
                 {
@@ -127,9 +113,10 @@ namespace hpx::execution::experimental::detail {
                         sync_wait_error_visitor{}, hpx::get<error_type>(value));
                 }
 
-                // If the variant holds a hpx::monostate something has gone
-                // wrong and we terminate
-                HPX_UNREACHABLE;
+                // If the variant holds a hpx::monostate set_stopped was called
+                // we return an empty optional
+                return hpx::optional<
+                    typename single_variant<result_type>::type>();
             }
         };
 
@@ -159,14 +146,13 @@ namespace hpx::execution::experimental::detail {
             r.signal_set_called();
         }
 
-        template <typename... Us,
-            typename =
-                std::enable_if_t<(is_void_result && sizeof...(Us) == 0) ||
-                    (!is_void_result && sizeof...(Us) == 1)>>
+        // possible add it back
+        template <typename... Us>
         friend void tag_invoke(
             set_value_t, sync_wait_receiver&& r, Us&&... us) noexcept
         {
-            r.state.value.template emplace<value_type>(HPX_FORWARD(Us, us)...);
+            r.state.value.template emplace<result_type>(
+                hpx::forward_as_tuple(HPX_FORWARD(Us, us)...));
             r.signal_set_called();
         }
     };
@@ -175,9 +161,31 @@ namespace hpx::execution::experimental::detail {
 namespace hpx::this_thread::experimental {
 
     inline constexpr struct sync_wait_t final
-      : hpx::functional::detail::tag_fallback<sync_wait_t>
+      : hpx::functional::detail::tag_priority<sync_wait_t>
     {
     private:
+        // clang-format off
+        template <typename Sender,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_sender_v<Sender> &&
+                hpx::execution::experimental::detail::
+                    is_completion_scheduler_tag_invocable_v<
+                        hpx::execution::experimental::set_value_t,
+                        Sender, sync_wait_t
+                    >
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
+            sync_wait_t, Sender&& sender)
+        {
+            auto scheduler =
+                hpx::execution::experimental::get_completion_scheduler<
+                    hpx::execution::experimental::set_value_t>(sender);
+
+            return hpx::functional::tag_invoke(sync_wait_t{},
+                HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender));
+        }
+
         // clang-format off
         template <typename Sender,
             HPX_CONCEPT_REQUIRES_(
