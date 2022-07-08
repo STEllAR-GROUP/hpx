@@ -90,6 +90,18 @@ namespace hpx::execution::experimental::detail {
         using type = T;
     };
 
+    template <typename T>
+    struct single_variant<meta::pack<T>>
+    {
+        using type = T;
+    };
+
+    template <typename T>
+    struct single_variant<hpx::variant<T>>
+    {
+        using type = T;
+    };
+
     template <typename Variants>
     using single_variant_t = meta::type<single_variant<Variants>>;
 
