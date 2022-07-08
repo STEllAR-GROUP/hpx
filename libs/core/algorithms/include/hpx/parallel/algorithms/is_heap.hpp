@@ -14,11 +14,10 @@ namespace hpx {
     /// Returns whether the range is max heap. That is, true if the range is
     /// max heap, false otherwise. The function uses the given comparison
     /// function object \a comp (defaults to using operator<()).
+    /// Executed according to the policy.
     ///
     /// \note   Complexity:
-    ///         Performs at most N applications of the comparison \a comp,
-    ///         at most 2 * N applications of the projection \a proj,
-    ///         where N = last - first.
+    ///         Linear in the distance between \a first and \a last.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -68,16 +67,48 @@ namespace hpx {
     is_heap(ExPolicy&& policy, RandIter first, RandIter last,
         Comp&& comp = Comp());
 
+    /// Returns whether the range is max heap. That is, true if the range is
+    /// max heap, false otherwise. The function uses the given comparison
+    /// function object \a comp (defaults to using operator<()).
+    ///
+    /// \note   Complexity:
+    ///         Linear in the distance between \a first and \a last.
+    ///
+    /// \tparam RandIter    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced).
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param comp         \a comp is a callable object. The return value of the
+    ///                     INVOKE operation applied to an object of type \a Comp,
+    ///                     when contextually converted to bool, yields true if
+    ///                     the first argument of the call is less than the
+    ///                     second, and false otherwise. It is assumed that comp
+    ///                     will not apply any non-constant function through the
+    ///                     dereferenced iterator.
+    ///
+    /// \a comp has to induce a strict weak ordering on the values.
+    ///
+    /// \returns  The \a is_heap a \a bool.
+    ///           The \a is_heap algorithm returns whether the range is max heap.
+    ///           That is, true if the range is max heap, false otherwise.
+    ///
+    template <typename RandIter, typename Comp = detail::less>
+    bool is_heap(RandIter first, RandIter last, Comp&& comp = Comp());
+
     /// Returns the upper bound of the largest range beginning at \a first
     /// which is a max heap. That is, the last iterator \a it for
     /// which range [first, it) is a max heap. The function
     /// uses the given comparison function object \a comp (defaults to using
-    /// operator<()).
+    /// operator<()). Executed according to the policy.
     ///
     /// \note   Complexity:
-    ///         Performs at most N applications of the comparison \a comp,
-    ///         at most 2 * N applications of the projection \a proj,
-    ///         where N = last - first.
+    ///         Linear in the distance between \a first and \a last. 
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -128,6 +159,44 @@ namespace hpx {
     typename util::detail::algorithm_result<ExPolicy, RandIter>::type
     is_heap_until(ExPolicy&& policy, RandIter first, RandIter last,
         Comp&& comp = Comp());
+
+    /// Returns the upper bound of the largest range beginning at \a first
+    /// which is a max heap. That is, the last iterator \a it for
+    /// which range [first, it) is a max heap. The function
+    /// uses the given comparison function object \a comp (defaults to using
+    /// operator<()).
+    ///
+    /// \note   Complexity:
+    ///         Linear in the distance between \a first and \a last. 
+    ///
+    /// \tparam RandIter    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced).
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param comp         \a comp is a callable object. The return value of the
+    ///                     INVOKE operation applied to an object of type \a Comp,
+    ///                     when contextually converted to bool, yields true if
+    ///                     the first argument of the call is less than the
+    ///                     second, and false otherwise. It is assumed that comp
+    ///                     will not apply any non-constant function through the
+    ///                     dereferenced iterator.
+    ///
+    /// \a comp has to induce a strict weak ordering on the values.
+    ///
+    /// \returns  The \a is_heap_until algorithm returns a \a RandIter.
+    ///           The \a is_heap_until algorithm returns the upper bound
+    ///           of the largest range beginning at first which is a max heap.
+    ///           That is, the last iterator \a it for which range [first, it)
+    ///           is a max heap.
+    ///
+    template <typename RandIter, typename Comp = detail::less>
+    RandIter is_heap_until(RandIter first, RandIter last, Comp&& comp = Comp());
 
     // clang-format on
 }    // namespace hpx
