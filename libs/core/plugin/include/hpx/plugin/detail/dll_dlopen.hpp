@@ -319,6 +319,7 @@ namespace hpx { namespace util { namespace plugin {
             std::string result;
 
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)
+#if defined(RTLD_DI_ORIGIN)
             char directory[PATH_MAX] = {'\0'};
             const_cast<dll&>(*this).LoadLibrary(ec);
             if (!ec && ::dlinfo(dll_handle, RTLD_DI_ORIGIN, directory) < 0)
@@ -333,6 +334,9 @@ namespace hpx { namespace util { namespace plugin {
             }
             result = directory;
             ::dlerror();    // Clear the error state.
+#else
+            result = path(dll_name).parent_path().string();
+#endif
 #elif defined(__APPLE__)
             // SO staticfloat's solution
             const_cast<dll&>(*this).LoadLibrary(ec);
