@@ -37,6 +37,11 @@
 #include <stdexcept>
 #include <sys/param.h>
 
+// Fix for musl. Use linux/param.h for EXEC_PAGESIZE
+#ifdef __linux__
+#include <linux/param.h>
+#endif
+
 #if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
 
 #include <cstring>
