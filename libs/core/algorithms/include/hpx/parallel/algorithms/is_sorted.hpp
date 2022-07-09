@@ -54,7 +54,7 @@ namespace hpx {
     bool is_sorted(FwdIter first, FwdIter last, Pred&& pred = Pred());
 
     /// Determines if the range [first, last) is sorted. Uses pred to
-    /// compare elements.
+    /// compare elements. Executed according to the policy.
     ///
     /// \note   Complexity: at most (N+S-1) comparisons where
     ///         \a N = distance(first, last).
@@ -158,6 +158,7 @@ namespace hpx {
 
     /// Returns the first element in the range [first, last) that is not sorted.
     /// Uses a predicate to compare elements or the less than operator.
+    /// Executed according to the policy.
     ///
     /// \note   Complexity: at most (N+S-1) comparisons where
     ///         \a N = distance(first, last).
