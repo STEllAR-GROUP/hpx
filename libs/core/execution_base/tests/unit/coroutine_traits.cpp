@@ -109,6 +109,23 @@ struct promise
     }
     void return_void() {}
     void unhandled_exception() {}
+
+    template <typename... T>
+    decltype(auto) await_transform(T...) noexcept
+    {
+        return awaiter_6<promise>{};
+    }
+};
+
+struct awaitable_1
+{
+    awaiter_1 operator co_await();
+    using promise_type = promise;
+};
+
+struct awaitable_2
+{
+    using promise_type = promise;
 };
 
 int main()
@@ -139,11 +156,11 @@ int main()
 
     static_assert(detail::has_await_suspend_coro_handle<awaiter_1, void>);
     static_assert(detail::has_await_suspend_coro_handle<awaiter_2, void>);
-    static_assert(
-        detail::has_await_suspend_coro_handle<awaiter_6<promise>, promise>);
     static_assert(detail::has_await_suspend<awaiter_3>);
     static_assert(detail::has_await_suspend<awaiter_4>);
     static_assert(detail::has_await_suspend<awaiter_5>);
+    static_assert(
+        detail::has_await_suspend_coro_handle<awaiter_6<promise>, promise>);
 
     static_assert(detail::has_await_suspend<non_awaiter_1>);
     static_assert(detail::has_await_suspend<non_awaiter_2>);
@@ -160,6 +177,62 @@ int main()
     static_assert(!is_awaiter_v<non_awaiter_2>);
     static_assert(!is_awaiter_v<non_awaiter_3>);
     static_assert(!is_awaiter_v<non_awaiter_4>);
+
+    static_assert(!detail::has_free_operator_co_await_v<awaiter_1>);
+    static_assert(!detail::has_free_operator_co_await_v<awaiter_2>);
+    static_assert(!detail::has_free_operator_co_await_v<awaiter_3>);
+    static_assert(!detail::has_free_operator_co_await_v<awaiter_4>);
+    static_assert(!detail::has_free_operator_co_await_v<awaiter_5>);
+    static_assert(!detail::has_free_operator_co_await_v<awaiter_6<promise>>);
+    static_assert(!detail::has_free_operator_co_await_v<non_awaiter_1>);
+    static_assert(!detail::has_free_operator_co_await_v<non_awaiter_2>);
+    static_assert(!detail::has_free_operator_co_await_v<non_awaiter_3>);
+    static_assert(!detail::has_free_operator_co_await_v<non_awaiter_4>);
+
+    static_assert(!detail::has_member_operator_co_await_v<awaiter_1>);
+    static_assert(!detail::has_member_operator_co_await_v<awaiter_2>);
+    static_assert(!detail::has_member_operator_co_await_v<awaiter_3>);
+    static_assert(!detail::has_member_operator_co_await_v<awaiter_4>);
+    static_assert(!detail::has_member_operator_co_await_v<awaiter_5>);
+    static_assert(!detail::has_member_operator_co_await_v<awaiter_6<promise>>);
+    static_assert(!detail::has_member_operator_co_await_v<non_awaiter_1>);
+    static_assert(!detail::has_member_operator_co_await_v<non_awaiter_2>);
+    static_assert(!detail::has_member_operator_co_await_v<non_awaiter_3>);
+    static_assert(!detail::has_member_operator_co_await_v<non_awaiter_4>);
+
+    static_assert(is_awaitable_v<awaiter_1>);
+    static_assert(is_awaitable_v<awaiter_2>);
+    static_assert(is_awaitable_v<awaiter_3>);
+    static_assert(is_awaitable_v<awaiter_4>);
+    static_assert(is_awaitable_v<awaiter_5>);
+    static_assert(is_awaiter_v<decltype(get_awaiter(
+                                   awaiter_6<promise>{}, (promise*) nullptr)),
+        promise>);
+    static_assert(is_awaitable_v<awaiter_6<promise>, promise>);
+    static_assert(!is_awaitable_v<non_awaiter_1>);
+    static_assert(!is_awaitable_v<non_awaiter_2>);
+    static_assert(!is_awaitable_v<non_awaiter_3>);
+    static_assert(!is_awaitable_v<non_awaiter_4>);
+
+    static_assert(is_awaitable_v<awaitable_1>);
+
+    static_assert(detail::has_await_transform<promise>);
+    static_assert(
+        is_awaiter_v<decltype(std::declval<promise>().await_transform()),
+            promise>);
+    static_assert(
+        std::is_same_v<decltype(get_awaiter(
+                           std::declval<awaitable_2>(), (promise*) nullptr)),
+            awaiter_6<promise>>);
+    static_assert(
+        std::is_same_v<decltype(get_awaiter(
+                           std::declval<awaitable_2>(), (promise*) nullptr)),
+            awaitable_2>);
+    static_assert(
+        std::is_same_v<decltype(get_awaiter(
+                           std::declval<awaitable_2>(), (void*) nullptr)),
+            awaitable_2>);
+    static_assert(is_awaitable_v<awaitable_2, promise>);
 
     return hpx::util::report_errors();
 }

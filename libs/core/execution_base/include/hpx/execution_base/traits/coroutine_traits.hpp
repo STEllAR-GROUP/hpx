@@ -205,7 +205,8 @@ namespace hpx { namespace execution { namespace experimental {
     struct is_awaitable
       : std::integral_constant<bool,
             is_awaiter_v<decltype(get_awaiter(
-                std::declval<Awaitable>(), std::declval<Promise>()))>>
+                             std::declval<Awaitable>(), (Promise*) nullptr)),
+                Promise>>
     {
     };
 
