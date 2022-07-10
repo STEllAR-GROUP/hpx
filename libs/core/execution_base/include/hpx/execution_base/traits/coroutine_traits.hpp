@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/forward.hpp>
+
 #include <coroutine>
 #include <type_traits>
 
@@ -22,47 +24,47 @@ namespace hpx { namespace execution { namespace experimental {
     namespace detail {
 
         template <typename T, typename... Ts>
-        bool inline constexpr one_of = (std::is_same_v<T, Ts> || ...);
+        inline constexpr bool one_of = (std::is_same_v<T, Ts> || ...);
 
-        template <class, template <class...> class>
-        constexpr bool is_instance_of_ = false;
+        template <typename, template <typename...> typename>
+        inline constexpr bool is_instance_of_ = false;
 
-        template <class... _As, template <class...> class _T>
-        constexpr bool is_instance_of_<_T<_As...>, _T> = true;
+        template <typename... _As, template <typename...> typename _T>
+        inline constexpr bool is_instance_of_<_T<_As...>, _T> = true;
 
-        template <class _Ty, template <class...> class _T>
-        constexpr bool is_instance_of = is_instance_of_<_Ty, _T>;
+        template <typename _Ty, template <typename...> typename _T>
+        inline constexpr bool is_instance_of = is_instance_of_<_Ty, _T>;
 
         template <typename T>
-        inline constexpr bool is_await_suspend_result_t =
+        inline constexpr bool is_await_suspend_result_v =
             one_of<T, void, bool> || is_instance_of<T, std::coroutine_handle>;
 
         template <typename, typename = void>
-        constexpr bool has_await_ready{};
+        inline constexpr bool has_await_ready = false;
 
         template <typename T>
-        constexpr bool has_await_ready<T,
+        inline constexpr bool has_await_ready<T,
             std::void_t<decltype(std::declval<T>().await_ready())>> = true;
 
         template <typename, typename = void>
-        constexpr bool has_await_resume{};
+        inline constexpr bool has_await_resume = false;
 
         template <typename T>
-        constexpr bool has_await_resume<T,
+        inline constexpr bool has_await_resume<T,
             std::void_t<decltype(std::declval<T>().await_resume())>> = true;
 
         template <typename, typename = void>
-        constexpr bool has_await_suspend{};
+        inline constexpr bool has_await_suspend = false;
 
         template <typename T>
-        constexpr bool has_await_suspend<T,
+        inline constexpr bool has_await_suspend<T,
             std::void_t<decltype(std::declval<T>().await_suspend())>> = true;
 
         template <typename, typename, typename = void>
-        constexpr bool has_await_suspend_coro_handle{};
+        inline constexpr bool has_await_suspend_coro_handle = false;
 
         template <typename T, typename Ts>
-        constexpr bool has_await_suspend_coro_handle<T, Ts,
+        inline constexpr bool has_await_suspend_coro_handle<T, Ts,
             std::void_t<decltype(std::declval<T>().await_suspend(
                 std::coroutine_handle<Ts>{}))>> = true;
 
@@ -77,7 +79,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Awaiter, typename Promise>
         struct is_awaiter_impl<true, Awaiter, Promise>
           : std::integral_constant<bool,
-                is_await_suspend_result_t<decltype(
+                is_await_suspend_result_v<decltype(
                     await_suspend<Promise>(std::declval<Awaiter>()))>>
         {
         };
@@ -115,28 +117,28 @@ namespace hpx { namespace execution { namespace experimental {
     namespace detail {
 
         template <typename Awaitable, typename = void>
-        constexpr bool has_member_operator_co_await_v = false;
+        inline constexpr bool has_member_operator_co_await_v = false;
 
         template <typename Awaitable>
-        constexpr bool has_member_operator_co_await_v<Awaitable,
+        inline constexpr bool has_member_operator_co_await_v<Awaitable,
             std::void_t<decltype(
                 std::declval<Awaitable>().operator co_await())>> = true;
 
         template <typename Awaitable, typename = void>
-        constexpr bool has_free_operator_co_await_v = false;
+        inline constexpr bool has_free_operator_co_await_v = false;
 
         template <typename Awaitable>
-        constexpr bool has_free_operator_co_await_v<Awaitable,
+        inline constexpr bool has_free_operator_co_await_v<Awaitable,
             std::void_t<decltype(operator co_await(
                 std::declval<Awaitable>()))>> = true;
 
         template <typename, typename = void, typename...>
-        constexpr bool has_await_transform{};
+        inline constexpr bool has_await_transform = false;
 
         template <typename Promise, typename... Ts>
-        constexpr bool has_await_transform<Promise,
+        inline constexpr bool has_await_transform<Promise,
             std::void_t<decltype(std::declval<Promise>().await_transform(
-                ((Ts &&) std::declval<Ts>())...))>,
+                HPX_FORWARD(Ts, std::declval<Ts>())...))>,
             Ts...> = true;
 
     }    // namespace detail
@@ -149,39 +151,41 @@ namespace hpx { namespace execution { namespace experimental {
     {
         if constexpr (detail::has_member_operator_co_await_v<Awaitable>)
         {
-            return ((Awaitable &&) await).operator co_await();
+            return ((HPX_FORWARD(Awaitable, await))).operator co_await();
         }
         else if constexpr (detail::has_free_operator_co_await_v<Awaitable>)
         {
-            return operator co_await((Awaitable &&) await);
+            return operator co_await(HPX_FORWARD(Awaitable, await));
         }
         else
         {
-            return (Awaitable &&) await;
+            return HPX_FORWARD(Awaitable, await);
         }
     }
 
     template <typename Awaitable, typename Promise,
-        typename = std::enable_if_t<
-            detail::has_await_transform<Promise, Awaitable>, void>>
+        typename =
+            std::enable_if_t<detail::has_await_transform<Promise, Awaitable>>>
     decltype(auto) get_awaiter(Awaitable&& await, Promise* promise)
     {
         if constexpr (detail::has_member_operator_co_await_v<decltype(
-                          promise->await_transform((Awaitable &&) await))>)
+                          promise->await_transform(
+                              HPX_FORWARD(Awaitable, await)))>)
         {
-            return promise->await_transform((Awaitable &&) await)
+            return promise->await_transform(HPX_FORWARD(Awaitable, await))
                 .
                 operator co_await();
         }
         else if constexpr (detail::has_free_operator_co_await_v<decltype(
-                               promise->await_transform((Awaitable &&) await))>)
+                               promise->await_transform(
+                                   HPX_FORWARD(Awaitable, await)))>)
         {
             return operator co_await(
-                promise->await_transform((Awaitable &&) await));
+                promise->await_transform(HPX_FORWARD(Awaitable, await)));
         }
         else
         {
-            return promise->await_transform((Awaitable &&) await);
+            return promise->await_transform(HPX_FORWARD(Awaitable, await));
         }
     }
 
@@ -203,13 +207,13 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Awaitable, typename Promise>
         struct is_awaitable_impl<true, Awaitable, Promise>
           : std::integral_constant<bool,
-                is_await_suspend_result_t<decltype(get_awaiter(
+                is_await_suspend_result_v<decltype(get_awaiter(
                     std::declval<Awaitable>(), std::declval<Promise>()))>>
         {
         };
     }    // namespace detail
 
-    template <typename Awaitable, typename Promise>
+    template <typename Awaitable, typename Promise = void>
     struct is_awaitable
       : detail::is_awaitable_impl<
             detail::has_await_suspend<Awaitable,
