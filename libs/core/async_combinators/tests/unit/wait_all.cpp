@@ -21,6 +21,13 @@ hpx::future<int> make_future()
 void test_wait_all()
 {
     {
+        auto f1 = make_future();
+
+        HPX_TEST(!hpx::wait_all_nothrow(f1));
+
+        HPX_TEST(f1.is_ready());
+    }
+    {
         std::vector<hpx::future<int>> future_array;
         future_array.push_back(make_future());
         future_array.push_back(make_future());
@@ -98,6 +105,25 @@ void test_wait_all()
         try
         {
             hpx::wait_all(f1, f2);
+            HPX_TEST(false);
+        }
+        catch (std::runtime_error const&)
+        {
+            caught_exception = true;
+        }
+        catch (...)
+        {
+            HPX_TEST(false);
+        }
+        HPX_TEST(caught_exception);
+    }
+    {
+        auto f1 = hpx::make_exceptional_future<int>(std::runtime_error(""));
+
+        bool caught_exception = false;
+        try
+        {
+            hpx::wait_all(f1);
             HPX_TEST(false);
         }
         catch (std::runtime_error const&)
