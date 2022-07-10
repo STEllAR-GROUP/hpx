@@ -195,30 +195,17 @@ namespace hpx { namespace execution { namespace experimental {
     // passing the awaited value.
     // Otherwise, if the promise type does not define an await_transform()
     // member then the awaitable is the awaited value itself.
-    namespace detail {
-        template <bool hasAwaitSuspend, typename Awaitable, typename Promise>
-        struct is_awaitable_impl;
-
-        template <typename Awaitable, typename Promise>
-        struct is_awaitable_impl<false, Awaitable, Promise> : std::false_type
-        {
-        };
-
-        template <typename Awaitable, typename Promise>
-        struct is_awaitable_impl<true, Awaitable, Promise>
-          : std::integral_constant<bool,
-                is_await_suspend_result_v<decltype(get_awaiter(
-                    std::declval<Awaitable>(), std::declval<Promise>()))>>
-        {
-        };
-    }    // namespace detail
-
+    //
+    // The awaitable concept simply checks whether the type supports
+    // applying the co_await operator to avalue of that type.
+    // If the object has either a member or non-member operator co_await()
+    // then its return value must satisfy the Awaiter concept. Otherwise,
+    // the Awaitable object must satisfy the Awaiter concept itself.
     template <typename Awaitable, typename Promise = void>
     struct is_awaitable
-      : detail::is_awaitable_impl<
-            detail::has_await_suspend<Awaitable,
-                decltype(std::coroutine_handle<Promise>{})>,
-            Awaitable, Promise>
+      : std::integral_constant<bool,
+            is_awaiter_v<decltype(get_awaiter(
+                std::declval<Awaitable>(), std::declval<Promise>()))>>
     {
     };
 
