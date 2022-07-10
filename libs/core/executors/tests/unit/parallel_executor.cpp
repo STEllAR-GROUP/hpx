@@ -152,20 +152,14 @@ void static_check_executor()
     using namespace hpx::traits;
     using executor = hpx::execution::parallel_executor;
 
-    static_assert(has_sync_execute_member<executor>::value,
-        "has_sync_execute_member<executor>::value");
-    static_assert(has_async_execute_member<executor>::value,
-        "has_async_execute_member<executor>::value");
-    static_assert(has_then_execute_member<executor>::value,
-        "has_then_execute_member<executor>::value");
-    static_assert(!has_bulk_sync_execute_member<executor>::value,
-        "!has_bulk_sync_execute_member<executor>::value");
-    static_assert(has_bulk_async_execute_member<executor>::value,
-        "has_bulk_async_execute_member<executor>::value");
-    static_assert(has_bulk_then_execute_member<executor>::value,
-        "has_bulk_then_execute_member<executor>::value");
-    static_assert(has_post_member<executor>::value,
-        "check has_post_member<executor>::value");
+    static_assert(
+        is_one_way_executor_v<executor>, "is_one_way_executor_v<executor>");
+    static_assert(is_never_blocking_one_way_executor_v<executor>,
+        "is_never_blocking_one_way_executor_v<executor>");
+    static_assert(
+        is_two_way_executor_v<executor>, "is_two_way_executor_v<executor>");
+    static_assert(is_bulk_two_way_executor_v<executor>,
+        "is_bulk_two_way_executor_v<executor>");
 }
 
 ///////////////////////////////////////////////////////////////////////////////

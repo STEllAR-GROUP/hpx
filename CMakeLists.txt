@@ -1666,8 +1666,12 @@ if(WIN32)
     # Exceptions
     hpx_add_target_compile_option(-EHsc)
     if(MSVC_VERSION GREATER_EQUAL 1900)
-      # assume conforming (throwing) operator new implementations
-      hpx_add_target_compile_option(-Zc:throwingNew PUBLIC)
+      if(NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"
+              AND "x${CMAKE_CXX_SIMULATE_ID}" STREQUAL "xMSVC")
+      )
+        # assume conforming (throwing) operator new implementations
+        hpx_add_target_compile_option(-Zc:throwingNew PUBLIC)
+      endif()
 
       # enable faster linking (requires VS2015 Update1) disabled for now as this
       # flag crashes debugger hpx_remove_link_flag(/debug CONFIGURATIONS Debug)

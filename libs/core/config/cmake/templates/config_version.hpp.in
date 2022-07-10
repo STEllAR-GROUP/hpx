@@ -77,7 +77,7 @@ namespace hpx {
 // library, forcing to resolve the variable HPX_CHECK_VERSION.
 namespace {
     // Note: this function is never executed.
-#if defined(__GNUG__)
+#if defined(__GNUG__) || defined(__clang__)
     __attribute__((unused))
 #endif
     char const*

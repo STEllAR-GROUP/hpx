@@ -122,9 +122,11 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename Executor, typename F, typename... Ts>
     struct dataflow_return_impl_executor<Executor, F, hpx::tuple<Ts...>>
     {
-        using type = decltype(
-            hpx::parallel::execution::async_execute(std::declval<Executor&&>(),
-                std::declval<F>(), std::declval<Ts>()...));
+        // clang-format off
+        using type = decltype(hpx::parallel::execution::async_execute(
+            std::declval<Executor&&>(), std::declval<F>(),
+            std::declval<Ts>()...));
+        // clang-format on
     };
 
     template <typename Policy, typename F, typename Args>
@@ -149,6 +151,7 @@ namespace hpx { namespace lcos { namespace detail {
     {
     };
 
+    // clang-format off
     template <typename Executor, typename Frame, typename Func,
         typename Futures>
     struct has_dataflow_finalize<Executor, Frame, Func, Futures,
@@ -158,6 +161,7 @@ namespace hpx { namespace lcos { namespace detail {
       : std::true_type
     {
     };
+    // clang-format on
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Policy, typename Func, typename Futures>
@@ -252,7 +256,8 @@ namespace hpx { namespace lcos { namespace detail {
             hpx::execution::parallel_policy_executor<launch::async_policy> exec{
                 policy};
 
-            exec.post(HPX_MOVE(this_f_), HPX_FORWARD(Futures_, futures));
+            hpx::parallel::execution::post(
+                exec, HPX_MOVE(this_f_), HPX_FORWARD(Futures_, futures));
         }
 
         template <typename Futures_>
@@ -263,7 +268,8 @@ namespace hpx { namespace lcos { namespace detail {
             hpx::execution::parallel_policy_executor<launch::fork_policy> exec{
                 policy};
 
-            exec.post(HPX_MOVE(this_f_), HPX_FORWARD(Futures_, futures));
+            hpx::parallel::execution::post(
+                exec, HPX_MOVE(this_f_), HPX_FORWARD(Futures_, futures));
         }
 
         template <typename Futures_>

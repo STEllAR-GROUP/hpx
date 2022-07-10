@@ -12,6 +12,7 @@ set(tests
     fork_join_executor
     limiting_executor
     parallel_executor
+    parallel_executor_parameters
     parallel_fork_executor
     parallel_policy_executor
     polymorphic_executor

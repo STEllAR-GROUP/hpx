@@ -33,13 +33,15 @@ struct void_parallel_executor : hpx::execution::parallel_executor
     using base_type = hpx::execution::parallel_executor;
 
     template <typename F, typename Shape, typename... Ts>
-    std::vector<hpx::future<void>> bulk_async_execute(
-        F&& f, Shape const& shape, Ts&&... ts)
+    friend auto tag_invoke(hpx::parallel::execution::bulk_async_execute_t,
+        void_parallel_executor const& exec, F&& f, Shape const& shape,
+        Ts&&... ts)
     {
         std::vector<hpx::future<void>> results;
         for (auto const& elem : shape)
         {
-            results.push_back(this->base_type::async_execute(f, elem, ts...));
+            results.push_back(hpx::parallel::execution::async_execute(
+                static_cast<base_type const&>(exec), f, elem, ts...));
         }
         return results;
     }
@@ -47,8 +49,8 @@ struct void_parallel_executor : hpx::execution::parallel_executor
     template <typename F, typename Shape, typename... Ts>
     void bulk_sync_execute(F&& f, Shape const& shape, Ts&&... ts)
     {
-        return hpx::unwrap(bulk_async_execute(
-            std::forward<F>(f), shape, std::forward<Ts>(ts)...));
+        return hpx::unwrap(hpx::parallel::execution::bulk_async_execute(
+            *this, std::forward<F>(f), shape, std::forward<Ts>(ts)...));
     }
 };
 
