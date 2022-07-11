@@ -20,10 +20,10 @@ namespace hpx { namespace ranges {
     ///                     forward iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a hpx::parallel::util::projection_identity.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced).
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a hpx::parallel::util::projection_identity.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of that the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements of
@@ -52,7 +52,8 @@ namespace hpx { namespace ranges {
     ///           false. If the range [first, last) contains less than two
     ///           elements, the function is always true.
     ///
-    template <typename FwdIter, typename Sent, typename Pred,
+    template <typename FwdIter, typename Sent,
+        typename Pred,
         typename Proj = hpx::parallel::util::projection_identity>
     bool is_partitioned(
         FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj());
@@ -71,11 +72,11 @@ namespace hpx { namespace ranges {
     ///                     forward iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a hpx::parallel::util::projection_identity.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). \a Pred must be \a CopyConstructible
     ///                     when using a parallel policy.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a hpx::parallel::util::projection_identity.
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
@@ -118,9 +119,10 @@ namespace hpx { namespace ranges {
     ///           false. If the range [first, last) contains less than two
     ///           elements, the function is always true.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent, typename Pred,
+    template <typename ExPolicy, typename FwdIter, typename Sent,
+        typename Pred,
         typename Proj = hpx::parallel::util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
+    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
     is_partitioned(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
         Proj&& proj = Proj());
 
@@ -132,10 +134,10 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an forward iterator.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a hpx::parallel::util::projection_identity.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced).
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a hpx::parallel::util::projection_identity.
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
     /// \param pred         Refers to the unary predicate which returns true
@@ -162,7 +164,8 @@ namespace hpx { namespace ranges {
     ///           false. If the range rng contains less than two
     ///           elements, the function is always true.
     ///
-    template <typename Rng, typename Pred,
+    template <typename Rng,
+        typename Pred,
         typename Proj = hpx::parallel::util::projection_identity>
     bool is_partitioned(Rng&& rng, Pred&& pred, Proj&& proj = Proj());
 
@@ -178,11 +181,11 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an forward iterator.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a hpx::parallel::util::projection_identity.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). \a Pred must be \a CopyConstructible
     ///                     when using a parallel policy.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a hpx::parallel::util::projection_identity.
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
@@ -223,9 +226,10 @@ namespace hpx { namespace ranges {
     ///           false. If the range rng contains less than two
     ///           elements, the function is always true.
     ///
-    template <typename ExPolicy, typename Rng, typename Pred,
+    template <typename ExPolicy, typename Rng,
+        typename Pred,
         typename Proj = hpx::parallel::util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
+    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
     is_partitioned(
         ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj());
 }}    // namespace hpx::ranges
