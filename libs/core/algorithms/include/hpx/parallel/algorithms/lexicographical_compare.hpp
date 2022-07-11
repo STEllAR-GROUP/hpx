@@ -20,11 +20,11 @@ namespace hpx {
     ///         operation, where N1 = std::distance(first1, last)
     ///         and N2 = std::distance(first2, last2).
     ///
-    /// \tparam InIter1    The type of the source iterators used for the
+    /// \tparam InIter1     The type of the source iterators used for the
     ///                     first range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
-    /// \tparam InIter2    The type of the source iterators used for the
+    /// \tparam InIter2     The type of the source iterators used for the
     ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
@@ -147,7 +147,8 @@ namespace hpx {
     ///           if the first range is lexicographically less, otherwise
     ///           it returns false.
     ///           range [first2, last2), it returns false.
-    template <typename FwdIter1, typename FwdIter2, typename Pred>
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename Pred>
     typename util::detail::algorithm_result<ExPolicy, bool>::type
     lexicographical_compare(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, FwdIter2 last2, Pred&& pred);
