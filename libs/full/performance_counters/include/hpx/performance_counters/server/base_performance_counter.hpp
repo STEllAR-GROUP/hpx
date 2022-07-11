@@ -16,6 +16,8 @@
 #include <hpx/performance_counters/performance_counter_base.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server {
 
@@ -111,6 +113,8 @@ namespace hpx { namespace performance_counters { namespace server {
         util::atomic_count invocation_count_;
     };
 }}}    // namespace hpx::performance_counters::server
+
+#include <hpx/config/warnings_suffix.hpp>
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(hpx::performance_counters::server::
         base_performance_counter ::get_counter_info_action)

@@ -64,7 +64,10 @@
 #include <hpx/init_runtime/pre_main.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/naming.hpp>
+#if defined(HPX_HAVE_NETWORKING)
 #include <hpx/parcelset/parcelhandler.hpp>
+#include <hpx/parcelset_base/locality_interface.hpp>
+#endif
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/runtime_distributed.hpp>
@@ -713,6 +716,16 @@ namespace hpx {
                 &hpx::terminate);
             hpx::parallel::util::detail::
                 set_parallel_exception_termination_handler(&hpx::terminate);
+
+            // instantiate the interface function initialization objects
+#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+#if defined(HPX_HAVE_NETWORKING)
+            parcelset::locality_init();
+#endif
+            agas::agas_init();
+            agas::runtime_components_init();
+            components::counter_init();
+#endif
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__) || defined(__bgqion__)
             unsetenv("LANG");

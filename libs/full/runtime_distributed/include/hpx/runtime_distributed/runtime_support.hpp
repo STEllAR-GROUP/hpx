@@ -152,3 +152,14 @@ namespace hpx { namespace components {
         hpx::id_type gid_;
     };
 }}    // namespace hpx::components
+
+///////////////////////////////////////////////////////////////////////////////
+// initialize runtime interface function wrappers
+namespace hpx::agas {
+    struct runtime_components_init_interface_functions&
+    runtime_components_init();
+}
+
+namespace hpx::components {
+    struct counter_interface_functions& counter_init();
+}    // namespace hpx::components

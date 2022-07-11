@@ -167,7 +167,10 @@ function(add_hpx_executable name)
     endif()
     set(_target_flags INSTALL INSTALL_FLAGS DESTINATION ${install_destination})
     # install PDB if needed
-    if(MSVC)
+    if(MSVC
+       AND NOT ${name}_STATIC
+       AND NOT HPX_WITH_STATIC_LINKING
+    )
       # cmake-format: off
       set(_target_flags
           ${_target_flags}

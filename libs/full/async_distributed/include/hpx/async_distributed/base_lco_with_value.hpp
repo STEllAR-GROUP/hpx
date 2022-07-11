@@ -421,8 +421,9 @@ namespace hpx { namespace components { namespace detail {
         HPX_PP_CAT(                                                            \
             HPX_PP_CAT(base_lco_with_value_, Name), Tag)::set_value_action,    \
         "lco_set_value_action", std::size_t(-1), std::size_t(-1))              \
-/**/
+    /**/
 
+#if !defined(HPX_HAVE_STATIC_LINKING)
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::naming::gid_type, gid_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
@@ -453,3 +454,4 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<std::uint32_t>, vector_std_uint32_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::util::section, hpx_section)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::string, std_string)
+#endif

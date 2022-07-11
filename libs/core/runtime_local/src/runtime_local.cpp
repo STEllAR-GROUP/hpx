@@ -400,30 +400,31 @@ namespace hpx {
 
             // copy over all startup functions registered so far
             for (startup_function_type& f :
-                detail::global_pre_startup_functions)
+                detail::global_pre_startup_functions())
             {
                 add_pre_startup_function(HPX_MOVE(f));
             }
-            detail::global_pre_startup_functions.clear();
+            detail::global_pre_startup_functions().clear();
 
-            for (startup_function_type& f : detail::global_startup_functions)
+            for (startup_function_type& f : detail::global_startup_functions())
             {
                 add_startup_function(HPX_MOVE(f));
             }
-            detail::global_startup_functions.clear();
+            detail::global_startup_functions().clear();
 
             for (shutdown_function_type& f :
-                detail::global_pre_shutdown_functions)
+                detail::global_pre_shutdown_functions())
             {
                 add_pre_shutdown_function(HPX_MOVE(f));
             }
-            detail::global_pre_shutdown_functions.clear();
+            detail::global_pre_shutdown_functions().clear();
 
-            for (shutdown_function_type& f : detail::global_shutdown_functions)
+            for (shutdown_function_type& f :
+                detail::global_shutdown_functions())
             {
                 add_shutdown_function(HPX_MOVE(f));
             }
-            detail::global_shutdown_functions.clear();
+            detail::global_shutdown_functions().clear();
         }
         catch (std::exception const& e)
         {
@@ -1114,10 +1115,31 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////
         // There is no need to protect these global from thread concurrent
         // access as they are access during early startup only.
-        std::list<startup_function_type> global_pre_startup_functions;
-        std::list<startup_function_type> global_startup_functions;
-        std::list<shutdown_function_type> global_pre_shutdown_functions;
-        std::list<shutdown_function_type> global_shutdown_functions;
+        std::list<startup_function_type>& global_pre_startup_functions()
+        {
+            static std::list<startup_function_type>
+                global_pre_startup_functions_;
+            return global_pre_startup_functions_;
+        }
+
+        std::list<startup_function_type>& global_startup_functions()
+        {
+            static std::list<startup_function_type> global_startup_functions_;
+            return global_startup_functions_;
+        }
+
+        std::list<shutdown_function_type>& global_pre_shutdown_functions()
+        {
+            static std::list<shutdown_function_type>
+                global_pre_shutdown_functions_;
+            return global_pre_shutdown_functions_;
+        }
+
+        std::list<shutdown_function_type>& global_shutdown_functions()
+        {
+            static std::list<shutdown_function_type> global_shutdown_functions_;
+            return global_shutdown_functions_;
+        }
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1137,7 +1159,7 @@ namespace hpx {
         }
         else
         {
-            detail::global_pre_startup_functions.push_back(HPX_MOVE(f));
+            detail::global_pre_startup_functions().push_back(HPX_MOVE(f));
         }
     }
 
@@ -1156,7 +1178,7 @@ namespace hpx {
         }
         else
         {
-            detail::global_startup_functions.push_back(HPX_MOVE(f));
+            detail::global_startup_functions().push_back(HPX_MOVE(f));
         }
     }
 
@@ -1176,7 +1198,7 @@ namespace hpx {
         }
         else
         {
-            detail::global_pre_shutdown_functions.push_back(HPX_MOVE(f));
+            detail::global_pre_shutdown_functions().push_back(HPX_MOVE(f));
         }
     }
 
@@ -1196,7 +1218,7 @@ namespace hpx {
         }
         else
         {
-            detail::global_shutdown_functions.push_back(HPX_MOVE(f));
+            detail::global_shutdown_functions().push_back(HPX_MOVE(f));
         }
     }
 

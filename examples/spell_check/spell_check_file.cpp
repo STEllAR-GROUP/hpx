@@ -14,6 +14,7 @@
 #include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
 
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -40,7 +41,7 @@ std::string search(int start, int end, std::string const& word)
         {
             int pos = mid / 2;
 
-            int size;
+            std::size_t size;
             //if our value is lower than start, we disregard it.
             if (word.length() >= check.length())
                 size = check.length();
@@ -48,7 +49,7 @@ std::string search(int start, int end, std::string const& word)
                 size = word.length();
             std::string part;
             bool sub = true;
-            for (int i = 0; i < size; i++)
+            for (std::size_t i = 0; i < size; i++)
             {
                 char check_char = static_cast<char>(tolower(check[i]));
                 char word_char = word[i];
@@ -75,13 +76,13 @@ std::string search(int start, int end, std::string const& word)
             return "";
         }
     }
-    int size;
+    std::size_t size;
     //if our value is lower than start, we disregard it.
     if (word.length() >= check.length())
         size = check.length();
     else
         size = word.length();
-    for (int i = 0; i < size; i++)
+    for (std::size_t i = 0; i < size; i++)
     {
         char check_char = static_cast<char>(tolower(check[i]));
         char word_char = word[i];
