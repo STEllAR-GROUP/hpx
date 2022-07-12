@@ -59,7 +59,7 @@ namespace hpx {
 
     /////////////////////////////////////////////////////////////////////////////
     /// Finds the smallest element in the range [first, last) using the given
-    /// comparison function \a f.
+    /// comparison function \a f. Executed according to the policy.
     ///
     /// \note   Complexity: Exactly \a max(N-1, 0) comparisons, where
     ///                     N = std::distance(first, last).
@@ -117,7 +117,7 @@ namespace hpx {
     ///           returns the iterator to the first such element. Returns last
     ///           if the range is empty.
     ///
-    template <typename ExPolicy, typename FwdIter, typename T>
+    template <typename ExPolicy, typename FwdIter, typename F>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
     min_element(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
 
@@ -169,7 +169,7 @@ namespace hpx {
     /////////////////////////////////////////////////////////////////////////////
     /// Removes all elements satisfying specific criteria from the range
     /// Finds the largest element in the range [first, last) using the given
-    /// comparison function \a f.
+    /// comparison function \a f. Executed according to the policy.
     ///
     /// \note   Complexity: Exactly \a max(N-1, 0) comparisons, where
     ///                     N = std::distance(first, last).
@@ -272,7 +272,7 @@ namespace hpx {
     ///           The \a minmax_element algorithm returns a pair consisting of
     ///           an iterator to the smallest element as the min element and
     ///           an iterator to the largest element as the max element. Returns
-    ///           minmax_element_result<FwdIter>{first, first} if the range is empty. If
+    ///           \a minmax_element_result<FwdIter>{first,first} if the range is empty. If
     ///           several elements are equivalent to the smallest element, the
     ///           iterator to the first such element is returned. If several
     ///           elements are equivalent to the largest element, the iterator
@@ -300,8 +300,6 @@ namespace hpx {
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a minmax_element requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -323,10 +321,6 @@ namespace hpx {
     ///                     it. The type \a Type1 must be such that objects of
     ///                     type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to \a Type1.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
     ///
     /// The comparisons in the parallel \a minmax_element algorithm invoked with
     /// an execution policy object of type \a sequenced_policy
@@ -339,7 +333,7 @@ namespace hpx {
     /// within each thread.
     ///
     /// \returns  The \a minmax_element algorithm returns a
-    /// \a minmax_element_result<FwdIter><FwdIter>
+    ///           \a hpx::future<minmax_element_result<FwdIter>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy
@@ -348,7 +342,7 @@ namespace hpx {
     ///           The \a minmax_element algorithm returns a pair consisting of
     ///           an iterator to the smallest element as the min element and
     ///           an iterator to the largest element as the max element. Returns
-    ///           std::make_pair(first, first) if the range is empty. If
+    ///           \a std::make_pair(first,first) if the range is empty. If
     ///           several elements are equivalent to the smallest element, the
     ///           iterator to the first such element is returned. If several
     ///           elements are equivalent to the largest element, the iterator
