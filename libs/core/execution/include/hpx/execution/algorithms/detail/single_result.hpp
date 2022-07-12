@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/type_support/meta.hpp>
+#include <hpx/datastructures/variant.hpp>
 
 #include <cstddef>
 #include <type_traits>
-#include <variant>
 
 namespace hpx::execution::experimental::detail {
 
