@@ -9,7 +9,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/tuple.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include "algorithm_test_utils.hpp"
 
