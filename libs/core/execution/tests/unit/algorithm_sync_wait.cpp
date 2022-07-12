@@ -121,8 +121,8 @@ int hpx_main()
 
     // cancellation path
     {
-        auto result = hpx::get<0>(*(stopped_sender{} | tt::sync_wait()));
-        HPX_TEST(!result);
+        auto result = stopped_sender_with_value_type{} | tt::sync_wait();
+        HPX_TEST(!result);    // returned optional should be empty
     }
 
     return hpx::local::finalize();

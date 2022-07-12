@@ -679,8 +679,9 @@ void test_future_sender()
         static_assert(ex::is_sender_v<std::decay_t<decltype(f)>>,
             "a future should be a sender");
         static_assert(
-            std::is_void<decltype(tt::sync_wait(std::move(f)))>::value,
-            "sync_wait should return void");
+            std::is_same_v<std::decay_t<decltype(*tt::sync_wait(std::move(f)))>,
+                hpx::tuple<>>,
+            "sync_wait should return hpx::tuple<>");
 
         tt::sync_wait(std::move(f));
         HPX_TEST(called);
@@ -735,8 +736,8 @@ void test_future_sender()
             return 42;
         });
 
-        HPX_TEST_EQ(
-            tt::sync_wait(ex::then(std::move(f), [](int x) { return x / 2; })),
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(
+                        ex::then(std::move(f), [](int x) { return x / 2; }))),
             21);
         HPX_TEST(called);
     }
@@ -747,9 +748,10 @@ void test_future_sender()
 
         static_assert(ex::is_sender_v<std::decay_t<decltype(sf)>>,
             "a shared_future should be a sender");
-        static_assert(
-            std::is_void<decltype(tt::sync_wait(std::move(sf)))>::value,
-            "sync_wait should return void");
+        static_assert(std::is_same_v<
+                          std::decay_t<decltype(*tt::sync_wait(std::move(sf)))>,
+                          hpx::tuple<>>,
+            "sync_wait should return hpx::tuple<>");
 
         tt::sync_wait(sf);
         tt::sync_wait(sf);

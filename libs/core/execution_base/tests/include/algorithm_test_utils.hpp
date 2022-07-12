@@ -145,6 +145,36 @@ struct stopped_sender
             hpx::execution::experimental::set_stopped_t()>;
 };
 
+struct stopped_sender_with_value_type
+{
+    template <typename R>
+    struct operation_state
+    {
+        std::decay_t<R> r;
+        friend void tag_invoke(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
+        {
+            hpx::execution::experimental::set_stopped(std::move(os.r));
+        }
+    };
+
+    template <typename R>
+    friend operation_state<R> tag_invoke(
+        hpx::execution::experimental::connect_t, stopped_sender_with_value_type,
+        R&& r)
+    {
+        return {std::forward<R>(r)};
+    }
+
+    template <typename Env>
+    friend auto tag_invoke(
+        hpx::execution::experimental::get_completion_signatures_t,
+        stopped_sender_with_value_type const&, Env)
+        -> hpx::execution::experimental::completion_signatures<
+            hpx::execution::experimental::set_stopped_t(),
+            hpx::execution::experimental::set_value_t()>;
+};
+
 template <typename F>
 struct callback_receiver
 {
