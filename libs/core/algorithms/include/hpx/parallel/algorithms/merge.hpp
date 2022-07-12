@@ -17,6 +17,7 @@ namespace hpx {
     /// For equivalent elements in the original two ranges, the elements from
     /// the first range precede the elements from the second range.
     /// The destination range cannot overlap with either of the input ranges.
+    /// Executed according to the policy.
     ///
     /// \note   Complexity: Performs
     ///         O(std::distance(first1, last1) + std::distance(first2, last2))
@@ -80,7 +81,7 @@ namespace hpx {
     /// within each thread.
     ///
     /// \returns  The \a merge algorithm returns a
-    /// \a hpx::future<RandIter3> >
+    ///           \a hpx::future<RandIter3> >
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns
@@ -94,11 +95,74 @@ namespace hpx {
     merge(ExPolicy&& policy, RandIter1 first1, RandIter1 last1,
         RandIter2 first2, RandIter2 last2, RandIter3 dest, Comp&& comp = Comp());
 
+    /// Merges two sorted ranges [first1, last1) and [first2, last2)
+    /// into one sorted range beginning at \a dest. The order of
+    /// equivalent elements in the each of original two ranges is preserved.
+    /// For equivalent elements in the original two ranges, the elements from
+    /// the first range precede the elements from the second range.
+    /// The destination range cannot overlap with either of the input ranges.
+    ///
+    /// \note   Complexity: Performs
+    ///         O(std::distance(first1, last1) + std::distance(first2, last2))
+    ///         applications of the comparison \a comp and the each projection.
+    ///
+    /// \tparam RandIter1   The type of the source iterators used (deduced)
+    ///                     representing the first sorted range.
+    ///                     This iterator type must meet the requirements of an
+    ///                     random access iterator.
+    /// \tparam RandIter2   The type of the source iterators used (deduced)
+    ///                     representing the second sorted range.
+    ///                     This iterator type must meet the requirements of an
+    ///                     random access iterator.
+    /// \tparam RandIter3   The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     random access iterator.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a merge requires \a Comp to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::less<>
+    ///
+    /// \param first1       Refers to the beginning of the first range of elements
+    ///                     the algorithm will be applied to.
+    /// \param last1        Refers to the end of the first range of elements
+    ///                     the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the second range of elements
+    ///                     the algorithm will be applied to.
+    /// \param last2        Refers to the end of the second range of elements
+    ///                     the algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param comp         \a comp is a callable object which returns true if
+    ///                     the first argument is less than the second,
+    ///                     and false otherwise. The signature of this
+    ///                     comparison should be equivalent to:
+    ///                     \code
+    ///                     bool comp(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such that
+    ///                     objects of types \a RandIter1 and \a RandIter2 can be
+    ///                     dereferenced and then implicitly converted to
+    ///                     both \a Type1 and \a Type2
+    ///
+    /// \returns  The \a merge algorithm returns a \a RandIter3.
+    ///           The \a merge algorithm returns the destination iterator to
+    ///           the end of the \a dest range.
+    ///
+    template <typename RandIter1, typename RandIter2,
+        typename RandIter3, typename Comp = detail::less>
+    RandIter3 merge(RandIter1 first1, RandIter1 last1,
+        RandIter2 first2, RandIter2 last2, RandIter3 dest, Comp&& comp = Comp());
+
     /// Merges two consecutive sorted ranges [first, middle) and
     /// [middle, last) into one sorted range [first, last). The order of
     /// equivalent elements in the each of original two ranges is preserved.
     /// For equivalent elements in the original two ranges, the elements from
-    /// the first range precede the elements from the second range.
+    /// the first range precede the elements from the second range. Executed
+    /// according to the policy.
+    ///
     ///
     /// \note   Complexity: Performs O(std::distance(first, last))
     ///         applications of the comparison \a comp and the each projection.
@@ -154,7 +218,7 @@ namespace hpx {
     ///           \a sequenced_task_policy or \a parallel_task_policy
     ///           and returns void otherwise.
     ///           The \a inplace_merge algorithm returns
-    ///           the source iterator \a last
+    ///           the source iterator \a last.
     ///
     template <typename ExPolicy, typename RandIter,
         typename Comp = detail::less>
@@ -162,6 +226,52 @@ namespace hpx {
     inplace_merge(ExPolicy&& policy, RandIter first, RandIter middle,
         RandIter last, Comp&& comp = Comp());
 
+    /// Merges two consecutive sorted ranges [first, middle) and
+    /// [middle, last) into one sorted range [first, last). The order of
+    /// equivalent elements in the each of original two ranges is preserved.
+    /// For equivalent elements in the original two ranges, the elements from
+    /// the first range precede the elements from the second range.
+    ///
+    /// \note   Complexity: Performs O(std::distance(first, last))
+    ///         applications of the comparison \a comp and the each projection.
+    ///
+    /// \tparam RandIter    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     random access iterator.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a inplace_merge requires \a Comp
+    ///                     to meet the requirements of \a CopyConstructible.
+    ///                     This defaults to std::less<>
+    ///
+    /// \param first        Refers to the beginning of the first sorted range
+    ///                     the algorithm will be applied to.
+    /// \param middle       Refers to the end of the first sorted range and
+    ///                     the beginning of the second sorted range
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the second sorted range
+    ///                     the algorithm will be applied to.
+    /// \param comp         \a comp is a callable object which returns true if
+    ///                     the first argument is less than the second,
+    ///                     and false otherwise. The signature of this
+    ///                     comparison should be equivalent to:
+    ///                     \code
+    ///                     bool comp(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be
+    ///                     such that objects of types \a RandIter can be
+    ///                     dereferenced and then implicitly converted to both
+    ///                     \a Type1 and \a Type2
+    ///
+    /// \returns  The \a inplace_merge algorithm returns a \a void.
+    ///           The \a inplace_merge algorithm returns
+    ///           the source iterator \a last.
+    ///
+    template <typename RandIter, typename Comp = detail::less>
+    void inplace_merge(RandIter first, RandIter middle,
+        RandIter last, Comp&& comp = Comp());
     // clang-format on
 }    // namespace hpx
 
