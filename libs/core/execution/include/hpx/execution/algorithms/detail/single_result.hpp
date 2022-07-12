@@ -8,8 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/meta.hpp>
 #include <hpx/datastructures/variant.hpp>
+#include <hpx/type_support/meta.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>
