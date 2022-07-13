@@ -35,6 +35,7 @@ struct point_member_serialization
         // clang-format on
     }
 };
+
 // Allow bitwise serialization
 HPX_IS_BITWISE_SERIALIZABLE(point_member_serialization)
 //]
@@ -67,8 +68,7 @@ void serialize(Archive& ar, rectangle_free& pt, const unsigned int)
 {
     // clang-format off
     ar & pt.lower_right & pt.top_left;
-    // clang-format one
-
+    // clang-format on
 }
 //]
 
@@ -84,12 +84,12 @@ public:
 
     point_class() = default;
 
-    [[nodiscard]] int getX() const noexcept
+    [[nodiscard]] int get_x() const noexcept
     {
         return x;
     }
 
-    [[nodiscard]] int getY() const noexcept
+    [[nodiscard]] int get_y() const noexcept
     {
         return y;
     }
@@ -110,8 +110,9 @@ void load(Archive& ar, point_class& pt, const unsigned int)
 template <typename Archive>
 void save(Archive& ar, point_class const& pt, const unsigned int)
 {
-    ar << pt.getX() << pt.getY();
+    ar << pt.get_x() << pt.get_y();
 }
+
 // This tells HPX that you have spilt your serialize function into
 // load and save
 HPX_SERIALIZATION_SPLIT_FREE(point_class)
@@ -125,6 +126,7 @@ void send_rectangle_struct(rectangle_free rectangle)
         rectangle.top_left.x, rectangle.top_left.y, rectangle.lower_right.x,
         rectangle.lower_right.y);
 }
+//]
 
 HPX_PLAIN_ACTION(send_rectangle_struct)
 
@@ -141,7 +143,7 @@ public:
     friend void save_construct_data(
         Archive&, planet_weight_calculator const*, unsigned int);
 
-    [[nodiscard]] double getG() const
+    [[nodiscard]] double get_g() const
     {
         return g;
     }
@@ -162,8 +164,8 @@ private:
 
 //[save_construct_data
 template <class Archive>
-inline void save_construct_data(
-    Archive& ar, planet_weight_calculator const* weight_calc, const unsigned int)
+inline void save_construct_data(Archive& ar,
+    planet_weight_calculator const* weight_calc, const unsigned int)
 {
     ar << weight_calc->g;    // Do all of your serialization here
 }
@@ -182,7 +184,7 @@ inline void load_construct_data(
 
 void send_gravity(planet_weight_calculator gravity)
 {
-    std::cout << "gravity.g = " << gravity.getG() << std::flush;
+    std::cout << "gravity.g = " << gravity.get_g() << std::endl;
 }
 
 HPX_PLAIN_ACTION(send_gravity)
@@ -190,15 +192,19 @@ HPX_PLAIN_ACTION(send_gravity)
 //[Main
 int main()
 {
-    // Needs at least two localities to run
-    // When sending to your current locality, no serialization is done
-    send_rectangle_struct_action rectangle_action;
-    auto rectangle = rectangle_free{{0, 0}, {0, 5}};
-    hpx::async(rectangle_action, hpx::find_here(), rectangle).wait();
+    for (int i = 0; i != 1000000; ++i)
+    {
+        // Needs at least two localities to run
+        // When sending to your current locality, no serialization is done
+        send_rectangle_struct_action rectangle_action;
+        auto rectangle = rectangle_free{{0, 0}, {0, 5}};
+        hpx::async(rectangle_action, hpx::find_here(), rectangle).get();
 
-    send_gravity_action gravityAction;
-    auto gravity = planet_weight_calculator(9.81);
-    hpx::async(gravityAction, hpx::find_remote_localities()[0], gravity).wait();
+        send_gravity_action gravityAction;
+        auto gravity = planet_weight_calculator(9.81);
+        hpx::async(gravityAction, hpx::find_remote_localities()[0], gravity)
+            .get();
+    }
     return 0;
 }
 //]
