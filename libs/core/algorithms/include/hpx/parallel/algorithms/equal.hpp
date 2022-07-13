@@ -17,8 +17,8 @@ namespace hpx {
     /// [first2, last2), and false otherwise. Executed according to the
     /// policy.
     ///
-    /// \note   Complexity: At most min(last1 - first1, last2 - first2)
-    ///         applications of the predicate \a f.
+    /// \note   Complexity: O(min(\a last1 - \a first1, \a last2 - \a first2))
+    ///         applications of the predicate \a op.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -96,8 +96,8 @@ namespace hpx {
     /// Returns true if the range [first1, last1) is equal to the range
     /// [first2, last2), and false otherwise. Executed according to policy.
     ///
-    /// \note   Complexity: At most min(last1 - first1, last2 - first2)
-    ///         applications of the predicate \a f.
+    /// \note   Complexity: O(min(\a last1 - \a first1, \a last2 - \a first2))
+    ///         applications of the predicate \a std::equal_to.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -156,8 +156,8 @@ namespace hpx {
     /// Returns true if the range [first1, last1) is equal to the range
     /// starting at first2, and false otherwise. Executed according to policy.
     ///
-    /// \note   Complexity: At most \a last1 - \a first1 applications of the
-    ///         predicate \a f.
+    /// \note   Complexity: O(min(\a last1 - \a first1, \a last2 - \a first2))
+    ///         applications of the predicate \a op.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -232,7 +232,7 @@ namespace hpx {
     /// [first2, last2), and false otherwise. Executed according to policy.
     ///
     /// \note   Complexity: At most \a last1 - \a first1 applications of the
-    ///         predicate \a f.
+    ///         predicate \a op.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -290,7 +290,7 @@ namespace hpx {
     /// [first2, last2), and false otherwise.
     ///
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
-    ///         applications of the predicate \a f.
+    ///         applications of the predicate \a op.
     ///
     /// \tparam FwdIter1    The type of the source iterators used for the
     ///                     first range (deduced).
@@ -348,7 +348,7 @@ namespace hpx {
     /// [first2, last2), and false otherwise.
     ///
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
-    ///         applications of the predicate \a f.
+    ///         applications of the predicate \a std::equal_to.
     ///
     /// \tparam FwdIter1    The type of the source iterators used for the
     ///                     first range (deduced).
@@ -385,8 +385,8 @@ namespace hpx {
     /// Returns true if the range [first1, last1) is equal to the range
     /// [first2, first2 + (last1 - first1)), and false otherwise.
     ///
-    /// \note   Complexity: At most min(last1 - first1, last2 - first2)
-    ///         applications of the predicate \a f.
+    /// \note   Complexity: At most \a last1 - \a first1 applications of the
+    ///         predicate \a op.
     ///
     /// \tparam FwdIter1    The type of the source iterators used for the
     ///                     first range (deduced).

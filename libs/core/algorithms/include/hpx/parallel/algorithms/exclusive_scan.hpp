@@ -215,10 +215,10 @@ namespace hpx {
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam T           The type of the value to be used as initial (and
-    ///                     intermediate) values (deduced).
     /// \tparam Op          The type of the binary function object used for
     ///                     the reduction operation.
+    /// \tparam T           The type of the value to be used as initial (and
+    ///                     intermediate) values (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -276,7 +276,7 @@ namespace hpx {
     /// \a inclusive_scan may be non-deterministic.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T, typename Op>
+    typename Op, typename T>
     typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     exclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, T init, Op&& op);
