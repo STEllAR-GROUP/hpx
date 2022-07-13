@@ -9,6 +9,8 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+    // clang-format off
+    
     /// Determines if the range [first, last) is sorted. Uses pred to
     /// compare elements.
     ///
@@ -19,6 +21,8 @@ namespace hpx { namespace ranges {
     /// \tparam FwdIter     The type of the source iterators used for the
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
     /// \tparam Pred        The type of an optional function/function object to use.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
@@ -73,6 +77,8 @@ namespace hpx { namespace ranges {
     /// \tparam FwdIter     The type of the source iterators used for the
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a is_sorted requires \a Pred to meet the
@@ -173,8 +179,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename Rng, typename Pred = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
-    bool is_sorted(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
-        Proj&& proj = Proj());
+    bool is_sorted(Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     /// Determines if the range rng is sorted. Uses pred to
     /// compare elements.
@@ -254,6 +259,8 @@ namespace hpx { namespace ranges {
     /// \tparam FwdIter     The type of the source iterators used for the
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
     /// \tparam Pred        The type of an optional function/function object to use.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
@@ -307,6 +314,8 @@ namespace hpx { namespace ranges {
     /// \tparam FwdIter     The type of the source iterators used for the
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a is_sorted_until requires \a Pred to meet
@@ -375,6 +384,10 @@ namespace hpx { namespace ranges {
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an forward iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a is_sorted_until requires \a Pred to meet
+    ///                     the requirements of \a CopyConstructible. This defaults
+    ///                     to std::less<>
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
@@ -397,19 +410,15 @@ namespace hpx { namespace ranges {
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
     ///
-    /// The comparison operations in the parallel \a is_sorted_until algorithm
-    /// execute in sequential order in the calling thread.
-    ///
-    /// \returns  The \a is_sorted_until algorithm returns a \a FwdIter.
+    /// \returns  The \a is_sorted_until returns \a FwdIter.
     ///           The \a is_sorted_until algorithm returns the first unsorted
     ///           element. If the sequence has less than two elements or the
     ///           sequence is sorted, last is returned.
     ///
     template <typename Rng, typename Pred = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::traits::range_iterator<Rng>::type is_sorted_until(
-        ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
-        Proj&& proj = Proj());
+    typename hpx::traits::range_iterator<Rng>::type
+    is_sorted_until(Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     /// Returns the first element in the range rng that is not sorted.
     /// Uses a predicate to compare elements or the less than operator.
@@ -479,6 +488,7 @@ namespace hpx { namespace ranges {
         typename hpx::traits::range_iterator<Rng>::type>::type
     is_sorted_until(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
         Proj&& proj = Proj());
+    // clang-format on
 }}    // namespace hpx::ranges
 
 #else

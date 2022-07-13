@@ -1,3 +1,4 @@
+//  Copyright (c) 2022 Dimitra Karatza
 //  Copyright (c) 2021 Karame M.Shokooh
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,244 +12,322 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+    // clang-format off
+
     /// Searches the range [first, last) for two consecutive identical elements.
     ///
     /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
     ///                     (last - first) - 1 application of the predicate
     ///                     where \a result is the value returned
     ///
-    /// \tparam FwdIter     The type of the source iterators used for the
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
     ///                     range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    /// \tparam Pred        The type of an optional function/function object to use.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of the range the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements of
     ///                     the range the algorithm will be applied to.
-    /// \param pred         The binary predicate which returns \a true
-    ///                     if the elements should be treated as equal. The
-    ///                     signature should be equivalent to the following:
-    ///                     \code
-    ///                     bool pred(const Type1 &a, const Type1 &b);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const &, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The types \a Type1 must be such
-    ///                     that objects of type \a FwdIter
-    ///                     can be dereferenced and then implicitly converted
-    ///                     to \a Type1 .
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// \returns  The \a adjacent_find algorithm returns an iterator to the
-    ///           first of the identical elements. If no such elements are
-    ///           found, \a last is returned.
-    template <typename FwdIter, typename Sent,
-        typename Proj = hpx::parallel::util::projection_identity,
-        typename Pred = detail::equal_to>
-    FwdIter adjacent_difference(
-        FwdIter first, Sent last, Pred&& pred = Pred(), Proj&& proj = Proj());
-
-    /// Searches the range [first, last) for two consecutive identical elements.
-    /// This version uses the given binary predicate pred
-    ///
-    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
-    ///                     (last - first) - 1 application of the predicate
-    ///                     where \a result is the value returned
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used for the
-    ///                     range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for InIter.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a adjacent_find requires \a Pred to meet the
-    ///                     requirements of \a CopyConstructible. This defaults
-    ///                     to std::equal_to<>
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     of the range the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements of
-    ///                     the range the algorithm will be applied to.
-    /// \param pred         The binary predicate which returns \a true
-    ///                     if the elements should be treated as equal. The
-    ///                     signature should be equivalent to the following:
-    ///                     \code
-    ///                     bool pred(const Type1 &a, const Type1 &b);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const &, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The types \a Type1 must be such
-    ///                     that objects of type \a FwdIter
-    ///                     can be dereferenced and then implicitly converted
-    ///                     to \a Type1 .
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The comparison operations in the parallel \a adjacent_find invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The comparison operations in the parallel \a adjacent_find invoked
-    /// with an execution policy object of type \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an
-    /// unordered fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<InIter>
-    ///           if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a InIter otherwise.
-    ///           The \a adjacent_find algorithm returns an iterator to the
-    ///           first of the identical elements. If no such elements are
-    ///           found, \a last is returned.
-    ///
-    ///           This overload of \a adjacent_find is available if the user
-    ///           decides to provide their algorithm their own binary
-    ///           predicate \a pred.
-    ///
-    template <typename ExPolicy, typename FwdIter, typename Sent,
-        typename Proj = hpx::parallel::util::projection_identity,
-        typename Pred = detail::equal_to>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    adjacent_find(ExPolicy&& policy, FwdIter first, Sent last,
-        Pred&& pred = Pred(), Proj&& proj = Proj());
-
-    /// Searches the range rng for two consecutive identical elements.
-    ///
-    /// \note   Complexity: Exactly the smaller of (result - std::begin(rng)) + 1
-    ///                     and (std::begin(rng) - std::end(rng)) - 1 applications
-    ///                     of the predicate where \a result is the value returned
-    ///
-    /// \tparam Rng         The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param pred         The binary predicate which returns \a true
-    ///                     if the elements should be treated as equal. The
-    ///                     signature should be equivalent to the following:
-    ///                     \code
-    ///                     bool pred(const Type1 &a, const Type1 &b);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const &, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The types \a Type1 must be such
-    ///                     that objects of type \a FwdIter
-    ///                     can be dereferenced and then implicitly converted
-    ///                     to \a Type1 .
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
+    /// \param dest         Refers to the beginning of the destination range.
     ///
     /// \returns  The \a adjacent_difference algorithm returns an iterator to the
     ///           first of the identical elements. If no such elements are
     ///           found, \a last is returned.
-    template <typename Rng,
-        typename Proj = hpx::parallel::util::projection_identity,
-        typename Pred = detail::equal_to>
-    typename hpx::traits::range_traits<Rng>::iterator_type adjacent_difference(
-        ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
-        Proj&& proj = Proj());
-
-    /// Searches the range rng for two consecutive identical elements.
     ///
-    /// \note   Complexity: Exactly the smaller of (result - std::begin(rng)) + 1
-    ///                     and (std::begin(rng) - std::end(rng)) - 1 applications
-    ///                     of the predicate where \a result is the value returned
+    template <typename FwdIter1, typename FwdIter2, typename Sent>
+    FwdIter2 adjacent_difference(
+        FwdIter1 first, Sent last, FwdIter2 dest);
+    
+    /// Searches the \a rng for two consecutive identical elements.
+    ///
+    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
+    ///                     (last - first) - 1 application of the predicate
+    ///                     where \a result is the value returned
+    ///
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// \returns  The \a adjacent_difference algorithm returns an iterator to the
+    ///           first of the identical elements.
+    ///
+    template <typename Rng, typename FwdIter2>
+    FwdIter2 adjacent_difference(Rng&& rng, FwdIter2 dest);
+
+    /// Searches the range [first, last) for two consecutive identical elements.
+    ///
+    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
+    ///                     (last - first) - 1 application of the predicate
+    ///                     where \a result is the value returned
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for InIter.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// \returns  The \a adjacent_difference algorithm returns an iterator to the
+    ///           first of the identical elements. If no such elements are
+    ///           found, \a last is returned.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename Sent,
+            typename FwdIter2>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            FwdIter2>
+    adjacent_difference(ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest);
+
+    /// Searches the \a rng for two consecutive identical elements.
+    ///
+    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
+    ///                     (last - first) - 1 application of the predicate
+    ///                     where \a result is the value returned
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
     /// \tparam Rng         The type of the source range used (deduced).
-    ///                     Thhpx::traits::is_range<Rng>::valuee iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    /// \tparam Pred        The type of an optional function/function object to use.
-    ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a adjacent_find requires \a Pred to meet the
-    ///                     requirements of \a CopyConstructible. This defaults
-    ///                     to std::equal_to<>
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
-    /// \param pred         The binary predicate which returns \a true
-    ///                     if the elements should be treated as equal. The
-    ///                     signature should be equivalent to the following:
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// \returns  The \a adjacent_difference algorithm returns an iterator to the
+    ///           first of the identical elements.
+    ///
+    template <typename ExPolicy, typename Rng, typename FwdIter2>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            FwdIter2>
+    adjacent_difference(ExPolicy&& policy, Rng&& rng, FwdIter2 dest);
+
+    /// Searches the range [first, last) for two consecutive identical elements.
+    ///
+    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
+    ///                     (last - first) - 1 application of the predicate
+    ///                     where \a result is the value returned
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for InIter.
+    /// \tparam Op          The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a adjacent_difference requires \a Op
+    ///                     to meet the requirements of \a CopyConstructible.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param op           Binary operation function object that will be applied.
+    ///                     The signature of the function should be equivalent to 
+    ///                     the following:
     ///                     \code
-    ///                     bool pred(const Type1 &a, const Type1 &b);
+    ///                     Ret fun(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
-    ///                     The signature does not need to have const &, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The types \a Type1 must be such
-    ///                     that objects of type \a FwdIter
-    ///                     can be dereferenced and then implicitly converted
-    ///                     to \a Type1 .
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
+    ///                     The signature does not need to have const &.
+    ///                     The types \a Type1 and \a Type2 must be such that an 
+    ///                     object of type \a iterator_traits<InputIt>::value_type 
+    ///                     can be implicitly converted to both of them. The type 
+    ///                     \a Ret must be such that an object of type \a OutputIt 
+    ///                     can be dereferenced and assigned a value of type \a Ret.​
     ///
-    /// The comparison operations in the parallel \a adjacent_find invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The comparison operations in the parallel \a adjacent_find invoked
-    /// with an execution policy object of type \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an
-    /// unordered fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<InIter>
-    ///           if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a InIter otherwise.
-    ///           The \a adjacent_find algorithm returns an iterator to the
+    /// \returns  The \a adjacent_difference algorithm returns an iterator to the
     ///           first of the identical elements. If no such elements are
     ///           found, \a last is returned.
     ///
-    ///           This overload of \a adjacent_find is available if the user
-    ///           decides to provide their algorithm their own binary
-    ///           predicate \a pred.
+    template <typename FwdIter1, typename Sent, typename FwdIter2,
+            typename Op>
+    FwdIter2 adjacent_difference(FwdIter1 first, Sent last, FwdIter2 dest, Op&& op);
+
+    /// Searches the \a rng for two consecutive identical elements.
     ///
-    template <typename ExPolicy, typename Rng,
-        typename Proj = hpx::parallel::util::projection_identity,
-        typename Pred = detail::equal_to>
-    typename util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_traits<Rng>::iterator_type>::type
-    adjacent_find(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
-        Proj&& proj = Proj());
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam Op          The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a adjacent_difference requires \a Op
+    ///                     to meet the requirements of \a CopyConstructible.
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param op           Binary operation function object that will be applied.
+    ///                     The signature of the function should be equivalent to 
+    ///                     the following:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &.
+    ///                     The types \a Type1 and \a Type2 must be such that an 
+    ///                     object of type \a iterator_traits<InputIt>::value_type 
+    ///                     can be implicitly converted to both of them. The type 
+    ///                     \a Ret must be such that an object of type \a OutputIt 
+    ///                     can be dereferenced and assigned a value of type \a Ret.​
+    ///
+    /// \returns  The \a adjacent_difference algorithm returns an iterator to the
+    ///           first of the identical elements.
+    ///
+    template <typename Rng, typename FwdIter2, typename Op>
+    FwdIter2 adjacent_difference(Rng&& rng, FwdIter2 dest, Op&& op);
+
+    /// Searches the range [first, last) for two consecutive identical elements.
+    ///
+    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
+    ///                     (last - first) - 1 application of the predicate
+    ///                     where \a result is the value returned
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for InIter.
+    /// \tparam Op          The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a adjacent_difference requires \a Op
+    ///                     to meet the requirements of \a CopyConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param op           Binary operation function object that will be applied.
+    ///                     The signature of the function should be equivalent to 
+    ///                     the following:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &.
+    ///                     The types \a Type1 and \a Type2 must be such that an 
+    ///                     object of type \a iterator_traits<InputIt>::value_type 
+    ///                     can be implicitly converted to both of them. The type 
+    ///                     \a Ret must be such that an object of type \a OutputIt 
+    ///                     can be dereferenced and assigned a value of type \a Ret.​
+    ///
+    /// \returns  The \a adjacent_difference algorithm returns an iterator to the
+    ///           first of the identical elements. If no such elements are
+    ///           found, \a last is returned.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename Sent,
+            typename FwdIter2, typename Op>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            FwdIter2>
+    adjacent_difference(ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest,
+            Op&& op);
+    
+    /// Searches the \a rng for two consecutive identical elements.
+    ///
+    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
+    ///                     (last - first) - 1 application of the predicate
+    ///                     where \a result is the value returned
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam Op          The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a adjacent_difference requires \a Op
+    ///                     to meet the requirements of \a CopyConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param op           Binary operation function object that will be applied.
+    ///                     The signature of the function should be equivalent to 
+    ///                     the following:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &.
+    ///                     The types \a Type1 and \a Type2 must be such that an 
+    ///                     object of type \a iterator_traits<InputIt>::value_type 
+    ///                     can be implicitly converted to both of them. The type 
+    ///                     \a Ret must be such that an object of type \a OutputIt 
+    ///                     can be dereferenced and assigned a value of type \a Ret.
+    ///
+    /// \returns  The \a adjacent_difference algorithm returns an iterator to the
+    ///           first of the identical elements.
+    ///
+    template <typename ExPolicy, typename Rng, typename FwdIter2,
+            typename Op>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            FwdIter2>
+    adjacent_difference(ExPolicy&& policy, Rng&& rng, FwdIter2 dest, Op&& op);
+    // clang-format on
 }}    // namespace hpx::ranges
 #else
 

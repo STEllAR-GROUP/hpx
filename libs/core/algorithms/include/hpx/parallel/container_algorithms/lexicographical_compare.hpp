@@ -12,6 +12,7 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+    // clang-format off
 
     /// Checks if the first range [first1, last1) is lexicographically less than
     /// the second range [first2, last2). uses a provided predicate to compare
@@ -63,16 +64,8 @@ namespace hpx { namespace ranges {
     ///                     \a is invoked.
     ///
     /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
-    ///
-    /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked with an execution policy object of type
-    /// \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
+    /// algorithm invoked without an execution policy object execute in sequential
+    /// order in the calling thread.
     ///
     /// \note     Lexicographical comparison is an operation with the
     ///           following properties
@@ -88,20 +81,15 @@ namespace hpx { namespace ranges {
     ///               range
     ///             - Two empty ranges are lexicographically \a equal
     ///
-    /// \returns  The \a lexicographically_compare algorithm returns a
-    ///           \a hpx::future<bool> if the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a bool otherwise.
+    /// \returns  The \a lexicographically_compare algorithm returns \a bool.
     ///           The \a lexicographically_compare algorithm returns true
     ///           if the first range is lexicographically less, otherwise
     ///           it returns false.
     ///           range [first2, last2), it returns false.
-    template <typename InIter1, typename Sent1, typename InIter2,
-        typename Sent2,
+    template <typename InIter1, typename Sent1, typename InIter2, typename Sent2,
         typename Proj1 = hpx::parallel::util::projection_identity,
         typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
+        typename Pred = hpx::parallel::v1::detail::less>
     bool lexicographical_compare(InIter1 first1, Sent1 last1, InIter2 first2,
         Sent2 last2, Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
@@ -201,7 +189,7 @@ namespace hpx { namespace ranges {
         typename FwdIter2, typename Sent2,
         typename Proj1 = hpx::parallel::util::projection_identity,
         typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
+        typename Pred = hpx::parallel::v1::detail::less>
     typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
     lexicographical_compare(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
         FwdIter2 first2, Sent2 last2, Pred&& pred = Pred(),
@@ -247,7 +235,7 @@ namespace hpx { namespace ranges {
     ///                     \a is invoked.
     ///
     /// The comparison operations in the parallel \a lexicographical_compare
-    /// algorithm invoked without an execution policy object  execute in sequential
+    /// algorithm invoked without an execution policy object execute in sequential
     /// order in the calling thread.
     ///
     /// \note     Lexicographical comparison is an operation with the
@@ -272,7 +260,7 @@ namespace hpx { namespace ranges {
     template <typename Rng1, typename Rng2,
         typename Proj1 = hpx::parallel::util::projection_identity,
         typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
+        typename Pred = hpx::parallel::v1::detail::less>
     bool lexicographical_compare(Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
@@ -360,10 +348,11 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename Rng1, typename Rng2,
         typename Proj1 = hpx::parallel::util::projection_identity,
         typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = detail::less>
+        typename Pred = hpx::parallel::v1::detail::less>
     typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
     lexicographical_compare(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
         Pred&& pred = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+    // clang-format on
 }}    // namespace hpx::ranges
 #else
 

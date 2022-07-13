@@ -12,6 +12,8 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+    // clang-format off
+    
     /// Searches the range [first, last) for two consecutive identical elements.
     ///
     /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
@@ -132,7 +134,8 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename FwdIter, typename Sent,
         typename Proj = hpx::parallel::util::projection_identity,
         typename Pred = detail::equal_to>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter>::type
     adjacent_find(ExPolicy&& policy, FwdIter first, Sent last,
         Pred&& pred = Pred(), Proj&& proj = Proj());
 
@@ -175,8 +178,7 @@ namespace hpx { namespace ranges {
         typename Proj = hpx::parallel::util::projection_identity,
         typename Pred = detail::equal_to>
     typename hpx::traits::range_traits<Rng>::iterator_type adjacent_find(
-        ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
-        Proj&& proj = Proj());
+        Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     /// Searches the range rng for two consecutive identical elements.
     ///
@@ -246,10 +248,11 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename Rng,
         typename Proj = hpx::parallel::util::projection_identity,
         typename Pred = detail::equal_to>
-    typename util::detail::algorithm_result<ExPolicy,
+    typename parallel::util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_traits<Rng>::iterator_type>::type
     adjacent_find(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
         Proj&& proj = Proj());
+    // clang-format on
 }}    // namespace hpx::ranges
 #else
 

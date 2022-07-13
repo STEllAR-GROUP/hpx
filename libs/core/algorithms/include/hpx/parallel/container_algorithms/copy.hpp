@@ -1,3 +1,4 @@
+//  Copyright (c) 2022 Dimitra Karatza
 //  Copyright (c) 2015-2020 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -22,7 +23,7 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iter1       The type of the begin source iterators used (deduced).
+    /// \tparam FwdIter1    The type of the begin source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
@@ -59,11 +60,11 @@ namespace hpx { namespace ranges {
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element copied.
-    template <typename ExPolicy, typename Iter1, typename Sent1,
+    template <typename ExPolicy, typename FwdIter1, typename Sent1,
         typename FwdIter>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::ranges::copy_result<Iter1, Iter>>::type
-    copy(ExPolicy&& policy, Iter1 iter, Sent1 sent, FwdIter dest);
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        ranges::copy_result<FwdIter1, FwdIter>>::type
+    copy(ExPolicy&& policy, FwdIter1 iter, Sent1 sent, FwdIter dest);
 
     /// Copies the elements in the range \a rng to another
     /// range beginning at \a dest.
@@ -109,13 +110,66 @@ namespace hpx { namespace ranges {
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element copied.
     template <typename ExPolicy, typename Rng, typename FwdIter>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::ranges::copy_result<
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        ranges::copy_result<
             typename hpx::traits::range_traits<Rng>::iterator_type,
-            FwdIter>
-        >::type
+            FwdIter>>::type
     copy(ExPolicy&& policy, Rng&& rng, FwdIter dest);
 
+    /// Copies the elements in the range, defined by [first, last), to another
+    /// range beginning at \a dest.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam FwdIter1    The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent1       The type of the end source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     sentinel for Iter1.
+    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param iter         Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param sent         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// \returns  The \a copy algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the element in the
+    ///           destination range, one past the last element copied.
+    template <typename FwdIter1, typename Sent1, typename FwdIter>
+    ranges::copy_result<FwdIter1, FwdIter>
+    copy(FwdIter1 iter, Sent1 sent, FwdIter dest);
+
+    /// Copies the elements in the range \a rng to another
+    /// range beginning at \a dest.
+    ///
+    /// \note   Complexity: Performs exactly
+    ///         std::distance(begin(rng), end(rng)) assignments.
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// \returns  The \a copy algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the element in the
+    ///           destination range, one past the last element copied.
+    template <typename Rng, typename FwdIter>
+    typename hpx::traits::range_traits<Rng>::iterator_type, FwdIter>
+    copy(Rng&& rng, FwdIter dest);
+    
     /// Copies the elements in the range [first, first + count), starting from
     /// first and proceeding to first + count - 1., to another range beginning
     /// at dest.
@@ -171,18 +225,45 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename FwdIter1, typename Size,
         typename FwdIter2>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::ranges::copy_n_result<FwdIter1, FwdIter2>>::type
+        ranges::copy_n_result<FwdIter1, FwdIter2>>::type
     copy_n(ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
-
-    /// Copies the elements in the range, defined by [first, last) to another
-    /// range beginning at \a dest. Copies only the elements for which the
-    /// predicate \a f returns true. The order of the elements that are not
-    /// removed is preserved.
+    
+    /// Copies the elements in the range [first, first + count), starting from
+    /// first and proceeding to first + count - 1., to another range beginning
+    /// at dest.
     ///
-    /// \note   Complexity: Performs not more than
-    ///         std::distance(begin(rng), end(rng)) assignments,
-    ///         exactly std::distance(begin(rng), end(rng)) applications
-    ///         of the predicate \a f.
+    /// \note   Complexity: Performs exactly \a count assignments, if
+    ///         count > 0, no assignments otherwise.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply \a f to.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// \returns  The \a copy algorithm returns the pair of the input iterator
+    ///           forwarded to the first element after the last in the input
+    ///           sequence and the output iterator to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
+    ///
+    template <typename FwdIter1, typename Size, typename FwdIter2>
+    ranges::copy_n_result<FwdIter1, FwdIter2>
+    copy_n(FwdIter1 first, Size count, FwdIter2 dest);
+    
+    /// Copies the elements in the range, defined by [first, last) to another
+    /// range beginning at \a dest. The order of the elements that are not
+    /// removed is preserved.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -198,10 +279,7 @@ namespace hpx { namespace ranges {
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a copy_if requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
+    /// \tparam Pred        The type of an optional function/function object to use.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
@@ -212,20 +290,18 @@ namespace hpx { namespace ranges {
     /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param f            Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).This is an
-    ///                     unary predicate which returns \a true for the
-    ///                     required elements. The signature of this predicate
-    ///                     should be equivalent to:
+    /// \param pred         The binary predicate which returns \a true
+    ///                     if the elements should be treated as equal. The
+    ///                     signature should be equivalent to the following:
     ///                     \code
-    ///                     bool pred(const Type &a);
+    ///                     bool pred(const Type1 &a, const Type1 &b);
     ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
+    ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
-    ///                     implicitly converted to Type.
+    ///                     it. The types \a Type1 must be such
+    ///                     that objects of type \a FwdIter
+    ///                     can be dereferenced and then implicitly converted
+    ///                     to \a Type1 .
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
@@ -252,24 +328,16 @@ namespace hpx { namespace ranges {
     ///           destination range, one past the last element copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter, typename F,
+        typename FwdIter, typename Pred,
         typename Proj = hpx::parallel::util::projection_identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::ranges::copy_if_result<
-            typename hpx::traits::range_traits<Rng>::iterator_type,
-            OutIter>>::type
-    copy_if(ExPolicy&& policy, FwdIter1 iter, Sent1 sent, FwdIter dest, F&& f,
+        ranges::copy_if_result<FwdIter1, FwdIter>>::type
+    copy_if(ExPolicy&& policy, FwdIter1 iter, Sent1 sent, FwdIter dest, Pred&& pred,
         Proj&& proj = Proj());
 
-    /// Copies the elements in the range \a rng to another
-    /// range beginning at \a dest. Copies only the elements for which the
-    /// predicate \a f returns true. The order of the elements that are not
+    /// Copies the elements in the range, defined by \a rng to another
+    /// range beginning at \a dest. The order of the elements that are not
     /// removed is preserved.
-    ///
-    /// \note   Complexity: Performs not more than
-    ///         std::distance(begin(rng), end(rng)) assignments,
-    ///         exactly std::distance(begin(rng), end(rng)) applications
-    ///         of the predicate \a f.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -277,15 +345,12 @@ namespace hpx { namespace ranges {
     ///                     in which it executes the assignments.
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam OutIter     The type of the iterator representing the
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a copy_if requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
+    /// \tparam Pred        The type of an optional function/function object to use.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
@@ -294,20 +359,18 @@ namespace hpx { namespace ranges {
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param f            Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).This is an
-    ///                     unary predicate which returns \a true for the
-    ///                     required elements. The signature of this predicate
-    ///                     should be equivalent to:
+    /// \param pred         The binary predicate which returns \a true
+    ///                     if the elements should be treated as equal. The
+    ///                     signature should be equivalent to the following:
     ///                     \code
-    ///                     bool pred(const Type &a);
+    ///                     bool pred(const Type1 &a, const Type1 &b);
     ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
+    ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
-    ///                     implicitly converted to Type.
+    ///                     it. The types \a Type1 must be such
+    ///                     that objects of type \a FwdIter
+    ///                     can be dereferenced and then implicitly converted
+    ///                     to \a Type1 .
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
@@ -333,14 +396,112 @@ namespace hpx { namespace ranges {
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element copied.
     ///
-    template <typename ExPolicy, typename Rng, typename OutIter, typename F,
+    template <typename ExPolicy, typename Rng, typename FwdIter,
+        typename Pred,
         typename Proj = hpx::parallel::util::projection_identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        hpx::ranges::copy_if_result<
-            typename hpx::traits::range_traits<Rng>::iterator_type, OutIter>
-    >::type
-    copy_if(
-        ExPolicy&& policy, Rng&& rng, OutIter dest, F&& f, Proj&& proj = Proj());
+        ranges::copy_if_result<
+            typename hpx::traits::range_traits<Rng>::iterator_type,
+            FwdIter>>::type
+    copy_if(ExPolicy&& policy, Rng&& rng, FwdIter dest, Pred&& pred, 
+        Proj&& proj = Proj());
+
+    /// Copies the elements in the range, defined by [first, last) to another
+    /// range beginning at \a dest. The order of the elements that are not
+    /// removed is preserved.
+    ///
+    /// \tparam FwdIter1    The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent1       The type of the end source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     sentinel for FwdIter1.
+    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param iter         Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param sent         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param pred         The binary predicate which returns \a true
+    ///                     if the elements should be treated as equal. The
+    ///                     signature should be equivalent to the following:
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type1 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 must be such
+    ///                     that objects of type \a FwdIter
+    ///                     can be dereferenced and then implicitly converted
+    ///                     to \a Type1 .
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// \returns  The \a copy_if algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the element in the
+    ///           destination range, one past the last element copied.
+    ///
+    template <typename FwdIter1, typename Sent1, typename FwdIter,
+        typename Pred,
+        typename Proj = hpx::parallel::util::projection_identity>
+    ranges::copy_if_result<FwdIter1, FwdIter>
+    copy_if(FwdIter1 iter, Sent1 sent, FwdIter dest, Pred&& pred,
+        Proj&& proj = Proj());
+
+    /// Copies the elements in the range, defined by \a rng to another
+    /// range beginning at \a dest. The order of the elements that are not
+    /// removed is preserved.
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param pred         The binary predicate which returns \a true
+    ///                     if the elements should be treated as equal. The
+    ///                     signature should be equivalent to the following:
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type1 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 must be such
+    ///                     that objects of type \a FwdIter
+    ///                     can be dereferenced and then implicitly converted
+    ///                     to \a Type1 .
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// \returns  The \a copy_if algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the element in the
+    ///           destination range, one past the last element copied.
+    ///
+    template <typename Rng, typename FwdIter, typename Pred,
+        typename Proj = hpx::parallel::util::projection_identity>
+    ranges::copy_if_result<
+        typename hpx::traits::range_traits<Rng>::iterator_type, FwdIter>
+    copy_if(Rng&& rng, FwdIter dest, Pred&& pred, 
+        Proj&& proj = Proj());
 
     // clang-format on
 }}    // namespace hpx::ranges
