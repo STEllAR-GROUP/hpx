@@ -111,7 +111,7 @@ struct promise
     void unhandled_exception() {}
 
     template <typename... T>
-    decltype(auto) await_transform(T...) noexcept
+    auto await_transform(T&&...) noexcept
     {
         return awaiter_6<promise>{};
     }
@@ -226,12 +226,8 @@ int main()
             awaiter_6<promise>>);
     static_assert(
         std::is_same_v<decltype(get_awaiter(
-                           std::declval<awaitable_2>(), (promise*) nullptr)),
-            awaitable_2>);
-    static_assert(
-        std::is_same_v<decltype(get_awaiter(
                            std::declval<awaitable_2>(), (void*) nullptr)),
-            awaitable_2>);
+            awaitable_2&&>);
     static_assert(is_awaitable_v<awaitable_2, promise>);
 
     return hpx::util::report_errors();

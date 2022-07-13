@@ -132,14 +132,13 @@ namespace hpx { namespace execution { namespace experimental {
             std::void_t<decltype(operator co_await(
                 std::declval<Awaitable>()))>> = true;
 
-        template <typename, typename = void, typename...>
+        template <typename Promise, typename = void>
         inline constexpr bool has_await_transform = false;
 
-        template <typename Promise, typename... Ts>
+        template <typename Promise>
         inline constexpr bool has_await_transform<Promise,
-            std::void_t<decltype(std::declval<Promise>().await_transform(
-                HPX_FORWARD(Ts, std::declval<Ts>())...))>,
-            Ts...> = true;
+            std::void_t<decltype(std::declval<Promise>().await_transform())>> =
+            true;
 
     }    // namespace detail
 
@@ -164,8 +163,7 @@ namespace hpx { namespace execution { namespace experimental {
     }
 
     template <typename Awaitable, typename Promise,
-        typename =
-            std::enable_if_t<detail::has_await_transform<Promise, Awaitable>>>
+        typename = std::enable_if_t<detail::has_await_transform<Promise>>>
     decltype(auto) get_awaiter(Awaitable&& await, Promise* promise)
     {
         if constexpr (detail::has_member_operator_co_await_v<decltype(
@@ -204,8 +202,8 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename Awaitable, typename Promise = void>
     struct is_awaitable
       : std::integral_constant<bool,
-            is_awaiter_v<decltype(get_awaiter(
-                             std::declval<Awaitable>(), (Promise*) nullptr)),
+            is_awaiter_v<decltype(get_awaiter(std::declval<Awaitable>(),
+                             static_cast<Promise*>(nullptr))),
                 Promise>>
     {
     };
@@ -216,8 +214,8 @@ namespace hpx { namespace execution { namespace experimental {
 
     template <typename Awaitable, typename Promise = void,
         typename = std::enable_if_t<is_awaitable_v<Awaitable, Promise>>>
-    using await_result_t =
-        decltype((get_awaiter(std::declval<Awaitable>(), (Promise*) nullptr)
-                      .await_resume()));
+    using await_result_t = decltype(
+        (get_awaiter(std::declval<Awaitable>(), static_cast<Promise*>(nullptr))
+                .await_resume()));
 
 }}}    // namespace hpx::execution::experimental
