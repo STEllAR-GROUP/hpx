@@ -12,6 +12,7 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+    // clang-format off
 
     /// Checks if the first range [first1, last1) is lexicographically less than
     /// the second range [first2, last2). uses a provided predicate to compare
@@ -351,6 +352,7 @@ namespace hpx { namespace ranges {
     typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
     lexicographical_compare(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
         Pred&& pred = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+    // clang-format on
 }}    // namespace hpx::ranges
 #else
 

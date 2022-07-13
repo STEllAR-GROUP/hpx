@@ -13,6 +13,7 @@
 #if defined(DOXYGEN)
 
 namespace hpx {
+    // clang-format off
 
     ///////////////////////////////////////////////////////////////////////////
     /// Finds the smallest element in the range [first, last) using the given
@@ -786,6 +787,7 @@ namespace hpx {
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         minmax_element_result<hpx::traits::range_iterator_t<Rng>>>
     minmax_element(ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj());
+    // clang-format on
 }    // namespace hpx
 
 #else    // DOXYGEN

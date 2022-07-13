@@ -12,6 +12,8 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+    // clang-format off
+    
     /// Searches the range [first, last) for two consecutive identical elements.
     ///
     /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
@@ -250,6 +252,7 @@ namespace hpx { namespace ranges {
         typename hpx::traits::range_traits<Rng>::iterator_type>::type
     adjacent_find(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
         Proj&& proj = Proj());
+    // clang-format on
 }}    // namespace hpx::ranges
 #else
 

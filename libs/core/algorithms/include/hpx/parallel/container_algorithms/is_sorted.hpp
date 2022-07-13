@@ -9,6 +9,8 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+    // clang-format off
+    
     /// Determines if the range [first, last) is sorted. Uses pred to
     /// compare elements.
     ///
@@ -486,6 +488,7 @@ namespace hpx { namespace ranges {
         typename hpx::traits::range_iterator<Rng>::type>::type
     is_sorted_until(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
         Proj&& proj = Proj());
+    // clang-format on
 }}    // namespace hpx::ranges
 
 #else

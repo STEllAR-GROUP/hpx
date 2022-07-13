@@ -10,6 +10,8 @@
 
 #if defined(DOXYGEN)
 namespace hpx { namespace ranges {
+    // clang-format off
+    
     /// Applies \a f to the result of dereferencing every iterator in the
     /// range [first, last).
     ///
@@ -403,6 +405,7 @@ namespace hpx { namespace ranges {
         FwdIter>::type 
     for_each_n(ExPolicy&& policy, FwdIter first, Size count, F&& f,
         Proj&& proj = Proj());
+    // clang-format on
 }}    // namespace hpx::ranges
 #else
 #include <hpx/config.hpp>
