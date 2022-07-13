@@ -255,10 +255,12 @@ namespace hpx { namespace traits {
                     HPX_ASSERT(!data.empty());
                     if (data.size() > 1)
                     {
-                        return hpx::reduce(++data.begin(), data.end(), data[0],
-                            HPX_FORWARD(F, op));
+                        return Communicator::template handle_bool<
+                            std::decay_t<T>>(hpx::reduce(++data.begin(),
+                            data.end(), data[0], HPX_FORWARD(F, op)));
                     }
-                    return data[0];
+                    return Communicator::template handle_bool<std::decay_t<T>>(
+                        data[0]);
                 });
         }
 

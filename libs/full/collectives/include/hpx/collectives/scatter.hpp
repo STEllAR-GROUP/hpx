@@ -242,7 +242,10 @@ namespace hpx { namespace traits {
                 // step function (invoked once for get)
                 nullptr,
                 // finalizer (invoked after all sites have checked in)
-                [which](auto& data, bool&) { return HPX_MOVE(data[which]); });
+                [which](auto& data, bool&) {
+                    return Communicator::template handle_bool<data_type>(
+                        HPX_MOVE(data[which]));
+                });
         }
 
         template <typename Result, typename T>
@@ -254,7 +257,10 @@ namespace hpx { namespace traits {
                 // step function (invoked once for set)
                 [&](auto& data) { data = HPX_MOVE(t); },
                 // finalizer (invoked after all sites have checked in)
-                [which](auto& data, bool&) { return HPX_MOVE(data[which]); });
+                [which](auto& data, bool&) {
+                    return Communicator::template handle_bool<T>(
+                        HPX_MOVE(data[which]));
+                });
         }
     };
 }}    // namespace hpx::traits
