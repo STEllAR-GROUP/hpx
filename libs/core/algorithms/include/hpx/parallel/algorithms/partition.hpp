@@ -23,7 +23,7 @@ namespace hpx {
     ///         projection.
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -48,7 +48,7 @@ namespace hpx {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
+    ///                     type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -64,7 +64,7 @@ namespace hpx {
     ///           the first element of the second group.
     ///
     template <typename FwdIter, typename Pred, typename Proj>
-    FwdIter partition(ExPolicy&& policy, FwdIter first, FwdIter last,
+    FwdIter partition(FwdIter first, FwdIter last,
         Pred&& pred, Proj&& proj);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ namespace hpx {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a InIter can be dereferenced and then
+    ///                     type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -149,8 +149,8 @@ namespace hpx {
     ///         projection.
     ///
     /// \tparam BidirIter   The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     This iterator type must meet the requirements of a
+    ///                     bidirectional iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a transform requires \a F to meet the
@@ -211,8 +211,8 @@ namespace hpx {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the invocations of \a f.
     /// \tparam BidirIter   The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    ///                     This iterator type must meet the requirements of a
+    ///                     bidirectional iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a transform requires \a F to meet the
@@ -262,7 +262,7 @@ namespace hpx {
     ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
     ///           the elements in both groups is preserved.
     ///           If the execution policy is of type \a parallel_task_policy
-    ///           the algorithm returns a future<> referring to this iterator.
+    ///           the algorithm returns a \a future<> referring to this iterator.
     ///
     template <typename ExPolicy, typename BidirIter, typename F,
         typename Proj>
@@ -280,7 +280,7 @@ namespace hpx {
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first applications of the
-    ///         predicate \a f.
+    ///         predicate \a pred.
     ///
     /// \tparam FwdIter1    The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -357,7 +357,7 @@ namespace hpx {
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first applications of the
-    ///         predicate \a f.
+    ///         predicate \a pred.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
