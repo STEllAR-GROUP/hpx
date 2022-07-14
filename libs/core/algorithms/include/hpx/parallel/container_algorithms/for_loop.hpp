@@ -11,7 +11,7 @@
 #if defined(DOXYGEN)
 namespace hpx { namespace ranges { namespace experimental {
     // clang-format off
-    
+
     /// The for_loop implements loop functionality over a range specified by
     /// iterator bounds. These algorithms resemble for_each from the
     /// Parallelism TS, but leave to the programmer when and if to dereference

@@ -11,7 +11,7 @@
 #if defined(DOXYGEN)
 namespace hpx { namespace ranges {
     // clang-format off
-    
+
     /// Determines if the range [first, last) is partitioned.
     ///
     /// \note   Complexity: at most (N) predicate evaluations where

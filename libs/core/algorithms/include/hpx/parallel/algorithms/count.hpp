@@ -60,7 +60,7 @@ namespace hpx {
     typename util::detail::algorithm_result<ExPolicy,
         typename std::iterator_traits<FwdIter>::difference_type>::type
     count(ExPolicy&& policy, FwdIter first, FwdIter last, T const& value);
-    
+
     /// Returns the number of elements in the range [first, last) satisfying
     /// a specific criteria. This version counts the elements that are equal to
     /// the given \a value.
@@ -86,7 +86,7 @@ namespace hpx {
     template <typename InIter, typename T>
     typename std::iterator_traits<InIter>::difference_type
     count(InIter first, InIter last, T const& value);
-    
+
     /// Returns the number of elements in the range [first, last) satisfying
     /// a specific criteria. This version counts elements for which predicate
     /// \a f returns true. Executed according to the policy.

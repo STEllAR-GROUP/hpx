@@ -11,7 +11,7 @@
 #if defined(DOXYGEN)
 namespace hpx { namespace ranges {
     // clang-format off
-    
+
     /// Applies \a f to the result of dereferencing every iterator in the
     /// range [first, last).
     ///
@@ -402,7 +402,7 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename FwdIter, typename Size, typename F,
         typename Proj = hpx::parallel::util::projection_identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        FwdIter>::type 
+        FwdIter>::type
     for_each_n(ExPolicy&& policy, FwdIter first, Size count, F&& f,
         Proj&& proj = Proj());
     // clang-format on

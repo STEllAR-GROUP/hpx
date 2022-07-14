@@ -177,7 +177,7 @@ namespace hpx { namespace ranges {
     ///                     object of type \a iterator_traits<InputIt>::value_type 
     ///                     can be implicitly converted to both of them. The type 
     ///                     \a Ret must be such that an object of type \a OutputIt 
-    ///                     can be dereferenced and assigned a value of type \a Ret.​
+    ///                     can be dereferenced and assigned a value of type \a Ret.
     ///
     /// \returns  The \a adjacent_difference algorithm returns an iterator to the
     ///           first of the identical elements. If no such elements are
@@ -215,7 +215,7 @@ namespace hpx { namespace ranges {
     ///                     object of type \a iterator_traits<InputIt>::value_type 
     ///                     can be implicitly converted to both of them. The type 
     ///                     \a Ret must be such that an object of type \a OutputIt 
-    ///                     can be dereferenced and assigned a value of type \a Ret.​
+    ///                     can be dereferenced and assigned a value of type \a Ret.?
     ///
     /// \returns  The \a adjacent_difference algorithm returns an iterator to the
     ///           first of the identical elements.
@@ -266,7 +266,7 @@ namespace hpx { namespace ranges {
     ///                     object of type \a iterator_traits<InputIt>::value_type 
     ///                     can be implicitly converted to both of them. The type 
     ///                     \a Ret must be such that an object of type \a OutputIt 
-    ///                     can be dereferenced and assigned a value of type \a Ret.​
+    ///                     can be dereferenced and assigned a value of type \a Ret.?
     ///
     /// \returns  The \a adjacent_difference algorithm returns an iterator to the
     ///           first of the identical elements. If no such elements are

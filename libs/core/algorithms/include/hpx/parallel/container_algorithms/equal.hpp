@@ -110,7 +110,7 @@ namespace hpx { namespace ranges {
         typename Proj1 = hpx::parallel::util::projection_identity,
         typename Proj2 = hpx::parallel::util::projection_identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    equal(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2, 
+    equal(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
         Pred&& op = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Returns true if the range [first1, last1) is equal to the range
@@ -199,7 +199,7 @@ namespace hpx { namespace ranges {
         typename Proj1 = hpx::parallel::util::projection_identity,
         typename Proj2 = hpx::parallel::util::projection_identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
-    equal(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(), 
+    equal(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Returns true if the range [first1, last1) is equal to the range
@@ -278,7 +278,7 @@ namespace hpx { namespace ranges {
         typename Iter2, typename Sent2, typename Pred = equal_to,
         typename Proj1 = hpx::parallel::util::projection_identity,
         typename Proj2 = hpx::parallel::util::projection_identity>
-    bool equal(Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2, 
+    bool equal(Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
         Pred&& op = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Returns true if the range [first1, last1) is equal to the range
@@ -344,7 +344,7 @@ namespace hpx { namespace ranges {
     template <typename Rng1, typename Rng2, typename Pred = equal_to,
         typename Proj1 = hpx::parallel::util::projection_identity,
         typename Proj2 = hpx::parallel::util::projection_identity>
-    bool equal(Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(), 
+    bool equal(Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     // clang-format on

@@ -599,7 +599,7 @@ namespace hpx {
     ///           \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
-    /// 
+    ///
     /// This overload of \a find_first_of is available if
     /// the user decides to provide the
     /// algorithm their own predicate \a op.
@@ -721,7 +721,7 @@ namespace hpx {
     ///           \a last is returned.
     ///           Additionally if the size of the subsequence is empty or no subsequence
     ///           is found, \a last is also returned.
-    /// 
+    ///
     /// This overload of \a find_first_of is available if
     /// the user decides to provide the
     /// algorithm their own predicate \a op.

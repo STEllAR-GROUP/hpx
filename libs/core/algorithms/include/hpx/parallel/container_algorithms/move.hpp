@@ -148,7 +148,7 @@ namespace hpx { namespace ranges {
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
-    /// \returns  The \a move algorithm returns \a 
+    /// \returns  The \a move algorithm returns \a
     ///           ranges::move_result<iterator_t<Rng>, FwdIter2>.
     ///           The \a move algorithm returns the pair of the input iterator
     ///           \a last and the output iterator to the element in the

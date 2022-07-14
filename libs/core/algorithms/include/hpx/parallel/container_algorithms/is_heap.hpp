@@ -373,7 +373,7 @@ namespace hpx { namespace ranges {
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
     is_heap_until(ExPolicy&& policy, Iter first, Sent sent, Comp&& comp = Comp(),
         Proj&& proj = Proj());
-    
+
     /// Returns the upper bound of the largest range beginning at \a first
     /// which is a max heap. That is, the last iterator \a it for
     /// which range [first, it) is a max heap. The function

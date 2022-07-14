@@ -166,7 +166,7 @@ namespace hpx { namespace ranges {
             Proj>::value_type>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
     Iter find(Iter first, Sent last, T const& val, Proj&& proj = Proj());
-    
+
     /// Returns the first element in the range [first, last) that is equal
     /// to value
     ///
@@ -220,7 +220,7 @@ namespace hpx { namespace ranges {
             hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
     typename hpx::traits::range_iterator<Rng>::type
     find(Rng&& rng, T const& val, Proj&& proj = Proj());
-    
+
     /// Returns the first element in the range [first, last) for which
     /// predicate \a pred returns true
     ///

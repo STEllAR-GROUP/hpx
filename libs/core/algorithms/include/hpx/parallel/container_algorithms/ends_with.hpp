@@ -72,7 +72,7 @@ namespace hpx { namespace ranges {
         typename Pred = ranges::equal_to,
         typename Proj1 = parallel::util::projection_identity,
         typename Proj2 = parallel::util::projection_identity>
-    bool ends_with(Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2, 
+    bool ends_with(Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
         Pred&& pred = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Checks whether the second range defined by [first1, last1) matches the
@@ -150,7 +150,7 @@ namespace hpx { namespace ranges {
         typename Proj2 = parallel::util::projection_identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         bool>::type
-    ends_with(ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2, 
+    ends_with(ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
         Sent2 last2, Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
 
@@ -202,7 +202,7 @@ namespace hpx { namespace ranges {
         typename Pred = ranges::equal_to,
         typename Proj1 = parallel::util::projection_identity,
         typename Proj2 = parallel::util::projection_identity>
-    bool ends_with(Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(), 
+    bool ends_with(Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Checks whether the second range \a rng2 matches the

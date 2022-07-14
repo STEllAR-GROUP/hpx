@@ -78,7 +78,7 @@ namespace hpx { namespace ranges {
         typename Comp,
         typename Proj = hpx::parallel::util::projection_identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
-    make_heap(ExPolicy&& policy, Iter first, Sent last, Comp&& comp, 
+    make_heap(ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
         Proj&& proj = Proj{});
 
     /// Constructs a \a max \a heap in the range [first, last).

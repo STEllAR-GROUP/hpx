@@ -246,7 +246,7 @@ namespace hpx { namespace ranges {
     ///                     will be applied to.
     /// \param value        The value to be assigned.
     ///
-    /// \returns  The \a fill_n algorithm returns an output iterator that 
+    /// \returns  The \a fill_n algorithm returns an output iterator that
     ///           compares equal to last.
     ///
     template <typename Rng,
@@ -274,7 +274,7 @@ namespace hpx { namespace ranges {
     ///                     \a first the algorithm will be applied to.
     /// \param value        The value to be assigned.
     ///
-    /// \returns  The \a fill_n algorithm returns an output iterator that 
+    /// \returns  The \a fill_n algorithm returns an output iterator that
     ///           compares equal to last.
     ///
     template <typename FwdIter, typename Size,

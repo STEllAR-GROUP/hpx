@@ -10,7 +10,7 @@
 
 namespace hpx { namespace ranges {
     // clang-format off
-    
+
     /// Determines if the range [first, last) is sorted. Uses pred to
     /// compare elements.
     ///

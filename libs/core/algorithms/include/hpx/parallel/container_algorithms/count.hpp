@@ -69,7 +69,7 @@ namespace hpx { namespace ranges {
     typename std::iterator_traits<typename hpx::traits::range_traits<
         Rng>::iterator_type>::difference_type>::type
     count(ExPolicy&& policy, Rng&& rng, T const& value, Proj&& proj = Proj());
-    
+
     /// Returns the number of elements in the range [first, last) satisfying
     /// a specific criteria. This version counts the elements that are equal to
     /// the given \a value.
@@ -126,7 +126,7 @@ namespace hpx { namespace ranges {
             Proj>::value_type>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename std::iterator_traits<Iter>::difference_type>::type
-    count(ExPolicy&& policy, Iter first, Sent last, T const& value, 
+    count(ExPolicy&& policy, Iter first, Sent last, T const& value,
         Proj&& proj = Proj());
 
     /// Returns the number of elements in the range [first, last) satisfying
@@ -335,7 +335,7 @@ namespace hpx { namespace ranges {
         typename Proj = hpx::parallel::util::projection_identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename std::iterator_traits<Iter>::difference_type>::type
-    count_if(ExPolicy&& policy, Iter first, Sent last, F&& f, 
+    count_if(ExPolicy&& policy, Iter first, Sent last, F&& f,
         Proj&& proj = Proj());
 
     /// Returns the number of elements in the range [first, last) satisfying

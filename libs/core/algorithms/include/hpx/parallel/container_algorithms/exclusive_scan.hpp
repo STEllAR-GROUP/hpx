@@ -169,7 +169,7 @@ namespace hpx { namespace ranges {
         typename Op = std::plus<T>>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         exclusive_scan_result<FwdIter1, FwdIter2>>::type
-    exclusive_scan(ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest, 
+    exclusive_scan(ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest,
         T init, Op&& op = Op());
 
     /// Assigns through each iterator \a i in [result, result + (last - first))

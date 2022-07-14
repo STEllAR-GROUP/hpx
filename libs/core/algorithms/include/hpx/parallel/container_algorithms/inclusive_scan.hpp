@@ -475,8 +475,8 @@ namespace hpx { namespace ranges {
         typename FwdIter2, typename Op,
         typename T = typename std::iterator_traits<FwdIter1>::value_type>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        inclusive_scan_result<FwdIter1, FwdIter2>>::type 
-    inclusive_scan(ExPolicy&& policy, InIter first, Sent last, OutIter dest, 
+        inclusive_scan_result<FwdIter1, FwdIter2>>::type
+    inclusive_scan(ExPolicy&& policy, InIter first, Sent last, OutIter dest,
         Op&& op, T init);
 
         ///////////////////////////////////////////////////////////////////////////

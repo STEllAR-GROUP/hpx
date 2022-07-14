@@ -288,8 +288,8 @@ namespace hpx { namespace ranges {
         typename Iter2, typename Sent2, typename Pred = equal_to,
         typename Proj1 = hpx::parallel::util::projection_identity,
         typename Proj2 = hpx::parallel::util::projection_identity>
-    mismatch_result<Iter1, Iter2> mismatch(Iter1 first1, Sent1 last1, 
-        Iter2 first2, Sent2 last2, Pred&& op = Pred(), 
+    mismatch_result<Iter1, Iter2> mismatch(Iter1 first1, Sent1 last1,
+        Iter2 first2, Sent2 last2, Pred&& op = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Returns std::pair with iterators to the first two non-equivalent

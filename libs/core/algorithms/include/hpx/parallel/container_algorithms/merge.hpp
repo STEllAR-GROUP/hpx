@@ -108,7 +108,7 @@ namespace hpx { namespace ranges {
         hpx::ranges::merge_result<
             typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, Iter3>>::type
-    merge(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Iter3 dest, 
+    merge(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Iter3 dest,
         Comp&& comp = Comp(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Merges two sorted ranges [first1, last1) and [first2, last2)
@@ -296,7 +296,7 @@ namespace hpx { namespace ranges {
     hpx::ranges::merge_result<
         typename hpx::traits::range_iterator<Rng1>::type,
         typename hpx::traits::range_iterator<Rng2>::type, Iter3>
-    merge(Rng1&& rng1, Rng2&& rng2, Iter3 dest, Comp&& comp = Comp(), 
+    merge(Rng1&& rng1, Rng2&& rng2, Iter3 dest, Comp&& comp = Comp(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Merges two sorted ranges [first1, last1) and [first2, last2)
@@ -596,7 +596,7 @@ namespace hpx { namespace ranges {
     template <typename Rng, typename Iter,
         typename Comp = hpx::ranges::less,
         typename Proj = hpx::parallel::util::projection_identity>
-    Iter inplace_merge(Rng&& rng, Iter middle, Comp&& comp = Comp(), 
+    Iter inplace_merge(Rng&& rng, Iter middle, Comp&& comp = Comp(),
         Proj&& proj = Proj());
 
     /// Merges two consecutive sorted ranges [first, middle) and
@@ -654,7 +654,7 @@ namespace hpx { namespace ranges {
     template <typename Iter, typename Sent,
         typename Comp = hpx::ranges::less,
         typename Proj = hpx::parallel::util::projection_identity>
-    Iter inplace_merge(Iter first, Iter middle, Sent last, Comp&& comp = Comp(), 
+    Iter inplace_merge(Iter first, Iter middle, Sent last, Comp&& comp = Comp(),
         Proj&& proj = Proj());
 
     // clang-format on

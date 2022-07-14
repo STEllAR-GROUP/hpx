@@ -169,7 +169,7 @@ namespace hpx { namespace ranges {
     template <typename Rng, typename FwdIter>
     typename hpx::traits::range_traits<Rng>::iterator_type, FwdIter>
     copy(Rng&& rng, FwdIter dest);
-    
+
     /// Copies the elements in the range [first, first + count), starting from
     /// first and proceeding to first + count - 1., to another range beginning
     /// at dest.
@@ -227,7 +227,7 @@ namespace hpx { namespace ranges {
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         ranges::copy_n_result<FwdIter1, FwdIter2>>::type
     copy_n(ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
-    
+
     /// Copies the elements in the range [first, first + count), starting from
     /// first and proceeding to first + count - 1., to another range beginning
     /// at dest.
@@ -260,7 +260,7 @@ namespace hpx { namespace ranges {
     template <typename FwdIter1, typename Size, typename FwdIter2>
     ranges::copy_n_result<FwdIter1, FwdIter2>
     copy_n(FwdIter1 first, Size count, FwdIter2 dest);
-    
+
     /// Copies the elements in the range, defined by [first, last) to another
     /// range beginning at \a dest. The order of the elements that are not
     /// removed is preserved.
@@ -403,7 +403,7 @@ namespace hpx { namespace ranges {
         ranges::copy_if_result<
             typename hpx::traits::range_traits<Rng>::iterator_type,
             FwdIter>>::type
-    copy_if(ExPolicy&& policy, Rng&& rng, FwdIter dest, Pred&& pred, 
+    copy_if(ExPolicy&& policy, Rng&& rng, FwdIter dest, Pred&& pred,
         Proj&& proj = Proj());
 
     /// Copies the elements in the range, defined by [first, last) to another
@@ -500,7 +500,7 @@ namespace hpx { namespace ranges {
         typename Proj = hpx::parallel::util::projection_identity>
     ranges::copy_if_result<
         typename hpx::traits::range_traits<Rng>::iterator_type, FwdIter>
-    copy_if(Rng&& rng, FwdIter dest, Pred&& pred, 
+    copy_if(Rng&& rng, FwdIter dest, Pred&& pred,
         Proj&& proj = Proj());
 
     // clang-format on

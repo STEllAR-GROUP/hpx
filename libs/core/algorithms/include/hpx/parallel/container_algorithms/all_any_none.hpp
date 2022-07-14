@@ -242,7 +242,7 @@ namespace hpx { namespace ranges {
     template <typename Iter, typename Sent, typename F,
         typename Proj = hpx::parallel::util::projection_identity>
     bool none_of(Iter first, Sent last, F&& f, Proj&& proj = Proj());
-    
+
     /// Checks if unary predicate \a f returns true for at least one element
     /// in the range \a rng.
     ///
@@ -379,7 +379,7 @@ namespace hpx { namespace ranges {
         typename Proj = hpx::parallel::util::projection_identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
     any_of(ExPolicy&& policy, Iter first, Sent last, F&& f, Proj&& proj = Proj());
-    
+
     /// Checks if unary predicate \a f returns true for at least one element
     /// in the range \a rng.
     ///
@@ -423,7 +423,7 @@ namespace hpx { namespace ranges {
     template <typename Rng, typename F,
         typename Proj = hpx::parallel::util::projection_identity>
     bool any_of(Rng&& rng, F&& f, Proj&& proj = Proj());
-    
+
     /// Checks if unary predicate \a f returns true for at least one element
     /// in the range \a rng.
     ///
@@ -470,7 +470,7 @@ namespace hpx { namespace ranges {
     template <typename Iter, typename Sent, typename F,
         typename Proj = hpx::parallel::util::projection_identity>
     bool any_of(Iter first, Sent last, F&& f, Proj&& proj = Proj());
-    
+
     /// Checks if unary predicate \a f returns true for all elements in the
     /// range \a rng.
     ///

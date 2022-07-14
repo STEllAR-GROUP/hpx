@@ -13,7 +13,7 @@
 
 namespace hpx { namespace ranges {
     // clang-format off
-    
+
     /// Searches the range [first, last) for two consecutive identical elements.
     ///
     /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
