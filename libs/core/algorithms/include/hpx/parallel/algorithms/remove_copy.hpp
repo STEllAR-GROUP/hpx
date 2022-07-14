@@ -24,7 +24,7 @@ namespace hpx {
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first applications of the
-    ///         predicate \a f.
+    ///         predicate \a pred, here comparison operator.
     ///
     /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -41,7 +41,7 @@ namespace hpx {
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param val          Value to be removed.
+    /// \param value        Value to be removed.
     ///
     /// The assignments in the parallel \a remove_copy algorithm
     /// execute in sequential order in the calling thread.
@@ -52,13 +52,14 @@ namespace hpx {
     ///           iterator to the element past the last element copied.
     ///
     template <typename InIter, typename OutIter, typename T>
-    FwdIter remove_copy(
+    OutIter remove_copy(
         InIter first, InIter last, OutIter dest, T const& value);
 
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest. Copies only the elements for which the
     /// comparison operator returns false when compare to value.
     /// The order of the elements that are not removed is preserved.
+    /// Executed according to the policy.
     ///
     /// Effects: Copies all the elements referred to by the iterator it in the
     ///          range [first,last) for which the following corresponding
@@ -66,7 +67,7 @@ namespace hpx {
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first applications of the
-    ///         predicate \a f.
+    ///         predicate \a pred, here comparison operator.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -89,7 +90,7 @@ namespace hpx {
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param val          Value to be removed.
+    /// \param value        Value to be removed.
     ///
     /// The assignments in the parallel \a remove_copy algorithm invoked with
     /// an execution policy object of type \a sequenced_policy
@@ -106,19 +107,19 @@ namespace hpx {
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a FwdIter2
-    ///           otherwise.
+    ///           returns \a FwdIter2 otherwise.
     ///           The \a remove_copy algorithm returns the
     ///           iterator to the element past the last element copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename T>
-    FwdIter remove_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, T const& val);
+        typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter2>::type remove_copy(ExPolicy&& policy, FwdIter1 first,
+            FwdIter1 last, FwdIter2 dest, T const& value);
 
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest. Copies only the elements for which the
-    /// predicate \a f returns false. The order of the elements that are not
+    /// predicate \a pred returns false. The order of the elements that are not
     /// removed is preserved.
     ///
     /// Effects: Copies all the elements referred to by the iterator it in the
@@ -128,13 +129,15 @@ namespace hpx {
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first applications of the
-    ///         predicate \a f.
+    ///         predicate \a pred.
     ///
     /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced).
     ///
@@ -161,20 +164,20 @@ namespace hpx {
     /// The assignments in the parallel \a remove_copy_if algorithm
     /// execute in sequential order in the calling thread.
     ///
-    ///
     /// \returns  The \a remove_copy_if algorithm returns an
     ///           \a OutIter
     ///           The \a remove_copy_if algorithm returns the
     ///           iterator to the element past the last element copied.
     ///
     template <typename InIter, typename OutIter, typename Pred>
-    FwdIter remove_copy_if(
+    OutIter remove_copy_if(
         InIter first, InIter last, OutIter dest, Pred&& pred);
 
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest. Copies only the elements for which the
-    /// predicate \a f returns false. The order of the elements that are not
+    /// predicate \a pred returns false. The order of the elements that are not
     /// removed is preserved.
+    /// Executed according to the policy.
     ///
     /// Effects: Copies all the elements referred to by the iterator it in the
     ///          range [first,last) for which the following corresponding
@@ -183,16 +186,16 @@ namespace hpx {
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first applications of the
-    ///         predicate \a f.
+    ///         predicate \a pred.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1     The type of the source iterators used (deduced).
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam FwdIter2     The type of the iterator representing the
+    /// \tparam FwdIter2    The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -245,8 +248,9 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred>
-    FwdIter remove_copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, Pred&& pred);
+        typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter2>::type remove_copy_if(ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred&& pred);
 
 }    // namespace hpx
 
