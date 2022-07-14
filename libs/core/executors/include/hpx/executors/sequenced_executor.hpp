@@ -172,9 +172,8 @@ namespace hpx { namespace execution {
             hpx::parallel::execution::bulk_sync_execute_t,
             sequenced_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
-            return hpx::unwrap(
-                tag_invoke(hpx::parallel::execution::bulk_async_execute, exec,
-                    HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
+            return hpx::unwrap(hpx::parallel::execution::bulk_async_execute(
+                exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
         }
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)

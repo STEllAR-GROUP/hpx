@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,7 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/type_support/always_void.hpp>
 
@@ -77,65 +78,81 @@ namespace hpx { namespace execution { namespace experimental {
         using future_type =
             hpx::traits::executor_future_t<BaseExecutor, T, Ts...>;
 
+    private:
         // NonBlockingOneWayExecutor interface
         template <typename F, typename... Ts>
-        decltype(auto) post(F&& f, Ts&&... ts)
+        friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
+            annotating_executor const& exec, F&& f, Ts&&... ts)
         {
-            return parallel::execution::post(exec_,
-                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
+            return parallel::execution::post(exec.exec_,
+                hpx::annotated_function(HPX_FORWARD(F, f), exec.annotation_),
                 HPX_FORWARD(Ts, ts)...);
         }
 
         // OneWayExecutor interface
         template <typename F, typename... Ts>
-        decltype(auto) sync_execute(F&& f, Ts&&... ts)
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::sync_execute_t,
+            annotating_executor const& exec, F&& f, Ts&&... ts)
         {
-            return parallel::execution::sync_execute(exec_,
-                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
+            return parallel::execution::sync_execute(exec.exec_,
+                hpx::annotated_function(HPX_FORWARD(F, f), exec.annotation_),
                 HPX_FORWARD(Ts, ts)...);
         }
 
         // TwoWayExecutor interface
         template <typename F, typename... Ts>
-        decltype(auto) async_execute(F&& f, Ts&&... ts)
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::async_execute_t,
+            annotating_executor const& exec, F&& f, Ts&&... ts)
         {
-            return parallel::execution::async_execute(exec_,
-                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
+            return parallel::execution::async_execute(exec.exec_,
+                hpx::annotated_function(HPX_FORWARD(F, f), exec.annotation_),
                 HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename Future, typename... Ts>
-        decltype(auto) then_execute(F&& f, Future&& predecessor, Ts&&... ts)
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::then_execute_t,
+            annotating_executor const& exec, F&& f, Future&& predecessor,
+            Ts&&... ts)
         {
-            return parallel::execution::then_execute(exec_,
-                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
+            return parallel::execution::then_execute(exec.exec_,
+                hpx::annotated_function(HPX_FORWARD(F, f), exec.annotation_),
                 HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
-        decltype(auto) bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::bulk_async_execute_t,
+            annotating_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
-            return parallel::execution::bulk_async_execute(exec_,
-                hpx::annotated_function(HPX_FORWARD(F, f), annotation_), shape,
-                HPX_FORWARD(Ts, ts)...);
+            return parallel::execution::bulk_async_execute(exec.exec_,
+                hpx::annotated_function(HPX_FORWARD(F, f), exec.annotation_),
+                shape, HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename... Ts>
-        decltype(auto) bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::bulk_sync_execute_t,
+            annotating_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
-            return parallel::execution::bulk_sync_execute(exec_,
-                hpx::annotated_function(HPX_FORWARD(F, f), annotation_), shape,
-                HPX_FORWARD(Ts, ts)...);
+            return parallel::execution::bulk_sync_execute(exec.exec_,
+                hpx::annotated_function(HPX_FORWARD(F, f), exec.annotation_),
+                shape, HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
-        decltype(auto) bulk_then_execute(
-            F&& f, S const& shape, Future&& predecessor, Ts&&... ts)
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::bulk_then_execute_t,
+            annotating_executor const& exec, F&& f, S const& shape,
+            Future&& predecessor, Ts&&... ts)
         {
-            return parallel::execution::bulk_then_execute(exec_,
-                hpx::annotated_function(HPX_FORWARD(F, f), annotation_), shape,
-                HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
+            return parallel::execution::bulk_then_execute(exec.exec_,
+                hpx::annotated_function(HPX_FORWARD(F, f), exec.annotation_),
+                shape, HPX_FORWARD(Future, predecessor),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // support with_annotation property

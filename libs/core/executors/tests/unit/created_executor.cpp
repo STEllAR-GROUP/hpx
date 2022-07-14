@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -47,16 +48,18 @@ struct void_parallel_executor : hpx::execution::parallel_executor
     }
 
     template <typename F, typename Shape, typename... Ts>
-    void bulk_sync_execute(F&& f, Shape const& shape, Ts&&... ts)
+    friend auto tag_invoke(hpx::parallel::execution::bulk_sync_execute_t,
+        void_parallel_executor const& exec, F&& f, Shape const& shape,
+        Ts&&... ts)
     {
         return hpx::unwrap(hpx::parallel::execution::bulk_async_execute(
-            *this, std::forward<F>(f), shape, std::forward<Ts>(ts)...));
+            exec, std::forward<F>(f), shape, std::forward<Ts>(ts)...));
     }
 };
 
 namespace hpx { namespace parallel { namespace execution {
     template <>
-    struct is_two_way_executor<void_parallel_executor> : std::true_type
+    struct is_bulk_one_way_executor<void_parallel_executor> : std::true_type
     {
     };
 
@@ -77,7 +80,7 @@ void bulk_test(int, hpx::thread::id tid, int passed_through)    //-V813
 
 void test_void_bulk_sync()
 {
-    typedef void_parallel_executor executor;
+    using executor = void_parallel_executor;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
@@ -95,7 +98,7 @@ void test_void_bulk_sync()
 
 void test_void_bulk_async()
 {
-    typedef void_parallel_executor executor;
+    using executor = void_parallel_executor;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
