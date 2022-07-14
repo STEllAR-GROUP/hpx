@@ -60,8 +60,7 @@ namespace hpx {
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a partial_sort_copy algorithm returns a
-    ///           returns \a RandomIt.
+    /// \returns  The \a partial_sort_copy algorithm returns a \a RandomIt.
     ///           The algorithm returns an iterator to the element defining
     ///           the upper boundary of the sorted range i.e.
     ///           d_first + min(last - first, d_last - d_first)
@@ -76,7 +75,8 @@ namespace hpx {
     /// order, storing the result in the range [d_first, d_last). At most
     /// d_last - d_first of the elements are placed sorted to the range
     /// [d_first, d_first + n) where n is the number of elements to sort
-    /// (n = min(last - first, d_last - d_first)).
+    /// (n = min(last - first, d_last - d_first)). Executed according to
+    /// the policy.
     ///
     /// \note   Complexity: O(Nlog(min(D,N))), where N =
     ///         std::distance(first, last) and D = std::distance(d_first,
