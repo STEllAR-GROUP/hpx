@@ -167,7 +167,10 @@ namespace hpx { namespace execution {
             return results;
         }
 
-        template <typename F, typename S, typename... Ts>
+        template <typename F, typename S, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<S>
+            )>
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
             sequenced_executor const& exec, F&& f, S const& shape, Ts&&... ts)
