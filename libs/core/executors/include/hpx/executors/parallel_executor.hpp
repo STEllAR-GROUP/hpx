@@ -315,7 +315,7 @@ namespace hpx { namespace execution {
 
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename... Ts>
-        void post(F&& f, Ts&&... ts) const
+        void post_impl(F&& f, Ts&&... ts) const
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             hpx::util::thread_description desc(f, annotation_);
@@ -332,7 +332,7 @@ namespace hpx { namespace execution {
         friend void tag_invoke(hpx::parallel::execution::post_t,
             parallel_policy_executor const& exec, F&& f, Ts&&... ts)
         {
-            exec.post(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            exec.post_impl(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkTwoWayExecutor interface

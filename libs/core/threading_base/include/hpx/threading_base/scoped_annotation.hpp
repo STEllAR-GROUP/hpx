@@ -52,18 +52,59 @@ namespace hpx {
         explicit scoped_annotation(char const* name)
           : task_(thread_domain_, hpx::util::itt::string_handle(name))
         {
+            auto* self = hpx::threads::get_self_ptr();
+            if (self != nullptr)
+            {
+                desc_ = threads::get_thread_id_data(self->get_thread_id())
+                            ->set_description(name);
+            }
         }
-        template <typename F>
+
+        explicit scoped_annotation(std::string name)
+          : task_(thread_domain_,
+                hpx::util::itt::string_handle(
+                    detail::store_function_annotation(name)))
+        {
+            auto* self = hpx::threads::get_self_ptr();
+            if (self != nullptr)
+            {
+                char const* name_c_str =
+                    detail::store_function_annotation(HPX_MOVE(name));
+                desc_ = threads::get_thread_id_data(self->get_thread_id())
+                            ->set_description(name_c_str);
+            }
+        }
+
+        template <typename F,
+            typename =
+                std::enable_if_t<!std::is_same_v<std::decay_t<F>, std::string>>>
         explicit scoped_annotation(F&& f)
           : task_(thread_domain_,
                 hpx::traits::get_function_annotation_itt<std::decay_t<F>>::call(
                     f))
         {
+            auto* self = hpx::threads::get_self_ptr();
+            if (self != nullptr)
+            {
+                desc_ = threads::get_thread_id_data(self->get_thread_id())
+                            ->set_description(hpx::util::thread_description(f));
+            }
+        }
+
+        ~scoped_annotation()
+        {
+            auto* self = hpx::threads::get_self_ptr();
+            if (self != nullptr)
+            {
+                threads::get_thread_id_data(self->get_thread_id())
+                    ->set_description(desc_);
+            }
         }
 
     private:
         hpx::util::itt::thread_domain thread_domain_;
         hpx::util::itt::task task_;
+        hpx::util::thread_description desc_;
     };
 #else
     struct [[nodiscard]] scoped_annotation
