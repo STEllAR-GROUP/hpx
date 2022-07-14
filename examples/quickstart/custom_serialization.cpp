@@ -192,19 +192,16 @@ HPX_PLAIN_ACTION(send_gravity)
 //[Main
 int main()
 {
-    for (int i = 0; i != 1000000; ++i)
-    {
-        // Needs at least two localities to run
-        // When sending to your current locality, no serialization is done
-        send_rectangle_struct_action rectangle_action;
-        auto rectangle = rectangle_free{{0, 0}, {0, 5}};
-        hpx::async(rectangle_action, hpx::find_here(), rectangle).get();
+    // Needs at least two localities to run
+    // When sending to your current locality, no serialization is done
+    send_rectangle_struct_action rectangle_action;
+    auto rectangle = rectangle_free{{0, 0}, {0, 5}};
+    hpx::async(rectangle_action, hpx::find_here(), rectangle).get();
 
-        send_gravity_action gravityAction;
-        auto gravity = planet_weight_calculator(9.81);
-        hpx::async(gravityAction, hpx::find_remote_localities()[0], gravity)
-            .get();
-    }
+    send_gravity_action gravityAction;
+    auto gravity = planet_weight_calculator(9.81);
+    hpx::async(gravityAction, hpx::find_remote_localities()[0], gravity).get();
+
     return 0;
 }
 //]
