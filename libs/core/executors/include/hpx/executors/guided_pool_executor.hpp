@@ -104,8 +104,8 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Executor, typename NumaFunction>
         struct pre_execution_async_domain_schedule
         {
-            Executor& executor_;
-            NumaFunction& numa_function_;
+            Executor const& executor_;
+            NumaFunction numa_function_;
             bool hp_sync_;
             //
             template <typename F, typename... Ts>
@@ -164,8 +164,8 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Executor, typename NumaFunction>
         struct pre_execution_then_domain_schedule
         {
-            Executor& executor_;
-            NumaFunction& numa_function_;
+            Executor const& executor_;
+            NumaFunction numa_function_;
             bool hp_sync_;
             //
             template <typename F, typename Future, typename... Ts>
@@ -256,7 +256,7 @@ namespace hpx { namespace parallel { namespace execution {
         friend struct guided_pool_executor_shim;
 
     public:
-        guided_pool_executor(
+        explicit guided_pool_executor(
             threads::thread_pool_base* pool, bool hp_sync = false)
           : pool_(pool)
           , priority_(threads::thread_priority::default_)
@@ -286,17 +286,18 @@ namespace hpx { namespace parallel { namespace execution {
         {
         }
 
+    private:
         // --------------------------------------------------------------------
         // async execute specialized for simple arguments typical
         // of a normal async call with arbitrary arguments
         // --------------------------------------------------------------------
         template <typename F, typename... Ts>
-        future<
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
-        async_execute(F&& f, Ts&&... ts)
+        friend auto tag_invoke(hpx::parallel::execution::async_execute_t,
+            guided_pool_executor const& exec, F&& f, Ts&&... ts)
+            -> future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
         {
-            typedef typename hpx::util::detail::invoke_deferred_result<F,
-                Ts...>::type result_type;
+            using result_type =
+                hpx::util::detail::invoke_deferred_result_t<F, Ts...>;
 
             gpx_deb.debug(debug::str<>("async execute"), "\n\t",
                 "Function    : ", hpx::util::debug::print_type<F>(), "\n\t",
@@ -311,8 +312,8 @@ namespace hpx { namespace parallel { namespace execution {
             // before passing the task onwards to the real executor
             return dataflow(launch::sync,
                 detail::pre_execution_async_domain_schedule<
-                    std::decay_t<std::remove_pointer_t<decltype(this)>>,
-                    pool_numa_hint<Tag>>{*this, hint_, hp_sync_},
+                    guided_pool_executor, pool_numa_hint<Tag>>{
+                    exec, exec.hint_, exec.hp_sync_},
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
@@ -322,12 +323,14 @@ namespace hpx { namespace parallel { namespace execution {
         // --------------------------------------------------------------------
         template <typename F, typename Future, typename... Ts,
             typename = std::enable_if_t<hpx::traits::is_future<Future>::value>>
-        auto then_execute(F&& f, Future&& predecessor, Ts&&... ts)
-            -> future<typename hpx::util::detail::invoke_deferred_result<F,
-                Future, Ts...>::type>
+        friend auto tag_invoke(hpx::parallel::execution::then_execute_t,
+            guided_pool_executor const& exec, F&& f, Future&& predecessor,
+            Ts&&... ts)
+            -> future<
+                hpx::util::detail::invoke_deferred_result_t<F, Future, Ts...>>
         {
-            typedef typename hpx::util::detail::invoke_deferred_result<F,
-                Future, Ts...>::type result_type;
+            using result_type =
+                hpx::util::detail::invoke_deferred_result<F, Future, Ts...>;
 
             gpx_deb.debug(debug::str<>("then execute"), "\n\t",
                 "Function    : ", hpx::util::debug::print_type<F>(), "\n\t",
@@ -354,11 +357,11 @@ namespace hpx { namespace parallel { namespace execution {
             // the real task will be spawned on a new task with hints - as intended
             return dataflow(
                 launch::sync,
-                [f = HPX_FORWARD(F, f), this](
+                [f = HPX_FORWARD(F, f), exec](
                     Future&& predecessor, Ts&&... /* ts */) mutable {
                     detail::pre_execution_then_domain_schedule<
                         guided_pool_executor, pool_numa_hint<Tag>>
-                        pre_exec{*this, hint_, hp_sync_};
+                        pre_exec{exec, exec.hint_, exec.hp_sync_};
 
                     return pre_exec(
                         HPX_MOVE(f), HPX_FORWARD(Future, predecessor));
@@ -376,10 +379,10 @@ namespace hpx { namespace parallel { namespace execution {
                 OuterFuture<hpx::tuple<InnerFutures...>>>::value>,
             typename = std::enable_if_t<hpx::traits::is_future_tuple<
                 hpx::tuple<InnerFutures...>>::value>>
-        auto then_execute(F&& f,
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::then_execute_t,
+            guided_pool_executor const& exec, F&& f,
             OuterFuture<hpx::tuple<InnerFutures...>>&& predecessor, Ts&&... ts)
-            -> future<typename hpx::util::detail::invoke_deferred_result<F,
-                OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>::type>
         {
 #ifdef GUIDED_EXECUTOR_DEBUG
             // get the tuple of futures from the predecessor future <tuple of futures>
@@ -414,12 +417,12 @@ namespace hpx { namespace parallel { namespace execution {
             // Please see notes for previous then_execute function above
             return dataflow(
                 launch::sync,
-                [f = HPX_FORWARD(F, f), this](
+                [f = HPX_FORWARD(F, f), exec](
                     OuterFuture<hpx::tuple<InnerFutures...>>&& predecessor,
                     Ts&&... /* ts */) mutable {
                     detail::pre_execution_then_domain_schedule<
                         guided_pool_executor, pool_numa_hint<Tag>>
-                        pre_exec{*this, hint_, hp_sync_};
+                        pre_exec{exec, exec.hint_, exec.hp_sync_};
 
                     return pre_exec(HPX_MOVE(f), HPX_MOVE(predecessor));
                 },
@@ -436,12 +439,14 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename F, typename... InnerFutures,
             typename = std::enable_if_t<hpx::traits::is_future_tuple<
                 hpx::tuple<InnerFutures...>>::value>>
-        auto async_execute(F&& f, hpx::tuple<InnerFutures...>&& predecessor)
-            -> future<typename hpx::util::detail::invoke_deferred_result<F,
-                hpx::tuple<InnerFutures...>>::type>
+        friend auto tag_invoke(hpx::parallel::execution::async_execute_t,
+            guided_pool_executor const& exec, F&& f,
+            hpx::tuple<InnerFutures...>&& predecessor)
+            -> future<hpx::util::detail::invoke_deferred_result_t<F,
+                hpx::tuple<InnerFutures...>>>
         {
-            typedef typename hpx::util::detail::invoke_deferred_result<F,
-                hpx::tuple<InnerFutures...>>::type result_type;
+            using result_type = hpx::util::detail::invoke_deferred_result_t<F,
+                hpx::tuple<InnerFutures...>>;
 
             // invoke the hint function with the unwrapped tuple futures
 #ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
@@ -451,7 +456,7 @@ namespace hpx { namespace parallel { namespace execution {
                 detail::future_extract_value{}, predecessor);
 
             int domain =
-                hpx::util::invoke_fused(hint_, unwrapped_futures_tuple);
+                hpx::util::invoke_fused(exec.hint_, unwrapped_futures_tuple);
 #endif
 
 #ifndef GUIDED_EXECUTOR_DEBUG
@@ -477,19 +482,20 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::util::deferred_call(HPX_FORWARD(F, f),
                     std::forward<hpx::tuple<InnerFutures...>>(predecessor)));
 
-            if (hp_sync_ && priority_ == hpx::threads::thread_priority::high)
+            if (exec.hp_sync_ &&
+                exec.priority_ == hpx::threads::thread_priority::high)
             {
-                p.apply(pool_, "guided async",
+                p.apply(exec.pool_, "guided async",
                     hpx::launch::sync_policy(
-                        hpx::threads::thread_priority::high, stacksize_,
+                        hpx::threads::thread_priority::high, exec.stacksize_,
                         hpx::threads::thread_schedule_hint(
                             hpx::threads::thread_schedule_hint_mode::numa,
                             domain)));
             }
             else
             {
-                p.apply(pool_, "guided async",
-                    hpx::launch::async_policy(priority_, stacksize_,
+                p.apply(exec.pool_, "guided async",
+                    hpx::launch::async_policy(exec.priority_, exec.stacksize_,
                         hpx::threads::thread_schedule_hint(
                             hpx::threads::thread_schedule_hint_mode::numa,
                             domain)));
@@ -546,8 +552,10 @@ namespace hpx { namespace parallel { namespace execution {
         async_execute(F&& f, Ts&&... ts)
         {
             if (guided_)
-                return guided_exec_.async_execute(
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            {
+                return hpx::parallel::execution::async_execute(
+                    guided_exec_, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
             else
             {
                 typedef typename hpx::util::detail::invoke_deferred_result<F,
@@ -574,8 +582,11 @@ namespace hpx { namespace parallel { namespace execution {
                 Future, Ts...>::type>
         {
             if (guided_)
-                return guided_exec_.then_execute(HPX_FORWARD(F, f),
-                    HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
+            {
+                return hpx::parallel::execution::then_execute(guided_exec_,
+                    HPX_FORWARD(F, f), HPX_FORWARD(Future, predecessor),
+                    HPX_FORWARD(Ts, ts)...);
+            }
             else
             {
                 typedef typename hpx::util::detail::invoke_deferred_result<F,

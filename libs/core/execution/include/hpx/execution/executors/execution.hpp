@@ -447,7 +447,8 @@ namespace hpx { namespace parallel { namespace execution {
                 TwoWayExecutor&& exec, F&& f, Ts&&... ts)
             {
                 // simply discard the returned future
-                exec.async_execute(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+                hpx::parallel::execution::async_execute(
+                    exec, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
             // dispatch to V1 executors
