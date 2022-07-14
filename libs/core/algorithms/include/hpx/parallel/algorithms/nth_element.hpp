@@ -21,6 +21,7 @@ namespace hpx {
     /// whatever element would occur in that position if [first, last) were
     /// sorted and all of the elements before this new nth element are less
     /// than or equal to the elements after the new nth element.
+    /// Executed according to the policy.
     ///
     /// \note   Complexity: Linear in std::distance(first, last) on average.
     ///         O(N) applications of the predicate, and O(N log N) swaps,
