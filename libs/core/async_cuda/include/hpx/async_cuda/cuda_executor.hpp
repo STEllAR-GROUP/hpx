@@ -89,7 +89,7 @@ namespace hpx { namespace cuda { namespace experimental {
             stream_ = target_->native_handle().get_stream();
         }
 
-        inline future_type get_future()
+        inline future_type get_future() const
         {
             if (event_mode_)
             {
@@ -114,7 +114,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // -------------------------------------------------------------------------
         // construct - create a cuda stream that all tasks invoked by
         // this helper will use
-        cuda_executor(std::size_t device, bool event_mode = true)
+        explicit cuda_executor(std::size_t device, bool event_mode = true)
           : cuda_executor_base(device, event_mode)
         {
         }

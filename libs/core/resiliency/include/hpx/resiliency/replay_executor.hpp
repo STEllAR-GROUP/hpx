@@ -12,6 +12,7 @@
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
+#include <hpx/executors/current_executor.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/resiliency/async_replay_executor.hpp>

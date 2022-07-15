@@ -107,6 +107,15 @@ namespace hpx { namespace parallel { namespace execution {
             Executor const& executor_;
             NumaFunction numa_function_;
             bool hp_sync_;
+
+            pre_execution_async_domain_schedule(Executor const& executor,
+                NumaFunction const& numa_function, bool hp_sync)
+              : executor_(executor)
+              , numa_function_(numa_function)
+              , hp_sync_(hp_sync)
+            {
+            }
+
             //
             template <typename F, typename... Ts>
             auto operator()(F&& f, Ts&&... ts) const
@@ -167,6 +176,15 @@ namespace hpx { namespace parallel { namespace execution {
             Executor const& executor_;
             NumaFunction numa_function_;
             bool hp_sync_;
+
+            pre_execution_then_domain_schedule(Executor const& executor,
+                NumaFunction const& numa_function, bool hp_sync)
+              : executor_(executor)
+              , numa_function_(numa_function)
+              , hp_sync_(hp_sync)
+            {
+            }
+
             //
             template <typename F, typename Future, typename... Ts>
             auto operator()(F&& f, Future&& predecessor, Ts&&... ts) const
@@ -312,8 +330,8 @@ namespace hpx { namespace parallel { namespace execution {
             // before passing the task onwards to the real executor
             return dataflow(launch::sync,
                 detail::pre_execution_async_domain_schedule<
-                    guided_pool_executor, pool_numa_hint<Tag>>{
-                    exec, exec.hint_, exec.hp_sync_},
+                    guided_pool_executor, pool_numa_hint<Tag>>(
+                    exec, exec.hint_, exec.hp_sync_),
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
@@ -361,7 +379,7 @@ namespace hpx { namespace parallel { namespace execution {
                     Future&& predecessor, Ts&&... /* ts */) mutable {
                     detail::pre_execution_then_domain_schedule<
                         guided_pool_executor, pool_numa_hint<Tag>>
-                        pre_exec{exec, exec.hint_, exec.hp_sync_};
+                        pre_exec(exec, exec.hint_, exec.hp_sync_);
 
                     return pre_exec(
                         HPX_MOVE(f), HPX_FORWARD(Future, predecessor));
@@ -422,7 +440,7 @@ namespace hpx { namespace parallel { namespace execution {
                     Ts&&... /* ts */) mutable {
                     detail::pre_execution_then_domain_schedule<
                         guided_pool_executor, pool_numa_hint<Tag>>
-                        pre_exec{exec, exec.hint_, exec.hp_sync_};
+                        pre_exec(exec, exec.hint_, exec.hp_sync_);
 
                     return pre_exec(HPX_MOVE(f), HPX_MOVE(predecessor));
                 },

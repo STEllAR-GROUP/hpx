@@ -147,26 +147,6 @@ void test_bulk_then(executor const& exec)
     HPX_TEST(count == v.size());
 }
 
-void static_check_executor()
-{
-    using namespace hpx::traits;
-
-    static_assert(has_sync_execute_member<executor>::value,
-        "has_sync_execute_member<executor>::value");
-    static_assert(has_async_execute_member<executor>::value,
-        "has_async_execute_member<executor>::value");
-    static_assert(has_then_execute_member<executor>::value,
-        "has_then_execute_member<executor>::value");
-    static_assert(has_bulk_sync_execute_member<executor>::value,
-        "has_bulk_sync_execute_member<executor>::value");
-    static_assert(has_bulk_async_execute_member<executor>::value,
-        "has_bulk_async_execute_member<executor>::value");
-    static_assert(has_bulk_then_execute_member<executor>::value,
-        "has_bulk_then_execute_member<executor>::value");
-    static_assert(has_post_member<executor>::value,
-        "check has_post_member<executor>::value");
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 void test_executor(executor const& exec)
 {
@@ -181,8 +161,6 @@ void test_executor(executor const& exec)
 
 int hpx_main()
 {
-    static_check_executor();
-
     hpx::execution::parallel_executor par_exec;
     test_executor(executor(par_exec));
 

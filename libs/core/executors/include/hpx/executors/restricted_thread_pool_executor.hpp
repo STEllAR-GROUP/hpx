@@ -61,7 +61,7 @@ namespace hpx::parallel::execution {
                 hierarchical_threshold)
         {
             // set initial number of cores
-            exec_ = hpx::parallel::execution::with_processing_units_count_t(
+            exec_ = hpx::parallel::execution::with_processing_units_count(
                 exec_, num_threads);
         }
 

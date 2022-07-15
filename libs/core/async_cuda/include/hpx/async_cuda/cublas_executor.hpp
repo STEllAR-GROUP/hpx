@@ -198,8 +198,8 @@ namespace hpx { namespace cuda { namespace experimental {
         // that you would use for a cublas call except the cublas handle which is omitted
         // as the wrapper will supply that for you
         template <typename R, typename... Params, typename... Args>
-        std::enable_if_t<std::is_same_v<cublasStatus_t, R>, R>
-        apply(R (*cublas_function)(Params...), Args&&... args) const
+        std::enable_if_t<std::is_same_v<cublasStatus_t, R>, R> apply(
+            R (*cublas_function)(Params...), Args&&... args) const
         {
             // make sure we run on the correct device
             check_cuda_error(cudaSetDevice(device_));
