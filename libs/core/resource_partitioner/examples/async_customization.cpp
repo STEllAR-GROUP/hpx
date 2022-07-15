@@ -42,8 +42,7 @@ struct test_async_executor
 
     template <typename... Futures>
     struct is_tuple_of_futures<hpx::tuple<Futures...>>
-      : util::all_of<
-            traits::is_future<std::remove_reference_t<Futures>>...>
+      : util::all_of<traits::is_future<std::remove_reference_t<Futures>>...>
     {
     };
 

@@ -357,7 +357,7 @@ namespace hpx { namespace execution {
                 threads::detail::get_self_or_default_pool();
 
             return parallel::execution::detail::hierarchical_bulk_async_execute(
-                desc, pool, 0, exec.get_num_cores(),
+                desc, pool, exec.get_first_core(), exec.get_num_cores(),
                 exec.hierarchical_threshold_, exec.policy_, HPX_FORWARD(F, f),
                 shape, HPX_FORWARD(Ts, ts)...);
         }
@@ -399,6 +399,17 @@ namespace hpx { namespace execution {
             auto pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
             return pool->get_os_thread_count();
+        }
+
+        std::size_t get_first_core() const
+        {
+            if (policy_.hint().mode !=
+                    hpx::threads::thread_schedule_hint_mode::none &&
+                policy_.hint().hint != -1)
+            {
+                return policy_.hint().hint;
+            }
+            return 0;
         }
 
         friend class hpx::serialization::access;

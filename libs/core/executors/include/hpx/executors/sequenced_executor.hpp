@@ -25,6 +25,7 @@
 
 #include <cstddef>
 #include <iterator>
+#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -167,10 +168,12 @@ namespace hpx { namespace execution {
             return results;
         }
 
+        // clang-format off
         template <typename F, typename S, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
                 !std::is_integral_v<S>
             )>
+        // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_sync_execute_t,
             sequenced_executor const& exec, F&& f, S const& shape, Ts&&... ts)
