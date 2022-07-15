@@ -58,9 +58,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         std::size_t const size = hpx::util::size(shape);
         results.resize(size);
 
-        auto post_policy = policy;
-        hpx::execution::experimental::with_stacksize(
-            post_policy, threads::thread_stacksize::small_);
+        auto post_policy = hpx::execution::experimental::with_stacksize(
+            policy, threads::thread_stacksize::small_);
 
         hpx::latch l(size);
         std::size_t part_begin = 0;
@@ -70,8 +69,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             std::size_t const part_end = ((t + 1) * size) / num_threads;
             std::size_t const part_size = part_end - part_begin;
 
-            auto async_policy = policy;
-            hpx::execution::experimental::with_hint(async_policy,
+            auto async_policy = hpx::execution::experimental::with_hint(policy,
                 threads::thread_schedule_hint{
                     static_cast<std::int16_t>(first_thread + t)});
 
@@ -136,9 +134,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 Launch policy, std::decay_t<F> f, S const& shape,
                 std::decay_t<Ts>... ts) {
                 std::size_t const size = hpx::util::size(shape);
-                auto post_policy = policy;
-                hpx::execution::experimental::with_stacksize(
-                    post_policy, threads::thread_stacksize::small_);
+                auto post_policy = hpx::execution::experimental::with_stacksize(
+                    policy, threads::thread_stacksize::small_);
 
                 std::exception_ptr e;
                 hpx::spinlock mtx_e;
@@ -163,10 +160,10 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 auto it = std::begin(shape);
                 for (std::size_t t = 0; t != num_threads; ++t)
                 {
-                    auto inner_post_policy = policy;
-                    hpx::execution::experimental::with_hint(inner_post_policy,
-                        threads::thread_schedule_hint{
-                            static_cast<std::int16_t>(first_thread + t)});
+                    auto inner_post_policy =
+                        hpx::execution::experimental::with_hint(policy,
+                            threads::thread_schedule_hint{
+                                static_cast<std::int16_t>(first_thread + t)});
 
                     std::size_t const end = ((t + 1) * size) / num_threads;
                     std::size_t const part_size = end - begin;
