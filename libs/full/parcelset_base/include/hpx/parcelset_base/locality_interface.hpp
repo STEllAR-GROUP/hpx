@@ -23,6 +23,11 @@ namespace hpx::parcelset {
     HPX_EXPORT parcelset::parcel create_parcel();
 
     HPX_EXPORT locality create_locality(std::string const& name);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // initialize locality interface function wrappers
+    struct locality_interface_functions& locality_init();
+
 }    // namespace hpx::parcelset
 
 #endif

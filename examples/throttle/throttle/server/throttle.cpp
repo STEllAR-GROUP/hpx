@@ -14,6 +14,7 @@
 
 #include <chrono>
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <mutex>
 #include <string>
@@ -121,7 +122,8 @@ namespace throttle { namespace server {
             hpx::threads::make_thread_function_nullary(
                 hpx::bind(&throttle::throttle_controller, this, shepherd)),
             description.c_str(), hpx::threads::thread_priority::high,
-            hpx::threads::thread_schedule_hint(shepherd));
+            hpx::threads::thread_schedule_hint(
+                static_cast<std::uint16_t>(shepherd)));
         hpx::threads::register_thread(data);
     }
 
@@ -135,7 +137,8 @@ namespace throttle { namespace server {
             hpx::threads::make_thread_function_nullary(
                 hpx::bind(&throttle::suspend, this, shepherd)),
             description.c_str(), hpx::threads::thread_priority::high,
-            hpx::threads::thread_schedule_hint(shepherd));
+            hpx::threads::thread_schedule_hint(
+                static_cast<std::uint16_t>(shepherd)));
         hpx::threads::register_thread(data);
     }
 }}    // namespace throttle::server

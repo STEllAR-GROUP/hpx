@@ -146,8 +146,6 @@ namespace hpx { namespace lcos { namespace server {
     HPX_REGISTER_ACTION_DECLARATION(                                           \
         hpx::lcos::server::channel<type>::close_action,                        \
         HPX_PP_CAT(__channel_close_action, HPX_PP_CAT(type, name)))            \
-    HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(                              \
-        type, type, name, component_tag)                                       \
     /**/
 
 #define HPX_REGISTER_CHANNEL(...)                                              \
@@ -179,5 +177,4 @@ namespace hpx { namespace lcos { namespace server {
         HPX_PP_CAT(__channel_set_generation_action, HPX_PP_CAT(type, name)))   \
     HPX_REGISTER_ACTION(hpx::lcos::server::channel<type>::close_action,        \
         HPX_PP_CAT(__channel_close_action, HPX_PP_CAT(type, name)))            \
-    HPX_REGISTER_BASE_LCO_WITH_VALUE(type, type, name, component_tag)          \
     /**/

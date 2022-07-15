@@ -20,6 +20,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // coarray<double> is predefined in the partitioned_vector module
+#if defined(HPX_HAVE_STATIC_LINKING)
+HPX_REGISTER_COARRAY(double)
+#endif
 
 void bulk_test( hpx::lcos::spmd_block block,
                 std::size_t height,

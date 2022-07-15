@@ -20,6 +20,9 @@
 
 // partitioned_vector<int> and partitioned_vector<double> are predefined in the
 // partitioned_vector module
+#if defined(HPX_HAVE_STATIC_LINKING)
+HPX_REGISTER_PARTITIONED_VECTOR(double)
+#endif
 
 typedef unsigned long ulong;
 

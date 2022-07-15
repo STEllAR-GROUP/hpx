@@ -31,7 +31,7 @@
 #include <exception>
 #include <system_error>
 
-#if defined(HPX_WINDOWS)
+#if defined(HPX_WINDOWS) && !defined(HPX_HAVE_STATIC_LINKING)
 // Prevent asio from initializing Winsock, the object must be constructed
 // before any Asio's own global objects. With MSVC, this may be accomplished
 // by adding the following code to the DLL:

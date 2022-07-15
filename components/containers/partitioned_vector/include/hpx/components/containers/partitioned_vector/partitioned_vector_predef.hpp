@@ -19,7 +19,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 // declare explicitly instantiated templates
 
-#if !defined(HPX_PARTITIONED_VECTOR_MODULE_EXPORTS)
+#if !defined(HPX_PARTITIONED_VECTOR_MODULE_EXPORTS) &&                         \
+    !defined(HPX_HAVE_STATIC_LINKING)
 
 // partitioned_vector<double>
 HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(double)

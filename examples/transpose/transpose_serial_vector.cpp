@@ -1,11 +1,12 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/init.hpp>
@@ -20,14 +21,14 @@
 #define COL_SHIFT 1000.00    // Constant to shift column index
 #define ROW_SHIFT 0.001      // Constant to shift row index
 
+#if defined(HPX_HAVE_STATIC_LINKING)
+HPX_REGISTER_PARTITIONED_VECTOR(double)
+#endif
+
 bool verbose = false;
 
 double test_results(
     std::uint64_t order, hpx::partitioned_vector<double> const& trans);
-
-#if !defined(HPX_MSVC)
-HPX_REGISTER_PARTITIONED_VECTOR(double)
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)

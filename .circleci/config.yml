@@ -601,7 +601,7 @@ jobs:
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
-                --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.targets | sed ':b;N;$!bb;s/\n/|/g'` \
+                --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.targets | sed ':b;N;$!bb;s/\n/|/g'`
       - run:
           <<: *convert_xml
       - run:

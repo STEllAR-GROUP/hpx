@@ -201,7 +201,10 @@ function(add_hpx_component name)
     # cmake-format: on
 
     # install PDB if needed
-    if(MSVC)
+    if(MSVC
+       AND NOT ${name}_STATIC
+       AND NOT HPX_WITH_STATIC_LINKING
+    )
       # cmake-format: off
       set(_target_flags
           ${_target_flags}

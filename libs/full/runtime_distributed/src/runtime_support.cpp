@@ -105,7 +105,12 @@ namespace hpx { namespace agas {
         }
     };
 
-    runtime_components_init_interface_functions runtime_components_init;
+    runtime_components_init_interface_functions& runtime_components_init()
+    {
+        static runtime_components_init_interface_functions
+            runtime_components_init_;
+        return runtime_components_init_;
+    }
 }}    // namespace hpx::agas
 
 namespace hpx { namespace components {
@@ -130,5 +135,9 @@ namespace hpx { namespace components {
         }
     };
 
-    counter_interface_functions counter_init;
+    counter_interface_functions& counter_init()
+    {
+        static counter_interface_functions counter_init_;
+        return counter_init_;
+    }
 }}    // namespace hpx::components

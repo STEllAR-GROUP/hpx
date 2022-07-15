@@ -368,16 +368,16 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename FwdIter, typename F,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
+        template <typename InIter, typename F,
+            typename T = typename std::iterator_traits<InIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::traits::is_iterator<InIter>::value
             )>
         // clang-format on
         friend T tag_fallback_invoke(
-            hpx::reduce_t, FwdIter first, FwdIter last, T init, F&& f)
+            hpx::reduce_t, InIter first, InIter last, T init, F&& f)
         {
-            static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_input_iterator<InIter>::value,
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
@@ -386,16 +386,16 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename FwdIter,
-            typename T = typename std::iterator_traits<FwdIter>::value_type,
+        template <typename InIter,
+            typename T = typename std::iterator_traits<InIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::traits::is_iterator<InIter>::value
             )>
         // clang-format on
         friend T tag_fallback_invoke(
-            hpx::reduce_t, FwdIter first, FwdIter last, T init)
+            hpx::reduce_t, InIter first, InIter last, T init)
         {
-            static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_input_iterator<InIter>::value,
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
@@ -404,19 +404,19 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename FwdIter,
+        template <typename InIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::traits::is_iterator<InIter>::value
             )>
         // clang-format on
-        friend typename std::iterator_traits<FwdIter>::value_type
-        tag_fallback_invoke(hpx::reduce_t, FwdIter first, FwdIter last)
+        friend typename std::iterator_traits<InIter>::value_type
+        tag_fallback_invoke(hpx::reduce_t, InIter first, InIter last)
         {
-            static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_input_iterator<InIter>::value,
                 "Requires at least input iterator.");
 
             using value_type =
-                typename std::iterator_traits<FwdIter>::value_type;
+                typename std::iterator_traits<InIter>::value_type;
 
             return hpx::parallel::v1::detail::reduce<value_type>().call(
                 hpx::execution::seq, first, last, value_type{}, std::plus<>());

@@ -5,6 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+#if !defined(HPX_HAVE_STATIC_LINKING)
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/apply.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
@@ -23,3 +26,5 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(std::int8_t, int8_t,
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(std::uint8_t, uint8_t,
     hpx::actions::base_lco_with_value_uint8_get,
     hpx::actions::base_lco_with_value_uint8_set)
+
+#endif

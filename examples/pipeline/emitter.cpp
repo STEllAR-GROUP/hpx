@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-HPX_REGISTER_CHANNEL(int)
+HPX_REGISTER_CHANNEL(int, pipeline)
 
 void f1(hpx::lcos::channel<int>& c1)
 {
@@ -20,7 +20,7 @@ void f1(hpx::lcos::channel<int>& c1)
         std::cout << "First Stage: " << i << ". Executed on locality "
                   << hpx::get_locality_id() << " " << hpx::get_locality_name()
                   << '\n';
-        c1.set(i);
+        c1.set(int(i));
         hpx::this_thread::sleep_for(std::chrono::seconds(5));
     }
     c1.close();

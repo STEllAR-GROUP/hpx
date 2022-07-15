@@ -634,5 +634,9 @@ namespace hpx { namespace agas {
         }
     };
 
-    agas_interface_functions agas_init;
+    agas_interface_functions& agas_init()
+    {
+        static agas_interface_functions agas_init_;
+        return agas_init_;
+    }
 }}    // namespace hpx::agas

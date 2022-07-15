@@ -294,4 +294,8 @@ namespace hpx { namespace agas {
     HPX_EXPORT naming::address_type get_symbol_ns_lva();
     HPX_EXPORT naming::address_type get_runtime_support_lva();
 
+    ///////////////////////////////////////////////////////////////////////////
+    // initialize AGAS interface function wrappers
+    struct agas_interface_functions& agas_init();
+
 }}    // namespace hpx::agas

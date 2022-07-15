@@ -162,7 +162,11 @@ namespace hpx::parcelset {
         }
     };
 
-    locality_interface_functions locality_init;
+    locality_interface_functions& locality_init()
+    {
+        static locality_interface_functions locality_init_;
+        return locality_init_;
+    }
 }    // namespace hpx::parcelset
 
 #endif

@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-HPX_REGISTER_CHANNEL(int)
+HPX_REGISTER_CHANNEL(int, pipeline)
 
 hpx::future<void> f3(hpx::lcos::channel<int>& c2)
 {
