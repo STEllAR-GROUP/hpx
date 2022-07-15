@@ -40,7 +40,7 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename R, typename... Args>
         struct dispatch_helper
         {
-            inline R operator()(R (*f)(Args...), Args... args)
+            inline R operator()(R (*f)(Args...), Args... args) const
             {
                 return f(args...);
             }
@@ -50,7 +50,7 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename... Args>
         struct dispatch_helper<void, Args...>
         {
-            inline void operator()(void (*f)(Args...), Args... args)
+            inline void operator()(void (*f)(Args...), Args... args) const
             {
                 f(args...);
             }
@@ -60,7 +60,8 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename... Args>
         struct dispatch_helper<cudaError_t, Args...>
         {
-            inline void operator()(cudaError_t (*f)(Args...), Args... args)
+            inline void operator()(
+                cudaError_t (*f)(Args...), Args... args) const
             {
                 check_cuda_error(f(args...));
             }
@@ -125,17 +126,20 @@ namespace hpx { namespace cuda { namespace experimental {
         // -------------------------------------------------------------------------
         // OneWay Execution
         template <typename F, typename... Ts>
-        inline decltype(auto) post(F&& f, Ts&&... ts)
+        friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
+            cuda_executor const& exec, F&& f, Ts&&... ts)
         {
-            return apply(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            return exec.apply(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // -------------------------------------------------------------------------
         // TwoWay Execution
         template <typename F, typename... Ts>
-        inline decltype(auto) async_execute(F&& f, Ts&&... ts)
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::async_execute_t,
+            cuda_executor const& exec, F&& f, Ts&&... ts)
         {
-            return async(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            return exec.async(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
     protected:
@@ -145,10 +149,11 @@ namespace hpx { namespace cuda { namespace experimental {
         // (typically this will be cudaError_t).
         // Throws cuda_exception if the async launch fails.
         template <typename R, typename... Params, typename... Args>
-        void apply(R (*cuda_function)(Params...), Args&&... args)
+        void apply(R (*cuda_function)(Params...), Args&&... args) const
         {
             // make sure we run on the correct device
             check_cuda_error(cudaSetDevice(device_));
+
             // insert the stream handle in the arg list and call the cuda function
             detail::dispatch_helper<R, Params...> helper{};
             helper(cuda_function, HPX_FORWARD(Args, args)..., stream_);
@@ -160,12 +165,14 @@ namespace hpx { namespace cuda { namespace experimental {
         // hpx::futures and the tasking DAG.
         // Puts a cuda_exception in the future if the async launch fails.
         template <typename R, typename... Params, typename... Args>
-        hpx::future<void> async(R (*cuda_kernel)(Params...), Args&&... args)
+        hpx::future<void> async(
+            R (*cuda_kernel)(Params...), Args&&... args) const
         {
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
                     // make sure we run on the correct device
                     check_cuda_error(cudaSetDevice(device_));
+
                     // insert the stream handle in the arg list and call the cuda function
                     detail::dispatch_helper<R, Params...> helper{};
                     helper(cuda_kernel, HPX_FORWARD(Args, args)..., stream_);

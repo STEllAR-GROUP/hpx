@@ -28,7 +28,7 @@ namespace hpx { namespace mpi { namespace experimental {
         // default params type as we don't do anything special
         using executor_parameters_type = hpx::execution::static_chunk_size;
 
-        constexpr executor(MPI_Comm communicator = MPI_COMM_WORLD)
+        constexpr explicit executor(MPI_Comm communicator = MPI_COMM_WORLD)
           : communicator_(communicator)
         {
         }
@@ -52,10 +52,12 @@ namespace hpx { namespace mpi { namespace experimental {
 
         // TwoWayExecutor interface
         template <typename F, typename... Ts>
-        decltype(auto) async_execute(F&& f, Ts&&... ts) const
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::async_execute_t, executor const& exec,
+            F&& f, Ts&&... ts)
         {
             return hpx::mpi::experimental::detail::async(
-                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)..., communicator_);
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)..., exec.communicator_);
         }
 
         std::size_t in_flight_estimate() const
