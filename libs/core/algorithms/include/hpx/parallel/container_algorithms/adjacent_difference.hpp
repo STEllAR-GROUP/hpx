@@ -44,7 +44,7 @@ namespace hpx { namespace ranges {
     template <typename FwdIter1, typename FwdIter2, typename Sent>
     FwdIter2 adjacent_difference(
         FwdIter1 first, Sent last, FwdIter2 dest);
-    
+
     /// Searches the \a rng for two consecutive identical elements.
     ///
     /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
@@ -167,16 +167,16 @@ namespace hpx { namespace ranges {
     ///                     the range the algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     /// \param op           Binary operation function object that will be applied.
-    ///                     The signature of the function should be equivalent to 
+    ///                     The signature of the function should be equivalent to
     ///                     the following:
     ///                     \code
     ///                     Ret fun(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const &.
-    ///                     The types \a Type1 and \a Type2 must be such that an 
-    ///                     object of type \a iterator_traits<InputIt>::value_type 
-    ///                     can be implicitly converted to both of them. The type 
-    ///                     \a Ret must be such that an object of type \a OutputIt 
+    ///                     The types \a Type1 and \a Type2 must be such that an
+    ///                     object of type \a iterator_traits<InputIt>::value_type
+    ///                     can be implicitly converted to both of them. The type
+    ///                     \a Ret must be such that an object of type \a OutputIt
     ///                     can be dereferenced and assigned a value of type \a Ret.
     ///
     /// \returns  The \a adjacent_difference algorithm returns an iterator to the
@@ -205,16 +205,16 @@ namespace hpx { namespace ranges {
     ///                     will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     /// \param op           Binary operation function object that will be applied.
-    ///                     The signature of the function should be equivalent to 
+    ///                     The signature of the function should be equivalent to
     ///                     the following:
     ///                     \code
     ///                     Ret fun(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const &.
-    ///                     The types \a Type1 and \a Type2 must be such that an 
-    ///                     object of type \a iterator_traits<InputIt>::value_type 
-    ///                     can be implicitly converted to both of them. The type 
-    ///                     \a Ret must be such that an object of type \a OutputIt 
+    ///                     The types \a Type1 and \a Type2 must be such that an
+    ///                     object of type \a iterator_traits<InputIt>::value_type
+    ///                     can be implicitly converted to both of them. The type
+    ///                     \a Ret must be such that an object of type \a OutputIt
     ///                     can be dereferenced and assigned a value of type \a Ret.?
     ///
     /// \returns  The \a adjacent_difference algorithm returns an iterator to the
@@ -256,16 +256,16 @@ namespace hpx { namespace ranges {
     ///                     the range the algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     /// \param op           Binary operation function object that will be applied.
-    ///                     The signature of the function should be equivalent to 
+    ///                     The signature of the function should be equivalent to
     ///                     the following:
     ///                     \code
     ///                     Ret fun(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const &.
-    ///                     The types \a Type1 and \a Type2 must be such that an 
-    ///                     object of type \a iterator_traits<InputIt>::value_type 
-    ///                     can be implicitly converted to both of them. The type 
-    ///                     \a Ret must be such that an object of type \a OutputIt 
+    ///                     The types \a Type1 and \a Type2 must be such that an
+    ///                     object of type \a iterator_traits<InputIt>::value_type
+    ///                     can be implicitly converted to both of them. The type
+    ///                     \a Ret must be such that an object of type \a OutputIt
     ///                     can be dereferenced and assigned a value of type \a Ret.?
     ///
     /// \returns  The \a adjacent_difference algorithm returns an iterator to the
@@ -278,7 +278,7 @@ namespace hpx { namespace ranges {
             FwdIter2>
     adjacent_difference(ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest,
             Op&& op);
-    
+
     /// Searches the \a rng for two consecutive identical elements.
     ///
     /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
@@ -307,16 +307,16 @@ namespace hpx { namespace ranges {
     ///                     will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     /// \param op           Binary operation function object that will be applied.
-    ///                     The signature of the function should be equivalent to 
+    ///                     The signature of the function should be equivalent to
     ///                     the following:
     ///                     \code
     ///                     Ret fun(const Type1 &a, const Type2 &b);
     ///                     \endcode \n
     ///                     The signature does not need to have const &.
-    ///                     The types \a Type1 and \a Type2 must be such that an 
-    ///                     object of type \a iterator_traits<InputIt>::value_type 
-    ///                     can be implicitly converted to both of them. The type 
-    ///                     \a Ret must be such that an object of type \a OutputIt 
+    ///                     The types \a Type1 and \a Type2 must be such that an
+    ///                     object of type \a iterator_traits<InputIt>::value_type
+    ///                     can be implicitly converted to both of them. The type
+    ///                     \a Ret must be such that an object of type \a OutputIt
     ///                     can be dereferenced and assigned a value of type \a Ret.
     ///
     /// \returns  The \a adjacent_difference algorithm returns an iterator to the
