@@ -89,7 +89,8 @@ namespace hpx::parallel::execution {
         }
 
     private:
-        std::int16_t get_next_thread_num()
+        // this function is conceptually const (os_threads_ is mutable)
+        std::int16_t get_next_thread_num() const
         {
             return static_cast<std::int16_t>(first_thread_ +
                 (os_thread_++ %

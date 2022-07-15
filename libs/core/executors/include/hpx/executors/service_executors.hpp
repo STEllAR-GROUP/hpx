@@ -144,7 +144,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                     vector_result_type>::type;
             using future_type = typename std::decay<Future>::type;
 
-            current_executor exec_current = hpx::this_thread::get_executor();
+            auto exec_current = hpx::this_thread::get_executor();
             shared_state_type p =
                 lcos::detail::make_continuation_exec<vector_result_type>(
                     HPX_FORWARD(Future, predecessor), exec_current,

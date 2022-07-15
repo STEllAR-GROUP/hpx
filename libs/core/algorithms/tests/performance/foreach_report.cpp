@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //  Copyright (c) 2014 Grant Mercer
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -7,8 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/executors/parallel_executor_aggregated.hpp>
 #include <hpx/local/algorithm.hpp>
 #include <hpx/local/chrono.hpp>
 #include <hpx/local/execution.hpp>
