@@ -13,14 +13,14 @@ struct awaiter_1
     {
         return false;
     }
-    void await_suspend(std::coroutine_handle<>) {}
+    void await_suspend(coro::coroutine_handle<>) {}
     void await_resume() {}
 };
 
 struct awaiter_2
 {
     void await_ready() {}
-    void await_suspend(std::coroutine_handle<>) {}
+    void await_suspend(coro::coroutine_handle<>) {}
     void await_resume() {}
 };
 
@@ -63,7 +63,7 @@ struct awaiter_6
     {
         return false;
     }
-    void await_suspend(std::coroutine_handle<Promise>) {}
+    void await_suspend(coro::coroutine_handle<Promise>) {}
     void await_resume() {}
 };
 
@@ -95,15 +95,15 @@ struct non_awaiter_4
 
 struct promise
 {
-    std::coroutine_handle<promise> get_return_object()
+    coro::coroutine_handle<promise> get_return_object()
     {
-        return {std::coroutine_handle<promise>::from_promise(*this)};
+        return {coro::coroutine_handle<promise>::from_promise(*this)};
     }
-    std::suspend_always initial_suspend() noexcept
+    coro::suspend_always initial_suspend() noexcept
     {
         return {};
     }
-    std::suspend_always final_suspend() noexcept
+    coro::suspend_always final_suspend() noexcept
     {
         return {};
     }
@@ -126,6 +126,52 @@ struct awaitable_1
 struct awaitable_2
 {
     using promise_type = promise;
+};
+
+struct yes
+{
+    template <class T>
+    T await_transform(T);
+};
+
+struct yes2
+{
+    int await_transform(int);
+    char await_transform(char);
+};
+
+struct yes3
+{
+    template <typename T>
+    T await_transform(T&&) = delete;
+};
+
+struct yes4
+{
+    std::function<int(int)> await_transform;
+};
+
+struct yes_final final
+{
+    template <typename T>
+    T await_transform(T);
+};
+
+struct yes6
+{
+    template <typename T>
+    static T await_transform(T) = delete;
+};
+
+struct yes7
+{
+    struct callable
+    {
+        template <typename T>
+        T operator()(T) = delete;
+    };
+
+    static constexpr callable await_transform = {};
 };
 
 int main()
@@ -216,7 +262,15 @@ int main()
 
     static_assert(is_awaitable_v<awaitable_1>);
 
-    static_assert(detail::has_await_transform<promise>);
+    static_assert(detail::has_await_transform_v<promise>);
+    static_assert(detail::has_await_transform_v<yes>);
+    static_assert(detail::has_await_transform_v<yes2>);
+    static_assert(detail::has_await_transform_v<yes2>);
+    static_assert(detail::has_await_transform_v<yes3>);
+    static_assert(detail::has_await_transform_v<yes4>);
+    static_assert(detail::has_await_transform_v<yes6>);
+    static_assert(detail::has_await_transform_v<yes7>);
+
     static_assert(
         is_awaiter_v<decltype(std::declval<promise>().await_transform()),
             promise>);

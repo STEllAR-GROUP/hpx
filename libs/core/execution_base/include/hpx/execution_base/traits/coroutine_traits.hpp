@@ -5,8 +5,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config/forward.hpp>
+#include <hpx/concepts/has_member_xxx.hpp>
 
+#if __has_include(<coroutine>)
 #include <coroutine>
+namespace coro = std;
+#else
+#include <experimental/coroutine>
+namespace coro = std::experimental;
+#endif
+
 #include <type_traits>
 
 namespace hpx { namespace execution { namespace experimental {
@@ -16,7 +24,7 @@ namespace hpx { namespace execution { namespace experimental {
     {
         if constexpr (!std::is_same_v<Promise, void>)
         {
-            return await.await_suspend(std::coroutine_handle<Promise>{});
+            return await.await_suspend(coro::coroutine_handle<Promise>{});
         }
         return;
     }
@@ -37,7 +45,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename T>
         inline constexpr bool is_await_suspend_result_v =
-            one_of<T, void, bool> || is_instance_of<T, std::coroutine_handle>;
+            one_of<T, void, bool> || is_instance_of<T, coro::coroutine_handle>;
 
         template <typename, typename = void>
         inline constexpr bool has_await_ready = false;
@@ -66,7 +74,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename T, typename Ts>
         inline constexpr bool has_await_suspend_coro_handle<T, Ts,
             std::void_t<decltype(std::declval<T>().await_suspend(
-                std::coroutine_handle<Ts>{}))>> = true;
+                coro::coroutine_handle<Ts>{}))>> = true;
 
         template <bool await_ready, typename Awaiter, typename Promise>
         struct is_awaiter_impl;
@@ -132,13 +140,7 @@ namespace hpx { namespace execution { namespace experimental {
             std::void_t<decltype(operator co_await(
                 std::declval<Awaitable>()))>> = true;
 
-        template <typename Promise, typename = void>
-        inline constexpr bool has_await_transform = false;
-
-        template <typename Promise>
-        inline constexpr bool has_await_transform<Promise,
-            std::void_t<decltype(std::declval<Promise>().await_transform())>> =
-            true;
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(await_transform);
 
     }    // namespace detail
 
@@ -163,7 +165,7 @@ namespace hpx { namespace execution { namespace experimental {
     }
 
     template <typename Awaitable, typename Promise,
-        typename = std::enable_if_t<detail::has_await_transform<Promise>>>
+        typename = std::enable_if_t<detail::has_await_transform_v<Promise>>>
     decltype(auto) get_awaiter(Awaitable&& await, Promise* promise)
     {
         if constexpr (detail::has_member_operator_co_await_v<decltype(
