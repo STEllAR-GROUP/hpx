@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //  Copyright (c) 2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -50,14 +50,16 @@ struct additional_argument
 struct additional_argument_executor
 {
     template <typename F, typename... Ts>
-    decltype(auto) async_execute(F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::async_execute_t,
+        additional_argument_executor const&, F&& f, Ts&&... ts)
     {
         return hpx::async(
             std::forward<F>(f), additional_argument{}, std::forward<Ts>(ts)...);
     }
 
     template <typename A, typename... Ts>
-    void post(
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
+        additional_argument_executor const&,
         hpx::lcos::detail::dataflow_finalization<A>&& f, hpx::tuple<Ts...>&& t)
     {
         additional_argument a;
@@ -164,7 +166,6 @@ void function_pointers(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
 std::atomic<std::uint32_t> future_void_f1_count;
 std::atomic<std::uint32_t> future_void_f2_count;
 

@@ -10,6 +10,8 @@ tests.examples.1d_stencil.1d_stencil_6
 tests.examples.1d_stencil.1d_stencil_7
 tests.examples.async_io.async_io_simple
 tests.examples.modules.checkpoint.1d_stencil_4_checkpoint
+tests.examples.modules.executors.executor_with_thread_hooks
+tests.examples.modules.executors.disable_thread_stealing_executor
 tests.examples.modules.program_options.config_file_types
 tests.examples.modules.program_options.custom_syntax
 tests.examples.modules.program_options.env_options

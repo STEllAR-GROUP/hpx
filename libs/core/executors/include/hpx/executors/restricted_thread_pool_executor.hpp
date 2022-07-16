@@ -54,7 +54,7 @@ namespace hpx::parallel::execution {
             threads::thread_schedule_hint schedulehint = {},
             std::size_t hierarchical_threshold =
                 hierarchical_threshold_default_)
-          : first_thread_(first_thread)
+          : first_thread_(static_cast<std::uint16_t>(first_thread))
           , os_thread_(0)
           , exec_(priority, stacksize, schedulehint,
                 parallel::execution::detail::get_default_policy<Policy>::call(),
@@ -206,7 +206,7 @@ namespace hpx::parallel::execution {
         /// \endcond
 
     private:
-        std::size_t const first_thread_;
+        std::uint16_t const first_thread_;
         mutable std::atomic<std::size_t> os_thread_;
 
         embedded_executor exec_;

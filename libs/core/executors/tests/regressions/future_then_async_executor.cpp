@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,8 +17,8 @@ struct test_async_executor
     using execution_category = hpx::execution::parallel_execution_tag;
 
     template <typename F, typename... Ts>
-    static hpx::future<typename hpx::util::invoke_result<F, Ts...>::type>
-    async_execute(F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::async_execute_t,
+        test_async_executor const&, F&& f, Ts&&... ts)
     {
         return hpx::dataflow(
             hpx::launch::async, std::forward<F>(f), std::forward<Ts>(ts)...);

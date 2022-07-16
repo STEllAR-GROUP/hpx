@@ -227,6 +227,14 @@ namespace hpx { namespace execution {
         }
 
     public:
+        // backwards compatibility support, will be removed in the future
+        template <typename Parameters>
+        std::size_t processing_units_count(Parameters&&) const
+        {
+            return get_num_cores();
+        }
+
+    public:
         /// \cond NOINTERNAL
         constexpr bool operator==(
             parallel_policy_executor const& rhs) const noexcept
@@ -299,8 +307,8 @@ namespace hpx { namespace execution {
                 hpx::annotated_function(HPX_FORWARD(F, f), exec.annotation_),
                 HPX_FORWARD(Ts, ts)...));
 #else
-            auto&& func =
-                hpx::util::one_shot(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            auto&& func = hpx::util::one_shot(
+                hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 #endif
 
             hpx::traits::detail::shared_state_ptr_t<result_type> p =

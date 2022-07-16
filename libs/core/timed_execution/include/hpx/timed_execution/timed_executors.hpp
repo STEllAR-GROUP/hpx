@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2020 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -319,21 +319,20 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename BaseExecutor>
     struct timed_executor
     {
-        typedef typename std::decay<BaseExecutor>::type base_executor_type;
+        using base_executor_type = std::decay_t<BaseExecutor>;
 
-        typedef typename hpx::traits::executor_execution_category<
-            base_executor_type>::type execution_category;
+        using execution_category =
+            hpx::traits::executor_execution_category_t<base_executor_type>;
+        using parameters_type =
+            hpx::traits::executor_parameters_type_t<base_executor_type>;
 
-        typedef typename hpx::traits::executor_parameters_type<
-            base_executor_type>::type parameters_type;
-
-        timed_executor(hpx::chrono::steady_time_point const& abs_time)
+        explicit timed_executor(hpx::chrono::steady_time_point const& abs_time)
           : exec_(BaseExecutor())
           , execute_at_(abs_time.value())
         {
         }
 
-        timed_executor(hpx::chrono::steady_duration const& rel_time)
+        explicit timed_executor(hpx::chrono::steady_duration const& rel_time)
           : exec_(BaseExecutor())
           , execute_at_(rel_time.from_now())
         {
@@ -372,31 +371,34 @@ namespace hpx { namespace parallel { namespace execution {
         }
         /// \endcond
 
+    private:
         // OneWayExecutor interface
         template <typename F, typename... Ts>
-        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
-        sync_execute(F&& f, Ts&&... ts)
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::sync_execute_t,
+            timed_executor const& exec, F&& f, Ts&&... ts)
         {
-            return detail::call_sync_execute_at(
-                exec_, execute_at_, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            return detail::call_sync_execute_at(exec.exec_, exec.execute_at_,
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // TwoWayExecutor interface
         template <typename F, typename... Ts>
-        hpx::future<
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
-        async_execute(F&& f, Ts&&... ts)
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::async_execute_t,
+            timed_executor const& exec, F&& f, Ts&&... ts)
         {
-            return detail::call_async_execute_at(
-                exec_, execute_at_, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            return detail::call_async_execute_at(exec.exec_, exec.execute_at_,
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename... Ts>
-        void post(F&& f, Ts&&... ts)
+        friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
+            timed_executor const& exec, F&& f, Ts&&... ts)
         {
-            detail::call_post_at(
-                exec_, execute_at_, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            detail::call_post_at(exec.exec_, exec.execute_at_,
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         BaseExecutor exec_;

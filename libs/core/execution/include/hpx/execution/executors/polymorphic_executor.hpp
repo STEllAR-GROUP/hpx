@@ -589,7 +589,8 @@ namespace hpx { namespace parallel { namespace execution {
         get_empty_polymorphic_executor_vtable() noexcept
         {
             static polymorphic_executor_vtable<Sig> const empty_vtable =
-                detail::construct_vtable<empty_polymorphic_executor>();
+                polymorphic_executor_vtable<Sig>(
+                    detail::construct_vtable<empty_polymorphic_executor>());
             return &empty_vtable;
         }
 #endif

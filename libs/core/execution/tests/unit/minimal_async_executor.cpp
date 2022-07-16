@@ -116,11 +116,11 @@ std::atomic<std::size_t> count_bulk_async(0);
 template <typename Executor>
 void test_executor(std::array<std::size_t, 5> expected)
 {
-    typedef typename hpx::traits::executor_execution_category<Executor>::type
-        execution_category;
+    using execution_category =
+        hpx::traits::executor_execution_category_t<Executor>;
 
-    HPX_TEST((std::is_same<hpx::execution::parallel_execution_tag,
-        execution_category>::value));
+    HPX_TEST((std::is_same_v<hpx::execution::parallel_execution_tag,
+        execution_category>) );
 
     count_apply.store(0);
     count_sync.store(0);
@@ -146,11 +146,11 @@ void test_executor(std::array<std::size_t, 5> expected)
 ///////////////////////////////////////////////////////////////////////////////
 struct test_async_executor1
 {
-    typedef hpx::execution::parallel_execution_tag execution_category;
+    using execution_category = hpx::execution::parallel_execution_tag;
 
     template <typename F, typename... Ts>
-    static hpx::future<typename hpx::util::invoke_result<F, Ts...>::type>
-    async_execute(F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::async_execute_t,
+        test_async_executor1 const&, F&& f, Ts&&... ts)
     {
         ++count_async;
         return hpx::async(
@@ -167,11 +167,11 @@ namespace hpx { namespace parallel { namespace execution {
 
 struct test_async_executor2 : test_async_executor1
 {
-    typedef hpx::execution::parallel_execution_tag execution_category;
+    using execution_category = hpx::execution::parallel_execution_tag;
 
     template <typename F, typename... Ts>
-    static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
-    sync_execute(F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::sync_execute_t,
+        test_async_executor2 const&, F&& f, Ts&&... ts)
     {
         ++count_sync;
         return hpx::async(
@@ -189,10 +189,12 @@ namespace hpx { namespace parallel { namespace execution {
 
 struct test_async_executor3 : test_async_executor1
 {
-    typedef hpx::execution::parallel_execution_tag execution_category;
+    using execution_category = hpx::execution::parallel_execution_tag;
 
     template <typename F, typename Shape, typename... Ts>
-    static void bulk_sync_execute(F f, Shape const& shape, Ts&&... ts)
+    friend decltype(auto) tag_invoke(
+        hpx::parallel::execution::bulk_sync_execute_t,
+        test_async_executor3 const&, F f, Shape const& shape, Ts&&... ts)
     {
         ++count_bulk_sync;
         std::vector<hpx::future<void>> results;
@@ -213,11 +215,12 @@ namespace hpx { namespace parallel { namespace execution {
 
 struct test_async_executor4 : test_async_executor1
 {
-    typedef hpx::execution::parallel_execution_tag execution_category;
+    using execution_category = hpx::execution::parallel_execution_tag;
 
     template <typename F, typename Shape, typename... Ts>
-    static std::vector<hpx::future<void>> bulk_async_execute(
-        F f, Shape const& shape, Ts&&... ts)
+    friend decltype(auto) tag_invoke(
+        hpx::parallel::execution::bulk_async_execute_t,
+        test_async_executor4 const&, F f, Shape const& shape, Ts&&... ts)
     {
         ++count_bulk_async;
         std::vector<hpx::future<void>> results;
@@ -243,10 +246,11 @@ namespace hpx { namespace parallel { namespace execution {
 
 struct test_async_executor5 : test_async_executor1
 {
-    typedef hpx::execution::parallel_execution_tag execution_category;
+    using execution_category = hpx::execution::parallel_execution_tag;
 
     template <typename F, typename... Ts>
-    static void post(F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
+        test_async_executor5 const&, F&& f, Ts&&... ts)
     {
         ++count_apply;
         hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -260,41 +264,9 @@ namespace hpx { namespace parallel { namespace execution {
     };
 }}}    // namespace hpx::parallel::execution
 
-template <typename Executor, typename B1, typename B2, typename B3, typename B4,
-    typename B5>
-void static_check_executor(B1, B2, B3, B4, B5)
-{
-    using namespace hpx::traits;
-
-    static_assert(has_async_execute_member<Executor>::value == B1::value,
-        "check has_async_execute_member<Executor>::value");
-    static_assert(has_sync_execute_member<Executor>::value == B2::value,
-        "check has_sync_execute_member<Executor>::value");
-    static_assert(has_bulk_sync_execute_member<Executor>::value == B3::value,
-        "check has_bulk_sync_execute_member<Executor>::value");
-    static_assert(has_bulk_async_execute_member<Executor>::value == B4::value,
-        "check has_bulk_async_execute_member<Executor>::value");
-    static_assert(has_post_member<Executor>::value == B5::value,
-        "check has_post_member<Executor>::value");
-
-    static_assert(!has_then_execute_member<Executor>::value,
-        "!has_then_execute_member<Executor>::value");
-    static_assert(!has_bulk_then_execute_member<Executor>::value,
-        "!has_bulk_then_execute_member<Executor>::value");
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    std::false_type f;
-    std::true_type t;
-
-    static_check_executor<test_async_executor1>(t, f, f, f, f);
-    static_check_executor<test_async_executor2>(t, t, f, f, f);
-    static_check_executor<test_async_executor3>(t, f, t, f, f);
-    static_check_executor<test_async_executor4>(t, f, f, t, f);
-    static_check_executor<test_async_executor5>(t, f, f, f, t);
-
     test_executor<test_async_executor1>({{0, 0, 431, 0, 0}});
     test_executor<test_async_executor2>({{0, 1, 430, 0, 0}});
     test_executor<test_async_executor3>({{0, 0, 217, 2, 0}});

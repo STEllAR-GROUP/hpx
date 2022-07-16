@@ -561,13 +561,22 @@ namespace hpx { namespace parallel { namespace execution {
         {
         }
 
+    private:
         // --------------------------------------------------------------------
         // async
         // --------------------------------------------------------------------
         template <typename F, typename... Ts>
-        future<
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
-        async_execute(F&& f, Ts&&... ts)
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::async_execute_t,
+            guided_pool_executor_shim const& exec, F&& f, Ts&&... ts)
+        {
+            return exec.async_execute_helper(
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename F, typename... Ts>
+        auto async_execute_helper(F&& f, Ts&&... ts) const
+            -> future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
         {
             if (guided_)
             {
@@ -576,8 +585,8 @@ namespace hpx { namespace parallel { namespace execution {
             }
             else
             {
-                typedef typename hpx::util::detail::invoke_deferred_result<F,
-                    Ts...>::type result_type;
+                using result_type =
+                    hpx::util::detail::invoke_deferred_result_t<F, Ts...>;
 
                 lcos::local::futures_factory<result_type()> p(
                     hpx::util::deferred_call(
@@ -595,29 +604,30 @@ namespace hpx { namespace parallel { namespace execution {
         // --------------------------------------------------------------------
         template <typename F, typename Future, typename... Ts,
             typename = std::enable_if_t<hpx::traits::is_future<Future>::value>>
-        auto then_execute(F&& f, Future&& predecessor, Ts&&... ts)
-            -> future<typename hpx::util::detail::invoke_deferred_result<F,
-                Future, Ts...>::type>
+        friend auto tag_invoke(hpx::parallel::execution::then_execute_t,
+            guided_pool_executor_shim const& exec, F&& f, Future&& predecessor,
+            Ts&&... ts)
+            -> future<
+                hpx::util::detail::invoke_deferred_result_t<F, Future, Ts...>>
         {
-            if (guided_)
+            if (exec.guided_)
             {
-                return hpx::parallel::execution::then_execute(guided_exec_,
+                return hpx::parallel::execution::then_execute(exec.guided_exec_,
                     HPX_FORWARD(F, f), HPX_FORWARD(Future, predecessor),
                     HPX_FORWARD(Ts, ts)...);
             }
             else
             {
-                typedef typename hpx::util::detail::invoke_deferred_result<F,
-                    Future, Ts...>::type result_type;
+                using result_type =
+                    hpx::util::detail::invoke_deferred_result_t<F, Future,
+                        Ts...>;
 
                 auto func = hpx::util::one_shot(
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
-                typename hpx::traits::detail::shared_state_ptr<
-                    result_type>::type p =
+                hpx::traits::detail::shared_state_ptr_t<result_type> p =
                     hpx::lcos::detail::make_continuation_exec<result_type>(
-                        HPX_FORWARD(Future, predecessor), *this,
-                        HPX_MOVE(func));
+                        HPX_FORWARD(Future, predecessor), exec, HPX_MOVE(func));
 
                 return hpx::traits::future_access<
                     hpx::future<result_type>>::create(HPX_MOVE(p));
@@ -625,7 +635,6 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         // --------------------------------------------------------------------
-
         bool guided_;
         guided_pool_executor<H> guided_exec_;
     };

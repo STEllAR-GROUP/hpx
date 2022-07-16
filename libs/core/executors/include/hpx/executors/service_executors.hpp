@@ -23,6 +23,7 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -72,6 +73,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 &post_wrapper_helper<decltype(f_wrapper)>::invoke,
                 HPX_MOVE(t)));
 #else
+            HPX_UNUSED(exec);
             HPX_ASSERT_MSG(
                 false, "Attempting to use io_service_pool in device code");
 #endif
@@ -98,6 +100,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                     result_type>::invoke,
                 t));
 #else
+            HPX_UNUSED(exec);
             HPX_ASSERT_MSG(
                 false, "Attempting to use io_service_pool in device code");
 #endif

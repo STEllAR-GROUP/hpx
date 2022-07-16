@@ -456,7 +456,8 @@ struct test_async_executor
     using execution_category = hpx::execution::parallel_execution_tag;
 
     template <typename F, typename... Ts>
-    static auto async_execute(F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::async_execute_t,
+        test_async_executor const&, F&& f, Ts&&... ts)
     {
         return hpx::async(std::forward<F>(f), std::forward<Ts>(ts)...);
     }

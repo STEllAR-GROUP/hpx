@@ -8,10 +8,8 @@
 set(example_programs
     composable_guard
     customize_async
-    disable_thread_stealing_executor
     enumerate_threads
     event_synchronization
-    executor_with_thread_hooks
     fibonacci_await
     fibonacci_dataflow
     fibonacci_futures
