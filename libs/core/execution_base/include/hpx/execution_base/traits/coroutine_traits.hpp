@@ -7,6 +7,8 @@
 #include <hpx/config/forward.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+
 #if __has_include(<coroutine>)
 #include <coroutine>
 namespace coro = std;
@@ -221,3 +223,5 @@ namespace hpx { namespace execution { namespace experimental {
                 .await_resume()));
 
 }}}    // namespace hpx::execution::experimental
+
+#endif    // HPX_HAVE_CXX20_COROUTINES

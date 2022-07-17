@@ -15,8 +15,11 @@ set(tests
     execution_context
     get_env
     execute_may_block_caller
-    coroutine_traits
 )
+
+if(HPX_WITH_CXX20_COROUTINES)
+  set(tests ${tests} coroutine_traits)
+endif()
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
