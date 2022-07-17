@@ -15,7 +15,14 @@
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/memory.hpp>
 
+#if __has_include(<coroutine>)
 #include <coroutine>
+namespace coro = std;
+#else
+#include <experimental/coroutine>
+namespace coro = std::experimental;
+#endif
+
 #include <cstddef>
 #include <exception>
 #include <memory>
@@ -26,8 +33,8 @@
 namespace hpx { namespace lcos { namespace detail {
 
     template <typename Promise = void>
-    using coroutine_handle = std::coroutine_handle<Promise>;
-    using suspend_never = std::suspend_never;
+    using coroutine_handle = coro::coroutine_handle<Promise>;
+    using suspend_never = coro::suspend_never;
 
     ///////////////////////////////////////////////////////////////////////////
     // this was removed from the TS, so we define our own
@@ -194,7 +201,7 @@ namespace hpx { namespace lcos { namespace detail {
 }}}    // namespace hpx::lcos::detail
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace std {
+namespace coro {
     // Allow for functions which use co_await to return an hpx::future<T>
     template <typename T, typename... Ts>
     struct coroutine_traits<hpx::future<T>, Ts...>
@@ -347,6 +354,6 @@ namespace std {
             }
         };
     };
-}    // namespace std
+}    // namespace coro
 
 #endif    // HPX_HAVE_CXX20_COROUTINES
