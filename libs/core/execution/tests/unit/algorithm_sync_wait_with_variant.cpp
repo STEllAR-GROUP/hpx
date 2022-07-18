@@ -48,31 +48,28 @@ int hpx_main()
 
     {
         auto result = *tt::sync_wait_with_variant(ex::just(3, 4.0));
-        HPX_TEST_EQ(hpx::get<0>(result), 3);
-        HPX_TEST_EQ(hpx::get<1>(result), 4.0);
+        HPX_TEST_EQ(result, ex::just(3, 4.0));
     }
 
     {
         auto result =
             *tt::sync_wait_with_variant(ex::just(3, 4.0, std::string("42")));
-        HPX_TEST_EQ(hpx::get<0>(result), 3);
-        HPX_TEST_EQ(hpx::get<1>(result), 4.0);
-        HPX_TEST_EQ(hpx::get<2>(result), std::string("42"));
+        HPX_TEST_EQ(result, ex::just(3, 4.0, std::string("42")));
     }
 
     {
-        HPX_TEST_EQ(*tt::sync_wait_with_variant(
+        HPX_TEST_EQ(*(tt::sync_wait_with_variant(
                         ex::just(custom_type_non_default_constructible{42}))
-                         .x,
+                            .x),
             42);
     }
 
     {
         HPX_TEST_EQ(
-            *tt::sync_wait_with_variant(
+            *(tt::sync_wait_with_variant(
                 ex::just(
                     custom_type_non_default_constructible_non_copyable{42}))
-                 .x,
+                    .x),
             42);
     }
 
@@ -124,7 +121,7 @@ int hpx_main()
     // cancellation path
     {
         auto result =
-            stopped_sender_with_value_type{} | tt::sync_wait_with_variant();
+            (stopped_sender_with_value_type{} | tt::sync_wait_with_variant());
         HPX_TEST(!result);    // returned optional should be empty
     }
 

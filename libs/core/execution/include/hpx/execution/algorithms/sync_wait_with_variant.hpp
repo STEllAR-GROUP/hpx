@@ -14,7 +14,6 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
-#include <hpx/execution/algorithms/detail/single_result.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -111,8 +110,7 @@ namespace hpx::execution::experimental::detail {
 
                 // If the variant holds a hpx::monostate set_stopped was called
                 // we return an empty optional
-                return hpx::optional<
-                    typename single_variant<result_type>::type>();
+                return hpx::optional<result_type>();
             }
         };
 
