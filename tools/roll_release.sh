@@ -94,8 +94,9 @@ fi
 
 echo ""
 echo "Setting the signing key for signing the release. It is up to you to change it back to your own afterwards."
-git -c user.signingkey E18AE35E86BB194F -c user.email contact@stellar-group.org \
-    -c user.name "STE||AR Group"
+git config user.signingkey E18AE35E86BB194F 
+git config user.email contact@stellar-group.org
+git config user.name "STE||AR Group"
 
 echo ""
 echo "Tagging release."
