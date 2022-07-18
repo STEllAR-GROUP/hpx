@@ -9,12 +9,22 @@
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 
+#if defined(__has_include)
 #if __has_include(<coroutine>)
 #include <coroutine>
-namespace coro = std;
+namespace hpx { namespace coro {
+    using std::coroutine_handle;
+    using std::suspend_always;
+    using std::suspend_never;
+}}    // namespace hpx::coro
 #else
 #include <experimental/coroutine>
-namespace coro = std::experimental;
+namespace hpx { namespace coro {
+    using std::experimental::coroutine_handle;
+    using std::experimental::suspend_always;
+    using std::experimental::suspend_never;
+}}    // namespace hpx::coro
+#endif
 #endif
 
 #include <type_traits>
@@ -26,7 +36,7 @@ namespace hpx { namespace execution { namespace experimental {
     {
         if constexpr (!std::is_same_v<Promise, void>)
         {
-            return await.await_suspend(coro::coroutine_handle<Promise>{});
+            return await.await_suspend(hpx::coro::coroutine_handle<Promise>{});
         }
         return;
     }
@@ -47,7 +57,8 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename T>
         inline constexpr bool is_await_suspend_result_v =
-            one_of<T, void, bool> || is_instance_of<T, coro::coroutine_handle>;
+            one_of<T, void, bool> ||
+            is_instance_of<T, hpx::coro::coroutine_handle>;
 
         template <typename, typename = void>
         inline constexpr bool has_await_ready = false;
@@ -76,7 +87,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename T, typename Ts>
         inline constexpr bool has_await_suspend_coro_handle<T, Ts,
             std::void_t<decltype(std::declval<T>().await_suspend(
-                coro::coroutine_handle<Ts>{}))>> = true;
+                hpx::coro::coroutine_handle<Ts>{}))>> = true;
 
         template <bool await_ready, typename Awaiter, typename Promise>
         struct is_awaiter_impl;

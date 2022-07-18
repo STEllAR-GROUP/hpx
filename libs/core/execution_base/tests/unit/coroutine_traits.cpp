@@ -13,14 +13,14 @@ struct awaiter_1
     {
         return false;
     }
-    void await_suspend(coro::coroutine_handle<>) {}
+    void await_suspend(hpx::coro::coroutine_handle<>) {}
     void await_resume() {}
 };
 
 struct awaiter_2
 {
     void await_ready() {}
-    void await_suspend(coro::coroutine_handle<>) {}
+    void await_suspend(hpx::coro::coroutine_handle<>) {}
     void await_resume() {}
 };
 
@@ -63,7 +63,7 @@ struct awaiter_6
     {
         return false;
     }
-    void await_suspend(coro::coroutine_handle<Promise>) {}
+    void await_suspend(hpx::coro::coroutine_handle<Promise>) {}
     void await_resume() {}
 };
 
@@ -95,15 +95,15 @@ struct non_awaiter_4
 
 struct promise
 {
-    coro::coroutine_handle<promise> get_return_object()
+    hpx::coro::coroutine_handle<promise> get_return_object()
     {
-        return {coro::coroutine_handle<promise>::from_promise(*this)};
+        return {hpx::coro::coroutine_handle<promise>::from_promise(*this)};
     }
-    coro::suspend_always initial_suspend() noexcept
+    hpx::coro::suspend_always initial_suspend() noexcept
     {
         return {};
     }
-    coro::suspend_always final_suspend() noexcept
+    hpx::coro::suspend_always final_suspend() noexcept
     {
         return {};
     }
