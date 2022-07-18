@@ -83,6 +83,7 @@ if(HPX_WITH_GIT_BRANCH)
       COPY "${DOCS_SOURCE}/latexpdf/latex/HPX.pdf"
       DESTINATION "${DOCS_BRANCH_DEST}/pdf/"
       PATTERN "*.buildinfo" EXCLUDE
+      RESULT __pdf_copied
     )
   endif()
   # special handling of dependency report files
