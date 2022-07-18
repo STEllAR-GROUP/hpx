@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,7 +14,6 @@
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/timed_execution/timed_executors.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -38,6 +37,10 @@ namespace hpx { namespace parallel { namespace execution {
 
     ///////////////////////////////////////////////////////////////////////
     // extensions
+
+    // forward declare timed_executor wrapper
+    template <typename BaseExecutor>
+    struct timed_executor;
 
     // define customization points
 
@@ -71,17 +74,16 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(post_at_t,
             Executor&& exec, hpx::chrono::steady_time_point const& abs_time,
             F&& f, Ts&&... ts)
         {
-            return detail::timed_post_fn_helper<
-                typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
-                                                               exec),
-                abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            return detail::timed_post_fn_helper<std::decay_t<Executor>>::call(
+                HPX_FORWARD(Executor, exec), abs_time, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
     } post_at{};
 
@@ -112,17 +114,16 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(post_after_t,
             Executor&& exec, hpx::chrono::steady_duration const& rel_time,
             F&& f, Ts&&... ts)
         {
-            return detail::timed_post_fn_helper<
-                typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
-                                                               exec),
-                rel_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            return detail::timed_post_fn_helper<std::decay_t<Executor>>::call(
+                HPX_FORWARD(Executor, exec), rel_time, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
     } post_after{};
 
@@ -159,7 +160,7 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -167,8 +168,7 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
         {
             return detail::timed_async_execute_fn_helper<
-                typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
-                                                               exec),
+                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
                 abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     } async_execute_at{};
@@ -201,7 +201,7 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -209,8 +209,7 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
         {
             return detail::timed_async_execute_fn_helper<
-                typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
-                                                               exec),
+                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
                 rel_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     } async_execute_after{};
@@ -243,7 +242,7 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -251,8 +250,7 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
         {
             return detail::timed_sync_execute_fn_helper<
-                typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
-                                                               exec),
+                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
                 abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     } sync_execute_at{};
@@ -285,7 +283,7 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -293,8 +291,7 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
         {
             return detail::timed_sync_execute_fn_helper<
-                typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
-                                                               exec),
+                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
                 rel_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     } sync_execute_after{};

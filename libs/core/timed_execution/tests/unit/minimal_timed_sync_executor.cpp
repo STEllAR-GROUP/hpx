@@ -165,7 +165,9 @@ struct test_timed_sync_executor1 : test_sync_executor1
     typedef hpx::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename... Ts>
-    static decltype(auto) sync_execute_at(
+    friend decltype(auto) tag_invoke(
+        hpx::parallel::execution::sync_execute_at_t,
+        test_timed_sync_executor1 const&,
         hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         ++count_sync_at;
@@ -202,7 +204,8 @@ struct test_sync_executor2 : test_sync_executor1
 struct test_timed_sync_executor2 : test_sync_executor2
 {
     template <typename F, typename... Ts>
-    static void post_at(
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::post_at_t,
+        test_timed_sync_executor2 const&,
         hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         ++count_apply_at;
