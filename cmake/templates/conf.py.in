@@ -384,6 +384,8 @@ rst_prolog += '''
 .. _docker_docs_bind_mounts: https://docs.docker.com/storage/bind-mounts/
 .. |docker_build_env| replace:: Docker Hub
 .. _docker_build_env: https://hub.docker.com/r/stellargroup/build_env/
+.. |eve| replace:: EVE - the Expressive Vector Engine
+.. _eve: https://github.com/jfalcou/eve
 .. |gcc| replace:: GNU Compiler Collection (g++)
 .. _gcc: https://gcc.gnu.org
 .. |clang| replace:: clang: a C language family frontend for LLVM
