@@ -60,9 +60,11 @@ namespace hpx { namespace ranges {
     ///           The algorithm returns an iterator pointing to the first
     ///           element after the last element in the input sequence.
     ///
-    template <typename RandomIt, typename Sent, typename Comp, typename Proj>
-    RandomIt partial_sort(RandomIt first, Sent last, Comp&& comp = Comp(),
-        Proj&& proj = Proj());
+    template <typename RandomIt, typename Sent,
+        typename Comp = ranges::less,
+        typename Proj = parallel::util::projection_identity>
+    RandomIt partial_sort(RandomIt first, RandomIt middle, Sent last,
+        Comp&& comp = Comp(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Places the first middle - first elements from the range [first, last)
@@ -129,9 +131,10 @@ namespace hpx { namespace ranges {
     ///           element after the last element in the input sequence.
     ///
     template <typename ExPolicy, typename RandomIt, typename Sent,
-        typename Comp, typename Proj>
-    parallel::util::detail::algorithm_result_t<ExPolicy,
-        RandomIt>
+        typename Comp = ranges::less,
+        typename Proj = parallel::util::projection_identity>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        RandomIt>::type
     partial_sort(ExPolicy&& policy, RandomIt first, RandomIt middle,
         Sent last, Comp&& comp = Comp(), Proj&& proj = Proj());
 
@@ -147,7 +150,7 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
-    /// \tparam Comp        The type of the function/function object to use
+    /// \tparam Compare     The type of the function/function object to use
     ///                     (deduced). Comp defaults to detail::less.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
@@ -176,10 +179,12 @@ namespace hpx { namespace ranges {
     /// \returns  The \a partial_sort algorithm returns \a
     ///           typename hpx::traits::range_iterator_t<Rng>.
     ///           It returns \a last.
-    template <typename Rng, typename Comp, typename Proj>
+    template <typename Rng,
+        typename Compare = ranges::less,
+        typename Proj = parallel::util::projection_identity>
     hpx::traits::range_iterator_t<Rng>
-    partial_sort(Rng&& rng,, hpx::traits::range_iterator_t<Rng> middle,
-        Comp&& comp = Comp(), Proj&& proj = Proj());
+    partial_sort(Rng&& rng, hpx::traits::range_iterator_t<Rng> middle,
+        Compare&& comp = Compare(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Sorts the elements in the range [first, last) in ascending order. The
@@ -203,7 +208,7 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
-    /// \tparam Comp        The type of the function/function object to use
+    /// \tparam Compare     The type of the function/function object to use
     ///                     (deduced). Comp defaults to detail::less;
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
@@ -247,12 +252,14 @@ namespace hpx { namespace ranges {
     ///           otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename Rng, typename Comp, typename Proj>
-    util::detail::algorithm_result_t<ExPolicy,
+    template <typename ExPolicy, typename Rng,
+        typename Compare = ranges::less,
+        typename Proj = parallel::util::projection_identity>
+    parallel::util::detail::algorithm_result_t<ExPolicy,
         hpx::traits::range_iterator_t<Rng>>
     partial_sort(ExPolicy&& policy, Rng&& rng,
-        hpx::traits::range_iterator_t<Rng> middle,
-        Comp&& comp = Comp(), Proj&& proj = Proj());
+        hpx::traits::range_iterator_t<Rng> middle, Compare&& comp = Compare(),
+        Proj&& proj = Proj());
 
     // clang-format on
 }}    // namespace hpx::ranges
