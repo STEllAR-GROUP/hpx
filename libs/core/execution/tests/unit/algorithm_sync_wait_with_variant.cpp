@@ -43,34 +43,102 @@ int hpx_main()
     }
 
     {
-        HPX_TEST_EQ(*tt::sync_wait_with_variant(ex::just(3)), 3);
+        auto result = ex::just(42) | tt::sync_wait_with_variant();
+
+        auto v = *result;
+        static_assert(
+            std::is_same_v<decltype(v), hpx::variant<hpx::tuple<int>>>);
+        HPX_TEST(hpx::holds_alternative<hpx::tuple<int>>(v));
+
+        auto t = hpx::get<hpx::tuple<int>>(v);
+        static_assert(std::is_same_v<decltype(t), hpx::tuple<int>>);
+
+        auto i = hpx::get<0>(t);
+        static_assert(std::is_same_v<decltype(i), int>);
+
+        HPX_TEST(i == 42);
     }
 
     {
-        auto result = *tt::sync_wait_with_variant(ex::just(3, 4.0));
-        HPX_TEST_EQ(result, ex::just(3, 4.0));
+        auto result = ex::just(3, 4.0) | tt::sync_wait_with_variant();
+
+        auto v = *result;
+        static_assert(
+            std::is_same_v<decltype(v), hpx::variant<hpx::tuple<int, double>>>);
+
+        auto t = hpx::get<hpx::tuple<int, double>>(v);
+        static_assert(std::is_same_v<decltype(t), hpx::tuple<int, double>>);
+
+        auto i = hpx::get<0>(t);
+        static_assert(std::is_same_v<decltype(i), int>);
+
+        HPX_TEST(i == 3);
+
+        auto j = hpx::get<1>(t);
+        static_assert(std::is_same_v<decltype(j), double>);
+
+        HPX_TEST(j == 4.0);
     }
 
     {
         auto result =
-            *tt::sync_wait_with_variant(ex::just(3, 4.0, std::string("42")));
-        HPX_TEST_EQ(result, ex::just(3, 4.0, std::string("42")));
+            tt::sync_wait_with_variant(ex::just(3, 4.0, std::string("42")));
+        auto v = *result;
+
+        static_assert(std::is_same_v<decltype(v),
+            hpx::variant<hpx::tuple<int, double, std::string>>>);
+
+        auto t = hpx::get<hpx::tuple<int, double, std::string>>(v);
+        static_assert(
+            std::is_same_v<decltype(t), hpx::tuple<int, double, std::string>>);
+
+        auto i = hpx::get<0>(t);
+        static_assert(std::is_same_v<decltype(i), int>);
+
+        HPX_TEST(i == 3);
+
+        auto j = hpx::get<1>(t);
+        static_assert(std::is_same_v<decltype(j), double>);
+
+        HPX_TEST(j == 4.0);
+
+        auto k = hpx::get<2>(t);
+        static_assert(std::is_same_v<decltype(k), std::string>);
+
+        HPX_TEST(k == "42");
     }
 
     {
-        HPX_TEST_EQ(*(tt::sync_wait_with_variant(
-                        ex::just(custom_type_non_default_constructible{42}))
-                            .x),
-            42);
+        auto s1 = ex::just(custom_type_non_default_constructible{42});
+        auto result = tt::sync_wait_with_variant(std::move(s1));
+        auto v = *result;
+        check_value_types<
+            hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(
+            s1);
+
+        auto t = hpx::get<hpx::tuple<custom_type_non_default_constructible>>(v);
+        auto p = hpx::get<0>(t);
+        static_assert(
+            std::is_same_v<decltype(p), custom_type_non_default_constructible>);
+
+        HPX_TEST_EQ(p.x, 42);
     }
 
     {
-        HPX_TEST_EQ(
-            *(tt::sync_wait_with_variant(
-                ex::just(
-                    custom_type_non_default_constructible_non_copyable{42}))
-                    .x),
-            42);
+        auto result = tt::sync_wait_with_variant(
+            ex::just(custom_type_non_default_constructible_non_copyable{42}));
+        auto const& v = *result;
+        static_assert(std::is_same_v<std::decay_t<decltype(v)>,
+            hpx::variant<hpx::tuple<
+                custom_type_non_default_constructible_non_copyable>>>);
+
+        auto const& t = hpx::get<
+            hpx::tuple<custom_type_non_default_constructible_non_copyable>>(v);
+        auto const& p = hpx::get<0>(t);
+        static_assert(std::is_same_v<std::decay_t<decltype(p)>,
+            custom_type_non_default_constructible_non_copyable>);
+
+        HPX_TEST_EQ(p.x, 42);
     }
 
     // operator| overload
@@ -87,7 +155,20 @@ int hpx_main()
     }
 
     {
-        HPX_TEST_EQ(*(ex::just(3) | tt::sync_wait_with_variant()), 3);
+        auto result = ex::just(3) | tt::sync_wait_with_variant();
+
+        auto v = *result;
+        static_assert(
+            std::is_same_v<decltype(v), hpx::variant<hpx::tuple<int>>>);
+        HPX_TEST(hpx::holds_alternative<hpx::tuple<int>>(v));
+
+        auto t = hpx::get<hpx::tuple<int>>(v);
+        static_assert(std::is_same_v<decltype(t), hpx::tuple<int>>);
+
+        auto i = hpx::get<0>(t);
+        static_assert(std::is_same_v<decltype(i), int>);
+
+        HPX_TEST(i == 3);
     }
 
     // tag_invoke overload
