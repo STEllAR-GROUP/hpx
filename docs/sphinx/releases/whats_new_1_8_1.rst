@@ -82,7 +82,7 @@ Closed pull requests
 * :hpx-pr:`5931` - docs: fix & improve parallel algorithms documentation
 * :hpx-pr:`5930` - Add boost to hip builder
 * :hpx-pr:`5929` - Apply fixes to M1/MacOS related stack allocation to all relevant spots
-* :hpx-pr:`5928` - updated context_generic_context to accomodate arm64_arch_8/Apple architecture
+* :hpx-pr:`5928` - updated context_generic_context to accommodate arm64_arch_8/Apple architecture
 * :hpx-pr:`5927` - Public derivation for counting_semaphore_var
 * :hpx-pr:`5926` - Fix doxygen warnings when building documentation
 * :hpx-pr:`5923` - Fixing git checkout to reflect latest version tag

@@ -2474,6 +2474,7 @@ if(HPX_WITH_DOCUMENTATION)
       FILES "${PROJECT_BINARY_DIR}/share/hpx/docs/latexpdf/latex/HPX.pdf"
       DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/pdf/
       COMPONENT docs
+      OPTIONAL
     )
   endif()
 
