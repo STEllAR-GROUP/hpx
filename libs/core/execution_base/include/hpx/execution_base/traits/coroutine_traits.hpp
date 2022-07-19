@@ -4,30 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/coroutines_support.hpp>
 #include <hpx/config/forward.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <type_traits>
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
-
-#if defined(__has_include)
-#if __has_include(<coroutine>)
-#include <coroutine>
-namespace hpx { namespace coro {
-    using std::coroutine_handle;
-    using std::suspend_always;
-    using std::suspend_never;
-}}    // namespace hpx::coro
-#else
-#include <experimental/coroutine>
-namespace hpx { namespace coro {
-    using std::experimental::coroutine_handle;
-    using std::experimental::suspend_always;
-    using std::experimental::suspend_never;
-}}    // namespace hpx::coro
-#endif
-#endif
-
-#include <type_traits>
 
 namespace hpx { namespace execution { namespace experimental {
 

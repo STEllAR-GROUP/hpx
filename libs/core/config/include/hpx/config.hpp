@@ -35,6 +35,10 @@
 #include <hpx/config/version.hpp>
 #include <hpx/config/weak_symbol.hpp>
 
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+#include <hpx/config/coroutines_support.hpp>
+#endif    //HPX_HAVE_CXX20_COROUTINES
+
 #include <boost/version.hpp>
 
 #if BOOST_VERSION < 107100

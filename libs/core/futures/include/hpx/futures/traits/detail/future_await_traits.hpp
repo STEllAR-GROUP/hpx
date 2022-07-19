@@ -15,26 +15,6 @@
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/memory.hpp>
 
-#if defined(__has_include)
-#if __has_include(<coroutine>)
-#include <coroutine>
-namespace hpx { namespace coro {
-    using std::coroutine_handle;
-    using std::suspend_always;
-    using std::suspend_never;
-}}    // namespace hpx::coro
-#define HPX_COROUTINE_NAMESPACE_STD std
-#else
-#include <experimental/coroutine>
-namespace hpx { namespace coro {
-    using std::experimental::coroutine_handle;
-    using std::experimental::suspend_always;
-    using std::experimental::suspend_never;
-}}    // namespace hpx::coro
-#define HPX_COROUTINE_NAMESPACE_STD std::experimental
-#endif
-#endif
-
 #include <cstddef>
 #include <exception>
 #include <memory>
