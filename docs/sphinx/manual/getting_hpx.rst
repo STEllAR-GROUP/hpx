@@ -23,4 +23,7 @@ It is also recommended that you check out the latest stable tag:
 .. code-block:: shell-session
 
     $ cd hpx
-    $ git checkout 1.7.1
+
+.. parsed-literal::
+
+    $ git checkout |version|

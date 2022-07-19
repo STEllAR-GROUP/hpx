@@ -251,6 +251,5 @@ namespace hpx::parallel { inline namespace v2 {
     {
         return hpx::experimental::induction(HPX_FORWARD(T, value));
     }
-
     /// \endcond
 }}    // namespace hpx::parallel::v2
