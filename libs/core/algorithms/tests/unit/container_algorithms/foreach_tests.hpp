@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -348,8 +348,8 @@ void test_for_each_sender(ExPolicy&& p, IteratorTag)
     auto rng = hpx::util::make_iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
     auto f = [](std::size_t& v) { v = 42; };
-    auto result = ex::just(rng, f) |
-        hpx::ranges::for_each(std::forward<ExPolicy>(p)) | tt::sync_wait();
+    auto result = hpx::get<0>(*(ex::just(rng, f) |
+        hpx::ranges::for_each(std::forward<ExPolicy>(p)) | tt::sync_wait()));
     HPX_TEST(result == iterator(std::end(c)));
 
     // verify values
