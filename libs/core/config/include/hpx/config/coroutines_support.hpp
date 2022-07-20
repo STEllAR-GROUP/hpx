@@ -4,7 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/defines.hpp>
+
 #pragma once
+
+#if defined(HPX_HAVE_CXX20_COROUTINES)
 
 #if defined(__has_include)
 #if __has_include(<coroutine>)
@@ -25,3 +29,5 @@ namespace hpx { namespace coro {
 #define HPX_COROUTINE_NAMESPACE_STD std::experimental
 #endif
 #endif
+
+#endif    // HPX_HAVE_CXX20_COROUTINES
