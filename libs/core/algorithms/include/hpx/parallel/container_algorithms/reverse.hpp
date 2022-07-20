@@ -28,7 +28,7 @@ namespace hpx { namespace ranges {
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     ///
     /// The assignments in the parallel \a reverse algorithm
@@ -39,7 +39,7 @@ namespace hpx { namespace ranges {
     ///           It returns \a last.
     ///
     template <typename Iter, typename Sent>
-    Iter reverse(Iter first, Sent last);
+    Iter reverse(Iter first, Sent sent);
 
     /// Uses \a rng as the source range, as if using \a util::begin(rng) as
     /// \a first and \a ranges::end(rng) as \a last.
@@ -87,7 +87,7 @@ namespace hpx { namespace ranges {
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     ///
     /// The assignments in the parallel \a reverse algorithm invoked
@@ -109,7 +109,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Iter, typename Sent>
     typename parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
-    reverse(ExPolicy&& policy, Iter first, Sent last);
+    reverse(ExPolicy&& policy, Iter first, Sent sent);
 
     /// Uses \a rng as the source range, as if using \a util::begin(rng) as
     /// \a first and \a ranges::end(rng) as \a last.
@@ -218,7 +218,7 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a bidirectional iterator.
-    /// \tparam OutputIter  The type of the iterator representing the
+    /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
@@ -237,8 +237,7 @@ namespace hpx { namespace ranges {
     ///           an object equal to {last, result + N} where N = last - first
     ///
     template <typename Rng, typename OutIter>
-    typename ranges::reverse_copy_result<
-        typename hpx::traits::range_iterator<Rng>::type, OutIter>
+    reverse_copy_result<typename hpx::traits::range_iterator<Rng>::type, OutIter>
     reverse_copy(Rng&& rng, OutIter result);
 
     /// Copies the elements from the range [first, last) to another range
@@ -262,10 +261,10 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of an input iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
     ///                     sentinel type must be a sentinel for Iter.
-    /// \tparam OutIter     The type of the iterator representing the
+    /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -286,11 +285,11 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a reverse_copy algorithm returns a
-    ///           \a hpx::future<reverse_copy_result<Iter, OutIter> >
+    ///           \a hpx::future<reverse_copy_result<Iter, FwdIter> >
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a reverse_copy_result<Iter, OutIter>
+    ///           returns \a reverse_copy_result<Iter, FwdIter>
     ///           otherwise.
     ///           The \a reverse_copy algorithm returns the pair of the input iterator
     ///           forwarded to the first element after the last in the input
@@ -298,10 +297,10 @@ namespace hpx { namespace ranges {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent, typename OutIter>
+    template <typename ExPolicy, typename Iter, typename Sent, typename FwdIter>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        reverse_copy_result<Iter, OutIter>>::type
-    reverse_copy(ExPolicy&& policy, Iter first, Sent last, OutIter result);
+        reverse_copy_result<Iter, FwdIter>>::type
+    reverse_copy(ExPolicy&& policy, Iter first, Sent last, FwdIter result);
 
     /// Uses \a rng as the source range, as if using \a util::begin(rng) as
     /// \a first and \a ranges::end(rng) as \a last.
@@ -324,7 +323,7 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a bidirectional iterator.
-    /// \tparam OutputIter  The type of the iterator representing the
+    /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
@@ -358,9 +357,9 @@ namespace hpx { namespace ranges {
     ///           an object equal to {last, result + N} where N = last - first
     ///
     template <typename ExPolicy, typename Rng, typename OutIter>
-    typename util::detail::algorithm_result<ExPolicy,
-        ranges::reverse_copy_result<
-            typename hpx::traits::range_iterator<Rng>::type, OutIter>>::type
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        reverse_copy_result<typename hpx::traits::range_iterator<Rng>::type,
+            OutIter>>::type
     reverse_copy(ExPolicy&& policy, Rng&& rng, OutIter result);
 }}    // namespace hpx::ranges
 
