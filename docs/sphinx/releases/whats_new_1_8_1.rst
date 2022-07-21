@@ -65,11 +65,15 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`5960` - docs: added name to documentation contributors list
+* :hpx-pr:`5954` - refactor: rename itr to correct type (`reduce`)
 * :hpx-pr:`5954` - refactor: rename itr to correct type (`reduce`)
 * :hpx-pr:`5953` - Fixed property handling in hierarchical_spawning
 * :hpx-pr:`5951` - Fixing static linking (for Windows)
 * :hpx-pr:`5947` - Fix building on musl.
-* :hpx-pr:`5941` - Fix sync_wait 
+* :hpx-pr:`5944` - added adaptive_static_chunk_size
+* :hpx-pr:`5943` - Fix sync_wait
+* :hpx-pr:`5941` - Fix sync_wait
 * :hpx-pr:`5940` - Protect collective operations against std::vector<bool> idiosyncrasies
 * :hpx-pr:`5939` - docs: fix & improve parallel algorithms documentation 2
 * :hpx-pr:`5938` - Properly implement generation support for collective operations
