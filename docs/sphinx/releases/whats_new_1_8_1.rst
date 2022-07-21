@@ -73,6 +73,7 @@ Closed pull requests
 * :hpx-pr:`5947` - Fix building on musl.
 * :hpx-pr:`5944` - added adaptive_static_chunk_size
 * :hpx-pr:`5943` - Fix sync_wait
+* :hpx-pr:`5942` - Fix doc warnings
 * :hpx-pr:`5941` - Fix sync_wait
 * :hpx-pr:`5940` - Protect collective operations against std::vector<bool> idiosyncrasies
 * :hpx-pr:`5939` - docs: fix & improve parallel algorithms documentation 2
