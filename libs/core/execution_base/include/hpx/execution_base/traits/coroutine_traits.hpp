@@ -19,6 +19,10 @@ namespace hpx { namespace execution { namespace experimental {
         {
             return await.await_suspend(hpx::coro::coroutine_handle<Promise>{});
         }
+        else
+        {
+            return;
+        }
     }
 
     namespace detail {
