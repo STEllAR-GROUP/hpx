@@ -21,6 +21,7 @@
 #include <hpx/config/compiler_fence.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/constexpr.hpp>
+#include <hpx/config/coroutines_support.hpp>
 #include <hpx/config/debug.hpp>
 #include <hpx/config/deprecation.hpp>
 #include <hpx/config/emulate_deleted.hpp>
@@ -34,10 +35,6 @@
 #include <hpx/config/threads_stack.hpp>
 #include <hpx/config/version.hpp>
 #include <hpx/config/weak_symbol.hpp>
-
-#if defined(HPX_HAVE_CXX20_COROUTINES)
-#include <hpx/config/coroutines_support.hpp>
-#endif    //HPX_HAVE_CXX20_COROUTINES
 
 #include <boost/version.hpp>
 
