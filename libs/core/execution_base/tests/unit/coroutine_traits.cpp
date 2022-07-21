@@ -28,14 +28,14 @@ struct awaiter_2
 struct awaiter_3
 {
     void await_ready() {}
-    void await_suspend() {}
+    void await_suspend(hpx::coro::coroutine_handle<>) {}
     void await_resume() {}
 };
 
 struct awaiter_4
 {
     void await_ready() {}
-    bool await_suspend()
+    bool await_suspend(hpx::coro::coroutine_handle<>)
     {
         return false;
     }
@@ -45,7 +45,7 @@ struct awaiter_4
 struct awaiter_5
 {
     void await_ready() {}
-    bool await_suspend()
+    bool await_suspend(hpx::coro::coroutine_handle<>)
     {
         return false;
     }
@@ -179,6 +179,26 @@ int main()
 {
     using namespace hpx::execution::experimental;
 
+    static_assert(
+        std::is_same_v<decltype(await_suspend<void>(awaiter_1{})), void>);
+    static_assert(
+        std::is_same_v<decltype(await_suspend<void>(awaiter_2{})), void>);
+    static_assert(
+        std::is_same_v<decltype(await_suspend<void>(awaiter_3{})), void>);
+    static_assert(
+        std::is_same_v<decltype(await_suspend<void>(awaiter_4{})), void>);
+    static_assert(
+        std::is_same_v<decltype(await_suspend<void>(awaiter_5{})), void>);
+    static_assert(
+        std::is_same_v<decltype(await_suspend<promise>(awaiter_4{})), bool>);
+    static_assert(
+        std::is_same_v<decltype(await_suspend<promise>(awaiter_5{})), bool>);
+    static_assert(
+        std::is_same_v<decltype(await_suspend<promise>(awaiter_6<promise>{})),
+            void>);
+    static_assert(
+        std::is_same_v<decltype(await_suspend<void>(awaiter_1{})), void>);
+
     static_assert(detail::has_await_resume<awaiter_1>);
     static_assert(detail::has_await_resume<awaiter_2>);
     static_assert(detail::has_await_resume<awaiter_3>);
@@ -203,16 +223,16 @@ int main()
 
     static_assert(detail::has_await_suspend_coro_handle<awaiter_1, void>);
     static_assert(detail::has_await_suspend_coro_handle<awaiter_2, void>);
-    static_assert(detail::has_await_suspend<awaiter_3>);
-    static_assert(detail::has_await_suspend<awaiter_4>);
-    static_assert(detail::has_await_suspend<awaiter_5>);
+    static_assert(detail::has_await_suspend_coro_handle<awaiter_3, void>);
+    static_assert(detail::has_await_suspend_coro_handle<awaiter_4, void>);
+    static_assert(detail::has_await_suspend_coro_handle<awaiter_5, void>);
     static_assert(
         detail::has_await_suspend_coro_handle<awaiter_6<promise>, promise>);
 
-    static_assert(detail::has_await_suspend<non_awaiter_1>);
-    static_assert(detail::has_await_suspend<non_awaiter_2>);
-    static_assert(!detail::has_await_suspend<non_awaiter_3>);
-    static_assert(!detail::has_await_suspend<non_awaiter_4>);
+    static_assert(!detail::has_await_suspend_coro_handle<non_awaiter_1, void>);
+    static_assert(!detail::has_await_suspend_coro_handle<non_awaiter_2, void>);
+    static_assert(!detail::has_await_suspend_coro_handle<non_awaiter_3, void>);
+    static_assert(!detail::has_await_suspend_coro_handle<non_awaiter_4, void>);
 
     static_assert(is_awaiter_v<awaiter_1>);
     static_assert(is_awaiter_v<awaiter_2>);

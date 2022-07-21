@@ -19,7 +19,6 @@ namespace hpx { namespace execution { namespace experimental {
         {
             return await.await_suspend(hpx::coro::coroutine_handle<Promise>{});
         }
-        return;
     }
 
     namespace detail {
@@ -54,13 +53,6 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename T>
         inline constexpr bool has_await_resume<T,
             std::void_t<decltype(std::declval<T>().await_resume())>> = true;
-
-        template <typename, typename = void>
-        inline constexpr bool has_await_suspend = false;
-
-        template <typename T>
-        inline constexpr bool has_await_suspend<T,
-            std::void_t<decltype(std::declval<T>().await_suspend())>> = true;
 
         template <typename, typename, typename = void>
         inline constexpr bool has_await_suspend_coro_handle = false;
@@ -107,8 +99,7 @@ namespace hpx { namespace execution { namespace experimental {
     struct is_awaiter
       : detail::is_awaiter_impl<detail::has_await_ready<Awaiter> &&
                 detail::has_await_resume<Awaiter> &&
-                (detail::has_await_suspend<Awaiter> ||
-                    detail::has_await_suspend_coro_handle<Awaiter, Promise>),
+                detail::has_await_suspend_coro_handle<Awaiter, Promise>,
             Awaiter, Promise>
     {
     };
