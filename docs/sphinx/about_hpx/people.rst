@@ -103,6 +103,7 @@ Contributors to this document
   Adrian Serio            |cct|_, |lsu|_        |email_aserio|
   Rebecca Stobaugh                              |email_rstobaugh|
   Dimitra Karatza         |tud_eemcs|_, |tud|_  |email_dkaratza|
+  Bhumit Attarde                                |email_bhumitattarde|
   ======================= ===================== =====
 
 Acknowledgements
