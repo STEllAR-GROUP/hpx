@@ -20,6 +20,8 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters {
 
@@ -132,3 +134,5 @@ namespace hpx { namespace performance_counters {
     HPX_EXPORT std::vector<performance_counter> discover_counters(
         std::string const& name, error_code& ec = throws);
 }}    // namespace hpx::performance_counters
+
+#include <hpx/config/warnings_suffix.hpp>
