@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/config/coroutines_support.hpp>
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 

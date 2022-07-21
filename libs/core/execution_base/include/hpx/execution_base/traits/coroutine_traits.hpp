@@ -137,7 +137,7 @@ namespace hpx { namespace execution { namespace experimental {
     {
         if constexpr (detail::has_member_operator_co_await_v<Awaitable>)
         {
-            return ((HPX_FORWARD(Awaitable, await))).operator co_await();
+            return HPX_FORWARD(Awaitable, await).operator co_await();
         }
         else if constexpr (detail::has_free_operator_co_await_v<Awaitable>)
         {
