@@ -46,7 +46,17 @@ int hpx_main()
     }
 
     {
+        // rvalue arguments
         auto result = *tt::sync_wait(ex::just(3, 4.0));
+        HPX_TEST_EQ(hpx::get<0>(result), 3);
+        HPX_TEST_EQ(hpx::get<1>(result), 4.0);
+    }
+
+    {
+        // lvalue arguments
+        int i = 3;
+        double d = 4.0;
+        auto result = *tt::sync_wait(ex::just(i, d));
         HPX_TEST_EQ(hpx::get<0>(result), 3);
         HPX_TEST_EQ(hpx::get<1>(result), 4.0);
     }

@@ -66,7 +66,8 @@ namespace hpx::execution::experimental::detail {
         // The template should compute the result type of whatever returned from
         // sync_wait, which should be optional of the variant of the tuples. The
         // sync_wait works when the variant has one tuple.
-        using result_type = predecessor_value_types<hpx::tuple, hpx::variant>;
+        using result_type =
+            predecessor_value_types<decayed_tuple, hpx::variant>;
 
         // The type of errors to store in the variant. This in itself is a
         // variant.
