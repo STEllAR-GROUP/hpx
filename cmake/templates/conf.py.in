@@ -177,18 +177,18 @@ for lib in hpx_libs.keys():
         for source in module_sources[1]:
             header = source[len('include/'):]
             header_splitted = re.split('[/ .]',header)
-            
+
             header_name = header_splitted[-2]
             # create a new, longer header name if current one already exists
             if header_name in header_names:
                 header_name = '{0}_{1}'.format(header_splitted[-3], header_name)
             header_names.add(header_name)
-                                
+
             header_ref = open(basedir + '/' + header_name + '.rst', 'w')
             header_ref.write(api_header_file.format(header, module))
             header_ref.close()
             header_refs += '   /libs/' + lib + '/' + module + '/api/' + header_name + '.rst\n'
-        module_api_ref.write(api_file) 
+        module_api_ref.write(api_file)
         module_api_ref.write(header_refs)
         module_api_ref.close()
         api_refs += '   /libs/' + lib + '/' + module + '/api/full_api.rst\n'
@@ -633,7 +633,6 @@ html_theme = 'sphinx_book_theme'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'logo_only': True,
     "home_page_in_toc": True,
     "repository_url": "https://github.com/STEllAR-GROUP/hpx",
     "use_repository_button": True,
