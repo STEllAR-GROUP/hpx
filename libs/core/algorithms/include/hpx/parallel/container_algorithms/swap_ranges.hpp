@@ -53,7 +53,7 @@ namespace hpx { namespace ranges {
     template <typename InIter1, typename Sent1, typename InIter2,
         typename Sent2>
     swap_ranges_result<InIter1, InIter2>
-    swap_ranges(InIter1 first1, Sent1 last1,InIter2 first2, Sent2 last2);
+    swap_ranges(InIter1 first1, Sent1 last1, InIter2 first2, Sent2 last2);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Exchanges elements between range [first1, last1) and another range
@@ -107,9 +107,9 @@ namespace hpx { namespace ranges {
     ///           element exchanged in the range beginning with \a first2.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Sent1,
-            typename FwdIter2, typename Sent2>
+        typename FwdIter2, typename Sent2>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        swap_ranges_result<FwdIter1, FwdIter2> >::type
+        swap_ranges_result<FwdIter1, FwdIter2>>::type
     swap_ranges(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
         FwdIter2 first2, Sent2 last2);
 
@@ -146,8 +146,8 @@ namespace hpx { namespace ranges {
     ///           element exchanged in the range beginning with \a first2.
     ///
     template <typename Rng1, typename Rng2>
-    swap_ranges_result<hpx::traits::range_iterator_t<Rng1>,
-            hpx::traits::range_iterator_t<Rng2>>
+    swap_ranges_result<typename hpx::traits::range_iterator_t<Rng1>,
+        typename hpx::traits::range_iterator_t<Rng2>>
     swap_ranges(Rng1&& rng1, Rng2&& rng2);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -202,10 +202,9 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng1, typename Rng2>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-    swap_ranges_result<hpx::traits::range_iterator_t<Rng1>,
-                hpx::traits::range_iterator_t<Rng2>>>::type
-    swap_ranges(ExPolicy&& policy, ExPolicy&& policy, Rng1&& rng1,
-        Rng2&& rng2);
+        swap_ranges_result<typename hpx::traits::range_iterator_t<Rng1>,
+            typename hpx::traits::range_iterator_t<Rng2>>>::type
+    swap_ranges(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2);
 
     // clang-format on
 }}    // namespace hpx::ranges
