@@ -21,6 +21,7 @@ set(execution_base_headers
     hpx/execution_base/this_thread.hpp
     hpx/execution_base/traits/is_executor.hpp
     hpx/execution_base/traits/is_executor_parameters.hpp
+    hpx/execution_base/traits/coroutine_traits.hpp
 )
 
 # cmake-format: off

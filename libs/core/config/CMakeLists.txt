@@ -33,6 +33,10 @@ set(config_headers
     hpx/config/weak_symbol.hpp
 )
 
+if(HPX_WITH_CXX20_COROUTINES)
+  set(config_headers ${config_headers} hpx/config/coroutines_support.hpp)
+endif()
+
 # Default location is $HPX_ROOT/libs/config/src
 set(config_sources version.cpp)
 
