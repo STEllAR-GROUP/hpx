@@ -65,8 +65,11 @@ namespace hpx { namespace ranges {
     ///           The algorithm returns an iterator pointing to the first
     ///           element after the last element in the input sequence.
     ///
-    template <typename RandomIt, typename Sent, typename Comp, typename Proj>
-    RandomIt stable_sort(RandomIt first, Sent last, Comp&& comp, Proj&& proj);
+    template <typename RandomIt, typename Sent,
+        typename Comp = ranges::less,
+        typename Proj = parallel::util::projection_identity>
+    RandomIt stable_sort(RandomIt first, Sent last, Comp&& comp = Comp(),
+        Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Sorts the elements in the range [first, last) in ascending order. The
@@ -138,11 +141,12 @@ namespace hpx { namespace ranges {
     ///           element after the last element in the input sequence.
     ///
     template <typename ExPolicy, typename RandomIt, typename Sent,
-        typename Comp, typename Proj>
+        typename Comp = ranges::less,
+        typename Proj = parallel::util::projection_identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         RandomIt>::type
-    stable_sort(ExPolicy&& policy, RandomIt first, Sent last, Comp&& comp,
-        Proj&& proj);
+    stable_sort(ExPolicy&& policy, RandomIt first, Sent last, Comp&& comp = Comp(),
+        Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Sorts the elements in the range [first, last) in ascending order. The
@@ -162,7 +166,7 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
-    /// \tparam Comp        The type of the function/function object to use
+    /// \tparam Compare     The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
@@ -190,9 +194,11 @@ namespace hpx { namespace ranges {
     /// \returns  The \a stable_sort algorithm returns \a
     ///           typename hpx::traits::range_iterator<Rng>::type.
     ///           It returns \a last.
-    template <typename Rng, typename Comp, typename Proj>
+    template <typename Rng,
+        typename Compare = ranges::less,
+        typename Proj = parallel::util::projection_identity>
     typename hpx::traits::range_iterator<Rng>::type
-    stable_sort(Rng&& rng, Compare&& comp, Proj&& proj);
+    stable_sort(Rng&& rng, Compare&& comp = Compare(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Sorts the elements in the range [first, last) in ascending order. The
@@ -216,7 +222,7 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
-    /// \tparam Comp        The type of the function/function object to use
+    /// \tparam Compare     The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
@@ -259,10 +265,13 @@ namespace hpx { namespace ranges {
     ///           otherwise.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename Rng, typename Pred, typename Proj>
-    typename util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_iterator_t<Rng>>::type
-    stable_sort(ExPolicy&& policy, Rng&& rng, Comp&& comp, Proj&&);
+    template <typename ExPolicy, typename Rng,
+        typename Compare = ranges::less,
+        typename Proj = parallel::util::projection_identity>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_iterator<Rng>::type>::type
+    stable_sort(ExPolicy&& policy, Rng&& rng, Compare&& comp = Compare(),
+        Proj&& proj = Proj());
 
     // clang-format on
 }}    // namespace hpx::ranges
