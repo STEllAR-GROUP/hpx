@@ -7,6 +7,8 @@
 #pragma once
 
 #include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/container_algorithms/for_each.hpp>
 

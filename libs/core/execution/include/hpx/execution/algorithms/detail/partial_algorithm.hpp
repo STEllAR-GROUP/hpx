@@ -1,4 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,7 +7,12 @@
 
 #pragma once
 
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/member_pack.hpp>
+#include <hpx/execution_base/completion_scheduler.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
+#include <hpx/execution_base/receiver.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -36,7 +42,39 @@ namespace hpx::execution::experimental::detail {
         partial_algorithm_base& operator=(
             partial_algorithm_base const&) = delete;
 
-        template <typename U>
+        // clang-format off
+        template <typename U,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_sender_v<U> &&
+                hpx::execution::experimental::detail::
+                    is_completion_scheduler_tag_invocable_v<
+                        hpx::execution::experimental::set_value_t,
+                        U, Tag
+                    >
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto operator|(
+            U&& u, partial_algorithm_base p)
+        {
+            auto scheduler =
+                hpx::execution::experimental::get_completion_scheduler<
+                    hpx::execution::experimental::set_value_t>(u);
+
+            return Tag{}(HPX_MOVE(scheduler), HPX_FORWARD(U, u),
+                HPX_MOVE(p.ts).template get<Is>()...);
+        }
+
+        // clang-format off
+        template <typename U,
+            HPX_CONCEPT_REQUIRES_(
+               !hpx::execution::experimental::is_sender_v<U> ||
+               !hpx::execution::experimental::detail::
+                    is_completion_scheduler_tag_invocable_v<
+                        hpx::execution::experimental::set_value_t,
+                        U, Tag
+                    >
+            )>
+        // clang-format on
         friend constexpr HPX_FORCEINLINE auto operator|(
             U&& u, partial_algorithm_base p)
         {

@@ -1,4 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,12 +9,47 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/execution_base/get_env.hpp>
+#include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 
 #include <type_traits>
 
 namespace hpx::execution::experimental {
+
+    // 1. execution::forwarding_sender_query is used to ask a customization
+    //    point object whether it is a sender query that should be forwarded
+    //    through sender adaptors.
+    //
+    // 2. execution::forwarding_sender_query is used to ask a customization
+    //    point object whether it is a sender query that should be forwarded
+    //    through sender adaptors.
+    //
+    //      1. tag_invoke(execution::forwarding_sender_query, t) contextually
+    //         converted to bool, if the tag_invoke expression is well formed.
+    //
+    //          - Mandates: The tag_invoke expression is indeed contextually
+    //            convertible to bool, that expression and the contextual
+    //            conversion are not potentially-throwing and are core constant
+    //            expressions if t is a core constant expression.
+    //
+    //      2. Otherwise, false.
+    //
+    inline constexpr struct forwarding_sender_query_t final
+      : hpx::functional::detail::tag_fallback_noexcept<
+            forwarding_sender_query_t,
+            detail::contextually_convertible_to_bool<forwarding_sender_query_t>>
+    {
+    private:
+        template <typename Tag>
+        friend constexpr bool tag_fallback_invoke(
+            forwarding_sender_query_t, Tag) noexcept
+        {
+            return false;
+        }
+    } forwarding_sender_query{};
 
     // execution::get_completion_scheduler is used to ask a sender object for
     // the completion scheduler for one of its signals.
@@ -41,14 +77,18 @@ namespace hpx::execution::experimental {
     // clang-format off
     template <typename CPO,
         HPX_CONCEPT_REQUIRES_(
-            std::is_same_v<CPO, set_value_t> ||
-            std::is_same_v<CPO, set_error_t> ||
-            std::is_same_v<CPO, set_stopped_t>
+            hpx::execution::experimental::detail::is_receiver_cpo_v<CPO>
         )>
     // clang-format on
     struct get_completion_scheduler_t final
       : hpx::functional::tag<get_completion_scheduler_t<CPO>>
     {
+    private:
+        friend constexpr bool tag_invoke(forwarding_sender_query_t,
+            get_completion_scheduler_t const&) noexcept
+        {
+            return true;
+        }
     };
 
     template <typename CPO>

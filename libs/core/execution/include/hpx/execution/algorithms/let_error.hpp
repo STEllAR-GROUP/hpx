@@ -136,6 +136,24 @@ namespace hpx::execution::experimental {
                 let_error_sender const&, Env) noexcept
                 -> generate_completion_signatures<Env>;
 
+            // clang-format off
+            template <typename CPO,
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::execution::experimental::detail::is_receiver_cpo_v<CPO> &&
+                    hpx::execution::experimental::detail::has_completion_scheduler_v<
+                        CPO, predecessor_sender_t>
+                )>
+            // clang-format on
+            friend constexpr auto tag_invoke(
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>
+                    tag,
+                let_error_sender const& sender)
+            {
+                return tag(sender.predecessor_sender);
+            }
+
+            // TODO: add forwarding_sender_query
+
             template <typename Receiver>
             struct operation_state
             {

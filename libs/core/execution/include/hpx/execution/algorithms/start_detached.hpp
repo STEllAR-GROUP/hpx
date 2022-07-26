@@ -13,6 +13,7 @@
 #include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
@@ -37,12 +38,12 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename Sender, typename Allocator>
-        struct operation_state_holder
+        template <typename Derived, typename Sender, typename Allocator>
+        struct operation_state_holder_base
         {
             struct start_detached_receiver
             {
-                hpx::intrusive_ptr<operation_state_holder> op_state;
+                hpx::intrusive_ptr<Derived> op_state;
 
                 template <typename Error>
                 [[noreturn]] friend void tag_invoke(
@@ -60,6 +61,7 @@ namespace hpx::execution::experimental {
                 friend void tag_invoke(
                     set_stopped_t, start_detached_receiver&& r) noexcept
                 {
+                    r.op_state->finish();
                     r.op_state.reset();
                 };
 
@@ -67,13 +69,14 @@ namespace hpx::execution::experimental {
                 friend void tag_invoke(
                     set_value_t, start_detached_receiver&& r, Ts&&...) noexcept
                 {
+                    r.op_state->finish();
                     r.op_state.reset();
                 }
             };
 
         private:
             using allocator_type = typename std::allocator_traits<
-                Allocator>::template rebind_alloc<operation_state_holder>;
+                Allocator>::template rebind_alloc<Derived>;
             HPX_NO_UNIQUE_ADDRESS allocator_type alloc;
             hpx::util::atomic_count count{0};
 
@@ -82,39 +85,80 @@ namespace hpx::execution::experimental {
             std::decay_t<operation_state_type> op_state;
 
         public:
-            // clang-format off
-            template <typename Sender_,
-                HPX_CONCEPT_REQUIRES_(
-                    meta::value<meta::none_of<operation_state_holder, Sender_>>
-                )>
-            // clang-format on
-            explicit operation_state_holder(
+            template <typename Sender_>
+            explicit operation_state_holder_base(
                 Sender_&& sender, allocator_type const& alloc)
               : alloc(alloc)
               , op_state(connect(HPX_FORWARD(Sender_, sender),
-                    start_detached_receiver{this}))
+                    start_detached_receiver{static_cast<Derived*>(this)}))
             {
-                start(op_state);
+                hpx::execution::experimental::start(op_state);
             }
 
         private:
             friend void intrusive_ptr_add_ref(
-                operation_state_holder* p) noexcept
+                operation_state_holder_base* p) noexcept
             {
                 ++p->count;
             }
 
             friend void intrusive_ptr_release(
-                operation_state_holder* p) noexcept
+                operation_state_holder_base* p) noexcept
             {
                 if (--p->count == 0)
                 {
                     allocator_type other_alloc(p->alloc);
                     std::allocator_traits<allocator_type>::destroy(
-                        other_alloc, p);
+                        other_alloc, static_cast<Derived*>(p));
                     std::allocator_traits<allocator_type>::deallocate(
-                        other_alloc, p, 1);
+                        other_alloc, static_cast<Derived*>(p), 1);
                 }
+            }
+        };
+
+        template <typename Sender, typename Allocator>
+        struct operation_state_holder
+          : operation_state_holder_base<
+                operation_state_holder<Sender, Allocator>, Sender, Allocator>
+        {
+            using base_type = operation_state_holder_base<
+                operation_state_holder<Sender, Allocator>, Sender, Allocator>;
+
+            using base_type::operation_state_holder_base;
+
+            static constexpr void finish() noexcept {}
+        };
+
+        template <typename Sender, typename Allocator>
+        struct operation_state_holder_with_run_loop
+          : operation_state_holder_base<
+                operation_state_holder_with_run_loop<Sender, Allocator>, Sender,
+                Allocator>
+        {
+        private:
+            hpx::execution::experimental::run_loop& loop;
+
+            using base_type = operation_state_holder_base<
+                operation_state_holder_with_run_loop<Sender, Allocator>, Sender,
+                Allocator>;
+
+        public:
+            template <typename Sender_, typename Allocator_>
+            explicit operation_state_holder_with_run_loop(
+                hpx::execution::experimental::run_loop_scheduler const& sched,
+                Sender_&& sender, Allocator_ const& alloc)
+              : base_type(HPX_FORWARD(Sender_, sender), alloc)
+              , loop(sched.get_run_loop())
+            {
+                // keep ourselves alive
+                hpx::intrusive_ptr<operation_state_holder_with_run_loop> this_(
+                    this);
+                loop.run();
+            }
+
+            void finish() noexcept
+            {
+                loop.finish();
             }
         };
     }    // namespace detail
@@ -155,6 +199,36 @@ namespace hpx::execution::experimental {
         template <typename Sender,
             typename Allocator = hpx::util::internal_allocator<>,
             HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_sender_v<Sender> &&
+                hpx::traits::is_allocator_v<Allocator>
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_invoke(start_detached_t,
+            hpx::execution::experimental::run_loop_scheduler const& sched,
+            Sender&& sender, Allocator const& allocator = {})
+        {
+            using allocator_type = Allocator;
+            using operation_state_type =
+                detail::operation_state_holder_with_run_loop<Sender, Allocator>;
+            using other_allocator = typename std::allocator_traits<
+                allocator_type>::template rebind_alloc<operation_state_type>;
+            using allocator_traits = std::allocator_traits<other_allocator>;
+            using unique_ptr = std::unique_ptr<operation_state_type,
+                util::allocator_deleter<other_allocator>>;
+
+            other_allocator alloc(allocator);
+            unique_ptr p(allocator_traits::allocate(alloc, 1),
+                hpx::util::allocator_deleter<other_allocator>{alloc});
+
+            allocator_traits::construct(
+                alloc, p.get(), sched, HPX_FORWARD(Sender, sender), alloc);
+            HPX_UNUSED(p.release());
+        }
+
+        // clang-format off
+        template <typename Sender,
+            typename Allocator = hpx::util::internal_allocator<>,
+            HPX_CONCEPT_REQUIRES_(
                 is_sender_v<Sender> &&
                 hpx::traits::is_allocator_v<Allocator>
             )>
@@ -179,6 +253,22 @@ namespace hpx::execution::experimental {
             allocator_traits::construct(
                 alloc, p.get(), HPX_FORWARD(Sender, sender), alloc);
             HPX_UNUSED(p.release());
+        }
+
+        // clang-format off
+        template <typename Scheduler, typename Allocator,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduler_v<Scheduler> &&
+                hpx::traits::is_allocator_v<Allocator>
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+            start_detached_t, Scheduler&& scheduler,
+            Allocator const& allocator = {})
+        {
+            return hpx::execution::experimental::detail::inject_scheduler<
+                start_detached_t, Scheduler, Allocator>{
+                HPX_FORWARD(Scheduler, scheduler), allocator};
         }
 
         // clang-format off

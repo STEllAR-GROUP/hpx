@@ -11,7 +11,9 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
+#include <hpx/execution/algorithms/run_loop.hpp>
 #include <hpx/execution/algorithms/split.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
@@ -49,7 +51,7 @@ namespace hpx::execution::experimental {
     // sequenced after the completion.
     //
     inline constexpr struct ensure_started_t final
-      : hpx::functional::detail::tag_fallback<ensure_started_t>
+      : hpx::functional::detail::tag_priority<ensure_started_t>
     {
     private:
         // clang-format off
@@ -79,6 +81,24 @@ namespace hpx::execution::experimental {
         template <typename Sender,
             typename Allocator = hpx::util::internal_allocator<>,
             HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_sender_v<Sender> &&
+                hpx::traits::is_allocator_v<Allocator>
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_invoke(ensure_started_t,
+            hpx::execution::experimental::run_loop_scheduler const& sched,
+            Sender&& sender, Allocator const& allocator = {})
+        {
+            return detail::split_sender<Sender, Allocator,
+                detail::submission_type::eager,
+                hpx::execution::experimental::run_loop_scheduler>{
+                HPX_FORWARD(Sender, sender), allocator, sched};
+        }
+
+        // clang-format off
+        template <typename Sender,
+            typename Allocator = hpx::util::internal_allocator<>,
+            HPX_CONCEPT_REQUIRES_(
                 is_sender_v<Sender> &&
                 hpx::traits::is_allocator_v<Allocator>
             )>
@@ -100,6 +120,22 @@ namespace hpx::execution::experimental {
             Allocator const& = {})
         {
             return sender;
+        }
+
+        // clang-format off
+        template <typename Scheduler, typename Allocator,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduler_v<Scheduler> &&
+                hpx::traits::is_allocator_v<Allocator>
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+            ensure_started_t, Scheduler&& scheduler,
+            Allocator const& allocator = {})
+        {
+            return hpx::execution::experimental::detail::inject_scheduler<
+                ensure_started_t, Scheduler, Allocator>{
+                HPX_FORWARD(Scheduler, scheduler), allocator};
         }
 
         // clang-format off

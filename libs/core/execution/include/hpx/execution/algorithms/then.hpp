@@ -142,12 +142,14 @@ namespace hpx::execution::experimental {
                 )>
             // clang-format on
             friend constexpr auto tag_invoke(
-                hpx::execution::experimental::get_completion_scheduler_t<CPO>,
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>
+                    tag,
                 then_sender const& sender)
             {
-                return hpx::execution::experimental::get_completion_scheduler<
-                    CPO>(sender.sender);
+                return tag(sender.sender);
             }
+
+            // TODO: add forwarding_sender_query
 
             template <typename Receiver>
             friend auto tag_invoke(

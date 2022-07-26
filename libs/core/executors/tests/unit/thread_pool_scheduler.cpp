@@ -594,15 +594,14 @@ void test_when_all()
 
         // The exception is likely to be thrown before set_value from the second
         // sender is called because the second sender sleeps.
-        auto work1 = ex::schedule(sched) | ex::then([parent_id]() {
+        auto work1 = ex::schedule(sched) | ex::then([parent_id]() -> int {
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
             throw std::runtime_error("error");
-            return 42;
         });
 
         auto work2 = ex::schedule(sched) | ex::then([parent_id]() {
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
             return std::string("hello");
         });
 
@@ -633,11 +632,10 @@ void test_when_all()
 
         // The exception is likely to be thrown after set_value from the second
         // sender is called because the first sender sleeps before throwing.
-        auto work1 = ex::schedule(sched) | ex::then([parent_id]() {
+        auto work1 = ex::schedule(sched) | ex::then([parent_id]() -> int {
             HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
             throw std::runtime_error("error");
-            return 42;
         });
 
         auto work2 = ex::schedule(sched) | ex::then([parent_id]() {

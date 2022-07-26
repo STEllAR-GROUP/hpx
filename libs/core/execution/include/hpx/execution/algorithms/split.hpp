@@ -17,8 +17,10 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
+#include <hpx/execution/algorithms/run_loop.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/operation_state.hpp>
@@ -82,9 +84,17 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <typename Sender, typename Allocator, submission_type Type>
+        // Dummy type used in place of a scheduler if none is given
+        struct no_scheduler
+        {
+        };
+
+        template <typename Sender, typename Allocator, submission_type Type,
+            typename Scheduler = no_scheduler>
         struct split_sender
         {
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
+
             template <typename Tuple>
             struct value_types_helper
             {
@@ -116,6 +126,22 @@ namespace hpx::execution::experimental {
             friend auto tag_invoke(
                 get_completion_signatures_t, split_sender const&, Env)
                 -> generate_completion_signatures<Env>;
+
+            // clang-format off
+            template <typename CPO, typename Scheduler_ = Scheduler,
+                HPX_CONCEPT_REQUIRES_(
+                   !std::is_same_v<Scheduler_, no_scheduler> &&
+                    is_receiver_cpo_v<std::decay_t<CPO>>
+                )>
+            // clang-format on
+            friend constexpr auto tag_invoke(
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>,
+                split_sender const& sender)
+            {
+                return sender.scheduler;
+            }
+
+            // TODO: add forwarding_sender_query
 
             struct shared_state
             {
@@ -415,8 +441,10 @@ namespace hpx::execution::experimental {
 
             hpx::intrusive_ptr<shared_state> state;
 
-            template <typename Sender_>
-            split_sender(Sender_&& sender, Allocator const& allocator)
+            template <typename Sender_, typename Scheduler_ = no_scheduler>
+            split_sender(Sender_&& sender, Allocator const& allocator,
+                Scheduler_&& scheduler = Scheduler_{})
+              : scheduler(HPX_FORWARD(Scheduler_, scheduler))
             {
                 using allocator_type = Allocator;
                 using other_allocator = typename std::allocator_traits<
@@ -547,7 +575,25 @@ namespace hpx::execution::experimental {
         template <typename Sender,
             typename Allocator = hpx::util::internal_allocator<>,
             HPX_CONCEPT_REQUIRES_(
-                is_sender_v<Sender> &&
+                hpx::execution::experimental::is_sender_v<Sender> &&
+                hpx::traits::is_allocator_v<Allocator>
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_invoke(split_t,
+            hpx::execution::experimental::run_loop_scheduler const& sched,
+            Sender&& sender, Allocator const& allocator = {})
+        {
+            return detail::split_sender<Sender, Allocator,
+                detail::submission_type::lazy,
+                hpx::execution::experimental::run_loop_scheduler>{
+                HPX_FORWARD(Sender, sender), allocator, sched};
+        }
+
+        // clang-format off
+        template <typename Sender,
+            typename Allocator = hpx::util::internal_allocator<>,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_sender_v<Sender> &&
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
@@ -567,6 +613,21 @@ namespace hpx::execution::experimental {
             Allocator const& = {})
         {
             return sender;
+        }
+
+        // clang-format off
+        template <typename Scheduler, typename Allocator,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduler_v<Scheduler> &&
+                hpx::traits::is_allocator_v<Allocator>
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+            split_t, Scheduler&& scheduler, Allocator const& allocator = {})
+        {
+            return hpx::execution::experimental::detail::inject_scheduler<
+                split_t, Scheduler, Allocator>{
+                HPX_FORWARD(Scheduler, scheduler), allocator};
         }
 
         // clang-format off
