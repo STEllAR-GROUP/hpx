@@ -120,7 +120,8 @@ namespace hpx {
     ///
     /// \returns  The \a nth_element algorithms returns nothing.
     ///
-    template <typename ExPolicy, typename RandomIt, typename Pred = hpx::parallel::v1::detail::less>
+    template <typename ExPolicy, typename RandomIt,
+        typename Pred = hpx::parallel::v1::detail::less>
     void nth_element(ExPolicy&& policy, RandomIt first, RandomIt nth,
         RandomIt last, Pred&& pred = Pred());
 

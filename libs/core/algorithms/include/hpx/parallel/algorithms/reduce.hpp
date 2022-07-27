@@ -87,7 +87,8 @@ namespace hpx {
     /// that the behavior of reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename ExPolicy, typename FwdIter, typename F, typename T = typename std::iterator_traits<FwdIter>::value_type>
+    template <typename ExPolicy, typename FwdIter, typename F,
+        typename T = typename std::iterator_traits<FwdIter>::value_type>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, T>::type
     reduce(ExPolicy&& policy, FwdIter first, FwdIter last, T init, F&& f);
 
@@ -146,7 +147,8 @@ namespace hpx {
     /// that the behavior of reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename ExPolicy, typename FwdIter, typename T = typename std::iterator_traits<FwdIter>::value_type>
+    template <typename ExPolicy, typename FwdIter,
+        typename T = typename std::iterator_traits<FwdIter>::value_type>
     typename util::detail::algorithm_result<ExPolicy, T>::type
     reduce(ExPolicy&& policy, FwdIter first, FwdIter last, T init);
 
@@ -264,7 +266,8 @@ namespace hpx {
     /// that the behavior of reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename FwdIter, typename F, typename T = typename std::iterator_traits<FwdIter>::value_type>
+    template <typename FwdIter, typename F,
+        typename T = typename std::iterator_traits<FwdIter>::value_type>
     T reduce(FwdIter first, FwdIter last, T init, F&& f);
 
     /// Returns GENERALIZED_SUM(+, init, *first, ..., *(first + (last - first) - 1)).
@@ -302,7 +305,8 @@ namespace hpx {
     /// that the behavior of reduce may be non-deterministic for
     /// non-associative or non-commutative binary predicate.
     ///
-    template <typename FwdIter, typename T = typename std::iterator_traits<FwdIter>::value_type>
+    template <typename FwdIter,
+        typename T = typename std::iterator_traits<FwdIter>::value_type>
     T reduce(FwdIter first, FwdIter last, T init);
 
     /// Returns GENERALIZED_SUM(+, T(), *first, ..., *(first + (last - first) - 1)).

@@ -92,7 +92,8 @@ namespace hpx {
     ///           \a parallel_task_policy and returns \a RandIter otherwise.
     ///           The iterator returned refers to \a last.
     ///
-    template <typename ExPolicy, typename RandIter, typename Comp = hpx::parallel::v1::detail::less>
+    template <typename ExPolicy, typename RandIter,
+        typename Comp = hpx::parallel::v1::detail::less>
     parallel::util::detail::algorithm_result_t<ExPolicy, RandIter> partial_sort(
         ExPolicy&& policy, RandIter first, RandIter middle, RandIter last,
         Comp&& comp = Comp());

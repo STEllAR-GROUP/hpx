@@ -63,7 +63,8 @@ namespace hpx {
     ///           The \a partition algorithm returns the iterator to
     ///           the first element of the second group.
     ///
-    template <typename FwdIter, typename Pred, typename Proj = parallel::util::projection_identity>
+    template <typename FwdIter, typename Pred,
+        typename Proj = parallel::util::projection_identity>
     FwdIter partition(FwdIter first, FwdIter last,
         Pred&& pred, Proj&& proj = Proj());
 
@@ -132,7 +133,8 @@ namespace hpx {
     ///           The \a partition algorithm returns the iterator to
     ///           the first element of the second group.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Pred, typename Proj = parallel::util::projection_identity>
+    template <typename ExPolicy, typename FwdIter, typename Pred,
+        typename Proj = parallel::util::projection_identity>
     parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
     partition(ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred,
         Proj&& proj = Proj());
@@ -191,7 +193,8 @@ namespace hpx {
     ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
     ///           the elements in both groups is preserved.
     ///
-    template <typename BidirIter, typename F, typename Proj = parallel::util::projection_identity>
+    template <typename BidirIter, typename F,
+        typename Proj = parallel::util::projection_identity>
     BidirIter stable_partition(BidirIter first, BidirIter last, F&& f,
         Proj&& proj = Proj());
 
@@ -341,11 +344,12 @@ namespace hpx {
     ///           range, and the destination iterator to the end of the \a
     ///           dest_false range.
     ///
-    template <typename FwdIter1, typename FwdIter2,
-        typename FwdIter3, typename Pred, typename Proj = parallel::util::projection_identity>
+    template <typename FwdIter1, typename FwdIter2, typename FwdIter3,
+        typename Pred, typename Proj = parallel::util::projection_identity>
     std::pair<FwdIter2 ,FwdIter3>
     partition_copy(FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj = Proj());
+        FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
+        fProj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements in the range, defined by [first, last),
@@ -434,8 +438,10 @@ namespace hpx {
     ///           dest_false range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename FwdIter3, typename Pred, typename Proj = parallel::util::projection_identity>
-    parallel::util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter2, FwdIter3>>
+        typename FwdIter3, typename Pred,
+        typename Proj = parallel::util::projection_identity>
+    parallel::util::detail::algorithm_result_t
+        <ExPolicy, std::pair<FwdIter2, FwdIter3>>
     partition_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj = Proj());
 

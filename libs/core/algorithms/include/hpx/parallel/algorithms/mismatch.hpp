@@ -89,17 +89,18 @@ namespace hpx {
     ///           returns \a std::pair<FwdIter1,FwdIter2> otherwise.
     ///           If no mismatches are found when the comparison reaches last1
     ///           or last2, whichever happens first, the pair holds the end
-    ///           iterator and the corresponding iterator from the other range. 
+    ///           iterator and the corresponding iterator from the other range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
+    hpx::parallel::util::detail::algorithm_result_t
+        <ExPolicy, std::pair<FwdIter1, FwdIter2>>
     mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, FwdIter2 last2, Pred&& op);
 
     /// Returns the first mismatching pair of elements from two ranges: one
     /// defined by [first1, last1) and another defined by [first2,last2). If
-    /// last2 is not provided, it denotes first2 + (last1 - first1). 
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
     /// Executed according to the policy.
     ///
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
@@ -158,13 +159,14 @@ namespace hpx {
     ///           iterator and the corresponding iterator from the other range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
+    hpx::parallel::util::detail::algorithm_result_t
+        <ExPolicy, std::pair<FwdIter1, FwdIter2>>
     mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, FwdIter2 last2);
 
     /// Returns the first mismatching pair of elements from two ranges: one
     /// defined by [first1, last1) and another defined by [first2,last2). If
-    /// last2 is not provided, it denotes first2 + (last1 - first1). 
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
     /// Executed according to the policy.
     ///
     /// \note   Complexity: At most last1 - first1
@@ -240,7 +242,8 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
+    hpx::parallel::util::detail::algorithm_result_t
+        <ExPolicy, std::pair<FwdIter1, FwdIter2>>
     mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, Pred&& op);
 
@@ -255,7 +258,7 @@ namespace hpx {
     ///         \a RandomAccessIterator and
     ///         (last1 - first1) != (last2 - first2) then no applications
     ///         of \a operator== are made.
-    ///         
+    ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
@@ -308,13 +311,14 @@ namespace hpx {
     ///           iterator and the corresponding iterator from the other range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
+    hpx::parallel::util::detail::algorithm_result_t
+        <ExPolicy, std::pair<FwdIter1, FwdIter2>>
     mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2);
 
     /// Returns the first mismatching pair of elements from two ranges: one
     /// defined by [first1, last1) and another defined by [first2,last2). If
-    /// last2 is not provided, it denotes first2 + (last1 - first1). 
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
     ///
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
     ///         applications of the predicate \a op or \a operator==.
@@ -377,7 +381,7 @@ namespace hpx {
 
     /// Returns the first mismatching pair of elements from two ranges: one
     /// defined by [first1, last1) and another defined by [first2,last2). If
-    /// last2 is not provided, it denotes first2 + (last1 - first1). 
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
     ///
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
     ///         applications of \a operator==.
@@ -421,7 +425,7 @@ namespace hpx {
 
     /// Returns the first mismatching pair of elements from two ranges: one
     /// defined by [first1, last1) and another defined by [first2,last2). If
-    /// last2 is not provided, it denotes first2 + (last1 - first1). 
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
     ///
     /// \note   Complexity: At most last1 - first1
     ///         applications of the predicate \a op or \a operator==.
@@ -482,7 +486,7 @@ namespace hpx {
 
     /// Returns the first mismatching pair of elements from two ranges: one
     /// defined by [first1, last1) and another defined by [first2,last2). If
-    /// last2 is not provided, it denotes first2 + (last1 - first1). 
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
     ///
     /// \note   Complexity: At most last1 - first1
     ///         applications of \a operator==.

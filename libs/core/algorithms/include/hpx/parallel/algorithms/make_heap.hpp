@@ -43,7 +43,7 @@ namespace hpx {
     ///                     equivalent to a copy. The types \a Type1 and \a Type2
     ///                     must be such that an object of type \a RandomIt can
     ///                     be dereferenced and then implicitly converted to both
-    ///                     of them. ​ 
+    ///                     of them.
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
@@ -144,7 +144,7 @@ namespace hpx {
     ///                     equivalent to a copy. The types \a Type1 and \a Type2
     ///                     must be such that an object of type \a RandomIt can
     ///                     be dereferenced and then implicitly converted to both
-    ///                     of them. ​ 
+    ///                     of them.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of that the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements of

@@ -51,7 +51,8 @@ namespace hpx {
     ///           The \a remove_copy algorithm returns the
     ///           iterator to the element past the last element copied.
     ///
-    template <typename InIter, typename OutIter, typename T = typename std::iterator_traits<InIter>::value_type>
+    template <typename InIter, typename OutIter,
+        typename T = typename std::iterator_traits<InIter>::value_type>
     OutIter remove_copy(
         InIter first, InIter last, OutIter dest, T const& value);
 

@@ -62,7 +62,8 @@ namespace hpx {
     ///           The \a is_heap algorithm returns whether the range is max heap.
     ///           That is, true if the range is max heap, false otherwise.
     ///
-    template <typename ExPolicy, typename RandIter, typename Comp = hpx::parallel::v1::detail::less>
+    template <typename ExPolicy, typename RandIter,
+        typename Comp = hpx::parallel::v1::detail::less>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
     is_heap(ExPolicy&& policy, RandIter first, RandIter last,
         Comp&& comp = Comp());
@@ -108,7 +109,7 @@ namespace hpx {
     /// operator<()). Executed according to the policy.
     ///
     /// \note   Complexity:
-    ///         Linear in the distance between \a first and \a last. 
+    ///         Linear in the distance between \a first and \a last.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -155,7 +156,8 @@ namespace hpx {
     ///           That is, the last iterator \a it for which range [first, it)
     ///           is a max heap.
     ///
-    template <typename ExPolicy, typename RandIter, typename Comp = hpx::parallel::v1::detail::less>
+    template <typename ExPolicy, typename RandIter,
+        typename Comp = hpx::parallel::v1::detail::less>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, RandIter>::type
     is_heap_until(ExPolicy&& policy, RandIter first, RandIter last,
         Comp&& comp = Comp());
@@ -167,7 +169,7 @@ namespace hpx {
     /// operator<()).
     ///
     /// \note   Complexity:
-    ///         Linear in the distance between \a first and \a last. 
+    ///         Linear in the distance between \a first and \a last.
     ///
     /// \tparam RandIter    The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of a
