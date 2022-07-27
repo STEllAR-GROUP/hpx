@@ -54,7 +54,7 @@ namespace hpx {
     ///           returns the iterator to the first such element. Returns last
     ///           if the range is empty.
     ///
-    template <typename FwdIter, typename F>
+    template <typename FwdIter, typename F = hpx::parallel::v1::detail::less>
     FwdIter min_element(FwdIter first, FwdIter last, F&& f);
 
     /////////////////////////////////////////////////////////////////////////////
@@ -117,8 +117,8 @@ namespace hpx {
     ///           returns the iterator to the first such element. Returns last
     ///           if the range is empty.
     ///
-    template <typename ExPolicy, typename FwdIter, typename F>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    template <typename ExPolicy, typename FwdIter, typename F = hpx::parallel::v1::detail::less>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
     min_element(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
 
     /////////////////////////////////////////////////////////////////////////////
@@ -163,7 +163,7 @@ namespace hpx {
     ///           returns the iterator to the first such element. Returns last
     ///           if the range is empty.
     ///
-    template <typename FwdIter, typename F>
+    template <typename FwdIter, typename F = hpx::parallel::v1::detail::less>
     FwdIter max_element(FwdIter first, FwdIter last, F&& f);
 
     /////////////////////////////////////////////////////////////////////////////
@@ -228,8 +228,8 @@ namespace hpx {
     ///           returns the iterator to the first such element. Returns last
     ///           if the range is empty.
     ///
-    template <typename ExPolicy, typename FwdIter, typename F>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    template <typename ExPolicy, typename FwdIter, typename F = hpx::parallel::v1::detail::less>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
     max_element(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
 
     /////////////////////////////////////////////////////////////////////////////
@@ -278,7 +278,7 @@ namespace hpx {
     ///           elements are equivalent to the largest element, the iterator
     ///           to the last such element is returned.
     ///
-    template <typename FwdIter, typename F>
+    template <typename FwdIter, typename F = hpx::parallel::v1::detail::less>
     minmax_element_result<FwdIter> minmax_element(
         FwdIter first, FwdIter last, F&& f);
 
@@ -348,8 +348,8 @@ namespace hpx {
     ///           elements are equivalent to the largest element, the iterator
     ///           to the last such element is returned.
     ///
-    template <typename ExPolicy, typename FwdIter, typename F>
-    typename util::detail::algorithm_result<ExPolicy,
+    template <typename ExPolicy, typename FwdIter, typename F = hpx::parallel::v1::detail::less>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         minmax_element_result<FwdIter>>::type
     minmax_element(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
 

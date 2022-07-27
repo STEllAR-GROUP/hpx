@@ -63,9 +63,9 @@ namespace hpx {
     ///           The \a partition algorithm returns the iterator to
     ///           the first element of the second group.
     ///
-    template <typename FwdIter, typename Pred, typename Proj>
+    template <typename FwdIter, typename Pred, typename Proj = parallel::util::projection_identity>
     FwdIter partition(FwdIter first, FwdIter last,
-        Pred&& pred, Proj&& proj);
+        Pred&& pred, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Reorders the elements in the range [first, last) in such a way that
@@ -132,10 +132,10 @@ namespace hpx {
     ///           The \a partition algorithm returns the iterator to
     ///           the first element of the second group.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Pred, typename Proj>
-    util::detail::algorithm_result_t<ExPolicy, FwdIter>
+    template <typename ExPolicy, typename FwdIter, typename Pred, typename Proj = parallel::util::projection_identity>
+    parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
     partition(ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred,
-        Proj&& proj);
+        Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Permutes the elements in the range [first, last) such that there exists
@@ -191,9 +191,9 @@ namespace hpx {
     ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
     ///           the elements in both groups is preserved.
     ///
-    template <typename BidirIter, typename F, typename Proj>
+    template <typename BidirIter, typename F, typename Proj = parallel::util::projection_identity>
     BidirIter stable_partition(BidirIter first, BidirIter last, F&& f,
-        Proj&& proj);
+        Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Permutes the elements in the range [first, last) such that there exists
@@ -265,10 +265,10 @@ namespace hpx {
     ///           the algorithm returns a \a future<> referring to this iterator.
     ///
     template <typename ExPolicy, typename BidirIter, typename F,
-        typename Proj>
-    util::detail::algorithm_result_t<ExPolicy, BidirIter>
+        typename Proj = parallel::util::projection_identity>
+    parallel::util::detail::algorithm_result_t<ExPolicy, BidirIter>
     stable_partition(ExPolicy&& policy, BidirIter first, BidirIter last,
-        F&& f, Proj&& proj);
+        F&& f, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements in the range, defined by [first, last),
@@ -342,10 +342,10 @@ namespace hpx {
     ///           dest_false range.
     ///
     template <typename FwdIter1, typename FwdIter2,
-        typename FwdIter3, typename Pred, typename Proj>
+        typename FwdIter3, typename Pred, typename Proj = parallel::util::projection_identity>
     std::pair<FwdIter2 ,FwdIter3>
     partition_copy(FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj);
+        FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements in the range, defined by [first, last),
@@ -434,10 +434,10 @@ namespace hpx {
     ///           dest_false range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename FwdIter3, typename Pred, typename Proj>
-    util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter2, FwdIter3>>
+        typename FwdIter3, typename Pred, typename Proj = parallel::util::projection_identity>
+    parallel::util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter2, FwdIter3>>
     partition_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj);
+        FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj = Proj());
 
     // clang-format on
 }    // namespace hpx

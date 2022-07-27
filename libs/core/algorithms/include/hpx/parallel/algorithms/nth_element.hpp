@@ -61,8 +61,8 @@ namespace hpx {
     ///
     /// \returns  The \a nth_element algorithms returns nothing.
     ///
-    template <typename RandomIt, typename Pred>
-    void nth_element(RandomIt first, RandomIt nth, RandomIt last, Pred&& pred);
+    template <typename RandomIt, typename Pred = hpx::parallel::v1::detail::less>
+    void nth_element(RandomIt first, RandomIt nth, RandomIt last, Pred&& pred = Pred());
 
     /// nth_element is a partial sorting algorithm that rearranges elements in
     /// [first, last) such that the element pointed at by nth is changed to
@@ -120,9 +120,9 @@ namespace hpx {
     ///
     /// \returns  The \a nth_element algorithms returns nothing.
     ///
-    template <typename ExPolicy, typename RandomIt, typename Pred>
+    template <typename ExPolicy, typename RandomIt, typename Pred = hpx::parallel::v1::detail::less>
     void nth_element(ExPolicy&& policy, RandomIt first, RandomIt nth,
-        RandomIt last, Pred&& pred);
+        RandomIt last, Pred&& pred = Pred());
 
     // clang-format on
 }    // namespace hpx

@@ -85,8 +85,8 @@ namespace hpx {
     ///           Also returns true if [\a first2, \a last2) is empty.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::less>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
+        typename Pred = hpx::parallel::v1::detail::less>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type>::type
     includes(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred());
 
@@ -142,7 +142,7 @@ namespace hpx {
     ///           Also returns true if [\a first2, \a last2) is empty.
     ///
     template <typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::less>
+        typename Pred = hpx::parallel::v1::detail::less>
     bool includes(FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred());
 

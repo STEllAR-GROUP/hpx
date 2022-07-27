@@ -117,7 +117,7 @@ namespace hpx {
     /// \a inclusive_scan includes the ith input element in the ith sum.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest);
 
@@ -259,7 +259,7 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Op>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, Op&& op);
 
@@ -412,7 +412,7 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Op, typename T>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     inclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, Op&& op, T init);
     // clang-format on

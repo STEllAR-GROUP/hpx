@@ -69,7 +69,7 @@ namespace hpx {
     ///           if the first range is lexicographically less, otherwise
     ///           it returns false.
     ///           range [first2, last2), it returns false.
-    template <typename InIter1, typename InIter2, typename Pred>
+    template <typename InIter1, typename InIter2, typename Pred = hpx::parallel::v1::detail::less>
     bool lexicographical_compare(InIter1 first1, InIter1 last1, InIter2 first2,
         InIter2 last2, Pred&& pred);
 
@@ -148,8 +148,8 @@ namespace hpx {
     ///           it returns false.
     ///           range [first2, last2), it returns false.
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Pred = hpx::parallel::v1::detail::less>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
     lexicographical_compare(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, FwdIter2 last2, Pred&& pred);
 

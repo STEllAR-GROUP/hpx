@@ -63,7 +63,7 @@ namespace hpx {
     ///           moved.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     move(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest);
 
     /// Moves the elements in the range [first, last), to another range

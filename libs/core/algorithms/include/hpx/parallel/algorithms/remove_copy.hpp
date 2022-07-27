@@ -51,7 +51,7 @@ namespace hpx {
     ///           The \a remove_copy algorithm returns the
     ///           iterator to the element past the last element copied.
     ///
-    template <typename InIter, typename OutIter, typename T>
+    template <typename InIter, typename OutIter, typename T = typename std::iterator_traits<InIter>::value_type>
     OutIter remove_copy(
         InIter first, InIter last, OutIter dest, T const& value);
 
@@ -112,7 +112,7 @@ namespace hpx {
     ///           iterator to the element past the last element copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T>
+        typename T = typename std::iterator_traits<InIter>::value_type>
         typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type remove_copy(ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest, T const& value);

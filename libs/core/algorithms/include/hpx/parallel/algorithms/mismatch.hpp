@@ -92,10 +92,10 @@ namespace hpx {
     ///           iterator and the corresponding iterator from the other range. 
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::equal_to>
-    util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
+        typename Pred>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
     mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred());
+            FwdIter2 first2, FwdIter2 last2, Pred&& op);
 
     /// Returns the first mismatching pair of elements from two ranges: one
     /// defined by [first1, last1) and another defined by [first2,last2). If
@@ -158,7 +158,7 @@ namespace hpx {
     ///           iterator and the corresponding iterator from the other range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
     mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, FwdIter2 last2);
 
@@ -239,10 +239,10 @@ namespace hpx {
     ///           iterator and the corresponding iterator from the other range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::equal_to>
-    util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
+        typename Pred>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
     mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, Pred&& op = Pred());
+            FwdIter2 first2, Pred&& op);
 
     /// Returns the first mismatching pair of elements from two ranges: one
     /// defined by [first1, last1) and another defined by [first2,last2). If
@@ -308,7 +308,7 @@ namespace hpx {
     ///           iterator and the corresponding iterator from the other range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
     mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2);
 
@@ -371,9 +371,9 @@ namespace hpx {
     ///           iterator and the corresponding iterator from the other range.
     ///
     template <typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::equal_to>
+        typename Pred>
     std::pair<FwdIter1, FwdIter2> mismatch(FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred());
+            FwdIter2 first2, FwdIter2 last2, Pred&& op);
 
     /// Returns the first mismatching pair of elements from two ranges: one
     /// defined by [first1, last1) and another defined by [first2,last2). If
@@ -476,9 +476,9 @@ namespace hpx {
     ///           iterator and the corresponding iterator from the other range.
     ///
     template <typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::equal_to>
+        typename Pred>
     std::pair<FwdIter1, FwdIter2> mismatch(FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, Pred&& op = Pred());
+            FwdIter2 first2, Pred&& op);
 
     /// Returns the first mismatching pair of elements from two ranges: one
     /// defined by [first1, last1) and another defined by [first2,last2). If

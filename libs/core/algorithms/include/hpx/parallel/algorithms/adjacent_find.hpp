@@ -45,7 +45,7 @@ namespace hpx {
     /// \returns  The \a adjacent_find algorithm returns an iterator to the
     ///           first of the identical elements. If no such elements are
     ///           found, \a last is returned.
-    template <typename InIter, typename Pred = detail::equal_to>
+    template <typename InIter, typename Pred = hpx::parallel::v1::detail::equal_to>
     InIter adjacent_find(InIter first, InIter last, Pred&& pred = Pred());
 
     /// Searches the range [first, last) for two consecutive identical elements.
@@ -112,7 +112,7 @@ namespace hpx {
     ///           predicate \a pred.
     ///
     template <typename ExPolicy, typename FwdIter,
-        typename Pred = detail::equal_to>
+        typename Pred = hpx::parallel::v1::detail::equal_to>
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
     adjacent_find(
         ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred = Pred());

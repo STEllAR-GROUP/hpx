@@ -66,7 +66,7 @@ namespace hpx {
     ///           d_first + min(last - first, d_last - d_first)
     ///
     template <typename InIter, typename RandIter,
-        typename Comp>
+        typename Comp = hpx::parallel::v1::detail::less>
     RandIter partial_sort_copy(InIter first, InIter last, RandIter d_first,
         RandIter d_last, Comp&& comp = Comp());
 
@@ -134,7 +134,7 @@ namespace hpx {
     ///           d_first + min(last - first, d_last - d_first)
     ///
     template <typename ExPolicy, typename FwdIter, typename RandIter,
-        typename Comp>
+        typename Comp = hpx::parallel::v1::detail::less>
     parallel::util::detail::algorithm_result_t<ExPolicy, RandIter>
     partial_sort_copy(
         ExPolicy&& policy, FwdIter first, FwdIter last, RandIter d_first,

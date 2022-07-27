@@ -90,8 +90,8 @@ namespace hpx {
     ///           the end of the \a dest range.
     ///
     template <typename ExPolicy, typename RandIter1, typename RandIter2,
-        typename RandIter3, typename Comp = detail::less>
-    typename util::detail::algorithm_result<ExPolicy, RandIter3>::type
+        typename RandIter3, typename Comp = hpx::parallel::v1::detail::less>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, RandIter3>::type
     merge(ExPolicy&& policy, RandIter1 first1, RandIter1 last1,
         RandIter2 first2, RandIter2 last2, RandIter3 dest, Comp&& comp = Comp());
 
@@ -152,7 +152,7 @@ namespace hpx {
     ///           the end of the \a dest range.
     ///
     template <typename RandIter1, typename RandIter2,
-        typename RandIter3, typename Comp = detail::less>
+        typename RandIter3, typename Comp = hpx::parallel::v1::detail::less>
     RandIter3 merge(RandIter1 first1, RandIter1 last1,
         RandIter2 first2, RandIter2 last2, RandIter3 dest, Comp&& comp = Comp());
 
@@ -221,8 +221,8 @@ namespace hpx {
     ///           the source iterator \a last.
     ///
     template <typename ExPolicy, typename RandIter,
-        typename Comp = detail::less>
-    typename util::detail::algorithm_result<ExPolicy>::type
+        typename Comp = hpx::parallel::v1::detail::less>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy>::type
     inplace_merge(ExPolicy&& policy, RandIter first, RandIter middle,
         RandIter last, Comp&& comp = Comp());
 
@@ -269,7 +269,7 @@ namespace hpx {
     ///           The \a inplace_merge algorithm returns
     ///           the source iterator \a last.
     ///
-    template <typename RandIter, typename Comp = detail::less>
+    template <typename RandIter, typename Comp = hpx::parallel::v1::detail::less>
     void inplace_merge(RandIter first, RandIter middle,
         RandIter last, Comp&& comp = Comp());
     // clang-format on

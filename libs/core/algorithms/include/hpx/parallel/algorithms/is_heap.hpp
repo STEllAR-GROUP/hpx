@@ -62,8 +62,8 @@ namespace hpx {
     ///           The \a is_heap algorithm returns whether the range is max heap.
     ///           That is, true if the range is max heap, false otherwise.
     ///
-    template <typename ExPolicy, typename RandIter, typename Comp = detail::less>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
+    template <typename ExPolicy, typename RandIter, typename Comp = hpx::parallel::v1::detail::less>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
     is_heap(ExPolicy&& policy, RandIter first, RandIter last,
         Comp&& comp = Comp());
 
@@ -98,7 +98,7 @@ namespace hpx {
     ///           The \a is_heap algorithm returns whether the range is max heap.
     ///           That is, true if the range is max heap, false otherwise.
     ///
-    template <typename RandIter, typename Comp = detail::less>
+    template <typename RandIter, typename Comp = hpx::parallel::v1::detail::less>
     bool is_heap(RandIter first, RandIter last, Comp&& comp = Comp());
 
     /// Returns the upper bound of the largest range beginning at \a first
@@ -155,8 +155,8 @@ namespace hpx {
     ///           That is, the last iterator \a it for which range [first, it)
     ///           is a max heap.
     ///
-    template <typename ExPolicy, typename RandIter, typename Comp = detail::less>
-    typename util::detail::algorithm_result<ExPolicy, RandIter>::type
+    template <typename ExPolicy, typename RandIter, typename Comp = hpx::parallel::v1::detail::less>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, RandIter>::type
     is_heap_until(ExPolicy&& policy, RandIter first, RandIter last,
         Comp&& comp = Comp());
 
@@ -195,7 +195,7 @@ namespace hpx {
     ///           That is, the last iterator \a it for which range [first, it)
     ///           is a max heap.
     ///
-    template <typename RandIter, typename Comp = detail::less>
+    template <typename RandIter, typename Comp = hpx::parallel::v1::detail::less>
     RandIter is_heap_until(RandIter first, RandIter last, Comp&& comp = Comp());
 
     // clang-format on

@@ -78,7 +78,7 @@ namespace hpx {
     ///           and returns \a void otherwise.
     ///
     template <typename ExPolicy, typename RndIter, typename Comp>
-    typename util::detail::algorithm_result<ExPolicy>::type make_heap(
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy>::type make_heap(
         ExPolicy&& policy, RndIter first, RndIter last, Comp&& comp);
 
     /// Constructs a \a max \a heap in the range [first, last). Uses the
