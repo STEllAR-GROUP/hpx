@@ -22,7 +22,7 @@ namespace hpx {
     /// \note   Complexity: At most (last - first) - n assignments.
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     positions to shift by.
@@ -51,7 +51,7 @@ namespace hpx {
     /// Shifts the elements in the range [first, last) by n positions towards
     /// the end of the range. For every integer i in [0, last - first - n),
     /// moves the element originally at position first + i to position first
-    /// + n + i.
+    /// + n + i. Executed according to the policy.
     ///
     /// \note   Complexity: At most (last - first) - n assignments.
     ///
@@ -60,7 +60,7 @@ namespace hpx {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     positions to shift by.
@@ -96,7 +96,7 @@ namespace hpx {
     ///           end of the resulting range.
     ///
     template <typename ExPolicy, typename FwdIter, typename Size>
-    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter>
     shift_right(ExPolicy&& policy, FwdIter first, FwdIter last, Size n);
 
     // clang-format on
