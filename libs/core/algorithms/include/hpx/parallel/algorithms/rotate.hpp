@@ -18,7 +18,7 @@ namespace hpx {
     /// \note   Complexity: Linear in the distance between \a first and \a last.
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
@@ -27,6 +27,7 @@ namespace hpx {
     ///                     beginning of the rotated range.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
+    ///
     /// The assignments in the parallel \a rotate algorithm
     /// execute in sequential order in the calling thread.
     ///
@@ -44,7 +45,8 @@ namespace hpx {
     /// Performs a left rotation on a range of elements. Specifically,
     /// \a rotate swaps the elements in the range [first, last) in such a way
     /// that the element new_first becomes the first element of the new range
-    /// and new_first - 1 becomes the last element.
+    /// and new_first - 1 becomes the last element. Executed according to the
+    /// policy.
     ///
     /// \note   Complexity: Linear in the distance between \a first and \a last.
     ///
@@ -53,7 +55,7 @@ namespace hpx {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -86,8 +88,9 @@ namespace hpx {
     ///           first + (last - new_first).
     ///
     template <typename ExPolicy, typename FwdIter>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type rotate(
-        ExPolicy&& policy, FwdIter first, FwdIter new_first, FwdIter last);
+    typename parallel::util::detail::algorithm_result
+        <ExPolicy, FwdIter>::type
+    rotate(ExPolicy&& policy, FwdIter first, FwdIter new_first, FwdIter last);
 
     /// Copies the elements from the range [first, last), to another range
     /// beginning at \a dest_first in such a way, that the element
@@ -98,10 +101,10 @@ namespace hpx {
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of
-    ///                     an forward iterator.
+    ///                     a forward iterator.
     /// \tparam OutIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of
-    ///                     an output iterator.
+    ///                     a output iterator.
     ///
     /// \param first        Refers to the beginning of the sequence of
     ///                     elements the algorithm will be applied to.
@@ -125,7 +128,8 @@ namespace hpx {
     /// Copies the elements from the range [first, last), to another range
     /// beginning at \a dest_first in such a way, that the element
     /// \a new_first becomes the first element of the new range and
-    /// \a new_first - 1 becomes the last element.
+    /// \a new_first - 1 becomes the last element. Executed according to
+    /// the policy.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
@@ -136,11 +140,11 @@ namespace hpx {
     ///                     assignments.
     /// \tparam FwdIter1    The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of
-    ///                     an forward iterator.
+    ///                     a forward iterator.
     /// \tparam FwdIter2    The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of
-    ///                     an forward iterator.
+    ///                     a forward iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling
     ///                     of the iterations.
@@ -170,7 +174,7 @@ namespace hpx {
     ///           to the element past the last element copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     rotate_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 new_first,
         FwdIter1 last, FwdIter2 dest_first);
 
