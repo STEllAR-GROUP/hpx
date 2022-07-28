@@ -15,7 +15,7 @@ namespace hpx {
 
     /// Reverses the order of the elements in the range [first, last).
     /// Behaves as if applying \a std::iter_swap to every pair of iterators
-    /// first+i, (\alast-i) - 1 for each non-negative i < (last-first)/2.
+    /// first+i, (\a last-i) - 1 for each non-negative i < (last-first)/2.
     ///
     /// \note   Complexity: Linear in the distance between \a first and \a last.
     ///
