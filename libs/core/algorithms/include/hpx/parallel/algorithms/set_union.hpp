@@ -15,7 +15,7 @@ namespace hpx {
     /// Constructs a sorted range beginning at dest consisting of all elements
     /// present in one or both sorted ranges [first1, last1) and
     /// [first2, last2). This algorithm expects both input ranges to be sorted
-    /// with the given binary predicate \a f.
+    /// with the given binary predicate \a pred. Executed according to the policy.
     ///
     /// \note   Complexity: At most 2*(N1 + N2 - 1) comparisons, where \a N1 is
     ///         the length of the first sequence and \a N2 is the length of the
@@ -35,16 +35,17 @@ namespace hpx {
     ///                     in which it applies user-provided function objects.
     /// \tparam FwdIter1    The type of the source iterators used (deduced)
     ///                     representing the first sequence.
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam FwdIter2    The type of the source iterators used (deduced)
     ///                     representing the first sequence.
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam FwdIter3    The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator or output iterator and sequential
+    ///                     execution.
     /// \tparam Op          The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a set_union requires \a Pred to meet the
@@ -72,7 +73,7 @@ namespace hpx {
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type1 must be such
-    ///                     that objects of type \a InIter can
+    ///                     that objects of type \a FwdIter can
     ///                     be dereferenced and then implicitly converted to
     ///                     \a Type1
     ///
@@ -98,10 +99,79 @@ namespace hpx {
     ///           copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename FwdIter3, typename Pred = detail::less>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter3>::type>::type
+        typename FwdIter3, typename Pred = hpx::parallel::v1::detail::less>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter3>::type
     set_union(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred&& op = Pred());
+    
+    /// Constructs a sorted range beginning at dest consisting of all elements
+    /// present in one or both sorted ranges [first1, last1) and
+    /// [first2, last2). This algorithm expects both input ranges to be sorted
+    /// with the given binary predicate \a pred. Executed according to the policy.
+    ///
+    /// \note   Complexity: At most 2*(N1 + N2 - 1) comparisons, where \a N1 is
+    ///         the length of the first sequence and \a N2 is the length of the
+    ///         second sequence.
+    ///
+    /// If some element is found \a m times in [first1, last1) and \a n times
+    /// in [first2, last2), then all \a m elements will be copied from
+    /// [first1, last1) to dest, preserving order, and then exactly
+    /// std::max(n-m, 0) elements will be copied from [first2, last2) to dest,
+    /// also preserving order.
+    ///
+    /// The resulting range cannot overlap with either of the input ranges.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used (deduced)
+    ///                     representing the first sequence.
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used (deduced)
+    ///                     representing the first sequence.
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam FwdIter3    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator or output iterator and sequential
+    ///                     execution.
+    /// \tparam Op          The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a set_union requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::less<>
+    ///
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    /// \param last2        Refers to the end of the sequence of elements of
+    ///                     the second range the algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param op           The binary predicate which returns true if the
+    ///                     elements should be treated as equal. The signature
+    ///                     of the predicate function should be equivalent to
+    ///                     the following:
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type1 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type1 must be such
+    ///                     that objects of type \a FwdIter can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type1
+    ///
+    /// \returns  The \a set_union algorithm returns a \a FwdIter3.
+    ///           The \a set_union algorithm returns the output iterator to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
+    ///
+    template <typename FwdIter1, typename FwdIter2, typename FwdIter3,
+        typename Pred = hpx::parallel::v1::detail::less>
+    FwdIter3 set_union(FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+        FwdIter2 last2, FwdIter3 dest, Pred&& op = Pred());
 
     // clang-format on
 }    // namespace hpx
