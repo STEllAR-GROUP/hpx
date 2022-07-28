@@ -37,15 +37,15 @@ namespace hpx {
     /// The assignments in the parallel \a replace algorithm
     /// execute in sequential order in the calling thread.
     ///
-    ///
     /// \returns  The \a replace algorithm returns a \a void.
     ///
-    template <typename Initer, typename T>
+    template <typename InIter,
+        typename T = typename std::iterator_traits<InIter>::value_type>
     void replace(
         InIter first, InIter last, T const& old_value, T const& new_value);
 
     /// Replaces all elements satisfying specific criteria with \a new_value
-    /// in the range [first, last).
+    /// in the range [first, last). Executed according to the policy.
     ///
     /// Effects: Substitutes elements referred by the iterator it in the range
     ///          [first, last) with new_value, when the following corresponding
@@ -60,7 +60,7 @@ namespace hpx {
     /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
-    /// \tparam T          The type of the old and new values to replace (deduced).
+    /// \tparam T           The type of the old and new values to replace (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -87,13 +87,14 @@ namespace hpx {
     ///           \a parallel_task_policy and
     ///           returns \a void otherwise.
     ///
-    template <typename ExPolicy, typename FwdIter, typename T>
+    template <typename ExPolicy, typename FwdIter,
+        typename T = typename std::iterator_traits<FwdIter>::value_type>
     typename parallel::util::detail::algorithm_result<ExPolicy, void>::type
     replace(ExPolicy&& policy, FwdIter first, FwdIter last, T const& old_value,
         T const& new_value);
 
     /// Replaces all elements satisfying specific criteria (for which predicate
-    /// \a f returns true) with \a new_value in the range [first, last).
+    /// \a pred returns true) with \a new_value in the range [first, last).
     ///
     /// Effects: Substitutes elements referred by the iterator it in the range
     ///          [first, last) with new_value, when the following corresponding
@@ -136,14 +137,15 @@ namespace hpx {
     /// The assignments in the parallel \a replace_if algorithm
     /// execute in sequential order in the calling thread.
     ///
-    ///
     /// \returns  The \a replace_if algorithm returns \a void.
     ///
-    template <typename Iter, typename Pred, typename T>
+    template <typename Iter, typename Pred,
+        typename T = typename std::iterator_traits<Iter>::value_type>
     void replace_if(Iter first, Iter last, Pred&& pred, T const& new_value);
 
     /// Replaces all elements satisfying specific criteria (for which predicate
     /// \a f returns true) with \a new_value in the range [first, last).
+    /// Executed according to the policy.
     ///
     /// Effects: Substitutes elements referred by the iterator it in the range
     ///          [first, last) with new_value, when the following corresponding
@@ -205,7 +207,8 @@ namespace hpx {
     ///           \a parallel_task_policy
     ///           and returns \a void otherwise.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Pred, typename T>
+    template <typename ExPolicy, typename FwdIter, typename Pred,
+        typename T = typename std::iterator_traits<FwdIter>::value_type>
     typename parallel::util::detail::algorithm_result<ExPolicy, void>::type
     replace_if(ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred,
         T const& new_value);
@@ -223,9 +226,6 @@ namespace hpx {
     /// \note   Complexity: Performs exactly \a last - \a first applications of
     ///         the predicate.
     ///
-
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
     /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
@@ -233,7 +233,7 @@ namespace hpx {
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
-    /// \tparam T          The type of the old and new values (deduced).
+    /// \tparam T           The type of the old and new values (deduced).
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -246,19 +246,19 @@ namespace hpx {
     /// The assignments in the parallel \a replace_copy algorithm
     /// execute in sequential order in the calling thread.
     ///
-    ///
     /// \returns  The \a replace_copy algorithm returns an
     ///           \a OutIter
     ///           The \a replace_copy algorithm returns the
     ///           Iterator to the element past the last element copied.
     ///
-    template <typename InIter, typename OutIter, typename T>
+    template <typename InIter, typename OutIter,
+        typename T = typename std::iterator_traits<OutIter>::value_type>
     OutIter replace_copy(InIter first, InIter last, OutIter dest,
         T const& old_value, T const& new_value);
 
     /// Copies the all elements from the range [first, last) to another range
     /// beginning at \a dest replacing all elements satisfying a specific
-    /// criteria with \a new_value.
+    /// criteria with \a new_value. Executed according to the policy.
     ///
     /// Effects: Assigns to every iterator it in the range
     ///          [result, result + (last - first)) either new_value or
@@ -313,8 +313,9 @@ namespace hpx {
     ///           Iterator to the element past the last element copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T>
-    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        typename T = typename std::iterator_traits<FwdIter2>::value_type>
+    typename parallel::util::detail::algorithm_result
+        <ExPolicy, FwdIter2>::type
     replace_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, T const& old_value, T const& new_value);
 
@@ -378,7 +379,8 @@ namespace hpx {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename InIter, typename OutIter, typename Pred, typename T>
+    template <typename InIter, typename OutIter, typename Pred,
+        typename T = typename std::iterator_traits<OutIter>::value_type>
     OutIter replace_copy_if(InIter first, InIter last, OutIter dest,
         Pred&& pred, T const& new_value);
 
@@ -408,8 +410,8 @@ namespace hpx {
     ///                     forward iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a equal requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
+    ///                     overload of \a replace_copy_if requires \a Pred to
+    ///                     meet the requirements of \a CopyConstructible.
     ///                     (deduced).
     /// \tparam T           The type of the new values to replace (deduced).
     ///
@@ -460,8 +462,10 @@ namespace hpx {
     ///           copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred, typename T>
-    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+        typename Pred, typename T = typename std::iterator_traits
+        <FwdIter2>::value_type>
+    typename parallel::util::detail::algorithm_result
+        <ExPolicy, FwdIter2>::type
     replace_copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, Pred&& pred, T const& new_value);
 
