@@ -37,17 +37,17 @@ namespace hpx {
     ///
     /// \tparam FwdIter     The type of the source iterators used for the
     ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam FwdIter2    The type of the source iterators used for the
     ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a adjacent_find requires \a Pred to meet the
+    ///                     overload of \a search requires \a Pred to meet the
     ///                     requirements of \a CopyConstructible. This defaults
-    ///                     to std::equal_to<>
+    ///                     to \a std::equal_to<>
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of the first range the algorithm will be applied to.
@@ -84,12 +84,12 @@ namespace hpx {
     ///           returned. If no subsequence is found, \a last is returned.
     ///
     template <typename FwdIter, typename FwdIter2,
-        typename Pred = detail::equal_to>
+        typename Pred = parallel::v1::detail::equal_to>
     FwdIter search(FwdIter first, FwdIter last, FwdIter2 s_first,
         FwdIter2 s_last, Pred&& op = Pred());
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
-    /// Uses a provided predicate to compare elements.
+    /// Uses a provided predicate to compare elements. Executed according to the policy.
     ///
     /// \note   Complexity: at most (S*N) comparisons where
     ///         \a S = distance(s_first, s_last) and
@@ -101,17 +101,17 @@ namespace hpx {
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used for the
     ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam FwdIter2    The type of the source iterators used for the
     ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a adjacent_find requires \a Pred to meet the
+    ///                     overload of \a search requires \a Pred to meet the
     ///                     requirements of \a CopyConstructible. This defaults
-    ///                     to std::equal_to<>
+    ///                     to \a std::equal_to<>.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -157,9 +157,9 @@ namespace hpx {
     ///           returned. If no subsequence is found, \a last is returned.
     ///
     template <typename ExPolicy, typename FwdIter, typename FwdIter2,
-        typename Pred = detail::equal_to>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type search(
-        ExPolicy&& policy, FwdIter first, FwdIter last, FwdIter2 s_first,
+        typename Pred = parallel::v1::detail::equal_to>
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    search( ExPolicy&& policy, FwdIter first, FwdIter last, FwdIter2 s_first,
         FwdIter2 s_last, Pred&& op = Pred());
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
@@ -171,18 +171,17 @@ namespace hpx {
     ///
     /// \tparam FwdIter     The type of the source iterators used for the
     ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam FwdIter2    The type of the source iterators used for the
     ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a adjacent_find requires \a Pred to meet the
+    ///                     overload of \a search_n requires \a Pred to meet the
     ///                     requirements of \a CopyConstructible. This defaults
-    ///                     to std::equal_to<>
-    ///
+    ///                     to \a std::equal_to<>
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of the first range the algorithm will be applied to.
@@ -218,12 +217,12 @@ namespace hpx {
     ///           is found, \a first is also returned.
     ///
     template <typename FwdIter, typename FwdIter2,
-        typename Pred = detail::equal_to>
+        typename Pred = parallel::v1::detail::equal_to>
     FwdIter search_n(FwdIter first, std::size_t count, FwdIter2 s_first,
         FwdIter2 s_last, Pred&& op = Pred());
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
-    /// Uses a provided predicate to compare elements.
+    /// Uses a provided predicate to compare elements. Executed according to the policy.
     ///
     /// \note   Complexity: at most (S*N) comparisons where
     ///         \a S = distance(s_first, s_last) and
@@ -235,17 +234,17 @@ namespace hpx {
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used for the
     ///                     first range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam FwdIter2    The type of the source iterators used for the
     ///                     second range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
-    ///                     overload of \a adjacent_find requires \a Pred to meet the
+    ///                     overload of \a search_n requires \a Pred to meet the
     ///                     requirements of \a CopyConstructible. This defaults
-    ///                     to std::equal_to<>
+    ///                     to \a std::equal_to<>
     ///
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -293,10 +292,10 @@ namespace hpx {
     ///           is found, \a first is also returned.
     ///
     template <typename ExPolicy, typename FwdIter, typename FwdIter2,
-        typename Pred = detail::equal_to>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type search_n(
-        ExPolicy&& policy, FwdIter first, std::size_t count, FwdIter2 s_first,
-        FwdIter2 s_last, Pred&& op = Pred());
+        typename Pred = parallel::v1::detail::equal_to>
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    search_n(ExPolicy&& policy, FwdIter first, std::size_t count,
+        FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred());
 }    // namespace hpx
 
 #else
