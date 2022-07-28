@@ -23,10 +23,6 @@ namespace hpx {
     ///         assignments, exactly \a last - \a first applications of
     ///         the operator==().
     ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -34,8 +30,6 @@ namespace hpx {
     ///                     This value type must meet the requirements of
     ///                     \a CopyConstructible.
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
@@ -49,19 +43,24 @@ namespace hpx {
     ///           The \a remove algorithm returns the iterator to the new end
     ///           of the range.
     ///
-    template <typename FwdIter, typename T>
+    template <typename FwdIter,
+        typename T = typename std::iterator_traits<FwdIter>::value_type>
     FwdIter remove(FwdIter first, FwdIter last, T const& value);
 
     /////////////////////////////////////////////////////////////////////////////
     /// Removes all elements satisfying specific criteria from the range
     /// [first, last) and returns a past-the-end iterator for the new
     /// end of the range. This version removes all elements that are
-    /// equal to \a value.
+    /// equal to \a value. Executed according to the policy.
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first applications of
     ///         the operator==().
     ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -69,6 +68,8 @@ namespace hpx {
     ///                     This value type must meet the requirements of
     ///                     \a CopyConstructible.
     ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
@@ -92,9 +93,11 @@ namespace hpx {
     ///           The \a remove algorithm returns the iterator to the new end
     ///           of the range.
     ///
-    template <typename ExPolicy, typename FwdIter, typename T>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type remove(
-        ExPolicy&& policy, FwdIter first, FwdIter last, T const& value);
+    template <typename ExPolicy, typename FwdIter,
+        typename T = typename std::iterator_traits<FwdIter>::value_type>
+    typename parallel::util::detail::algorithm_result
+        <ExPolicy, FwdIter>::type remove(
+    ExPolicy&& policy, FwdIter first, FwdIter last, T const& value);
 
     /// Removes all elements satisfying specific criteria from the range
     /// [first, last) and returns a past-the-end iterator for the new
@@ -145,7 +148,7 @@ namespace hpx {
     /// Removes all elements satisfying specific criteria from the range
     /// [first, last) and returns a past-the-end iterator for the new
     /// end of the range. This version removes all elements for which predicate
-    /// \a pred returns true.
+    /// \a pred returns true. Executed according to the policy.
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first applications of
@@ -202,8 +205,9 @@ namespace hpx {
     ///           of the range.
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type remove_if(
-        ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred);
+    typename parallel::util::detail::algorithm_result<
+        ExPolicy, FwdIter>::type remove_if(
+    ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred);
 
 }    // namespace hpx
 
