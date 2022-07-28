@@ -47,15 +47,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// The algorithm is not stable, the order of equal elements is not guaranteed
     /// to be preserved.
     /// The function uses the given comparison function object comp (defaults
-    /// to using operator<()).
+    /// to using operator<()). Executed according to the policy.
     ///
     /// \note   Complexity: O(Nlog(N)), where N = std::distance(first, last)
     ///                     comparisons.
     ///
-    /// A sequence is sorted with respect to a comparator \a comp and a
-    /// projection \a proj if for every iterator i pointing to the sequence and
+    /// A sequence is sorted with respect to a comparator \a comp
+    /// if for every iterator i pointing to the sequence and
     /// every non-negative integer n such that i + n is a valid iterator
     /// pointing to an element of the sequence, and
+    /// FIXME(bhumit,hkaiser): proj doesn't exist
     /// INVOKE(comp, INVOKE(proj, *(i + n)), INVOKE(proj, *i)) == false.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
@@ -68,7 +69,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// \tparam ValueIter   The type of the value iterators used (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     random access iterator.
-    /// \tparam Comp        The type of the function/function object to use
+    /// \tparam Compare     The type of the function/function object to use
     ///                     (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -101,19 +102,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a sort_by-key algorithm returns a
-    /// \a hpx::future<sort_by_key_result<KeyIter, ValueIter>>
+    /// \returns  The \a sort_by_key algorithm returns a
+    ///           \a hpx::future<sort_by_key_result<KeyIter,ValueIter>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a
-    ///           \a sort_by_key_result<KeyIter, ValueIter>
-    ///           otherwise.
+    ///           \a sort_by_key_result<KeyIter,ValueIter> otherwise.
     ///           The algorithm returns a pair holding an iterator pointing to
     ///           the first element after the last element in the input key
     ///           sequence and an iterator pointing to the first element after
     ///           the last element in the input value sequence.
-    //-----------------------------------------------------------------------------
-
     template <typename ExPolicy, typename KeyIter, typename ValueIter,
         typename Compare = detail::less>
     util::detail::algorithm_result_t<ExPolicy,
