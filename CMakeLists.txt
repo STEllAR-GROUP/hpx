@@ -1979,6 +1979,8 @@ else()
                                               "ppc64"
   )
     set(__has_timestamp_support ON)
+  elseif("${__target_arch}" STREQUAL "riscv64")
+    set(__has_timestamp_support ON)
   elseif("${__target_arch}" STREQUAL "bgq")
     set(__has_timestamp_support ON)
   elseif("${__target_arch}" STREQUAL "s390x")

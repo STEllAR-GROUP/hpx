@@ -1,4 +1,5 @@
 //  Copyright (c) 2013-2016 Thomas Heller
+//  Copyright (c) 2022 Christopher Taylor 
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -43,6 +44,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         asm("stw %%r1, 0(%0)" : "=&r"(stack_ptr_p));
 #elif defined(__arm__)
         asm("mov %0, sp" : "=r"(stack_ptr));
+#elif defined(__riscv)
+        __asm__ __volatile__("add %0, x0, sp" : "=r"(stack_ptr));
 #endif
         return stack_ptr;
 #endif
