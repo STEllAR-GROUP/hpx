@@ -39,6 +39,8 @@
     #include <hpx/hardware/timestamp/linux_generic.hpp>
 #elif defined(__bgq__)
     #include <hpx/hardware/timestamp/bgq.hpp>
+#elif defined(__riscv)
+    #include <hpx/hardware/timestamp/linux_riscv_64.hpp>
 #else
     #error Unsupported platform.
 #endif

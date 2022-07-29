@@ -13,6 +13,7 @@ set(hardware_headers
     hpx/hardware/timestamp/linux_generic.hpp
     hpx/hardware/timestamp/linux_x86_32.hpp
     hpx/hardware/timestamp/linux_x86_64.hpp
+    hpx/hardware/timestamp/linux_riscv_64.hpp
     hpx/hardware/timestamp/msvc.hpp
     hpx/hardware/timestamp.hpp
 )
@@ -42,6 +43,7 @@ add_hpx_module(
     "hpx/hardware/timestamp/linux_generic.hpp"
     "hpx/hardware/timestamp/linux_x86_32.hpp"
     "hpx/hardware/timestamp/linux_x86_64.hpp"
+    "hpx/hardware/timestamp/linux_riscv_64.hpp"
     "hpx/hardware/timestamp/msvc.hpp"
   SOURCES ${hardware_sources}
   HEADERS ${hardware_headers}
