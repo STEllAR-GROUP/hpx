@@ -50,6 +50,7 @@ Breaking changes
 Closed issues
 =============
 
+* :hpx-issue:`5964` - component with multiple inheritance
 * :hpx-issue:`5946` - dll_dlopen.hpp: error: RTLD_DI_ORIGIN was not declared in this scope with musl libc
 * :hpx-issue:`5925` - Simplify implementation of execution policies
 * :hpx-issue:`5924` - {what}: mmap() failed to allocate thread stack: HPX(unhandled_exception)
@@ -66,6 +67,7 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`5970` - Fixing component multiple inheritance
 * :hpx-pr:`5969` - Fixing sync_wait to avoid dangling references
 * :hpx-pr:`5963` - Fixing sync_wait to decay the result types
 * :hpx-pr:`5960` - docs: added name to documentation contributors list
