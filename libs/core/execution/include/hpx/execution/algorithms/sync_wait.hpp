@@ -73,7 +73,7 @@ namespace hpx::execution::experimental::detail {
 
         // forcing static_assert ensuring variant has exactly one tuple
         //
-        // FIXME: using make_decayed_pack is a workaround for the impedence
+        // FIXME: using make_decayed_pack is a workaround for the impedance
         // mismatch between the different techniques we use for calculating
         // value_types for a sender. In particular, split() explicitly adds a
         // const& to all tuple members in a way that prevent simply passing

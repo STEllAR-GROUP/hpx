@@ -66,6 +66,7 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`5969` - Fixing sync_wait to avoid dangling references
 * :hpx-pr:`5963` - Fixing sync_wait to decay the result types
 * :hpx-pr:`5960` - docs: added name to documentation contributors list
 * :hpx-pr:`5959` - Fixing sync_wait to decay the result types
