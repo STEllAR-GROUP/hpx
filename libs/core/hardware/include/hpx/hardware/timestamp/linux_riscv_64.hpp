@@ -10,8 +10,6 @@
 
 #include <hpx/config.hpp>
 
-#if defined(__riscv)
-
 #include <cstdint>
 
 namespace hpx { namespace util { namespace hardware {
@@ -29,5 +27,3 @@ namespace hpx { namespace util { namespace hardware {
     // clang-format on
 
 }}}    // namespace hpx::util::hardware
-
-#endif
