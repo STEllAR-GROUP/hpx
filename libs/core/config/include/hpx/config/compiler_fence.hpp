@@ -1,6 +1,6 @@
 //  Copyright (c) 2008 Peter Dimov
 //  Copyright (c) 2017 Agustin Berge
-//  Copyright (c) 2022 Christopher Taylor 
+//  Copyright (c) 2022 Christopher Taylor
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -56,7 +56,7 @@ extern "C" void _mm_pause();
 //
 // gcc/clang assembler will not currently (2022) accept `fence w,unknown`;
 // `hand-rolling` the instruction (see below) does the job.
-// 
+//
 #define HPX_SMT_PAUSE __asm__ __volatile__(".insn i 0x0F, 0, x0, x0, 0x010")
 #else
 #define HPX_SMT_PAUSE HPX_COMPILER_FENCE
