@@ -40,6 +40,7 @@ if(HPX_WITH_TESTS)
         "hpx/hardware/timestamp/linux_x86_32.hpp"
         "hpx/hardware/timestamp/linux_x86_64.hpp"
         "hpx/hardware/timestamp/linux_generic.hpp"
+        "hpx/hardware/timestamp/linux_risk_64.hpp"
         "hpx/hardware/timestamp/bgq.hpp"
       NOLIBS
       DEPENDENCIES hpx_hardware
