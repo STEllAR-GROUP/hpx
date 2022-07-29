@@ -116,7 +116,7 @@ namespace hpx { namespace components {
             return naming::address(
                 naming::get_gid_from_locality_id(agas::get_locality_id()),
                 components::get_component_type<wrapped_type>(),
-                const_cast<component_base*>(this));
+                const_cast<Component*>(static_cast<Component const*>(this)));
         }
 
         hpx::id_type get_id() const
