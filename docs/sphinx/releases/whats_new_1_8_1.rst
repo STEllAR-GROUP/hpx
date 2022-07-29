@@ -8,7 +8,7 @@
 .. _hpx_1_8_1:
 
 ===========================
-|hpx| V1.8.1 (Jul 18, 2022)
+|hpx| V1.8.1 (Jul 29, 2022)
 ===========================
 
 This is a bugfix release with a few minor additions and resolved problems.
@@ -16,7 +16,7 @@ This is a bugfix release with a few minor additions and resolved problems.
 General changes
 ===============
 
-This patch release add a number of small new features and fixes a handful of
+This patch release adds a number of small new features and fixes a handful of
 problems discovered since the last release, in particular:
 
 - A lot of work has been done to improve vectorization support for our parallel
@@ -26,6 +26,7 @@ problems discovered since the last release, in particular:
   networking layer.
 - More work was done towards full compatibility with the sender/receivers
   proposal |p2300|.
+- Fixing sync_wait to decay the result types
 - Fixed collective operations to properly avoid overalapping consecutive
   operations on the same communicator.
 - Simplified the implementation of our execution policies and added mapping
@@ -65,7 +66,9 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`5963` - Fixing sync_wait to decay the result types
 * :hpx-pr:`5960` - docs: added name to documentation contributors list
+* :hpx-pr:`5959` - Fixing sync_wait to decay the result types
 * :hpx-pr:`5954` - refactor: rename itr to correct type (`reduce`)
 * :hpx-pr:`5954` - refactor: rename itr to correct type (`reduce`)
 * :hpx-pr:`5953` - Fixed property handling in hierarchical_spawning
