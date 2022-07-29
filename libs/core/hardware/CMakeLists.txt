@@ -25,7 +25,6 @@ set(hardware_compat_headers
     hpx/util/hardware/timestamp/linux_generic.hpp => hpx/modules/hardware.hpp
     hpx/util/hardware/timestamp/linux_x86_32.hpp => hpx/modules/hardware.hpp
     hpx/util/hardware/timestamp/linux_x86_64.hpp => hpx/modules/hardware.hpp
-    hpx/util/hardware/timestamp/linux_riscv_64.hpp => hpx/modules/hardware.hpp
     hpx/util/hardware/timestamp/msvc.hpp => hpx/modules/hardware.hpp
     hpx/util/hardware/timestamp.hpp => hpx/modules/hardware.hpp
 )
