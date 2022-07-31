@@ -114,9 +114,9 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename T = typename std::iterator_traits<InIter>::value_type>
-        typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type remove_copy(ExPolicy&& policy, FwdIter1 first,
-            FwdIter1 last, FwdIter2 dest, T const& value);
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    remove_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
+        T const& value);
 
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest. Copies only the elements for which the
@@ -249,9 +249,9 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred>
-        typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type remove_copy_if(ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred&& pred);
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    remove_copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
+        FwdIter2 dest, Pred&& pred);
 
 }    // namespace hpx
 

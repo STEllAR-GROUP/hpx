@@ -119,7 +119,8 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter,
         typename F = hpx::parallel::v1::detail::less>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        FwdIter>::type
     min_element(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
 
     /////////////////////////////////////////////////////////////////////////////
@@ -231,7 +232,8 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter,
         typename F = hpx::parallel::v1::detail::less>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        FwdIter>::type
     max_element(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
 
     /////////////////////////////////////////////////////////////////////////////
