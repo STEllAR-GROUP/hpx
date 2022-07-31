@@ -374,7 +374,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename I, typename Sent, typename O,
         typename Proj = hpx::parallel::util::projection_identity,
-        typename T = typename hpx::parallel::traits::projected<I, Proj>::value_type>
+        typename T =
+            typename hpx::parallel::traits::projected<I, Proj>::value_type>
     remove_copy_result<I, O> ranges::remove_copy(
         I first, Sent last, O dest, T const& value, Proj&& proj = Proj());
 
@@ -496,8 +497,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename I, typename Sent, typename O,
         typename Proj = hpx::parallel::util::projection_identity,
-        typename T = typename hpx::parallel::traits::projected<I,
-            Proj>::value_type>
+        typename T =
+            typename hpx::parallel::traits::projected<I, Proj>::value_type>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         remove_copy_result<I, O>>::type
     ranges::remove_copy(ExPolicy&& policy, I first, Sent last, O dest,

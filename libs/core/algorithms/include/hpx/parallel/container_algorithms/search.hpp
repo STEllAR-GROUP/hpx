@@ -207,7 +207,8 @@ namespace hpx { namespace ranges {
         typename Pred = hpx::ranges::equal_to,
         typename Proj1 = parallel::util::projection_identity,
         typename Proj2 = parallel::util::projection_identity>
-    typename typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    typename typename parallel::util::detail::algorithm_result<ExPolicy,
+        FwdIter>::type
     search(ExPolicy&& policy, FwdIter first, Sent last, FwdIter2 s_first,
         Sent2 s_last, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
@@ -444,9 +445,9 @@ namespace hpx { namespace ranges {
         typename Pred = hpx::ranges::equal_to,
         typename Proj1 = parallel::util::projection_identity,
         typename Proj2 = parallel::util::projection_identity>
-    FwdIter search_n(FwdIter first, std::size_t count,
-        FwdIter2 s_first, Sent s_last, Pred&& op = Pred(),
-        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+    FwdIter search_n(FwdIter first, std::size_t count, FwdIter2 s_first,
+        Sent s_last, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+        Proj2&& proj2 = Proj2());
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
     /// Uses a provided predicate to compare elements.
@@ -539,10 +540,11 @@ namespace hpx { namespace ranges {
         typename Sent2, typename Pred = hpx::ranges::equal_to,
         typename Proj1 = parallel::util::projection_identity,
         typename Proj2 = parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    search_n(ExPolicy&& policy, FwdIter first, std::size_t count, FwdIter2 s_first,
-        Sent2 s_last, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-        Proj2&& proj2 = Proj2());
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        FwdIter>::type
+    search_n(ExPolicy&& policy, FwdIter first, std::size_t count,
+        FwdIter2 s_first, Sent2 s_last, Pred&& op = Pred(),
+        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
     /// Uses a provided predicate to compare elements.

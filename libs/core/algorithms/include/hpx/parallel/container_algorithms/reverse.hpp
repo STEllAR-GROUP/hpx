@@ -237,7 +237,8 @@ namespace hpx { namespace ranges {
     ///           an object equal to {last, result + N} where N = last - first
     ///
     template <typename Rng, typename OutIter>
-    reverse_copy_result<typename hpx::traits::range_iterator<Rng>::type, OutIter>
+    reverse_copy_result<typename hpx::traits::range_iterator<Rng>::type,
+        OutIter>
     reverse_copy(Rng&& rng, OutIter result);
 
     /// Copies the elements from the range [first, last) to another range

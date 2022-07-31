@@ -71,8 +71,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename Iter, typename Sent, typename Pred,
         typename Proj = hpx::parallel::util::projection_identity,
-        typename T = typename hpx::parallel::traits::projected<Iter,
-            Proj>::value_type>
+        typename T =
+            typename hpx::parallel::traits::projected<Iter, Proj>::value_type>
     Iter replace_if(Iter first, Sent sent, Pred&& pred, T const& new_value,
         Proj&& proj = Proj());
 
@@ -205,8 +205,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Iter, typename Sent, typename Pred,
         typename Proj = hpx::parallel::util::projection_identity,
-        typename T = typename hpx::parallel::traits::projected<Iter,
-            Proj>::value_type>
+        typename T =
+            typename hpx::parallel::traits::projected<Iter, Proj>::value_type>
     typename parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
     replace_if(ExPolicy&& policy, Iter first, Sent sent, Pred&& pred,
         T const& new_value, Proj&& proj = Proj());
@@ -326,8 +326,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename Iter, typename Sent,
         typename Proj = hpx::parallel::util::projection_identity,
-        typename T1 = typename hpx::parallel::traits::projected<Iter,
-            Proj>::value_type,
+        typename T1 =
+            typename hpx::parallel::traits::projected<Iter, Proj>::value_type,
         typename T2 = T1>
     Iter replace(Iter first, Sent sent, T1 const& old_value,
         T2 const& new_value, Proj&& proj = Proj());
@@ -427,8 +427,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Iter, typename Sent,
         typename Proj = hpx::parallel::util::projection_identity,
-        typename T1 = typename hpx::parallel::traits::projected<Iter,
-            Proj>::value_type,
+        typename T1 =
+            typename hpx::parallel::traits::projected<Iter, Proj>::value_type,
         typename T2 = T1>
     typename parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
     replace(ExPolicy&& policy, Iter first, Sent sent, T1 const& old_value,
@@ -561,8 +561,7 @@ namespace hpx { namespace ranges {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename InIter, typename Sent, typename OutIter,
-        typename Pred,
+    template <typename InIter, typename Sent, typename OutIter, typename Pred,
         typename T = typename std::iterator_traits<OutIter>::value_type,
         typename Proj = hpx::parallel::util::projection_identity>
     replace_copy_if_result<InIter, OutIter> replace_copy_if(InIter first,
@@ -866,11 +865,11 @@ namespace hpx { namespace ranges {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename InIter, typename Sent,
-        typename OutIter,
+    template <typename InIter, typename Sent, typename OutIter,
         typename Proj = hpx::parallel::util::projection_identity,
-        typename T1 = typename hpx::parallel::traits::projected<InIter,
-            Proj>::value_type, typename T2 = T1>
+        typename T1 =
+            typename hpx::parallel::traits::projected<InIter, Proj>::value_type,
+        typename T2 = T1>
     replace_copy_result<InIter, OutIter> replace_copy(InIter first, Sent sent,
         OutIter dest, T1 const& old_value, T2 const& new_value,
         Proj&& proj = Proj());
@@ -998,11 +997,12 @@ namespace hpx { namespace ranges {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename ExPolicy, typename FwdIter1,
-        typename Sent, typename FwdIter2,
+    template <typename ExPolicy, typename FwdIter1, typename Sent,
+        typename FwdIter2,
         typename Proj = hpx::parallel::util::projection_identity,
         typename T1 = typename hpx::parallel::traits::projected<FwdIter1,
-            Proj>::value_type, typename T2 = T1>
+            Proj>::value_type,
+        typename T2 = T1>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         replace_copy_result<FwdIter1, FwdIter2>>::type
     replace_copy(ExPolicy&& policy, FwdIter1 first, Sent sent, FwdIter2 dest,

@@ -273,8 +273,8 @@ namespace hpx { namespace ranges {
 
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/partial_sort.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -358,8 +358,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::partial_sort_t, Rng&& rng,
-            hpx::traits::range_iterator_t<Rng> middle,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
+            hpx::traits::range_iterator_t<Rng> middle, Comp&& comp = Comp(),
+            Proj&& proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 

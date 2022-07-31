@@ -331,8 +331,8 @@ namespace hpx { namespace ranges {
     ///           the element past the last element copied.
     ///
     template <typename Rng, typename OutIter>
-    rotate_copy_result<hpx::traits::range_iterator_t<Rng>, OutIter>
-    rotate_copy(Rng&& rng, hpx::traits::range_iterator_t<Rng> middle,
+    rotate_copy_result<hpx::traits::range_iterator_t<Rng>, OutIter> rotate_copy(
+        Rng&& rng, hpx::traits::range_iterator_t<Rng> middle,
         OutIter dest_first);
 
     ///////////////////////////////////////////////////////////////////////////

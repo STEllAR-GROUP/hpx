@@ -306,8 +306,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename Iter, typename Sent,
         typename Proj = hpx::parallel::util::projection_identity,
-        typename T = typename hpx::parallel::traits::projected<Iter,
-            Proj>::value_type>
+        typename T =
+            typename hpx::parallel::traits::projected<Iter, Proj>::value_type>
     subrange_t<Iter, Sent> remove(
         Iter first, Sent last, T const& value, Proj&& proj = Proj());
 
