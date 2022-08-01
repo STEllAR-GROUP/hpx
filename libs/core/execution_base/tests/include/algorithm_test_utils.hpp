@@ -341,7 +341,14 @@ struct custom_sender_tag_invoke
     struct operation_state
     {
         std::decay_t<R> r;
-        void start() noexcept
+
+        friend void tag_invoke(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
+        {
+            os.start();
+        }
+
+        void start() & noexcept
         {
             hpx::execution::experimental::set_value(std::move(r));
         }

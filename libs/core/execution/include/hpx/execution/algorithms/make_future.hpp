@@ -116,7 +116,7 @@ namespace hpx::execution::experimental {
                     no_addref, alloc)
               , op_state(hpx::execution::experimental::connect(
                     HPX_FORWARD(Sender, sender),
-                    detail::future_receiver<T, Allocator>{this}))
+                    detail::future_receiver<T, Allocator>{{this}}))
             {
                 hpx::execution::experimental::start(op_state);
             }

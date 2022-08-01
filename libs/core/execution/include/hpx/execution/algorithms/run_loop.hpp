@@ -15,9 +15,11 @@
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/get_env.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/meta.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <exception>
 #include <mutex>
@@ -132,7 +134,7 @@ namespace hpx::execution::experimental {
                 os.start();
             }
 
-            void start() noexcept;
+            void start() & noexcept;
         };
 
     public:
@@ -246,8 +248,8 @@ namespace hpx::execution::experimental {
         hpx::spinlock mtx;
         hpx::condition_variable cond_var;
 
-        // MSVC doesn't properly handle the friend declaration above
-#if defined(HPX_MSVC)
+        // MSVC and gcc don't properly handle the friend declaration above
+#if defined(HPX_MSVC) || defined(HPX_GCC_VERSION)
     public:
 #endif
         run_loop_opstate_base head;
@@ -318,6 +320,8 @@ namespace hpx::execution::experimental {
         void finish()
         {
             std::unique_lock l(mtx);
+            hpx::util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
             stop = true;
             cond_var.notify_all();
         }
@@ -327,7 +331,7 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Receiver>
-    inline void run_loop::run_loop_opstate<Receiver>::start() noexcept
+    inline void run_loop::run_loop_opstate<Receiver>::start() & noexcept
     try
     {
         loop.push_back(this);

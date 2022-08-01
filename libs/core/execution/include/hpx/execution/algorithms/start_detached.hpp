@@ -15,6 +15,7 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
+#include <hpx/execution/algorithms/run_loop.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/operation_state.hpp>
@@ -74,9 +75,11 @@ namespace hpx::execution::experimental {
                 }
             };
 
-        private:
+        protected:
             using allocator_type = typename std::allocator_traits<
                 Allocator>::template rebind_alloc<Derived>;
+
+        private:
             HPX_NO_UNIQUE_ADDRESS allocator_type alloc;
             hpx::util::atomic_count count{0};
 
@@ -123,8 +126,14 @@ namespace hpx::execution::experimental {
         {
             using base_type = operation_state_holder_base<
                 operation_state_holder<Sender, Allocator>, Sender, Allocator>;
+            using allocator_type = typename base_type::allocator_type;
 
-            using base_type::operation_state_holder_base;
+            template <typename Sender_>
+            explicit operation_state_holder(
+                Sender_&& sender, allocator_type const& alloc)
+              : base_type(HPX_FORWARD(Sender_, sender), alloc)
+            {
+            }
 
             static constexpr void finish() noexcept {}
         };

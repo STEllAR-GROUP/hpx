@@ -56,8 +56,7 @@ namespace hpx::execution::experimental::detail {
                 hpx::execution::experimental::detail::
                     is_completion_scheduler_tag_invocable_v<
                         hpx::execution::experimental::set_value_t,
-                        U, Tag
-                    >
+                        U, Tag, Ts...>
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto operator|(
@@ -77,8 +76,7 @@ namespace hpx::execution::experimental::detail {
                !hpx::execution::experimental::detail::
                     is_completion_scheduler_tag_invocable_v<
                         hpx::execution::experimental::set_value_t,
-                        U, Tag
-                    >
+                        U, Tag, Ts...>
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto operator|(

@@ -84,11 +84,6 @@ namespace hpx::execution::experimental {
             }
         };
 
-        // Dummy type used in place of a scheduler if none is given
-        struct no_scheduler
-        {
-        };
-
         template <typename Sender, typename Allocator, submission_type Type,
             typename Scheduler = no_scheduler>
         struct split_sender
@@ -130,7 +125,7 @@ namespace hpx::execution::experimental {
             // clang-format off
             template <typename CPO, typename Scheduler_ = Scheduler,
                 HPX_CONCEPT_REQUIRES_(
-                    is_scheduler_v<Scheduler_> &&
+                    hpx::execution::experimental::is_scheduler_v<Scheduler_> &&
                     is_receiver_cpo_v<std::decay_t<CPO>>
                 )>
             // clang-format on
@@ -452,7 +447,8 @@ namespace hpx::execution::experimental {
                     )>
                 // clang-format on
                 shared_state_run_loop(Sender_&& sender,
-                    shared_state::allocator_type const& alloc, run_loop& loop)
+                    typename shared_state::allocator_type const& alloc,
+                    run_loop& loop)
                   : shared_state(HPX_FORWARD(Sender_, sender), alloc)
                   , loop(loop)
                 {

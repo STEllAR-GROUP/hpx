@@ -5,6 +5,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+// Clang V11 ICE's on this test
+#if !defined(HPX_CLANG_VERSION) || (HPX_CLANG_VERSION / 10000) != 11
+
 #include <hpx/local/condition_variable.hpp>
 #include <hpx/local/execution.hpp>
 #include <hpx/local/functional.hpp>
@@ -185,7 +190,7 @@ void test_sender_receiver_then_wait()
             decltype(work2), tt::sync_wait_t>);
     auto compl_sched_work2 =
         ex::get_completion_scheduler<ex::set_value_t>(work2);
-    HPX_TEST(sched == compl_sched_work1);
+    HPX_TEST(sched == compl_sched_work2);
 
     tt::sync_wait(std::move(work2));
 
@@ -942,264 +947,278 @@ void test_split_when_all()
     }
 }
 
-// TODO: let_value does not work with run_loop
-//void test_let_value()
-//{
-//    // void predecessor
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(*(ex::schedule(sched) |
-//            ex::let_value([]() { return ex::just(42); }) | tt::sync_wait()));
-//        HPX_TEST_EQ(result, 42);
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(*(ex::schedule(sched) | ex::let_value([=]() {
-//            return ex::transfer_just(sched, 42);
-//        }) | tt::sync_wait()));
-//        HPX_TEST_EQ(result, 42);
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(*(ex::just() | ex::let_value([=]() {
-//            return ex::transfer_just(sched, 42);
-//        }) | tt::sync_wait()));
-//        HPX_TEST_EQ(result, 42);
-//    }
-//
-//    // int predecessor, value ignored
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(*(ex::transfer_just(sched, 43) |
-//            ex::let_value([](int&) { return ex::just(42); }) |
-//            tt::sync_wait()));
-//        HPX_TEST_EQ(result, 42);
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(*(ex::transfer_just(sched, 43) |
-//            ex::let_value([=](int&) { return ex::transfer_just(sched, 42); }) |
-//            tt::sync_wait()));
-//        HPX_TEST_EQ(result, 42);
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(*(ex::just(43) | ex::let_value([=](int&) {
-//            return ex::transfer_just(sched, 42);
-//        }) | tt::sync_wait()));
-//        HPX_TEST_EQ(result, 42);
-//    }
-//
-//    // int predecessor, value used
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(
-//            *(ex::transfer_just(sched, 43) | ex::let_value([](int& x) {
-//                return ex::just(42) | ex::then([&](int y) { return x + y; });
-//            }) | tt::sync_wait()));
-//        HPX_TEST_EQ(result, 85);
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(
-//            *(ex::transfer_just(sched, 43) | ex::let_value([=](int& x) {
-//                return ex::transfer_just(sched, 42) |
-//                    ex::then([&](int y) { return x + y; });
-//            }) | tt::sync_wait()));
-//        HPX_TEST_EQ(result, 85);
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(*(ex::just(43) | ex::let_value([=](int& x) {
-//            return ex::transfer_just(sched, 42) |
-//                ex::then([&](int y) { return x + y; });
-//        }) | tt::sync_wait()));
-//        HPX_TEST_EQ(result, 85);
-//    }
-//
-//    // predecessor throws, let sender is ignored
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        bool exception_thrown = false;
-//
-//        try
-//        {
-//            ex::transfer_just(sched, 43) | ex::then([](int x) -> int {
-//                throw std::runtime_error("error");
-//            }) | ex::let_value([](int&) {
-//                HPX_TEST(false);
-//                return ex::just(0);
-//            }) | tt::sync_wait();
-//
-//            HPX_TEST(false);
-//        }
-//        catch (std::runtime_error const& e)
-//        {
-//            HPX_TEST_EQ(std::string(e.what()), std::string("error"));
-//            exception_thrown = true;
-//        }
-//
-//        HPX_TEST(exception_thrown);
-//    }
-//}
+void test_let_value()
+{
+    // void predecessor
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
 
-// TODO: let_error does not work with run_loop
-//void test_let_error()
-//{
-//    // void predecessor
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        std::atomic<bool> called{false};
-//        ex::schedule(sched) | ex::then([]() {
-//            throw std::runtime_error("error");
-//        }) | ex::let_error([&called](std::exception_ptr& ep) {
-//            called = true;
-//            check_exception_ptr_message(ep, "error");
-//            return ex::just();
-//        }) | tt::sync_wait();
-//        HPX_TEST(called);
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        std::atomic<bool> called{false};
-//        ex::schedule(sched) | ex::then([]() {
-//            throw std::runtime_error("error");
-//        }) | ex::let_error([=, &called](std::exception_ptr& ep) {
-//            called = true;
-//            check_exception_ptr_message(ep, "error");
-//            return ex::transfer_just(sched);
-//        }) | tt::sync_wait();
-//        HPX_TEST(called);
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        std::atomic<bool> called{false};
-//        ex::just() | ex::then([]() { throw std::runtime_error("error"); }) |
-//            ex::let_error([=, &called](std::exception_ptr& ep) {
-//                called = true;
-//                check_exception_ptr_message(ep, "error");
-//                return ex::transfer_just(sched);
-//            }) |
-//            tt::sync_wait();
-//        HPX_TEST(called);
-//    }
-//
-//    // int predecessor
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(*(ex::schedule(sched) | ex::then([]() {
-//            throw std::runtime_error("error");
-//            return 43;
-//        }) | ex::let_error([](std::exception_ptr& ep) {
-//            check_exception_ptr_message(ep, "error");
-//            return ex::just(42);
-//        }) | tt::sync_wait()));
-//        HPX_TEST_EQ(result, 42);
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(*(ex::schedule(sched) | ex::then([]() {
-//            throw std::runtime_error("error");
-//            return 43;
-//        }) | ex::let_error([=](std::exception_ptr& ep) {
-//            check_exception_ptr_message(ep, "error");
-//            return ex::transfer_just(sched, 42);
-//        }) | tt::sync_wait()));
-//        HPX_TEST_EQ(result, 42);
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(*(ex::just() | ex::then([]() {
-//            throw std::runtime_error("error");
-//            return 43;
-//        }) | ex::let_error([=](std::exception_ptr& ep) {
-//            check_exception_ptr_message(ep, "error");
-//            return ex::transfer_just(sched, 42);
-//        }) | tt::sync_wait()));
-//        HPX_TEST_EQ(result, 42);
-//    }
-//
-//    // predecessor doesn't throw, let sender is ignored
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(*(ex::transfer_just(sched, 42) |
-//            ex::let_error([](std::exception_ptr) {
-//                HPX_TEST(false);
-//                return ex::just(43);
-//            }) |
-//            tt::sync_wait()));
-//        HPX_TEST_EQ(result, 42);
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result = hpx::get<0>(*(ex::transfer_just(sched, 42) |
-//            ex::let_error([=](std::exception_ptr) {
-//                HPX_TEST(false);
-//                return ex::transfer_just(sched, 43);
-//            }) |
-//            tt::sync_wait()));
-//        HPX_TEST_EQ(result, 42);
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        auto result =
-//            hpx::get<0>(*(ex::just(42) | ex::let_error([=](std::exception_ptr) {
-//                HPX_TEST(false);
-//                return ex::transfer_just(sched, 43);
-//            }) | tt::sync_wait()));
-//        HPX_TEST_EQ(result, 42);
-//    }
-//}
+        auto result = hpx::get<0>(*(ex::schedule(sched) |
+            ex::let_value([]() { return ex::just(42); }) | tt::sync_wait()));
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result = hpx::get<0>(*(ex::schedule(sched) | ex::let_value([=]() {
+            return ex::transfer_just(sched, 42);
+        }) | tt::sync_wait()));
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result = hpx::get<0>(*(ex::just() | ex::let_value([=]() {
+            return ex::transfer_just(sched, 42);
+        }) | tt::sync_wait(sched)));
+        HPX_TEST_EQ(result, 42);
+    }
+
+    // int predecessor, value ignored
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result = hpx::get<0>(*(ex::transfer_just(sched, 43) |
+            ex::let_value([](int&) { return ex::just(42); }) |
+            tt::sync_wait()));
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result = hpx::get<0>(*(ex::transfer_just(sched, 43) |
+            ex::let_value([=](int&) { return ex::transfer_just(sched, 42); }) |
+            tt::sync_wait()));
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result = hpx::get<0>(*(ex::just(43) | ex::let_value([=](int&) {
+            return ex::transfer_just(sched, 42);
+        }) | tt::sync_wait(sched)));
+        HPX_TEST_EQ(result, 42);
+    }
+
+    // int predecessor, value used
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result = hpx::get<0>(
+            *(ex::transfer_just(sched, 43) | ex::let_value([](int& x) {
+                return ex::just(42) | ex::then([&](int y) { return x + y; });
+            }) | tt::sync_wait()));
+        HPX_TEST_EQ(result, 85);
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result = hpx::get<0>(
+            *(ex::transfer_just(sched, 43) | ex::let_value([=](int& x) {
+                return ex::transfer_just(sched, 42) |
+                    ex::then([&](int y) { return x + y; });
+            }) | tt::sync_wait()));
+        HPX_TEST_EQ(result, 85);
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result = hpx::get<0>(*(ex::just(43) | ex::let_value([=](int& x) {
+            return ex::transfer_just(sched, 42) |
+                ex::then([&](int y) { return x + y; });
+        }) | tt::sync_wait(sched)));
+        HPX_TEST_EQ(result, 85);
+    }
+
+    // predecessor throws, let sender is ignored
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        bool exception_thrown = false;
+
+        try
+        {
+            ex::transfer_just(sched, 43) | ex::then([](int) -> int {
+                throw std::runtime_error("error");
+            }) | ex::let_value([](int&) {
+                HPX_TEST(false);
+                return ex::just(0);
+            }) | tt::sync_wait();
+
+            HPX_TEST(false);
+        }
+        catch (std::runtime_error const& e)
+        {
+            HPX_TEST_EQ(std::string(e.what()), std::string("error"));
+            exception_thrown = true;
+        }
+
+        HPX_TEST(exception_thrown);
+    }
+}
+
+void check_exception_ptr_message(
+    std::exception_ptr ep, std::string const& message)
+{
+    try
+    {
+        std::rethrow_exception(ep);
+    }
+    catch (std::runtime_error const& e)
+    {
+        HPX_TEST_EQ(std::string(e.what()), message);
+        return;
+    }
+
+    HPX_TEST(false);
+}
+
+void test_let_error()
+{
+    // void predecessor
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        std::atomic<bool> called{false};
+        ex::schedule(sched) | ex::then([]() {
+            throw std::runtime_error("error");
+        }) | ex::let_error([&called](std::exception_ptr& ep) {
+            called = true;
+            check_exception_ptr_message(ep, "error");
+            return ex::just();
+        }) | tt::sync_wait();
+        HPX_TEST(called);
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        std::atomic<bool> called{false};
+        ex::schedule(sched) | ex::then([]() {
+            throw std::runtime_error("error");
+        }) | ex::let_error([=, &called](std::exception_ptr& ep) {
+            called = true;
+            check_exception_ptr_message(ep, "error");
+            return ex::transfer_just(sched);
+        }) | tt::sync_wait();
+        HPX_TEST(called);
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        std::atomic<bool> called{false};
+        ex::just() | ex::then([]() { throw std::runtime_error("error"); }) |
+            ex::let_error([=, &called](std::exception_ptr& ep) {
+                called = true;
+                check_exception_ptr_message(ep, "error");
+                return ex::transfer_just(sched);
+            }) |
+            tt::sync_wait(sched);
+        HPX_TEST(called);
+    }
+
+    // int predecessor
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result = hpx::get<0>(*(ex::schedule(sched) | ex::then([]() {
+            throw std::runtime_error("error");
+            return 43;
+        }) | ex::let_error([](std::exception_ptr& ep) {
+            check_exception_ptr_message(ep, "error");
+            return ex::just(42);
+        }) | tt::sync_wait()));
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result = hpx::get<0>(*(ex::schedule(sched) | ex::then([]() {
+            throw std::runtime_error("error");
+            return 43;
+        }) | ex::let_error([=](std::exception_ptr& ep) {
+            check_exception_ptr_message(ep, "error");
+            return ex::transfer_just(sched, 42);
+        }) | tt::sync_wait()));
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result = hpx::get<0>(*(ex::just() | ex::then([]() {
+            throw std::runtime_error("error");
+            return 43;
+        }) | ex::let_error([=](std::exception_ptr& ep) {
+            check_exception_ptr_message(ep, "error");
+            return ex::transfer_just(sched, 42);
+        }) | tt::sync_wait(sched)));
+        HPX_TEST_EQ(result, 42);
+    }
+
+    // predecessor doesn't throw, let sender is ignored
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result = hpx::get<0>(*(ex::transfer_just(sched, 42) |
+            ex::let_error([](std::exception_ptr) {
+                HPX_TEST(false);
+                return ex::just(43);
+            }) |
+            tt::sync_wait()));
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result = hpx::get<0>(*(ex::transfer_just(sched, 42) |
+            ex::let_error([=](std::exception_ptr) {
+                HPX_TEST(false);
+                return ex::transfer_just(sched, 43);
+            }) |
+            tt::sync_wait()));
+        HPX_TEST_EQ(result, 42);
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        auto result =
+            hpx::get<0>(*(ex::just(42) | ex::let_error([=](std::exception_ptr) {
+                HPX_TEST(false);
+                return ex::transfer_just(sched, 43);
+            }) | tt::sync_wait(sched)));
+        HPX_TEST_EQ(result, 42);
+    }
+}
 
 void test_detach()
 {
@@ -1732,11 +1751,8 @@ int hpx_main()
     test_ensure_started_when_all();
     test_split();
     test_split_when_all();
-
-    // TODO: add support for run_loop
-    //test_let_value();
-    //test_let_error();
-
+    test_let_value();
+    test_let_error();
     test_detach();
     test_bulk();
 
@@ -1752,3 +1768,5 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
+
+#endif
