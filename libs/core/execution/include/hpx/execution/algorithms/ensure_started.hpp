@@ -89,10 +89,13 @@ namespace hpx::execution::experimental {
             hpx::execution::experimental::run_loop_scheduler const& sched,
             Sender&& sender, Allocator const& allocator = {})
         {
-            return detail::split_sender<Sender, Allocator,
+            auto split_sender = detail::split_sender<Sender, Allocator,
                 detail::submission_type::eager,
                 hpx::execution::experimental::run_loop_scheduler>{
                 HPX_FORWARD(Sender, sender), allocator, sched};
+
+            sched.get_run_loop().run();
+            return split_sender;
         }
 
         // clang-format off

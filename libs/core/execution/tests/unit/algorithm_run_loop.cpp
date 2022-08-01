@@ -689,120 +689,119 @@ void test_ensure_started()
     }
 }
 
-// TODO: ensure_started does not fully work with run_loop
-//void test_ensure_started_when_all()
-//{
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        std::atomic<std::size_t> first_task_calls{0};
-//        std::atomic<std::size_t> successor_task_calls{0};
-//        hpx::mutex mtx;
-//        hpx::condition_variable cond;
-//        bool started{false};
-//        auto s = ex::schedule(sched) | ex::then([&]() {
-//            ++first_task_calls;
-//            std::lock_guard l{mtx};
-//            started = true;
-//            cond.notify_one();
-//        }) | ex::ensure_started();
-//        {
-//            std::unique_lock l{mtx};
-//            cond.wait(l, [&]() { return started; });
-//        }
-//        auto succ1 = s | ex::then([&]() {
-//            ++successor_task_calls;
-//            return 1;
-//        });
-//        auto succ2 = s | ex::then([&]() {
-//            ++successor_task_calls;
-//            return 2;
-//        });
-//        HPX_TEST_EQ(
-//            hpx::get<0>(*(ex::when_all(succ1, succ2) |
-//                ex::then([](int const& x, int const& y) { return x + y; }) |
-//                tt::sync_wait())),
-//            3);
-//        HPX_TEST_EQ(first_task_calls, std::size_t(1));
-//        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        std::atomic<std::size_t> first_task_calls{0};
-//        std::atomic<std::size_t> successor_task_calls{0};
-//        hpx::mutex mtx;
-//        hpx::condition_variable cond;
-//        bool started{false};
-//        auto s = ex::schedule(sched) | ex::then([&]() {
-//            ++first_task_calls;
-//            std::lock_guard l{mtx};
-//            started = true;
-//            cond.notify_one();
-//            return 3;
-//        }) | ex::ensure_started();
-//        {
-//            std::unique_lock l{mtx};
-//            cond.wait(l, [&]() { return started; });
-//        }
-//        HPX_TEST_EQ(first_task_calls, std::size_t(1));
-//        auto succ1 = s | ex::then([&](int const& x) {
-//            ++successor_task_calls;
-//            return x + 1;
-//        });
-//        auto succ2 = s | ex::then([&](int const& x) {
-//            ++successor_task_calls;
-//            return x + 2;
-//        });
-//        HPX_TEST_EQ(
-//            hpx::get<0>(*(ex::when_all(succ1, succ2) |
-//                ex::then([](int const& x, int const& y) { return x + y; }) |
-//                tt::sync_wait())),
-//            9);
-//        HPX_TEST_EQ(first_task_calls, std::size_t(1));
-//        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
-//    }
-//
-//    {
-//        ex::run_loop loop;
-//        auto sched = loop.get_scheduler();
-//
-//        std::atomic<std::size_t> first_task_calls{0};
-//        std::atomic<std::size_t> successor_task_calls{0};
-//        hpx::mutex mtx;
-//        hpx::condition_variable cond;
-//        bool started{false};
-//        auto s = ex::schedule(sched) | ex::then([&]() {
-//            ++first_task_calls;
-//            std::lock_guard l{mtx};
-//            started = true;
-//            cond.notify_one();
-//            return 3;
-//        }) | ex::ensure_started();
-//        {
-//            std::unique_lock l{mtx};
-//            cond.wait(l, [&]() { return started; });
-//        }
-//        auto succ1 = s | ex::transfer(sched) | ex::then([&](int const& x) {
-//            ++successor_task_calls;
-//            return x + 1;
-//        });
-//        auto succ2 = s | ex::transfer(sched) | ex::then([&](int const& x) {
-//            ++successor_task_calls;
-//            return x + 2;
-//        });
-//        HPX_TEST_EQ(
-//            hpx::get<0>(*(ex::when_all(succ1, succ2) |
-//                ex::then([](int const& x, int const& y) { return x + y; }) |
-//                tt::sync_wait())),
-//            9);
-//        HPX_TEST_EQ(first_task_calls, std::size_t(1));
-//        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
-//    }
-//}
+void test_ensure_started_when_all()
+{
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        std::atomic<std::size_t> first_task_calls{0};
+        std::atomic<std::size_t> successor_task_calls{0};
+        hpx::mutex mtx;
+        hpx::condition_variable cond;
+        bool started{false};
+        auto s = ex::schedule(sched) | ex::then([&]() {
+            ++first_task_calls;
+            std::lock_guard l{mtx};
+            started = true;
+            cond.notify_one();
+        }) | ex::ensure_started();
+        {
+            std::unique_lock l{mtx};
+            cond.wait(l, [&]() { return started; });
+        }
+        auto succ1 = s | ex::then([&]() {
+            ++successor_task_calls;
+            return 1;
+        });
+        auto succ2 = s | ex::then([&]() {
+            ++successor_task_calls;
+            return 2;
+        });
+        HPX_TEST_EQ(
+            hpx::get<0>(*(ex::when_all(succ1, succ2) |
+                ex::then([](int const& x, int const& y) { return x + y; }) |
+                tt::sync_wait(sched))),
+            3);
+        HPX_TEST_EQ(first_task_calls, std::size_t(1));
+        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        std::atomic<std::size_t> first_task_calls{0};
+        std::atomic<std::size_t> successor_task_calls{0};
+        hpx::mutex mtx;
+        hpx::condition_variable cond;
+        bool started{false};
+        auto s = ex::schedule(sched) | ex::then([&]() {
+            ++first_task_calls;
+            std::lock_guard l{mtx};
+            started = true;
+            cond.notify_one();
+            return 3;
+        }) | ex::ensure_started();
+        {
+            std::unique_lock l{mtx};
+            cond.wait(l, [&]() { return started; });
+        }
+        HPX_TEST_EQ(first_task_calls, std::size_t(1));
+        auto succ1 = s | ex::then([&](int const& x) {
+            ++successor_task_calls;
+            return x + 1;
+        });
+        auto succ2 = s | ex::then([&](int const& x) {
+            ++successor_task_calls;
+            return x + 2;
+        });
+        HPX_TEST_EQ(
+            hpx::get<0>(*(ex::when_all(succ1, succ2) |
+                ex::then([](int const& x, int const& y) { return x + y; }) |
+                tt::sync_wait(sched))),
+            9);
+        HPX_TEST_EQ(first_task_calls, std::size_t(1));
+        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        std::atomic<std::size_t> first_task_calls{0};
+        std::atomic<std::size_t> successor_task_calls{0};
+        hpx::mutex mtx;
+        hpx::condition_variable cond;
+        bool started{false};
+        auto s = ex::schedule(sched) | ex::then([&]() {
+            ++first_task_calls;
+            std::lock_guard l{mtx};
+            started = true;
+            cond.notify_one();
+            return 3;
+        }) | ex::ensure_started();
+        {
+            std::unique_lock l{mtx};
+            cond.wait(l, [&]() { return started; });
+        }
+        auto succ1 = s | ex::transfer(sched) | ex::then([&](int const& x) {
+            ++successor_task_calls;
+            return x + 1;
+        });
+        auto succ2 = s | ex::transfer(sched) | ex::then([&](int const& x) {
+            ++successor_task_calls;
+            return x + 2;
+        });
+        HPX_TEST_EQ(
+            hpx::get<0>(*(ex::when_all(succ1, succ2) |
+                ex::then([](int const& x, int const& y) { return x + y; }) |
+                tt::sync_wait(sched))),
+            9);
+        HPX_TEST_EQ(first_task_calls, std::size_t(1));
+        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
+    }
+}
 
 void test_split()
 {
@@ -842,82 +841,106 @@ void test_split()
     }
 }
 
-// TODO: split does not fully work with run_loop
-//void test_split_when_all()
-//{
-//    ex::run_loop loop;
-//    auto sched = loop.get_scheduler();
-//
-//    {
-//        std::atomic<std::size_t> first_task_calls{0};
-//        std::atomic<std::size_t> successor_task_calls{0};
-//        auto s = ex::schedule(sched) | ex::then([&]() { ++first_task_calls; }) |
-//            ex::split();
-//        auto succ1 = s | ex::then([&]() {
-//            ++successor_task_calls;
-//            return 1;
-//        });
-//        auto succ2 = s | ex::then([&]() {
-//            ++successor_task_calls;
-//            return 2;
-//        });
-//        HPX_TEST_EQ(
-//            hpx::get<0>(*(ex::when_all(succ1, succ2) |
-//                ex::then([](int const& x, int const& y) { return x + y; }) |
-//                tt::sync_wait())),
-//            3);
-//        HPX_TEST_EQ(first_task_calls, std::size_t(1));
-//        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
-//    }
-//
-//    {
-//        std::atomic<std::size_t> first_task_calls{0};
-//        std::atomic<std::size_t> successor_task_calls{0};
-//        auto s = ex::schedule(sched) | ex::then([&]() {
-//            ++first_task_calls;
-//            return 3;
-//        }) | ex::split();
-//        auto succ1 = s | ex::then([&](int const& x) {
-//            ++successor_task_calls;
-//            return x + 1;
-//        });
-//        auto succ2 = s | ex::then([&](int const& x) {
-//            ++successor_task_calls;
-//            return x + 2;
-//        });
-//        HPX_TEST_EQ(
-//            hpx::get<0>(*(ex::when_all(succ1, succ2) |
-//                ex::then([](int const& x, int const& y) { return x + y; }) |
-//                tt::sync_wait())),
-//            9);
-//        HPX_TEST_EQ(first_task_calls, std::size_t(1));
-//        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
-//    }
-//
-//    {
-//        std::atomic<std::size_t> first_task_calls{0};
-//        std::atomic<std::size_t> successor_task_calls{0};
-//        auto s = ex::schedule(sched) | ex::then([&]() {
-//            ++first_task_calls;
-//            return 3;
-//        }) | ex::split();
-//        auto succ1 = s | ex::transfer(sched) | ex::then([&](int const& x) {
-//            ++successor_task_calls;
-//            return x + 1;
-//        });
-//        auto succ2 = s | ex::transfer(sched) | ex::then([&](int const& x) {
-//            ++successor_task_calls;
-//            return x + 2;
-//        });
-//        HPX_TEST_EQ(
-//            hpx::get<0>(*(ex::when_all(succ1, succ2) |
-//                ex::then([](int const& x, int const& y) { return x + y; }) |
-//                tt::sync_wait())),
-//            9);
-//        HPX_TEST_EQ(first_task_calls, std::size_t(1));
-//        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
-//    }
-//}
+void test_split_when_all()
+{
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        std::atomic<std::size_t> first_task_calls{0};
+        std::atomic<std::size_t> successor_task_calls{0};
+        auto s = ex::schedule(sched) | ex::then([&]() {
+            HPX_TEST_EQ(first_task_calls, std::size_t(0));
+            HPX_TEST_EQ(successor_task_calls, std::size_t(0));
+            ++first_task_calls;
+        }) | ex::split();
+        auto succ1 = s | ex::then([&]() {
+            HPX_TEST_EQ(first_task_calls, std::size_t(1));
+            HPX_TEST_EQ(successor_task_calls, std::size_t(0));
+            ++successor_task_calls;
+            return 1;
+        });
+        auto succ2 = s | ex::then([&]() {
+            HPX_TEST_EQ(first_task_calls, std::size_t(1));
+            HPX_TEST_EQ(successor_task_calls, std::size_t(1));
+            ++successor_task_calls;
+            return 2;
+        });
+        HPX_TEST_EQ(
+            hpx::get<0>(*(ex::when_all(succ1, succ2) |
+                ex::then([](int const& x, int const& y) { return x + y; }) |
+                tt::sync_wait(sched))),
+            3);
+        HPX_TEST_EQ(first_task_calls, std::size_t(1));
+        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        std::atomic<std::size_t> first_task_calls{0};
+        std::atomic<std::size_t> successor_task_calls{0};
+        auto s = ex::schedule(sched) | ex::then([&]() {
+            HPX_TEST_EQ(first_task_calls, std::size_t(0));
+            HPX_TEST_EQ(successor_task_calls, std::size_t(0));
+            ++first_task_calls;
+            return 3;
+        }) | ex::split();
+        auto succ1 = s | ex::then([&](int const& x) {
+            HPX_TEST_EQ(first_task_calls, std::size_t(1));
+            HPX_TEST_EQ(successor_task_calls, std::size_t(0));
+            ++successor_task_calls;
+            return x + 1;
+        });
+        auto succ2 = s | ex::then([&](int const& x) {
+            HPX_TEST_EQ(first_task_calls, std::size_t(1));
+            HPX_TEST_EQ(successor_task_calls, std::size_t(1));
+            ++successor_task_calls;
+            return x + 2;
+        });
+        HPX_TEST_EQ(
+            hpx::get<0>(*(ex::when_all(succ1, succ2) |
+                ex::then([](int const& x, int const& y) { return x + y; }) |
+                tt::sync_wait(sched))),
+            9);
+        HPX_TEST_EQ(first_task_calls, std::size_t(1));
+        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
+    }
+
+    {
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+
+        std::atomic<std::size_t> first_task_calls{0};
+        std::atomic<std::size_t> successor_task_calls{0};
+        auto s = ex::schedule(sched) | ex::then([&]() {
+            HPX_TEST_EQ(first_task_calls, std::size_t(0));
+            HPX_TEST_EQ(successor_task_calls, std::size_t(0));
+            ++first_task_calls;
+            return 3;
+        }) | ex::split();
+        auto succ1 = s | ex::transfer(sched) | ex::then([&](int const& x) {
+            HPX_TEST_EQ(first_task_calls, std::size_t(1));
+            HPX_TEST_EQ(successor_task_calls, std::size_t(0));
+            ++successor_task_calls;
+            return x + 1;
+        });
+        auto succ2 = s | ex::transfer(sched) | ex::then([&](int const& x) {
+            HPX_TEST_EQ(first_task_calls, std::size_t(1));
+            HPX_TEST_EQ(successor_task_calls, std::size_t(1));
+            ++successor_task_calls;
+            return x + 2;
+        });
+        HPX_TEST_EQ(
+            hpx::get<0>(*(ex::when_all(succ1, succ2) |
+                ex::then([](int const& x, int const& y) { return x + y; }) |
+                tt::sync_wait(sched))),
+            9);
+        HPX_TEST_EQ(first_task_calls, std::size_t(1));
+        HPX_TEST_EQ(successor_task_calls, std::size_t(2));
+    }
+}
 
 // TODO: let_value does not work with run_loop
 //void test_let_value()
@@ -1706,11 +1729,11 @@ int hpx_main()
     test_future_sender();
     test_keep_future_sender();
     test_ensure_started();
+    test_ensure_started_when_all();
+    test_split();
+    test_split_when_all();
 
     // TODO: add support for run_loop
-    //test_ensure_started_when_all();
-    test_split();
-    //test_split_when_all();
     //test_let_value();
     //test_let_error();
 

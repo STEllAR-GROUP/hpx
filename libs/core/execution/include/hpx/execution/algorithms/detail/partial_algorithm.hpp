@@ -27,9 +27,16 @@ namespace hpx::execution::experimental::detail {
     struct partial_algorithm_base<Tag, hpx::util::index_pack<Is...>, Ts...>
     {
     private:
-        hpx::util::member_pack_for<Ts...> ts;
+        HPX_NO_UNIQUE_ADDRESS hpx::util::member_pack_for<Ts...> ts;
 
     public:
+        template <typename... Us>
+        constexpr HPX_FORCEINLINE auto invoke(Us&&... us)
+        {
+            return Tag{}(
+                HPX_FORWARD(Us, us)..., HPX_MOVE(ts).template get<Is>()...);
+        }
+
         template <typename... Ts_>
         explicit constexpr partial_algorithm_base(Ts_&&... ts)
           : ts(std::piecewise_construct, HPX_FORWARD(Ts_, ts)...)
@@ -60,14 +67,13 @@ namespace hpx::execution::experimental::detail {
                 hpx::execution::experimental::get_completion_scheduler<
                     hpx::execution::experimental::set_value_t>(u);
 
-            return Tag{}(HPX_MOVE(scheduler), HPX_FORWARD(U, u),
-                HPX_MOVE(p.ts).template get<Is>()...);
+            return p.invoke(HPX_MOVE(scheduler), HPX_FORWARD(U, u));
         }
 
         // clang-format off
         template <typename U,
             HPX_CONCEPT_REQUIRES_(
-               !hpx::execution::experimental::is_sender_v<U> ||
+                hpx::execution::experimental::is_sender_v<U> &&
                !hpx::execution::experimental::detail::
                     is_completion_scheduler_tag_invocable_v<
                         hpx::execution::experimental::set_value_t,
@@ -78,8 +84,7 @@ namespace hpx::execution::experimental::detail {
         friend constexpr HPX_FORCEINLINE auto operator|(
             U&& u, partial_algorithm_base p)
         {
-            return Tag{}(
-                HPX_FORWARD(U, u), HPX_MOVE(p.ts).template get<Is>()...);
+            return p.invoke(HPX_FORWARD(U, u));
         }
     };
 
