@@ -481,7 +481,7 @@ namespace hpx { namespace ranges {
     /// \tparam Iter        The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     random access iterator.
-    /// \tparam Sent       The type of the end source iterators used (deduced).
+    /// \tparam Sent        The type of the end source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
     /// \tparam Comp        The type of the function/function object to use
