@@ -12,6 +12,7 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+    // clang-format off
 
     /// Moves the elements in the range, defined by [first, last), to an
     /// uninitialized memory area beginning at \a dest. If an exception is
@@ -283,7 +284,7 @@ namespace hpx { namespace ranges {
     /// \param count        Refers to the number of elements starting at
     ///                     \a first the algorithm will be applied to.
     /// \param first2       Refers to the beginning of the destination range.
-    /// \param last1        Refers to sentinel value denoting the end of the
+    /// \param last2        Refers to sentinel value denoting the end of the
     ///                     second range the algorithm will be applied to.
     ///
     /// The assignments in the parallel \a uninitialized_move_n algorithm
@@ -313,6 +314,8 @@ namespace hpx { namespace ranges {
         parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
     uninitialized_move_n(ExPolicy&& policy, FwdIter1 first1, Size count,
         FwdIter2 first2, Sent2 last2);
+
+    // clang-format on
 }}    // namespace hpx::ranges
 #else
 
