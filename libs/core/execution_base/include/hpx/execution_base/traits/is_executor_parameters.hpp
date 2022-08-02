@@ -77,12 +77,15 @@ namespace hpx { namespace parallel { namespace execution {
         // by default, assume equally sized chunks
     };
 
+#if !defined(DOXYGEN)
+    // doxygen gets confused by the following construct
     template <typename Parameters>
     struct extract_invokes_testing_function<Parameters,
         std::void_t<typename Parameters::invokes_testing_function>>
       : std::true_type
     {
     };
+#endif
 
     template <typename Parameters>
     inline constexpr bool extract_invokes_testing_function_v =
