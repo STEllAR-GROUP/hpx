@@ -43,8 +43,7 @@ namespace hpx { namespace ranges {
     ///           the last element constructed.
     ///
     template <typename FwdIter, typename Sent>
-    FwdIter uninitialized_default_construct(
-        FwdIter first, Sent last);
+    FwdIter uninitialized_default_construct(FwdIter first, Sent last);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>
     /// ::value_type in the uninitialized storage designated by the range
@@ -91,8 +90,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent>
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    uninitialized_default_construct(
-        ExPolicy&& policy, FwdIter first, Sent last);
+    uninitialized_default_construct(ExPolicy&& policy, FwdIter first, Sent last);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>
     /// ::value_type in the uninitialized storage designated by the range
@@ -249,8 +247,8 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename FwdIter, typename Size>
     typename typename parallel::util::detail::algorithm_result<ExPolicy,
         FwdIter>::type
-    uninitialized_default_construct_n(
-        ExPolicy&& policy, FwdIter first, Size count);
+    uninitialized_default_construct_n(ExPolicy&& policy, FwdIter first,
+        Size count);
 
     // clang-format on
 }}    // namespace hpx::ranges
