@@ -69,9 +69,11 @@ namespace hpx { namespace ranges {
     ///           where ret is a past-the-end iterator for a new
     ///           subrange.
     ///
-    template <typename FwdIter, typename Sent, typename Pred, typename Proj>
-    subrange_t<FwdIter, Sent> unique(FwdIter first, Sent last, Pred&& pred,
-        Proj&& proj);
+    template <typename FwdIter, typename Sent,
+        typename Pred = ranges::equal_to,
+        typename Proj = parallel::util::projection_identity>
+    subrange_t<FwdIter, Sent> unique(FwdIter first, Sent last,
+        Pred&& pred = Pred(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Eliminates all but the first element from every consecutive group of
@@ -141,12 +143,13 @@ namespace hpx { namespace ranges {
     ///           where ret is a past-the-end iterator for a new
     ///           subrange.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent, typename Pred,
-        typename Proj>
+    template <typename ExPolicy, typename FwdIter, typename Sent,
+        typename Pred = ranges::equal_to,
+        typename Proj = parallel::util::projection_identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         subrange_t<FwdIter, Sent>>::type
-    unique(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
-        Proj&& proj);
+    unique(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred = Pred(),
+        Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Eliminates all but the first element from every consecutive group of
@@ -201,10 +204,12 @@ namespace hpx { namespace ranges {
     ///           where ret is a past-the-end iterator for a new
     ///           subrange.
     ///
-    template <typename Rng, typename Pred, typename Proj>
+    template <typename Rng,
+        typename Pred = ranges::equal_to,
+        typename Proj = parallel::util::projection_identity>
     subrange_t<hpx::traits::range_iterator_t<Rng>,
         hpx::traits::range_iterator_t<Rng>>
-    unique(Rng&& rng, Pred&& pred, Proj&& proj);
+    unique(Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Eliminates all but the first element from every consecutive group of
@@ -276,11 +281,14 @@ namespace hpx { namespace ranges {
     ///           where ret is a past-the-end iterator for a new
     ///           subrange.
     ///
-    template <typename ExPolicy, typename Rng, typename Pred, typename Proj>
-    typename util::detail::algorithm_result<ExPolicy,
-    subrange_t<hpx::traits::range_iterator_t<Rng>,
-    hpx::traits::range_iterator_t<Rng>>::type
-    unique(ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj);
+    template <typename ExPolicy, typename Rng,
+        typename Pred = ranges::equal_to,
+        typename Proj = parallel::util::projection_identity>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        subrange_t<hpx::traits::range_iterator_t<Rng>,
+            hpx::traits::range_iterator_t<Rng>>>::type
+    unique(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
+        Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements from the range [first, last),
@@ -298,10 +306,8 @@ namespace hpx { namespace ranges {
     ///                     input iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
-    /// \tparam OutIter     The type of the iterator representing the
+    /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a unique_copy requires \a Pred to meet the
@@ -327,7 +333,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     type \a InIter1 can be dereferenced and then
     ///                     implicitly converted to \a Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -339,16 +345,17 @@ namespace hpx { namespace ranges {
     /// order in the calling thread.
     ///
     /// \returns  The \a unique_copy algorithm returns a
-    ///           returns unique_copy_result<FwdIter, OutIter>.
+    ///           returns unique_copy_result<InIter, O>.
     ///           The \a unique_copy algorithm returns an in_out_result with
     ///           the source iterator to one past the last element and out
     ///           containing the destination iterator to the end of the
     ///           \a dest range.
     ///
-    template <typename InIter, typename Sent, typename OutIter,
-        typename Pred, typename Proj>
-    unique_copy_result<FwdIter, OutIter> unique_copy(InIter first,
-        Sent last, OutIter dest, Pred&& pred, Proj&& proj);
+    template <typename InIter, typename Sent, typename O,
+        typename Pred = ranges::equal_to,
+        typename Proj = parallel::util::projection_identity>
+    unique_copy_result<InIter, O> unique_copy(InIter first,
+        Sent last, O dest, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements from the range [first, last),
@@ -365,15 +372,13 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter1.
-    /// \tparam FwdIter2    The type of the iterator representing the
+    /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a unique_copy requires \a Pred to meet the
@@ -401,7 +406,7 @@ namespace hpx { namespace ranges {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to \a Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
@@ -419,21 +424,23 @@ namespace hpx { namespace ranges {
     /// within each thread.
     ///
     /// \returns  The \a unique_copy algorithm returns areturns hpx::future<
-    ///           unique_copy_result<FwdIter1, FwdIter2>> if the
+    ///           unique_copy_result<FwdIter, O>> if the
     ///           execution policy is of type \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a
-    ///           unique_copy_result<FwdIter1, FwdIter2> otherwise.
+    ///           unique_copy_result<FwdIter, O> otherwise.
     ///           The \a unique_copy algorithm returns an in_out_result with
     ///           the source iterator to one past the last element and out
     ///           containing the destination iterator to the end of the
     ///           \a dest range.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent,
-        typename FwdIter2, typename Pred, typename Proj>
+    template <typename ExPolicy, typename FwdIter, typename Sent,
+        typename O,
+        typename Pred = ranges::equal_to,
+        typename Proj = parallel::util::projection_identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        unique_copy_result<FwdIter1, FwdIter2>>::type
-    unique_copy(ExPolicy&& policy, FwdIter1 first, Sent last,
-        FwdIter2 dest, Pred&& pred, Proj&& proj);
+        unique_copy_result<FwdIter, O>>::type
+    unique_copy(ExPolicy&& policy, FwdIter first, Sent last,
+        O dest, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements from the range \a rng,
@@ -493,9 +500,11 @@ namespace hpx { namespace ranges {
     ///           the source iterator to \a last, and
     ///           the destination iterator to the end of the \a dest range.
     ///
-    template <typename Rng, typename O, typename Pred, typename Proj>
+    template <typename Rng, typename O,
+        typename Pred = ranges::equal_to,
+        typename Proj = parallel::util::projection_identity>
     unique_copy_result<hpx::traits::range_iterator_t<Rng>, O>
-    unique_copy(Rng&& rng, O dest, Pred&& pred, Proj&& proj);
+    unique_copy(Rng&& rng, O dest, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements from the range \a rng,
@@ -573,13 +582,13 @@ namespace hpx { namespace ranges {
     ///           the source iterator to \a last, and
     ///           the destination iterator to the end of the \a dest range.
     ///
-    template <typename InIter, typename Sent, typename OutIter,
-        typename Pred, typename Proj>
+    template <typename ExPolicy, typename Rng, typename O,
+        typename Pred = ranges::equal_to,
+        typename Proj = parallel::util::projection_identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        unique_copy_result<hpx::traits::range_iterator_t<Rng>,
-        O>>::type
+        unique_copy_result<hpx::traits::range_iterator_t<Rng>, O>>::type
     unique_copy(ExPolicy&& policy, Rng&& rng, O dest,
-        Pred&& pred, Proj&& proj);
+        Pred&& pred = Pred(), Proj&& proj = Proj());
 
     // clang-format on
 }}    // namespace hpx::ranges
