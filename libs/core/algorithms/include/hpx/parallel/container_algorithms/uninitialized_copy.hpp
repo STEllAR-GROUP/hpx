@@ -275,7 +275,7 @@ namespace hpx { namespace ranges {
     /// \param count        Refers to the number of elements starting at
     ///                     \a first the algorithm will be applied to.
     /// \param first2       Refers to the beginning of the destination range.
-    /// \param last1        Refers to sentinel value denoting the end of the
+    /// \param last2        Refers to sentinel value denoting the end of the
     ///                     second range the algorithm will be applied to.
     ///
     /// The assignments in the parallel \a uninitialized_copy_n algorithm
