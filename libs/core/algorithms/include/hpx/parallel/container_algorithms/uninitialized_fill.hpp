@@ -12,6 +12,7 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+    // clang-format off
 
     /// Copies the given \a value to an uninitialized memory area, defined by
     /// the range [first, last). If an exception is thrown during the
@@ -86,10 +87,10 @@ namespace hpx { namespace ranges {
     ///           iterator to the element in the range, one past
     ///           the last element copied.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent>
+    template <typename ExPolicy, typename FwdIter, typename Sent, typename T>
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    uninitialized_fill(
-        ExPolicy&& policy, FwdIter first, Sent last, T const& value);
+    uninitialized_fill(ExPolicy&& policy, FwdIter first, Sent last,
+        T const& value);
 
     /// Copies the given \a value to an uninitialized memory area, defined by
     /// the range [first, last). If an exception is thrown during the
@@ -248,10 +249,11 @@ namespace hpx { namespace ranges {
     ///           the last element copied.
     ///
     template <typename ExPolicy, typename FwdIter, typename Size, typename T>
-    typename typename parallel::util::detail::algorithm_result<ExPolicy,
-        FwdIter>::type
-    uninitialized_fill_n(
-        ExPolicy&& policy, FwdIter first, Size count, T const& value);
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    uninitialized_fill_n(ExPolicy&& policy, FwdIter first, Size count,
+        T const& value);
+
+    // clang-format on
 }}    // namespace hpx::ranges
 #else
 
