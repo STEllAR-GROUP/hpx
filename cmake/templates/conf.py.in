@@ -269,6 +269,10 @@ rst_prolog += '''
     :alt: JOSS Paper about HPX
 .. |hpx_dependency_report| replace:: |hpx| Dependency report
 .. _hpx_dependency_report: ../../report/index.html
+.. |hpx_single_html| replace:: |hpx| Single HTML documentation
+.. _hpx_single_html: ../../singlehtml/index.h
+.. |hpx_pdf| replace:: |hpx| PDF documentation
+.. _hpx_pdf: ../../pdf/HPX.pdf
 
 .. |hpxpi| replace:: HPXPI
 .. _hpxpi: https://github.com/STEllAR-GROUP/hpxpi/
