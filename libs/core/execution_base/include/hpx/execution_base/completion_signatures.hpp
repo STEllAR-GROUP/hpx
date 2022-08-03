@@ -12,11 +12,13 @@
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/execution_base/traits/coroutine_traits.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>
 
+#include <exception>
 #include <type_traits>
 
 namespace hpx::execution::experimental {
@@ -341,20 +343,22 @@ namespace hpx::execution::experimental {
                     Sender>::completion_signatures{};
             }
 #if defined(HPX_HAVE_CXX20_COROUTINES)
-            // else if constexpr (is_awaitable<Sender>)
-            // {
-            //     using result_type = await_result_t<Sender>;
-            //     if constexpr (std::is_void_v<result_type>)
-            //     {
-            //         return completion_signatures<set_value_t(),
-            //             set_error_t(exception_ptr)>{};
-            //     }
-            //     else
-            //     {
-            //         return completion_signatures<set_value_t(result_type),
-            //             set_error_t(exception_ptr)>{};
-            //     }
-            // }
+            // TODO: Handle a case where is_awaitable_v<Sender,Promise>
+            // where Promise type is not void.
+            else if constexpr (is_awaitable_v<Sender>)
+            {
+                using result_type = await_result_t<Sender>;
+                if constexpr (std::is_void_v<result_type>)
+                {
+                    return completion_signatures<set_value_t(),
+                        set_error_t(std::exception_ptr)>{};
+                }
+                else
+                {
+                    return completion_signatures<set_value_t(result_type),
+                        set_error_t(std::exception_ptr)>{};
+                }
+            }
 #endif
             else
             {
