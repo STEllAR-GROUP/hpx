@@ -146,15 +146,6 @@ function(target_architecture output_var)
       # Get rid of the value marker leaving just the architecture name
       string(REPLACE "cmake_ARCH " "" ARCH "${ARCH}")
 
-      # If compiling for riscv64, automatically bake in Boost.Context
-      if(ARCH STREQUAL "riscv64")
-        hpx_set_option(
-            HPX_WITH_GENERIC_CONTEXT_COROUTINES
-            VALUE ON
-            FORCE
-        )
-      endif()
-
       # If we are compiling with an unknown architecture this variable should
       # already be set to "unknown" but in the case that it's empty (i.e. due to
       # a typo in the code), then set it to unknown

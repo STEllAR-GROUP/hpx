@@ -1557,6 +1557,8 @@ hpx_option(
 include(HPX_SetupCUDA)
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
+include(TargetArch)
+target_architecture(__target_arch)
 
 # ##############################################################################
 # Set configuration option to use Boost.Context or not. This depends on the
@@ -1568,6 +1570,11 @@ endif()
 if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   set(__use_generic_coroutine_context ON)
 endif()
+# If compiling for riscv64, automatically bake in Boost.Context
+if(${__target_arch} STREQUAL "riscv64")
+  set(__use_generic_coroutine_context ON)
+endif()
+
 hpx_option(
   HPX_WITH_GENERIC_CONTEXT_COROUTINES
   BOOL
@@ -1939,9 +1946,7 @@ else()
   endif()
 
   set(__has_timestamp_support OFF)
-  include(TargetArch)
 
-  target_architecture(__target_arch)
   if("${__target_arch}" STREQUAL "i386"
      OR "${__target_arch}" STREQUAL "ix86"
      OR "${__target_arch}" STREQUAL "x86_64"
