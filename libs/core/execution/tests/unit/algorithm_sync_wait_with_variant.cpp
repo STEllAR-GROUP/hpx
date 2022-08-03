@@ -27,6 +27,10 @@ void tag_invoke(tt::sync_wait_with_variant_t, custom_sender2 s)
 {
     s.tag_invoke_overload_called = true;
 }
+void tag_invoke(tt::sync_wait_with_variant_t, custom_sender_multiTuple s)
+{
+    s.tag_invoke_overload_called = true;
+}
 
 int hpx_main()
 {
@@ -145,14 +149,36 @@ int hpx_main()
     // sync_wait_with_variant can accept more than one senders:
     // (accept variant of multi_tuple senders )
     // tests a sender which has two different value types
+    // Success path
+    {
+        std::atomic<bool> start_called{false};
+        std::atomic<bool> connect_called{false};
+        std::atomic<bool> tag_invoke_overload_called{false};
+        tt::sync_wait_with_variant(custom_sender_multiTuple{
+            start_called, connect_called, tag_invoke_overload_called, true});
+        HPX_TEST(start_called);
+        HPX_TEST(connect_called);
+        HPX_TEST(!tag_invoke_overload_called);
+    }
+
+    {
+        std::atomic<bool> start_called{false};
+        std::atomic<bool> connect_called{false};
+        std::atomic<bool> tag_invoke_overload_called{false};
+        tt::sync_wait_with_variant(custom_sender_multiTuple{
+            start_called, connect_called, tag_invoke_overload_called, false});
+        HPX_TEST(start_called);
+        HPX_TEST(connect_called);
+        HPX_TEST(!tag_invoke_overload_called);
+    }
+
     {
         auto sender = ex::just(3) | ex::let_error([](std::exception_ptr) {
             HPX_TEST(false);
             return ex::just(std::string{"err"});
         });
 
-        hpx::optional<
-            hpx::variant<hpx::tuple<int>, hpx::tuple<std::string>>>
+        hpx::optional<hpx::variant<hpx::tuple<int>, hpx::tuple<std::string>>>
             result = tt::sync_wait_with_variant(sender);
 
         auto v = *result;
@@ -180,8 +206,6 @@ int hpx_main()
     //             HPX_TEST(false);
     //             return ex::just(std::string{"err"});
     //         });
-
-
     //     check_value_types<
     //         hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(
     //         s2);
