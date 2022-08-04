@@ -1,5 +1,5 @@
 ..
-    Copyright (C) 2007-2015 Hartmut Kaiser
+    Copyright (C) 2007-2022 Hartmut Kaiser
     Copyright (C) 2016-2018 Adrian Serio
 
     SPDX-License-Identifier: BSL-1.0
@@ -153,7 +153,8 @@ the project through discussions, pull requests, documentation patches, etc.
 * Bruno Pitrus, for his work with parallel algorithms.
 * Nikunj Gupta, for rewriting the implementation of ``hpx_main.hpp`` and for his
   fixes for tests.
-* Christopher Taylor, for his interest in |hpx| and the fixes he provided.
+* Christopher Taylor, for his interest in |hpx| and the fixes he provided. Chris
+  also contributed support for RISC-V architectures.
 * Shoshana Jakobovits, for her work on the resource partitioner.
 * Denis Blank, who re-wrote our unwrapped function to accept plain values
   arbitrary containers, and properly deal with nested futures.
@@ -268,7 +269,7 @@ the project through discussions, pull requests, documentation patches, etc.
   xaguilar, Andrew Kemp, Dylan Stark, Matthew Anderson, Jeremy Wilke, Jiazheng
   Yuan, CyberDrudge, david8dixon, Maxwell Reeser, Raffaele Solca, Marco
   Ippolito, Jules Penuchot, Weile Wei, Severin Strobl, Kor de Jong, albestro,
-  Jeff Trull, Yuri Victorovich, and Gregor Dai√ü who contributed to the general
+  Jeff Trull, Yuri Victorovich, and Gregor Daiﬂ who contributed to the general
   improvement of |hpx|.
 
 |stellar_hpx_funding|_ lists current and past funding sources for |hpx|. Special thanks to 

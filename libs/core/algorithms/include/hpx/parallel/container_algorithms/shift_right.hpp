@@ -101,7 +101,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent,
         typename Size>
-    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
     shift_right(ExPolicy&& policy, FwdIter first, Sent last, Size n);
 
     ///////////////////////////////////////////////////////////////////////////

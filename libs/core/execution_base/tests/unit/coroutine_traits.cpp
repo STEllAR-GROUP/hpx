@@ -8,6 +8,8 @@
 #include <hpx/execution_base/traits/coroutine_traits.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <utility>
+
 struct awaiter_1
 {
     bool await_ready()

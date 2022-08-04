@@ -4,18 +4,23 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#pragma once
+
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/type_support/meta.hpp>
+
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace execution { namespace experimental {
 
     template <typename Promise, typename Awaiter>
     decltype(auto) await_suspend(Awaiter&& await)
     {
-        if constexpr (!std::is_same_v<Promise, void>)
+        if constexpr (!std::is_void_v<Promise>)
         {
             return await.await_suspend(hpx::coro::coroutine_handle<Promise>{});
         }
@@ -27,21 +32,18 @@ namespace hpx { namespace execution { namespace experimental {
 
     namespace detail {
 
-        template <typename T, typename... Ts>
-        inline constexpr bool one_of = (std::is_same_v<T, Ts> || ...);
-
         template <typename, template <typename...> typename>
         inline constexpr bool is_instance_of_ = false;
 
-        template <typename... _As, template <typename...> typename _T>
-        inline constexpr bool is_instance_of_<_T<_As...>, _T> = true;
+        template <typename... As, template <typename...> typename T>
+        inline constexpr bool is_instance_of_<T<As...>, T> = true;
 
-        template <typename _Ty, template <typename...> typename _T>
-        inline constexpr bool is_instance_of = is_instance_of_<_Ty, _T>;
+        template <typename T, template <typename...> typename F>
+        inline constexpr bool is_instance_of = is_instance_of_<T, F>;
 
         template <typename T>
         inline constexpr bool is_await_suspend_result_v =
-            one_of<T, void, bool> ||
+            meta::value<meta::one_of<T, void, bool>> ||
             is_instance_of<T, hpx::coro::coroutine_handle>;
 
         template <typename, typename = void>
@@ -74,31 +76,33 @@ namespace hpx { namespace execution { namespace experimental {
         {
         };
 
+        // different versions of clang-format disagree
+        // clang-format off
         template <typename Awaiter, typename Promise>
         struct is_awaiter_impl<true, Awaiter, Promise>
           : std::integral_constant<bool,
-                is_await_suspend_result_v<decltype(
-                    await_suspend<Promise>(std::declval<Awaiter>()))>>
+                is_await_suspend_result_v<decltype(await_suspend<Promise>(
+                    std::declval<Awaiter>()))>>
+        // clang-format on
         {
         };
 
     }    // namespace detail
 
-    // An Awaiter type is a type that implements the three special methods
-    // that are called as part of a co_await expression: await_ready,
-    // await_suspend and await_resume.
-
+    // An Awaiter type is a type that implements the three special methods that
+    // are called as part of a co_await expression: await_ready, await_suspend
+    // and await_resume.
+    //
     // https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1288r0.pdf
-    // Lewis Baker - The rationale here is that for an awaiter object
-    // to be able to support being awaited in an arbitrary natural coroutine
-    // context it will generally need to type-erase the
-    // coroutine_handle<Promise> to coroutine_handle<void> so that it can
-    // store the continuation for an arbitrary coroutine-type.
-    // If theawait_suspend() method overload-set only has overloads that
-    // accept specific types of coroutine_handle<P> then it is only awaitable
-    // within specific contexts and thus we don’t consider it to satisfy the
-    // Awaiter concept.
-
+    // Lewis Baker - The rationale here is that for an awaiter object to be able
+    // to support being awaited in an arbitrary natural coroutine context it
+    // will generally need to type-erase the coroutine_handle<Promise> to
+    // coroutine_handle<void> so that it can store the continuation for an
+    // arbitrary coroutine-type. If the await_suspend() method overload-set only
+    // has overloads that accept specific types of coroutine_handle<P> then it
+    // is only awaitable within specific contexts and thus we don't consider it
+    // to satisfy the Awaiter concept.
+    //
     template <typename Awaiter, typename Promise = void>
     struct is_awaiter
       : detail::is_awaiter_impl<detail::has_await_ready<Awaiter> &&
@@ -109,17 +113,21 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     template <typename Awaiter, typename Promise = void>
-    bool inline constexpr is_awaiter_v = is_awaiter<Awaiter, Promise>::value;
+    inline constexpr bool is_awaiter_v = is_awaiter<Awaiter, Promise>::value;
 
     namespace detail {
 
         template <typename Awaitable, typename = void>
         inline constexpr bool has_member_operator_co_await_v = false;
 
+        // different versions of clang-format disagree
+        // clang-format off
         template <typename Awaitable>
         inline constexpr bool has_member_operator_co_await_v<Awaitable,
-            std::void_t<decltype(
-                std::declval<Awaitable>().operator co_await())>> = true;
+            std::void_t<
+                decltype(std::declval<Awaitable>().operator co_await())>> =
+            true;
+        // clang-format on
 
         template <typename Awaitable, typename = void>
         inline constexpr bool has_free_operator_co_await_v = false;
@@ -133,9 +141,9 @@ namespace hpx { namespace execution { namespace experimental {
 
     }    // namespace detail
 
-    // Returns the result of applying operator co_await() to the function’s
-    // argument, if the operator is defined, otherwise returns a reference
-    // to the input argument.
+    // Returns the result of applying operator co_await() to the function's
+    // argument, if the operator is defined, otherwise returns a reference to
+    // the input argument.
     template <typename Awaitable>
     decltype(auto) get_awaiter(Awaitable&& await, void*)
     {
@@ -157,16 +165,17 @@ namespace hpx { namespace execution { namespace experimental {
         typename = std::enable_if_t<detail::has_await_transform_v<Promise>>>
     decltype(auto) get_awaiter(Awaitable&& await, Promise* promise)
     {
-        if constexpr (detail::has_member_operator_co_await_v<decltype(
-                          promise->await_transform(
+        // different versions of clang-format disagree
+        // clang-format off
+        if constexpr (detail::has_member_operator_co_await_v<
+                          decltype(promise->await_transform(
                               HPX_FORWARD(Awaitable, await)))>)
         {
             return promise->await_transform(HPX_FORWARD(Awaitable, await))
-                .
-                operator co_await();
+                .operator co_await();
         }
-        else if constexpr (detail::has_free_operator_co_await_v<decltype(
-                               promise->await_transform(
+        else if constexpr (detail::has_free_operator_co_await_v<
+                               decltype(promise->await_transform(
                                    HPX_FORWARD(Awaitable, await)))>)
         {
             return operator co_await(
@@ -176,26 +185,28 @@ namespace hpx { namespace execution { namespace experimental {
         {
             return promise->await_transform(HPX_FORWARD(Awaitable, await));
         }
+        // clang-format on
     }
 
-    // Awaitable - Something that you can apply the ‘co_await’ operator to.
-    // If the promise type defines an await_transform() member then
-    // the awaitable is obtained by calling promise.await_transform(value),
-    // passing the awaited value.
+    // Awaitable - Something that you can apply the 'co_await' operator to. If
+    // the promise type defines an await_transform() member then the awaitable
+    // is obtained by calling promise.await_transform(value), passing the
+    // awaited value.
+    //
     // Otherwise, if the promise type does not define an await_transform()
     // member then the awaitable is the awaited value itself.
     //
-    // The awaitable concept simply checks whether the type supports
-    // applying the co_await operator to avalue of that type.
-    // If the object has either a member or non-member operator co_await()
-    // then its return value must satisfy the Awaiter concept. Otherwise,
-    // the Awaitable object must satisfy the Awaiter concept itself.
+    // The awaitable concept simply checks whether the type supports applying
+    // the co_await operator to avalue of that type. If the object has either a
+    // member or non-member operator co_await() then its return value must
+    // satisfy the Awaiter concept. Otherwise, the Awaitable object must satisfy
+    // the Awaiter concept itself.
+    //
     template <typename Awaitable, typename Promise = void>
     struct is_awaitable
-      : std::integral_constant<bool,
-            is_awaiter_v<decltype(get_awaiter(std::declval<Awaitable>(),
-                             static_cast<Promise*>(nullptr))),
-                Promise>>
+      : is_awaiter<decltype(get_awaiter(std::declval<Awaitable>(),
+                       static_cast<Promise*>(nullptr))),
+            Promise>
     {
     };
 
@@ -203,11 +214,14 @@ namespace hpx { namespace execution { namespace experimental {
     inline constexpr bool is_awaitable_v =
         is_awaitable<Awaitable, Promise>::value;
 
+    // different versions of clang-format disagree
+    // clang-format off
     template <typename Awaitable, typename Promise = void,
         typename = std::enable_if_t<is_awaitable_v<Awaitable, Promise>>>
-    using await_result_t = decltype(
-        (get_awaiter(std::declval<Awaitable>(), static_cast<Promise*>(nullptr))
-                .await_resume()));
+    using await_result_t = decltype((
+        get_awaiter(std::declval<Awaitable>(), static_cast<Promise*>(nullptr))
+            .await_resume()));
+    // clang-format on
 
 }}}    // namespace hpx::execution::experimental
 

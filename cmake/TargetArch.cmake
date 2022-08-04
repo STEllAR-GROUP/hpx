@@ -39,6 +39,8 @@ set(archdetect_cpp_code
         #else
             #error cmake_ARCH arm
         #endif
+    #elif defined(__riscv) && (__riscv_xlen == 64)
+        #error cmake_ARCH riscv64
     #elif defined(__i386) || defined(__i386__) || defined(_M_IX86)
         #error cmake_ARCH i386
     #elif defined(__i486__) || defined(__i586__) || defined(__i686__)

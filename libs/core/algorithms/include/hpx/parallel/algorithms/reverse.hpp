@@ -171,8 +171,7 @@ namespace hpx {
     ///           copied.
     ///
     template <typename ExPolicy, typename BidirIter, typename FwdIter>
-    typename parallel::util::detail::algorithm_result
-        <ExPolicy, FwdIter>::type
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
     reverse_copy(
         ExPolicy&& policy, BidirIter first, BidirIter last, FwdIter dest);
 

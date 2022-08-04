@@ -159,7 +159,7 @@ namespace hpx {
     template <typename ExPolicy, typename FwdIter, typename FwdIter2,
         typename Pred = parallel::v1::detail::equal_to>
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    search( ExPolicy&& policy, FwdIter first, FwdIter last, FwdIter2 s_first,
+    search(ExPolicy&& policy, FwdIter first, FwdIter last, FwdIter2 s_first,
         FwdIter2 s_last, Pred&& op = Pred());
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).

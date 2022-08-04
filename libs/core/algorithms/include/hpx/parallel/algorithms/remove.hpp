@@ -95,9 +95,8 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter,
         typename T = typename std::iterator_traits<FwdIter>::value_type>
-    typename parallel::util::detail::algorithm_result
-        <ExPolicy, FwdIter>::type remove(
-    ExPolicy&& policy, FwdIter first, FwdIter last, T const& value);
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    remove(ExPolicy&& policy, FwdIter first, FwdIter last, T const& value);
 
     /// Removes all elements satisfying specific criteria from the range
     /// [first, last) and returns a past-the-end iterator for the new
@@ -205,9 +204,8 @@ namespace hpx {
     ///           of the range.
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred>
-    typename parallel::util::detail::algorithm_result<
-        ExPolicy, FwdIter>::type remove_if(
-    ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred);
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    remove_if(ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred);
 
 }    // namespace hpx
 

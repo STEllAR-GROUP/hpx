@@ -314,8 +314,7 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename T = typename std::iterator_traits<FwdIter2>::value_type>
-    typename parallel::util::detail::algorithm_result
-        <ExPolicy, FwdIter2>::type
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     replace_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, T const& old_value, T const& new_value);
 
@@ -462,10 +461,9 @@ namespace hpx {
     ///           copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred, typename T = typename std::iterator_traits
-        <FwdIter2>::value_type>
-    typename parallel::util::detail::algorithm_result
-        <ExPolicy, FwdIter2>::type
+        typename Pred,
+        typename T = typename std::iterator_traits<FwdIter2>::value_type>
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     replace_copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, Pred&& pred, T const& new_value);
 

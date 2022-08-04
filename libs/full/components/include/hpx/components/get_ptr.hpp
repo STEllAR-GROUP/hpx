@@ -253,7 +253,8 @@ namespace hpx {
             naming::get_locality_id_from_gid(gid) == agas::get_locality_id(ec))
         {
             return std::shared_ptr<Component>(
-                get_lva<Component>::call(gid.get_lsb()),
+                get_lva<Component>::call(
+                    reinterpret_cast<hpx::naming::address_type>(gid.get_lsb())),
                 detail::get_ptr_no_unpin_deleter(id));
         }
 

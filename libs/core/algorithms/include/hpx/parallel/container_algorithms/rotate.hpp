@@ -155,10 +155,10 @@ namespace hpx { namespace ranges {
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a forward iterator.
     ///
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
     /// \param middle       Refers to the element that should appear at the
     ///                     beginning of the rotated range.
     ///
@@ -187,7 +187,7 @@ namespace hpx { namespace ranges {
     ///           pair(first + (last - middle), last).
     ///
     template <typename ExPolicy, typename Rng>
-    typename util::detail::algorithm_result<ExPolicy,
+    typename parallel::util::detail::algorithm_result<ExPolicy,
         subrange_t<hpx::traits::range_iterator_t<Rng>,
             hpx::traits::range_iterator_t<Rng>>>::type
     rotate(ExPolicy&& policy, Rng&& rng,
@@ -217,6 +217,10 @@ namespace hpx { namespace ranges {
     ///                     beginning of the rotated range.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
+    /// \param dest_first   Output iterator to the initial position of the range
+    ///                     where the reversed range is stored. The pointed type
+    ///                     shall support being assigned the value of an element
+    ///                     in the range [first,last).
     ///
     /// The assignments in the parallel \a rotate_copy algorithm
     /// execute in sequential order in the calling thread.
@@ -245,19 +249,25 @@ namespace hpx { namespace ranges {
     /// \tparam FwdIter1    The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
+    /// \tparam Sent        The type of the end iterators used (deduced).
+    ///                     This sentinel type must be a sentinel for FwdIter.
     /// \tparam FwdIter2    The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam Sent        The type of the end iterators used (deduced).
-    ///                     This sentinel type must be a sentinel for FwdIter.
     ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param middle       Refers to the element that should appear at the
     ///                     beginning of the rotated range.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
+    /// \param dest_first   Output iterator to the initial position of the range
+    ///                     where the reversed range is stored. The pointed type
+    ///                     shall support being assigned the value of an element
+    ///                     in the range [first,last).
     ///
     /// The assignments in the parallel \a rotate_copy algorithm invoked
     /// with an execution policy object of type \a sequenced_policy
@@ -306,7 +316,10 @@ namespace hpx { namespace ranges {
     ///                     will be applied to.
     /// \param middle       Refers to the element that should appear at the
     ///                     beginning of the rotated range.
-    /// \param dest_first   Refers to the begin of the destination range.
+    /// \param dest_first   Output iterator to the initial position of the range
+    ///                     where the reversed range is stored. The pointed type
+    ///                     shall support being assigned the value of an element
+    ///                     in the range [first,last).
     ///
     /// The assignments in the parallel \a rotate_copy algorithm
     /// execute in sequential order in the calling thread.
@@ -318,8 +331,8 @@ namespace hpx { namespace ranges {
     ///           the element past the last element copied.
     ///
     template <typename Rng, typename OutIter>
-    typename rotate_copy_result<hpx::traits::range_iterator_t<Rng>, OutIter>
-    rotate_copy(Rng&& rng, hpx::traits::range_iterator_t<Rng> middle,
+    rotate_copy_result<hpx::traits::range_iterator_t<Rng>, OutIter> rotate_copy(
+        Rng&& rng, hpx::traits::range_iterator_t<Rng> middle,
         OutIter dest_first);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -350,7 +363,10 @@ namespace hpx { namespace ranges {
     ///                     will be applied to.
     /// \param middle       Refers to the element that should appear at the
     ///                     beginning of the rotated range.
-    /// \param dest_first   Refers to the begin of the destination range.
+    /// \param dest_first   Output iterator to the initial position of the range
+    ///                     where the reversed range is stored. The pointed type
+    ///                     shall support being assigned the value of an element
+    ///                     in the range [first,last).
     ///
     /// The assignments in the parallel \a rotate_copy algorithm invoked
     /// with an execution policy object of type \a sequenced_policy

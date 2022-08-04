@@ -14,199 +14,6 @@
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Replaces all elements satisfying specific criteria with \a new_value
-    /// in the range [first, last).
-    ///
-    /// \note   Complexity: Performs exactly \a last - \a first assignments.
-    ///
-    /// Effects: Substitutes elements referred by the iterator it in the range
-    ///          [first,last) with new_value, when the following corresponding
-    ///          conditions hold: INVOKE(proj, *i) == old_value
-    ///
-    /// \tparam Iter        The type of the source iterator used (deduced).
-    ///                     The iterator type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam Sent        The type of the end iterators used (deduced). This
-    ///                     sentinel type must be a sentinel for Iter.
-    /// \tparam T1          The type of the old value to replace (deduced).
-    /// \tparam T2          The type of the new values to replace (deduced).
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param old_value    Refers to the old value of the elements to replace.
-    /// \param new_value    Refers to the new value to use as the replacement.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a replace algorithm
-    /// execute in sequential order in the calling thread.
-    ///
-    /// \returns  The \a replace algorithm returns an \a Iter.
-    ///
-    template <typename Iter, typename Sent, typename T1, typename T2,
-        typename Proj = hpx::parallel::util::projection_identity>
-    Iter replace(Iter first, Sent sent, T1 const& old_value,
-        T2 const& new_value, Proj&& proj = Proj());
-
-    /// Replaces all elements satisfying specific criteria with \a new_value
-    /// in the range \a rng.
-    ///
-    /// \note   Complexity: Performs exactly \a util::end(rng) - \a util::begin(rng)
-    ///         assignments.
-    ///
-    /// Effects: Substitutes elements referred by the iterator it in the range
-    ///          rng with new_value, when the following corresponding
-    ///          conditions hold: INVOKE(proj, *i) == old_value
-    ///
-    /// \tparam Rng         The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a forward iterator.
-    /// \tparam T1          The type of the old value to replace (deduced).
-    /// \tparam T2          The type of the new values to replace (deduced).
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param old_value    Refers to the old value of the elements to replace.
-    /// \param new_value    Refers to the new value to use as the replacement.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a replace algorithm
-    /// execute in sequential order in the calling thread.
-    ///
-    /// \returns  The \a replace algorithm returns an
-    ///           \a hpx::traits::range_iterator<Rng>::type.
-    ///
-    template <typename Rng, typename T1, typename T2,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::traits::range_iterator<Rng>::type replace(Rng&& rng,
-        T1 const& old_value, T2 const& new_value, Proj&& proj = Proj());
-
-    /// Replaces all elements satisfying specific criteria with \a new_value
-    /// in the range [first, last).
-    ///
-    /// \note   Complexity: Performs exactly \a last - \a first assignments.
-    ///
-    /// Effects: Substitutes elements referred by the iterator it in the range
-    ///          [first,last) with new_value, when the following corresponding
-    ///          conditions hold: INVOKE(proj, *i) == old_value
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam Iter        The type of the source iterator used (deduced).
-    ///                     The iterator type must
-    ///                     meet the requirements of a forward iterator.
-    /// \tparam Sent        The type of the end iterators used (deduced). This
-    ///                     sentinel type must be a sentinel for Iter.
-    /// \tparam T1          The type of the old value to replace (deduced).
-    /// \tparam T2          The type of the new values to replace (deduced).
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param old_value    Refers to the old value of the elements to replace.
-    /// \param new_value    Refers to the new value to use as the replacement.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a replace algorithm invoked with an
-    /// execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a replace algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a replace algorithm returns a \a hpx::future<Iter> if
-    ///           the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a Iter otherwise.
-    ///
-    template <typename ExPolicy, typename Iter, typename Sent, typename T1,
-        typename T2, typename Proj = hpx::parallel::util::projection_identity>
-    typename parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
-    replace(ExPolicy&& policy, Iter first, Sent sent, T1 const& old_value,
-        T2 const& new_value, Proj&& proj = Proj());
-
-    /// Replaces all elements satisfying specific criteria with \a new_value
-    /// in the range \a rng.
-    ///
-    /// \note   Complexity: Performs exactly \a util::end(rng) - \a util::begin(rng)
-    ///         assignments.
-    ///
-    /// Effects: Substitutes elements referred by the iterator it in the range
-    ///          rng with new_value, when the following corresponding
-    ///          conditions hold: INVOKE(proj, *i) == old_value
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of a forward iterator.
-    /// \tparam T1          The type of the old value to replace (deduced).
-    /// \tparam T2          The type of the new values to replace (deduced).
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param old_value    Refers to the old value of the elements to replace.
-    /// \param new_value    Refers to the new value to use as the replacement.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    /// The assignments in the parallel \a replace algorithm invoked with an
-    /// execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a replace algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a replace algorithm returns an
-    ///           \a hpx::future<hpx::traits::range_iterator<Rng>::type> if
-    ///           the execution policy is of type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a hpx::traits::range_iterator<Rng>::type otherwise.
-    ///
-    template <typename ExPolicy, typename Rng, typename T1, typename T2,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename parallel::util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_iterator<Rng>::type>::type
-    replace(ExPolicy&& policy, Rng&& rng, T1 const& old_value,
-        T2 const& new_value, Proj&& proj = Proj());
-
-    ///////////////////////////////////////////////////////////////////////////
     /// Replaces all elements satisfying specific criteria (for which predicate
     /// \a f returns true) with \a new_value in the range [first, sent).
     ///
@@ -217,10 +24,6 @@ namespace hpx { namespace ranges {
     ///          [first, sent) with new_value, when the following corresponding
     ///          conditions hold: INVOKE(f, INVOKE(proj, *it)) != false
     ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
     /// \tparam Iter        The type of the source iterator used (deduced).
     ///                     The iterator type must
     ///                     meet the requirements of a forward iterator.
@@ -235,11 +38,9 @@ namespace hpx { namespace ranges {
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param pred         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
@@ -265,12 +66,13 @@ namespace hpx { namespace ranges {
     /// The assignments in the parallel \a replace_if algorithm
     /// execute in sequential order in the calling thread.
     ///
-    ///
-    /// \returns  The \a replace_if algorithm returns an \a Iter
+    /// \returns  The \a replace_if algorithm returns \a Iter.
     ///           It returns \a last.
     ///
-    template <typename Iter, typename Sent, typename Pred, typename T,
-        typename Proj = hpx::parallel::util::projection_identity>
+    template <typename Iter, typename Sent, typename Pred,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T =
+            typename hpx::parallel::traits::projected<Iter, Proj>::value_type>
     Iter replace_if(Iter first, Sent sent, Pred&& pred, T const& new_value,
         Proj&& proj = Proj());
 
@@ -319,21 +121,14 @@ namespace hpx { namespace ranges {
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
     ///
-    /// The assignments in the parallel \a replace algorithm invoked with an
-    /// execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a replace algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a replace_if algorithm returns an \a hpx::traits::range_iterator<Rng>::type
+    /// \returns  The \a replace_if algorithm returns an \a
+    ///           hpx::traits::range_iterator<Rng>::type.
     ///           It returns \a last.
     ///
-    template <typename Rng, typename Pred, typename T,
-        typename Proj = hpx::parallel::util::projection_identity>
+    template <typename Rng, typename Pred,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T = typename hpx::parallel::traits::projected<
+            hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
     typename hpx::traits::range_iterator<Rng>::type replace_if(
         Rng&& rng, Pred&& pred, T const& new_value, Proj&& proj = Proj());
 
@@ -369,7 +164,7 @@ namespace hpx { namespace ranges {
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param pred         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
@@ -409,8 +204,10 @@ namespace hpx { namespace ranges {
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename Iter, typename Sent, typename Pred,
-        typename T, typename Proj = hpx::parallel::util::projection_identity>
-    typename parallel::util::detail::algorithm_result<ExPolicy, Iter>::type t
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T =
+            typename hpx::parallel::traits::projected<Iter, Proj>::value_type>
+    typename parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
     replace_if(ExPolicy&& policy, Iter first, Sent sent, Pred&& pred,
         T const& new_value, Proj&& proj = Proj());
 
@@ -482,36 +279,30 @@ namespace hpx { namespace ranges {
     ///           \a parallel_task_policy.
     ///           It returns \a last.
     ///
-    template <typename ExPolicy, typename Rng, typename Pred, typename T,
-        typename Proj = hpx::parallel::util::projection_identity>
+    template <typename ExPolicy, typename Rng, typename Pred,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T = typename hpx::parallel::traits::projected<
+            hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type
     replace_if(ExPolicy&& policy, Rng&& rng, Pred&& pred, T const& new_value,
         Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Copies the all elements from the range [first, sent) to another range
-    /// beginning at \a dest replacing all elements satisfying a specific
-    /// criteria with \a new_value.
+    /// Replaces all elements satisfying specific criteria with \a new_value
+    /// in the range [first, last).
     ///
-    /// Effects: Assigns to every iterator it in the range
-    ///          [result, result + (sent - first)) either new_value or
-    ///          *(first + (it - result)) depending on whether the following
-    ///          corresponding condition holds:
-    ///          INVOKE(proj, *(first + (i - result))) == old_value
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
-    /// \note   Complexity: Performs exactly \a sent - \a first applications of
-    ///         the predicate.
+    /// Effects: Substitutes elements referred by the iterator it in the range
+    ///          [first,last) with new_value, when the following corresponding
+    ///          conditions hold: INVOKE(proj, *i) == old_value
     ///
     /// \tparam Iter        The type of the source iterator used (deduced).
     ///                     The iterator type must
     ///                     meet the requirements of an input iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
     ///                     sentinel type must be a sentinel for Iter.
-    /// \tparam OutIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
     /// \tparam T1          The type of the old value to replace (deduced).
     /// \tparam T2          The type of the new values to replace (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -521,7 +312,6 @@ namespace hpx { namespace ranges {
     ///                     the algorithm will be applied to.
     /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
     /// \param old_value    Refers to the old value of the elements to replace.
     /// \param new_value    Refers to the new value to use as the replacement.
     /// \param proj         Specifies the function (or function object) which
@@ -529,101 +319,78 @@ namespace hpx { namespace ranges {
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
     ///
-    /// The assignments in the parallel \a replace_copy algorithm
+    /// The assignments in the parallel \a replace algorithm
     /// execute in sequential order in the calling thread.
     ///
-    /// \returns  The \a replace_copy algorithm returns an
-    ///           \a in_out_result<InIter, OutIter>.
-    ///           The \a copy algorithm returns the pair of the input iterator
-    ///           \a last and the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
+    /// \returns  The \a replace algorithm returns an \a Iter.
     ///
-    template <typename Initer, typename Sent, typename OutIter, typename T1,
-        typename T2, typename Proj = hpx::parallel::util::projection_identity>
-    replace_copy_result<InIter, OutIter> replace_copy(InIter first, Sent sent,
-        OutIter dest, T1 const& old_value, T2 const& new_value,
-        Proj&& proj = Proj());
-
-    /// Copies the all elements from the range rbg to another range
-    /// beginning at \a dest replacing all elements satisfying a specific
-    /// criteria with \a new_value.
-    ///
-    /// Effects: Assigns to every iterator it in the range
-    ///          [result, result + (util::end(rng) - util::begin(rng))) either new_value or
-    ///          *(first + (it - result)) depending on whether the following
-    ///          corresponding condition holds:
-    ///          INVOKE(proj, *(first + (i - result))) == old_value
-    ///
-    /// \note   Complexity: Performs exactly \a util::end(rng) - \a util::begin(rng)
-    ///         applications of the predicate.
-    ///
-    /// \tparam Rng         The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam OutIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
-    /// \tparam T1          The type of the old value to replace (deduced).
-    /// \tparam T2          The type of the new values to replace (deduced).
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    /// \param old_value    Refers to the old value of the elements to replace.
-    /// \param new_value    Refers to the new value to use as the replacement.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a replace_copy algorithm
-    /// execute in sequential order in the calling thread.
-    ///
-    /// \returns  The \a replace_copy algorithm returns an
-    ///           \a in_out_result<typename hpx::traits::range_iterator<
-    ///             Rng>::type, OutIter>.
-    ///           The \a copy algorithm returns the pair of the input iterator
-    ///           \a last and the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
-    ///
-    template <typename Rng, typename OutIter, typename T1, typename T2,
-        typename Proj = hpx::parallel::util::projection_identity>
-    replace_copy_result<typename hpx::traits::range_iterator<Rng>::type,
-        OutIter>
-    replace_copy(Rng&& rng, OutIter dest, T1 const& old_value,
+    template <typename Iter, typename Sent,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T1 =
+            typename hpx::parallel::traits::projected<Iter, Proj>::value_type,
+        typename T2 = T1>
+    Iter replace(Iter first, Sent sent, T1 const& old_value,
         T2 const& new_value, Proj&& proj = Proj());
 
-    /// Copies the all elements from the range [first, sent) to another range
-    /// beginning at \a dest replacing all elements satisfying a specific
-    /// criteria with \a new_value.
+    /// Replaces all elements satisfying specific criteria with \a new_value
+    /// in the range \a rng.
     ///
-    /// Effects: Assigns to every iterator it in the range
-    ///          [result, result + (sent - first)) either new_value or
-    ///          *(first + (it - result)) depending on whether the following
-    ///          corresponding condition holds:
-    ///          INVOKE(proj, *(first + (i - result))) == old_value
+    /// \note   Complexity: Performs exactly \a util::end(rng) - \a util::begin(rng)
+    ///         assignments.
     ///
-    /// \note   Complexity: Performs exactly \a sent - \a first applications of
-    ///         the predicate.
+    /// Effects: Substitutes elements referred by the iterator it in the range
+    ///          rng with new_value, when the following corresponding
+    ///          conditions hold: INVOKE(proj, *i) == old_value
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of a forward iterator.
+    /// \tparam T1          The type of the old value to replace (deduced).
+    /// \tparam T2          The type of the new values to replace (deduced).
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param old_value    Refers to the old value of the elements to replace.
+    /// \param new_value    Refers to the new value to use as the replacement.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a replace algorithm
+    /// execute in sequential order in the calling thread.
+    ///
+    /// \returns  The \a replace algorithm returns an
+    ///           \a hpx::traits::range_iterator<Rng>::type.
+    ///
+    template <typename Rng,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T1 = typename hpx::parallel::traits::projected<
+            hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
+        typename T2 = T1>
+    typename hpx::traits::range_iterator<Rng>::type replace(Rng&& rng,
+        T1 const& old_value, T2 const& new_value, Proj&& proj = Proj());
+
+    /// Replaces all elements satisfying specific criteria with \a new_value
+    /// in the range [first, last).
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// Effects: Substitutes elements referred by the iterator it in the range
+    ///          [first,last) with new_value, when the following corresponding
+    ///          conditions hold: INVOKE(proj, *i) == old_value
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterator used (deduced).
+    /// \tparam Iter        The type of the source iterator used (deduced).
     ///                     The iterator type must
-    ///                     meet the requirements of an forward iterator.
+    ///                     meet the requirements of a forward iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
     ///                     sentinel type must be a sentinel for Iter.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
     /// \tparam T1          The type of the old value to replace (deduced).
     /// \tparam T2          The type of the new values to replace (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -635,7 +402,6 @@ namespace hpx { namespace ranges {
     ///                     the algorithm will be applied to.
     /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
     /// \param old_value    Refers to the old value of the elements to replace.
     /// \param new_value    Refers to the new value to use as the replacement.
     /// \param proj         Specifies the function (or function object) which
@@ -643,48 +409,40 @@ namespace hpx { namespace ranges {
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
     ///
-    /// The assignments in the parallel \a replace_copy algorithm invoked
-    /// with an execution policy object of type \a sequenced_policy
+    /// The assignments in the parallel \a replace algorithm invoked with an
+    /// execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The assignments in the parallel \a replace_copy algorithm invoked
-    /// with an execution policy object of type \a parallel_policy or
+    /// The assignments in the parallel \a replace algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
     /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace_copy algorithm returns a
-    ///           \a hpx::future<in_out_result<FwdIter1, FwdIter2>>
-    ///           if the execution policy is of type
+    /// \returns  The \a replace algorithm returns a \a hpx::future<Iter> if
+    ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a in_out_result<FwdIter1, FwdIter2>
-    ///           otherwise.
-    ///           The \a copy algorithm returns the pair of the forward iterator
-    ///           \a last and the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
+    ///           returns \a Iter otherwise.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent,
-        typename FwdIter2, typename T1, typename T2,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename parallel::util::detail::algorithm_result<ExPolicy,
-        replace_copy_result<FwdIter1, FwdIter2>>::type
-    replace_copy(ExPolicy&& policy, FwdIter1 first, Sent sent, FwdIter2 dest,
-        T1 const& old_value, T2 const& new_value, Proj&& proj = Proj());
+    template <typename ExPolicy, typename Iter, typename Sent,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T1 =
+            typename hpx::parallel::traits::projected<Iter, Proj>::value_type,
+        typename T2 = T1>
+    typename parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
+    replace(ExPolicy&& policy, Iter first, Sent sent, T1 const& old_value,
+        T2 const& new_value, Proj&& proj = Proj());
 
-    /// Copies the all elements from the range rbg to another range
-    /// beginning at \a dest replacing all elements satisfying a specific
-    /// criteria with \a new_value.
-    ///
-    /// Effects: Assigns to every iterator it in the range
-    ///          [result, result + (util::end(rng) - util::begin(rng))) either new_value or
-    ///          *(first + (it - result)) depending on whether the following
-    ///          corresponding condition holds:
-    ///          INVOKE(proj, *(first + (i - result))) == old_value
+    /// Replaces all elements satisfying specific criteria with \a new_value
+    /// in the range \a rng.
     ///
     /// \note   Complexity: Performs exactly \a util::end(rng) - \a util::begin(rng)
-    ///         applications of the predicate.
+    ///         assignments.
+    ///
+    /// Effects: Substitutes elements referred by the iterator it in the range
+    ///          rng with new_value, when the following corresponding
+    ///          conditions hold: INVOKE(proj, *i) == old_value
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -692,11 +450,7 @@ namespace hpx { namespace ranges {
     ///                     in which it executes the assignments.
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an input iterator.
-    /// \tparam FwdIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     meet the requirements of a forward iterator.
     /// \tparam T1          The type of the old value to replace (deduced).
     /// \tparam T2          The type of the new values to replace (deduced).
     /// \tparam Proj        The type of an optional projection function. This
@@ -706,44 +460,38 @@ namespace hpx { namespace ranges {
     ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
     /// \param old_value    Refers to the old value of the elements to replace.
     /// \param new_value    Refers to the new value to use as the replacement.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a replace_copy algorithm invoked
-    /// with an execution policy object of type \a sequenced_policy
+    /// The assignments in the parallel \a replace algorithm invoked with an
+    /// execution policy object of type \a sequenced_policy
     /// execute in sequential order in the calling thread.
     ///
-    /// The assignments in the parallel \a replace_copy algorithm invoked
-    /// with an execution policy object of type \a parallel_policy or
+    /// The assignments in the parallel \a replace algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
     /// \a parallel_task_policy are permitted to execute in an unordered
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a replace_copy algorithm returns a
-    ///           \a hpx::future<in_out_result<
-    ///            typename hpx::traits::range_iterator<Rng>::type, FwdIter>>
-    ///           if the execution policy is of type
+    /// \returns  The \a replace algorithm returns an
+    ///           \a hpx::future<hpx::traits::range_iterator<Rng>::type> if
+    ///           the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a in_out_result<
-    ///            typename hpx::traits::range_iterator<Rng>::type, FwdIter>>
-    ///           The \a copy algorithm returns the pair of the input iterator
-    ///           \a last and the forward iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
+    ///           returns \a hpx::traits::range_iterator<Rng>::type otherwise.
     ///
-    template <typename ExPolicy, typename Rng, typename FwdIter, typename T1,
-        typename T2, typename Proj = hpx::parallel::util::projection_identity>
+    template <typename ExPolicy, typename Rng,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T1 = typename hpx::parallel::traits::projected<
+            hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
+        typename T2 = T1>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        replace_copy_result<typename hpx::traits::range_iterator<Rng>::type,
-            FwdIter>>::type
-    replace_copy(ExPolicy&& policy, Rng&& rng, FwdIter dest,
-        T1 const& old_value, T2 const& new_value, Proj&& proj = Proj());
+        typename hpx::traits::range_iterator<Rng>::type>::type
+    replace(ExPolicy&& policy, Rng&& rng, T1 const& old_value,
+        T2 const& new_value, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the all elements from the range [first, sent) to another range
@@ -814,7 +562,8 @@ namespace hpx { namespace ranges {
     ///           copied.
     ///
     template <typename InIter, typename Sent, typename OutIter, typename Pred,
-        typename T, typename Proj = hpx::parallel::util::projection_identity>
+        typename T = typename std::iterator_traits<OutIter>::value_type,
+        typename Proj = hpx::parallel::util::projection_identity>
     replace_copy_if_result<InIter, OutIter> replace_copy_if(InIter first,
         Sent sent, OutIter dest, Pred&& pred, T const& new_value,
         Proj&& proj = Proj());
@@ -883,7 +632,8 @@ namespace hpx { namespace ranges {
     ///           element in the destination range, one past the last element
     ///           copied.
     ///
-    template <typename Rng, typename OutIter, typename Pred, typename T,
+    template <typename Rng, typename OutIter, typename Pred,
+        typename T = typename std::iterator_traits<OutIter>::value_type,
         typename Proj = hpx::parallel::util::projection_identity>
     replace_copy_if_result<typename hpx::traits::range_iterator<Rng>::type,
         OutIter>
@@ -971,7 +721,8 @@ namespace hpx { namespace ranges {
     ///           copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Sent,
-        typename FwdIter2, typename Pred, typename T,
+        typename FwdIter2, typename Pred,
+        typename T = typename std::iterator_traits<FwdIter2>::value_type,
         typename Proj = hpx::parallel::util::projection_identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         replace_copy_if_result<FwdIter1, FwdIter2>>::type
@@ -998,10 +749,10 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
-    /// \tparam OutIter     The type of the iterator representing the
+    /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
+    ///                     forward iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a equal requires \a Pred to meet the
@@ -1056,12 +807,281 @@ namespace hpx { namespace ranges {
     ///           copied.
     ///
     template <typename ExPolicy, typename Rng, typename FwdIter, typename Pred,
-        typename T, typename Proj = hpx::parallel::util::projection_identity>
+        typename T = typename std::iterator_traits<FwdIter>::value_type,
+        typename Proj = hpx::parallel::util::projection_identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         replace_copy_if_result<typename hpx::traits::range_iterator<Rng>::type,
             FwdIter>>::type
     replace_copy_if(ExPolicy&& policy, Rng&& rng, FwdIter dest, Pred&& pred,
         T const& new_value, Proj&& proj = Proj());
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Copies the all elements from the range [first, sent) to another range
+    /// beginning at \a dest replacing all elements satisfying a specific
+    /// criteria with \a new_value.
+    ///
+    /// Effects: Assigns to every iterator it in the range
+    ///          [result, result + (sent - first)) either new_value or
+    ///          *(first + (it - result)) depending on whether the following
+    ///          corresponding condition holds:
+    ///          INVOKE(proj, *(first + (i - result))) == old_value
+    ///
+    /// \note   Complexity: Performs exactly \a sent - \a first applications of
+    ///         the predicate.
+    ///
+    /// \tparam InIter      The type of the source iterator used (deduced).
+    ///                     The iterator type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam Sent        The type of the end iterators used (deduced). This
+    ///                     sentinel type must be a sentinel for Iter.
+    /// \tparam OutIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
+    /// \tparam T1          The type of the old value to replace (deduced).
+    /// \tparam T2          The type of the new values to replace (deduced).
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param sent         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param old_value    Refers to the old value of the elements to replace.
+    /// \param new_value    Refers to the new value to use as the replacement.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a replace_copy algorithm
+    /// execute in sequential order in the calling thread.
+    ///
+    /// \returns  The \a replace_copy algorithm returns an
+    ///           \a in_out_result<InIter, OutIter>.
+    ///           The \a copy algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
+    ///
+    template <typename InIter, typename Sent, typename OutIter,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T1 =
+            typename hpx::parallel::traits::projected<InIter, Proj>::value_type,
+        typename T2 = T1>
+    replace_copy_result<InIter, OutIter> replace_copy(InIter first, Sent sent,
+        OutIter dest, T1 const& old_value, T2 const& new_value,
+        Proj&& proj = Proj());
+
+    /// Copies the all elements from the range rbg to another range
+    /// beginning at \a dest replacing all elements satisfying a specific
+    /// criteria with \a new_value.
+    ///
+    /// Effects: Assigns to every iterator it in the range
+    ///          [result, result + (util::end(rng) - util::begin(rng))) either new_value or
+    ///          *(first + (it - result)) depending on whether the following
+    ///          corresponding condition holds:
+    ///          INVOKE(proj, *(first + (i - result))) == old_value
+    ///
+    /// \note   Complexity: Performs exactly \a util::end(rng) - \a util::begin(rng)
+    ///         applications of the predicate.
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam OutIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     output iterator.
+    /// \tparam T1          The type of the old value to replace (deduced).
+    /// \tparam T2          The type of the new values to replace (deduced).
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param old_value    Refers to the old value of the elements to replace.
+    /// \param new_value    Refers to the new value to use as the replacement.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a replace_copy algorithm
+    /// execute in sequential order in the calling thread.
+    ///
+    /// \returns  The \a replace_copy algorithm returns an
+    ///           \a in_out_result<typename hpx::traits::range_iterator<
+    ///             Rng>::type, OutIter>.
+    ///           The \a copy algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
+    ///
+    template <typename Rng, typename OutIter,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T1 = typename hpx::parallel::traits::projected<
+            hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
+        typename T2 = T1>
+    replace_copy_result<typename hpx::traits::range_iterator<Rng>::type,
+        OutIter>
+    replace_copy(Rng&& rng, OutIter dest, T1 const& old_value,
+        T2 const& new_value, Proj&& proj = Proj());
+
+    /// Copies the all elements from the range [first, sent) to another range
+    /// beginning at \a dest replacing all elements satisfying a specific
+    /// criteria with \a new_value.
+    ///
+    /// Effects: Assigns to every iterator it in the range
+    ///          [result, result + (sent - first)) either new_value or
+    ///          *(first + (it - result)) depending on whether the following
+    ///          corresponding condition holds:
+    ///          INVOKE(proj, *(first + (i - result))) == old_value
+    ///
+    /// \note   Complexity: Performs exactly \a sent - \a first applications of
+    ///         the predicate.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterator used (deduced).
+    ///                     The iterator type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Sent        The type of the end iterators used (deduced). This
+    ///                     sentinel type must be a sentinel for Iter.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam T1          The type of the old value to replace (deduced).
+    /// \tparam T2          The type of the new values to replace (deduced).
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param sent         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param old_value    Refers to the old value of the elements to replace.
+    /// \param new_value    Refers to the new value to use as the replacement.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a replace_copy algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a replace_copy algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a replace_copy algorithm returns a
+    ///           \a hpx::future<in_out_result<FwdIter1, FwdIter2>>
+    ///           if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a in_out_result<FwdIter1, FwdIter2>
+    ///           otherwise.
+    ///           The \a copy algorithm returns the pair of the forward iterator
+    ///           \a last and the output iterator to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename Sent,
+        typename FwdIter2,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T1 = typename hpx::parallel::traits::projected<FwdIter1,
+            Proj>::value_type,
+        typename T2 = T1>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        replace_copy_result<FwdIter1, FwdIter2>>::type
+    replace_copy(ExPolicy&& policy, FwdIter1 first, Sent sent, FwdIter2 dest,
+        T1 const& old_value, T2 const& new_value, Proj&& proj = Proj());
+
+    /// Copies the all elements from the range rbg to another range
+    /// beginning at \a dest replacing all elements satisfying a specific
+    /// criteria with \a new_value.
+    ///
+    /// Effects: Assigns to every iterator it in the range
+    ///          [result, result + (util::end(rng) - util::begin(rng))) either new_value or
+    ///          *(first + (it - result)) depending on whether the following
+    ///          corresponding condition holds:
+    ///          INVOKE(proj, *(first + (i - result))) == old_value
+    ///
+    /// \note   Complexity: Performs exactly \a util::end(rng) - \a util::begin(rng)
+    ///         applications of the predicate.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam T1          The type of the old value to replace (deduced).
+    /// \tparam T2          The type of the new values to replace (deduced).
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param old_value    Refers to the old value of the elements to replace.
+    /// \param new_value    Refers to the new value to use as the replacement.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a replace_copy algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a replace_copy algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a replace_copy algorithm returns a
+    ///           \a hpx::future<in_out_result<
+    ///            typename hpx::traits::range_iterator<Rng>::type, FwdIter>>
+    ///           if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a in_out_result<
+    ///            typename hpx::traits::range_iterator<Rng>::type, FwdIter>>
+    ///           The \a copy algorithm returns the pair of the input iterator
+    ///           \a last and the forward iterator to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
+    ///
+    template <typename ExPolicy, typename Rng, typename FwdIter,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T1 = typename hpx::parallel::traits::projected<
+            hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
+        typename T2 = T1>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        replace_copy_result<typename hpx::traits::range_iterator<Rng>::type,
+            FwdIter>>::type
+    replace_copy(ExPolicy&& policy, Rng&& rng, FwdIter dest,
+        T1 const& old_value, T2 const& new_value, Proj&& proj = Proj());
 
 }}    // namespace hpx::ranges
 

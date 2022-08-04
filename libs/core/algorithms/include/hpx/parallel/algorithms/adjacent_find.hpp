@@ -15,8 +15,8 @@
 namespace hpx {
     /// Searches the range [first, last) for two consecutive identical elements.
     ///
-    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
-    ///                     (last - first) - 1 application of the predicate
+    /// \note   Complexity: Exactly the smaller of (\a result - \a first) + 1 and
+    ///                     (\a last - \a first) - 1 application of the predicate
     ///                     where \a result is the value returned
     ///
     /// \tparam InIter      The type of the source iterators used for the
@@ -45,14 +45,15 @@ namespace hpx {
     /// \returns  The \a adjacent_find algorithm returns an iterator to the
     ///           first of the identical elements. If no such elements are
     ///           found, \a last is returned.
-    template <typename InIter, typename Pred = detail::equal_to>
+    template <typename InIter,
+        typename Pred = hpx::parallel::v1::detail::equal_to>
     InIter adjacent_find(InIter first, InIter last, Pred&& pred = Pred());
 
     /// Searches the range [first, last) for two consecutive identical elements.
     /// This version uses the given binary predicate pred
     ///
-    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
-    ///                     (last - first) - 1 application of the predicate
+    /// \note   Complexity: Exactly the smaller of (\a result - \a first) + 1 and
+    ///                     (\a last - \a first) - 1 application of the predicate
     ///                     where \a result is the value returned
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
@@ -98,11 +99,11 @@ namespace hpx {
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<InIter>
+    /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<FwdIter>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a InIter otherwise.
+    ///           returns \a FwdIter otherwise.
     ///           The \a adjacent_find algorithm returns an iterator to the
     ///           first of the identical elements. If no such elements are
     ///           found, \a last is returned.
@@ -112,9 +113,8 @@ namespace hpx {
     ///           predicate \a pred.
     ///
     template <typename ExPolicy, typename FwdIter,
-        typename Pred = detail::equal_to>
-    typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type>::type
+        typename Pred = hpx::parallel::v1::detail::equal_to>
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
     adjacent_find(
         ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred = Pred());
 }    // namespace hpx

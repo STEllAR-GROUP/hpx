@@ -88,8 +88,7 @@ namespace hpx {
     ///           first + (last - new_first).
     ///
     template <typename ExPolicy, typename FwdIter>
-    typename parallel::util::detail::algorithm_result
-        <ExPolicy, FwdIter>::type
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
     rotate(ExPolicy&& policy, FwdIter first, FwdIter new_first, FwdIter last);
 
     /// Copies the elements from the range [first, last), to another range

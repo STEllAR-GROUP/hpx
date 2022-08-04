@@ -441,18 +441,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///                     random access iterator.
     /// \tparam FwdIter1    The type of the iterator representing the
     ///                     destination key range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam FwdIter2    The type of the iterator representing the
     ///                     destination value range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Compare     The type of the optional function/function object to use
     ///                     to compare keys (deduced).
     ///                     Assumed to be std::equal_to otherwise.
     /// \tparam Func        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a copy_if requires \a F to meet the
+    ///                     overload of \a reduce_by_key requires \a Func to meet the
     ///                     requirements of \a CopyConstructible.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -507,7 +507,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a pair<Iter1,Iter2>
     ///           otherwise.
-    //-----------------------------------------------------------------------------
+    ///
     template <typename ExPolicy, typename RanIter, typename RanIter2,
         typename FwdIter1, typename FwdIter2,
         typename Compare =

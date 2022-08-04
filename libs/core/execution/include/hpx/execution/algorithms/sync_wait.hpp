@@ -46,6 +46,18 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
+    template <typename Pack>
+    struct make_decayed_pack;
+
+    template <template <typename...> typename Pack, typename... Ts>
+    struct make_decayed_pack<Pack<Ts...>>
+    {
+        using type = Pack<std::decay_t<Ts>...>;
+    };
+
+    template <typename Pack>
+    using make_decayed_pack_t = typename make_decayed_pack<Pack>::type;
+
     template <typename Sender>
     struct sync_wait_receiver
     {
@@ -60,13 +72,19 @@ namespace hpx::execution::experimental::detail {
             error_types_of_t<Sender, empty_env, Variant>;
 
         // forcing static_assert ensuring variant has exactly one tuple
-        using is_single = typename single_variant<
-            predecessor_value_types<meta::pack, meta::pack>>::type;
+        //
+        // FIXME: using make_decayed_pack is a workaround for the impedence
+        // mismatch between the different techniques we use for calculating
+        // value_types for a sender. In particular, split() explicitly adds a
+        // const& to all tuple members in a way that prevent simply passing
+        // decayed_tuple to predecessor_value_types.
+        using single_result_type = make_decayed_pack_t<
+            single_variant_t<predecessor_value_types<hpx::tuple, meta::pack>>>;
 
         // The template should compute the result type of whatever returned from
         // sync_wait, which should be optional of the variant of the tuples. The
         // sync_wait works when the variant has one tuple.
-        using result_type = predecessor_value_types<hpx::tuple, hpx::variant>;
+        using result_type = hpx::variant<single_result_type>;
 
         // The type of errors to store in the variant. This in itself is a
         // variant.
@@ -103,8 +121,8 @@ namespace hpx::execution::experimental::detail {
                 if (hpx::holds_alternative<result_type>(value))
                 {
                     // pull the tuple out of the variant and wrap it into an
-                    // optional
-                    return hpx::make_optional(
+                    // optional, make sure to remove the references
+                    return hpx::optional<single_result_type>(
                         hpx::get<0>(hpx::get<result_type>(HPX_MOVE(value))));
                 }
                 else if (hpx::holds_alternative<error_type>(value))
@@ -115,8 +133,7 @@ namespace hpx::execution::experimental::detail {
 
                 // If the variant holds a hpx::monostate set_stopped was called
                 // we return an empty optional
-                return hpx::optional<
-                    typename single_variant<result_type>::type>();
+                return hpx::optional<single_result_type>();
             }
         };
 

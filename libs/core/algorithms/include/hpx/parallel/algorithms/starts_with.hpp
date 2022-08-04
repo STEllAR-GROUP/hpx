@@ -12,7 +12,7 @@
 
 #if defined(DOXYGEN)
 
-namespace hpx{
+namespace hpx {
     // clang-format off
 
     /// Checks whether the second range defined by [first1, last1) matches the
@@ -143,7 +143,7 @@ namespace hpx{
     // clang-format on
 }    // namespace hpx
 
-#else // DOXYGEN
+#else    // DOXYGEN
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
