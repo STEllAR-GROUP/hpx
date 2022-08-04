@@ -18,85 +18,12 @@ namespace hpx {
     /// past-the-end iterator for the new logical end of the range.
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
-    ///         assignments.
-    ///
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    ///
-    /// The assignments in the parallel \a unique algorithm invoked without
-    /// an execution policy object execute in sequential order in the
-    /// calling thread.
-    ///
-    /// \returns  The \a unique algorithm returns \a FwdIter.
-    ///           The \a unique algorithm returns the iterator to the new end
-    ///           of the range.
-    ///
-    template <typename FwdIter>
-    FwdIter unique(FwdIter first, FwdIter last);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Eliminates all but the first element from every consecutive group of
-    /// equivalent elements from the range [first, last) and returns a
-    /// past-the-end iterator for the new logical end of the range.
-    ///
-    /// \note   Complexity: Performs not more than \a last - \a first
-    ///         assignments.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    ///
-    /// The assignments in the parallel \a unique algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a unique algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a unique algorithm returns a \a hpx::future<FwdIter>
-    ///           if the execution policy is of type
-    ///           \a sequenced_task_policy or \a parallel_task_policy and
-    ///           returns \a FwdIter otherwise.
-    ///           The \a unique algorithm returns the iterator to the new end
-    ///           of the range.
-    ///
-    template <typename ExPolicy, typename FwdIter>
-    typename parallel::util::detail::algorithm_result<ExPolicy,
-        FwdIter>::type
-     unique(ExPolicy&& policy, FwdIter first, FwdIter last);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Eliminates all but the first element from every consecutive group of
-    /// equivalent elements from the range [first, last) and returns a
-    /// past-the-end iterator for the new logical end of the range.
-    ///
-    /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first - 1 applications of
     ///         the predicate \a pred and no more than twice as many
     ///         applications of the projection \a proj.
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -104,7 +31,7 @@ namespace hpx {
     ///                     requirements of \a CopyConstructible. This defaults
     ///                     to std::equal_to<>
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a parallel::util::projection_identity.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -128,25 +55,23 @@ namespace hpx {
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a unique algorithm invoked without
-    /// an execution policy object execute in sequential order in the
-    /// calling thread.
+    ///                     \a pred is invoked.
     ///
     /// \returns  The \a unique algorithm returns \a FwdIter.
     ///           The \a unique algorithm returns the iterator to the new end
     ///           of the range.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Pred,
-        typename Proj>
-    FwdIter unique(FwdIter first, FwdIter last, Pred&& pred,
-        Proj&& proj);
+    template <typename FwdIter,
+        typename Pred = hpx::parallel::v1::detail::equal_to,
+        typename Proj = parallel::util::projection_identity>
+    FwdIter unique(FwdIter first, FwdIter last, Pred&& pred = Pred(),
+        Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Eliminates all but the first element from every consecutive group of
     /// equivalent elements from the range [first, last) and returns a
-    /// past-the-end iterator for the new logical end of the range.
+    /// past-the-end iterator for the new logical end of the range. Executed
+    /// according to the policy.
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first - 1 applications of
@@ -158,7 +83,7 @@ namespace hpx {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -166,7 +91,7 @@ namespace hpx {
     ///                     requirements of \a CopyConstructible. This defaults
     ///                     to std::equal_to<>
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a parallel::util::projection_identity.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -192,7 +117,7 @@ namespace hpx {
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
+    ///                     \a pred is invoked.
     ///
     /// The assignments in the parallel \a unique algorithm invoked with
     /// an execution policy object of type \a sequenced_policy
@@ -211,101 +136,13 @@ namespace hpx {
     ///           The \a unique algorithm returns the iterator to the new end
     ///           of the range.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Pred,
-        typename Proj>
+    template <typename ExPolicy, typename FwdIter,
+        typename Pred = hpx::parallel::v1::detail::equal_to,
+        typename Proj = parallel::util::projection_identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         FwdIter>::type
-     unique(ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred,
-         Proj&& proj);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Copies the elements from the range [first, last),
-    /// to another range beginning at \a dest in such a way that
-    /// there are no consecutive equal elements. Only the first element of
-    /// each group of equal elements is copied.
-    ///
-    /// \note   Complexity: Performs not more than \a last - \a first
-    ///         assignments.
-    ///
-    /// \tparam InIter      The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam OutIter     The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     output iterator.
-    ///
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    ///
-    /// The assignments in the parallel \a unique_copy algorithm invoked
-    /// without an execution policy object  will execute in sequential
-    /// order in the calling thread.
-    ///
-    /// \returns  The \a unique_copy algorithm returns a
-    ///           returns OutIter.
-    ///           The \a unique_copy algorithm returns the destination
-    ///           iterator to the end of the \a dest range.
-    ///
-    template <typename InIter, typename OutIter>
-    OutIter unique_copy(InIter first, InIter last, OutIter dest);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Copies the elements from the range [first, last),
-    /// to another range beginning at \a dest in such a way that
-    /// there are no consecutive equal elements. Only the first element of
-    /// each group of equal elements is copied.
-    ///
-    /// \note   Complexity: Performs not more than \a last - \a first
-    ///         assignments.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param dest         Refers to the beginning of the destination range.
-    ///
-    /// The assignments in the parallel \a unique_copy algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a unique_copy algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a unique_copy algorithm returns a
-    ///           \a hpx::future<FwdIter2> if the execution policy
-    ///           is of type \a sequenced_task_policy or
-    ///           \a parallel_task_policy and
-    ///           returns \a FwdIter2 otherwise.
-    ///           The \a unique_copy algorithm returns the pair of
-    ///           the source iterator to \a last, and
-    ///           the destination iterator to the end of the \a dest range.
-    ///
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    typename parallel::util::detail::algorithm_result<ExPolicy,
-        FwdIter2>::type
-     unique_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-         FwdIter2 dest);
+    unique(ExPolicy&& policy, FwdIter first, FwdIter last,
+        Pred&& pred = Pred(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements from the range [first, last),
@@ -350,32 +187,29 @@ namespace hpx {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to \a Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a unique_copy algorithm invoked
-    /// without an execution policy object  will execute in sequential
-    /// order in the calling thread.
+    ///                     \a pred is invoked.
     ///
     /// \returns  The \a unique_copy algorithm returns a
-    ///           returns OutIter.
+    ///           returns \a OutIter.
     ///           The \a unique_copy algorithm returns the destination
     ///           iterator to the end of the \a dest range.
     ///
-    template <typename InIter, typename OutIter, typename Pred,
-        typename Proj>
+    template <typename InIter, typename OutIter,
+        typename Pred = hpx::parallel::v1::detail::equal_to,
+        typename Proj = parallel::util::projection_identity>
     OutIter unique_copy(InIter first, InIter last, OutIter dest,
-        Pred&& pred, Proj&& proj);
+        Pred&& pred = Pred(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements from the range [first, last),
     /// to another range beginning at \a dest in such a way that
     /// there are no consecutive equal elements. Only the first element of
-    /// each group of equal elements is copied.
+    /// each group of equal elements is copied. Executed according to the policy.
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first - 1 applications of
@@ -387,11 +221,11 @@ namespace hpx {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam FwdIter2    The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -399,7 +233,7 @@ namespace hpx {
     ///                     requirements of \a CopyConstructible. This defaults
     ///                     to std::equal_to<>
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a parallel::util::projection_identity.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -425,7 +259,7 @@ namespace hpx {
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
+    ///                     \a pred is invoked.
     ///
     /// The assignments in the parallel \a unique_copy algorithm invoked with
     /// an execution policy object of type \a sequenced_policy
@@ -447,11 +281,12 @@ namespace hpx {
     ///           the destination iterator to the end of the \a dest range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred, typename Proj>
+        typename Pred = hpx::parallel::v1::detail::equal_to,
+        typename Proj = parallel::util::projection_identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         FwdIter2>::type
      unique_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-         FwdIter2 dest, Pred&& pred, Proj&& proj);
+         FwdIter2 dest, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     // clang-format on
 }    // namespace hpx
