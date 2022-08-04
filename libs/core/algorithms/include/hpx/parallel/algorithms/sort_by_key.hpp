@@ -56,8 +56,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// if for every iterator i pointing to the sequence and
     /// every non-negative integer n such that i + n is a valid iterator
     /// pointing to an element of the sequence, and
-    /// FIXME(bhumit,hkaiser): proj doesn't exist
-    /// INVOKE(comp, INVOKE(proj, *(i + n)), INVOKE(proj, *i)) == false.
+    /// INVOKE(comp, *(i + n), *i) == false.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
