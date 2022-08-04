@@ -103,7 +103,7 @@ namespace hpx {
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter3>::type
     set_union(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred&& op = Pred());
-    
+
     /// Constructs a sorted range beginning at dest consisting of all elements
     /// present in one or both sorted ranges [first1, last1) and
     /// [first2, last2). This algorithm expects both input ranges to be sorted

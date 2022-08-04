@@ -28,7 +28,7 @@ namespace hpx{
     ///                     (deduced). This iterator type must meet the
     ///                     requirements of an input iterator.
     /// \tparam Pred        The binary predicate that compares the projected
-    ///                     elements. This defaults to 
+    ///                     elements. This defaults to
     ///                     \a hpx::parallel::v1::detail::equal_to.
     /// \tparam Proj1       The type of an optional projection function for
     ///                     the source range. This defaults to
@@ -90,7 +90,7 @@ namespace hpx{
     ///                     (deduced). This iterator type must meet the
     ///                     requirements of an input iterator.
     /// \tparam Pred        The binary predicate that compares the projected
-    ///                     elements. This defaults to 
+    ///                     elements. This defaults to
     ///                     \a hpx::parallel::v1::detail::equal_to.
     /// \tparam Proj1       The type of an optional projection function for
     ///                     the source range. This defaults to
