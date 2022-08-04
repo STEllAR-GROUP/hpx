@@ -408,9 +408,9 @@ void test_seq_policy()
             hpx::execution::seq, "seq");
 
         static_assert(
-            !std::is_same<std::decay_t<decltype(policy.executor())>,
-                std::decay_t<decltype(hpx::execution::seq.executor())>>::value,
-            "sequenced_executor should be wrapped in annotating_executor");
+            std::is_same_v<std::decay_t<decltype(policy.executor())>,
+                std::decay_t<decltype(hpx::execution::seq.executor())>>,
+            "sequenced_executor should not be wrapped in annotating_executor");
     }
 
     {
@@ -419,9 +419,9 @@ void test_seq_policy()
             std::move(original_policy), "seq");
 
         static_assert(
-            !std::is_same<std::decay_t<decltype(policy.executor())>,
-                std::decay_t<decltype(hpx::execution::seq.executor())>>::value,
-            "sequenced_executor should be wrapped in annotating_executor");
+            std::is_same_v<std::decay_t<decltype(policy.executor())>,
+                std::decay_t<decltype(hpx::execution::seq.executor())>>,
+            "sequenced_executor should be not wrapped in annotating_executor");
     }
 }
 
@@ -456,7 +456,8 @@ struct test_async_executor
     using execution_category = hpx::execution::parallel_execution_tag;
 
     template <typename F, typename... Ts>
-    static auto async_execute(F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::async_execute_t,
+        test_async_executor const&, F&& f, Ts&&... ts)
     {
         return hpx::async(std::forward<F>(f), std::forward<Ts>(ts)...);
     }

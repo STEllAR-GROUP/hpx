@@ -66,7 +66,7 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             ///////////////////////////////////////////////////////////////////
-            // Executor directly supports property
+            // Parameters directly supports property
             // clang-format off
             template <typename Executor, typename Parameters,
                 HPX_CONCEPT_REQUIRES_(

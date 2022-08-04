@@ -10,7 +10,9 @@
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/type_support/detected.hpp>
 
 #include <cstddef>
@@ -180,10 +182,22 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Executor, typename T, typename... Ts>
         struct executor_future<Executor, T, hpx::util::pack<Ts...>,
             std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor> &&
+                has_async_execute_member<Executor>::value &&
                 !exposes_future_type<Executor, T>::value>>
         {
             using type = decltype(std::declval<Executor&&>().async_execute(
                 std::declval<T (*)(Ts...)>(), std::declval<Ts>()...));
+        };
+
+        template <typename Executor, typename T, typename... Ts>
+        struct executor_future<Executor, T, hpx::util::pack<Ts...>,
+            std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor> &&
+                !has_async_execute_member<Executor>::value &&
+                !exposes_future_type<Executor, T>::value>>
+        {
+            using type = hpx::functional::tag_invoke_result_t<
+                hpx::parallel::execution::async_execute_t, Executor,
+                T (*)(Ts...), Ts...>;
         };
 
         template <typename Executor, typename T, typename Ts>

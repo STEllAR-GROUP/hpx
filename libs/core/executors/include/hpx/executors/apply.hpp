@@ -32,7 +32,8 @@ namespace hpx { namespace detail {
         call(F&& f, Ts&&... ts)
         {
             execution::parallel_executor exec;
-            exec.post(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            hpx::parallel::execution::post(
+                exec, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             return false;
         }
     };

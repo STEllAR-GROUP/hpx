@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,8 +32,11 @@ namespace executor_example {
         using executor_parameters_type =
             typename BaseExecutor::executor_parameters_type;
 
-        explicit disable_thread_stealing_executor(BaseExecutor& exec)
-          : BaseExecutor(exec)
+        template <typename Executor,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Executor>, disable_thread_stealing_executor>>>
+        explicit disable_thread_stealing_executor(Executor&& exec)
+          : BaseExecutor(std::forward<Executor>(exec))
         {
         }
 
@@ -64,10 +67,10 @@ namespace executor_example {
     };
 
     template <typename BaseExecutor>
-    disable_thread_stealing_executor<BaseExecutor>
-    make_disable_thread_stealing_executor(BaseExecutor& exec)
+    auto make_disable_thread_stealing_executor(BaseExecutor&& exec)
     {
-        return disable_thread_stealing_executor<BaseExecutor>(exec);
+        return disable_thread_stealing_executor<std::decay_t<BaseExecutor>>(
+            std::forward<BaseExecutor>(exec));
     }
 }    // namespace executor_example
 
@@ -78,36 +81,35 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename BaseExecutor>
     struct is_one_way_executor<
         executor_example::disable_thread_stealing_executor<BaseExecutor>>
-      : is_one_way_executor<typename std::decay<BaseExecutor>::type>
+      : is_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
     template <typename BaseExecutor>
     struct is_never_blocking_one_way_executor<
         executor_example::disable_thread_stealing_executor<BaseExecutor>>
-      : is_never_blocking_one_way_executor<
-            typename std::decay<BaseExecutor>::type>
+      : is_never_blocking_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
     template <typename BaseExecutor>
     struct is_two_way_executor<
         executor_example::disable_thread_stealing_executor<BaseExecutor>>
-      : is_two_way_executor<typename std::decay<BaseExecutor>::type>
+      : is_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
     template <typename BaseExecutor>
     struct is_bulk_one_way_executor<
         executor_example::disable_thread_stealing_executor<BaseExecutor>>
-      : is_bulk_one_way_executor<typename std::decay<BaseExecutor>::type>
+      : is_bulk_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
     template <typename BaseExecutor>
     struct is_bulk_two_way_executor<
         executor_example::disable_thread_stealing_executor<BaseExecutor>>
-      : is_bulk_two_way_executor<typename std::decay<BaseExecutor>::type>
+      : is_bulk_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 }}}    // namespace hpx::parallel::execution

@@ -15,6 +15,8 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/futures_factory.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/threading_base/scoped_annotation.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -75,33 +77,44 @@ namespace hpx { namespace detail {
 
             if (policy == launch::sync)
             {
+                auto ann = hpx::scoped_annotation(desc.get_description());
                 return detail::call_sync(
                     HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
+            if (policy == launch::deferred)
+            {
+                lcos::local::futures_factory<result_type()> p(
+                    util::deferred_call(
+                        hpx::annotated_function(
+                            HPX_FORWARD(F, f), desc.get_description()),
+                        HPX_FORWARD(Ts, ts)...));
+                return p.get_future();
+            }
+
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
-            if (hpx::detail::has_async_policy(policy))
-            {
-                threads::thread_id_ref_type tid =
-                    p.apply(pool, desc.get_description(), policy);
-                if (tid)
-                {
-                    if (policy == launch::fork)
-                    {
-                        // make sure this thread is executed last
-                        // yield_to
-                        hpx::this_thread::suspend(
-                            threads::thread_schedule_state::pending,
-                            tid.noref(), desc.get_description());
-                    }
+            HPX_ASSERT(hpx::detail::has_async_policy(policy));
 
-                    auto&& result = p.get_future();
-                    traits::detail::get_shared_state(result)->set_on_completed(
-                        [tid = HPX_MOVE(tid)]() { (void) tid; });
-                    return HPX_MOVE(result);
+            threads::thread_id_ref_type tid =
+                p.apply(pool, desc.get_description(), policy);
+            if (tid)
+            {
+                if (policy == launch::fork)
+                {
+                    // make sure this thread is executed last
+                    // yield_to
+                    hpx::this_thread::suspend(
+                        threads::thread_schedule_state::pending, tid.noref(),
+                        desc.get_description());
                 }
+
+                auto&& result = p.get_future();
+                traits::detail::get_shared_state(result)->set_on_completed(
+                    [tid = HPX_MOVE(tid)]() { (void) tid; });
+                return HPX_MOVE(result);
             }
+
             return p.get_future();
         }
 

@@ -11,7 +11,7 @@
 
 #include <hpx/modules/program_options.hpp>
 
-#include <boost/spirit/include/phoenix.hpp>
+#include <boost/phoenix.hpp>
 #include <boost/spirit/include/qi_action.hpp>
 #include <boost/spirit/include/qi_auxiliary.hpp>
 #include <boost/spirit/include/qi_char.hpp>

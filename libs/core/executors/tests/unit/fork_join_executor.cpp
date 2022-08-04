@@ -155,20 +155,10 @@ void static_check_executor()
 {
     using namespace hpx::traits;
 
-    static_assert(!has_sync_execute_member<fork_join_executor>::value,
-        "!has_sync_execute_member<fork_join_executor>::value");
-    static_assert(!has_async_execute_member<fork_join_executor>::value,
-        "!has_async_execute_member<fork_join_executor>::value");
-    static_assert(!has_then_execute_member<fork_join_executor>::value,
-        "!has_then_execute_member<fork_join_executor>::value");
-    static_assert(has_bulk_sync_execute_member<fork_join_executor>::value,
-        "has_bulk_sync_execute_member<fork_join_executor>::value");
-    static_assert(has_bulk_async_execute_member<fork_join_executor>::value,
-        "has_bulk_async_execute_member<fork_join_executor>::value");
-    static_assert(!has_bulk_then_execute_member<fork_join_executor>::value,
-        "!has_bulk_then_execute_member<fork_join_executor>::value");
-    static_assert(!has_post_member<fork_join_executor>::value,
-        "!has_post_member<fork_join_executor>::value");
+    static_assert(is_bulk_one_way_executor_v<fork_join_executor>,
+        "is_bulk_one_way_executor_v<fork_join_executor>");
+    static_assert(is_bulk_two_way_executor_v<fork_join_executor>,
+        "is_bulk_two_way_executor_v<fork_join_executor>");
 }
 
 template <typename... ExecutorArgs>

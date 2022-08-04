@@ -95,6 +95,9 @@ namespace hpx::execution::experimental {
 
             template <typename... Ts, std::size_t... Is>
             auto set_value_helper(hpx::util::index_pack<Is...>, Ts&&... ts)
+            // MSVC sometimes invalidly rejects valid invocations
+            // clang-format off
+#if !defined(HPX_MSVC)
                 -> decltype(
                     (std::declval<
                          typename OperationState::value_types_storage_type>()
@@ -103,6 +106,8 @@ namespace hpx::execution::experimental {
                             .emplace(HPX_FORWARD(Ts, ts)),
                         ...),
                     void())
+#endif
+            // clang-format on
             {
                 // op_state.ts holds values from all predecessor senders. We
                 // emplace the values using the offset calculated while

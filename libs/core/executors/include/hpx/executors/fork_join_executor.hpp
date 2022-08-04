@@ -594,21 +594,36 @@ namespace hpx { namespace execution { namespace experimental {
     private:
         std::shared_ptr<shared_data> shared_data_ = nullptr;
 
+    private:
+        // clang-format off
+        template <typename F, typename S, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<S>
+            )>
+        // clang-format on
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::bulk_sync_execute_t,
+            fork_join_executor const& exec, F&& f, S const& shape, Ts&&... ts)
+        {
+            exec.shared_data_->bulk_sync_execute(
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+        }
+
+        // clang-format off
+        template <typename F, typename S, typename... Ts,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<S>
+            )>
+        // clang-format on
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::bulk_async_execute_t,
+            fork_join_executor const& exec, F&& f, S const& shape, Ts&&... ts)
+        {
+            return exec.shared_data_->bulk_async_execute(
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+        }
+
     public:
-        template <typename F, typename S, typename... Ts>
-        void bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
-        {
-            shared_data_->bulk_sync_execute(
-                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
-        }
-
-        template <typename F, typename S, typename... Ts>
-        decltype(auto) bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
-        {
-            return shared_data_->bulk_async_execute(
-                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
-        }
-
         bool operator==(fork_join_executor const& rhs) const noexcept
         {
             return *shared_data_ == *rhs.shared_data_;

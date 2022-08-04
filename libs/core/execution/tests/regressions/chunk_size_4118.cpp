@@ -19,15 +19,16 @@
 struct test_async_executor : hpx::execution::parallel_executor
 {
     template <typename F, typename T, typename... Ts>
-    hpx::future<
-        typename hpx::util::invoke_result<F, T, std::size_t, Ts...>::type>
-    async_execute(F&& f, T&& t, std::size_t chunk_size, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::async_execute_t,
+        test_async_executor const& exec, F&& f, T&& t, std::size_t chunk_size,
+        Ts&&... ts)
     {
         // make sure the chunk_size is equal to what was specified below
         HPX_TEST_EQ(chunk_size, std::size_t(50000));
 
         using base_type = hpx::execution::parallel_executor;
-        return this->base_type::async_execute(std::forward<F>(f),
+        return hpx::parallel::execution::async_execute(
+            static_cast<base_type const&>(exec), std::forward<F>(f),
             std::forward<T>(t), chunk_size, std::forward<Ts>(ts)...);
     }
 };

@@ -84,12 +84,6 @@ const char* exec_name(hpx::execution::parallel_executor const&)
     return "parallel_executor";
 }
 
-const char* exec_name(
-    hpx::parallel::execution::parallel_executor_aggregated const&)
-{
-    return "parallel_executor_aggregated";
-}
-
 const char* exec_name(hpx::execution::experimental::scheduler_executor<
     hpx::execution::experimental::thread_pool_scheduler> const&)
 {
@@ -511,7 +505,6 @@ int hpx_main(variables_map& vm)
             throw std::logic_error("error: count of 0 futures specified\n");
 
         hpx::execution::parallel_executor par;
-        hpx::parallel::execution::parallel_executor_aggregated par_agg;
         hpx::execution::parallel_executor par_nostack(
             hpx::threads::thread_priority::default_,
             hpx::threads::thread_stacksize::nostack);
@@ -534,7 +527,6 @@ int hpx_main(variables_map& vm)
                 measure_function_futures_wait_all(count, csv, par);
                 measure_function_futures_sliding_semaphore(count, csv, par);
                 measure_function_futures_for_loop(count, csv, par);
-                measure_function_futures_for_loop(count, csv, par_agg);
                 measure_function_futures_for_loop(count, csv, sched_exec_tps);
                 measure_function_futures_for_loop(
                     count, csv, par_nostack, "parallel_executor_nostack");

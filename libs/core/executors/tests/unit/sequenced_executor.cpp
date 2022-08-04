@@ -148,21 +148,57 @@ void static_check_executor()
     using namespace hpx::traits;
     using executor = hpx::execution::sequenced_executor;
 
-    static_assert(has_sync_execute_member<executor>::value,
-        "has_sync_execute_member<executor>::value");
-    static_assert(has_async_execute_member<executor>::value,
-        "has_async_execute_member<executor>::value");
-    static_assert(!has_then_execute_member<executor>::value,
-        "!has_then_execute_member<executor>::value");
-    static_assert(has_bulk_sync_execute_member<executor>::value,
-        "has_bulk_sync_execute_member<executor>::value");
-    static_assert(has_bulk_async_execute_member<executor>::value,
-        "has_bulk_async_execute_member<executor>::value");
-    static_assert(!has_bulk_then_execute_member<executor>::value,
-        "!has_bulk_then_execute_member<executor>::value");
-    static_assert(has_post_member<executor>::value,
-        "check has_post_member<executor>::value");
+    static_assert(
+        is_one_way_executor_v<executor>, "is_one_way_executor_v<executor>");
+    static_assert(is_bulk_one_way_executor_v<executor>,
+        "is_bulk_one_way_executor_v<executor>");
+    static_assert(is_never_blocking_one_way_executor_v<executor>,
+        "is_never_blocking_one_way_executor_v<executor>");
+    static_assert(
+        is_two_way_executor_v<executor>, "is_two_way_executor_v<executor>");
+    static_assert(is_bulk_two_way_executor_v<executor>,
+        "is_bulk_two_way_executor_v<executor>");
 }
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+std::string get_annotation()
+{
+    return hpx::threads::get_thread_description(hpx::threads::get_self_id())
+        .get_description();
+}
+
+void test_annotation()
+{
+    using executor = hpx::execution::sequenced_executor;
+
+    executor exec;
+
+    std::string desc("test_sync");
+    {
+        auto newexec = hpx::experimental::prefer(
+            hpx::execution::experimental::with_annotation, exec, desc);
+
+        auto newdesc =
+            hpx::parallel::execution::sync_execute(newexec, &get_annotation);
+        HPX_TEST_EQ(newdesc, desc);
+
+        HPX_TEST_EQ(newdesc,
+            std::string(hpx::execution::experimental::get_annotation(newexec)));
+    }
+
+    {
+        auto newexec =
+            hpx::execution::experimental::with_annotation(exec, desc);
+
+        auto newdesc =
+            hpx::parallel::execution::sync_execute(newexec, &get_annotation);
+        HPX_TEST_EQ(newdesc, desc);
+
+        HPX_TEST_EQ(newdesc,
+            std::string(hpx::execution::experimental::get_annotation(newexec)));
+    }
+}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
@@ -176,6 +212,10 @@ int hpx_main()
     test_bulk_sync();
     test_bulk_async();
     test_bulk_then();
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+    test_annotation();
+#endif
 
     return hpx::local::finalize();
 }
