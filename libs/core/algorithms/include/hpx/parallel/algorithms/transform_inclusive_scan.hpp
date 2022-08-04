@@ -20,7 +20,7 @@ namespace hpx {
     /// conv(*(first + (i - result)))).
     ///
     /// \note   Complexity: O(last - first) applications of each of
-    ///                     \a binary_op and \a unary_op. 
+    ///                     \a binary_op and \a unary_op.
     ///
     /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -39,7 +39,7 @@ namespace hpx {
     /// \param dest         Refers to the beginning of the destination range.
     /// \param binary_op    Binary \a FunctionObject that will be applied in to
     ///                     the result of \a unary_op, the results of other
-    ///                     \a binary_op, and \a init if provided. 
+    ///                     \a binary_op, and \a init if provided.
     /// \param unary_op     Unary \a FunctionObject that will be applied to each
     ///                     element of the input range. The return type must
     ///                     be acceptable as input to \a binary_op.
@@ -79,7 +79,7 @@ namespace hpx {
     /// conv(*(first + (i - result)))). Executed according to the policy.
     ///
     /// \note   Complexity: O(last - first) applications of each of
-    ///                     \a binary_op and \a unary_op. 
+    ///                     \a binary_op and \a unary_op.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -104,10 +104,10 @@ namespace hpx {
     /// \param dest         Refers to the beginning of the destination range.
     /// \param binary_op    Binary \a FunctionObject that will be applied in to
     ///                     the result of \a unary_op, the results of other
-    ///                     \a binary_op, and \a init if provided. 
+    ///                     \a binary_op, and \a init if provided.
     /// \param unnary_op    Unary \a FunctionObject that will be applied to
     ///                     each element of the input range. The return type
-    ///                     must be acceptable as input to \a binary_op. 
+    ///                     must be acceptable as input to \a binary_op.
     ///
     /// The reduce operations in the parallel \a transform_inclusive_scan
     /// algorithm invoked with an execution policy object of type \a
@@ -156,7 +156,7 @@ namespace hpx {
     /// conv(*(first + (i - result)))).
     ///
     /// \note   Complexity: O(last - first) applications of each of
-    ///                     \a binary_op and \a unary_op. 
+    ///                     \a binary_op and \a unary_op.
     ///
     /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -177,10 +177,10 @@ namespace hpx {
     /// \param dest         Refers to the beginning of the destination range.
     /// \param binary_op    Binary \a FunctionObject that will be applied in to
     ///                     the result of \a unary_op, the results of other
-    ///                     \a binary_op, and \a init if provided. 
+    ///                     \a binary_op, and \a init if provided.
     /// \param unnary_op    Unary \a FunctionObject that will be applied to
     ///                     each element of the input range. The return type
-    ///                     must be acceptable as input to \a binary_op. 
+    ///                     must be acceptable as input to \a binary_op.
     /// \param init         The initial value for the generalized sum.
     ///
     /// The reduce operations in the parallel \a transform_inclusive_scan
@@ -220,7 +220,7 @@ namespace hpx {
     /// conv(*(first + (i - result)))). Executed according to the policy.
     ///
     /// \note   Complexity: O(last - first) applications of each of
-    ///                     \a binary_op and \a unary_op. 
+    ///                     \a binary_op and \a unary_op.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -247,10 +247,10 @@ namespace hpx {
     /// \param dest         Refers to the beginning of the destination range.
     /// \param binary_op    Binary \a FunctionObject that will be applied in to
     ///                     the result of \a unary_op, the results of other
-    ///                     \a binary_op, and \a init if provided. 
+    ///                     \a binary_op, and \a init if provided.
     /// \param unnary_op    Unary \a FunctionObject that will be applied to
     ///                     each element of the input range. The return type
-    ///                     must be acceptable as input to \a binary_op. 
+    ///                     must be acceptable as input to \a binary_op.
     /// \param init         The initial value for the generalized sum.
     ///
     /// The reduce operations in the parallel \a transform_inclusive_scan

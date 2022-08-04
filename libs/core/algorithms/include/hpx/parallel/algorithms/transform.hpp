@@ -128,9 +128,8 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename F>
-    parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
-    transform(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-        FwdIter2 dest, F&& f);
+    parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2> transform(
+        ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest, F&& f);
 
     /// Applies the given function \a f to pairs of elements from two ranges:
     /// one defined by [first1, last1) and the other beginning at first2, and
@@ -189,8 +188,8 @@ namespace hpx {
     ///
     template <typename FwdIter1, typename FwdIter2, typename FwdIter3,
         typename F>
-    FwdIter3 transform(FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
-        FwdIter3 dest, F&& f);
+    FwdIter3 transform(
+        FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter3 dest, F&& f);
 
     /// Applies the given function \a f to pairs of elements from two ranges:
     /// one defined by [first1, last1) and the other beginning at first2, and
@@ -268,9 +267,9 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename F>
-    parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter3>
-    transform(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-        FwdIter2 first2, FwdIter3 dest, F&& f);
+    parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter3> transform(
+        ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+        FwdIter3 dest, F&& f);
 
 }    // namespace hpx
 

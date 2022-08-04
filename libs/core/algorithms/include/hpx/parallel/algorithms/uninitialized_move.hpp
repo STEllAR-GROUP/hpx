@@ -122,11 +122,11 @@ namespace hpx {
     ///           first element is an iterator to the element past the last
     ///           element moved in the source range, and whose second element
     ///           is an iterator to the element past the last element moved
-    ///           in the destination range. 
+    ///           in the destination range.
     ///
     template <typename InIter, typename Size, typename FwdIter>
-    std::pair<InIter, FwdIter> uninitialized_move_n(InIter first, Size count,
-        FwdIter dest);
+    std::pair<InIter, FwdIter> uninitialized_move_n(
+        InIter first, Size count, FwdIter dest);
 
     /// Moves the elements in the range [first, first + count), starting from
     /// first and proceeding to first + count - 1., to another range beginning
@@ -182,12 +182,12 @@ namespace hpx {
     ///           first element is an iterator to the element past the last
     ///           element moved in the source range, and whose second element
     ///           is an iterator to the element past the last element moved
-    ///           in the destination range. 
+    ///           in the destination range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Size,
         typename FwdIter2>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>>::type
+        std::pair<FwdIter1, FwdIter2>>::type
     uninitialized_move_n(
         ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
 }    // namespace hpx

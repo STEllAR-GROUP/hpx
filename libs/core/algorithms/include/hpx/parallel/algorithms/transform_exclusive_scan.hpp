@@ -27,7 +27,7 @@ namespace hpx {
     /// noncommutative sum GNSUM(op, a1, ..., a N) is defined as follows:
     ///     - if N=1, a1
     ///     - if N > 1, op(GNSUM(op, a1, ..., aK), GNSUM(op, aM, ..., aN))
-    ///     for any K where 1 < K+1 = M ≤ N
+    ///     for any K where 1 < K+1 = M <= N
     /// In other words, the summation operations may be performed in arbitrary
     /// order, and the behavior is nondeterministic if \a binary_op is not
     /// associative.
@@ -55,7 +55,7 @@ namespace hpx {
     /// \param init         The initial value for the generalized sum.
     /// \param binary_op    Binary \a FunctionObject that will be applied to
     ///                     the result of \a unary_op, the results of other
-    ///                     \a binary_op, and \a init. 
+    ///                     \a binary_op, and \a init.
     /// \param unary_op     Unary \a FunctionObject that will be applied to each
     ///                     element of the input range. The return type must
     ///                     be acceptable as input to \a binary_op.
@@ -123,7 +123,7 @@ namespace hpx {
     /// \param init         The initial value for the generalized sum.
     /// \param binary_op    Binary \a FunctionObject that will be applied in to
     ///                     the result of \a unary_op, the results of other
-    ///                     \a binary_op, and \a init. 
+    ///                     \a binary_op, and \a init.
     /// \param unary_op    Unary \a FunctionObject that will be applied to each
     ///                     element of the input range. The return type must
     ///                     be acceptable as input to \a binary_op.
