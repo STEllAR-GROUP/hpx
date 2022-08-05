@@ -21,6 +21,7 @@
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/type_support/detail/with_result_of.hpp>
+#include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <atomic>
@@ -74,31 +75,15 @@ namespace hpx::execution::experimental {
             // clang-format off
             template <typename CPO,
                 HPX_CONCEPT_REQUIRES_(
-                    hpx::execution::experimental::detail::is_receiver_cpo_v<CPO> &&
-                    (std::is_same_v<CPO, hpx::execution::experimental::set_value_t> ||
-                        hpx::execution::experimental::detail::has_completion_scheduler_v<
-                                hpx::execution::experimental::set_error_t,
-                                std::decay_t<Sender>> ||
-                        hpx::execution::experimental::detail::has_completion_scheduler_v<
-                                hpx::execution::experimental::set_stopped_t,
-                                std::decay_t<Sender>>)
+                    meta::value<meta::one_of<
+                        std::decay_t<CPO>, set_value_t, set_stopped_t>>
                 )>
             // clang-format on
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
                 schedule_from_sender const& sender)
             {
-                if constexpr (std::is_same_v<std::decay_t<CPO>,
-                                  hpx::execution::experimental::set_value_t>)
-                {
-                    return sender.scheduler;
-                }
-                else
-                {
-                    return hpx::execution::experimental::
-                        get_completion_scheduler<CPO>(
-                            sender.predecessor_sender);
-                }
+                return sender.scheduler;
             }
 
             template <typename Receiver>
@@ -209,7 +194,8 @@ namespace hpx::execution::experimental {
                 {
                     ts.template emplace<hpx::tuple<Us...>>(
                         HPX_FORWARD(Us, us)...);
-#if defined(HPX_HAVE_CXX17_COPY_ELISION)
+#if defined(HPX_HAVE_CXX17_COPY_ELISION) &&                                    \
+    defined(HPX_HAVE_CXX17_OPTIONAL_COPY_ELISION)
                     // with_result_of is used to emplace the operation
                     // state returned from connect without any
                     // intermediate copy construction (the operation

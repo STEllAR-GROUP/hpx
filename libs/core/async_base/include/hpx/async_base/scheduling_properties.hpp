@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 
 namespace hpx { namespace execution { namespace experimental {
@@ -46,8 +47,16 @@ namespace hpx { namespace execution { namespace experimental {
     } with_priority{};
 
     inline constexpr struct get_priority_t final
-      : detail::property_base<get_priority_t>
+      : hpx::functional::detail::tag_fallback<get_priority_t>
     {
+    private:
+        // simply return default_ if get_priority is not supported
+        template <typename Target>
+        friend HPX_FORCEINLINE constexpr hpx::threads::thread_priority
+        tag_fallback_invoke(get_priority_t, Target&&) noexcept
+        {
+            return hpx::threads::thread_priority::default_;
+        }
     } get_priority{};
 
     inline constexpr struct with_stacksize_t final
@@ -56,8 +65,16 @@ namespace hpx { namespace execution { namespace experimental {
     } with_stacksize{};
 
     inline constexpr struct get_stacksize_t final
-      : detail::property_base<get_stacksize_t>
+      : hpx::functional::detail::tag_fallback<get_stacksize_t>
     {
+    private:
+        // simply return default_ if get_stacksize is not supported
+        template <typename Target>
+        friend HPX_FORCEINLINE constexpr hpx::threads::thread_stacksize
+        tag_fallback_invoke(get_stacksize_t, Target&&) noexcept
+        {
+            return hpx::threads::thread_stacksize::default_;
+        }
     } get_stacksize{};
 
     inline constexpr struct with_hint_t final
@@ -65,8 +82,17 @@ namespace hpx { namespace execution { namespace experimental {
     {
     } with_hint{};
 
-    inline constexpr struct get_hint_t final : detail::property_base<get_hint_t>
+    inline constexpr struct get_hint_t final
+      : hpx::functional::detail::tag_fallback<get_hint_t>
     {
+    private:
+        // simply return default constructed hint if get_hint is not supported
+        template <typename Target>
+        friend HPX_FORCEINLINE constexpr hpx::threads::thread_schedule_hint
+        tag_fallback_invoke(get_hint_t, Target&&) noexcept
+        {
+            return {};
+        }
     } get_hint{};
 
     inline constexpr struct with_annotation_t final
@@ -75,7 +101,15 @@ namespace hpx { namespace execution { namespace experimental {
     } with_annotation{};
 
     inline constexpr struct get_annotation_t final
-      : detail::property_base<get_annotation_t>
+      : hpx::functional::detail::tag_fallback<get_annotation_t>
     {
+    private:
+        // simply return nullptr if get_annotation is not supported
+        template <typename Target>
+        friend HPX_FORCEINLINE constexpr char const* tag_fallback_invoke(
+            get_annotation_t, Target&&) noexcept
+        {
+            return nullptr;
+        }
     } get_annotation{};
 }}}    // namespace hpx::execution::experimental

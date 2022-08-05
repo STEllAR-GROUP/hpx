@@ -1092,15 +1092,6 @@ namespace hpx { namespace parallel { namespace execution {
                     {
                         throw exceptions;
                     }
-                    catch (std::bad_alloc const& ba)
-                    {
-                        throw ba;
-                    }
-                    catch (...)
-                    {
-                        // note: constructor doesn't lock/suspend
-                        throw hpx::exception_list(std::current_exception());
-                    }
                 }
             }
 

@@ -167,11 +167,11 @@ namespace hpx { namespace execution {
             typename Enable = std::enable_if_t<
                 hpx::functional::is_tag_invocable_v<Tag, Policy, Property>>>
         friend parallel_policy_executor tag_invoke(
-            Tag, parallel_policy_executor const& exec, Property&& prop)
+            Tag tag, parallel_policy_executor const& exec, Property&& prop)
         {
             auto exec_with_prop = exec;
-            exec_with_prop.policy_ =
-                Tag{}(exec.policy_, HPX_FORWARD(Property, prop));
+            exec_with_prop.policy_ = hpx::functional::tag_invoke(
+                tag, exec.policy_, HPX_FORWARD(Property, prop));
             return exec_with_prop;
         }
 
@@ -179,9 +179,9 @@ namespace hpx { namespace execution {
             typename Enable = std::enable_if_t<
                 hpx::functional::is_tag_invocable_v<Tag, Policy>>>
         friend decltype(auto) tag_invoke(
-            Tag, parallel_policy_executor const& exec)
+            Tag tag, parallel_policy_executor const& exec)
         {
-            return Tag{}(exec.policy_);
+            return hpx::functional::tag_invoke(tag, exec.policy_);
         }
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
@@ -272,8 +272,9 @@ namespace hpx { namespace execution {
                     "parallel_policy_executor::sync_execute");
 #endif
             HPX_UNUSED(exec);
-            return hpx::detail::sync_launch_policy_dispatch<Policy>::call(
-                launch::sync, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            return hpx::detail::sync_launch_policy_dispatch<
+                launch::sync_policy>::call(exec.policy_, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // TwoWayExecutor interface

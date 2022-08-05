@@ -146,7 +146,12 @@ std::uint64_t averageout_parallel_forloop(
 
     // average out 100 executions to avoid varying results
     for (auto i = 0; i < test_count; i++)
-        measure_parallel_forloop(data_representation, exec);
+    {
+        auto ann_exec = hpx::experimental::prefer(
+            hpx::execution::experimental::with_annotation, exec,
+            "averageout_parallel_forloop_" + std::to_string(i));
+        measure_parallel_forloop(data_representation, ann_exec);
+    }
 
     return (hpx::chrono::high_resolution_clock::now() - start) / test_count;
 }
@@ -361,10 +366,40 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 seq_time_forloop = averageout_sequential_forloop(vector_size);
             }
         }
+        else if (vm["executor"].as<std::string>() == "sender")
+        {
+            hpx::execution::experimental::explicit_scheduler_executor<
+                hpx::execution::experimental::thread_pool_scheduler>
+                p;
+
+            auto par = hpx::execution::experimental::with_priority(
+                p, hpx::threads::thread_priority::bound);
+
+            if (enable_all || vm.count("parallel_foreach"))
+            {
+                par_time_foreach =
+                    averageout_parallel_foreach(vector_size, par);
+            }
+            if (enable_all || vm.count("sequential_foreach"))
+            {
+                seq_time_foreach = averageout_sequential_foreach(vector_size);
+            }
+
+            if (enable_all || vm.count("parallel_forloop"))
+            {
+                par_time_forloop =
+                    averageout_parallel_forloop(vector_size, par);
+            }
+            if (enable_all || vm.count("sequential_forloop"))
+            {
+                seq_time_forloop = averageout_sequential_forloop(vector_size);
+            }
+        }
         else
         {
             std::cerr << "unknown executor option (should be "
-                         "forkjoin, scheduler or parallel (default)\n"
+                         "forkjoin, scheduler, executor, sender, or parallel "
+                         "(default)\n"
                       << std::flush;
             hpx::local::finalize();
             return -1;
@@ -491,7 +526,7 @@ int main(int argc, char* argv[])
         ("csv_output", "print results in csv format")
         ("executor", value<std::string>()->default_value("parallel"),
             "use specified executor (possible values: "
-            "forkjoin, scheduler, or parallel (default)")
+            "forkjoin, scheduler, sender, or parallel (default)")
         ("disable_stealing", "disable thread stealing")
         ("fast_idle_mode", "enable fast idle mode")
 

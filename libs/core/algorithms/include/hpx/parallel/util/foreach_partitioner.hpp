@@ -38,7 +38,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util {
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Result, typename ExPolicy, typename FwdIter,
             typename F>
         auto foreach_partition(
@@ -157,10 +160,11 @@ namespace hpx { namespace parallel { namespace util {
                 if constexpr (ex::is_sender_v<std::decay_t<Items>> &&
                     !hpx::traits::is_future_v<std::decay_t<Items>>)
                 {
-                    auto proj = [f = HPX_FORWARD(F, f), last]() mutable {
-                        return HPX_INVOKE(f, HPX_MOVE(last));
-                    };
-                    return ex::then(HPX_FORWARD(Items, items), proj);
+                    return ex::then(HPX_FORWARD(Items, items),
+                        [f = HPX_FORWARD(F, f),
+                            last = HPX_MOVE(last)]() mutable {
+                            return HPX_INVOKE(f, HPX_MOVE(last));
+                        });
                 }
                 else
                 {

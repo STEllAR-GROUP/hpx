@@ -192,18 +192,19 @@ namespace hpx { namespace execution { namespace experimental {
             typename Enable = std::enable_if_t<hpx::functional::
                     is_tag_invocable_v<Tag, BaseExecutor, Property>>>
         friend annotating_executor tag_invoke(
-            Tag, annotating_executor const& exec, Property&& prop)
+            Tag tag, annotating_executor const& exec, Property&& prop)
         {
             return annotating_executor(hpx::functional::tag_invoke(
-                Tag{}, exec.exec_, HPX_FORWARD(Property, prop)));
+                tag, exec.exec_, HPX_FORWARD(Property, prop)));
         }
 
         template <typename Tag,
             typename Enable = std::enable_if_t<
                 hpx::functional::is_tag_invocable_v<Tag, BaseExecutor>>>
-        friend decltype(auto) tag_invoke(Tag, annotating_executor const& exec)
+        friend decltype(auto) tag_invoke(
+            Tag tag, annotating_executor const& exec)
         {
-            return hpx::functional::tag_invoke(Tag{}, exec.exec_);
+            return hpx::functional::tag_invoke(tag, exec.policy_);
         }
 
     private:
@@ -223,7 +224,7 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-#if !defined(DOXYGEN)   // doxygen gets confused by the deduction guides
+#if !defined(DOXYGEN)    // doxygen gets confused by the deduction guides
     template <typename BaseExecutor>
     explicit annotating_executor(BaseExecutor&& sched, std::string annotation)
         -> annotating_executor<std::decay_t<BaseExecutor>>;
@@ -307,6 +308,13 @@ namespace hpx { namespace parallel { namespace execution {
     struct is_bulk_two_way_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_bulk_two_way_executor<BaseExecutor>
+    {
+    };
+
+    template <typename BaseExecutor>
+    struct is_scheduler_executor<
+        hpx::execution::experimental::annotating_executor<BaseExecutor>>
+      : is_scheduler_executor<BaseExecutor>
     {
     };
     /// \endcond

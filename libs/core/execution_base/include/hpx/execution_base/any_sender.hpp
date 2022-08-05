@@ -34,7 +34,7 @@ namespace hpx::detail {
     template <typename T>
     using empty_vtable_t = typename empty_vtable_type<T>::type;
 
-#if defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
+#if !defined(HPX_MSVC) && defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
     template <typename T>
     inline constexpr empty_vtable_t<T> empty_vtable{};
 
@@ -287,9 +287,10 @@ namespace hpx::detail {
 }    // namespace hpx::detail
 
 namespace hpx::execution::experimental::detail {
-    struct any_operation_state_base
+    struct HPX_CORE_EXPORT any_operation_state_base
     {
         virtual ~any_operation_state_base() = default;
+
         virtual bool empty() const noexcept
         {
             return false;
@@ -675,7 +676,7 @@ namespace hpx::execution::experimental::detail {
 
 namespace hpx::execution::experimental {
 
-#if !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
+#if defined(HPX_MSVC) || !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
     namespace detail {
         // This helper only exists to make it possible to use
         // any_(unique_)sender in global variables or in general static
@@ -702,7 +703,7 @@ namespace hpx::execution::experimental {
 
     template <typename... Ts>
     class unique_any_sender
-#if !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
+#if defined(HPX_MSVC) || !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
       : private detail::any_sender_static_empty_vtable_helper<Ts...>
 #endif
     {
@@ -765,7 +766,7 @@ namespace hpx::execution::experimental {
 
     template <typename... Ts>
     class any_sender
-#if !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
+#if defined(HPX_MSVC) || !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
       : private detail::any_sender_static_empty_vtable_helper<Ts...>
 #endif
     {

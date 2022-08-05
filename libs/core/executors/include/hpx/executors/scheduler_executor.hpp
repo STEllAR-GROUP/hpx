@@ -112,18 +112,19 @@ namespace hpx::execution::experimental {
             typename Enable = std::enable_if_t<hpx::functional::
                     is_tag_invocable_v<Tag, BaseScheduler, Property>>>
         friend scheduler_executor tag_invoke(
-            Tag, scheduler_executor const& exec, Property&& prop)
+            Tag tag, scheduler_executor const& exec, Property&& prop)
         {
             return scheduler_executor(hpx::functional::tag_invoke(
-                Tag{}, exec.sched_, HPX_FORWARD(Property, prop)));
+                tag, exec.sched_, HPX_FORWARD(Property, prop)));
         }
 
         template <typename Tag,
             typename Enable = std::enable_if_t<
                 hpx::functional::is_tag_invocable_v<Tag, BaseScheduler>>>
-        friend decltype(auto) tag_invoke(Tag, scheduler_executor const& exec)
+        friend decltype(auto) tag_invoke(
+            Tag tag, scheduler_executor const& exec)
         {
-            return hpx::functional::tag_invoke(Tag{}, exec.sched_);
+            return hpx::functional::tag_invoke(tag, exec.sched_);
         }
 
         // Associate the parallel_execution_tag executor tag type as a default
@@ -150,11 +151,10 @@ namespace hpx::execution::experimental {
 
         // OneWayExecutor interface
         template <typename F, typename... Ts>
-        friend decltype(auto) tag_invoke(
-            hpx::parallel::execution::sync_execute_t,
+        friend auto tag_invoke(hpx::parallel::execution::sync_execute_t,
             scheduler_executor const& exec, F&& f, Ts&&... ts)
         {
-            return hpx::this_thread::experimental::sync_wait(
+            return *hpx::this_thread::experimental::sync_wait(
                 then(schedule(exec.sched_),
                     hpx::util::deferred_call(
                         HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));

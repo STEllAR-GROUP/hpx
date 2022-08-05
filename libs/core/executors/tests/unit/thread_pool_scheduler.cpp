@@ -330,6 +330,7 @@ void test_properties()
         // thread_pool_scheduler holds the property.
     }
 
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
     {
         char const* annotation = "<test>";
         auto exec_prop = ex::with_annotation(sched, annotation);
@@ -337,14 +338,10 @@ void test_properties()
             std::string(annotation));
 
         auto check = [annotation]() {
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             HPX_TEST_EQ(std::string(annotation),
                 hpx::threads::get_thread_description(
                     hpx::threads::get_self_id())
                     .get_description());
-#else
-            (void) annotation;
-#endif
         };
         executed = false;
         auto os = ex::connect(ex::schedule(exec_prop),
@@ -358,6 +355,7 @@ void test_properties()
 
         HPX_TEST(executed);
     }
+#endif
 }
 
 void test_transfer_basic()

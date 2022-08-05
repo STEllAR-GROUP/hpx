@@ -41,7 +41,7 @@ void test_for_each_explicit_sender_direct(
     auto result = hpx::for_each(policy.on(exec), iterator(std::begin(c)),
                       iterator(std::end(c)), f) |
         tt::sync_wait();
-    HPX_TEST(result == iterator(std::end(c)));
+    HPX_TEST(hpx::get<0>(*result) == iterator(std::end(c)));
 
     // verify values
     std::size_t count = 0;
@@ -72,7 +72,7 @@ void test_for_each_explicit_sender(Policy l, ExPolicy&& policy, IteratorTag)
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
     auto result = ex::just(iterator(std::begin(c)), iterator(std::end(c)), f) |
         hpx::for_each(policy.on(exec)) | tt::sync_wait();
-    HPX_TEST(result == iterator(std::end(c)));
+    HPX_TEST(hpx::get<0>(*result) == iterator(std::end(c)));
 
     // verify values
     std::size_t count = 0;

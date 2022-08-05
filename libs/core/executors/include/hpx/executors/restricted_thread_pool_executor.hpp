@@ -250,5 +250,11 @@ namespace hpx::parallel::execution {
             hpx::execution::parallel_policy_executor<Policy>>
     {
     };
+
+    template <typename Policy>
+    struct is_scheduler_executor<restricted_policy_executor<Policy>>
+      : is_scheduler_executor<hpx::execution::parallel_policy_executor<Policy>>
+    {
+    };
     /// \endcond
 }    // namespace hpx::parallel::execution

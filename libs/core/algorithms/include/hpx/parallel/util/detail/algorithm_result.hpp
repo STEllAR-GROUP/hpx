@@ -137,6 +137,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         using type = T;
 
         template <typename T_>
+        static constexpr auto get()
+        {
+            namespace ex = hpx::execution::experimental;
+            return ex::just(T());
+        }
+
+        template <typename T_>
         static constexpr auto get(T_&& t)
         {
             namespace ex = hpx::execution::experimental;
@@ -147,6 +154,33 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             else
             {
                 return ex::just(HPX_FORWARD(T_, t));
+            }
+        }
+    };
+
+    template <typename ExPolicy>
+    struct algorithm_result_impl<ExPolicy, void,
+        std::enable_if_t<
+            hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
+    {
+        // The return type of the initiating function.
+        using type = void;
+
+        static constexpr auto get() noexcept {}
+
+        static auto get(hpx::util::unused_type) noexcept {}
+
+        template <typename T_>
+        static constexpr auto get(T_&& t)
+        {
+            namespace ex = hpx::execution::experimental;
+            if constexpr (ex::is_sender_v<std::decay_t<T_>>)
+            {
+                return HPX_FORWARD(T_, t);
+            }
+            else
+            {
+                return ex::just();
             }
         }
     };
