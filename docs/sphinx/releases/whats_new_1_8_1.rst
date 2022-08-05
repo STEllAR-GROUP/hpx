@@ -8,7 +8,7 @@
 .. _hpx_1_8_1:
 
 ===========================
-|hpx| V1.8.1 (Jul 29, 2022)
+|hpx| V1.8.1 (Aug 5, 2022)
 ===========================
 
 This is a bugfix release with a few minor additions and resolved problems.
