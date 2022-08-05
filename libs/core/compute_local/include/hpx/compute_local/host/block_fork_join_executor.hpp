@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/compute_local/host/numa_domains.hpp>
 #include <hpx/compute_local/host/target.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
@@ -200,13 +201,14 @@ namespace hpx::execution::experimental {
                         targets[index].native_handle().get_device(), priority,
                         stacksize, schedule, yield_delay);
                 };
-                exec_.bulk_sync_execute(init_f,
+
+                hpx::parallel::execution::bulk_sync_execute(exec_, init_f,
                     hpx::util::detail::make_counting_shape(targets.size()));
             }
         }
 
         template <typename F, typename S, typename... Ts>
-        void bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
+        void bulk_sync_execute_helper(F&& f, S const& shape, Ts&&... ts)
         {
             std::size_t num_targets = block_execs_.size();
             if (num_targets == 0)
@@ -241,14 +243,24 @@ namespace hpx::execution::experimental {
         }
 
         template <typename F, typename S, typename... Ts>
-        decltype(auto) bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
+        friend void tag_invoke(hpx::parallel::execution::bulk_sync_execute_t,
+            block_fork_join_executor& exec, F&& f, S const& shape, Ts&&... ts)
+        {
+            exec.bulk_sync_execute_helper(
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename F, typename S, typename... Ts>
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::bulk_async_execute_t,
+            block_fork_join_executor& exec, F&& f, S const& shape, Ts&&... ts)
         {
             // Forward to the synchronous version as we can't create
             // futures to the completion of the parallel region (this HPX
             // thread participates in computation).
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    bulk_sync_execute(
+                    exec.bulk_sync_execute_helper(
                         HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
                     return hpx::make_ready_future();
                 },
@@ -257,32 +269,31 @@ namespace hpx::execution::experimental {
                 });
         }
 
-        friend block_fork_join_executor tag_invoke(
-            hpx::execution::experimental::with_annotation_t,
-            block_fork_join_executor const& exec,
-            char const* annotation) noexcept
+        // support all properties that are exposed by the fork_join_executor
+        // clang-format off
+        template <typename Tag, typename Property,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_invocable_v<Tag, fork_join_executor, Property>
+            )>
+        // clang-format on
+        friend block_fork_join_executor tag_invoke(Tag tag,
+            block_fork_join_executor const& exec, Property&& prop) noexcept
         {
-            auto exec_with_annotation = exec;
-            hpx::execution::experimental::with_annotation(
-                exec_with_annotation.exec_, annotation);
-            return exec_with_annotation;
+            auto exec_with_prop = exec;
+            exec_with_prop.exec_ = tag(exec.exec_, HPX_FORWARD(Property, prop));
+            return exec_with_prop;
         }
 
-        friend block_fork_join_executor tag_invoke(
-            hpx::execution::experimental::with_annotation_t,
-            block_fork_join_executor const& exec, std::string annotation)
-        {
-            auto exec_with_annotation = exec;
-            hpx::execution::experimental::with_annotation(
-                exec_with_annotation.exec_, HPX_MOVE(annotation));
-            return exec_with_annotation;
-        }
-
+        // clang-format off
+        template <typename Tag,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_invocable_v<Tag, fork_join_executor>
+            )>
+        // clang-format on
         friend char const* tag_invoke(
-            hpx::execution::experimental::get_annotation_t,
-            block_fork_join_executor const& exec) noexcept
+            Tag tag, block_fork_join_executor const& exec) noexcept
         {
-            return hpx::execution::experimental::get_annotation(exec.exec_);
+            return tag(exec.exec_);
         }
 
     private:

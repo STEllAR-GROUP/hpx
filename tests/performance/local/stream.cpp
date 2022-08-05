@@ -22,6 +22,7 @@
 #include <hpx/local/execution.hpp>
 #include <hpx/local/thread.hpp>
 #include <hpx/modules/compute.hpp>
+#include <hpx/modules/compute_local.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/version.hpp>
