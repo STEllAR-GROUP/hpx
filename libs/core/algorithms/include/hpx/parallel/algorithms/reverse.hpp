@@ -14,13 +14,13 @@
 namespace hpx {
 
     /// Reverses the order of the elements in the range [first, last).
-    /// Behaves as if applying std::iter_swap to every pair of iterators
-    /// first+i, (last-i) - 1 for each non-negative i < (last-first)/2.
+    /// Behaves as if applying \a std::iter_swap to every pair of iterators
+    /// first+i, (\a last-i) - 1 for each non-negative i < (last-first)/2.
     ///
     /// \note   Complexity: Linear in the distance between \a first and \a last.
     ///
-    /// \tparam BidirIter  The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    /// \tparam BidirIter   The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
     ///                     bidirectional iterator.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
@@ -31,14 +31,15 @@ namespace hpx {
     /// The assignments in the parallel \a reverse algorithm
     /// execute in sequential order in the calling thread.
     ///
-    /// \returns  The \a reverse algorithm returns a \a void.
+    /// \returns  The \a reverse algorithm returns \a void.
     ///
     template <typename BidirIter>
     void reverse(BidirIter first, BidirIter last);
 
     /// Reverses the order of the elements in the range [first, last).
-    /// Behaves as if applying std::iter_swap to every pair of iterators
+    /// Behaves as if applying \a std::iter_swap to every pair of iterators
     /// first+i, (last-i) - 1 for each non-negative i < (last-first)/2.
+    /// Executed according to the policy.
     ///
     /// \note   Complexity: Linear in the distance between \a first and \a last.
     ///
@@ -46,8 +47,8 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam BidirIter  The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    /// \tparam BidirIter   The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
     ///                     bidirectional iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -79,19 +80,19 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements from the range [first, last) to another range
-    /// beginning at dest_first in such a way that the elements in the new
+    /// beginning at dest in such a way that the elements in the new
     /// range are in reverse order.
     /// Behaves as if by executing the assignment
-    /// *(dest_first + (last - first) - 1 - i) = *(first + i) once for each
+    /// *(dest + (last - first) - 1 - i) = *(first + i) once for each
     /// non-negative i < (last - first)
     /// If the source and destination ranges (that is, [first, last) and
-    /// [dest_first, dest_first+(last-first)) respectively) overlap, the
+    /// [dest, dest+(last-first)) respectively) overlap, the
     /// behavior is undefined.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam BidirIter   The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     bidirectional iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
@@ -117,14 +118,14 @@ namespace hpx {
     OutIter reverse_copy(BidirIter first, BidirIter last, Outiter dest);
 
     /// Copies the elements from the range [first, last) to another range
-    /// beginning at dest_first in such a way that the elements in the new
+    /// beginning at dest in such a way that the elements in the new
     /// range are in reverse order.
     /// Behaves as if by executing the assignment
-    /// *(dest_first + (last - first) - 1 - i) = *(first + i) once for each
+    /// *(dest + (last - first) - 1 - i) = *(first + i) once for each
     /// non-negative i < (last - first)
     /// If the source and destination ranges (that is, [first, last) and
-    /// [dest_first, dest_first+(last-first)) respectively) overlap, the
-    /// behavior is undefined.
+    /// [dest, dest+(last-first)) respectively) overlap, the
+    /// behavior is undefined. Executed according to the policy.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
@@ -133,11 +134,11 @@ namespace hpx {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam BidirIter   The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     bidirectional iterator.
     /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -170,9 +171,9 @@ namespace hpx {
     ///           copied.
     ///
     template <typename ExPolicy, typename BidirIter, typename FwdIter>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
     reverse_copy(
-        ExPolicy&& policy, BidirIter first, BidirIter last, FwdIter dest_first);
+        ExPolicy&& policy, BidirIter first, BidirIter last, FwdIter dest);
 
 }    // namespace hpx
 

@@ -4,12 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config/coroutines_support.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <exception>
+#include <utility>
 
 namespace ex = hpx::execution::experimental;
 
@@ -317,6 +319,153 @@ void test_sender3()
         ex::detail::no_completion_signatures>);
 }
 
+template <typename Awaiter>
+struct promise
+{
+    hpx::coro::coroutine_handle<promise> get_return_object()
+    {
+        return {hpx::coro::coroutine_handle<promise>::from_promise(*this)};
+    }
+    hpx::coro::suspend_always initial_suspend() noexcept
+    {
+        return {};
+    }
+    hpx::coro::suspend_always final_suspend() noexcept
+    {
+        return {};
+    }
+    void return_void() {}
+    void unhandled_exception() {}
+
+    template <typename... T>
+    auto await_transform(T&&...) noexcept
+    {
+        return std::declval<Awaiter>();
+    }
+};
+
+struct awaiter
+{
+    void await_ready() {}
+    bool await_suspend(hpx::coro::coroutine_handle<>)
+    {
+        return false;
+    }
+    bool await_resume()
+    {
+        return false;
+    }
+};
+
+template <typename Awaiter>
+struct awaitable_sender_1
+{
+    Awaiter operator co_await();
+};
+
+struct awaitable_sender_2
+{
+    using promise_type = promise<hpx::coro::suspend_always>;
+};
+
+struct awaitable_sender_3
+{
+    using promise_type = promise<awaiter>;
+};
+
+template <typename Signatures, typename Awaiter>
+void test_awaitable_sender1(Signatures&&, Awaiter&&)
+{
+    static_assert(ex::is_sender_v<awaitable_sender_1<Awaiter>>);
+    static_assert(ex::is_awaitable_v<awaitable_sender_1<Awaiter>>);
+
+    awaitable_sender_1<Awaiter> s;
+    static_assert(!hpx::meta::value<ex::detail::has_completion_signatures<
+                      awaitable_sender_1<Awaiter>>>);
+    static_assert(
+        std::is_same_v<decltype(ex::get_completion_signatures(s)), Signatures>);
+    static_assert(std::is_same_v<
+        ex::completion_signatures_of_t<awaitable_sender_1<Awaiter>>,
+        Signatures>);
+
+    using value_types_of = ex::value_types_of_t<awaitable_sender_1<Awaiter>>;
+    using value_types = possibly_empty_variant_t<
+        typename Signatures::template value_types<hpx::tuple, hpx::variant>>;
+
+    static_assert(std::is_same_v<value_types_of, value_types>);
+
+    using error_types_of = ex::error_types_of_t<awaitable_sender_1<Awaiter>>;
+    using error_types = possibly_empty_variant_t<
+        typename Signatures::template error_types<hpx::variant>>;
+
+    static_assert(std::is_same_v<error_types_of, error_types>);
+}
+
+template <typename Signatures>
+void test_awaitable_sender2(Signatures)
+{
+    // is_sender_v relies on get_completion_signatures and is not true
+    // even if a sender is an awaitable if it's promise type is not
+    // used to evaluate the concept awaitable
+    // static_assert(ex::is_sender_v<awaitable_sender_2>);
+
+    // static_assert(ex::is_awaitable_v<awaitable_sender_2,
+    //     promise<hpx::coro::suspend_always>>);
+
+    // awaitable_sender_2 s;
+    // static_assert(!hpx::meta::value<
+    //               ex::detail::has_completion_signatures<awaitable_sender_2>>);
+
+    // static_assert(
+    //     std::is_same_v<decltype(ex::get_completion_signatures(s)), Signatures>);
+    // static_assert(
+    //     std::is_same_v<ex::completion_signatures_of_t<awaitable_sender_2>,
+    //         Signatures>);
+
+    // using value_types_of = ex::value_types_of_t<awaitable_sender_2>;
+    // using value_types = possibly_empty_variant_t<
+    //     typename Signatures::template value_types<hpx::tuple, hpx::variant>>;
+
+    // static_assert(std::is_same_v<value_types_of, value_types>);
+
+    // using error_types_of = ex::error_types_of_t<awaitable_sender_2>;
+    // using error_types = possibly_empty_variant_t<
+    //     typename Signatures::template error_types<hpx::variant>>;
+
+    // static_assert(std::is_same_v<error_types_of, error_types>);
+}
+
+template <typename Signatures>
+void test_awaitable_sender3(Signatures)
+{
+    // is_sender_v relies on get_completion_signatures and is not true
+    // even if a sender is an awaitable if it's promise type is not
+    // used to evaluate the concept awaitable
+    // static_assert(ex::is_sender_v<awaitable_sender_3>);
+    // static_assert(ex::is_awaitable_v<awaitable_sender_3, promise<awaiter>>);
+
+    // awaitable_sender_3 s;
+    // static_assert(hpx::meta::value<
+    //     ex::detail::has_completion_signatures<awaitable_sender_3>>);
+    // static_assert(
+    //     std::is_same_v<decltype(ex::get_completion_signatures(s)), Signatures>);
+    // static_assert(
+    //     std::is_same_v<ex::completion_signatures_of_t<awaitable_sender_3>,
+    //         Signatures>);
+
+    // using value_types_of = ex::value_types_of_t<awaitable_sender_3>;
+    // using value_types = possibly_empty_variant_t<
+    //     typename Signatures::template value_types<hpx::tuple, hpx::variant>>;
+
+    // static_assert(std::is_same_v<value_types_of, value_types>);
+
+    // using error_types_of = ex::error_types_of_t<awaitable_sender_3>;
+    // using error_types = possibly_empty_variant_t<
+    //     typename Signatures::template error_types<hpx::variant>>;
+
+    // static_assert(std::is_same_v<error_types_of, error_types>);
+}
+
 int main()
 {
     {
@@ -392,6 +541,18 @@ int main()
     }
 
     test_sender3();
+
+    {
+        test_awaitable_sender1(signature_error_values(std::exception_ptr()),
+            hpx::coro::suspend_always{});
+        test_awaitable_sender1(
+            signature_error_values(std::exception_ptr(), bool()), awaiter{});
+
+        // TODO: handle for awaitables that do not have co_await free/member
+        // operator
+        // test_awaitable_sender2(signature_error_values(std::exception_ptr()));
+        // test_awaitable_sender3(signature_error_values(std::exception_ptr()));
+    }
 
     return hpx::util::report_errors();
 }
