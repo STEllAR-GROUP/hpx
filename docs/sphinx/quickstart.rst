@@ -17,11 +17,13 @@ The following steps will help you get started with |hpx|.
 Installing |hpx|
 ================
 
-The easiest way to install |hpx| on your system is by choosing one of the steps below:
+The easiest way to install |hpx| on your system is by choosing one of the steps
+below:
 
 #. **vcpkg**
 
-   You can download and install |hpx| using the `vcpkg <https://github.com/Microsoft/vcpkg>`_ dependency manager:
+   You can download and install |hpx| using the `vcpkg
+   <https://github.com/Microsoft/vcpkg>`_ dependency manager:
 
    .. code-block:: shell-session
 
@@ -29,7 +31,8 @@ The easiest way to install |hpx| on your system is by choosing one of the steps 
 
 #. **Spack**
 
-   Another way to install |hpx| is using `Spack <https://spack.readthedocs.io/en/latest/>`_:
+   Another way to install |hpx| is using
+   `Spack <https://spack.readthedocs.io/en/latest/>`_:
 
    .. code-block:: shell-session
 
@@ -37,7 +40,8 @@ The easiest way to install |hpx| on your system is by choosing one of the steps 
 
 #. **Fedora**
 
-   Installation can be done with `Fedora <https://fedoraproject.org/wiki/DNF>`_ as well:
+   Installation can be done with
+   `Fedora <https://fedoraproject.org/wiki/DNF>`_ as well:
 
    .. code-block:: shell-session
 
@@ -45,14 +49,20 @@ The easiest way to install |hpx| on your system is by choosing one of the steps 
 
 #. **Arch Linux**
 
-   |hpx| is available in the `Arch User Repository (AUR) <https://wiki.archlinux.org/title/Arch_User_Repository>`_ as ``hpx`` too.
+   |hpx| is available in the
+   `Arch User Repository (AUR) <https://wiki.archlinux.org/title/Arch_User_Repository>`_
+   as ``hpx`` too.
 
-More information or alternatives regarding the installation can be found in the :ref:`building_hpx`, a detailed guide with thorough explanation of ways to build and use |hpx|.
+More information or alternatives regarding the installation can be found in the
+:ref:`building_hpx`, a detailed guide with thorough explanation of ways to build
+and use |hpx|.
 
 Hello, World!
 =============
 
-To get started with this minimal example you need to create a new project directory and a file ``CMakeLists.txt`` with the contents below in order to build an executable using |cmake| and |hpx|:
+To get started with this minimal example you need to create a new project
+directory and a file ``CMakeLists.txt`` with the contents below in order to
+build an executable using |cmake| and |hpx|:
 
 .. code-block:: cmake
 

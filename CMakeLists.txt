@@ -58,10 +58,10 @@ endif()
 # Build all of HPX
 # ##############################################################################
 set(HPX_VERSION_MAJOR 1)
-set(HPX_VERSION_MINOR 9)
-set(HPX_VERSION_SUBMINOR 0)
-set(HPX_VERSION_DATE 20220518)
-set(HPX_VERSION_TAG "-trunk")
+set(HPX_VERSION_MINOR 8)
+set(HPX_VERSION_SUBMINOR 1)
+set(HPX_VERSION_DATE 20220805)
+set(HPX_VERSION_TAG "")
 
 set(HPX_VERSION
     "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}"
@@ -2480,6 +2480,7 @@ if(HPX_WITH_DOCUMENTATION)
       FILES "${PROJECT_BINARY_DIR}/share/hpx/docs/latexpdf/latex/HPX.pdf"
       DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/pdf/
       COMPONENT docs
+      OPTIONAL
     )
   endif()
 

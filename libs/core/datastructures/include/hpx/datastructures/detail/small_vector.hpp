@@ -181,6 +181,14 @@ namespace hpx::detail {
             }
             return new (ptr) storage<T>(capacity);
         }
+
+        static void dealloc(storage* strg)
+        {
+            if (strg == nullptr)
+                return;
+            strg->storage::~storage();
+            ::operator delete(strg);
+        }
     };
 
     template <typename T>
@@ -313,7 +321,7 @@ namespace hpx::detail {
                     uninitialized_move_and_destroy(
                         storage->data(), direct_data(), storage->size());
                     set_direct_and_size(storage->size());
-                    delete storage;
+                    detail::storage<T>::dealloc(storage);
                 }
             }
             else
@@ -333,7 +341,7 @@ namespace hpx::detail {
                     uninitialized_move_and_destroy(data<direction::indirect>(),
                         storage->data(), size<direction::indirect>());
                     storage->size(size<direction::indirect>());
-                    delete indirect();
+                    detail::storage<T>::dealloc(indirect());
                 }
                 set_indirect(storage);
             }
@@ -642,7 +650,7 @@ namespace hpx::detail {
             }
             if (!is_dir)
             {
-                delete indirect();
+                detail::storage<T>::dealloc(indirect());
             }
         }
 

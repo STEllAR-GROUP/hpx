@@ -112,7 +112,10 @@ Acknowledgements
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
-* Dimitra Karatza, for her work on refactoring the documentation and providing 
+* Shreyas Atre, for contributing fixes to our implementation of
+  senders/receivers.
+* Alexander Neumann, for contributing fixes to the cmake build system.
+* Dimitra Karatza, for her work on refactoring the documentation and providing
   a new user-friendly environment during and after Google Season of Docs 2021.
 * Srinivas Yadav, for his work on SIMD support in algorithms before and during
   Google Summer of Code 2021.
@@ -272,6 +275,6 @@ the project through discussions, pull requests, documentation patches, etc.
   Jeff Trull, Yuri Victorovich, and Gregor Daiﬂ who contributed to the general
   improvement of |hpx|.
 
-|stellar_hpx_funding|_ lists current and past funding sources for |hpx|. Special thanks to 
-|gsoc|_ and |gsod|_ for the continuous support they provide which helps us enhance both our 
+|stellar_hpx_funding|_ lists current and past funding sources for |hpx|. Special thanks to
+|gsoc|_ and |gsod|_ for the continuous support they provide which helps us enhance both our
 code and our documentation.
