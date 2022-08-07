@@ -171,26 +171,6 @@ int hpx_main()
     gf2.get();
 
     // ------------------------------------------------------------------------
-    // static checks for laughs
-    // ------------------------------------------------------------------------
-    static_assert(
-        hpx::traits::has_sync_execute_member<hpx::parallel::execution::
-                guided_pool_executor<hint_type2>>::value == std::false_type(),
-        "check has_sync_execute_member<Executor>::value");
-    static_assert(
-        hpx::traits::has_async_execute_member<hpx::parallel::execution::
-                guided_pool_executor<hint_type2>>::value == std::true_type(),
-        "check has_async_execute_member<Executor>::value");
-    static_assert(
-        hpx::traits::has_then_execute_member<hpx::parallel::execution::
-                guided_pool_executor<hint_type2>>::value == std::true_type(),
-        "has_then_execute_member<executor>::value");
-    static_assert(
-        hpx::traits::has_post_member<hpx::parallel::execution::
-                guided_pool_executor<hint_type2>>::value == std::false_type(),
-        "has_post_member<executor>::value");
-
-    // ------------------------------------------------------------------------
     // test 3
     // ------------------------------------------------------------------------
     std::cout << std::endl << std::endl;
@@ -208,14 +188,6 @@ int hpx_main()
         return 2 * 3.1415;
     }).then(guided_cont_exec, a_function);
 
-    /*
-    [](double df)
-    {
-        double d = df; // .get();
-        std::cout << "received a double of value " << d << std::endl;
-        return d*2;
-    }));
-*/
     new_future.get();
 
     return hpx::local::finalize();

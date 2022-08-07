@@ -1,5 +1,5 @@
 //  Copyright (c)      2020 ETH Zurich
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,18 +23,20 @@ struct additional_argument
 struct additional_argument_executor
 {
     template <typename F, typename... Ts,
-        typename Enable = typename std::enable_if<
-            !std::is_member_function_pointer<F>::value>::type>
-    decltype(auto) async_execute(F&& f, Ts&&... ts)
+        typename Enable =
+            std::enable_if_t<!std::is_member_function_pointer_v<F>>>
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::async_execute_t,
+        additional_argument_executor const&, F&& f, Ts&&... ts)
     {
         return hpx::async(
             std::forward<F>(f), additional_argument{}, std::forward<Ts>(ts)...);
     }
 
     template <typename F, typename T, typename... Ts,
-        typename Enable = typename std::enable_if<
-            std::is_member_function_pointer<F>::value>::type>
-    decltype(auto) async_execute(F&& f, T&& t, Ts&&... ts)
+        typename Enable =
+            std::enable_if_t<std::is_member_function_pointer_v<F>>>
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::async_execute_t,
+        additional_argument_executor const&, F&& f, T&& t, Ts&&... ts)
     {
         return hpx::async(std::forward<F>(f), std::forward<T>(t),
             additional_argument{}, std::forward<Ts>(ts)...);

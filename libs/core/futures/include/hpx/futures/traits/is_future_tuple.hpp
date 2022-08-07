@@ -22,4 +22,7 @@ namespace hpx { namespace traits {
     struct is_future_tuple<hpx::tuple<Ts...>> : util::all_of<is_future<Ts>...>
     {
     };
+
+    template <typename... Ts>
+    inline constexpr bool is_future_tuple_v = is_future_tuple<Ts...>::value;
 }}    // namespace hpx::traits

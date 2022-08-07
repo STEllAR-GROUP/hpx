@@ -34,14 +34,14 @@ namespace hpx { namespace resiliency { namespace experimental {
         static constexpr int num_spread = 4;
         static constexpr int num_tasks = 128;
 
-        using execution_category = typename BaseExecutor::execution_category;
+        using execution_category =
+            hpx::traits::executor_execution_category_t<BaseExecutor>;
         using executor_parameters_type =
-            typename BaseExecutor::executor_parameters_type;
+            hpx::traits::executor_parameters_type_t<BaseExecutor>;
 
         template <typename Result>
         using future_type =
-            typename hpx::parallel::execution::executor_future<BaseExecutor,
-                Result>::type;
+            hpx::traits::executor_future_t<BaseExecutor, Result>;
 
         template <typename V, typename F>
         explicit replicate_executor(
@@ -68,34 +68,38 @@ namespace hpx { namespace resiliency { namespace experimental {
             return *this;
         }
 
+    private:
         // TwoWayExecutor interface
         template <typename F, typename... Ts>
-        decltype(auto) async_execute(F&& f, Ts&&... ts) const
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::async_execute_t,
+            replicate_executor const& exec, F&& f, Ts&&... ts)
         {
-            return async_replicate_vote_validate(exec_, replicate_count_,
-                voter_, validator_, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            return async_replicate_vote_validate(exec.exec_,
+                exec.replicate_count_, exec.voter_, exec.validator_,
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
-        decltype(auto) bulk_async_execute(
-            F&& f, S const& shape, Ts&&... ts) const
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::bulk_async_execute_t,
+            replicate_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
             std::size_t size = hpx::util::size(shape);
 
             using result_type =
-                typename hpx::parallel::execution::detail::bulk_function_result<
-                    F, S, Ts...>::type;
+                hpx::parallel::execution::detail::bulk_function_result_t<F, S,
+                    Ts...>;
             using future_type =
-                typename hpx::parallel::execution::executor_future<BaseExecutor,
-                    result_type>::type;
+                hpx::traits::executor_future_t<BaseExecutor, result_type>;
 
             std::vector<future_type> results;
             results.resize(size);
 
             hpx::latch l(size + 1);
 
-            spawn_hierarchical(results, l, 0, size, num_tasks, f,
+            exec.spawn_hierarchical(results, l, 0, size, num_tasks, f,
                 hpx::util::begin(shape), ts...);
 
             l.arrive_and_wait();
@@ -115,7 +119,9 @@ namespace hpx { namespace resiliency { namespace experimental {
 
             for (std::size_t i = 0; i != size; (void) ++i, ++it)
             {
-                results[base + i] = async_execute(func, *it, ts...);
+                results[base + i] =
+                    tag_invoke(hpx::parallel::execution::async_execute_t{},
+                        *this, func, *it, ts...);
             }
 
             l.count_down(size);
@@ -135,8 +141,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                 while (size > chunk_size)
                 {
                     hpx::parallel::execution::post(
-                        hpx::this_thread::get_executor(),
-                        [&, base, chunk_size, num_tasks, it] {
+                        exec_, [&, base, chunk_size, num_tasks, it] {
                             spawn_hierarchical(results, l, base, chunk_size,
                                 num_tasks, func, it, ts...);
                         });

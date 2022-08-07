@@ -17,6 +17,10 @@ set(tests
     execute_may_block_caller
 )
 
+if(HPX_WITH_CXX20_COROUTINES)
+  set(tests ${tests} coroutine_traits)
+endif()
+
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

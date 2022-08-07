@@ -21,6 +21,7 @@
 #include <hpx/config/compiler_fence.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/constexpr.hpp>
+#include <hpx/config/coroutines_support.hpp>
 #include <hpx/config/debug.hpp>
 #include <hpx/config/deprecation.hpp>
 #include <hpx/config/emulate_deleted.hpp>

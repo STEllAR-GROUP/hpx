@@ -1,5 +1,6 @@
 //  Copyright (c) 2008 Peter Dimov
 //  Copyright (c) 2017 Agustin Berge
+//  Copyright (c) 2022 Christopher Taylor
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -46,6 +47,17 @@ extern "C" void _mm_pause();
 #define HPX_SMT_PAUSE __asm__ __volatile__("or 27,27,27")
 #elif defined(__arm__)
 #define HPX_SMT_PAUSE __asm__ __volatile__("yield")
+#elif defined(__riscv)
+// According to:
+//
+// https://blog.jiejiss.com/Rust-is-incompatible-with-LLVM-at-least-partially/
+// https://github.com/riscv/riscv-isa-manual/issues/43
+// https://stackoverflow.com/questions/68537854/pause-instruction-unrecognized-opcode-pause-in-risc-v
+//
+// gcc/clang assembler will not currently (2022) accept `fence w,unknown`;
+// `hand-rolling` the instruction (see below) does the job.
+//
+#define HPX_SMT_PAUSE __asm__ __volatile__(".insn i 0x0F, 0, x0, x0, 0x010")
 #else
 #define HPX_SMT_PAUSE HPX_COMPILER_FENCE
 #endif

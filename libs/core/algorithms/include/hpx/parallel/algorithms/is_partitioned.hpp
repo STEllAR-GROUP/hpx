@@ -48,6 +48,7 @@ namespace hpx {
     bool is_partitioned(FwdIter first, FwdIter last, Pred&& pred);
 
     /// Determines if the range [first, last) is partitioned.
+    /// Executed according to the policy.
     ///
     /// \note   Complexity: at most (N) predicate evaluations where
     ///         \a N = distance(first, last).
@@ -101,7 +102,7 @@ namespace hpx {
     ///           elements, the function is always true.
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
     is_partitioned(ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred);
 }    // namespace hpx
 #else

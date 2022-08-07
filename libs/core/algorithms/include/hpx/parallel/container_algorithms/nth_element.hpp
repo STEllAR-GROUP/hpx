@@ -70,9 +70,11 @@ namespace hpx { namespace ranges {
     ///           The \a nth_element algorithm returns an iterator equal
     ///           to last.
     ///
-    template <typename RandomIt, typename Sent, typename Pred, typename Proj>
-    RandomIt nth_element(RandomIt first, RandomIt nth, Sent last, Pred&& pred,
-        Proj&& proj);
+    template <typename RandomIt, typename Sent,
+        typename Pred = hpx::parallel::v1::detail::less,
+        typename Proj = hpx::parallel::util::projection_identity>
+    RandomIt nth_element(RandomIt first, RandomIt nth, Sent last,
+        Pred&& pred = Pred(), Proj&& proj = Proj());
 
     /// nth_element is a partial sorting algorithm that rearranges elements in
     /// [first, last) such that the element pointed at by nth is changed to
@@ -144,10 +146,11 @@ namespace hpx { namespace ranges {
     ///           to last.
     ///
     template <typename ExPolicy, typename RandomIt, typename Sent,
-        typename Pred, typename Proj>
+        typename Pred = hpx::parallel::v1::detail::less,
+        typename Proj = hpx::parallel::util::projection_identity>
     parallel::util::detail::algorithm_result_t<ExPolicy, RandomIt>
     nth_element(ExPolicy&& policy, RandomIt first, RandomIt nth,
-        Sent last, Pred&& pred, Proj&& proj);
+        Sent last, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     /// nth_element is a partial sorting algorithm that rearranges elements in
     /// [first, last) such that the element pointed at by nth is changed to
@@ -200,10 +203,12 @@ namespace hpx { namespace ranges {
     ///           The \a nth_element algorithm returns an iterator equal
     ///           to last.
     ///
-    template <typename Rng, typename Pred, typename Proj>
+    template <typename Rng,
+        typename Pred = hpx::parallel::v1::detail::less,
+        typename Proj = hpx::parallel::util::projection_identity>
     hpx::traits::range_iterator_t<Rng> nth_element(Rng&& rng,
-        hpx::traits::range_iterator_t<Rng> nth, Pred&& pred,
-        Proj&& proj);
+        hpx::traits::range_iterator_t<Rng> nth, Pred&& pred = Pred(),
+        Proj&& proj = Proj());
 
     /// nth_element is a partial sorting algorithm that rearranges elements in
     /// [first, last) such that the element pointed at by nth is changed to
@@ -270,12 +275,14 @@ namespace hpx { namespace ranges {
     ///           The \a nth_element algorithm returns an iterator equal
     ///           to last.
     ///
-    template <typename ExPolicy, typename Rng, typename Pred, typename Proj>
+    template <typename ExPolicy, typename Rng,
+        typename Pred = hpx::parallel::v1::detail::less,
+        typename Proj = hpx::parallel::util::projection_identity>
     parallel::util::detail::algorithm_result_t<ExPolicy,
         hpx::traits::range_iterator_t<Rng>>
     nth_element(ExPolicy&& policy, Rng&& rng,
         hpx::traits::range_iterator_t<Rng> nth,
-        Pred&& pred, Proj&& proj);
+        Pred&& pred = Pred(), Proj&& proj = Proj());
 
     // clang-format on
 }}       // namespace hpx::ranges

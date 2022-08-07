@@ -14,6 +14,133 @@ namespace hpx { namespace ranges {
     // clang-format off
 
     ///////////////////////////////////////////////////////////////////////////
+    /// Reorders the elements in the range \a rng in such a way that
+    /// all elements for which the predicate \a pred returns true precede
+    /// the elements for which the predicate \a pred returns false.
+    /// Relative order of the elements is not preserved.
+    ///
+    /// \note   Complexity: Performs at most 2 * N swaps,
+    ///         exactly N applications of the predicate and projection,
+    ///         where N = std::distance(begin(rng), end(rng)).
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a partition requires \a Pred to meet
+    ///                     the requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by the range \a rng. This is an
+    ///                     unary predicate for partitioning the source
+    ///                     iterators. The signature of this predicate should
+    ///                     be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to \a Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a partition algorithm invoked without
+    /// an execution policy object execute in sequential order in the calling
+    /// thread.
+    ///
+    /// \returns  The \a partition algorithm returns
+    ///           \a subrange_t<hpx::traits::range_iterator_t<Rng>>
+    ///           The \a partition algorithm returns a subrange starting with
+    ///           an iterator to the first element of the second group and
+    ///           finishing with an iterator equal to last.
+    ///
+    template <typename Rng, typename Pred,
+        typename Proj = parallel::util::projection_identity>
+    subrange_t<hpx::traits::range_iterator_t<Rng>>
+    partition(Rng&& rng, Pred&& pred, Proj&& proj = Proj());
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Reorders the elements in the range \a rng in such a way that
+    /// all elements for which the predicate \a pred returns true precede
+    /// the elements for which the predicate \a pred returns false.
+    /// Relative order of the elements is not preserved.
+    ///
+    /// \note   Complexity: Performs at most 2 * N swaps,
+    ///         exactly N applications of the predicate and projection,
+    ///         where N = std::distance(begin(rng), end(rng)).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a partition requires \a Pred to meet
+    ///                     the requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by the range \a rng. This is an
+    ///                     unary predicate for partitioning the source
+    ///                     iterators. The signature of this predicate should
+    ///                     be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to \a Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a partition algorithm invoked with
+    /// an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a partition algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a partition algorithm returns a \a
+    ///           hpx::future<subrange_t<hpx::traits::range_iterator_t<Rng>>>
+    ///           if the execution policy is of type \a parallel_task_policy
+    ///           and returns \a subrange_t<hpx::traits::range_iterator_t<Rng>>
+    ///           The \a partition algorithm returns a subrange starting with
+    ///           an iterator to the first element of the second group and
+    ///           finishing with an iterator equal to last.
+    ///
+    template <typename ExPolicy, typename Rng, typename Pred,
+        typename Proj = parallel::util::projection_identity>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        subrange_t<hpx::traits::range_iterator_t<Rng>>>::type
+    partition(ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj());
+
+    ///////////////////////////////////////////////////////////////////////////
     /// Reorders the elements in the range [first, last) in such a way that
     /// all elements for which the predicate \a pred returns true precede
     /// the elements for which the predicate \a pred returns false.
@@ -68,9 +195,10 @@ namespace hpx { namespace ranges {
     ///           an iterator to the first element of the second group and
     ///           finishing with an iterator equal to last.
     ///
-    template <typename FwdIter, typename Sent, typename Pred, typename Proj>
-    subrange_t<FwdIter> partition(ExPolicy&& policy, Sent first, Sent last,
-        Pred&& pred, Proj&& proj);
+    template <typename FwdIter, typename Sent, typename Pred,
+        typename Proj = parallel::util::projection_identity>
+    subrange_t<FwdIter> partition(FwdIter first, Sent last, Pred&& pred,
+        Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Reorders the elements in the range [first, last) in such a way that
@@ -142,277 +270,14 @@ namespace hpx { namespace ranges {
     ///           finishing with an iterator equal to last.
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent,
-        typename Pred, typename Proj>
-    typename util::detail::algorithm_result<ExPolicy,
+        typename Pred,
+        typename Proj = parallel::util::projection_identity>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
         subrange_t<FwdIter>>::type
     partition(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
-        Proj&& proj);
+        Proj&& proj = Proj());
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// Reorders the elements in the range \a rng in such a way that
-    /// all elements for which the predicate \a pred returns true precede
-    /// the elements for which the predicate \a pred returns false.
-    /// Relative order of the elements is not preserved.
-    ///
-    /// \note   Complexity: Performs at most 2 * N swaps,
-    ///         exactly N applications of the predicate and projection,
-    ///         where N = std::distance(begin(rng), end(rng)).
-    ///
-    /// \tparam Rng         The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam Pred        The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a partition requires \a Pred to meet
-    ///                     the requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param pred         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by the range \a rng. This is an
-    ///                     unary predicate for partitioning the source
-    ///                     iterators. The signature of this predicate should
-    ///                     be equivalent to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
-    ///                     implicitly converted to \a Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a partition algorithm invoked without
-    /// an execution policy object execute in sequential order in the calling
-    /// thread.
-    ///
-    /// \returns  The \a partition algorithm returns
-    ///           \a subrange_t<hpx::traits::range_iterator_t<Rng>>
-    ///           The \a partition algorithm returns a subrange starting with
-    ///           an iterator to the first element of the second group and
-    ///           finishing with an iterator equal to last.
-    ///
-    template <typename Rng, typename Pred, typename Proj>
-    subrange_t<hpx::traits::range_iterator_t<Rng>>
-    partition(Rng&& rng, Pred&& pred, Proj&& proj);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Reorders the elements in the range \a rng in such a way that
-    /// all elements for which the predicate \a pred returns true precede
-    /// the elements for which the predicate \a pred returns false.
-    /// Relative order of the elements is not preserved.
-    ///
-    /// \note   Complexity: Performs at most 2 * N swaps,
-    ///         exactly N applications of the predicate and projection,
-    ///         where N = std::distance(begin(rng), end(rng)).
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam Pred        The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a partition requires \a Pred to meet
-    ///                     the requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param pred         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by the range \a rng. This is an
-    ///                     unary predicate for partitioning the source
-    ///                     iterators. The signature of this predicate should
-    ///                     be equivalent to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
-    ///                     implicitly converted to \a Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a partition algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a partition algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a partition algorithm returns a \a
-    ///           hpx::future<subrange_t<hpx::traits::range_iterator_t<Rng>>>
-    ///           if the execution policy is of type \a parallel_task_policy
-    ///           and returns \a subrange_t<hpx::traits::range_iterator_t<Rng>>
-    ///           The \a partition algorithm returns a subrange starting with
-    ///           an iterator to the first element of the second group and
-    ///           finishing with an iterator equal to last.
-    ///
-    template <typename ExPolicy, typename Rng, typename Pred,
-        typename Proj>
-    typename util::detail::algorithm_result<ExPolicy,
-        subrange_t<hpx::traits::range_iterator_t<Rng>>>::type
-    partition(ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Permutes the elements in the range [first, last) such that there exists
-    /// an iterator i such that for every iterator j in the range [first, i)
-    /// INVOKE(f, INVOKE (proj, *j)) != false, and for every iterator k in the
-    /// range [i, last), INVOKE(f, INVOKE (proj, *k)) == false
-    ///
-    /// \note   Complexity: At most (last - first) * log(last - first) swaps,
-    ///         but only linear number of swaps if there is enough extra memory
-    ///         Exactly \a last - \a first applications of the predicate and
-    ///         projection.
-    ///
-    /// \tparam BidirIter   The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for BidirIter.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a transform requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to sentinel value denoting the end of the
-    ///                     sequence of elements the algorithm will be applied.
-    /// \param f            Unary predicate which returns true if the element
-    ///                     should be ordered before other elements.
-    ///                     Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). The signature
-    ///                     of this predicate should be equivalent to:
-    ///                     \code
-    ///                     bool fun(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&.
-    ///                     The type \a Type must be such that an object of
-    ///                     type \a BidirIter can be dereferenced and then
-    ///                     implicitly converted to \a Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a f is invoked.
-    ///
-    /// The invocations of \a f in the parallel \a stable_partition algorithm
-    /// invoked without an execution policy object executes in sequential order
-    /// in the calling thread.
-    ///
-    /// \returns  The \a stable_partition algorithm returns an iterator i such
-    ///           that for every iterator j in the range [first, i), f(*j) !=
-    ///           false INVOKE(f, INVOKE(proj, *j)) != false, and for every
-    ///           iterator k in the range [i, last), f(*k) == false
-    ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
-    ///           the elements in both groups is preserved.
-    ///
-    template <typename BidirIter, typename Sent, typename F, typename Proj>
-    subrange_t<BidirIter> stable_partition(BidirIter first, Sent last, F&& f,
-        Proj&& proj);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Permutes the elements in the range [first, last) such that there exists
-    /// an iterator i such that for every iterator j in the range [first, i)
-    /// INVOKE(f, INVOKE (proj, *j)) != false, and for every iterator k in the
-    /// range [i, last), INVOKE(f, INVOKE (proj, *k)) == false
-    ///
-    /// \note   Complexity: At most (last - first) * log(last - first) swaps,
-    ///         but only linear number of swaps if there is enough extra memory
-    ///         Exactly \a last - \a first applications of the predicate and
-    ///         projection.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the invocations of \a f.
-    /// \tparam BidirIter   The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for BidirIter.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a transform requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to sentinel value denoting the end of the
-    ///                     sequence of elements the algorithm will be applied.
-    /// \param f            Unary predicate which returns true if the element
-    ///                     should be ordered before other elements.
-    ///                     Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). The signature
-    ///                     of this predicate should be equivalent to:
-    ///                     \code
-    ///                     bool fun(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&.
-    ///                     The type \a Type must be such that an object of
-    ///                     type \a BidirIter can be dereferenced and then
-    ///                     implicitly converted to \a Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a f is invoked.
-    ///
-    /// The invocations of \a f in the parallel \a stable_partition algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequenced_policy executes in sequential order in the
-    /// calling thread.
-    ///
-    /// The invocations of \a f in the parallel \a stable_partition algorithm
-    /// invoked with an execution policy object of type \a parallel_policy
-    /// or \a parallel_task_policy are permitted to execute in an
-    /// unordered fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a stable_partition algorithm returns an iterator i such
-    ///           that for every iterator j in the range [first, i), f(*j) !=
-    ///           false INVOKE(f, INVOKE(proj, *j)) != false, and for every
-    ///           iterator k in the range [i, last), f(*k) == false
-    ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
-    ///           the elements in both groups is preserved.
-    ///           If the execution policy is of type \a parallel_task_policy
-    ///           the algorithm returns a future<> referring to this iterator.
-    ///
-    template <typename ExPolicy, typename BidirIter, typename Sent, typename F,
-        typename Proj>
-    typename util::detail::algorithm_result<ExPolicy,
-        subrange_t<BidirIter>>::type
-    stable_partition(ExPolicy&& policy, BidirIter first, Sent last,
-        F&& f, Proj&& proj);
-
-    ///////////////////////////////////////////////////////////////////////////
+     ///////////////////////////////////////////////////////////////////////////
     /// Permutes the elements in the range [first, last) such that there exists
     /// an iterator i such that for every iterator j in the range [first, i)
     /// INVOKE(f, INVOKE (proj, *j)) != false, and for every iterator k in the
@@ -426,16 +291,16 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an birdirectional iterator
-    /// \tparam F           The type of the function/function object to use
+    /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a transform requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
+    ///                     overload of \a partition requires \a Pred to meet
+    ///                     the requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
-    /// \param f            Unary predicate which returns true if the element
+    /// \param pred         Unary predicate which returns true if the element
     ///                     should be ordered before other elements.
     ///                     Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
@@ -464,9 +329,10 @@ namespace hpx { namespace ranges {
     ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
     ///           the elements in both groups is preserved.
     ///
-    template <typename Rng, typename F, typename Proj>
+    template <typename Rng, typename Pred,
+        typename Proj = parallel::util::projection_identity>
     subrange_t<hpx::traits::range_iterator_t<Rng>> stable_partition(Rng&& rng,
-        F&& f, Proj&& proj);
+        Pred&& pred, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Permutes the elements in the range [first, last) such that there exists
@@ -486,10 +352,10 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an birdirectional iterator
-    /// \tparam F           The type of the function/function object to use
+    /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a transform requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
+    ///                     overload of \a partition requires \a Pred to meet
+    ///                     the requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
@@ -497,7 +363,7 @@ namespace hpx { namespace ranges {
     ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
-    /// \param f            Unary predicate which returns true if the element
+    /// \param pred         Unary predicate which returns true if the element
     ///                     should be ordered before other elements.
     ///                     Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
@@ -535,42 +401,33 @@ namespace hpx { namespace ranges {
     ///           If the execution policy is of type \a parallel_task_policy
     ///           the algorithm returns a future<> referring to this iterator.
     ///
-    template <typename ExPolicy, typename Rng, typename F, typename Proj>
-    typename util::detail::algorithm_result<ExPolicy,
+    template <typename ExPolicy, typename Rng, typename Pred,
+        typename Proj = parallel::util::projection_identity>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
         subrange_t<hpx::traits::range_iterator_t<Rng>>>::type
-    stable_partition(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj);
+    stable_partition(ExPolicy&& policy, Rng&& rng, Pred&& pred,
+        Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Copies the elements in the range, defined by [first, last),
-    /// to two different ranges depending on the value returned by
-    /// the predicate \a pred. The elements, that satisfy the predicate \a pred
-    /// are copied to the range beginning at \a dest_true. The rest of
-    /// the elements are copied to the range beginning at \a dest_false.
-    /// The order of the elements is preserved.
+    /// Permutes the elements in the range [first, last) such that there exists
+    /// an iterator i such that for every iterator j in the range [first, i)
+    /// INVOKE(f, INVOKE (proj, *j)) != false, and for every iterator k in the
+    /// range [i, last), INVOKE(f, INVOKE (proj, *k)) == false
     ///
-    /// \note   Complexity: Performs not more than \a last - \a first
-    ///         assignments, exactly \a last - \a first applications of the
-    ///         predicate \a f.
+    /// \note   Complexity: At most (last - first) * log(last - first) swaps,
+    ///         but only linear number of swaps if there is enough extra memory
+    ///         Exactly \a last - \a first applications of the predicate and
+    ///         projection.
     ///
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    /// \tparam BidirIter   The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     input iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range for the elements that satisfy
-    ///                     the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter3    The type of the iterator representing the
-    ///                     destination range for the elements that don't
-    ///                     satisfy the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     sentinel type must be a sentinel for BidirIter.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a partition_copy requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible.
+    ///                     overload of \a partition requires \a Pred to meet
+    ///                     the requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
@@ -578,83 +435,64 @@ namespace hpx { namespace ranges {
     ///                     the algorithm will be applied to.
     /// \param last         Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied.
-    /// \param dest_true    Refers to the beginning of the destination range
-    ///                     for the elements that satisfy the predicate \a pred
-    /// \param dest_false   Refers to the beginning of the destination range
-    ///                     for the elements that don't satisfy the predicate
-    ///                     \a pred.
-    /// \param pred         Specifies the function (or function object) which
+    /// \param pred         Unary predicate which returns true if the element
+    ///                     should be ordered before other elements.
+    ///                     Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). This is an
-    ///                     unary predicate for partitioning the source
-    ///                     iterators. The signature of
-    ///                     this predicate should be equivalent to:
+    ///                     sequence specified by [first, last). The signature
+    ///                     of this predicate should be equivalent to:
     ///                     \code
-    ///                     bool pred(const Type &a);
+    ///                     bool fun(const Type &a);
     ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
-    ///                     implicitly converted to Type.
+    ///                     The signature does not need to have const&.
+    ///                     The type \a Type must be such that an object of
+    ///                     type \a BidirIter can be dereferenced and then
+    ///                     implicitly converted to \a Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
+    ///                     \a f is invoked.
     ///
-    /// The assignments in the parallel \a partition_copy algorithm invoked
-    /// without an execution policy object execute in sequential order in the
-    /// calling thread.
+    /// The invocations of \a f in the parallel \a stable_partition algorithm
+    /// invoked without an execution policy object executes in sequential order
+    /// in the calling thread.
     ///
-    /// \returns  The \a partition_copy algorithm returns a
-    ///           \a partition_copy_result<FwdIter, OutIter2, OutIter3>.
-    ///           The \a partition_copy algorithm returns the tuple of
-    ///           the source iterator \a last,
-    ///           the destination iterator to the end of the \a
-    ///           dest_true range, and the destination iterator to the end of
-    ///           the \a dest_false range.
+    /// \returns  The \a stable_partition algorithm returns an iterator i such
+    ///           that for every iterator j in the range [first, i), f(*j) !=
+    ///           false INVOKE(f, INVOKE(proj, *j)) != false, and for every
+    ///           iterator k in the range [i, last), f(*k) == false
+    ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
+    ///           the elements in both groups is preserved.
     ///
-    template <typename FwdIter1, typename Sent, typename FwdIter2,
-        typename FwdIter3, typename Pred, typename Proj>
-    hpx::util::in_out_out<FwdIter1, FwdIter2, FwdIter3>
-    partition_copy(FwdIter1 first, Sent last,
-        FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj);
+    template <typename BidirIter, typename Sent, typename Pred,
+        typename Proj = parallel::util::projection_identity>
+    subrange_t<BidirIter> stable_partition(BidirIter first, Sent last,
+        Pred&& pred, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Copies the elements in the range, defined by [first, last),
-    /// to two different ranges depending on the value returned by
-    /// the predicate \a pred. The elements, that satisfy the predicate \a pred
-    /// are copied to the range beginning at \a dest_true. The rest of
-    /// the elements are copied to the range beginning at \a dest_false.
-    /// The order of the elements is preserved.
+    /// Permutes the elements in the range [first, last) such that there exists
+    /// an iterator i such that for every iterator j in the range [first, i)
+    /// INVOKE(f, INVOKE (proj, *j)) != false, and for every iterator k in the
+    /// range [i, last), INVOKE(f, INVOKE (proj, *k)) == false
     ///
-    /// \note   Complexity: Performs not more than \a last - \a first
-    ///         assignments, exactly \a last - \a first applications of the
-    ///         predicate \a f.
+    /// \note   Complexity: At most (last - first) * log(last - first) swaps,
+    ///         but only linear number of swaps if there is enough extra memory
+    ///         Exactly \a last - \a first applications of the predicate and
+    ///         projection.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     in which it executes the invocations of \a f.
+    /// \tparam BidirIter   The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     input iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination range for the elements that satisfy
-    ///                     the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIter3    The type of the iterator representing the
-    ///                     destination range for the elements that don't
-    ///                     satisfy the predicate \a pred (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     sentinel type must be a sentinel for BidirIter.
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a partition_copy requires \a Pred to
-    ///                     meet the requirements of \a CopyConstructible.
+    ///                     overload of \a partition requires \a Pred to meet
+    ///                     the requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
@@ -664,61 +502,53 @@ namespace hpx { namespace ranges {
     ///                     the algorithm will be applied to.
     /// \param last         Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied.
-    /// \param dest_true    Refers to the beginning of the destination range
-    ///                     for the elements that satisfy the predicate \a pred
-    /// \param dest_false   Refers to the beginning of the destination range
-    ///                     for the elements that don't satisfy the predicate
-    ///                     \a pred.
-    /// \param pred         Specifies the function (or function object) which
+    /// \param pred         Unary predicate which returns true if the element
+    ///                     should be ordered before other elements.
+    ///                     Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). This is an
-    ///                     unary predicate for partitioning the source
-    ///                     iterators. The signature of
-    ///                     this predicate should be equivalent to:
+    ///                     sequence specified by [first, last). The signature
+    ///                     of this predicate should be equivalent to:
     ///                     \code
-    ///                     bool pred(const Type &a);
+    ///                     bool fun(const Type &a);
     ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
-    ///                     implicitly converted to Type.
+    ///                     The signature does not need to have const&.
+    ///                     The type \a Type must be such that an object of
+    ///                     type \a BidirIter can be dereferenced and then
+    ///                     implicitly converted to \a Type.
     /// \param proj         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
+    ///                     \a f is invoked.
     ///
-    /// The assignments in the parallel \a partition_copy algorithm invoked
-    /// with an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
+    /// The invocations of \a f in the parallel \a stable_partition algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequenced_policy executes in sequential order in the
+    /// calling thread.
     ///
-    /// The assignments in the parallel \a partition_copy algorithm invoked
-    /// with an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
+    /// The invocations of \a f in the parallel \a stable_partition algorithm
+    /// invoked with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a partition_copy algorithm returns a
-    ///           hpx::future<partition_copy_result<FwdIter, OutIter2,
-    ///           OutIter3>>
-    ///           if the execution policy is of type \a parallel_task_policy
-    ///           and returns
-    ///           \a partition_copy_result<FwdIter, OutIter2, OutIter3>
-    ///           otherwise.
-    ///           The \a partition_copy algorithm returns the tuple of
-    ///           the source iterator \a last,
-    ///           the destination iterator to the end of the \a
-    ///           dest_true range, and the destination iterator to the end of
-    ///           the \a dest_false range.
+    /// \returns  The \a stable_partition algorithm returns an iterator i such
+    ///           that for every iterator j in the range [first, i), f(*j) !=
+    ///           false INVOKE(f, INVOKE(proj, *j)) != false, and for every
+    ///           iterator k in the range [i, last), f(*k) == false
+    ///           INVOKE(f, INVOKE (proj, *k)) == false. The relative order of
+    ///           the elements in both groups is preserved.
+    ///           If the execution policy is of type \a parallel_task_policy
+    ///           the algorithm returns a future<> referring to this iterator.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent,
-        typename FwdIter2, typename FwdIter3, typename Pred, typename Proj>
-    typename util::detail::algorithm_result<ExPolicy,
-        partition_copy_result<FwdIter, OutIter2, OutIter3>>::type
-    partition_copy(ExPolicy&& policy, FwdIter1 first, Sent last,
-        FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj);
+    template <typename ExPolicy, typename BidirIter, typename Sent,
+        typename Pred,
+        typename Proj = parallel::util::projection_identity>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        subrange_t<BidirIter>>::type
+    stable_partition(ExPolicy&& policy, BidirIter first, Sent last,
+        Pred&& pred, Proj&& proj = Proj());
 
-    ///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
     /// Copies the elements in the range \a rng,
     /// to two different ranges depending on the value returned by
     /// the predicate \a pred. The elements, that satisfy the predicate \a pred
@@ -733,12 +563,12 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an forward iterator.
-    /// \tparam FwdIter2    The type of the iterator representing the
+    /// \tparam OutIter2    The type of the iterator representing the
     ///                     destination range for the elements that satisfy
     ///                     the predicate \a pred (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam FwdIter3    The type of the iterator representing the
+    /// \tparam OutIter3    The type of the iterator representing the
     ///                     destination range for the elements that don't
     ///                     satisfy the predicate \a pred (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -789,12 +619,13 @@ namespace hpx { namespace ranges {
     ///           range, and the destination iterator to the end of the \a
     ///           dest_false range.
     ///
-    template <typename Rng, typename FwdIter2,
-        typename FwdIter3, typename Pred, typename Proj>
-    friend partition_copy_result<hpx::traits::range_iterator_t<Rng>, FwdIter2,
-        FwdIter3> >::type
-    partition_copy(Rng&& rng, FwdIter2 dest_true, FwdIter3 dest_false,
-        Pred&& pred, Proj&& proj);
+    template <typename Rng, typename OutIter2,
+        typename OutIter3, typename Pred,
+        typename Proj = parallel::util::projection_identity>
+    partition_copy_result<hpx::traits::range_iterator_t<Rng>,
+        OutIter2, OutIter3>
+    partition_copy(Rng&& rng, OutIter2 dest_true, OutIter3 dest_false,
+        Pred&& pred, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements in the range \a rng,
@@ -886,12 +717,195 @@ namespace hpx { namespace ranges {
     ///           dest_false range.
     ///
     template <typename ExPolicy, typename Rng, typename FwdIter2,
-        typename FwdIter3, typename Pred, typename Proj>
-    friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        typename FwdIter3, typename Pred,
+        typename Proj = parallel::util::projection_identity>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
         partition_copy_result<hpx::traits::range_iterator_t<Rng>, FwdIter2,
-        FwdIter3>>::type
+            FwdIter3>>::type
     partition_copy(ExPolicy&& policy, Rng&& rng, FwdIter2 dest_true,
-        FwdIter3 dest_false, Pred&& pred, Proj&& proj);
+        FwdIter3 dest_false, Pred&& pred, Proj&& proj = Proj());
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Copies the elements in the range, defined by [first, last),
+    /// to two different ranges depending on the value returned by
+    /// the predicate \a pred. The elements, that satisfy the predicate \a pred
+    /// are copied to the range beginning at \a dest_true. The rest of
+    /// the elements are copied to the range beginning at \a dest_false.
+    /// The order of the elements is preserved.
+    ///
+    /// \note   Complexity: Performs not more than \a last - \a first
+    ///         assignments, exactly \a last - \a first applications of the
+    ///         predicate \a f.
+    ///
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
+    /// \tparam OutIter2    The type of the iterator representing the
+    ///                     destination range for the elements that satisfy
+    ///                     the predicate \a pred (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam OutIter3    The type of the iterator representing the
+    ///                     destination range for the elements that don't
+    ///                     satisfy the predicate \a pred (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a partition_copy requires \a Pred to
+    ///                     meet the requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to sentinel value denoting the end of the
+    ///                     sequence of elements the algorithm will be applied.
+    /// \param dest_true    Refers to the beginning of the destination range
+    ///                     for the elements that satisfy the predicate \a pred
+    /// \param dest_false   Refers to the beginning of the destination range
+    ///                     for the elements that don't satisfy the predicate
+    ///                     \a pred.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is an
+    ///                     unary predicate for partitioning the source
+    ///                     iterators. The signature of
+    ///                     this predicate should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a partition_copy algorithm invoked
+    /// without an execution policy object execute in sequential order in the
+    /// calling thread.
+    ///
+    /// \returns  The \a partition_copy algorithm returns a
+    ///           \a partition_copy_result<FwdIter, OutIter2, OutIter3>.
+    ///           The \a partition_copy algorithm returns the tuple of
+    ///           the source iterator \a last,
+    ///           the destination iterator to the end of the \a
+    ///           dest_true range, and the destination iterator to the end of
+    ///           the \a dest_false range.
+    ///
+    template <typename InIter, typename Sent, typename OutIter2,
+        typename OutIter3, typename Pred,
+        typename Proj = parallel::util::projection_identity>
+    partition_copy_result<InIter, OutIter2, OutIter3>
+    partition_copy(InIter first,
+        Sent last, OutIter2 dest_true, OutIter3 dest_false, Pred&& pred,
+        Proj&& proj = Proj());
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Copies the elements in the range, defined by [first, last),
+    /// to two different ranges depending on the value returned by
+    /// the predicate \a pred. The elements, that satisfy the predicate \a pred
+    /// are copied to the range beginning at \a dest_true. The rest of
+    /// the elements are copied to the range beginning at \a dest_false.
+    /// The order of the elements is preserved.
+    ///
+    /// \note   Complexity: Performs not more than \a last - \a first
+    ///         assignments, exactly \a last - \a first applications of the
+    ///         predicate \a f.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
+    /// \tparam OutIter2    The type of the iterator representing the
+    ///                     destination range for the elements that satisfy
+    ///                     the predicate \a pred (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam OutIter3    The type of the iterator representing the
+    ///                     destination range for the elements that don't
+    ///                     satisfy the predicate \a pred (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a partition_copy requires \a Pred to
+    ///                     meet the requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to sentinel value denoting the end of the
+    ///                     sequence of elements the algorithm will be applied.
+    /// \param dest_true    Refers to the beginning of the destination range
+    ///                     for the elements that satisfy the predicate \a pred
+    /// \param dest_false   Refers to the beginning of the destination range
+    ///                     for the elements that don't satisfy the predicate
+    ///                     \a pred.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is an
+    ///                     unary predicate for partitioning the source
+    ///                     iterators. The signature of
+    ///                     this predicate should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a partition_copy algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a partition_copy algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a partition_copy algorithm returns a
+    ///           hpx::future<partition_copy_result<FwdIter, OutIter2,
+    ///           OutIter3>>
+    ///           if the execution policy is of type \a parallel_task_policy
+    ///           and returns
+    ///           \a partition_copy_result<FwdIter, OutIter2, OutIter3>
+    ///           otherwise.
+    ///           The \a partition_copy algorithm returns the tuple of
+    ///           the source iterator \a last,
+    ///           the destination iterator to the end of the \a
+    ///           dest_true range, and the destination iterator to the end of
+    ///           the \a dest_false range.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename Sent,
+        typename OutIter2, typename OutIter3, typename Pred,
+        typename Proj = parallel::util::projection_identity>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        partition_copy_result<FwdIter, OutIter2, OutIter3>>::type
+    partition_copy(ExPolicy&& policy,
+        FwdIter first, Sent last, OutIter2 dest_true, OutIter3 dest_false,
+        Pred&& pred, Proj&& proj = Proj());
 
     // clang-format on
 }}    // namespace hpx::ranges

@@ -15,6 +15,8 @@
 #include <exception>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::distributed {
 
@@ -162,3 +164,5 @@ namespace hpx::lcos {
         hpx::distributed::latch;
     /// \endcond
 }    // namespace hpx::lcos
+
+#include <hpx/config/warnings_suffix.hpp>

@@ -26,11 +26,10 @@ int make_int_slowly()
     return 42;
 }
 
-template <class Container>
 void test_when_all_from_list()
 {
     unsigned const count = 10;
-    Container futures;
+    std::vector<hpx::future<int>> futures;
     for (unsigned j = 0; j < count; ++j)
     {
         hpx::lcos::local::futures_factory<int()> task(make_int_slowly);
@@ -38,9 +37,8 @@ void test_when_all_from_list()
         task.apply();
     }
 
-    hpx::future<Container> r = hpx::when_all(futures);
-
-    Container result = r.get();
+    auto r = hpx::when_all(futures);
+    auto result = r.get();
 
     HPX_TEST_EQ(futures.size(), result.size());
     for (const auto& f : futures)
@@ -49,12 +47,11 @@ void test_when_all_from_list()
         HPX_TEST(r.is_ready());
 }
 
-template <class Container>
 void test_when_all_from_list_iterators()
 {
     unsigned const count = 10;
 
-    Container futures;
+    std::vector<hpx::future<int>> futures;
     for (unsigned j = 0; j < count; ++j)
     {
         hpx::lcos::local::futures_factory<int()> task(make_int_slowly);
@@ -62,11 +59,8 @@ void test_when_all_from_list_iterators()
         task.apply();
     }
 
-    hpx::future<Container> r =
-        hpx::when_all<typename Container::iterator, Container>(
-            futures.begin(), futures.end());
-
-    Container result = r.get();
+    auto r = hpx::when_all(futures.begin(), futures.end());
+    auto result = r.get();
 
     HPX_TEST_EQ(futures.size(), result.size());
     for (const auto& f : futures)
@@ -258,12 +252,8 @@ using hpx::future;
 int hpx_main(variables_map&)
 {
     {
-        test_when_all_from_list<std::vector<future<int>>>();
-        test_when_all_from_list<std::list<future<int>>>();
-        test_when_all_from_list<std::deque<future<int>>>();
-        test_when_all_from_list_iterators<std::vector<future<int>>>();
-        test_when_all_from_list_iterators<std::list<future<int>>>();
-        test_when_all_from_list_iterators<std::deque<future<int>>>();
+        test_when_all_from_list();
+        test_when_all_from_list_iterators();
         test_when_all_one_future();
         test_when_all_two_futures();
         test_when_all_three_futures();

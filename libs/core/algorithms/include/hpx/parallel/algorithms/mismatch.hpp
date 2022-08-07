@@ -1,3 +1,4 @@
+//  Copyright (c) 2022 Bhumit Attarde
 //  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,14 +13,17 @@
 namespace hpx {
     // clang-format off
 
-    /// Returns true if the range [first1, last1) is mismatch to the range
-    /// [first2, last2), and false otherwise.
+    /// Returns the first mismatching pair of elements from two ranges: one
+    /// defined by [first1, last1) and another defined by [first2,last2). If
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
+    /// Executed according to the policy.
     ///
     /// \note   Complexity: At most min(last1 - first1, last2 - first2)
-    ///         applications of the predicate \a f. If \a FwdIter1
-    ///         and \a FwdIter2 meet the requirements of \a RandomAccessIterator
-    ///         and (last1 - first1) != (last2 - first2) then no applications
-    ///         of the predicate \a f are made.
+    ///         applications of the predicate \a op or \a operator==.
+    ///         If \a FwdIter1 and \a FwdIter2 meet the requirements of
+    ///         \a RandomAccessIterator and
+    ///         (last1 - first1) != (last2 - first2) then no applications
+    ///         of the predicate \a op or \a operator== are made.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -78,27 +82,99 @@ namespace hpx {
     ///           This overload of mismatch uses operator== to determine if two
     ///           elements are mismatch.
     ///
-    /// \returns  The \a mismatch algorithm returns a \a hpx::future<bool> if the
-    ///           execution policy is of type
-    ///           \a sequenced_task_policy or
+    /// \returns  The \a mismatch algorithm returns a
+    ///           \a hpx::future<std::pair<FwdIter1,FwdIter2>>
+    ///           if the execution policy is of type \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a bool otherwise.
-    ///           The \a mismatch algorithm returns true if the elements in the
-    ///           two ranges are mismatch, otherwise it returns false.
-    ///           If the length of the range [first1, last1) does not mismatch
-    ///           the length of the range [first2, last2), it returns false.
+    ///           returns \a std::pair<FwdIter1,FwdIter2> otherwise.
+    ///           If no mismatches are found when the comparison reaches last1
+    ///           or last2, whichever happens first, the pair holds the end
+    ///           iterator and the corresponding iterator from the other range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::equal_to>
-    util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
+        typename Pred>
+    hpx::parallel::util::detail::algorithm_result_t
+        <ExPolicy, std::pair<FwdIter1, FwdIter2>>
     mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred());
+            FwdIter2 first2, FwdIter2 last2, Pred&& op);
 
-    /// Returns std::pair with iterators to the first two non-equivalent
-    /// elements.
+    /// Returns the first mismatching pair of elements from two ranges: one
+    /// defined by [first1, last1) and another defined by [first2,last2). If
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
+    /// Executed according to the policy.
     ///
-    /// \note   Complexity: At most \a last1 - \a first1 applications of the
-    ///         predicate \a f.
+    /// \note   Complexity: At most min(last1 - first1, last2 - first2)
+    ///         applications of \a operator==.
+    ///         If \a FwdIter1 and \a FwdIter2 meet the requirements of
+    ///         \a RandomAccessIterator and
+    ///         (last1 - first1) != (last2 - first2) then no applications
+    ///         of \a operator== are made.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    /// \param last2        Refers to the end of the sequence of elements of
+    ///                     the second range the algorithm will be applied to.
+    ///
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \note     The two ranges are considered mismatch if, for every iterator
+    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           This overload of mismatch uses operator== to determine if two
+    ///           elements are mismatch.
+    ///
+    /// \returns  The \a mismatch algorithm returns a
+    ///           \a hpx::future<std::pair<FwdIter1,FwdIter2>>
+    ///           if the execution policy is of type \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a std::pair<FwdIter1,FwdIter2> otherwise.
+    ///           If no mismatches are found when the comparison reaches last1
+    ///           or last2, whichever happens first, the pair holds the end
+    ///           iterator and the corresponding iterator from the other range.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+    hpx::parallel::util::detail::algorithm_result_t
+        <ExPolicy, std::pair<FwdIter1, FwdIter2>>
+    mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2);
+
+    /// Returns the first mismatching pair of elements from two ranges: one
+    /// defined by [first1, last1) and another defined by [first2,last2). If
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
+    /// Executed according to the policy.
+    ///
+    /// \note   Complexity: At most last1 - first1
+    ///         applications of the predicate \a op or \a operator==.
+    ///         If \a FwdIter1 and \a FwdIter2 meet the requirements of
+    ///         \a RandomAccessIterator and
+    ///         (last1 - first1) != (last2 - first2) then no applications
+    ///         of the predicate \a op or \a operator== are made.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -150,21 +226,310 @@ namespace hpx {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
+    /// \note     The two ranges are considered mismatch if, for every iterator
+    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           This overload of mismatch uses operator== to determine if two
+    ///           elements are mismatch.
+    ///
     /// \returns  The \a mismatch algorithm returns a
-    ///           \a hpx::future<std::pair<FwdIter1, FwdIter2> > if the
-    ///           execution policy is of type
-    ///           \a sequenced_task_policy or
+    ///           \a hpx::future<std::pair<FwdIter1,FwdIter2>>
+    ///           if the execution policy is of type \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a std::pair<FwdIter1, FwdIter2> otherwise.
-    ///           The \a mismatch algorithm returns the first mismatching pair
-    ///           of elements from two ranges: one defined by [first1, last1)
-    ///           and another defined by [first2, last2).
+    ///           returns \a std::pair<FwdIter1,FwdIter2> otherwise.
+    ///           If no mismatches are found when the comparison reaches last1
+    ///           or last2, whichever happens first, the pair holds the end
+    ///           iterator and the corresponding iterator from the other range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::equal_to>
-    util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter1, FwdIter2>>
-    mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
-        Pred&& op = Pred());
+        typename Pred>
+    hpx::parallel::util::detail::algorithm_result_t
+        <ExPolicy, std::pair<FwdIter1, FwdIter2>>
+    mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, Pred&& op);
+
+    /// Returns the first mismatching pair of elements from two ranges: one
+    /// defined by [first1, last1) and another defined by [first2,last2). If
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
+    /// Executed according to the policy.
+    ///
+    /// \note   Complexity: At most last1 - first1
+    ///         applications of \a operator==.
+    ///         If \a FwdIter1 and \a FwdIter2 meet the requirements of
+    ///         \a RandomAccessIterator and
+    ///         (last1 - first1) != (last2 - first2) then no applications
+    ///         of \a operator== are made.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a mismatch requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    ///
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a mismatch algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \note     The two ranges are considered mismatch if, for every iterator
+    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           This overload of mismatch uses operator== to determine if two
+    ///           elements are mismatch.
+    ///
+    /// \returns  The \a mismatch algorithm returns a
+    ///           \a hpx::future<std::pair<FwdIter1,FwdIter2>>
+    ///           if the execution policy is of type \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a std::pair<FwdIter1,FwdIter2> otherwise.
+    ///           If no mismatches are found when the comparison reaches last1
+    ///           or last2, whichever happens first, the pair holds the end
+    ///           iterator and the corresponding iterator from the other range.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
+    hpx::parallel::util::detail::algorithm_result_t
+        <ExPolicy, std::pair<FwdIter1, FwdIter2>>
+    mismatch(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2);
+
+    /// Returns the first mismatching pair of elements from two ranges: one
+    /// defined by [first1, last1) and another defined by [first2,last2). If
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
+    ///
+    /// \note   Complexity: At most min(last1 - first1, last2 - first2)
+    ///         applications of the predicate \a op or \a operator==.
+    ///         If \a FwdIter1 and \a FwdIter2 meet the requirements of
+    ///         \a RandomAccessIterator and
+    ///         (last1 - first1) != (last2 - first2) then no applications
+    ///         of the predicate \a op or \a operator== are made.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a mismatch requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
+    ///
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    /// \param last2        Refers to the end of the sequence of elements of
+    ///                     the second range the algorithm will be applied to.
+    /// \param op           The binary predicate which returns true if the
+    ///                     elements should be treated as mismatch. The signature
+    ///                     of the predicate function should be equivalent to
+    ///                     the following:
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type1 and \a Type2 respectively
+    ///
+    /// \note     The two ranges are considered mismatch if, for every iterator
+    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           This overload of mismatch uses operator== to determine if two
+    ///           elements are mismatch.
+    ///
+    /// \returns  The \a mismatch algorithm returns a
+    ///           \a std::pair<FwdIter1,FwdIter2>.
+    ///           If no mismatches are found when the comparison reaches last1
+    ///           or last2, whichever happens first, the pair holds the end
+    ///           iterator and the corresponding iterator from the other range.
+    ///
+    template <typename FwdIter1, typename FwdIter2,
+        typename Pred>
+    std::pair<FwdIter1, FwdIter2> mismatch(FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2, Pred&& op);
+
+    /// Returns the first mismatching pair of elements from two ranges: one
+    /// defined by [first1, last1) and another defined by [first2,last2). If
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
+    ///
+    /// \note   Complexity: At most min(last1 - first1, last2 - first2)
+    ///         applications of \a operator==.
+    ///         If \a FwdIter1 and \a FwdIter2 meet the requirements of
+    ///         \a RandomAccessIterator and
+    ///         (last1 - first1) != (last2 - first2) then no applications
+    ///         of \a operator== are made.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    /// \param last2        Refers to the end of the sequence of elements of
+    ///                     the second range the algorithm will be applied to.
+    ///
+    /// \note     The two ranges are considered mismatch if, for every iterator
+    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           This overload of mismatch uses operator== to determine if two
+    ///           elements are mismatch.
+    ///
+    /// \returns  The \a mismatch algorithm returns a
+    ///           \a std::pair<FwdIter1,FwdIter2>.
+    ///           If no mismatches are found when the comparison reaches last1
+    ///           or last2, whichever happens first, the pair holds the end
+    ///           iterator and the corresponding iterator from the other range.
+    ///
+    template <typename FwdIter1, typename FwdIter2>
+    std::pair<FwdIter1, FwdIter2> mismatch(FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2);
+
+    /// Returns the first mismatching pair of elements from two ranges: one
+    /// defined by [first1, last1) and another defined by [first2,last2). If
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
+    ///
+    /// \note   Complexity: At most last1 - first1
+    ///         applications of the predicate \a op or \a operator==.
+    ///         If \a FwdIter1 and \a FwdIter2 meet the requirements of
+    ///         \a RandomAccessIterator and
+    ///         (last1 - first1) != (last2 - first2) then no applications
+    ///         of the predicate \a op or \a operator== are made.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a mismatch requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
+    ///
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    /// \param op           The binary predicate which returns true if the
+    ///                     elements should be treated as mismatch. The signature
+    ///                     of the predicate function should be equivalent to
+    ///                     the following:
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type1 and \a Type2 respectively
+    ///
+    /// \note     The two ranges are considered mismatch if, for every iterator
+    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           This overload of mismatch uses operator== to determine if two
+    ///           elements are mismatch.
+    ///
+    /// \returns  The \a mismatch algorithm returns a
+    ///           \a std::pair<FwdIter1,FwdIter2>.
+    ///           If no mismatches are found when the comparison reaches last1
+    ///           or last2, whichever happens first, the pair holds the end
+    ///           iterator and the corresponding iterator from the other range.
+    ///
+    template <typename FwdIter1, typename FwdIter2,
+        typename Pred>
+    std::pair<FwdIter1, FwdIter2> mismatch(FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, Pred&& op);
+
+    /// Returns the first mismatching pair of elements from two ranges: one
+    /// defined by [first1, last1) and another defined by [first2,last2). If
+    /// last2 is not provided, it denotes first2 + (last1 - first1).
+    ///
+    /// \note   Complexity: At most last1 - first1
+    ///         applications of \a operator==.
+    ///         If \a FwdIter1 and \a FwdIter2 meet the requirements of
+    ///         \a RandomAccessIterator and
+    ///         (last1 - first1) != (last2 - first2) then no applications
+    ///         of \a operator== are made.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a mismatch requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
+    ///
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    ///
+    /// \note     The two ranges are considered mismatch if, for every iterator
+    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           This overload of mismatch uses operator== to determine if two
+    ///           elements are mismatch.
+    ///
+    /// \returns  The \a mismatch algorithm returns a
+    ///           \a std::pair<FwdIter1,FwdIter2>.
+    ///           If no mismatches are found when the comparison reaches last1
+    ///           or last2, whichever happens first, the pair holds the end
+    ///           iterator and the corresponding iterator from the other range.
+    ///
+    template <typename FwdIter1, typename FwdIter2>
+    std::pair<FwdIter1, FwdIter2> mismatch(FwdIter1 first1,
+        FwdIter1 last1, FwdIter2 first2);
 
     // clang-format on
 }    // namespace hpx

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,9 +21,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 struct shared_parallel_executor
 {
+private:
     template <typename F, typename... Ts>
-    hpx::shared_future<typename hpx::util::invoke_result<F, Ts...>::type>
-    async_execute(F&& f, Ts&&... ts)
+    friend hpx::shared_future<hpx::util::invoke_result_t<F, Ts...>> tag_invoke(
+        hpx::parallel::execution::async_execute_t,
+        shared_parallel_executor const&, F&& f, Ts&&... ts)
     {
         return hpx::async(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
@@ -45,7 +47,7 @@ hpx::thread::id test(int passed_through)
 
 void test_sync()
 {
-    typedef shared_parallel_executor executor;
+    using executor = shared_parallel_executor;
 
     executor exec;
     HPX_TEST(hpx::parallel::execution::sync_execute(exec, &test, 42) !=
@@ -54,7 +56,7 @@ void test_sync()
 
 void test_async()
 {
-    typedef shared_parallel_executor executor;
+    using executor = shared_parallel_executor;
 
     executor exec;
 
@@ -73,7 +75,7 @@ void bulk_test(int, hpx::thread::id tid, int passed_through)    //-V813
 
 void test_bulk_sync()
 {
-    typedef shared_parallel_executor executor;
+    using executor = shared_parallel_executor;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
@@ -91,7 +93,7 @@ void test_bulk_sync()
 
 void test_bulk_async()
 {
-    typedef shared_parallel_executor executor;
+    using executor = shared_parallel_executor;
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
@@ -120,7 +122,7 @@ void void_test(int passed_through)
 
 void test_sync_void()
 {
-    typedef shared_parallel_executor executor;
+    using executor = shared_parallel_executor;
 
     executor exec;
     hpx::parallel::execution::sync_execute(exec, &void_test, 42);
@@ -128,7 +130,7 @@ void test_sync_void()
 
 void test_async_void()
 {
-    typedef shared_parallel_executor executor;
+    using executor = shared_parallel_executor;
 
     executor exec;
     hpx::shared_future<void> fut =

@@ -159,9 +159,8 @@ struct test_async_executor1
     typedef hpx::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename... Ts>
-    static hpx::future<
-        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
-    async_execute(F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::async_execute_t,
+        test_async_executor1 const&, F&& f, Ts&&... ts)
     {
         ++count_async;
         return hpx::async(
@@ -172,9 +171,9 @@ struct test_async_executor1
 struct test_timed_async_executor1 : test_async_executor1
 {
     template <typename F, typename... Ts>
-    static hpx::future<
-        typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
-    async_execute_at(
+    friend decltype(auto) tag_invoke(
+        hpx::parallel::execution::async_execute_at_t,
+        test_timed_async_executor1 const&,
         hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         ++count_async_at;
@@ -199,8 +198,8 @@ namespace hpx { namespace parallel { namespace execution {
 struct test_timed_async_executor2 : test_async_executor1
 {
     template <typename F, typename... Ts>
-    static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
-    sync_execute(F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::sync_execute_t,
+        test_timed_async_executor2 const&, F&& f, Ts&&... ts)
     {
         ++count_sync;
         return hpx::async(
@@ -212,8 +211,9 @@ struct test_timed_async_executor2 : test_async_executor1
 struct test_timed_async_executor3 : test_timed_async_executor2
 {
     template <typename F, typename... Ts>
-    static typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
-    sync_execute_at(
+    friend decltype(auto) tag_invoke(
+        hpx::parallel::execution::sync_execute_at_t,
+        test_timed_async_executor3 const&,
         hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         ++count_sync_at;
@@ -239,7 +239,8 @@ namespace hpx { namespace parallel { namespace execution {
 struct test_timed_async_executor4 : test_async_executor1
 {
     template <typename F, typename... Ts>
-    static void post(F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
+        test_timed_async_executor4 const&, F&& f, Ts&&... ts)
     {
         ++count_apply;
         hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
@@ -249,7 +250,8 @@ struct test_timed_async_executor4 : test_async_executor1
 struct test_timed_async_executor5 : test_timed_async_executor4
 {
     template <typename F, typename... Ts>
-    static void post_at(
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::post_at_t,
+        test_timed_async_executor5 const&,
         hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         ++count_apply_at;

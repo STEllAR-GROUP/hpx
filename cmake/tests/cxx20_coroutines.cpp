@@ -5,7 +5,24 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 // This tests whether C++20 coroutines are supported
+
+#if defined(__has_include)
+#if __has_include(<coroutine>)
 #include <coroutine>
+namespace hpx { namespace coro {
+    using std::coroutine_handle;
+    using std::suspend_always;
+    using std::suspend_never;
+}}    // namespace hpx::coro
+#else
+#include <experimental/coroutine>
+namespace hpx { namespace coro {
+    using std::experimental::coroutine_handle;
+    using std::experimental::suspend_always;
+    using std::experimental::suspend_never;
+}}    // namespace hpx::coro
+#endif
+#endif
 
 struct resumable
 {
@@ -19,12 +36,12 @@ struct resumable
             return {};
         }
 
-        std::suspend_never initial_suspend() const noexcept
+        hpx::coro::suspend_never initial_suspend() const noexcept
         {
             return {};
         }
 
-        std::suspend_never final_suspend() const noexcept
+        hpx::coro::suspend_never final_suspend() const noexcept
         {
             return {};
         }
@@ -41,7 +58,9 @@ struct resumable
     {
         return 42;
     }
-    void await_suspend(std::coroutine_handle<promise_type>) const noexcept {}
+    void await_suspend(hpx::coro::coroutine_handle<promise_type>) const noexcept
+    {
+    }
 };
 
 resumable test()

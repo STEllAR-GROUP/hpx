@@ -156,7 +156,8 @@ the project through discussions, pull requests, documentation patches, etc.
 * Bruno Pitrus, for his work with parallel algorithms.
 * Nikunj Gupta, for rewriting the implementation of ``hpx_main.hpp`` and for his
   fixes for tests.
-* Christopher Taylor, for his interest in |hpx| and the fixes he provided.
+* Christopher Taylor, for his interest in |hpx| and the fixes he provided. Chris
+  also contributed support for RISC-V architectures.
 * Shoshana Jakobovits, for her work on the resource partitioner.
 * Denis Blank, who re-wrote our unwrapped function to accept plain values
   arbitrary containers, and properly deal with nested futures.

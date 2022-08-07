@@ -17,6 +17,7 @@ namespace hpx {
     /// beginning at \a dest. After this operation the elements in the
     /// moved-from range will still contain valid values of the appropriate
     /// type, but not necessarily the same values as before the move.
+    /// Executed according to the policy.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first move assignments.
     ///
@@ -62,8 +63,37 @@ namespace hpx {
     ///           moved.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     move(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest);
+
+    /// Moves the elements in the range [first, last), to another range
+    /// beginning at \a dest. After this operation the elements in the
+    /// moved-from range will still contain valid values of the appropriate
+    /// type, but not necessarily the same values as before the move.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first move assignments.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// \returns  The \a move algorithm returns a \a FwdIter2.
+    ///           The \a move algorithm returns the output iterator to the
+    ///           element in the destination range, one past the last element
+    ///           moved.
+    ///
+    template <typename FwdIter1, typename FwdIter2>
+    FwdIter2 move(FwdIter1 first, FwdIter1 last, FwdIter2 dest);
 
     // clang-format off
 }   // namespace hpx

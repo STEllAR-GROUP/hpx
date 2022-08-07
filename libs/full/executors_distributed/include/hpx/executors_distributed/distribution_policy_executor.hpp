@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -119,9 +119,8 @@ namespace hpx { namespace parallel { namespace execution {
         /// \param policy   The distribution_policy to create an executor from
         ///
         template <typename DistPolicy_,
-            typename Enable = typename std::enable_if<
-                !std::is_same<distribution_policy_executor,
-                    typename std::decay<DistPolicy_>::type>::value>::type>
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                distribution_policy_executor, std::decay_t<DistPolicy_>>>>
         distribution_policy_executor(DistPolicy_&& policy)
           : policy_(HPX_FORWARD(DistPolicy_, policy))
         {
@@ -147,26 +146,30 @@ namespace hpx { namespace parallel { namespace execution {
         /// \cond NOINTERNAL
         using execution_category = hpx::execution::parallel_execution_tag;
 
+    private:
         template <typename F, typename... Ts>
-        void post(F&& f, Ts&&... ts) const
+        friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
+            distribution_policy_executor const& exec, F&& f, Ts&&... ts)
         {
-            return post_impl(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            return exec.post_impl(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
-        hpx::future<
-            typename detail::distribution_policy_execute_result<F, Ts...>::type>
-        async_execute(F&& f, Ts&&... ts) const
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::async_execute_t,
+            distribution_policy_executor const& exec, F&& f, Ts&&... ts)
         {
-            return async_execute_impl(
+            return exec.async_execute_impl(
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
-        typename detail::distribution_policy_execute_result<F, Ts...>::type
-        sync_execute(F&& f, Ts&&... ts) const
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::sync_execute_t,
+            distribution_policy_executor const& exec, F&& f, Ts&&... ts)
         {
-            return async_execute_impl(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)
+            return exec
+                .async_execute_impl(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)
                 .get();
         }
         /// \endcond

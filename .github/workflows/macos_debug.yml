@@ -72,4 +72,5 @@ jobs:
           tests.unit.modules.resource_partitioner.used_pus|\
           tests.unit.modules.segmented_algorithms.distributed.tcp.partitioned_vector|\
           tests.unit.threads.distributed.tcp.thread_stacksize|\
-          tests.unit.topology.numa_allocator"
+          tests.unit.topology.numa_allocator|\
+          tests.unit.modules.runtime_components.distributed.tcp.migrate_polymorphic_component"
