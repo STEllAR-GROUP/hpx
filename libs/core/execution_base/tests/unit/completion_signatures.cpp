@@ -319,6 +319,8 @@ void test_sender3()
         ex::detail::no_completion_signatures>);
 }
 
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+
 template <typename Awaiter>
 struct promise
 {
@@ -466,6 +468,8 @@ void test_awaitable_sender3(Signatures)
     // static_assert(std::is_same_v<error_types_of, error_types>);
 }
 
+#endif    // HPX_HAVE_CXX20_COROUTINES
+
 int main()
 {
     {
@@ -542,6 +546,8 @@ int main()
 
     test_sender3();
 
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+
     {
         test_awaitable_sender1(signature_error_values(std::exception_ptr()),
             hpx::coro::suspend_always{});
@@ -553,6 +559,8 @@ int main()
         // test_awaitable_sender2(signature_error_values(std::exception_ptr()));
         // test_awaitable_sender3(signature_error_values(std::exception_ptr()));
     }
+
+#endif    // HPX_HAVE_CXX20_COROUTINES
 
     return hpx::util::report_errors();
 }
