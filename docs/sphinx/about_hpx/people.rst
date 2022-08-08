@@ -71,18 +71,18 @@ tables below.
    ======================= ================ =====
    Hartmut Kaiser          |cct|_, |lsu|_   |email_hkaiser|
    Thomas Heller           |inf3|_, |fau|_  |email_theller|
-   Agustin Berge           |cct|_, |lsu|_   |email_aberge|
+   Agustin Berge                            |email_aberge|
    Mikael Simberg          |cscs|_          |email_msimberg|
    John Biddiscombe        |cscs|_          |email_jbiddiscombe|
    Anton Bikineev          |cct|_, |lsu|_   |email_abikineev|
    Martin Stumpf           |inf3|_, |fau|_  |email_mstumpf|
-   Bryce Adelstein Lelbach |nvidia|_        |email_blelbach|
+   Bryce Adelstein Lelbach                  |email_blelbach|
    Shuangyang Yang         |cct|_, |lsu|_   |email_syang|
-   Jeroen Habraken         |tue|_           |email_jhabraken|
+   Jeroen Habraken                          |email_jhabraken|
    Steven Brandt           |cct|_, |lsu|_   |email_sbrandt|
-   Antoine Tran Tan        |cct|_, |lsu|_   |email_atrantan|
-   Adrian Serio            |cct|_, |lsu|_   |email_aserio|
-   Maciej Brodowicz        |crest|_, |iu|_  |email_mbrodowicz|
+   Antoine Tran Tan        |psu|_,          |email_atrantan|
+   Adrian S. Lemoine       |amd|_           |email_alemoine|
+   Maciej Brodowicz                         |email_mbrodowicz|
    Giannis Gonidelis       |cct|_, |lsu|_   |email_ggonidelis|
    ======================= ================ =====
 
@@ -96,11 +96,11 @@ Contributors to this document
   ======================= ===================== =====
   Hartmut Kaiser          |cct|_, |lsu|_        |email_hkaiser|
   Thomas Heller           |inf3|_, |fau|_       |email_theller|
-  Bryce Adelstein Lelbach |nvidia|_             |email_blelbach|
+  Bryce Adelstein Lelbach                       |email_blelbach|
   Vinay C Amatya          |cct|_, |lsu|_        |email_vamatya|
   Steven Brandt           |cct|_, |lsu|_        |email_sbrandt|
-  Maciej Brodowicz        |crest|_, |iu|_       |email_mbrodowicz|
-  Adrian Serio            |cct|_, |lsu|_        |email_aserio|
+  Maciej Brodowicz                              |email_mbrodowicz|
+  Adrian S. Lemoine       |amd|_                |email_alemoine|
   Rebecca Stobaugh                              |email_rstobaugh|
   Dimitra Karatza         |tud_eemcs|_, |tud|_  |email_dkaratza|
   Bhumit Attarde                                |email_bhumitattarde|
@@ -272,7 +272,7 @@ the project through discussions, pull requests, documentation patches, etc.
   xaguilar, Andrew Kemp, Dylan Stark, Matthew Anderson, Jeremy Wilke, Jiazheng
   Yuan, CyberDrudge, david8dixon, Maxwell Reeser, Raffaele Solca, Marco
   Ippolito, Jules Penuchot, Weile Wei, Severin Strobl, Kor de Jong, albestro,
-  Jeff Trull, Yuri Victorovich, and Gregor Daiﬂ who contributed to the general
+  Jeff Trull, Yuri Victorovich, and Gregor Dai√ü who contributed to the general
   improvement of |hpx|.
 
 |stellar_hpx_funding|_ lists current and past funding sources for |hpx|. Special thanks to

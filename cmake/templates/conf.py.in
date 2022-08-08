@@ -285,18 +285,12 @@ rst_prolog += '''
 .. _lsu: https://www.lsu.edu
 .. |cct| replace:: Center for Computation and Technology (CCT)
 .. _cct: https://www.cct.lsu.edu
-.. |iu| replace:: Indiana University (IU)
-.. _iu: https://www.iu.edu
-.. |crest| replace:: Center for Research in Extreme Scale Technologies (CREST)
-.. _crest: https://pti.iu.edu
 .. |fau| replace:: Friedrich-Alexander University Erlangen-Nuremberg (FAU)
 .. _fau: https://www.fau.de
 .. |inf3| replace:: Department of Computer Science 3 - Computer Architecture
 .. _inf3: https://www3.cs.fau.de
 .. |sandia| replace:: Sandia National Labs (Albuquerque)
 .. _sandia: https://www.sandia.gov
-.. |tue| replace:: Technische Universiteit Eindhoven
-.. _tue: https://www.tui.nl
 .. |nmsu| replace:: New Mexico State University
 .. _nmsu: https://www.nmsu.edu
 .. |unlv| replace:: University of Nevada, Las Vegas
@@ -313,6 +307,10 @@ rst_prolog += '''
 .. _tud: https://www.tudelft.nl/en/
 .. |tud_eemcs| replace:: Faculty of Electrical Engineering, Mathematics & Computer Science
 .. _tud_eemcs: https://www.tudelft.nl/en/eemcs
+.. |amd| replace:: AMD
+.. _amd: https://www.amd.com/en
+.. |psu| replace:: Paris-Saclay University
+.. _psu: https://www.universite-paris-saclay.fr/en
 
 .. |gsoc| replace:: Google Summer of Code
 .. _gsoc: https://developers.google.com/open-source/soc/
@@ -554,10 +552,10 @@ rst_prolog += '''
 .. |email_mstumpf| image:: /_static/images/emails/martinhstumpf.png
 .. |email_blelbach| image:: /_static/images/emails/blelbach.png
 .. |email_syang| image:: /_static/images/emails/syang16.png
-.. |email_jhabraken| image:: /_static/images/emails/vexocide.png
+.. |email_jhabraken| image:: /_static/images/emails/jhabraken.png
 .. |email_sbrandt| image:: /_static/images/emails/sbrandt.png
 .. |email_atrantan| image:: /_static/images/emails/atrantan.png
-.. |email_aserio| image:: /_static/images/emails/aserio.png
+.. |email_alemoine| image:: /_static/images/emails/alemoine.png
 .. |email_mbrodowicz| image:: /_static/images/emails/mbrodowicz.png
 .. |email_vamatya| image:: /_static/images/emails/vamatya.png
 .. |email_dkaratza| image:: /_static/images/emails/dkaratza.png
