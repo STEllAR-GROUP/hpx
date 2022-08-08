@@ -25,14 +25,14 @@ namespace hpx { namespace ranges {
     ///                     in which it executes the invocations of \a f.
     /// \tparam FwdIter1    The type of the source iterators for the first
     ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     sentinel for FwdIter1.
     /// \tparam FwdIter2    The type of the source iterators for the first
     ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -111,7 +111,7 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of an input iterator.
     /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -186,21 +186,21 @@ namespace hpx { namespace ranges {
     ///                     in which it executes the invocations of \a f.
     /// \tparam FwdIter1    The type of the source iterators for the first
     ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     sentinel for FwdIter1.
     /// \tparam FwdIter2    The type of the source iterators for the first
     ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Sent2       The type of the end source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     sentinel for FwdIter2.
     /// \tparam FwdIter3    The type of the source iterators for the first
     ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -396,14 +396,14 @@ namespace hpx { namespace ranges {
     ///
     /// \tparam FwdIter1    The type of the source iterators for the first
     ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     sentinel for FwdIter1.
     /// \tparam FwdIter2    The type of the source iterators for the first
     ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -462,7 +462,7 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of an input iterator.
     /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
@@ -516,21 +516,21 @@ namespace hpx { namespace ranges {
     ///
     /// \tparam FwdIter1    The type of the source iterators for the first
     ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Sent1       The type of the end source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     sentinel for FwdIter1.
     /// \tparam FwdIter2    The type of the source iterators for the first
     ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Sent2       The type of the end source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     sentinel for FwdIter2.
     /// \tparam FwdIter3    The type of the source iterators for the first
     ///                     range used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
