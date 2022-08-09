@@ -8,6 +8,7 @@ set(execution_base_headers
     hpx/execution_base/agent_base.hpp
     hpx/execution_base/agent_ref.hpp
     hpx/execution_base/any_sender.hpp
+    hpx/execution_base/as_awaitable.hpp
     hpx/execution_base/completion_scheduler.hpp
     hpx/execution_base/completion_signatures.hpp
     hpx/execution_base/context_base.hpp
