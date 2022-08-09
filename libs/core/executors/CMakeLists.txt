@@ -94,13 +94,15 @@ add_hpx_module(
     hpx_config
     hpx_errors
     hpx_execution
+    hpx_format
     hpx_futures
     hpx_hardware
     hpx_io_service
     hpx_itt_notify
-    hpx_properties
-    hpx_threading
-    hpx_errors
     hpx_memory
+    hpx_properties
+    hpx_resource_partitioner
+    hpx_threading
+    hpx_topology
   CMAKE_SUBDIRS examples tests
 )

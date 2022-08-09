@@ -21,10 +21,19 @@ namespace hpx { namespace util { namespace detail {
 
     template <typename Incrementable>
     HPX_HOST_DEVICE inline constexpr counting_shape_type<Incrementable>
-    make_counting_shape(Incrementable n)
+    make_counting_shape(Incrementable n) noexcept
     {
         return hpx::util::make_iterator_range(
             hpx::util::make_counting_iterator(Incrementable(0)),
             hpx::util::make_counting_iterator(n));
+    }
+
+    template <typename Incrementable>
+    HPX_HOST_DEVICE inline constexpr counting_shape_type<Incrementable>
+    make_counting_shape(Incrementable b, Incrementable e) noexcept
+    {
+        return hpx::util::make_iterator_range(
+            hpx::util::make_counting_iterator(b),
+            hpx::util::make_counting_iterator(e));
     }
 }}}    // namespace hpx::util::detail

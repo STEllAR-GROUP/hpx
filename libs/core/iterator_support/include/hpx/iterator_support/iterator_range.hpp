@@ -59,7 +59,7 @@ namespace hpx { namespace util {
         typename Sentinel = traits::range_iterator_t<Range>>
     constexpr std::enable_if_t<traits::is_range_v<Range>,
         iterator_range<Iterator, Sentinel>>
-    make_iterator_range(Range& r)
+    make_iterator_range(Range& r) noexcept
     {
         return iterator_range<Iterator, Sentinel>(util::begin(r), util::end(r));
     }
@@ -69,7 +69,7 @@ namespace hpx { namespace util {
         typename Sentinel = traits::range_iterator_t<Range const>>
     constexpr std::enable_if_t<traits::is_range_v<Range>,
         iterator_range<Iterator, Sentinel>>
-    make_iterator_range(Range const& r)
+    make_iterator_range(Range const& r) noexcept
     {
         return iterator_range<Iterator, Sentinel>(util::begin(r), util::end(r));
     }

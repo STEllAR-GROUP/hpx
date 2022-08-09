@@ -412,8 +412,6 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT topology& create_topology();
 
-    [[nodiscard]] HPX_CORE_EXPORT unsigned int hardware_concurrency();
-
     ///////////////////////////////////////////////////////////////////////////
     // abstract away memory page size, calls to system functions are
     // expensive, so return a value initialized at startup

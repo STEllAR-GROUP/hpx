@@ -707,7 +707,7 @@ namespace hpx { namespace threads { namespace policies {
         /// Schedule the passed thread
         void schedule_thread(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
-            thread_priority priority = thread_priority::normal) override
+            thread_priority priority = thread_priority::default_) override
         {
             HPX_ASSERT(get_thread_id_data(thrd)->get_scheduler_base() == this);
 
@@ -815,6 +815,11 @@ namespace hpx { namespace threads { namespace policies {
                 debug::dec<3>(thread_num), "D", debug::dec<2>(domain_num), "Q",
                 debug::dec<3>(q_index));
 
+            if (priority == thread_priority::default_)
+            {
+                priority = get_thread_id_data(thrd)->get_priority();
+            }
+
             numa_holder_[domain_num].thread_queue(q_index)->schedule_thread(
                 thrd, priority, false);
         }
@@ -823,7 +828,7 @@ namespace hpx { namespace threads { namespace policies {
         /// just put it on the normal queue for now
         void schedule_thread_last(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
-            thread_priority priority = thread_priority::normal) override
+            thread_priority priority = thread_priority::default_) override
         {
             spq_deb.debug(debug::str<>("schedule_thread_last"));
             schedule_thread(thrd, schedulehint, allow_fallback, priority);

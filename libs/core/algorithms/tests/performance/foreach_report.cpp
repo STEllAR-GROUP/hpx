@@ -13,6 +13,7 @@
 #include <hpx/local/chrono.hpp>
 #include <hpx/local/execution.hpp>
 #include <hpx/local/init.hpp>
+#include <hpx/modules/compute_local.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include "foreach_scaling_helpers.hpp"

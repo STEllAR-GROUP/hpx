@@ -15,7 +15,8 @@
 /// Generates assembly that serves as a fence to the compiler CPU to disable
 /// optimization. Usually implemented in the form of a memory barrier.
 #define HPX_COMPILER_FENCE
-/// Generates assembly the executes a "pause" instruction. Useful in spinning
+
+/// Generates assembly that executes a "pause" instruction. Useful in spinning
 /// loops.
 #define HPX_SMT_PAUSE
 
@@ -46,7 +47,8 @@ extern "C" void _mm_pause();
 // According to: https://stackoverflow.com/questions/5425506/equivalent-of-x86-pause-instruction-for-ppc
 #define HPX_SMT_PAUSE __asm__ __volatile__("or 27,27,27")
 #elif defined(__arm__)
-#define HPX_SMT_PAUSE __asm__ __volatile__("yield")
+// according to: https://mysqlonarm.github.io/Porting-Optimizing-HPC-for-ARM/
+#define HPX_SMT_PAUSE __asm__ __volatile__("yield" : : : "memory")
 #elif defined(__riscv)
 // According to:
 //
