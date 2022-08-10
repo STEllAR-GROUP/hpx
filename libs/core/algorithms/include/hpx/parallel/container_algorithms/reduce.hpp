@@ -560,18 +560,12 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         operator+().
     ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
     /// \param init         The initial value for the generalized sum.
@@ -601,10 +595,6 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         operator+().
     ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source begin iterator used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -612,8 +602,6 @@ namespace hpx { namespace ranges {
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
@@ -648,16 +636,10 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         operator+().
     ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
     ///
