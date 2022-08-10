@@ -4,20 +4,62 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/assert.hpp>
 #include <hpx/datastructures/variant.hpp>
-#include <hpx/execution/execution.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/traits/coroutine_traits.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/local/functional.hpp>
 #include <hpx/type_support/meta.hpp>
 
 #include <exception>
 #include <system_error>
 #include <utility>
 
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+
 namespace hpx::execution::experimental {
+
+    template <typename Sender, typename Receiver>
+    inline constexpr bool has_nothrow_connect = noexcept(
+        connect(std::declval<Sender>(), std::declval<Receiver>()));
+
+    // 4.18. Cancellation of a sender can unwind a stack of coroutines
+    // As described in the section "All awaitables are senders", the sender
+    // customization points recognize awaitables and adapt them transparently
+    // to model the sender concept. When connect-ing an awaitable and a
+    // receiver, the adaptation layer awaits the awaitable within a coroutine
+    // that implements unhandled_stopped in its promise type. The effect of
+    // this is that an "uncatchable" stopped exception propagates seamlessly
+    // out of awaitables, causing execution::set_stopped to be called on the
+    // receiver.
+    // Obviously, unhandled_stopped is a library extension of the
+    // coroutine promise interface. Many promise types will not implement
+    // unhandled_stopped. When an uncatchable stopped exception tries to
+    // propagate through such a coroutine, it is treated as an unhandled
+    // exception and terminate is called. The solution, as described above, is
+    // to use a sender adaptor to handle the stopped exception before awaiting
+    // it. It goes without saying that any future Standard Library coroutine
+    // types ought to implement unhandled_stopped. The author of Add lazy
+    // coroutine (coroutine task) type, which proposes a standard coroutine
+    // task type, is in agreement.
+    template <typename Promise, typename = void>
+    inline constexpr bool has_unhandled_stopped = false;
+
+    template <typename Promise>
+    inline constexpr bool has_unhandled_stopped<Promise,
+        std::void_t<decltype(std::declval<Promise>().unhandled_stopped())>> =
+        true;
+
+    template <typename Promise, typename = void>
+    inline constexpr bool has_convertible_unhandled_stopped = false;
+
+    template <typename Promise>
+    inline constexpr bool has_convertible_unhandled_stopped<Promise,
+        std::enable_if_t<std::is_convertible_v<
+            decltype(std::declval<Promise>().unhandled_stopped()),
+            hpx::coro::coroutine_handle<>>>> = true;
+
     // execution::as_awaitable [execution.coro_utils.as_awaitable]
     // as_awaitable is used to transform an object into one that is
     // awaitable within a particular coroutine.
@@ -32,8 +74,11 @@ namespace hpx::execution::experimental {
     //         -- Mandates: is-awaitable<A> is true,
     //          where A is the type of the tag_invoke expression above.
     //      2. Otherwise, e if is-awaitable<E> is true.
-    //      3. Otherwise, sender-awaitable{e, p} if awaitable-sender<E, P> is true.
+    //      3. Otherwise, sender-awaitable{e, p} if awaitable-sender<E, P>
+    //      is true.
     //      4. Otherwise, e.
+    struct as_awaitable_t;
+
     namespace impl {
         template <typename T, typename U>
         inline constexpr bool decays_to = std::is_same_v<std::decay_t<T>, U>&&
@@ -52,8 +97,7 @@ namespace hpx::execution::experimental {
             std::exception_ptr>;
 
         template <typename Value>
-        inline constexpr struct receiver_base
-          : hpx::functional::tag<receiver_base>
+        struct receiver_base : hpx::functional::tag<receiver_base<Value>>
         {
             template <typename... Us,
                 HPX_CONCEPT_REQUIRES_(
@@ -67,7 +111,7 @@ namespace hpx::execution::experimental {
             }
             catch (...)
             {
-                set_error((receiver_base &&) self, current_exception());
+                set_error((receiver_base &&) self, std::current_exception());
             }
 
             template <typename Error>
@@ -90,9 +134,9 @@ namespace hpx::execution::experimental {
         };
 
         template <typename PromiseId, typename Value>
-        inline constexpr struct sender_awaitable_base
+        struct sender_awaitable_base
         {
-            using Promise = t<PromiseId>;
+            using Promise = hpx::meta::hidden<PromiseId>;
             struct receiver : receiver_base<Value>
             {
                 friend void tag_invoke(set_stopped_t, receiver&& self) noexcept
@@ -126,7 +170,7 @@ namespace hpx::execution::experimental {
                 switch (result.index())
                 {
                 case 0:    // receiver contract not satisfied
-                    assert(!"_Should never get here");
+                    HPX_ASSERT_MSG(0, "_Should never get here");
                     break;
                 case 1:    // set_value
                     if constexpr (!std::is_void_v<Value>)
@@ -149,14 +193,15 @@ namespace hpx::execution::experimental {
         template <typename PromiseId, typename SenderId>
         struct sender_awaitable
           : sender_awaitable_base<PromiseId,
-                single_sender_value_t<t<SenderId>, env_of_t<t<PromiseId>>>>
+                single_sender_value_t<hpx::meta::hidden<SenderId>,
+                    env_of_t<hpx::meta::hidden<PromiseId>>>>
         {
         private:
-            using Promise = t<_PromiseId>;
-            using Sender = t<_SenderId>;
+            using Promise = hpx::meta::hidden<PromiseId>;
+            using Sender = hpx::meta::hidden<SenderId>;
             using Env = env_of_t<Promise>;
             using Value = single_sender_value_t<Sender, Env>;
-            using Base = sender_awaitable_base<_PromiseId, Value>;
+            using Base = sender_awaitable_base<PromiseId, Value>;
             using receiver = typename Base::receiver;
             connect_result_t<Sender, receiver> op_state_;
 
@@ -175,29 +220,32 @@ namespace hpx::execution::experimental {
             }
         };
         template <typename Promise, typename Sender>
-        using sender_awaitable_t = sender_awaitable<x<Promise>, x<Sender>>;
+        using sender_awaitable_t = sender_awaitable<hpx::meta::hidden<Promise>,
+            hpx::meta::hidden<Sender>>;
 
         template <typename T, typename Promise>
-        inline constexpr bool is_custom_tag_invoke_awaiter =
+        inline constexpr bool is_custom_tag_invoke_awaiter_v =
             hpx::functional::is_tag_invocable_v<as_awaitable_t, T, Promise&>&&
-                is_awaitable<tag_invoke_result_t<as_awaitable_t, _T, Promise&>,
+                is_awaitable_v<hpx::functional::tag_invoke_result_t<
+                                   as_awaitable_t, T, Promise&>,
                     Promise>;
 
         template <typename Sender, typename Promise>
-        using receiver = typename sender_awaitable_base<x<Promise>,
-            single_sender_value_t<Sender, env_of_t<Promise>>>::receiver;
+        using receiver =
+            typename sender_awaitable_base<hpx::meta::hidden<Promise>,
+                single_sender_value_t<Sender, env_of_t<Promise>>>::receiver;
+
+        template <class Sender, class Env = no_env>
+        inline constexpr bool is_single_typed_sender_v =
+            is_sender_v<Sender, Env>&& hpx::meta::value<
+                hpx::meta::is_valid<single_sender_value_t, Sender, Env>>;
 
         template <typename Sender, typename Promise>
-        inline constexpr bool awaitable_sender =
-            single_typed_sender<Sender, env_of_t<Promise>>&&
-                sender_to<Sender, receiver<Sender, Promise>>&& requires(
-                    Promise& promise)
-        {
-            {
-                promise.unhandled_stopped()
-            }
-            ->convertible_to<hpx::coro::coroutine_handle<>>;
-        };
+        inline constexpr bool is_awaitable_sender_v =
+            is_single_typed_sender_v<Sender, env_of_t<Promise>>&&
+                is_sender_to_v<Sender, receiver<Sender, Promise>>&&
+                    has_unhandled_stopped<Promise>;
+
     }    // namespace impl
 
     struct as_awaitable_t
@@ -205,19 +253,19 @@ namespace hpx::execution::experimental {
         template <typename T, typename Promise>
         static constexpr bool is_noexcept() noexcept
         {
-            if constexpr (impl::custom_tag_invoke_awaiter<_T, Promise>)
+            if constexpr (impl::is_custom_tag_invoke_awaiter_v<T, Promise>)
             {
-                return hpx::functional::is_nothrow_tag_invocable<as_awaitable_t,
-                    _T, Promise&>;
+                return hpx::functional::is_nothrow_tag_invocable_v<
+                    as_awaitable_t, T, Promise&>;
             }
-            else if constexpr (awaitable<_T>)
+            else if constexpr (is_awaitable_v<T>)
             {
                 return true;
             }
-            else if constexpr (impl::awaitable_sender<_T, Promise>)
+            else if constexpr (impl::is_awaitable_sender_v<T, Promise>)
             {
-                using Sender = impl::sender_awaitable_t<Promise, _T>;
-                return is_nothrow_constructible_v<Sender, _T,
+                using Sender = impl::sender_awaitable_t<Promise, T>;
+                return std::is_nothrow_constructible_v<Sender, T,
                     hpx::coro::coroutine_handle<Promise>>;
             }
             else
@@ -225,29 +273,32 @@ namespace hpx::execution::experimental {
                 return true;
             }
         }
+
         template <typename T, typename Promise>
-        decltype(auto) operator()(_T&& t, Promise& promise) const
-            noexcept(is_noexcept<_T, Promise>())
+        decltype(auto) operator()(T&& t, Promise& promise) const
+            noexcept(is_noexcept<T, Promise>())
         {
-            if constexpr (impl::custom_tag_invoke_awaiter<_T, Promise>)
+            if constexpr (impl::is_custom_tag_invoke_awaiter_v<T, Promise>)
             {
-                return tag_invoke(*this, (_T &&) t, promise);
+                return tag_invoke(*this, (T &&) t, promise);
             }
-            else if constexpr (awaitable<_T>)
+            else if constexpr (is_awaitable_v<T>)
             {
-                return (_T &&) t;
+                return (T &&) t;
             }
-            else if constexpr (impl::awaitable_sender<_T, Promise>)
+            else if constexpr (impl::is_awaitable_sender_v<T, Promise>)
             {
                 auto hcoro =
                     hpx::coro::coroutine_handle<Promise>::from_promise(promise);
-                return impl::sender_awaitable_t<Promise, _T>{(_T &&) t, hcoro};
+                return impl::sender_awaitable_t<Promise, T>{(T &&) t, hcoro};
             }
             else
             {
-                return (_T &&) t;
+                return (T &&) t;
             }
         }
     };
 
 }    // namespace hpx::execution::experimental
+
+#endif    // HPX_HAVE_CXX20_COROUTINES
