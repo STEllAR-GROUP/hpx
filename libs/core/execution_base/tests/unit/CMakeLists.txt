@@ -18,7 +18,7 @@ set(tests
 )
 
 if(HPX_WITH_CXX20_COROUTINES)
-  set(tests ${tests} coroutine_traits)
+  set(tests ${tests} coroutine_traits as_awaitable)
 endif()
 
 foreach(test ${tests})
