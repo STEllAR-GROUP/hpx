@@ -273,10 +273,9 @@ namespace hpx { namespace ranges {
     ///           <subrange_t<hpx::traits::range_iterator_t<Rng>,
     ///           hpx::traits::range_iterator_t<Rng>>>
     ///           if the execution policy is of type \a sequenced_task_policy
-    ///           or \a parallel_task_policy and returns
-    ///           \a subrange_t<typename hpx::traits::range_iterator<Rng>
-    ///           ::type,hpx::traits::range_iterator_t<Rng>>.
-    ///           otherwise.
+    ///           or \a parallel_task_policy and returns \a
+    ///           subrange_t<typename hpx::traits::range_iterator<Rng>::type,
+    ///           hpx::traits::range_iterator_t<Rng>> otherwise.
     ///           The \a unique algorithm returns an object {ret, last},
     ///           where ret is a past-the-end iterator for a new
     ///           subrange.

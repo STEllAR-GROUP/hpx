@@ -139,10 +139,9 @@ namespace hpx { namespace ranges {
     /// without an execution policy object will execute in sequential order in
     /// the calling thread.
     ///
-    /// \returns  The \a uninitialized_move algorithm returns an
-    ///           \a in_out_result<typename hpx::traits::range_traits<Rng1>
-    ///           ::iterator_type, typename hpx::traits::range_traits<Rng2>
-    ///           ::iterator_type>.
+    /// \returns  The \a uninitialized_move algorithm returns an \a
+    ///           in_out_result<typename hpx::traits::range_traits<Rng1>::iterator_type,
+    ///           typename hpx::traits::range_traits<Rng2>::iterator_type>.
     ///           The \a uninitialized_move algorithm returns an input iterator
     ///           to one past the last element moved from and the output
     ///           iterator to the element in the destination range, one past

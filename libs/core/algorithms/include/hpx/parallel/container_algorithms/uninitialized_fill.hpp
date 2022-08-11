@@ -112,8 +112,7 @@ namespace hpx { namespace ranges {
     /// the calling thread.
     ///
     /// \returns  The \a uninitialized_fill algorithm returns a
-    ///           returns \a hpx::traits::range_traits<Rng>
-    ///           ::iterator_type.
+    ///           returns \a hpx::traits::range_traits<Rng>::iterator_type.
     ///           The \a uninitialized_fill algorithm returns the output
     ///           iterator to the element in the range, one past
     ///           the last element copied.
@@ -153,10 +152,9 @@ namespace hpx { namespace ranges {
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a uninitialized_fill algorithm returns a
-    ///           \a hpx::future<typename hpx::traits::range_traits<Rng>
-    ///           ::iterator_type>, if the
-    ///           execution policy is of type \a sequenced_task_policy
+    /// \returns  The \a uninitialized_fill algorithm returns a \a
+    ///           hpx::future<typename hpx::traits::range_traits<Rng>::iterator_type>,
+    ///           if the execution policy is of type \a sequenced_task_policy
     ///           or \a parallel_task_policy and returns \a typename
     ///           hpx::traits::range_traits<Rng>::iterator_type otherwise.
     ///           The \a uninitialized_fill algorithm returns the
