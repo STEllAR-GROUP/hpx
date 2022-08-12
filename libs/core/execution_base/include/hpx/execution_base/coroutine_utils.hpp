@@ -111,7 +111,8 @@ namespace hpx::execution::experimental {
             }
             catch (...)
             {
-                set_error((receiver_base &&) self, std::current_exception());
+                set_error(
+                    HPX_FORWARD(receiver_base, self), std::current_exception());
             }
 
             template <typename Error>
@@ -125,7 +126,7 @@ namespace hpx::execution::experimental {
                         make_exception_ptr(system_error(err)));
                 else
                     self.result->template emplace<2>(
-                        make_exception_ptr((Error &&) err));
+                        make_exception_ptr(HPX_FORWARD(Error, err)));
                 self.continuation.resume();
             }
 
@@ -174,7 +175,7 @@ namespace hpx::execution::experimental {
                     break;
                 case 1:    // set_value
                     if constexpr (!std::is_void_v<Value>)
-                        return (Value &&) std::get<1>(result);
+                        return HPX_FORWARD(Value, std::get<1>(result));
                     else
                         return;
                 case 2:    // set_error
@@ -235,7 +236,7 @@ namespace hpx::execution::experimental {
             typename sender_awaitable_base<hpx::meta::hidden<Promise>,
                 single_sender_value_t<Sender, env_of_t<Promise>>>::receiver;
 
-        template <class Sender, class Env = no_env>
+        template <typename Sender, typename Env = no_env>
         inline constexpr bool is_single_typed_sender_v =
             is_sender_v<Sender, Env>&& hpx::meta::value<
                 hpx::meta::is_valid<single_sender_value_t, Sender, Env>>;
@@ -258,7 +259,7 @@ namespace hpx::execution::experimental {
                 return hpx::functional::is_nothrow_tag_invocable_v<
                     as_awaitable_t, T, Promise&>;
             }
-            else if constexpr (is_awaitable_v<T>)
+            else if constexpr (is_awaitable_v<T, Promise>)
             {
                 return true;
             }
@@ -282,9 +283,9 @@ namespace hpx::execution::experimental {
             {
                 return tag_invoke(*this, (T &&) t, promise);
             }
-            else if constexpr (is_awaitable_v<T>)
+            else if constexpr (is_awaitable_v<T, Promise>)
             {
-                return (T &&) t;
+                return HPX_FORWARD(T, t);
             }
             else if constexpr (impl::is_awaitable_sender_v<T, Promise>)
             {
@@ -294,8 +295,82 @@ namespace hpx::execution::experimental {
             }
             else
             {
-                return (T &&) t;
+                return HPX_FORWARD(T, t);
             }
+        }
+    };
+
+    inline constexpr as_awaitable_t as_awaitable;
+
+    namespace impl {
+        struct with_awaitable_senders_base
+        {
+            template <typename OtherPromise>
+            void set_continuation(
+                hpx::coro::coroutine_handle<OtherPromise> hcoro) noexcept
+            {
+                static_assert(!std::is_void_v<OtherPromise>);
+                continuation_handle = hcoro;
+                if constexpr (has_unhandled_stopped<OtherPromise>)
+                {
+                    stopped_callback = [](void* address) noexcept
+                        -> hpx::coro::coroutine_handle<> {
+                        // This causes the rest of the coroutine (the part after the co_await
+                        // of the sender) to be skipped and invokes the calling coroutine's
+                        // stopped handler.
+                        return hpx::coro::coroutine_handle<
+                            OtherPromise>::from_address(address)
+                            .promise()
+                            .unhandled_stopped();
+                    };
+                }
+                // If OtherPromise doesn't implement unhandled_stopped(), then if a "stopped" unwind
+                // reaches this point, it's considered an unhandled exception and terminate()
+                // is called.
+            }
+
+            hpx::coro::coroutine_handle<> continuation() const noexcept
+            {
+                return continuation_handle;
+            }
+
+            hpx::coro::coroutine_handle<> unhandled_stopped() noexcept
+            {
+                return (*stopped_callback)(continuation_handle.address());
+            }
+
+        private:
+            hpx::coro::coroutine_handle<> continuation_handle{};
+            hpx::coro::coroutine_handle<> (*stopped_callback)(void*) noexcept =
+                [](void*) noexcept -> hpx::coro::coroutine_handle<> {
+                std::terminate();
+            };
+        };
+    }    // namespace impl
+
+    template <typename A, typename B>
+    inline constexpr bool is_derived_from = std::is_base_of_v<B, A>&&
+        std::is_convertible_v<const volatile A*, const volatile B*>;
+
+    // with_awaitable_senders, when used as the base class of a coroutine
+    // promise type, makes senders awaitable in that coroutine type. In
+    // addition, it provides a default implementation of unhandled_stopped()
+    // such that if a sender completes by calling execution::set_stopped, it
+    // is treated as if an uncatchable "stopped" exception were thrown from
+    // the await-expression. In practice, the coroutine is never resumed, and
+    // the unhandled_stopped of the coroutine caller’s promise type is called.
+    //
+    template <typename Promise>
+    struct with_awaitable_senders : impl::with_awaitable_senders_base
+    {
+        template <typename Value>
+        auto await_transform(Value&& val)
+            -> hpx::functional::tag_invoke_result_t<as_awaitable_t, Value,
+                Promise&>
+        {
+            static_assert(is_derived_from<Promise, with_awaitable_senders>);
+            return as_awaitable(
+                HPX_FORWARD(Value, val), static_cast<Promise&>(*this));
         }
     };
 
