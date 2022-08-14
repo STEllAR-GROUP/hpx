@@ -79,7 +79,7 @@ namespace hpx::execution::experimental {
     //      4. Otherwise, e.
     struct as_awaitable_t;
 
-    namespace impl {
+    namespace detail {
         template <typename T, typename U>
         inline constexpr bool decays_to = std::is_same_v<std::decay_t<T>, U>&&
             std::is_same_v<std::decay_t<U>, T>;
@@ -247,14 +247,14 @@ namespace hpx::execution::experimental {
                 is_sender_to_v<Sender, receiver<Sender, Promise>>&&
                     has_unhandled_stopped<Promise>;
 
-    }    // namespace impl
+    }    // namespace detail
 
     struct as_awaitable_t
     {
         template <typename T, typename Promise>
         static constexpr bool is_noexcept() noexcept
         {
-            if constexpr (impl::is_custom_tag_invoke_awaiter_v<T, Promise>)
+            if constexpr (detail::is_custom_tag_invoke_awaiter_v<T, Promise>)
             {
                 return hpx::functional::is_nothrow_tag_invocable_v<
                     as_awaitable_t, T, Promise&>;
@@ -263,9 +263,9 @@ namespace hpx::execution::experimental {
             {
                 return true;
             }
-            else if constexpr (impl::is_awaitable_sender_v<T, Promise>)
+            else if constexpr (detail::is_awaitable_sender_v<T, Promise>)
             {
-                using Sender = impl::sender_awaitable_t<Promise, T>;
+                using Sender = detail::sender_awaitable_t<Promise, T>;
                 return std::is_nothrow_constructible_v<Sender, T,
                     hpx::coro::coroutine_handle<Promise>>;
             }
@@ -279,7 +279,7 @@ namespace hpx::execution::experimental {
         decltype(auto) operator()(T&& t, Promise& promise) const
             noexcept(is_noexcept<T, Promise>())
         {
-            if constexpr (impl::is_custom_tag_invoke_awaiter_v<T, Promise>)
+            if constexpr (detail::is_custom_tag_invoke_awaiter_v<T, Promise>)
             {
                 return tag_invoke(*this, (T &&) t, promise);
             }
@@ -287,11 +287,11 @@ namespace hpx::execution::experimental {
             {
                 return HPX_FORWARD(T, t);
             }
-            else if constexpr (impl::is_awaitable_sender_v<T, Promise>)
+            else if constexpr (detail::is_awaitable_sender_v<T, Promise>)
             {
                 auto hcoro =
                     hpx::coro::coroutine_handle<Promise>::from_promise(promise);
-                return impl::sender_awaitable_t<Promise, T>{(T &&) t, hcoro};
+                return detail::sender_awaitable_t<Promise, T>{(T &&) t, hcoro};
             }
             else
             {
@@ -302,7 +302,7 @@ namespace hpx::execution::experimental {
 
     inline constexpr as_awaitable_t as_awaitable;
 
-    namespace impl {
+    namespace detail {
         struct with_awaitable_senders_base
         {
             template <typename OtherPromise>
@@ -346,7 +346,7 @@ namespace hpx::execution::experimental {
                 std::terminate();
             };
         };
-    }    // namespace impl
+    }    // namespace detail
 
     template <typename A, typename B>
     inline constexpr bool is_derived_from = std::is_base_of_v<B, A>&&
@@ -361,7 +361,7 @@ namespace hpx::execution::experimental {
     // the unhandled_stopped of the coroutine caller’s promise type is called.
     //
     template <typename Promise>
-    struct with_awaitable_senders : impl::with_awaitable_senders_base
+    struct with_awaitable_senders : detail::with_awaitable_senders_base
     {
         template <typename Value>
         auto await_transform(Value&& val)
