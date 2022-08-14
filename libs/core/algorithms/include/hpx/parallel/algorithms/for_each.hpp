@@ -253,6 +253,7 @@ namespace hpx {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -365,6 +366,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                Iter part_begin, std::size_t part_size)
+            {
+                util::loop_n<execution_policy_type>(part_begin, part_size,
+                    invoke_projected<fun_type, proj_type>{f_, proj_});
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
                 Iter part_begin, std::size_t part_size, std::size_t)
             {
                 util::loop_n<execution_policy_type>(part_begin, part_size,
@@ -413,7 +422,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
-                Iter part_begin, std::size_t part_size, std::size_t)
+                Iter part_begin, std::size_t part_size)
             {
                 using value_type = std::decay_t<
                     typename std::iterator_traits<Iter>::reference>;
@@ -427,6 +436,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::loop_n_ind<execution_policy_type>(
                         part_begin, part_size, f_);
                 }
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                Iter part_begin, std::size_t part_size, std::size_t)
+            {
+                return (*this)(part_begin, part_size);
             }
         };
 
@@ -463,19 +479,22 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy&& policy, FwdIter first, std::size_t count, F&& f,
                 Proj&& proj /* = Proj()*/)
             {
-                if (count != 0)
+                if constexpr (!hpx::execution_policy_has_scheduler_executor_v<
+                                  ExPolicy>)
                 {
-                    auto f1 =
-                        for_each_iteration<ExPolicy, F, std::decay_t<Proj>>(
-                            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
-
-                    return util::foreach_partitioner<ExPolicy>::call(
-                        HPX_FORWARD(ExPolicy, policy), first, count,
-                        HPX_MOVE(f1), util::projection_identity());
+                    if (count == 0)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            FwdIter>::get(HPX_MOVE(first));
+                    }
                 }
 
-                return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                    HPX_MOVE(first));
+                auto f1 = for_each_iteration<ExPolicy, F, std::decay_t<Proj>>(
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+
+                return util::foreach_partitioner<ExPolicy>::call(
+                    HPX_FORWARD(ExPolicy, policy), first, count, HPX_MOVE(f1),
+                    hpx::identity());
             }
         };
         /// \endcond
@@ -533,25 +552,29 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
                 typename F, typename Proj>
-            static constexpr typename util::detail::algorithm_result<ExPolicy,
-                FwdIterB>::type
-            parallel(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
-                Proj&& proj)
+            static constexpr decltype(auto) parallel(ExPolicy&& policy,
+                FwdIterB first, FwdIterE last, F&& f, Proj&& proj)
             {
-                if (first != last)
-                {
-                    auto f1 =
-                        for_each_iteration<ExPolicy, F, std::decay_t<Proj>>(
-                            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+                using result_t =
+                    hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                        FwdIterB>;
 
-                    return util::foreach_partitioner<ExPolicy>::call(
-                        HPX_FORWARD(ExPolicy, policy), first,
-                        detail::distance(first, last), HPX_MOVE(f1),
-                        util::projection_identity());
+                if constexpr (!hpx::execution_policy_has_scheduler_executor_v<
+                                  ExPolicy>)
+                {
+                    if (first == last)
+                    {
+                        return result_t::get(HPX_MOVE(first));
+                    }
                 }
 
-                return util::detail::algorithm_result<ExPolicy, FwdIterB>::get(
-                    HPX_MOVE(first));
+                auto f1 = for_each_iteration<ExPolicy, F, std::decay_t<Proj>>(
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+
+                return result_t::get(util::foreach_partitioner<ExPolicy>::call(
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1),
+                    hpx::identity()));
             }
         };
         /// \endcond
@@ -601,20 +624,11 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<
-            ExPolicy>::type
-        tag_fallback_invoke(hpx::for_each_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, F&& f)
+        friend decltype(auto) tag_fallback_invoke(hpx::for_each_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");
-
-            if (first == last)
-            {
-                using result =
-                    hpx::parallel::util::detail::algorithm_result<ExPolicy>;
-                return result::get();
-            }
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
                 hpx::parallel::v1::detail::for_each<FwdIter>().call(
@@ -659,8 +673,7 @@ namespace hpx {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::for_each_n_t, ExPolicy&& policy, FwdIter first,
             Size count, F&& f)
         {

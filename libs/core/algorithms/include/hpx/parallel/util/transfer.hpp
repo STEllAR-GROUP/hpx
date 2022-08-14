@@ -86,13 +86,16 @@ namespace hpx { namespace parallel { namespace util {
         {
             using data_type = typename std::iterator_traits<InIter>::value_type;
 
-            char const* const first_ch = to_const_ptr(first);
-            char* const dest_ch = to_ptr(dest);
+            if (count != 0)
+            {
+                char const* const first_ch = to_const_ptr(first);
+                char* const dest_ch = to_ptr(dest);
 
-            std::memmove(dest_ch, first_ch, count * sizeof(data_type));
+                std::memmove(dest_ch, first_ch, count * sizeof(data_type));
 
-            std::advance(first, count);
-            std::advance(dest, count);
+                std::advance(first, count);
+                std::advance(dest, count);
+            }
             return in_out_result<InIter, OutIter>{
                 HPX_MOVE(first), HPX_MOVE(dest)};
         }

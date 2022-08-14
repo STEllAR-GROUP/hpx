@@ -30,6 +30,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename Result>
         struct handle_exception_impl<ExPolicy, Result,
             std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
+                !hpx::execution_policy_has_scheduler_executor_v<ExPolicy> &&
                 !hpx::is_unsequenced_execution_policy_v<ExPolicy>>>
         {
             using type = Result;
@@ -86,6 +87,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename Result>
         struct handle_exception_impl<ExPolicy, Result,
             std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
+                !hpx::execution_policy_has_scheduler_executor_v<ExPolicy> &&
                 !hpx::is_unsequenced_execution_policy_v<ExPolicy>>>
         {
             using type = future<Result>;
@@ -158,6 +160,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename Result>
         struct handle_exception_impl<ExPolicy, Result,
             std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy> &&
+                !hpx::execution_policy_has_scheduler_executor_v<ExPolicy> &&
                 hpx::is_unsequenced_execution_policy_v<ExPolicy>>>
         {
             using type = Result;
@@ -182,6 +185,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename ExPolicy, typename Result>
         struct handle_exception_impl<ExPolicy, Result,
             std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
+                !hpx::execution_policy_has_scheduler_executor_v<ExPolicy> &&
                 hpx::is_unsequenced_execution_policy_v<ExPolicy>>>
         {
             using type = future<Result>;
@@ -199,6 +203,55 @@ namespace hpx { namespace parallel { inline namespace v1 {
             [[noreturn]] static future<Result> call(std::exception_ptr const&)
             {
                 exception_list_termination_handler();
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename ExPolicy, typename Result>
+        struct handle_exception_impl<ExPolicy, Result,
+            std::enable_if_t<
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
+        {
+            using type = Result;
+
+            [[noreturn]] static Result call()
+            {
+                try
+                {
+                    throw;    //-V667
+                }
+                catch (std::bad_alloc const&)
+                {
+                    throw;
+                }
+                catch (hpx::exception_list const&)
+                {
+                    throw;
+                }
+                catch (...)
+                {
+                    throw hpx::exception_list(std::current_exception());
+                }
+            }
+
+            [[noreturn]] static Result call(std::exception_ptr const& e)
+            {
+                try
+                {
+                    std::rethrow_exception(e);
+                }
+                catch (std::bad_alloc const&)
+                {
+                    throw;
+                }
+                catch (hpx::exception_list const&)
+                {
+                    throw;
+                }
+                catch (...)
+                {
+                    throw hpx::exception_list(std::current_exception());
+                }
             }
         };
 

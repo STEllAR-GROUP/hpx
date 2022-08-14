@@ -28,7 +28,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     template <typename ExPolicy, template <typename...> class Partitioner,
         template <typename...> class TaskPartitioner>
     struct select_partitioner<ExPolicy, Partitioner, TaskPartitioner,
-        std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
+        std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
+            !hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
         template <typename... Args>
         using apply = TaskPartitioner<ExPolicy, Args...>;

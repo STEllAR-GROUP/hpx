@@ -62,7 +62,7 @@ namespace hpx::optional_ns {
         {
         }
 
-        explicit constexpr optional(nullopt_t) noexcept
+        constexpr optional(nullopt_t) noexcept
           : empty_(true)
         {
         }
@@ -328,7 +328,8 @@ namespace hpx::optional_ns {
             empty_ = false;
         }
 
-#if !defined(HPX_HAVE_CXX17_COPY_ELISION)
+#if !defined(HPX_HAVE_CXX17_COPY_ELISION) ||                                   \
+    !defined(HPX_HAVE_CXX17_OPTIONAL_COPY_ELISION)
         // workaround for broken return type copy elison in MSVC
         template <typename F, typename... Ts>
         void emplace_f(F&& f, Ts&&... ts)

@@ -273,7 +273,8 @@ namespace hpx::execution::experimental {
         // clang-format off
         template <typename Tag, typename Property,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_invocable_v<Tag, fork_join_executor, Property>
+                hpx::functional::is_tag_invocable_v<
+                    Tag, fork_join_executor, Property>
             )>
         // clang-format on
         friend block_fork_join_executor tag_invoke(Tag tag,
@@ -287,10 +288,10 @@ namespace hpx::execution::experimental {
         // clang-format off
         template <typename Tag,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_invocable_v<Tag, fork_join_executor>
+                hpx::functional::is_tag_invocable_v<Tag, fork_join_executor>
             )>
         // clang-format on
-        friend char const* tag_invoke(
+        friend decltype(auto) tag_invoke(
             Tag tag, block_fork_join_executor const& exec) noexcept
         {
             return tag(exec.exec_);

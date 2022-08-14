@@ -440,6 +440,15 @@ function(hpx_check_for_cxx17_copy_elision)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx17_optional_copy_elision)
+  add_hpx_config_test(
+    HPX_WITH_CXX17_OPTIONAL_COPY_ELISION
+    SOURCE cmake/tests/cxx17_optional_copy_elision.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_cxx20_coroutines)
   if(NOT HPX_WITH_CXX20_COROUTINES)
     unset(HPX_CXX20_COROUTINES_FLAGS)

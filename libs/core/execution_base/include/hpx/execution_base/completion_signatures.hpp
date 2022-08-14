@@ -387,7 +387,7 @@ namespace hpx::execution::experimental {
 
     // The sender_of concept defines the requirements for a sender type that on
     // successful completion sends the specified set of value types.
-    template <class S, class E = no_env, class... Ts>
+    template <typename S, typename E = no_env, typename... Ts>
     struct is_sender_of;
 
     namespace detail {
@@ -632,7 +632,7 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
-    template <class S, class E, class... Ts>
+    template <typename S, typename E, typename... Ts>
     struct is_sender_of
       : detail::is_sender_of_impl<is_sender_v<S, E>, S, E, Ts...>
     {

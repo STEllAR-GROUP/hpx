@@ -61,102 +61,93 @@ namespace hpx { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action>
-    struct async_launch_policy_dispatch<Action,
-        std::enable_if_t<!traits::is_action_v<Action>>>
+    template <>
+    struct async_launch_policy_dispatch<hpx::launch::sync_policy>
     {
-        template <typename F, typename... Ts>
+        template <typename Policy, typename F, typename... Ts>
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(launch policy, hpx::util::thread_description const& desc,
-            threads::thread_pool_base* pool, F&& f, Ts&&... ts)
+        call(Policy const&, F&& f, Ts&&... ts)
+        {
+            return call_sync(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename Policy, typename F, typename... Ts>
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
+        call(Policy const&, hpx::util::thread_description const& desc, F&& f,
+            Ts&&... ts)
+        {
+            auto ann = hpx::scoped_annotation(desc.get_description());
+            return call_sync(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename Policy, typename F, typename... Ts>
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
+        call(Policy const&, hpx::util::thread_description const& desc,
+            threads::thread_pool_base*, F&& f, Ts&&... ts)
+        {
+            auto ann = hpx::scoped_annotation(desc.get_description());
+            return call_sync(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        }
+    };
+
+    template <>
+    struct async_launch_policy_dispatch<hpx::launch::deferred_policy>
+    {
+        template <typename Policy, typename F, typename... Ts>
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
+        call(Policy const&, F&& f, Ts&&... ts)
         {
             using result_type =
                 util::detail::invoke_deferred_result_t<F, Ts...>;
 
-            if (policy == launch::sync)
-            {
-                auto ann = hpx::scoped_annotation(desc.get_description());
-                return detail::call_sync(
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-            }
-
-            if (policy == launch::deferred)
-            {
-                lcos::local::futures_factory<result_type()> p(
-                    util::deferred_call(
-                        hpx::annotated_function(
-                            HPX_FORWARD(F, f), desc.get_description()),
-                        HPX_FORWARD(Ts, ts)...));
-                return p.get_future();
-            }
-
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
-            HPX_ASSERT(hpx::detail::has_async_policy(policy));
-
-            threads::thread_id_ref_type tid =
-                p.apply(pool, desc.get_description(), policy);
-            if (tid)
-            {
-                if (policy == launch::fork)
-                {
-                    // make sure this thread is executed last
-                    // yield_to
-                    hpx::this_thread::suspend(
-                        threads::thread_schedule_state::pending, tid.noref(),
-                        desc.get_description());
-                }
-
-                auto&& result = p.get_future();
-                traits::detail::get_shared_state(result)->set_on_completed(
-                    [tid = HPX_MOVE(tid)]() { (void) tid; });
-                return HPX_MOVE(result);
-            }
-
             return p.get_future();
         }
 
-        template <typename F, typename... Ts>
+        template <typename Policy, typename F, typename... Ts>
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(launch policy, hpx::util::thread_description const& desc, F&& f,
-            Ts&&... ts)
+        call(Policy const& policy, hpx::util::thread_description const& desc,
+            F&& f, Ts&&... ts)
         {
-            return call(policy, desc,
-                threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
+            return call(policy,
+                hpx::annotated_function(
+                    HPX_FORWARD(F, f), desc.get_description()),
                 HPX_FORWARD(Ts, ts)...);
         }
 
-        template <typename F, typename... Ts>
+        template <typename Policy, typename F, typename... Ts>
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(launch policy, F&& f, Ts&&... ts)
+        call(Policy const& policy, hpx::util::thread_description const& desc,
+            threads::thread_pool_base*, F&& f, Ts&&... ts)
         {
-            hpx::util::thread_description desc(f);
-            return call(policy, desc,
-                threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
+            return call(policy,
+                hpx::annotated_function(
+                    HPX_FORWARD(F, f), desc.get_description()),
                 HPX_FORWARD(Ts, ts)...);
         }
+    };
 
-        template <typename F, typename... Ts>
+    template <>
+    struct async_launch_policy_dispatch<hpx::launch::async_policy>
+    {
+        template <typename Policy, typename F, typename... Ts>
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(hpx::detail::sync_policy, F&& f, Ts&&... ts)
-        {
-            return detail::call_sync(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-        }
-
-        template <typename F, typename... Ts>
-        HPX_FORCEINLINE static std::enable_if_t<
-            traits::detail::is_deferred_invocable_v<F, Ts...>,
-            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(hpx::detail::async_policy policy,
-            hpx::util::thread_description const& desc,
+        call(Policy const& policy, hpx::util::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
             HPX_ASSERT(pool);
@@ -178,27 +169,43 @@ namespace hpx { namespace detail {
                     [tid = HPX_MOVE(tid)]() { (void) tid; });
                 return HPX_MOVE(result);
             }
+
             return p.get_future();
         }
 
-        template <typename F, typename... Ts>
+        template <typename Policy, typename F, typename... Ts>
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(hpx::detail::async_policy policy, F&& f, Ts&&... ts)
+        call(Policy const& policy, hpx::util::thread_description const& desc,
+            F&& f, Ts&&... ts)
+        {
+            return call(policy, desc,
+                threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename Policy, typename F, typename... Ts>
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
+        call(Policy const& policy, F&& f, Ts&&... ts)
         {
             hpx::util::thread_description desc(f);
             return call(policy, desc,
                 threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
                 HPX_FORWARD(Ts, ts)...);
         }
+    };
 
-        template <typename F, typename... Ts>
+    template <>
+    struct async_launch_policy_dispatch<hpx::launch::fork_policy>
+    {
+        template <typename Policy, typename F, typename... Ts>
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(hpx::detail::fork_policy policy,
-            hpx::util::thread_description const& desc,
+        call(Policy const& policy, hpx::util::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
             HPX_ASSERT(pool);
@@ -229,16 +236,77 @@ namespace hpx { namespace detail {
                     [tid = HPX_MOVE(tid)]() { (void) tid; });
                 return HPX_MOVE(result);
             }
+
             return p.get_future();
+        }
+
+        template <typename Policy, typename F, typename... Ts>
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
+        call(Policy const& policy, hpx::util::thread_description const& desc,
+            F&& f, Ts&&... ts)
+        {
+            return call(policy, desc,
+                threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename Policy, typename F, typename... Ts>
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
+        call(Policy const& policy, F&& f, Ts&&... ts)
+        {
+            hpx::util::thread_description desc(f);
+            return call(policy, desc,
+                threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
+        }
+    };
+
+    template <typename Action>
+    struct async_launch_policy_dispatch<Action,
+        std::enable_if_t<!traits::is_action_v<Action>>>
+    {
+        template <typename F, typename... Ts>
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable_v<F, Ts...>,
+            hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
+        call(launch policy, hpx::util::thread_description const& desc,
+            threads::thread_pool_base* pool, F&& f, Ts&&... ts)
+        {
+            if (policy == launch::sync)
+            {
+                return async_launch_policy_dispatch<
+                    hpx::launch::sync_policy>::call(policy, desc, pool,
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
+            if (policy == launch::deferred)
+            {
+                return async_launch_policy_dispatch<
+                    hpx::launch::deferred_policy>::call(policy, desc, pool,
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
+            if (policy == launch::fork)
+            {
+                return async_launch_policy_dispatch<
+                    hpx::launch::fork_policy>::call(policy, desc, pool,
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
+
+            return async_launch_policy_dispatch<
+                hpx::launch::async_policy>::call(policy, desc, pool,
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(hpx::detail::fork_policy policy, F&& f, Ts&&... ts)
+        call(launch policy, hpx::util::thread_description const& desc, F&& f,
+            Ts&&... ts)
         {
-            hpx::util::thread_description desc(f);
             return call(policy, desc,
                 threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
                 HPX_FORWARD(Ts, ts)...);
@@ -248,15 +316,12 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(hpx::detail::deferred_policy, F&& f, Ts&&... ts)
+        call(launch policy, F&& f, Ts&&... ts)
         {
-            using result_type =
-                util::detail::invoke_deferred_result_t<F, Ts...>;
-
-            lcos::local::futures_factory<result_type()> p(
-                util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
-
-            return p.get_future();
+            hpx::util::thread_description desc(f);
+            return call(policy, desc,
+                threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
     };
 }}    // namespace hpx::detail

@@ -80,4 +80,18 @@ namespace hpx::parallel::execution {
     {
         return policy.with(HPX_FORWARD(Params, params));
     }
+
+    // clang-format off
+    template <typename ParametersProperty, typename ExPolicy, typename...Ts,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::functional::is_tag_invocable_v<ParametersProperty,
+                typename std::decay_t<ExPolicy>::executor_type, Ts&&...>
+        )>
+    // clang-format on
+    constexpr decltype(auto) tag_fallback_invoke(
+        ParametersProperty, ExPolicy&& policy, Ts&&... ts)
+    {
+        return ParametersProperty{}(policy.executor(), HPX_FORWARD(Ts, ts)...);
+    }
 }    // namespace hpx::parallel::execution

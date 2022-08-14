@@ -65,7 +65,7 @@ namespace hpx::parcelset::policies::tcp {
           , pp_(pp)
 #endif
         {
-#if not defined(HPX_HAVE_PARCELPORT_COUNTERS)
+#if !defined(HPX_HAVE_PARCELPORT_COUNTERS)
             HPX_UNUSED(pp);
 #endif
         }

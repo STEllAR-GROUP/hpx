@@ -51,6 +51,7 @@ set(tests
     foreach
     foreach_executors
     foreach_prefetching
+    foreach_sender
     foreachn
     foreachn_exception
     foreachn_bad_alloc
@@ -62,6 +63,7 @@ set(tests
     for_loop_n_strided
     for_loop_reduction
     for_loop_reduction_async
+    for_loop_sender
     for_loop_strided
     generate
     generaten

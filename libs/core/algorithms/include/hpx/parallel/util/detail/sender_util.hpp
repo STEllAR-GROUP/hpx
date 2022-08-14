@@ -1,4 +1,5 @@
 //  Copyright (c) ETH Zurich 2021
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +18,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     // This is a lighter-weight alternative to bind for use in parallel
     // algorithm overloads, where one needs to bind an execution policy to an
     // algorithm for use in execution::then. Typically used together with
@@ -56,27 +58,46 @@ namespace hpx { namespace detail {
     // "algorithm" (i.e. a tag) and applies then with the predecessor
     // sender and the execution policy bound to the algorithm.
     template <typename Tag, typename ExPolicy, typename Predecessor>
-    auto then_with_bound_algorithm(Predecessor&& predecessor, ExPolicy&& policy)
+    decltype(auto) then_with_bound_algorithm(
+        Predecessor&& predecessor, ExPolicy&& policy)
     {
-        // If the given execution policy has a task policy, i.e. the algorithm
-        // can return a future, we use the task policy since we can then
-        // directly return the future as a sender and avoid potential blocking
-        // that may happen internally.
-        if constexpr (hpx::execution::detail::has_async_execution_policy_v<
-                          ExPolicy>)
+        if constexpr (hpx::execution_policy_has_scheduler_executor_v<ExPolicy>)
         {
-            auto task_policy =
-                HPX_FORWARD(ExPolicy, policy)(hpx::execution::task);
+            // If the executor contained in the execution policy explicitly
+            // returns senders, we don't need to wrap the algorithm in any
+            // specific way as it directly integrates with the given
+            // predecessor.
+            //
+            // We also string any asynchrony requirements from the given policy
+            // as the senders returned by the executor naturally provide this.
+            auto non_task_policy = hpx::execution::experimental::to_non_task(
+                HPX_FORWARD(ExPolicy, policy));
+
+            return hpx::execution::experimental::let_value(
+                HPX_FORWARD(Predecessor, predecessor),
+                bound_algorithm<Tag, decltype(non_task_policy)>{
+                    HPX_MOVE(non_task_policy)});
+        }
+        else if constexpr (hpx::execution::detail::has_async_execution_policy_v<
+                               ExPolicy>)
+        {
+            // If the given execution policy has a task policy, i.e. the
+            // algorithm can return a future, we use the task policy since we
+            // can then directly return the future as a sender and avoid
+            // potential blocking that may happen internally.
+            auto task_policy = hpx::execution::experimental::to_task(
+                HPX_FORWARD(ExPolicy, policy));
+
             return hpx::execution::experimental::let_value(
                 HPX_FORWARD(Predecessor, predecessor),
                 bound_algorithm<Tag, decltype(task_policy)>{
                     HPX_MOVE(task_policy)});
         }
-        // If the policy does not have a task policy, the algorithm can only be
-        // called synchronously. In this case we only use then to chain the
-        // algorithm after the predecessor sender.
         else
         {
+            // If the policy does not have a task policy, the algorithm can only
+            // be called synchronously. In this case we only use then to chain
+            // the algorithm after the predecessor sender.
             return hpx::execution::experimental::then(
                 HPX_FORWARD(Predecessor, predecessor),
                 bound_algorithm<Tag, ExPolicy>{HPX_FORWARD(ExPolicy, policy)});
@@ -129,4 +150,4 @@ namespace hpx { namespace detail {
                 ExPolicy>{HPX_FORWARD(ExPolicy, policy)};
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

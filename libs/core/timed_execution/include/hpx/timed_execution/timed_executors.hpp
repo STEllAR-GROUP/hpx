@@ -542,6 +542,25 @@ namespace hpx { namespace parallel { namespace execution {
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
+        // support all properties exposed by the wrapped executor
+        template <typename Tag, typename Property,
+            typename Enable = std::enable_if_t<hpx::functional::
+                    is_tag_invocable_v<Tag, BaseExecutor, Property>>>
+        friend timed_executor tag_invoke(
+            Tag tag, timed_executor const& exec, Property&& prop)
+        {
+            return timed_executor(hpx::functional::tag_invoke(
+                tag, exec.exec_, HPX_FORWARD(Property, prop)));
+        }
+
+        template <typename Tag,
+            typename Enable = std::enable_if_t<
+                hpx::functional::is_tag_invocable_v<Tag, BaseExecutor>>>
+        friend decltype(auto) tag_invoke(Tag tag, timed_executor const& exec)
+        {
+            return hpx::functional::tag_invoke(tag, exec.exec_);
+        }
+
         BaseExecutor exec_;
         std::chrono::steady_clock::time_point execute_at_;
     };

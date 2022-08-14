@@ -746,31 +746,30 @@ namespace hpx::ranges::experimental {
         // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent, typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<Iter>::value &&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<Iter> &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<
-            ExPolicy>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::ranges::experimental::for_loop_t,
             ExPolicy&& policy, Iter first, Sent last, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop must be called with at least a function object");
 
-            using hpx::util::make_index_pack;
+            using hpx::util::make_index_pack_t;
             return hpx::parallel::v2::detail::for_loop(
-                HPX_FORWARD(ExPolicy, policy), first, last, 1,
-                typename make_index_pack<sizeof...(Args) - 1>::type(),
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                make_index_pack_t<sizeof...(Args) - 1>(),
                 HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
         template <typename Iter, typename Sent, typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<Iter>::value &&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value
+                hpx::traits::is_iterator_v<Iter> &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter>
             )>
         // clang-format on
         friend void tag_fallback_invoke(hpx::ranges::experimental::for_loop_t,
@@ -779,40 +778,37 @@ namespace hpx::ranges::experimental {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop must be called with at least a function object");
 
-            using hpx::util::make_index_pack;
+            using hpx::util::make_index_pack_t;
             return hpx::parallel::v2::detail::for_loop(hpx::execution::seq,
-                first, last, 1,
-                typename make_index_pack<sizeof...(Args) - 1>::type(),
+                first, last, make_index_pack_t<sizeof...(Args) - 1>(),
                 HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
         template <typename ExPolicy, typename R, typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<R>::value
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<
-            ExPolicy>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::ranges::experimental::for_loop_t,
             ExPolicy&& policy, R&& rng, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop must be called with at least a function object");
 
-            using hpx::util::make_index_pack;
+            using hpx::util::make_index_pack_t;
             return hpx::parallel::v2::detail::for_loop(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), 1,
-                typename make_index_pack<sizeof...(Args) - 1>::type(),
+                hpx::util::end(rng), make_index_pack_t<sizeof...(Args) - 1>(),
                 HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
         template <typename Rng, typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value
+                hpx::traits::is_range_v<Rng>
             )>
         // clang-format on
         friend void tag_fallback_invoke(
@@ -821,10 +817,10 @@ namespace hpx::ranges::experimental {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop must be called with at least a function object");
 
-            using hpx::util::make_index_pack;
+            using hpx::util::make_index_pack_t;
             return hpx::parallel::v2::detail::for_loop(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng), 1,
-                typename make_index_pack<sizeof...(Args) - 1>::type(),
+                hpx::util::begin(rng), hpx::util::end(rng),
+                make_index_pack_t<sizeof...(Args) - 1>(),
                 HPX_FORWARD(Args, args)...);
         }
     } for_loop{};
@@ -837,13 +833,13 @@ namespace hpx::ranges::experimental {
         template <typename ExPolicy, typename Iter, typename Sent, typename S,
             typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                std::is_integral<S>::value &&
-                hpx::traits::is_iterator<Iter>::value &&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                std::is_integral_v<S> &&
+                hpx::traits::is_iterator_v<Iter> &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::ranges::experimental::for_loop_strided_t,
             ExPolicy&& policy, Iter first, Sent last, S stride, Args&&... args)
         {
@@ -851,19 +847,19 @@ namespace hpx::ranges::experimental {
                 "for_loop_strided must be called with at least a function "
                 "object");
 
-            using hpx::util::make_index_pack;
-            return hpx::parallel::v2::detail::for_loop(
+            using hpx::util::make_index_pack_t;
+            return hpx::parallel::v2::detail::for_loop_strided(
                 HPX_FORWARD(ExPolicy, policy), first, last, stride,
-                typename make_index_pack<sizeof...(Args) - 1>::type(),
+                make_index_pack_t<sizeof...(Args) - 1>(),
                 HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
         template <typename Iter, typename Sent, typename S, typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                std::is_integral<S>::value &&
-                hpx::traits::is_iterator<Iter>::value &&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value
+                std::is_integral_v<S> &&
+                hpx::traits::is_iterator_v<Iter> &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter>
             )>
         // clang-format on
         friend void tag_fallback_invoke(
@@ -874,23 +870,22 @@ namespace hpx::ranges::experimental {
                 "for_loop_strided must be called with at least a function "
                 "object");
 
-            using hpx::util::make_index_pack;
-            return hpx::parallel::v2::detail::for_loop(hpx::execution::seq,
-                first, last, stride,
-                typename make_index_pack<sizeof...(Args) - 1>::type(),
+            using hpx::util::make_index_pack_t;
+            return hpx::parallel::v2::detail::for_loop_strided(
+                hpx::execution::seq, first, last, stride,
+                make_index_pack_t<sizeof...(Args) - 1>(),
                 HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
         template <typename ExPolicy, typename Rng, typename S, typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                std::is_integral<S>::value &&
-                hpx::traits::is_range<Rng>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                std::is_integral_v<S> &&
+                hpx::traits::is_range_v<Rng>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<
-            ExPolicy>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::ranges::experimental::for_loop_strided_t,
             ExPolicy&& policy, Rng&& rng, S stride, Args&&... args)
         {
@@ -898,19 +893,19 @@ namespace hpx::ranges::experimental {
                 "for_loop_strided must be called with at least a function "
                 "object");
 
-            using hpx::util::make_index_pack;
-            return hpx::parallel::v2::detail::for_loop(
+            using hpx::util::make_index_pack_t;
+            return hpx::parallel::v2::detail::for_loop_strided(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), stride,
-                typename make_index_pack<sizeof...(Args) - 1>::type(),
+                make_index_pack_t<sizeof...(Args) - 1>(),
                 HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
         template <typename Rng, typename S, typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                std::is_integral<S>::value &&
-                hpx::traits::is_range<Rng>::value
+                std::is_integral_v<S> &&
+                hpx::traits::is_range_v<Rng>
             )>
         // clang-format on
         friend void tag_fallback_invoke(
@@ -921,10 +916,10 @@ namespace hpx::ranges::experimental {
                 "for_loop_strided must be called with at least a function "
                 "object");
 
-            using hpx::util::make_index_pack;
-            return hpx::parallel::v2::detail::for_loop(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng), stride,
-                typename make_index_pack<sizeof...(Args) - 1>::type(),
+            using hpx::util::make_index_pack_t;
+            return hpx::parallel::v2::detail::for_loop_strided(
+                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+                stride, make_index_pack_t<sizeof...(Args) - 1>(),
                 HPX_FORWARD(Args, args)...);
         }
     } for_loop_strided{};

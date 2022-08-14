@@ -235,9 +235,13 @@ namespace hpx { namespace meta {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
+        template <typename... Ts>
+        struct compose_args_helper_not_valid;
+
         template <typename F, typename Pack, typename Enable = void>
         struct compose_args_helper
         {
+            using type = compose_args_helper_not_valid<F, Pack>;
         };
 
         template <typename F, template <class...> typename A, typename... As>

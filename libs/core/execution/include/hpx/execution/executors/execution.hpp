@@ -926,7 +926,6 @@ namespace hpx { namespace parallel { namespace execution {
                 !hpx::traits::is_two_way_executor_v<Executor> &&
                 !hpx::traits::is_bulk_one_way_executor_v<Executor>>>
         {
-            // returns void if F returns void
             template <typename BulkExecutor, typename F, typename Shape,
                 typename... Ts>
             HPX_FORCEINLINE static auto call_impl(hpx::traits::detail::wrap_int,

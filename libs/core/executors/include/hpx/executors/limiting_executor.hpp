@@ -365,6 +365,13 @@ namespace hpx { namespace parallel { namespace execution {
       : is_bulk_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
+
+    template <typename BaseExecutor>
+    struct is_scheduler_executor<
+        hpx::execution::experimental::limiting_executor<BaseExecutor>>
+      : is_scheduler_executor<std::decay_t<BaseExecutor>>
+    {
+    };
 }}}    // namespace hpx::parallel::execution
 
 #include <hpx/config/warnings_suffix.hpp>

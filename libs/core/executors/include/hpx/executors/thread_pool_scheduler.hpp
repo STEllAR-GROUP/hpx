@@ -9,9 +9,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_base/launch_policy.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/execution/queries/get_scheduler.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -27,100 +31,133 @@
 
 namespace hpx::execution::experimental {
 
-    struct thread_pool_scheduler
+    namespace detail {
+        template <typename Policy>
+        struct get_default_scheduler_policy
+        {
+            static constexpr Policy call() noexcept
+            {
+                return Policy{};
+            }
+        };
+
+        template <>
+        struct get_default_scheduler_policy<hpx::launch>
+        {
+            static constexpr hpx::launch::async_policy call() noexcept
+            {
+                return hpx::launch::async_policy{};
+            }
+        };
+    }    // namespace detail
+
+    template <typename Policy>
+    struct thread_pool_policy_scheduler
     {
-        constexpr thread_pool_scheduler() = default;
-        explicit thread_pool_scheduler(hpx::threads::thread_pool_base* pool)
+        // Associate the parallel_execution_tag tag type as a default with this
+        // scheduler, except if the given launch policy is synch.
+        using execution_category =
+            std::conditional_t<std::is_same_v<Policy, launch::sync_policy>,
+                sequenced_execution_tag, parallel_execution_tag>;
+
+        constexpr thread_pool_policy_scheduler(
+            Policy l = experimental::detail::get_default_scheduler_policy<
+                Policy>::call())
+          : policy_(l)
+        {
+        }
+
+        explicit thread_pool_policy_scheduler(
+            hpx::threads::thread_pool_base* pool,
+            Policy l = experimental::detail::get_default_scheduler_policy<
+                Policy>::call())
           : pool_(pool)
+          , policy_(l)
         {
         }
 
         /// \cond NOINTERNAL
-        bool operator==(thread_pool_scheduler const& rhs) const noexcept
+        friend constexpr bool operator==(
+            thread_pool_policy_scheduler const& lhs,
+            thread_pool_policy_scheduler const& rhs) noexcept
         {
-            return pool_ == rhs.pool_ && priority_ == rhs.priority_ &&
-                stacksize_ == rhs.stacksize_ &&
-                schedulehint_ == rhs.schedulehint_;
+            return lhs.pool_ == rhs.pool_ && lhs.policy_ == rhs.policy_;
         }
 
-        bool operator!=(thread_pool_scheduler const& rhs) const noexcept
+        friend constexpr bool operator!=(
+            thread_pool_policy_scheduler const& lhs,
+            thread_pool_policy_scheduler const& rhs) noexcept
         {
-            return !(*this == rhs);
+            return !(lhs == rhs);
         }
 
-        hpx::threads::thread_pool_base* get_thread_pool()
+        hpx::threads::thread_pool_base* get_thread_pool() noexcept
         {
             HPX_ASSERT(pool_);
             return pool_;
         }
 
-        // support with_priority property
-        friend thread_pool_scheduler tag_invoke(
-            hpx::execution::experimental::with_priority_t,
-            thread_pool_scheduler const& scheduler,
-            hpx::threads::thread_priority priority)
+        // support all properties exposed by the embedded policy
+        // clang-format off
+        template <typename Tag, typename Property,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::functional::is_tag_invocable_v<Tag, Policy, Property>
+            )>
+        // clang-format on
+        friend thread_pool_policy_scheduler tag_invoke(Tag tag,
+            thread_pool_policy_scheduler const& scheduler, Property&& prop)
         {
-            auto sched_with_priority = scheduler;
-            sched_with_priority.priority_ = priority;
-            return sched_with_priority;
+            auto scheduler_with_prop = scheduler;
+            scheduler_with_prop.policy_ =
+                tag(scheduler.policy_, HPX_FORWARD(Property, prop));
+            return scheduler_with_prop;
         }
 
-        friend hpx::threads::thread_priority tag_invoke(
-            hpx::execution::experimental::get_priority_t,
-            thread_pool_scheduler const& scheduler)
+        // clang-format off
+        template <typename Tag,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::functional::is_tag_invocable_v<Tag, Policy>
+            )>
+        // clang-format on
+        friend decltype(auto) tag_invoke(
+            Tag tag, thread_pool_policy_scheduler const& scheduler)
         {
-            return scheduler.priority_;
+            return tag(scheduler.policy_);
         }
 
-        // support with_stacksize property
-        friend thread_pool_scheduler tag_invoke(
-            hpx::execution::experimental::with_stacksize_t,
-            thread_pool_scheduler const& scheduler,
-            hpx::threads::thread_stacksize stacksize)
+        friend constexpr thread_pool_policy_scheduler tag_invoke(
+            hpx::parallel::execution::with_processing_units_count_t,
+            thread_pool_policy_scheduler const& scheduler,
+            std::size_t num_cores)
         {
-            auto sched_with_stacksize = scheduler;
-            sched_with_stacksize.stacksize_ = stacksize;
-            return sched_with_stacksize;
+            auto scheduler_with_num_cores = scheduler;
+            scheduler_with_num_cores.num_cores_ = num_cores;
+            return scheduler_with_num_cores;
         }
 
-        friend hpx::threads::thread_stacksize tag_invoke(
-            hpx::execution::experimental::get_stacksize_t,
-            thread_pool_scheduler const& scheduler)
+        friend constexpr std::size_t tag_invoke(
+            hpx::parallel::execution::processing_units_count_t,
+            thread_pool_policy_scheduler const& scheduler)
         {
-            return scheduler.stacksize_;
+            return scheduler.get_num_cores();
         }
 
-        // support with_hint property
-        friend thread_pool_scheduler tag_invoke(
-            hpx::execution::experimental::with_hint_t,
-            thread_pool_scheduler const& scheduler,
-            hpx::threads::thread_schedule_hint hint)
-        {
-            auto sched_with_hint = scheduler;
-            sched_with_hint.schedulehint_ = hint;
-            return sched_with_hint;
-        }
-
-        friend hpx::threads::thread_schedule_hint tag_invoke(
-            hpx::execution::experimental::get_hint_t,
-            thread_pool_scheduler const& scheduler)
-        {
-            return scheduler.schedulehint_;
-        }
-
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
         // support with_annotation property
-        friend constexpr thread_pool_scheduler tag_invoke(
+        friend constexpr thread_pool_policy_scheduler tag_invoke(
             hpx::execution::experimental::with_annotation_t,
-            thread_pool_scheduler const& scheduler, char const* annotation)
+            thread_pool_policy_scheduler const& scheduler,
+            char const* annotation)
         {
             auto sched_with_annotation = scheduler;
             sched_with_annotation.annotation_ = annotation;
             return sched_with_annotation;
         }
 
-        friend thread_pool_scheduler tag_invoke(
+        friend thread_pool_policy_scheduler tag_invoke(
             hpx::execution::experimental::with_annotation_t,
-            thread_pool_scheduler const& scheduler, std::string annotation)
+            thread_pool_policy_scheduler const& scheduler,
+            std::string annotation)
         {
             auto sched_with_annotation = scheduler;
             sched_with_annotation.annotation_ =
@@ -131,22 +168,31 @@ namespace hpx::execution::experimental {
         // support get_annotation property
         friend constexpr char const* tag_invoke(
             hpx::execution::experimental::get_annotation_t,
-            thread_pool_scheduler const& scheduler) noexcept
+            thread_pool_policy_scheduler const& scheduler) noexcept
         {
             return scheduler.annotation_;
         }
+#endif
 
         template <typename F>
-        void execute(F&& f) const
+        void execute(F&& f, Policy const& policy) const
         {
-            char const* annotation = annotation_ == nullptr ?
-                traits::get_function_annotation<std::decay_t<F>>::call(f) :
-                annotation_;
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            hpx::util::thread_description desc(f, annotation_);
+#else
+            hpx::util::thread_description desc(f);
+#endif
+            auto pool =
+                pool_ ? pool_ : threads::detail::get_self_or_default_pool();
 
-            threads::thread_init_data data(
-                threads::make_thread_function_nullary(HPX_FORWARD(F, f)),
-                annotation, priority_, schedulehint_, stacksize_);
-            threads::register_work(data, pool_);
+            hpx::detail::post_policy_dispatch<Policy>::call(
+                policy, desc, pool, HPX_FORWARD(F, f));
+        }
+
+        template <typename F>
+        HPX_FORCEINLINE void execute(F&& f) const
+        {
+            execute(HPX_FORWARD(F, f), policy_);
         }
 
         template <typename Scheduler, typename Receiver>
@@ -189,22 +235,17 @@ namespace hpx::execution::experimental {
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
 
-            template <typename Env>
-            struct generate_completion_signatures
-            {
-                template <template <typename...> typename Tuple,
-                    template <typename...> typename Variant>
-                using value_types = Variant<Tuple<>>;
-
-                template <template <typename...> typename Variant>
-                using error_types = Variant<std::exception_ptr>;
-
-                static constexpr bool sends_stopped = false;
-            };
+            using completion_signatures =
+                hpx::execution::experimental::completion_signatures<
+                    hpx::execution::experimental::set_value_t(),
+                    hpx::execution::experimental::set_error_t(
+                        std::exception_ptr),
+                    hpx::execution::experimental::set_stopped_t()>;
 
             template <typename Env>
-            friend auto tag_invoke(get_completion_signatures_t, sender const&,
-                Env) noexcept -> generate_completion_signatures<Env>;
+            friend auto tag_invoke(
+                hpx::execution::experimental::get_completion_signatures_t,
+                sender const&, Env) noexcept -> completion_signatures;
 
             template <typename Receiver>
             friend operation_state<Scheduler, Receiver> tag_invoke(
@@ -220,9 +261,13 @@ namespace hpx::execution::experimental {
                 return {s.scheduler, HPX_FORWARD(Receiver, receiver)};
             }
 
+            // clang-format off
             template <typename CPO,
-                HPX_CONCEPT_REQUIRES_(std::is_same_v<CPO,
-                    hpx::execution::experimental::set_value_t>)>
+                HPX_CONCEPT_REQUIRES_(
+                    meta::value<meta::one_of<
+                        CPO, set_value_t, set_stopped_t>>
+                )>
+            // clang-format on
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>,
                 sender const& s)
@@ -231,16 +276,45 @@ namespace hpx::execution::experimental {
             }
         };
 
-        friend constexpr sender<thread_pool_scheduler> tag_invoke(
-            schedule_t, thread_pool_scheduler&& sched)
+        friend hpx::execution::experimental::forward_progress_guarantee
+        tag_invoke(
+            hpx::execution::experimental::get_forward_progress_guarantee_t,
+            thread_pool_policy_scheduler const&) noexcept
+        {
+            return hpx::execution::experimental::forward_progress_guarantee::
+                parallel;
+        }
+
+        friend constexpr sender<thread_pool_policy_scheduler> tag_invoke(
+            hpx::execution::experimental::schedule_t,
+            thread_pool_policy_scheduler&& sched)
         {
             return {HPX_MOVE(sched)};
         }
 
-        friend constexpr sender<thread_pool_scheduler> tag_invoke(
-            schedule_t, thread_pool_scheduler const& sched)
+        friend constexpr sender<thread_pool_policy_scheduler> tag_invoke(
+            hpx::execution::experimental::schedule_t,
+            thread_pool_policy_scheduler const& sched)
         {
             return {sched};
+        }
+
+        Policy policy() const
+        {
+            return policy_;
+        }
+        /// \endcond
+
+    private:
+        /// \cond NOINTERNAL
+        std::size_t get_num_cores() const
+        {
+            if (num_cores_ != 0)
+                return num_cores_;
+
+            auto pool =
+                pool_ ? pool_ : threads::detail::get_self_or_default_pool();
+            return pool->get_os_thread_count();
         }
         /// \endcond
 
@@ -248,12 +322,13 @@ namespace hpx::execution::experimental {
         /// \cond NOINTERNAL
         hpx::threads::thread_pool_base* pool_ =
             hpx::threads::detail::get_self_or_default_pool();
-        hpx::threads::thread_priority priority_ =
-            hpx::threads::thread_priority::normal;
-        hpx::threads::thread_stacksize stacksize_ =
-            hpx::threads::thread_stacksize::small_;
-        hpx::threads::thread_schedule_hint schedulehint_{};
+        Policy policy_;
+        std::size_t num_cores_ = 0;
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
         char const* annotation_ = nullptr;
+#endif
         /// \endcond
     };
+
+    using thread_pool_scheduler = thread_pool_policy_scheduler<hpx::launch>;
 }    // namespace hpx::execution::experimental

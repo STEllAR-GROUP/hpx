@@ -133,14 +133,6 @@ namespace hpx::execution::experimental {
             friend auto tag_invoke(get_completion_signatures_t,
                 then_sender const&, Env) -> generate_completion_signatures<Env>;
 
-            //using signatures = hpx::util::detail::concat_inner_packs_t<
-            //    hpx::util::detail::concat_t<hpx::tuple<
-            //        std::size_t, double, std::string>>>;
-
-            //using signatures = typename completion_signatures_of_t<Sender,
-            //    empty_env>::template value_types<gen_value_signature,
-            //    hpx::variant>;
-
             // clang-format off
             template <typename CPO,
                 HPX_CONCEPT_REQUIRES_(

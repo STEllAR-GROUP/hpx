@@ -224,7 +224,7 @@ void set_union_test2()
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_set_union_exception(IteratorTag)
+void test_set_union_exception(IteratorTag, char const* desc)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -242,7 +242,7 @@ void test_set_union_exception(IteratorTag)
     try
     {
         hpx::set_union(decorated_iterator(std::begin(c1),
-                           []() { throw std::runtime_error("test"); }),
+                           [=]() { throw std::runtime_error(desc); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
             std::begin(c3));
 
@@ -263,7 +263,7 @@ void test_set_union_exception(IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_union_exception(ExPolicy&& policy, IteratorTag)
+void test_set_union_exception(ExPolicy&& policy, IteratorTag, char const* desc)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -285,7 +285,7 @@ void test_set_union_exception(ExPolicy&& policy, IteratorTag)
     {
         hpx::set_union(policy,
             decorated_iterator(
-                std::begin(c1), []() { throw std::runtime_error("test"); }),
+                std::begin(c1), [=]() { throw std::runtime_error(desc); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
             std::begin(c3));
 
@@ -305,7 +305,7 @@ void test_set_union_exception(ExPolicy&& policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_set_union_exception_async(ExPolicy&& p, IteratorTag)
+void test_set_union_exception_async(ExPolicy&& p, IteratorTag, char const* desc)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
@@ -328,7 +328,7 @@ void test_set_union_exception_async(ExPolicy&& p, IteratorTag)
     {
         hpx::future<void> f = hpx::set_union(p,
             decorated_iterator(
-                std::begin(c1), []() { throw std::runtime_error("test"); }),
+                std::begin(c1), [=]() { throw std::runtime_error(desc); }),
             decorated_iterator(std::end(c1)), std::begin(c2), std::end(c2),
             std::begin(c3));
 
@@ -356,16 +356,16 @@ void test_set_union_exception()
 {
     using namespace hpx::execution;
 
-    test_set_union_exception(IteratorTag());
+    test_set_union_exception(IteratorTag(), "no_policy");
 
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
-    test_set_union_exception(seq, IteratorTag());
-    test_set_union_exception(par, IteratorTag());
+    test_set_union_exception(seq, IteratorTag(), "seq");
+    test_set_union_exception(par, IteratorTag(), "par");
 
-    test_set_union_exception_async(seq(task), IteratorTag());
-    test_set_union_exception_async(par(task), IteratorTag());
+    test_set_union_exception_async(seq(task), IteratorTag(), "seq(task)");
+    test_set_union_exception_async(par(task), IteratorTag(), "par(task)");
 }
 
 void set_union_exception_test()

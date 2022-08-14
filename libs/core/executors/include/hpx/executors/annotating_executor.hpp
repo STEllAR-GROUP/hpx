@@ -13,7 +13,7 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/serialization/serialize.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/type_support/always_void.hpp>
 
@@ -29,6 +29,10 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename BaseExecutor>
     struct annotating_executor
     {
+        static_assert(
+            hpx::traits::is_executor_any_v<std::decay_t<BaseExecutor>>,
+            "annotating_executor requires an executor");
+
         template <typename Executor,
             typename Enable = std::enable_if_t<
                 hpx::traits::is_executor_any_v<Executor> &&
@@ -183,6 +187,26 @@ namespace hpx { namespace execution { namespace experimental {
             return exec.annotation_;
         }
 
+        // support all properties exposed by the wrapped executor
+        template <typename Tag, typename Property,
+            typename Enable = std::enable_if_t<hpx::functional::
+                    is_tag_invocable_v<Tag, BaseExecutor, Property>>>
+        friend annotating_executor tag_invoke(
+            Tag tag, annotating_executor const& exec, Property&& prop)
+        {
+            return annotating_executor(hpx::functional::tag_invoke(
+                tag, exec.exec_, HPX_FORWARD(Property, prop)));
+        }
+
+        template <typename Tag,
+            typename Enable = std::enable_if_t<
+                hpx::functional::is_tag_invocable_v<Tag, BaseExecutor>>>
+        friend decltype(auto) tag_invoke(
+            Tag tag, annotating_executor const& exec)
+        {
+            return hpx::functional::tag_invoke(tag, exec.policy_);
+        }
+
     private:
         friend class hpx::serialization::access;
 
@@ -194,10 +218,22 @@ namespace hpx { namespace execution { namespace experimental {
             // clang-format on
         }
 
-        BaseExecutor exec_;
+        std::decay_t<BaseExecutor> exec_;
         char const* const annotation_ = nullptr;
         /// \endcond
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+#if !defined(DOXYGEN)    // doxygen gets confused by the deduction guides
+    template <typename BaseExecutor>
+    explicit annotating_executor(BaseExecutor&& sched, std::string annotation)
+        -> annotating_executor<std::decay_t<BaseExecutor>>;
+
+    template <typename BaseExecutor>
+    explicit annotating_executor(
+        BaseExecutor&& sched, char const* annotation = nullptr)
+        -> annotating_executor<std::decay_t<BaseExecutor>>;
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     // if the given executor does not support annotations, wrap it into
@@ -272,6 +308,13 @@ namespace hpx { namespace parallel { namespace execution {
     struct is_bulk_two_way_executor<
         hpx::execution::experimental::annotating_executor<BaseExecutor>>
       : is_bulk_two_way_executor<BaseExecutor>
+    {
+    };
+
+    template <typename BaseExecutor>
+    struct is_scheduler_executor<
+        hpx::execution::experimental::annotating_executor<BaseExecutor>>
+      : is_scheduler_executor<BaseExecutor>
     {
     };
     /// \endcond

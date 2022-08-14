@@ -24,23 +24,71 @@ namespace hpx { namespace detail {
     struct sync_launch_policy_dispatch;
 
     ///////////////////////////////////////////////////////////////////////////
+    template <>
+    struct sync_launch_policy_dispatch<launch::sync_policy>
+    {
+        // launch::sync execute inline
+        template <typename Policy, typename F, typename... Ts>
+        HPX_FORCEINLINE static decltype(auto) call(Policy, F&& f, Ts&&... ts)
+        {
+            try
+            {
+                return HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
+            catch (std::bad_alloc const& ba)
+            {
+                throw ba;
+            }
+            catch (...)
+            {
+                throw exception_list(std::current_exception());
+            }
+        }
+    };
+
+    template <>
+    struct sync_launch_policy_dispatch<launch::deferred_policy>
+    {
+        // launch::deferred execute inline
+        template <typename Policy, typename F, typename... Ts>
+        HPX_FORCEINLINE static decltype(auto) call(Policy, F&& f, Ts&&... ts)
+        {
+            try
+            {
+                return HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
+            catch (std::bad_alloc const& ba)
+            {
+                throw ba;
+            }
+            catch (...)
+            {
+                throw exception_list(std::current_exception());
+            }
+        }
+    };
+
     template <typename Action>
     struct sync_launch_policy_dispatch<Action,
         std::enable_if_t<!traits::is_action_v<Action>>>
     {
         // general case execute on separate thread (except launch::sync)
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static hpx::util::detail::invoke_deferred_result_t<F,
-            Ts...>
-        call(launch policy, F&& f, Ts&&... ts)
+        HPX_FORCEINLINE static auto call(launch policy, F&& f, Ts&&... ts)
         {
             using result_type =
                 util::detail::invoke_deferred_result_t<F, Ts...>;
 
             if (policy == launch::sync)
             {
-                return call(
-                    launch::sync, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+                return sync_launch_policy_dispatch<launch::sync_policy>::call(
+                    policy, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
+            else if (policy == launch::deferred)
+            {
+                return sync_launch_policy_dispatch<
+                    launch::deferred_policy>::call(policy, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Ts, ts)...);
             }
 
             lcos::local::futures_factory<result_type()> p(
@@ -62,46 +110,6 @@ namespace hpx { namespace detail {
             }
 
             return p.get_future().get();
-        }
-
-        // launch::sync execute inline
-        template <typename F, typename... Ts>
-        HPX_FORCEINLINE static hpx::util::detail::invoke_deferred_result_t<F,
-            Ts...>
-        call(launch::sync_policy, F&& f, Ts&&... ts)
-        {
-            try
-            {
-                return HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-            }
-            catch (std::bad_alloc const& ba)
-            {
-                throw ba;
-            }
-            catch (...)
-            {
-                throw exception_list(std::current_exception());
-            }
-        }
-
-        // launch::deferred execute inline
-        template <typename F, typename... Ts>
-        HPX_FORCEINLINE static hpx::util::detail::invoke_deferred_result_t<F,
-            Ts...>
-        call(launch::deferred_policy, F&& f, Ts&&... ts)
-        {
-            try
-            {
-                return HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-            }
-            catch (std::bad_alloc const& ba)
-            {
-                throw ba;
-            }
-            catch (...)
-            {
-                throw exception_list(std::current_exception());
-            }
         }
     };
 }}    // namespace hpx::detail
