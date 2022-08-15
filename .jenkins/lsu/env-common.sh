@@ -9,3 +9,6 @@ configure_extra_options+=" -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=ON"
 if [ "${build_type}" = "Debug" ]; then
     configure_extra_options+=" -DHPX_WITH_PARCELPORT_COUNTERS=ON"
 fi
+
+hostname
+module avail
