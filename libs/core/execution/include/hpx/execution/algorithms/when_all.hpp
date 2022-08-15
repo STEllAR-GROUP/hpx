@@ -50,8 +50,7 @@ namespace hpx::execution::experimental {
         // passed to when_all. When set_value is called, it will emplace the
         // values sent into the appropriate position in the pack used to store
         // values from all predecessor senders.
-        template <typename OperationState,
-            std::size_t I = OperationState::sender_pack_size>
+        template <typename OperationState>
         struct when_all_receiver
         {
             std::decay_t<OperationState>& op_state;
@@ -118,7 +117,8 @@ namespace hpx::execution::experimental {
                     ...);
             }
 
-            static constexpr std::size_t sender_pack_size = I;
+            static constexpr std::size_t sender_pack_size =
+                OperationState::sender_pack_size;
             using index_pack_type =
                 hpx::util::make_index_pack_t<sender_pack_size>;
 

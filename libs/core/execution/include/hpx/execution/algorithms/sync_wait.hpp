@@ -41,7 +41,7 @@ namespace hpx::execution::experimental::detail {
     {
         void operator()(std::exception_ptr ep) const
         {
-            std::rethrow_exception(ep);
+            std::rethrow_exception(HPX_MOVE(ep));
         }
 
         template <typename Error>

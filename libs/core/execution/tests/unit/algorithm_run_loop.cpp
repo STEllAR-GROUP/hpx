@@ -16,6 +16,7 @@
 #include <hpx/local/init.hpp>
 #include <hpx/local/mutex.hpp>
 #include <hpx/local/thread.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include "algorithm_test_utils.hpp"
@@ -24,6 +25,7 @@
 #include <chrono>
 #include <cstddef>
 #include <exception>
+#include <iostream>
 #include <mutex>
 #include <string>
 #include <type_traits>
@@ -59,6 +61,7 @@ void test_concepts()
         "ex::sends_stopped_of_v<decltype(s)> must be true");
 
     loop.finish();
+    loop.run();
 }
 
 void test_execute()
@@ -559,6 +562,7 @@ void test_when_all()
 // required scheduler again.
 void test_future_sender()
 {
+    std::cout << "1\n";
     // senders as futures
     {
         ex::run_loop loop;
@@ -569,6 +573,7 @@ void test_future_sender()
         HPX_TEST_EQ(f.get(), 3);
     }
 
+    std::cout << "2\n";
     {
         ex::run_loop loop;
         auto sched = loop.get_scheduler();
@@ -577,6 +582,7 @@ void test_future_sender()
         HPX_TEST_EQ(f.get(), 3);
     }
 
+    std::cout << "3\n";
     {
         ex::run_loop loop;
         auto sched = loop.get_scheduler();
@@ -585,6 +591,7 @@ void test_future_sender()
         HPX_TEST_EQ(f.get(), 3);
     }
 
+    std::cout << "4\n";
     {
         ex::run_loop loop;
         auto sched = loop.get_scheduler();
@@ -596,6 +603,7 @@ void test_future_sender()
         HPX_TEST(called);
     }
 
+    std::cout << "5\n";
     {
         ex::run_loop loop;
         auto sched = loop.get_scheduler();
@@ -612,6 +620,7 @@ void test_future_sender()
     }
 
     // mixing senders and futures
+    std::cout << "6\n";
     {
         ex::run_loop loop;
         auto sched = loop.get_scheduler();
@@ -621,16 +630,21 @@ void test_future_sender()
             42);
     }
 
+    std::cout << "7\n";
     {
         ex::run_loop loop;
         auto sched = loop.get_scheduler();
 
-        HPX_TEST_EQ(ex::make_future(
-                        ex::transfer(hpx::async([]() { return 42; }), sched))
-                        .get(),
-            42);
+        auto f = hpx::async([]() {
+            hpx::this_thread::sleep_for(std::chrono::seconds(1));
+            return 42;
+        });
+
+        HPX_TEST_EQ(
+            ex::make_future(ex::transfer(std::move(f), sched)).get(), 42);
     }
 
+    std::cout << "8\n";
     {
         ex::run_loop loop;
         auto sched = loop.get_scheduler();
@@ -1727,36 +1741,44 @@ void test_completion_scheduler()
     loop.run();
 }
 
+void do_run_test(void (*func)(), char const* func_name)
+{
+    std::cout << func_name << "\n";
+    func();
+}
+
+#define RUN_TEST(func) do_run_test(&func, HPX_PP_STRINGIZE(func))
+
 int hpx_main()
 {
-    test_concepts();
-    test_execute();
-    test_sender_receiver_basic();
-    test_sender_receiver_then();
-    test_sender_receiver_then_wait();
-    test_sender_receiver_then_sync_wait();
-    test_sender_receiver_then_arguments();
-    test_transfer_basic();
-    test_transfer_arguments();
-    test_just_void();
-    test_just_one_arg();
-    test_just_two_args();
-    test_transfer_just_void();
-    test_transfer_just_one_arg();
-    test_transfer_just_two_args();
-    test_when_all();
-    test_future_sender();
-    test_keep_future_sender();
-    test_ensure_started();
-    test_ensure_started_when_all();
-    test_split();
-    test_split_when_all();
-    test_let_value();
-    test_let_error();
-    test_detach();
-    test_bulk();
+    RUN_TEST(test_concepts);
+    RUN_TEST(test_execute);
+    RUN_TEST(test_sender_receiver_basic);
+    RUN_TEST(test_sender_receiver_then);
+    RUN_TEST(test_sender_receiver_then_wait);
+    RUN_TEST(test_sender_receiver_then_sync_wait);
+    RUN_TEST(test_sender_receiver_then_arguments);
+    RUN_TEST(test_transfer_basic);
+    RUN_TEST(test_transfer_arguments);
+    RUN_TEST(test_just_void);
+    RUN_TEST(test_just_one_arg);
+    RUN_TEST(test_just_two_args);
+    RUN_TEST(test_transfer_just_void);
+    RUN_TEST(test_transfer_just_one_arg);
+    RUN_TEST(test_transfer_just_two_args);
+    RUN_TEST(test_when_all);
+    RUN_TEST(test_future_sender);
+    RUN_TEST(test_keep_future_sender);
+    RUN_TEST(test_ensure_started);
+    RUN_TEST(test_ensure_started_when_all);
+    RUN_TEST(test_split);
+    RUN_TEST(test_split_when_all);
+    RUN_TEST(test_let_value);
+    RUN_TEST(test_let_error);
+    RUN_TEST(test_detach);
+    RUN_TEST(test_bulk);
 
-    test_completion_scheduler();
+    RUN_TEST(test_completion_scheduler);
 
     return hpx::local::finalize();
 }
@@ -1767,6 +1789,13 @@ int main(int argc, char* argv[])
         "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
+}
+
+#else
+
+int main(int, char*[])
+{
+    return 0;
 }
 
 #endif

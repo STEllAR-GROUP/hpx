@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //  Copyright (c) 2015 Andreas Schaefer
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -136,7 +136,12 @@ void test_initialization_from_vector(std::size_t max_size)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
+#if defined(HPX_DEBUG)
+    std::size_t const max_size = 1 << 10;
+#else
     std::size_t const max_size = 1 << 20;
+#endif
+
     std::unique_ptr<char[]> send_buffer(new char[max_size]);
 
     for (hpx::id_type const& loc : hpx::find_all_localities())
