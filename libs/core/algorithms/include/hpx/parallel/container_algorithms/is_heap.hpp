@@ -187,7 +187,7 @@ namespace hpx { namespace ranges {
         typename Proj = hpx::parallel::util::projection_identity>
     bool is_heap(Rng&& rng, Comp&& comp = Comp(), Proj&& proj = Proj());
 
-        /// Returns whether the range is max heap. That is, true if the range is
+    /// Returns whether the range is max heap. That is, true if the range is
     /// max heap, false otherwise. The function uses the given comparison
     /// function object \a comp (defaults to using operator<()).
     ///
@@ -371,7 +371,7 @@ namespace hpx { namespace ranges {
         typename Comp = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
-    is_heap_until(ExPolicy&& policy, Iter first, Sent sent, Comp&& comp = Comp(),
+    is_heap_until(ExPolicy&& policy, Iter first, Sent last, Comp&& comp = Comp(),
         Proj&& proj = Proj());
 
     /// Returns the upper bound of the largest range beginning at \a first
@@ -471,7 +471,7 @@ namespace hpx { namespace ranges {
     template <typename Iter, typename Sent,
         typename Comp = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
-    Iter is_heap_until(Iter first, Sent sent, Comp&& comp = Comp(),
+    Iter is_heap_until(Iter first, Sent last, Comp&& comp = Comp(),
         Proj&& proj = Proj());
     // clang-format on
 }}    // namespace hpx::ranges

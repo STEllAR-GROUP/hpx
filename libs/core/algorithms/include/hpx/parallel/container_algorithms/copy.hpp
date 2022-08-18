@@ -167,8 +167,8 @@ namespace hpx { namespace ranges {
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element copied.
     template <typename Rng, typename FwdIter>
-    typename hpx::traits::range_traits<Rng>::iterator_type, FwdIter>
-    copy(Rng&& rng, FwdIter dest);
+    ranges::copy_result<typename hpx::traits::range_traits<Rng>::iterator_type,
+        FwdIter> copy(Rng&& rng, FwdIter dest);
 
     /// Copies the elements in the range [first, first + count), starting from
     /// first and proceeding to first + count - 1., to another range beginning

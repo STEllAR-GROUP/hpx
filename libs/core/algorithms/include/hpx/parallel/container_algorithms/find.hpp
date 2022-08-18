@@ -164,7 +164,6 @@ namespace hpx { namespace ranges {
         typename Proj = hpx::parallel::util::projection_identity,
         typename T = typename hpx::parallel::traits::projected<Iter,
             Proj>::value_type>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
     Iter find(Iter first, Sent last, T const& val, Proj&& proj = Proj());
 
     /// Returns the first element in the range [first, last) that is equal
@@ -173,10 +172,6 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: At most last - first
     ///         applications of the operator==().
     ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
@@ -184,8 +179,6 @@ namespace hpx { namespace ranges {
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
     /// \param val          the value to compare the elements to
@@ -409,7 +402,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename Iter, typename Sent, typename Pred,
         typename Proj = hpx::parallel::util::projection_identity>
-    Iter find_if(Iter first, Iter first, Sent last, Pred&& pred, Proj&& proj = Proj());
+    Iter find_if(Iter first, Sent last, Pred&& pred, Proj&& proj = Proj());
 
     /// Returns the first element in the range \a rng for which
     /// predicate \a pred returns true
@@ -779,7 +772,7 @@ namespace hpx { namespace ranges {
         typename Proj2 = hpx::parallel::util::projection_identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng1>::type>::type
-    find_end(ExPolicy&& policy, Rng1&& rng, Rng2&& rng2, Pred&& op = Pred(),
+    find_end(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Returns the last subsequence of elements \a [first2, last2) found in
@@ -953,7 +946,7 @@ namespace hpx { namespace ranges {
         typename Proj1 = hpx::parallel::util::projection_identity,
         typename Proj2 = hpx::parallel::util::projection_identity>
     typename hpx::traits::range_iterator<Rng1>::type
-    find_end(Rng1&& rng, Rng2&& rng2, Pred&& op = Pred(),
+    find_end(Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Returns the last subsequence of elements \a [first2, last2) found in

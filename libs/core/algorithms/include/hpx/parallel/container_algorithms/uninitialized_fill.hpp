@@ -12,6 +12,7 @@
 #if defined(DOXYGEN)
 
 namespace hpx { namespace ranges {
+    // clang-format off
 
     /// Copies the given \a value to an uninitialized memory area, defined by
     /// the range [first, last). If an exception is thrown during the
@@ -20,7 +21,7 @@ namespace hpx { namespace ranges {
     /// \note   Complexity: Linear in the distance between \a first and \a last
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter.
@@ -56,7 +57,7 @@ namespace hpx { namespace ranges {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter.
@@ -86,10 +87,10 @@ namespace hpx { namespace ranges {
     ///           iterator to the element in the range, one past
     ///           the last element copied.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent>
+    template <typename ExPolicy, typename FwdIter, typename Sent, typename T>
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    uninitialized_fill(
-        ExPolicy&& policy, FwdIter first, Sent last, T const& value);
+    uninitialized_fill(ExPolicy&& policy, FwdIter first, Sent last,
+        T const& value);
 
     /// Copies the given \a value to an uninitialized memory area, defined by
     /// the range [first, last). If an exception is thrown during the
@@ -111,8 +112,7 @@ namespace hpx { namespace ranges {
     /// the calling thread.
     ///
     /// \returns  The \a uninitialized_fill algorithm returns a
-    ///           returns \a hpx::traits::range_traits<Rng>
-    ///           ::iterator_type.
+    ///           returns \a hpx::traits::range_traits<Rng>::iterator_type.
     ///           The \a uninitialized_fill algorithm returns the output
     ///           iterator to the element in the range, one past
     ///           the last element copied.
@@ -152,10 +152,9 @@ namespace hpx { namespace ranges {
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a uninitialized_fill algorithm returns a
-    ///           \a hpx::future<typename hpx::traits::range_traits<Rng>
-    ///           ::iterator_type>, if the
-    ///           execution policy is of type \a sequenced_task_policy
+    /// \returns  The \a uninitialized_fill algorithm returns a \a
+    ///           hpx::future<typename hpx::traits::range_traits<Rng>::iterator_type>,
+    ///           if the execution policy is of type \a sequenced_task_policy
     ///           or \a parallel_task_policy and returns \a typename
     ///           hpx::traits::range_traits<Rng>::iterator_type otherwise.
     ///           The \a uninitialized_fill algorithm returns the
@@ -248,10 +247,11 @@ namespace hpx { namespace ranges {
     ///           the last element copied.
     ///
     template <typename ExPolicy, typename FwdIter, typename Size, typename T>
-    typename typename parallel::util::detail::algorithm_result<ExPolicy,
-        FwdIter>::type
-    uninitialized_fill_n(
-        ExPolicy&& policy, FwdIter first, Size count, T const& value);
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    uninitialized_fill_n(ExPolicy&& policy, FwdIter first, Size count,
+        T const& value);
+
+    // clang-format on
 }}    // namespace hpx::ranges
 #else
 

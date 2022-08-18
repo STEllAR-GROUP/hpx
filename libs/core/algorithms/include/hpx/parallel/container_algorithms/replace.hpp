@@ -912,9 +912,9 @@ namespace hpx { namespace ranges {
     /// The assignments in the parallel \a replace_copy algorithm
     /// execute in sequential order in the calling thread.
     ///
-    /// \returns  The \a replace_copy algorithm returns an
-    ///           \a in_out_result<typename hpx::traits::range_iterator<
-    ///             Rng>::type, OutIter>.
+    /// \returns  The \a replace_copy algorithm returns an \a
+    ///           in_out_result<typename hpx::traits::range_iterator<Rng>::type,
+    ///           OutIter>.
     ///           The \a copy algorithm returns the pair of the input iterator
     ///           \a last and the output iterator to the
     ///           element in the destination range, one past the last element
