@@ -796,6 +796,18 @@ shortcuts. For more information about commandline options, see the section
    -8 = --hpx:node=8
    -9 = --hpx:node=9
 
+.. note::
+
+  The short options listed above are disabled by default if the application
+  is built using ``#include <hpx/hpx_main.hpp>``. See :ref:`minimal` for more
+  information.
+  The rationale behind this is that in this case the user's application may
+  handle its own command line options, since |hpx| passes all unknown options
+  to ``main()``. Short options like ``-t`` are prone to create ambiguities regarding
+  what the application will support.
+  Hence, the user should instead rely on the corresponding long options like
+  ``--hpx:threads`` in such a case.
+
 .. _ini_hpx_shortuts:
 
 .. list-table::
@@ -1710,6 +1722,18 @@ application.
    ``-8``          :option:`--hpx:node`\ ``=8``
    ``-9``          :option:`--hpx:node`\ ``=9``
    =============== ======================
+
+.. note::
+
+  The short options listed above are disabled by default if the application
+  is built using ``#include <hpx/hpx_main.hpp>``. See :ref:`minimal` for more
+  information.
+  The rationale behind this is that in this case the user's application may
+  handle its own command line options, since |hpx| passes all unknown options
+  to ``main()``. Short options like ``-t`` are prone to create ambiguities regarding
+  what the application will support.
+  Hence, the user should instead rely on the corresponding long options like
+  ``--hpx:threads`` in such a case.
 
 It is possible to define your own shortcut options. In fact, all of the
 shortcuts listed above are pre-defined using the technique described here. Also,
