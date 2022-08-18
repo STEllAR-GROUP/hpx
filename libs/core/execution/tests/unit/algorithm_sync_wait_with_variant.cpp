@@ -178,64 +178,49 @@ int hpx_main()
             return ex::just(std::string{"err"});
         });
 
-        hpx::optional<hpx::variant<hpx::tuple<int>, hpx::tuple<std::string>>>
-            result = tt::sync_wait_with_variant(sender);
+        auto result = tt::sync_wait_with_variant(std::move(sender));
 
-        auto v = *result;
         // variant
+        auto v = *result;
         static_assert(std::is_same_v<decltype(v),
-            hpx::variant<hpx::tuple<int>, hpx::tuple<std::string>>>);
+            hpx::variant<hpx::tuple<std::string>, hpx::tuple<int>>>);
+
+        HPX_TEST(hpx::holds_alternative<hpx::tuple<int>>(v));
+
         // tuple
-        auto t = hpx::get<0>(v);
+        auto t = hpx::get<1>(v);
         static_assert(std::is_same_v<decltype(t), hpx::tuple<int>>);
 
         auto i = hpx::get<0>(t);
         static_assert(std::is_same_v<decltype(i), int>);
 
-        HPX_TEST(i == 3);
+        HPX_TEST_EQ(i, 3);
     }
 
-    // {
-    //     auto s1 = ex::just(custom_type_non_default_constructible{42});
-    //     auto s2 = ex::let_error(std::move(s1), [](std::exception_ptr) {
-    //         HPX_TEST(false);
-    //         return ex::just(std::string{"err"});
-    //     });
-    //     auto sender = ex::just(custom_type_non_default_constructible{42}) |
-    //         ex::let_error([](std::exception_ptr) {
-    //             HPX_TEST(false);
-    //             return ex::just(std::string{"err"});
-    //         });
-    //     check_value_types<
-    //         hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(
-    //         s2);
+    {
+        auto s1 = ex::just(custom_type_non_default_constructible{42});
+        auto s2 = ex::let_value(std::move(s1),
+            [](custom_type_non_default_constructible const& value) {
+                HPX_TEST_EQ(value.x, 42);
+                return ex::just(std::to_string(value.x));
+            });
 
-    //     hpx::optional<
-    //         hpx::variant<hpx::tuple<custom_type_non_default_constructible>,
-    //             hpx::tuple<std::string>>>
-    //         result = tt::sync_wait_with_variant(s2);
+        auto result = tt::sync_wait_with_variant(std::move(s2));
 
-    //     hpx::optional<
-    //         hpx::variant<hpx::tuple<custom_type_non_default_constructible>,
-    //             hpx::tuple<std::string>>>
-    //         result = tt::sync_wait_with_variant(sender);
+        // variant
+        auto v = *result;
+        static_assert(
+            std::is_same_v<decltype(v), hpx::variant<hpx::tuple<std::string>>>);
 
-    //     auto v = *result;
-    //     // variant
-    //     static_assert(std::is_same_v<decltype(v),
-    //         hpx::variant<hpx::tuple<custom_type_non_default_constructible>,
-    //             hpx::tuple<std::string>>>);
-    //     // tuple
-    //     auto t = hpx::get<0>(v);
-    //     static_assert(std::is_same_v<decltype(t),
-    //         hpx::tuple<custom_type_non_default_constructible>>);
+        // tuple
+        auto t = hpx::get<0>(v);
+        static_assert(std::is_same_v<decltype(t), hpx::tuple<std::string>>);
 
-    //     auto j = hpx::get<0>(t);
-    //     static_assert(
-    //         std::is_same_v<decltype(j), custom_type_non_default_constructible>);
+        auto j = hpx::get<0>(t);
+        static_assert(std::is_same_v<decltype(j), std::string>);
 
-    //     HPX_TEST(j.x == 42);
-    // }
+        HPX_TEST_EQ(j, std::string("42"));
+    }
 
     // operator| overload
     {
