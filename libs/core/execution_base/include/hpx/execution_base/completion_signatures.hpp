@@ -703,6 +703,9 @@ namespace hpx::execution::experimental {
         detail::value_types_from<detail::completion_signatures_of<Sender, Env>,
             meta::func<Tuple>, meta::func<Variant>>;
 
+    template <typename Sender, typename Env = no_env>
+    using single_sender_value_t = value_types_of_t<Sender, Env>;
+
     // Let r be an rvalue receiver of type R, and let S be the type of a sender.
     // If error_types_of_t<S, env_of_t<R>, Variant> is well formed, it shall
     // name the type Variant<E0, E1, ..., EN>, where the types E0 through EN are

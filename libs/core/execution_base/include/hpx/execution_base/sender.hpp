@@ -8,6 +8,8 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
+#include <hpx/execution_base/coroutine_utils.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -67,6 +69,14 @@ namespace hpx { namespace execution { namespace experimental {
 
 #endif
 
+    struct is_debug_env_t
+    {
+        template <typename Env,
+            typename = std::enable_if_t<
+                hpx::functional::is_tag_invocable_v<is_debug_env_t, Env>>>
+        void operator()(Env&&) const noexcept;
+    };
+
     // execution::connect is used to connect a sender with a receiver, producing
     // an operation state object that represents the work that needs to be
     // performed to satisfy the receiver contract of the receiver with values
@@ -89,9 +99,74 @@ namespace hpx { namespace execution { namespace experimental {
     //      // operation states are not movable, and therefore this operation
     //      // state object must be kept alive until the operation finishes
     //
-    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct connect_t : hpx::functional::tag<connect_t>
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct connect_t
+      : hpx::functional::tag<connect_t>
     {
+        template <typename Sender, typename Receiver>
+        static inline constexpr bool is_connectable_with_tag_invoke_v =
+            is_sender_v<Sender, env_of_t<Receiver>>&&
+                is_receiver_from_v<Receiver, Sender>&&
+                    hpx::functional::is_tag_invocable_v<connect_t, Sender,
+                        Receiver>;
+
+        template <typename Sender, typename Receiver>
+        static constexpr bool nothrow_connect() noexcept
+        {
+            if constexpr (is_connectable_with_tag_invoke_v<Sender, Receiver>)
+            {
+                return hpx::functional::is_nothrow_tag_invocable_v<connect_t,
+                    Sender, Receiver>;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+
+        template <typename Sender, typename Receiver,
+            typename = std::enable_if_t<
+                is_connectable_with_tag_invoke_v<Sender, Receiver> ||
+                hpx::is_invocable_v<connect_awaitable_t, Sender, Receiver> ||
+                hpx::functional::is_tag_invocable_v<is_debug_env_t,
+                    env_of_t<Receiver>>>>
+        auto operator()(Sender&& sndr, Receiver&& rcvr) const
+            noexcept(nothrow_connect<Sender, Receiver>())
+        {
+            if constexpr (is_connectable_with_tag_invoke_v<Sender, Receiver>)
+            {
+                // hpx::util::invoke_result_t<connect_t, std::decay_t<Sender>,
+                // std::decay_t<Receiver>> is same as connect_result_t<S,R>
+                std::decay_t<hpx::util::invoke_result_t<connect_t,
+                    std::decay_t<Sender>, std::decay_t<Receiver>>>
+                    operation_state;
+
+                static_assert(
+                    is_operation_state_v<hpx::functional::tag_invoke_result_t<
+                        connect_t, Sender, Receiver>>,
+                    "execution::connect(sender, receiver) must return a type "
+                    "that "
+                    "satisfies the operation_state concept");
+                return tag_invoke(connect_t{}, HPX_FORWARD(Sender, sndr),
+                    HPX_FORWARD(Receiver, rcvr));
+            }
+            else if constexpr (hpx::is_invocable_v<connect_awaitable_t, Sender,
+                                   Receiver>)
+            {
+                return connect_awaitable(
+                    HPX_FORWARD(Sender, sndr), HPX_FORWARD(Receiver, rcvr));
+            }
+            else
+            {
+                // This should generate an instantiate backtrace that contains useful
+                // debugging information.
+                return hpx::functional::tag_invoke(*this,
+                    HPX_FORWARD(Sender, sndr), HPX_FORWARD(Receiver, rcvr));
+            }
+        }
+#endif    // HPX_HAVE_CXX20_COROUTINES
+
     } connect{};
 
     namespace detail {
