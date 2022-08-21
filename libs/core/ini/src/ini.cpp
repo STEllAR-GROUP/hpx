@@ -62,6 +62,23 @@ namespace hpx { namespace util {
             size_type last = s.find_last_not_of(" \t\r\n");
             return s.substr(first, last - first + 1);
         }
+
+        // MSVC: using std::string::replace triggers ASAN reports
+        std::string replace_substr(std::string const& str,
+            std::size_t start_pos, std::size_t oldlen, char const* newstr)
+        {
+            std::string result(str.substr(0, start_pos));
+            result += newstr;
+            result += str.substr(start_pos + oldlen);
+            return result;
+        }
+
+        std::string replace_substr(std::string const& str,
+            std::size_t start_pos, std::size_t oldlen,
+            std::string const& newstr)
+        {
+            return replace_substr(str, start_pos, oldlen, newstr.c_str());
+        }
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -818,7 +835,7 @@ namespace hpx { namespace util {
         {
             if (end != 0 && value[end - 1] != '\\')
                 break;
-            value.replace(end - 1, 2, ch);
+            value = detail::replace_substr(value, end - 1, 2, ch);
             end = value.find_first_of(ch, end);
         }
         return end;
@@ -853,12 +870,12 @@ namespace hpx { namespace util {
             std::string::size_type colon = find_next(":", to_expand);
             if (colon == std::string::npos)
             {
-                value.replace(begin, end - begin + 1,
+                value = detail::replace_substr(value, begin, end - begin + 1,
                     root_->get_entry(l, to_expand, std::string("")));
             }
             else
             {
-                value.replace(begin, end - begin + 1,
+                value = detail::replace_substr(value, begin, end - begin + 1,
                     root_->get_entry(l, to_expand.substr(0, colon),
                         to_expand.substr(colon + 1)));
             }
@@ -880,13 +897,13 @@ namespace hpx { namespace util {
             if (colon == std::string::npos)
             {
                 char* env = getenv(to_expand.c_str());
-                value.replace(
-                    begin, end - begin + 1, nullptr != env ? env : "");
+                value = detail::replace_substr(
+                    value, begin, end - begin + 1, nullptr != env ? env : "");
             }
             else
             {
                 char* env = getenv(to_expand.substr(0, colon).c_str());
-                value.replace(begin, end - begin + 1,
+                value = detail::replace_substr(value, begin, end - begin + 1,
                     nullptr != env ? std::string(env) :
                                      to_expand.substr(colon + 1));
             }
@@ -933,13 +950,14 @@ namespace hpx { namespace util {
             {
                 if (to_expand == expand_this)
                 {
-                    value.replace(begin, end - begin + 1,
-                        root_->get_entry(l, to_expand, std::string("")));
+                    value =
+                        detail::replace_substr(value, begin, end - begin + 1,
+                            root_->get_entry(l, to_expand, std::string("")));
                 }
             }
             else if (to_expand.substr(0, colon) == expand_this)
             {
-                value.replace(begin, end - begin + 1,
+                value = detail::replace_substr(value, begin, end - begin + 1,
                     root_->get_entry(l, to_expand.substr(0, colon),
                         to_expand.substr(colon + 1)));
             }
@@ -962,13 +980,13 @@ namespace hpx { namespace util {
             if (colon == std::string::npos)
             {
                 char* env = getenv(to_expand.c_str());
-                value.replace(
-                    begin, end - begin + 1, nullptr != env ? env : "");
+                value = detail::replace_substr(
+                    value, begin, end - begin + 1, nullptr != env ? env : "");
             }
             else
             {
                 char* env = getenv(to_expand.substr(0, colon).c_str());
-                value.replace(begin, end - begin + 1,
+                value = detail::replace_substr(value, begin, end - begin + 1,
                     nullptr != env ? std::string(env) :
                                      to_expand.substr(colon + 1));
             }

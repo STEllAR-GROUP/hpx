@@ -181,7 +181,7 @@ namespace hpx { namespace threads { namespace coroutines {
                 {
                     void const* dummy = nullptr;
                     GetCurrentThreadStackLimits(
-                        (PULONG_PTR) &dummy, (PULONG_PTR) &asan_stack_bottom);
+                        (PULONG_PTR) &asan_stack_bottom, (PULONG_PTR) &dummy);
                 }
                 __sanitizer_start_switch_fiber(
                     fake_stack, asan_stack_bottom, asan_stack_size);

@@ -10,6 +10,7 @@
 #include <hpx/modules/async_mpi.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include "algorithm_test_utils.hpp"

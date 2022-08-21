@@ -1620,8 +1620,10 @@ namespace hpx {
     {
         using shared_state = lcos::detail::timed_future_data<void>;
 
-        return hpx::traits::future_access<future<void>>::create(
+        hpx::intrusive_ptr<shared_state> p(
             new shared_state(abs_time.value(), hpx::util::unused));
+
+        return hpx::traits::future_access<future<void>>::create(HPX_MOVE(p));
     }
 
     template <typename T>

@@ -9,6 +9,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(execution_headers
     hpx/execution/algorithms/bulk.hpp
     hpx/execution/algorithms/detail/is_negative.hpp
+    hpx/execution/algorithms/detail/inject_scheduler.hpp
     hpx/execution/algorithms/detail/partial_algorithm.hpp
     hpx/execution/algorithms/detail/predicates.hpp
     hpx/execution/algorithms/detail/single_result.hpp
@@ -20,6 +21,7 @@ set(execution_headers
     hpx/execution/algorithms/let_stopped.hpp
     hpx/execution/algorithms/let_value.hpp
     hpx/execution/algorithms/make_future.hpp
+    hpx/execution/algorithms/run_loop.hpp
     hpx/execution/algorithms/schedule_from.hpp
     hpx/execution/algorithms/split.hpp
     hpx/execution/algorithms/start_detached.hpp
@@ -154,6 +156,7 @@ add_hpx_module(
     hpx_threading
     hpx_pack_traversal
     hpx_errors
+    hpx_lock_registration
     hpx_memory
     hpx_synchronization
     hpx_thread_support

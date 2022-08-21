@@ -133,7 +133,7 @@ namespace hpx { namespace lcos { namespace detail {
         util::atomic_count count_;
     };
 
-    /// support functions for hpx::intrusive_ptr
+    // support functions for hpx::intrusive_ptr
     inline void intrusive_ptr_add_ref(future_data_refcnt_base* p) noexcept
     {
         ++p->count_;
@@ -251,8 +251,7 @@ namespace hpx { namespace lcos { namespace detail {
             exception = 4 | ready
         };
 
-        /// Return whether or not the data is available for this
-        /// \a future.
+        // Return whether or not the data is available for this \a future.
         bool is_ready(
             std::memory_order order = std::memory_order_acquire) const noexcept
         {
@@ -302,9 +301,9 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Callback>
         static void handle_on_completed(Callback&& on_completed);
 
-        /// Set the callback which needs to be invoked when the future becomes
-        /// ready. If the future is ready the function will be invoked
-        /// immediately.
+        // Set the callback which needs to be invoked when the future becomes
+        // ready. If the future is ready the function will be invoked
+        // immediately.
         void set_on_completed(completed_callback_type data_sink) override;
 
         virtual state wait(error_code& ec = throws);
@@ -600,8 +599,8 @@ namespace hpx { namespace lcos { namespace detail {
                 [&](std::exception_ptr ep) { set_exception(HPX_MOVE(ep)); });
         }
 
-        /// Reset the promise to allow to restart an asynchronous
-        /// operation. Allows any subsequent set_data operation to succeed.
+        // Reset the promise to allow to restart an asynchronous operation.
+        // Allows any subsequent set_data operation to succeed.
         void reset(error_code& /*ec*/ = throws)
         {
             // no locking is required as semantics guarantee a single writer
