@@ -24,8 +24,9 @@ void barrier_test(
     std::size_t num, std::size_t rank, std::atomic<std::size_t>& c)
 {
     hpx::distributed::barrier b(
-        hpx::util::format("local_barrier_test_{}", hpx::get_locality_id()), num,
-        rank);
+        hpx::util::format("local_barrier_test_{}", hpx::get_locality_id()),
+        hpx::collectives::num_sites_arg(num),
+        hpx::collectives::this_site_arg(rank));
     ++c;
 
     // wait for all threads to enter the barrier
@@ -48,7 +49,8 @@ void local_tests(hpx::program_options::variables_map& vm)
     {
         hpx::distributed::barrier b(
             hpx::util::format("local_barrier_test_{}", hpx::get_locality_id()),
-            threads + 1, 0);
+            hpx::collectives::num_sites_arg(threads + 1),
+            hpx::collectives::this_site_arg(0));
 
         std::atomic<std::size_t> c(0);
         for (std::size_t j = 1; j <= threads; ++j)

@@ -20,46 +20,46 @@
 namespace hpx { namespace components {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Client>
+    template <typename Client, typename... Ts>
     inline std::enable_if_t<traits::is_client_v<Client>, Client> make_client(
-        hpx::id_type const& id)
+        hpx::id_type const& id, Ts&&... ts)
     {
-        return Client(id);
+        return Client(id, HPX_FORWARD(Ts, ts)...);
     }
 
-    template <typename Client>
+    template <typename Client, typename... Ts>
     inline std::enable_if_t<traits::is_client_v<Client>, Client> make_client(
-        hpx::id_type&& id)
+        hpx::id_type&& id, Ts&&... ts)
     {
-        return Client(HPX_MOVE(id));
+        return Client(HPX_MOVE(id), HPX_FORWARD(Ts, ts)...);
     }
 
-    template <typename Client>
+    template <typename Client, typename... Ts>
     inline std::enable_if_t<traits::is_client_v<Client>, Client> make_client(
-        hpx::future<hpx::id_type> const& id)
+        hpx::future<hpx::id_type> const& id, Ts&&... ts)
     {
-        return Client(id);
+        return Client(id, HPX_FORWARD(Ts, ts)...);
     }
 
-    template <typename Client>
+    template <typename Client, typename... Ts>
     inline std::enable_if_t<traits::is_client_v<Client>, Client> make_client(
-        hpx::future<hpx::id_type>&& id)
+        hpx::future<hpx::id_type>&& id, Ts&&... ts)
     {
-        return Client(HPX_MOVE(id));
+        return Client(HPX_MOVE(id), HPX_FORWARD(Ts, ts)...);
     }
 
-    template <typename Client>
+    template <typename Client, typename... Ts>
     inline std::enable_if_t<traits::is_client_v<Client>, Client> make_client(
-        hpx::shared_future<hpx::id_type> const& id)
+        hpx::shared_future<hpx::id_type> const& id, Ts&&... ts)
     {
-        return Client(id);
+        return Client(id, HPX_FORWARD(Ts, ts)...);
     }
 
-    template <typename Client>
+    template <typename Client, typename... Ts>
     inline std::enable_if_t<traits::is_client_v<Client>, Client> make_client(
-        hpx::shared_future<hpx::id_type>&& id)
+        hpx::shared_future<hpx::id_type>&& id, Ts&&... ts)
     {
-        return Client(HPX_MOVE(id));
+        return Client(HPX_MOVE(id), HPX_FORWARD(Ts, ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////

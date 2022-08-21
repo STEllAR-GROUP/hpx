@@ -96,7 +96,10 @@ namespace hpx { namespace lcos {
           , images_per_locality_(images_per_locality)
           , num_images_(num_images)
           , image_id_(image_id)
-          , barrier_(std::make_shared<barrier>(name, num_images, image_id))
+          , barrier_(
+                std::make_shared<hpx::distributed::barrier>(name_ + "_barrier",
+                    hpx::collectives::num_sites_arg(num_images_),
+                    hpx::collectives::this_site_arg(image_id_)))
         {
         }
 
@@ -152,13 +155,16 @@ namespace hpx { namespace lcos {
 #pragma GCC diagnostic pop
 #endif
 
-                    table_it = barriers_
-                                   .insert({images,
-                                       std::make_shared<barrier_type>(name_ +
-                                               "_barrier_" +
-                                               std::to_string(hash_(suffix)),
-                                           images.size(), rank)})
-                                   .first;
+                    table_it =
+                        barriers_
+                            .insert({images,
+                                std::make_shared<barrier_type>(name_ +
+                                        "_barrier_" +
+                                        std::to_string(hash_(suffix)),
+                                    hpx::collectives::num_sites_arg(
+                                        images.size()),
+                                    hpx::collectives::this_site_arg(rank))})
+                            .first;
                 }
 
                 table_it->second->wait();
@@ -212,13 +218,16 @@ namespace hpx { namespace lcos {
                     for (std::size_t s : images)
                         suffix += ("_" + std::to_string(s));
 
-                    table_it = barriers_
-                                   .insert({images,
-                                       std::make_shared<barrier_type>(name_ +
-                                               "_barrier_" +
-                                               std::to_string(hash_(suffix)),
-                                           images.size(), rank)})
-                                   .first;
+                    table_it =
+                        barriers_
+                            .insert({images,
+                                std::make_shared<barrier_type>(name_ +
+                                        "_barrier_" +
+                                        std::to_string(hash_(suffix)),
+                                    hpx::collectives::num_sites_arg(
+                                        images.size()),
+                                    hpx::collectives::this_site_arg(rank))})
+                            .first;
                 }
 
                 return table_it->second->wait(hpx::launch::async);

@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2021 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(DOXYGEN)
+
 // clang-format off
 namespace hpx { namespace collectives {
 
@@ -142,12 +143,18 @@ namespace hpx::collectives {
           : base_type(HPX_MOVE(id))
         {
         }
-        explicit communicator(future<hpx::id_type>&& id) noexcept
+        explicit communicator(future<hpx::id_type>&& id,
+            num_sites_arg num_sites = {}, this_site_arg this_site = {}) noexcept
           : base_type(HPX_MOVE(id))
+          , num_sites_(num_sites)
+          , this_site_(this_site)
         {
         }
-        communicator(future<communicator>&& c)
+        communicator(future<communicator>&& c, num_sites_arg num_sites = {},
+            this_site_arg this_site = {})
           : base_type(HPX_MOVE(c))
+          , num_sites_(num_sites)
+          , this_site_(this_site)
         {
         }
 
@@ -164,10 +171,8 @@ namespace hpx::collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT communicator create_communicator(char const* basename,
-        num_sites_arg num_sites = num_sites_arg(),
-        this_site_arg this_site = this_site_arg(),
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg());
+        num_sites_arg num_sites = {}, this_site_arg this_site = {},
+        generation_arg generation = {}, root_site_arg root_site = {});
 
     HPX_EXPORT communicator create_local_communicator(char const* basename,
         num_sites_arg num_sites, this_site_arg this_site,

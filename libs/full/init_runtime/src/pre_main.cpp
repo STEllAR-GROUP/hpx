@@ -11,7 +11,6 @@
 
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/collectives/barrier.hpp>
-#include <hpx/collectives/detail/barrier_node.hpp>
 #include <hpx/collectives/latch.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -159,8 +158,7 @@ namespace hpx { namespace detail {
             }
 
             // create our global barrier...
-            hpx::distributed::barrier::get_global_barrier() =
-                hpx::distributed::barrier::create_global_barrier();
+            hpx::distributed::barrier::get_global_barrier();
 
             // Second stage bootstrap synchronizes component loading across all
             // localities, ensuring that the component namespace tables are fully
@@ -220,8 +218,8 @@ namespace hpx { namespace detail {
             get_config_entry("hpx.on_startup.wait_on_latch", ""));
         if (!connect_back_to.empty())
         {
-            lbt_ << "(6th stage) runtime::run_helper: about to "
-                    "synchronize with latch: "
+            lbt_ << "(6th stage) runtime::run_helper: about to synchronize "
+                    "with latch: "
                  << connect_back_to;
 
             // inform launching process that this locality is up and running
@@ -229,8 +227,7 @@ namespace hpx { namespace detail {
             l.connect_to(connect_back_to);
             l.arrive_and_wait();
 
-            lbt_ << "(6th stage) runtime::run_helper: "
-                    "synchronized with latch: "
+            lbt_ << "(6th stage) runtime::run_helper: synchronized with latch: "
                  << connect_back_to;
         }
 

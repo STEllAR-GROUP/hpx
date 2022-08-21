@@ -71,6 +71,9 @@ namespace hpx::util {
         std::uint32_t get_num_localities() const;
         void set_num_localities(std::uint32_t);
 
+        // initial rank of this locality
+        std::uint32_t get_locality() const;
+
         // should networking be enabled
         bool enable_networking() const;
 
@@ -185,6 +188,7 @@ namespace hpx::util {
 
     private:
         mutable std::uint32_t num_localities;
+        mutable std::uint32_t locality;
         mutable std::uint32_t num_os_threads;
         std::ptrdiff_t small_stacksize;
         std::ptrdiff_t medium_stacksize;

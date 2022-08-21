@@ -162,10 +162,11 @@ namespace hpx::collectives::detail {
         // set or get).
         //
         // Finalizer will be invoked under lock after all sites have checked in.
-        template <typename Data, typename Step, typename Finalizer>
+        template <typename Data, typename Step = std::nullptr_t,
+            typename Finalizer = std::nullptr_t>
         auto handle_data(std::size_t which, std::size_t generation,
-            [[maybe_unused]] Step&& step, Finalizer&& finalizer,
-            std::size_t num_values = static_cast<std::size_t>(-1))
+            Step&& step = nullptr, Finalizer&& finalizer = nullptr,
+            std::size_t num_values = std::size_t(-1))
         {
             auto on_ready = [this, num_values,
                                 finalizer = HPX_FORWARD(Finalizer, finalizer)](

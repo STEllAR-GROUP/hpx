@@ -98,11 +98,20 @@ namespace hpx {
     ///         This is important in order to reliably retrieve ids from a
     ///         name, even if the name was already registered.
     ///
-    template <typename Client>
-    Client find_from_basename(std::string base_name, std::size_t sequence_nr)
+    template <typename Client, typename... Ts>
+    Client find_from_basename(
+        std::string base_name, std::size_t sequence_nr, Ts&&... ts)
     {
         return components::make_client<Client>(
-            find_from_basename(HPX_MOVE(base_name), sequence_nr));
+            find_from_basename(HPX_MOVE(base_name), sequence_nr),
+            HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename Client>
+    Client find_from_basename(std::string base_name)
+    {
+        return components::make_client<Client>(find_from_basename(
+            HPX_MOVE(base_name), ~static_cast<std::size_t>(0)));
     }
 
     /// Register the id wrapped in the given client using the given base name.
@@ -159,11 +168,12 @@ namespace hpx {
     /// \returns A future representing the result of the un-registration
     ///          operation itself.
     ///
-    template <typename Client>
+    template <typename Client, typename... Ts>
     Client unregister_with_basename(
-        std::string base_name, std::size_t sequence_nr)
+        std::string base_name, std::size_t sequence_nr, Ts&&... ts)
     {
         return components::make_client<Client>(
-            unregister_with_basename(HPX_MOVE(base_name), sequence_nr));
+            unregister_with_basename(HPX_MOVE(base_name), sequence_nr),
+            HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx

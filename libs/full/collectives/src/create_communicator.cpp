@@ -110,6 +110,10 @@ namespace hpx::collectives {
                 root_site = this_site;
             }
         }
+        if (root_site == std::size_t(-1))
+        {
+            root_site = 0;
+        }
 
         HPX_ASSERT(this_site < num_sites);
         HPX_ASSERT(
@@ -125,6 +129,7 @@ namespace hpx::collectives {
         {
             // create a new communicator
             auto c = hpx::local_new<communicator>(num_sites);
+            c.set_info(num_sites, this_site);
 
             // register the communicator's id using the given basename, this
             // keeps the communicator alive
@@ -141,13 +146,13 @@ namespace hpx::collectives {
                             "operation was already registered: {}",
                             target.registered_name());
                     }
-                    target.set_info(num_sites, this_site);
                     return target;
                 });
         }
 
         // find existing communicator
-        return hpx::find_from_basename<communicator>(HPX_MOVE(name), root_site);
+        return hpx::find_from_basename<communicator>(
+            HPX_MOVE(name), root_site, num_sites, this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////

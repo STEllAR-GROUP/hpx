@@ -242,9 +242,12 @@ namespace hpx {
     ///         This is important in order to reliably retrieve ids from a
     ///         name, even if the name was already registered.
     ///
+    template <typename Client, typename... Ts>
+    Client find_from_basename(
+        std::string base_name, std::size_t sequence_nr, Ts&&... ts);
+
     template <typename Client>
-    Client find_from_basename(std::string base_name,
-        std::size_t sequence_nr = ~static_cast<std::size_t>(0));
+    Client find_from_basename(std::string base_name);
 
     /// Register the id wrapped in the given client using the given base name.
     ///
