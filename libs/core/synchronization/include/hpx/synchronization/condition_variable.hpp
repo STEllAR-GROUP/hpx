@@ -34,7 +34,7 @@ namespace hpx {
      *
      * \a hpx::cv_status is used by the \a wait_for and \a wait_until member
      * functions of \a hpx::condition_variable and
-     * \a hpx::condition_variable_any. 
+     * \a hpx::condition_variable_any.
      */
     enum class cv_status
     {
@@ -90,11 +90,11 @@ namespace hpx {
      * Condition variables permit concurrent invocation of the \a wait,
      * \a wait_for, \a wait_until, \a notify_one and \a notify_all member
      * functions.
-     * 
+     *
      * The class \a hpx::condition_variable is a \a StandardLayoutType.
      * It is not \a CopyConstructible, \a MoveConstructible, \a CopyAssignable,
      * or \a MoveAssignable.
-     * 
+     *
      */
     class condition_variable
     {
@@ -113,8 +113,8 @@ namespace hpx {
         }
 
         /**
-         * \brief Destroys the object of type \a hpx::condition_variable. 
-         * 
+         * \brief Destroys the object of type \a hpx::condition_variable.
+         *
          * \note Preconditions: There is no thread blocked on *this. [Note:
          *                      That is, all threads have been notified; they
          *                      could subsequently block on the lock specified
@@ -141,8 +141,8 @@ namespace hpx {
 
         /**
          * \brief If any threads are waiting on \a *this, calling \a notify_one
-         * unblocks one of the waiting threads. 
-         * 
+         * unblocks one of the waiting threads.
+         *
          * \param ec Used to hold error code value originated during the
          * operation. Defaults to \a throws -- A special 'throw on error'
          * \a error_code.
@@ -156,8 +156,8 @@ namespace hpx {
         }
 
         /**
-         * \brief Unblocks all threads currently waiting for \a *this. 
-         * 
+         * \brief Unblocks all threads currently waiting for \a *this.
+         *
          * \param ec Used to hold error code value originated during the
          * operation. Defaults to \a throws -- A special 'throw on error'
          * \a error_code.
@@ -187,7 +187,7 @@ namespace hpx {
          *       2. Calling this function if \a lock.mutex() is not the same
          *          mutex as the one used by all other threads that are
          *          currently waiting on the same condition variable is
-         *          undefined behavior. 
+         *          undefined behavior.
          *
          * \tparam Mutex Type of mutex to wait on.
          *
@@ -195,7 +195,7 @@ namespace hpx {
          * \param ec   Used to hold error code value originated during the
          *             operation. Defaults to \a throws -- A special 'throw on
          *             error' \a error_code.
-         * 
+         *
          * \returns \a wait returns \a void.
          */
         template <typename Mutex>
@@ -230,27 +230,27 @@ namespace hpx {
          *      while (!pred()) {
          *          wait(lock);
          *      }
-         * \endcode 
-         * 
+         * \endcode
+         *
          * This overload may be used to ignore spurious awakenings while
          * waiting for a specific condition to become true. Note that lock must
          * be acquired before entering this method, and it is reacquired after
          * \a wait(lock) exits, which means that lock can be used to guard
          * access to \a pred().
-         * 
+         *
          * \note 1. Calling this function if \a lock.mutex() is not locked by
          *          the current thread is undefined behavior.
          *       2. Calling this function if \a lock.mutex() is not the same
          *          mutex as the one used by all other threads that are
          *          currently waiting on the same condition variable is
-         *          undefined behavior. 
-         * 
+         *          undefined behavior.
+         *
          * \tparam Mutex     Type of mutex to wait on.
          * \tparam Predicate Type of predicate \a pred function.
          *
          * \param lock \a unique_lock that must be locked by the current
          *             thread
-         * \param pred Predicate which returns \a ​false if the waiting should
+         * \param pred Predicate which returns \a false if the waiting should
          *             be continued \a (bool(pred())==false). The
          *             signature of the predicate function should be equivalent
          *             to the following: `bool pred();`
@@ -281,7 +281,7 @@ namespace hpx {
          * when the absolute time point \a abs_time is reached. It may also
          * be unblocked spuriously. When unblocked, regardless of the reason,
          * lock is reacquired and \a wait_until exits.
-         * 
+         *
          * \note 1. Calling this function if \a lock.mutex() is not locked by
          *          the current thread is undefined behavior.
          *       2. Calling this function if \a lock.mutex() is not the same
@@ -352,7 +352,7 @@ namespace hpx {
          *      return true;
          * \endcode
          * This overload may be used to ignore spurious wakeups.
-         * 
+         *
          * \note 1. Calling this function if \a lock.mutex() is not locked by
          *          the current thread is undefined behavior.
          *       2. Calling this function if \a lock.mutex() is not the same
@@ -366,7 +366,7 @@ namespace hpx {
          * \param lock      \a unique_lock that must be locked by the current
          *                  thread
          * \param abs_time  Represents the time when waiting should be stopped
-         * \param pred      Predicate which returns \a ​false if the waiting
+         * \param pred      Predicate which returns \a false if the waiting
          *                  should be continued
          *                  \a (bool(pred())==false). The signature of
          *                  the predicate function should be equivalent to the
@@ -414,7 +414,7 @@ namespace hpx {
          *       2. Calling this function if \a lock.mutex() is not the same
          *          mutex as the one used by all other threads that are
          *          currently waiting on the same condition variable is
-         *          undefined behavior. 
+         *          undefined behavior.
          *       3. Even if notified under lock, this overload makes no
          *          guarantees about the state of the associated predicate when
          *          returning due to timeout.
@@ -426,7 +426,7 @@ namespace hpx {
          * \param rel_time represents the maximum time to spend waiting. Note
          *                 that \a rel_time must be small enough not to
          *                 overflow when added to
-         *                 \a hpx::chrono::steady_clock::now(). 
+         *                 \a hpx::chrono::steady_clock::now().
          * \param ec       Used to hold error code value originated during the
          *                 operation. Defaults to \a throws -- A special
          *                 'throw on error' \a error_code.
@@ -445,7 +445,7 @@ namespace hpx {
 
         /**
          * \brief Equivalent to
-         * \code 
+         * \code
          *      return wait_until(lock,
          *                 hpx::chrono::steady_clock::now() + rel_time,
          *                 hpx::move(pred));
@@ -462,7 +462,7 @@ namespace hpx {
          *       2. Calling this function if \a lock.mutex() is not the same
          *          mutex as the one used by all other threads that are
          *          currently waiting on the same condition variable is
-         *          undefined behavior. 
+         *          undefined behavior.
          *
          * \tparam Mutex     Type of mutex to wait on.
          * \tparam Predicate Type of predicate \a pred function.
@@ -473,7 +473,7 @@ namespace hpx {
          *                 that \a rel_time must be small enough not to
          *                 overflow when added to
          *                 \a hpx::chrono::steady_clock::now().
-         * \param pred     Predicate which returns \a ​false if the waiting
+         * \param pred     Predicate which returns \a false if the waiting
          *                 should be continued
          *                 \a (bool(pred())==false). The signature of
          *                 the predicate function should be equivalent to the
@@ -611,7 +611,7 @@ namespace hpx {
 
         /**
          * \brief Unblocks all threads currently waiting for \a *this.
-         * 
+         *
          * \note The effects of \a notify_one()/notify_all() and each of the
          *       three atomic parts of \a wait()/wait_for()/wait_until()
          *       (unlock+wait, wakeup, and lock) take place in a single
@@ -627,7 +627,7 @@ namespace hpx {
          *       doing so is a pessimization, since the notified thread would
          *       immediately block again, waiting for the notifying thread to
          *       release the lock.
-         * 
+         *
          * \param ec Used to hold error code value originated during the
          * operation. Defaults to \a throws -- A special 'throw on error'
          * \a error_code.
@@ -665,16 +665,16 @@ namespace hpx {
          *       variable: the order is specific to this individual condition
          *       variable. This makes it impossible for notify_one() to, for
          *       example, be delayed and unblock a thread that started waiting
-         *       just after the call to `notify_one()` was made. 
-         * 
+         *       just after the call to `notify_one()` was made.
+         *
          * @tparam Lock Type of \a lock.
          *
          * @param lock An object of type Lock that meets the \a BasicLockable
-         *             requirements, which must be locked by the current thread 
+         *             requirements, which must be locked by the current thread
          * \param ec   Used to hold error code value originated during the
          *             operation. Defaults to \a throws -- A special'throw on
          *             error' \a error_code.
-         * 
+         *
          * \returns \a wait returns \a void.
          */
         template <typename Lock>
@@ -705,7 +705,7 @@ namespace hpx {
          * \a (bool(pred())==true).
          *
          * Equivalent to
-         * \code 
+         * \code
          *     while (!pred()) {
          *         wait(lock);
          *     }
@@ -729,18 +729,18 @@ namespace hpx {
          *       variable: the order is specific to this individual condition
          *       variable. This makes it impossible for notify_one() to, for
          *       example, be delayed and unblock a thread that started waiting
-         *       just after the call to `notify_one()` was made. 
-         * 
+         *       just after the call to `notify_one()` was made.
+         *
          * @tparam Lock      Type of \a lock.
          * \tparam Predicate Type of \a pred.
          *
          * @param lock an object of type Lock that meets the \a BasicLockable
          *             requirements, which must be locked by the current thread
-         * \param pred predicate which returns ​`false` if the waiting should
+         * \param pred predicate which returns `false` if the waiting should
          *             be continued `(bool(pred()) == false)`.
          *             The signature of the predicate function should be
          *             equivalent to the following: `bool pred()`.
-         * 
+         *
          * \returns \a wait returns \a void.
          */
         template <typename Lock, typename Predicate>
@@ -774,13 +774,13 @@ namespace hpx {
          *       variable: the order is specific to this individual condition
          *       variable. This makes it impossible for \a notify_one() to,
          *       for example, be delayed and unblock a thread that started
-         *       waiting just after the call to \a notify_one() was made. 
-         *       
+         *       waiting just after the call to \a notify_one() was made.
+         *
          * @tparam Lock Type of \a lock.
          *
          * @param lock     an object of type \a Lock that meets the
          *                 requirements of \a BasicLockable, which must be
-         *                 locked by the current thread 
+         *                 locked by the current thread
          * @param abs_time represents the time when waiting should be stopped.
          * \param ec       used to hold error code value originated during the
          *                 operation. Defaults to \a throws -- A special
@@ -788,7 +788,7 @@ namespace hpx {
          *
          * @return cv_status \a hpx::cv_status::timeout if the absolute timeout
          *                   specified by \a abs_time was reached,
-         *                   \a hpx::cv_status::no_timeout otherwise. 
+         *                   \a hpx::cv_status::no_timeout otherwise.
          */
         template <typename Lock>
         cv_status wait_until(Lock& lock,
@@ -848,20 +848,20 @@ namespace hpx {
          *       variable: the order is specific to this individual condition
          *       variable. This makes it impossible for \a notify_one() to,
          *       for example, be delayed and unblock a thread that started
-         *       waiting just after the call to \a notify_one() was made. 
-         *       
+         *       waiting just after the call to \a notify_one() was made.
+         *
          * @tparam Lock      Type of \a lock.
          * @tparam Predicate Type of \a pred.
          *
          * @param lock     an object of type \a Lock that meets the
          *                 requirements of \a BasicLockable, which must be
-         *                 locked by the current thread 
+         *                 locked by the current thread
          * @param abs_time represents the time when waiting should be stopped.
-         * @param pred     predicate which returns \a ​false if the waiting
+         * @param pred     predicate which returns \a false if the waiting
          *                 should be continued
          *                 `(bool(pred()) == false)`.
          *                 The signature of the predicate function should be
-         *                 equivalent to the following: `bool pred();`.​ 
+         *                 equivalent to the following: `bool pred();`.
          * \param ec       Used to hold error code value originated during the
          *                 operation. Defaults to \a throws -- A special
          *                 'throw on error' \a error_code.
@@ -869,7 +869,7 @@ namespace hpx {
          * @return bool \a false if the predicate \a pred still evaluates to
          *              \a false after the \a abs_time timeout expired,
          *              otherwise true. If the timeout had already expired,
-         *              evaluates and returns the result of \a pred. 
+         *              evaluates and returns the result of \a pred.
          */
         template <typename Lock, typename Predicate>
         bool wait_until(Lock& lock,
@@ -893,7 +893,7 @@ namespace hpx {
          * executed, or when the relative timeout \a rel_time expires. It may
          * also be unblocked spuriously. When unblocked, regardless of the
          * reason, \a lock is reacquired and \a wait_for() exits.
-         * 
+         *
          * \note Even if notified under lock, this overload makes no guarantees
          *       about the state of the associated predicate when returning due
          *       to timeout.
@@ -905,18 +905,18 @@ namespace hpx {
          *       variable: the order is specific to this individual condition
          *       variable. This makes it impossible for \a notify_one() to, for
          *       example, be delayed and unblock a thread that started waiting
-         *       just after the call to \a notify_one() was made.  
-         * 
+         *       just after the call to \a notify_one() was made.
+         *
          * @tparam Lock Type of \a lock.
          *
          * @param lock     an object of type \a Lock that meets the
          *                 \a BasicLockable requirements, which must be locked
-         *                 by the current thread. 
+         *                 by the current thread.
          * @param rel_time an object of type \a hpx::chrono::duration
          *                 representing the maximum time to spend waiting. Note
          *                 that \a rel_time must be small enough not to
          *                 overflow when added to
-         *                 \a hpx::chrono::steady_clock::now(). 
+         *                 \a hpx::chrono::steady_clock::now().
          * \param ec       Used to hold error code value originated during the
          *                 operation. Defaults to \a throws -- A special 'throw
          *                 on error' \a error_code.
@@ -935,14 +935,14 @@ namespace hpx {
 
         /**
          * @brief Equivalent to
-         * \code 
+         * \code
          *     return wait_until(lock,
          *         hpx::chrono::steady_clock::now() + rel_time,
          *         std::move(pred));
          * \endcode
          * This overload may be used to ignore spurious awakenings by looping
          * until some predicate is satisfied `(bool(pred()) == true)`.
-         * 
+         *
          * \note The effects of \a notify_one()/notify_all() and each of the
          *       three atomic parts of \a wait()/wait_for()/wait_until()
          *       (unlock+wait, wakeup, and lock) take place in a single total
@@ -950,20 +950,20 @@ namespace hpx {
          *       variable: the order is specific to this individual condition
          *       variable. This makes it impossible for \a notify_one() to, for
          *       example, be delayed and unblock a thread that started waiting
-         *       just after the call to \a notify_one() was made.  
-         * 
+         *       just after the call to \a notify_one() was made.
+         *
          * @tparam Lock      Type of \a lock.
          * @tparam Predicate Type of \a pred.
          *
          * @param lock     an object of type \a Lock that meets the
          *                 \a BasicLockable requirements, which must be locked
-         *                 by the current thread. 
+         *                 by the current thread.
          * @param rel_time an object of type \a hpx::chrono::duration
          *                 representing the maximum time to spend waiting. Note
          *                 that \a rel_time must be small enough not to
          *                 overflow when added to
          *                 \a hpx::chrono::steady_clock::now().
-         * @param pred     predicate which returns ​\a false if the waiting
+         * @param pred     predicate which returns \a false if the waiting
          *                 should be continued
          *                 `(bool(pred()) == false)`.
          *                 The signature of the predicate function should be
@@ -1010,8 +1010,8 @@ namespace hpx {
          *       variable: the order is specific to this individual condition
          *       variable. This makes it impossible for notify_one() to, for
          *       example, be delayed and unblock a thread that started waiting
-         *       just after the call to `notify_one()` was made. 
-         * 
+         *       just after the call to `notify_one()` was made.
+         *
          * @tparam Lock      Type of \a lock.
          * \tparam Predicate Type of \a pred.
          *
@@ -1019,14 +1019,14 @@ namespace hpx {
          *               requirements, which must be locked by the current
          *               thread
          * @param stoken a \a hpx::stop_token to register interruption for
-         * \param pred   predicate which returns ​`false` if the waiting should
+         * \param pred   predicate which returns `false` if the waiting should
          *               be continued `(bool(pred()) == false)`.
          *               The signature of the predicate function should be
          *               equivalent to the following: `bool pred()`.
          * \param ec     Used to hold error code value originated during the
          *               operation. Defaults to \a throws -- A special 'throw
          *               on error' \a error_code.
-         * 
+         *
          * \returns bool result of \a pred().
          */
         template <typename Lock, typename Predicate>
@@ -1099,21 +1099,21 @@ namespace hpx {
          *       variable: the order is specific to this individual condition
          *       variable. This makes it impossible for \a notify_one() to,
          *       for example, be delayed and unblock a thread that started
-         *       waiting just after the call to \a notify_one() was made. 
-         *       
+         *       waiting just after the call to \a notify_one() was made.
+         *
          * @tparam Lock      Type of \a lock.
          * @tparam Predicate Type of \a pred.
          *
          * @param lock     an object of type \a Lock that meets the
          *                 requirements of \a BasicLockable, which must be
          *                 locked by the current thread.
-         * \param stoken   a \a hpx::stop_token to register interruption for. 
+         * \param stoken   a \a hpx::stop_token to register interruption for.
          * @param abs_time represents the time when waiting should be stopped.
-         * @param pred     predicate which returns \a ​false if the waiting
+         * @param pred     predicate which returns \a false if the waiting
          *                 should be continued
          *                 `(bool(pred()) == false)`.
          *                 The signature of the predicate function should be
-         *                 equivalent to the following: `bool pred();`.​ 
+         *                 equivalent to the following: `bool pred();`.
          * \param ec       Used to hold error code value originated during the
          *                 operation. Defaults to \a throws -- A special
          *                 'throw on error' \a error_code.
@@ -1187,7 +1187,7 @@ namespace hpx {
          *         hpx::chrono::steady_clock::now() + rel_time,
          *         std::move(pred));
          * \endcode
-         * 
+         *
          * \note The effects of \a notify_one()/notify_all() and each of the
          *       three atomic parts of \a wait()/wait_for()/wait_until()
          *       (unlock+wait, wakeup, and lock) take place in a single total
@@ -1195,21 +1195,21 @@ namespace hpx {
          *       variable: the order is specific to this individual condition
          *       variable. This makes it impossible for \a notify_one() to, for
          *       example, be delayed and unblock a thread that started waiting
-         *       just after the call to \a notify_one() was made.  
-         * 
+         *       just after the call to \a notify_one() was made.
+         *
          * @tparam Lock      Type of \a lock.
          * @tparam Predicate Type of \a pred.
          *
          * @param lock     an object of type \a Lock that meets the
          *                 \a BasicLockable requirements, which must be locked
          *                 by the current thread.
-         * \param stoken   a \a hpx::stop_token to register interruption for. 
+         * \param stoken   a \a hpx::stop_token to register interruption for.
          * @param rel_time an object of type \a hpx::chrono::duration
          *                 representing the maximum time to spend waiting. Note
          *                 that \a rel_time must be small enough not to
          *                 overflow when added to
          *                 \a hpx::chrono::steady_clock::now().
-         * @param pred     predicate which returns ​\a false if the waiting
+         * @param pred     predicate which returns \a false if the waiting
          *                 should be continued
          *                 `(bool(pred()) == false)`.
          *                 The signature of the predicate function should be
