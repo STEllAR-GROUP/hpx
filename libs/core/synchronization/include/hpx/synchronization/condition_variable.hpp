@@ -134,8 +134,7 @@ namespace hpx {
          * returns from a wait. If this happens with \a condition_variable,
          * that waiting thread will attempt to lock the destructed mutex.
          * To fix this, there must be shared ownership of the data members
-         * FIXME(bhumit->hkaiser) shouldn't this be condition_variable_any?
-         * between the \a condition_variable_any object and the member
+         * between the \a condition_variable object and the member
          * functions \a wait (\a wait_for, etc.).
          */
         ~condition_variable() = default;
@@ -144,8 +143,7 @@ namespace hpx {
          * \brief If any threads are waiting on \a *this, calling \a notify_one
          * unblocks one of the waiting threads. 
          * 
-         * FIXME(bhumit->hkaiser) is this correct?
-         * \param ec Used to hold error code value originted during the
+         * \param ec Used to hold error code value originated during the
          * operation. Defaults to \a throws -- A special 'throw on error'
          * \a error_code.
          *
@@ -160,8 +158,7 @@ namespace hpx {
         /**
          * \brief Unblocks all threads currently waiting for \a *this. 
          * 
-         * FIXME(bhumit->hkaiser) is this correct?
-         * \param ec Used to hold error code value originted during the
+         * \param ec Used to hold error code value originated during the
          * operation. Defaults to \a throws -- A special 'throw on error'
          * \a error_code.
          *
@@ -184,12 +181,6 @@ namespace hpx {
          * be unblocked when \a notify_all() or \a notify_one() is executed.
          * It may also be unblocked spuriously. When unblocked, regardless of
          * the reason, lock is reacquired and wait exits.
-         * 
-         * If this function fails to meet the postconditions
-         * (\a lock.owns_lock()==true and \a lock.mutex() is locked by the
-         * FIXME(bhumit->hkaiser) what does hpx call?
-         * calling thread), \a std::terminate is called. For example, this
-         * could happen if relocking the mutex throws an exception.
          *
          * \note 1. Calling this function if \a lock.mutex() is not locked by
          *          the current thread is undefined behavior.
@@ -201,8 +192,7 @@ namespace hpx {
          * \tparam Mutex Type of mutex to wait on.
          *
          * \param lock \a unique_lock that must be locked by the current thread
-         *             FIXME(bhumit->hkaiser) is this correct?
-         * \param ec   Used to hold error code value originted during the
+         * \param ec   Used to hold error code value originated during the
          *             operation. Defaults to \a throws -- A special 'throw on
          *             error' \a error_code.
          * 
@@ -248,12 +238,6 @@ namespace hpx {
          * \a wait(lock) exits, which means that lock can be used to guard
          * access to \a pred().
          * 
-         * If this function fails to meet the postconditions
-         * (\a lock.owns_lock()==true and \a lock.mutex() is locked by the
-         * FIXME(bhumit->hkaiser) what does hpx call (wrt std::terminate)?
-         * calling thread), \a std::terminate is called. For example, this
-         * could happen if relocking the mutex throws an exception.
-         *
          * \note 1. Calling this function if \a lock.mutex() is not locked by
          *          the current thread is undefined behavior.
          *       2. Calling this function if \a lock.mutex() is not the same
@@ -298,12 +282,6 @@ namespace hpx {
          * be unblocked spuriously. When unblocked, regardless of the reason,
          * lock is reacquired and \a wait_until exits.
          * 
-         * If this function fails to meet the postcondition
-         * \a (lock.owns_lock()==true and \a lock.mutex() is locked by the
-         * FIXME(bhumit->hkaiser) what does hpx call (wrt std::terminate)?
-         * calling thread), \a std::terminate is called. For example, this
-         * could happen if relocking the mutex throws an exception.
-         * 
          * \note 1. Calling this function if \a lock.mutex() is not locked by
          *          the current thread is undefined behavior.
          *       2. Calling this function if \a lock.mutex() is not the same
@@ -316,8 +294,7 @@ namespace hpx {
          * \param lock      \a unique_lock that must be locked by the current
          *                  thread
          * \param abs_time  Represents the time when waiting should be stopped
-         *                  FIXME(bhumit->hkaiser) is this correct?
-         * \param ec        Used to hold error code value originted during the
+         * \param ec        Used to hold error code value originated during the
          *                  operation. Defaults to \a throws -- A special
          *                  'throw on error' \a error_code.
          *
@@ -376,12 +353,6 @@ namespace hpx {
          * \endcode
          * This overload may be used to ignore spurious wakeups.
          * 
-         * If this function fails to meet the postcondition
-         * \a (lock.owns_lock()==true and \a lock.mutex() is locked by the
-         * FIXME(bhumit->hkaiser) what does hpx call (wrt std::terminate)?
-         * calling thread), \a std::terminate is called. For example, this
-         * could happen if relocking the mutex throws an exception.
-         * 
          * \note 1. Calling this function if \a lock.mutex() is not locked by
          *          the current thread is undefined behavior.
          *       2. Calling this function if \a lock.mutex() is not the same
@@ -395,13 +366,12 @@ namespace hpx {
          * \param lock      \a unique_lock that must be locked by the current
          *                  thread
          * \param abs_time  Represents the time when waiting should be stopped
-         *                  FIXME(bhumit->hkaiser) is this correct?
          * \param pred      Predicate which returns \a ​false if the waiting
          *                  should be continued
          *                  \a (bool(pred())==false). The signature of
          *                  the predicate function should be equivalent to the
          *                  following: `bool pred();`
-         * \param ec        Used to hold error code value originted during the
+         * \param ec        Used to hold error code value originated during the
          *                  operation. Defaults to \a throws -- A special
          *                  'throw on error' \a error_code.
          *
@@ -439,12 +409,6 @@ namespace hpx {
          * duration. This function may block for longer than \a rel_time due
          * to scheduling or resource contention delays.
          *
-         * If this function fails to meet the postcondition
-         * \a (lock.owns_lock()==true and \a lock.mutex() is locked by the
-         * FIXME(bhumit->hkaiser) what does hpx call (wrt std::terminate)?
-         * calling thread), \a std::terminate is called. For example, this
-         * could happen if relocking the mutex throws an exception.
-         * 
          * \note 1. Calling this function if \a lock.mutex() is not locked by
          *          the current thread is undefined behavior.
          *       2. Calling this function if \a lock.mutex() is not the same
@@ -463,7 +427,7 @@ namespace hpx {
          *                 that \a rel_time must be small enough not to
          *                 overflow when added to
          *                 \a hpx::chrono::steady_clock::now(). 
-         * \param ec       Used to hold error code value originted during the
+         * \param ec       Used to hold error code value originated during the
          *                 operation. Defaults to \a throws -- A special
          *                 'throw on error' \a error_code.
          *
@@ -493,12 +457,6 @@ namespace hpx {
          * duration. This function may block for longer than \a rel_time due
          * to scheduling or resource contention delays.
          *
-         * If this function fails to meet the postcondition
-         * \a (lock.owns_lock()==true and \a lock.mutex() is locked by the
-         * FIXME(bhumit->hkaiser) what does hpx call (wrt std::terminate)?
-         * calling thread), \a std::terminate is called. For example, this
-         * could happen if relocking the mutex throws an exception.
-         * 
          * \note 1. Calling this function if \a lock.mutex() is not locked by
          *          the current thread is undefined behavior.
          *       2. Calling this function if \a lock.mutex() is not the same
@@ -520,7 +478,7 @@ namespace hpx {
          *                 \a (bool(pred())==false). The signature of
          *                 the predicate function should be equivalent to the
          *                 following: `bool pred();`
-         * \param ec       Used to hold error code value originted during the
+         * \param ec       Used to hold error code value originated during the
          *                 operation. Defaults to \a throws -- A special
          *                 'throw on error' \a error_code.
          *
@@ -551,10 +509,6 @@ namespace hpx {
      * The class \a hpx::condition_variable_any is a \a StandardLayoutType. It
      * is not \a CopyConstructible, \a MoveConstructible, \a CopyAssignable,
      * or \a MoveAssignable.
-     *
-     * FIXME(bhumit->hkaiser) true for std, what about hpx?
-     * If the lock is \a std::unique_lock<std::mutex>,
-     * \a hpx::condition_variable may provide better performance.
      */
     class condition_variable_any
     {
@@ -602,8 +556,7 @@ namespace hpx {
          *                predicate. end note]
          *
          * IOW, \a ~condition_variable_any() can execute before a signaled thread
-         * FIXME(bhumit->hkaiser) shouldn't this be condition_variable_any?
-         * returns from a wait. If this happens with \a condition_variable, that
+         * returns from a wait. If this happens with \a condition_variable_any, that
          * waiting thread will attempt to lock the destructed mutex.
          * To fix this, there must be shared ownership of the data members
          * between the \a condition_variable_any object and the member functions
@@ -644,7 +597,7 @@ namespace hpx {
          *       before notify would result in notify called on a destroyed
          *       object.
          *
-         * \param ec Used to hold error code value originted during the
+         * \param ec Used to hold error code value originated during the
          *           operation. Defaults to \a throws -- A special 'throw on
          *           error' \a error_code.
          *
@@ -675,7 +628,7 @@ namespace hpx {
          *       immediately block again, waiting for the notifying thread to
          *       release the lock.
          * 
-         * \param ec Used to hold error code value originted during the
+         * \param ec Used to hold error code value originated during the
          * operation. Defaults to \a throws -- A special 'throw on error'
          * \a error_code.
          *
@@ -718,7 +671,7 @@ namespace hpx {
          *
          * @param lock An object of type Lock that meets the \a BasicLockable
          *             requirements, which must be locked by the current thread 
-         * \param ec   Used to hold error code value originted during the
+         * \param ec   Used to hold error code value originated during the
          *             operation. Defaults to \a throws -- A special'throw on
          *             error' \a error_code.
          * 
@@ -814,13 +767,7 @@ namespace hpx {
          * be unblocked spuriously. When unblocked, regardless of the reason,
          * lock is reacquired and \a wait_until exits.
          *
-         * \note If these functions fail to meet the postcondition (lock is
-         *       FIXME(bhumit->hkaiser) is this true for hpx as well?
-         *       locked by the calling thread), \a std::terminate is called.
-         *       For example, this could happen if relocking the mutex throws
-         *       an exception.
-         *
-         *       The effects of \a notify_one()/notify_all() and each of the
+         * \note The effects of \a notify_one()/notify_all() and each of the
          *       three atomic parts of \a wait()/wait_for()/wait_until()
          *       (unlock+wait, wakeup, and lock) take place in a single total
          *       order that can be viewed as modification order of an atomic
@@ -835,7 +782,7 @@ namespace hpx {
          *                 requirements of \a BasicLockable, which must be
          *                 locked by the current thread 
          * @param abs_time represents the time when waiting should be stopped.
-         * \param ec       used to hold error code value originted during the
+         * \param ec       used to hold error code value originated during the
          *                 operation. Defaults to \a throws -- A special
          *                 'throw on error' \a error_code.
          *
@@ -894,13 +841,7 @@ namespace hpx {
          *
          * This overload may be used to ignore spurious wakeups.
          *
-         * \note If these functions fail to meet the postcondition (lock is
-         *       FIXME(bhumit->hkaiser) is this true for hpx as well?
-         *       locked by the calling thread), \a std::terminate is called.
-         *       For example, this could happen if relocking the mutex throws
-         *       an exception.
-         *
-         *       The effects of \a notify_one()/notify_all() and each of the
+         * \note The effects of \a notify_one()/notify_all() and each of the
          *       three atomic parts of \a wait()/wait_for()/wait_until()
          *       (unlock+wait, wakeup, and lock) take place in a single total
          *       order that can be viewed as modification order of an atomic
@@ -921,7 +862,7 @@ namespace hpx {
          *                 `(bool(pred()) == false)`.
          *                 The signature of the predicate function should be
          *                 equivalent to the following: `bool pred();`.​ 
-         * \param ec       Used to hold error code value originted during the
+         * \param ec       Used to hold error code value originated during the
          *                 operation. Defaults to \a throws -- A special
          *                 'throw on error' \a error_code.
          *
@@ -953,13 +894,7 @@ namespace hpx {
          * also be unblocked spuriously. When unblocked, regardless of the
          * reason, \a lock is reacquired and \a wait_for() exits.
          * 
-         * \note If these functions fail to meet the postcondition (lock is
-         *       FIXME(bhumit->hkaiser) is this true for hpx as well?
-         *       locked by the calling thread), \a std::terminate is called.
-         *       For example, this could happen if relocking the mutex throws\
-         *       an exception.
-         *
-         *       Even if notified under lock, this overload makes no guarantees
+         * \note Even if notified under lock, this overload makes no guarantees
          *       about the state of the associated predicate when returning due
          *       to timeout.
          *
@@ -982,7 +917,7 @@ namespace hpx {
          *                 that \a rel_time must be small enough not to
          *                 overflow when added to
          *                 \a hpx::chrono::steady_clock::now(). 
-         * \param ec       Used to hold error code value originted during the
+         * \param ec       Used to hold error code value originated during the
          *                 operation. Defaults to \a throws -- A special 'throw
          *                 on error' \a error_code.
          *
@@ -1008,13 +943,7 @@ namespace hpx {
          * This overload may be used to ignore spurious awakenings by looping
          * until some predicate is satisfied `(bool(pred()) == true)`.
          * 
-         * \note If these functions fail to meet the postcondition (lock is
-         *       FIXME(bhumit->hkaiser) is this true for hpx as well?
-         *       locked by the calling thread), \a std::terminate is called.
-         *       For example, this could happen if relocking the mutex throws\
-         *       an exception.
-         *
-         *       The effects of \a notify_one()/notify_all() and each of the
+         * \note The effects of \a notify_one()/notify_all() and each of the
          *       three atomic parts of \a wait()/wait_for()/wait_until()
          *       (unlock+wait, wakeup, and lock) take place in a single total
          *       order that can be viewed as modification order of an atomic
@@ -1039,7 +968,7 @@ namespace hpx {
          *                 `(bool(pred()) == false)`.
          *                 The signature of the predicate function should be
          *                 equivalent to the following: `bool pred();`.
-         * \param ec       Used to hold error code value originted during the
+         * \param ec       Used to hold error code value originated during the
          *                 operation. Defaults to \a throws -- A special 'throw
          *                 on error' \a error_code.
          *
@@ -1074,13 +1003,7 @@ namespace hpx {
          * Note that the returned value indicates whether \a pred evaluated to
          * \a true, regardless of whether there was a stop requested or not.
          *
-         * \note If these functions fail to meet the postconditions (lock is
-         *       FIXME(bhumit->hkaiser) is this true for hpx as well?
-         *       locked by the calling thread), \a std::terminate is called. For
-         *       example, this could happen if relocking the mutex throws an
-         *       exception.
-         *
-         *       The effects of `notify_one()/notify_all()` and each of the
+         * \note The effects of `notify_one()/notify_all()` and each of the
          *       three atomic parts of `wait()/wait_for()/wait_until()`
          *       `(unlock+wait, wakeup, and lock)` take place in a single total
          *       order that can be viewed as modification order of an atomic
@@ -1100,7 +1023,7 @@ namespace hpx {
          *               be continued `(bool(pred()) == false)`.
          *               The signature of the predicate function should be
          *               equivalent to the following: `bool pred()`.
-         * \param ec     Used to hold error code value originted during the
+         * \param ec     Used to hold error code value originated during the
          *               operation. Defaults to \a throws -- A special 'throw
          *               on error' \a error_code.
          * 
@@ -1169,13 +1092,7 @@ namespace hpx {
          *     return pred();
          * \endcode
          *
-         * \note If these functions fail to meet the postcondition (lock is
-         *       FIXME(bhumit->hkaiser) is this true for hpx as well?
-         *       locked by the calling thread), \a std::terminate is called.
-         *       For example, this could happen if relocking the mutex throws
-         *       an exception.
-         *
-         *       The effects of \a notify_one()/notify_all() and each of the
+         * \note The effects of \a notify_one()/notify_all() and each of the
          *       three atomic parts of \a wait()/wait_for()/wait_until()
          *       (unlock+wait, wakeup, and lock) take place in a single total
          *       order that can be viewed as modification order of an atomic
@@ -1197,7 +1114,7 @@ namespace hpx {
          *                 `(bool(pred()) == false)`.
          *                 The signature of the predicate function should be
          *                 equivalent to the following: `bool pred();`.​ 
-         * \param ec       Used to hold error code value originted during the
+         * \param ec       Used to hold error code value originated during the
          *                 operation. Defaults to \a throws -- A special
          *                 'throw on error' \a error_code.
          *
@@ -1271,13 +1188,7 @@ namespace hpx {
          *         std::move(pred));
          * \endcode
          * 
-         * \note If these functions fail to meet the postcondition (lock is
-         *       FIXME(bhumit->hkaiser) is this true for hpx as well?
-         *       locked by the calling thread), \a std::terminate is called.
-         *       For example, this could happen if relocking the mutex throws\
-         *       an exception.
-         *
-         *       The effects of \a notify_one()/notify_all() and each of the
+         * \note The effects of \a notify_one()/notify_all() and each of the
          *       three atomic parts of \a wait()/wait_for()/wait_until()
          *       (unlock+wait, wakeup, and lock) take place in a single total
          *       order that can be viewed as modification order of an atomic
@@ -1303,7 +1214,7 @@ namespace hpx {
          *                 `(bool(pred()) == false)`.
          *                 The signature of the predicate function should be
          *                 equivalent to the following: `bool pred();`.
-         * \param ec       Used to hold error code value originted during the
+         * \param ec       Used to hold error code value originated during the
          *                 operation. Defaults to \a throws -- A special 'throw
          *                 on error' \a error_code.
          *
