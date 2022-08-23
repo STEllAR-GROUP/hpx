@@ -65,7 +65,16 @@ namespace hpx::execution {
         friend struct detail::execution_policy;
     };
 
-    inline constexpr non_task_policy_tag non_task{};
+    inline constexpr hpx::execution::experimental::to_non_task_t non_task{};
+    using task_policy_tag HPX_DEPRECATED_V(1, 9,
+        "hpx::execution::task_policy_tag is deprecated, use "
+        "hpx::execution::experimental::to_task_t instead") =
+        hpx::execution::experimental::to_task_t;
+
+    using non_task_policy_tag HPX_DEPRECATED_V(1, 9,
+        "hpx::execution::non_task_policy_tag is deprecated, use "
+        "hpx::execution::experimental::to_non_task_t instead") =
+        hpx::execution::experimental::to_non_task_t;
 
     namespace experimental {
 
