@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     static void garbage_collect_non_blocking()
     {
@@ -158,7 +158,7 @@ namespace hpx { namespace detail {
             }
 
             // create our global barrier...
-            hpx::distributed::barrier::get_global_barrier();
+            hpx::distributed::barrier::create_global_barrier();
 
             // Second stage bootstrap synchronizes component loading across all
             // localities, ensuring that the component namespace tables are fully
@@ -238,9 +238,8 @@ namespace hpx { namespace detail {
     {
         // simply destroy global barrier
         auto& b = hpx::distributed::barrier::get_global_barrier();
-        b[0].detach();
-        b[1].detach();
+        b.detach();
     }
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 #endif

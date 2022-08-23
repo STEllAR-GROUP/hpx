@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Weile Wei
 // Copyright (c) 2019 Maxwell Reeser
-// Copyright (c) 2019 Hartmut Kaiser
+// Copyright (c) 2019-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,13 +20,29 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-void run_barrier_test(std::vector<size_t> locs)
+void run_barrier_test(
+    std::size_t root_locality, std::vector<size_t> const& locs)
 {
-    std::string barrier_name =
+    auto const this_locality = hpx::get_locality_id();
+    auto const it = std::find(locs.begin(), locs.end(), this_locality);
+    if (it == locs.end())
+        return;
+
+    auto const root_it = std::find(locs.begin(), locs.end(), root_locality);
+    if (root_it == locs.end())
+        return;
+
+    // this assumes that the first locality in the array has the smallest ordinal
+    // number
+    std::size_t const offset = it - locs.begin();
+    std::string const barrier_name =
         "/loc_list/barrier" + std::to_string(locs[0]) + std::to_string(locs[1]);
+
     hpx::distributed::barrier b(barrier_name,
         hpx::collectives::num_sites_arg(locs.size()),
-        hpx::collectives::this_site_arg(hpx::get_locality_id()));
+        hpx::collectives::this_site_arg(offset),
+        hpx::collectives::generation_arg(),
+        hpx::collectives::root_site_arg(root_it - locs.begin()));
     b.wait();
 }
 
@@ -34,12 +50,16 @@ int hpx_main()
 {
     std::cout << "Hello world from locality " << hpx::get_locality_id()
               << std::endl;
-    std::vector<size_t> locs_0{0, 1};
-    run_barrier_test(locs_0);
-    std::vector<size_t> locs_1{0, 2};
-    run_barrier_test(locs_1);
-    std::vector<size_t> locs_2{1, 2};
-    run_barrier_test(locs_2);
+
+    run_barrier_test(0, {0, 1});
+    run_barrier_test(1, {0, 1});
+
+    run_barrier_test(0, {0, 2});
+    run_barrier_test(2, {0, 2});
+
+    run_barrier_test(1, {1, 2});
+    run_barrier_test(2, {1, 2});
+
     return hpx::finalize();
 }
 

@@ -166,7 +166,7 @@ namespace hpx::collectives::detail {
             typename Finalizer = std::nullptr_t>
         auto handle_data(std::size_t which, std::size_t generation,
             Step&& step = nullptr, Finalizer&& finalizer = nullptr,
-            std::size_t num_values = std::size_t(-1))
+            std::size_t num_values = static_cast<std::size_t>(-1))
         {
             auto on_ready = [this, num_values,
                                 finalizer = HPX_FORWARD(Finalizer, finalizer)](

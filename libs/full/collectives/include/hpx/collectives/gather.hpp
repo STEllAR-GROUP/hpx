@@ -311,6 +311,10 @@ namespace hpx::collectives {
             return result;
         };
 
+        if (fid.is_ready())
+        {
+            return gather_here_data(HPX_MOVE(fid));
+        }
         return fid.then(hpx::launch::sync, HPX_MOVE(gather_here_data));
     }
 
@@ -374,6 +378,10 @@ namespace hpx::collectives {
             return result;
         };
 
+        if (fid.is_ready())
+        {
+            return gather_there_data(HPX_MOVE(fid));
+        }
         return fid.then(hpx::launch::sync, HPX_MOVE(gather_there_data));
     }
 

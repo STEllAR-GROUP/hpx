@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2022 Hartmut Kaiser
+//  Copyright (c) 2015-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,18 +15,19 @@
 #include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/memory.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
 
 #include <cstddef>
 #include <exception>
-#include <functional>
 #include <mutex>
 #include <utility>
 
 namespace hpx::lcos::detail {
 
-    static run_on_completed_error_handler_type run_on_completed_error_handler;
+    namespace {
+
+        run_on_completed_error_handler_type run_on_completed_error_handler;
+        util::unused_type unused_;
+    }    // namespace
 
     void set_run_on_completed_error_handler(
         run_on_completed_error_handler_type f)
@@ -53,43 +54,44 @@ namespace hpx::lcos::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Callback>
-    static void run_on_completed_on_new_thread(Callback&& f)
-    {
-        lcos::local::futures_factory<void()> p(HPX_FORWARD(Callback, f));
+    namespace {
 
-        bool is_hpx_thread = nullptr != hpx::threads::get_self_ptr();
-        hpx::launch policy = launch::fork;
-        if (!is_hpx_thread)
+        template <typename Callback>
+        void run_on_completed_on_new_thread(Callback&& f)
         {
-            policy = launch::async;
+            lcos::local::futures_factory<void()> p(HPX_FORWARD(Callback, f));
+
+            bool const is_hpx_thread = nullptr != hpx::threads::get_self_ptr();
+            hpx::launch policy = launch::fork;
+            if (!is_hpx_thread)
+            {
+                policy = launch::async;
+            }
+
+            policy.set_priority(threads::thread_priority::boost);
+            policy.set_stacksize(threads::thread_stacksize::current);
+
+            // launch a new thread executing the given function
+            threads::thread_id_ref_type const tid =    //-V821
+                p.post("run_on_completed_on_new_thread", policy);
+
+            // wait for the task to run
+            if (is_hpx_thread)
+            {
+                // make sure this thread is executed last
+                this_thread::suspend(
+                    threads::thread_schedule_state::pending, tid.noref());
+                return p.get_future().get();
+            }
+
+            // If we are not on a HPX thread, we need to return immediately, to
+            // allow the newly spawned thread to execute.
         }
-
-        policy.set_priority(threads::thread_priority::boost);
-        policy.set_stacksize(threads::thread_stacksize::current);
-
-        // launch a new thread executing the given function
-        threads::thread_id_ref_type tid =    //-V821
-            p.post("run_on_completed_on_new_thread", policy);
-
-        // wait for the task to run
-        if (is_hpx_thread)
-        {
-            // make sure this thread is executed last
-            this_thread::suspend(
-                threads::thread_schedule_state::pending, tid.noref());
-            return p.get_future().get();
-        }
-
-        // If we are not on a HPX thread, we need to return immediately, to
-        // allow the newly spawned thread to execute.
-    }
+    }    // namespace
 
     ///////////////////////////////////////////////////////////////////////////
     future_data_base<traits::detail::future_data_void>::~future_data_base() =
         default;
-
-    static util::unused_type unused_;
 
     util::unused_type*
     future_data_base<traits::detail::future_data_void>::get_result_void(
@@ -135,7 +137,7 @@ namespace hpx::lcos::detail {
         // and promise::set_exception).
         if (s == exception)
         {
-            std::exception_ptr const* exception_ptr =
+            auto const* exception_ptr =
                 static_cast<std::exception_ptr const*>(storage);
 
             // an error has been reported in the meantime, throw or set
@@ -212,13 +214,14 @@ namespace hpx::lcos::detail {
         else
         {
             // re-spawn continuation on a new thread
-
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    constexpr void (*p)(Callback &&) noexcept =
+                    // clang-format off
+                    constexpr void (*p)(Callback&&) noexcept =
                         &future_data_base::run_on_completed;
                     run_on_completed_on_new_thread(util::deferred_call(
                         p, HPX_FORWARD(Callback, on_completed)));
+                    // clang-format on
                 },
                 [&](std::exception_ptr ep) {
                     // If an exception while creating the new task or inside the

@@ -54,38 +54,6 @@ namespace hpx { namespace lcos {
         using table_type =
             std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
 
-        struct barrier
-        {
-            static std::array<hpx::distributed::barrier, 2> create_barriers(
-                std::string const& name, std::size_t num_images,
-                std::size_t image_id)
-            {
-                return {{hpx::distributed::barrier(
-                             name + "_barrier0_", num_images, image_id),
-                    hpx::distributed::barrier(
-                        name + "_barrier1_", num_images, image_id)}};
-            }
-
-            barrier(std::string const& name, std::size_t num_images,
-                std::size_t image_id)
-              : generation(0)
-              , barriers(create_barriers(name, num_images, image_id))
-            {
-            }
-
-            void wait()
-            {
-                barriers[++generation % 2].wait();
-            }
-            auto wait(hpx::launch::async_policy const& l)
-            {
-                return barriers[++generation % 2].wait(l);
-            }
-
-            std::atomic<std::size_t> generation;
-            std::array<hpx::distributed::barrier, 2> barriers;
-        };
-
     public:
         spmd_block() = default;
 
@@ -274,7 +242,7 @@ namespace hpx { namespace lcos {
         // Note : barrier is stored as a pointer because
         // hpx::distributed::barrier default constructor does not exist (Needed
         // by spmd_block::spmd_block())
-        mutable std::shared_ptr<barrier> barrier_;
+        mutable std::shared_ptr<hpx::distributed::barrier> barrier_;
         mutable table_type barriers_;
 
     private:

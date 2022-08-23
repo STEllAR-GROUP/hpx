@@ -28,7 +28,6 @@
 
 namespace hpx::util {
 
-
     enum class reinitializable_static_init_mode
     {
         default_,

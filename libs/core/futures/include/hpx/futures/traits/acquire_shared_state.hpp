@@ -75,8 +75,7 @@ namespace hpx::traits {
         struct acquire_shared_state_impl<Future,
             std::enable_if_t<is_future_v<Future>>>
         {
-            using type = traits::detail::shared_state_ptr_t<
-                traits::future_traits_t<Future>> const&;
+            using type = shared_state_ptr_for_t<Future>;
 
             HPX_FORCEINLINE type operator()(Future const& f) const
             {

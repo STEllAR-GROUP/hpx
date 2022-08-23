@@ -121,11 +121,12 @@ namespace hpx { namespace collectives {
     class channel_communicator;
 
     template <typename T>
-    hpx::future<T> get(channel_communicator, that_site_arg, tag_arg = {});
+    hpx::future<T> get(
+        channel_communicator, that_site_arg, tag_arg = tag_arg{});
 
     template <typename T>
     hpx::future<void> set(
-        channel_communicator, that_site_arg, T&&, tag_arg = {});
+        channel_communicator, that_site_arg, T&&, tag_arg = tag_arg{});
 
     ///////////////////////////////////////////////////////////////////////////
     class channel_communicator
@@ -166,12 +167,13 @@ namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT hpx::future<channel_communicator> create_channel_communicator(
-        char const* basename, num_sites_arg num_sites = {},
-        this_site_arg this_site = {});
+        char const* basename, num_sites_arg num_sites = num_sites_arg{},
+        this_site_arg this_site = this_site_arg{});
 
     HPX_EXPORT channel_communicator create_channel_communicator(
         hpx::launch::sync_policy, char const* basename,
-        num_sites_arg num_sites = {}, this_site_arg this_site = {});
+        num_sites_arg num_sites = num_sites_arg{},
+        this_site_arg this_site = this_site_arg{});
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>

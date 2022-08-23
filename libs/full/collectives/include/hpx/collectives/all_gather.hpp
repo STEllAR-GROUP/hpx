@@ -198,6 +198,10 @@ namespace hpx::collectives {
             return result;
         };
 
+        if (fid.is_ready())
+        {
+            return all_gather_data(HPX_MOVE(fid));
+        }
         return fid.then(hpx::launch::sync, HPX_MOVE(all_gather_data));
     }
 

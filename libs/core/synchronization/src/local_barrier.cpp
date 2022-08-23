@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,9 +12,27 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local {
-    barrier::barrier(std::size_t number_of_threads)
-      : number_of_threads_(number_of_threads)
+namespace hpx::detail {
+
+    void intrusive_ptr_add_ref(barrier_data* p) noexcept
+    {
+        ++p->count_;
+    }
+
+    void intrusive_ptr_release(barrier_data* p) noexcept
+    {
+        if (0 == --p->count_)
+        {
+            delete p;
+        }
+    }
+}    // namespace hpx::detail
+
+///////////////////////////////////////////////////////////////////////////////
+namespace hpx::lcos::local {
+
+    barrier::barrier(std::size_t expected)
+      : number_of_threads_(expected)
       , total_(barrier_flag)
       , mtx_()
       , cond_()
@@ -82,4 +100,4 @@ namespace hpx { namespace lcos { namespace local {
         this->number_of_threads_ = number_of_threads;
     }
 
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

@@ -193,7 +193,7 @@ namespace hpx::lcos::detail {
     // same as above, except with allocator
     template <typename ContResult, typename Allocator, typename Future,
         typename Policy, typename F>
-    inline traits::detail::shared_state_ptr_t<continuation_result_t<ContResult>>
+    traits::detail::shared_state_ptr_t<continuation_result_t<ContResult>>
     make_continuation_alloc(
         Allocator const& a, Future&& future, Policy&& policy, F&& f)
     {
@@ -201,7 +201,7 @@ namespace hpx::lcos::detail {
 
         using base_allocator = Allocator;
         using shared_state = traits::shared_state_allocator_t<
-            detail::continuation<Future, F, result_type>, base_allocator>;
+            continuation<Future, F, result_type>, base_allocator>;
 
         using other_allocator = typename std::allocator_traits<
             base_allocator>::template rebind_alloc<shared_state>;
@@ -235,7 +235,7 @@ namespace hpx::lcos::detail {
     // futures
     template <typename ContResult, typename Allocator, typename Future,
         typename Policy, typename F>
-    inline traits::detail::shared_state_ptr_t<ContResult>
+    traits::detail::shared_state_ptr_t<ContResult>
     make_continuation_alloc_nounwrap(
         Allocator const& a, Future&& future, Policy&& policy, F&& f)
     {
@@ -243,7 +243,7 @@ namespace hpx::lcos::detail {
 
         using base_allocator = Allocator;
         using shared_state = traits::shared_state_allocator_t<
-            detail::continuation<Future, F, result_type>, base_allocator>;
+            continuation<Future, F, result_type>, base_allocator>;
 
         using other_allocator = typename std::allocator_traits<
             base_allocator>::template rebind_alloc<shared_state>;

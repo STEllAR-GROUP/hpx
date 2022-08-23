@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -103,18 +103,15 @@ namespace hpx::collectives::detail {
     };
 }    // namespace hpx::collectives::detail
 
-namespace hpx::util {
-
-    // This is explicitly instantiated to ensure that the id is stable across
-    // shared libraries.
-    template <>
-    struct extra_data_helper<collectives::detail::communicator_data>
-    {
-        HPX_EXPORT static extra_data_id_type id() noexcept;
-        static constexpr void reset(
-            collectives::detail::communicator_data*) noexcept {};
-    };
-}    // namespace hpx::util
+// This is explicitly instantiated to ensure that the id is stable across shared
+// libraries.
+template <>
+struct hpx::util::extra_data_helper<hpx::collectives::detail::communicator_data>
+{
+    HPX_EXPORT static extra_data_id_type id() noexcept;
+    static constexpr void reset(
+        collectives::detail::communicator_data*) noexcept {};
+};
 
 namespace hpx::collectives {
 
@@ -127,7 +124,6 @@ namespace hpx::collectives {
             detail::communicator_data>;
         using future_type = base_type::future_type;
 
-    public:
         // construction
         communicator() = default;
 
@@ -143,19 +139,26 @@ namespace hpx::collectives {
           : base_type(HPX_MOVE(id))
         {
         }
-        explicit communicator(future<hpx::id_type>&& id,
-            num_sites_arg num_sites = {}, this_site_arg this_site = {}) noexcept
+        explicit communicator(future<hpx::id_type>&& id) noexcept
           : base_type(HPX_MOVE(id))
-          , num_sites_(num_sites)
-          , this_site_(this_site)
         {
         }
-        communicator(future<communicator>&& c, num_sites_arg num_sites = {},
-            this_site_arg this_site = {})
-          : base_type(HPX_MOVE(c))
-          , num_sites_(num_sites)
-          , this_site_(this_site)
+        communicator(future<hpx::id_type>&& id, num_sites_arg num_sites,
+            this_site_arg this_site) noexcept
+          : base_type(HPX_MOVE(id))
         {
+            set_info(num_sites, this_site);
+        }
+
+        communicator(future<communicator>&& c)
+          : base_type(HPX_MOVE(c))
+        {
+        }
+        communicator(future<communicator>&& c, num_sites_arg num_sites,
+            this_site_arg this_site)
+          : base_type(HPX_MOVE(c))
+        {
+            set_info(num_sites, this_site);
         }
 
         HPX_EXPORT void set_info(
@@ -171,14 +174,15 @@ namespace hpx::collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT communicator create_communicator(char const* basename,
-        num_sites_arg num_sites = {}, this_site_arg this_site = {},
-        generation_arg generation = {}, root_site_arg root_site = {});
+        num_sites_arg num_sites = num_sites_arg{},
+        this_site_arg this_site = this_site_arg{},
+        generation_arg generation = generation_arg{},
+        root_site_arg root_site = root_site_arg{});
 
     HPX_EXPORT communicator create_local_communicator(char const* basename,
         num_sites_arg num_sites, this_site_arg this_site,
-        generation_arg generation = generation_arg(),
-        root_site_arg root_site = root_site_arg());
-
+        generation_arg generation = generation_arg{},
+        root_site_arg root_site = root_site_arg{});
 }    // namespace hpx::collectives
 
 #endif    // !HPX_COMPUTE_DEVICE_CODE
