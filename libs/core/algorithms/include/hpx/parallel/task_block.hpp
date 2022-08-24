@@ -172,8 +172,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         ///       available. \a run might or might not return before invocation
         ///       of f completes.
         ///
-        /// \throw This function may throw \a task_canceled_exception, as
-        ///        described in Exception Handling.
+        /// \throw task_canceled_exception, as described in Exception Handling.
         ///
         template <typename F, typename... Ts>
         void run(F&& f, Ts&&... ts)
@@ -220,10 +219,9 @@ namespace hpx { namespace parallel { inline namespace v2 {
         ///       available. \a run might or might not return before invocation
         ///       of f completes.
         ///
-        /// \throw This function may throw \a task_canceled_exception, as
-        ///        described in Exception Handling. The function will also
-        ///        throw a \a exception_list holding all exceptions that were
-        ///        caught while executing the tasks.
+        /// \throw task_canceled_exception, as described in Exception Handling.
+        ///        The function will also throw an \a exception_list holding all
+        ///        exceptions that were caught while executing the tasks.
         ///
         template <typename Executor, typename F, typename... Ts>
         void run(Executor&& exec, F&& f, Ts&&... ts)
@@ -365,7 +363,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     ///                A call to define_task_block may return on a different
     ///                thread than that on which it was called.
     ///
-    /// \throws An \a exception_list, as specified in Exception Handling.
+    /// \throws exception_list, as specified in Exception Handling.
     ///
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
@@ -409,7 +407,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     ///                A call to define_task_block may return on a different
     ///                thread than that on which it was called.
     ///
-    /// \throws An \a exception_list, as specified in Exception Handling.
+    /// \throws exception_list, as specified in Exception Handling.
     ///
     /// \note It is expected (but not mandated) that f will (directly or
     ///       indirectly) call tr.run(_callable_object_).
@@ -435,7 +433,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     ///             Given an lvalue \a tr of type \a task_block, the
     ///             expression, (void)f(tr), shall be well-formed.
     ///
-    /// \throws An \a exception_list, as specified in Exception Handling.
+    /// \throws exception_list, as specified in Exception Handling.
     ///
     /// Postcondition: All tasks spawned from \a f have finished execution.
     ///                A call to \a define_task_block_restore_thread always
@@ -469,7 +467,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     ///             Given an lvalue \a tr of type \a task_block, the
     ///             expression, (void)f(tr), shall be well-formed.
     ///
-    /// \throws An \a exception_list, as specified in Exception Handling.
+    /// \throws exception_list, as specified in Exception Handling.
     ///
     /// Postcondition: All tasks spawned from \a f have finished execution.
     ///                A call to \a define_task_block_restore_thread always
