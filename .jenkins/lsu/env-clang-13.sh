@@ -13,7 +13,7 @@ module load openmpi
 module load pwrapi/1.1.1
 
 export HPXRUN_RUNWRAPPER=srun
-export CXX_STD="20"
+export CXX_STD="17"
 
 configure_extra_options+=" -DCMAKE_BUILD_TYPE=${build_type}"
 configure_extra_options+=" -DHPX_WITH_CXX_STANDARD=${CXX_STD}"
