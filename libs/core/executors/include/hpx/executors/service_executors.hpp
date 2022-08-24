@@ -145,14 +145,13 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             using result_future_type = hpx::future<vector_result_type>;
             using shared_state_type =
                 hpx::traits::detail::shared_state_ptr_t<vector_result_type>;
-            using future_type = std::decay_t<Future>;
 
             auto exec_current = hpx::this_thread::get_executor();
             shared_state_type p =
                 lcos::detail::make_continuation_exec<vector_result_type>(
                     HPX_FORWARD(Future, predecessor), exec_current,
-                    [func = HPX_MOVE(func)](future_type&& predecessor) mutable
-                    -> vector_result_type {
+                    [func = HPX_MOVE(func)](
+                        auto&& predecessor) mutable -> vector_result_type {
                         return hpx::unwrap(func(HPX_MOVE(predecessor)));
                     });
 

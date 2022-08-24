@@ -39,7 +39,7 @@ void test_async(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-std::thread::id test_f(hpx::future<void> f, int passed_through)
+std::thread::id test_f(hpx::future<void>&& f, int passed_through)
 {
     HPX_TEST(f.is_ready());    // make sure, future is ready
 
@@ -102,7 +102,7 @@ void test_bulk_async(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test_f(int, hpx::shared_future<void> f, hpx::thread::id tid,
+void bulk_test_f(int, hpx::shared_future<void>&& f, hpx::thread::id tid,
     int passed_through)    //-V813
 {
     HPX_TEST(f.is_ready());    // make sure, future is ready

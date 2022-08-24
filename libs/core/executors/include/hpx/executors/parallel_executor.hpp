@@ -14,6 +14,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
+#include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>

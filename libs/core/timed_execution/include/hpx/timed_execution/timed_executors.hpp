@@ -91,7 +91,7 @@ namespace hpx { namespace parallel { namespace execution {
                         HPX_FORWARD(Executor, exec),
                         hpx::util::deferred_call(
                             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)),
-                    predecessor)
+                    HPX_MOVE(predecessor))
                     .get();
             }
 
@@ -224,7 +224,7 @@ namespace hpx { namespace parallel { namespace execution {
                         HPX_FORWARD(Executor, exec),
                         hpx::util::deferred_call(
                             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)),
-                    predecessor);
+                    HPX_MOVE(predecessor));
             }
 
             template <typename Executor, typename F, typename... Ts,
@@ -356,7 +356,7 @@ namespace hpx { namespace parallel { namespace execution {
                         HPX_FORWARD(Executor, exec),
                         hpx::util::deferred_call(
                             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)),
-                    predecessor);
+                    HPX_MOVE(predecessor));
             }
 
             template <typename Executor, typename F, typename... Ts,

@@ -12,12 +12,15 @@
 namespace hpx {
 
     /// \namespace lcos
-    namespace lcos { namespace detail {
+    namespace lcos::detail {
         template <typename Result>
         struct future_data;
 
+        template <typename Result>
+        struct future_data_base;
+
         struct future_data_refcnt_base;
-    }}    // namespace lcos::detail
+    }    // namespace lcos::detail
 
     template <typename R>
     class future;
