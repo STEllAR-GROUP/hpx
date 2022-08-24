@@ -349,7 +349,7 @@ namespace hpx {
     std::pair<FwdIter2 ,FwdIter3>
     partition_copy(FwdIter1 first, FwdIter1 last,
         FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
-        fProj&& proj = Proj());
+        Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements in the range, defined by [first, last),
