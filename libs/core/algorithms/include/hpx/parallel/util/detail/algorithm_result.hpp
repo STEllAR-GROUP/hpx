@@ -21,8 +21,6 @@
 namespace hpx { namespace parallel { namespace util { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \struct algorithm_result<ExPolicy, FwdIter>
-    /// \brief this represents the result of an algorithm
     template <typename ExPolicy, typename T, typename Enable = void>
     struct algorithm_result_impl;
 
