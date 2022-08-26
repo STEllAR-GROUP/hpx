@@ -703,8 +703,32 @@ namespace hpx::execution::experimental {
         detail::value_types_from<detail::completion_signatures_of<Sender, Env>,
             meta::func<Tuple>, meta::func<Variant>>;
 
+    namespace detail {
+        template <typename = void, typename... As>
+        struct front;
+
+        template <typename A, typename... As>
+        struct front<std::enable_if_t<sizeof...(As) != 0>, A, As...>
+        {
+            using type = A;
+        };
+
+        template <typename... As>
+        using single_t =
+            front<std::enable_if_t<sizeof...(As) == 1>, As...>::type;
+
+        template <typename Ty>
+        struct single_or
+        {
+            template <typename... As>
+            using apply =
+                front<std::enable_if_t<sizeof...(As) <= 1>, As..., Ty>;
+        };
+    }    // namespace detail
+
     template <typename Sender, typename Env = no_env>
-    using single_sender_value_t = value_types_of_t<Sender, Env>;
+    using single_sender_value_t = value_types_of_t<Sender, Env,
+        detail::single_or<void>, meta::compose_func<detail::single_t>>;
 
     // Let r be an rvalue receiver of type R, and let S be the type of a sender.
     // If error_types_of_t<S, env_of_t<R>, Variant> is well formed, it shall
