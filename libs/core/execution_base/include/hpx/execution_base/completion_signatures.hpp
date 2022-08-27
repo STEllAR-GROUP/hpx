@@ -864,6 +864,9 @@ namespace hpx::execution::experimental {
 
     struct as_awaitable_t;
 
+    template <typename S, typename R>
+    using connect_result_t = hpx::util::invoke_result_t<connect_t, S, R>;
+
     namespace detail {
         template <typename T, typename U>
         inline constexpr bool decays_to = std::is_same_v<std::decay_t<T>, U>&&
