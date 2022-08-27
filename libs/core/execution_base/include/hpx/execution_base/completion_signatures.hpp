@@ -10,6 +10,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution_base/get_env.hpp>
+#include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/execution_base/traits/coroutine_traits.hpp>
