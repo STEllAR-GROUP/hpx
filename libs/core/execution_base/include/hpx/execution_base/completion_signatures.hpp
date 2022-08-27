@@ -710,6 +710,10 @@ namespace hpx::execution::experimental {
 
     /// Start definitions from coroutine_utils and sender
 
+    template <typename Receiver, typename Sender>
+    inline constexpr bool is_receiver_from_v = is_receiver_of_v<Receiver,
+        decltype(get_completion_signatures(Sender{}, env_of_t<Receiver>{}))>;
+
     namespace detail {
         template <typename A, typename... As>
         struct front
@@ -738,7 +742,10 @@ namespace hpx::execution::experimental {
     }    // namespace detail
 
     template <typename Sender, typename Env = no_env>
-    using single_sender_value_t = value_types_of_t<Sender, Env>;
+    using single_sender_value_t =
+        detail::value_types_from<detail::completion_signatures_of<Sender, Env>,
+            detail::single_or<void>,
+            detail::compose_template_func<detail::single_t>>;
 
     struct connect_awaitable_t;
 

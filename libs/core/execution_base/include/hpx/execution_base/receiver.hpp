@@ -212,10 +212,6 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename T, typename CS>
     inline constexpr bool is_receiver_of_v = is_receiver_of<T, CS>::value;
 
-    template <typename Receiver, typename Sender>
-    inline constexpr bool is_receiver_from_v = is_receiver_of_v<Receiver,
-        decltype(get_completion_signatures(Sender{}, env_of_t<Receiver>{}))>;
-
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename F, typename T, typename Variant>
