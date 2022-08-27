@@ -572,6 +572,8 @@ namespace hpx::execution::experimental {
     using completion_signatures_of_t =
         detail::completion_signatures_of<Sender, Env>;
 
+    struct connect_t;
+
     namespace detail {
 
         template <bool IsSenderReceiver, typename Sender, typename Receiver>
