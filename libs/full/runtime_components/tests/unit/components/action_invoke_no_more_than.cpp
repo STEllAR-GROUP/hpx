@@ -57,24 +57,24 @@ struct test_server : hpx::components::component_base<test_server>
         return hpx::make_ready_future();
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, call_void, call_void_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call_void, call_void_action)
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server, call_future_void, call_future_void_action);
+        test_server, call_future_void, call_future_void_action)
 };
 
 typedef hpx::components::component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 typedef test_server::call_void_action call_void_action;
-HPX_REGISTER_ACTION_DECLARATION(call_void_action);
-HPX_ACTION_INVOKE_NO_MORE_THAN(call_void_action, 1);    // limit to max one
-HPX_REGISTER_ACTION(call_void_action);
+HPX_REGISTER_ACTION_DECLARATION(call_void_action)
+HPX_ACTION_INVOKE_NO_MORE_THAN(call_void_action, 1)    // limit to max one
+HPX_REGISTER_ACTION(call_void_action)
 
 typedef test_server::call_future_void_action call_future_void_action;
-HPX_REGISTER_ACTION_DECLARATION(call_future_void_action);
+HPX_REGISTER_ACTION_DECLARATION(call_future_void_action)
 HPX_ACTION_INVOKE_NO_MORE_THAN(
-    call_future_void_action, 1);    // limit to max one
-HPX_REGISTER_ACTION(call_future_void_action);
+    call_future_void_action, 1)    // limit to max one
+HPX_REGISTER_ACTION(call_future_void_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_component_call_void()
@@ -136,9 +136,9 @@ void plain_void()
 }
 
 HPX_DEFINE_PLAIN_ACTION(plain_void, plain_void_action);
-HPX_REGISTER_ACTION_DECLARATION(plain_void_action);
-HPX_ACTION_INVOKE_NO_MORE_THAN(plain_void_action, 1);    // limit to max one
-HPX_REGISTER_ACTION(plain_void_action);
+HPX_REGISTER_ACTION_DECLARATION(plain_void_action)
+HPX_ACTION_INVOKE_NO_MORE_THAN(plain_void_action, 1)    // limit to max one
+HPX_REGISTER_ACTION(plain_void_action)
 
 hpx::future<void> plain_future_void()
 {
@@ -156,10 +156,10 @@ hpx::future<void> plain_future_void()
 }
 
 HPX_DEFINE_PLAIN_ACTION(plain_future_void, plain_future_void_action);
-HPX_REGISTER_ACTION_DECLARATION(plain_future_void_action);
+HPX_REGISTER_ACTION_DECLARATION(plain_future_void_action)
 HPX_ACTION_INVOKE_NO_MORE_THAN(
-    plain_future_void_action, 1);    // limit to max one
-HPX_REGISTER_ACTION(plain_future_void_action);
+    plain_future_void_action, 1)    // limit to max one
+HPX_REGISTER_ACTION(plain_future_void_action)
 
 void test_plain_call_void()
 {

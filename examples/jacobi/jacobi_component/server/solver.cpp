@@ -10,14 +10,10 @@
 #include <hpx/hpx.hpp>
 #include "solver.hpp"
 
-typedef hpx::components::component<
-    jacobi::server::solver
-> solver_type;
+typedef hpx::components::component<jacobi::server::solver> solver_type;
 
-HPX_REGISTER_COMPONENT(solver_type, solver);
+HPX_REGISTER_COMPONENT(solver_type, solver)
 
 HPX_REGISTER_ACTION(
-    jacobi::server::solver::run_action
-  , jacobi_server_solver_run_action
-)
+    jacobi::server::solver::run_action, jacobi_server_solver_run_action)
 #endif

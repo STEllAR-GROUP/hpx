@@ -12,6 +12,8 @@
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
+#include <cstdint>
+#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -23,8 +25,8 @@ constexpr char const* channel_communicator_basename =
 constexpr std::size_t NUM_CHANNEL_COMMUNICATOR_SITES = 32;
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_channel_communicator_set_first_comm(
-    std::size_t site, hpx::collectives::channel_communicator comm)
+void test_channel_communicator_set_first_comm(std::size_t site,
+    hpx::collectives::channel_communicator comm, std::size_t iter)
 {
     using data_type = std::pair<std::size_t, std::size_t>;
 
@@ -34,7 +36,8 @@ void test_channel_communicator_set_first_comm(
 
     for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
     {
-        sets.push_back(set(comm, that_site_arg(i), std::make_pair(i, site)));
+        sets.push_back(set(
+            comm, that_site_arg(i), std::make_pair(i, site), tag_arg(iter)));
     }
 
     // receive the values sent above
@@ -43,13 +46,14 @@ void test_channel_communicator_set_first_comm(
 
     for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
     {
-        gets.push_back(get<data_type>(comm, that_site_arg(i)));
+        gets.push_back(get<data_type>(comm, that_site_arg(i), tag_arg(iter)));
     }
 
     hpx::wait_all(sets, gets);
 
     for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
     {
+        HPX_TEST(!gets[i].has_exception());
         HPX_TEST(!sets[i].has_exception());
 
         auto data = gets[i].get();
@@ -58,14 +62,15 @@ void test_channel_communicator_set_first_comm(
     }
 }
 
-void test_channel_communicator_set_first_single_use(std::size_t site)
+void test_channel_communicator_set_first_single_use(
+    std::size_t site, std::size_t iter)
 {
     // for each site, create new channel_communicator
     auto comm = create_channel_communicator(hpx::launch::sync,
         channel_communicator_basename,
         num_sites_arg(NUM_CHANNEL_COMMUNICATOR_SITES), this_site_arg(site));
 
-    test_channel_communicator_set_first_comm(site, comm);
+    test_channel_communicator_set_first_comm(site, comm, iter);
 }
 
 void test_single_use_set_first()
@@ -77,8 +82,8 @@ void test_single_use_set_first()
 
         for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
         {
-            tasks.push_back(
-                hpx::async(test_channel_communicator_set_first_single_use, i));
+            tasks.push_back(hpx::async(
+                test_channel_communicator_set_first_single_use, i, j));
         }
         hpx::wait_all(tasks);
     }
@@ -106,7 +111,7 @@ void test_multi_use_set_first()
         for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
         {
             tasks.push_back(hpx::async(
-                test_channel_communicator_set_first_comm, i, comms[i]));
+                test_channel_communicator_set_first_comm, i, comms[i], j));
         }
 
         hpx::wait_all(tasks);
@@ -114,8 +119,8 @@ void test_multi_use_set_first()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_channel_communicator_get_first_comm(
-    std::size_t site, hpx::collectives::channel_communicator comm)
+void test_channel_communicator_get_first_comm(std::size_t site,
+    hpx::collectives::channel_communicator comm, std::size_t iter)
 {
     using data_type = std::pair<std::size_t, std::size_t>;
 
@@ -125,7 +130,7 @@ void test_channel_communicator_get_first_comm(
 
     for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
     {
-        gets.push_back(get<data_type>(comm, that_site_arg(i)));
+        gets.push_back(get<data_type>(comm, that_site_arg(i), tag_arg(iter)));
     }
 
     // send a value to each of the participating sites
@@ -134,13 +139,15 @@ void test_channel_communicator_get_first_comm(
 
     for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
     {
-        sets.push_back(set(comm, that_site_arg(i), std::make_pair(i, site)));
+        sets.push_back(set(
+            comm, that_site_arg(i), std::make_pair(i, site), tag_arg(iter)));
     }
 
     hpx::wait_all(sets, gets);
 
     for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
     {
+        HPX_TEST(!gets[i].has_exception());
         HPX_TEST(!sets[i].has_exception());
 
         auto data = gets[i].get();
@@ -149,14 +156,15 @@ void test_channel_communicator_get_first_comm(
     }
 }
 
-void test_channel_communicator_get_first_single_use(std::size_t site)
+void test_channel_communicator_get_first_single_use(
+    std::size_t site, std::size_t iter)
 {
     // for each site, create new channel_communicator
     auto comm = create_channel_communicator(hpx::launch::sync,
         channel_communicator_basename,
         num_sites_arg(NUM_CHANNEL_COMMUNICATOR_SITES), this_site_arg(site));
 
-    test_channel_communicator_get_first_comm(site, comm);
+    test_channel_communicator_get_first_comm(site, comm, iter);
 }
 
 void test_single_use_get_first()
@@ -168,8 +176,8 @@ void test_single_use_get_first()
 
         for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
         {
-            tasks.push_back(
-                hpx::async(test_channel_communicator_get_first_single_use, i));
+            tasks.push_back(hpx::async(
+                test_channel_communicator_get_first_single_use, i, j));
         }
 
         hpx::wait_all(tasks);
@@ -198,7 +206,7 @@ void test_multi_use_get_first()
         for (std::size_t i = 0; i != NUM_CHANNEL_COMMUNICATOR_SITES; ++i)
         {
             tasks.push_back(hpx::async(
-                test_channel_communicator_get_first_comm, i, comms[i]));
+                test_channel_communicator_get_first_comm, i, comms[i], j));
         }
 
         hpx::wait_all(tasks);

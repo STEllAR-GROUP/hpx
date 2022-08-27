@@ -23,14 +23,14 @@
 
 using hpx::unwrapping;
 
-typedef hpx::lcos::shared_future<double> future_type;
+typedef hpx::shared_future<double> future_type;
 
 struct mul
 {
     double operator()(double x1, double x2) const
     {
         hpx::this_thread::sleep_for(std::chrono::milliseconds(10000));
-        hpx::util::format_to(hpx::cout, "func: {}, {}\n", x1, x2) << hpx::flush;
+        hpx::util::format_to(hpx::cout, "func: {}, {}\n", x1, x2) << std::flush;
         return x1 * x2;
     }
 };
@@ -57,8 +57,8 @@ int main()
 
     future_swap(f1, f2);
 
-    hpx::util::format_to(hpx::cout, "f1: {}\n", f1.get()) << hpx::flush;
-    hpx::util::format_to(hpx::cout, "f2: {}\n", f2.get()) << hpx::flush;
+    hpx::util::format_to(hpx::cout, "f1: {}\n", f1.get()) << std::flush;
+    hpx::util::format_to(hpx::cout, "f2: {}\n", f2.get()) << std::flush;
 
     return 0;
 }

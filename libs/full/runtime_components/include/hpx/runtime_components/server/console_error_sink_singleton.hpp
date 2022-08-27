@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace server {
 
     public:
         typedef util::spinlock mutex_type;
-        typedef util::function_nonser<void(std::string const&)> sink_type;
+        typedef hpx::function<void(std::string const&)> sink_type;
 
         console_error_dispatcher()
           : mtx_()
@@ -37,8 +37,8 @@ namespace hpx { namespace components { namespace server {
         sink_type set_error_sink(F&& sink)
         {
             std::lock_guard<mutex_type> l(mtx_);
-            sink_type old_sink = std::move(sink_);
-            sink_ = std::forward<F>(sink);
+            sink_type old_sink = HPX_MOVE(sink_);
+            sink_ = HPX_FORWARD(F, sink);
             return old_sink;
         }
 

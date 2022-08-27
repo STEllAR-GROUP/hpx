@@ -114,8 +114,8 @@ namespace hpx { namespace compute {
         vector(vector&& other)
           : size_(other.size_)
           , capacity_(other.capacity_)
-          , alloc_(std::move(other.alloc_))
-          , data_(std::move(other.data_))
+          , alloc_(HPX_MOVE(other.alloc_))
+          , data_(HPX_MOVE(other.data_))
         {
             other.data_ = pointer(nullptr);
             other.size_ = 0;
@@ -126,7 +126,7 @@ namespace hpx { namespace compute {
           : size_(other.size_)
           , capacity_(other.capacity_)
           , alloc_(alloc)
-          , data_(std::move(other.data_))
+          , data_(HPX_MOVE(other.data_))
         {
             other.data_ = pointer(nullptr);
             other.size_ = 0;
@@ -184,8 +184,8 @@ namespace hpx { namespace compute {
 
             size_ = other.size_;
             capacity_ = other.capacity_;
-            alloc_ = std::move(tmp_alloc);
-            data_ = std::move(data);
+            alloc_ = HPX_MOVE(tmp_alloc);
+            data_ = HPX_MOVE(data);
 
             return *this;
         }
@@ -197,8 +197,8 @@ namespace hpx { namespace compute {
 
             size_ = other.size_;
             capacity_ = other.capacity_;
-            alloc_ = std::move(other.alloc_);
-            data_ = std::move(other.data_);
+            alloc_ = HPX_MOVE(other.alloc_);
+            data_ = HPX_MOVE(other.data_);
 
             other.data_ = pointer(nullptr);
             other.size_ = 0;
@@ -351,9 +351,9 @@ namespace hpx { namespace compute {
         ///
         void swap(vector& other)
         {
-            vector tmp = std::move(other);
-            other = std::move(*this);
-            *this = std::move(tmp);
+            vector tmp = HPX_MOVE(other);
+            other = HPX_MOVE(*this);
+            *this = HPX_MOVE(tmp);
         }
 
         /// Effects: Erases all elements in the range [begin(),end()).

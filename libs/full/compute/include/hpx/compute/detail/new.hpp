@@ -15,7 +15,7 @@ namespace hpx { namespace util { namespace functional {
         template <typename... Ts>
         T* operator()(Ts&&... vs) const
         {
-            return new T(std::forward<Ts>(vs)...);
+            return new T(HPX_FORWARD(Ts, vs)...);
         }
     };
 
@@ -25,7 +25,7 @@ namespace hpx { namespace util { namespace functional {
         template <typename... Ts>
         T* operator()(void* p, Ts&&... vs) const
         {
-            return new (p) T(std::forward<Ts>(vs)...);
+            return new (p) T(HPX_FORWARD(Ts, vs)...);
         }
     };
 
@@ -40,7 +40,7 @@ namespace hpx { namespace util { namespace functional {
         template <typename... Ts>
         T* operator()(Ts&&... vs) const
         {
-            return new (p_) T(std::forward<Ts>(vs)...);
+            return new (p_) T(HPX_FORWARD(Ts, vs)...);
         }
 
         void* p_;

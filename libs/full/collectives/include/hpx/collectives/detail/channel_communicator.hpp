@@ -17,8 +17,13 @@
 #include <hpx/datastructures/any.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos_local/channel.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
+#include <map>
+#include <mutex>
 #include <utility>
 #include <vector>
 
@@ -34,21 +39,31 @@ namespace hpx { namespace collectives { namespace detail {
 
     public:
         channel_communicator_server()    //-V730
-          : channels_()
+          : data_()
         {
             HPX_ASSERT(false);    // shouldn't ever be called
         }
 
         explicit channel_communicator_server(std::size_t num_sites)
-          : channels_(num_sites)
+          : data_(num_sites)
         {
             HPX_ASSERT(num_sites != 0);
         }
 
         template <typename T>
-        hpx::future<T> get(std::size_t which) const
+        hpx::future<T> get(std::size_t which, std::size_t tag) const
         {
-            hpx::future<unique_any_nonser> f = channels_[which].get();
+            hpx::future<unique_any_nonser> f;
+
+            {
+                std::unique_lock l(data_[which].mtx_);
+                util::ignore_while_checking il(&l);
+                HPX_UNUSED(il);
+
+                channel_type& c = data_[which].channels_[tag];
+                f = c.get();
+            }
+
             return f.then(
                 hpx::launch::sync, [](hpx::future<unique_any_nonser>&& f) -> T {
                     return hpx::any_cast<T const&>(f.get());
@@ -59,29 +74,39 @@ namespace hpx { namespace collectives { namespace detail {
         struct get_action
           : hpx::actions::make_action<hpx::future<T> (
                                           channel_communicator_server::*)(
-                                          std::size_t) const,
+                                          std::size_t, std::size_t) const,
                 &channel_communicator_server::template get<T>,
                 get_action<T>>::type
         {
         };
 
         template <typename T>
-        void set(std::size_t which, T value)
+        void set(std::size_t which, T value, std::size_t tag)
         {
-            channels_[which].set(std::move(value));
+            std::unique_lock l(data_[which].mtx_);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
+
+            data_[which].channels_[tag].set(HPX_MOVE(value));
         }
 
         template <typename T>
         struct set_action
           : hpx::actions::make_action<void (channel_communicator_server::*)(
-                                          std::size_t, T),
+                                          std::size_t, T, std::size_t),
                 &channel_communicator_server::template set<T>,
                 set_action<T>>::type
         {
         };
 
     private:
-        std::vector<channel_type> channels_;
+        struct locality_data
+        {
+            hpx::lcos::local::spinlock mtx_;
+            std::map<std::size_t, channel_type> channels_;
+        };
+
+        mutable std::vector<locality_data> data_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -103,24 +128,24 @@ namespace hpx { namespace collectives { namespace detail {
             std::size_t num_sites, std::size_t this_site, client_type here);
 
         template <typename T>
-        hpx::future<T> get(std::size_t site) const
+        hpx::future<T> get(std::size_t site, std::size_t tag) const
         {
             // all get operations refer to the channels located on this site
             using action_type =
                 channel_communicator_server::template get_action<T>;
-            return hpx::async(action_type(), clients_[this_site_], site);
+            return hpx::sync(action_type(), clients_[this_site_], site, tag);
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
-        hpx::future<void> set(std::size_t site, T&& value)
+        hpx::future<void> set(std::size_t site, T&& value, std::size_t tag)
         {
             // all set operations refer to the channel on the target site
             using action_type =
                 channel_communicator_server::template set_action<
                     std::decay_t<T>>;
             return hpx::async(action_type(), clients_[site], this_site_,
-                std::forward<T>(value));
+                HPX_FORWARD(T, value), tag);
         }
 
         std::pair<std::size_t, std::size_t> get_info() const noexcept

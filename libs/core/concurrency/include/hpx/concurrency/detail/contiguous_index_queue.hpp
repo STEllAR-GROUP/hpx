@@ -15,6 +15,7 @@
 #include <type_traits>
 
 namespace hpx { namespace concurrency { namespace detail {
+
     /// \brief A concurrent queue which can only hold contiguous ranges of
     ///        integers.
     ///
@@ -39,23 +40,23 @@ namespace hpx { namespace concurrency { namespace detail {
 
             range() = default;
 
-            range(T first, T last)
+            range(T first, T last) noexcept
               : first(first)
               , last(last)
             {
             }
 
-            constexpr range increment_first()
+            constexpr range increment_first() const noexcept
             {
                 return range{first + 1, last};
             }
 
-            constexpr range decrement_last()
+            constexpr range decrement_last() const noexcept
             {
                 return range{first, last - 1};
             }
 
-            constexpr bool empty()
+            constexpr bool empty() const noexcept
             {
                 return first >= last;
             }
@@ -125,8 +126,8 @@ namespace hpx { namespace concurrency { namespace detail {
         /// \brief Attempt to pop an item from the left of the queue.
         ///
         /// Attempt to pop an item from the left (beginning) of the queue. If
-        /// no items are left hpx::util::nullopt is returned.
-        constexpr hpx::util::optional<T> pop_left() noexcept
+        /// no items are left hpx::nullopt is returned.
+        constexpr hpx::optional<T> pop_left() noexcept
         {
             range desired_range{0, 0};
             T index = 0;
@@ -138,7 +139,7 @@ namespace hpx { namespace concurrency { namespace detail {
             {
                 if (expected_range.empty())
                 {
-                    return hpx::util::nullopt;
+                    return hpx::nullopt;
                 }
 
                 index = expected_range.first;
@@ -146,14 +147,14 @@ namespace hpx { namespace concurrency { namespace detail {
             } while (!current_range.data_.compare_exchange_weak(
                 expected_range, desired_range));
 
-            return hpx::util::make_optional<>(index);
+            return hpx::optional<T>(HPX_MOVE(index));
         }
 
         /// \brief Attempt to pop an item from the right of the queue.
         ///
         /// Attempt to pop an item from the right (end) of the queue. If
-        /// no items are left hpx::util::nullopt is returned.
-        constexpr hpx::util::optional<T> pop_right() noexcept
+        /// no items are left hpx::nullopt is returned.
+        constexpr hpx::optional<T> pop_right() noexcept
         {
             range desired_range{0, 0};
             T index = 0;
@@ -165,7 +166,7 @@ namespace hpx { namespace concurrency { namespace detail {
             {
                 if (expected_range.empty())
                 {
-                    return hpx::util::nullopt;
+                    return hpx::nullopt;
                 }
 
                 desired_range = expected_range.decrement_last();
@@ -173,10 +174,10 @@ namespace hpx { namespace concurrency { namespace detail {
             } while (!current_range.data_.compare_exchange_weak(
                 expected_range, desired_range));
 
-            return hpx::util::make_optional(index);
+            return hpx::optional<T>(HPX_MOVE(index));
         }
 
-        constexpr bool empty() noexcept
+        constexpr bool empty() const noexcept
         {
             return current_range.data_.load(std::memory_order_relaxed).empty();
         }

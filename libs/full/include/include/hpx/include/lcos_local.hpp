@@ -15,7 +15,6 @@
 #include <hpx/modules/synchronization.hpp>
 
 #include <hpx/lcos_local/and_gate.hpp>
-#include <hpx/lcos_local/packaged_task.hpp>
 #include <hpx/lcos_local/receive_buffer.hpp>
 #include <hpx/lcos_local/trigger.hpp>
 #include <hpx/modules/execution.hpp>

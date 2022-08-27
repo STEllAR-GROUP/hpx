@@ -18,52 +18,52 @@
 
 #include <vector>
 
-namespace boost
-{
-  namespace inspect
-  {
+namespace boost { namespace inspect {
 
     struct names_includes
     {
-      char const* name_regex;
-      char const* name;
-      char const* include;
+        char const* name_regex;
+        char const* name;
+        std::vector<char const*> include;
     };
 
     struct names_regex_data
     {
-      names_regex_data(names_includes const* d, std::string const& rx)
-        : data(d), pattern(rx, boost::regex::normal)
-      {}
+        names_regex_data(names_includes const* d, std::string const& rx)
+          : data(d)
+          , pattern(rx, boost::regex::normal)
+        {
+        }
 
-      names_includes const* data;
-      boost::regex pattern;
+        names_includes const* data;
+        boost::regex pattern;
     };
 
     class include_check : public inspector
     {
-      long m_errors;
-      std::vector<names_regex_data> regex_data;
+        long m_errors;
+        std::vector<names_regex_data> regex_data;
 
     public:
+        include_check();
+        virtual const char* name() const
+        {
+            return "*I*";
+        }
+        virtual const char* desc() const
+        {
+            return "uses of function without "
+                   "#include'ing corresponding header";
+        }
 
-      include_check();
-      virtual const char * name() const { return "*I*"; }
-      virtual const char * desc() const { return "uses of function without "
-          "#include'ing corresponding header"; }
+        virtual void inspect(const std::string& library_name,
+            const path& full_path, const std::string& contents);
 
-      virtual void inspect(
-        const std::string & library_name,
-        const path & full_path,
-        const std::string & contents);
+        virtual void print_summary(std::ostream& out)
+        {
+            out << "  " << m_errors << " missing #include's" << line_break();
+        }
 
-      virtual void print_summary(std::ostream& out)
-      {
-        out << "  " << m_errors << " missing #include's" << line_break();
-      }
-
-      virtual ~include_check() {}
+        virtual ~include_check() {}
     };
-  }
-}
-
+}}    // namespace boost::inspect

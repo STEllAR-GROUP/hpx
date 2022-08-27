@@ -9,6 +9,8 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
+// make inspect happy: hpxinspect:noinclude:hpx::intrusive_ptr
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -20,10 +22,10 @@
 #include <functional>
 #include <iosfwd>
 #include <type_traits>
+#include <utility>
 
-namespace hpx { namespace memory {
+namespace hpx {
 
-    //
     //  intrusive_ptr
     //
     //  A smart pointer that uses intrusive reference counting.
@@ -48,7 +50,8 @@ namespace hpx { namespace memory {
 
         constexpr intrusive_ptr() noexcept = default;
 
-        intrusive_ptr(T* p, bool add_ref = true)
+        intrusive_ptr(T* p, bool add_ref = true) noexcept(
+            noexcept(intrusive_ptr_add_ref(std::declval<T*>())))
           : px(p)
         {
             if (px != nullptr && add_ref)
@@ -56,16 +59,18 @@ namespace hpx { namespace memory {
         }
 
         template <typename U,
-            typename Enable = typename std::enable_if<
-                memory::detail::sp_convertible<U, T>::value>::type>
-        intrusive_ptr(intrusive_ptr<U> const& rhs)
+            typename Enable =
+                std::enable_if_t<memory::detail::sp_convertible_v<U, T>>>
+        intrusive_ptr(intrusive_ptr<U> const& rhs) noexcept(
+            noexcept(intrusive_ptr_add_ref(std::declval<U*>())))
           : px(rhs.get())
         {
             if (px != nullptr)
                 intrusive_ptr_add_ref(px);
         }
 
-        intrusive_ptr(intrusive_ptr const& rhs)
+        intrusive_ptr(intrusive_ptr const& rhs) noexcept(
+            noexcept(intrusive_ptr_add_ref(std::declval<T*>())))
           : px(rhs.px)
         {
             if (px != nullptr)
@@ -79,7 +84,8 @@ namespace hpx { namespace memory {
         }
 
         template <typename U>
-        intrusive_ptr& operator=(intrusive_ptr<U> const& rhs)
+        intrusive_ptr& operator=(intrusive_ptr<U> const& rhs) noexcept(
+            noexcept(intrusive_ptr_add_ref(std::declval<U*>())))
         {
             this_type(rhs).swap(*this);
             return *this;
@@ -102,9 +108,9 @@ namespace hpx { namespace memory {
         friend class intrusive_ptr;
 
         template <typename U,
-            typename Enable = typename std::enable_if<
-                memory::detail::sp_convertible<U, T>::value>::type>
-        constexpr intrusive_ptr(intrusive_ptr<U>&& rhs)
+            typename Enable =
+                std::enable_if_t<memory::detail::sp_convertible_v<U, T>>>
+        constexpr intrusive_ptr(intrusive_ptr<U>&& rhs) noexcept
           : px(rhs.px)
         {
             rhs.px = nullptr;
@@ -118,29 +124,29 @@ namespace hpx { namespace memory {
         }
 
         // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
-        intrusive_ptr& operator=(intrusive_ptr const& rhs)
+        intrusive_ptr& operator=(intrusive_ptr const& rhs) noexcept
         {
             this_type(rhs).swap(*this);
             return *this;
         }
 
-        intrusive_ptr& operator=(T* rhs)
+        intrusive_ptr& operator=(T* rhs) noexcept
         {
             this_type(rhs).swap(*this);
             return *this;
         }
 
-        void reset()
+        void reset() noexcept
         {
             this_type().swap(*this);
         }
 
-        void reset(T* rhs)
+        void reset(T* rhs) noexcept
         {
             this_type(rhs).swap(*this);
         }
 
-        void reset(T* rhs, bool add_ref)
+        void reset(T* rhs, bool add_ref) noexcept
         {
             this_type(rhs, add_ref).swap(*this);
         }
@@ -157,13 +163,13 @@ namespace hpx { namespace memory {
             return ret;
         }
 
-        T& operator*() const HPX_NOEXCEPT_WITH_ASSERT
+        T& operator*() const noexcept
         {
             HPX_ASSERT(px != nullptr);
             return *px;
         }
 
-        T* operator->() const HPX_NOEXCEPT_WITH_ASSERT
+        T* operator->() const noexcept
         {
             HPX_ASSERT(px != nullptr);
             return px;
@@ -186,124 +192,136 @@ namespace hpx { namespace memory {
     };
 
     template <typename T, typename U>
-    inline bool operator==(
-        intrusive_ptr<T> const& a, intrusive_ptr<U> const& b) noexcept
+    inline constexpr bool operator==(
+        hpx::intrusive_ptr<T> const& a, hpx::intrusive_ptr<U> const& b) noexcept
     {
         return a.get() == b.get();
     }
 
     template <typename T, typename U>
-    inline bool operator!=(
-        intrusive_ptr<T> const& a, intrusive_ptr<U> const& b) noexcept
+    inline constexpr bool operator!=(
+        hpx::intrusive_ptr<T> const& a, hpx::intrusive_ptr<U> const& b) noexcept
     {
         return a.get() != b.get();
     }
 
     template <typename T, typename U>
-    inline bool operator==(intrusive_ptr<T> const& a, U* b) noexcept
+    inline constexpr bool operator==(
+        hpx::intrusive_ptr<T> const& a, U* b) noexcept
     {
         return a.get() == b;
     }
 
     template <typename T, typename U>
-    inline bool operator!=(intrusive_ptr<T> const& a, U* b) noexcept
+    inline constexpr bool operator!=(
+        hpx::intrusive_ptr<T> const& a, U* b) noexcept
     {
         return a.get() != b;
     }
 
     template <typename T, typename U>
-    inline bool operator==(T* a, intrusive_ptr<U> const& b) noexcept
+    inline constexpr bool operator==(
+        T* a, hpx::intrusive_ptr<U> const& b) noexcept
     {
         return a == b.get();
     }
 
     template <typename T, typename U>
-    inline bool operator!=(T* a, intrusive_ptr<U> const& b) noexcept
+    inline constexpr bool operator!=(
+        T* a, hpx::intrusive_ptr<U> const& b) noexcept
     {
         return a != b.get();
     }
 
     template <typename T>
-    inline bool operator==(intrusive_ptr<T> const& p, std::nullptr_t) noexcept
+    inline constexpr bool operator==(
+        hpx::intrusive_ptr<T> const& p, std::nullptr_t) noexcept
     {
         return p.get() == nullptr;
     }
 
     template <typename T>
-    inline bool operator==(std::nullptr_t, intrusive_ptr<T> const& p) noexcept
+    inline constexpr bool operator==(
+        std::nullptr_t, hpx::intrusive_ptr<T> const& p) noexcept
     {
         return p.get() == nullptr;
     }
 
     template <typename T>
-    inline bool operator!=(intrusive_ptr<T> const& p, std::nullptr_t) noexcept
+    inline constexpr bool operator!=(
+        hpx::intrusive_ptr<T> const& p, std::nullptr_t) noexcept
     {
         return p.get() != nullptr;
     }
 
     template <typename T>
-    inline bool operator!=(std::nullptr_t, intrusive_ptr<T> const& p) noexcept
+    inline constexpr bool operator!=(
+        std::nullptr_t, hpx::intrusive_ptr<T> const& p) noexcept
     {
         return p.get() != nullptr;
     }
 
     template <typename T>
-    inline bool operator<(
-        intrusive_ptr<T> const& a, intrusive_ptr<T> const& b) noexcept
+    inline constexpr bool operator<(
+        hpx::intrusive_ptr<T> const& a, hpx::intrusive_ptr<T> const& b) noexcept
     {
         return std::less<T*>{}(a.get(), b.get());
     }
 
     template <typename T>
-    void swap(intrusive_ptr<T>& lhs, intrusive_ptr<T>& rhs) noexcept
+    void swap(hpx::intrusive_ptr<T>& lhs, hpx::intrusive_ptr<T>& rhs) noexcept
     {
         lhs.swap(rhs);
     }
 
     // mem_fn support
     template <typename T>
-    T* get_pointer(intrusive_ptr<T> const& p) noexcept
+    constexpr T* get_pointer(hpx::intrusive_ptr<T> const& p) noexcept
     {
         return p.get();
     }
 
     // pointer casts
     template <typename T, typename U>
-    intrusive_ptr<T> static_pointer_cast(intrusive_ptr<U> const& p)
+    constexpr hpx::intrusive_ptr<T> static_pointer_cast(
+        hpx::intrusive_ptr<U> const& p) noexcept
     {
         return static_cast<T*>(p.get());
     }
 
     template <typename T, typename U>
-    intrusive_ptr<T> const_pointer_cast(intrusive_ptr<U> const& p)
+    constexpr hpx::intrusive_ptr<T> const_pointer_cast(
+        hpx::intrusive_ptr<U> const& p) noexcept
     {
         return const_cast<T*>(p.get());
     }
 
     template <typename T, typename U>
-    intrusive_ptr<T> dynamic_pointer_cast(intrusive_ptr<U> const& p)
+    hpx::intrusive_ptr<T> dynamic_pointer_cast(hpx::intrusive_ptr<U> const& p)
     {
         return dynamic_cast<T*>(p.get());
     }
 
     template <typename T, typename U>
-    intrusive_ptr<T> static_pointer_cast(intrusive_ptr<U>&& p) noexcept
+    constexpr hpx::intrusive_ptr<T> static_pointer_cast(
+        hpx::intrusive_ptr<U>&& p) noexcept
     {
-        return intrusive_ptr<T>(static_cast<T*>(p.detach()), false);
+        return hpx::intrusive_ptr<T>(static_cast<T*>(p.detach()), false);
     }
 
     template <typename T, typename U>
-    intrusive_ptr<T> const_pointer_cast(intrusive_ptr<U>&& p) noexcept
+    constexpr hpx::intrusive_ptr<T> const_pointer_cast(
+        hpx::intrusive_ptr<U>&& p) noexcept
     {
-        return intrusive_ptr<T>(const_cast<T*>(p.detach()), false);
+        return hpx::intrusive_ptr<T>(const_cast<T*>(p.detach()), false);
     }
 
     template <typename T, typename U>
-    intrusive_ptr<T> dynamic_pointer_cast(intrusive_ptr<U>&& p) noexcept
+    hpx::intrusive_ptr<T> dynamic_pointer_cast(hpx::intrusive_ptr<U>&& p)
     {
         T* p2 = dynamic_cast<T*>(p.get());
 
-        intrusive_ptr<T> r(p2, false);
+        hpx::intrusive_ptr<T> r(p2, false);
 
         if (p2)
             p.detach();
@@ -313,35 +331,100 @@ namespace hpx { namespace memory {
 
     // operator<<
     template <typename Y>
-    std::ostream& operator<<(std::ostream& os, intrusive_ptr<Y> const& p)
+    std::ostream& operator<<(std::ostream& os, hpx::intrusive_ptr<Y> const& p)
     {
         os << p.get();
         return os;
     }
-}}    // namespace hpx::memory
+}    // namespace hpx
 
-namespace hpx {
+namespace hpx::memory {
 
     // hoist intrusive_ptr and friends into this namespace
-    using hpx::memory::intrusive_ptr;
+    template <typename T>
+    using intrusive_ptr HPX_DEPRECATED_V(1, 8,
+        "hpx::memory::intrusive_ptr is deprecated, use hpx::intrusive_ptr "
+        "instead") = hpx::intrusive_ptr<T>;
 
-    using hpx::memory::get_pointer;
+    template <typename T>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::memory::get_pointer is deprecated, use hpx::get_pointer instead")
+    constexpr T* get_pointer(hpx::intrusive_ptr<T> const& p) noexcept
+    {
+        return hpx::get_pointer(p);
+    }
 
-    using hpx::memory::const_pointer_cast;
-    using hpx::memory::dynamic_pointer_cast;
-    using hpx::memory::static_pointer_cast;
-}    // namespace hpx
+    template <typename T, typename U>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::memory::const_pointer_cast is deprecated, use "
+        "hpx::const_pointer_cast instead")
+    constexpr hpx::intrusive_ptr<T> const_pointer_cast(
+        hpx::intrusive_ptr<U> const& p) noexcept
+    {
+        return hpx::const_pointer_cast<T>(p);
+    }
+
+    template <typename T, typename U>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::memory::const_pointer_cast is deprecated, use "
+        "hpx::const_pointer_cast instead")
+    constexpr hpx::intrusive_ptr<T> const_pointer_cast(
+        hpx::intrusive_ptr<U>&& p) noexcept
+    {
+        return hpx::const_pointer_cast<T>(HPX_MOVE(p));
+    }
+
+    template <typename T, typename U>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::memory::dynamic_pointer_cast is deprecated, use "
+        "hpx::dynamic_pointer_cast instead")
+    constexpr hpx::intrusive_ptr<T> dynamic_pointer_cast(
+        hpx::intrusive_ptr<U> const& p)
+    {
+        return hpx::dynamic_pointer_cast<T>(p);
+    }
+
+    template <typename T, typename U>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::memory::dynamic_pointer_cast is deprecated, use "
+        "hpx::dynamic_pointer_cast instead")
+    constexpr hpx::intrusive_ptr<T> dynamic_pointer_cast(
+        hpx::intrusive_ptr<U>&& p)
+    {
+        return hpx::dynamic_pointer_cast<T>(HPX_MOVE(p));
+    }
+
+    template <typename T, typename U>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::memory::static_pointer_cast is deprecated, use "
+        "hpx::static_pointer_cast instead")
+    constexpr hpx::intrusive_ptr<T> static_pointer_cast(
+        hpx::intrusive_ptr<U> const& p) noexcept
+    {
+        return hpx::static_pointer_cast<T>(p);
+    }
+
+    template <typename T, typename U>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::memory::static_pointer_cast is deprecated, use "
+        "hpx::static_pointer_cast instead")
+    constexpr hpx::intrusive_ptr<T> static_pointer_cast(
+        hpx::intrusive_ptr<U>&& p) noexcept
+    {
+        return hpx::static_pointer_cast<T>(HPX_MOVE(p));
+    }
+}    // namespace hpx::memory
 
 namespace std {
 
     // support hashing
     template <typename T>
-    struct hash<hpx::memory::intrusive_ptr<T>>
+    struct hash<hpx::intrusive_ptr<T>>
     {
         using result_type = std::size_t;
 
-        result_type operator()(
-            hpx::memory::intrusive_ptr<T> const& p) const noexcept
+        constexpr result_type operator()(
+            hpx::intrusive_ptr<T> const& p) const noexcept
         {
             return hash<T*>{}(p.get());
         }

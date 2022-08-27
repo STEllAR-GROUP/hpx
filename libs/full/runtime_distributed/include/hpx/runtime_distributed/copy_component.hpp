@@ -41,12 +41,12 @@ namespace hpx { namespace components {
     ///
     template <typename Component>
 #if defined(DOXYGEN)
-    future<naming::id_type>
+    future<hpx::id_type>
 #else
     inline typename std::enable_if<traits::is_component<Component>::value,
-        future<naming::id_type>>::type
+        future<hpx::id_type>>::type
 #endif
-    copy(naming::id_type const& to_copy)
+    copy(hpx::id_type const& to_copy)
     {
         typedef server::copy_component_action_here<Component> action_type;
         return hpx::detail::async_colocated<action_type>(to_copy, to_copy);
@@ -71,12 +71,12 @@ namespace hpx { namespace components {
     ///
     template <typename Component>
 #if defined(DOXYGEN)
-    future<naming::id_type>
+    future<hpx::id_type>
 #else
     inline typename std::enable_if<traits::is_component<Component>::value,
-        future<naming::id_type>>::type
+        future<hpx::id_type>>::type
 #endif
-    copy(naming::id_type const& to_copy, naming::id_type const& target_locality)
+    copy(hpx::id_type const& to_copy, hpx::id_type const& target_locality)
     {
         typedef server::copy_component_action<Component> action_type;
         return hpx::detail::async_colocated<action_type>(
@@ -109,7 +109,7 @@ namespace hpx { namespace components {
     ///
     template <typename Derived, typename Stub>
     Derived copy(client_base<Derived, Stub> const& to_copy,
-        naming::id_type const& target_locality = naming::invalid_id)
+        hpx::id_type const& target_locality = hpx::invalid_id)
     {
         typedef typename client_base<Derived, Stub>::server_component_type
             component_type;

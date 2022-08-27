@@ -11,13 +11,13 @@
 #include <hpx/command_line_handling_local/command_line_handling_local.hpp>
 #include <hpx/coroutines/detail/context_impl.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
-#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/init_runtime_local/detail/init_logging.hpp>
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
@@ -72,7 +72,7 @@ namespace hpx {
     namespace detail {
 
         int init_helper(hpx::program_options::variables_map& /*vm*/,
-            util::function_nonser<int(int, char**)> const& f)
+            hpx::function<int(int, char**)> const& f)
         {
             std::string cmdline(
                 hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
@@ -279,10 +279,10 @@ namespace hpx {
                 }
 
                 if (!!startup)
-                    rt.add_startup_function(std::move(startup));
+                    rt.add_startup_function(HPX_MOVE(startup));
 
                 if (!!shutdown)
-                    rt.add_shutdown_function(std::move(shutdown));
+                    rt.add_shutdown_function(HPX_MOVE(shutdown));
 
                 if (vm.count("hpx:dump-config-initial"))
                 {
@@ -298,7 +298,7 @@ namespace hpx {
 
             ///////////////////////////////////////////////////////////////////////
             int run(hpx::runtime& rt,
-                util::function_nonser<int(
+                hpx::function<int(
                     hpx::program_options::variables_map& vm)> const& f,
                 hpx::program_options::variables_map& vm,
                 startup_function_type startup, shutdown_function_type shutdown)
@@ -306,18 +306,18 @@ namespace hpx {
                 LPROGRESS_;
 
                 add_startup_functions(
-                    rt, vm, std::move(startup), std::move(shutdown));
+                    rt, vm, HPX_MOVE(startup), HPX_MOVE(shutdown));
 
                 // Run this runtime instance using the given function f.
                 if (!f.empty())
-                    return rt.run(util::bind_front(f, vm));
+                    return rt.run(hpx::bind_front(f, vm));
 
                 // Run this runtime instance without an hpx_main
                 return rt.run();
             }
 
             int start(hpx::runtime& rt,
-                util::function_nonser<int(
+                hpx::function<int(
                     hpx::program_options::variables_map& vm)> const& f,
                 hpx::program_options::variables_map& vm,
                 startup_function_type startup, shutdown_function_type shutdown)
@@ -325,12 +325,12 @@ namespace hpx {
                 LPROGRESS_;
 
                 add_startup_functions(
-                    rt, vm, std::move(startup), std::move(shutdown));
+                    rt, vm, HPX_MOVE(startup), HPX_MOVE(shutdown));
 
                 if (!f.empty())
                 {
                     // Run this runtime instance using the given function f.
-                    return rt.start(util::bind_front(f, vm));
+                    return rt.start(hpx::bind_front(f, vm));
                 }
 
                 // Run this runtime instance without an hpx_main
@@ -343,13 +343,13 @@ namespace hpx {
             {
                 if (blocking)
                 {
-                    return run(*rt, cfg.hpx_main_f_, cfg.vm_,
-                        std::move(startup), std::move(shutdown));
+                    return run(*rt, cfg.hpx_main_f_, cfg.vm_, HPX_MOVE(startup),
+                        HPX_MOVE(shutdown));
                 }
 
                 // non-blocking version
-                start(*rt, cfg.hpx_main_f_, cfg.vm_, std::move(startup),
-                    std::move(shutdown));
+                start(*rt, cfg.hpx_main_f_, cfg.vm_, HPX_MOVE(startup),
+                    HPX_MOVE(shutdown));
 
                 // pointer to runtime is stored in TLS
                 hpx::runtime* p = rt.release();
@@ -433,7 +433,7 @@ namespace hpx {
 
             ///////////////////////////////////////////////////////////////////////
             int run_or_start(
-                util::function_nonser<int(
+                hpx::function<int(
                     hpx::program_options::variables_map& vm)> const& f,
                 int argc, char** argv, init_params const& params, bool blocking)
             {
@@ -517,8 +517,8 @@ namespace hpx {
                     LPROGRESS_ << "creating local runtime";
                     rt.reset(new hpx::runtime(cmdline.rtcfg_, true));
 
-                    result = run_or_start(blocking, std::move(rt), cmdline,
-                        std::move(params.startup), std::move(params.shutdown));
+                    result = run_or_start(blocking, HPX_MOVE(rt), cmdline,
+                        HPX_MOVE(params.startup), HPX_MOVE(params.shutdown));
                 }
                 catch (hpx::detail::command_line_error const& e)
                 {

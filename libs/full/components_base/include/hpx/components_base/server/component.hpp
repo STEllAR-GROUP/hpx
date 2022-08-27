@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <new>
+#include <type_traits>
 #include <utility>
 
 namespace hpx { namespace components { namespace detail {
@@ -30,7 +31,7 @@ namespace hpx { namespace components { namespace detail {
             HPX_ASSERT(1 == count);
             return alloc_.allocate(count);
         }
-        void free(void* p, std::size_t count)
+        void free(void* p, std::size_t count) noexcept
         {
             HPX_ASSERT(1 == count);
             alloc_.deallocate(static_cast<Component*>(p), count);
@@ -65,10 +66,14 @@ namespace hpx { namespace components {
         using derived_type = component_type;
         using heap_type = typename traits::component_heap_type<Component>::type;
 
+        constexpr component() = default;
+
         // Construct a component instance holding a new wrapped instance
-        template <typename... Ts>
-        component(Ts&&... vs)
-          : Component(std::forward<Ts>(vs)...)
+        template <typename T, typename... Ts,
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<std::decay_t<T>, component>>>
+        explicit component(T&& t, Ts&&... ts)
+          : Component(HPX_FORWARD(T, t), HPX_FORWARD(Ts, ts)...)
         {
         }
     };

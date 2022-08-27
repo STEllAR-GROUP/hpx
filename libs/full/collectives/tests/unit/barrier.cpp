@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -23,7 +23,7 @@
 void barrier_test(
     std::size_t num, std::size_t rank, std::atomic<std::size_t>& c)
 {
-    hpx::lcos::barrier b(
+    hpx::distributed::barrier b(
         hpx::util::format("local_barrier_test_{}", hpx::get_locality_id()), num,
         rank);
     ++c;
@@ -35,9 +35,9 @@ void barrier_test(
 ///////////////////////////////////////////////////////////////////////////////
 void local_tests(hpx::program_options::variables_map& vm)
 {
-    std::size_t pxthreads = 0;
-    if (vm.count("pxthreads"))
-        pxthreads = vm["pxthreads"].as<std::size_t>();
+    std::size_t threads = 0;
+    if (vm.count("threads"))
+        threads = vm["threads"].as<std::size_t>();
 
     std::size_t iterations = 0;
     if (vm.count("iterations"))
@@ -46,18 +46,19 @@ void local_tests(hpx::program_options::variables_map& vm)
     hpx::id_type here = hpx::find_here();
     for (std::size_t i = 0; i < iterations; ++i)
     {
+        hpx::distributed::barrier b(
+            hpx::util::format("local_barrier_test_{}", hpx::get_locality_id()),
+            threads + 1, 0);
+
         std::atomic<std::size_t> c(0);
-        for (std::size_t j = 1; j <= pxthreads; ++j)
+        for (std::size_t j = 1; j <= threads; ++j)
         {
-            hpx::async(&barrier_test, pxthreads + 1, j, std::ref(c));
+            hpx::async(&barrier_test, threads + 1, j, std::ref(c));
         }
 
-        hpx::lcos::barrier b(
-            hpx::util::format("local_barrier_test_{}", hpx::get_locality_id()),
-            pxthreads + 1, 0);
         b.wait();    // wait for all threads to enter the barrier
 
-        HPX_TEST_EQ(pxthreads, c.load());
+        HPX_TEST_EQ(threads, c.load());
     }
 }
 
@@ -70,7 +71,7 @@ void remote_test_multiple(hpx::program_options::variables_map& vm)
 
     char const* const barrier_test_name = "/test/barrier/multiple";
 
-    hpx::lcos::barrier b(barrier_test_name);
+    hpx::distributed::barrier b(barrier_test_name);
     for (std::size_t i = 0; i != iterations; ++i)
         b.wait();
 }
@@ -86,12 +87,12 @@ void remote_test_single(hpx::program_options::variables_map& vm)
         iterations = vm["iterations"].as<std::size_t>();
 
     char const* const barrier_test_name_outer = "/test/barrier/single_outer";
-    hpx::lcos::barrier outer(barrier_test_name_outer);
+    hpx::distributed::barrier outer(barrier_test_name_outer);
 
     char const* const barrier_test_name = "/test/barrier/single";
     for (std::size_t i = 0; i != iterations; ++i)
     {
-        hpx::lcos::barrier b(barrier_test_name);
+        hpx::distributed::barrier b(barrier_test_name);
         b.wait();
 
         outer.wait();
@@ -103,7 +104,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 {
     local_tests(vm);
 
-    remote_test_multiple(vm);
+    remote_test_single(vm);
     remote_test_multiple(vm);
 
     return hpx::finalize();
@@ -120,8 +121,8 @@ int main(int argc, char* argv[])
 
     // clang-format off
     desc_commandline.add_options()
-        ("pxthreads,T", value<std::size_t>()->default_value(64),
-            "the number of PX threads to invoke")
+        ("threads,T", value<std::size_t>()->default_value(64),
+            "the number of threads to invoke")
         ("iterations", value<std::size_t>()->default_value(64),
             "the number of times to repeat the test")
         ;

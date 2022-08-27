@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 Jan Melech
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,8 +9,8 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename Archive, typename T>
     void serialize_struct(Archive& ar, T& t, const unsigned int);
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

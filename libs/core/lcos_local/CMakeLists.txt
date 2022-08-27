@@ -13,7 +13,6 @@ set(lcos_local_headers
     hpx/lcos_local/composable_guard.hpp
     hpx/lcos_local/conditional_trigger.hpp
     hpx/lcos_local/detail/preprocess_future.hpp
-    hpx/lcos_local/packaged_task.hpp
     hpx/lcos_local/receive_buffer.hpp
     hpx/lcos_local/trigger.hpp
 )
@@ -26,7 +25,6 @@ set(lcos_local_compat_headers
     hpx/lcos/local/channel.hpp => hpx/include/local_lcos.hpp
     hpx/lcos/local/composable_guard.hpp => hpx/include/local_lcos.hpp
     hpx/lcos/local/conditional_trigger.hpp => hpx/include/local_lcos.hpp
-    hpx/lcos/local/packaged_task.hpp => hpx/future.hpp
     hpx/lcos/local/receive_buffer.hpp => hpx/include/local_lcos.hpp
     hpx/lcos/local/spmd_block.hpp => hpx/algorithms/parallel/spmd_block.hpp
     hpx/lcos/local/trigger.hpp => hpx/include/local_lcos.hpp
@@ -34,7 +32,6 @@ set(lcos_local_compat_headers
     hpx/local_lcos/channel.hpp => hpx/lcos_local/channel.hpp
     hpx/local_lcos/composable_guard.hpp => hpx/lcos_local/composable_guard.hpp
     hpx/local_lcos/conditional_trigger.hpp => hpx/lcos_local/conditional_trigger.hpp
-    hpx/local_lcos/packaged_task.hpp => hpx/lcos_local/packaged_task.hpp
     hpx/local_lcos/receive_buffer.hpp => hpx/lcos_local/receive_buffer.hpp
     hpx/local_lcos/spmd_block.hpp => hpx/lcos_local/spmd_block.hpp
     hpx/local_lcos/trigger.hpp => hpx/lcos_local/trigger.hpp
@@ -54,6 +51,7 @@ add_hpx_module(
     hpx_execution
     hpx_executors
     hpx_futures
+    hpx_lock_registration
     hpx_pack_traversal
     hpx_errors
     hpx_memory

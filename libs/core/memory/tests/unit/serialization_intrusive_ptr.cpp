@@ -30,12 +30,12 @@ struct A
     }
 };
 
-void intrusive_ptr_add_ref(A* a)
+void intrusive_ptr_add_ref(A* a) noexcept
 {
     ++a->count;
 }
 
-void intrusive_ptr_release(A* a)
+void intrusive_ptr_release(A* a) noexcept
 {
     if (--a->count == 0)
     {

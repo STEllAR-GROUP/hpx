@@ -60,8 +60,8 @@ bool MaybeThrowOnCopy::throwOnCopy = false;
 
 int main(int, char*[])
 {
-    hpx::util::function_nonser<int()> f;
-    hpx::util::function_nonser<int()> g;
+    hpx::function<int()> f;
+    hpx::function<int()> g;
 
     MaybeThrowOnCopy::throwOnCopy = false;
     f = MaybeThrowOnCopy(1);

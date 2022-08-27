@@ -23,7 +23,7 @@ int tss_total = 0;
 
 struct tss_value_t
 {
-    tss_value_t(hpx::lcos::local::promise<void> pp)
+    tss_value_t(hpx::promise<void> pp)
       : p(std::move(pp))
     {
         std::unique_lock<hpx::lcos::local::spinlock> lock(tss_mutex);
@@ -37,13 +37,13 @@ struct tss_value_t
         --tss_instances;
         p.set_value();
     }
-    hpx::lcos::local::promise<void> p;
+    hpx::promise<void> p;
     int value;
 };
 
 hpx::threads::thread_specific_ptr<tss_value_t> tss_value;
 
-void test_tss_thread(hpx::lcos::local::promise<void> p)
+void test_tss_thread(hpx::promise<void> p)
 {
     tss_value.reset(new tss_value_t(std::move(p)));
     for (int i = 0; i < 1000; ++i)
@@ -64,10 +64,11 @@ void test_tss()
 
     int const NUMTHREADS = 5;
 
-    std::vector<hpx::future<void>> threads(NUMTHREADS);
+    std::vector<hpx::future<void>> threads;
+    threads.reserve(NUMTHREADS);
     for (int i = 0; i < NUMTHREADS; ++i)
     {
-        hpx::lcos::local::promise<void> p;
+        hpx::promise<void> p;
         threads.push_back(p.get_future());
         // The future obtained from this promise will be set ready from the tss
         // variable's dtor. The tss destructors are called after the threads

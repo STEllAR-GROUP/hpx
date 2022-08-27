@@ -15,6 +15,7 @@
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/upper_lower_bound.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -124,7 +125,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         // first step, is applied to all partitions
         auto f1 = [=](set_chunk_data* curr_chunk,
-                      std::size_t part_size) -> void {
+                      std::size_t part_size) mutable -> void {
             HPX_ASSERT(part_size == 1);
             HPX_UNUSED(part_size);
 
@@ -140,15 +141,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             bool first_partition = (start1 == 0);
             bool last_partition = (end1 == std::size_t(len1));
 
-            auto start_value = hpx::util::invoke(proj1, first1[start1]);
-            auto end_value = hpx::util::invoke(proj1, first1[end1]);
+            auto start_value = HPX_INVOKE(proj1, first1[start1]);
+            auto end_value = HPX_INVOKE(proj1, first1[end1]);
 
             // all but the last chunk require special handling
             if (!last_partition)
             {
                 // this chunk will be handled by the next one if all
                 // elements of this partition are equal
-                if (!hpx::util::invoke(f, start_value, end_value))
+                if (!HPX_INVOKE(f, start_value, end_value))
                 {
                     return;
                 }
@@ -157,14 +158,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 // the last element of the current chunk
                 if (end1 != 0)
                 {
-                    auto end_value1 =
-                        hpx::util::invoke(proj1, first1[end1 - 1]);
+                    auto end_value1 = HPX_INVOKE(proj1, first1[end1 - 1]);
 
-                    while (!hpx::util::invoke(f, end_value1, end_value) &&
-                        --end1 != 0)
+                    while (!HPX_INVOKE(f, end_value1, end_value) && --end1 != 0)
                     {
-                        end_value = std::move(end_value1);
-                        end_value1 = hpx::util::invoke(proj1, first1[end1 - 1]);
+                        end_value = HPX_MOVE(end_value1);
+                        end_value1 = HPX_INVOKE(proj1, first1[end1 - 1]);
                     }
                 }
             }
@@ -173,14 +172,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             // the first element of the current chunk
             if (start1 != 0)
             {
-                auto start_value1 =
-                    hpx::util::invoke(proj1, first1[start1 - 1]);
+                auto start_value1 = HPX_INVOKE(proj1, first1[start1 - 1]);
 
-                while (!hpx::util::invoke(f, start_value1, start_value) &&
-                    --start1 != 0)
+                while (
+                    !HPX_INVOKE(f, start_value1, start_value) && --start1 != 0)
                 {
-                    start_value = std::move(start_value1);
-                    start_value1 = hpx::util::invoke(proj1, first1[start1 - 1]);
+                    start_value = HPX_MOVE(start_value1);
+                    start_value1 = HPX_INVOKE(proj1, first1[start1 - 1]);
                 }
             }
 
@@ -217,12 +215,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         // different versions of clang-format produce different formatting
         // clang-format off
         auto f2 = [buffer, chunks, cores, first1, first2, dest](
-                      std::vector<future<void>>&& data) -> result_type {
+                      auto&& data) -> result_type {
             // clang-format on
 
             // make sure iterators embedded in function object that is
             // attached to futures are invalidated
-            data.clear();
+            util::detail::clear_container(data);
 
             // accumulate real length and rightmost positions in input sequences
             std::size_t first1_pos = 0;
@@ -271,7 +269,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         // fill the buffer piecewise
         return parallel::util::partitioner<ExPolicy, result_type, void>::call(
-            policy, chunks.get(), cores, std::move(f1), std::move(f2));
+            policy, chunks.get(), cores, HPX_MOVE(f1), HPX_MOVE(f2));
     }
 
     /// \endcond

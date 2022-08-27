@@ -60,11 +60,11 @@ namespace hpx { namespace components {
             // Make sure we pin the component at construction of the bound object
             // which will also unpin it once the thread runs to completion (the
             // bound object goes out of scope).
-            return util::one_shot(util::bind_front(
+            return util::one_shot(hpx::bind_front(
                 &abstract_base_migration_support::thread_function,
                 get_lva<this_component_type>::call(lva),
                 traits::component_decorate_function<base_type>::call(
-                    lva, std::forward<F>(f)),
+                    lva, HPX_FORWARD(F, f)),
                 components::pinned_ptr::create<this_component_type>(lva)));
         }
 
@@ -96,9 +96,15 @@ namespace hpx { namespace components {
         using type_holder = Derived;
         using base_type_holder = Base;
 
-        template <typename... Ts>
-        abstract_migration_support(Ts&&... ts)
-          : abstract_base_type(std::forward<Ts>(ts)...)
+        using base_type::get_current_address;
+
+        abstract_migration_support() = default;
+
+        template <typename T, typename... Ts,
+            typename Enable = std::enable_if_t<
+                !std::is_same_v<std::decay_t<T>, abstract_migration_support>>>
+        abstract_migration_support(T&& t, Ts&&... ts)
+          : abstract_base_type(HPX_FORWARD(T, t), HPX_FORWARD(Ts, ts)...)
         {
         }
 

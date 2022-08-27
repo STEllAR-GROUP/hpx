@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,10 +14,12 @@
 #include <deque>
 #include <functional>
 #include <map>
+#include <type_traits>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache {
+namespace hpx::util::cache {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \class local_cache local_cache.hpp hpx/cache/local_cache.hpp
     ///
@@ -72,8 +74,12 @@ namespace hpx { namespace util { namespace cache {
         template <typename Func, typename Iterator>
         struct adapt
         {
-            adapt(Func f)
+            explicit adapt(Func const& f)
               : f_(f)
+            {
+            }
+            explicit adapt(Func&& f) noexcept
+              : f_(HPX_MOVE(f))
             {
             }
 
@@ -86,27 +92,27 @@ namespace hpx { namespace util { namespace cache {
         };
 
     public:
-        typedef Key key_type;
-        typedef Entry entry_type;
-        typedef UpdatePolicy update_policy_type;
-        typedef InsertPolicy insert_policy_type;
-        typedef CacheStorage storage_type;
-        typedef Statistics statistics_type;
+        using key_type = Key;
+        using entry_type = Entry;
+        using update_policy_type = UpdatePolicy;
+        using insert_policy_type = InsertPolicy;
+        using storage_type = CacheStorage;
+        using statistics_type = Statistics;
 
-        typedef typename entry_type::value_type value_type;
-        typedef typename storage_type::size_type size_type;
-        typedef typename storage_type::value_type storage_value_type;
+        using value_type = typename entry_type::value_type;
+        using size_type = typename storage_type::size_type;
+        using storage_value_type = typename storage_type::value_type;
 
     private:
-        typedef typename storage_type::iterator iterator;
-        typedef typename storage_type::const_iterator const_iterator;
+        using iterator = typename storage_type::iterator;
+        using const_iterator = typename storage_type::const_iterator;
 
-        typedef std::deque<iterator> heap_type;
-        typedef typename heap_type::iterator heap_iterator;
+        using heap_type = std::deque<iterator>;
+        using heap_iterator = typename heap_type::iterator;
 
-        typedef adapt<UpdatePolicy, iterator> adapted_update_policy_type;
+        using adapted_update_policy_type = adapt<UpdatePolicy, iterator>;
 
-        typedef typename statistics_type::update_on_exit update_on_exit;
+        using update_on_exit = typename statistics_type::update_on_exit;
 
     public:
         ///////////////////////////////////////////////////////////////////////
@@ -136,22 +142,13 @@ namespace hpx { namespace util { namespace cache {
         {
         }
 
-        local_cache(local_cache&& other)
-          : max_size_(other.max_size_)
-          , current_size_(other.current_size_)
-          , store_(std::move(other.store_))
-          , entry_heap_(std::move(other.entry_heap_))
-          , update_policy_(std::move(other.update_policy_.f_))
-          , insert_policy_(std::move(other.insert_policy_))
-          , statistics_(std::move(other.statistics_))
-        {
-        }
+        local_cache(local_cache&& other) = default;
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Return current size of the cache.
         ///
         /// \returns The current size of this cache instance.
-        size_type size() const
+        constexpr size_type size() const noexcept
         {
             return current_size_;
         }
@@ -166,7 +163,7 @@ namespace hpx { namespace util { namespace cache {
         /// \returns    The maximum size this cache instance is currently
         ///             allowed to reach. If this number is zero the cache has
         ///             no limitation with regard to a maximum size.
-        size_type capacity() const
+        constexpr size_type capacity() const noexcept
         {
             return max_size_;
         }
@@ -231,7 +228,7 @@ namespace hpx { namespace util { namespace cache {
         ///               referenced entry, otherwise it returns \a false.
         bool get_entry(key_type const& k, key_type& realkey, entry_type& val)
         {
-            update_on_exit update(statistics_, statistics::method_get_entry);
+            update_on_exit update(statistics_, statistics::method::get_entry);
 
             // locate the requested entry
             iterator it = store_.find(k);
@@ -255,6 +252,7 @@ namespace hpx { namespace util { namespace cache {
             // return the value
             realkey = (*it).first;
             val = (*it).second;
+
             return true;
         }
 
@@ -274,7 +272,7 @@ namespace hpx { namespace util { namespace cache {
         ///               referenced entry, otherwise it returns \a false.
         bool get_entry(key_type const& k, entry_type& val)
         {
-            update_on_exit update(statistics_, statistics::method_get_entry);
+            update_on_exit update(statistics_, statistics::method::get_entry);
 
             // locate the requested entry
             iterator it = store_.find(k);
@@ -297,6 +295,7 @@ namespace hpx { namespace util { namespace cache {
 
             // return the value
             val = (*it).second;
+
             return true;
         }
 
@@ -316,7 +315,7 @@ namespace hpx { namespace util { namespace cache {
         ///               referenced entry, otherwise it returns \a false.
         bool get_entry(key_type const& k, value_type& val)
         {
-            update_on_exit update(statistics_, statistics::method_get_entry);
+            update_on_exit update(statistics_, statistics::method::get_entry);
 
             // locate the requested entry
             iterator it = store_.find(k);
@@ -339,6 +338,7 @@ namespace hpx { namespace util { namespace cache {
 
             // return the value
             val = (*it).second.get();
+
             return true;
         }
 
@@ -371,6 +371,11 @@ namespace hpx { namespace util { namespace cache {
             return insert(k, e);
         }
 
+        bool insert(key_type const& k, value_type&& val)
+        {
+            return insert(k, entry_type(HPX_MOVE(val)));
+        }
+
         /// \brief Insert a new entry into this cache
         ///
         /// \param k      [in] The key for the entry which should be added to
@@ -393,9 +398,14 @@ namespace hpx { namespace util { namespace cache {
         /// \returns      This function returns \a true if the entry has been
         ///               successfully added to the cache, otherwise it returns
         ///               \a false.
-        bool insert(key_type const& k, entry_type& e)
+        template <typename Entry_,
+            std::enable_if_t<
+                std::is_convertible_v<std::decay_t<Entry_>, entry_type>, int> =
+                0>
+        bool insert(key_type const& k, Entry_&& e)
         {
-            update_on_exit update(statistics_, statistics::method_insert_entry);
+            update_on_exit update(
+                statistics_, statistics::method::insert_entry);
 
             // ask entry if it really wants to be inserted
             if (!insert_policy_(e) || !e.insert())
@@ -410,9 +420,8 @@ namespace hpx { namespace util { namespace cache {
             }
 
             // insert new entry to cache
-            typedef typename storage_type::value_type storage_value_type;
             std::pair<iterator, bool> p =
-                store_.insert(storage_value_type(k, e));
+                store_.insert(storage_value_type(k, HPX_FORWARD(Entry_, e)));
             if (!p.second)
                 return false;
 
@@ -451,20 +460,26 @@ namespace hpx { namespace util { namespace cache {
         ///               If the entry currently is not held by the cache it is
         ///               added and the return value reflects the outcome of
         ///               the corresponding insert operation.
-        bool update(key_type const& k, value_type const& val)
+        template <typename Value,
+            std::enable_if_t<
+                std::is_convertible_v<std::decay_t<Value>, value_type>, int> =
+                0>
+        bool update(key_type const& k, Value&& val)
         {
-            update_on_exit update(statistics_, statistics::method_update_entry);
+            update_on_exit update(
+                statistics_, statistics::method::update_entry);
 
             iterator it = store_.find(k);
             if (it == store_.end())
             {
                 // doesn't exist in this cache
                 statistics_.got_miss();    // update statistics
-                return insert(k, val);     // insert into cache
+                return insert(
+                    k, HPX_FORWARD(Value, val));    // insert into cache
             }
 
             // update cache entry
-            (*it).second.get() = val;
+            (*it).second.get() = HPX_FORWARD(Value, val);
 
             // touch the entry
             if ((*it).second.touch())
@@ -506,24 +521,28 @@ namespace hpx { namespace util { namespace cache {
         ///               If the entry currently is not held by the cache it is
         ///               added and the return value reflects the outcome of
         ///               the corresponding insert operation.
-        template <typename F>
-        bool update_if(key_type const& k, value_type const& val, F f)
+        template <typename F, typename Value,
+            typename = std::enable_if_t<
+                std::is_convertible_v<std::decay_t<Value>, value_type>>>
+        bool update_if(key_type const& k, Value&& val, F&& f)
         {
-            update_on_exit update(statistics_, statistics::method_update_entry);
+            update_on_exit update(
+                statistics_, statistics::method::update_entry);
 
             iterator it = store_.find(k);
             if (it == store_.end())
             {
                 // doesn't exist in this cache
                 statistics_.got_miss();    // update statistics
-                return insert(k, val);     // insert into cache
+                return insert(
+                    k, HPX_FORWARD(Value, val));    // insert into cache
             }
 
             if (!f(k, (*it).first))
                 return false;
 
             // update cache entry
-            (*it).second.get() = val;
+            (*it).second.get() = HPX_FORWARD(Value, val);
 
             // touch the entry
             if ((*it).second.touch())
@@ -560,9 +579,14 @@ namespace hpx { namespace util { namespace cache {
         ///               If the entry currently is not held by the cache it is
         ///               added and the return value reflects the outcome of
         ///               the corresponding insert operation.
-        bool update(key_type const& k, entry_type& e)
+        template <typename Entry_,
+            std::enable_if_t<
+                std::is_convertible_v<std::decay_t<Entry_>, entry_type>, int> =
+                0>
+        bool update(key_type const& k, Entry_&& e)
         {
-            update_on_exit update(statistics_, statistics::method_update_entry);
+            update_on_exit update(
+                statistics_, statistics::method::update_entry);
 
             iterator it = store_.find(k);
             if (it == store_.end())
@@ -581,7 +605,7 @@ namespace hpx { namespace util { namespace cache {
                 return false;    // entry doesn't want to be inserted
 
             // update cache entry
-            (*it).second = e;
+            (*it).second = HPX_FORWARD(Entry_, e);
 
             // touch the entry
             if ((*it).second.touch())
@@ -613,10 +637,10 @@ namespace hpx { namespace util { namespace cache {
         ///               entries (which is the sum of the values returned by
         ///               the \a entry#get_size functions of the removed
         ///               entries).
-        template <typename Func>
-        size_type erase(Func const& ep = policies::always<storage_value_type>())
+        template <typename Func = policies::always<storage_value_type>>
+        size_type erase(Func&& ep = Func())
         {
-            update_on_exit update(statistics_, statistics::method_erase_entry);
+            update_on_exit update(statistics_, statistics::method::erase_entry);
 
             size_type erased = 0;
             for (heap_iterator it = entry_heap_.begin();
@@ -696,12 +720,12 @@ namespace hpx { namespace util { namespace cache {
         ///
         /// \returns      This function returns a reference to the statistics
         ///               instance embedded inside this cache
-        statistics_type const& get_statistics() const
+        constexpr statistics_type const& get_statistics() const noexcept
         {
             return statistics_;
         }
 
-        statistics_type& get_statistics()
+        statistics_type& get_statistics() noexcept
         {
             return statistics_;
         }
@@ -779,4 +803,4 @@ namespace hpx { namespace util { namespace cache {
 
         statistics_type statistics_;    // embedded statistics instance
     };
-}}}    // namespace hpx::util::cache
+}    // namespace hpx::util::cache

@@ -125,9 +125,9 @@ namespace hpx { namespace performance_counters {
     private:
         mutable mutex_type mtx_;
 
-        std::vector<counter_info> infos_;     // counter instance names
-        std::vector<naming::id_type> ids_;    // global ids of counter instances
-        std::vector<std::uint8_t> reset_;     // != 0 if counter should be reset
+        std::vector<counter_info> infos_;    // counter instance names
+        std::vector<hpx::id_type> ids_;      // global ids of counter instances
+        std::vector<std::uint8_t> reset_;    // != 0 if counter should be reset
 
         mutable std::uint64_t invocation_count_;
         bool print_counters_locally_;    // handle only local counters

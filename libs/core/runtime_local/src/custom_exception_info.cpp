@@ -7,8 +7,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/futures/futures_factory.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
@@ -188,7 +188,7 @@ namespace hpx { namespace util {
         lcos::local::futures_factory<std::string()> p(
             [&bt]() { return bt.trace(); });
 
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         threads::thread_id_ref_type tid =
             p.apply("hpx::util::trace_on_new_stack",
                 launch::fork_policy(threads::thread_priority::default_,
@@ -287,7 +287,7 @@ namespace hpx { namespace detail {
         // be thrown and annotate it with all the local information we have
         try
         {
-            throw_with_info(e, std::move(info));
+            throw_with_info(e, HPX_MOVE(info));
         }
         catch (...)
         {
@@ -408,7 +408,7 @@ namespace hpx { namespace detail {
             state rts_state = rt->get_state();
             state_name = get_runtime_state_name(rts_state);
 
-            if (rts_state >= state_initialized && rts_state < state_stopped)
+            if (rts_state >= state::initialized && rts_state < state::stopped)
             {
                 hostname = get_runtime().here();
             }
@@ -416,7 +416,7 @@ namespace hpx { namespace detail {
 
         // if this is not a HPX thread we do not need to query neither for
         // the shepherd thread nor for the thread id
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         std::uint32_t node = get_locality_id(ec);
 
         std::size_t shepherd = std::size_t(-1);
@@ -426,7 +426,7 @@ namespace hpx { namespace detail {
         threads::thread_self* self = threads::get_self_ptr();
         if (nullptr != self)
         {
-            if (threads::threadmanager_is(state_running))
+            if (threads::threadmanager_is(hpx::state::running))
                 shepherd = hpx::get_worker_thread_num();
 
             thread_id = threads::get_self_id();

@@ -6,8 +6,8 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx_main.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_main.hpp>
 
 #include <iostream>
 #include <type_traits>
@@ -20,14 +20,14 @@ struct plain_data
 {
     static hpx::components::component_type get_component_type()
     {
-        return hpx::components::get_component_type<plain_data<Action> >();
+        return hpx::components::get_component_type<plain_data<Action>>();
     }
     static void set_component_type(hpx::components::component_type type)
     {
-        hpx::components::set_component_type<plain_data<Action> >(type);
+        hpx::components::set_component_type<plain_data<Action>>(type);
     }
 
-    static bool is_target_valid(hpx::naming::id_type const&)
+    static bool is_target_valid(hpx::id_type const&)
     {
         return true;
     }
@@ -36,25 +36,24 @@ struct plain_data
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T, typename Derived>
 struct data_get_action_base
-    : public hpx::actions::basic_action<plain_data<Derived>,
+  : public hpx::actions::basic_action<plain_data<Derived>,
         typename std::remove_pointer<T>::type(), Derived>
-{};
+{
+};
 
-template <typename T, T Data, typename Derived = hpx::actions::detail::this_type>
+template <typename T, T Data,
+    typename Derived = hpx::actions::detail::this_type>
 struct data_get_action
-    : public data_get_action_base<
-        typename std::remove_pointer<T>::type,
+  : public data_get_action_base<typename std::remove_pointer<T>::type,
         typename hpx::actions::detail::action_type<
-            data_get_action<T, Data, Derived>, Derived
-        >::type>
+            data_get_action<T, Data, Derived>, Derived>::type>
 {
     typedef std::false_type direct_execution;
 
     typedef typename std::remove_pointer<T>::type data_type;
 
     // Return the referenced data
-    static data_type invoke(
-        hpx::naming::address::address_type /*lva*/,
+    static data_type invoke(hpx::naming::address::address_type /*lva*/,
         hpx::naming::address::component_type /*comptype*/)
     {
         return *Data;
@@ -64,25 +63,23 @@ struct data_get_action
 ///////////////////////////////////////////////////////////////////////////
 template <typename T, typename Derived>
 struct data_set_action_base
-    : public hpx::actions::basic_action<plain_data<Derived>,
-        void(T), Derived>
-{};
+  : public hpx::actions::basic_action<plain_data<Derived>, void(T), Derived>
+{
+};
 
-template <typename T, T Data, typename Derived = hpx::actions::detail::this_type>
+template <typename T, T Data,
+    typename Derived = hpx::actions::detail::this_type>
 struct data_set_action
-    : public data_set_action_base<
-        typename std::remove_pointer<T>::type,
+  : public data_set_action_base<typename std::remove_pointer<T>::type,
         typename hpx::actions::detail::action_type<
-            data_set_action<T, Data, Derived>, Derived
-        >::type>
+            data_set_action<T, Data, Derived>, Derived>::type>
 {
     typedef typename std::remove_pointer<T>::type data_type;
 
     typedef std::false_type direct_execution;
 
     // Return the referenced data
-    static void invoke(
-        hpx::naming::address::address_type /*lva*/,
+    static void invoke(hpx::naming::address::address_type /*lva*/,
         hpx::naming::address::component_type /*comptype*/,
         data_type const& data)
     {
@@ -91,13 +88,13 @@ struct data_set_action
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-int data = 0;       // this variable is exposed using the actions below
+int data = 0;    // this variable is exposed using the actions below
 
 typedef data_get_action<decltype(&data), &data> get_action;
 typedef data_set_action<decltype(&data), &data> set_action;
 
-HPX_DEFINE_GET_COMPONENT_TYPE(plain_data<get_action>);
-HPX_DEFINE_GET_COMPONENT_TYPE(plain_data<set_action>);
+HPX_DEFINE_GET_COMPONENT_TYPE(plain_data<get_action>)
+HPX_DEFINE_GET_COMPONENT_TYPE(plain_data<set_action>)
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()

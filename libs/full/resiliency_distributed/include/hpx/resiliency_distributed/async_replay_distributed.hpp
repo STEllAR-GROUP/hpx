@@ -41,22 +41,21 @@ namespace hpx { namespace resiliency { namespace experimental {
             template <typename Pred_, typename Action_, typename Tuple_>
             distributed_async_replay_helper(
                 Pred_&& pred, Action_&& action, Tuple_&& tuple)
-              : pred_(std::forward<Pred_>(pred))
-              , action_(std::forward<Action_>(action))
-              , t_(std::forward<Tuple_>(tuple))
+              : pred_(HPX_FORWARD(Pred_, pred))
+              , action_(HPX_FORWARD(Action_, action))
+              , t_(HPX_FORWARD(Tuple_, tuple))
             {
             }
 
             template <std::size_t... Is>
             hpx::future<Result> invoke_distributed(
-                hpx::naming::id_type id, hpx::util::index_pack<Is...>)
+                hpx::id_type id, hpx::util::index_pack<Is...>)
             {
                 return hpx::async(action_, id, std::get<Is>(t_)...);
             }
 
             hpx::future<Result> call(
-                const std::vector<hpx::naming::id_type>& ids,
-                std::size_t iteration = 0)
+                const std::vector<hpx::id_type>& ids, std::size_t iteration = 0)
             {
                 hpx::future<Result> f = invoke_distributed(ids.at(iteration),
                     hpx::util::make_index_pack<
@@ -66,7 +65,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                 // necessary
                 auto this_ = this->shared_from_this();
                 return f.then(hpx::launch::sync,
-                    [this_ = std::move(this_), ids, iteration](
+                    [this_ = HPX_MOVE(this_), ids, iteration](
                         hpx::future<Result>&& f) {
                         if (f.has_exception())
                         {
@@ -87,7 +86,7 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                         auto&& result = f.get();
 
-                        if (!hpx::util::invoke(this_->pred_, result))
+                        if (!HPX_INVOKE(this_->pred_, result))
                         {
                             // execute the task again if an error occurred and
                             // this was not the last attempt
@@ -104,7 +103,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                         if (iteration != ids.size())
                         {
                             // return result
-                            return hpx::make_ready_future(std::move(result));
+                            return hpx::make_ready_future(HPX_MOVE(result));
                         }
 
                         // throw aborting exception as attempts were
@@ -131,9 +130,9 @@ namespace hpx { namespace resiliency { namespace experimental {
                 typename std::decay<Action>::type,
                 std::tuple<typename std::decay<Ts>::type...>>;
 
-            return std::make_shared<return_type>(std::forward<Pred>(pred),
-                std::forward<Action>(action),
-                std::make_tuple(std::forward<Ts>(ts)...));
+            return std::make_shared<return_type>(HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Action, action),
+                std::make_tuple(HPX_FORWARD(Ts, ts)...));
         }
     }    // namespace detail
 
@@ -143,19 +142,19 @@ namespace hpx { namespace resiliency { namespace experimental {
     // abort_replay_exception is thrown).
     template <typename Action, typename... Ts>
     hpx::future<typename hpx::util::detail::invoke_deferred_result<Action,
-        hpx::naming::id_type, Ts...>::type>
-    tag_dispatch(async_replay_t, const std::vector<hpx::naming::id_type>& ids,
+        hpx::id_type, Ts...>::type>
+    tag_invoke(async_replay_t, const std::vector<hpx::id_type>& ids,
         Action&& action, Ts&&... ts)
     {
         HPX_ASSERT(ids.size() > 0);
 
         using result_type =
             typename hpx::util::detail::invoke_deferred_result<Action,
-                hpx::naming::id_type, Ts...>::type;
+                hpx::id_type, Ts...>::type;
 
         auto helper = detail::make_distributed_async_replay_helper<result_type>(
-            detail::replay_validator{}, std::forward<Action>(action),
-            std::forward<Ts>(ts)...);
+            detail::replay_validator{}, HPX_FORWARD(Action, action),
+            HPX_FORWARD(Ts, ts)...);
 
         return helper->call(ids);
     }
@@ -166,20 +165,19 @@ namespace hpx { namespace resiliency { namespace experimental {
     // abort_replay_exception is thrown).
     template <typename Pred, typename Action, typename... Ts>
     hpx::future<typename hpx::util::detail::invoke_deferred_result<Action,
-        hpx::naming::id_type, Ts...>::type>
-    tag_dispatch(async_replay_validate_t,
-        const std::vector<hpx::naming::id_type>& ids, Pred&& pred,
-        Action&& action, Ts&&... ts)
+        hpx::id_type, Ts...>::type>
+    tag_invoke(async_replay_validate_t, const std::vector<hpx::id_type>& ids,
+        Pred&& pred, Action&& action, Ts&&... ts)
     {
         HPX_ASSERT(ids.size() > 0);
 
         using result_type =
             typename hpx::util::detail::invoke_deferred_result<Action,
-                hpx::naming::id_type, Ts...>::type;
+                hpx::id_type, Ts...>::type;
 
         auto helper = detail::make_distributed_async_replay_helper<result_type>(
-            std::forward<Pred>(pred), std::forward<Action>(action),
-            std::forward<Ts>(ts)...);
+            HPX_FORWARD(Pred, pred), HPX_FORWARD(Action, action),
+            HPX_FORWARD(Ts, ts)...);
 
         return helper->call(ids);
     }

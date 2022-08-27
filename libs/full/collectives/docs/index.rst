@@ -1,5 +1,5 @@
 ..
-    Copyright (c) 2019-2021 The STE||AR-Group
+    Copyright (c) 2019-2022 The STE||AR-Group
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -41,10 +41,10 @@ At this point the module exposes the following collective primitives:
 
 * :cpp:func:`hpx::lcos::broadcast`: performs a given action on all given global
   identifiers.
-* :cpp:class:`hpx::lcos::barrier`: distributed barrier.
+* :cpp:class:`hpx::distributed::barrier`: distributed barrier.
 * :cpp:func:`hpx::lcos::fold`: performs a fold with a given action on all given
   global identifiers.
-* :cpp:class:`hpx::lcos::latch`: distributed latch.
+* :cpp:class:`hpx::distributed::latch`: distributed latch.
 * :cpp:func:`hpx::lcos::reduce`: performs a reduction on data from each
   given global identifiers.
 * :cpp:class:`hpx::lcos::spmd_block`: performs the same operation on a local

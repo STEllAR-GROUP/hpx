@@ -21,7 +21,7 @@ hpx::id_type test_colocation()
 {
     return hpx::find_here();
 }
-HPX_PLAIN_ACTION(test_colocation);
+HPX_PLAIN_ACTION(test_colocation)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server : hpx::components::managed_component_base<test_server>
@@ -30,14 +30,14 @@ struct test_server : hpx::components::managed_component_base<test_server>
     {
         return hpx::find_here();
     }
-    HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action)
 };
 
 typedef hpx::components::managed_component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 typedef test_server::call_action call_action;
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION(call_action)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {
@@ -63,7 +63,7 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 void test(hpx::id_type there)
 {
     test_client t1 = hpx::new_<test_client>(there);
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), there);

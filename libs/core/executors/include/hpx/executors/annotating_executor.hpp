@@ -29,11 +29,12 @@ namespace hpx { namespace execution { namespace experimental {
     struct annotating_executor
     {
         template <typename Executor,
-            typename Enable =
-                std::enable_if_t<hpx::traits::is_executor_any_v<Executor>>>
+            typename Enable = std::enable_if_t<
+                hpx::traits::is_executor_any_v<Executor> &&
+                !std::is_same_v<std::decay_t<Executor>, annotating_executor>>>
         constexpr explicit annotating_executor(
             Executor&& exec, char const* annotation = nullptr)
-          : exec_(std::forward<Executor>(exec))
+          : exec_(HPX_FORWARD(Executor, exec))
           , annotation_(annotation)
         {
         }
@@ -42,9 +43,9 @@ namespace hpx { namespace execution { namespace experimental {
             typename Enable =
                 std::enable_if_t<hpx::traits::is_executor_any_v<Executor>>>
         explicit annotating_executor(Executor&& exec, std::string annotation)
-          : exec_(std::forward<Executor>(exec))
-          , annotation_(hpx::util::detail::store_function_annotation(
-                std::move(annotation)))
+          : exec_(HPX_FORWARD(Executor, exec))
+          , annotation_(
+                hpx::detail::store_function_annotation(HPX_MOVE(annotation)))
         {
         }
 
@@ -81,8 +82,8 @@ namespace hpx { namespace execution { namespace experimental {
         decltype(auto) post(F&& f, Ts&&... ts)
         {
             return parallel::execution::post(exec_,
-                hpx::util::annotated_function(std::forward<F>(f), annotation_),
-                std::forward<Ts>(ts)...);
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // OneWayExecutor interface
@@ -90,8 +91,8 @@ namespace hpx { namespace execution { namespace experimental {
         decltype(auto) sync_execute(F&& f, Ts&&... ts)
         {
             return parallel::execution::sync_execute(exec_,
-                hpx::util::annotated_function(std::forward<F>(f), annotation_),
-                std::forward<Ts>(ts)...);
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // TwoWayExecutor interface
@@ -99,16 +100,16 @@ namespace hpx { namespace execution { namespace experimental {
         decltype(auto) async_execute(F&& f, Ts&&... ts)
         {
             return parallel::execution::async_execute(exec_,
-                hpx::util::annotated_function(std::forward<F>(f), annotation_),
-                std::forward<Ts>(ts)...);
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename Future, typename... Ts>
         decltype(auto) then_execute(F&& f, Future&& predecessor, Ts&&... ts)
         {
             return parallel::execution::then_execute(exec_,
-                hpx::util::annotated_function(std::forward<F>(f), annotation_),
-                std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
+                HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkTwoWayExecutor interface
@@ -116,16 +117,16 @@ namespace hpx { namespace execution { namespace experimental {
         decltype(auto) bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
         {
             return parallel::execution::bulk_async_execute(exec_,
-                hpx::util::annotated_function(std::forward<F>(f), annotation_),
-                shape, std::forward<Ts>(ts)...);
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_), shape,
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename... Ts>
         decltype(auto) bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
         {
             return parallel::execution::bulk_sync_execute(exec_,
-                hpx::util::annotated_function(std::forward<F>(f), annotation_),
-                shape, std::forward<Ts>(ts)...);
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_), shape,
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
@@ -133,13 +134,12 @@ namespace hpx { namespace execution { namespace experimental {
             F&& f, S const& shape, Future&& predecessor, Ts&&... ts)
         {
             return parallel::execution::bulk_then_execute(exec_,
-                hpx::util::annotated_function(std::forward<F>(f), annotation_),
-                shape, std::forward<Future>(predecessor),
-                std::forward<Ts>(ts)...);
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_), shape,
+                HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
 
         // support with_annotation property
-        friend constexpr annotating_executor tag_dispatch(
+        friend constexpr annotating_executor tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             annotating_executor const& exec, char const* annotation)
         {
@@ -148,19 +148,18 @@ namespace hpx { namespace execution { namespace experimental {
             return exec_with_annotation;
         }
 
-        friend annotating_executor tag_dispatch(
+        friend annotating_executor tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             annotating_executor const& exec, std::string annotation)
         {
             auto exec_with_annotation = exec;
             exec_with_annotation.annotation_ =
-                hpx::util::detail::store_function_annotation(
-                    std::move(annotation));
+                hpx::detail::store_function_annotation(HPX_MOVE(annotation));
             return exec_with_annotation;
         }
 
         // support get_annotation property
-        friend constexpr char const* tag_dispatch(
+        friend constexpr char const* tag_invoke(
             hpx::execution::experimental::get_annotation_t,
             annotating_executor const& exec) noexcept
         {
@@ -197,11 +196,11 @@ namespace hpx { namespace execution { namespace experimental {
             hpx::traits::is_executor_any_v<Executor>
         )>
     // clang-format on
-    constexpr auto tag_fallback_dispatch(
+    constexpr auto tag_fallback_invoke(
         with_annotation_t, Executor&& exec, char const* annotation)
     {
         return annotating_executor<std::decay_t<Executor>>(
-            std::forward<Executor>(exec), annotation);
+            HPX_FORWARD(Executor, exec), annotation);
     }
 
     // clang-format off
@@ -210,11 +209,11 @@ namespace hpx { namespace execution { namespace experimental {
             hpx::traits::is_executor_any_v<Executor>
          )>
     // clang-format on
-    auto tag_fallback_dispatch(
+    auto tag_fallback_invoke(
         with_annotation_t, Executor&& exec, std::string annotation)
     {
         return annotating_executor<std::decay_t<Executor>>(
-            std::forward<Executor>(exec), std::move(annotation));
+            HPX_FORWARD(Executor, exec), HPX_MOVE(annotation));
     }
 }}}    // namespace hpx::execution::experimental
 

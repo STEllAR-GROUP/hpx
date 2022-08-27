@@ -270,7 +270,7 @@ namespace hpx { namespace ranges {
 #include <vector>
 
 namespace hpx { namespace ranges {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct adjacent_find_t final
+    inline constexpr struct adjacent_find_t final
       : hpx::detail::tag_parallel_algorithm<adjacent_find_t>
     {
     private:
@@ -289,13 +289,13 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(hpx::ranges::adjacent_find_t,
+        friend FwdIter tag_fallback_invoke(hpx::ranges::adjacent_find_t,
             FwdIter first, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::adjacent_find<FwdIter, FwdIter>()
-                .call(hpx::execution::seq, first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -316,13 +316,13 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::ranges::adjacent_find_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::adjacent_find_t, ExPolicy&& policy,
             FwdIter first, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::adjacent_find<FwdIter, FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -340,7 +340,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
-        tag_fallback_dispatch(hpx::ranges::adjacent_find_t, Rng&& rng,
+        tag_fallback_invoke(hpx::ranges::adjacent_find_t, Rng&& rng,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             using iterator_type =
@@ -353,7 +353,7 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::adjacent_find<iterator_type,
                 iterator_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng),
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -373,7 +373,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>::type
-        tag_fallback_dispatch(hpx::ranges::adjacent_find_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::adjacent_find_t, ExPolicy&& policy,
             Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             using iterator_type =
@@ -385,9 +385,9 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::adjacent_find<iterator_type,
                 iterator_type>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng),
-                    std::end(rng), std::forward<Pred>(pred),
-                    std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
+                    std::end(rng), HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
     } adjacent_find{};
 }}    // namespace hpx::ranges

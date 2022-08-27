@@ -26,6 +26,7 @@ set(performance_counters_headers
     hpx/performance_counters/locality_namespace_counters.hpp
     hpx/performance_counters/manage_counter.hpp
     hpx/performance_counters/manage_counter_type.hpp
+    hpx/performance_counters/parcelhandler_counter_types.hpp
     hpx/performance_counters/per_action_data_counter_discoverer.hpp
     hpx/performance_counters/performance_counter.hpp
     hpx/performance_counters/performance_counter_base.hpp
@@ -61,6 +62,7 @@ set(performance_counters_sources
     locality_namespace_counters.cpp
     manage_counter.cpp
     manage_counter_type.cpp
+    parcelhandler_counter_types.cpp
     per_action_data_counter_discoverer.cpp
     performance_counter.cpp
     performance_counter_set.cpp
@@ -72,6 +74,7 @@ set(performance_counters_sources
     server/action_invocation_counter.cpp
     server/arithmetics_counter.cpp
     server/arithmetics_counter_extended.cpp
+    server/base_performance_counter.cpp
     server/component_instance_counter.cpp
     server/elapsed_time_counter.cpp
     server/per_action_data_counters.cpp
@@ -89,12 +92,16 @@ add_hpx_module(
   DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES
     hpx_actions
+    hpx_actions_base
     hpx_agas
-    hpx_async_colocated
+    hpx_agas_base
     hpx_async_distributed
+    hpx_components
+    hpx_components_base
     hpx_naming
+    hpx_naming_base
+    hpx_parcelset
     hpx_runtime_components
-    hpx_runtime_distributed
     hpx_statistics
   CMAKE_SUBDIRS examples tests
 )

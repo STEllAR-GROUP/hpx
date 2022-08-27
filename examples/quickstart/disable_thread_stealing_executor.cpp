@@ -52,14 +52,14 @@ namespace executor_example {
         static void mark_begin_execution(Parameters&&)
         {
             hpx::threads::remove_scheduler_mode(
-                hpx::threads::policies::enable_stealing);
+                hpx::threads::policies::scheduler_mode::enable_stealing);
         }
 
         template <typename Parameters>
         static void mark_end_execution(Parameters&&)
         {
             hpx::threads::add_scheduler_mode(
-                hpx::threads::policies::enable_stealing);
+                hpx::threads::policies::scheduler_mode::enable_stealing);
         }
     };
 
@@ -121,7 +121,7 @@ int hpx_main()
     auto exec = executor_example::make_disable_thread_stealing_executor(
         hpx::execution::par.executor());
 
-    hpx::for_loop(
+    hpx::experimental::for_loop(
         hpx::execution::par.on(exec), 0, v.size(), [](std::size_t) {});
 
     return hpx::local::finalize();

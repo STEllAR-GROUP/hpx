@@ -17,6 +17,6 @@
 namespace hpx { namespace performance_counters {
     /// Install a new performance counter in a way, which will uninstall it
     /// automatically during shutdown.
-    HPX_EXPORT void install_counter(naming::id_type const& id,
+    HPX_EXPORT void install_counter(hpx::id_type const& id,
         counter_info const& info, error_code& ec = throws);
 }}    // namespace hpx::performance_counters

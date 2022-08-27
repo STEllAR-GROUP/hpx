@@ -47,12 +47,16 @@ function(add_hpx_module libname modulename)
       ${HPX_ENABLED_MODULES} ${modulename}
       CACHE INTERNAL "List of enabled HPX modules" FORCE
   )
+  list(SORT HPX_ENABLED_MODULES)
+  list(REMOVE_DUPLICATES HPX_ENABLED_MODULES)
 
   set(HPX_${libname_upper}_ENABLED_MODULES
       ${HPX_${libname_upper}_ENABLED_MODULES} ${modulename}
       CACHE INTERNAL "List of enabled HPX modules in the ${libname} library"
             FORCE
   )
+  list(SORT HPX_${libname_upper}_ENABLED_MODULES)
+  list(REMOVE_DUPLICATES HPX_${libname_upper}_ENABLED_MODULES)
 
   # Main directories of the module
   set(SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -189,9 +193,9 @@ function(add_hpx_module libname modulename)
     hpx_debug(${header_file})
   endforeach(header_file)
 
-  # NOTE: the modules belonging to libhpx still have cyclic dependencies. We
-  # keep those as static libraries.
-  if("${libname}" STREQUAL "full")
+  # NOTE: We optionally keep the modules as static libraries as otherwise cmake
+  # may run out of memory.
+  if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES)
     set(module_library_type STATIC)
   else()
     set(module_library_type OBJECT)
@@ -385,22 +389,22 @@ function(add_hpx_module libname modulename)
   endif()
 
   # Link modules to their higher-level libraries
-  if("${libname}" STREQUAL "full")
-    set(_module_target hpx_${modulename})
+  if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES)
     if(UNIX)
       if(APPLE)
         set(_module_target "-Wl,-all_load" "hpx_${modulename}")
-      else(APPLE) # not apple, regular linux
+      else()
+        # not apple, regular linux
         set(_module_target "-Wl,--whole-archive" "hpx_${modulename}"
                            "-Wl,--no-whole-archive"
         )
-      endif(APPLE)
+      endif()
     elseif(MSVC)
+      set(_module_target hpx_${modulename})
       target_link_libraries(
         hpx_${libname} PRIVATE -WHOLEARCHIVE:$<TARGET_FILE:hpx_${modulename}>
       )
     endif()
-
     target_link_libraries(hpx_${libname} PRIVATE ${_module_target})
 
     get_target_property(

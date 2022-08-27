@@ -13,29 +13,31 @@
 
 #include "inspector.hpp"
 
-namespace boost
-{
-  namespace inspect
-  {
+namespace boost { namespace inspect {
     class crlf_check : public source_inspector
     {
-      long m_files_with_errors;
+        long m_files_with_errors;
+
     public:
+        crlf_check();
+        virtual const char* name() const
+        {
+            return "*EOL*";
+        }
+        virtual const char* desc() const
+        {
+            return "invalid (cr only) line-ending";
+        }
 
-      crlf_check();
-      virtual const char * name() const { return "*EOL*"; }
-      virtual const char * desc() const { return "invalid (cr only) line-ending"; }
+        virtual void inspect(const std::string& library_name,
+            const path& full_path, const std::string& contents);
 
-      virtual void inspect(
-        const std::string & library_name,
-        const path & full_path,
-        const std::string & contents );
+        virtual void print_summary(std::ostream& out)
+        {
+            out << "  " << m_files_with_errors
+                << " files with invalid line endings" << line_break();
+        }
 
-      virtual void print_summary(std::ostream& out)
-        { out << "  " << m_files_with_errors << " files with invalid line endings" << line_break(); }
-
-      virtual ~crlf_check() {}
+        virtual ~crlf_check() {}
     };
-  }
-}
-
+}}    // namespace boost::inspect

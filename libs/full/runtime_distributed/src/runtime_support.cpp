@@ -24,7 +24,7 @@ namespace hpx { namespace components { namespace server {
         if (!f.empty())
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            pre_startup_functions_.push_back(std::move(f));
+            pre_startup_functions_.push_back(HPX_MOVE(f));
         }
     }
 
@@ -33,7 +33,7 @@ namespace hpx { namespace components { namespace server {
         if (!f.empty())
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            startup_functions_.push_back(std::move(f));
+            startup_functions_.push_back(HPX_MOVE(f));
         }
     }
 
@@ -42,7 +42,7 @@ namespace hpx { namespace components { namespace server {
         if (!f.empty())
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            pre_shutdown_functions_.push_back(std::move(f));
+            pre_shutdown_functions_.push_back(HPX_MOVE(f));
         }
     }
 
@@ -51,7 +51,7 @@ namespace hpx { namespace components { namespace server {
         if (!f.empty())
         {
             std::lock_guard<lcos::local::spinlock> l(globals_mtx_);
-            shutdown_functions_.push_back(std::move(f));
+            shutdown_functions_.push_back(HPX_MOVE(f));
         }
     }
 }}}    // namespace hpx::components::server
@@ -60,8 +60,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
 
     /// \brief Invoke an asynchronous garbage collection step on the given target
     ///        locality.
-    void garbage_collect_non_blocking_id(
-        naming::id_type const& id, error_code& ec)
+    void garbage_collect_non_blocking_id(hpx::id_type const& id, error_code& ec)
     {
         try
         {
@@ -78,7 +77,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
 
     /// \brief Invoke a synchronous garbage collection step on the given target
     ///        locality.
-    void garbage_collect_id(naming::id_type const& id, error_code& ec)
+    void garbage_collect_id(hpx::id_type const& id, error_code& ec)
     {
         try
         {

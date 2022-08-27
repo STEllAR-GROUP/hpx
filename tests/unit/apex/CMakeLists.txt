@@ -49,9 +49,9 @@ foreach(launch ${launch_types_})
   set(REGEX_MATCH_C_ "${REGEX_MATCH_C_}.*3-${launch}Unwrapping Continuation")
 endforeach()
 
-# annotate_function with std::string and char*
+# scoped_annotation with std::string and char*
 foreach(type "char" "string")
-  set(REGEX_MATCH_ANN_ "${REGEX_MATCH_ANN_}.*4-${type} annotate_function")
+  set(REGEX_MATCH_ANN_ "${REGEX_MATCH_ANN_}.*4-${type} scoped_annotation")
 endforeach()
 
 set_tests_properties(

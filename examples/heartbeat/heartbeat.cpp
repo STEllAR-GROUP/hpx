@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx_init.hpp>
 #include <hpx/chrono.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/future.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/threadmanager.hpp>
@@ -32,9 +32,9 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-void stop_monitor(std::shared_ptr<hpx::lcos::promise<void> > p)
+void stop_monitor(std::shared_ptr<hpx::distributed::promise<void>> p)
 {
-    p->set_value();      // Kill the monitor.
+    p->set_value();    // Kill the monitor.
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -48,9 +48,9 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
     hpx::performance_counters::performance_counter c(name);
     if (!c.get_id())
     {
-        hpx::util::format_to(std::cout,
-            "error: performance counter not found ({})",
-            name) << std::endl;
+        hpx::util::format_to(
+            std::cout, "error: performance counter not found ({})", name)
+            << std::endl;
         return 1;
     }
 
@@ -59,16 +59,16 @@ int monitor(double runfor, std::string const& name, std::uint64_t pause)
     {
         hpx::util::format_to(std::cout,
             "error: cannot query performance counters on its own locality ({})",
-            name) << std::endl;
+            name)
+            << std::endl;
         return 1;
     }
 
-    std::shared_ptr<hpx::lcos::promise<void> > stop_flag =
-        std::make_shared<hpx::lcos::promise<void> >();
+    std::shared_ptr<hpx::distributed::promise<void>> stop_flag =
+        std::make_shared<hpx::distributed::promise<void>>();
     hpx::future<void> f = stop_flag->get_future();
 
-    hpx::register_shutdown_function(
-        hpx::util::bind(&stop_monitor, stop_flag));
+    hpx::register_shutdown_function(hpx::bind(&stop_monitor, stop_flag));
 
     std::int64_t zero_time = 0;
 
@@ -121,21 +121,21 @@ int hpx_main(hpx::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options.
-    hpx::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    hpx::program_options::options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
     using hpx::program_options::value;
-    desc_commandline.add_options()
-        ( "name", value<std::string>()->default_value(
-              "/threadqueue{locality#0/total}/length")
-        , "symbolic name of the performance counter")
+    desc_commandline.add_options()("name",
+        value<std::string>()->default_value(
+            "/threadqueue{locality#0/total}/length"),
+        "symbolic name of the performance counter")
 
-        ( "pause", value<std::uint64_t>()->default_value(500)
-        , "milliseconds between each performance counter query")
+        ("pause", value<std::uint64_t>()->default_value(500),
+            "milliseconds between each performance counter query")
 
-        ( "runfor", value<double>()->default_value(-1)
-        , "time to wait before this application exits ([s], default: run forever)")
-        ;
+            ("runfor", value<double>()->default_value(-1),
+                "time to wait before this application exits ([s], default: run "
+                "forever)");
 
 #if defined(HPX_WINDOWS) && HPX_USE_WINDOWS_PERFORMANCE_COUNTERS != 0
     hpx::register_startup_function(&install_windows_counters);
@@ -143,9 +143,7 @@ int main(int argc, char* argv[])
 
     // Initialize and run HPX, enforce connect mode as we connect to an existing
     // application.
-    std::vector<std::string> const cfg = {
-        "hpx.run_hpx_main!=1"
-    };
+    std::vector<std::string> const cfg = {"hpx.run_hpx_main!=1"};
 
     hpx::init_params init_args;
     init_args.mode = hpx::runtime_mode::connect;

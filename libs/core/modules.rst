@@ -51,6 +51,7 @@ Core modules
    /libs/core/iterator_support/docs/index.rst
    /libs/core/itt_notify/docs/index.rst
    /libs/core/lcos_local/docs/index.rst
+   /libs/core/lock_registration/docs/index.rst
    /libs/core/logging/docs/index.rst
    /libs/core/memory/docs/index.rst
    /libs/core/mpi_base/docs/index.rst
@@ -69,7 +70,7 @@ Core modules
    /libs/core/static_reinit/docs/index.rst
    /libs/core/string_util/docs/index.rst
    /libs/core/synchronization/docs/index.rst
-   /libs/core/tag_dispatch/docs/index.rst
+   /libs/core/tag_invoke/docs/index.rst
    /libs/core/testing/docs/index.rst
    /libs/core/thread_pool_util/docs/index.rst
    /libs/core/thread_pools/docs/index.rst

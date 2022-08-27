@@ -293,7 +293,7 @@ namespace hpx { namespace threads {
         int get_numa_domain(const void* addr) const;
 
         /// Free memory that was previously allocated by allocate
-        void deallocate(void* addr, std::size_t len) const;
+        void deallocate(void* addr, std::size_t len) const noexcept;
 
         void print_vector(
             std::ostream& os, std::vector<std::size_t> const& v) const;
@@ -412,7 +412,7 @@ namespace hpx { namespace threads {
     ///////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT topology& create_topology();
 
-    HPX_NODISCARD HPX_CORE_EXPORT unsigned int hardware_concurrency();
+    [[nodiscard]] HPX_CORE_EXPORT unsigned int hardware_concurrency();
 
     ///////////////////////////////////////////////////////////////////////////
     // abstract away memory page size, calls to system functions are

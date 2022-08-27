@@ -18,8 +18,8 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
@@ -37,16 +37,16 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables
-bool header = true; // print csv heading
-double k = 0.5;     // heat transfer coefficient
-double dt = 1.;     // time step
-double dx = 1.;     // grid spacing
+bool header = true;    // print csv heading
+double k = 0.5;        // heat transfer coefficient
+double dt = 1.;        // time step
+double dx = 1.;        // grid spacing
 
 inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 {
-    if(i == 0 && dir == -1)
-        return size-1;
-    if(i == size-1 && dir == +1)
+    if (i == 0 && dir == -1)
+        return size - 1;
+    if (i == size - 1 && dir == +1)
         return 0;
 
     HPX_ASSERT((i + dir) < size);
@@ -67,24 +67,37 @@ private:
 public:
     partition_data()
       : size_(0)
-    {}
+    {
+    }
 
     explicit partition_data(std::size_t size)
-      : data_(new double [size]), size_(size)
-    {}
+      : data_(new double[size])
+      , size_(size)
+    {
+    }
 
     partition_data(std::size_t size, double initial_value)
-      : data_(new double [size]), size_(size)
+      : data_(new double[size])
+      , size_(size)
     {
         double base_value = double(initial_value * size);
         for (std::size_t i = 0; i != size; ++i)
             data_[i] = base_value + double(i);
     }
 
-    double& operator[](std::size_t idx) { return data_[idx]; }
-    double operator[](std::size_t idx) const { return data_[idx]; }
+    double& operator[](std::size_t idx)
+    {
+        return data_[idx];
+    }
+    double operator[](std::size_t idx) const
+    {
+        return data_[idx];
+    }
 
-    std::size_t size() const { return size_; }
+    std::size_t size() const
+    {
+        return size_;
+    }
 
 private:
     // Serialization support: even if all of the code below runs on one
@@ -119,19 +132,20 @@ std::ostream& operator<<(std::ostream& os, partition_data const& c)
 // This is the server side representation of the data. We expose this as a HPX
 // component which allows for it to be created and accessed remotely through
 // a global address (hpx::id_type).
-struct partition_server
-  : hpx::components::component_base<partition_server>
+struct partition_server : hpx::components::component_base<partition_server>
 {
     // construct new instances
     partition_server() {}
 
     partition_server(partition_data const& data)
       : data_(data)
-    {}
+    {
+    }
 
     partition_server(std::size_t size, double initial_value)
       : data_(size, initial_value)
-    {}
+    {
+    }
 
     // access data
     partition_data get_data() const
@@ -143,7 +157,8 @@ struct partition_server
     // wrapped into a component action. The macro below defines a new type
     // 'get_data_action' which represents the (possibly remote) member function
     // partition::get_data().
-    HPX_DEFINE_COMPONENT_DIRECT_ACTION(partition_server, get_data, get_data_action);
+    HPX_DEFINE_COMPONENT_DIRECT_ACTION(
+        partition_server, get_data, get_data_action)
 
 private:
     partition_data data_;
@@ -155,12 +170,12 @@ private:
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
 typedef hpx::components::component<partition_server> partition_server_type;
-HPX_REGISTER_COMPONENT(partition_server_type, partition_server);
+HPX_REGISTER_COMPONENT(partition_server_type, partition_server)
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.
 typedef partition_server::get_data_action get_data_action;
-HPX_REGISTER_ACTION(get_data_action);
+HPX_REGISTER_ACTION(get_data_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // This is a client side helper class allowing to hide some of the tedious
@@ -174,24 +189,29 @@ struct partition : hpx::components::client_base<partition, partition_server>
     // Create new component on locality 'where' and initialize the held data
     partition(hpx::id_type where, std::size_t size, double initial_value)
       : base_type(hpx::new_<partition_server>(where, size, initial_value))
-    {}
+    {
+    }
 
     // Create a new component on the locality co-located to the id 'where'. The
     // new instance will be initialized from the given partition_data.
-    partition(hpx::id_type where, partition_data && data)
-      : base_type(hpx::new_<partition_server>(hpx::colocated(where), std::move(data)))
-    {}
+    partition(hpx::id_type where, partition_data&& data)
+      : base_type(
+            hpx::new_<partition_server>(hpx::colocated(where), std::move(data)))
+    {
+    }
 
     // Attach a future representing a (possibly remote) partition.
-    partition(hpx::future<hpx::id_type> && id)
+    partition(hpx::future<hpx::id_type>&& id)
       : base_type(std::move(id))
-    {}
+    {
+    }
 
     // Unwrap a future<partition> (a partition already holds a future to the id of the
     // referenced object, thus unwrapping accesses this inner future).
-    partition(hpx::future<partition> && c)
+    partition(hpx::future<partition>&& c)
       : base_type(std::move(c))
-    {}
+    {
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // Invoke the (remote) member function which gives us access to the data.
@@ -211,7 +231,7 @@ struct stepper
     // Our operator
     static double heat(double left, double middle, double right)
     {
-        return middle + (k*dt/(dx*dx)) * (left - 2*middle + right);
+        return middle + (k * dt / (dx * dx)) * (left - 2 * middle + right);
     }
 
     // The partitioned operator, it invokes the heat operator above on all elements
@@ -223,32 +243,29 @@ struct stepper
         std::size_t size = middle.size();
         partition_data next(size);
 
-        next[0] = heat(left[size-1], middle[0], middle[1]);
+        next[0] = heat(left[size - 1], middle[0], middle[1]);
 
-        for (std::size_t i = 1; i != size-1; ++i)
-            next[i] = heat(middle[i-1], middle[i], middle[i+1]);
+        for (std::size_t i = 1; i != size - 1; ++i)
+            next[i] = heat(middle[i - 1], middle[i], middle[i + 1]);
 
-        next[size-1] = heat(middle[size-2], middle[size-1], right[0]);
+        next[size - 1] = heat(middle[size - 2], middle[size - 1], right[0]);
 
         return next;
     }
 
-    static partition heat_part(partition const& left, partition const& middle,
-        partition const& right)
+    static partition heat_part(
+        partition const& left, partition const& middle, partition const& right)
     {
         using hpx::dataflow;
         using hpx::unwrapping;
 
         return dataflow(
-            unwrapping(
-                [middle](partition_data const& l, partition_data const& m,
-                    partition_data const& r)
-                {
-                    // The new partition_data will be allocated on the same
-                    // locality as 'middle'.
-                    return partition(middle.get_id(), heat_part_data(l, m, r));
-                }
-            ),
+            unwrapping([middle](partition_data const& l,
+                           partition_data const& m, partition_data const& r) {
+                // The new partition_data will be allocated on the same
+                // locality as 'middle'.
+                return partition(middle.get_id(), heat_part_data(l, m, r));
+            }),
             left.get_data(), middle.get_data(), right.get_data());
     }
 
@@ -261,7 +278,7 @@ struct stepper
 // those remotely. The macro HPX_PLAIN_ACTION() defines a new action type
 // 'heat_part_action' which wraps the global function heat_part(). It can be
 // used to call that function on a given locality.
-HPX_PLAIN_ACTION(stepper::heat_part, heat_part_action);
+HPX_PLAIN_ACTION(stepper::heat_part, heat_part_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
@@ -272,17 +289,17 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
 
     // U[t][i] is the state of position i at time t.
     std::vector<space> U(2);
-    for (space& s: U)
+    for (space& s : U)
         s.resize(np);
 
     // Initial conditions: f(0, i) = i
     for (std::size_t i = 0; i != np; ++i)
         U[0][i] = partition(hpx::find_here(), nx, double(i));
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    using hpx::util::placeholders::_3;
-    auto Op = hpx::util::bind(heat_part_action(), hpx::find_here(), _1, _2, _3);
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
+    using hpx::placeholders::_3;
+    auto Op = hpx::bind(heat_part_action(), hpx::find_here(), _1, _2, _3);
 
     // Actual time step loop
     for (std::size_t t = 0; t != nt; ++t)
@@ -292,10 +309,8 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
 
         for (std::size_t i = 0; i != np; ++i)
         {
-            next[i] = dataflow(
-                    hpx::launch::async, Op,
-                    current[idx(i, -1, np)], current[i], current[idx(i, +1, np)]
-                );
+            next[i] = dataflow(hpx::launch::async, Op, current[idx(i, -1, np)],
+                current[i], current[idx(i, +1, np)]);
         }
     }
 
@@ -306,9 +321,10 @@ stepper::space stepper::do_work(std::size_t np, std::size_t nx, std::size_t nt)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    std::uint64_t np = vm["np"].as<std::uint64_t>();   // Number of partitions.
-    std::uint64_t nx = vm["nx"].as<std::uint64_t>();   // Number of grid points.
-    std::uint64_t nt = vm["nt"].as<std::uint64_t>();   // Number of steps.
+    std::uint64_t np = vm["np"].as<std::uint64_t>();    // Number of partitions.
+    std::uint64_t nx =
+        vm["nx"].as<std::uint64_t>();    // Number of grid points.
+    std::uint64_t nt = vm["nt"].as<std::uint64_t>();    // Number of steps.
 
     if (vm.count("no-header"))
         header = false;
@@ -331,15 +347,15 @@ int hpx_main(hpx::program_options::variables_map& vm)
     {
         for (std::size_t i = 0; i != np; ++i)
         {
-            std::cout << "U[" << i << "] = "
-                      << solution[i].get_data().get()
+            std::cout << "U[" << i << "] = " << solution[i].get_data().get()
                       << std::endl;
         }
     }
 
     std::uint64_t const num_worker_threads = hpx::get_num_worker_threads();
     hpx::future<std::uint32_t> locs = hpx::get_num_localities();
-    print_time_results(locs.get(),num_worker_threads, elapsed, nx, np, nt, header);
+    print_time_results(
+        locs.get(), num_worker_threads, elapsed, nx, np, nt, header);
 
     return hpx::finalize();
 }
@@ -349,22 +365,18 @@ int main(int argc, char* argv[])
     using namespace hpx::program_options;
 
     options_description desc_commandline;
-    desc_commandline.add_options()
-        ("results", "print generated results (default: false)")
-        ("nx", value<std::uint64_t>()->default_value(10),
-         "Local x dimension (of each partition)")
-        ("nt", value<std::uint64_t>()->default_value(45),
-         "Number of time steps")
-        ("np", value<std::uint64_t>()->default_value(10),
-         "Number of partitions")
-        ("k", value<double>(&k)->default_value(0.5),
-         "Heat transfer coefficient (default: 0.5)")
-        ("dt", value<double>(&dt)->default_value(1.0),
-         "Timestep unit (default: 1.0[s])")
-        ("dx", value<double>(&dx)->default_value(1.0),
-         "Local x dimension")
-        ( "no-header", "do not print out the csv header row")
-    ;
+    desc_commandline.add_options()(
+        "results", "print generated results (default: false)")("nx",
+        value<std::uint64_t>()->default_value(10),
+        "Local x dimension (of each partition)")("nt",
+        value<std::uint64_t>()->default_value(45),
+        "Number of time steps")("np", value<std::uint64_t>()->default_value(10),
+        "Number of partitions")("k", value<double>(&k)->default_value(0.5),
+        "Heat transfer coefficient (default: 0.5)")("dt",
+        value<double>(&dt)->default_value(1.0),
+        "Timestep unit (default: 1.0[s])")(
+        "dx", value<double>(&dx)->default_value(1.0), "Local x dimension")(
+        "no-header", "do not print out the csv header row");
 
     // Initialize and run HPX
     hpx::init_params init_args;

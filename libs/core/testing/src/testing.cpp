@@ -25,7 +25,7 @@ namespace hpx { namespace util {
 
     void set_test_failure_handler(test_failure_handler_type f)
     {
-        test_failure_handler = f;
+        test_failure_handler = HPX_MOVE(f);
     }
 
     namespace detail {
@@ -69,8 +69,11 @@ namespace hpx { namespace util {
             return std::size_t(-1);
         }
 
-        fixture global_fixture{std::cerr};
-
+        fixture& global_fixture()
+        {
+            static fixture fixture_(std::cerr);
+            return fixture_;
+        }
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
@@ -81,8 +84,8 @@ namespace hpx { namespace util {
 
     int report_errors(std::ostream& stream)
     {
-        std::size_t sanity = detail::global_fixture.get(counter_sanity),
-                    test = detail::global_fixture.get(counter_test);
+        std::size_t sanity = detail::global_fixture().get(counter_sanity),
+                    test = detail::global_fixture().get(counter_test);
         if (sanity == 0 && test == 0)
             return 0;
 

@@ -16,8 +16,7 @@
 #include "partition.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace interpolate1d
-{
+namespace interpolate1d {
     // This class encapsulates N partitions and dispatches requests based on
     // the given values to get interpolated results for.
     class HPX_COMPONENT_EXPORT interpolate1d
@@ -32,8 +31,7 @@ namespace interpolate1d
         // Return the interpolated  function value for the given argument. This
         // function dispatches to the proper partition for the actual
         // interpolation.
-        hpx::lcos::future<double>
-        interpolate_async(double value) const
+        hpx::future<double> interpolate_async(double value) const
         {
             return get_partition(value).interpolate_async(value);
         }
@@ -50,14 +48,11 @@ namespace interpolate1d
 
         // initialize the partitions and store the mappings
         void fill_partitions(std::string const& datafilename,
-            hpx::future<std::vector<partition> > && partitions);
+            hpx::future<std::vector<partition>>&& partitions);
 
     private:
         std::vector<partition> partitions_;
         std::uint64_t num_elements_;
         double minval_, delta_;
     };
-}
-
-
-
+}    // namespace interpolate1d

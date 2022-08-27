@@ -21,10 +21,6 @@ if(HPX_WITH_TESTS_UNIT)
   set(unit_FLAGS ON)
 endif()
 
-if(HPX_WITH_TESTS_HEADERS)
-  set(subdirs ${subdirs} headers)
-endif()
-
 foreach(subdir ${subdirs})
   add_subdirectory(${subdir})
 endforeach()

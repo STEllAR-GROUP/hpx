@@ -43,15 +43,15 @@ struct A : hpx::components::managed_component_base<A>
     {
         return test0();
     }
-    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action);
+    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action)
 };
 
 typedef hpx::components::managed_component<A> serverA_type;
-HPX_REGISTER_COMPONENT(serverA_type, A);
+HPX_REGISTER_COMPONENT(serverA_type, A)
 
 typedef A::test0_action test0_action;
-HPX_REGISTER_ACTION_DECLARATION(test0_action);
-HPX_REGISTER_ACTION(test0_action);
+HPX_REGISTER_ACTION_DECLARATION(test0_action)
+HPX_REGISTER_ACTION(test0_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Concrete
@@ -87,15 +87,15 @@ struct B
     {
         return "B";
     }
-    HPX_DEFINE_COMPONENT_ACTION(B, test1, test1_action);
+    HPX_DEFINE_COMPONENT_ACTION(B, test1, test1_action)
 };
 
 typedef hpx::components::managed_component<B> serverB_type;
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(serverB_type, B, "A");
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(serverB_type, B, "A")
 
 typedef B::test1_action test1_action;
-HPX_REGISTER_ACTION_DECLARATION(test1_action);
-HPX_REGISTER_ACTION(test1_action);
+HPX_REGISTER_ACTION_DECLARATION(test1_action)
+HPX_REGISTER_ACTION(test1_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct clientA : hpx::components::client_base<clientA, A>

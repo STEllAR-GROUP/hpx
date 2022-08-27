@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +12,7 @@
 #include <hpx/config/endian.hpp>
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/serialization/basic_archive.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/detail/raw_ptr.hpp>
@@ -27,33 +29,55 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     struct input_archive : basic_archive<input_archive>
     {
         using base_type = basic_archive<input_archive>;
 
         template <typename Container>
-        input_archive(Container& buffer, std::size_t inbound_data_size = 0,
-            const std::vector<serialization_chunk>* chunks = nullptr)
+        explicit input_archive(Container& buffer,
+            std::size_t inbound_data_size = 0,
+            std::vector<serialization_chunk> const* chunks = nullptr)
           : base_type(0U)
           , buffer_(new input_container<Container>(
                 buffer, chunks, inbound_data_size))
         {
-            // endianness needs to be saves separately as it is needed to
+            // endianness needs to be saved separately as it is needed to
             // properly interpret the flags
 
             // FIXME: make bool once integer compression is implemented
             std::uint64_t endianness = 0ul;
             load(endianness);
             if (endianness)
-                this->base_type::flags_ = hpx::serialization::endian_big;
+            {
+                flags_ = std::uint32_t(
+                    hpx::serialization::archive_flags::endian_big);
+            }
 
-            // load flags sent by the other end to make sure both ends have
-            // the same assumptions about the archive format
+#if !defined(HPX_SERIALIZATION_HAVE_SUPPORTS_ENDIANESS)
+            if ((endianness && (endian::native == endian::little)) ||
+                (!endianness && (endian::native == endian::big)))
+            {
+                HPX_THROW_EXCEPTION(hpx::bad_request,
+                    "hpx::serialization::input_archive::input_archive",
+                    "Converting endianness is not supported by the "
+                    "serialization library, please reconfigure HPX with "
+                    "-DHPX_SERIALIZATION_WITH_SUPPORTS_ENDIANESS=On");
+            }
+#endif
+            // Load flags sent by the other end to make sure both ends have
+            // the same assumptions about the archive format. It is safe to
+            // overwrite the flags_ now.
             std::uint32_t flags = 0;
             load(flags);
-            this->base_type::flags_ = flags;
+            flags_ = flags;
+
+            // load the zero-copy limit used by the other end
+            std::size_t zero_copy_serialization_threshold;
+            load(zero_copy_serialization_threshold);
+            buffer_->set_zero_copy_serialization_threshold(
+                zero_copy_serialization_threshold);
 
             bool has_filter = false;
             load(has_filter);
@@ -67,27 +91,85 @@ namespace hpx { namespace serialization {
         }
 
         template <typename T>
-        void invoke_impl(T& t)
+        HPX_FORCEINLINE void invoke(T& t)
         {
             load(t);
         }
 
         template <typename T>
-        std::enable_if_t<!std::is_integral_v<T> && !std::is_enum_v<T>> load(
-            T& t)
+        HPX_FORCEINLINE void invoke_impl(T& t)
         {
-            using use_optimized = std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable_v<T> ||
-                    !hpx::traits::is_not_bitwise_serializable_v<T>>;
-
-            load_bitwise(t, use_optimized());
+            load(t);
         }
 
         template <typename T>
-        std::enable_if_t<std::is_integral_v<T> || std::is_enum_v<T>> load(
-            T& t)    //-V659
+        void load(T& t)
         {
-            load_integral(t, std::is_unsigned<T>());
+#if !defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
+            static_assert(!std::is_pointer_v<T>,
+                "HPX does not support serialization of raw pointers. "
+                "Please use smart pointers instead.");
+#endif
+            if constexpr (!std::is_integral_v<T> && !std::is_enum_v<T>)
+            {
+                if constexpr (hpx::traits::is_bitwise_serializable_v<T> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<T>)
+                {
+                    // bitwise serialization
+                    static_assert(!std::is_abstract_v<T>,
+                        "Can not bitwise serialize a class that is abstract");
+
+#if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
+                    if (disable_array_optimization() || endianess_differs())
+                    {
+                        access::serialize(*this, t, 0);
+                        return;
+                    }
+#else
+                    HPX_ASSERT(
+                        !(disable_array_optimization() || endianess_differs()));
+#endif
+                    load_binary(&t, sizeof(t));
+                }
+                else if constexpr (traits::is_nonintrusive_polymorphic_v<T>)
+                {
+                    // non-bitwise polymorphic serialization
+                    detail::polymorphic_nonintrusive_factory::instance().load(
+                        *this, t);
+                }
+                else
+                {
+                    // non-bitwise normal serialization
+                    access::serialize(*this, t, 0);
+                }
+            }
+#if defined(HPX_SERIALIZATION_HAVE_SUPPORTS_ENDIANESS)
+            else if constexpr (std::is_unsigned_v<T>)
+            {
+                std::uint64_t ul;
+                load_integral(ul);
+                t = static_cast<T>(ul);
+            }
+            else
+            {
+                std::int64_t l;
+                load_integral(l);
+                t = static_cast<T>(l);
+            }
+#else
+            else if constexpr (std::is_unsigned_v<T>)
+            {
+                std::uint64_t ul;
+                load_binary(&ul, sizeof(std::uint64_t));
+                t = static_cast<T>(ul);
+            }
+            else
+            {
+                std::int64_t ul;
+                load_binary(&ul, sizeof(std::int64_t));
+                t = static_cast<T>(ul);
+            }
+#endif
         }
 
         void load(float& f)
@@ -105,6 +187,16 @@ namespace hpx { namespace serialization {
             load_binary(&c, sizeof(char));
         }
 
+        void load(signed char& c)
+        {
+            load_binary(&c, sizeof(signed char));
+        }
+
+        void load(unsigned char& c)
+        {
+            load_binary(&c, sizeof(unsigned char));
+        }
+
         void load(bool& b)
         {
             load_binary(&b, sizeof(bool));
@@ -119,96 +211,33 @@ namespace hpx { namespace serialization {
         }
 #endif
 
-        std::size_t bytes_read() const
+        constexpr std::size_t bytes_read() const noexcept
         {
-            return size_;
+            return current_pos();
         }
 
         // this function is needed to avoid a MSVC linker error
-        std::size_t current_pos() const
+        constexpr std::size_t current_pos() const noexcept
         {
-            return basic_archive<input_archive>::current_pos();
+            return base_type::current_pos();
         }
 
     private:
         friend struct basic_archive<input_archive>;
 
-        template <typename T>
-        friend class array;
-
-        template <typename T>
-        void load_bitwise(T& t, std::false_type)
+#if defined(HPX_SERIALIZATION_HAVE_SUPPORTS_ENDIANESS)
+        template <typename Promoted>
+        void load_integral(Promoted& l)
         {
-            load_nonintrusively_polymorphic(
-                t, hpx::traits::is_nonintrusive_polymorphic<T>());
+            load_binary(&l, sizeof(Promoted));
+            if (endianess_differs())
+            {
+                reverse_bytes(sizeof(Promoted), reinterpret_cast<char*>(&l));
+            }
         }
-
-        template <typename T>
-        void load_bitwise(T& t, std::true_type)
-        {
-            static_assert(!std::is_abstract<T>::value,
-                "Can not bitwise serialize a class that is abstract");
-
-            bool archive_endianess_differs =
-                endian::native == endian::big ? endian_little() : endian_big();
-
-#if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
-            if (disable_array_optimization() || archive_endianess_differs)
-            {
-                access::serialize(*this, t, 0);
-            }
-            else
-            {
-                load_binary(&t, sizeof(t));
-            }
-#else
-            (void) archive_endianess_differs;
-            HPX_ASSERT(
-                !(disable_array_optimization() || archive_endianess_differs));
-            load_binary(&t, sizeof(t));
 #endif
-        }
 
-        template <class T>
-        void load_nonintrusively_polymorphic(T& t, std::false_type)
-        {
-            access::serialize(*this, t, 0);
-        }
-
-        template <class T>
-        void load_nonintrusively_polymorphic(T& t, std::true_type)
-        {
-            detail::polymorphic_nonintrusive_factory::instance().load(*this, t);
-        }
-
-        template <typename T>
-        void load_integral(T& val, std::false_type)
-        {
-            std::int64_t l;
-            load_integral_impl(l);
-            val = static_cast<T>(l);
-        }
-
-        template <typename T>
-        void load_integral(T& val, std::true_type)
-        {
-            std::uint64_t ul;
-            load_integral_impl(ul);
-            val = static_cast<T>(ul);
-        }
-        template <class Promoted>
-        void load_integral_impl(Promoted& l)
-        {
-            const std::size_t size = sizeof(Promoted);
-            char* cptr = reinterpret_cast<char*>(&l);    //-V206
-            load_binary(cptr, static_cast<std::size_t>(size));
-
-            const bool endianess_differs =
-                endian::native == endian::big ? endian_little() : endian_big();
-            if (endianess_differs)
-                reverse_bytes(size, cptr);
-        }
-
+    public:
         void load_binary(void* address, std::size_t count)
         {
             if (0 == count)
@@ -232,10 +261,9 @@ namespace hpx { namespace serialization {
             size_ += count;
         }
 
+    private:
         std::unique_ptr<erased_input_container> buffer_;
     };
-
-    //
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
 #include <hpx/config/warnings_suffix.hpp>

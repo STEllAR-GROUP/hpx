@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -43,13 +43,13 @@ namespace hpx { namespace detail {
         {
             if constexpr (std::is_void_v<R>)
             {
-                HPX_INVOKE(std::forward<F>(f), std::move(vs)...);
+                HPX_INVOKE(HPX_FORWARD(F, f), HPX_MOVE(vs)...);
                 return make_ready_future();
             }
             else
             {
                 return make_ready_future<R>(
-                    HPX_INVOKE(std::forward<F>(f), std::move(vs)...));
+                    HPX_INVOKE(HPX_FORWARD(F, f), HPX_MOVE(vs)...));
             }
         }
         catch (...)
@@ -76,11 +76,11 @@ namespace hpx { namespace detail {
             if (policy == launch::sync)
             {
                 return detail::call_sync(
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
-            lcos::local::futures_factory<result_type()> p(util::deferred_call(
-                std::forward<F>(f), std::forward<Ts>(ts)...));
+            lcos::local::futures_factory<result_type()> p(
+                util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
             if (hpx::detail::has_async_policy(policy))
             {
                 threads::thread_id_ref_type tid =
@@ -98,8 +98,8 @@ namespace hpx { namespace detail {
 
                     auto&& result = p.get_future();
                     traits::detail::get_shared_state(result)->set_on_completed(
-                        [tid = std::move(tid)]() { (void) tid; });
-                    return std::move(result);
+                        [tid = HPX_MOVE(tid)]() { (void) tid; });
+                    return HPX_MOVE(result);
                 }
             }
             return p.get_future();
@@ -113,8 +113,8 @@ namespace hpx { namespace detail {
             Ts&&... ts)
         {
             return call(policy, desc,
-                threads::detail::get_self_or_default_pool(), std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
@@ -125,8 +125,8 @@ namespace hpx { namespace detail {
         {
             hpx::util::thread_description desc(f);
             return call(policy, desc,
-                threads::detail::get_self_or_default_pool(), std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
@@ -135,8 +135,7 @@ namespace hpx { namespace detail {
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(hpx::detail::sync_policy, F&& f, Ts&&... ts)
         {
-            return detail::call_sync(
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return detail::call_sync(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
@@ -152,8 +151,8 @@ namespace hpx { namespace detail {
             using result_type =
                 util::detail::invoke_deferred_result_t<F, Ts...>;
 
-            lcos::local::futures_factory<result_type()> p(util::deferred_call(
-                std::forward<F>(f), std::forward<Ts>(ts)...));
+            lcos::local::futures_factory<result_type()> p(
+                util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
             threads::thread_id_ref_type tid =
                 p.apply(pool, desc.get_description(), policy);
@@ -163,8 +162,8 @@ namespace hpx { namespace detail {
                 // keep thread alive, if needed
                 auto&& result = p.get_future();
                 traits::detail::get_shared_state(result)->set_on_completed(
-                    [tid = std::move(tid)]() { (void) tid; });
-                return std::move(result);
+                    [tid = HPX_MOVE(tid)]() { (void) tid; });
+                return HPX_MOVE(result);
             }
             return p.get_future();
         }
@@ -177,8 +176,8 @@ namespace hpx { namespace detail {
         {
             hpx::util::thread_description desc(f);
             return call(policy, desc,
-                threads::detail::get_self_or_default_pool(), std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
@@ -194,8 +193,8 @@ namespace hpx { namespace detail {
             using result_type =
                 util::detail::invoke_deferred_result_t<F, Ts...>;
 
-            lcos::local::futures_factory<result_type()> p(util::deferred_call(
-                std::forward<F>(f), std::forward<Ts>(ts)...));
+            lcos::local::futures_factory<result_type()> p(
+                util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
             threads::thread_id_ref_type tid =
                 p.apply(pool, desc.get_description(), policy);
@@ -214,8 +213,8 @@ namespace hpx { namespace detail {
                 // keep thread alive, if needed
                 auto&& result = p.get_future();
                 traits::detail::get_shared_state(result)->set_on_completed(
-                    [tid = std::move(tid)]() { (void) tid; });
-                return std::move(result);
+                    [tid = HPX_MOVE(tid)]() { (void) tid; });
+                return HPX_MOVE(result);
             }
             return p.get_future();
         }
@@ -228,8 +227,8 @@ namespace hpx { namespace detail {
         {
             hpx::util::thread_description desc(f);
             return call(policy, desc,
-                threads::detail::get_self_or_default_pool(), std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
@@ -241,8 +240,8 @@ namespace hpx { namespace detail {
             using result_type =
                 util::detail::invoke_deferred_result_t<F, Ts...>;
 
-            lcos::local::futures_factory<result_type()> p(util::deferred_call(
-                std::forward<F>(f), std::forward<Ts>(ts)...));
+            lcos::local::futures_factory<result_type()> p(
+                util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
             return p.get_future();
         }

@@ -106,7 +106,7 @@ namespace hpx { namespace cuda { namespace experimental {
         }
 
         HPX_HOST_DEVICE target(target&& rhs) noexcept
-          : handle_(std::move(rhs.handle_))
+          : handle_(HPX_MOVE(rhs.handle_))
         {
         }
 
@@ -123,7 +123,7 @@ namespace hpx { namespace cuda { namespace experimental {
         {
             if (&rhs != this)
             {
-                handle_ = std::move(rhs.handle_);
+                handle_ = HPX_MOVE(rhs.handle_);
             }
             return *this;
         }
@@ -174,12 +174,5 @@ namespace hpx { namespace cuda { namespace experimental {
     using detail::get_future_with_callback;
     HPX_CORE_EXPORT target& get_default_target();
 }}}    // namespace hpx::cuda::experimental
-
-namespace hpx { namespace compute { namespace cuda {
-    using target HPX_DEPRECATED_V(1, 6,
-        "hpx::compute::cuda::target is deprecated. Please use "
-        "hpx::cuda::experimental::target instead.") =
-        hpx::cuda::experimental::target;
-}}}    // namespace hpx::compute::cuda
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -25,7 +25,6 @@ namespace hpx { namespace actions {
         base_disconnect_action_id,
         base_set_event_action_id,
         base_set_exception_action_id,
-        broadcast_call_shutdown_functions_action_id,
         broadcast_call_startup_functions_action_id,
         broadcast_symbol_namespace_on_event_action_id,
         call_shutdown_functions_action_id,
@@ -176,8 +175,6 @@ namespace hpx { namespace actions {
         base_lco_with_value_parcelset_endpoints_set,
         base_lco_with_value_vector_compute_host_target_get,
         base_lco_with_value_vector_compute_host_target_set,
-        base_lco_with_value_vector_compute_cuda_target_get,
-        base_lco_with_value_vector_compute_cuda_target_set,
 
         // typed continuations...
         typed_continuation_hpx_agas_response,

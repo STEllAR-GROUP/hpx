@@ -54,7 +54,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             FwdIter output = last;
 
             util::invoke_projected<Pred, Proj> pred_projected{
-                std::forward<Pred>(pred), std::forward<Proj>(proj)};
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
 
             if (sit == send)
             {
@@ -87,8 +87,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
                 FwdIter ending = traits::compose(sit, std::prev(end));
                 if (!found &&
-                    hpx::util::invoke(
-                        pred_projected, *ending, *std::next(ending)))
+                    HPX_INVOKE(pred_projected, *ending, *std::next(ending)))
                 {
                     found = true;
                     output = traits::compose(sit, std::prev(end));
@@ -113,7 +112,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             }
                         }
                         ending = traits::compose(sit, std::prev(end));
-                        if (hpx::util::invoke(
+                        if (HPX_INVOKE(
                                 pred_projected, *ending, *std::next(ending)) &&
                             !found)
                         {
@@ -138,7 +137,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     }
                 }
             }
-            return result::get(std::move(output));
+            return result::get(HPX_MOVE(output));
         }
 
         // parallel remote implementation
@@ -170,7 +169,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             between_segments.reserve(std::distance(sit, send));
 
             util::invoke_projected<Pred, Proj> pred_projected{
-                std::forward<Pred>(pred), std::forward<Proj>(proj)};
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
 
             if (sit == send)
             {
@@ -256,23 +255,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::list<std::exception_ptr> errors;
                     parallel::util::detail::handle_remote_exceptions<
                         ExPolicy>::call(r, errors);
-                    std::vector<FwdIter> res = hpx::unwrap(std::move(r));
+                    std::vector<FwdIter> res = hpx::unwrap(HPX_MOVE(r));
                     auto it = res.begin();
                     int i = 0;
                     while (it != res.end())
                     {
                         if (*it != last)
                             return *it;
-                        if (hpx::util::invoke(pred_projected,
+                        if (HPX_INVOKE(pred_projected,
                                 *std::prev(between_segments[i]),
                                 *(between_segments[i])))
+                        {
                             return std::prev(between_segments[i]);
+                        }
                         ++it;
                         i += 1;
                     }
                     return res.back();
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
         /// \endcond
     }    // namespace detail
@@ -289,7 +290,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<InIter>::value
         )>
     // clang-format on
-    InIter tag_dispatch(
+    InIter tag_invoke(
         hpx::adjacent_find_t, InIter first, InIter last, Pred&& pred = Pred())
     {
         static_assert((hpx::traits::is_input_iterator<InIter>::value),
@@ -306,7 +307,7 @@ namespace hpx { namespace segmented {
             hpx::parallel::v1::detail::adjacent_find<
                 typename iterator_traits::local_iterator,
                 typename iterator_traits::local_iterator>(),
-            hpx::execution::seq, first, last, std::forward<Pred>(pred),
+            hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
             hpx::parallel::util::projection_identity(), std::true_type());
     }
 
@@ -321,7 +322,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         SegIter>::type
-    tag_dispatch(hpx::adjacent_find_t, ExPolicy&& policy, SegIter first,
+    tag_invoke(hpx::adjacent_find_t, ExPolicy&& policy, SegIter first,
         SegIter last, Pred&& pred)
     {
         static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
@@ -334,7 +335,7 @@ namespace hpx { namespace segmented {
             using result =
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     SegIter>;
-            return result::get(std::move(first));
+            return result::get(HPX_MOVE(first));
         }
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
@@ -343,8 +344,7 @@ namespace hpx { namespace segmented {
             hpx::parallel::v1::detail::adjacent_find<
                 typename iterator_traits::local_iterator,
                 typename iterator_traits::local_iterator>(),
-            std::forward<ExPolicy>(policy), first, last,
-            std::forward<Pred>(pred),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(Pred, pred),
             hpx::parallel::util::projection_identity(), is_seq());
     }
 }}    // namespace hpx::segmented

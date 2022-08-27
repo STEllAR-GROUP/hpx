@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 Thomas Heller
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,13 +8,15 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/type_support/meta.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
 #if defined(DOXYGEN)
     /// start is a customization point object. The expression
     /// `hpx::execution::experimental::start(r)` is equivalent to:
@@ -25,10 +28,9 @@ namespace hpx { namespace execution { namespace experimental {
     ///       `void start();`
     ///     * Otherwise, the expression is ill-formed.
     ///
-    /// The customization is implemented in terms of `hpx::functional::tag_dispatch`.
+    /// The customization is implemented in terms of `hpx::functional::tag_invoke`.
     template <typename O>
     void start(O&& o);
-#endif
 
     /// An `operation_state` is an object representing the asynchronous operation
     /// that has been returned from calling `hpx::execution::experimental::connect` with
@@ -44,13 +46,25 @@ namespace hpx { namespace execution { namespace experimental {
     ///
     template <typename O>
     struct is_operation_state;
+#endif
+
+    namespace detail {
+
+        // start should not be callable for operation states that are rvalues
+        template <typename State>
+        struct enable_start : std::is_lvalue_reference<State>
+        {
+        };
+    }    // namespace detail
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct start_t : hpx::functional::tag_noexcept<start_t>
+    struct start_t
+      : hpx::functional::tag_noexcept<start_t, meta::func<detail::enable_start>>
     {
     } start{};
 
     namespace detail {
+
         template <bool IsOperationState, typename O>
         struct is_operation_state_impl;
 
@@ -68,14 +82,14 @@ namespace hpx { namespace execution { namespace experimental {
 
     template <typename O>
     struct is_operation_state
-      : detail::is_operation_state_impl<std::is_destructible<O>::value &&
-                std::is_object<O>::value &&
+      : detail::is_operation_state_impl<std::is_destructible_v<O> &&
+                std::is_object_v<O> &&
                 hpx::is_invocable_v<start_t, std::decay_t<O>&>,
             O>
     {
     };
 
     template <typename O>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_operation_state_v =
-        is_operation_state<O>::value;
-}}}    // namespace hpx::execution::experimental
+    inline constexpr bool is_operation_state_v =
+        meta::value<is_operation_state<O>>;
+}    // namespace hpx::execution::experimental

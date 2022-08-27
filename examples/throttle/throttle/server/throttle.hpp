@@ -8,18 +8,17 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/future.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/future.hpp>
 #include <hpx/mutex.hpp>
 
 #include <boost/dynamic_bitset.hpp>
 
 #include <cstddef>
 
-namespace throttle { namespace server
-{
+namespace throttle { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT throttle
       : public hpx::components::component_base<throttle>
@@ -50,9 +49,9 @@ namespace throttle { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(throttle, suspend, suspend_action);
-        HPX_DEFINE_COMPONENT_ACTION(throttle, resume, resume_action);
-        HPX_DEFINE_COMPONENT_ACTION(throttle, is_suspended, is_suspended_action);
+        HPX_DEFINE_COMPONENT_ACTION(throttle, suspend, suspend_action)
+        HPX_DEFINE_COMPONENT_ACTION(throttle, resume, resume_action)
+        HPX_DEFINE_COMPONENT_ACTION(throttle, is_suspended, is_suspended_action)
 
     private:
         // this function is periodically scheduled as a worker thread with the
@@ -68,21 +67,19 @@ namespace throttle { namespace server
         boost::dynamic_bitset<> blocked_os_threads_;
         mutable mutex_type mtx_;
     };
-}}
+}}    // namespace throttle::server
 
-HPX_ACTION_HAS_CRITICAL_PRIORITY(throttle::server::throttle::suspend_action);
+HPX_ACTION_HAS_CRITICAL_PRIORITY(throttle::server::throttle::suspend_action)
 HPX_REGISTER_ACTION_DECLARATION(
-    throttle::server::throttle::suspend_action
-  , throttle_suspend_action);
+    throttle::server::throttle::suspend_action, throttle_suspend_action)
 
-HPX_ACTION_HAS_CRITICAL_PRIORITY(throttle::server::throttle::resume_action);
+HPX_ACTION_HAS_CRITICAL_PRIORITY(throttle::server::throttle::resume_action)
 HPX_REGISTER_ACTION_DECLARATION(
-    throttle::server::throttle::resume_action
-  , throttle_resume_action);
+    throttle::server::throttle::resume_action, throttle_resume_action)
 
-HPX_ACTION_HAS_CRITICAL_PRIORITY(throttle::server::throttle::is_suspended_action);
-HPX_REGISTER_ACTION_DECLARATION(
-    throttle::server::throttle::is_suspended_action
-  , throttle_is_suspended_action);
+HPX_ACTION_HAS_CRITICAL_PRIORITY(
+    throttle::server::throttle::is_suspended_action)
+HPX_REGISTER_ACTION_DECLARATION(throttle::server::throttle::is_suspended_action,
+    throttle_is_suspended_action)
 
 #endif

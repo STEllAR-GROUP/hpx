@@ -36,13 +36,13 @@ namespace hpx { namespace util { namespace detail {
 
         public:
             explicit constexpr spread_box(hpx::tuple<T...> boxed)
-              : boxed_(std::move(boxed))
+              : boxed_(HPX_MOVE(boxed))
             {
             }
 
             hpx::tuple<T...> unbox()
             {
-                return std::move(boxed_);
+                return HPX_MOVE(boxed_);
             }
         };
 
@@ -92,7 +92,7 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         constexpr T unpack(T&& type)
         {
-            return std::forward<T>(type);
+            return HPX_FORWARD(T, type);
         }
         template <typename... T>
         constexpr auto unpack(spread_box<T...> type) -> decltype(type.unbox())
@@ -110,9 +110,9 @@ namespace hpx { namespace util { namespace detail {
         /// the return type will be void.
         template <typename T>
         constexpr auto unpack_or_void(T&& type)
-            -> decltype(unpack(std::forward<T>(type)))
+            -> decltype(unpack(HPX_FORWARD(T, type)))
         {
-            return unpack(std::forward<T>(type));
+            return unpack(HPX_FORWARD(T, type));
         }
         inline void unpack_or_void(spread_box<>) noexcept {}
 
@@ -121,7 +121,7 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         constexpr hpx::tuple<T> undecorate(T&& type)
         {
-            return hpx::tuple<T>{std::forward<T>(type)};
+            return hpx::tuple<T>{HPX_FORWARD(T, type)};
         }
         template <typename... T>
         constexpr auto undecorate(spread_box<T...> type)
@@ -142,7 +142,7 @@ namespace hpx { namespace util { namespace detail {
                 First&& first, T&&... args) const
             {
                 return Type<First, T...>{
-                    std::forward<First>(first), std::forward<T>(args)...};
+                    HPX_FORWARD(First, first), HPX_FORWARD(T, args)...};
             }
 
             // Specifically return the empty object which can be different
@@ -185,7 +185,7 @@ namespace hpx { namespace util { namespace detail {
                 -> array_type_of_t<First, T...>
             {
                 return array_type_of_t<First, T...>{
-                    {std::forward<First>(first), std::forward<T>(args)...}};
+                    {HPX_FORWARD(First, first), HPX_FORWARD(T, args)...}};
             }
 
             constexpr auto operator()() const noexcept
@@ -199,11 +199,11 @@ namespace hpx { namespace util { namespace detail {
         /// may contain spread types
         template <typename C, typename... T>
         constexpr auto apply_spread_impl(std::true_type, C&& callable,
-            T&&... args) -> decltype(invoke_fused(std::forward<C>(callable),
-            hpx::tuple_cat(undecorate(std::forward<T>(args))...)))
+            T&&... args) -> decltype(invoke_fused(HPX_FORWARD(C, callable),
+            hpx::tuple_cat(undecorate(HPX_FORWARD(T, args))...)))
         {
-            return invoke_fused(std::forward<C>(callable),
-                hpx::tuple_cat(undecorate(std::forward<T>(args))...));
+            return invoke_fused(HPX_FORWARD(C, callable),
+                hpx::tuple_cat(undecorate(HPX_FORWARD(T, args))...));
         }
 
         /// Use the linear instantiation for variadic packs which don't
@@ -213,7 +213,7 @@ namespace hpx { namespace util { namespace detail {
             T&&... args) -> typename invoke_result<C, T...>::type
         {
             return HPX_INVOKE(
-                std::forward<C>(callable), std::forward<T>(args)...);
+                HPX_FORWARD(C, callable), HPX_FORWARD(T, args)...);
         }
 
         /// Deduces to a true_type if any of the given types marks
@@ -224,22 +224,22 @@ namespace hpx { namespace util { namespace detail {
         template <typename C, typename... T>
         constexpr auto map_spread(C&& callable, T&&... args)
             -> decltype(apply_spread_impl(is_any_spread_t<T...>{},
-                std::forward<C>(callable), std::forward<T>(args)...))
+                HPX_FORWARD(C, callable), HPX_FORWARD(T, args)...))
         {
             // Check whether any of the args is a detail::flatted_tuple_t,
             // if not, use the linear called version for better
             // compilation speed.
             return apply_spread_impl(is_any_spread_t<T...>{},
-                std::forward<C>(callable), std::forward<T>(args)...);
+                HPX_FORWARD(C, callable), HPX_FORWARD(T, args)...);
         }
 
         /// Converts the given variadic arguments into a tuple in a way
         /// that spread return values are inserted into the current pack.
         template <typename... T>
-        constexpr auto tupelize(T&&... args) -> decltype(
-            map_spread(tupelizer_of_t<>{}, std::forward<T>(args)...))
+        constexpr auto tupelize(T&&... args)
+            -> decltype(map_spread(tupelizer_of_t<>{}, HPX_FORWARD(T, args)...))
         {
-            return map_spread(tupelizer_of_t<>{}, std::forward<T>(args)...);
+            return map_spread(tupelizer_of_t<>{}, HPX_FORWARD(T, args)...);
         }
 
         /// Converts the given variadic arguments into a tuple in a way
@@ -248,10 +248,10 @@ namespace hpx { namespace util { namespace detail {
         /// mapping is propagated backwards to the caller.
         template <template <typename...> class Type, typename... T>
         constexpr auto flat_tupelize_to(T&&... args) -> decltype(
-            map_spread(flat_tupelizer_of_t<Type>{}, std::forward<T>(args)...))
+            map_spread(flat_tupelizer_of_t<Type>{}, HPX_FORWARD(T, args)...))
         {
             return map_spread(
-                flat_tupelizer_of_t<Type>{}, std::forward<T>(args)...);
+                flat_tupelizer_of_t<Type>{}, HPX_FORWARD(T, args)...);
         }
 
         /// Converts the given variadic arguments into an array in a way
@@ -261,10 +261,9 @@ namespace hpx { namespace util { namespace detail {
         /// mapping is propagated backwards to the caller.
         template <template <typename, std::size_t> class Type, typename... T>
         constexpr auto flat_arraylize_to(T&&... args) -> decltype(
-            map_spread(flat_arraylizer<Type>{}, std::forward<T>(args)...))
+            map_spread(flat_arraylizer<Type>{}, HPX_FORWARD(T, args)...))
         {
-            return map_spread(
-                flat_arraylizer<Type>{}, std::forward<T>(args)...);
+            return map_spread(flat_arraylizer<Type>{}, HPX_FORWARD(T, args)...);
         }
 
         /// Converts an empty tuple to void
@@ -282,9 +281,9 @@ namespace hpx { namespace util { namespace detail {
         /// If the returned tuple is empty, void is returned instead.
         template <typename... T>
         constexpr auto tupelize_or_void(T&&... args)
-            -> decltype(voidify_empty_tuple(tupelize(std::forward<T>(args)...)))
+            -> decltype(voidify_empty_tuple(tupelize(HPX_FORWARD(T, args)...)))
         {
-            return voidify_empty_tuple(tupelize(std::forward<T>(args)...));
+            return voidify_empty_tuple(tupelize(HPX_FORWARD(T, args)...));
         }
     }    // end namespace spreading
 
@@ -380,7 +379,7 @@ namespace hpx { namespace util { namespace detail {
 
         public:
             container_accessor(C&& container)
-              : container_(std::move(container))
+              : container_(HPX_MOVE(container))
             {
             }
 
@@ -400,7 +399,7 @@ namespace hpx { namespace util { namespace detail {
         container_accessor<T> container_accessor_of(T&& container)
         {
             // Don't use any decay here
-            return container_accessor<T>(std::forward<T>(container));
+            return container_accessor<T>(HPX_FORWARD(T, container));
         }
 
         /// Deduces to the type the homogeneous container is containing
@@ -418,7 +417,7 @@ namespace hpx { namespace util { namespace detail {
         template <typename Container>
         using element_of_t = typename std::conditional<
             std::is_rvalue_reference<Container&&>::value,
-            decltype(std::move(*(std::declval<Container>().begin()))),
+            decltype(HPX_MOVE(*(std::declval<Container>().begin()))),
             decltype(*(std::declval<Container>().begin()))>::type;
 
         /// Removes all qualifier and references from the given type
@@ -492,10 +491,10 @@ namespace hpx { namespace util { namespace detail {
             // the destination.
             // We could have used std::transform for this, however,
             // I didn't want to pull a whole header for it in.
-            for (auto&& val : container_accessor_of(std::forward<T>(container)))
+            for (auto&& val : container_accessor_of(HPX_FORWARD(T, container)))
             {
                 remapped.push_back(spreading::unpack(
-                    std::forward<M>(mapper)(std::forward<decltype(val)>(val))));
+                    HPX_FORWARD(M, mapper)(HPX_FORWARD(decltype(val), val))));
             }
 
             return remapped;    // RVO
@@ -507,12 +506,12 @@ namespace hpx { namespace util { namespace detail {
         auto remap_container(container_mapping_tag<false, true>, M&& mapper,
             T&& container) -> typename std::decay<T>::type
         {
-            for (auto&& val : container_accessor_of(std::forward<T>(container)))
+            for (auto&& val : container_accessor_of(HPX_FORWARD(T, container)))
             {
                 val = spreading::unpack(
-                    std::forward<M>(mapper)(std::forward<decltype(val)>(val)));
+                    HPX_FORWARD(M, mapper)(HPX_FORWARD(decltype(val), val)));
             }
-            return std::forward<T>(container);
+            return HPX_FORWARD(T, container);
         }
 
         /// Remap the container to zero arguments
@@ -520,11 +519,11 @@ namespace hpx { namespace util { namespace detail {
         auto remap_container(container_mapping_tag<true, false>, M&& mapper,
             T&& container) -> decltype(spreading::empty_spread())
         {
-            for (auto&& val : container_accessor_of(std::forward<T>(container)))
+            for (auto&& val : container_accessor_of(HPX_FORWARD(T, container)))
             {
                 // Don't save the empty mapping for each invocation
                 // of the mapper.
-                std::forward<M>(mapper)(std::forward<decltype(val)>(val));
+                HPX_FORWARD(M, mapper)(HPX_FORWARD(decltype(val), val));
             }
             // Return one instance of an empty mapping for the container
             return spreading::empty_spread();
@@ -538,10 +537,10 @@ namespace hpx { namespace util { namespace detail {
             typename std::enable_if<
                 is_effective_t<M, element_of_t<T>>::value>::type* = nullptr)
             -> decltype(remap_container(container_mapping_tag_of_t<T, M>{},
-                std::forward<M>(mapper), std::forward<T>(container)))
+                HPX_FORWARD(M, mapper), HPX_FORWARD(T, container)))
         {
             return remap_container(container_mapping_tag_of_t<T, M>{},
-                std::forward<M>(mapper), std::forward<T>(container));
+                HPX_FORWARD(M, mapper), HPX_FORWARD(T, container));
         }
 
         /// Just call the visitor with the content of the container
@@ -550,10 +549,14 @@ namespace hpx { namespace util { namespace detail {
             typename std::enable_if<
                 is_effective_t<M, element_of_t<T>>::value>::type* = nullptr)
         {
+#if defined(HPX_CUDA_VERSION)
             for (auto&& element : std::forward<T>(container))
+#else
+            for (auto&& element : HPX_FORWARD(T, container))
+#endif
+
             {
-                std::forward<M>(mapper)(
-                    std::forward<decltype(element)>(element));
+                HPX_FORWARD(M, mapper)(HPX_FORWARD(decltype(element), element));
             }
         }
     }    // end namespace container_remapping
@@ -581,10 +584,10 @@ namespace hpx { namespace util { namespace detail {
             template <typename... Args>
             auto operator()(Args&&... args)
                 -> decltype(spreading::flat_tupelize_to<Base>(
-                    std::declval<M>()(std::forward<Args>(args))...))
+                    std::declval<M>()(HPX_FORWARD(Args, args))...))
             {
                 return spreading::flat_tupelize_to<Base>(
-                    mapper_(std::forward<Args>(args))...);
+                    mapper_(HPX_FORWARD(Args, args))...);
             }
         };
         template <typename M, template <typename...> class Base,
@@ -601,7 +604,7 @@ namespace hpx { namespace util { namespace detail {
                 typename invoke_result<M, OldArgs>::type...>::type
             {
                 int dummy[] = {
-                    0, ((void) mapper_(std::forward<Args>(args)), 0)...};
+                    0, ((void) mapper_(HPX_FORWARD(Args, args)), 0)...};
                 (void) dummy;
             }
         };
@@ -619,10 +622,10 @@ namespace hpx { namespace util { namespace detail {
             template <typename... Args>
             auto operator()(Args&&... args)
                 -> decltype(spreading::flat_arraylize_to<Base>(
-                    mapper_(std::forward<Args>(args))...))
+                    mapper_(HPX_FORWARD(Args, args))...))
             {
                 return spreading::flat_arraylize_to<Base>(
-                    mapper_(std::forward<Args>(args))...);
+                    mapper_(HPX_FORWARD(Args, args))...);
             }
         };
         template <typename M, template <typename, std::size_t> class Base,
@@ -638,7 +641,7 @@ namespace hpx { namespace util { namespace detail {
                 typename invoke_result<M, OldArg>::type>::type
             {
                 int dummy[] = {
-                    0, ((void) mapper_(std::forward<Args>(args)), 0)...};
+                    0, ((void) mapper_(HPX_FORWARD(Args, args)), 0)...};
                 (void) dummy;
             }
         };
@@ -651,12 +654,12 @@ namespace hpx { namespace util { namespace detail {
         remap(Strategy, T&& container, M&& mapper) -> decltype(invoke_fused(
             std::declval<tuple_like_remapper<Strategy,
                 typename std::decay<M>::type, typename std::decay<T>::type>>(),
-            std::forward<T>(container)))
+            HPX_FORWARD(T, container)))
         {
             return invoke_fused(
                 tuple_like_remapper<Strategy, typename std::decay<M>::type,
-                    typename std::decay<T>::type>{std::forward<M>(mapper)},
-                std::forward<T>(container));
+                    typename std::decay<T>::type>{HPX_FORWARD(M, mapper)},
+                HPX_FORWARD(T, container));
         }
     }    // end namespace tuple_like_remapping
 
@@ -668,7 +671,7 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         decltype(auto) may_void(T&& element) const
         {
-            return std::forward<T>(element);
+            return HPX_FORWARD(T, element);
         }
     };
     template <>
@@ -715,7 +718,7 @@ namespace hpx { namespace util { namespace detail {
             template <typename T>
             auto operator()(T&& element)
                 -> decltype(std::declval<traversor>().get_helper()->traverse(
-                    Strategy{}, std::forward<T>(element)));
+                    Strategy{}, HPX_FORWARD(T, element)));
 
             /// An alias to this type
             using traversor_type = traversor;
@@ -735,10 +738,10 @@ namespace hpx { namespace util { namespace detail {
             template <typename T>
             auto operator()(T&& element) -> decltype(
                 std::declval<try_traversor>().get_helper()->try_traverse(
-                    Strategy{}, std::forward<T>(element)))
+                    Strategy{}, HPX_FORWARD(T, element)))
             {
                 return this->get_helper()->try_traverse(
-                    Strategy{}, std::forward<T>(element));
+                    Strategy{}, HPX_FORWARD(T, element));
             }
 
             /// An alias to the traversor type
@@ -748,9 +751,9 @@ namespace hpx { namespace util { namespace detail {
         /// Invokes the real mapper with the given element
         template <typename T>
         auto invoke_mapper(T&& element) -> decltype(
-            std::declval<mapping_helper>().mapper_(std::forward<T>(element)))
+            std::declval<mapping_helper>().mapper_(HPX_FORWARD(T, element)))
         {
-            return mapper_(std::forward<T>(element));
+            return mapper_(HPX_FORWARD(T, element));
         }
 
         /// SFINAE helper for plain elements not satisfying the tuple like
@@ -762,21 +765,21 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         auto match(container_category_tag<false, false>, T&& element)
             -> decltype(std::declval<mapping_helper>().invoke_mapper(
-                std::forward<T>(element)));
+                HPX_FORWARD(T, element)));
 
         /// SFINAE helper for elements satisfying the container
         /// requirements, which are not tuple like.
         template <typename T>
         auto match(container_category_tag<true, false>, T&& container)
             -> decltype(container_remapping::remap(Strategy{},
-                std::forward<T>(container), std::declval<traversor>()));
+                HPX_FORWARD(T, container), std::declval<traversor>()));
 
         /// SFINAE helper for elements which are tuple like and
         /// that also may satisfy the container requirements
         template <bool IsContainer, typename T>
         auto match(container_category_tag<IsContainer, true>, T&& tuple_like)
             -> decltype(tuple_like_remapping::remap(Strategy{},
-                std::forward<T>(tuple_like), std::declval<traversor>()));
+                HPX_FORWARD(T, tuple_like), std::declval<traversor>()));
 
         /// This method implements the functionality for routing
         /// elements through, that aren't accepted by the mapper.
@@ -787,9 +790,9 @@ namespace hpx { namespace util { namespace detail {
         /// with the minimal needed set of accepted arguments.
         template <typename MatcherTag, typename T>
         auto try_match(MatcherTag, T&& element) -> decltype(
-            std::declval<mapping_helper>().may_void(std::forward<T>(element)))
+            std::declval<mapping_helper>().may_void(HPX_FORWARD(T, element)))
         {
-            return this->may_void(std::forward<T>(element));
+            return this->may_void(HPX_FORWARD(T, element));
         }
 
         /// Match plain elements not satisfying the tuple like or
@@ -801,11 +804,11 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         auto try_match(container_category_tag<false, false>, T&& element)
             -> decltype(std::declval<mapping_helper>().invoke_mapper(
-                std::forward<T>(element)))
+                HPX_FORWARD(T, element)))
         {
             // T could be any non container or non tuple like type here,
             // take int or hpx::future<int> as an example.
-            return invoke_mapper(std::forward<T>(element));
+            return invoke_mapper(HPX_FORWARD(T, element));
         }
 
         /// Match elements satisfying the container requirements,
@@ -813,10 +816,10 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         auto try_match(container_category_tag<true, false>, T&& container)
             -> decltype(container_remapping::remap(Strategy{},
-                std::forward<T>(container), std::declval<try_traversor>()))
+                HPX_FORWARD(T, container), std::declval<try_traversor>()))
         {
             return container_remapping::remap(
-                Strategy{}, std::forward<T>(container), try_traversor{this});
+                Strategy{}, HPX_FORWARD(T, container), try_traversor{this});
         }
 
         /// Match elements which are tuple like and that also may
@@ -825,10 +828,10 @@ namespace hpx { namespace util { namespace detail {
         template <bool IsContainer, typename T>
         auto try_match(container_category_tag<IsContainer, true>,
             T&& tuple_like) -> decltype(tuple_like_remapping::remap(Strategy{},
-            std::forward<T>(tuple_like), std::declval<try_traversor>()))
+            HPX_FORWARD(T, tuple_like), std::declval<try_traversor>()))
         {
             return tuple_like_remapping::remap(
-                Strategy{}, std::forward<T>(tuple_like), try_traversor{this});
+                Strategy{}, HPX_FORWARD(T, tuple_like), try_traversor{this});
         }
 
         /// Traverses a single element.
@@ -855,12 +858,12 @@ namespace hpx { namespace util { namespace detail {
             // Then we can choose the underlying implementation accordingly.
             return try_match(container_category_of_t<
                                  typename hpx::util::decay_unwrap<T>::type>{},
-                std::forward<T>(element));
+                HPX_FORWARD(T, element));
         }
 
     public:
         explicit mapping_helper(M mapper)
-          : mapper_(std::move(mapper))
+          : mapper_(HPX_MOVE(mapper))
         {
         }
 
@@ -872,12 +875,12 @@ namespace hpx { namespace util { namespace detail {
                     strategy_remap_tag{}, std::declval<T>())))
         {
             return spreading::unpack_or_void(
-                try_traverse(strategy_remap_tag{}, std::forward<T>(element)));
+                try_traverse(strategy_remap_tag{}, HPX_FORWARD(T, element)));
         }
         template <typename T>
         void init_traverse(strategy_traverse_tag, T&& element)
         {
-            try_traverse(strategy_traverse_tag{}, std::forward<T>(element));
+            try_traverse(strategy_traverse_tag{}, HPX_FORWARD(T, element));
         }
 
         /// Calls the traversal method for every element in the pack,
@@ -887,16 +890,16 @@ namespace hpx { namespace util { namespace detail {
             Second&& second, T&&... rest)
             -> decltype(spreading::tupelize_or_void(
                 std::declval<mapping_helper>().try_traverse(
-                    strategy, std::forward<First>(first)),
+                    strategy, HPX_FORWARD(First, first)),
                 std::declval<mapping_helper>().try_traverse(
-                    strategy, std::forward<Second>(second)),
+                    strategy, HPX_FORWARD(Second, second)),
                 std::declval<mapping_helper>().try_traverse(
-                    strategy, std::forward<T>(rest))...))
+                    strategy, HPX_FORWARD(T, rest))...))
         {
             return spreading::tupelize_or_void(
-                try_traverse(strategy, std::forward<First>(first)),
-                try_traverse(strategy, std::forward<Second>(second)),
-                try_traverse(strategy, std::forward<T>(rest))...);
+                try_traverse(strategy, HPX_FORWARD(First, first)),
+                try_traverse(strategy, HPX_FORWARD(Second, second)),
+                try_traverse(strategy, HPX_FORWARD(T, rest))...);
         }
 
         /// Calls the traversal method for every element in the pack,
@@ -905,10 +908,10 @@ namespace hpx { namespace util { namespace detail {
         void init_traverse(strategy_traverse_tag strategy, First&& first,
             Second&& second, T&&... rest)
         {
-            try_traverse(strategy, std::forward<First>(first));
-            try_traverse(strategy, std::forward<Second>(second));
-            int dummy[] = {0,
-                ((void) try_traverse(strategy, std::forward<T>(rest)), 0)...};
+            try_traverse(strategy, HPX_FORWARD(First, first));
+            try_traverse(strategy, HPX_FORWARD(Second, second));
+            int dummy[] = {
+                0, ((void) try_traverse(strategy, HPX_FORWARD(T, rest)), 0)...};
             (void) dummy;
         }
     };
@@ -919,10 +922,10 @@ namespace hpx { namespace util { namespace detail {
         -> decltype(
             std::declval<
                 mapping_helper<Strategy, typename std::decay<Mapper>::type>>()
-                .init_traverse(strategy, std::forward<T>(pack)...))
+                .init_traverse(strategy, HPX_FORWARD(T, pack)...))
     {
         mapping_helper<Strategy, typename std::decay<Mapper>::type> helper(
-            std::forward<Mapper>(mapper));
-        return helper.init_traverse(strategy, std::forward<T>(pack)...);
+            HPX_FORWARD(Mapper, mapper));
+        return helper.init_traverse(strategy, HPX_FORWARD(T, pack)...);
     }
 }}}    // namespace hpx::util::detail

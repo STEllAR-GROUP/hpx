@@ -10,8 +10,8 @@
 /// \file hpx/components/partitioned_vector/partitioned_vector_segmented_iterator.hpp
 /// \brief This file contains the implementation of iterators for hpx::partitioned_vector.
 
- // The idea for these iterators is taken from
- // http://lafstern.org/matt/segmented.pdf.
+// The idea for these iterators is taken from
+// http://lafstern.org/matt/segmented.pdf.
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
@@ -22,8 +22,8 @@
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
-#include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_decl.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -34,15 +34,13 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace segmented
-{
+namespace hpx { namespace segmented {
     ///////////////////////////////////////////////////////////////////////////
     // This class wraps plain a vector<>::iterator or vector<>::const_iterator
     template <typename T, typename Data, typename BaseIter>
     class local_raw_vector_iterator
       : public hpx::util::iterator_adaptor<
-            local_raw_vector_iterator<T, Data, BaseIter>, BaseIter
-        >
+            local_raw_vector_iterator<T, Data, BaseIter>, BaseIter>
     {
     private:
         typedef hpx::util::iterator_adaptor<
@@ -58,14 +56,17 @@ namespace hpx { namespace segmented
         local_raw_vector_iterator() = default;
 
         local_raw_vector_iterator(base_iterator const& it,
-                std::shared_ptr<server::partitioned_vector<T, Data> > const& data)
-          : base_type(it), data_(data)
-        {}
+            std::shared_ptr<server::partitioned_vector<T, Data>> const& data)
+          : base_type(it)
+          , data_(data)
+        {
+        }
 
         local_iterator remote()
         {
             HPX_ASSERT(data_);
-            std::size_t local_index = std::distance(data_->begin(), this->base());
+            std::size_t local_index =
+                std::distance(data_->begin(), this->base());
             return local_iterator(
                 partitioned_vector_partition<T, Data>(data_->get_id()),
                 local_index, data_);
@@ -73,14 +74,15 @@ namespace hpx { namespace segmented
         local_const_iterator remote() const
         {
             HPX_ASSERT(data_);
-            std::size_t local_index = std::distance(data_->begin(), this->base());
+            std::size_t local_index =
+                std::distance(data_->begin(), this->base());
             return local_const_iterator(
                 partitioned_vector_partition<T, Data>(data_->get_id()),
                 local_index, data_);
         }
 
     private:
-        std::shared_ptr<server::partitioned_vector<T, Data> > data_;
+        std::shared_ptr<server::partitioned_vector<T, Data>> data_;
     };
 
     template <typename T, typename Data, typename BaseIter>
@@ -104,14 +106,17 @@ namespace hpx { namespace segmented
         const_local_raw_vector_iterator() = default;
 
         const_local_raw_vector_iterator(base_iterator const& it,
-                std::shared_ptr<server::partitioned_vector<T, Data> > const& data)
-          : base_type(it), data_(data)
-        {}
+            std::shared_ptr<server::partitioned_vector<T, Data>> const& data)
+          : base_type(it)
+          , data_(data)
+        {
+        }
 
         local_const_iterator remote()
         {
             HPX_ASSERT(data_);
-            std::size_t local_index = std::distance(data_->cbegin(), this->base());
+            std::size_t local_index =
+                std::distance(data_->cbegin(), this->base());
             return local_const_iterator(
                 partitioned_vector_partition<T, Data>(data_->get_id()),
                 local_index, data_);
@@ -119,19 +124,19 @@ namespace hpx { namespace segmented
         local_const_iterator remote() const
         {
             HPX_ASSERT(data_);
-            std::size_t local_index = std::distance(data_->cbegin(), this->base());
+            std::size_t local_index =
+                std::distance(data_->cbegin(), this->base());
             return local_const_iterator(
                 partitioned_vector_partition<T, Data>(data_->get_id()),
                 local_index, data_);
         }
 
     private:
-        std::shared_ptr<server::partitioned_vector<T, Data> > data_;
+        std::shared_ptr<server::partitioned_vector<T, Data>> data_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Data>
         struct local_vector_value_proxy
@@ -139,30 +144,33 @@ namespace hpx { namespace segmented
             explicit local_vector_value_proxy(
                 local_vector_iterator<T, Data> const& it)
               : it_(it)
-            {}
+            {
+            }
 
             operator T() const
             {
                 if (!it_.get_data())
                 {
-                    return it_.get_partition().get_value(launch::sync,
-                        it_.get_local_index());
+                    return it_.get_partition().get_value(
+                        launch::sync, it_.get_local_index());
                 }
                 return *(it_.get_data()->begin() + it_.get_local_index());
             }
 
-            template <typename T_>
-            local_vector_value_proxy& operator=(T_ && value)
+            template <typename T_,
+                typename Enable = std::enable_if_t<!std::is_same_v<
+                    std::decay_t<T_>, local_vector_value_proxy>>>
+            local_vector_value_proxy& operator=(T_&& value)
             {
                 if (!it_.get_data())
                 {
                     it_.get_partition().set_value(launch::sync,
-                        it_.get_local_index(), std::forward<T_>(value));
+                        it_.get_local_index(), HPX_FORWARD(T_, value));
                 }
                 else
                 {
                     *(it_.get_data()->begin() + it_.get_local_index()) =
-                        std::forward<T_>(value);
+                        HPX_FORWARD(T_, value);
                 }
                 return *this;
             }
@@ -174,16 +182,17 @@ namespace hpx { namespace segmented
         struct const_local_vector_value_proxy
         {
             explicit const_local_vector_value_proxy(
-                    const_local_vector_iterator<T, Data> const& it)
+                const_local_vector_iterator<T, Data> const& it)
               : it_(it)
-            {}
+            {
+            }
 
             operator T() const
             {
                 if (!it_.get_data())
                 {
-                    return it_.get_partition().get_value(launch::sync,
-                        it_.get_local_index());
+                    return it_.get_partition().get_value(
+                        launch::sync, it_.get_local_index());
                 }
                 return *it_.local();
             }
@@ -195,27 +204,31 @@ namespace hpx { namespace segmented
         template <typename T, typename Data>
         struct vector_value_proxy
         {
-            explicit vector_value_proxy(hpx::partitioned_vector<T, Data>& v,
-                    std::size_t index)
-              : v_(v), index_(index)
-            {}
+            explicit vector_value_proxy(
+                hpx::partitioned_vector<T, Data>& v, std::size_t index)
+              : v_(v)
+              , index_(index)
+            {
+            }
 
             operator T() const
             {
                 return v_.get_value(launch::sync, index_);
             }
 
-            template <typename T_>
-            vector_value_proxy& operator=(T_ && value)
+            template <typename T_,
+                typename Enable = std::enable_if_t<
+                    !std::is_same_v<std::decay_t<T_>, vector_value_proxy>>>
+            vector_value_proxy& operator=(T_&& value)
             {
-                v_.set_value(launch::sync, index_, std::forward<T_>(value));
+                v_.set_value(launch::sync, index_, HPX_FORWARD(T_, value));
                 return *this;
             }
 
             partitioned_vector<T, Data>& v_;
             std::size_t index_;
         };
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     /// This class implements the local iterator functionality for the
@@ -239,31 +252,35 @@ namespace hpx { namespace segmented
 
         // constructors
         local_vector_iterator()
-          : partition_(), local_index_(size_type(-1))
-        {}
+          : partition_()
+          , local_index_(size_type(-1))
+        {
+        }
 
         local_vector_iterator(hpx::id_type const& partition,
-                size_type local_index,
-                std::shared_ptr<server::partitioned_vector<T, Data> > const& data)
-          : partition_(partitioned_vector_partition<T, Data>(partition)),
-            local_index_(local_index),
-            data_(data)
-        {}
+            size_type local_index,
+            std::shared_ptr<server::partitioned_vector<T, Data>> const& data)
+          : partition_(partitioned_vector_partition<T, Data>(partition))
+          , local_index_(local_index)
+          , data_(data)
+        {
+        }
 
         local_vector_iterator(partitioned_vector_partition<T, Data> partition,
-                size_type local_index,
-                std::shared_ptr<server::partitioned_vector<T, Data> > const& data)
-          : partition_(partition),
-            local_index_(local_index),
-            data_(data)
-        {}
+            size_type local_index,
+            std::shared_ptr<server::partitioned_vector<T, Data>> const& data)
+          : partition_(partition)
+          , local_index_(local_index)
+          , data_(data)
+        {
+        }
 
-        typedef segmented::local_raw_vector_iterator<
-                T, Data, typename Data::iterator
-            > local_raw_iterator;
-        typedef segmented::const_local_raw_vector_iterator<
-                T, Data, typename Data::const_iterator
-            > local_raw_const_iterator;
+        typedef segmented::local_raw_vector_iterator<T, Data,
+            typename Data::iterator>
+            local_raw_iterator;
+        typedef segmented::const_local_raw_vector_iterator<T, Data,
+            typename Data::const_iterator>
+            local_raw_const_iterator;
 
         ///////////////////////////////////////////////////////////////////////
         local_raw_iterator local()
@@ -285,12 +302,12 @@ namespace hpx { namespace segmented
         template <typename Archive>
         void load(Archive& ar, unsigned /* version */)
         {
-            ar & partition_ & local_index_;
+            ar& partition_& local_index_;
         }
         template <typename Archive>
         void save(Archive& ar, unsigned /* version */) const
         {
-            ar & partition_ & local_index_;
+            ar& partition_& local_index_;
         }
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
@@ -340,16 +357,19 @@ namespace hpx { namespace segmented
             return partition_;
         }
 
-        size_type get_local_index() const { return local_index_; }
+        size_type get_local_index() const
+        {
+            return local_index_;
+        }
 
-        std::shared_ptr<server::partitioned_vector<T, Data> >& get_data()
+        std::shared_ptr<server::partitioned_vector<T, Data>>& get_data()
         {
             if (partition_ && !data_)
                 data_ = partition_.get_ptr();
             return data_;
         }
-        std::shared_ptr<server::partitioned_vector<T, Data> > const&
-            get_data() const
+        std::shared_ptr<server::partitioned_vector<T, Data>> const& get_data()
+            const
         {
             if (partition_ && !data_)
                 data_ = partition_.get_ptr();
@@ -364,59 +384,60 @@ namespace hpx { namespace segmented
         size_type local_index_;
 
         // caching address of component
-        mutable std::shared_ptr<server::partitioned_vector<T, Data> > data_;
+        mutable std::shared_ptr<server::partitioned_vector<T, Data>> data_;
     };
 
     template <typename T, typename Data>
     class const_local_vector_iterator
-      : public hpx::util::iterator_facade<
-            const_local_vector_iterator<T, Data>, T const,
-            std::random_access_iterator_tag,
-            segmented::detail::const_local_vector_value_proxy<T, Data>
-        >
+      : public hpx::util::iterator_facade<const_local_vector_iterator<T, Data>,
+            T const, std::random_access_iterator_tag,
+            segmented::detail::const_local_vector_value_proxy<T, Data>>
     {
     private:
-        typedef hpx::util::iterator_facade<
-                const_local_vector_iterator<T, Data>, T const,
-                std::random_access_iterator_tag,
-                segmented::detail::const_local_vector_value_proxy<T, Data>
-            > base_type;
+        typedef hpx::util::iterator_facade<const_local_vector_iterator<T, Data>,
+            T const, std::random_access_iterator_tag,
+            segmented::detail::const_local_vector_value_proxy<T, Data>>
+            base_type;
 
     public:
         typedef std::size_t size_type;
 
         // constructors
         const_local_vector_iterator()
-          : partition_(), local_index_(size_type(-1))
-        {}
+          : partition_()
+          , local_index_(size_type(-1))
+        {
+        }
+
+        const_local_vector_iterator(hpx::id_type const& partition,
+            size_type local_index,
+            std::shared_ptr<server::partitioned_vector<T, Data>> const& data)
+          : partition_(partitioned_vector_partition<T, Data>(partition))
+          , local_index_(local_index)
+          , data_(data)
+        {
+        }
 
         const_local_vector_iterator(
-                hpx::id_type const& partition,
-                size_type local_index,
-                std::shared_ptr<server::partitioned_vector<T, Data> > const& data)
-          : partition_(partitioned_vector_partition<T, Data>(partition)),
-            local_index_(local_index),
-            data_(data)
-        {}
-
-        const_local_vector_iterator(
-                partitioned_vector_partition<T, Data> partition,
-                size_type local_index,
-                std::shared_ptr<server::partitioned_vector<T, Data> > const& data)
-          : partition_(partition),
-            local_index_(local_index),
-            data_(data)
-        {}
+            partitioned_vector_partition<T, Data> partition,
+            size_type local_index,
+            std::shared_ptr<server::partitioned_vector<T, Data>> const& data)
+          : partition_(partition)
+          , local_index_(local_index)
+          , data_(data)
+        {
+        }
 
         const_local_vector_iterator(local_vector_iterator<T, Data> const& it)
-          : partition_(it.get_partition()),
-            local_index_(it.get_local_index()),
-            data_(it.get_data())
-        {}
+          : partition_(it.get_partition())
+          , local_index_(it.get_local_index())
+          , data_(it.get_data())
+        {
+        }
 
-        typedef segmented::const_local_raw_vector_iterator<
-                T, Data, typename Data::const_iterator
-            > local_raw_iterator;
+        typedef segmented::const_local_raw_vector_iterator<T, Data,
+            typename Data::const_iterator>
+            local_raw_iterator;
         typedef local_raw_iterator local_raw_const_iterator;
 
         ///////////////////////////////////////////////////////////////////////
@@ -430,7 +451,8 @@ namespace hpx { namespace segmented
         {
             if (partition_ && !data_)
                 data_ = partition_.get_ptr();
-            return local_raw_const_iterator(data_->cbegin() + local_index_, data_);
+            return local_raw_const_iterator(
+                data_->cbegin() + local_index_, data_);
         }
 
     private:
@@ -439,12 +461,12 @@ namespace hpx { namespace segmented
         template <typename Archive>
         void load(Archive& ar, unsigned /* version */)
         {
-            ar & partition_ & local_index_;
+            ar& partition_& local_index_;
         }
         template <typename Archive>
         void save(Archive& ar, unsigned /* version */) const
         {
-            ar & partition_ & local_index_;
+            ar& partition_& local_index_;
         }
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
@@ -479,7 +501,8 @@ namespace hpx { namespace segmented
             local_index_ += n;
         }
 
-        std::ptrdiff_t distance_to(const_local_vector_iterator const& other) const
+        std::ptrdiff_t distance_to(
+            const_local_vector_iterator const& other) const
         {
             HPX_ASSERT(partition_ == other.partition_);
             return other.local_index_ - local_index_;
@@ -490,16 +513,19 @@ namespace hpx { namespace segmented
         {
             return partition_;
         }
-        size_type get_local_index() const { return local_index_; }
+        size_type get_local_index() const
+        {
+            return local_index_;
+        }
 
-        std::shared_ptr<server::partitioned_vector<T, Data> >& get_data()
+        std::shared_ptr<server::partitioned_vector<T, Data>>& get_data()
         {
             if (partition_ && !data_)
                 data_ = partition_.get_ptr();
             return data_;
         }
-        std::shared_ptr<server::partitioned_vector<T, Data> > const&
-            get_data() const
+        std::shared_ptr<server::partitioned_vector<T, Data>> const& get_data()
+            const
         {
             if (partition_ && !data_)
                 data_ = partition_.get_ptr();
@@ -514,7 +540,7 @@ namespace hpx { namespace segmented
         size_type local_index_;
 
         // caching address of component
-        mutable std::shared_ptr<server::partitioned_vector<T, Data> > data_;
+        mutable std::shared_ptr<server::partitioned_vector<T, Data>> data_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -522,26 +548,34 @@ namespace hpx { namespace segmented
     template <typename T, typename Data, typename BaseIter>
     class segment_vector_iterator
       : public hpx::util::iterator_adaptor<
-            segment_vector_iterator<T, Data, BaseIter>, BaseIter
-        >
+            segment_vector_iterator<T, Data, BaseIter>, BaseIter>
     {
     private:
         typedef hpx::util::iterator_adaptor<
-                segment_vector_iterator<T, Data, BaseIter>, BaseIter
-            > base_type;
+            segment_vector_iterator<T, Data, BaseIter>, BaseIter>
+            base_type;
 
     public:
         segment_vector_iterator()
           : data_(nullptr)
-        {}
+        {
+        }
 
-        explicit segment_vector_iterator(BaseIter const& it,
-                partitioned_vector<T, Data>* data = nullptr)
-          : base_type(it), data_(data)
-        {}
+        explicit segment_vector_iterator(
+            BaseIter const& it, partitioned_vector<T, Data>* data = nullptr)
+          : base_type(it)
+          , data_(data)
+        {
+        }
 
-        partitioned_vector<T, Data>* get_data() { return data_; }
-        partitioned_vector<T, Data> const* get_data() const { return data_; }
+        partitioned_vector<T, Data>* get_data()
+        {
+            return data_;
+        }
+        partitioned_vector<T, Data> const* get_data() const
+        {
+            return data_;
+        }
 
         bool is_at_end() const
         {
@@ -556,31 +590,38 @@ namespace hpx { namespace segmented
     template <typename T, typename Data, typename BaseIter>
     class const_segment_vector_iterator
       : public hpx::util::iterator_adaptor<
-            const_segment_vector_iterator<T, Data, BaseIter>, BaseIter
-        >
+            const_segment_vector_iterator<T, Data, BaseIter>, BaseIter>
     {
     private:
         typedef hpx::util::iterator_adaptor<
-                const_segment_vector_iterator<T, Data, BaseIter>, BaseIter
-            > base_type;
+            const_segment_vector_iterator<T, Data, BaseIter>, BaseIter>
+            base_type;
 
     public:
         const_segment_vector_iterator()
           : data_(nullptr)
-        {}
+        {
+        }
 
-        template<typename RightBaseIter>
+        template <typename RightBaseIter>
         explicit const_segment_vector_iterator(
-            segment_vector_iterator<T, Data, RightBaseIter> const & o)
-          : base_type(o.base()), data_(o.get_data())
-        {}
+            segment_vector_iterator<T, Data, RightBaseIter> const& o)
+          : base_type(o.base())
+          , data_(o.get_data())
+        {
+        }
 
         explicit const_segment_vector_iterator(BaseIter const& it,
-                partitioned_vector<T, Data> const* data = nullptr)
-          : base_type(it), data_(data)
-        {}
+            partitioned_vector<T, Data> const* data = nullptr)
+          : base_type(it)
+          , data_(data)
+        {
+        }
 
-        partitioned_vector<T, Data> const* get_data() const { return data_; }
+        partitioned_vector<T, Data> const* get_data() const
+        {
+            return data_;
+        }
 
         bool is_at_end() const
         {
@@ -593,55 +634,58 @@ namespace hpx { namespace segmented
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         template <typename BaseIterator>
         struct is_requested_locality
         {
             typedef typename std::iterator_traits<BaseIterator>::reference
                 reference;
 
-            explicit is_requested_locality(std::uint32_t locality_id =
-                    naming::invalid_locality_id)
+            explicit is_requested_locality(
+                std::uint32_t locality_id = naming::invalid_locality_id)
               : locality_id_(locality_id)
-            {}
+            {
+            }
 
             bool operator()(reference val) const
             {
                 return locality_id_ == naming::invalid_locality_id ||
-                       locality_id_ == val.locality_id_;
+                    locality_id_ == val.locality_id_;
             }
 
             std::uint32_t locality_id_;
         };
-    }
+    }    // namespace detail
 
     /// This class implement the local segmented iterator for the hpx::vector
     template <typename T, typename Data, typename BaseIter>
     class local_segment_vector_iterator
       : public hpx::util::iterator_adaptor<
-            local_segment_vector_iterator<T, Data, BaseIter>, BaseIter,
-            Data, std::forward_iterator_tag
-        >
+            local_segment_vector_iterator<T, Data, BaseIter>, BaseIter, Data,
+            std::forward_iterator_tag>
     {
     private:
         typedef hpx::util::iterator_adaptor<
-                local_segment_vector_iterator<T, Data, BaseIter>, BaseIter,
-                Data, std::forward_iterator_tag
-            > base_type;
+            local_segment_vector_iterator<T, Data, BaseIter>, BaseIter, Data,
+            std::forward_iterator_tag>
+            base_type;
         typedef detail::is_requested_locality<BaseIter> predicate;
 
     public:
         local_segment_vector_iterator() = default;
 
         explicit local_segment_vector_iterator(BaseIter const& end)
-          : base_type(end), predicate_(), end_(end)
-        {}
+          : base_type(end)
+          , predicate_()
+          , end_(end)
+        {
+        }
 
         local_segment_vector_iterator(
-                BaseIter const& it, BaseIter const& end,
-                std::uint32_t locality_id)
-          : base_type(it), predicate_(locality_id), end_(end)
+            BaseIter const& it, BaseIter const& end, std::uint32_t locality_id)
+          : base_type(it)
+          , predicate_(locality_id)
+          , end_(end)
         {
             satisfy_predicate();
         }
@@ -694,7 +738,7 @@ namespace hpx { namespace segmented
         }
 
     private:
-        std::shared_ptr<server::partitioned_vector<T, Data> > data_;
+        std::shared_ptr<server::partitioned_vector<T, Data>> data_;
         predicate predicate_;
         BaseIter end_;
     };
@@ -703,16 +747,15 @@ namespace hpx { namespace segmented
     /// This class implements the (global) iterator functionality for hpx::vector.
     template <typename T, typename Data>
     class vector_iterator
-      : public hpx::util::iterator_facade<
-            vector_iterator<T, Data>, T, std::random_access_iterator_tag,
-            detail::vector_value_proxy<T, Data>
-        >
+      : public hpx::util::iterator_facade<vector_iterator<T, Data>, T,
+            std::random_access_iterator_tag,
+            detail::vector_value_proxy<T, Data>>
     {
     private:
-        typedef hpx::util::iterator_facade<
-                vector_iterator<T, Data>, T, std::random_access_iterator_tag,
-                detail::vector_value_proxy<T, Data>
-            > base_type;
+        typedef hpx::util::iterator_facade<vector_iterator<T, Data>, T,
+            std::random_access_iterator_tag,
+            detail::vector_value_proxy<T, Data>>
+            base_type;
 
     public:
         typedef std::size_t size_type;
@@ -720,23 +763,36 @@ namespace hpx { namespace segmented
             segment_iterator;
         typedef typename partitioned_vector<T, Data>::local_segment_iterator
             local_segment_iterator;
-        typedef typename partitioned_vector<T, Data>::local_iterator
-            local_iterator;
+        typedef
+            typename partitioned_vector<T, Data>::local_iterator local_iterator;
 
         // constructors
         vector_iterator()
-          : data_(nullptr), global_index_(size_type(-1))
-        {}
+          : data_(nullptr)
+          , global_index_(size_type(-1))
+        {
+        }
 
-        vector_iterator(partitioned_vector<T, Data>* data,
-                size_type global_index)
-          : data_(data), global_index_(global_index)
-        {}
+        vector_iterator(
+            partitioned_vector<T, Data>* data, size_type global_index)
+          : data_(data)
+          , global_index_(global_index)
+        {
+        }
 
-        partitioned_vector<T, Data>* get_data() { return data_; }
-        partitioned_vector<T, Data> const* get_data() const { return data_; }
+        partitioned_vector<T, Data>* get_data()
+        {
+            return data_;
+        }
+        partitioned_vector<T, Data> const* get_data() const
+        {
+            return data_;
+        }
 
-        size_type get_global_index() const { return global_index_; }
+        size_type get_global_index() const
+        {
+            return global_index_;
+        }
 
     protected:
         friend class hpx::util::iterator_core_access;
@@ -789,38 +845,46 @@ namespace hpx { namespace segmented
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Data>
     class const_vector_iterator
-      : public hpx::util::iterator_facade<
-            const_vector_iterator<T, Data>, T const,
-            std::random_access_iterator_tag, T const
-        >
+      : public hpx::util::iterator_facade<const_vector_iterator<T, Data>,
+            T const, std::random_access_iterator_tag, T const>
     {
     private:
-        typedef hpx::util::iterator_facade<
-                const_vector_iterator<T, Data>, T const,
-                std::random_access_iterator_tag, T const
-            > base_type;
+        typedef hpx::util::iterator_facade<const_vector_iterator<T, Data>,
+            T const, std::random_access_iterator_tag, T const>
+            base_type;
 
     public:
         typedef std::size_t size_type;
         typedef typename partitioned_vector<T, Data>::const_segment_iterator
             segment_iterator;
-        typedef typename partitioned_vector<T, Data>::const_local_segment_iterator
-            local_segment_iterator;
+        typedef
+            typename partitioned_vector<T, Data>::const_local_segment_iterator
+                local_segment_iterator;
         typedef typename partitioned_vector<T, Data>::const_local_iterator
             local_iterator;
 
         // constructors
         const_vector_iterator()
-          : data_(0), global_index_(size_type(-1))
-        {}
+          : data_(0)
+          , global_index_(size_type(-1))
+        {
+        }
 
-        const_vector_iterator(partitioned_vector<T, Data> const* data,
-                size_type global_index)
-          : data_(data), global_index_(global_index)
-        {}
+        const_vector_iterator(
+            partitioned_vector<T, Data> const* data, size_type global_index)
+          : data_(data)
+          , global_index_(global_index)
+        {
+        }
 
-        partitioned_vector<T, Data> const* get_data() const { return data_; }
-        size_type get_global_index() const { return global_index_; }
+        partitioned_vector<T, Data> const* get_data() const
+        {
+            return data_;
+        }
+        size_type get_global_index() const
+        {
+            return global_index_;
+        }
 
     protected:
         friend class hpx::util::iterator_core_access;
@@ -868,10 +932,10 @@ namespace hpx { namespace segmented
         // global position in the referenced vector
         size_type global_index_;
     };
-}}
+}}    // namespace hpx::segmented
 
 // Starting V1.7 we have moved the iterators into the segmented namespace such
-// that the tag_dispatch overload for the segmented algorithms will be found.
+// that the tag_invoke overload for the segmented algorithms will be found.
 namespace hpx {
 
     template <typename T, typename Data, typename BaseIter>
@@ -930,8 +994,7 @@ namespace hpx {
 }    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <typename T, typename Data>
     struct segmented_iterator_traits<segmented::vector_iterator<T, Data>>
     {
@@ -939,7 +1002,8 @@ namespace hpx { namespace traits
 
         typedef segmented::vector_iterator<T, Data> iterator;
         typedef typename iterator::segment_iterator segment_iterator;
-        typedef typename iterator::local_segment_iterator local_segment_iterator;
+        typedef
+            typename iterator::local_segment_iterator local_segment_iterator;
         typedef typename iterator::local_iterator local_iterator;
 
         typedef typename local_iterator::local_raw_iterator local_raw_iterator;
@@ -957,13 +1021,12 @@ namespace hpx { namespace traits
         static local_iterator local(iterator iter)
         {
             HPX_ASSERT(iter.get_data());    // avoid dereferencing end iterator
-            return iter.get_data()->get_local_iterator(
-                iter.get_global_index());
+            return iter.get_data()->get_local_iterator(iter.get_global_index());
         }
 
         //  Build a full iterator from the segment and local iterators
-        static iterator compose(segment_iterator seg_iter,
-            local_iterator local_iter)
+        static iterator compose(
+            segment_iterator seg_iter, local_iterator local_iter)
         {
             partitioned_vector<T, Data>* data = seg_iter.get_data();
             std::size_t index = local_iter.get_local_index();
@@ -991,27 +1054,27 @@ namespace hpx { namespace traits
         static local_iterator end(segment_iterator seg_iter)
         {
             if (seg_iter.is_at_end())
-                --seg_iter;     // return iterator to the end of last segment
+                --seg_iter;    // return iterator to the end of last segment
 
             auto& base = seg_iter.base();
-            return local_iterator(base->partition_, base->size_,
-                base->local_data_);
+            return local_iterator(
+                base->partition_, base->size_, base->local_data_);
         }
 
         //  This function should specify the local iterator which is at the
         //  beginning of the partition data.
         static local_raw_iterator begin(local_segment_iterator const& seg_iter)
         {
-            return local_raw_iterator(seg_iter->begin(),
-                seg_iter.base()->local_data_);
+            return local_raw_iterator(
+                seg_iter->begin(), seg_iter.base()->local_data_);
         }
 
         //  This function should specify the local iterator which is at the
         //  end of the partition data.
         static local_raw_iterator end(local_segment_iterator const& seg_iter)
         {
-            return local_raw_iterator(seg_iter->end(),
-                seg_iter.base()->local_data_);
+            return local_raw_iterator(
+                seg_iter->end(), seg_iter.base()->local_data_);
         }
 
         // Extract the base id for the segment referenced by the given segment
@@ -1029,7 +1092,8 @@ namespace hpx { namespace traits
 
         typedef segmented::const_vector_iterator<T, Data> iterator;
         typedef typename iterator::segment_iterator segment_iterator;
-        typedef typename iterator::local_segment_iterator local_segment_iterator;
+        typedef
+            typename iterator::local_segment_iterator local_segment_iterator;
         typedef typename iterator::local_iterator local_iterator;
 
         typedef typename local_iterator::local_raw_iterator local_raw_iterator;
@@ -1052,8 +1116,8 @@ namespace hpx { namespace traits
         }
 
         //  Build a full iterator from the segment and local iterators
-        static iterator compose(segment_iterator const& seg_iter,
-            local_iterator const& local_iter)
+        static iterator compose(
+            segment_iterator const& seg_iter, local_iterator const& local_iter)
         {
             partitioned_vector<T, Data> const* data = seg_iter.get_data();
             std::size_t index = local_iter.get_local_index();
@@ -1081,27 +1145,27 @@ namespace hpx { namespace traits
         static local_iterator end(segment_iterator seg_iter)
         {
             if (seg_iter.is_at_end())
-                --seg_iter;     // return iterator to the end of last segment
+                --seg_iter;    // return iterator to the end of last segment
 
             auto& base = seg_iter.base();
-            return local_iterator(base->partition_, base->size_,
-                base->local_data_);
+            return local_iterator(
+                base->partition_, base->size_, base->local_data_);
         }
 
         //  This function should specify the local iterator which is at the
         //  beginning of the partition data.
         static local_raw_iterator begin(local_segment_iterator const& seg_iter)
         {
-            return local_raw_iterator(seg_iter->cbegin(),
-                seg_iter.base()->local_data_);
+            return local_raw_iterator(
+                seg_iter->cbegin(), seg_iter.base()->local_data_);
         }
 
         //  This function should specify the local iterator which is at the
         //  end of the partition data.
         static local_raw_iterator end(local_segment_iterator const& seg_iter)
         {
-            return local_raw_iterator(seg_iter->cend(),
-                seg_iter.base()->local_data_);
+            return local_raw_iterator(
+                seg_iter->cend(), seg_iter.base()->local_data_);
         }
 
         // Extract the base id for the segment referenced by the given segment
@@ -1140,7 +1204,7 @@ namespace hpx { namespace traits
 
     template <typename T, typename Data>
     struct segmented_local_iterator_traits<
-        segmented::const_local_vector_iterator<T, Data> >
+        segmented::const_local_vector_iterator<T, Data>>
     {
         typedef std::true_type is_segmented_local_iterator;
 
@@ -1166,11 +1230,25 @@ namespace hpx { namespace traits
     struct is_value_proxy<
         hpx::segmented::detail::local_vector_value_proxy<T, Data>>
       : std::true_type
-    {};
+    {
+    };
+
+    template <typename T, typename Data>
+    struct proxy_value<
+        hpx::segmented::detail::local_vector_value_proxy<T, Data>>
+    {
+        using type = T;
+    };
 
     template <typename T, typename Data>
     struct is_value_proxy<hpx::segmented::detail::vector_value_proxy<T, Data>>
       : std::true_type
-    {};
-}}
+    {
+    };
 
+    template <typename T, typename Data>
+    struct proxy_value<hpx::segmented::detail::vector_value_proxy<T, Data>>
+    {
+        using type = T;
+    };
+}}    // namespace hpx::traits

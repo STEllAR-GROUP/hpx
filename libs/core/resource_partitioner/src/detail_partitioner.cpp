@@ -32,13 +32,13 @@
 
 namespace hpx { namespace resource { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_NORETURN void throw_runtime_error(
+    [[noreturn]] void throw_runtime_error(
         std::string const& func, std::string const& message)
     {
         HPX_THROW_EXCEPTION(invalid_status, func, message);
     }
 
-    HPX_NORETURN void throw_invalid_argument(
+    [[noreturn]] void throw_invalid_argument(
         std::string const& func, std::string const& message)
     {
         HPX_THROW_EXCEPTION(bad_parameter, func, message);
@@ -69,7 +69,7 @@ namespace hpx { namespace resource { namespace detail {
       , scheduling_policy_(user_defined)
       , num_threads_(0)
       , mode_(mode)
-      , create_function_(std::move(create_func))
+      , create_function_(HPX_MOVE(create_func))
     {
         if (name.empty())
         {
@@ -210,7 +210,7 @@ namespace hpx { namespace resource { namespace detail {
       , first_core_(std::size_t(-1))
       , mode_(mode_default)
       , topo_(threads::create_topology())
-      , default_scheduler_mode_(threads::policies::scheduler_mode::default_mode)
+      , default_scheduler_mode_(threads::policies::scheduler_mode::default_)
     {
         // allow only one partitioner instance
         if (++instance_number_counter_ > 1)
@@ -535,8 +535,8 @@ namespace hpx { namespace resource { namespace detail {
         }
 
         affinity_data_.set_num_threads(new_pu_nums.size());
-        affinity_data_.set_pu_nums(std::move(new_pu_nums));
-        affinity_data_.set_affinity_masks(std::move(new_affinity_masks));
+        affinity_data_.set_pu_nums(HPX_MOVE(new_pu_nums));
+        affinity_data_.set_affinity_masks(HPX_MOVE(new_affinity_masks));
     }
 
     // Returns true if any of the pools defined by the user is empty of resources
@@ -620,7 +620,7 @@ namespace hpx { namespace resource { namespace detail {
         {
             initial_thread_pools_[0] =
                 detail::init_pool_data(get_default_pool_name(),
-                    std::move(scheduler_creation), default_scheduler_mode_);
+                    HPX_MOVE(scheduler_creation), default_scheduler_mode_);
             return;
         }
 
@@ -639,7 +639,7 @@ namespace hpx { namespace resource { namespace detail {
         }
 
         initial_thread_pools_.push_back(detail::init_pool_data(
-            pool_name, std::move(scheduler_creation), default_scheduler_mode_));
+            pool_name, HPX_MOVE(scheduler_creation), default_scheduler_mode_));
     }
 
     // ----------------------------------------------------------------------
@@ -910,7 +910,7 @@ namespace hpx { namespace resource { namespace detail {
     }
 
     std::size_t partitioner::shrink_pool(std::string const& pool_name,
-        util::function_nonser<void(std::size_t)> const& remove_pu)
+        hpx::function<void(std::size_t)> const& remove_pu)
     {
         if (!(mode_ & mode_allow_dynamic_pools))
         {
@@ -955,7 +955,7 @@ namespace hpx { namespace resource { namespace detail {
     }
 
     std::size_t partitioner::expand_pool(std::string const& pool_name,
-        util::function_nonser<void(std::size_t)> const& add_pu)
+        hpx::function<void(std::size_t)> const& add_pu)
     {
         if (!(mode_ & mode_allow_dynamic_pools))
         {

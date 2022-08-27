@@ -11,6 +11,7 @@ set -eux
 orig_src_dir="$(pwd)"
 src_dir="/dev/shm/hpx/src"
 build_dir="/dev/shm/hpx/build"
+install_dir="/dev/shm/hpx/install"
 
 # Copy source directory to /dev/shm for faster builds
 mkdir -p "${build_dir}"
@@ -23,7 +24,7 @@ set +e
 ctest \
     --verbose \
     -S ${src_dir}/.jenkins/cscs/ctest.cmake \
-    -DCTEST_CONFIGURE_EXTRA_OPTIONS="${configure_extra_options}" \
+    -DCTEST_CONFIGURE_EXTRA_OPTIONS="${configure_extra_options} -DCMAKE_INSTALL_PREFIX=${install_dir}" \
     -DCTEST_BUILD_CONFIGURATION_NAME="${configuration_name_with_build_type}" \
     -DCTEST_SOURCE_DIRECTORY="${src_dir}" \
     -DCTEST_BINARY_DIRECTORY="${build_dir}"

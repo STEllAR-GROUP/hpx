@@ -21,7 +21,7 @@
 
 #include <hpx/functional/bind.hpp>
 
-namespace placeholders = hpx::util::placeholders;
+namespace placeholders = hpx::placeholders;
 
 #include <iostream>
 
@@ -150,17 +150,16 @@ void test(F f, int r)
 
 int main()
 {
-    test(hpx::util::bind(X()), 17041);
-    test(hpx::util::bind(X(), 1), 1);
-    test(hpx::util::bind(X(), 1, 2), 1 + 2);
-    test(hpx::util::bind(X(), 1, 2, 3), 1 + 2 + 3);
-    test(hpx::util::bind(X(), 1, 2, 3, 4), 1 + 2 + 3 + 4);
-    test(hpx::util::bind(X(), 1, 2, 3, 4, 5), 1 + 2 + 3 + 4 + 5);
-    test(hpx::util::bind(X(), 1, 2, 3, 4, 5, 6), 1 + 2 + 3 + 4 + 5 + 6);
-    test(hpx::util::bind(X(), 1, 2, 3, 4, 5, 6, 7), 1 + 2 + 3 + 4 + 5 + 6 + 7);
-    test(hpx::util::bind(X(), 1, 2, 3, 4, 5, 6, 7, 8),
-        1 + 2 + 3 + 4 + 5 + 6 + 7 + 8);
-    test(hpx::util::bind(X(), 1, 2, 3, 4, 5, 6, 7, 8, 9),
+    test(hpx::bind(X()), 17041);
+    test(hpx::bind(X(), 1), 1);
+    test(hpx::bind(X(), 1, 2), 1 + 2);
+    test(hpx::bind(X(), 1, 2, 3), 1 + 2 + 3);
+    test(hpx::bind(X(), 1, 2, 3, 4), 1 + 2 + 3 + 4);
+    test(hpx::bind(X(), 1, 2, 3, 4, 5), 1 + 2 + 3 + 4 + 5);
+    test(hpx::bind(X(), 1, 2, 3, 4, 5, 6), 1 + 2 + 3 + 4 + 5 + 6);
+    test(hpx::bind(X(), 1, 2, 3, 4, 5, 6, 7), 1 + 2 + 3 + 4 + 5 + 6 + 7);
+    test(hpx::bind(X(), 1, 2, 3, 4, 5, 6, 7, 8), 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8);
+    test(hpx::bind(X(), 1, 2, 3, 4, 5, 6, 7, 8, 9),
         1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9);
 
     return hpx::util::report_errors();

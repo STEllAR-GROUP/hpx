@@ -23,7 +23,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // This class allows to handle credit splitting for gid_types during
@@ -110,14 +110,14 @@ namespace hpx { namespace serialization { namespace detail {
         split_gids_map move_split_gids() noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
-            return std::move(split_gids_);
+            return HPX_MOVE(split_gids_);
         }
         void set_split_gids(split_gids_map&& gids)
         {
             std::unique_lock<mutex_type> l(mtx_);
 
             reset_locked(l);
-            split_gids_ = std::move(gids);
+            split_gids_ = HPX_MOVE(gids);
         }
 
     private:
@@ -133,4 +133,4 @@ namespace hpx { namespace serialization { namespace detail {
         HPX_EXPORT static extra_archive_data_id_type id() noexcept;
         static constexpr void reset(preprocess_gid_types*) noexcept {}
     };
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail

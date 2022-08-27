@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2015-2016 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -130,18 +130,20 @@ namespace hpx { namespace parallel { namespace util {
 #endif
                     }));
             }
-            hpx::wait_all(first_touch);
 
-            for (auto&& f : first_touch)
+            if (hpx::wait_all_nothrow(first_touch))
             {
-                f.get();    // rethrow exceptions
+                for (auto&& f : first_touch)
+                {
+                    f.get();    // rethrow exceptions
+                }
             }
 
             // return the overall memory block
             return p;
         }
 
-        void deallocate(pointer p, size_type cnt)
+        void deallocate(pointer p, size_type cnt) noexcept
         {
             topo_.deallocate(p, cnt * sizeof(T));
         }

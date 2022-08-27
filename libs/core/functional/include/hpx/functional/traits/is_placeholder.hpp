@@ -15,7 +15,7 @@
 #include <functional>
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx {
 #if defined(DOXYGEN)
     /// If \p T is a standard, Boost, or HPX placeholder (_1, _2, _3, ...) then
     /// this template is derived from ``std::integral_constant<int, 1>``,
@@ -28,9 +28,8 @@ namespace hpx { namespace traits {
     template <typename T>
     struct is_placeholder
       : std::integral_constant<int,
-            std::is_placeholder<T>::value != 0 ?
-                std::is_placeholder<T>::value :
-                boost::is_placeholder<T>::value>
+            std::is_placeholder_v<T> != 0 ? std::is_placeholder_v<T> :
+                                            boost::is_placeholder<T>::value>
     {
     };
 
@@ -40,7 +39,20 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE int is_placeholder_v =
-        is_placeholder<T>::value;
+    inline constexpr int is_placeholder_v = is_placeholder<T>::value;
 #endif
-}}    // namespace hpx::traits
+}    // namespace hpx
+
+namespace hpx::traits {
+
+    template <typename T>
+    using is_placeholder HPX_DEPRECATED_V(1, 8,
+        "hpx::traits::is_placeholder is deprecated, use "
+        "hpx::is_placeholder instead") = hpx::is_placeholder<T>;
+
+    template <typename T>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::traits::is_placeholder_v is deprecated, use "
+        "hpx::is_placeholder_v instead")
+    inline constexpr bool is_placeholder_v = hpx::is_placeholder_v<T>;
+}    // namespace hpx::traits

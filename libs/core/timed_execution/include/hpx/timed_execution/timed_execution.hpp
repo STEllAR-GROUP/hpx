@@ -41,11 +41,11 @@ namespace hpx { namespace parallel { namespace execution {
                 Ts&&... ts)
                 -> decltype(execution::async_execute(
                     timed_executor<TwoWayExecutor&>(exec, abs_time),
-                    std::forward<F>(f), std::forward<Ts>(ts)...))
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return execution::async_execute(
                     timed_executor<TwoWayExecutor&>(exec, abs_time),
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename TwoWayExecutor, typename F, typename... Ts>
@@ -53,11 +53,11 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
                 -> decltype(execution::async_execute(
                     timed_executor<TwoWayExecutor&>(exec, rel_time),
-                    std::forward<F>(f), std::forward<Ts>(ts)...))
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return execution::async_execute(
                     timed_executor<TwoWayExecutor&>(exec, rel_time),
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename TwoWayExecutor, typename F, typename... Ts>
@@ -85,11 +85,11 @@ namespace hpx { namespace parallel { namespace execution {
                 Ts&&... ts)
                 -> decltype(execution::post(
                     timed_executor<NonBlockingOneWayExecutor&>(exec, abs_time),
-                    std::forward<F>(f), std::forward<Ts>(ts)...))
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return execution::post(
                     timed_executor<NonBlockingOneWayExecutor&>(exec, abs_time),
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename NonBlockingOneWayExecutor, typename F,
@@ -98,11 +98,11 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
                 -> decltype(execution::post(
                     timed_executor<NonBlockingOneWayExecutor&>(exec, rel_time),
-                    std::forward<F>(f), std::forward<Ts>(ts)...))
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return execution::post(
                     timed_executor<NonBlockingOneWayExecutor&>(exec, rel_time),
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename NonBlockingOneWayExecutor, typename F,
@@ -137,11 +137,11 @@ namespace hpx { namespace parallel { namespace execution {
                 Ts&&... ts)
                 -> decltype(execution::sync_execute(
                     timed_executor<OneWayExecutor&>(exec, abs_time),
-                    std::forward<F>(f), std::forward<Ts>(ts)...))
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return execution::sync_execute(
                     timed_executor<OneWayExecutor&>(exec, abs_time),
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename OneWayExecutor, typename F, typename... Ts>
@@ -149,11 +149,11 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::chrono::steady_duration const& rel_time, F&& f, Ts&&... ts)
                 -> decltype(execution::sync_execute(
                     timed_executor<OneWayExecutor&>(exec, rel_time),
-                    std::forward<F>(f), std::forward<Ts>(ts)...))
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return execution::sync_execute(
                     timed_executor<OneWayExecutor&>(exec, rel_time),
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename OneWayExecutor, typename F, typename... Ts>

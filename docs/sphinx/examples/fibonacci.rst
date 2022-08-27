@@ -9,9 +9,9 @@
 
 .. _examples_fibonacci:
 
-=================================================================
-Asynchronous execution with ``hpx::async`` and actions: Fibonacci
-=================================================================
+===================================
+Asynchronous execution with actions
+===================================
 
 This example extends the :ref:`previous example <examples_fibonacci_local>` by
 introducing :term:`actions<action>`: functions that can be run remotely. In this
@@ -30,15 +30,15 @@ To compile this program, go to your |hpx| build directory (see
 :ref:`hpx_build_system` for information on configuring and building |hpx|) and
 enter:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   make examples.quickstart.fibonacci
+   $ make examples.quickstart.fibonacci
 
 To run the program type:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ./bin/fibonacci
+   $ ./bin/fibonacci
 
 This should print (time should be approximate):
 
@@ -53,9 +53,9 @@ the ``--n-value`` option. Additionally you can use the :option:`--hpx:threads`
 option to declare how many OS-threads you wish to use when running the program.
 For instance, running:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ./bin/fibonacci --n-value 20 --hpx:threads 4
+   $ ./bin/fibonacci --n-value 20 --hpx:threads 4
 
 Will yield:
 

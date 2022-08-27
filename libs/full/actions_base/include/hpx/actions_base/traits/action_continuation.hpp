@@ -23,4 +23,7 @@ namespace hpx { namespace traits {
             hpx::actions::typed_continuation<typename Action::local_result_type,
                 typename Action::remote_result_type>;
     };
+
+    template <typename Action>
+    using action_continuation_t = typename action_continuation<Action>::type;
 }}    // namespace hpx::traits

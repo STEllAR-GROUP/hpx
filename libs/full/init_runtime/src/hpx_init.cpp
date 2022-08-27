@@ -13,7 +13,6 @@
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/coroutines/detail/context_impl.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
-#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
@@ -24,6 +23,7 @@
 #include <hpx/init_runtime/detail/init_logging.hpp>
 #include <hpx/init_runtime/detail/run_or_start.hpp>
 #include <hpx/init_runtime_local/init_runtime_local.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
@@ -35,7 +35,6 @@
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/variables_map.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/debugging.hpp>
@@ -65,10 +64,9 @@
 #include <hpx/init_runtime/pre_main.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/naming.hpp>
+#include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime_configuration/register_locks_globally.hpp>
 #include <hpx/runtime_distributed.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
@@ -120,9 +118,9 @@ HPX_PLAIN_ACTION_ID(hpx::detail::console_print, console_print_action,
 HPX_PLAIN_ACTION_ID(hpx::detail::list_component_type,
     list_component_type_action, hpx::actions::list_component_type_action_id)
 
-typedef hpx::util::detail::bound_action<list_component_type_action,
-    hpx::util::index_pack<0, 1, 2>, hpx::naming::id_type,
-    hpx::util::detail::placeholder<1>, hpx::util::detail::placeholder<2>>
+typedef hpx::detail::bound_action<list_component_type_action,
+    hpx::util::index_pack<0, 1, 2>, hpx::id_type, hpx::detail::placeholder<1>,
+    hpx::detail::placeholder<2>>
     bound_list_component_type_action;
 
 HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
@@ -145,7 +143,7 @@ namespace hpx { namespace detail {
     inline void print(std::string const& name, error_code& ec = throws)
     {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-        naming::id_type console(agas::get_console_locality(ec));
+        hpx::id_type console(agas::get_console_locality(ec));
         if (ec)
             return;
 
@@ -251,8 +249,9 @@ namespace hpx { namespace detail {
     void list_symbolic_name(std::string const& name, hpx::id_type const& id)
     {
         std::string str = hpx::util::format("{}, {}, {}", name, id,
-            (id.get_management_type() == id_type::managed ? "managed" :
-                                                            "unmanaged"));
+            (id.get_management_type() == id_type::management_type::managed ?
+                    "management_type::managed" :
+                    "management_type::unmanaged"));
         print(str);
     }
 
@@ -283,12 +282,12 @@ namespace hpx { namespace detail {
         print(std::string("List of all registered component types:"));
         print(std::string("---------------------------------------"));
 
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
 
-        naming::id_type console(agas::get_console_locality());
+        hpx::id_type console(agas::get_console_locality());
         naming::get_agas_client().iterate_types(
-            hpx::util::bind<list_component_type_action>(console, _1, _2));
+            hpx::bind<list_component_type_action>(console, _1, _2));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -351,17 +350,6 @@ namespace hpx {
             else
             {
                 util::disable_lock_detection();
-            }
-#endif
-#if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) &&                                   \
-    defined(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
-            if (cmdline.rtcfg_.enable_global_lock_detection())
-            {
-                util::enable_global_lock_detection();
-            }
-            else
-            {
-                util::disable_global_lock_detection();
             }
 #endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
@@ -525,13 +513,13 @@ namespace hpx {
                 if (get_config_entry("hpx.print_counter.shutdown", "0") == "1")
                 {
                     // schedule to run at shutdown
-                    rt.add_pre_shutdown_function(util::bind_front(
+                    rt.add_pre_shutdown_function(hpx::bind_front(
                         &util::query_counters::evaluate, qc, true));
                 }
 
                 // schedule to start all counters
 
-                rt.add_startup_function(util::bind_front(&start_counters, qc));
+                rt.add_startup_function(hpx::bind_front(&start_counters, qc));
 
                 // register the query_counters object with the runtime system
                 rtd->register_query_counters(qc);
@@ -587,10 +575,10 @@ namespace hpx {
             }
 
             if (!!startup)
-                rt.add_startup_function(std::move(startup));
+                rt.add_startup_function(HPX_MOVE(startup));
 
             if (!!shutdown)
-                rt.add_shutdown_function(std::move(shutdown));
+                rt.add_shutdown_function(HPX_MOVE(shutdown));
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             // Add startup function related to listing counter names or counter
@@ -619,39 +607,39 @@ namespace hpx {
 
         ///////////////////////////////////////////////////////////////////////
         int run(hpx::runtime& rt,
-            util::function_nonser<int(
-                hpx::program_options::variables_map& vm)> const& f,
+            hpx::function<int(hpx::program_options::variables_map& vm)> const&
+                f,
             hpx::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type startup, shutdown_function_type shutdown)
         {
             LPROGRESS_;
 
             add_startup_functions(
-                rt, vm, mode, std::move(startup), std::move(shutdown));
+                rt, vm, mode, HPX_MOVE(startup), HPX_MOVE(shutdown));
 
             // Run this runtime instance using the given function f.
             if (!f.empty())
-                return rt.run(util::bind_front(f, vm));
+                return rt.run(hpx::bind_front(f, vm));
 
             // Run this runtime instance without an hpx_main
             return rt.run();
         }
 
         int start(hpx::runtime& rt,
-            util::function_nonser<int(
-                hpx::program_options::variables_map& vm)> const& f,
+            hpx::function<int(hpx::program_options::variables_map& vm)> const&
+                f,
             hpx::program_options::variables_map& vm, runtime_mode mode,
             startup_function_type startup, shutdown_function_type shutdown)
         {
             LPROGRESS_;
 
             add_startup_functions(
-                rt, vm, mode, std::move(startup), std::move(shutdown));
+                rt, vm, mode, HPX_MOVE(startup), HPX_MOVE(shutdown));
 
             if (!f.empty())
             {
                 // Run this runtime instance using the given function f.
-                return rt.start(util::bind_front(f, vm));
+                return rt.start(hpx::bind_front(f, vm));
             }
 
             // Run this runtime instance without an hpx_main
@@ -665,12 +653,12 @@ namespace hpx {
             if (blocking)
             {
                 return run(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_,
-                    std::move(startup), std::move(shutdown));
+                    HPX_MOVE(startup), HPX_MOVE(shutdown));
             }
 
             // non-blocking version
             start(*rt, cfg.hpx_main_f_, cfg.vm_, cfg.rtcfg_.mode_,
-                std::move(startup), std::move(shutdown));
+                HPX_MOVE(startup), HPX_MOVE(shutdown));
 
             // pointer to runtime is stored in TLS
             hpx::runtime* p = rt.release();
@@ -772,8 +760,9 @@ namespace hpx {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        int run_or_start(util::function_nonser<int(
-                             hpx::program_options::variables_map& vm)> const& f,
+        int run_or_start(
+            hpx::function<int(hpx::program_options::variables_map& vm)> const&
+                f,
             int argc, char** argv, init_params const& params, bool blocking)
         {
             init_environment();
@@ -886,8 +875,8 @@ namespace hpx {
                 {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
                     LPROGRESS_ << "creating distributed runtime";
-                    rt.reset(new hpx::runtime_distributed(
-                        cmdline.rtcfg_, &hpx::detail::pre_main));
+                    rt.reset(new hpx::runtime_distributed(cmdline.rtcfg_,
+                        &hpx::detail::pre_main, &hpx::detail::post_main));
                     break;
 #else
                     HPX_THROW_EXCEPTION(invalid_status, "run_or_start",
@@ -903,8 +892,8 @@ namespace hpx {
                 }
                 }
 
-                result = run_or_start(blocking, std::move(rt), cmdline,
-                    std::move(params.startup), std::move(params.shutdown));
+                result = run_or_start(blocking, HPX_MOVE(rt), cmdline,
+                    HPX_MOVE(params.startup), HPX_MOVE(params.shutdown));
             }
             catch (detail::command_line_error const& e)
             {
@@ -1025,7 +1014,7 @@ namespace hpx {
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
         components::server::runtime_support* p =
-            reinterpret_cast<components::server::runtime_support*>(
+            static_cast<components::server::runtime_support*>(
                 get_runtime_distributed().get_runtime_support_lva());
 
         if (nullptr == p)
@@ -1039,7 +1028,7 @@ namespace hpx {
         p->call_shutdown_functions(true);
         p->call_shutdown_functions(false);
 
-        p->stop(shutdown_timeout, naming::invalid_id, true);
+        p->stop(shutdown_timeout, hpx::invalid_id, true);
 #else
         HPX_UNUSED(shutdown_timeout);
         HPX_UNUSED(localwait);
@@ -1060,7 +1049,7 @@ namespace hpx {
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         components::server::runtime_support* p =
-            reinterpret_cast<components::server::runtime_support*>(
+            static_cast<components::server::runtime_support*>(
                 get_runtime_distributed().get_runtime_support_lva());
 
         if (nullptr == p)

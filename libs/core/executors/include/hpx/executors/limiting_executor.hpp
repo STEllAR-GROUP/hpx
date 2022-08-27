@@ -74,7 +74,7 @@ namespace hpx { namespace execution { namespace experimental {
             throttling_wrapper(
                 limiting_executor& lim, BaseExecutor const& /* base */, F&& f)
               : limiting_(lim)
-              , f_(std::forward<F>(f))
+              , f_(HPX_FORWARD(F, f))
             {
                 limiting_.count_up();
                 if (exceeds_upper())
@@ -90,7 +90,7 @@ namespace hpx { namespace execution { namespace experimental {
             decltype(auto) operator()(Ts&&... ts)
             {
                 on_exit _{limiting_};
-                return HPX_INVOKE(f_, std::forward<Ts>(ts)...);
+                return HPX_INVOKE(f_, HPX_FORWARD(Ts, ts)...);
             }
 
             // returns true if too many tasks would be in flight
@@ -124,7 +124,7 @@ namespace hpx { namespace execution { namespace experimental {
             throttling_wrapper(
                 limiting_executor const& lim, BaseExecutor const& base, F&& f)
               : limiting_(lim)
-              , f_(std::forward<F>(f))
+              , f_(HPX_FORWARD(F, f))
             {
                 if (exceeds_upper(base))
                 {
@@ -142,7 +142,7 @@ namespace hpx { namespace execution { namespace experimental {
             template <typename... Ts>
             decltype(auto) operator()(Ts&&... ts)
             {
-                return HPX_INVOKE(f_, std::forward<Ts>(ts)...);
+                return HPX_INVOKE(f_, HPX_FORWARD(Ts, ts)...);
             }
 
             // NB. use ">=" because counting is external
@@ -208,8 +208,8 @@ namespace hpx { namespace execution { namespace experimental {
         decltype(auto) sync_execute(F&& f, Ts&&... ts) const
         {
             return hpx::parallel::execution::sync_execute(executor_,
-                throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
-                std::forward<Ts>(ts)...);
+                throttling_wrapper<F>(*this, executor_, HPX_FORWARD(F, f)),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // --------------------------------------------------------------------
@@ -218,16 +218,16 @@ namespace hpx { namespace execution { namespace experimental {
         decltype(auto) async_execute(F&& f, Ts&&... ts)
         {
             return hpx::parallel::execution::async_execute(executor_,
-                throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
-                std::forward<Ts>(ts)...);
+                throttling_wrapper<F>(*this, executor_, HPX_FORWARD(F, f)),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename Future, typename... Ts>
         decltype(auto) then_execute(F&& f, Future&& predecessor, Ts&&... ts)
         {
             return hpx::parallel::execution::then_execute(executor_,
-                throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
-                std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
+                throttling_wrapper<F>(*this, executor_, HPX_FORWARD(F, f)),
+                HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
 
         // --------------------------------------------------------------------
@@ -238,8 +238,8 @@ namespace hpx { namespace execution { namespace experimental {
         void post(F&& f, Ts&&... ts)
         {
             hpx::parallel::execution::post(executor_,
-                throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
-                std::forward<Ts>(ts)...);
+                throttling_wrapper<F>(*this, executor_, HPX_FORWARD(F, f)),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // --------------------------------------------------------------------
@@ -249,8 +249,8 @@ namespace hpx { namespace execution { namespace experimental {
         {
             return hpx::parallel::execution::bulk_async_execute(executor_,
                 shape,
-                throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
-                std::forward<Ts>(ts)...);
+                throttling_wrapper<F>(*this, executor_, HPX_FORWARD(F, f)),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // --------------------------------------------------------------------
@@ -259,8 +259,8 @@ namespace hpx { namespace execution { namespace experimental {
             F&& f, S const& shape, Future&& predecessor, Ts&&... ts)
         {
             return hpx::parallel::execution::bulk_then_execute(executor_, shape,
-                throttling_wrapper<F>(*this, executor_, std::forward<F>(f)),
-                std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
+                throttling_wrapper<F>(*this, executor_, HPX_FORWARD(F, f)),
+                HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
 
         // --------------------------------------------------------------------

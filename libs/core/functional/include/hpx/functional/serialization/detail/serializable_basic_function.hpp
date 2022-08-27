@@ -43,7 +43,7 @@ namespace hpx { namespace util { namespace detail {
         {
             using target_type = typename std::decay<F>::type;
 
-            base_type::assign(std::forward<F>(f));
+            base_type::assign(HPX_FORWARD(F, f));
             if (!base_type::empty())
             {
                 serializable_vptr = get_serializable_vtable<target_type>();

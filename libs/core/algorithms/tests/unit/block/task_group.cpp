@@ -36,6 +36,32 @@ void task_group_test1()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+int fib1(int n)
+{
+    if (n < 2)
+    {
+        return n;
+    }
+
+    int x = 0, y = 0;
+
+    hpx::execution::experimental::task_group g;
+    g.run([&x, n] { x = fib1(n - 1); });    // spawn a task
+    g.wait();                               // wait for both tasks to complete
+
+    // reuse the task group
+    g.run([&y, n] { y = fib1(n - 2); });    // spawn another task
+    g.wait();                               // wait for both tasks to complete
+
+    return x + y;
+}
+
+void task_group_test1_reuse()
+{
+    HPX_TEST_EQ(fib(22), 17711);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 template <typename Executor>
 int fib(Executor&& exec, int n)
 {
@@ -93,6 +119,7 @@ void task_group_test3()
 int hpx_main()
 {
     task_group_test1();
+    task_group_test1_reuse();
     task_group_test2();
     task_group_test3();
 

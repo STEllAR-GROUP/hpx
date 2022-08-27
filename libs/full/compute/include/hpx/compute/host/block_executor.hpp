@@ -56,7 +56,7 @@ namespace hpx { namespace compute { namespace host {
         }
 
         block_executor(std::vector<host::target>&& targets)
-          : targets_(std::move(targets))
+          : targets_(HPX_MOVE(targets))
           , current_(0)
         {
             init_executors();
@@ -70,9 +70,9 @@ namespace hpx { namespace compute { namespace host {
         }
 
         block_executor(block_executor&& other)
-          : targets_(std::move(other.targets_))
+          : targets_(HPX_MOVE(other.targets_))
           , current_(other.current_.load())
-          , executors_(std::move(other.executors_))
+          , executors_(HPX_MOVE(other.executors_))
         {
         }
 
@@ -91,9 +91,9 @@ namespace hpx { namespace compute { namespace host {
         {
             if (&other != this)
             {
-                targets_ = std::move(other.targets_);
+                targets_ = HPX_MOVE(other.targets_);
                 current_ = other.current_.load();
-                executors_ = std::move(other.executors_);
+                executors_ = HPX_MOVE(other.executors_);
             }
             return *this;
         }
@@ -119,8 +119,8 @@ namespace hpx { namespace compute { namespace host {
         template <typename F, typename... Ts>
         void post(F&& f, Ts&&... ts)
         {
-            parallel::execution::post(executors_[current_], std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+            parallel::execution::post(executors_[current_], HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
@@ -129,8 +129,8 @@ namespace hpx { namespace compute { namespace host {
         async_execute(F&& f, Ts&&... ts)
         {
             std::size_t current = ++current_ % executors_.size();
-            return parallel::execution::async_execute(executors_[current],
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return parallel::execution::async_execute(
+                executors_[current], HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
@@ -138,8 +138,8 @@ namespace hpx { namespace compute { namespace host {
         sync_execute(F&& f, Ts&&... ts)
         {
             std::size_t current = ++current_ % executors_.size();
-            return parallel::execution::sync_execute(executors_[current],
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return parallel::execution::sync_execute(
+                executors_[current], HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename Shape, typename... Ts>
@@ -168,12 +168,20 @@ namespace hpx { namespace compute { namespace host {
                     std::advance(part_begin, part_begin_offset);
                     std::advance(part_end, part_end_offset);
                     auto futures = parallel::execution::bulk_async_execute(
-                        executors_[i], std::forward<F>(f),
+                        executors_[i], HPX_FORWARD(F, f),
                         util::make_iterator_range(part_begin, part_end),
-                        std::forward<Ts>(ts)...);
-                    results.insert(results.end(),
-                        std::make_move_iterator(futures.begin()),
-                        std::make_move_iterator(futures.end()));
+                        HPX_FORWARD(Ts, ts)...);
+
+                    if constexpr (hpx::traits::is_future_v<decltype(futures)>)
+                    {
+                        results.push_back(HPX_MOVE(futures));
+                    }
+                    else
+                    {
+                        results.insert(results.end(),
+                            std::make_move_iterator(futures.begin()),
+                            std::make_move_iterator(futures.end()));
+                    }
                 }
                 return results;
             }
@@ -212,9 +220,9 @@ namespace hpx { namespace compute { namespace host {
                     std::advance(part_begin, part_begin_offset);
                     std::advance(part_end, part_end_offset);
                     auto part_results = parallel::execution::bulk_sync_execute(
-                        executors_[i], std::forward<F>(f),
+                        executors_[i], HPX_FORWARD(F, f),
                         util::make_iterator_range(begin, part_end),
-                        std::forward<Ts>(ts)...);
+                        HPX_FORWARD(Ts, ts)...);
                     results.insert(results.end(),
                         std::make_move_iterator(part_results.begin()),
                         std::make_move_iterator(part_results.end()));

@@ -21,7 +21,7 @@ namespace hpx { namespace parallel { namespace util {
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T&& operator()(
             T&& val) const noexcept
         {
-            return std::forward<T>(val);
+            return HPX_FORWARD(T, val);
         }
     };
 }}}    // namespace hpx::parallel::util

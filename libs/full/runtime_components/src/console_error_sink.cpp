@@ -21,10 +21,10 @@ namespace hpx { namespace components {
 
     // Stub function which applies the console_error_sink action.
     void console_error_sink(
-        naming::id_type const& dst, std::exception_ptr const& e)
+        hpx::id_type const& dst, std::exception_ptr const& e)
     {
         // Report the error only if the thread-manager is up.
-        if (threads::threadmanager_is(state_running))
+        if (threads::threadmanager_is(hpx::state::running))
         {
             if (threads::get_self_ptr())
             {
@@ -51,12 +51,13 @@ namespace hpx { namespace components {
         }
 
         // Report the error only if the thread-manager is up.
-        if (threads::threadmanager_is(state_running))
+        if (threads::threadmanager_is(hpx::state::running))
         {
             // retrieve console locality
             naming::gid_type console_gid;
             naming::get_agas_client().get_console_locality(console_gid);
-            naming::id_type dst(console_gid, naming::id_type::unmanaged);
+            hpx::id_type dst(
+                console_gid, hpx::id_type::management_type::unmanaged);
 
             hpx::async<server::console_error_sink_action>(dst, e).get();
         }

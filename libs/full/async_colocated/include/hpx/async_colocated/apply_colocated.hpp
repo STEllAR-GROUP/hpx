@@ -26,27 +26,27 @@
 namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
-    bool apply_colocated(naming::id_type const& gid, Ts&&... vs)
+    bool apply_colocated(hpx::id_type const& gid, Ts&&... vs)
     {
         // shortcut co-location code if target already is a locality
         if (naming::is_locality(gid))
         {
-            return apply<Action>(gid, std::forward<Ts>(vs)...);
+            return apply<Action>(gid, HPX_FORWARD(Ts, vs)...);
         }
 
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
-        naming::id_type service_target(
+        hpx::id_type service_target(
             agas::primary_namespace::get_service_instance(gid.get_gid()),
-            naming::id_type::unmanaged);
+            hpx::id_type::management_type::unmanaged);
 
         typedef agas::server::primary_namespace::colocate_action action_type;
 
-        using util::placeholders::_2;
+        using placeholders::_2;
         return apply_continue<action_type>(
-            util::functional::apply_continuation(util::bind<Action>(
-                util::bind(util::functional::extract_locality(), _2, gid),
-                std::forward<Ts>(vs)...)),
+            util::functional::apply_continuation(hpx::bind<Action>(
+                hpx::bind(util::functional::extract_locality(), _2, gid),
+                HPX_FORWARD(Ts, vs)...)),
             service_target, gid.get_gid());
     }
 
@@ -54,38 +54,38 @@ namespace hpx { namespace detail {
         typename... Ts>
     bool apply_colocated(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Ts&&... vs)
+        hpx::id_type const& gid, Ts&&... vs)
     {
-        return apply_colocated<Derived>(gid, std::forward<Ts>(vs)...);
+        return apply_colocated<Derived>(gid, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Continuation, typename... Ts>
     typename std::enable_if<traits::is_continuation<Continuation>::value,
         bool>::type
-    apply_colocated(Continuation&& cont, naming::id_type const& gid, Ts&&... vs)
+    apply_colocated(Continuation&& cont, hpx::id_type const& gid, Ts&&... vs)
     {
         // shortcut co-location code if target already is a locality
         if (naming::is_locality(gid))
         {
             return apply_continue<Action>(
-                std::forward<Continuation>(cont), gid, std::forward<Ts>(vs)...);
+                HPX_FORWARD(Continuation, cont), gid, HPX_FORWARD(Ts, vs)...);
         }
 
         // Attach the requested action as a continuation to a resolve_async
         // call on the locality responsible for the target gid.
-        naming::id_type service_target(
+        hpx::id_type service_target(
             agas::primary_namespace::get_service_instance(gid.get_gid()),
-            naming::id_type::unmanaged);
+            hpx::id_type::management_type::unmanaged);
 
         typedef agas::server::primary_namespace::colocate_action action_type;
 
-        using util::placeholders::_2;
+        using placeholders::_2;
         return apply_continue<action_type>(
             util::functional::apply_continuation(
-                util::bind<Action>(
-                    util::bind(util::functional::extract_locality(), _2, gid),
-                    std::forward<Ts>(vs)...),
-                std::forward<Continuation>(cont)),
+                hpx::bind<Action>(
+                    hpx::bind(util::functional::extract_locality(), _2, gid),
+                    HPX_FORWARD(Ts, vs)...),
+                HPX_FORWARD(Continuation, cont)),
             service_target, gid.get_gid());
     }
 
@@ -93,10 +93,10 @@ namespace hpx { namespace detail {
         typename Derived, typename... Ts>
     bool apply_colocated(Continuation&& cont,
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
-        naming::id_type const& gid, Ts&&... vs)
+        hpx::id_type const& gid, Ts&&... vs)
     {
         return apply_colocated<Derived>(
-            std::forward<Continuation>(cont), gid, std::forward<Ts>(vs)...);
+            HPX_FORWARD(Continuation, cont), gid, HPX_FORWARD(Ts, vs)...);
     }
 }}    // namespace hpx::detail
 

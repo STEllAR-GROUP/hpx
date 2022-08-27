@@ -12,30 +12,20 @@
 
 #include <cstddef>
 
-namespace jacobi
-{
-    namespace server
+namespace jacobi { namespace server {
+    void row::init(std::size_t nx, double init)
     {
-        void row::init(std::size_t nx, double init)
-        {
-            values.reset(new value_holder(nx, init));
-        }
+        values.reset(new value_holder(nx, init));
     }
-}
+}}    // namespace jacobi::server
 
-typedef hpx::components::component<
-    jacobi::server::row
-> row_type;
+typedef hpx::components::component<jacobi::server::row> row_type;
 
-HPX_REGISTER_COMPONENT(row_type, row);
+HPX_REGISTER_COMPONENT(row_type, row)
 
 HPX_REGISTER_ACTION(
-    jacobi::server::row::init_action
-  , jacobi_server_row_init_action
-)
+    jacobi::server::row::init_action, jacobi_server_row_init_action)
 
 HPX_REGISTER_ACTION(
-    jacobi::server::row::get_action
-  , jacobi_server_row_get_action
-)
+    jacobi::server::row::get_action, jacobi_server_row_get_action)
 #endif

@@ -17,17 +17,23 @@ set(algorithms_headers
     hpx/parallel/algorithms/copy.hpp
     hpx/parallel/algorithms/count.hpp
     hpx/parallel/algorithms/destroy.hpp
+    hpx/parallel/algorithms/detail/adjacent_difference.hpp
+    hpx/parallel/algorithms/detail/adjacent_find.hpp
     hpx/parallel/algorithms/detail/accumulate.hpp
     hpx/parallel/algorithms/detail/advance_and_get_distance.hpp
     hpx/parallel/algorithms/detail/advance_to_sentinel.hpp
     hpx/parallel/algorithms/detail/dispatch.hpp
     hpx/parallel/algorithms/detail/distance.hpp
+    hpx/parallel/algorithms/detail/equal.hpp
     hpx/parallel/algorithms/detail/fill.hpp
     hpx/parallel/algorithms/detail/find.hpp
+    hpx/parallel/algorithms/detail/generate.hpp
     hpx/parallel/algorithms/detail/indirect.hpp
     hpx/parallel/algorithms/detail/insertion_sort.hpp
     hpx/parallel/algorithms/detail/is_sorted.hpp
+    hpx/parallel/algorithms/detail/mismatch.hpp
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
+    hpx/parallel/algorithms/detail/pivot.hpp
     hpx/parallel/algorithms/detail/rotate.hpp
     hpx/parallel/algorithms/detail/sample_sort.hpp
     hpx/parallel/algorithms/detail/search.hpp
@@ -35,6 +41,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/spin_sort.hpp
     hpx/parallel/algorithms/detail/transfer.hpp
     hpx/parallel/algorithms/detail/upper_lower_bound.hpp
+    hpx/parallel/algorithms/ends_with.hpp
     hpx/parallel/algorithms/equal.hpp
     hpx/parallel/algorithms/exclusive_scan.hpp
     hpx/parallel/algorithms/fill.hpp
@@ -55,7 +62,9 @@ set(algorithms_headers
     hpx/parallel/algorithms/minmax.hpp
     hpx/parallel/algorithms/mismatch.hpp
     hpx/parallel/algorithms/move.hpp
+    hpx/parallel/algorithms/nth_element.hpp
     hpx/parallel/algorithms/partial_sort.hpp
+    hpx/parallel/algorithms/partial_sort_copy.hpp
     hpx/parallel/algorithms/partition.hpp
     hpx/parallel/algorithms/reduce_by_key.hpp
     hpx/parallel/algorithms/reduce.hpp
@@ -72,6 +81,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/shift_left.hpp
     hpx/parallel/algorithms/shift_right.hpp
     hpx/parallel/algorithms/stable_sort.hpp
+    hpx/parallel/algorithms/starts_with.hpp
     hpx/parallel/algorithms/sort_by_key.hpp
     hpx/parallel/algorithms/sort.hpp
     hpx/parallel/algorithms/swap_ranges.hpp
@@ -86,11 +96,13 @@ set(algorithms_headers
     hpx/parallel/algorithms/uninitialized_move.hpp
     hpx/parallel/algorithms/uninitialized_value_construct.hpp
     hpx/parallel/algorithms/unique.hpp
+    hpx/parallel/container_algorithms/adjacent_difference.hpp
     hpx/parallel/container_algorithms/adjacent_find.hpp
     hpx/parallel/container_algorithms/all_any_none.hpp
     hpx/parallel/container_algorithms/copy.hpp
     hpx/parallel/container_algorithms/count.hpp
     hpx/parallel/container_algorithms/destroy.hpp
+    hpx/parallel/container_algorithms/ends_with.hpp
     hpx/parallel/container_algorithms/equal.hpp
     hpx/parallel/container_algorithms/exclusive_scan.hpp
     hpx/parallel/container_algorithms/fill.hpp
@@ -110,6 +122,9 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/minmax.hpp
     hpx/parallel/container_algorithms/mismatch.hpp
     hpx/parallel/container_algorithms/move.hpp
+    hpx/parallel/container_algorithms/nth_element.hpp
+    hpx/parallel/container_algorithms/partial_sort.hpp
+    hpx/parallel/container_algorithms/partial_sort_copy.hpp
     hpx/parallel/container_algorithms/partition.hpp
     hpx/parallel/container_algorithms/reduce.hpp
     hpx/parallel/container_algorithms/remove_copy.hpp
@@ -126,6 +141,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/shift_right.hpp
     hpx/parallel/container_algorithms/sort.hpp
     hpx/parallel/container_algorithms/stable_sort.hpp
+    hpx/parallel/container_algorithms/starts_with.hpp
     hpx/parallel/container_algorithms/swap_ranges.hpp
     hpx/parallel/container_algorithms/transform.hpp
     hpx/parallel/container_algorithms/transform_exclusive_scan.hpp
@@ -140,16 +156,21 @@ set(algorithms_headers
     hpx/parallel/container_memory.hpp
     hpx/parallel/container_numeric.hpp
     hpx/parallel/datapar.hpp
+    hpx/parallel/datapar/adjacent_difference.hpp
+    hpx/parallel/datapar/adjacent_find.hpp
+    hpx/parallel/datapar/equal.hpp
     hpx/parallel/datapar/fill.hpp
+    hpx/parallel/datapar/find.hpp
+    hpx/parallel/datapar/generate.hpp
     hpx/parallel/datapar/iterator_helpers.hpp
     hpx/parallel/datapar/loop.hpp
+    hpx/parallel/datapar/mismatch.hpp
     hpx/parallel/datapar/transfer.hpp
     hpx/parallel/datapar/transform_loop.hpp
     hpx/parallel/datapar/zip_iterator.hpp
     hpx/parallel/memory.hpp
     hpx/parallel/numeric.hpp
     hpx/parallel/spmd_block.hpp
-    hpx/parallel/tagspec.hpp
     hpx/parallel/task_block.hpp
     hpx/parallel/task_group.hpp
     hpx/parallel/util/cancellation_token.hpp
@@ -157,6 +178,7 @@ set(algorithms_headers
     hpx/parallel/util/detail/algorithm_result.hpp
     hpx/parallel/util/detail/chunk_size.hpp
     hpx/parallel/util/detail/chunk_size_iterator.hpp
+    hpx/parallel/util/detail/clear_container.hpp
     hpx/parallel/util/detail/handle_exception_termination_handler.hpp
     hpx/parallel/util/detail/handle_local_exceptions.hpp
     hpx/parallel/util/detail/handle_remote_exceptions.hpp
@@ -179,8 +201,6 @@ set(algorithms_headers
     hpx/parallel/util/ranges_facilities.hpp
     hpx/parallel/util/result_types.hpp
     hpx/parallel/util/scan_partitioner.hpp
-    hpx/parallel/util/tagged_pair.hpp
-    hpx/parallel/util/tagged_tuple.hpp
     hpx/parallel/util/transfer.hpp
     hpx/parallel/util/transform_loop.hpp
     hpx/parallel/util/zip_iterator.hpp
@@ -194,12 +214,10 @@ set(algorithms_compat_headers
     hpx/traits/is_value_proxy.hpp => hpx/algorithms/traits/is_value_proxy.hpp
     hpx/traits/pointer_category.hpp => hpx/algorithms/traits/pointer_category.hpp
     hpx/traits/segmented_iterator_traits.hpp => hpx/algorithms/traits/segmented_iterator_traits.hpp
-    hpx/util/tagged_pair.hpp => hpx/datastructures/tagged_pair.hpp
-    hpx/util/tagged_tuple.hpp => hpx/datastructures/tagged_tuple.hpp
 )
 # cmake-format: on
 
-set(algorithms_sources handle_exception_termination_handler.cpp)
+set(algorithms_sources handle_exception_termination_handler.cpp task_group.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -214,7 +232,9 @@ add_hpx_module(
     hpx_execution
     hpx_executors
     hpx_futures
+    hpx_lcos_local
     hpx_pack_traversal
+    hpx_serialization
     hpx_util
   CMAKE_SUBDIRS examples tests
 )

@@ -16,6 +16,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/datapar/execution_policy_fwd.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/executors/sequenced_executor.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -73,6 +74,12 @@ namespace hpx { namespace execution { inline namespace v1 {
             return *this;
         }
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task simd policy
+        ///
+        inline decltype(auto) operator()(non_task_policy_tag /*tag*/) const;
+
         /// Create a new simd_task_policy from the given
         /// executor
         ///
@@ -98,7 +105,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             typedef
                 typename parallel::execution::rebind_executor<simd_task_policy,
                     Executor, executor_parameters_type>::type rebound_type;
-            return rebound_type(std::forward<Executor>(exec), parameters());
+            return rebound_type(HPX_FORWARD(Executor, exec), parameters());
         }
 
         /// Create a new simd_task_policy from the given
@@ -128,7 +135,13 @@ namespace hpx { namespace execution { inline namespace v1 {
                     executor_type, ParametersType>::type rebound_type;
             return rebound_type(executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters>(params)...));
+                    HPX_FORWARD(Parameters, params)...));
+        }
+
+        using base_policy_type = sequenced_task_policy;
+        base_policy_type base_policy()
+        {
+            return sequenced_task_policy{};
         }
 
     public:
@@ -214,6 +227,12 @@ namespace hpx { namespace execution { inline namespace v1 {
             return *this;
         }
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task simd_policy_shim
+        ///
+        inline decltype(auto) operator()(non_task_policy_tag /*tag*/) const;
+
         /// Create a new simd_task_policy_shim from the given
         /// executor
         ///
@@ -239,7 +258,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             typedef typename parallel::execution::rebind_executor<
                 simd_task_policy_shim, Executor_,
                 executor_parameters_type>::type rebound_type;
-            return rebound_type(std::forward<Executor_>(exec), params_);
+            return rebound_type(HPX_FORWARD(Executor_, exec), params_);
         }
 
         /// Create a new simd_task_policy_shim from the given
@@ -269,7 +288,14 @@ namespace hpx { namespace execution { inline namespace v1 {
                 rebound_type;
             return rebound_type(exec_,
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
+        }
+
+        using base_policy_type =
+            sequenced_task_policy_shim<Executor, Parameters>;
+        base_policy_type base_policy()
+        {
+            return simd_task_policy_shim<Executor, Parameters>(exec_, params_);
         }
 
         /// Return the associated executor object.
@@ -299,8 +325,8 @@ namespace hpx { namespace execution { inline namespace v1 {
 
         template <typename Executor_, typename Parameters_>
         constexpr simd_task_policy_shim(Executor_&& exec, Parameters_&& params)
-          : exec_(std::forward<Executor_>(exec))
-          , params_(std::forward<Parameters_>(params))
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
         {
         }
 
@@ -365,6 +391,15 @@ namespace hpx { namespace execution { inline namespace v1 {
             return simd_task_policy();
         }
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task simd policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
         /// Create a new simd_policy from the given
         /// executor
         ///
@@ -389,7 +424,7 @@ namespace hpx { namespace execution { inline namespace v1 {
 
             typedef typename parallel::execution::rebind_executor<simd_policy,
                 Executor, executor_parameters_type>::type rebound_type;
-            return rebound_type(std::forward<Executor>(exec), parameters());
+            return rebound_type(HPX_FORWARD(Executor, exec), parameters());
         }
 
         /// Create a new simd_policy from the given
@@ -418,7 +453,13 @@ namespace hpx { namespace execution { inline namespace v1 {
                 executor_type, ParametersType>::type rebound_type;
             return rebound_type(executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters>(params)...));
+                    HPX_FORWARD(Parameters, params)...));
+        }
+
+        using base_policy_type = sequenced_policy;
+        base_policy_type base_policy()
+        {
+            return sequenced_policy{};
         }
 
     public:
@@ -502,6 +543,15 @@ namespace hpx { namespace execution { inline namespace v1 {
             return simd_task_policy_shim<Executor, Parameters>(exec_, params_);
         }
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task simd_policy_shim
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
         /// Create a new simd_policy from the given
         /// executor
         ///
@@ -527,7 +577,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             typedef
                 typename parallel::execution::rebind_executor<simd_policy_shim,
                     Executor_, executor_parameters_type>::type rebound_type;
-            return rebound_type(std::forward<Executor_>(exec), params_);
+            return rebound_type(HPX_FORWARD(Executor_, exec), params_);
         }
 
         /// Create a new simd_policy_shim from the given
@@ -557,7 +607,13 @@ namespace hpx { namespace execution { inline namespace v1 {
                     executor_type, ParametersType>::type rebound_type;
             return rebound_type(exec_,
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
+        }
+
+        using base_policy_type = sequenced_policy_shim<Executor, Parameters>;
+        base_policy_type base_policy()
+        {
+            return sequenced_policy_shim<Executor, Parameters>(exec_, params_);
         }
 
         /// Return the associated executor object.
@@ -587,8 +643,8 @@ namespace hpx { namespace execution { inline namespace v1 {
 
         template <typename Executor_, typename Parameters_>
         constexpr simd_policy_shim(Executor_&& exec, Parameters_&& params)
-          : exec_(std::forward<Executor_>(exec))
-          , params_(std::forward<Parameters_>(params))
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
         {
         }
 
@@ -657,6 +713,12 @@ namespace hpx { namespace execution { inline namespace v1 {
             return *this;
         }
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task par_simd policy
+        ///
+        inline decltype(auto) operator()(non_task_policy_tag /*tag*/) const;
+
         /// Create a new par_simd_task_policy from given executor
         ///
         /// \tparam Executor    The type of the executor to associate with this
@@ -681,7 +743,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             typedef typename parallel::execution::rebind_executor<
                 par_simd_task_policy, Executor, executor_parameters_type>::type
                 rebound_type;
-            return rebound_type(std::forward<Executor>(exec), parameters());
+            return rebound_type(HPX_FORWARD(Executor, exec), parameters());
         }
 
         /// Create a new par_simd_task_policy_shim from the given
@@ -711,7 +773,13 @@ namespace hpx { namespace execution { inline namespace v1 {
                 rebound_type;
             return rebound_type(executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters>(params)...));
+                    HPX_FORWARD(Parameters, params)...));
+        }
+
+        using base_policy_type = parallel_task_policy;
+        base_policy_type base_policy()
+        {
+            return parallel_task_policy{};
         }
 
     public:
@@ -794,6 +862,15 @@ namespace hpx { namespace execution { inline namespace v1 {
             return par_simd_task_policy();
         }
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task par_simd policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
         /// Create a new par_simd_policy referencing an executor and
         /// a chunk size.
         ///
@@ -814,7 +891,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             typedef
                 typename parallel::execution::rebind_executor<par_simd_policy,
                     Executor, executor_parameters_type>::type rebound_type;
-            return rebound_type(std::forward<Executor>(exec), parameters());
+            return rebound_type(HPX_FORWARD(Executor, exec), parameters());
         }
 
         /// Create a new par_simd_policy from the given
@@ -843,7 +920,13 @@ namespace hpx { namespace execution { inline namespace v1 {
                     executor_type, ParametersType>::type rebound_type;
             return rebound_type(executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters>(params)...));
+                    HPX_FORWARD(Parameters, params)...));
+        }
+
+        using base_policy_type = parallel_policy;
+        base_policy_type base_policy()
+        {
+            return parallel_policy{};
         }
 
     public:
@@ -927,6 +1010,15 @@ namespace hpx { namespace execution { inline namespace v1 {
                 exec_, params_);
         }
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task par_simd policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
         /// Create a new par_simd_task_policy_shim from the given
         /// executor
         ///
@@ -952,7 +1044,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             typedef typename parallel::execution::rebind_executor<
                 par_simd_policy_shim, Executor_, executor_parameters_type>::type
                 rebound_type;
-            return rebound_type(std::forward<Executor_>(exec), params_);
+            return rebound_type(HPX_FORWARD(Executor_, exec), params_);
         }
 
         /// Create a new par_simd_policy_shim from the given
@@ -981,7 +1073,13 @@ namespace hpx { namespace execution { inline namespace v1 {
                 rebound_type;
             return rebound_type(exec_,
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
+        }
+
+        using base_policy_type = parallel_policy_shim<Executor, Parameters>;
+        base_policy_type base_policy()
+        {
+            return parallel_policy_shim<Executor, Parameters>(exec_, params_);
         }
 
         /// Return the associated executor object.
@@ -1011,8 +1109,8 @@ namespace hpx { namespace execution { inline namespace v1 {
 
         template <typename Executor_, typename Parameters_>
         constexpr par_simd_policy_shim(Executor_&& exec, Parameters_&& params)
-          : exec_(std::forward<Executor_>(exec))
-          , params_(std::forward<Parameters_>(params))
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
         {
         }
 
@@ -1075,6 +1173,12 @@ namespace hpx { namespace execution { inline namespace v1 {
             return *this;
         }
 
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task par_simd policy
+        ///
+        inline decltype(auto) operator()(non_task_policy_tag /*tag*/) const;
+
         /// Create a new parallel_task_policy from the given
         /// executor
         ///
@@ -1100,7 +1204,7 @@ namespace hpx { namespace execution { inline namespace v1 {
             typedef typename parallel::execution::rebind_executor<
                 par_simd_task_policy_shim, Executor_,
                 executor_parameters_type>::type rebound_type;
-            return rebound_type(std::forward<Executor_>(exec), params_);
+            return rebound_type(HPX_FORWARD(Executor_, exec), params_);
         }
 
         /// Create a new parallel_policy_shim from the given
@@ -1130,7 +1234,15 @@ namespace hpx { namespace execution { inline namespace v1 {
                 rebound_type;
             return rebound_type(exec_,
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
+        }
+
+        using base_policy_type =
+            parallel_task_policy_shim<Executor, Parameters>;
+        base_policy_type base_policy()
+        {
+            return parallel_task_policy_shim<Executor, Parameters>(
+                exec_, params_);
         }
 
         /// Return the associated executor object.
@@ -1161,8 +1273,8 @@ namespace hpx { namespace execution { inline namespace v1 {
         template <typename Executor_, typename Parameters_>
         constexpr par_simd_task_policy_shim(
             Executor_&& exec, Parameters_&& params)
-          : exec_(std::forward<Executor_>(exec))
-          , params_(std::forward<Parameters_>(params))
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
         {
         }
 
@@ -1182,6 +1294,36 @@ namespace hpx { namespace execution { inline namespace v1 {
         Parameters params_;
         /// \endcond
     };
+
+    decltype(auto) simd_task_policy::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return simd.on(executor()).with(parameters());
+    }
+
+    decltype(auto) par_simd_task_policy::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return par_simd.on(executor()).with(parameters());
+    }
+
+    template <typename Executor, typename Parameters>
+    decltype(auto) simd_task_policy_shim<Executor, Parameters>::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return simd_policy_shim<Executor, Parameters>{}
+            .on(executor())
+            .with(parameters());
+    }
+
+    template <typename Executor, typename Parameters>
+    decltype(auto) par_simd_task_policy_shim<Executor, Parameters>::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return par_simd_policy_shim<Executor, Parameters>{}
+            .on(executor())
+            .with(parameters());
+    }
 }}}    // namespace hpx::execution::v1
 
 namespace hpx { namespace detail {

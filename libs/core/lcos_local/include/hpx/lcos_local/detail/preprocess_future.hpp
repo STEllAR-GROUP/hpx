@@ -40,7 +40,7 @@ namespace hpx { namespace serialization { namespace detail {
           , done_(rhs.done_)
           , num_futures_(rhs.num_futures_)
           , triggered_futures_(rhs.triggered_futures_)
-          , promise_(std::move(rhs.promise_))
+          , promise_(HPX_MOVE(rhs.promise_))
         {
             rhs.done_ = true;
             rhs.num_futures_ = 0;
@@ -59,7 +59,7 @@ namespace hpx { namespace serialization { namespace detail {
             done_ = rhs.done_;
             num_futures_ = rhs.num_futures_;
             triggered_futures_ = rhs.triggered_futures_;
-            promise_ = std::move(rhs.promise_);
+            promise_ = HPX_MOVE(rhs.promise_);
 
             rhs.done_ = true;
             rhs.num_futures_ = 0;
@@ -130,7 +130,7 @@ namespace hpx { namespace serialization { namespace detail {
             done_ = true;
             num_futures_ = 0;
             triggered_futures_ = 0;
-            promise_ = hpx::lcos::local::promise<void>();
+            promise_ = hpx::promise<void>();
         }
 
         bool has_futures() const
@@ -169,7 +169,7 @@ namespace hpx { namespace serialization { namespace detail {
             auto& shared_state_ =
                 hpx::traits::future_access<hpx::future<void>>::get_shared_state(
                     fut);
-            shared_state_->set_on_completed([this, f = std::move(f)]() {
+            shared_state_->set_on_completed([this, f = HPX_MOVE(f)]() {
                 reset();
                 f();    // this invokes the next round of the fixed-point
                         // iteration
@@ -181,7 +181,7 @@ namespace hpx { namespace serialization { namespace detail {
         bool done_;
         std::size_t num_futures_;
         std::size_t triggered_futures_;
-        hpx::lcos::local::promise<void> promise_;
+        hpx::promise<void> promise_;
     };
 
     // This is explicitly instantiated to ensure that the id is stable across

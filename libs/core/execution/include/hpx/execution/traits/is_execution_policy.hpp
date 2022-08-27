@@ -65,8 +65,7 @@ namespace hpx {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_execution_policy_v =
-        is_execution_policy<T>::value;
+    inline constexpr bool is_execution_policy_v = is_execution_policy<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     /// Extension: Detect whether given execution policy enables parallelization
@@ -88,7 +87,7 @@ namespace hpx {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_parallel_execution_policy_v =
+    inline constexpr bool is_parallel_execution_policy_v =
         is_parallel_execution_policy<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -114,7 +113,7 @@ namespace hpx {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_sequenced_execution_policy_v =
+    inline constexpr bool is_sequenced_execution_policy_v =
         is_sequenced_execution_policy<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -140,7 +139,7 @@ namespace hpx {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_async_execution_policy_v =
+    inline constexpr bool is_async_execution_policy_v =
         is_async_execution_policy<T>::value;
 
     /// \cond NOINTERNAL
@@ -151,7 +150,7 @@ namespace hpx {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_rebound_execution_policy_v =
+    inline constexpr bool is_rebound_execution_policy_v =
         is_rebound_execution_policy<T>::value;
 
     // extension:
@@ -163,47 +162,7 @@ namespace hpx {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_vectorpack_execution_policy_v =
+    inline constexpr bool is_vectorpack_execution_policy_v =
         is_vectorpack_execution_policy<T>::value;
     /// \endcond
 }    // namespace hpx
-
-namespace hpx { namespace parallel { namespace execution {
-
-    template <typename T>
-    using is_execution_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::is_execution_policy is deprecated, use "
-        "hpx::is_execution_policy instead") = hpx::is_execution_policy<T>;
-
-    template <typename T>
-    using is_parallel_execution_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::is_parallel_execution_policy is deprecated, "
-        "use hpx::is_parallel_execution_policy instead") =
-        hpx::is_parallel_execution_policy<T>;
-
-    template <typename T>
-    using is_sequenced_execution_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::is_sequenced_execution_policy is "
-        "deprecated, use hpx::is_sequenced_execution_policy instead") =
-        hpx::is_sequenced_execution_policy<T>;
-
-    /// \cond
-    template <typename T>
-    using is_async_execution_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::is_async_execution_policy is deprecated, "
-        "use hpx::is_async_execution_policy instead") =
-        hpx::is_async_execution_policy<T>;
-
-    template <typename T>
-    using is_rebound_execution_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::is_rebound_execution_policy is deprecated, "
-        "use hpx::is_rebound_execution_policy instead") =
-        hpx::is_rebound_execution_policy<T>;
-
-    template <typename T>
-    using is_vectorpack_execution_policy HPX_DEPRECATED_V(1, 6,
-        "hpx:parallel::execution:::is_vectorpack_execution_policy is "
-        "deprecated, use hpx::is_vectorpack_execution_policy instead") =
-        hpx::is_vectorpack_execution_policy<T>;
-    /// \endcond
-}}}    // namespace hpx::parallel::execution

@@ -102,7 +102,7 @@ struct test_async_executor
 
         // forward the task execution on to the real internal executor
         return hpx::parallel::execution::async_execute(executor_,
-            util::annotated_function(std::forward<F>(f), "custom"),
+            hpx::annotated_function(std::forward<F>(f), "custom"),
             std::forward<Ts>(ts)...);
     }
 
@@ -187,7 +187,7 @@ struct test_async_executor
 
         // forward the task execution on to the real internal executor
         return hpx::parallel::execution::then_execute(executor_,
-            util::annotated_function(std::forward<F>(f), "custom then"),
+            hpx::annotated_function(std::forward<F>(f), "custom then"),
             std::forward<OuterFuture<hpx::tuple<InnerFutures...>>>(predecessor),
             std::forward<Ts>(ts)...);
     }
@@ -230,7 +230,7 @@ struct test_async_executor
 
         // forward the task execution on to the real internal executor
         return hpx::parallel::execution::async_execute(executor_,
-            util::annotated_function(std::forward<F>(f), "custom async"),
+            hpx::annotated_function(std::forward<F>(f), "custom async"),
             std::forward<hpx::tuple<InnerFutures...>>(predecessor));
     }
 
@@ -321,7 +321,7 @@ int test(const std::string& message, Executor& exec)
     auto fw1 = hpx::async(&dummy_task<decltype(testval2)>, testval2);
     auto fw2 = hpx::async(&dummy_task<decltype(testval3)>, testval3);
     //
-    auto fw = when_all(fw1, fw2).then(exec,
+    auto fw = hpx::when_all(fw1, fw2).then(exec,
         [testval2, testval3](
             future<hpx::tuple<future<int>, future<double>>>&& f) {
             std::cout << "Inside when_all : " << std::endl;
@@ -347,7 +347,7 @@ int test(const std::string& message, Executor& exec)
     auto fws2 = hpx::async(&dummy_task<decltype(testval5)>, testval5).share();
     //
     auto fws =
-        when_all(fws1, fws2)
+        hpx::when_all(fws1, fws2)
             .then(exec,
                 [testval4, testval5](future<hpx::tuple<future<std::uint64_t>,
                         shared_future<float>>>&& f) {
@@ -476,7 +476,6 @@ namespace hpx { namespace parallel { namespace execution {
 
 int hpx_main()
 {
-    bool ok = true;
     try
     {
         test_async_executor exec;
@@ -485,7 +484,6 @@ int hpx_main()
     catch (std::exception& e)
     {
         std::cout << "Exception " << e.what() << std::endl;
-        ok = false;
     }
 
     typedef hpx::parallel::execution::pool_numa_hint<dummy_tag> dummy_hint;
@@ -498,7 +496,6 @@ int hpx_main()
     catch (std::exception& e)
     {
         std::cout << "Exception " << e.what() << std::endl;
-        ok = false;
     }
 
     try
@@ -510,7 +507,6 @@ int hpx_main()
     catch (std::exception& e)
     {
         std::cout << "Exception " << e.what() << std::endl;
-        ok = false;
     }
 
     std::cout << "Tests done \n";

@@ -8,18 +8,23 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
-#include <hpx/functional/unique_function.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/parcelset_base/locality.hpp>
+#include <hpx/parcelset_base/parcel_interface.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <map>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -39,24 +44,23 @@ namespace hpx { namespace agas {
         naming::gid_type const& gid, error_code& ec = throws);
 
     HPX_EXPORT bool register_name(launch::sync_policy, std::string const& name,
-        naming::id_type const& id, error_code& ec = throws);
+        hpx::id_type const& id, error_code& ec = throws);
 
     HPX_EXPORT hpx::future<bool> register_name(
-        std::string const& name, naming::id_type const& id);
+        std::string const& name, hpx::id_type const& id);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT naming::id_type unregister_name(
+    HPX_EXPORT hpx::id_type unregister_name(
         launch::sync_policy, std::string const& name, error_code& ec = throws);
 
-    HPX_EXPORT hpx::future<naming::id_type> unregister_name(
+    HPX_EXPORT hpx::future<hpx::id_type> unregister_name(
         std::string const& name);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT naming::id_type resolve_name(
+    HPX_EXPORT hpx::id_type resolve_name(
         launch::sync_policy, std::string const& name, error_code& ec = throws);
 
-    HPX_EXPORT hpx::future<naming::id_type> resolve_name(
-        std::string const& name);
+    HPX_EXPORT hpx::future<hpx::id_type> resolve_name(std::string const& name);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT hpx::future<std::uint32_t> get_num_localities(
@@ -107,6 +111,14 @@ namespace hpx { namespace agas {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
+    HPX_EXPORT parcelset::endpoints_type const& resolve_locality(
+        naming::gid_type const& gid, error_code& ec = throws);
+
+    HPX_EXPORT void remove_resolved_locality(naming::gid_type const& gid);
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT bool is_local_address_cached(
         naming::gid_type const& gid, error_code& ec = throws);
 
@@ -114,13 +126,13 @@ namespace hpx { namespace agas {
         naming::address& addr, error_code& ec = throws);
 
     inline bool is_local_address_cached(
-        naming::id_type const& id, error_code& ec = throws)
+        hpx::id_type const& id, error_code& ec = throws)
     {
         return is_local_address_cached(id.get_gid(), ec);
     }
 
-    inline bool is_local_address_cached(naming::id_type const& id,
-        naming::address& addr, error_code& ec = throws)
+    inline bool is_local_address_cached(
+        hpx::id_type const& id, naming::address& addr, error_code& ec = throws)
     {
         return is_local_address_cached(id.get_gid(), addr, ec);
     }
@@ -132,16 +144,16 @@ namespace hpx { namespace agas {
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT bool is_local_lva_encoded_address(naming::gid_type const& gid);
 
-    inline bool is_local_lva_encoded_address(naming::id_type const& id)
+    inline bool is_local_lva_encoded_address(hpx::id_type const& id)
     {
         return is_local_lva_encoded_address(id.get_gid());
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT hpx::future<naming::address> resolve(naming::id_type const& id);
+    HPX_EXPORT hpx::future<naming::address> resolve(hpx::id_type const& id);
 
-    HPX_EXPORT naming::address resolve(launch::sync_policy,
-        naming::id_type const& id, error_code& ec = throws);
+    HPX_EXPORT naming::address resolve(
+        launch::sync_policy, hpx::id_type const& id, error_code& ec = throws);
 
     HPX_EXPORT bool resolve_local(naming::gid_type const& gid,
         naming::address& addr, error_code& ec = throws);
@@ -193,16 +205,16 @@ namespace hpx { namespace agas {
     /// \brief Invoke an asynchronous garbage collection step on the given target
     ///        locality.
     HPX_EXPORT void garbage_collect_non_blocking(
-        naming::id_type const& id, error_code& ec = throws);
+        hpx::id_type const& id, error_code& ec = throws);
 
     /// \brief Invoke a synchronous garbage collection step on the given target
     ///        locality.
     HPX_EXPORT void garbage_collect(
-        naming::id_type const& id, error_code& ec = throws);
+        hpx::id_type const& id, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return an id_type referring to the console locality.
-    HPX_EXPORT naming::id_type get_console_locality(error_code& ec = throws);
+    HPX_EXPORT hpx::id_type get_console_locality(error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT naming::gid_type get_next_id(
@@ -214,41 +226,40 @@ namespace hpx { namespace agas {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT hpx::future<std::int64_t> incref(naming::gid_type const& gid,
-        std::int64_t credits,
-        naming::id_type const& keep_alive = naming::invalid_id);
+        std::int64_t credits, hpx::id_type const& keep_alive = hpx::invalid_id);
 
     HPX_EXPORT std::int64_t incref(launch::sync_policy,
         naming::gid_type const& gid, std::int64_t credits = 1,
-        naming::id_type const& keep_alive = naming::invalid_id,
+        hpx::id_type const& keep_alive = hpx::invalid_id,
         error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT std::int64_t replenish_credits(naming::gid_type& gid);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT hpx::future<naming::id_type> get_colocation_id(
-        naming::id_type const& id);
+    HPX_EXPORT hpx::future<hpx::id_type> get_colocation_id(
+        hpx::id_type const& id);
 
-    HPX_EXPORT naming::id_type get_colocation_id(launch::sync_policy,
-        naming::id_type const& id, error_code& ec = throws);
+    HPX_EXPORT hpx::id_type get_colocation_id(
+        launch::sync_policy, hpx::id_type const& id, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT hpx::future<hpx::id_type> on_symbol_namespace_event(
         std::string const& name, bool call_for_past_events);
 
     ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT hpx::future<std::pair<naming::id_type, naming::address>>
-    begin_migration(naming::id_type const& id);
+    HPX_EXPORT hpx::future<std::pair<hpx::id_type, naming::address>>
+    begin_migration(hpx::id_type const& id);
 
-    HPX_EXPORT bool end_migration(naming::id_type const& id);
+    HPX_EXPORT bool end_migration(hpx::id_type const& id);
 
     HPX_EXPORT hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
-        util::unique_function_nonser<std::pair<bool, hpx::future<void>>()>&& f,
+        hpx::move_only_function<std::pair<bool, hpx::future<void>>()>&& f,
         bool expect_to_be_marked_as_migrating);
 
     HPX_EXPORT std::pair<bool, components::pinned_ptr> was_object_migrated(
         naming::gid_type const& gid,
-        util::unique_function_nonser<components::pinned_ptr()>&& f);
+        hpx::move_only_function<components::pinned_ptr()>&& f);
 
     HPX_EXPORT void unmark_as_migrated(naming::gid_type const& gid);
 
@@ -268,4 +279,19 @@ namespace hpx { namespace agas {
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT void destroy_component(
         naming::gid_type const& gid, naming::address const& addr);
+
+    ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
+    HPX_EXPORT void route(parcelset::parcel&& p,
+        hpx::function<void(std::error_code const&, parcelset::parcel const&)>&&
+            f,
+        threads::thread_priority local_priority =
+            threads::thread_priority::default_);
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_EXPORT naming::address_type get_primary_ns_lva();
+    HPX_EXPORT naming::address_type get_symbol_ns_lva();
+    HPX_EXPORT naming::address_type get_runtime_support_lva();
+
 }}    // namespace hpx::agas

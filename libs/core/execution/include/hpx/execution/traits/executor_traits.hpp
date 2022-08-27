@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/type_support/detected.hpp>
 
@@ -16,10 +17,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace lcos {
+namespace hpx {
     template <typename R>
     class future;
-}}    // namespace hpx::lcos
+}    // namespace hpx
 
 namespace hpx { namespace execution {
     ///////////////////////////////////////////////////////////////////////////
@@ -163,8 +164,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename Executor, typename T>
         struct exposes_future_type<Executor, T,
-            typename hpx::util::always_void<
-                typename Executor::template future_type<T>>::type>
+            std::void_t<typename Executor::template future_type<T>>>
           : std::true_type
         {
         };
@@ -190,7 +190,7 @@ namespace hpx { namespace parallel { namespace execution {
         struct executor_future<Executor, T, Ts,
             std::enable_if_t<!hpx::traits::is_two_way_executor_v<Executor>>>
         {
-            using type = hpx::lcos::future<T>;
+            using type = hpx::future<T>;
         };
     }    // namespace detail
 
@@ -252,31 +252,30 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_post_member_v =
-        has_post_member<T>::value;
+    inline constexpr bool has_post_member_v = has_post_member<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_sync_execute_member_v =
+    inline constexpr bool has_sync_execute_member_v =
         has_sync_execute_member<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_async_execute_member_v =
+    inline constexpr bool has_async_execute_member_v =
         has_async_execute_member<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_then_execute_member_v =
+    inline constexpr bool has_then_execute_member_v =
         has_then_execute_member<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_bulk_sync_execute_member_v =
+    inline constexpr bool has_bulk_sync_execute_member_v =
         has_bulk_sync_execute_member<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_bulk_async_execute_member_v =
+    inline constexpr bool has_bulk_async_execute_member_v =
         has_bulk_async_execute_member<T>::value;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool has_bulk_then_execute_member_v =
+    inline constexpr bool has_bulk_then_execute_member_v =
         has_bulk_then_execute_member<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -339,4 +338,5 @@ namespace hpx { namespace traits {
     template <typename Executor>
     using executor_parameters_type_t =
         typename executor_parameters_type<Executor>::type;
+
 }}    // namespace hpx::traits

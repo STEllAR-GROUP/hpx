@@ -98,7 +98,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         {
             // notify_one() returns false if no more threads are
             // waiting
-            if (!cond_.notify_one(std::move(l)))
+            if (!cond_.notify_one(HPX_MOVE(l)))
                 break;
 
             l = std::unique_lock<mutex_type>(*mtx);
@@ -111,7 +111,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         HPX_ASSERT_OWNS_LOCK(l);
 
         std::ptrdiff_t count = static_cast<std::ptrdiff_t>(cond_.size(l));
-        signal(std::move(l), count);
+        signal(HPX_MOVE(l), count);
         return count;
     }
 }}}}    // namespace hpx::lcos::local::detail

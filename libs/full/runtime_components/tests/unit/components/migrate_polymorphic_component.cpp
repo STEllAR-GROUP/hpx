@@ -37,7 +37,7 @@ struct test_server_base
     {
         return hpx::find_here();
     }
-    HPX_DEFINE_COMPONENT_ACTION(test_server_base, call, call_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server_base, call, call_action)
 
     void busy_work() const
     {
@@ -45,7 +45,7 @@ struct test_server_base
         hpx::this_thread::sleep_for(std::chrono::seconds(1));
         HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
     }
-    HPX_DEFINE_COMPONENT_ACTION(test_server_base, busy_work, busy_work_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server_base, busy_work, busy_work_action)
 
     hpx::future<void> lazy_busy_work() const
     {
@@ -60,7 +60,7 @@ struct test_server_base
         });
     }
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server_base, lazy_busy_work, lazy_busy_work_action);
+        test_server_base, lazy_busy_work, lazy_busy_work_action)
 
     int get_base_data() const
     {
@@ -68,7 +68,7 @@ struct test_server_base
         return base_data_;
     }
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server_base, get_base_data, get_base_data_action);
+        test_server_base, get_base_data, get_base_data_action)
 
     hpx::future<int> lazy_get_base_data() const
     {
@@ -84,7 +84,7 @@ struct test_server_base
         });
     }
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server_base, lazy_get_base_data, lazy_get_base_data_action);
+        test_server_base, lazy_get_base_data, lazy_get_base_data_action)
 
     virtual int get_data() const
     {
@@ -95,7 +95,7 @@ struct test_server_base
         return get_data();
     }
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server_base, get_data_nonvirt, get_data_action);
+        test_server_base, get_data_nonvirt, get_data_action)
 
     virtual hpx::future<int> lazy_get_data() const
     {
@@ -106,7 +106,7 @@ struct test_server_base
         return lazy_get_data();
     }
     HPX_DEFINE_COMPONENT_ACTION(
-        test_server_base, lazy_get_data_nonvirt, lazy_get_data_action);
+        test_server_base, lazy_get_data_nonvirt, lazy_get_data_action)
 
     // Components which should be migrated using hpx::migrate<> need to
     // be Serializable and CopyConstructable. Components can be
@@ -131,39 +131,47 @@ struct test_server_base
         // clang-format on
     }
 
+    hpx::naming::address get_current_address() const override
+    {
+        return hpx::naming::address(
+            hpx::naming::get_gid_from_locality_id(hpx::get_locality_id()),
+            hpx::components::get_component_type<test_server_base>(),
+            const_cast<test_server_base*>(this));
+    }
+
 private:
     int base_data_;
 };
 
-HPX_DEFINE_GET_COMPONENT_TYPE(test_server_base);
+HPX_DEFINE_GET_COMPONENT_TYPE(test_server_base)
 
 typedef test_server_base::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION_DECLARATION(call_action)
+HPX_REGISTER_ACTION(call_action)
 
 typedef test_server_base::busy_work_action busy_work_action;
-HPX_REGISTER_ACTION_DECLARATION(busy_work_action);
-HPX_REGISTER_ACTION(busy_work_action);
+HPX_REGISTER_ACTION_DECLARATION(busy_work_action)
+HPX_REGISTER_ACTION(busy_work_action)
 
 typedef test_server_base::lazy_busy_work_action lazy_busy_work_action;
-HPX_REGISTER_ACTION_DECLARATION(lazy_busy_work_action);
-HPX_REGISTER_ACTION(lazy_busy_work_action);
+HPX_REGISTER_ACTION_DECLARATION(lazy_busy_work_action)
+HPX_REGISTER_ACTION(lazy_busy_work_action)
 
 typedef test_server_base::get_base_data_action get_base_data_action;
-HPX_REGISTER_ACTION_DECLARATION(get_base_data_action);
-HPX_REGISTER_ACTION(get_base_data_action);
+HPX_REGISTER_ACTION_DECLARATION(get_base_data_action)
+HPX_REGISTER_ACTION(get_base_data_action)
 
 typedef test_server_base::lazy_get_base_data_action lazy_get_base_data_action;
-HPX_REGISTER_ACTION_DECLARATION(lazy_get_base_data_action);
-HPX_REGISTER_ACTION(lazy_get_base_data_action);
+HPX_REGISTER_ACTION_DECLARATION(lazy_get_base_data_action)
+HPX_REGISTER_ACTION(lazy_get_base_data_action)
 
 typedef test_server_base::get_data_action get_data_action;
-HPX_REGISTER_ACTION_DECLARATION(get_data_action);
-HPX_REGISTER_ACTION(get_data_action);
+HPX_REGISTER_ACTION_DECLARATION(get_data_action)
+HPX_REGISTER_ACTION(get_data_action)
 
 typedef test_server_base::lazy_get_data_action lazy_get_data_action;
-HPX_REGISTER_ACTION_DECLARATION(lazy_get_data_action);
-HPX_REGISTER_ACTION(lazy_get_data_action);
+HPX_REGISTER_ACTION_DECLARATION(lazy_get_data_action)
+HPX_REGISTER_ACTION(lazy_get_data_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server
@@ -226,13 +234,21 @@ struct test_server
         // clang-format on
     }
 
+    hpx::naming::address get_current_address() const override
+    {
+        return hpx::naming::address(
+            hpx::naming::get_gid_from_locality_id(hpx::get_locality_id()),
+            hpx::components::get_component_type<test_server>(),
+            const_cast<test_server*>(this));
+    }
+
 private:
     int data_;
 };
 
 typedef hpx::components::component<test_server> server_type;
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
-    server_type, test_server, "test_server_base");
+    server_type, test_server, "test_server_base")
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_client : hpx::components::client_base<test_client, test_server_base>
@@ -292,7 +308,7 @@ bool test_migrate_polymorphic_component(
 {
     // create component on given locality
     test_client t1(hpx::new_<test_server>(source, 7, 42));
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -301,13 +317,13 @@ bool test_migrate_polymorphic_component(
 
     try
     {
-        hpx::cout << "Migrating..." << hpx::endl;
+        hpx::cout << "Migrating..." << std::endl;
         // migrate t1 to the target
         test_client t2(hpx::components::migrate<test_server>(t1, target));
 
         // wait for migration to be done
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
-        hpx::cout << "...completed migrating..." << hpx::endl;
+        HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
+        hpx::cout << "...completed migrating..." << std::endl;
 
         // the migrated object should have the same id as before
         HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -317,7 +333,7 @@ bool test_migrate_polymorphic_component(
         HPX_TEST_EQ(t2.get_data(), 42);
         HPX_TEST_EQ(t2.get_base_data(), 7);
 
-        hpx::cout << "...pass all tests!" << hpx::endl;
+        hpx::cout << "...pass all tests!" << std::endl;
     }
     catch (hpx::exception const& e)
     {
@@ -334,7 +350,7 @@ bool test_migrate_lazy_polymorphic_component(
 {
     // create component on given locality
     test_client t1(hpx::new_<test_server>(source, 7, 42));
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -347,7 +363,7 @@ bool test_migrate_lazy_polymorphic_component(
         test_client t2(hpx::components::migrate<test_server>(t1, target));
 
         // wait for migration to be done
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
         // the migrated object should have the same id as before
         HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -372,7 +388,7 @@ bool test_migrate_busy_polymorphic_component(
 {
     // create component on given locality
     test_client t1(hpx::new_<test_server>(source, 7, 42));
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -391,7 +407,7 @@ bool test_migrate_busy_polymorphic_component(
         HPX_TEST_EQ(t1.get_base_data(), 7);
 
         // wait for migration to be done
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
         // the migrated object should have the same id as before
         HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -419,7 +435,7 @@ bool test_migrate_lazy_busy_polymorphic_component(
 {
     // create component on given locality
     test_client t1(hpx::new_<test_server>(source, 7, 42));
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -438,7 +454,7 @@ bool test_migrate_lazy_busy_polymorphic_component(
         HPX_TEST_EQ(t1.lazy_get_base_data(), 7);
 
         // wait for migration to be done
-        HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+        HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
         // the migrated object should have the same id as before
         HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -465,7 +481,7 @@ bool test_migrate_polymorphic_component2(
     hpx::id_type source, hpx::id_type target)
 {
     test_client t1(hpx::new_<test_server>(source, 7, 42));
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -487,7 +503,7 @@ bool test_migrate_polymorphic_component2(
             HPX_TEST_EQ(t1.get_base_data(), 7);
 
             // wait for migration to be done
-            HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+            HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
             // the migrated object should have the same id as before
             HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -517,7 +533,7 @@ bool test_migrate_lazy_polymorphic_component2(
     hpx::id_type source, hpx::id_type target)
 {
     test_client t1(hpx::new_<test_server>(source, 7, 42));
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -539,7 +555,7 @@ bool test_migrate_lazy_polymorphic_component2(
             HPX_TEST_EQ(t1.lazy_get_base_data(), 7);
 
             // wait for migration to be done
-            HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+            HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
             // the migrated object should have the same id as before
             HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -570,7 +586,7 @@ bool test_migrate_busy_polymorphic_component2(
     hpx::id_type source, hpx::id_type target)
 {
     test_client t1(hpx::new_<test_server>(source, 7, 42));
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -592,7 +608,7 @@ bool test_migrate_busy_polymorphic_component2(
             HPX_TEST_EQ(t1.get_base_data(), 7);
 
             // wait for migration to be done
-            HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+            HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
             // the migrated object should have the same id as before
             HPX_TEST_EQ(t1.get_id(), t2.get_id());
@@ -643,7 +659,7 @@ bool test_migrate_lazy_busy_polymorphic_component2(
     hpx::id_type source, hpx::id_type target)
 {
     test_client t1(hpx::new_<test_server>(source, 7, 42));
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t1.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
@@ -665,7 +681,7 @@ bool test_migrate_lazy_busy_polymorphic_component2(
             HPX_TEST_EQ(t1.lazy_get_base_data(), 7);
 
             // wait for migration to be done
-            HPX_TEST_NEQ(hpx::naming::invalid_id, t2.get_id());
+            HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
 
             // the migrated object should have the same id as before
             HPX_TEST_EQ(t1.get_id(), t2.get_id());

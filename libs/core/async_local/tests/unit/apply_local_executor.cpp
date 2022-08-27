@@ -61,67 +61,66 @@ void test_apply_with_executor(Executor& exec)
     accumulator.store(0);
 
     {
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
         hpx::apply(exec, &increment, 1);
-        hpx::apply(exec, hpx::util::bind(&increment, 1));
-        hpx::apply(exec, hpx::util::bind(&increment, _1), 1);
+        hpx::apply(exec, hpx::bind(&increment, 1));
+        hpx::apply(exec, hpx::bind(&increment, _1), 1);
     }
 
     {
-        hpx::lcos::local::promise<std::int32_t> p;
+        hpx::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         p.set_value(1);
 
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
         hpx::apply(exec, &increment_with_future, f);
-        hpx::apply(exec, hpx::util::bind(&increment_with_future, f));
-        hpx::apply(exec, hpx::util::bind(&increment_with_future, _1), f);
+        hpx::apply(exec, hpx::bind(&increment_with_future, f));
+        hpx::apply(exec, hpx::bind(&increment_with_future, _1), f);
     }
 
     {
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
         hpx::apply(exec, increment, 1);
-        hpx::apply(exec, hpx::util::bind(increment, 1));
-        hpx::apply(exec, hpx::util::bind(increment, _1), 1);
+        hpx::apply(exec, hpx::bind(increment, 1));
+        hpx::apply(exec, hpx::bind(increment, _1), 1);
     }
 
     {
         increment_type inc;
 
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
         hpx::apply(exec, &increment_type::call, inc, 1);
-        hpx::apply(exec, hpx::util::bind(&increment_type::call, inc, 1));
-        hpx::apply(exec, hpx::util::bind(&increment_type::call, inc, _1), 1);
+        hpx::apply(exec, hpx::bind(&increment_type::call, inc, 1));
+        hpx::apply(exec, hpx::bind(&increment_type::call, inc, _1), 1);
     }
 
     {
         increment_function_object obj;
 
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
         hpx::apply(exec, obj, 1);
-        hpx::apply(exec, hpx::util::bind(obj, 1));
-        hpx::apply(exec, hpx::util::bind(obj, _1), 1);
+        hpx::apply(exec, hpx::bind(obj, 1));
+        hpx::apply(exec, hpx::bind(obj, _1), 1);
     }
 
     {
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
         hpx::apply(exec, increment_lambda, 1);
-        hpx::apply(exec, hpx::util::bind(increment_lambda, 1));
-        hpx::apply(exec, hpx::util::bind(increment_lambda, _1), 1);
+        hpx::apply(exec, hpx::bind(increment_lambda, 1));
+        hpx::apply(exec, hpx::bind(increment_lambda, _1), 1);
     }
 
     hpx::lcos::local::no_mutex result_mutex;
     std::unique_lock<hpx::lcos::local::no_mutex> l(result_mutex);
     result_cv.wait_for(l, std::chrono::seconds(1),
-        hpx::util::bind(
-            std::equal_to<std::int32_t>(), std::ref(accumulator), 18));
+        hpx::bind(std::equal_to<std::int32_t>(), std::ref(accumulator), 18));
 
     HPX_TEST_EQ(accumulator.load(), 18);
 }

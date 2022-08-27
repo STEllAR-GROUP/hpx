@@ -37,7 +37,7 @@ namespace hpx {
         }
 
         explicit error_info(Type&& value)
-          : _value(std::move(value))
+          : _value(HPX_MOVE(value))
         {
         }
 
@@ -53,7 +53,7 @@ namespace hpx {
         }                                                                      \
                                                                                \
         explicit NAME(TYPE&& value)                                            \
-          : error_info(::std::forward<TYPE>(value))                            \
+          : error_info(HPX_FORWARD(TYPE, value))                               \
         {                                                                      \
         }                                                                      \
     } /**/
@@ -129,9 +129,9 @@ namespace hpx {
             using node_type = detail::exception_info_node<ErrorInfo...>;
 
             node_ptr node = std::make_shared<node_type>(
-                std::forward<ErrorInfo>(tagged_values)...);
-            node->next = std::move(_data);
-            _data = std::move(node);
+                HPX_FORWARD(ErrorInfo, tagged_values)...);
+            node->next = HPX_MOVE(_data);
+            _data = HPX_MOVE(node);
             return *this;
         }
 
@@ -153,7 +153,7 @@ namespace hpx {
         {
             exception_with_info_base(
                 std::type_info const& type, exception_info xi)
-              : exception_info(std::move(xi))
+              : exception_info(HPX_MOVE(xi))
               , type(type)
             {
             }
@@ -168,20 +168,20 @@ namespace hpx {
         {
             explicit exception_with_info(E const& e, exception_info xi)
               : E(e)
-              , exception_with_info_base(typeid(E), std::move(xi))
+              , exception_with_info_base(typeid(E), HPX_MOVE(xi))
             {
             }
 
             explicit exception_with_info(E&& e, exception_info xi)
-              : E(std::move(e))
-              , exception_with_info_base(typeid(E), std::move(xi))
+              : E(HPX_MOVE(e))
+              , exception_with_info_base(typeid(E), HPX_MOVE(xi))
             {
             }
         };
     }    // namespace detail
 
     template <typename E>
-    HPX_NORETURN void throw_with_info(
+    [[noreturn]] void throw_with_info(
         E&& e, exception_info&& xi = exception_info())
     {
         using ED = typename std::decay<E>::type;
@@ -190,14 +190,13 @@ namespace hpx {
         static_assert(!std::is_base_of<exception_info, ED>::value,
             "E shall not derive from exception_info");
 
-        throw detail::exception_with_info<ED>(
-            std::forward<E>(e), std::move(xi));
+        throw detail::exception_with_info<ED>(HPX_FORWARD(E, e), HPX_MOVE(xi));
     }
 
     template <typename E>
-    HPX_NORETURN void throw_with_info(E&& e, exception_info const& xi)
+    [[noreturn]] void throw_with_info(E&& e, exception_info const& xi)
     {
-        throw_with_info(std::forward<E>(e), exception_info(xi));
+        throw_with_info(HPX_FORWARD(E, e), exception_info(xi));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -216,15 +215,15 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename E, typename F>
     auto invoke_with_exception_info(E const& e, F&& f)
-        -> decltype(std::forward<F>(f)(std::declval<exception_info const*>()))
+        -> decltype(HPX_FORWARD(F, f)(std::declval<exception_info const*>()))
     {
-        return std::forward<F>(f)(
+        return HPX_FORWARD(F, f)(
             dynamic_cast<exception_info const*>(std::addressof(e)));
     }
 
     template <typename F>
     auto invoke_with_exception_info(std::exception_ptr const& p, F&& f)
-        -> decltype(std::forward<F>(f)(std::declval<exception_info const*>()))
+        -> decltype(HPX_FORWARD(F, f)(std::declval<exception_info const*>()))
     {
         try
         {
@@ -233,19 +232,19 @@ namespace hpx {
         }
         catch (exception_info const& xi)
         {
-            return std::forward<F>(f)(&xi);
+            return HPX_FORWARD(F, f)(&xi);
         }
         catch (...)
         {
         }
-        return std::forward<F>(f)(nullptr);
+        return HPX_FORWARD(F, f)(nullptr);
     }
 
     template <typename F>
     auto invoke_with_exception_info(hpx::error_code const& ec, F&& f)
-        -> decltype(std::forward<F>(f)(std::declval<exception_info const*>()))
+        -> decltype(HPX_FORWARD(F, f)(std::declval<exception_info const*>()))
     {
         return invoke_with_exception_info(
-            detail::access_exception(ec), std::forward<F>(f));
+            detail::access_exception(ec), HPX_FORWARD(F, f));
     }
 }    // namespace hpx

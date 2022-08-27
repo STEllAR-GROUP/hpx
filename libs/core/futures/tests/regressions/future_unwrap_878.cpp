@@ -16,7 +16,7 @@
 
 int hpx_main()
 {
-    hpx::lcos::local::promise<hpx::future<int>> promise;
+    hpx::promise<hpx::future<int>> promise;
     hpx::future<hpx::future<int>> future = promise.get_future();
     std::exception_ptr p;
     try

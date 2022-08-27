@@ -55,4 +55,9 @@ extern "C" void _mm_pause();
 #define HPX_COMPILER_FENCE
 
 #endif
+
+#if !defined(HPX_SMT_PAUSE)
+#define HPX_SMT_PAUSE
+#endif
+
 #endif

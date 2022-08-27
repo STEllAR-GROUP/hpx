@@ -21,7 +21,7 @@
     {                                                                          \
         NAME.set(hpx::any(value));                                             \
     }                                                                          \
-    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, HPX_PP_CAT(NAME, _));     \
+    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, HPX_PP_CAT(NAME, _))      \
                                                                                \
     ::hpx::lcos::broadcast<HPX_PP_CAT(HPX_PP_CAT(NAME, _), _action)> NAME;     \
     /**/
@@ -29,7 +29,7 @@
 namespace hpx { namespace lcos {
     namespace detail {
         void broadcast_impl(std::vector<hpx::id_type> ids,
-            hpx::util::function<void(hpx::id_type)> fun,
+            hpx::distributed::function<void(hpx::id_type)> fun,
             std::size_t fan_out = 2);
         HPX_DEFINE_PLAIN_ACTION(broadcast_impl, broadcast_impl_action);
     }    // namespace detail
@@ -39,14 +39,14 @@ namespace hpx { namespace lcos {
     {
         broadcast()
           : ready_future(ready_promise.get_future())
-          , bcast_future(hpx::lcos::make_ready_future())
+          , bcast_future(hpx::make_ready_future())
         {
         }
 
         explicit broadcast(hpx::id_type id, std::size_t fan_out = 2)
           : this_id(id)
           , ready_future(ready_promise.get_future())
-          , bcast_future(hpx::lcos::make_ready_future())
+          , bcast_future(hpx::make_ready_future())
         {
         }
 
@@ -86,10 +86,9 @@ namespace hpx { namespace lcos {
 
                     bcast_future = hpx::async<detail::broadcast_impl_action>(
                         locality, std::move(bcast_ids),
-                        hpx::util::bind(act, hpx::util::placeholders::_1, a0),
-                        fan_out);
+                        hpx::bind(act, hpx::placeholders::_1, a0), fan_out);
                 }
-                return hpx::lcos::make_ready_future(a0);
+                return hpx::make_ready_future(a0);
             }
             else
             {
@@ -102,7 +101,7 @@ namespace hpx { namespace lcos {
                 }
 
                 return bcast_future.then(
-                    hpx::util::bind(&broadcast::when_dst<A0>, this));
+                    hpx::bind(&broadcast::when_dst<A0>, this));
             }
         }
 
@@ -124,7 +123,7 @@ namespace hpx { namespace lcos {
         std::size_t fan_out;
 
         hpx::lcos::local::and_gate bcast_gate;
-        hpx::lcos::local::promise<void> ready_promise;
+        hpx::promise<void> ready_promise;
         hpx::future<void> ready_future;
         hpx::any recv_value;
         hpx::future<void> bcast_future;
@@ -132,7 +131,8 @@ namespace hpx { namespace lcos {
 
     namespace detail {
         void broadcast_impl(std::vector<hpx::id_type> ids,
-            hpx::util::function<void(hpx::id_type)> fun, std::size_t fan_out)
+            hpx::distributed::function<void(hpx::id_type)> fun,
+            std::size_t fan_out)
         {
             // Call some action for the fan_out first ids here ...
             std::vector<hpx::future<void>> broadcast_futures;

@@ -15,8 +15,7 @@
 
 #include <cstdint>
 
-namespace performance_counters { namespace sine { namespace server
-{
+namespace performance_counters { namespace sine { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     //[sine_counter_definition
     class sine_counter
@@ -24,7 +23,11 @@ namespace performance_counters { namespace sine { namespace server
     //]
     {
     public:
-        sine_counter() : current_value_(0), evaluated_at_(0) {}
+        sine_counter()
+          : current_value_(0)
+          , evaluated_at_(0)
+        {
+        }
         explicit sine_counter(
             hpx::performance_counters::counter_info const& info);
 
@@ -52,5 +55,5 @@ namespace performance_counters { namespace sine { namespace server
 
         hpx::util::interval_timer timer_;
     };
-}}}
+}}}    // namespace performance_counters::sine::server
 #endif

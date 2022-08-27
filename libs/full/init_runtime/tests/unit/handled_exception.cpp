@@ -20,7 +20,7 @@ void throw_hpx_exception()
         hpx::bad_request, "throw_hpx_exception", "testing HPX exception");
 }
 
-HPX_PLAIN_ACTION(throw_hpx_exception, throw_hpx_exception_action);
+HPX_PLAIN_ACTION(throw_hpx_exception, throw_hpx_exception_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()

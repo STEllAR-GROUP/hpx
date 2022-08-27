@@ -19,22 +19,22 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::components::component<
-    ::performance_counters::sine::server::sine_counter
-> sine_counter_type;
+    ::performance_counters::sine::server::sine_counter>
+    sine_counter_type;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC(
-    sine_counter_type, sine_counter, "base_performance_counter");
+    sine_counter_type, sine_counter, "base_performance_counter")
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace performance_counters { namespace sine { namespace server
-{
+namespace performance_counters { namespace sine { namespace server {
     ///////////////////////////////////////////////////////////////////////////
-    sine_counter::sine_counter(hpx::performance_counters::counter_info const& info)
-      : hpx::performance_counters::base_performance_counter<sine_counter>(info),
-        current_value_(0),
-        evaluated_at_(0),
-        timer_(hpx::util::bind(&sine_counter::evaluate, this),
-            1000000, "sine example performance counter")
+    sine_counter::sine_counter(
+        hpx::performance_counters::counter_info const& info)
+      : hpx::performance_counters::base_performance_counter<sine_counter>(info)
+      , current_value_(0)
+      , evaluated_at_(0)
+      , timer_(hpx::bind(&sine_counter::evaluate, this), 1000000,
+            "sine example performance counter")
     {
     }
 
@@ -48,8 +48,8 @@ namespace performance_counters { namespace sine { namespace server
         return timer_.stop();
     }
 
-    hpx::performance_counters::counter_value
-        sine_counter::get_counter_value(bool reset)
+    hpx::performance_counters::counter_value sine_counter::get_counter_value(
+        bool reset)
     {
         std::int64_t const scaling = 100000;
 
@@ -75,7 +75,8 @@ namespace performance_counters { namespace sine { namespace server
     void sine_counter::finalize()
     {
         timer_.stop();
-        hpx::performance_counters::base_performance_counter<sine_counter>::finalize();
+        hpx::performance_counters::base_performance_counter<
+            sine_counter>::finalize();
     }
 
     bool sine_counter::evaluate()
@@ -85,5 +86,5 @@ namespace performance_counters { namespace sine { namespace server
         current_value_ = std::sin(evaluated_at_ / 1e10);
         return true;
     }
-}}}
+}}}    // namespace performance_counters::sine::server
 #endif

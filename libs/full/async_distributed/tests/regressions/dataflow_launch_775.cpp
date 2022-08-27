@@ -18,7 +18,7 @@
 
 using hpx::dataflow;
 
-typedef hpx::lcos::shared_future<double> future_type;
+typedef hpx::shared_future<double> future_type;
 
 template <typename Value>
 struct mul

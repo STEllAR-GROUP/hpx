@@ -31,6 +31,6 @@ namespace hpx {
     ///           function is called. The name is retrieved from the underlying
     ///           networking layer and may be different for different parcelports.
     ///
-    /// \see      \a future<std::string> get_locality_name(naming::id_type const& id)
+    /// \see      \a future<std::string> get_locality_name(hpx::id_type const& id)
     HPX_CORE_EXPORT std::string get_locality_name();
 }    // namespace hpx

@@ -90,7 +90,9 @@ configure_file(
   @ONLY
 )
 # ... and the build dir
-set(HPX_CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+set(HPX_CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake"
+                          "${HPX_CMAKE_ADDITIONAL_MODULE_PATH_BUILD}"
+)
 configure_file(
   cmake/templates/HPXMacros.cmake.in
   "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXMacros.cmake"

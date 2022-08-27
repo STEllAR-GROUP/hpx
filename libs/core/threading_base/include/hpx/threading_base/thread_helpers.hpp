@@ -11,8 +11,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/execution_base/register_locks.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
@@ -382,7 +382,7 @@ namespace hpx { namespace threads {
         thread_id_type const& id, error_code& ec = throws);
 
     HPX_CORE_EXPORT bool add_thread_exit_callback(thread_id_type const& id,
-        util::function_nonser<void()> const& f, error_code& ec = throws);
+        hpx::function<void()> const& f, error_code& ec = throws);
 
     HPX_CORE_EXPORT void free_thread_exit_callbacks(
         thread_id_type const& id, error_code& ec = throws);
@@ -414,8 +414,8 @@ namespace hpx { namespace threads {
         thread_id_type const& id, std::size_t data, error_code& ec = throws);
 #endif
 
-    HPX_CORE_EXPORT std::size_t& get_continuation_recursion_count();
-    HPX_CORE_EXPORT void reset_continuation_recursion_count();
+    HPX_CORE_EXPORT std::size_t& get_continuation_recursion_count() noexcept;
+    HPX_CORE_EXPORT void reset_continuation_recursion_count() noexcept;
     /// \endcond
 
     /// Returns a pointer to the pool that was used to run the current thread

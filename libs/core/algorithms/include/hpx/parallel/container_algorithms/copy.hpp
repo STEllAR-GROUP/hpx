@@ -349,10 +349,10 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
@@ -376,8 +376,8 @@ namespace hpx { namespace ranges {
     using copy_if_result = parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct copy_t final
+    // CPO for hpx::ranges::copy
+    inline constexpr struct copy_t final
       : hpx::detail::tag_parallel_algorithm<copy_t>
     {
     private:
@@ -393,14 +393,14 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             ranges::copy_result<FwdIter1, FwdIter>>::type
-        tag_fallback_dispatch(hpx::ranges::copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::copy_t, ExPolicy&& policy,
             FwdIter1 iter, Sent1 sent, FwdIter dest)
         {
             using copy_iter_t =
                 hpx::parallel::v1::detail::copy_iter<FwdIter1, FwdIter>;
 
             return hpx::parallel::v1::detail::transfer<copy_iter_t>(
-                std::forward<ExPolicy>(policy), iter, sent, dest);
+                HPX_FORWARD(ExPolicy, policy), iter, sent, dest);
         }
 
         // clang-format off
@@ -415,7 +415,7 @@ namespace hpx { namespace ranges {
             ranges::copy_result<
                 typename hpx::traits::range_traits<Rng>::iterator_type,
                 FwdIter>>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::ranges::copy_t, ExPolicy&& policy, Rng&& rng, FwdIter dest)
         {
             using copy_iter_t = hpx::parallel::v1::detail::copy_iter<
@@ -423,7 +423,7 @@ namespace hpx { namespace ranges {
                 FwdIter>;
 
             return hpx::parallel::v1::detail::transfer<copy_iter_t>(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), dest);
         }
 
@@ -435,7 +435,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend ranges::copy_result<FwdIter1, FwdIter> tag_fallback_dispatch(
+        friend ranges::copy_result<FwdIter1, FwdIter> tag_fallback_invoke(
             hpx::ranges::copy_t, FwdIter1 iter, Sent1 sent, FwdIter dest)
         {
             using copy_iter_t =
@@ -454,7 +454,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend ranges::copy_result<
             typename hpx::traits::range_traits<Rng>::iterator_type, FwdIter>
-        tag_fallback_dispatch(hpx::ranges::copy_t, Rng&& rng, FwdIter dest)
+        tag_fallback_invoke(hpx::ranges::copy_t, Rng&& rng, FwdIter dest)
         {
             using copy_iter_t = hpx::parallel::v1::detail::copy_iter<
                 typename hpx::traits::range_traits<Rng>::iterator_type,
@@ -467,8 +467,8 @@ namespace hpx { namespace ranges {
     } copy{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::copy_n
-    HPX_INLINE_CONSTEXPR_VARIABLE struct copy_n_t final
+    // CPO for hpx::ranges::copy_n
+    inline constexpr struct copy_n_t final
       : hpx::detail::tag_parallel_algorithm<copy_n_t>
     {
     private:
@@ -482,7 +482,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             ranges::copy_n_result<FwdIter1, FwdIter2>>::type
-        tag_fallback_dispatch(hpx::ranges::copy_n_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::copy_n_t, ExPolicy&& policy,
             FwdIter1 first, Size count, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -497,12 +497,12 @@ namespace hpx { namespace ranges {
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     ranges::copy_n_result<FwdIter1, FwdIter2>>::
                     get(ranges::copy_n_result<FwdIter1, FwdIter2>{
-                        std::move(first), std::move(dest)});
+                        HPX_MOVE(first), HPX_MOVE(dest)});
             }
 
             return hpx::parallel::v1::detail::copy_n<
                 ranges::copy_n_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first, std::size_t(count),
+                .call(HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
                     dest);
         }
 
@@ -512,7 +512,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value)>
         // clang-format on
-        friend ranges::copy_n_result<FwdIter1, FwdIter2> tag_fallback_dispatch(
+        friend ranges::copy_n_result<FwdIter1, FwdIter2> tag_fallback_invoke(
             hpx::ranges::copy_n_t, FwdIter1 first, Size count, FwdIter2 dest)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -524,7 +524,7 @@ namespace hpx { namespace ranges {
             if (hpx::parallel::v1::detail::is_negative(count))
             {
                 return ranges::copy_n_result<FwdIter1, FwdIter2>{
-                    std::move(first), std::move(dest)};
+                    HPX_MOVE(first), HPX_MOVE(dest)};
             }
 
             return hpx::parallel::v1::detail::copy_n<
@@ -534,8 +534,8 @@ namespace hpx { namespace ranges {
     } copy_n{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::copy_if
-    HPX_INLINE_CONSTEXPR_VARIABLE struct copy_if_t final
+    // CPO for hpx::ranges::copy_if
+    inline constexpr struct copy_if_t final
       : hpx::detail::tag_parallel_algorithm<copy_if_t>
     {
     private:
@@ -556,7 +556,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             ranges::copy_if_result<FwdIter1, FwdIter>>::type
-        tag_fallback_dispatch(hpx::ranges::copy_if_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::copy_if_t, ExPolicy&& policy,
             FwdIter1 iter, Sent1 sent, FwdIter dest, Pred&& pred,
             Proj&& proj = Proj())
         {
@@ -570,8 +570,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::copy_if<
                 hpx::parallel::util::in_out_result<FwdIter1, FwdIter>>()
-                .call(std::forward<ExPolicy>(policy), iter, sent, dest,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), iter, sent, dest,
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -592,7 +592,7 @@ namespace hpx { namespace ranges {
             ranges::copy_if_result<
                 typename hpx::traits::range_traits<Rng>::iterator_type,
                 FwdIter>>::type
-        tag_fallback_dispatch(hpx::ranges::copy_if_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::copy_if_t, ExPolicy&& policy,
             Rng&& rng, FwdIter dest, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value ||
@@ -604,9 +604,9 @@ namespace hpx { namespace ranges {
                 hpx::parallel::util::in_out_result<
                     typename hpx::traits::range_traits<Rng>::iterator_type,
                     FwdIter>>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, std::forward<Pred>(pred),
-                    std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -624,7 +624,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend ranges::copy_if_result<FwdIter1, FwdIter> tag_fallback_dispatch(
+        friend ranges::copy_if_result<FwdIter1, FwdIter> tag_fallback_invoke(
             hpx::ranges::copy_if_t, FwdIter1 iter, Sent1 sent, FwdIter dest,
             Pred&& pred, Proj&& proj = Proj())
         {
@@ -637,7 +637,7 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::copy_if<
                 hpx::parallel::util::in_out_result<FwdIter1, FwdIter>>()
                 .call(hpx::execution::seq, iter, sent, dest,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -655,7 +655,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend ranges::copy_if_result<
             typename hpx::traits::range_traits<Rng>::iterator_type, FwdIter>
-        tag_fallback_dispatch(hpx::ranges::copy_if_t, Rng&& rng, FwdIter dest,
+        tag_fallback_invoke(hpx::ranges::copy_if_t, Rng&& rng, FwdIter dest,
             Pred&& pred, Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_output_iterator<FwdIter>::value),
@@ -666,99 +666,10 @@ namespace hpx { namespace ranges {
                     typename hpx::traits::range_traits<Rng>::iterator_type,
                     FwdIter>>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, std::forward<Pred>(pred),
-                    std::forward<Proj>(proj));
+                    hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
-
     } copy_if{};
-
 }}    // namespace hpx::ranges
-
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::copy is deprecated, use hpx::ranges::copy instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            hpx::ranges::copy_result<FwdIter1, FwdIter>>::type
-        copy(ExPolicy&& policy, FwdIter1 iter, Sent1 sent, FwdIter dest)
-    {
-        using copy_iter_t = detail::copy_iter<FwdIter1, FwdIter>;
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::transfer<copy_iter_t>(
-            std::forward<ExPolicy>(policy), iter, sent, dest);
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename FwdIter,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            hpx::traits::is_iterator<FwdIter>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::copy is deprecated, use hpx::ranges::copy instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            ranges::copy_result<
-                typename hpx::traits::range_traits<Rng>::iterator_type,
-                FwdIter>>::type copy(ExPolicy&& policy, Rng&& rng, FwdIter dest)
-    {
-        using copy_iter_t = detail::copy_iter<
-            typename hpx::traits::range_traits<Rng>::iterator_type, FwdIter>;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::transfer<copy_iter_t>(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), dest);
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename OutIter, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            traits::is_projected_range<Proj, Rng>::value &&
-            hpx::traits::is_iterator<OutIter>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj, Rng>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::copy_if is deprecated, use "
-        "hpx::ranges::copy_if instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            ranges::copy_if_result<
-                typename hpx::traits::range_traits<Rng>::iterator_type,
-                OutIter>>::type copy_if(ExPolicy&& policy, Rng&& rng,
-            OutIter dest, F&& f, Proj&& proj = Proj())
-    {
-        return copy_if(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), dest, std::forward<F>(f),
-            std::forward<Proj>(proj));
-    }
-}}}    // namespace hpx::parallel::v1
 
 #endif    // DOXYGEN

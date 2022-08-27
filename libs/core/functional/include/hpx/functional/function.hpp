@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,16 +19,18 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sig, bool Serializable = true>
+    template <typename Sig, bool Serializable = false>
     class function;
 
     template <typename R, typename... Ts, bool Serializable>
     class function<R(Ts...), Serializable>
-      : public detail::basic_function<R(Ts...), true, Serializable>
+      : public util::detail::basic_function<R(Ts...), true, Serializable>
     {
-        using base_type = detail::basic_function<R(Ts...), true, Serializable>;
+        using base_type =
+            util::detail::basic_function<R(Ts...), true, Serializable>;
 
     public:
         using result_type = R;
@@ -41,25 +43,23 @@ namespace hpx { namespace util {
         function& operator=(function&&) noexcept = default;
 
         // the split SFINAE prevents MSVC from eagerly instantiating things
-        template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable1 = typename std::enable_if<
-                !std::is_same<FD, function>::value>::type,
+        template <typename F, typename FD = std::decay_t<F>,
+            typename Enable1 = std::enable_if_t<!std::is_same_v<FD, function>>,
             typename Enable2 =
-                typename std::enable_if<is_invocable_r_v<R, FD&, Ts...>>::type>
+                std::enable_if_t<is_invocable_r_v<R, FD&, Ts...>>>
         function(F&& f)
         {
-            assign(std::forward<F>(f));
+            assign(HPX_FORWARD(F, f));
         }
 
         // the split SFINAE prevents MSVC from eagerly instantiating things
-        template <typename F, typename FD = typename std::decay<F>::type,
-            typename Enable1 = typename std::enable_if<
-                !std::is_same<FD, function>::value>::type,
+        template <typename F, typename FD = std::decay_t<F>,
+            typename Enable1 = std::enable_if_t<!std::is_same_v<FD, function>>,
             typename Enable2 =
-                typename std::enable_if<is_invocable_r_v<R, FD&, Ts...>>::type>
+                std::enable_if_t<is_invocable_r_v<R, FD&, Ts...>>>
         function& operator=(F&& f)
         {
-            assign(std::forward<F>(f));
+            assign(HPX_FORWARD(F, f));
             return *this;
         }
 
@@ -70,28 +70,46 @@ namespace hpx { namespace util {
         using base_type::target;
     };
 
+    namespace distributed {
+
+        // serializable function is equivalent to hpx::distributed::function
+        template <typename Sig>
+        using function = hpx::function<Sig, true>;
+    }    // namespace distributed
+}    // namespace hpx
+
+namespace hpx::util {
+
+    template <typename Sig, bool Serializable = true>
+    using function HPX_DEPRECATED_V(1, 8,
+        "hpx::util::function is deprecated. Please use hpx::function "
+        "instead.") = hpx::function<Sig, Serializable>;
+
     template <typename Sig>
-    using function_nonser = function<Sig, false>;
-}}    // namespace hpx::util
+    using function_nonser HPX_DEPRECATED_V(1, 8,
+        "hpx::util::function_nonser is deprecated. Please use hpx::function "
+        "instead.") = hpx::function<Sig>;
+}    // namespace hpx::util
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits {
+
     template <typename Sig, bool Serializable>
-    struct get_function_address<util::function<Sig, Serializable>>
+    struct get_function_address<hpx::function<Sig, Serializable>>
     {
         static constexpr std::size_t call(
-            util::function<Sig, Serializable> const& f) noexcept
+            hpx::function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_address();
         }
     };
 
     template <typename Sig, bool Serializable>
-    struct get_function_annotation<util::function<Sig, Serializable>>
+    struct get_function_annotation<hpx::function<Sig, Serializable>>
     {
         static constexpr char const* call(
-            util::function<Sig, Serializable> const& f) noexcept
+            hpx::function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation();
         }
@@ -99,10 +117,10 @@ namespace hpx { namespace traits {
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
     template <typename Sig, bool Serializable>
-    struct get_function_annotation_itt<util::function<Sig, Serializable>>
+    struct get_function_annotation_itt<hpx::function<Sig, Serializable>>
     {
         static util::itt::string_handle call(
-            util::function<Sig, Serializable> const& f) noexcept
+            hpx::function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation_itt();
         }

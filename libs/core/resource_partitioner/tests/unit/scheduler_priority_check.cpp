@@ -59,20 +59,20 @@ int hpx_main(variables_map& vm)
         std::cout << "Setting shared-priority mode flags" << std::endl;
         sched->add_remove_scheduler_mode(
             // add these flags
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::enable_stealing |
-                hpx::threads::policies::enable_stealing_numa |
-                hpx::threads::policies::assign_work_round_robin |
-                hpx::threads::policies::steal_high_priority_first),
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::enable_stealing_numa |
+                hpx::threads::policies::scheduler_mode::
+                    assign_work_round_robin |
+                hpx::threads::policies::scheduler_mode::
+                    steal_high_priority_first,
             // remove these flags
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::assign_work_thread_parent |
-                hpx::threads::policies::steal_after_local |
-                hpx::threads::policies::do_background_work |
-                hpx::threads::policies::reduce_thread_priority |
-                hpx::threads::policies::delay_exit |
-                hpx::threads::policies::fast_idle_mode |
-                hpx::threads::policies::enable_elasticity));
+            hpx::threads::policies::scheduler_mode::assign_work_thread_parent |
+                hpx::threads::policies::scheduler_mode::steal_after_local |
+                hpx::threads::policies::scheduler_mode::do_background_work |
+                hpx::threads::policies::scheduler_mode::reduce_thread_priority |
+                hpx::threads::policies::scheduler_mode::delay_exit |
+                hpx::threads::policies::scheduler_mode::fast_idle_mode |
+                hpx::threads::policies::scheduler_mode::enable_elasticity);
     }
 
     // setup executors for different task priorities on the pools
@@ -118,14 +118,14 @@ int hpx_main(variables_map& vm)
     std::atomic<int> count_down((np_loop + hp_loop) * cycles);
     std::atomic<int> counter(0);
     auto f3 = hpx::async(NP_executor,
-        hpx::util::annotated_function(
+        hpx::annotated_function(
             [&]() {
                 ++launch_count;
                 for (int i = 0; i < np_total; ++i)
                 {
                     // normal priority
                     auto f3 = hpx::async(NP_executor,
-                        hpx::util::annotated_function(
+                        hpx::annotated_function(
                             [&, np_m]() {
                                 np_task_count++;
                                 dec_counter dec(count_down);
@@ -141,13 +141,13 @@ int hpx_main(variables_map& vm)
 
                         // Launch HP tasks using an HP task to do it
                         hpx::async(HP_executor,
-                            hpx::util::annotated_function(
+                            hpx::annotated_function(
                                 [&]() {
                                     ++hp_launch_count;
                                     for (int j = 0; j < hp_loop; ++j)
                                     {
                                         hpx::async(HP_executor,
-                                            hpx::util::annotated_function(
+                                            hpx::annotated_function(
                                                 [&]() {
                                                     ++hp_task_count;
                                                     dec_counter dec(count_down);

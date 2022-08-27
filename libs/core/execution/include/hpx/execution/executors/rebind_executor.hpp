@@ -81,11 +81,10 @@ namespace hpx { namespace parallel { namespace execution {
             using rebound_type =
                 typename rebind_executor<ExPolicy, Executor, Parameters>::type;
 
-            return rebound_type(std::forward<Executor>(exec),
-                std::forward<Parameters>(parameters));
+            return rebound_type(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(Parameters, parameters));
         }
     };
 
-    HPX_INLINE_CONSTEXPR_VARIABLE create_rebound_policy_t
-        create_rebound_policy{};
+    inline constexpr create_rebound_policy_t create_rebound_policy{};
 }}}    // namespace hpx::parallel::execution

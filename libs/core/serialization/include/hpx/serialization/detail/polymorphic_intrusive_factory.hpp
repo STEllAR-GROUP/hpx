@@ -30,7 +30,7 @@ namespace hpx { namespace serialization { namespace detail {
             std::unordered_map<std::string, ctor_type, hpx::util::jenkins_hash>;
 
     public:
-        polymorphic_intrusive_factory() {}
+        polymorphic_intrusive_factory() = default;
 
         HPX_CORE_EXPORT static polymorphic_intrusive_factory& instance();
 

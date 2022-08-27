@@ -99,7 +99,7 @@ void thread_affinity_foreman()
     std::size_t const os_threads = hpx::get_os_thread_count();
 
     // Find the global name of the current locality.
-    hpx::naming::id_type const here = hpx::find_here();
+    hpx::id_type const here = hpx::find_here();
 
     // Populate a set with the OS-thread numbers of all OS-threads on this
     // locality. When the hello world message has been printed on a particular
@@ -117,7 +117,7 @@ void thread_affinity_foreman()
         // Each iteration, we create a task for each element in the set of
         // OS-threads that have not said "Hello world". Each of these tasks
         // is encapsulated in a future.
-        std::vector<hpx::lcos::future<std::size_t>> futures;
+        std::vector<hpx::future<std::size_t>> futures;
         futures.reserve(attendance.size());
 
         for (std::size_t worker : attendance)
@@ -130,14 +130,14 @@ void thread_affinity_foreman()
         }
 
         // Wait for all of the futures to finish. The callback version of the
-        // hpx::lcos::wait function takes two arguments: a vector of futures,
+        // hpx::wait_each function takes two arguments: a vector of futures,
         // and a binary callback.  The callback takes two arguments; the first
         // is the index of the future in the vector, and the second is the
-        // return value of the future. hpx::lcos::wait doesn't return until
+        // return value of the future. hpx::wait_each doesn't return until
         // all the futures in the vector have returned.
-        using hpx::util::placeholders::_1;
-        hpx::lcos::wait_each(hpx::unwrapping(hpx::util::bind(
-                                 &check_in, std::ref(attendance), _1)),
+        using hpx::placeholders::_1;
+        hpx::wait_each(
+            hpx::unwrapping(hpx::bind(&check_in, std::ref(attendance), _1)),
             futures);
     }
 }
@@ -149,14 +149,13 @@ int hpx_main(hpx::program_options::variables_map& /*vm*/)
 {
     {
         // Get a list of all available localities.
-        std::vector<hpx::naming::id_type> localities =
-            hpx::find_all_localities();
+        std::vector<hpx::id_type> localities = hpx::find_all_localities();
 
         // Reserve storage space for futures, one for each locality.
-        std::vector<hpx::lcos::future<void>> futures;
+        std::vector<hpx::future<void>> futures;
         futures.reserve(localities.size());
 
-        for (hpx::naming::id_type const& node : localities)
+        for (hpx::id_type const& node : localities)
         {
             // Asynchronously start a new task. The task is encapsulated in a
             // future, which we can query to determine if the task has

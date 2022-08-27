@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //  Copyright (c) 2017 Denis Blank
 //
@@ -6,7 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file lcos/when_all.hpp
+/// \file when_all.hpp
 
 #pragma once
 
@@ -41,7 +41,7 @@ namespace hpx {
     template <typename InputIter,
         typename Container = vector<
             future<typename std::iterator_traits<InputIter>::value_type>>>
-    future<Container> when_all(InputIter first, InputIter last);
+    hpx::future<Container> when_all(InputIter first, InputIter last);
 
     /// The function \a when_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -67,7 +67,7 @@ namespace hpx {
     ///       The future returned by \a when_all will not throw an exception,
     ///       but the futures held in the output collection may.
     template <typename Range>
-    future<Range> when_all(Range&& values);
+    hpx::future<Range> when_all(Range&& values);
 
     /// The function \a when_all is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -92,7 +92,7 @@ namespace hpx {
     ///       The future returned by \a when_all will not throw an exception,
     ///       but the futures held in the output collection may.
     template <typename... T>
-    future<tuple<future<T>...>> when_all(T&&... futures);
+    hpx::future<hpx::tuple<hpx::future<T>...>> when_all(T&&... futures);
 
     /// The function \a when_all_n is an operator allowing to join on the result
     /// of all given futures. It AND-composes all future objects given and
@@ -127,7 +127,7 @@ namespace hpx {
     template <typename InputIter,
         typename Container = vector<
             future<typename std::iterator_traits<InputIter>::value_type>>>
-    future<Container> when_all_n(InputIter begin, std::size_t count);
+    hpx::future<Container> when_all_n(InputIter begin, std::size_t count);
 }    // namespace hpx
 
 #else    // DOXYGEN
@@ -139,6 +139,7 @@ namespace hpx {
 #include <hpx/futures/detail/future_transforms.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_future.hpp>
+#include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
@@ -152,144 +153,154 @@ namespace hpx {
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos {
-    namespace detail {
+namespace hpx {
+
+    namespace lcos { namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable = void>
         struct when_all_result
         {
-            typedef T type;
+            using type = T;
 
-            static type call(T&& t)
+            static type call(T&& t) noexcept
             {
-                return std::move(t);
+                return HPX_MOVE(t);
             }
         };
 
         template <typename T>
         struct when_all_result<hpx::tuple<T>,
-            typename std::enable_if<traits::is_future_range<T>::value>::type>
+            std::enable_if_t<hpx::traits::is_future_range_v<T>>>
         {
-            typedef T type;
+            using type = T;
 
-            static type call(hpx::tuple<T>&& t)
+            static type call(hpx::tuple<T>&& t) noexcept
             {
-                return std::move(hpx::get<0>(t));
+                return HPX_MOVE(hpx::get<0>(t));
             }
         };
 
+        template <typename T>
+        using when_all_result_t = typename when_all_result<T>::type;
+
         template <typename Tuple>
         class async_when_all_frame
-          : public future_data<typename when_all_result<Tuple>::type>
+          : public future_data<when_all_result_t<Tuple>>
         {
         public:
-            typedef typename when_all_result<Tuple>::type result_type;
-            typedef hpx::lcos::future<result_type> type;
-            typedef hpx::lcos::detail::future_data<result_type> base_type;
+            using result_type = when_all_result_t<Tuple>;
+            using type = hpx::future<result_type>;
+            using base_type = hpx::lcos::detail::future_data<result_type>;
 
             explicit async_when_all_frame(
                 typename base_type::init_no_addref no_addref)
-              : future_data<typename when_all_result<Tuple>::type>(no_addref)
+              : base_type(no_addref)
             {
             }
 
             template <typename T>
-            auto operator()(util::async_traverse_visit_tag, T&& current)
-                -> decltype(async_visit_future(std::forward<T>(current)))
+            auto operator()(hpx::util::async_traverse_visit_tag, T&& current)
+                -> decltype(async_visit_future(HPX_FORWARD(T, current)))
             {
-                return async_visit_future(std::forward<T>(current));
+                return async_visit_future(HPX_FORWARD(T, current));
             }
 
             template <typename T, typename N>
             auto operator()(
-                util::async_traverse_detach_tag, T&& current, N&& next)
+                hpx::util::async_traverse_detach_tag, T&& current, N&& next)
                 -> decltype(async_detach_future(
-                    std::forward<T>(current), std::forward<N>(next)))
+                    HPX_FORWARD(T, current), HPX_FORWARD(N, next)))
             {
                 return async_detach_future(
-                    std::forward<T>(current), std::forward<N>(next));
+                    HPX_FORWARD(T, current), HPX_FORWARD(N, next));
             }
 
             template <typename T>
-            void operator()(util::async_traverse_complete_tag, T&& pack)
+            void operator()(hpx::util::async_traverse_complete_tag, T&& pack)
             {
                 this->set_value(
-                    when_all_result<Tuple>::call(std::forward<T>(pack)));
+                    when_all_result<Tuple>::call(HPX_FORWARD(T, pack)));
             }
         };
 
         template <typename... T>
-        typename detail::async_when_all_frame<
-            hpx::tuple<typename traits::acquire_future<T>::type...>>::type
+        typename async_when_all_frame<
+            hpx::tuple<hpx::traits::acquire_future_t<T>...>>::type
         when_all_impl(T&&... args)
         {
-            typedef hpx::tuple<typename traits::acquire_future<T>::type...>
-                result_type;
-            typedef detail::async_when_all_frame<result_type> frame_type;
+            using result_type = hpx::tuple<hpx::traits::acquire_future_t<T>...>;
+            using frame_type = async_when_all_frame<result_type>;
+            using no_addref = typename frame_type::base_type::init_no_addref;
 
-            traits::acquire_future_disp func;
+            auto frame = hpx::util::traverse_pack_async_allocator(
+                hpx::util::internal_allocator<>{},
+                hpx::util::async_traverse_in_place_tag<frame_type>{},
+                no_addref{},
+                hpx::traits::acquire_future_disp()(HPX_FORWARD(T, args))...);
 
-            typename frame_type::base_type::init_no_addref no_addref;
-
-            auto frame = util::traverse_pack_async_allocator(
-                util::internal_allocator<>{},
-                util::async_traverse_in_place_tag<frame_type>{}, no_addref,
-                func(std::forward<T>(args))...);
-
-            using traits::future_access;
-            return future_access<typename frame_type::type>::create(
-                std::move(frame));
+            return hpx::traits::future_access<
+                typename frame_type::type>::create(HPX_MOVE(frame));
         }
-    }    // namespace detail
+    }}    // namespace lcos::detail
 
-    template <typename First, typename Second>
-    auto when_all(First&& first, Second&& second)
-        -> decltype(detail::when_all_impl(
-            std::forward<First>(first), std::forward<Second>(second)))
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename... Args>
+    auto when_all(Args&&... args) -> decltype(
+        hpx::lcos::detail::when_all_impl(HPX_FORWARD(Args, args)...))
     {
-        return detail::when_all_impl(
-            std::forward<First>(first), std::forward<Second>(second));
+        return hpx::lcos::detail::when_all_impl(HPX_FORWARD(Args, args)...);
     }
+
     template <typename Iterator,
-        typename Container = std::vector<
-            typename detail::future_iterator_traits<Iterator>::type>>
-    future<Container> when_all(Iterator begin, Iterator end)
+        typename Container =
+            std::vector<hpx::lcos::detail::future_iterator_traits_t<Iterator>>,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    decltype(auto) when_all(Iterator begin, Iterator end)
     {
-        return detail::when_all_impl(
-            detail::acquire_future_iterators<Iterator, Container>(begin, end));
+        return hpx::lcos::detail::when_all_impl(
+            hpx::lcos::detail::acquire_future_iterators<Iterator, Container>(
+                begin, end));
     }
 
-    inline lcos::future<hpx::tuple<>>    //-V524
+    template <typename Iterator,
+        typename Container =
+            std::vector<hpx::lcos::detail::future_iterator_traits_t<Iterator>>,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    decltype(auto) when_all_n(Iterator begin, std::size_t count)
+    {
+        return hpx::lcos::detail::when_all_impl(
+            hpx::lcos::detail::acquire_future_n<Iterator, Container>(
+                begin, count));
+    }
+
+    inline hpx::future<hpx::tuple<>>    //-V524
     when_all()
     {
-        typedef hpx::tuple<> result_type;
-        return lcos::make_ready_future(result_type());
+        return hpx::make_ready_future(hpx::tuple<>());
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator,
-        typename Container = std::vector<
-            typename lcos::detail::future_iterator_traits<Iterator>::type>>
-    lcos::future<Container> when_all_n(Iterator begin, std::size_t count)
-    {
-        return detail::when_all_impl(
-            detail::acquire_future_n<Iterator, Container>(begin, count));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename... Args,
-        typename std::enable_if<(sizeof...(Args) == 1U) ||
-            (sizeof...(Args) > 2U)>::type* = nullptr>
-    auto when_all(Args&&... args)
-        -> decltype(detail::when_all_impl(std::forward<Args>(args)...))
-    {
-        return detail::when_all_impl(std::forward<Args>(args)...);
-    }
-}}    // namespace hpx::lcos
-
-namespace hpx {
-    using lcos::when_all;
-    using lcos::when_all_n;
 }    // namespace hpx
+
+namespace hpx::lcos {
+
+    template <typename... Args>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::when_all is deprecated. Use hpx::when_all instead.")
+    auto when_all(Args&&... args)
+    {
+        return hpx::when_all(HPX_FORWARD(Args, args)...);
+    }
+
+    template <typename Iterator,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::when_all_n is deprecated. Use hpx::when_all_n instead.")
+    auto when_all_n(Iterator begin, std::size_t count)
+    {
+        return hpx::when_all(begin, count);
+    }
+}    // namespace hpx::lcos
 
 #endif    // DOXYGEN

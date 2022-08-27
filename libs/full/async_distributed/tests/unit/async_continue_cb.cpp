@@ -24,20 +24,20 @@ std::int32_t increment(std::int32_t i)
 {
     return i + 1;
 }
-HPX_PLAIN_ACTION(increment);    // defines increment_action
+HPX_PLAIN_ACTION(increment)    // defines increment_action
 
 std::int32_t increment_with_future(hpx::shared_future<std::int32_t> fi)
 {
     return fi.get() + 1;
 }
-HPX_PLAIN_ACTION(increment_with_future);
+HPX_PLAIN_ACTION(increment_with_future)
 
 ///////////////////////////////////////////////////////////////////////////////
 std::int32_t mult2(std::int32_t i)
 {
     return i * 2;
 }
-HPX_PLAIN_ACTION(mult2);    // defines mult2_action
+HPX_PLAIN_ACTION(mult2)    // defines mult2_action
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<int> callback_called(0);
@@ -70,7 +70,7 @@ int hpx_main()
             inc, make_continuation(), hpx::find_here(), &cb, 42);
         HPX_TEST_EQ(f1.get(), 43);
 
-        hpx::lcos::promise<std::int32_t> p;
+        hpx::distributed::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<int> f2 = hpx::async_continue_cb(
@@ -94,7 +94,7 @@ int hpx_main()
             inc, make_continuation(), localities[0], &cb, 42);
         HPX_TEST_EQ(f1.get(), 43);
 
-        hpx::lcos::promise<std::int32_t> p;
+        hpx::distributed::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<int> f2 = hpx::async_continue_cb(

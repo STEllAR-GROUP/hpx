@@ -23,7 +23,7 @@ double message_double(double d)
 {
     return d;
 }
-HPX_PLAIN_ACTION(message_double);
+HPX_PLAIN_ACTION(message_double)
 
 // ----------------------------------------------------------------------------
 int main()
@@ -37,23 +37,23 @@ int main()
         there = localities[0];
 
     std::size_t parcel_count = 0;
-    std::size_t loop         = 10000;
-    std::size_t window_size  = 1;
-    std::size_t skip         = 50;
+    std::size_t loop = 10000;
+    std::size_t window_size = 1;
+    std::size_t skip = 50;
 
     std::atomic<std::size_t> signal_count(0);
 
     hpx::lcos::local::sliding_semaphore sem(window_size, 0);
     message_double_action msg;
 
-    for (std::size_t i = 0; i < (loop*window_size) + skip; ++i)
+    for (std::size_t i = 0; i < (loop * window_size) + skip; ++i)
     {
         // launch a message to the remote node
         hpx::async(msg, there, 3.5)
             .then(hpx::launch::sync,
                 // when the message completes, increment our semaphore count
                 // so that N are always in flight
-                [&, parcel_count](hpx::future<double> &&) -> void {
+                [&, parcel_count](hpx::future<double>&&) -> void {
                     ++signal_count;
                     sem.signal(parcel_count);
                 });
@@ -67,7 +67,7 @@ int main()
 
     sem.wait(parcel_count + window_size - 1);
 
-    HPX_TEST_EQ(signal_count, (loop*window_size) + skip);
+    HPX_TEST_EQ(signal_count, (loop * window_size) + skip);
 
     return hpx::util::report_errors();
 }

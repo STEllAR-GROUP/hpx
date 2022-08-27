@@ -8,8 +8,8 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -21,20 +21,26 @@
 struct test_server : hpx::components::component_base<test_server>
 {
     test_server() = delete;
-    explicit test_server(int i) : i_(i) {}
+    explicit test_server(int i)
+      : i_(i)
+    {
+    }
 
-    hpx::id_type call() const { return hpx::find_here(); }
+    hpx::id_type call() const
+    {
+        return hpx::find_here();
+    }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call)
 
     int i_;
 };
 
 typedef hpx::components::component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 typedef test_server::call_action call_action;
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION(call_action)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {
@@ -42,10 +48,12 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 
     test_client(hpx::id_type const& id)
       : base_type(id)
-    {}
-    explicit test_client(hpx::future<hpx::id_type> && id)
+    {
+    }
+    explicit test_client(hpx::future<hpx::id_type>&& id)
       : base_type(std::move(id))
-    {}
+    {
+    }
 
     hpx::id_type call() const
     {
@@ -57,13 +65,13 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 void test_create_single_instance()
 {
     // make sure created objects live on locality they are supposed to be
-    for (hpx::id_type const& loc: hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         hpx::id_type id = hpx::new_<test_server>(loc, 42).get();
         HPX_TEST_EQ(hpx::async<call_action>(id).get(), loc);
     }
 
-    for (hpx::id_type const& loc: hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         test_client t1 = hpx::new_<test_client>(loc, 42);
         HPX_TEST_EQ(t1.call(), loc);
@@ -76,14 +84,14 @@ void test_create_single_instance()
     test_client t2 = hpx::new_<test_client>(hpx::default_layout, 42);
     HPX_TEST_EQ(t2.call(), hpx::find_here());
 
-    for (hpx::id_type const& loc: hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         hpx::id_type id =
             hpx::new_<test_server>(hpx::default_layout(loc), 42).get();
         HPX_TEST_EQ(hpx::async<call_action>(id).get(), loc);
     }
 
-    for (hpx::id_type const& loc: hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         test_client t3 = hpx::new_<test_client>(hpx::default_layout(loc), 42);
         HPX_TEST_EQ(t3.call(), loc);
@@ -94,25 +102,25 @@ void test_create_single_instance()
 void test_create_multiple_instances()
 {
     // make sure created objects live on locality they are supposed to be
-    for (hpx::id_type const& loc: hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         std::vector<hpx::id_type> ids =
             hpx::new_<test_server[]>(loc, 10, 42).get();
         HPX_TEST_EQ(ids.size(), std::size_t(10));
 
-        for (hpx::id_type const& id: ids)
+        for (hpx::id_type const& id : ids)
         {
             HPX_TEST_EQ(hpx::async<call_action>(id).get(), loc);
         }
     }
 
-    for (hpx::id_type const& loc: hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         std::vector<test_client> ids =
             hpx::new_<test_client[]>(loc, 10, 42).get();
         HPX_TEST_EQ(ids.size(), std::size_t(10));
 
-        for (test_client const& c: ids)
+        for (test_client const& c : ids)
         {
             HPX_TEST_EQ(c.call(), loc);
         }
@@ -122,7 +130,7 @@ void test_create_multiple_instances()
     std::vector<hpx::id_type> ids =
         hpx::new_<test_server[]>(hpx::default_layout, 10, 42).get();
     HPX_TEST_EQ(ids.size(), std::size_t(10));
-    for (hpx::id_type const& id: ids)
+    for (hpx::id_type const& id : ids)
     {
         HPX_TEST_EQ(hpx::async<call_action>(id).get(), hpx::find_here());
     }
@@ -130,30 +138,30 @@ void test_create_multiple_instances()
     std::vector<test_client> clients =
         hpx::new_<test_client[]>(hpx::default_layout, 10, 42).get();
     HPX_TEST_EQ(clients.size(), std::size_t(10));
-    for (test_client const& c: clients)
+    for (test_client const& c : clients)
     {
         HPX_TEST_EQ(c.call(), hpx::find_here());
     }
 
-    for (hpx::id_type const& loc: hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         std::vector<hpx::id_type> ids =
             hpx::new_<test_server[]>(hpx::default_layout(loc), 10, 42).get();
         HPX_TEST_EQ(ids.size(), std::size_t(10));
 
-        for (hpx::id_type const& id: ids)
+        for (hpx::id_type const& id : ids)
         {
             HPX_TEST_EQ(hpx::async<call_action>(id).get(), loc);
         }
     }
 
-    for (hpx::id_type const& loc: hpx::find_all_localities())
+    for (hpx::id_type const& loc : hpx::find_all_localities())
     {
         std::vector<test_client> ids =
             hpx::new_<test_client[]>(hpx::default_layout(loc), 10, 42).get();
         HPX_TEST_EQ(ids.size(), std::size_t(10));
 
-        for (test_client const& c: ids)
+        for (test_client const& c : ids)
         {
             HPX_TEST_EQ(c.call(), loc);
         }

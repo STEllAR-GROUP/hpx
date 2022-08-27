@@ -127,7 +127,7 @@ namespace hpx { namespace threads {
         {
             this->thread_data::rebind_base(init_data);
 
-            coroutine_.rebind(std::move(init_data.func), thread_id_type(this));
+            coroutine_.rebind(HPX_MOVE(init_data.func), thread_id_type(this));
 
             HPX_ASSERT(coroutine_.is_ready());
         }
@@ -135,7 +135,7 @@ namespace hpx { namespace threads {
         thread_data_stackless(thread_init_data& init_data, void* queue,
             std::ptrdiff_t stacksize, thread_id_addref addref)
           : thread_data(init_data, queue, stacksize, true, addref)
-          , coroutine_(std::move(init_data.func), thread_id_type(this_()))
+          , coroutine_(HPX_MOVE(init_data.func), thread_id_type(this_()))
         {
             HPX_ASSERT(coroutine_.is_ready());
         }
@@ -146,7 +146,7 @@ namespace hpx { namespace threads {
             std::ptrdiff_t stacksize,
             thread_id_addref addref = thread_id_addref::yes);
 
-        void destroy() override
+        void destroy() noexcept override
         {
             this->~thread_data_stackless();
             thread_alloc_.deallocate(this, 1);

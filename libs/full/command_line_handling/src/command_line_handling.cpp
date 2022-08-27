@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,9 @@
 #include <hpx/modules/format.hpp>
 #if defined(HPX_HAVE_MODULE_MPI_BASE)
 #include <hpx/modules/mpi_base.hpp>
+#endif
+#if defined(HPX_HAVE_MODULE_LCI_BASE)
+#include <hpx/modules/lci_base.hpp>
 #endif
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
@@ -104,7 +107,7 @@ namespace hpx { namespace util {
         inline std::string encode_and_enquote(std::string str)
         {
             encode(str, '\"', "\\\"", 2);
-            return detail::enquote(std::move(str));
+            return detail::enquote(HPX_MOVE(str));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -381,41 +384,37 @@ namespace hpx { namespace util {
                 get_number_of_default_cores(env, use_process_mask);
             const std::size_t batch_threads = env.retrieve_number_of_threads();
 
-            std::size_t default_threads = init_threads;
-
             std::string threads_str =
                 cfgmap.get_value<std::string>("hpx.os_threads",
                     rtcfg.get_entry(
-                        "hpx.os_threads", std::to_string(default_threads)));
+                        "hpx.os_threads", std::to_string(init_threads)));
 
+            std::size_t threads = 0;
             if ("cores" == threads_str)
             {
-                default_threads = init_cores;
+                threads = init_cores;
                 if (batch_threads != std::size_t(-1))
                 {
-                    default_threads = batch_threads;
+                    threads = batch_threads;
                 }
             }
             else if ("all" == threads_str)
             {
-                default_threads = init_threads;
+                threads = init_threads;
                 if (batch_threads != std::size_t(-1))
                 {
-                    default_threads = batch_threads;
+                    threads = batch_threads;
                 }
             }
             else if (batch_threads != std::size_t(-1))
             {
-                default_threads = batch_threads;
+                threads = batch_threads;
             }
             else
             {
-                default_threads =
-                    hpx::util::from_string<std::size_t>(threads_str);
+                threads = cfgmap.get_value<std::size_t>("hpx.os_threads",
+                    hpx::util::from_string<std::size_t>(threads_str));
             }
-
-            std::size_t threads = cfgmap.get_value<std::size_t>(
-                "hpx.os_threads", default_threads);
 
             if (vm.count("hpx:threads"))
             {
@@ -1511,7 +1510,7 @@ namespace hpx { namespace util {
     {
         if (options.empty())
         {
-            return std::move(args);
+            return HPX_MOVE(args);
         }
 
         using tokenizer = boost::tokenizer<boost::escaped_list_separator<char>>;
@@ -1554,8 +1553,7 @@ namespace hpx { namespace util {
         std::string prepend_command_line =
             rtcfg_.get_entry("hpx.commandline.prepend_options");
 
-        args =
-            prepend_options(std::move(args), std::move(prepend_command_line));
+        args = prepend_options(HPX_MOVE(args), HPX_MOVE(prepend_command_line));
 
         // Initial analysis of the command line options. This is
         // preliminary as it will not take into account any aliases as
@@ -1618,6 +1616,18 @@ namespace hpx { namespace util {
             num_localities_ =
                 static_cast<std::size_t>(util::mpi_environment::size());
             node_ = static_cast<std::size_t>(util::mpi_environment::rank());
+        }
+#endif
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
+    defined(HPX_HAVE_MODULE_LCI_BASE)
+        // better to put LCI init after MPI init, since LCI will also
+        // initialize MPI if MPI is not already initialized.
+        if (util::lci_environment::check_lci_environment(rtcfg_))
+        {
+            util::lci_environment::init(&argc, &argv, rtcfg_);
+            num_localities_ =
+                static_cast<std::size_t>(util::lci_environment::size());
+            node_ = static_cast<std::size_t>(util::lci_environment::rank());
         }
 #endif
 

@@ -130,7 +130,7 @@ namespace hpx { namespace traits {
 
             auto this_ = this->shared_from_this();
             auto on_ready =
-                [which, this_ = std::move(this_), op = std::forward<F>(op)](
+                [which, this_ = HPX_MOVE(this_), op = HPX_FORWARD(F, op)](
                     hpx::shared_future<void> f) mutable -> arg_type {
                 HPX_UNUSED(this_);
                 f.get();    // propagate any exceptions
@@ -138,7 +138,8 @@ namespace hpx { namespace traits {
                 auto& communicator = this_->communicator_;
 
                 lock_type l(communicator.mtx_);
-                util::ignore_while_checking<lock_type> il(&l);
+                util::ignore_while_checking il(&l);
+                HPX_UNUSED(il);
 
                 auto& data = communicator.template access_data<arg_type>(l);
                 if (!communicator.data_available_)
@@ -148,7 +149,7 @@ namespace hpx { namespace traits {
 
                     auto it = data.begin();
                     hpx::exclusive_scan(hpx::execution::seq, it, data.end(),
-                        dest.begin(), *it, std::forward<F>(op));
+                        dest.begin(), *it, HPX_FORWARD(F, op));
 
                     std::swap(data, dest);
                     communicator.data_available_ = true;
@@ -157,18 +158,19 @@ namespace hpx { namespace traits {
             };
 
             lock_type l(communicator_.mtx_);
-            util::ignore_while_checking<lock_type> il(&l);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
 
             hpx::future<arg_type> f =
                 communicator_.gate_.get_shared_future(l).then(
-                    hpx::launch::sync, std::move(on_ready));
+                    hpx::launch::sync, HPX_MOVE(on_ready));
 
             communicator_.gate_.synchronize(1, l);
 
             auto& data = communicator_.template access_data<arg_type>(l);
-            data[which] = std::forward<T>(t);
+            data[which] = HPX_FORWARD(T, t);
 
-            if (communicator_.gate_.set(which, std::move(l)))
+            if (communicator_.gate_.set(which, HPX_MOVE(l)))
             {
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
@@ -197,8 +199,8 @@ namespace hpx { namespace collectives {
         using arg_type = std::decay_t<T>;
 
         auto scan_data_direct =
-            [op = std::forward<F>(op),
-                local_result = std::forward<T>(local_result),
+            [op = HPX_FORWARD(F, op),
+                local_result = HPX_FORWARD(T, local_result),
                 this_site](communicator&& c) mutable -> hpx::future<arg_type> {
             using func_type = std::decay_t<F>;
             using action_type = typename detail::communicator_server::
@@ -209,15 +211,15 @@ namespace hpx { namespace collectives {
             // make sure id is kept alive as long as the returned future,
             // explicitly unwrap returned future
             hpx::future<arg_type> result = async(action_type(), c, this_site,
-                std::forward<T>(local_result), std::forward<F>(op));
+                HPX_FORWARD(T, local_result), HPX_FORWARD(F, op));
 
             traits::detail::get_shared_state(result)->set_on_completed(
-                [client = std::move(c)]() { HPX_UNUSED(client); });
+                [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
 
             return result;
         };
 
-        return fid.then(hpx::launch::sync, std::move(scan_data_direct));
+        return fid.then(hpx::launch::sync, HPX_MOVE(scan_data_direct));
     }
 
     template <typename T, typename F>
@@ -229,7 +231,7 @@ namespace hpx { namespace collectives {
     {
         return exclusive_scan(create_communicator(basename, num_sites,
                                   this_site, generation, root_site),
-            std::forward<T>(local_result), std::forward<F>(op), this_site);
+            HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site);
     }
 }}    // namespace hpx::collectives
 

@@ -12,7 +12,10 @@
 
 struct test
 {
-    test() { ++count; }
+    test()
+    {
+        ++count;
+    }
     test(test const&)
     {
         ++count;
@@ -22,7 +25,10 @@ struct test
         ++count;
         return *this;
     }
-    ~test() { --count; }
+    ~test()
+    {
+        --count;
+    }
 
     static int count;
 };
@@ -33,8 +39,8 @@ int hpx_main()
 {
     {
         HPX_TEST_EQ(test::count, 0);
-        hpx::lcos::promise<test> p;
-        hpx::lcos::future<test> f = p.get_future();
+        hpx::distributed::promise<test> p;
+        hpx::future<test> f = p.get_future();
         p.set_value(test());
         HPX_TEST_EQ(test::count, 1);
         f.get();
@@ -50,7 +56,7 @@ int hpx_main()
     return hpx::util::report_errors();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     return hpx::init(argc, argv);
 }

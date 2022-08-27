@@ -12,8 +12,8 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
-#include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/components.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -25,20 +25,26 @@
 struct test_server : hpx::components::component_base<test_server>
 {
     test_server() = delete;
-    explicit test_server(int i) : i_(i) {}
+    explicit test_server(int i)
+      : i_(i)
+    {
+    }
 
-    int call() const { return i_; }
+    int call() const
+    {
+        return i_;
+    }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call)
 
     int i_;
 };
 
 typedef hpx::components::component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 typedef test_server::call_action call_action;
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION(call_action)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {
@@ -48,10 +54,12 @@ struct test_client : hpx::components::client_base<test_client, test_server>
 
     test_client(hpx::id_type const& id)
       : base_type(id)
-    {}
-    explicit test_client(hpx::future<hpx::id_type> && id)
+    {
+    }
+    explicit test_client(hpx::future<hpx::id_type>&& id)
       : base_type(std::move(id))
-    {}
+    {
+    }
 
     int call() const
     {
@@ -71,7 +79,7 @@ void test_client_registration()
 
         HPX_TEST_EQ(42, c.call());
 
-        c_outer = c;        // should keep instance alive
+        c_outer = c;    // should keep instance alive
     }
 
     {

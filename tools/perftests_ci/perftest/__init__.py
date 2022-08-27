@@ -36,13 +36,14 @@ def _now():
     return datetime.now(timezone.utc).astimezone().isoformat()
 
 
-def run(local, scheduling_policy, threads, extra_opts):
+def run(local, targets_and_opts):
     from pyutils import buildinfo
 
-    binary = os.path.join(buildinfo.binary_dir, 'bin', 'future_overhead_report_test')
-    command = [binary] + [str(scheduling_policy)] + [str(threads)]
-    if extra_opts:
-        command += extra_opts.split()
+    binary_dir = buildinfo.binary_dir
+    command = []
+    if targets_and_opts:
+        run_command = os.path.join(binary_dir, targets_and_opts)
+        command += run_command.split()
 
     if local:
         output = runtools.run(command)

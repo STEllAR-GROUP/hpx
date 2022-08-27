@@ -55,8 +55,8 @@ namespace hpx { namespace util {
       , csv_header_(csv_header)
       , print_counters_locally_(print_counters_locally)
       , counter_types_(counter_types)
-      , timer_(util::bind_front(&query_counters::evaluate, this_(), false),
-            util::bind_front(&query_counters::terminate, this_()),
+      , timer_(hpx::bind_front(&query_counters::evaluate, this_(), false),
+            hpx::bind_front(&query_counters::terminate, this_()),
             interval * 1000, "query_counters", true)
     {
         // add counter prefix, if necessary
@@ -166,7 +166,7 @@ namespace hpx { namespace util {
         std::string const& name = info.fullname_;
         std::string const& uom = info.unit_of_measure_;
 
-        error_code ec(lightweight);    // do not throw
+        error_code ec(throwmode::lightweight);    // do not throw
         double val = value.get_value<double>(ec);
 
         if (!ec)
@@ -221,7 +221,7 @@ namespace hpx { namespace util {
         std::string const& name = info.fullname_;
         std::string const& uom = info.unit_of_measure_;
 
-        error_code ec(lightweight);    // do not throw
+        error_code ec(throwmode::lightweight);    // do not throw
 
         print_name_csv(*out, name);
         *out << "," << value.count_ << ",";
@@ -255,7 +255,7 @@ namespace hpx { namespace util {
         performance_counters::counter_info const& info,
         performance_counters::counter_value const& value)
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         double val = value.get_value<double>(ec);
 
         if (!ec)
@@ -537,8 +537,8 @@ namespace hpx { namespace util {
         // Output the performance counter value.
         if (!no_output)
             print_headers(output, infos);
-        print_values(no_output ? nullptr : &output, std::move(values),
-            std::move(indices), infos);
+        print_values(no_output ? nullptr : &output, HPX_MOVE(values),
+            HPX_MOVE(indices), infos);
 
         if (!no_output)
         {
@@ -591,8 +591,8 @@ namespace hpx { namespace util {
         // Output the performance counter value.
         if (!no_output)
             print_headers(output, infos);
-        print_values(no_output ? nullptr : &output, std::move(values),
-            std::move(indices), infos);
+        print_values(no_output ? nullptr : &output, HPX_MOVE(values),
+            HPX_MOVE(indices), infos);
 
         if (!no_output)
         {

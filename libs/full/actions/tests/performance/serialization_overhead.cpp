@@ -49,10 +49,9 @@ std::size_t get_archive_size(hpx::parcelset::parcel const& p,
 double benchmark_serialization(std::size_t data_size, std::size_t iterations,
     bool continuation, bool zerocopy)
 {
-    hpx::naming::id_type const here = hpx::find_here();
+    hpx::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
-        hpx::components::component_invalid,
-        reinterpret_cast<std::uint64_t>(&test_function));
+        hpx::components::component_invalid, (void*) &test_function);
 
     // compose archive flags
     std::string endian_out = hpx::get_config_entry("hpx.parcel.endian_out",
@@ -60,9 +59,11 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
     unsigned int out_archive_flags = 0U;
     if (endian_out == "little")
-        out_archive_flags |= hpx::serialization::endian_little;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_little);
     else if (endian_out == "big")
-        out_archive_flags |= hpx::serialization::endian_big;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::endian_big);
     else
     {
         HPX_TEST(endian_out == "little" || endian_out == "big");
@@ -73,8 +74,10 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 
     if (hpx::util::from_string<int>(array_optimization) == 0)
     {
-        out_archive_flags |= hpx::serialization::disable_array_optimization;
-        out_archive_flags |= hpx::serialization::disable_data_chunking;
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::disable_array_optimization);
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::disable_data_chunking);
     }
     else
     {
@@ -83,7 +86,8 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         if (!zerocopy ||
             hpx::util::from_string<int>(zero_copy_optimization) == 0)
         {
-            out_archive_flags |= hpx::serialization::disable_data_chunking;
+            out_archive_flags = out_archive_flags |
+                int(hpx::serialization::archive_flags::disable_data_chunking);
         }
     }
 
@@ -177,11 +181,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
         overall_time += timings[i].get();
 
     if (print_header)
-        hpx::cout << "datasize,testcount,average_time[s]\n" << hpx::flush;
+        hpx::cout << "datasize,testcount,average_time[s]\n" << std::flush;
 
     hpx::util::format_to(hpx::cout, "{},{},{}\n", data_size, iterations,
         overall_time / concurrency)
-        << hpx::flush;
+        << std::flush;
     hpx::util::print_cdash_timing("Serialization", overall_time / concurrency);
 
     return hpx::finalize();

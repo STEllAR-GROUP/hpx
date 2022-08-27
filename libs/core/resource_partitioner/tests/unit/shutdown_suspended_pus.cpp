@@ -6,6 +6,7 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
+#include <hpx/assert.hpp>
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/local/thread.hpp>
@@ -21,16 +22,19 @@
 #include <utility>
 #include <vector>
 
+std::size_t const max_threads = (std::min)(
+    std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
+
 int hpx_main()
 {
     std::size_t const num_threads = hpx::resource::get_num_threads("default");
 
-    HPX_TEST_EQ(std::size_t(4), num_threads);
+    HPX_TEST_EQ(std::size_t(max_threads), num_threads);
 
     hpx::threads::thread_pool_base& tp =
         hpx::resource::get_thread_pool("default");
 
-    HPX_TEST_EQ(tp.get_active_os_thread_count(), std::size_t(4));
+    HPX_TEST_EQ(tp.get_active_os_thread_count(), std::size_t(max_threads));
 
     // Remove all but one pu
     for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)
@@ -53,13 +57,12 @@ void test_scheduler(
 {
     hpx::local::init_params init_args;
 
-    init_args.cfg = {"hpx.os_threads=4"};
+    init_args.cfg = {"hpx.os_threads=" + std::to_string(max_threads)};
     init_args.rp_callback = [scheduler](auto& rp,
                                 hpx::program_options::variables_map const&) {
         rp.create_thread_pool("default", scheduler,
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::default_mode |
-                hpx::threads::policies::enable_elasticity));
+            hpx::threads::policies::scheduler_mode::default_ |
+                hpx::threads::policies::scheduler_mode::enable_elasticity);
     };
 
     HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);
@@ -67,6 +70,8 @@ void test_scheduler(
 
 int main(int argc, char* argv[])
 {
+    HPX_ASSERT(max_threads >= 2);
+
     {
         // These schedulers should succeed
         std::vector<hpx::resource::scheduling_policy> schedulers = {

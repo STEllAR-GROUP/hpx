@@ -48,15 +48,17 @@ int main(int argc, char* argv[])
 {
     hpx::local::init_params init_args;
 
-    init_args.cfg = {"hpx.os_threads=4"};
+    init_args.cfg = {"hpx.os_threads=" +
+        std::to_string(((std::min)(std::size_t(4),
+            std::size_t(hpx::threads::hardware_concurrency()))))};
     init_args.rp_callback = [](auto& rp,
                                 hpx::program_options::variables_map const&) {
         // Explicitly disable elasticity if it is in defaults
         rp.create_thread_pool("default",
             hpx::resource::scheduling_policy::local_priority_fifo,
             hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::default_mode &
-                ~hpx::threads::policies::enable_elasticity));
+                hpx::threads::policies::scheduler_mode::default_ &
+                ~hpx::threads::policies::scheduler_mode::enable_elasticity));
     };
 
     HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);

@@ -128,13 +128,6 @@ namespace hpx { namespace util {
 #endif
             "throw_on_held_lock = ${HPX_THROW_ON_HELD_LOCK:1}",
 #endif
-#ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
-#if defined(HPX_DEBUG)
-            "global_lock_detection = ${HPX_GLOBAL_LOCK_DETECTION:1}",
-#else
-            "global_lock_detection = ${HPX_GLOBAL_LOCK_DETECTION:0}",
-#endif
-#endif
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
 #ifdef HPX_DEBUG
             "minimal_deadlock_detection = ${HPX_MINIMAL_DEADLOCK_DETECTION:1}",
@@ -702,6 +695,8 @@ namespace hpx { namespace util {
       , argv0(argv0_)
 #endif
     {
+        (void) argv0_;
+
         pre_initialize_ini();
 
         // set global config options
@@ -945,19 +940,6 @@ namespace hpx { namespace util {
         return false;
     }
 
-    // Enable global lock tracking
-    bool runtime_configuration::enable_global_lock_detection() const
-    {
-#ifdef HPX_HAVE_VERIFY_LOCKS_GLOBALLY
-        if (util::section const* sec = get_section("hpx"); nullptr != sec)
-        {
-            return hpx::util::get_entry_as<int>(
-                       *sec, "global_lock_detection", 0) != 0;
-        }
-#endif
-        return false;
-    }
-
     // Enable minimal deadlock detection for HPX threads
     bool runtime_configuration::enable_minimal_deadlock_detection() const
     {
@@ -1184,7 +1166,8 @@ namespace hpx { namespace util {
             // file doesn't exist or is ill-formed
             if (&ec == &throws)
                 throw;
-            ec = make_error_code(e.get_error(), e.what(), hpx::rethrow);
+            ec = make_error_code(
+                e.get_error(), e.what(), hpx::throwmode::rethrow);
             return false;
         }
         return true;

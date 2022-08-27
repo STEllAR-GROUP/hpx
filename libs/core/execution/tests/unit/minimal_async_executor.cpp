@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,8 +29,7 @@ hpx::thread::id async_test(int passed_through)
     return hpx::this_thread::get_id();
 }
 
-void apply_test(
-    hpx::lcos::local::latch& l, hpx::thread::id& id, int passed_through)
+void apply_test(hpx::latch& l, hpx::thread::id& id, int passed_through)
 {
     HPX_TEST_EQ(passed_through, 42);
     id = hpx::this_thread::get_id();
@@ -47,12 +46,12 @@ void async_bulk_test(int, hpx::thread::id tid, int passed_through)    //-V813
 template <typename Executor>
 void test_apply(Executor& exec)
 {
-    hpx::lcos::local::latch l(2);
+    hpx::latch l(2);
     hpx::thread::id id;
 
     hpx::parallel::execution::post(
         exec, &apply_test, std::ref(l), std::ref(id), 42);
-    l.count_down_and_wait();
+    l.arrive_and_wait();
 
     HPX_TEST_NEQ(id, hpx::this_thread::get_id());
 }
@@ -80,11 +79,11 @@ void test_bulk_sync(Executor& exec)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     hpx::parallel::execution::bulk_sync_execute(
-        exec, hpx::util::bind(&async_bulk_test, _1, tid, _2), v, 42);
+        exec, hpx::bind(&async_bulk_test, _1, tid, _2), v, 42);
     hpx::parallel::execution::bulk_sync_execute(
         exec, &async_bulk_test, v, tid, 42);
 }
@@ -97,11 +96,11 @@ void test_bulk_async(Executor& exec)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
-    hpx::when_all(hpx::parallel::execution::bulk_async_execute(exec,
-                      hpx::util::bind(&async_bulk_test, _1, tid, _2), v, 42))
+    hpx::when_all(hpx::parallel::execution::bulk_async_execute(
+                      exec, hpx::bind(&async_bulk_test, _1, tid, _2), v, 42))
         .get();
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
                       exec, &async_bulk_test, v, tid, 42))

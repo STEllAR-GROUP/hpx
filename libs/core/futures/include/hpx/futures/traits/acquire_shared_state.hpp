@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2016 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,11 +13,13 @@
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/futures/traits/is_future_range.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/util/detail/reserve.hpp>
 
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
@@ -25,50 +27,56 @@
 #include <vector>
 
 namespace hpx { namespace traits {
+
     namespace detail {
+
         template <typename T, typename Enable = void>
         struct acquire_shared_state_impl;
     }
 
     template <typename T, typename Enable = void>
     struct acquire_shared_state
-      : detail::acquire_shared_state_impl<typename std::decay<T>::type>
+      : detail::acquire_shared_state_impl<std::decay_t<T>>
     {
     };
+
+    template <typename T>
+    using acquire_shared_state_t = typename acquire_shared_state<T>::type;
 
     struct acquire_shared_state_disp
     {
         template <typename T>
-        HPX_FORCEINLINE typename acquire_shared_state<T>::type operator()(
-            T&& t) const
+        HPX_FORCEINLINE acquire_shared_state_t<T> operator()(T&& t) const
         {
-            return acquire_shared_state<T>()(std::forward<T>(t));
+            return acquire_shared_state<T>()(HPX_FORWARD(T, t));
         }
     };
 
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable>
         struct acquire_shared_state_impl
         {
-            static_assert(!is_future_or_future_range<T>::value, "");
+            static_assert(!traits::detail::is_future_or_future_range_v<T>,
+                "!is_future_or_future_range_v<T>");
 
-            typedef T type;
+            using type = T;
 
             template <typename T_>
             HPX_FORCEINLINE T operator()(T_&& value) const
             {
-                return std::forward<T_>(value);
+                return HPX_FORWARD(T_, value);
             }
         };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Future>
         struct acquire_shared_state_impl<Future,
-            typename std::enable_if<is_future<Future>::value>::type>
+            std::enable_if_t<is_future_v<Future>>>
         {
-            typedef typename traits::detail::shared_state_ptr<
-                typename traits::future_traits<Future>::type>::type const& type;
+            using type = traits::detail::shared_state_ptr_t<
+                traits::future_traits_t<Future>> const&;
 
             HPX_FORCEINLINE type operator()(Future const& f) const
             {
@@ -77,28 +85,77 @@ namespace hpx { namespace traits {
         };
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename Cont>
+        struct is_static_array : std::false_type
+        {
+        };
+
+        template <typename T, std::size_t N>
+        struct is_static_array<std::array<T, N>> : std::true_type
+        {
+        };
+
         template <typename Range>
         struct acquire_shared_state_impl<Range,
-            typename std::enable_if<
-                traits::is_future_range<Range>::value>::type>
+            std::enable_if_t<traits::is_future_range_v<Range>>>
         {
-            typedef typename traits::future_range_traits<Range>::future_type
-                future_type;
-
-            typedef
-                typename traits::detail::shared_state_ptr_for<future_type>::type
-                    shared_state_ptr;
-            typedef std::vector<shared_state_ptr> type;
+            using type = traits::detail::shared_state_ptr_for_t<Range>;
 
             template <typename Range_>
-            HPX_FORCEINLINE std::vector<shared_state_ptr> operator()(
-                Range_&& futures) const
+            HPX_FORCEINLINE type operator()(Range_&& futures) const
             {
-                std::vector<shared_state_ptr> values;
-                detail::reserve_if_random_access_by_range(values, futures);
+                if constexpr (detail::is_static_array<type>::value)
+                {
+                    type values;
+                    std::transform(util::begin(futures), util::end(futures),
+                        util::begin(values), acquire_shared_state_disp());
+                    return values;
+                }
+                else
+                {
+                    type values;
+                    detail::reserve_if_random_access_by_range(values, futures);
 
-                std::transform(util::begin(futures), util::end(futures),
-                    std::back_inserter(values), acquire_shared_state_disp());
+                    std::transform(util::begin(futures), util::end(futures),
+                        std::back_inserter(values),
+                        acquire_shared_state_disp());
+                    return values;
+                }
+            }
+        };
+
+        template <typename Iterator>
+        struct acquire_shared_state_impl<Iterator,
+            std::enable_if_t<traits::is_iterator_v<Iterator>>>
+        {
+            using future_type =
+                typename std::iterator_traits<Iterator>::value_type;
+            using shared_state_ptr =
+                traits::detail::shared_state_ptr_for_t<future_type>;
+            using type = std::vector<shared_state_ptr>;
+
+            template <typename Iter>
+            HPX_FORCEINLINE type operator()(Iter begin, Iter end) const
+            {
+                type values;
+                detail::reserve_if_random_access_by_range(values, begin, end);
+
+                std::transform(begin, end, std::back_inserter(values),
+                    acquire_shared_state_disp());
+
+                return values;
+            }
+
+            template <typename Iter>
+            HPX_FORCEINLINE type operator()(Iter begin, std::size_t count) const
+            {
+                type values;
+                values.reserve(count);
+
+                for (std::size_t i = 0; i != count; ++i)
+                {
+                    values.push_back(acquire_shared_state_disp()(*begin++));
+                }
 
                 return values;
             }
@@ -107,11 +164,11 @@ namespace hpx { namespace traits {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename T>
-        HPX_FORCEINLINE typename acquire_shared_state<T>::type get_shared_state(
-            T&& t)
+        HPX_FORCEINLINE acquire_shared_state_t<T> get_shared_state(T&& t)
         {
-            return acquire_shared_state<T>()(std::forward<T>(t));
+            return acquire_shared_state<T>()(HPX_FORWARD(T, t));
         }
 
         template <typename R>
@@ -128,8 +185,8 @@ namespace hpx { namespace traits {
         struct wait_get_shared_state
         {
             HPX_FORCEINLINE
-            typename traits::detail::shared_state_ptr_for<Future>::type const&
-            operator()(Future const& f) const
+            traits::detail::shared_state_ptr_for_t<Future> const& operator()(
+                Future const& f) const
             {
                 return traits::detail::get_shared_state(f);
             }

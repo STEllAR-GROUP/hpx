@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2021 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(execution_headers
     hpx/execution/algorithms/bulk.hpp
-    hpx/execution/algorithms/detach.hpp
     hpx/execution/algorithms/detail/is_negative.hpp
     hpx/execution/algorithms/detail/partial_algorithm.hpp
     hpx/execution/algorithms/detail/predicates.hpp
@@ -16,15 +15,18 @@ set(execution_headers
     hpx/execution/algorithms/ensure_started.hpp
     hpx/execution/algorithms/execute.hpp
     hpx/execution/algorithms/just.hpp
-    hpx/execution/algorithms/just_on.hpp
     hpx/execution/algorithms/keep_future.hpp
     hpx/execution/algorithms/let_error.hpp
+    hpx/execution/algorithms/let_stopped.hpp
     hpx/execution/algorithms/let_value.hpp
     hpx/execution/algorithms/make_future.hpp
-    hpx/execution/algorithms/on.hpp
+    hpx/execution/algorithms/schedule_from.hpp
     hpx/execution/algorithms/split.hpp
+    hpx/execution/algorithms/start_detached.hpp
     hpx/execution/algorithms/sync_wait.hpp
-    hpx/execution/algorithms/transform.hpp
+    hpx/execution/algorithms/then.hpp
+    hpx/execution/algorithms/transfer.hpp
+    hpx/execution/algorithms/transfer_just.hpp
     hpx/execution/algorithms/when_all.hpp
     hpx/execution/detail/async_launch_policy_dispatch.hpp
     hpx/execution/detail/execution_parameter_callbacks.hpp
@@ -41,23 +43,35 @@ set(execution_headers
     hpx/execution/executors/execution_parameters_fwd.hpp
     hpx/execution/executors/fused_bulk_execute.hpp
     hpx/execution/executors/guided_chunk_size.hpp
+    hpx/execution/executors/num_cores.hpp
     hpx/execution/executors/persistent_auto_chunk_size.hpp
     hpx/execution/executors/polymorphic_executor.hpp
     hpx/execution/executors/rebind_executor.hpp
     hpx/execution/executors/static_chunk_size.hpp
+    hpx/execution/queries/get_allocator.hpp
+    hpx/execution/queries/get_scheduler.hpp
+    hpx/execution/queries/get_delegatee_scheduler.hpp
+    hpx/execution/queries/get_stop_token.hpp
+    hpx/execution/queries/read.hpp
     hpx/execution/traits/detail/simd/vector_pack_alignment_size.hpp
+    hpx/execution/traits/detail/simd/vector_pack_all_any_none.hpp
     hpx/execution/traits/detail/simd/vector_pack_count_bits.hpp
+    hpx/execution/traits/detail/simd/vector_pack_find.hpp
     hpx/execution/traits/detail/simd/vector_pack_load_store.hpp
     hpx/execution/traits/detail/simd/vector_pack_type.hpp
     hpx/execution/traits/detail/vc/vector_pack_alignment_size.hpp
+    hpx/execution/traits/detail/vc/vector_pack_all_any_none.hpp
     hpx/execution/traits/detail/vc/vector_pack_count_bits.hpp
+    hpx/execution/traits/detail/vc/vector_pack_find.hpp
     hpx/execution/traits/detail/vc/vector_pack_load_store.hpp
     hpx/execution/traits/detail/vc/vector_pack_type.hpp
     hpx/execution/traits/executor_traits.hpp
     hpx/execution/traits/future_then_result_exec.hpp
     hpx/execution/traits/is_execution_policy.hpp
     hpx/execution/traits/vector_pack_alignment_size.hpp
+    hpx/execution/traits/vector_pack_all_any_none.hpp
     hpx/execution/traits/vector_pack_count_bits.hpp
+    hpx/execution/traits/vector_pack_find.hpp
     hpx/execution/traits/vector_pack_load_store.hpp
     hpx/execution/traits/vector_pack_type.hpp
 )
@@ -85,6 +99,8 @@ set(execution_compat_headers
     hpx/parallel/executors/rebind_executor.hpp => hpx/execution.hpp
     hpx/parallel/executors/static_chunk_size.hpp => hpx/execution.hpp
     hpx/parallel/traits/vector_pack_alignment_size.hpp => hpx/execution.hpp
+    hpx/parallel/traits/vector_pack_all_any_none.hpp => hpx/execution.hpp
+    hpx/parallel/traits/vector_pack_find.hpp => hpx/execution.hpp
     hpx/parallel/traits/vector_pack_count_bits.hpp => hpx/execution.hpp
     hpx/parallel/traits/vector_pack_load_store.hpp => hpx/execution.hpp
     hpx/parallel/traits/vector_pack_type.hpp => hpx/execution.hpp
@@ -113,6 +129,7 @@ add_hpx_module(
     hpx_pack_traversal
     hpx_errors
     hpx_memory
+    hpx_synchronization
     hpx_thread_support
     hpx_timing
     hpx_topology

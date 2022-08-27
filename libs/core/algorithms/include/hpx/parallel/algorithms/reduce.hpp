@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -215,10 +215,10 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/accumulate.hpp>
@@ -254,8 +254,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static T sequential(
                 ExPolicy, InIterB first, InIterE last, T_&& init, Reduce&& r)
             {
-                return detail::accumulate(first, last, std::forward<T_>(init),
-                    std::forward<Reduce>(r));
+                return detail::accumulate(
+                    first, last, HPX_FORWARD(T_, init), HPX_FORWARD(Reduce, r));
             }
 
             template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
@@ -267,129 +267,41 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first == last)
                 {
                     return util::detail::algorithm_result<ExPolicy, T>::get(
-                        std::forward<T_>(init));
+                        HPX_FORWARD(T_, init));
                 }
 
                 auto f1 = [r](FwdIterB part_begin, std::size_t part_size) -> T {
                     T val = *part_begin;
                     return util::accumulate_n(
-                        ++part_begin, --part_size, std::move(val), r);
+                        ++part_begin, --part_size, HPX_MOVE(val), r);
                 };
 
                 return util::partitioner<ExPolicy, T>::call(
-                    std::forward<ExPolicy>(policy), first,
-                    detail::distance(first, last), std::move(f1),
-                    hpx::unwrapping([init = std::forward<T_>(init),
-                                        r = std::forward<Reduce>(r)](
-                                        std::vector<T>&& results) -> T {
-                        return util::accumulate_n(hpx::util::begin(results),
-                            hpx::util::size(results), init, r);
-                    }));
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1),
+                    hpx::unwrapping(
+                        [init = HPX_FORWARD(T_, init),
+                            r = HPX_FORWARD(Reduce, r)](auto&& results) -> T {
+                            return util::accumulate_n(hpx::util::begin(results),
+                                hpx::util::size(results), init, r);
+                        }));
             }
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-        typename T, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::reduce is deprecated, use hpx::ranges::reduce "
-        "instead") typename util::detail::algorithm_result<ExPolicy, T>::type
-        reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init, F&& f)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIterB>::value,
-            "Requires at least forward iterator.");
-
-        static_assert(hpx::traits::is_forward_iterator<FwdIterE>::value,
-            "Requires at least forward iterator.");
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::reduce<T>().call(std::forward<ExPolicy>(policy), first,
-            last, std::move(init), std::forward<F>(f));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-        typename T,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::reduce is deprecated, use hpx::ranges::reduce instead")
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-        reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last, T init)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIterB>::value,
-            "Requires at least forward iterator.");
-
-        static_assert(hpx::traits::is_forward_iterator<FwdIterE>::value,
-            "Requires at least forward iterator.");
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::reduce<T>().call(std::forward<ExPolicy>(policy), first,
-            last, std::move(init), std::plus<T>());
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_sentinel_for<FwdIterE, FwdIterB>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::reduce is deprecated, use hpx::ranges::reduce instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIterB>::value_type>::type
-        reduce(ExPolicy&& policy, FwdIterB first, FwdIterE last)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIterB>::value,
-            "Requires at least forward iterator.");
-
-        static_assert(hpx::traits::is_forward_iterator<FwdIterE>::value,
-            "Requires at least forward iterator.");
-
-        using value_type = typename std::iterator_traits<FwdIterB>::value_type;
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::reduce<value_type>().call(std::forward<ExPolicy>(policy),
-            first, last, value_type{}, std::plus<value_type>());
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::reduce
-    HPX_INLINE_CONSTEXPR_VARIABLE struct reduce_t final
+    // CPO for hpx::reduce
+    inline constexpr struct reduce_t final
       : hpx::detail::tag_parallel_algorithm<reduce_t>
     {
     private:
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename T, typename F,
+        template <typename ExPolicy, typename FwdIter, typename F,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
@@ -397,19 +309,20 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_fallback_dispatch(hpx::reduce_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(hpx::reduce_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, T init, F&& f)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                std::forward<ExPolicy>(policy), first, last, std::move(init),
-                std::forward<F>(f));
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
+                HPX_FORWARD(F, f));
         }
 
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename T,
+        template <typename ExPolicy, typename FwdIter,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
@@ -417,14 +330,14 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_fallback_dispatch(hpx::reduce_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(hpx::reduce_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, T init)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                std::forward<ExPolicy>(policy), first, last, std::move(init),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
                 std::plus<T>{});
         }
 
@@ -437,7 +350,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<FwdIter>::value_type>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::reduce_t, ExPolicy&& policy, FwdIter first, FwdIter last)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -447,41 +360,43 @@ namespace hpx {
                 typename std::iterator_traits<FwdIter>::value_type;
 
             return hpx::parallel::v1::detail::reduce<value_type>().call(
-                std::forward<ExPolicy>(policy), first, last, value_type{},
+                HPX_FORWARD(ExPolicy, policy), first, last, value_type{},
                 std::plus<value_type>{});
         }
 
         // clang-format off
-        template <typename FwdIter, typename T, typename F,
+        template <typename FwdIter, typename F,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend T tag_fallback_dispatch(
+        friend T tag_fallback_invoke(
             hpx::reduce_t, FwdIter first, FwdIter last, T init, F&& f)
         {
             static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                hpx::execution::seq, first, last, std::move(init),
-                std::forward<F>(f));
+                hpx::execution::seq, first, last, HPX_MOVE(init),
+                HPX_FORWARD(F, f));
         }
 
         // clang-format off
-        template <typename FwdIter, typename T,
+        template <typename FwdIter,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend T tag_fallback_dispatch(
+        friend T tag_fallback_invoke(
             hpx::reduce_t, FwdIter first, FwdIter last, T init)
         {
             static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::reduce<T>().call(
-                hpx::execution::seq, first, last, std::move(init),
+                hpx::execution::seq, first, last, HPX_MOVE(init),
                 std::plus<T>{});
         }
 
@@ -492,7 +407,7 @@ namespace hpx {
             )>
         // clang-format on
         friend typename std::iterator_traits<FwdIter>::value_type
-        tag_fallback_dispatch(hpx::reduce_t, FwdIter first, FwdIter last)
+        tag_fallback_invoke(hpx::reduce_t, FwdIter first, FwdIter last)
         {
             static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
                 "Requires at least input iterator.");

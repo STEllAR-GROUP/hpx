@@ -6,6 +6,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_mpi/mpi_exception.hpp>
 #include <hpx/async_mpi/mpi_future.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/threading_base.hpp>
@@ -14,6 +15,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <ostream>
 #include <string>
@@ -23,18 +25,83 @@
 #include <mpi.h>
 
 namespace hpx { namespace mpi { namespace experimental {
+
     namespace detail {
 
-        // extract MPI error message
-        std::string error_message(int code)
+        // Holds an MPI_Request and a callback. The callback is intended to be
+        // called when the operation tight to the request handle is finished.
+        struct request_callback
         {
-            int N = 1023;
-            std::unique_ptr<char[]> err_buff(new char[std::size_t(N) + 1]);
-            err_buff[0] = '\0';
+            MPI_Request request;
+            request_callback_function_type callback_function;
+        };
 
-            MPI_Error_string(code, err_buff.get(), &N);
+        using request_callback_queue_type =
+            concurrency::ConcurrentQueue<request_callback>;
 
-            return err_buff.get();
+        request_callback_queue_type& get_request_callback_queue()
+        {
+            static request_callback_queue_type request_callback_queue;
+            return request_callback_queue;
+        }
+
+        using request_callback_vector_type = std::vector<request_callback>;
+
+        request_callback_vector_type& get_request_callback_vector()
+        {
+            static request_callback_vector_type request_callback_vector;
+            return request_callback_vector;
+        }
+
+        std::size_t get_num_active_requests_in_vector()
+        {
+            return std::count_if(detail::get_requests_vector().begin(),
+                detail::get_requests_vector().end(),
+                [](MPI_Request r) { return r != MPI_REQUEST_NULL; });
+        }
+
+        // used internally to add an MPI_Request to the lockfree queue
+        // that will be used by the polling routines to check when requests
+        // have completed
+        void add_to_request_callback_queue(request_callback&& req_callback)
+        {
+            get_request_callback_queue().enqueue(std::move(req_callback));
+            ++(get_mpi_info().requests_queue_size_);
+
+            if constexpr (mpi_debug.is_enabled())
+            {
+                mpi_debug.debug(debug::str<>("request callback queued"),
+                    get_mpi_info(), "request",
+                    debug::hex<8>(req_callback.request));
+            }
+        }
+
+        // used internally to add a request to the main polling vector
+        // that is passed to MPI_Testany
+        void add_to_request_callback_vector(request_callback&& req_callback)
+        {
+            get_requests_vector().push_back(req_callback.request);
+            get_request_callback_vector().push_back(std::move(req_callback));
+            get_mpi_info().requests_vector_size_ =
+                static_cast<std::uint32_t>(get_requests_vector().size());
+
+            if constexpr (mpi_debug.is_enabled())
+            {
+                mpi_debug.debug(
+                    debug::str<>("request callback moved from queue to vector"),
+                    get_mpi_info(), "request",
+                    debug::hex<8>(req_callback.request), "callbacks in vector",
+                    debug::dec<3>(get_request_callback_vector().size()),
+                    "non null",
+                    debug::dec<3>(get_num_active_requests_in_vector()));
+            }
+        }
+
+        void add_request_callback(
+            request_callback_function_type&& callback, MPI_Request request)
+        {
+            detail::add_to_request_callback_queue(
+                request_callback{request, std::move(callback)});
         }
 
         // mutex needed to protect mpi request vector, note that the
@@ -62,10 +129,10 @@ namespace hpx { namespace mpi { namespace experimental {
             std::ostream& os, mpi_info const&)
         {
             os << "R " << debug::dec<3>(get_mpi_info().rank_) << "/"
-               << debug::dec<3>(get_mpi_info().size_) << " active futures "
-               << debug::dec<3>(get_mpi_info().active_futures_size_)
+               << debug::dec<3>(get_mpi_info().size_) << " requests in vector "
+               << debug::dec<3>(get_mpi_info().requests_vector_size_)
                << " queued requests "
-               << debug::dec<3>(get_mpi_info().request_queue_size_);
+               << debug::dec<3>(get_mpi_info().requests_queue_size_);
             return os;
         }
 
@@ -77,57 +144,10 @@ namespace hpx { namespace mpi { namespace experimental {
                 detail::error_message(*errorcode));
         }
 
-        std::vector<MPI_Request>& get_active_requests()
+        std::vector<MPI_Request>& get_requests_vector()
         {
-            static std::vector<MPI_Request> active_requests;
-            return active_requests;
-        }
-
-        std::vector<future_data_ptr>& get_active_futures()
-        {
-            static std::vector<future_data_ptr> active_futures;
-            return active_futures;
-        }
-
-        queue_type& get_request_queue()
-        {
-            static queue_type request_queue;
-            return request_queue;
-        }
-
-        // used internally to add an MPI_Request to the lockfree queue
-        // that will be used by the polling routines to check when requests
-        // have completed
-        void add_to_request_queue(future_data_ptr data)
-        {
-            // place this future data request in our queue for handling
-            get_request_queue().enqueue(data);
-            ++(get_mpi_info().request_queue_size_);
-
-            mpi_debug.debug(debug::str<>("request queued"), get_mpi_info(),
-                "request", debug::hex<8>(data->request_));
-        }
-
-        // used internally to add a request to the main polling vector
-        // that is passed to MPI_Testany
-        void add_to_request_vector(future_data_ptr data)
-        {
-            // this will make a copy and increment the ref count
-            get_active_futures().push_back(data);
-            get_active_requests().push_back(data->request_);
-            get_mpi_info().active_futures_size_ = get_active_futures().size();
-
-            mpi_debug.debug(debug::str<>("add request"), get_mpi_info(),
-                "request", debug::hex<8>(data->request_), "vector size",
-                debug::dec<3>(get_active_futures().size()), "non null",
-                debug::dec<3>(get_number_of_active_requests()));
-        }
-
-        std::size_t get_number_of_active_requests()
-        {
-            return std::count_if(detail::get_active_requests().begin(),
-                detail::get_active_requests().end(),
-                [](MPI_Request r) { return r != MPI_REQUEST_NULL; });
+            static std::vector<MPI_Request> requests_vector;
+            return requests_vector;
         }
 
 #if defined(HPX_DEBUG)
@@ -153,12 +173,9 @@ namespace hpx { namespace mpi { namespace experimental {
             detail::future_data_ptr data(new detail::future_data(
                 detail::future_data::init_no_addref{}, request));
 
-            // queue the future state internally for processing
-            detail::add_to_request_queue(data);
-
             // return a future bound to the shared state
             using traits::future_access;
-            return future_access<hpx::future<void>>::create(std::move(data));
+            return future_access<hpx::future<void>>::create(HPX_MOVE(data));
         }
         return hpx::make_ready_future<void>();
     }
@@ -181,11 +198,14 @@ namespace hpx { namespace mpi { namespace experimental {
     {
         using hpx::threads::policies::detail::polling_status;
 
+        auto& request_callback_vector = detail::get_request_callback_vector();
+        auto& requests_vector = detail::get_requests_vector();
+
         std::unique_lock<detail::mutex_type> lk(
             detail::get_vector_mtx(), std::try_to_lock);
         if (!lk.owns_lock())
         {
-            if (mpi_debug.is_enabled())
+            if constexpr (mpi_debug.is_enabled())
             {
                 // for debugging, create a timer
                 static auto poll_deb =
@@ -196,7 +216,7 @@ namespace hpx { namespace mpi { namespace experimental {
             return polling_status::idle;
         }
 
-        if (mpi_debug.is_enabled())
+        if constexpr (mpi_debug.is_enabled())
         {
             // for debugging, create a timer
             static auto poll_deb =
@@ -205,133 +225,135 @@ namespace hpx { namespace mpi { namespace experimental {
             mpi_debug.timed(poll_deb, detail::get_mpi_info());
         }
 
-        // have any requests been made that need to be handled?
-        // create a future data shared state
-        detail::future_data_ptr val;
-        while (detail::get_request_queue().try_dequeue(val))
         {
-            --(detail::get_mpi_info().request_queue_size_);
-            add_to_request_vector(std::move(val));
+            // have any requests been made that need to be handled?
+            detail::request_callback req_callback;
+            while (
+                detail::get_request_callback_queue().try_dequeue(req_callback))
+            {
+                --(detail::get_mpi_info().requests_queue_size_);
+                add_to_request_callback_vector(HPX_MOVE(req_callback));
+            }
         }
 
-        bool keep_trying = !detail::get_active_requests().empty();
+        bool keep_trying = !requests_vector.empty();
         while (keep_trying)
         {
             int index = 0;
             int flag = false;
             MPI_Status status;
 
-            int result = MPI_Testany(
-                static_cast<int>(detail::get_active_requests().size()),
-                &detail::get_active_requests()[0], &index, &flag, &status);
+            int result = MPI_Testany(static_cast<int>(requests_vector.size()),
+                requests_vector.data(), &index, &flag, &status);
 
-            if (result == MPI_SUCCESS)
+            if constexpr (mpi_debug.is_enabled())
             {
-                if (mpi_debug.is_enabled())
+                if (result == MPI_SUCCESS)
                 {
                     static auto poll_deb =
                         mpi_debug.make_timer(1, debug::str<>("Poll - success"));
 
-                    // clang-format off
-                    mpi_debug.timed(poll_deb,
-                        detail::get_mpi_info(),
-                        debug::str<>("Success"),
-                        "index", debug::dec<>(index == MPI_UNDEFINED ? -1 : index),
-                        "flag", debug::dec<>(flag),
-                        "status", debug::hex(status.MPI_ERROR));
-                    // clang-format on
+                    mpi_debug.timed(poll_deb, detail::get_mpi_info(),
+                        debug::str<>("Success"), "index",
+                        debug::dec<>(index == MPI_UNDEFINED ? -1 : index),
+                        "flag", debug::dec<>(flag), "status",
+                        debug::hex(status.MPI_ERROR));
                 }
-
-                if (index == MPI_UNDEFINED)
-                    break;
-
-                keep_trying = flag;
-                if (keep_trying)
-                {
-                    auto req =
-                        detail::get_active_requests()[std::size_t(index)];
-
-                    mpi_debug.debug(debug::str<>("MPI_Testany(set)"),
-                        detail::get_mpi_info(), "request", debug::hex<8>(req),
-                        "vector size",
-                        debug::dec<3>(detail::get_active_futures().size()),
-                        "non null",
-                        debug::dec<3>(detail::get_number_of_active_requests()));
-
-                    // mark the future as ready by setting the shared_state
-                    detail::get_active_futures()[std::size_t(index)]->set_data(
-                        MPI_SUCCESS);
-
-                    // remove the request from our vector to prevent retesting
-                    detail::get_active_requests()[std::size_t(index)] =
-                        MPI_REQUEST_NULL;
-
-                    detail::get_active_futures()[std::size_t(index)] = nullptr;
-                }
-            }
-            else
-            {
-                keep_trying = false;
-
-                if (mpi_debug.is_enabled())
+                else
                 {
                     auto poll_deb =
                         mpi_debug.make_timer(1, debug::str<>("Poll - <ERR>"));
 
-                    // clang-format off
-                    mpi_debug.error(poll_deb,
-                        detail::get_mpi_info(),
-                        debug::str<>("Poll <ERR>"),
-                        "MPI_ERROR", detail::error_message(status.MPI_ERROR),
-                        "status", debug::dec<>(status.MPI_ERROR),
-                        "index", debug::dec<>(index),
-                        "flag", debug::dec<>(flag));
-                    // clang-format on
+                    mpi_debug.error(poll_deb, detail::get_mpi_info(),
+                        debug::str<>("Poll <ERR>"), "MPI_ERROR",
+                        detail::error_message(status.MPI_ERROR), "status",
+                        debug::dec<>(status.MPI_ERROR), "index",
+                        debug::dec<>(index), "flag", debug::dec<>(flag));
                 }
+            }
+
+            // No operation completed
+            if (index == MPI_UNDEFINED)
+                break;
+
+            keep_trying = flag;
+            if constexpr (mpi_debug.is_enabled())
+            {
+                // One operation completed
+                if (keep_trying)
+                {
+                    mpi_debug.debug(debug::str<>("MPI_Testany(set)"),
+                        detail::get_mpi_info(), "request",
+                        debug::hex<8>(requests_vector[std::size_t(index)]),
+                        "vector size", debug::dec<3>(requests_vector.size()),
+                        "non null",
+                        debug::dec<3>(
+                            detail::get_num_active_requests_in_vector()));
+                }
+            }
+            if (result != MPI_SUCCESS)    // Error and operation not completed
+                keep_trying = false;
+            if (keep_trying || result != MPI_SUCCESS)
+            {
+                // Invoke the callback with the status of the completed
+                // operation (status of the request is forwarded to MPI_Testany)
+                request_callback_vector[std::size_t(index)].callback_function(
+                    result);
+
+                // Remove the request from our vector to prevent retesting
+                requests_vector[std::size_t(index)] = MPI_REQUEST_NULL;
+
+                // Could store only the callbacks, right now the request
+                // is only used for an assert
+                request_callback_vector[std::size_t(index)].request =
+                    MPI_REQUEST_NULL;
             }
         }
 
         // if there are more than 25% NULL request handles in our vector,
         // compact them
-        if (!detail::get_active_futures().empty())
+        if (!requests_vector.empty())
         {
-            std::size_t nulls =
-                std::count(detail::get_active_requests().begin(),
-                    detail::get_active_requests().end(), MPI_REQUEST_NULL);
+            std::size_t nulls = std::count(requests_vector.begin(),
+                requests_vector.end(), MPI_REQUEST_NULL);
 
-            if (nulls > detail::get_active_requests().size() / 4)
+            if (nulls > requests_vector.size() / 4)
             {
                 // compact away any requests that have been replaced by
                 // MPI_REQUEST_NULL
-                auto end1 = std::remove(detail::get_active_requests().begin(),
-                    detail::get_active_requests().end(), MPI_REQUEST_NULL);
-                detail::get_active_requests().resize(
-                    std::distance(detail::get_active_requests().begin(), end1));
+                auto end1 = std::remove(requests_vector.begin(),
+                    requests_vector.end(), MPI_REQUEST_NULL);
+                requests_vector.resize(
+                    std::distance(requests_vector.begin(), end1));
 
-                // compact away any null pointers in futures vector
-                auto end2 = std::remove(detail::get_active_futures().begin(),
-                    detail::get_active_futures().end(), nullptr);
-                detail::get_active_futures().resize(
-                    std::distance(detail::get_active_futures().begin(), end2));
+                auto end2 = std::remove_if(request_callback_vector.begin(),
+                    request_callback_vector.end(),
+                    [](detail::request_callback& req_callback) {
+                        return req_callback.request == MPI_REQUEST_NULL;
+                    });
+                request_callback_vector.resize(
+                    std::distance(request_callback_vector.begin(), end2));
 
-                if (detail::get_active_requests().size() !=
-                    detail::get_active_futures().size())
+                if (requests_vector.size() != request_callback_vector.size())
                 {
                     HPX_THROW_EXCEPTION(invalid_status,
                         "hpx::mpi::experimental::poll",
                         "Fatal Error: Mismatch in vectors");
                 }
 
-                detail::get_mpi_info().active_futures_size_ =
-                    detail::get_active_futures().size();
+                detail::get_mpi_info().requests_vector_size_ =
+                    static_cast<std::uint32_t>(requests_vector.size());
 
-                mpi_debug.debug(debug::str<>("MPI_REQUEST_NULL"),
-                    detail::get_mpi_info(), "nulls ", debug::dec<>(nulls));
+                if constexpr (mpi_debug.is_enabled())
+                {
+                    mpi_debug.debug(debug::str<>("MPI_REQUEST_NULL"),
+                        detail::get_mpi_info(), "nulls ", debug::dec<>(nulls));
+                }
             }
         }
 
-        return detail::get_active_futures().empty() ? polling_status::idle :
-                                                      polling_status::busy;
+        return requests_vector.empty() ? polling_status::idle :
+                                         polling_status::busy;
     }
 
     namespace detail {
@@ -343,11 +365,11 @@ namespace hpx { namespace mpi { namespace experimental {
                     detail::get_vector_mtx(), std::try_to_lock);
                 if (lk.owns_lock())
                 {
-                    work_count += get_number_of_active_requests();
+                    work_count += get_num_active_requests_in_vector();
                 }
             }
 
-            work_count += get_mpi_info().request_queue_size_;
+            work_count += get_mpi_info().requests_queue_size_;
 
             return work_count;
         }
@@ -371,20 +393,23 @@ namespace hpx { namespace mpi { namespace experimental {
             {
                 std::unique_lock<hpx::mpi::experimental::detail::mutex_type> lk(
                     detail::get_vector_mtx());
-                bool active_requests_empty = get_active_requests().empty();
-                bool active_futures_empty = get_active_futures().empty();
+                bool requests_queue_empty =
+                    get_request_callback_queue().size_approx() == 0;
+                bool requests_vector_empty =
+                    get_num_active_requests_in_vector() == 0;
                 lk.unlock();
-                HPX_ASSERT_MSG(active_requests_empty,
+                HPX_ASSERT_MSG(requests_queue_empty,
                     "MPI request polling was disabled while there are "
                     "unprocessed MPI requests. Make sure MPI request polling "
                     "is not disabled too early.");
-                HPX_ASSERT_MSG(active_futures_empty,
+                HPX_ASSERT_MSG(requests_vector_empty,
                     "MPI request polling was disabled while there are active "
                     "MPI futures. Make sure MPI request polling is not "
                     "disabled too early.");
             }
 #endif
-            mpi_debug.debug(debug::str<>("disable polling"));
+            if constexpr (mpi_debug.is_enabled())
+                mpi_debug.debug(debug::str<>("disable polling"));
             auto* sched = pool.get_scheduler();
             sched->clear_mpi_polling_function();
         }
@@ -399,11 +424,10 @@ namespace hpx { namespace mpi { namespace experimental {
         if (init_mpi)
         {
             int required = MPI_THREAD_MULTIPLE;
-            int minimal = MPI_THREAD_FUNNELED;
             int provided;
             hpx::util::mpi_environment::init(
-                nullptr, nullptr, required, minimal, provided);
-            if (provided < MPI_THREAD_FUNNELED)
+                nullptr, nullptr, required, required, provided);
+            if (provided != required)
             {
                 mpi_debug.error(debug::str<>("hpx::mpi::experimental::init"),
                     "init failed");

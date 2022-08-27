@@ -19,8 +19,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-REGISTER_TEMPLATE_ACCUMULATOR(double);
-REGISTER_TEMPLATE_ACCUMULATOR(int);
+REGISTER_TEMPLATE_ACCUMULATOR(double)
+REGISTER_TEMPLATE_ACCUMULATOR(int)
 
 ///////////////////////////////////////////////////////////////////////////////
 char const* const help = "commands: reset, add [amount], query, help, quit";
@@ -42,8 +42,8 @@ void run_template_accumulator(char const* type)
 
     // Print out the available commands.
     std::cout << std::endl
-        << "Running accumulator accepting argument type: "
-        << type << std::endl;
+              << "Running accumulator accepting argument type: " << type
+              << std::endl;
     std::cout << help << std::endl;
 
     // Enter the interpreter loop.
@@ -53,50 +53,59 @@ void run_template_accumulator(char const* type)
         hpx::string_util::trim(line);
 
         std::vector<std::string> cmd;
-        hpx::string_util::split(cmd, line,
-            hpx::string_util::is_any_of(" \t\n"),
+        hpx::string_util::split(cmd, line, hpx::string_util::is_any_of(" \t\n"),
             hpx::string_util::token_compress_mode::on);
 
         if (!cmd.empty() && !cmd[0].empty())
         {
             // try to interpret the entered command
-            if (cmd[0] == "reset") {
+            if (cmd[0] == "reset")
+            {
                 accu.reset();
             }
-            else if (cmd[0] == "add") {
-                if (cmd.size() == 2) {
-                    try {
+            else if (cmd[0] == "add")
+            {
+                if (cmd.size() == 2)
+                {
+                    try
+                    {
                         double val = hpx::util::from_string<double>(cmd[1]);
                         accu.add(argument_type(val));
                     }
-                    catch (hpx::util::bad_lexical_cast const&) {
+                    catch (hpx::util::bad_lexical_cast const&)
+                    {
                         std::cout << "error: invalid argument for add: '"
-                                    << cmd[1] << "'" << std::endl;
+                                  << cmd[1] << "'" << std::endl;
                     }
                 }
-                else {
-                    std::cout << "error: invalid command '"
-                                << line << "'" << std::endl
-                                << help << std::endl;
+                else
+                {
+                    std::cout << "error: invalid command '" << line << "'"
+                              << std::endl
+                              << help << std::endl;
                 }
             }
-            else if (cmd[0] == "query") {
+            else if (cmd[0] == "query")
+            {
                 std::cout << accu.query() << std::endl;
             }
-            else if (cmd[0] == "help") {
+            else if (cmd[0] == "help")
+            {
                 std::cout << help << std::endl;
             }
-            else if (cmd[0] == "quit") {
+            else if (cmd[0] == "quit")
+            {
                 break;
             }
-            else {
-                std::cout << "error: invalid command '"
-                            << line << "'" << std::endl
-                            << help << std::endl;
+            else
+            {
+                std::cout << "error: invalid command '" << line << "'"
+                          << std::endl
+                          << help << std::endl;
             }
         }
 
-        std:: cout << "> ";
+        std::cout << "> ";
     }
 }
 
@@ -106,9 +115,9 @@ int hpx_main()
     // Dispatch to proper accumulator type
     while (std::cin)
     {
-        std::cout << std::endl <<
-            "Available accumulator types are: "
-            "double (press 1) and int (press 2): ";
+        std::cout << std::endl
+                  << "Available accumulator types are: "
+                     "double (press 1) and int (press 2): ";
 
         char c = '0';
         std::cin >> c;
@@ -130,9 +139,7 @@ int main(int argc, char* argv[])
 {
     // We force this example to use 2 threads by default as one of the threads
     // will be sitting most of the time in the kernel waiting for user input.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=2"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=2"};
 
     // Initialize and run HPX.
     hpx::init_params init_args;

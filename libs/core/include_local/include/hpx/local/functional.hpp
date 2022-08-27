@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,24 +14,15 @@
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/mem_fn.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/functional/traits/is_bind_expression.hpp>
 #include <hpx/functional/traits/is_placeholder.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/threading_base/scoped_annotation.hpp>
 
 namespace hpx {
-    using hpx::traits::is_bind_expression;
-    using hpx::traits::is_placeholder;
-    using hpx::util::bind_back;
-    using hpx::util::bind_front;
-    using hpx::util::function;
-    using hpx::util::function_nonser;
+
     using hpx::util::invoke;
     using hpx::util::invoke_fused;
     using hpx::util::mem_fn;
-    using hpx::util::unique_function;
-    using hpx::util::unique_function_nonser;
-
-    namespace placeholders {
-        using namespace hpx::util::placeholders;
-    }
 }    // namespace hpx

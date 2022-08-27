@@ -28,7 +28,7 @@ namespace hpx { namespace serialization {
         {
             T t;
             ar >> t;
-            set.insert(set.end(), std::move(t));
+            set.insert(set.end(), HPX_MOVE(t));
         }
     }
 

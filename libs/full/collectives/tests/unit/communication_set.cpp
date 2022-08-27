@@ -112,7 +112,8 @@ namespace hpx { namespace traits {
             };
 
             std::unique_lock<mutex_type> l(communicator_.mtx_);
-            util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
 
             hpx::future<void> f = communicator_.gate_.get_shared_future(l).then(
                 hpx::launch::sync, on_ready);

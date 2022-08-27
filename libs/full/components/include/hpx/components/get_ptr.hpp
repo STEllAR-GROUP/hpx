@@ -33,7 +33,7 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////
         struct get_ptr_deleter
         {
-            explicit get_ptr_deleter(naming::id_type const& id) noexcept
+            explicit get_ptr_deleter(hpx::id_type const& id) noexcept
               : id_(id)
             {
             }
@@ -41,17 +41,16 @@ namespace hpx {
             template <typename Component>
             void operator()(Component* p)
             {
-                id_ = naming::invalid_id;    // release component
+                id_ = hpx::invalid_id;    // release component
                 traits::component_pin_support<Component>::unpin(p);
             }
 
-            naming::id_type id_;    // holds component alive
+            hpx::id_type id_;    // holds component alive
         };
 
         struct get_ptr_no_unpin_deleter
         {
-            explicit get_ptr_no_unpin_deleter(
-                naming::id_type const& id) noexcept
+            explicit get_ptr_no_unpin_deleter(hpx::id_type const& id) noexcept
               : id_(id)
             {
             }
@@ -59,16 +58,16 @@ namespace hpx {
             template <typename Component>
             void operator()(Component*)
             {
-                id_ = naming::invalid_id;    // release component
+                id_ = hpx::invalid_id;    // release component
             }
 
-            naming::id_type id_;    // holds component alive
+            hpx::id_type id_;    // holds component alive
         };
 
         struct get_ptr_for_migration_deleter
         {
             explicit get_ptr_for_migration_deleter(
-                naming::id_type const& id) noexcept
+                hpx::id_type const& id) noexcept
               : id_(id)
             {
             }
@@ -88,15 +87,15 @@ namespace hpx {
                                             agas::get_locality_id()),
                             type, p));
                 }
-                id_ = naming::invalid_id;    // release credits
+                id_ = hpx::invalid_id;    // release credits
             }
 
-            naming::id_type id_;    // holds component alive
+            hpx::id_type id_;    // holds component alive
         };
 
         template <typename Component, typename Deleter>
         std::shared_ptr<Component> get_ptr_postproc(
-            naming::address const& addr, naming::id_type const& id)
+            naming::address const& addr, hpx::id_type const& id)
         {
             if (agas::get_locality_id() !=
                 naming::get_locality_id_from_gid(addr.locality_))
@@ -129,7 +128,7 @@ namespace hpx {
         // delete the local instance when it goes out of scope.
         template <typename Component>
         std::shared_ptr<Component> get_ptr_for_migration(
-            naming::address const& addr, naming::id_type const& id)
+            naming::address const& addr, hpx::id_type const& id)
         {
             return get_ptr_postproc<Component, get_ptr_for_migration_deleter>(
                 addr, id);
@@ -163,7 +162,7 @@ namespace hpx {
     ///            returned shared_ptr alive.
     ///
     template <typename Component>
-    hpx::future<std::shared_ptr<Component>> get_ptr(naming::id_type const& id)
+    hpx::future<std::shared_ptr<Component>> get_ptr(hpx::id_type const& id)
     {
         hpx::future<naming::address> f = agas::resolve(id);
         return f.then(hpx::launch::sync,
@@ -241,12 +240,12 @@ namespace hpx {
     ///
 #if defined(DOXYGEN)
     template <typename Component>
-    std::shared_ptr<Component> get_ptr(launch::sync_policy p,
-        naming::id_type const& id, error_code& ec = throws);
+    std::shared_ptr<Component> get_ptr(
+        launch::sync_policy p, hpx::id_type const& id, error_code& ec = throws);
 #else
     template <typename Component>
     std::shared_ptr<Component> get_ptr(
-        launch::sync_policy, naming::id_type const& id, error_code& ec = throws)
+        launch::sync_policy, hpx::id_type const& id, error_code& ec = throws)
     {
         // shortcut for local, non-migratable objects
         naming::gid_type gid = id.get_gid();

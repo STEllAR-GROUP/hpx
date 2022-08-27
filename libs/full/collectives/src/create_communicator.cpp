@@ -29,7 +29,7 @@
 using collectives_component =
     hpx::components::component<hpx::collectives::detail::communicator_server>;
 
-HPX_REGISTER_COMPONENT(collectives_component);
+HPX_REGISTER_COMPONENT(collectives_component)
 
 namespace hpx { namespace collectives {
 
@@ -69,10 +69,10 @@ namespace hpx { namespace collectives {
             // register the communicator's id using the given basename,
             // this keeps the communicator alive
             auto f = c.register_as(
-                hpx::detail::name_from_basename(std::move(name), this_site));
+                hpx::detail::name_from_basename(HPX_MOVE(name), this_site));
 
             return f.then(hpx::launch::sync,
-                [=, target = std::move(c)](hpx::future<bool>&& f) mutable {
+                [=, target = HPX_MOVE(c)](hpx::future<bool>&& f) mutable {
                     bool result = f.get();
                     if (!result)
                     {
@@ -89,8 +89,7 @@ namespace hpx { namespace collectives {
         }
 
         // find existing communicator
-        return hpx::find_from_basename<communicator>(
-            std::move(name), root_site);
+        return hpx::find_from_basename<communicator>(HPX_MOVE(name), root_site);
     }
 }}    // namespace hpx::collectives
 

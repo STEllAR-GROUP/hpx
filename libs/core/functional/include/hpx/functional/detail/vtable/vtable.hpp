@@ -68,7 +68,7 @@ namespace hpx { namespace util { namespace detail {
 
         template <typename T>
         static void _deallocate(
-            void* obj, std::size_t storage_size, bool destroy)
+            void* obj, std::size_t storage_size, bool destroy) noexcept
         {
             using storage_t =
                 typename std::aligned_storage<sizeof(T), alignof(T)>::type;
@@ -83,7 +83,7 @@ namespace hpx { namespace util { namespace detail {
                 delete static_cast<storage_t*>(obj);
             }
         }
-        void (*deallocate)(void*, std::size_t storage_size, bool);
+        void (*deallocate)(void*, std::size_t storage_size, bool) noexcept;
 
         template <typename T>
         constexpr vtable(construct_vtable<T>) noexcept

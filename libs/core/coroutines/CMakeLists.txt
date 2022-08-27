@@ -34,6 +34,7 @@ set(coroutines_headers
     hpx/coroutines/detail/posix_utility.hpp
     hpx/coroutines/detail/swap_context.hpp
     hpx/coroutines/detail/tss.hpp
+    hpx/coroutines/signal_handler_debugging.hpp
     hpx/coroutines/thread_enums.hpp
     hpx/coroutines/thread_id_type.hpp
 )
@@ -57,6 +58,7 @@ set(coroutines_sources
     detail/tss.cpp
     swapcontext.cpp
     thread_enums.cpp
+    signal_handler_debugging.cpp
 )
 
 if(MSVC)
@@ -117,6 +119,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_assertion
     hpx_config
+    hpx_debugging
     hpx_errors
     hpx_format
     hpx_functional
@@ -124,6 +127,7 @@ add_hpx_module(
     hpx_thread_support
     hpx_type_support
     hpx_util
+    hpx_version
   CMAKE_SUBDIRS examples tests
 )
 

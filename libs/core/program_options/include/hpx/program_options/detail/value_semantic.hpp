@@ -165,14 +165,13 @@ namespace hpx { namespace program_options {
     /** Validates optional arguments. */
     template <class T, class Char>
     void validate(hpx::any_nonser& v,
-        const std::vector<std::basic_string<Char>>& s, hpx::util::optional<T>*,
-        int)
+        const std::vector<std::basic_string<Char>>& s, hpx::optional<T>*, int)
     {
         validators::check_first_occurrence(v);
         validators::get_single_string(s);
         hpx::any_nonser a;
         validate(a, s, (T*) nullptr, 0);
-        v = hpx::any_nonser(hpx::util::optional<T>(hpx::any_cast<T>(a)));
+        v = hpx::any_nonser(hpx::optional<T>(hpx::any_cast<T>(a)));
     }
 
     template <class T, class Char>

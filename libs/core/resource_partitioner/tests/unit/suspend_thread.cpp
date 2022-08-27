@@ -6,6 +6,7 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
+#include <hpx/assert.hpp>
 #include <hpx/local/chrono.hpp>
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
@@ -23,16 +24,19 @@
 #include <utility>
 #include <vector>
 
+std::size_t const max_threads = (std::min)(
+    std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
+
 int hpx_main()
 {
     std::size_t const num_threads = hpx::resource::get_num_threads("default");
 
-    HPX_TEST_EQ(std::size_t(4), num_threads);
+    HPX_TEST_EQ(std::size_t(max_threads), num_threads);
 
     hpx::threads::thread_pool_base& tp =
         hpx::resource::get_thread_pool("default");
 
-    HPX_TEST_EQ(tp.get_active_os_thread_count(), std::size_t(4));
+    HPX_TEST_EQ(tp.get_active_os_thread_count(), std::size_t(max_threads));
 
     {
         // Check number of used resources
@@ -118,21 +122,25 @@ int hpx_main()
 
             fs.clear();
 
-            // Launching 4 (i.e. same as number of threads) tasks may deadlock
+            // Launching the same number of tasks as worker threads may deadlock
             // as no thread is available to steal from the current thread.
-            fs.push_back(hpx::threads::suspend_processing_unit(tp, thread_num));
-            fs.push_back(hpx::threads::suspend_processing_unit(tp, thread_num));
-            fs.push_back(hpx::threads::suspend_processing_unit(tp, thread_num));
+            for (std::size_t i = 0; i < max_threads - 1; ++i)
+            {
+                fs.push_back(
+                    hpx::threads::suspend_processing_unit(tp, thread_num));
+            }
 
             hpx::wait_all(fs);
 
             fs.clear();
 
-            // Launching 4 (i.e. same as number of threads) tasks may deadlock
+            // Launching the same number of tasks as worker threads may deadlock
             // as no thread is available to steal from the current thread.
-            fs.push_back(hpx::threads::resume_processing_unit(tp, thread_num));
-            fs.push_back(hpx::threads::resume_processing_unit(tp, thread_num));
-            fs.push_back(hpx::threads::resume_processing_unit(tp, thread_num));
+            for (std::size_t i = 0; i < max_threads - 1; ++i)
+            {
+                fs.push_back(
+                    hpx::threads::resume_processing_unit(tp, thread_num));
+            }
 
             hpx::wait_all(fs);
         }
@@ -154,7 +162,7 @@ int hpx_main()
 
             if (up)
             {
-                if (thread_num != hpx::resource::get_num_threads("default") - 1)
+                if (thread_num < hpx::resource::get_num_threads("default") - 1)
                 {
                     hpx::threads::suspend_processing_unit(tp, thread_num).get();
                 }
@@ -169,11 +177,13 @@ int hpx_main()
             }
             else
             {
-                hpx::threads::resume_processing_unit(tp, thread_num - 1).get();
+                hpx::threads::resume_processing_unit(tp, thread_num).get();
 
-                --thread_num;
-
-                if (thread_num == 0)
+                if (thread_num > 0)
+                {
+                    --thread_num;
+                }
+                else
                 {
                     up = true;
                 }
@@ -197,13 +207,12 @@ void test_scheduler(
     int argc, char* argv[], hpx::resource::scheduling_policy scheduler)
 {
     hpx::local::init_params init_args;
-    init_args.cfg = {"hpx.os_threads=4"};
+    init_args.cfg = {"hpx.os_threads=" + std::to_string(max_threads)};
     init_args.rp_callback = [scheduler](auto& rp,
                                 hpx::program_options::variables_map const&) {
         rp.create_thread_pool("default", scheduler,
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::default_mode |
-                hpx::threads::policies::enable_elasticity));
+            hpx::threads::policies::scheduler_mode::default_ |
+                hpx::threads::policies::scheduler_mode::enable_elasticity);
     };
 
     HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);
@@ -211,6 +220,8 @@ void test_scheduler(
 
 int main(int argc, char* argv[])
 {
+    HPX_ASSERT(max_threads >= 2);
+
     // NOTE: Static schedulers do not support suspending the own worker thread
     // because they do not steal work.
 

@@ -45,9 +45,12 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         using executor_parameters_type = hpx::execution::static_chunk_size;
 
         service_executor(hpx::util::io_service_pool* pool)
+#if defined(HPX_COMPUTE_HOST_CODE)
           : pool_(pool)
+#endif
         {
-            HPX_ASSERT(pool_);
+            (void) pool;
+            HPX_ASSERT(pool);
         }
 
         template <typename F, typename... Ts>
@@ -56,14 +59,19 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             typedef typename hpx::util::detail::invoke_deferred_result<F,
                 Ts...>::type result_type;
 
-            hpx::util::unique_function_nonser<result_type()> f_wrapper =
+            hpx::move_only_function<result_type()> f_wrapper =
                 hpx::util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             auto t = std::make_shared<post_wrapper_helper<decltype(f_wrapper)>>(
-                std::move(f_wrapper));
-            pool_->get_io_service().post(hpx::util::bind_front(
+                HPX_MOVE(f_wrapper));
+#if defined(HPX_COMPUTE_HOST_CODE)
+            pool_->get_io_service().post(hpx::bind_front(
                 &post_wrapper_helper<decltype(f_wrapper)>::invoke,
-                std::move(t)));
+                HPX_MOVE(t)));
+#else
+            HPX_ASSERT_MSG(
+                false, "Attempting to use io_service_pool in device code");
+#endif
         }
 
         template <typename F, typename... Ts>
@@ -74,22 +82,27 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             typedef typename hpx::util::detail::invoke_deferred_result<F,
                 Ts...>::type result_type;
 
-            hpx::util::unique_function_nonser<result_type()> f_wrapper =
+            hpx::move_only_function<result_type()> f_wrapper =
                 hpx::util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             auto t = std::make_shared<
                 async_execute_wrapper_helper<decltype(f_wrapper), result_type>>(
-                std::move(f_wrapper));
-            pool_->get_io_service().post(hpx::util::bind_front(
+                HPX_MOVE(f_wrapper));
+#if defined(HPX_COMPUTE_HOST_CODE)
+            pool_->get_io_service().post(hpx::bind_front(
                 &async_execute_wrapper_helper<decltype(f_wrapper),
                     result_type>::invoke,
                 t));
+#else
+            HPX_ASSERT_MSG(
+                false, "Attempting to use io_service_pool in device code");
+#endif
 
             return t->p_.get_future();
         }
 
         template <typename F, typename Shape, typename... Ts>
-        std::vector<hpx::lcos::future<
+        std::vector<hpx::future<
             typename detail::bulk_function_result<F, Shape, Ts...>::type>>
         bulk_async_execute(F&& f, Shape const& shape, Ts&&... ts) const
         {
@@ -101,7 +114,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             for (auto const& elem : shape)
             {
                 results.push_back(
-                    async_execute(std::forward<F>(f), elem, ts...));
+                    async_execute(HPX_FORWARD(F, f), elem, ts...));
             }
 
             return results;
@@ -119,16 +132,9 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         bulk_then_execute(
             F&& f, Shape const& shape, Future&& predecessor, Ts&&... ts)
         {
-            using func_result_type =
-                typename parallel::execution::detail::then_bulk_function_result<
-                    F, Shape, Future, Ts...>::type;
-            using result_type =
-                std::vector<hpx::lcos::future<func_result_type>>;
-
             auto func = parallel::execution::detail::
-                make_fused_bulk_async_execute_helper<result_type>(*this,
-                    std::forward<F>(f), shape,
-                    hpx::make_tuple(std::forward<Ts>(ts)...));
+                make_fused_bulk_async_execute_helper(*this, HPX_FORWARD(F, f),
+                    shape, hpx::make_tuple(HPX_FORWARD(Ts, ts)...));
             using vector_result_type =
                 typename parallel::execution::detail::bulk_then_execute_result<
                     F, Shape, Future, Ts...>::type;
@@ -141,14 +147,14 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             current_executor exec_current = hpx::this_thread::get_executor();
             shared_state_type p =
                 lcos::detail::make_continuation_exec<vector_result_type>(
-                    std::forward<Future>(predecessor), exec_current,
-                    [func = std::move(func)](future_type&& predecessor) mutable
+                    HPX_FORWARD(Future, predecessor), exec_current,
+                    [func = HPX_MOVE(func)](future_type&& predecessor) mutable
                     -> vector_result_type {
-                        return hpx::unwrap(func(std::move(predecessor)));
+                        return hpx::unwrap(func(HPX_MOVE(predecessor)));
                     });
 
             return hpx::traits::future_access<result_future_type>::create(
-                std::move(p));
+                HPX_MOVE(p));
         }
 
     private:
@@ -156,7 +162,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         struct async_execute_wrapper_helper
         {
             async_execute_wrapper_helper(F&& f)
-              : f_(std::move(f))
+              : f_(HPX_MOVE(f))
             {
             }
 
@@ -165,7 +171,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() { invoke_helper(std::is_void<Result>()); },
                     [&](std::exception_ptr ep) {
-                        p_.set_exception(std::move(ep));
+                        p_.set_exception(HPX_MOVE(ep));
                     });
             }
 
@@ -180,14 +186,14 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             }
 
             F f_;
-            hpx::lcos::local::promise<Result> p_;
+            hpx::promise<Result> p_;
         };
 
         template <typename F>
         struct post_wrapper_helper
         {
             post_wrapper_helper(F&& f)
-              : f_(std::move(f))
+              : f_(HPX_MOVE(f))
             {
             }
 
@@ -199,7 +205,9 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             F f_;
         };
 
+#if defined(HPX_COMPUTE_HOST_CODE)
     private:
         hpx::util::io_service_pool* pool_;
+#endif
     };
 }}}}    // namespace hpx::parallel::execution::detail

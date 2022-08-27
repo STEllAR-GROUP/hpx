@@ -27,4 +27,3 @@ HPX_FORCEINLINE void worker_timed(std::uint64_t delay_ns) noexcept
             break;
     }
 }
-

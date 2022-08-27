@@ -10,7 +10,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx {
+namespace hpx { namespace ranges {
     // clang-format off
 
     ///////////////////////////////////////////////////////////////////////////
@@ -189,7 +189,7 @@ namespace hpx {
     shift_left(ExPolicy&& policy, Rng&& rng, Size n);
 
     // clang-format on
-}    // namespace hpx
+}}    // namespace hpx::ranges
 
 #else    // DOXYGEN
 
@@ -206,8 +206,8 @@ namespace hpx {
 #include <utility>
 
 namespace hpx { namespace ranges {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct shift_left_t final
-      : hpx::functional::tag_fallback<shift_left_t>
+    inline constexpr struct shift_left_t final
+      : hpx::functional::detail::tag_fallback<shift_left_t>
     {
     private:
         // clang-format off
@@ -217,7 +217,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             hpx::ranges::shift_left_t, FwdIter first, Sent last, Size n)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
@@ -238,14 +238,14 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::ranges::shift_left_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::shift_left_t, ExPolicy&& policy,
             FwdIter first, Sent last, Size n)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, last, n);
+                HPX_FORWARD(ExPolicy, policy), first, last, n);
         }
 
         // clang-format off
@@ -254,7 +254,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend hpx::traits::range_iterator_t<Rng> tag_fallback_dispatch(
+        friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::shift_left_t, Rng&& rng, Size n)
         {
             static_assert(hpx::traits::is_forward_iterator_v<
@@ -275,7 +275,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             hpx::traits::range_iterator_t<Rng>>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::ranges::shift_left_t, ExPolicy&& policy, Rng&& rng, Size n)
         {
             static_assert(hpx::traits::is_forward_iterator_v<
@@ -284,7 +284,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::shift_left<
                 hpx::traits::range_iterator_t<Rng>>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng),
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
                     std::end(rng), n);
         }
     } shift_left{};

@@ -16,7 +16,10 @@
 
 struct test
 {
-    test() { ++count; }
+    test()
+    {
+        ++count;
+    }
     test(test const&)
     {
         ++count;
@@ -26,15 +29,21 @@ struct test
         ++count;
         return *this;
     }
-    ~test() { --count; }
+    ~test()
+    {
+        --count;
+    }
 
     static std::atomic<int> count;
 };
 
 std::atomic<int> test::count(0);
 
-test call() { return test(); }
-HPX_PLAIN_ACTION(call);
+test call()
+{
+    return test();
+}
+HPX_PLAIN_ACTION(call)
 
 void test_leak()
 {
@@ -42,7 +51,7 @@ void test_leak()
         hpx::shared_future<test> f;
 
         {
-            hpx::lcos::promise<test> p;
+            hpx::distributed::promise<test> p;
             f = p.get_future();
             hpx::apply_c<call_action>(p.get_id(), hpx::find_here());
         }
@@ -66,17 +75,17 @@ int hpx_main()
         hpx::id_type promise_id;
         hpx::future<int> f;
         {
-            hpx::lcos::promise<int> p;
+            hpx::distributed::promise<int> p;
             f = p.get_future();
             {
                 auto local_promise_id = p.get_id();
-                hpx::cout << local_promise_id << hpx::endl;
+                hpx::cout << local_promise_id << std::endl;
             }
 
             hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
 
             promise_id = p.get_id();
-            hpx::cout << promise_id << hpx::endl;
+            hpx::cout << promise_id << std::endl;
         }
 
         hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -91,17 +100,17 @@ int hpx_main()
     {
         hpx::id_type promise_id;
         {
-            hpx::lcos::promise<int> p;
+            hpx::distributed::promise<int> p;
             p.get_future();
             {
                 auto local_promise_id = p.get_id();
-                hpx::cout << local_promise_id << hpx::endl;
+                hpx::cout << local_promise_id << std::endl;
             }
 
             hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
 
             promise_id = p.get_id();
-            hpx::cout << promise_id << hpx::endl;
+            hpx::cout << promise_id << std::endl;
         }
 
         hpx::this_thread::sleep_for(std::chrono::milliseconds(100));

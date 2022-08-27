@@ -44,7 +44,7 @@ namespace hpx {
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
-    HPX_CORE_EXPORT lcos::future<std::uint32_t> get_num_localities();
+    HPX_CORE_EXPORT hpx::future<std::uint32_t> get_num_localities();
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of localities which are currently registered

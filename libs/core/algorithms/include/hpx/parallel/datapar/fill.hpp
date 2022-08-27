@@ -10,7 +10,7 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/fill.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
 #include <hpx/parallel/util/result_types.hpp>
@@ -29,7 +29,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             util::detail::iterator_datapar_compatible<Iter>::value, Iter>::type
         call(ExPolicy&& policy, Iter first, Sent last, T const& val)
         {
-            hpx::parallel::util::loop_ind(std::forward<ExPolicy>(policy), first,
+            hpx::parallel::util::loop_ind(HPX_FORWARD(ExPolicy, policy), first,
                 last, [&val](auto& v) { v = val; });
             return first;
         }
@@ -40,11 +40,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             hpx::is_vectorpack_execution_policy<ExPolicy>::value&&
                 hpx::parallel::util::detail::iterator_datapar_compatible<
                     Iter>::value)>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Iter tag_dispatch(sequential_fill_t,
+    HPX_HOST_DEVICE HPX_FORCEINLINE Iter tag_invoke(sequential_fill_t,
         ExPolicy&& policy, Iter first, Sent last, T const& value)
     {
         return datapar_fill::call(
-            std::forward<ExPolicy>(policy), first, last, value);
+            HPX_FORWARD(ExPolicy, policy), first, last, value);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -66,11 +66,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             hpx::is_vectorpack_execution_policy<ExPolicy>::value&&
                 hpx::parallel::util::detail::iterator_datapar_compatible<
                     Iter>::value)>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Iter tag_dispatch(sequential_fill_n_t,
+    HPX_HOST_DEVICE HPX_FORCEINLINE Iter tag_invoke(sequential_fill_n_t,
         ExPolicy&& policy, Iter first, std::size_t count, T const& value)
     {
         return datapar_fill_n::call(
-            std::forward<ExPolicy>(policy), first, count, value);
+            HPX_FORWARD(ExPolicy, policy), first, count, value);
     }
 }}}}    // namespace hpx::parallel::v1::detail
 #endif

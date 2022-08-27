@@ -22,16 +22,16 @@ namespace hpx { namespace agas { namespace detail {
 
     struct bootstrap_component_namespace : component_namespace
     {
-        typedef hpx::util::function<void(
+        typedef hpx::distributed::function<void(
             std::string const&, components::component_type)>
             iterate_types_function_type;
 
         naming::address::address_type ptr() const
         {
-            return reinterpret_cast<naming::address::address_type>(&server_);
+            return const_cast<server::component_namespace*>(&server_);
         }
         naming::address addr() const;
-        naming::id_type gid() const;
+        hpx::id_type gid() const;
 
         components::component_type bind_prefix(
             std::string const& key, std::uint32_t prefix);
@@ -46,10 +46,8 @@ namespace hpx { namespace agas { namespace detail {
 
         std::string get_component_type_name(components::component_type type);
 
-        lcos::future<std::uint32_t> get_num_localities(
+        hpx::future<std::uint32_t> get_num_localities(
             components::component_type type);
-
-        void register_counter_types();
 
         void register_server_instance(std::uint32_t locality_id);
 

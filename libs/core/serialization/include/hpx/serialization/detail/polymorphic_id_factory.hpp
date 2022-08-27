@@ -1,5 +1,6 @@
 //  Copyright (c) 2015 Anton Bikineev
 //  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -26,7 +27,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
+
     class id_registry
     {
     public:
@@ -38,7 +40,7 @@ namespace hpx { namespace serialization { namespace detail {
         typedef std::map<std::string, std::uint32_t> typename_to_id_t;
         typedef std::vector<ctor_t> cache_t;
 
-        HPX_STATIC_CONSTEXPR std::uint32_t invalid_id = ~0u;
+        static constexpr std::uint32_t invalid_id = ~0u;
 
         HPX_CORE_EXPORT void register_factory_function(
             const std::string& type_name, ctor_t ctor);
@@ -62,7 +64,7 @@ namespace hpx { namespace serialization { namespace detail {
         HPX_CORE_EXPORT static id_registry& instance();
 
     private:
-        id_registry()
+        id_registry() noexcept
           : max_id(0u)
         {
         }
@@ -121,7 +123,7 @@ namespace hpx { namespace serialization { namespace detail {
             const std::string& type_name);
 
     private:
-        polymorphic_id_factory() {}
+        polymorphic_id_factory() = default;
 
         HPX_CORE_EXPORT static polymorphic_id_factory& instance();
         HPX_CORE_EXPORT static std::string collect_registered_typenames();
@@ -154,10 +156,10 @@ namespace hpx { namespace serialization { namespace detail {
 
     template <class T>
     register_class_name<T,
-        typename std::enable_if<traits::is_serialized_with_id<T>::value>::type>
+        std::enable_if_t<traits::is_serialized_with_id<T>::value>>
         register_class_name<T,
-            typename std::enable_if<
-                traits::is_serialized_with_id<T>::value>::type>::instance;
+            std::enable_if_t<traits::is_serialized_with_id<T>::value>>::
+            instance;
 
     template <std::uint32_t desc>
     std::string get_constant_entry_name();
@@ -177,20 +179,17 @@ namespace hpx { namespace serialization { namespace detail {
     template <std::uint32_t Id>
     add_constant_entry<Id> add_constant_entry<Id>::instance;
 
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail
 
 #include <hpx/config/warnings_suffix.hpp>
 
 #define HPX_SERIALIZATION_ADD_CONSTANT_ENTRY(String, Id)                       \
-    namespace hpx { namespace serialization { namespace detail {               \
-                template <>                                                    \
-                std::string get_constant_entry_name<Id>()                      \
-                {                                                              \
-                    return HPX_PP_STRINGIZE(String);                           \
-                }                                                              \
-                template add_constant_entry<Id>                                \
-                    add_constant_entry<Id>::instance;                          \
-            }                                                                  \
+    namespace hpx::serialization::detail {                                     \
+        template <>                                                            \
+        std::string get_constant_entry_name</**/ Id>()                         \
+        {                                                                      \
+            return HPX_PP_STRINGIZE(String);                                   \
         }                                                                      \
+        template add_constant_entry<Id> add_constant_entry</**/ Id>::instance; \
     }                                                                          \
     /**/

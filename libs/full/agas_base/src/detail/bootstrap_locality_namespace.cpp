@@ -13,7 +13,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 
 #include <cstdint>
 #include <string>
@@ -34,11 +34,11 @@ namespace hpx { namespace agas { namespace detail {
             components::component_agas_locality_namespace, this->ptr());
     }
 
-    naming::id_type bootstrap_locality_namespace::gid() const
+    hpx::id_type bootstrap_locality_namespace::gid() const
     {
-        return naming::id_type(
+        return hpx::id_type(
             naming::gid_type(agas::locality_ns_msb, agas::locality_ns_lsb),
-            naming::id_type::unmanaged);
+            hpx::id_type::management_type::unmanaged);
     }
 
     std::uint32_t bootstrap_locality_namespace::allocate(

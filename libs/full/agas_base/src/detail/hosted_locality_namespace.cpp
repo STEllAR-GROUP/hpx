@@ -14,7 +14,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -27,7 +27,7 @@ namespace hpx { namespace agas { namespace detail {
 
     hosted_locality_namespace::hosted_locality_namespace(naming::address addr)
       : gid_(naming::gid_type(agas::locality_ns_msb, agas::locality_ns_lsb),
-            naming::id_type::unmanaged)
+            hpx::id_type::management_type::unmanaged)
       , addr_(addr)
     {
     }

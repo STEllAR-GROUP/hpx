@@ -548,13 +548,13 @@ struct future_factory
 {
     FutureType<void> operator()() const
     {
-        return hpx::lcos::make_ready_future();
+        return hpx::make_ready_future();
     }
 
     template <typename T>
     FutureType<typename std::decay<T>::type> operator()(T&& value) const
     {
-        return hpx::lcos::make_ready_future(std::forward<T>(value));
+        return hpx::make_ready_future(std::forward<T>(value));
     }
 };
 
@@ -579,9 +579,9 @@ void test_all()
 int hpx_main()
 {
     // Test everything using default futures
-    test_all<hpx::lcos::future>();
+    test_all<hpx::future>();
     // Test everything using shared futures
-    test_all<hpx::lcos::shared_future>();
+    test_all<hpx::shared_future>();
 
     return hpx::local::finalize();
 }

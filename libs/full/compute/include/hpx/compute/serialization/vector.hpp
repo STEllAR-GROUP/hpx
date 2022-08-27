@@ -55,20 +55,15 @@ namespace hpx { namespace serialization {
         void load_impl(
             input_archive& ar, compute::vector<T, Allocator>& v, std::true_type)
         {
-            bool archive_endianess_differs = endian::native == endian::big ?
-                ar.endian_little() :
-                ar.endian_big();
-
 #if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
-            if (ar.disable_array_optimization() || archive_endianess_differs)
+            if (ar.disable_array_optimization() || ar.endianess_differs())
             {
                 load_impl(ar, v, std::false_type());
                 return;
             }
 #else
-            (void) archive_endianess_differs;
-            HPX_ASSERT(!(
-                ar.disable_array_optimization() || archive_endianess_differs));
+            HPX_ASSERT(
+                !(ar.disable_array_optimization() || ar.endianess_differs()));
 #endif
             // bitwise load ...
             using value_type =
@@ -120,20 +115,15 @@ namespace hpx { namespace serialization {
         void save_impl(output_archive& ar,
             compute::vector<T, Allocator> const& v, std::true_type)
         {
-            bool archive_endianess_differs = endian::native == endian::big ?
-                ar.endian_little() :
-                ar.endian_big();
-
 #if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
-            if (ar.disable_array_optimization() || archive_endianess_differs)
+            if (ar.disable_array_optimization() || ar.endianess_differs())
             {
                 save_impl(ar, v, std::false_type());
                 return;
             }
 #else
-            (void) archive_endianess_differs;
-            HPX_ASSERT(!(
-                ar.disable_array_optimization() || archive_endianess_differs));
+            HPX_ASSERT(
+                !(ar.disable_array_optimization() || ar.endianess_differs()));
 #endif
             // bitwise save ...
             using value_type =

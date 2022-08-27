@@ -51,12 +51,12 @@ namespace hpx { namespace util {
 
     namespace detail {
 
-        HPX_NORETURN HPX_CORE_EXPORT void throw_bad_lexical_cast(
+        [[noreturn]] HPX_CORE_EXPORT void throw_bad_lexical_cast(
             std::type_info const& source_type,
             std::type_info const& target_type);
 
         template <typename Source, typename Target>
-        HPX_NORETURN inline Target throw_bad_lexical_cast()
+        [[noreturn]] inline Target throw_bad_lexical_cast()
         {
             detail::throw_bad_lexical_cast(typeid(Source), typeid(Target));
         }

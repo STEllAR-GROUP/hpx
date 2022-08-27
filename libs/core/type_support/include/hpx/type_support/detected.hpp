@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -35,8 +34,7 @@ namespace hpx { namespace util {
 
         template <typename Default, template <typename...> class Op,
             typename... Args>
-        struct detector<Default, typename always_void<Op<Args...>>::type, Op,
-            Args...>
+        struct detector<Default, std::void_t<Op<Args...>>, Op, Args...>
         {
             using value_t = std::true_type;
             using type = Op<Args...>;
@@ -49,6 +47,9 @@ namespace hpx { namespace util {
     template <template <typename...> class Op, typename... Args>
     using is_detected =
         typename detail::detector<nonesuch, void, Op, Args...>::value_t;
+
+    template <template <typename...> class Op, typename... Args>
+    inline constexpr bool is_detected_v = is_detected<Op, Args...>::value;
 
     // The alias template detected_t is an alias for Op<Args...> if that
     // template-id is valid; otherwise it is an alias for the class

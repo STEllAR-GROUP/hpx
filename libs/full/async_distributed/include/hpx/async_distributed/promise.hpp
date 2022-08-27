@@ -16,7 +16,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace lcos {
+namespace hpx::distributed {
 
     ///////////////////////////////////////////////////////////////////////////
     /// A promise can be used by a single \a thread to invoke a
@@ -31,10 +31,10 @@ namespace hpx { namespace lcos {
     ///
     /// \code
     ///     // Create the promise (the expected result is a id_type)
-    ///     lcos::promise<naming::id_type> p;
+    ///     hpx::distributed::promise<hpx::id_type> p;
     ///
     ///     // Get the associated future
-    ///     future<naming::id_type> f = p.get_future();
+    ///     future<hpx::id_type> f = p.get_future();
     ///
     ///     // initiate the action supplying the promise as a
     ///     // continuation
@@ -42,7 +42,7 @@ namespace hpx { namespace lcos {
     ///
     ///     // Wait for the result to be returned, yielding control
     ///     // in the meantime.
-    ///     naming::id_type result = f.get();
+    ///     hpx::id_type result = f.get();
     ///     // ...
     /// \endcode
     ///
@@ -59,11 +59,11 @@ namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result, typename RemoteResult>
     class promise
-      : public detail::promise_base<Result, RemoteResult,
-            detail::promise_data<Result>>
+      : public lcos::detail::promise_base<Result, RemoteResult,
+            lcos::detail::promise_data<Result>>
     {
-        using base_type = detail::promise_base<Result, RemoteResult,
-            detail::promise_data<Result>>;
+        using base_type = lcos::detail::promise_base<Result, RemoteResult,
+            lcos::detail::promise_data<Result>>;
 
     public:
         /// \brief constructs a promise object and a shared state.
@@ -88,7 +88,7 @@ namespace hpx { namespace lcos {
         ~promise() = default;
 
         /// \brief   Abandons any shared state (30.6.4) and then as if
-        ///          promise(std::move(other)).swap(*this).
+        ///          promise(HPX_MOVE(other)).swap(*this).
         /// \returns *this.
         promise& operator=(promise&& other) noexcept = default;
 
@@ -146,11 +146,11 @@ namespace hpx { namespace lcos {
 
     template <>
     class promise<void, hpx::util::unused_type>
-      : public detail::promise_base<void, hpx::util::unused_type,
-            detail::promise_data<void>>
+      : public lcos::detail::promise_base<void, hpx::util::unused_type,
+            lcos::detail::promise_data<void>>
     {
-        using base_type = detail::promise_base<void, hpx::util::unused_type,
-            detail::promise_data<void>>;
+        using base_type = lcos::detail::promise_base<void,
+            hpx::util::unused_type, lcos::detail::promise_data<void>>;
 
     public:
         /// \brief constructs a promise object and a shared state.
@@ -175,7 +175,7 @@ namespace hpx { namespace lcos {
         ~promise() = default;
 
         /// \brief   Abandons any shared state (30.6.4) and then as if
-        ///          promise(std::move(other)).swap(*this).
+        ///          promise(HPX_MOVE(other)).swap(*this).
         /// \returns *this.
         promise& operator=(promise&& other) noexcept = default;
 
@@ -241,13 +241,14 @@ namespace hpx { namespace lcos {
     {
         x.swap(y);
     }
-}}    // namespace hpx::lcos
+}    // namespace hpx::distributed
 
 namespace std {
 
     /// Requires: Allocator shall be an allocator (17.6.3.5)
     template <typename R, typename Allocator>
-    struct uses_allocator<hpx::lcos::promise<R>, Allocator> : std::true_type
+    struct uses_allocator<hpx::distributed::promise<R>, Allocator>
+      : std::true_type
     {
     };
 }    // namespace std

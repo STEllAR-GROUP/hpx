@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -40,7 +40,8 @@ namespace hpx { namespace execution {
         ///                     schedule together.
         ///                     The default minimal chunk size is 1.
         ///
-        constexpr explicit guided_chunk_size(std::size_t min_chunk_size = 1)
+        constexpr explicit guided_chunk_size(
+            std::size_t min_chunk_size = 1) noexcept
           : min_chunk_size_(min_chunk_size)
         {
         }
@@ -48,7 +49,7 @@ namespace hpx { namespace execution {
         /// \cond NOINTERNAL
         // This executor parameters type provides variable chunk sizes and
         // needs to be invoked for each of the chunks to be combined.
-        typedef std::true_type has_variable_chunk_size;
+        using has_variable_chunk_size = std::true_type;
 
         //         template <typename Executor>
         //         static std::size_t get_maximal_number_of_chunks(
@@ -60,7 +61,7 @@ namespace hpx { namespace execution {
 
         template <typename Executor, typename F>
         constexpr std::size_t get_chunk_size(Executor&& /* exec */, F&&,
-            std::size_t cores, std::size_t num_tasks) const
+            std::size_t cores, std::size_t num_tasks) const noexcept
         {
             return (std::max)(min_chunk_size_, (num_tasks + cores - 1) / cores);
         }
@@ -73,7 +74,9 @@ namespace hpx { namespace execution {
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int /* version */)
         {
-            ar& min_chunk_size_;
+            // clang-format off
+            ar & min_chunk_size_;
+            // clang-format on
         }
         /// \endcond
 
@@ -83,13 +86,6 @@ namespace hpx { namespace execution {
         /// \endcond
     };
 }}    // namespace hpx::execution
-
-namespace hpx { namespace parallel { namespace execution {
-    using guided_chunk_size HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::guided_chunk_size is deprecated. Use "
-        "hpx::execution::guided_chunk_size instead.") =
-        hpx::execution::guided_chunk_size;
-}}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL

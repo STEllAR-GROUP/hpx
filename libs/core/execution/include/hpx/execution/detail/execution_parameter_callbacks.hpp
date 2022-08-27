@@ -15,12 +15,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace execution { namespace detail {
     /// \cond NOINTERNAL
-    using get_os_thread_count_type = hpx::util::function_nonser<std::size_t()>;
+    using get_os_thread_count_type = hpx::function<std::size_t()>;
     HPX_CORE_EXPORT void set_get_os_thread_count(get_os_thread_count_type f);
     HPX_CORE_EXPORT std::size_t get_os_thread_count();
 
-    using get_pu_mask_type = hpx::util::function_nonser<threads::mask_cref_type(
-        threads::topology&, std::size_t)>;
+    using get_pu_mask_type =
+        hpx::function<threads::mask_cref_type(threads::topology&, std::size_t)>;
     HPX_CORE_EXPORT void set_get_pu_mask(get_pu_mask_type f);
     HPX_CORE_EXPORT threads::mask_cref_type get_pu_mask(
         threads::topology&, std::size_t);

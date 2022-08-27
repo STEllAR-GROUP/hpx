@@ -19,46 +19,36 @@
 
 #include <cstddef>
 
-namespace jacobi {
-    namespace server
+namespace jacobi { namespace server {
+
+    struct HPX_COMPONENT_EXPORT row : hpx::components::component_base<row>
     {
+        typedef hpx::components::component_base<row> base_type;
 
-        struct HPX_COMPONENT_EXPORT row
-            : hpx::components::component_base<row>
+        typedef hpx::components::component<row> component_type;
+
+        void init(std::size_t nx, double value);
+
+        typedef hpx::intrusive_ptr<value_holder> values_type;
+
+        values_type values;
+
+        row_range get(std::size_t begin, std::size_t end)
         {
-            typedef
-                hpx::components::component_base<row>
-                base_type;
+            //std::cout << this->get_id() << "row::get ...\n";
+            HPX_ASSERT(values);
+            return row_range(values, begin, end);
+        }
 
-            typedef hpx::components::component<row> component_type;
-
-            void init(std::size_t nx, double value);
-
-            typedef hpx::intrusive_ptr<value_holder> values_type;
-
-            values_type values;
-
-            row_range get(std::size_t begin, std::size_t end)
-            {
-                //std::cout << this->get_id() << "row::get ...\n";
-                HPX_ASSERT(values);
-                return row_range(values, begin, end);
-            }
-
-            HPX_DEFINE_COMPONENT_ACTION(row, get, get_action);
-            HPX_DEFINE_COMPONENT_ACTION(row, init, init_action);
-        };
-    }
-}
+        HPX_DEFINE_COMPONENT_ACTION(row, get, get_action)
+        HPX_DEFINE_COMPONENT_ACTION(row, init, init_action)
+    };
+}}    // namespace jacobi::server
 
 HPX_REGISTER_ACTION_DECLARATION(
-    jacobi::server::row::get_action
-  , jacobi_server_row_get_action
-)
+    jacobi::server::row::get_action, jacobi_server_row_get_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    jacobi::server::row::init_action
-  , jacobi_server_row_init_action
-)
+    jacobi::server::row::init_action, jacobi_server_row_init_action)
 
 #endif

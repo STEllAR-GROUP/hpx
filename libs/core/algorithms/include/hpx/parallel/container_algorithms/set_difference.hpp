@@ -248,9 +248,9 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/algorithms/set_difference.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
@@ -265,7 +265,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::set_difference
-    HPX_INLINE_CONSTEXPR_VARIABLE struct set_difference_t final
+    inline constexpr struct set_difference_t final
       : hpx::detail::tag_parallel_algorithm<set_difference_t>
     {
     private:
@@ -290,7 +290,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             set_difference_result<Iter1, Iter3>>::type
-        tag_fallback_dispatch(set_difference_t, ExPolicy&& policy, Iter1 first1,
+        tag_fallback_invoke(set_difference_t, ExPolicy&& policy, Iter1 first1,
             Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -312,9 +312,9 @@ namespace hpx { namespace ranges {
             using result_type = set_difference_result<Iter1, Iter3>;
 
             return hpx::parallel::v1::detail::set_difference<result_type>()
-                .call2(std::forward<ExPolicy>(policy), is_seq(), first1, last1,
-                    first2, last2, dest, std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first1, last1,
+                    first2, last2, dest, HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -338,7 +338,7 @@ namespace hpx { namespace ranges {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             set_difference_result<
                 typename hpx::traits::range_iterator<Rng1>::type, Iter3>>::type
-        tag_fallback_dispatch(set_difference_t, ExPolicy&& policy, Rng1&& rng1,
+        tag_fallback_invoke(set_difference_t, ExPolicy&& policy, Rng1&& rng1,
             Rng2&& rng2, Iter3 dest, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -368,11 +368,11 @@ namespace hpx { namespace ranges {
             using result_type = set_difference_result<iterator_type1, Iter3>;
 
             return hpx::parallel::v1::detail::set_difference<result_type>()
-                .call2(std::forward<ExPolicy>(policy), is_seq(),
+                .call2(HPX_FORWARD(ExPolicy, policy), is_seq(),
                     hpx::util::begin(rng1), hpx::util::end(rng1),
                     hpx::util::begin(rng2), hpx::util::end(rng2), dest,
-                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -393,7 +393,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend set_difference_result<Iter1, Iter3> tag_fallback_dispatch(
+        friend set_difference_result<Iter1, Iter3> tag_fallback_invoke(
             set_difference_t, Iter1 first1, Sent1 last1, Iter2 first2,
             Sent2 last2, Iter3 dest, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
@@ -409,8 +409,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::set_difference<result_type>()
                 .call(hpx::execution::seq, first1, last1, first2, last2, dest,
-                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -433,7 +433,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend set_difference_result<
             typename hpx::traits::range_iterator<Rng1>::type, Iter3>
-        tag_fallback_dispatch(set_difference_t, Rng1&& rng1, Rng2&& rng2,
+        tag_fallback_invoke(set_difference_t, Rng1&& rng1, Rng2&& rng2,
             Iter3 dest, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -456,8 +456,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::set_difference<result_type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), dest, std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), dest, HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
     } set_difference{};
 

@@ -28,7 +28,7 @@ namespace hpx {
     {
         using cont_type = typename std::decay<Cont>::type;
         return hpx::actions::continuation_impl<cont_type>(
-            std::forward<Cont>(cont),
+            HPX_FORWARD(Cont, cont),
             naming::get_id_from_locality_id(agas::get_locality_id()));
     }
 
@@ -38,7 +38,7 @@ namespace hpx {
     {
         using cont_type = typename std::decay<Cont>::type;
         return hpx::actions::continuation_impl<cont_type>(
-            std::forward<Cont>(f), target);
+            HPX_FORWARD(Cont, f), target);
     }
 
     template <typename Cont, typename F>
@@ -52,9 +52,9 @@ namespace hpx {
         using function_type = typename std::decay<F>::type;
 
         return hpx::actions::continuation2_impl<cont_type, function_type>(
-            std::forward<Cont>(cont),
+            HPX_FORWARD(Cont, cont),
             naming::get_id_from_locality_id(agas::get_locality_id()),
-            std::forward<F>(f));
+            HPX_FORWARD(F, f));
     }
 
     template <typename Cont, typename F>
@@ -66,6 +66,6 @@ namespace hpx {
         using function_type = typename std::decay<F>::type;
 
         return hpx::actions::continuation2_impl<cont_type, function_type>(
-            std::forward<Cont>(cont), target, std::forward<F>(f));
+            HPX_FORWARD(Cont, cont), target, HPX_FORWARD(F, f));
     }
 }    // namespace hpx

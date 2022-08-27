@@ -28,7 +28,7 @@ namespace hpx { namespace lcos { namespace local {
     {
     protected:
         typedef Mutex mutex_type;
-        typedef hpx::lcos::local::promise<T> buffer_promise_type;
+        typedef hpx::promise<T> buffer_promise_type;
 
         struct entry_data
         {
@@ -51,7 +51,7 @@ namespace hpx { namespace lcos { namespace local {
             void set_value(Val&& val)
             {
                 value_set_ = true;
-                promise_.set_value(std::forward<Val>(val));
+                promise_.set_value(HPX_FORWARD(Val, val));
             }
 
             bool cancel(std::exception_ptr const& e)
@@ -96,7 +96,7 @@ namespace hpx { namespace lcos { namespace local {
 
         receive_buffer(receive_buffer&& other) noexcept
           : mtx_()
-          , buffer_map_(std::move(other.buffer_map_))
+          , buffer_map_(HPX_MOVE(other.buffer_map_))
         {
         }
 
@@ -110,7 +110,7 @@ namespace hpx { namespace lcos { namespace local {
             if (this != &other)
             {
                 mtx_ = mutex_type();
-                buffer_map_ = std::move(other.buffer_map_);
+                buffer_map_ = HPX_MOVE(other.buffer_map_);
             }
             return *this;
         }
@@ -195,7 +195,7 @@ namespace hpx { namespace lcos { namespace local {
                 lock->unlock();
 
             // set value in promise, but only after the lock went out of scope
-            entry->set_value(std::move(val));
+            entry->set_value(HPX_MOVE(val));
         }
 
         bool empty() const
@@ -253,7 +253,7 @@ namespace hpx { namespace lcos { namespace local {
     {
     protected:
         typedef Mutex mutex_type;
-        typedef hpx::lcos::local::promise<void> buffer_promise_type;
+        typedef hpx::promise<void> buffer_promise_type;
 
         struct entry_data
         {
@@ -319,7 +319,7 @@ namespace hpx { namespace lcos { namespace local {
         receive_buffer() {}
 
         receive_buffer(receive_buffer&& other)
-          : buffer_map_(std::move(other.buffer_map_))
+          : buffer_map_(HPX_MOVE(other.buffer_map_))
         {
         }
 
@@ -332,7 +332,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             if (this != &other)
             {
-                buffer_map_ = std::move(other.buffer_map_);
+                buffer_map_ = HPX_MOVE(other.buffer_map_);
             }
             return *this;
         }

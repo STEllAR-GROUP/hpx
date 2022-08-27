@@ -23,6 +23,7 @@ set(threading_base_headers
     hpx/threading_base/scheduler_base.hpp
     hpx/threading_base/scheduler_mode.hpp
     hpx/threading_base/scheduler_state.hpp
+    hpx/threading_base/scoped_annotation.hpp
     hpx/threading_base/set_thread_state.hpp
     hpx/threading_base/set_thread_state_timed.hpp
     hpx/threading_base/thread_data.hpp
@@ -108,6 +109,7 @@ add_hpx_module(
     hpx_functional
     hpx_hardware
     hpx_itt_notify
+    hpx_lock_registration
     hpx_logging
     hpx_memory
     hpx_timing

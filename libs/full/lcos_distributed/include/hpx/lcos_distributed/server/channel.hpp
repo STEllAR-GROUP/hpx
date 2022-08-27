@@ -67,12 +67,20 @@ namespace hpx { namespace lcos { namespace server {
             components::set_component_type<channel>(type);
         }
 
+        naming::address get_current_address() const
+        {
+            return naming::address(
+                naming::get_gid_from_locality_id(agas::get_locality_id()),
+                components::get_component_type<channel>(),
+                const_cast<channel*>(this));
+        }
+
         // standard LCO action implementations
 
         // Push a value to the channel.
         void set_value(RemoteType&& result)
         {
-            channel_.set(std::move(result));
+            channel_.set(HPX_MOVE(result));
         }
 
         // Close the channel
@@ -96,19 +104,19 @@ namespace hpx { namespace lcos { namespace server {
         {
             return channel_.get(generation);
         }
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(channel, get_generation);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(channel, get_generation)
 
         void set_generation(RemoteType&& value, std::size_t generation)
         {
-            channel_.set(std::move(value), generation);
+            channel_.set(HPX_MOVE(value), generation);
         }
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(channel, set_generation);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(channel, set_generation)
 
         std::size_t close(bool force_delete_entries)
         {
             return channel_.close(force_delete_entries);
         }
-        HPX_DEFINE_COMPONENT_ACTION(channel, close);
+        HPX_DEFINE_COMPONENT_ACTION(channel, close)
 
     private:
         lcos::local::channel<result_type> channel_;
@@ -131,10 +139,10 @@ namespace hpx { namespace lcos { namespace server {
         ::hpx::lcos::server::channel<type>;                                    \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
         hpx::lcos::server::channel<type>::get_generation_action,               \
-        HPX_PP_CAT(__channel_get_generation_action, HPX_PP_CAT(type, name)));  \
+        HPX_PP_CAT(__channel_get_generation_action, HPX_PP_CAT(type, name)))   \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
         hpx::lcos::server::channel<type>::set_generation_action,               \
-        HPX_PP_CAT(__channel_set_generation_action, HPX_PP_CAT(type, name)));  \
+        HPX_PP_CAT(__channel_set_generation_action, HPX_PP_CAT(type, name)))   \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
         hpx::lcos::server::channel<type>::close_action,                        \
         HPX_PP_CAT(__channel_close_action, HPX_PP_CAT(type, name)))            \
@@ -162,13 +170,13 @@ namespace hpx { namespace lcos { namespace server {
     HPX_REGISTER_DERIVED_COMPONENT_FACTORY(                                    \
         HPX_PP_CAT(__channel_component_, name),                                \
         HPX_PP_CAT(__channel_component_, name),                                \
-        HPX_PP_STRINGIZE(HPX_PP_CAT(__base_lco_with_value_channel_, name)));   \
+        HPX_PP_STRINGIZE(HPX_PP_CAT(__base_lco_with_value_channel_, name)))    \
     HPX_REGISTER_ACTION(                                                       \
         hpx::lcos::server::channel<type>::get_generation_action,               \
-        HPX_PP_CAT(__channel_get_generation_action, HPX_PP_CAT(type, name)));  \
+        HPX_PP_CAT(__channel_get_generation_action, HPX_PP_CAT(type, name)))   \
     HPX_REGISTER_ACTION(                                                       \
         hpx::lcos::server::channel<type>::set_generation_action,               \
-        HPX_PP_CAT(__channel_set_generation_action, HPX_PP_CAT(type, name)));  \
+        HPX_PP_CAT(__channel_set_generation_action, HPX_PP_CAT(type, name)))   \
     HPX_REGISTER_ACTION(hpx::lcos::server::channel<type>::close_action,        \
         HPX_PP_CAT(__channel_close_action, HPX_PP_CAT(type, name)))            \
     HPX_REGISTER_BASE_LCO_WITH_VALUE(type, type, name, component_tag)          \

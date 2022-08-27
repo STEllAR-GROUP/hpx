@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,7 +18,7 @@
 #error This code assumes an eight-bit byte.
 #endif
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     ////////////////////////////////////////////////////////////////////////////
     union chunk_data
@@ -28,7 +28,7 @@ namespace hpx { namespace serialization {
         void* pos_;            // pointer to external data buffer //-V117
     };
 
-    enum chunk_type
+    enum class chunk_type : std::uint8_t
     {
         chunk_type_index = 0,
         chunk_type_pointer = 1
@@ -40,25 +40,25 @@ namespace hpx { namespace serialization {
         std::size_t size_;      // size of serialization_chunk starting pos_
         std::uint64_t rkey_;    // optional RDMA remote key for parcelport
                                 // operations
-        std::uint8_t type_;     // chunk_type
+        chunk_type type_;       // chunk_type
     };
 
     ///////////////////////////////////////////////////////////////////////
     inline serialization_chunk create_index_chunk(
-        std::size_t index, std::size_t size)
+        std::size_t index, std::size_t size) noexcept
     {
         serialization_chunk retval = {
-            {0}, size, 0, static_cast<std::uint8_t>(chunk_type_index)};
+            {0}, size, 0, chunk_type::chunk_type_index};
         retval.data_.index_ = index;
         return retval;
     }
 
     inline serialization_chunk create_pointer_chunk(
-        void const* pos, std::size_t size, std::uint64_t rkey = 0)
+        void const* pos, std::size_t size, std::uint64_t rkey = 0) noexcept
     {
         serialization_chunk retval = {
-            {0}, size, rkey, static_cast<std::uint8_t>(chunk_type_pointer)};
+            {0}, size, rkey, chunk_type::chunk_type_pointer};
         retval.data_.cpos_ = pos;
         return retval;
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

@@ -23,7 +23,7 @@
 
 void scatter(std::vector<hpx::id_type> const& localities,
     hpx::serialization::serialize_buffer<char> buffer, std::size_t chunk_size);
-HPX_PLAIN_ACTION(scatter);
+HPX_PLAIN_ACTION(scatter)
 
 void scatter(std::vector<hpx::id_type> const& localities,
     hpx::serialization::serialize_buffer<char> buffer, std::size_t chunk_size)
@@ -73,8 +73,8 @@ void run_benchmark(params const& p)
     if (localities.size() < 2)
     {
         hpx::cout << "This benchmark must be run with at least 2 localities"
-                  << hpx::endl
-                  << hpx::flush;
+                  << std::endl
+                  << std::flush;
         return;
     }
 

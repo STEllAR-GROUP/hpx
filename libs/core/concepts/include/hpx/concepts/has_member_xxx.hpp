@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Anton Bikineev
+//  Copyright (c) 2020-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -56,8 +57,7 @@
     };                                                                         \
                                                                                \
     template <typename T>                                                      \
-    struct HPX_PP_CAT(has_,                                                    \
-        MEMBER)<T, typename std::enable_if<std::is_class<T>::value>::type>     \
+    struct HPX_PP_CAT(has_, MEMBER)<T, std::enable_if_t<std::is_class_v<T>>>   \
       : HPX_PP_CAT(HPX_PP_CAT(has_, MEMBER), _detail)::impl<T>                 \
     {                                                                          \
     };                                                                         \
@@ -67,6 +67,6 @@
         typename HPX_PP_CAT(has_, MEMBER)<T>::type;                            \
                                                                                \
     template <typename T>                                                      \
-    HPX_INLINE_CONSTEXPR_VARIABLE bool HPX_PP_CAT(                             \
-        HPX_PP_CAT(has_, MEMBER), _v) = HPX_PP_CAT(has_, MEMBER)<T>::value;    \
+    inline constexpr bool HPX_PP_CAT(HPX_PP_CAT(has_, MEMBER), _v) =           \
+        HPX_PP_CAT(has_, MEMBER)<T>::value;                                    \
     /**/

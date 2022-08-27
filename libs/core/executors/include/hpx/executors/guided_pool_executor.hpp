@@ -123,7 +123,7 @@ namespace hpx { namespace parallel { namespace execution {
 
                 lcos::local::futures_factory<result_type()> p(
                     hpx::util::deferred_call(
-                        std::forward<F>(f), std::forward<Ts>(ts)...));
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 gpx_deb.debug(
                     debug::str<>("triggering apply"), "domain ", domain);
@@ -184,9 +184,9 @@ namespace hpx { namespace parallel { namespace execution {
                     Future, Ts...>::type result_type;
 
                 lcos::local::futures_factory<result_type()> p(
-                    hpx::util::deferred_call(std::forward<F>(f),
-                        std::forward<Future>(predecessor),
-                        std::forward<Ts>(ts)...));
+                    hpx::util::deferred_call(HPX_FORWARD(F, f),
+                        HPX_FORWARD(Future, predecessor),
+                        HPX_FORWARD(Ts, ts)...));
 
                 if (hp_sync_ &&
                     executor_.priority_ == hpx::threads::thread_priority::high)
@@ -310,7 +310,7 @@ namespace hpx { namespace parallel { namespace execution {
                     typename std::decay<typename std::remove_pointer<decltype(
                         this)>::type>::type,
                     pool_numa_hint<Tag>>{*this, hint_, hp_sync_},
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // --------------------------------------------------------------------
@@ -351,18 +351,16 @@ namespace hpx { namespace parallel { namespace execution {
             // the real task will be spawned on a new task with hints - as intended
             return dataflow(
                 launch::sync,
-                [f = std::forward<F>(f), this](
-                    Future&& predecessor, Ts&&... /* ts */) {
+                [f = HPX_FORWARD(F, f), this](
+                    Future&& predecessor, Ts&&... /* ts */) mutable {
                     detail::pre_execution_then_domain_schedule<
-                        typename std::decay<typename std::remove_pointer<
-                            decltype(this)>::type>::type,
-                        pool_numa_hint<Tag>>
+                        guided_pool_executor, pool_numa_hint<Tag>>
                         pre_exec{*this, hint_, hp_sync_};
 
                     return pre_exec(
-                        std::move(f), std::forward<Future>(predecessor));
+                        HPX_MOVE(f), HPX_FORWARD(Future, predecessor));
                 },
-                std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
+                HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
 
         // --------------------------------------------------------------------
@@ -413,22 +411,20 @@ namespace hpx { namespace parallel { namespace execution {
             // Please see notes for previous then_execute function above
             return dataflow(
                 launch::sync,
-                [f = std::forward<F>(f), this](
+                [f = HPX_FORWARD(F, f), this](
                     OuterFuture<hpx::tuple<InnerFutures...>>&& predecessor,
-                    Ts&&... /* ts */) {
+                    Ts&&... /* ts */) mutable {
                     detail::pre_execution_then_domain_schedule<
-                        typename std::decay<typename std::remove_pointer<
-                            decltype(this)>::type>::type,
-                        pool_numa_hint<Tag>>
+                        guided_pool_executor, pool_numa_hint<Tag>>
                         pre_exec{*this, hint_, hp_sync_};
 
-                    return pre_exec(std::move(f),
+                    return pre_exec(HPX_MOVE(f),
                         std::forward<OuterFuture<hpx::tuple<InnerFutures...>>>(
                             predecessor));
                 },
                 std::forward<OuterFuture<hpx::tuple<InnerFutures...>>>(
                     predecessor),
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // --------------------------------------------------------------------
@@ -477,7 +473,7 @@ namespace hpx { namespace parallel { namespace execution {
 
             // forward the task execution on to the real internal executor
             lcos::local::futures_factory<result_type()> p(
-                hpx::util::deferred_call(std::forward<F>(f),
+                hpx::util::deferred_call(HPX_FORWARD(F, f),
                     std::forward<hpx::tuple<InnerFutures...>>(predecessor)));
 
             if (hp_sync_ && priority_ == hpx::threads::thread_priority::high)
@@ -550,7 +546,7 @@ namespace hpx { namespace parallel { namespace execution {
         {
             if (guided_)
                 return guided_exec_.async_execute(
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             else
             {
                 typedef typename hpx::util::detail::invoke_deferred_result<F,
@@ -558,7 +554,7 @@ namespace hpx { namespace parallel { namespace execution {
 
                 lcos::local::futures_factory<result_type()> p(
                     hpx::util::deferred_call(
-                        std::forward<F>(f), std::forward<Ts>(ts)...));
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 p.apply(guided_exec_.pool_, "guided async",
                     hpx::launch::async_policy(
@@ -577,24 +573,24 @@ namespace hpx { namespace parallel { namespace execution {
                 Future, Ts...>::type>
         {
             if (guided_)
-                return guided_exec_.then_execute(std::forward<F>(f),
-                    std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
+                return guided_exec_.then_execute(HPX_FORWARD(F, f),
+                    HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
             else
             {
                 typedef typename hpx::util::detail::invoke_deferred_result<F,
                     Future, Ts...>::type result_type;
 
-                auto func = hpx::util::one_shot(hpx::util::bind_back(
-                    std::forward<F>(f), std::forward<Ts>(ts)...));
+                auto func = hpx::util::one_shot(
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 typename hpx::traits::detail::shared_state_ptr<
                     result_type>::type p =
                     hpx::lcos::detail::make_continuation_exec<result_type>(
-                        std::forward<Future>(predecessor), *this,
-                        std::move(func));
+                        HPX_FORWARD(Future, predecessor), *this,
+                        HPX_MOVE(func));
 
                 return hpx::traits::future_access<
-                    hpx::lcos::future<result_type>>::create(std::move(p));
+                    hpx::future<result_type>>::create(HPX_MOVE(p));
             }
         }
 

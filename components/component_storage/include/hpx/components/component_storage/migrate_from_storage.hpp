@@ -41,14 +41,14 @@ namespace hpx { namespace components
     ///
     template <typename Component>
 #if defined(DOXYGEN)
-    future<naming::id_type>
+    future<hpx::id_type>
 #else
     inline typename std::enable_if<
-        traits::is_component<Component>::value, future<naming::id_type>
+        traits::is_component<Component>::value, future<hpx::id_type>
     >::type
 #endif
-    migrate_from_storage(naming::id_type const& to_resurrect,
-        naming::id_type const& target = naming::invalid_id)
+    migrate_from_storage(hpx::id_type const& to_resurrect,
+        hpx::id_type const& target = hpx::invalid_id)
     {
         typedef server::trigger_migrate_from_storage_here_action<Component>
             action_type;

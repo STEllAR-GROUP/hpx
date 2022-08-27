@@ -23,13 +23,13 @@ std::int32_t increment(std::int32_t i)
 {
     return i + 1;
 }
-HPX_PLAIN_ACTION(increment);
+HPX_PLAIN_ACTION(increment)
 
 std::int32_t increment_with_future(hpx::shared_future<std::int32_t> fi)
 {
     return fi.get() + 1;
 }
-HPX_PLAIN_ACTION(increment_with_future);
+HPX_PLAIN_ACTION(increment_with_future)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct decrement_server
@@ -40,15 +40,15 @@ struct decrement_server
         return i - 1;
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(decrement_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(decrement_server, call)
 };
 
 typedef hpx::components::managed_component<decrement_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, decrement_server);
+HPX_REGISTER_COMPONENT(server_type, decrement_server)
 
 typedef decrement_server::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION_DECLARATION(call_action)
+HPX_REGISTER_ACTION(call_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_remote_sync(hpx::id_type const& target)
@@ -68,7 +68,7 @@ void test_remote_sync(hpx::id_type const& target)
 
     {
         increment_with_future_action inc;
-        hpx::lcos::promise<std::int32_t> p;
+        hpx::distributed::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         p.set_value(42);
@@ -86,7 +86,7 @@ void test_remote_sync(hpx::id_type const& target)
     {
         increment_action inc;
 
-        std::int32_t r1 = hpx::sync(hpx::util::bind(inc, target, 42));
+        std::int32_t r1 = hpx::sync(hpx::bind(inc, target, 42));
         HPX_TEST_EQ(r1, 43);
     }
 
@@ -127,16 +127,16 @@ void test_remote_sync(hpx::id_type const& target)
 
         call_action call;
 
-        std::int32_t r1 = hpx::sync(hpx::util::bind(call, dec, 42));
+        std::int32_t r1 = hpx::sync(hpx::bind(call, dec, 42));
         HPX_TEST_EQ(r1, 41);
 
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
 
-        std::int32_t r2 = hpx::sync(hpx::util::bind(call, _1, 42), dec);
+        std::int32_t r2 = hpx::sync(hpx::bind(call, _1, 42), dec);
         HPX_TEST_EQ(r2, 41);
 
-        std::int32_t r3 = hpx::sync(hpx::util::bind(call, _1, _2), dec, 42);
+        std::int32_t r3 = hpx::sync(hpx::bind(call, _1, _2), dec, 42);
         HPX_TEST_EQ(r3, 41);
     }
 
@@ -158,7 +158,7 @@ void test_remote_sync(hpx::id_type const& target)
     {
         increment_with_future_action inc;
         hpx::shared_future<std::int32_t> f =
-            hpx::async(hpx::launch::deferred, hpx::util::bind(&increment, 42));
+            hpx::async(hpx::launch::deferred, hpx::bind(&increment, 42));
 
         std::int32_t r1 = hpx::sync(inc, target, f);
         std::int32_t r2 = hpx::sync(hpx::launch::all, inc, target, f);
@@ -175,7 +175,7 @@ void test_remote_sync(hpx::id_type const& target)
 
         increment_with_future_action inc;
         hpx::shared_future<std::int32_t> f =
-            hpx::async(policy1, hpx::util::bind(&increment, 42));
+            hpx::async(policy1, hpx::bind(&increment, 42));
 
         std::atomic<int> count(0);
         auto policy2 = hpx::launch::select([&count]() -> hpx::launch {

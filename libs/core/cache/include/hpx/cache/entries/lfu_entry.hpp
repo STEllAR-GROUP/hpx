@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,8 +9,12 @@
 #include <hpx/config.hpp>
 #include <hpx/cache/entries/entry.hpp>
 
+#include <type_traits>
+#include <utility>
+
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache { namespace entries {
+namespace hpx::util::cache::entries {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \class lfu_entry lfu_entry.hpp hpx/cache/entries/lfu_entry.hpp
     ///
@@ -31,20 +35,24 @@ namespace hpx { namespace util { namespace cache { namespace entries {
     class lfu_entry : public entry<Value, lfu_entry<Value>>
     {
     private:
-        typedef entry<Value, lfu_entry<Value>> base_type;
+        using base_type = entry<Value, lfu_entry<Value>>;
 
     public:
         /// \brief Any cache entry has to be default constructible
-        lfu_entry()
-          : ref_count_(0)
+        lfu_entry() = default;
+
+        /// \brief Construct a new instance of a cache entry holding the given
+        ///        value.
+        explicit lfu_entry(Value const& val) noexcept(
+            std::is_nothrow_constructible_v<base_type, Value const&>)
+          : base_type(val)
         {
         }
 
         /// \brief Construct a new instance of a cache entry holding the given
         ///        value.
-        explicit lfu_entry(Value const& val)
-          : base_type(val)
-          , ref_count_(0)
+        explicit lfu_entry(Value&& val) noexcept
+          : base_type(HPX_MOVE(val))
         {
         }
 
@@ -60,25 +68,26 @@ namespace hpx { namespace util { namespace cache { namespace entries {
         ///           update it's internal heap. Usually this is needed if the
         ///           entry has been changed by touch() in a way influencing
         ///           the sort order as mandated by the cache's UpdatePolicy
-        bool touch()
+        bool touch() noexcept
         {
             ++ref_count_;
             return true;
         }
 
-        unsigned long const& get_access_count() const
+        constexpr unsigned long const& get_access_count() const noexcept
         {
             return ref_count_;
         }
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has been accessed less frequently (LFU).
-        friend bool operator<(lfu_entry const& lhs, lfu_entry const& rhs)
+        friend bool operator<(
+            lfu_entry const& lhs, lfu_entry const& rhs) noexcept
         {
             return lhs.get_access_count() < rhs.get_access_count();
         }
 
     private:
-        unsigned long ref_count_;
+        unsigned long ref_count_ = 0;
     };
-}}}}    // namespace hpx::util::cache::entries
+}    // namespace hpx::util::cache::entries

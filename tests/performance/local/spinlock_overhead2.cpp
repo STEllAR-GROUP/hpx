@@ -11,36 +11,35 @@
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/async_combinators/wait_each.hpp>
 #include <hpx/async_distributed/continuation.hpp>
-#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/iostream.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 #include <vector>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using hpx::find_here;
 
-using hpx::naming::id_type;
+using hpx::id_type;
 
-using hpx::lcos::future;
 using hpx::async;
-using hpx::lcos::wait_each;
+using hpx::future;
 
 using hpx::chrono::high_resolution_timer;
 
 using hpx::cout;
-using hpx::flush;
 
 #define N 100
 
@@ -54,12 +53,12 @@ std::size_t k1 = 0;
 std::size_t k2 = 0;
 std::size_t k3 = 0;
 
-namespace test
-{
+namespace test {
+
     struct local_spinlock
     {
     private:
-        std::uint64_t v_;
+        std::atomic<bool> v_;
 
         ///////////////////////////////////////////////////////////////////////////
         static void yield(std::size_t k)
@@ -67,61 +66,42 @@ namespace test
             if (k < k1)
             {
             }
-            if(k < k2)
+            if (k < k2)
             {
-#if defined(BOOST_SMT_PAUSE)
-                BOOST_SMT_PAUSE
-#endif
+                HPX_SMT_PAUSE;
             }
-            else if(k < k3 || k & 1)
+            else if (k < k3 || k & 1)
             {
-                /*
-                if(hpx::threads::get_self_ptr())
-                {
-                    hpx::this_thread::suspend();
-                }
-                else
-                */
-                {
 #if defined(HPX_WINDOWS)
-                    Sleep(0);
+                Sleep(0);
 #elif defined(BOOST_HAS_PTHREADS)
-                    sched_yield();
+                sched_yield();
 #else
 #endif
-                }
             }
             else
             {
-                /*
-                if (hpx::threads::get_self_ptr())
-                {
-                    hpx::this_thread::suspend(std::chrono::microseconds(1));
-                }
-                else
-                */
-                {
 #if defined(HPX_WINDOWS)
-                    Sleep(1);
+                Sleep(1);
 #elif defined(BOOST_HAS_PTHREADS)
-                    // g++ -Wextra warns on {} or {0}
-                    struct timespec rqtp = { 0, 0 };
+                // g++ -Wextra warns on {} or {0}
+                struct timespec rqtp = {0, 0};
 
-                    // POSIX says that timespec has tv_sec and tv_nsec
-                    // But it doesn't guarantee order or placement
+                // POSIX says that timespec has tv_sec and tv_nsec
+                // But it doesn't guarantee order or placement
 
-                    rqtp.tv_sec = 0;
-                    rqtp.tv_nsec = 1000;
+                rqtp.tv_sec = 0;
+                rqtp.tv_nsec = 1000;
 
-                    nanosleep( &rqtp, nullptr );
+                nanosleep(&rqtp, nullptr);
 #else
 #endif
-                }
             }
         }
 
     public:
-        local_spinlock() : v_(0)
+        local_spinlock()
+          : v_(0)
         {
             HPX_ITT_SYNC_CREATE(this, "test::local_spinlock", "");
         }
@@ -138,10 +118,12 @@ namespace test
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-            for (std::size_t k = 0; !try_lock(); ++k)
+            do
             {
-                local_spinlock::yield(k);
-            }
+                hpx::util::yield_while(
+                    [this]() noexcept { return is_locked(); },
+                    "test::local_spinlock::lock");
+            } while (!acquire_lock());
 
             HPX_ITT_SYNC_ACQUIRED(this);
             hpx::util::register_lock(this);
@@ -151,14 +133,10 @@ namespace test
         {
             HPX_ITT_SYNC_PREPARE(this);
 
-#if defined(BOOST_SP_HAS_SYNC_INTRINSICS) || defined(BOOST_SP_HAS_SYNC)
-            std::uint64_t r = __sync_lock_test_and_set(&v_, 1);
-#else
-            std::uint64_t r = BOOST_INTERLOCKED_EXCHANGE(&v_, 1);
-            HPX_COMPILER_FENCE;
-#endif
+            bool r = acquire_lock();    //-V707
 
-            if (r == 0) {
+            if (r)
+            {
                 HPX_ITT_SYNC_ACQUIRED(this);
                 hpx::util::register_lock(this);
                 return true;
@@ -172,18 +150,31 @@ namespace test
         {
             HPX_ITT_SYNC_RELEASING(this);
 
-#if defined(BOOST_SP_HAS_SYNC_INTRINSICS) || defined(BOOST_SP_HAS_SYNC)
-            __sync_lock_release(&v_);
-#else
-            HPX_COMPILER_FENCE;
-            *const_cast<std::uint64_t volatile*>(&v_) = 0;
-#endif
+            relinquish_lock();
 
             HPX_ITT_SYNC_RELEASED(this);
             hpx::util::unregister_lock(this);
         }
+
+    private:
+        // returns whether the mutex has been acquired
+        HPX_FORCEINLINE bool acquire_lock()
+        {
+            return !v_.exchange(true, std::memory_order_acquire);
+        }
+
+        // relinquish lock
+        HPX_FORCEINLINE void relinquish_lock()
+        {
+            v_.store(false, std::memory_order_release);
+        }
+
+        HPX_FORCEINLINE bool is_locked() const
+        {
+            return v_.load(std::memory_order_relaxed);
+        }
     };
-}
+}    // namespace test
 
 test::local_spinlock mtx[N];
 
@@ -210,9 +201,7 @@ double null_function(std::size_t i)
 HPX_PLAIN_ACTION(null_function, null_action)
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(
-    variables_map& vm
-    )
+int hpx_main(variables_map& vm)
 {
     {
         num_iterations = vm["delay-iterations"].as<std::uint64_t>();
@@ -228,7 +217,7 @@ int hpx_main(
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
 
-        std::vector<future<double> > futures;
+        std::vector<future<double>> futures;
 
         futures.reserve(count);
 
@@ -245,7 +234,7 @@ int hpx_main(
                 for (std::uint64_t i = 0; i < count; ++i)
                     futures.push_back(async<null_action>(here, i));
 
-                wait_each(
+                hpx::wait_each(
                     hpx::unwrapping([](double r) { global_scratch += r; }),
                     futures);
 
@@ -253,24 +242,15 @@ int hpx_main(
                 const double duration = walltime.elapsed();
 
                 if (vm.count("csv"))
-                    hpx::util::format_to(cout,
-                        "{3},{4},{5},{2}\n",
-                        count,
-                        duration,
-                        k1,
-                        k2,
-                        k3
-                    ) << flush;
+                    hpx::util::format_to(
+                        cout, "{3},{4},{5},{2}\n", count, duration, k1, k2, k3)
+                        << std::flush;
                 else
                     hpx::util::format_to(cout,
                         "invoked {1} futures in {2} seconds "
                         "(k1 = {3}, k2 = {4}, k3 = {5})\n",
-                        count,
-                        duration,
-                        k1,
-                        k2,
-                        k3
-                    ) << flush;
+                        count, duration, k1, k2, k3)
+                        << std::flush;
                 hpx::util::print_cdash_timing("Spinlock2", duration);
             }
         }
@@ -281,38 +261,23 @@ int hpx_main(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(
-    int argc
-  , char* argv[]
-    )
+int main(int argc, char* argv[])
 {
     // Configure application-specific options.
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
+    // clang-format off
     cmdline.add_options()
-        ( "futures"
-        , value<std::uint64_t>()->default_value(500000)
-        , "number of futures to invoke")
-
-        ( "delay-iterations"
-        , value<std::uint64_t>()->default_value(0)
-        , "number of iterations in the delay loop")
-
-        ( "k1"
-        , value<std::size_t>()->default_value(4)
-        , "")
-
-        ( "k2"
-        , value<std::size_t>()->default_value(16)
-        , "")
-
-        ( "k3"
-        , value<std::size_t>()->default_value(32)
-        , "")
-
-        ( "csv"
-        , "output results as csv (format: count,duration)")
+        ("futures", value<std::uint64_t>()->default_value(500000),
+            "number of futures to invoke")
+        ("delay-iterations", value<std::uint64_t>()->default_value(0),
+            "number of iterations in the delay loop")
+        ("k1", value<std::size_t>()->default_value(4), "")
+        ("k2", value<std::size_t>()->default_value(16), "")
+        ("k3", value<std::size_t>()->default_value(32), "")
+        ("csv", "output results as csv (format: count,duration)")
         ;
+    // clang-format on
 
     // Initialize and run HPX.
     hpx::init_params init_args;

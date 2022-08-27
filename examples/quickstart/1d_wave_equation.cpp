@@ -42,19 +42,17 @@ using hpx::program_options::options_description;
 using hpx::program_options::value;
 using hpx::program_options::variables_map;
 
-using hpx::naming::id_type;
-using hpx::naming::invalid_id;
+using hpx::id_type;
+using hpx::invalid_id;
 
 using hpx::async;
-using hpx::lcos::future;
-using hpx::lcos::wait;
+using hpx::future;
 
 using hpx::chrono::high_resolution_timer;
 
 using hpx::find_here;
 
 using hpx::cout;
-using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Globals.
@@ -113,7 +111,7 @@ double wave(std::uint64_t t, std::uint64_t x);
 // Any global function needs to be wrapped into a plain_action if it should be
 // invoked as a HPX-thread.
 // This generates the required boilerplate we need for remote invocation.
-HPX_PLAIN_ACTION(wave);
+HPX_PLAIN_ACTION(wave)
 
 double calculate_u_tplus_x(
     double u_t_xplus, double u_t_x, double u_t_xminus, double u_tminus_x)
@@ -182,8 +180,8 @@ double wave(std::uint64_t t, std::uint64_t x)
     }
     else
     {
-        std::lock_guard<hpx::lcos::local::mutex> l(u[t][x].mtx);
         double u_tminus_x = async<wave_action>(here, t - 2, x).get();
+        std::lock_guard<hpx::lcos::local::mutex> l(u[t][x].mtx);
         u[t][x].u_value =
             calculate_u_tplus_x(u_t_xplus, u_t_x, u_t_xminus, u_tminus_x);
         return u[t][x].u_value;
@@ -213,14 +211,14 @@ int hpx_main(variables_map& vm)
     {
         cout << (("alpha^2 = (c*dt/dx)^2 should be less than 0.25 for "
                   "stability!\n"))
-             << flush;
+             << std::flush;
     }
 
     u = std::vector<std::vector<data>>(nt, std::vector<data>(nx));
 
-    hpx::util::format_to(cout, "dt = {1}\n", dt) << flush;
-    hpx::util::format_to(cout, "dx = {1}\n", dx) << flush;
-    hpx::util::format_to(cout, "alpha^2 = {1}\n", alpha_squared) << flush;
+    hpx::util::format_to(cout, "dt = {1}\n", dt) << std::flush;
+    hpx::util::format_to(cout, "dx = {1}\n", dx) << std::flush;
+    hpx::util::format_to(cout, "alpha^2 = {1}\n", alpha_squared) << std::flush;
 
     {
         // Keep track of the time required to execute.
@@ -234,11 +232,12 @@ int hpx_main(variables_map& vm)
         std::ofstream outfile;
         outfile.open("output.dat");
 
-        auto f = [&](std::size_t i, double n) {
+        auto f = [&](std::size_t i, hpx::future<double>&& f) {
             double x_here = i * dx;
-            hpx::util::format_to(outfile, "{1} {2}\n", x_here, n) << flush;
+            hpx::util::format_to(outfile, "{1} {2}\n", x_here, f.get())
+                << std::flush;
         };
-        wait(futures, f);
+        hpx::wait_each(f, futures);
 
         outfile.close();
 

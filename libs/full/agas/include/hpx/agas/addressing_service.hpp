@@ -20,7 +20,7 @@
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <boost/dynamic_bitset.hpp>
@@ -53,11 +53,11 @@ namespace hpx { namespace agas {
     public:
         using component_id_type = components::component_type;
 
-        using iterate_names_return_type =
-            std::map<std::string, naming::id_type>;
+        using iterate_names_return_type = std::map<std::string, hpx::id_type>;
 
-        using iterate_types_function_type = hpx::util::function<void(
-            std::string const&, components::component_type)>;
+        using iterate_types_function_type =
+            hpx::function<void(std::string const&, components::component_type),
+                true>;
 
         using mutex_type = hpx::lcos::local::spinlock;
 
@@ -178,7 +178,7 @@ namespace hpx { namespace agas {
         void garbage_collect(error_code& ec = throws);
 
         std::int64_t synchronize_with_async_incref(
-            hpx::future<std::int64_t> fut, naming::id_type const& id,
+            hpx::future<std::int64_t> fut, hpx::id_type const& id,
             std::int64_t compensated_credit);
 
         server::primary_namespace& get_local_primary_namespace_service()
@@ -209,6 +209,11 @@ namespace hpx { namespace agas {
         server::symbol_namespace& get_local_symbol_namespace_service()
         {
             return symbol_ns_.get_service();
+        }
+
+        naming::address::address_type get_runtime_support_lva() const
+        {
+            return reinterpret_cast<naming::address::address_type>(rts_lva_);
         }
 
     protected:
@@ -358,7 +363,7 @@ namespace hpx { namespace agas {
         ///                   throw but returns the result code using the
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
-        lcos::future<std::uint32_t> get_num_localities_async(
+        hpx::future<std::uint32_t> get_num_localities_async(
             components::component_type type =
                 components::component_invalid) const;
 
@@ -370,11 +375,11 @@ namespace hpx { namespace agas {
             return get_num_localities(components::component_invalid, ec);
         }
 
-        lcos::future<std::uint32_t> get_num_overall_threads_async() const;
+        hpx::future<std::uint32_t> get_num_overall_threads_async() const;
 
         std::uint32_t get_num_overall_threads(error_code& ec = throws) const;
 
-        lcos::future<std::vector<std::uint32_t>> get_num_threads_async() const;
+        hpx::future<std::vector<std::uint32_t>> get_num_threads_async() const;
 
         std::vector<std::uint32_t> get_num_threads(
             error_code& ec = throws) const;
@@ -825,7 +830,7 @@ namespace hpx { namespace agas {
             return resolve_full_local(id, addr, ec);
         }
 
-        bool resolve_local(naming::id_type const& id, naming::address& addr,
+        bool resolve_local(hpx::id_type const& id, naming::address& addr,
             error_code& ec = throws)
         {
             return resolve_local(id.get_gid(), addr, ec);
@@ -840,7 +845,7 @@ namespace hpx { namespace agas {
         }
 
         naming::address resolve_local(
-            naming::id_type const& id, error_code& ec = throws)
+            hpx::id_type const& id, error_code& ec = throws)
         {
             naming::address addr;
             resolve_local(id.get_gid(), addr, ec);
@@ -850,21 +855,21 @@ namespace hpx { namespace agas {
         ///////////////////////////////////////////////////////////////////////////
         hpx::future<naming::address> resolve_async(naming::gid_type const& id);
 
-        hpx::future<naming::address> resolve_async(naming::id_type const& id)
+        hpx::future<naming::address> resolve_async(hpx::id_type const& id)
         {
             return resolve_async(id.get_gid());
         }
 
         ///////////////////////////////////////////////////////////////////////////
-        hpx::future<naming::id_type> get_colocation_id_async(
-            naming::id_type const& id);
+        hpx::future<hpx::id_type> get_colocation_id_async(
+            hpx::id_type const& id);
 
         ///////////////////////////////////////////////////////////////////////////
         bool resolve_full_local(naming::gid_type const& id,
             naming::address& addr, error_code& ec = throws);
 
-        bool resolve_full_local(naming::id_type const& id,
-            naming::address& addr, error_code& ec = throws)
+        bool resolve_full_local(hpx::id_type const& id, naming::address& addr,
+            error_code& ec = throws)
         {
             return resolve_full_local(id.get_gid(), addr, ec);
         }
@@ -878,7 +883,7 @@ namespace hpx { namespace agas {
         }
 
         naming::address resolve_full_local(
-            naming::id_type const& id, error_code& ec = throws)
+            hpx::id_type const& id, error_code& ec = throws)
         {
             naming::address addr;
             resolve_full_local(id.get_gid(), addr, ec);
@@ -888,8 +893,7 @@ namespace hpx { namespace agas {
         hpx::future<naming::address> resolve_full_async(
             naming::gid_type const& id);
 
-        hpx::future<naming::address> resolve_full_async(
-            naming::id_type const& id)
+        hpx::future<naming::address> resolve_full_async(hpx::id_type const& id)
         {
             return resolve_full_async(id.get_gid());
         }
@@ -897,7 +901,7 @@ namespace hpx { namespace agas {
         bool resolve_cached(naming::gid_type const& id, naming::address& addr,
             error_code& ec = throws);
 
-        bool resolve_cached(naming::id_type const& id, naming::address& addr,
+        bool resolve_cached(hpx::id_type const& id, naming::address& addr,
             error_code& ec = throws)
         {
             return resolve_cached(id.get_gid(), addr, ec);
@@ -947,7 +951,7 @@ namespace hpx { namespace agas {
         ///                   before the parcel has been delivered to its
         ///                   destination.
         void route(parcelset::parcel p,
-            util::function_nonser<void(
+            hpx::function<void(
                 std::error_code const&, parcelset::parcel const&)>&&,
             threads::thread_priority local_priority =
                 threads::thread_priority::default_);
@@ -970,9 +974,9 @@ namespace hpx { namespace agas {
         ///                   throw but returns the result code using the
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
-        lcos::future<std::int64_t> incref_async(naming::gid_type const& gid,
+        hpx::future<std::int64_t> incref_async(naming::gid_type const& gid,
             std::int64_t credits = 1,
-            naming::id_type const& keep_alive = naming::invalid_id);
+            hpx::id_type const& keep_alive = hpx::invalid_id);
 
         std::int64_t incref(naming::gid_type const& gid,
             std::int64_t credits = 1, error_code& ec = throws)
@@ -1045,10 +1049,10 @@ namespace hpx { namespace agas {
         bool register_name(std::string const& name, naming::gid_type const& id,
             error_code& ec = throws);
 
-        lcos::future<bool> register_name_async(
-            std::string const& name, naming::id_type const& id);
+        hpx::future<bool> register_name_async(
+            std::string const& name, hpx::id_type const& id);
 
-        bool register_name(std::string const& name, naming::id_type const& id,
+        bool register_name(std::string const& name, hpx::id_type const& id,
             error_code& ec = throws);
 
         /// \brief Unregister a global name (release any existing association)
@@ -1073,10 +1077,10 @@ namespace hpx { namespace agas {
         ///                   throw but returns the result code using the
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
-        lcos::future<naming::id_type> unregister_name_async(
+        hpx::future<hpx::id_type> unregister_name_async(
             std::string const& name);
 
-        naming::id_type unregister_name(
+        hpx::id_type unregister_name(
             std::string const& name, error_code& ec = throws);
 
         /// \brief Query for the global address associated with a given global name.
@@ -1104,10 +1108,9 @@ namespace hpx { namespace agas {
         ///                   throw but returns the result code using the
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
-        lcos::future<naming::id_type> resolve_name_async(
-            std::string const& name);
+        hpx::future<hpx::id_type> resolve_name_async(std::string const& name);
 
-        naming::id_type resolve_name(
+        hpx::id_type resolve_name(
             std::string const& name, error_code& ec = throws);
 
         /// \brief Install a listener for a given symbol namespace event.
@@ -1170,20 +1173,19 @@ namespace hpx { namespace agas {
         /// start/stop migration of an object
         ///
         /// \returns Current locality and address of the object to migrate
-        hpx::future<std::pair<naming::id_type, naming::address>>
-        begin_migration(naming::id_type const& id);
-        bool end_migration(naming::id_type const& id);
+        hpx::future<std::pair<hpx::id_type, naming::address>> begin_migration(
+            hpx::id_type const& id);
+        bool end_migration(hpx::id_type const& id);
 
         /// Maintain list of migrated objects
         std::pair<bool, components::pinned_ptr> was_object_migrated(
             naming::gid_type const& gid,
-            util::unique_function_nonser<components::pinned_ptr()>&& f);
+            hpx::move_only_function<components::pinned_ptr()>&& f);
 
         /// Mark the given object as being migrated (if the object is unpinned).
         /// Delay migration until the object is unpinned otherwise.
         hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
-            util::unique_function_nonser<std::pair<bool, hpx::future<void>>()>&&
-                f,
+            hpx::move_only_function<std::pair<bool, hpx::future<void>>()>&& f,
             bool expect_to_be_marked_as_migrating);
 
         /// Remove the given object from the table of migrated objects

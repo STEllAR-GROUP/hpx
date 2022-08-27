@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +11,7 @@
 
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
 #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
     template <typename T>
@@ -27,17 +28,16 @@ namespace hpx { namespace traits {
 #endif
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_bitwise_serializable_v =
+    inline constexpr bool is_bitwise_serializable_v =
         is_bitwise_serializable<T>::value;
 
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
 #define HPX_IS_BITWISE_SERIALIZABLE(T)                                         \
-    namespace hpx { namespace traits {                                         \
-            template <>                                                        \
-            struct is_bitwise_serializable<T> : std::true_type                 \
-            {                                                                  \
-            };                                                                 \
-        }                                                                      \
+    namespace hpx::traits {                                                    \
+        template <>                                                            \
+        struct is_bitwise_serializable<T> : std::true_type                     \
+        {                                                                      \
+        };                                                                     \
     }                                                                          \
     /**/

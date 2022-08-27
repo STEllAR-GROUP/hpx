@@ -10,7 +10,9 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/executors/datapar/execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/parallel/datapar/transform_loop.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/transfer.hpp>
@@ -39,7 +41,7 @@ namespace hpx { namespace parallel { namespace util {
                         first, count, dest, [](auto& v) { return v; });
 
                 return util::in_out_result<InIter, OutIter>{
-                    std::move(ret.first), std::move(ret.second)};
+                    HPX_MOVE(ret.first), HPX_MOVE(ret.second)};
             }
 
             template <typename InIter, typename OutIter>
@@ -60,7 +62,7 @@ namespace hpx { namespace parallel { namespace util {
     HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
         hpx::is_vectorpack_execution_policy<ExPolicy>::value,
         in_out_result<InIter, OutIter>>::type
-    tag_dispatch(hpx::parallel::util::copy_n_t<ExPolicy>, InIter first,
+    tag_invoke(hpx::parallel::util::copy_n_t<ExPolicy>, InIter first,
         std::size_t count, OutIter dest)
     {
         return detail::datapar_copy_n<InIter>::call(first, count, dest);

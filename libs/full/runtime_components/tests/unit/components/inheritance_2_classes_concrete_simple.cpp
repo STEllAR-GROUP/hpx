@@ -40,15 +40,22 @@ struct A : hpx::components::component_base<A>
     {
         return test0();
     }
-    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action);
+    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action)
+
+    hpx::naming::address get_current_address() const
+    {
+        return hpx::naming::address(
+            hpx::naming::get_gid_from_locality_id(hpx::get_locality_id()),
+            hpx::components::get_component_type<A>(), const_cast<A*>(this));
+    }
 };
 
 typedef hpx::components::component<A> serverA_type;
-HPX_REGISTER_COMPONENT(serverA_type, A);
+HPX_REGISTER_COMPONENT(serverA_type, A)
 
 typedef A::test0_action test0_action;
-HPX_REGISTER_ACTION_DECLARATION(test0_action);
-HPX_REGISTER_ACTION(test0_action);
+HPX_REGISTER_ACTION_DECLARATION(test0_action)
+HPX_REGISTER_ACTION(test0_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Concrete
@@ -61,7 +68,13 @@ struct B
 
     using hpx::components::component_base<B>::finalize;
     using hpx::components::component_base<B>::get_base_gid;
-    using hpx::components::component_base<B>::get_current_address;
+
+    hpx::naming::address get_current_address() const
+    {
+        return hpx::naming::address(
+            hpx::naming::get_gid_from_locality_id(hpx::get_locality_id()),
+            hpx::components::get_component_type<B>(), const_cast<B*>(this));
+    }
 
     typedef B type_holder;
     typedef A base_type_holder;
@@ -84,15 +97,15 @@ struct B
     {
         return "B";
     }
-    HPX_DEFINE_COMPONENT_ACTION(B, test1, test1_action);
+    HPX_DEFINE_COMPONENT_ACTION(B, test1, test1_action)
 };
 
 typedef hpx::components::component<B> serverB_type;
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(serverB_type, B, "A");
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(serverB_type, B, "A")
 
 typedef B::test1_action test1_action;
-HPX_REGISTER_ACTION_DECLARATION(test1_action);
-HPX_REGISTER_ACTION(test1_action);
+HPX_REGISTER_ACTION_DECLARATION(test1_action)
+HPX_REGISTER_ACTION(test1_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct clientA : hpx::components::client_base<clientA, A>

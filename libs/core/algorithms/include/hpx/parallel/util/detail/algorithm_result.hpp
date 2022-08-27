@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,7 +33,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         template <typename T_>
         static constexpr type get(T_&& t)
         {
-            return std::forward<T_>(t);
+            return HPX_FORWARD(T_, t);
         }
 
         template <typename T_>
@@ -75,12 +75,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         // Obtain initiating function's return type.
         static type get(T&& t)
         {
-            return hpx::make_ready_future(std::move(t));
+            return hpx::make_ready_future(HPX_MOVE(t));
         }
 
         static type get(hpx::future<T>&& t)
         {
-            return std::move(t);
+            return HPX_MOVE(t);
         }
     };
 
@@ -101,15 +101,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             return hpx::make_ready_future();
         }
 
-        static type get(hpx::future<void>&& t)
+        static type get(hpx::future<void>&& t) noexcept
         {
-            return std::move(t);
+            return HPX_MOVE(t);
         }
 
         template <typename T>
-        static type get(hpx::future<T>&& t)
+        static type get(hpx::future<T>&& t) noexcept
         {
-            return hpx::future<void>(std::move(t));
+            return hpx::future<void>(HPX_MOVE(t));
         }
     };
 
@@ -122,12 +122,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         // Obtain initiating function's return type.
         static type get(T&& t)
         {
-            return hpx::make_ready_future(std::move(t));
+            return hpx::make_ready_future(HPX_MOVE(t));
         }
 
-        static type get(hpx::future<T>&& t)
+        static type get(hpx::future<T>&& t) noexcept
         {
-            return std::move(t);
+            return HPX_MOVE(t);
         }
     };
 
@@ -148,15 +148,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             return hpx::make_ready_future();
         }
 
-        static type get(hpx::future<void>&& t)
+        static type get(hpx::future<void>&& t) noexcept
         {
-            return std::move(t);
+            return HPX_MOVE(t);
         }
 
         template <typename T>
-        static type get(hpx::future<T>&& t)
+        static type get(hpx::future<T>&& t) noexcept
         {
-            return hpx::future<void>(std::move(t));
+            return hpx::future<void>(HPX_MOVE(t));
         }
     };
 
@@ -246,10 +246,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename T = void>
-    struct algorithm_result
-      : algorithm_result_impl<typename std::decay<ExPolicy>::type, T>
+    struct algorithm_result : algorithm_result_impl<std::decay_t<ExPolicy>, T>
     {
-        static_assert(!std::is_lvalue_reference<T>::value,
+        static_assert(!std::is_lvalue_reference_v<T>,
             "T shouldn't be a lvalue reference");
     };
 
@@ -259,20 +258,20 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename U, typename Conv,
         HPX_CONCEPT_REQUIRES_(hpx::is_invocable_v<Conv, U>)>
-    constexpr typename hpx::util::invoke_result<Conv, U>::type
-    convert_to_result(U&& val, Conv&& conv)
+    constexpr hpx::util::invoke_result_t<Conv, U> convert_to_result(
+        U&& val, Conv&& conv)
     {
         return HPX_INVOKE(conv, val);
     }
 
     template <typename U, typename Conv,
         HPX_CONCEPT_REQUIRES_(hpx::is_invocable_v<Conv, U>)>
-    hpx::future<typename hpx::util::invoke_result<Conv, U>::type>
-    convert_to_result(hpx::future<U>&& f, Conv&& conv)
+    hpx::future<hpx::util::invoke_result_t<Conv, U>> convert_to_result(
+        hpx::future<U>&& f, Conv&& conv)
     {
-        using result_type = typename hpx::util::invoke_result<Conv, U>::type;
+        using result_type = hpx::util::invoke_result_t<Conv, U>;
 
         return hpx::make_future<result_type>(
-            std::move(f), std::forward<Conv>(conv));
+            HPX_MOVE(f), HPX_FORWARD(Conv, conv));
     }
 }}}}    // namespace hpx::parallel::util::detail

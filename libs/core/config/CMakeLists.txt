@@ -14,7 +14,6 @@ set(config_headers
     hpx/config/autolink.hpp
     hpx/config/branch_hints.hpp
     hpx/config/compiler_fence.hpp
-    hpx/config/compiler_native_tls.hpp
     hpx/config/compiler_specific.hpp
     hpx/config/constexpr.hpp
     hpx/config/debug.hpp
@@ -24,9 +23,10 @@ set(config_headers
     hpx/config/endian.hpp
     hpx/config/export_definitions.hpp
     hpx/config/forceinline.hpp
-    hpx/config/lambda_capture.hpp
+    hpx/config/forward.hpp
     hpx/config/lambda_capture_this.hpp
     hpx/config/manual_profiling.hpp
+    hpx/config/move.hpp
     hpx/config/threads_stack.hpp
     hpx/config/warnings_prefix.hpp
     hpx/config/warnings_suffix.hpp

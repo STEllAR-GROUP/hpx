@@ -18,7 +18,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 
 #include <cstdint>
 #include <map>
@@ -39,7 +39,7 @@ namespace hpx { namespace agas { namespace detail {
         {
             return addr_;
         }
-        naming::id_type gid() const override
+        hpx::id_type gid() const override
         {
             return gid_;
         }
@@ -66,7 +66,7 @@ namespace hpx { namespace agas { namespace detail {
         hpx::future<std::uint32_t> get_num_overall_threads_async() override;
 
     private:
-        naming::id_type gid_;
+        hpx::id_type gid_;
         naming::address addr_;
     };
 }}}    // namespace hpx::agas::detail

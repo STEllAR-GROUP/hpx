@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -201,7 +201,7 @@ void test_concurrent_callback_registration()
 void test_callback_deregistered_from_within_callback_does_not_deadlock()
 {
     hpx::stop_source src;
-    hpx::util::optional<hpx::stop_callback<std::function<void()>>> cb;
+    hpx::optional<hpx::stop_callback<std::function<void()>>> cb;
 
     cb.emplace(src.get_token(), [&] { cb.reset(); });
 
@@ -223,8 +223,8 @@ void test_callback_deregistration_doesnt_wait_for_others_to_finish_executing()
 
     auto dummy_callback = [] {};
 
-    hpx::util::optional<hpx::stop_callback<decltype(dummy_callback)&>> cb1(
-        hpx::util::in_place, src.get_token(), dummy_callback);
+    hpx::optional<hpx::stop_callback<decltype(dummy_callback)&>> cb1(
+        std::in_place, src.get_token(), dummy_callback);
 
     // Register a first callback that will signal when it starts executing
     // and then block until it receives a signal.
@@ -237,8 +237,8 @@ void test_callback_deregistration_doesnt_wait_for_others_to_finish_executing()
     hpx::stop_callback<decltype(f)> blocking_callback(
         src.get_token(), std::move(f));
 
-    hpx::util::optional<hpx::stop_callback<decltype(dummy_callback)&>> cb2{
-        hpx::util::in_place, src.get_token(), dummy_callback};
+    hpx::optional<hpx::stop_callback<decltype(dummy_callback)&>> cb2{
+        std::in_place, src.get_token(), dummy_callback};
 
     hpx::thread signalling_thread{[&] { src.request_stop(); }};
 

@@ -69,10 +69,14 @@ namespace hpx { namespace cuda { namespace experimental {
             case HIPBLAS_STATUS_INVALID_ENUM:
                 return "HIPBLAS_STATUS_INVALID_ENUM";
 #endif
+            case HIPBLAS_STATUS_UNKNOWN:
+                return "HIPBLAS_STATUS_UNKNOWN";
 #else
             case CUBLAS_STATUS_LICENSE_ERROR:
                 return "CUBLAS_STATUS_LICENSE_ERROR";
 #endif
+            default:
+                break;
             }
             return "<unknown>";
         }
@@ -174,7 +178,7 @@ namespace hpx { namespace cuda { namespace experimental {
         decltype(auto) post(F&& f, Ts&&... ts)
         {
             return cublas_executor::apply(
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // -------------------------------------------------------------------------
@@ -184,7 +188,7 @@ namespace hpx { namespace cuda { namespace experimental {
         decltype(auto) async_execute(F&& f, Ts&&... ts)
         {
             return cublas_executor::async(
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
     protected:
@@ -204,7 +208,7 @@ namespace hpx { namespace cuda { namespace experimental {
             // insert the cublas handle in the arg list and call the cublas function
             detail::dispatch_helper<R, Params...> helper{};
             return helper(
-                cublas_function, handle_.get(), std::forward<Args>(args)...);
+                cublas_function, handle_.get(), HPX_FORWARD(Args, args)...);
         }
 
         // -------------------------------------------------------------------------
@@ -216,7 +220,7 @@ namespace hpx { namespace cuda { namespace experimental {
         apply(R (*cuda_function)(Params...), Args&&... args)
         {
             return cuda_executor::apply(
-                cuda_function, std::forward<Args>(args)...);
+                cuda_function, HPX_FORWARD(Args, args)...);
         }
 
         // -------------------------------------------------------------------------
@@ -238,11 +242,11 @@ namespace hpx { namespace cuda { namespace experimental {
                     // cublas function
                     detail::dispatch_helper<R, Params...> helper;
                     helper(cublas_function, handle_.get(),
-                        std::forward<Args>(args)...);
+                        HPX_FORWARD(Args, args)...);
                     return get_future();
                 },
                 [&](std::exception_ptr&& ep) {
-                    return hpx::make_exceptional_future<void>(std::move(ep));
+                    return hpx::make_exceptional_future<void>(HPX_MOVE(ep));
                 });
         }
 
@@ -254,7 +258,7 @@ namespace hpx { namespace cuda { namespace experimental {
         async(R (*cuda_function)(Params...), Args&&... args)
         {
             return cuda_executor::async(
-                cuda_function, std::forward<Args>(args)...);
+                cuda_function, HPX_FORWARD(Args, args)...);
         }
 
         // return a copy of the cublas handle

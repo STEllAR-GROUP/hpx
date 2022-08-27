@@ -8,7 +8,3 @@
 
 #include <hpx/parallel/container_numeric.hpp>
 #include <hpx/parallel/numeric.hpp>
-
-namespace hpx {
-    using hpx::parallel::adjacent_difference;
-}    // namespace hpx

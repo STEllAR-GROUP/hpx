@@ -18,7 +18,7 @@ std::atomic<int> invocation_count(0);
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    hpx::lcos::local::promise<int> p;
+    hpx::promise<int> p;
     hpx::shared_future<int> f1 = p.get_future();
 
     hpx::future<int> f2 = f1.then([](hpx::shared_future<int>&& f) {

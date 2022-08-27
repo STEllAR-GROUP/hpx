@@ -1,5 +1,5 @@
 //  Copyright (c) 2018 Bruno Pitrus
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -122,6 +122,280 @@ namespace hpx { namespace ranges {
         typename Proj = util::projection_identity>
     typename util::detail::algorithm_result<ExPolicy, Iter>::type
     find(ExPolicy&& policy, Rng&& rng, T const& val, Proj&& proj = Proj());
+
+    /// Returns the first element in the range [first, last) for which
+    /// predicate \a pred returns true
+    ///
+    /// \note   Complexity: At most last - first
+    ///         applications of the predicate.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Iter        The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the end source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     sentinel for Iter.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param pred         The unary predicate which returns true for the
+    ///                     required element. The signature of the predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such
+    ///                     that objects of type \a FwdIter can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The comparison operations in the parallel \a find_if algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a find_if algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a find_if algorithm returns a \a hpx::future<FwdIter> if the
+    ///           execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a find_if algorithm returns the first element in the range
+    ///           [first,last) that satisfies the predicate \a f.
+    ///           If no such element exists that satisfies the predicate f, the
+    ///           algorithm returns \a last.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename F>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    find_if(ExPolicy&& policy, Iter first, Iter first, Sent last,
+            Pred&& pred, Proj&& proj = Proj());
+
+    /// Returns the first element in the range \a rng for which
+    /// predicate \a pred returns true
+    ///
+    /// \note   Complexity: At most last - first
+    ///         applications of the predicate.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param pred         The unary predicate which returns true for the
+    ///                     required element. The signature of the predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such
+    ///                     that objects of type \a FwdIter can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The comparison operations in the parallel \a find_if algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a find_if algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a find_if algorithm returns a \a hpx::future<FwdIter> if the
+    ///           execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a find_if algorithm returns the first element in the range
+    ///           [first,last) that satisfies the predicate \a f.
+    ///           If no such element exists that satisfies the predicate f, the
+    ///           algorithm returns \a last.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename F>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    find_if(ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj());
+
+    /// Returns the first element in the range [first, last) for which
+    /// predicate \a f returns false
+    ///
+    /// \note   Complexity: At most last - first
+    ///         applications of the predicate.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Iter        The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the end source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     sentinel for Iter.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param pred         The unary predicate which returns false for the
+    ///                     required element. The signature of the predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such
+    ///                     that objects of type \a FwdIter can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The comparison operations in the parallel \a find_if_not algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a find_if_not algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a find_if_not algorithm returns a \a hpx::future<FwdIter> if the
+    ///           execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a find_if_not algorithm returns the first element in the range
+    ///           [first, last) that does \b not satisfy the predicate \a f.
+    ///           If no such element exists that does not satisfy the predicate f, the
+    ///           algorithm returns \a last.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename F>
+    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    find_if_not(ExPolicy&& policy, Iter first, Sent last, Pred&& pred,
+        Proj&& proj = Proj());
+
+    /// Returns the first element in the range \a rng for which
+    /// predicate \a f returns false
+    ///
+    /// \note   Complexity: At most last - first
+    ///         applications of the predicate.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param pred         The unary predicate which returns false for the
+    ///                     required element. The signature of the predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such
+    ///                     that objects of type \a FwdIter can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The comparison operations in the parallel \a find_if_not algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a find_if_not algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a find_if_not algorithm returns a \a hpx::future<FwdIter> if the
+    ///           execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a find_if_not algorithm returns the first element in the range
+    ///           [first, last) that does \b not satisfy the predicate \a f.
+    ///           If no such element exists that does not satisfy the predicate f, the
+    ///           algorithm returns \a last.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename F>
+    typename util::detail::algorithm_result<ExPolicy, Iter>::type
+    find_if_not(ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj());
 
     /// Returns the last subsequence of elements \a [first2, last2) found in
     /// the range \a [first1, last1) using the given predicate \a f to
@@ -536,118 +810,19 @@ namespace hpx { namespace ranges {
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    ///////////////////////////////////////////////////////////////////////////
-    // find_end
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename Pred = detail::equal_to,
-        typename Proj = hpx::parallel::util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::parallel::traits::is_projected_range<Proj, Rng1>::value &&
-            hpx::parallel::traits::is_projected_range<Proj, Rng2>::value &&
-            hpx::parallel::traits::is_indirect_callable<ExPolicy, Pred,
-                hpx::parallel::traits::projected_range<Proj, Rng1>,
-                hpx::parallel::traits::projected_range<Proj, Rng2>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::find_end is deprecated, use hpx::ranges::find_end "
-        "instead")
-        typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_iterator<Rng1>::type>::type
-        find_end(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
-            Pred&& op = Pred(), Proj&& proj = Proj())
-    {
-        using iterator_type = typename hpx::traits::range_iterator<Rng1>::type;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        static_assert((hpx::traits::is_forward_iterator<iterator_type>::value),
-            "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<
-                typename hpx::traits::range_iterator<Rng2>::type>::value),
-            "Requires at least forward iterator.");
-
-        return hpx::parallel::v1::detail::find_end<iterator_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
-            hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
-            std::forward<Pred>(op), proj, proj);
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // find_first_of
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename Pred = detail::equal_to,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
-            hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
-            hpx::parallel::traits::is_indirect_callable<ExPolicy, Pred,
-                hpx::parallel::traits::projected_range<Proj1, Rng1>,
-                hpx::parallel::traits::projected_range<Proj2, Rng2>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::find_first_of is deprecated, use "
-        "hpx::ranges::find_first_of instead")
-        typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_iterator<Rng1>::type>::type
-        find_first_of(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
-            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
-    {
-        using iterator_type = typename hpx::traits::range_iterator<Rng1>::type;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        static_assert((hpx::traits::is_forward_iterator<iterator_type>::value),
-            "Requires at least forward iterator.");
-        static_assert(
-            (hpx::traits::is_forward_iterator<
-                typename hpx::traits::range_iterator<Rng2>::type>::value),
-            "Subsequence requires at least forward iterator.");
-
-        return hpx::parallel::v1::detail::find_first_of<iterator_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
-            hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
-            std::forward<Pred>(op), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-}}}    // namespace hpx::parallel::v1
-
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::find
-    HPX_INLINE_CONSTEXPR_VARIABLE struct find_t final
+    // CPO for hpx::ranges::find
+    inline constexpr struct find_t final
       : hpx::detail::tag_parallel_algorithm<find_t>
     {
     private:
         // clang-format off
-        template <typename ExPolicy, typename Iter, typename Sent, typename T,
+        template <typename ExPolicy, typename Iter, typename Sent,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<Iter,
+                Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
@@ -656,20 +831,22 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_dispatch(find_t, ExPolicy&& policy, Iter first, Sent last,
+        tag_fallback_invoke(find_t, ExPolicy&& policy, Iter first, Sent last,
             T const& val, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find<Iter>().call(
-                std::forward<ExPolicy>(policy), first, last, val,
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last, val,
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename T,
+        template <typename ExPolicy, typename Rng,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value &&
@@ -678,8 +855,8 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_dispatch(find_t, ExPolicy&& policy, Rng&& rng,
-            T const& val, Proj&& proj = Proj())
+        tag_fallback_invoke(find_t, ExPolicy&& policy, Rng&& rng, T const& val,
+            Proj&& proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
@@ -689,39 +866,42 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), val, std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), val, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
-        template <typename Iter, typename Sent, typename T,
+        template <typename Iter, typename Sent,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<Iter,
+                Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value
             )>
         // clang-format on
-        friend Iter tag_fallback_dispatch(
+        friend Iter tag_fallback_invoke(
             find_t, Iter first, Sent last, T const& val, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_input_iterator<Iter>::value,
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::find<Iter>().call(
-                hpx::execution::seq, first, last, val,
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, val, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
-        template <typename Rng, typename T,
+        template <typename Rng,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             find_t, Rng&& rng, T const& val, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -732,13 +912,13 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::find<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                val, std::forward<Proj>(proj));
+                val, HPX_FORWARD(Proj, proj));
         }
     } find{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::find_if
-    HPX_INLINE_CONSTEXPR_VARIABLE struct find_if_t final
+    // CPO for hpx::ranges::find_if
+    inline constexpr struct find_if_t final
       : hpx::detail::tag_parallel_algorithm<find_if_t>
     {
     private:
@@ -756,15 +936,15 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_dispatch(find_if_t, ExPolicy&& policy, Iter first,
-            Sent last, Pred&& pred, Proj&& proj = Proj())
+        tag_fallback_invoke(find_if_t, ExPolicy&& policy, Iter first, Sent last,
+            Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_if<Iter>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -783,7 +963,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_dispatch(find_if_t, ExPolicy&& policy, Rng&& rng,
+        tag_fallback_invoke(find_if_t, ExPolicy&& policy, Rng&& rng,
             Pred&& pred, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -794,9 +974,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_if<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -810,15 +990,15 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend Iter tag_fallback_dispatch(
+        friend Iter tag_fallback_invoke(
             find_if_t, Iter first, Sent last, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_input_iterator<Iter>::value,
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::find_if<Iter>().call(
-                hpx::execution::seq, first, last, std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -835,7 +1015,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             find_if_t, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -846,13 +1026,13 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::find_if<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
     } find_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::find_if_not
-    HPX_INLINE_CONSTEXPR_VARIABLE struct find_if_not_t final
+    // CPO for hpx::ranges::find_if_not
+    inline constexpr struct find_if_not_t final
       : hpx::detail::tag_parallel_algorithm<find_if_not_t>
     {
     private:
@@ -870,15 +1050,15 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_dispatch(find_if_not_t, ExPolicy&& policy, Iter first,
+        tag_fallback_invoke(find_if_not_t, ExPolicy&& policy, Iter first,
             Sent last, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_if_not<Iter>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -897,7 +1077,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_dispatch(find_if_not_t, ExPolicy&& policy, Rng&& rng,
+        tag_fallback_invoke(find_if_not_t, ExPolicy&& policy, Rng&& rng,
             Pred&& pred, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -908,9 +1088,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_if_not<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -924,15 +1104,15 @@ namespace hpx { namespace ranges {
                 >
             )>
         // clang-format on
-        friend Iter tag_fallback_dispatch(find_if_not_t, Iter first, Sent last,
+        friend Iter tag_fallback_invoke(find_if_not_t, Iter first, Sent last,
             Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_input_iterator<Iter>::value,
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::find_if_not<Iter>().call(
-                hpx::execution::seq, first, last, std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -949,7 +1129,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             find_if_not_t, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -960,13 +1140,13 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::find_if_not<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
     } find_if_not{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::find_end
-    HPX_INLINE_CONSTEXPR_VARIABLE struct find_end_t final
+    // CPO for hpx::ranges::find_end
+    inline constexpr struct find_end_t final
       : hpx::detail::tag_parallel_algorithm<find_end_t>
     {
     private:
@@ -987,7 +1167,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_fallback_dispatch(find_end_t, ExPolicy&& policy, Rng1&& rng1,
+        tag_fallback_invoke(find_end_t, ExPolicy&& policy, Rng1&& rng1,
             Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -1003,10 +1183,10 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_end<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), std::forward<Pred>(op),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1026,7 +1206,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter1>::type
-        tag_fallback_dispatch(find_end_t, ExPolicy&& policy, Iter1 first1,
+        tag_fallback_invoke(find_end_t, ExPolicy&& policy, Iter1 first1,
             Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -1036,9 +1216,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_end<Iter1>().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1056,7 +1236,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng1>::type
-        tag_fallback_dispatch(find_end_t, Rng1&& rng1, Rng2&& rng2,
+        tag_fallback_invoke(find_end_t, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -1074,8 +1254,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::find_end<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), std::forward<Pred>(op),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1093,8 +1273,8 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter1 tag_fallback_dispatch(find_end_t, Iter1 first1,
-            Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
+        friend Iter1 tag_fallback_invoke(find_end_t, Iter1 first1, Sent1 last1,
+            Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter1>::value),
@@ -1104,14 +1284,14 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::find_end<Iter1>().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
     } find_end{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::find_first_of
-    HPX_INLINE_CONSTEXPR_VARIABLE struct find_first_of_t final
+    // CPO for hpx::ranges::find_first_of
+    inline constexpr struct find_first_of_t final
       : hpx::detail::tag_parallel_algorithm<find_first_of_t>
     {
     private:
@@ -1132,7 +1312,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_fallback_dispatch(find_first_of_t, ExPolicy&& policy, Rng1&& rng1,
+        tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, Rng1&& rng1,
             Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -1148,10 +1328,10 @@ namespace hpx { namespace ranges {
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_first_of<iterator_type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1171,7 +1351,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter1>::type
-        tag_fallback_dispatch(find_first_of_t, ExPolicy&& policy, Iter1 first1,
+        tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, Iter1 first1,
             Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -1181,9 +1361,9 @@ namespace hpx { namespace ranges {
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::find_first_of<Iter1>().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1201,7 +1381,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng1>::type
-        tag_fallback_dispatch(find_first_of_t, Rng1&& rng1, Rng2&& rng2,
+        tag_fallback_invoke(find_first_of_t, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -1219,8 +1399,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::find_first_of<iterator_type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1238,7 +1418,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter1 tag_fallback_dispatch(find_first_of_t, Iter1 first1,
+        friend Iter1 tag_fallback_invoke(find_first_of_t, Iter1 first1,
             Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -1249,8 +1429,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::find_first_of<Iter1>().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
     } find_first_of{};

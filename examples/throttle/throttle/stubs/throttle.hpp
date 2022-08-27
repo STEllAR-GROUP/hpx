@@ -15,14 +15,13 @@
 
 #include <cstddef>
 
-namespace throttle { namespace stubs
-{
+namespace throttle { namespace stubs {
     ///////////////////////////////////////////////////////////////////////////
     struct throttle : hpx::components::stub_base<server::throttle>
     {
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::future<void>
-        suspend_async(hpx::naming::id_type const& gid, std::size_t thread_num)
+        static hpx::future<void> suspend_async(
+            hpx::id_type const& gid, std::size_t thread_num)
         {
             // Create a future, execute the required action,
             // we simply return the initialized future, the caller needs
@@ -31,15 +30,14 @@ namespace throttle { namespace stubs
             return hpx::async<action_type>(gid, thread_num);
         }
 
-        static void
-        suspend(hpx::naming::id_type const& gid, std::size_t thread_num)
+        static void suspend(hpx::id_type const& gid, std::size_t thread_num)
         {
             suspend_async(gid, thread_num).get();
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static hpx::lcos::future<void>
-        resume_async(hpx::naming::id_type const& gid, std::size_t thread_num)
+        static hpx::future<void> resume_async(
+            hpx::id_type const& gid, std::size_t thread_num)
         {
             // Create a future, execute the required action,
             // we simply return the initialized future, the caller needs
@@ -48,11 +46,9 @@ namespace throttle { namespace stubs
             return hpx::async<action_type>(gid, thread_num);
         }
 
-        static void
-        resume(hpx::naming::id_type const& gid, std::size_t thread_num)
+        static void resume(hpx::id_type const& gid, std::size_t thread_num)
         {
             resume_async(gid, thread_num).get();
         }
     };
-}}
-
+}}    // namespace throttle::stubs

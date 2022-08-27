@@ -7,7 +7,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
 #ifdef HPX_HAVE_VERIFY_LOCKS
-#include <hpx/execution_base/register_locks.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #endif
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/format.hpp>

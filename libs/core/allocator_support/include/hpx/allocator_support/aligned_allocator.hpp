@@ -140,7 +140,7 @@ namespace hpx { namespace util {
             return &x;
         }
 
-        HPX_NODISCARD pointer allocate(size_type n, void const* = nullptr)
+        [[nodiscard]] pointer allocate(size_type n, void const* = nullptr)
         {
             if (max_size() < n)
             {
@@ -158,7 +158,7 @@ namespace hpx { namespace util {
             return p;
         }
 
-        void deallocate(pointer p, size_type)
+        void deallocate(pointer p, size_type) noexcept
         {
             __aligned_free(p);
         }
@@ -171,7 +171,7 @@ namespace hpx { namespace util {
         template <typename U, typename... Args>
         void construct(U* p, Args&&... args)
         {
-            ::new ((void*) p) U(std::forward<Args>(args)...);
+            ::new ((void*) p) U(HPX_FORWARD(Args, args)...);
         }
 
         template <typename U>

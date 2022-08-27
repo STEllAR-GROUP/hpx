@@ -9,9 +9,9 @@
 
 #pragma once
 
+#include <hpx/collectives/spmd_block.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_view.hpp>
-#include <hpx/collectives/spmd_block.hpp>
 #include <hpx/runtime_distributed/find_all_localities.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -31,15 +31,11 @@
     HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(__VA_ARGS__)
 #define HPX_REGISTER_COARRAY(...) HPX_REGISTER_PARTITIONED_VECTOR(__VA_ARGS__)
 
-namespace hpx
-{
-    namespace detail
-    {
+namespace hpx {
+    namespace detail {
         struct auto_subscript
         {
-            constexpr auto_subscript()
-            {
-            }
+            constexpr auto_subscript() {}
 
             // Defined to pass the coarray_sizes constructor
             operator std::size_t()
@@ -85,9 +81,8 @@ namespace hpx
                     "equal to its dimension");
 
                 static_assert(
-                    util::all_of<typename std::is_integral<
-                        typename detail::cast_if_autosubscript<I>::type>::
-                            type...>::value,
+                    util::all_of<typename std::is_integral<typename detail::
+                            cast_if_autosubscript<I>::type>::type...>::value,
                     "One or more elements in sizes given to hpx::coarray() "
                     "is not integral");
             }
@@ -115,13 +110,12 @@ namespace hpx
         private:
             std::array<std::size_t, N> sizes_;
         };
-    }
+    }    // namespace detail
 
     // Used for "automatic" coarray subscript and "automatic" coarray size
-    namespace container { namespace placeholders
-    {
-            constexpr hpx::detail::auto_subscript _;
-    }}
+    namespace container { namespace placeholders {
+        constexpr hpx::detail::auto_subscript _;
+    }}    // namespace container::placeholders
 
     template <typename T, std::size_t N, typename Data = std::vector<T>>
     struct coarray : public partitioned_vector_view<T, N, Data>
@@ -130,17 +124,16 @@ namespace hpx
         using base_type = partitioned_vector_view<T, N, Data>;
         using indices = typename hpx::util::make_index_pack<N>::type;
 
-        std::vector<hpx::naming::id_type> get_unrolled_localities(
-            std::vector<hpx::naming::id_type> const& in,
-            std::size_t num_segments,
+        std::vector<hpx::id_type> get_unrolled_localities(
+            std::vector<hpx::id_type> const& in, std::size_t num_segments,
             std::size_t unroll)
         {
-            using iterator = typename std::vector<hpx::naming::id_type>::iterator;
+            using iterator = typename std::vector<hpx::id_type>::iterator;
 
             using const_iterator =
-                typename std::vector<hpx::naming::id_type>::const_iterator;
+                typename std::vector<hpx::id_type>::const_iterator;
 
-            std::vector<hpx::naming::id_type> out(num_segments);
+            std::vector<hpx::id_type> out(num_segments);
 
             iterator o_end = out.end();
             const_iterator i_begin = in.cbegin();
@@ -158,23 +151,19 @@ namespace hpx
 
         template <typename Iterator, std::size_t... I>
         base_type update_view(hpx::detail::coarray_sizes<N> const& cosizes,
-            std::size_t num_images,
-            hpx::util::index_pack<I...>,
-            hpx::lcos::spmd_block const& block,
-            Iterator&& begin,
+            std::size_t num_images, hpx::util::index_pack<I...>,
+            hpx::lcos::spmd_block const& block, Iterator&& begin,
             Iterator&& last) const
         {
-            return base_type(block,
-                std::forward<Iterator>(begin),
-                std::forward<Iterator>(last),
+            return base_type(block, HPX_FORWARD(Iterator, begin),
+                HPX_FORWARD(Iterator, last),
                 {(cosizes.begin()[I] != std::size_t(-1) ? cosizes.begin()[I] :
                                                           num_images)...});
         }
 
     public:
         explicit coarray(hpx::lcos::spmd_block const& block,
-            std::string const& name,
-            hpx::detail::coarray_sizes<N> cosizes,
+            std::string const& name, hpx::detail::coarray_sizes<N> cosizes,
             std::size_t segment_size)
           : base_type(block)
           , vector_()
@@ -194,7 +183,8 @@ namespace hpx
                     num_segments *= (i != std::size_t(-1) ? i : num_images);
                 }
 
-                std::vector<hpx::id_type> localities = hpx::find_all_localities();
+                std::vector<hpx::id_type> localities =
+                    hpx::find_all_localities();
 
                 vector_ = hpx::partitioned_vector<T, Data>(
                     segment_size * num_segments, T(0),
@@ -213,32 +203,22 @@ namespace hpx
                 vector_.begin(), vector_.end());
         }
 
-        template<typename... I,
-            typename = typename std::enable_if<
-                ! std::is_same<
-                    typename util::at_index<sizeof...(I) - 1, I...>::type,
-                    detail::auto_subscript
-                >::value
-            >::type
-        >
-        hpx::detail::view_element<T,Data>
-        operator()(I... index) const
+        template <typename... I,
+            typename = typename std::enable_if<!std::is_same<
+                typename util::at_index<sizeof...(I) - 1, I...>::type,
+                detail::auto_subscript>::value>::type>
+        hpx::detail::view_element<T, Data> operator()(I... index) const
         {
             return base_type::operator()(
                 (std::is_same<I, detail::auto_subscript>::value ? this_image_ :
                                                                   index)...);
         }
 
-        template<typename... I,
-            typename = typename std::enable_if<
-                std::is_same<
-                    typename util::at_index<sizeof...(I) - 1, I...>::type,
-                    detail::auto_subscript
-                >::value
-            >::type
-        >
-        Data &
-        operator()(I... index)
+        template <typename... I,
+            typename = typename std::enable_if<std::is_same<
+                typename util::at_index<sizeof...(I) - 1, I...>::type,
+                detail::auto_subscript>::value>::type>
+        Data& operator()(I... index)
         {
             return base_type::operator()(
                 (std::is_same<I, detail::auto_subscript>::value ? this_image_ :
@@ -250,5 +230,4 @@ namespace hpx
         hpx::partitioned_vector<T, Data> vector_;
         std::size_t this_image_;
     };
-}
-
+}    // namespace hpx

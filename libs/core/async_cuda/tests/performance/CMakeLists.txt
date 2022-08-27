@@ -4,16 +4,21 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(benchmarks)
+set(benchmarks synchronize)
 if(HPX_WITH_GPUBLAS)
-  set(benchmarks ${benchmarks} cuda_executor_throughput)
+  list(APPEND benchmarks cuda_executor_throughput)
 endif()
 
+set(synchronize_CUDA ON)
 set(cuda_executor_throughput_PARAMETERS THREADS_PER_LOCALITY 1)
 
 foreach(benchmark ${benchmarks})
 
-  set(sources ${benchmark}.cpp)
+  if(${${benchmark}_CUDA})
+    set(sources ${benchmark}.cu)
+  else()
+    set(sources ${benchmark}.cpp)
+  endif()
 
   source_group("Source Files" FILES ${sources})
 

@@ -8,6 +8,3 @@
 
 #include <hpx/parallel/container_memory.hpp>
 #include <hpx/parallel/memory.hpp>
-
-namespace hpx {
-}    // namespace hpx

@@ -168,7 +168,7 @@ namespace hpx { namespace util {
             using value_type = typename std::decay<T>::type;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(),
-                std::forward<T>(x));
+                HPX_FORWARD(T, x));
         }
 
         template <typename T, typename... Ts,
@@ -185,7 +185,7 @@ namespace hpx { namespace util {
             using value_type = typename std::decay<T>::type;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(),
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename T, typename U, typename... Ts,
@@ -203,7 +203,7 @@ namespace hpx { namespace util {
             using value_type = typename std::decay<T>::type;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(), il,
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Ts, ts)...);
         }
 
         ~basic_any()
@@ -237,14 +237,14 @@ namespace hpx { namespace util {
         static void new_object(void*& object, std::true_type, Ts&&... ts)
         {
             using value_type = typename std::decay<T>::type;
-            new (&object) value_type(std::forward<Ts>(ts)...);
+            new (&object) value_type(HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename T, typename... Ts>
         static void new_object(void*& object, std::false_type, Ts&&... ts)
         {
             using value_type = typename std::decay<T>::type;
-            object = new value_type(std::forward<Ts>(ts)...);
+            object = new value_type(HPX_FORWARD(Ts, ts)...);
         }
 
     public:
@@ -273,7 +273,7 @@ namespace hpx { namespace util {
                     typename std::decay<T>::type>::value>::type>
         basic_any& operator=(T&& rhs)
         {
-            basic_any(std::forward<T>(rhs)).swap(*this);
+            basic_any(HPX_FORWARD(T, rhs)).swap(*this);
             return *this;
         }
 
@@ -386,7 +386,7 @@ namespace hpx { namespace util {
     {
         return basic_any<serialization::input_archive,
             serialization::output_archive, Char, std::true_type>(
-            std::in_place_type<T>, std::forward<Ts>(ts)...);
+            std::in_place_type<T>, HPX_FORWARD(Ts, ts)...);
     }
 
     template <typename T, typename Char, typename U, typename... Ts>
@@ -395,26 +395,11 @@ namespace hpx { namespace util {
     {
         return basic_any<serialization::input_archive,
             serialization::output_archive, Char, std::true_type>(
-            std::in_place_type<T>, il, std::forward<Ts>(ts)...);
-    }
-
-    template <typename T, typename Char>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::util::make_any is deprecated. Please use hpx::make_any instead.")
-    basic_any<serialization::input_archive, serialization::output_archive,
-        Char> make_any(T&& t)
-    {
-        return basic_any<serialization::input_archive,
-            serialization::output_archive, Char, std::true_type>(
-            std::forward<T>(t));
+            std::in_place_type<T>, il, HPX_FORWARD(Ts, ts)...);
     }
 
     ////////////////////////////////////////////////////////////////////////////
     // backwards compatibility
-    using any HPX_DEPRECATED_V(
-        1, 6, "hpx::util::any is deprecated. Please use hpx::any instead.") =
-        basic_any<serialization::input_archive, serialization::output_archive,
-            char, std::true_type>;
     using wany = basic_any<serialization::input_archive,
         serialization::output_archive, wchar_t, std::true_type>;
 
@@ -437,7 +422,7 @@ namespace hpx {
     {
         return util::basic_any<serialization::input_archive,
             serialization::output_archive, Char, std::true_type>(
-            std::forward<T>(t));
+            HPX_FORWARD(T, t));
     }
 
     using any = util::basic_any<serialization::input_archive,

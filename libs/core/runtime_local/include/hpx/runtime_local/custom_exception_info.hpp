@@ -88,11 +88,11 @@ namespace hpx {
 
         // Report an early or late exception and locally abort execution. There
         // isn't anything more we could do.
-        HPX_NORETURN HPX_CORE_EXPORT void report_exception_and_terminate(
+        [[noreturn]] HPX_CORE_EXPORT void report_exception_and_terminate(
             std::exception const&);
-        HPX_NORETURN HPX_CORE_EXPORT void report_exception_and_terminate(
+        [[noreturn]] HPX_CORE_EXPORT void report_exception_and_terminate(
             std::exception_ptr const&);
-        HPX_NORETURN HPX_CORE_EXPORT void report_exception_and_terminate(
+        [[noreturn]] HPX_CORE_EXPORT void report_exception_and_terminate(
             hpx::exception const&);
 
         // Report an early or late exception and locally exit execution. There

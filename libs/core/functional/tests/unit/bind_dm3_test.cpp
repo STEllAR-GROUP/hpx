@@ -21,7 +21,7 @@
 
 #include <hpx/functional/bind.hpp>
 
-namespace placeholders = hpx::util::placeholders;
+namespace placeholders = hpx::placeholders;
 
 #include <iostream>
 
@@ -34,7 +34,7 @@ int main()
 
     pair_type pair(10, 20);
 
-    int const& x = hpx::util::bind(&pair_type::first, placeholders::_1)(pair);
+    int const& x = hpx::bind(&pair_type::first, placeholders::_1)(pair);
 
     HPX_TEST_EQ(&pair.first, &x);
 

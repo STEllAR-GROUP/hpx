@@ -1,10 +1,10 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file lcos/split_future.hpp
+/// \file hpx/async_combinators/split_future.hpp
 
 #pragma once
 
@@ -88,30 +88,30 @@ namespace hpx {
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos {
+namespace hpx {
+
     namespace detail {
         ///////////////////////////////////////////////////////////////////////
         template <typename ContResult>
-        class split_nth_continuation : public future_data<ContResult>
+        class split_nth_continuation
+          : public lcos::detail::future_data<ContResult>
         {
-            typedef future_data<ContResult> base_type;
+            using base_type = lcos::detail::future_data<ContResult>;
 
         private:
             template <std::size_t I, typename T>
             void on_ready(
-                typename traits::detail::shared_state_ptr_for<T>::type const&
-                    state)
+                traits::detail::shared_state_ptr_for_t<T> const& state)
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        typedef
-                            typename traits::future_traits<T>::type result_type;
+                        using result_type = traits::future_traits_t<T>;
                         result_type* result = state->get_result();
                         this->base_type::set_value(
-                            std::move(hpx::get<I>(*result)));
+                            HPX_MOVE(hpx::get<I>(*result)));
                     },
                     [&](std::exception_ptr ep) {
-                        this->base_type::set_exception(std::move(ep));
+                        this->base_type::set_exception(HPX_MOVE(ep));
                     });
             }
 
@@ -119,9 +119,8 @@ namespace hpx { namespace lcos {
             template <std::size_t I, typename Future>
             void attach(Future& future)
             {
-                typedef
-                    typename traits::detail::shared_state_ptr_for<Future>::type
-                        shared_state_ptr;
+                using shared_state_ptr =
+                    traits::detail::shared_state_ptr_for_t<Future>;
 
                 // Bind an on_completed handler to this future which will wait
                 // for the future and will transfer its result to the new
@@ -133,20 +132,20 @@ namespace hpx { namespace lcos {
                 state->execute_deferred();
                 state->set_on_completed(util::deferred_call(
                     &split_nth_continuation::on_ready<I, Future>,
-                    std::move(this_), state));
+                    HPX_MOVE(this_), state));
             }
         };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Result, typename Tuple, std::size_t I,
             typename Future>
-        inline typename hpx::traits::detail::shared_state_ptr<
-            typename hpx::tuple_element<I, Tuple>::type>::type
+        inline hpx::traits::detail::shared_state_ptr_t<
+            typename hpx::tuple_element<I, Tuple>::type>
         extract_nth_continuation(Future& future)
         {
-            typedef split_nth_continuation<Result> shared_state;
+            using shared_state = split_nth_continuation<Result>;
 
-            typename hpx::traits::detail::shared_state_ptr<Result>::type p(
+            hpx::traits::detail::shared_state_ptr_t<Result> p(
                 new shared_state());
 
             static_cast<shared_state*>(p.get())->template attach<I>(future);
@@ -158,7 +157,7 @@ namespace hpx { namespace lcos {
         HPX_FORCEINLINE hpx::future<typename hpx::tuple_element<I, Tuple>::type>
         extract_nth_future(hpx::future<Tuple>& future)
         {
-            typedef typename hpx::tuple_element<I, Tuple>::type result_type;
+            using result_type = typename hpx::tuple_element<I, Tuple>::type;
 
             return hpx::traits::future_access<hpx::future<result_type>>::create(
                 extract_nth_continuation<result_type, Tuple, I>(future));
@@ -168,7 +167,7 @@ namespace hpx { namespace lcos {
         HPX_FORCEINLINE hpx::future<typename hpx::tuple_element<I, Tuple>::type>
         extract_nth_future(hpx::shared_future<Tuple>& future)
         {
-            typedef typename hpx::tuple_element<I, Tuple>::type result_type;
+            using result_type = typename hpx::tuple_element<I, Tuple>::type;
 
             return hpx::traits::future_access<hpx::future<result_type>>::create(
                 extract_nth_continuation<result_type, Tuple, I>(future));
@@ -227,20 +226,18 @@ namespace hpx { namespace lcos {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ContResult>
-        class split_continuation : public future_data<ContResult>
+        class split_continuation : public lcos::detail::future_data<ContResult>
         {
-            typedef future_data<ContResult> base_type;
+            using base_type = lcos::detail::future_data<ContResult>;
 
         private:
             template <typename T>
             void on_ready(std::size_t i,
-                typename traits::detail::shared_state_ptr_for<T>::type const&
-                    state)
+                traits::detail::shared_state_ptr_for_t<T> const& state)
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
-                        typedef
-                            typename traits::future_traits<T>::type result_type;
+                        using result_type = traits::future_traits_t<T>;
                         result_type* result = state->get_result();
                         if (i >= result->size())
                         {
@@ -248,10 +245,10 @@ namespace hpx { namespace lcos {
                                 "split_continuation::on_ready",
                                 "index out of bounds");
                         }
-                        this->base_type::set_value(std::move((*result)[i]));
+                        this->base_type::set_value(HPX_MOVE((*result)[i]));
                     },
                     [&](std::exception_ptr ep) {
-                        this->base_type::set_exception(std::move(ep));
+                        this->base_type::set_exception(HPX_MOVE(ep));
                     });
             }
 
@@ -259,9 +256,8 @@ namespace hpx { namespace lcos {
             template <typename Future>
             void attach(std::size_t i, Future& future)
             {
-                typedef
-                    typename traits::detail::shared_state_ptr_for<Future>::type
-                        shared_state_ptr;
+                using shared_state_ptr =
+                    traits::detail::shared_state_ptr_for_t<Future>;
 
                 // Bind an on_completed handler to this future which will wait
                 // for the future and will transfer its result to the new
@@ -273,7 +269,7 @@ namespace hpx { namespace lcos {
                 state->execute_deferred();
                 state->set_on_completed(
                     util::deferred_call(&split_continuation::on_ready<Future>,
-                        std::move(this_), i, state));
+                        HPX_MOVE(this_), i, state));
             }
         };
 
@@ -281,10 +277,9 @@ namespace hpx { namespace lcos {
         inline hpx::future<T> extract_future_array(
             std::size_t i, Future& future)
         {
-            typedef split_continuation<T> shared_state;
+            using shared_state = split_continuation<T>;
 
-            typename hpx::traits::detail::shared_state_ptr<T>::type p(
-                new shared_state());
+            hpx::traits::detail::shared_state_ptr_t<T> p(new shared_state());
 
             static_cast<shared_state*>(p.get())->attach(i, future);
             return hpx::traits::future_access<hpx::future<T>>::create(p);
@@ -297,7 +292,9 @@ namespace hpx { namespace lcos {
             std::array<hpx::future<T>, N> result;
 
             for (std::size_t i = 0; i != N; ++i)
+            {
                 result[i] = extract_future_array<T>(i, f);
+            }
 
             return result;
         }
@@ -310,7 +307,9 @@ namespace hpx { namespace lcos {
             result.reserve(size);
 
             for (std::size_t i = 0; i != size; ++i)
+            {
                 result.push_back(extract_future_array<T>(i, f));
+            }
 
             return result;
         }
@@ -321,28 +320,28 @@ namespace hpx { namespace lcos {
     HPX_FORCEINLINE hpx::tuple<hpx::future<Ts>...> split_future(
         hpx::future<hpx::tuple<Ts...>>&& f)
     {
-        return detail::split_future_helper(std::move(f),
-            typename hpx::util::make_index_pack<sizeof...(Ts)>::type());
+        return detail::split_future_helper(
+            HPX_MOVE(f), hpx::util::make_index_pack_t<sizeof...(Ts)>());
     }
 
     HPX_FORCEINLINE hpx::tuple<hpx::future<void>> split_future(
         hpx::future<hpx::tuple<>>&& f)
     {
-        return hpx::make_tuple(hpx::future<void>(std::move(f)));
+        return hpx::make_tuple(hpx::future<void>(HPX_MOVE(f)));
     }
 
     template <typename... Ts>
     HPX_FORCEINLINE hpx::tuple<hpx::future<Ts>...> split_future(
         hpx::shared_future<hpx::tuple<Ts...>>&& f)
     {
-        return detail::split_future_helper(std::move(f),
-            typename hpx::util::make_index_pack<sizeof...(Ts)>::type());
+        return detail::split_future_helper(
+            HPX_MOVE(f), hpx::util::make_index_pack_t<sizeof...(Ts)>());
     }
 
     HPX_FORCEINLINE hpx::tuple<hpx::future<void>> split_future(
         hpx::shared_future<hpx::tuple<>>&& f)
     {
-        return hpx::make_tuple(hpx::make_future<void>(std::move(f)));
+        return hpx::make_tuple(hpx::make_future<void>(HPX_MOVE(f)));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -351,28 +350,28 @@ namespace hpx { namespace lcos {
     HPX_FORCEINLINE std::tuple<hpx::future<Ts>...> split_future(
         hpx::future<std::tuple<Ts...>>&& f)
     {
-        return detail::split_future_helper(std::move(f),
-            typename hpx::util::make_index_pack<sizeof...(Ts)>::type());
+        return detail::split_future_helper(
+            HPX_MOVE(f), hpx::util::make_index_pack_t<sizeof...(Ts)>());
     }
 
     HPX_FORCEINLINE std::tuple<hpx::future<void>> split_future(
         hpx::future<std::tuple<>>&& f)
     {
-        return std::make_tuple(hpx::future<void>(std::move(f)));
+        return std::make_tuple(hpx::future<void>(HPX_MOVE(f)));
     }
 
     template <typename... Ts>
     HPX_FORCEINLINE std::tuple<hpx::future<Ts>...> split_future(
         hpx::shared_future<std::tuple<Ts...>>&& f)
     {
-        return detail::split_future_helper(std::move(f),
-            typename hpx::util::make_index_pack<sizeof...(Ts)>::type());
+        return detail::split_future_helper(
+            HPX_MOVE(f), hpx::util::make_index_pack_t<sizeof...(Ts)>());
     }
 
     HPX_FORCEINLINE std::tuple<hpx::future<void>> split_future(
         hpx::shared_future<std::tuple<>>&& f)
     {
-        return std::make_tuple(hpx::make_future<void>(std::move(f)));
+        return std::make_tuple(hpx::make_future<void>(HPX_MOVE(f)));
     }
 #endif
 
@@ -381,14 +380,14 @@ namespace hpx { namespace lcos {
     HPX_FORCEINLINE std::pair<hpx::future<T1>, hpx::future<T2>> split_future(
         hpx::future<std::pair<T1, T2>>&& f)
     {
-        return detail::split_future_helper(std::move(f));
+        return detail::split_future_helper(HPX_MOVE(f));
     }
 
     template <typename T1, typename T2>
     HPX_FORCEINLINE std::pair<hpx::future<T1>, hpx::future<T2>> split_future(
         hpx::shared_future<std::pair<T1, T2>>&& f)
     {
-        return detail::split_future_helper(std::move(f));
+        return detail::split_future_helper(HPX_MOVE(f));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -396,7 +395,7 @@ namespace hpx { namespace lcos {
     HPX_FORCEINLINE std::array<hpx::future<T>, N> split_future(
         hpx::future<std::array<T, N>>&& f)
     {
-        return detail::split_future_helper_array<N, T>(std::move(f));
+        return detail::split_future_helper_array<N, T>(HPX_MOVE(f));
     }
 
     template <typename T>
@@ -404,7 +403,7 @@ namespace hpx { namespace lcos {
         hpx::future<std::array<T, 0>>&& f)
     {
         std::array<hpx::future<void>, 1> result;
-        result[0] = hpx::future<void>(std::move(f));
+        result[0] = hpx::future<void>(HPX_MOVE(f));
         return result;
     }
 
@@ -412,7 +411,7 @@ namespace hpx { namespace lcos {
     HPX_FORCEINLINE std::array<hpx::future<T>, N> split_future(
         hpx::shared_future<std::array<T, N>>&& f)
     {
-        return detail::split_future_helper_array<N, T>(std::move(f));
+        return detail::split_future_helper_array<N, T>(HPX_MOVE(f));
     }
 
     template <typename T>
@@ -420,7 +419,7 @@ namespace hpx { namespace lcos {
         hpx::shared_future<std::array<T, 0>>&& f)
     {
         std::array<hpx::future<void>, 1> result;
-        result[0] = hpx::make_future<void>(std::move(f));
+        result[0] = hpx::make_future<void>(HPX_MOVE(f));
         return result;
     }
 
@@ -429,18 +428,33 @@ namespace hpx { namespace lcos {
     HPX_FORCEINLINE std::vector<hpx::future<T>> split_future(
         hpx::future<std::vector<T>>&& f, std::size_t size)
     {
-        return detail::split_future_helper_vector<T>(std::move(f), size);
+        return detail::split_future_helper_vector<T>(HPX_MOVE(f), size);
     }
 
     template <typename T>
     HPX_FORCEINLINE std::vector<hpx::future<T>> split_future(
         hpx::shared_future<std::vector<T>>&& f, std::size_t size)
     {
-        return detail::split_future_helper_vector<T>(std::move(f), size);
+        return detail::split_future_helper_vector<T>(HPX_MOVE(f), size);
     }
-}}    // namespace hpx::lcos
+}    // namespace hpx
 
-namespace hpx {
-    using lcos::split_future;
-}
+namespace hpx::lcos {
+
+    template <typename F>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::split_future is deprecated. Use hpx::split_future instead.")
+    decltype(auto) split_future(F&& future)
+    {
+        return hpx::split_future(HPX_FORWARD(F, future));
+    }
+
+    template <typename F>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::split_future is deprecated. Use hpx::split_future instead.")
+    decltype(auto) split_future(F&& future, std::size_t size)
+    {
+        return hpx::split_future(HPX_FORWARD(F, future), size);
+    }
+}    // namespace hpx::lcos
 #endif

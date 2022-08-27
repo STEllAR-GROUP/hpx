@@ -41,7 +41,7 @@ namespace hpx { namespace components { namespace server {
         Component* c = nullptr;
         try
         {
-            c = new (storage) Component(std::forward<Ts>(ts)...);
+            c = new (storage) Component(HPX_FORWARD(Ts, ts)...);
         }
         catch (...)
         {
@@ -84,7 +84,7 @@ namespace hpx { namespace components { namespace server {
         Component* c = nullptr;
         try
         {
-            c = new (storage) Component(std::forward<Ts>(ts)...);
+            c = new (storage) Component(HPX_FORWARD(Ts, ts)...);
         }
         catch (...)
         {
@@ -145,7 +145,7 @@ namespace hpx { namespace components { namespace server {
             for (std::size_t i = 0; i != count; ++i, ++storage_it)
             {
                 Component* c = nullptr;
-                c = new (storage_it) Component(std::forward<Ts>(ts)...);
+                c = new (storage_it) Component(HPX_FORWARD(Ts, ts)...);
                 naming::gid_type gid = c->get_base_gid();
                 if (!gid)
                 {
@@ -154,7 +154,7 @@ namespace hpx { namespace components { namespace server {
                     HPX_THROW_EXCEPTION(hpx::unknown_component_address,
                         "bulk_create<Component>", "can't assign global id");
                 }
-                gids.push_back(std::move(gid));
+                gids.push_back(HPX_MOVE(gid));
                 ++instance_count(type);
                 ++succeeded;
             }

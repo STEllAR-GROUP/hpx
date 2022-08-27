@@ -31,6 +31,6 @@ namespace hpx {
 
     /// Set the string value of a configuration entry given by \p key.
     HPX_CORE_EXPORT void set_config_entry_callback(std::string const& key,
-        util::function_nonser<void(
-            std::string const&, std::string const&)> const& callback);
+        hpx::function<void(std::string const&, std::string const&)> const&
+            callback);
 }    // namespace hpx

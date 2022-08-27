@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,12 +11,12 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/bulk.hpp>
-#include <hpx/execution/algorithms/detach.hpp>
 #include <hpx/execution/algorithms/keep_future.hpp>
 #include <hpx/execution/algorithms/make_future.hpp>
-#include <hpx/execution/algorithms/on.hpp>
+#include <hpx/execution/algorithms/start_detached.hpp>
 #include <hpx/execution/algorithms/sync_wait.hpp>
-#include <hpx/execution/algorithms/transform.hpp>
+#include <hpx/execution/algorithms/then.hpp>
+#include <hpx/execution/algorithms/transfer.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
@@ -33,31 +33,31 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
 
     namespace detail {
 #if defined(HPX_HAVE_CXX20_PERFECT_PACK_CAPTURE)
         template <typename F, typename... Ts>
         auto captured_args_then(F&& f, Ts&&... ts)
         {
-            return [f = std::forward<F>(f), ... ts = std::forward<Ts>(ts)](
+            return [f = HPX_FORWARD(F, f), ... ts = HPX_FORWARD(Ts, ts)](
                        auto i, auto&& predecessor, auto& v) mutable {
-                v[i] = HPX_INVOKE(std::forward<F>(f), i,
-                    std::forward<decltype(predecessor)>(predecessor),
-                    std::forward<Ts>(ts)...);
+                v[i] = HPX_INVOKE(HPX_FORWARD(F, f), i,
+                    HPX_FORWARD(decltype(predecessor), predecessor),
+                    HPX_FORWARD(Ts, ts)...);
             };
         }
 #else
         template <typename F, typename... Ts>
         auto captured_args_then(F&& f, Ts&&... ts)
         {
-            return [f = std::forward<F>(f),
-                       t = hpx::make_tuple(std::forward<Ts>(ts)...)](
+            return [f = HPX_FORWARD(F, f),
+                       t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
                        auto i, auto&& predecessor, auto& v) mutable {
                 v[i] = hpx::util::invoke_fused(
-                    hpx::util::bind_front(std::forward<F>(f), i,
-                        std::forward<decltype(predecessor)>(predecessor)),
-                    std::move(t));
+                    hpx::bind_front(HPX_FORWARD(F, f), i,
+                        HPX_FORWARD(decltype(predecessor), predecessor)),
+                    HPX_MOVE(t));
             };
         }
 #endif
@@ -69,13 +69,17 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename BaseScheduler>
     struct scheduler_executor
     {
+        static_assert(hpx::execution::experimental::is_scheduler_v<
+                          std::decay_t<BaseScheduler>>,
+            "scheduler_executor requires a scheduler");
+
         constexpr scheduler_executor() = default;
 
         template <typename Scheduler,
             typename Enable = std::enable_if_t<
                 hpx::execution::experimental::is_scheduler_v<Scheduler>>>
         constexpr explicit scheduler_executor(Scheduler&& sched)
-          : sched_(std::forward<Scheduler>(sched))
+          : sched_(HPX_FORWARD(Scheduler, sched))
         {
         }
 
@@ -104,7 +108,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Enable =
                       std::enable_if_t<hpx::is_invocable_v<with_priority_t,
                           BaseScheduler, hpx::threads::thread_priority>>>
-        friend scheduler_executor tag_dispatch(
+        friend scheduler_executor tag_invoke(
             hpx::execution::experimental::with_priority_t,
             scheduler_executor const& exec,
             hpx::threads::thread_priority priority)
@@ -114,7 +118,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Enable = std::enable_if_t<
                       hpx::is_invocable_v<get_priority_t, BaseScheduler>>>
-        friend hpx::threads::thread_priority tag_dispatch(
+        friend hpx::threads::thread_priority tag_invoke(
             hpx::execution::experimental::get_priority_t,
             scheduler_executor const& exec)
         {
@@ -124,7 +128,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename Enable =
                       std::enable_if_t<hpx::is_invocable_v<with_stacksize_t,
                           BaseScheduler, hpx::threads::thread_stacksize>>>
-        friend scheduler_executor tag_dispatch(
+        friend scheduler_executor tag_invoke(
             hpx::execution::experimental::with_stacksize_t,
             scheduler_executor const& exec,
             hpx::threads::thread_stacksize stacksize)
@@ -134,7 +138,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Enable = std::enable_if_t<
                       hpx::is_invocable_v<get_stacksize_t, BaseScheduler>>>
-        friend hpx::threads::thread_stacksize tag_dispatch(
+        friend hpx::threads::thread_stacksize tag_invoke(
             hpx::execution::experimental::get_stacksize_t,
             scheduler_executor const& exec)
         {
@@ -144,7 +148,7 @@ namespace hpx { namespace execution { namespace experimental {
         template <
             typename Enable = std::enable_if_t<hpx::is_invocable_v<with_hint_t,
                 BaseScheduler, hpx::threads::thread_schedule_hint>>>
-        friend scheduler_executor tag_dispatch(
+        friend scheduler_executor tag_invoke(
             hpx::execution::experimental::with_hint_t,
             scheduler_executor const& exec,
             hpx::threads::thread_schedule_hint hint)
@@ -154,7 +158,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Enable = std::enable_if_t<
                       hpx::is_invocable_v<get_hint_t, BaseScheduler>>>
-        friend hpx::threads::thread_schedule_hint tag_dispatch(
+        friend hpx::threads::thread_schedule_hint tag_invoke(
             hpx::execution::experimental::get_hint_t,
             scheduler_executor const& exec)
         {
@@ -163,7 +167,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Enable = std::enable_if_t<hpx::is_invocable_v<
                       with_annotation_t, BaseScheduler, char const*>>>
-        friend scheduler_executor tag_dispatch(
+        friend scheduler_executor tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             scheduler_executor const& exec, char const* annotation)
         {
@@ -172,7 +176,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Enable = std::enable_if_t<hpx::is_invocable_v<
                       with_annotation_t, BaseScheduler, std::string>>>
-        friend scheduler_executor tag_dispatch(
+        friend scheduler_executor tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             scheduler_executor const& exec, std::string annotation)
         {
@@ -181,7 +185,7 @@ namespace hpx { namespace execution { namespace experimental {
 
         template <typename Enable = std::enable_if_t<
                       hpx::is_invocable_v<get_annotation_t, BaseScheduler>>>
-        friend char const* tag_dispatch(
+        friend char const* tag_invoke(
             hpx::execution::experimental::get_annotation_t,
             scheduler_executor const& exec)
         {
@@ -203,43 +207,43 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename F, typename... Ts>
         void post(F&& f, Ts&&... ts)
         {
-            detach(transform(schedule(sched_),
+            start_detached(then(schedule(sched_),
                 hpx::util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...)));
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
         // OneWayExecutor interface
         template <typename F, typename... Ts>
         decltype(auto) sync_execute(F&& f, Ts&&... ts)
         {
-            return sync_wait(transform(schedule(sched_),
-                hpx::util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...)));
+            return hpx::this_thread::experimental::sync_wait(
+                then(schedule(sched_),
+                    hpx::util::deferred_call(
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
         // TwoWayExecutor interface
         template <typename F, typename... Ts>
         decltype(auto) async_execute(F&& f, Ts&&... ts)
         {
-            return make_future(transform(schedule(sched_),
+            return make_future(then(schedule(sched_),
                 hpx::util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...)));
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
         template <typename F, typename Future, typename... Ts>
         decltype(auto) then_execute(F&& f, Future&& predecessor, Ts&&... ts)
         {
-            auto&& predecessor_on_sched =
-                on(keep_future(std::forward<Future>(predecessor)), sched_);
+            auto&& predecessor_transfer_sched =
+                transfer(keep_future(HPX_FORWARD(Future, predecessor)), sched_);
 
-            return make_future(transform(std::move(predecessor_on_sched),
-                hpx::util::bind_back(
-                    std::forward<F>(f), std::forward<Ts>(ts)...)));
+            return make_future(then(HPX_MOVE(predecessor_transfer_sched),
+                hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
-        decltype(auto) bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
+        auto bulk_async_execute(F&& f, S const& shape, Ts&&... ts)
         {
             using shape_element =
                 typename hpx::traits::range_traits<S>::value_type;
@@ -248,17 +252,13 @@ namespace hpx { namespace execution { namespace experimental {
 
             if constexpr (std::is_void_v<result_type>)
             {
-                std::vector<hpx::future<void>> results;
-                results.reserve(1);
-                results.emplace_back(make_future(bulk(schedule(sched_), shape,
-                    hpx::util::bind_back(
-                        std::forward<F>(f), std::forward<Ts>(ts)...))));
-                return results;
+                return make_future(bulk(schedule(sched_), shape,
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
             }
             else
             {
                 using promise_vector_type =
-                    std::vector<hpx::lcos::local::promise<result_type>>;
+                    std::vector<hpx::promise<result_type>>;
                 using result_vector_type =
                     std::vector<hpx::future<result_type>>;
 
@@ -284,14 +284,14 @@ namespace hpx { namespace execution { namespace experimental {
                             promises[i].set_value(HPX_INVOKE(f, *it, ts...));
                         },
                         [&](std::exception_ptr&& ep) {
-                            promises[i].set_exception(std::move(ep));
+                            promises[i].set_exception(HPX_MOVE(ep));
                         });
                 };
 
-                detach(bulk(
-                    just_on(sched_, std::move(promises), std::forward<F>(f),
-                        shape, std::forward<Ts>(ts)...),
-                    n, std::move(f_helper)));
+                start_detached(
+                    bulk(transfer_just(sched_, HPX_MOVE(promises),
+                             HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...),
+                        n, HPX_MOVE(f_helper)));
 
                 return results;
             }
@@ -300,9 +300,9 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename F, typename S, typename... Ts>
         void bulk_sync_execute(F&& f, S const& shape, Ts&&... ts)
         {
-            sync_wait(bulk(schedule(sched_), shape,
-                hpx::util::bind_back(
-                    std::forward<F>(f), std::forward<Ts>(ts)...)));
+            hpx::this_thread::experimental::sync_wait(
+                bulk(schedule(sched_), shape,
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)));
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
@@ -313,32 +313,31 @@ namespace hpx { namespace execution { namespace experimental {
                 parallel::execution::detail::then_bulk_function_result_t<F, S,
                     Future, Ts...>;
 
-            if constexpr (std::is_void<result_type>::value)
+            if constexpr (std::is_void_v<result_type>)
             {
                 // the overall return value is future<void>
                 auto prereq =
-                    when_all(keep_future(std::forward<Future>(predecessor)));
+                    when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
-                auto loop = bulk(on(std::move(prereq), sched_), shape,
-                    hpx::util::bind_back(
-                        std::forward<F>(f), std::forward<Ts>(ts)...));
+                auto loop = bulk(transfer(HPX_MOVE(prereq), sched_), shape,
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
-                return make_future(std::move(loop));
+                return make_future(HPX_MOVE(loop));
             }
             else
             {
                 // the overall return value is future<std::vector<result_type>>
                 auto prereq =
-                    when_all(keep_future(std::forward<Future>(predecessor)),
+                    when_all(keep_future(HPX_FORWARD(Future, predecessor)),
                         just(std::vector<result_type>(hpx::util::size(shape))));
 
-                auto loop = bulk(on(std::move(prereq), sched_), shape,
+                auto loop = bulk(transfer(HPX_MOVE(prereq), sched_), shape,
                     detail::captured_args_then(
-                        std::forward<F>(f), std::forward<Ts>(ts)...));
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
-                return make_future(transform(
-                    std::move(loop), [](auto&&, std::vector<result_type>&& v) {
-                        return std::move(v);
+                return make_future(then(
+                    HPX_MOVE(loop), [](auto&&, std::vector<result_type>&& v) {
+                        return HPX_MOVE(v);
                     }));
             }
         }
@@ -351,7 +350,7 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename BaseScheduler>
     explicit scheduler_executor(BaseScheduler&& sched)
         -> scheduler_executor<std::decay_t<BaseScheduler>>;
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental
 
 namespace hpx { namespace parallel { namespace execution {
 

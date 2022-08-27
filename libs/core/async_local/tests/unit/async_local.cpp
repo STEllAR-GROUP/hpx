@@ -73,7 +73,7 @@ int hpx_main()
     }
 
     {
-        hpx::lcos::local::promise<std::int32_t> p;
+        hpx::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<std::int32_t> f1 = hpx::async(&increment_with_future, f);
@@ -86,30 +86,28 @@ int hpx_main()
     }
 
     {
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
-        hpx::future<std::int32_t> f1 =
-            hpx::async(hpx::util::bind(&increment, 42));
+        hpx::future<std::int32_t> f1 = hpx::async(hpx::bind(&increment, 42));
         HPX_TEST_EQ(f1.get(), 43);
 
         hpx::future<std::int32_t> f2 =
-            hpx::async(hpx::launch::all, hpx::util::bind(&increment, _1), 42);
+            hpx::async(hpx::launch::all, hpx::bind(&increment, _1), 42);
         HPX_TEST_EQ(f2.get(), 43);
 
-        hpx::future<std::int32_t> f3 =
-            hpx::async(hpx::util::bind(&increment, 42));
+        hpx::future<std::int32_t> f3 = hpx::async(hpx::bind(&increment, 42));
         HPX_TEST_EQ(f3.get(), 43);
 
         hpx::future<std::int32_t> f4 =
-            hpx::async(hpx::launch::all, hpx::util::bind(&increment, _1), 42);
+            hpx::async(hpx::launch::all, hpx::bind(&increment, _1), 42);
         HPX_TEST_EQ(f4.get(), 43);
 
         hpx::future<void> f5 =
-            hpx::async(hpx::launch::all, hpx::util::bind(&do_nothing, _1), 42);
+            hpx::async(hpx::launch::all, hpx::bind(&do_nothing, _1), 42);
         f5.get();
 
         hpx::future<void> f6 =
-            hpx::async(hpx::launch::sync, hpx::util::bind(&do_nothing, _1), 42);
+            hpx::async(hpx::launch::sync, hpx::bind(&do_nothing, _1), 42);
         f6.get();
     }
 
@@ -129,30 +127,28 @@ int hpx_main()
     }
 
     {
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
-        hpx::future<std::int32_t> f1 =
-            hpx::async(hpx::util::bind(increment, 42));
+        hpx::future<std::int32_t> f1 = hpx::async(hpx::bind(increment, 42));
         HPX_TEST_EQ(f1.get(), 43);
 
         hpx::future<std::int32_t> f2 =
-            hpx::async(hpx::launch::all, hpx::util::bind(increment, _1), 42);
+            hpx::async(hpx::launch::all, hpx::bind(increment, _1), 42);
         HPX_TEST_EQ(f2.get(), 43);
 
-        hpx::future<std::int32_t> f3 =
-            hpx::async(hpx::util::bind(increment, 42));
+        hpx::future<std::int32_t> f3 = hpx::async(hpx::bind(increment, 42));
         HPX_TEST_EQ(f3.get(), 43);
 
         hpx::future<std::int32_t> f4 =
-            hpx::async(hpx::launch::all, hpx::util::bind(increment, _1), 42);
+            hpx::async(hpx::launch::all, hpx::bind(increment, _1), 42);
         HPX_TEST_EQ(f4.get(), 43);
 
         hpx::future<void> f5 =
-            hpx::async(hpx::launch::all, hpx::util::bind(do_nothing, _1), 42);
+            hpx::async(hpx::launch::all, hpx::bind(do_nothing, _1), 42);
         f5.get();
 
         hpx::future<void> f6 =
-            hpx::async(hpx::launch::sync, hpx::util::bind(do_nothing, _1), 42);
+            hpx::async(hpx::launch::sync, hpx::bind(do_nothing, _1), 42);
         f6.get();
     }
 
@@ -169,30 +165,29 @@ int hpx_main()
     {
         mult2 mult;
 
-        hpx::future<std::int32_t> f1 = hpx::async(hpx::util::bind(mult, 42));
+        hpx::future<std::int32_t> f1 = hpx::async(hpx::bind(mult, 42));
         HPX_TEST_EQ(f1.get(), 84);
 
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
         hpx::future<std::int32_t> f2 =
-            hpx::async(hpx::launch::all, hpx::util::bind(mult, 42));
+            hpx::async(hpx::launch::all, hpx::bind(mult, 42));
         HPX_TEST_EQ(f2.get(), 84);
 
-        hpx::future<std::int32_t> f3 =
-            hpx::async(hpx::util::bind(mult, _1), 42);
+        hpx::future<std::int32_t> f3 = hpx::async(hpx::bind(mult, _1), 42);
         HPX_TEST_EQ(f3.get(), 84);
 
         hpx::future<std::int32_t> f4 =
-            hpx::async(hpx::launch::all, hpx::util::bind(mult, _1), 42);
+            hpx::async(hpx::launch::all, hpx::bind(mult, _1), 42);
         HPX_TEST_EQ(f4.get(), 84);
 
         do_nothing_obj do_nothing_f;
         hpx::future<void> f5 =
-            hpx::async(hpx::launch::all, hpx::util::bind(do_nothing_f, _1), 42);
+            hpx::async(hpx::launch::all, hpx::bind(do_nothing_f, _1), 42);
         f5.get();
 
-        hpx::future<void> f6 = hpx::async(
-            hpx::launch::sync, hpx::util::bind(do_nothing_f, _1), 42);
+        hpx::future<void> f6 =
+            hpx::async(hpx::launch::sync, hpx::bind(do_nothing_f, _1), 42);
         f6.get();
     }
 
@@ -219,45 +214,45 @@ int hpx_main()
     {
         decrement dec;
 
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
         hpx::future<std::int32_t> f1 =
-            hpx::async(hpx::util::bind(&decrement::call, dec, 42));
+            hpx::async(hpx::bind(&decrement::call, dec, 42));
         HPX_TEST_EQ(f1.get(), 41);
 
-        hpx::future<std::int32_t> f2 = hpx::async(
-            hpx::launch::all, hpx::util::bind(&decrement::call, dec, 42));
+        hpx::future<std::int32_t> f2 =
+            hpx::async(hpx::launch::all, hpx::bind(&decrement::call, dec, 42));
         HPX_TEST_EQ(f2.get(), 41);
 
         hpx::future<std::int32_t> f3 =
-            hpx::async(hpx::util::bind(&decrement::call, dec, _1), 42);
+            hpx::async(hpx::bind(&decrement::call, dec, _1), 42);
         HPX_TEST_EQ(f3.get(), 41);
 
         hpx::future<std::int32_t> f4 = hpx::async(
-            hpx::launch::all, hpx::util::bind(&decrement::call, dec, _1), 42);
+            hpx::launch::all, hpx::bind(&decrement::call, dec, _1), 42);
         HPX_TEST_EQ(f4.get(), 41);
 
         do_nothing_member dnm;
-        hpx::future<void> f5 = hpx::async(hpx::launch::all,
-            hpx::util::bind(&do_nothing_member::call, dnm, _1), 42);
+        hpx::future<void> f5 = hpx::async(
+            hpx::launch::all, hpx::bind(&do_nothing_member::call, dnm, _1), 42);
         f5.get();
 
         hpx::future<void> f6 = hpx::async(hpx::launch::sync,
-            hpx::util::bind(&do_nothing_member::call, dnm, _1), 42);
+            hpx::bind(&do_nothing_member::call, dnm, _1), 42);
         f6.get();
     }
 
     {
-        using hpx::util::placeholders::_1;
+        using hpx::placeholders::_1;
 
         auto policy1 = hpx::launch::select([]() { return hpx::launch::sync; });
 
         hpx::future<std::int32_t> f1 =
-            hpx::async(policy1, hpx::util::bind(&increment, 42));
+            hpx::async(policy1, hpx::bind(&increment, 42));
         HPX_TEST_EQ(f1.get(), 43);
 
         hpx::future<std::int32_t> f2 =
-            hpx::async(policy1, hpx::util::bind(&increment, _1), 42);
+            hpx::async(policy1, hpx::bind(&increment, _1), 42);
         HPX_TEST_EQ(f2.get(), 43);
 
         std::atomic<int> count(0);
@@ -268,11 +263,10 @@ int hpx_main()
         });
 
         hpx::future<void> f3 =
-            hpx::async(policy2, hpx::util::bind(&do_nothing, _1), 42);
+            hpx::async(policy2, hpx::bind(&do_nothing, _1), 42);
         f3.get();
 
-        hpx::future<void> f4 =
-            hpx::async(policy2, hpx::util::bind(&do_nothing, 42));
+        hpx::future<void> f4 = hpx::async(policy2, hpx::bind(&do_nothing, 42));
         f4.get();
     }
 

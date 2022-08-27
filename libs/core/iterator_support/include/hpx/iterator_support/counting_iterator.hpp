@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -103,15 +103,19 @@ namespace hpx { namespace util {
 
     public:
         counting_iterator() = default;
+        counting_iterator(counting_iterator&& rhs) = default;
+        counting_iterator& operator=(counting_iterator&& rhs) = default;
         counting_iterator(counting_iterator const& rhs) = default;
+        counting_iterator& operator=(counting_iterator const& rhs) = default;
 
-        HPX_HOST_DEVICE explicit counting_iterator(Incrementable x)
+        HPX_HOST_DEVICE explicit constexpr counting_iterator(Incrementable x)
           : base_type(x)
         {
         }
 
     private:
-        HPX_HOST_DEVICE typename base_type::reference dereference() const
+        HPX_HOST_DEVICE constexpr typename base_type::reference dereference()
+            const
         {
             return this->base_reference();
         }
@@ -120,7 +124,7 @@ namespace hpx { namespace util {
     template <typename Incrementable, typename CategoryOrTraversal,
         typename Difference>
     class counting_iterator<Incrementable, CategoryOrTraversal, Difference,
-        typename std::enable_if<std::is_integral<Incrementable>::value>::type>
+        std::enable_if_t<std::is_integral_v<Incrementable>>>
       : public detail::counting_iterator_base<Incrementable,
             CategoryOrTraversal, Difference>::type
     {
@@ -132,38 +136,43 @@ namespace hpx { namespace util {
 
     public:
         counting_iterator() = default;
+        counting_iterator(counting_iterator&& rhs) = default;
+        counting_iterator& operator=(counting_iterator&& rhs) = default;
         counting_iterator(counting_iterator const& rhs) = default;
+        counting_iterator& operator=(counting_iterator const& rhs) = default;
 
-        HPX_HOST_DEVICE explicit counting_iterator(Incrementable x)
+        HPX_HOST_DEVICE explicit constexpr counting_iterator(
+            Incrementable x) noexcept
           : base_type(x)
         {
         }
 
     private:
         template <typename Iterator>
-        HPX_HOST_DEVICE bool equal(Iterator const& rhs) const
+        HPX_HOST_DEVICE constexpr bool equal(Iterator const& rhs) const noexcept
         {
             return this->base() == rhs.base();
         }
 
-        HPX_HOST_DEVICE void increment()
+        HPX_HOST_DEVICE void increment() noexcept
         {
             ++this->base_reference();
         }
 
-        HPX_HOST_DEVICE void decrement()
+        HPX_HOST_DEVICE void decrement() noexcept
         {
             --this->base_reference();
         }
 
         template <typename Distance>
-        HPX_HOST_DEVICE void advance(Distance n)
+        HPX_HOST_DEVICE void advance(Distance n) noexcept
         {
             this->base_reference() +=
                 static_cast<typename base_type::base_type>(n);
         }
 
-        HPX_HOST_DEVICE typename base_type::reference dereference() const
+        HPX_HOST_DEVICE constexpr typename base_type::reference dereference()
+            const noexcept
         {
             return this->base_reference();
         }
@@ -171,7 +180,7 @@ namespace hpx { namespace util {
         template <typename OtherIncrementable>
         HPX_HOST_DEVICE typename base_type::difference_type distance_to(
             counting_iterator<OtherIncrementable, CategoryOrTraversal,
-                Difference> const& y) const
+                Difference> const& y) const noexcept
         {
             using difference_type = typename base_type::difference_type;
             return static_cast<difference_type>(y.base()) -
@@ -181,7 +190,7 @@ namespace hpx { namespace util {
 
     // Manufacture a counting iterator for an arbitrary incrementable type
     template <typename Incrementable>
-    HPX_HOST_DEVICE inline counting_iterator<Incrementable>
+    HPX_HOST_DEVICE inline constexpr counting_iterator<Incrementable>
     make_counting_iterator(Incrementable x)
     {
         return counting_iterator<Incrementable>(x);

@@ -9,9 +9,9 @@
 
 .. _examples_hello_world:
 
-==========================================
-Remote execution with actions: Hello world
-==========================================
+=============================
+Remote execution with actions
+=============================
 
 This program will print out a hello world message on every OS-thread on every
 :term:`locality`. The output will look something like this:
@@ -34,15 +34,15 @@ To compile this program, go to your |hpx| build directory (see
 :ref:`hpx_build_system` for information on configuring and building |hpx|) and
 enter:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   make examples.quickstart.hello_world_distributed
+   $ make examples.quickstart.hello_world_distributed
 
 To run the program type:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ./bin/hello_world_distributed
+   $ ./bin/hello_world_distributed
 
 This should print:
 
@@ -53,9 +53,9 @@ This should print:
 To use more OS-threads use the command line option :option:`--hpx:threads` and
 type the number of threads that you wish to use. For example, typing:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ./bin/hello_world_distributed --hpx:threads 2
+   $ ./bin/hello_world_distributed --hpx:threads 2
 
 will yield:
 
@@ -116,14 +116,14 @@ wrapped in the action above:
 
 Now, before we discuss ``hello_world_foreman()``, let's talk about the
 :cpp:func:`hpx::wait_each()` function.
-The version of :cpp:func:`hpx::lcos::wait_each` invokes a callback function
+The version of :cpp:func:`hpx::wait_each` invokes a callback function
 provided by the user, supplying the callback function with the result of the
 future.
 
 In ``hello_world_foreman()``, an ``std::set<>`` called ``attendance`` keeps
 track of which OS-threads have printed out the hello world message. When the
 OS-thread prints out the statement, the future is marked as ready, and
-:cpp:func:`hpx::lcos::wait_each` in ``hello_world_foreman()``. If it is not
+:cpp:func:`hpx::wait_each` in ``hello_world_foreman()``. If it is not
 executing on the correct OS-thread, it returns a value of -1, which causes
 ``hello_world_foreman()`` to leave the OS-thread id in ``attendance``.
 

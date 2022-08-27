@@ -33,7 +33,7 @@ namespace hpx { namespace agas { namespace server {
     void primary_namespace_register_counter_types(error_code& ec)
     {
         performance_counters::create_counter_func creator(
-            util::bind_back(&performance_counters::agas_raw_counter_creator,
+            hpx::bind_back(&performance_counters::agas_raw_counter_creator,
                 agas::server::primary_namespace_service_name));
 
         for (std::size_t i = 0;
@@ -83,7 +83,7 @@ namespace hpx { namespace agas { namespace server {
     void primary_namespace_register_global_counter_types(error_code& ec)
     {
         performance_counters::create_counter_func creator(
-            util::bind_back(&performance_counters::agas_raw_counter_creator,
+            hpx::bind_back(&performance_counters::agas_raw_counter_creator,
                 agas::server::primary_namespace_service_name));
 
         for (std::size_t i = 0;
@@ -172,60 +172,60 @@ namespace hpx { namespace agas { namespace server {
 
         using cd = primary_namespace::counter_data;
 
-        util::function_nonser<std::int64_t(bool)> get_data_func;
+        hpx::function<std::int64_t(bool)> get_data_func;
         if (target == agas::detail::counter_target_count)
         {
             switch (code)
             {
 #if defined(HPX_HAVE_NETWORKING)
             case primary_ns_route:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_route_count, &service.counter_data_);
                 service.counter_data_.route_.enabled_ = true;
                 break;
 #endif
             case primary_ns_bind_gid:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_bind_gid_count, &service.counter_data_);
                 service.counter_data_.bind_gid_.enabled_ = true;
                 break;
             case primary_ns_resolve_gid:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_resolve_gid_count, &service.counter_data_);
                 service.counter_data_.resolve_gid_.enabled_ = true;
                 break;
             case primary_ns_unbind_gid:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_unbind_gid_count, &service.counter_data_);
                 service.counter_data_.unbind_gid_.enabled_ = true;
                 break;
             case primary_ns_increment_credit:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_increment_credit_count, &service.counter_data_);
                 service.counter_data_.increment_credit_.enabled_ = true;
                 break;
             case primary_ns_decrement_credit:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_decrement_credit_count, &service.counter_data_);
                 service.counter_data_.decrement_credit_.enabled_ = true;
                 break;
             case primary_ns_allocate:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_allocate_count, &service.counter_data_);
                 service.counter_data_.allocate_.enabled_ = true;
                 break;
             case primary_ns_begin_migration:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_begin_migration_count, &service.counter_data_);
                 service.counter_data_.begin_migration_.enabled_ = true;
                 break;
             case primary_ns_end_migration:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_end_migration_count, &service.counter_data_);
                 service.counter_data_.end_migration_.enabled_ = true;
                 break;
             case primary_ns_statistics_counter:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_overall_count, &service.counter_data_);
                 service.counter_data_.enable_all();
                 break;
@@ -242,53 +242,53 @@ namespace hpx { namespace agas { namespace server {
             {
 #if defined(HPX_HAVE_NETWORKING)
             case primary_ns_route:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_route_time, &service.counter_data_);
                 service.counter_data_.route_.enabled_ = true;
                 break;
 #endif
             case primary_ns_bind_gid:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_bind_gid_time, &service.counter_data_);
                 service.counter_data_.bind_gid_.enabled_ = true;
                 break;
             case primary_ns_resolve_gid:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_resolve_gid_time, &service.counter_data_);
                 service.counter_data_.resolve_gid_.enabled_ = true;
                 break;
             case primary_ns_unbind_gid:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_unbind_gid_time, &service.counter_data_);
                 service.counter_data_.unbind_gid_.enabled_ = true;
                 break;
             case primary_ns_increment_credit:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_increment_credit_time, &service.counter_data_);
                 service.counter_data_.increment_credit_.enabled_ = true;
                 break;
             case primary_ns_decrement_credit:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_decrement_credit_time, &service.counter_data_);
                 service.counter_data_.decrement_credit_.enabled_ = true;
                 break;
             case primary_ns_allocate:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_allocate_time, &service.counter_data_);
                 service.counter_data_.allocate_.enabled_ = true;
                 break;
             case primary_ns_begin_migration:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_begin_migration_time, &service.counter_data_);
                 service.counter_data_.begin_migration_.enabled_ = true;
                 break;
             case primary_ns_end_migration:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_end_migration_time, &service.counter_data_);
                 service.counter_data_.end_migration_.enabled_ = true;
                 break;
             case primary_ns_statistics_counter:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_overall_time, &service.counter_data_);
                 service.counter_data_.enable_all();
                 break;

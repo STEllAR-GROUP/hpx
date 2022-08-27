@@ -49,7 +49,7 @@ hpx::future<non_default_ctor> plain_future_non_default_ctor()
 }
 
 HPX_PLAIN_ACTION(
-    plain_future_non_default_ctor, plain_future_non_default_ctor_action);
+    plain_future_non_default_ctor, plain_future_non_default_ctor_action)
 
 void test_plain_call_future_non_default_ctor(hpx::id_type id)
 {

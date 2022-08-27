@@ -20,7 +20,7 @@ class foo_server : public hpx::components::component_base<foo_server>
 };
 
 typedef hpx::components::component<foo_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, foo_server);
+HPX_REGISTER_COMPONENT(server_type, foo_server)
 
 class foo : public hpx::components::client_base<foo, foo_server>
 {
@@ -28,7 +28,10 @@ public:
     typedef hpx::components::client_base<foo, foo_server> base_type;
 
     foo() {}
-    foo(hpx::future<hpx::id_type>&& id) : base_type(std::move(id)) {}
+    foo(hpx::future<hpx::id_type>&& id)
+      : base_type(std::move(id))
+    {
+    }
 };
 
 foo get_foo()
@@ -36,14 +39,14 @@ foo get_foo()
     return hpx::new_<foo_server>(hpx::find_here());
 }
 
-HPX_PLAIN_ACTION(get_foo, get_foo_action);
+HPX_PLAIN_ACTION(get_foo, get_foo_action)
 
 hpx::future<hpx::id_type> get_future_id()
 {
     return hpx::new_<foo_server>(hpx::find_here());
 }
 
-HPX_PLAIN_ACTION(get_future_id, get_future_id_action);
+HPX_PLAIN_ACTION(get_future_id, get_future_id_action)
 
 int hpx_main()
 {

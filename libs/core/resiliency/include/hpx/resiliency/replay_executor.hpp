@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -47,7 +47,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         explicit replay_executor(BaseExecutor& exec, std::size_t n, F&& f)
           : exec_(exec)
           , replay_count_(n)
-          , validator_(std::forward<F>(f))
+          , validator_(HPX_FORWARD(F, f))
         {
         }
 
@@ -71,7 +71,7 @@ namespace hpx { namespace resiliency { namespace experimental {
         decltype(auto) async_execute(F&& f, Ts&&... ts) const
         {
             return async_replay_validate(exec_, replay_count_, validator_,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkTwoWayExecutor interface
@@ -91,12 +91,12 @@ namespace hpx { namespace resiliency { namespace experimental {
             std::vector<future_type> results;
             results.resize(size);
 
-            hpx::lcos::local::latch l(size + 1);
+            hpx::latch l(size + 1);
 
             spawn_hierarchical(results, l, 0, size, num_tasks, f,
                 hpx::util::begin(shape), ts...);
 
-            l.count_down_and_wait();
+            l.arrive_and_wait();
 
             return results;
         }
@@ -105,8 +105,8 @@ namespace hpx { namespace resiliency { namespace experimental {
         /// \cond NOINTERNAL
         template <typename Result, typename F, typename Iter, typename... Ts>
         void spawn_sequential(std::vector<hpx::future<Result>>& results,
-            hpx::lcos::local::latch& l, std::size_t base, std::size_t size,
-            F&& func, Iter it, Ts&&... ts) const
+            hpx::latch& l, std::size_t base, std::size_t size, F&& func,
+            Iter it, Ts&&... ts) const
         {
             // spawn tasks sequentially
             HPX_ASSERT(base + size <= results.size());
@@ -121,7 +121,7 @@ namespace hpx { namespace resiliency { namespace experimental {
 
         template <typename Result, typename F, typename Iter, typename... Ts>
         void spawn_hierarchical(std::vector<hpx::future<Result>>& results,
-            hpx::lcos::local::latch& l, std::size_t base, std::size_t size,
+            hpx::latch& l, std::size_t base, std::size_t size,
             std::size_t num_tasks, F&& func, Iter it, Ts&&... ts) const
         {
             if (size > num_tasks)
@@ -163,7 +163,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     {
         return replay_executor<BaseExecutor,
             typename std::decay<Validate>::type>(
-            exec, n, std::forward<Validate>(validate));
+            exec, n, HPX_FORWARD(Validate, validate));
     }
 
     template <typename BaseExecutor>

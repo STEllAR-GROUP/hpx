@@ -67,7 +67,7 @@ namespace jacobi_smp {
                  * left
                 (*deps_new)[j]
                     = hpx::dataflow(
-                        hpx::util::bind(
+                        hpx::bind(
                             jacobi_kernel_wrap
                           , range(y, y_end)
                           , n
@@ -81,8 +81,8 @@ namespace jacobi_smp {
                 (*deps_new)[j] =
                     hpx::when_all(std::move(trigger))
                         .then(hpx::launch::async,
-                            hpx::util::bind(jacobi_kernel_wrap, range(y, y_end),
-                                n, std::ref(*grid_new), std::cref(*grid_old)));
+                            hpx::bind(jacobi_kernel_wrap, range(y, y_end), n,
+                                std::ref(*grid_new), std::cref(*grid_old)));
             }
 
             std::swap(grid_new, grid_old);

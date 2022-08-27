@@ -10,10 +10,10 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/iostream.hpp>
 
 #include <vector>
 
@@ -21,60 +21,93 @@
 // Define a base component which exposes the required interface
 struct A : hpx::components::abstract_component_base<A>
 {
-    A() { hpx::cout << "A::A\n" << hpx::flush; }
-    virtual ~A() { hpx::cout << "A::~A\n" << hpx::flush; }
+    A()
+    {
+        hpx::cout << "A::A\n" << std::flush;
+    }
+    virtual ~A()
+    {
+        hpx::cout << "A::~A\n" << std::flush;
+    }
 
     virtual void print() const = 0;
 
     // It is not possible to bind a virtual function to an action, thus we
     // bind a simple forwarding function, which is not virtual.
-    void print_nonvirt() const { print(); }
-    HPX_DEFINE_COMPONENT_ACTION(A, print_nonvirt, print_action);
+    void print_nonvirt() const
+    {
+        print();
+    }
+    HPX_DEFINE_COMPONENT_ACTION(A, print_nonvirt, print_action)
+
+    // Overload this function to allow to extract the proper base address
+    // of the component that is used as part of the generated global id.
+    hpx::naming::address get_current_address() const override
+    {
+        return hpx::naming::address(
+            hpx::naming::get_gid_from_locality_id(hpx::get_locality_id()),
+            hpx::components::get_component_type<A>(), const_cast<A*>(this));
+    }
 };
 
-HPX_DEFINE_GET_COMPONENT_TYPE(A);
+HPX_DEFINE_GET_COMPONENT_TYPE(A)
 
 typedef A::print_action print_action;
-HPX_REGISTER_ACTION_DECLARATION(print_action);
-HPX_REGISTER_ACTION(print_action);
+HPX_REGISTER_ACTION_DECLARATION(print_action)
+HPX_REGISTER_ACTION(print_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define a component which implements the required interface by deriving from
 // the base component 'A' defined above.
-struct B : A, hpx::components::component_base<B>
+struct B
+  : A
+  , hpx::components::component_base<B>
 {
-    typedef hpx::components::component_base<B>::wrapping_type wrapping_type;
+    using wrapping_type = hpx::components::component_base<B>::wrapping_type;
 
-    typedef B type_holder;
-    typedef A base_type_holder;
+    using type_holder = B;
+    using base_type_holder = A;
 
-    B() : value_(0)
+    using A::get_current_address;
+
+    B()
+      : value_(0)
     {
-        hpx::cout << "B::B\n" << hpx::flush;
+        hpx::cout << "B::B\n" << std::flush;
     }
 
-    B(int i) : value_(i)
+    B(int i)
+      : value_(i)
     {
-        hpx::cout << "B::B(int) " << i << "\n" << hpx::flush;
+        hpx::cout << "B::B(int) " << i << "\n" << std::flush;
     }
 
     ~B()
     {
-        hpx::cout << "B::~B\n" << hpx::flush;
+        hpx::cout << "B::~B\n" << std::flush;
+    }
+
+    // Overload this function to allow to extract the proper base address
+    // of the component that is used as part of the generated global id.
+    hpx::naming::address get_current_address() const override
+    {
+        return hpx::naming::address(
+            hpx::naming::get_gid_from_locality_id(hpx::get_locality_id()),
+            hpx::components::get_component_type<B>(), const_cast<B*>(this));
     }
 
     void print() const override
     {
-        hpx::cout << "B::print from locality: "
-            << hpx::find_here() << ", value: " << value_ << "\n"
-            << hpx::flush;
+        hpx::cout << "B::print from locality: " << hpx::find_here()
+                  << ", value: " << value_ << "\n"
+                  << std::flush;
     }
 
     int value_;
 };
 
 typedef hpx::components::component<B> server_type;
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(server_type, B, "A");
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(server_type, B, "A")
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define a client side representation for a remote component instance 'A',
@@ -85,7 +118,8 @@ struct client : hpx::components::client_base<client, A>
 
     client(hpx::shared_future<hpx::id_type> const& gid)
       : base_type(gid)
-    {}
+    {
+    }
 
     void print()
     {

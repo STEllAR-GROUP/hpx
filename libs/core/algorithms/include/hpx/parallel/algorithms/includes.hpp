@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -96,8 +96,8 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -105,9 +105,9 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/upper_lower_bound.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -139,15 +139,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return false;
                 }
 
-                auto&& value1 = hpx::util::invoke(proj1, *first1);
-                auto&& value2 = hpx::util::invoke(proj2, *first2);
+                auto&& value1 = HPX_INVOKE(proj1, *first1);
+                auto&& value2 = HPX_INVOKE(proj2, *first2);
 
-                if (hpx::util::invoke(f, value2, value1))
+                if (HPX_INVOKE(f, value2, value1))
                 {
                     return false;
                 }
 
-                if (!hpx::util::invoke(f, value1, value2))
+                if (!HPX_INVOKE(f, value1, value2))
                 {
                     ++first2;
                 }
@@ -169,15 +169,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return false;
                 }
 
-                auto&& value1 = hpx::util::invoke(proj1, *first1);
-                auto&& value2 = hpx::util::invoke(proj2, *first2);
+                auto&& value1 = HPX_INVOKE(proj1, *first1);
+                auto&& value2 = HPX_INVOKE(proj2, *first2);
 
-                if (hpx::util::invoke(f, value2, value1))
+                if (HPX_INVOKE(f, value2, value1))
                 {
                     return false;
                 }
 
-                if (!hpx::util::invoke(f, value1, value2))
+                if (!HPX_INVOKE(f, value1, value2))
                 {
                     ++first2;
                 }
@@ -202,8 +202,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
             {
                 return sequential_includes(first1, last1, first2, last2,
-                    std::forward<F>(f), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
             }
 
             template <typename ExPolicy, typename Iter1, typename Sent1,
@@ -227,13 +227,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 util::cancellation_token<> tok;
 
                 auto f1 =
-                    [first1, last1, first2, last2, tok, f = std::forward<F>(f),
-                        proj1 = std::forward<Proj1>(proj1),
-                        proj2 = std::forward<Proj2>(proj2)](Iter2 part_begin,
+                    [first1, last1, first2, last2, tok, f = HPX_FORWARD(F, f),
+                        proj1 = HPX_FORWARD(Proj1, proj1),
+                        proj2 = HPX_FORWARD(Proj2, proj2)](Iter2 part_begin,
                         std::size_t part_count) mutable -> bool {
                     Iter2 part_end = detail::next(part_begin, part_count);
 
-                    auto value = hpx::util::invoke(proj2, *part_begin);
+                    auto value = HPX_INVOKE(proj2, *part_begin);
                     if (first2 != part_begin && part_count > 1)
                     {
                         part_begin = detail::upper_bound(
@@ -246,7 +246,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         {
                             return true;
                         }
-                        value = hpx::util::invoke(proj2, *part_begin);
+                        value = HPX_INVOKE(proj2, *part_begin);
                     }
 
                     Iter1 low = detail::lower_bound(
@@ -257,8 +257,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     }
 
                     if (low == last1 ||
-                        hpx::util::invoke(
-                            f, value, hpx::util::invoke(proj1, *low)))
+                        HPX_INVOKE(f, value, HPX_INVOKE(proj1, *low)))
                     {
                         tok.cancel();
                         return false;
@@ -267,7 +266,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     Iter1 high = last1;
                     if (part_end != last2)
                     {
-                        auto&& value1 = hpx::util::invoke(proj2, *part_end);
+                        auto&& value1 = HPX_INVOKE(proj2, *part_end);
 
                         high = detail::upper_bound(
                             low, last1, value1, f, proj1, tok);
@@ -288,62 +287,26 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return !tok.was_cancelled();
                 };
 
-                auto f2 = [](std::vector<hpx::future<bool>>&& results) {
+                auto f2 = [](auto&& results) {
                     return std::all_of(hpx::util::begin(results),
                         hpx::util::end(results),
                         [](hpx::future<bool>& val) { return val.get(); });
                 };
 
                 return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy), first2,
-                    detail::distance(first2, last2), std::move(f1),
-                    std::move(f2));
+                    HPX_FORWARD(ExPolicy, policy), first2,
+                    detail::distance(first2, last2), HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::less,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
-            hpx::is_invocable_v<Pred,
-                typename std::iterator_traits<FwdIter1>::value_type,
-                typename std::iterator_traits<FwdIter2>::value_type
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::includes is deprecated, use hpx::includes instead")
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        includes(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::includes().call(std::forward<ExPolicy>(policy), first1,
-            last1, first2, last2, std::forward<Pred>(op),
-            util::projection_identity(), util::projection_identity());
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::includes
-    HPX_INLINE_CONSTEXPR_VARIABLE struct includes_t final
+    // CPO for hpx::includes
+    inline constexpr struct includes_t final
       : hpx::detail::tag_parallel_algorithm<includes_t>
     {
     private:
@@ -362,7 +325,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(includes_t, ExPolicy&& policy, FwdIter1 first1,
+        tag_fallback_invoke(includes_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -371,8 +334,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::includes().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                std::forward<Pred>(op),
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                HPX_FORWARD(Pred, op),
                 hpx::parallel::util::projection_identity(),
                 hpx::parallel::util::projection_identity());
         }
@@ -389,7 +352,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(includes_t, FwdIter1 first1,
+        friend bool tag_fallback_invoke(includes_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
@@ -399,7 +362,7 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::includes().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                std::forward<Pred>(op),
+                HPX_FORWARD(Pred, op),
                 hpx::parallel::util::projection_identity(),
                 hpx::parallel::util::projection_identity());
         }

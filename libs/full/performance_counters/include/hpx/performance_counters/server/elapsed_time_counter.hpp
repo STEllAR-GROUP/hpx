@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,27 +24,19 @@ namespace hpx { namespace performance_counters { namespace server {
         using type_holder = elapsed_time_counter;
         using base_type_holder = base_performance_counter;
 
-        elapsed_time_counter() = default;
+        elapsed_time_counter();
         elapsed_time_counter(counter_info const& info);
 
         hpx::performance_counters::counter_value get_counter_value(
             bool reset) override;
         void reset_counter_value() override;
 
-        bool start() override
-        {
-            return false;
-        }
-        bool stop() override
-        {
-            return false;
-        }
+        bool start() override;
+        bool stop() override;
 
         // finalize() will be called just before the instance gets destructed
-        void finalize()
-        {
-            base_performance_counter::finalize();
-            base_type::finalize();
-        }
+        void finalize();
+
+        naming::address get_current_address() const;
     };
 }}}    // namespace hpx::performance_counters::server

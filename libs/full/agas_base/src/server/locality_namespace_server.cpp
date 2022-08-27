@@ -37,10 +37,10 @@ namespace hpx { namespace agas {
         return naming::gid_type(agas::primary_ns_msb, agas::locality_ns_lsb);
     }
 
-    naming::id_type bootstrap_locality_namespace_id()
+    hpx::id_type bootstrap_locality_namespace_id()
     {
-        return naming::id_type(agas::locality_ns_msb, agas::locality_ns_lsb,
-            naming::id_type::unmanaged);
+        return hpx::id_type(agas::locality_ns_msb, agas::locality_ns_lsb,
+            hpx::id_type::management_type::unmanaged);
     }
 }}    // namespace hpx::agas
 
@@ -70,7 +70,7 @@ namespace hpx { namespace agas { namespace server {
     {
         if (!instance_name_.empty())
         {
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             agas::unregister_name(launch::sync, instance_name_, ec);
         }
     }

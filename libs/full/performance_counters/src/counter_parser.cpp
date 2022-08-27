@@ -85,7 +85,7 @@ namespace {
     auto const raw_uint_def = x3::raw[x3::uint_];
 
     BOOST_SPIRIT_DEFINE(
-        path_parser, instance, parent, child, subchild, raw_uint);
+        path_parser, instance, parent, child, subchild, raw_uint)
 
 }    // namespace
 

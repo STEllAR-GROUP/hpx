@@ -19,7 +19,7 @@ double compute_minmax(const std::vector<double> v)
 
     auto minmaxX_ = hpx::minmax_element(policy, v.begin(), v.end());
     auto minmaxX = minmaxX_.get();
-    return *minmaxX.second - *minmaxX.first;
+    return *minmaxX.max - *minmaxX.min;
 }
 
 int hpx_main()
@@ -28,7 +28,7 @@ int hpx_main()
     double extent;
 
     hpx::async(hpx::launch::sync,
-        hpx::util::annotated_function(
+        hpx::annotated_function(
             [&]() { extent = compute_minmax(vec); }, "compute_minmax"));
     HPX_TEST_EQ(extent, 76.6);
 

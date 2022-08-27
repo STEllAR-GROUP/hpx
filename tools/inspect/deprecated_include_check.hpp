@@ -18,51 +18,51 @@
 
 #include <vector>
 
-namespace boost
-{
-  namespace inspect
-  {
+namespace boost { namespace inspect {
 
     struct deprecated_includes
     {
-      char const* include_regex;
-      char const* use_instead;
+        char const* include_regex;
+        char const* use_instead;
     };
 
     struct deprecated_includes_regex_data
     {
-      deprecated_includes_regex_data(deprecated_includes const* d,
-            std::string const& rx)
-        : data(d), pattern(rx, boost::regex::normal)
-      {}
+        deprecated_includes_regex_data(
+            deprecated_includes const* d, std::string const& rx)
+          : data(d)
+          , pattern(rx, boost::regex::normal)
+        {
+        }
 
-      deprecated_includes const* data;
-      boost::regex pattern;
+        deprecated_includes const* data;
+        boost::regex pattern;
     };
 
     class deprecated_include_check : public inspector
     {
-      long m_errors;
-      std::vector<deprecated_includes_regex_data> regex_data;
+        long m_errors;
+        std::vector<deprecated_includes_regex_data> regex_data;
 
     public:
+        deprecated_include_check();
+        virtual const char* name() const
+        {
+            return "*DI*";
+        }
+        virtual const char* desc() const
+        {
+            return "#include'ing deprecated header";
+        }
 
-      deprecated_include_check();
-      virtual const char * name() const { return "*DI*"; }
-      virtual const char * desc() const { return "#include'ing deprecated header"; }
+        virtual void inspect(const std::string& library_name,
+            const path& full_path, const std::string& contents);
 
-      virtual void inspect(
-        const std::string & library_name,
-        const path & full_path,
-        const std::string & contents);
+        virtual void print_summary(std::ostream& out)
+        {
+            out << "  " << m_errors << " deprecated #include's" << line_break();
+        }
 
-      virtual void print_summary(std::ostream& out)
-      {
-        out << "  " << m_errors << " deprecated #include's" << line_break();
-      }
-
-      virtual ~deprecated_include_check() {}
+        virtual ~deprecated_include_check() {}
     };
-  }
-}
-
+}}    // namespace boost::inspect

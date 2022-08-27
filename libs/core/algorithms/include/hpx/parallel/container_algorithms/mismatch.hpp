@@ -219,10 +219,10 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -235,7 +235,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::mismatch
-    HPX_INLINE_CONSTEXPR_VARIABLE struct mismatch_t final
+    inline constexpr struct mismatch_t final
       : hpx::detail::tag_parallel_algorithm<mismatch_t>
     {
     private:
@@ -256,7 +256,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             mismatch_result<Iter1, Iter2>>::type
-        tag_fallback_dispatch(mismatch_t, ExPolicy&& policy, Iter1 first1,
+        tag_fallback_invoke(mismatch_t, ExPolicy&& policy, Iter1 first1,
             Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -267,9 +267,9 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::mismatch_binary<
                 mismatch_result<Iter1, Iter2>>()
-                .call(std::forward<ExPolicy>(policy), first1, last1, first2,
-                    last2, std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
+                    last2, HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -293,7 +293,7 @@ namespace hpx { namespace ranges {
             mismatch_result<
                 typename hpx::traits::range_traits<Rng1>::iterator_type,
                 typename hpx::traits::range_traits<Rng2>::iterator_type>>::type
-        tag_fallback_dispatch(mismatch_t, ExPolicy&& policy, Rng1&& rng1,
+        tag_fallback_invoke(mismatch_t, ExPolicy&& policy, Rng1&& rng1,
             Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -311,10 +311,10 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_traits<Rng2>::iterator_type>;
 
             return hpx::parallel::v1::detail::mismatch_binary<result_type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -332,7 +332,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend mismatch_result<Iter1, Iter2> tag_fallback_dispatch(mismatch_t,
+        friend mismatch_result<Iter1, Iter2> tag_fallback_invoke(mismatch_t,
             Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -345,8 +345,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::mismatch_binary<
                 mismatch_result<Iter1, Iter2>>()
                 .call(hpx::execution::seq, first1, last1, first2, last2,
-                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -368,7 +368,7 @@ namespace hpx { namespace ranges {
         friend mismatch_result<
             typename hpx::traits::range_traits<Rng1>::iterator_type,
             typename hpx::traits::range_traits<Rng2>::iterator_type>
-        tag_fallback_dispatch(mismatch_t, Rng1&& rng1, Rng2&& rng2,
+        tag_fallback_invoke(mismatch_t, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -388,8 +388,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::mismatch_binary<result_type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
     } mismatch{};

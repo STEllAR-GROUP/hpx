@@ -47,6 +47,8 @@ set(async_headers
     hpx/async_distributed/lcos_fwd.hpp
     hpx/async_distributed/packaged_action.hpp
     hpx/async_distributed/promise.hpp
+    hpx/async_distributed/put_parcel.hpp
+    hpx/async_distributed/put_parcel_fwd.hpp
     hpx/async_distributed/detail/promise_base.hpp
     hpx/async_distributed/detail/promise_lco.hpp
     hpx/async_distributed/sync.hpp
@@ -89,15 +91,17 @@ set(async_compat_headers
     hpx/runtime/applier/apply.hpp => hpx/include/async.hpp
     hpx/runtime/applier/bind_naming_wrappers.hpp => hpx/include/async.hpp
     hpx/runtime/applier/trigger.hpp => hpx/include/async.hpp
-    hpx/runtime/actions/continuation_fwd.hpp => hpx/modules/async.hpp
-    hpx/runtime/actions/continuation.hpp => hpx/modules/async.hpp
-    hpx/runtime/actions/set_lco_value_continuation.hpp => hpx/modules/async.hpp
-    hpx/runtime/actions/transfer_continuation_action.hpp => hpx/modules/async.hpp
-    hpx/runtime/trigger_lco.hpp => hpx/modules/async.hpp
-    hpx/runtime/trigger_lco_fwd.hpp => hpx/modules/async.hpp
+    hpx/runtime/actions/continuation_fwd.hpp => hpx/include/async.hpp
+    hpx/runtime/actions/continuation.hpp => hpx/include/async.hpp
+    hpx/runtime/actions/set_lco_value_continuation.hpp => hpx/include/async.hpp
+    hpx/runtime/actions/transfer_continuation_action.hpp => hpx/include/async.hpp
+    hpx/runtime/trigger_lco.hpp => hpx/include/async.hpp
+    hpx/runtime/trigger_lco_fwd.hpp => hpx/include/async.hpp
     hpx/sync.hpp => hpx/include/async.hpp
     hpx/traits/action_trigger_continuation.hpp => hpx/modules/actions.hpp
     hpx/util/bind_action.hpp => hpx/modules/actions.hpp
+    hpx/runtime/put_parcel.hpp => hpx/include/async.hpp
+    hpx/runtime/put_parcel_fwd.hpp => hpx/include/async.hpp
 )
 # cmake-format: on
 
@@ -120,6 +124,14 @@ add_hpx_module(
   HEADERS ${async_headers}
   COMPAT_HEADERS ${async_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_actions hpx_naming
+  MODULE_DEPENDENCIES
+    hpx_actions
+    hpx_actions_base
+    hpx_components
+    hpx_components_base
+    hpx_naming
+    hpx_naming_base
+    hpx_parcelset
+    hpx_parcelset_base
   CMAKE_SUBDIRS examples tests
 )

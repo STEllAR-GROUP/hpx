@@ -15,11 +15,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 struct cout_continuation
 {
-    typedef hpx::tuple<hpx::lcos::future<int>, hpx::lcos::future<int>,
-        hpx::lcos::future<int>>
+    typedef hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>>
         data_type;
 
-    void operator()(hpx::lcos::future<data_type> data) const
+    void operator()(hpx::future<data_type> data) const
     {
         data_type v = data.get();
         std::cout << hpx::get<0>(v).get() << "\n";
@@ -31,9 +30,9 @@ struct cout_continuation
 int hpx_main()
 {
     {
-        hpx::future<int> a = hpx::lcos::make_ready_future<int>(17);
-        hpx::future<int> b = hpx::lcos::make_ready_future<int>(42);
-        hpx::future<int> c = hpx::lcos::make_ready_future<int>(-1);
+        hpx::future<int> a = hpx::make_ready_future<int>(17);
+        hpx::future<int> b = hpx::make_ready_future<int>(42);
+        hpx::future<int> c = hpx::make_ready_future<int>(-1);
 
         hpx::when_all(a, b, c).then(cout_continuation());
     }

@@ -52,14 +52,12 @@ namespace hpx {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a move algorithm returns a
-    ///           \a  hpx::future<tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)> >
+    ///           \a  hpx::future<FwdIter2>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a tagged_pair<tag::in(FwdIter1), tag::out(FwdIter2)>
-    ///           otherwise.
-    ///           The \a move algorithm returns the pair of the input iterator
-    ///           \a last and the output iterator to the
+    ///           returns \a FwdIter2 otherwise.
+    ///           The \a move algorithm returns the output iterator to the
     ///           element in the destination range, one past the last element
     ///           moved.
     ///
@@ -68,7 +66,7 @@ namespace hpx {
     move(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest);
 
     // clang-format off
-}
+}   // namespace hpx
 
 #else // DOXYGEN
 
@@ -138,7 +136,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::detail::get_in_out_result(
                     util::foreach_partitioner<ExPolicy>::call(
-                        std::forward<ExPolicy>(policy),
+                        HPX_FORWARD(ExPolicy, policy),
                         hpx::util::make_zip_iterator(first, dest),
                         detail::distance(first, last),
                         [](zip_iterator part_begin, std::size_t part_size,
@@ -150,7 +148,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 get<0>(iters), part_size, get<1>(iters));
                         },
                         [](zip_iterator&& last) -> zip_iterator {
-                            return std::move(last);
+                            return HPX_MOVE(last);
                         }));
             }
         };
@@ -180,30 +178,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value)>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 6, "hpx::parallel::move is deprecated, use hpx::move instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<FwdIter1, FwdIter2>>::type
-        move(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
-    {
-        return detail::transfer<detail::move<FwdIter1, FwdIter2>>(
-            std::forward<ExPolicy>(policy), first, last, dest);
-    }
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::move
-    HPX_INLINE_CONSTEXPR_VARIABLE struct move_t final
+    // CPO for hpx::move
+    inline constexpr struct move_t final
       : hpx::detail::tag_parallel_algorithm<move_t>
     {
     private:
@@ -216,13 +197,13 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(move_t, ExPolicy&& policy, FwdIter1 first,
+        tag_fallback_invoke(move_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest)
         {
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::transfer<
                     hpx::parallel::v1::detail::move<FwdIter1, FwdIter2>>(
-                    std::forward<ExPolicy>(policy), first, last, dest));
+                    HPX_FORWARD(ExPolicy, policy), first, last, dest));
         }
 
         // clang-format off
@@ -231,7 +212,7 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter1>::value &&
                 hpx::traits::is_iterator<FwdIter2>::value)>
         // clang-format on
-        friend FwdIter2 tag_fallback_dispatch(
+        friend FwdIter2 tag_fallback_invoke(
             move_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
             return std::move(first, last, dest);

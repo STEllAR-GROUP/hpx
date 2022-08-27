@@ -38,8 +38,8 @@ namespace hpx { namespace util { namespace detail {
     public:
         pool_timer();
 
-        pool_timer(util::function_nonser<bool()> const& f,
-            util::function_nonser<void()> const& on_term,
+        pool_timer(hpx::function<bool()> const& f,
+            hpx::function<void()> const& on_term,
             std::string const& description, bool pre_shutdown);
 
         ~pool_timer();
@@ -66,9 +66,8 @@ namespace hpx { namespace util { namespace detail {
             asio::basic_waitable_timer<std::chrono::steady_clock>;
 
         mutable mutex_type mtx_;
-        util::function_nonser<bool()> f_;    ///< function to call
-        util::function_nonser<void()>
-            on_term_;                ///< function to call on termination
+        hpx::function<bool()> f_;          ///< function to call
+        hpx::function<void()> on_term_;    ///< function to call on termination
         std::string description_;    ///< description of this interval timer
 
         bool pre_shutdown_;     ///< execute termination during pre-shutdown
@@ -91,9 +90,9 @@ namespace hpx { namespace util { namespace detail {
     {
     }
 
-    pool_timer::pool_timer(util::function_nonser<bool()> const& f,
-        util::function_nonser<void()> const& on_term,
-        std::string const& description, bool pre_shutdown)
+    pool_timer::pool_timer(hpx::function<bool()> const& f,
+        hpx::function<void()> const& on_term, std::string const& description,
+        bool pre_shutdown)
       : f_(f)
       , on_term_(on_term)
       , description_(description)
@@ -148,7 +147,7 @@ namespace hpx { namespace util { namespace detail {
 
             HPX_ASSERT(timer_ != nullptr);
             timer_->expires_from_now(time_duration.value());
-            timer_->async_wait(util::bind_front(
+            timer_->async_wait(hpx::bind_front(
                 &pool_timer::timer_handler, this->shared_from_this()));
 
             return true;
@@ -210,9 +209,9 @@ namespace hpx { namespace util { namespace detail {
 namespace hpx { namespace util {
     pool_timer::pool_timer() {}
 
-    pool_timer::pool_timer(util::function_nonser<bool()> const& f,
-        util::function_nonser<void()> const& on_term,
-        std::string const& description, bool pre_shutdown)
+    pool_timer::pool_timer(hpx::function<bool()> const& f,
+        hpx::function<void()> const& on_term, std::string const& description,
+        bool pre_shutdown)
       : timer_(std::make_shared<detail::pool_timer>(
             f, on_term, description, pre_shutdown))
     {

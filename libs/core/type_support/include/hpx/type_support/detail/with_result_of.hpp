@@ -27,19 +27,19 @@ namespace hpx { namespace util { namespace detail {
         using type = decltype(std::declval<F&&>()());
 
         explicit with_result_of_t(F&& f)
-          : f(std::forward<F>(f))
+          : f(HPX_FORWARD(F, f))
         {
         }
 
         operator type()
         {
-            return std::forward<F>(f)();
+            return HPX_FORWARD(F, f)();
         }
     };
 
     template <typename F>
     inline with_result_of_t<F> with_result_of(F&& f)
     {
-        return with_result_of_t<F>(std::forward<F>(f));
+        return with_result_of_t<F>(HPX_FORWARD(F, f));
     }
 }}}    // namespace hpx::util::detail

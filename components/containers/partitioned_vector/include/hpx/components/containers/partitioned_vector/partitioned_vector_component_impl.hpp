@@ -30,8 +30,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace server
-{
+namespace hpx { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Data>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
@@ -63,24 +62,6 @@ namespace hpx { namespace server
     {
     }
 
-    template <typename T, typename Data>
-    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
-    partitioned_vector<T, Data>::partitioned_vector(
-        partitioned_vector const& rhs)
-      : base_type(rhs)
-      , partitioned_vector_partition_(rhs.partitioned_vector_partition_)
-    {
-    }
-
-    template <typename T, typename Data>
-    HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
-    partitioned_vector<T, Data>::partitioned_vector(partitioned_vector&& rhs)
-      : base_type(std::move(rhs))
-      , partitioned_vector_partition_(
-            std::move(rhs.partitioned_vector_partition_))
-    {
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Data>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
@@ -109,7 +90,7 @@ namespace hpx { namespace server
     template <typename T, typename Data>
     void partitioned_vector<T, Data>::set_data(data_type&& other)
     {
-        partitioned_vector_partition_ = std::move(other);
+        partitioned_vector_partition_ = HPX_MOVE(other);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -289,40 +270,41 @@ namespace hpx { namespace server
     {
         partitioned_vector_partition_.clear();
     }
-}}
+}}    // namespace hpx::server
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_PARTITIONED_VECTOR(...)                                   \
-    HPX_REGISTER_VECTOR_(__VA_ARGS__)    \
+    HPX_REGISTER_VECTOR_(__VA_ARGS__)                                          \
 /**/
 #define HPX_REGISTER_VECTOR_(...)                                              \
     HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_VECTOR_, HPX_PP_NARGS(__VA_ARGS__))( \
-        __VA_ARGS__))    \
-/**/
+        __VA_ARGS__))                                                          \
+    /**/
 
 #define HPX_REGISTER_VECTOR_IMPL(type, name)                                   \
     HPX_REGISTER_ACTION(                                                       \
-        type::get_value_action, HPX_PP_CAT(__vector_get_value_action_, name)); \
+        type::get_value_action, HPX_PP_CAT(__vector_get_value_action_, name))  \
     HPX_REGISTER_ACTION(type::get_values_action,                               \
-        HPX_PP_CAT(__vector_get_values_action_, name));                        \
+        HPX_PP_CAT(__vector_get_values_action_, name))                         \
     HPX_REGISTER_ACTION(                                                       \
-        type::set_value_action, HPX_PP_CAT(__vector_set_value_action_, name)); \
+        type::set_value_action, HPX_PP_CAT(__vector_set_value_action_, name))  \
     HPX_REGISTER_ACTION(type::set_values_action,                               \
-        HPX_PP_CAT(__vector_set_values_action_, name));                        \
+        HPX_PP_CAT(__vector_set_values_action_, name))                         \
     HPX_REGISTER_ACTION(                                                       \
-        type::size_action, HPX_PP_CAT(__vector_size_action_, name));           \
+        type::size_action, HPX_PP_CAT(__vector_size_action_, name))            \
     HPX_REGISTER_ACTION(                                                       \
-        type::resize_action, HPX_PP_CAT(__vector_resize_action_, name));       \
+        type::resize_action, HPX_PP_CAT(__vector_resize_action_, name))        \
     HPX_REGISTER_ACTION(type::get_copied_data_action,                          \
-        HPX_PP_CAT(__vector_get_copied_data_action_, name));                   \
+        HPX_PP_CAT(__vector_get_copied_data_action_, name))                    \
     HPX_REGISTER_ACTION(                                                       \
-        type::set_data_action, HPX_PP_CAT(__vector_set_data_action_, name));   \
+        type::set_data_action, HPX_PP_CAT(__vector_set_data_action_, name))    \
     typedef ::hpx::components::component<type> HPX_PP_CAT(__vector_, name);    \
-    HPX_REGISTER_COMPONENT(HPX_PP_CAT(__vector_, name))    \
-/**/
+    HPX_REGISTER_COMPONENT(HPX_PP_CAT(__vector_, name))                        \
+    /**/
 
 #define HPX_REGISTER_VECTOR_1(type)                                            \
-    HPX_REGISTER_VECTOR_3(type, std::vector<type>, HPX_PP_CAT(std_vector_, type))\
+    HPX_REGISTER_VECTOR_3(                                                     \
+        type, std::vector<type>, HPX_PP_CAT(std_vector_, type))                \
 /**/
 #define HPX_REGISTER_VECTOR_2(type, data)                                      \
     HPX_REGISTER_VECTOR_3(type, data, HPX_PP_CAT(type, data))                  \
@@ -332,10 +314,9 @@ namespace hpx { namespace server
         __partitioned_vector_, HPX_PP_CAT(type, name));                        \
     HPX_REGISTER_VECTOR_IMPL(                                                  \
         HPX_PP_CAT(__partitioned_vector_, HPX_PP_CAT(type, name)), name)       \
-/**/
+    /**/
 
-namespace hpx
-{
+namespace hpx {
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
     partitioned_vector_partition<T, Data>::partitioned_vector_partition(
@@ -357,7 +338,7 @@ namespace hpx
         std::shared_ptr<hpx::server::partitioned_vector<T, Data>>
         partitioned_vector_partition<T, Data>::get_ptr() const
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         return hpx::get_ptr<server::partitioned_vector<T, Data>>(this->get_id())
             .get(ec);
     }
@@ -459,7 +440,7 @@ namespace hpx
     partitioned_vector_partition<T, Data>::set_value(
         launch::sync_policy, std::size_t pos, T&& val)
     {
-        set_value(pos, std::move(val)).get();
+        set_value(pos, HPX_MOVE(val)).get();
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -477,7 +458,7 @@ namespace hpx
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
         return hpx::async<typename server_type::set_value_action>(
-            this->get_id(), pos, std::move(val));
+            this->get_id(), pos, HPX_MOVE(val));
 #else
         HPX_ASSERT(false);
         HPX_UNUSED(pos);
@@ -488,7 +469,8 @@ namespace hpx
 
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<void>
-    partitioned_vector_partition<T, Data>::set_value(std::size_t pos, T const& val)
+    partitioned_vector_partition<T, Data>::set_value(
+        std::size_t pos, T const& val)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
@@ -557,7 +539,7 @@ namespace hpx
     partitioned_vector_partition<T, Data>::set_data(
         launch::sync_policy, typename server_type::data_type&& other) const
     {
-        set_data(std::move(other)).get();
+        set_data(HPX_MOVE(other)).get();
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -568,12 +550,11 @@ namespace hpx
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         HPX_ASSERT(this->get_id());
         return hpx::async<typename server_type::set_data_action>(
-            this->get_id(), std::move(other));
+            this->get_id(), HPX_MOVE(other));
 #else
         HPX_ASSERT(false);
         HPX_UNUSED(other);
         return hpx::make_ready_future();
 #endif
     }
-}
-
+}    // namespace hpx

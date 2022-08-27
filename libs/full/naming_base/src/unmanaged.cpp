@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,11 +8,11 @@
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/naming_base/unmanaged.hpp>
 
-namespace hpx { namespace naming {
+namespace hpx::naming {
 
-    id_type unmanaged(id_type const& id)
+    hpx::id_type unmanaged(hpx::id_type const& id)
     {
-        return id_type(detail::strip_internal_bits_from_gid(id.get_msb()),
-            id.get_lsb(), id_type::unmanaged);
+        return hpx::id_type(detail::strip_internal_bits_from_gid(id.get_msb()),
+            id.get_lsb(), hpx::id_type::management_type::unmanaged);
     }
-}}    // namespace hpx::naming
+}    // namespace hpx::naming

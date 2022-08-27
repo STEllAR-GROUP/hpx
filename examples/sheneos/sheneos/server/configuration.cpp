@@ -12,19 +12,20 @@
 #include "configuration.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     ///////////////////////////////////////////////////////////////////////////
     // Implement the serialization functions.
-    void serialize(input_archive& ar, sheneos::config_data& cfg, unsigned int const)
+    void serialize(
+        input_archive& ar, sheneos::config_data& cfg, unsigned int const)
     {
-        ar & cfg.datafile_name_ & cfg.symbolic_name_& cfg.num_instances_;
+        ar& cfg.datafile_name_& cfg.symbolic_name_& cfg.num_instances_;
     }
 
-    void serialize(output_archive& ar, sheneos::config_data& cfg, unsigned int const)
+    void serialize(
+        output_archive& ar, sheneos::config_data& cfg, unsigned int const)
     {
-        ar & cfg.datafile_name_ & cfg.symbolic_name_& cfg.num_instances_;
+        ar& cfg.datafile_name_& cfg.symbolic_name_& cfg.num_instances_;
     }
-}}
+}}    // namespace hpx::serialization
 
-HPX_DISTRIBUTED_METADATA(sheneos::config_data, sheneos_config_data);
+HPX_DISTRIBUTED_METADATA(sheneos::config_data, sheneos_config_data)

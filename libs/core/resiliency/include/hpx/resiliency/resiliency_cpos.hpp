@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/resiliency/config.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/async_local.hpp>
 
 #include <utility>
@@ -15,17 +15,17 @@
 namespace hpx { namespace resiliency { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
-    // helper base class implementing the deferred tag_dispatch logic for DPOs
+    // helper base class implementing the deferred tag_invoke logic for DPOs
     template <typename Tag, typename BaseTag>
     struct tag_deferred : hpx::functional::tag<Tag>
     {
         // force unwrapping of the inner future on return
         template <typename... Args>
-        friend HPX_FORCEINLINE auto tag_dispatch(Tag, Args&&... args) ->
-            typename hpx::functional::tag_dispatch_result<BaseTag,
+        friend HPX_FORCEINLINE auto tag_invoke(Tag, Args&&... args) ->
+            typename hpx::functional::tag_invoke_result<BaseTag,
                 Args&&...>::type
         {
-            return hpx::dataflow(BaseTag{}, std::forward<Args>(args)...);
+            return hpx::dataflow(BaseTag{}, HPX_FORWARD(Args, args)...);
         }
     };
 
@@ -37,7 +37,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     /// predicate \a pred.
     /// Repeat launching on error exactly \a n times (except if
     /// abort_replay_exception is thrown).
-    HPX_INLINE_CONSTEXPR_VARIABLE struct async_replay_validate_t final
+    inline constexpr struct async_replay_validate_t final
       : hpx::functional::tag<async_replay_validate_t>
     {
     } async_replay_validate{};
@@ -45,7 +45,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     /// Customization point for asynchronously launching given function \a f
     /// repeatedly. Repeat launching on error exactly \a n times (except if
     /// abort_replay_exception is thrown).
-    HPX_INLINE_CONSTEXPR_VARIABLE struct async_replay_t final
+    inline constexpr struct async_replay_t final
       : hpx::functional::tag<async_replay_t>
     {
     } async_replay{};
@@ -57,7 +57,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     ///
     /// Delay the invocation of \a f if any of the arguments to \a f are
     /// futures.
-    HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replay_validate_t final
+    inline constexpr struct dataflow_replay_validate_t final
       : tag_deferred<dataflow_replay_validate_t, async_replay_validate_t>
     {
     } dataflow_replay_validate{};
@@ -68,7 +68,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     ///
     /// Delay the invocation of \a f if any of the arguments to \a f are
     /// futures.
-    HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replay_t final
+    inline constexpr struct dataflow_replay_t final
       : tag_deferred<dataflow_replay_t, async_replay_t>
     {
     } dataflow_replay{};
@@ -81,7 +81,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     /// using the given predicate \a pred.
     /// Run all the valid results against a user provided voting function.
     /// Return the valid output.
-    HPX_INLINE_CONSTEXPR_VARIABLE struct async_replicate_vote_validate_t final
+    inline constexpr struct async_replicate_vote_validate_t final
       : hpx::functional::tag<async_replicate_vote_validate_t>
     {
     } async_replicate_vote_validate{};
@@ -92,7 +92,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     /// using the given predicate \a pred.
     /// Run all the valid results against a user provided voting function.
     /// Return the valid output.
-    HPX_INLINE_CONSTEXPR_VARIABLE struct async_replicate_vote_t final
+    inline constexpr struct async_replicate_vote_t final
       : hpx::functional::tag<async_replicate_vote_t>
     {
     } async_replicate_vote{};
@@ -102,7 +102,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     /// exactly \a n times concurrently. Verify the result of those invocations
     /// using the given predicate \a pred.
     /// Return the first valid result.
-    HPX_INLINE_CONSTEXPR_VARIABLE struct async_replicate_validate_t final
+    inline constexpr struct async_replicate_validate_t final
       : hpx::functional::tag<async_replicate_validate_t>
     {
     } async_replicate_validate{};
@@ -112,7 +112,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     /// exactly \a n times concurrently. Verify the result of those invocations
     /// by checking for exception.
     /// Return the first valid result.
-    HPX_INLINE_CONSTEXPR_VARIABLE struct async_replicate_t final
+    inline constexpr struct async_replicate_t final
       : hpx::functional::tag<async_replicate_t>
     {
     } async_replicate{};
@@ -124,8 +124,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     ///
     /// Delay the invocation of \a f if any of the arguments to \a f are
     /// futures.
-    HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replicate_vote_validate_t
-        final
+    inline constexpr struct dataflow_replicate_vote_validate_t final
       : tag_deferred<dataflow_replicate_vote_validate_t,
             async_replicate_vote_validate_t>
     {
@@ -138,7 +137,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     ///
     /// Delay the invocation of \a f if any of the arguments to \a f are
     /// futures.
-    HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replicate_vote_t final
+    inline constexpr struct dataflow_replicate_vote_t final
       : tag_deferred<dataflow_replicate_vote_t, async_replicate_vote_t>
     {
     } dataflow_replicate_vote{};
@@ -149,7 +148,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     ///
     /// Delay the invocation of \a f if any of the arguments to \a f are
     /// futures.
-    HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replicate_validate_t final
+    inline constexpr struct dataflow_replicate_validate_t final
       : tag_deferred<dataflow_replicate_validate_t, async_replicate_validate_t>
     {
     } dataflow_replicate_validate{};
@@ -159,7 +158,7 @@ namespace hpx { namespace resiliency { namespace experimental {
     ///
     /// Delay the invocation of \a f if any of the arguments to \a f are
     /// futures.
-    HPX_INLINE_CONSTEXPR_VARIABLE struct dataflow_replicate_t final
+    inline constexpr struct dataflow_replicate_t final
       : tag_deferred<dataflow_replicate_t, async_replicate_t>
     {
     } dataflow_replicate{};

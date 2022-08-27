@@ -195,7 +195,7 @@ namespace hpx { namespace util {
         }
         catch (...)
         {
-            return std::forward<U>(default_value);
+            return HPX_FORWARD(U, default_value);
         }
     }
 
@@ -225,7 +225,7 @@ namespace hpx { namespace util {
         }
         catch (...)
         {
-            return std::forward<U>(default_value);
+            return HPX_FORWARD(U, default_value);
         }
     }
 

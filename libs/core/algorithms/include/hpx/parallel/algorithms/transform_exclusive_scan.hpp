@@ -215,9 +215,9 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -228,6 +228,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -258,8 +259,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             T temp = init;
             for (/* */; first != last; (void) ++first, ++dest)
             {
-                init = hpx::util::invoke(
-                    op, init, hpx::util::invoke(conv, *first));
+                init = HPX_INVOKE(op, init, HPX_INVOKE(conv, *first));
                 *dest = temp;
                 temp = init;
             }
@@ -274,8 +274,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             T temp = init;
             for (/* */; count-- != 0; (void) ++first, ++dest)
             {
-                init = hpx::util::invoke(
-                    op, init, hpx::util::invoke(conv, *first));
+                init = HPX_INVOKE(op, init, HPX_INVOKE(conv, *first));
                 *dest = temp;
                 temp = init;
             }
@@ -300,8 +299,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 T&& init, Op&& op)
             {
                 return sequential_transform_exclusive_scan(first, last, dest,
-                    std::forward<Conv>(conv), std::forward<T>(init),
-                    std::forward<Op>(op));
+                    HPX_FORWARD(Conv, conv), HPX_FORWARD(T, init),
+                    HPX_FORWARD(Op, op));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
@@ -322,8 +321,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first == last)
                     return result::get(std::move(result_type{first, dest}));
 
-                difference_type count = detail::distance(first, last);
-                FwdIter1 last_iter = detail::advance_to_sentinel(first, last);
+                FwdIter1 last_iter = first;
+                difference_type count =
+                    detail::advance_and_get_distance(last_iter, last);
 
                 FwdIter2 final_dest = dest;
                 std::advance(final_dest, count);
@@ -337,28 +337,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using hpx::util::make_zip_iterator;
 
                 auto f3 = [op](zip_iterator part_begin, std::size_t part_size,
-                              hpx::shared_future<T> curr,
-                              hpx::shared_future<T> next) -> void {
-                    next.get();    // rethrow exceptions
-
-                    T val = curr.get();
+                              T val) mutable -> void {
                     FwdIter2 dst = get<1>(part_begin.get_iterator_tuple());
                     *dst++ = val;
 
                     util::loop_n<std::decay_t<ExPolicy>>(
                         dst, part_size - 1, [&op, &val](FwdIter2 it) -> void {
-                            *it = hpx::util::invoke(op, val, *it);
+                            *it = HPX_INVOKE(op, val, *it);
                         });
                 };
 
                 return util::scan_partitioner<ExPolicy, result_type, T>::call(
-                    std::forward<ExPolicy>(policy),
+                    HPX_FORWARD(ExPolicy, policy),
                     make_zip_iterator(first, dest), count, init,
                     // step 1 performs first part of scan algorithm
-                    [op, conv](
-                        zip_iterator part_begin, std::size_t part_size) -> T {
-                        T part_init =
-                            hpx::util::invoke(conv, get<0>(*part_begin++));
+                    [op, conv](zip_iterator part_begin,
+                        std::size_t part_size) mutable -> T {
+                        T part_init = HPX_INVOKE(conv, get<0>(*part_begin++));
 
                         auto iters = part_begin.get_iterator_tuple();
                         return sequential_transform_exclusive_scan_n(
@@ -367,17 +362,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     },
                     // step 2 propagates the partition results from left
                     // to right
-                    hpx::unwrapping(op),
+                    op,
                     // step 3 runs final accumulation on each partition
-                    std::move(f3),
+                    HPX_MOVE(f3),
                     // use this return value
-                    [last_iter, final_dest](
-                        std::vector<hpx::shared_future<T>>&& items,
+                    [last_iter, final_dest](std::vector<T>&&,
                         std::vector<hpx::future<void>>&& data) -> result_type {
                         // make sure iterators embedded in function object that is
                         // attached to futures are invalidated
-                        items.clear();
-                        data.clear();
+                        util::detail::clear_container(data);
 
                         return result_type{last_iter, final_dest};
                     });
@@ -423,9 +416,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
         return parallel::util::get_second_element(
             detail::transform_exclusive_scan<result_type>().call(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::forward<Conv>(conv), std::move(init),
-                std::forward<Op>(op)));
+                HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                HPX_FORWARD(Conv, conv), HPX_MOVE(init), HPX_FORWARD(Op, op)));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -435,12 +427,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::transform_exclusive_scan
-    HPX_INLINE_CONSTEXPR_VARIABLE struct transform_exclusive_scan_t final
+    inline constexpr struct transform_exclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<transform_exclusive_scan_t>
     {
         // clang-format off
-        template <typename InIter, typename OutIter, typename T,
+        template <typename InIter, typename OutIter,
             typename BinOp, typename UnOp,
+            typename T = typename std::iterator_traits<InIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
@@ -454,7 +447,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(hpx::transform_exclusive_scan_t,
+        friend OutIter tag_fallback_invoke(hpx::transform_exclusive_scan_t,
             InIter first, InIter last, OutIter dest, T init, BinOp&& binary_op,
             UnOp&& unary_op)
         {
@@ -469,13 +462,14 @@ namespace hpx {
                 hpx::parallel::v1::detail::transform_exclusive_scan<
                     result_type>()
                     .call(hpx::execution::seq, first, last, dest,
-                        std::forward<UnOp>(unary_op), std::move(init),
-                        std::forward<BinOp>(binary_op)));
+                        HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
+                        HPX_FORWARD(BinOp, binary_op)));
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename T, typename BinOp, typename UnOp,
+            typename BinOp, typename UnOp,
+            typename T = typename std::iterator_traits<FwdIter1>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
@@ -492,9 +486,9 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::transform_exclusive_scan_t,
-            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
-            T init, BinOp&& binary_op, UnOp&& unary_op)
+        tag_fallback_invoke(hpx::transform_exclusive_scan_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init,
+            BinOp&& binary_op, UnOp&& unary_op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -507,9 +501,9 @@ namespace hpx {
             return parallel::util::get_second_element(
                 hpx::parallel::v1::detail::transform_exclusive_scan<
                     result_type>()
-                    .call(std::forward<ExPolicy>(policy), first, last, dest,
-                        std::forward<UnOp>(unary_op), std::move(init),
-                        std::forward<BinOp>(binary_op)));
+                    .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                        HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
+                        HPX_FORWARD(BinOp, binary_op)));
         }
     } transform_exclusive_scan{};
 }    // namespace hpx

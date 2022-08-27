@@ -21,24 +21,24 @@
 
 std::vector<std::string> words;
 
-std::string search(int start, int end, std::string const &word);
+std::string search(int start, int end, std::string const& word);
 
-HPX_PLAIN_ACTION(search, search_action);
+HPX_PLAIN_ACTION(search, search_action)
 
-std::string search(int start, int end, std::string const &word)
+std::string search(int start, int end, std::string const& word)
 {
     //highest value is 'z' at 122
     //lowest value is 'a' at 97
     //start is where our word check is located.
     //end is where the end if this thread's search is.
-    int mid = (start+end);
-    std::string check = words[mid/2];
+    int mid = (start + end);
+    std::string check = words[mid / 2];
     //first we check if there is no definitive match
     if (start == end && word != check)
     {
         //just a quick check, because the list is not perfectly symmetrical
         {
-            int pos = mid/2;
+            int pos = mid / 2;
 
             int size;
             //if our value is lower than start, we disregard it.
@@ -54,14 +54,14 @@ std::string search(int start, int end, std::string const &word)
                 char word_char = word[i];
                 if (word_char != check_char)
                 {
-                    if (word_char >=check_char)
+                    if (word_char >= check_char)
                         sub = false;
                     break;
                 }
                 else
                     part.push_back(word_char);
             }
-            while(check != word)
+            while (check != word)
             {
                 check = words[pos];
                 if (sub)
@@ -69,7 +69,8 @@ std::string search(int start, int end, std::string const &word)
                 else
                     pos++;
                 if (check.find(part) == std::string::npos)
-                    return word + " was not found in this dictionary, " + check + " was the closest match.\n";
+                    return word + " was not found in this dictionary, " +
+                        check + " was the closest match.\n";
             }
             return "";
         }
@@ -87,15 +88,15 @@ std::string search(int start, int end, std::string const &word)
         if (check_char != word_char)
         {
             if (word_char > check_char)
-                return search((mid+1)/2, end, word);
+                return search((mid + 1) / 2, end, word);
             else
-                return search(start, (mid-1)/2, word);
+                return search(start, (mid - 1) / 2, word);
         }
     }
     if (check.length() == word.length())
         return "";
     else
-        return search((start+end+1)/2, end, word);
+        return search((start + end + 1) / 2, end, word);
 }
 int hpx_main()
 {
@@ -120,10 +121,11 @@ int hpx_main()
         cout << "Loading file: example_text.txt\n";
         hpx::chrono::high_resolution_timer t;
 
-        int fileLines = 0;;
+        int fileLines = 0;
+        ;
         std::string example_path = wordlist_path + "example_text.txt";
         fin.open(example_path);
-        if(fin.is_open())
+        if (fin.is_open())
         {
             string temp;
             while (fin.good())
@@ -145,7 +147,8 @@ int hpx_main()
         vector<string> strs;
         {
             vector<string> temp;
-            hpx::string_util::split(temp, word, hpx::string_util::is_any_of("\n\t -"));
+            hpx::string_util::split(
+                temp, word, hpx::string_util::is_any_of("\n\t -"));
             for (string::size_type i = 0; i < temp.size(); i++)
             {
                 bool isContraction = false;
@@ -155,8 +158,9 @@ int hpx_main()
                     //a size check to avoid errors
                     if (temp[i].size() - j - 1 == 2)
                     {
-                    //if this is a contraction, ignore the rest of it...
-                        if (temp[i][j+1] == '\'' && temp[i][j] == 'n' && temp[i][j+2] == 't')
+                        //if this is a contraction, ignore the rest of it...
+                        if (temp[i][j + 1] == '\'' && temp[i][j] == 'n' &&
+                            temp[i][j + 2] == 't')
                         {
                             //but label this as a contraction
                             isContraction = true;
@@ -164,8 +168,10 @@ int hpx_main()
                         }
                     }
                     //remove any garbage characters
-                    if (toupper(temp[i][j]) >= 'A' && toupper(temp[i][j]) <= 'Z')
-                        holder.push_back(static_cast<char>(tolower(temp[i][j])));
+                    if (toupper(temp[i][j]) >= 'A' &&
+                        toupper(temp[i][j]) <= 'Z')
+                        holder.push_back(
+                            static_cast<char>(tolower(temp[i][j])));
                 }
                 if (holder.size() > 0)
                 {
@@ -180,14 +186,14 @@ int hpx_main()
         int wordcount = 0;
         cout << "Reading dictionary file to memory...\n";
         t.restart();
-        if(fin.is_open())
+        if (fin.is_open())
         {
             string temp;
             while (fin.good())
             {
                 getline(fin, temp);
                 for (string::size_type i = 0; i < temp.length(); i++)
-                temp[i] = static_cast<char>(tolower(temp[i]));
+                    temp[i] = static_cast<char>(tolower(temp[i]));
                 words.push_back(temp);
                 wordcount++;
             }
@@ -201,23 +207,24 @@ int hpx_main()
         fin.close();
         t.restart();
         {
-            using hpx::lcos::future;
             using hpx::async;
+            using hpx::future;
             using hpx::wait_all;
-            vector<search_action> sAct;//[sizeX * sizeY];
-            vector<future<string> > wordRun;
+            vector<search_action> sAct;    //[sizeX * sizeY];
+            vector<future<string>> wordRun;
             wordRun.reserve(strs.size());
             for (string::size_type i = 0; i < strs.size(); ++i)
             {
                 string& single = strs[i];
                 int start = 0;
-                hpx::naming::id_type const locality_id = hpx::find_here();
+                hpx::id_type const locality_id = hpx::find_here();
                 search_action temp;
-                wordRun.push_back(async(temp, locality_id, start, wordcount, single));
+                wordRun.push_back(
+                    async(temp, locality_id, start, wordcount, single));
                 sAct.push_back(temp);
                 //cout << search(0, wordcount, single) << endl;
             }
-            wait_all(wordRun);
+            hpx::wait_all(wordRun);
             cout << "Search completed in " << t.elapsed() << "s.\n";
             for (string::size_type i = 0; i < strs.size(); i++)
             {
@@ -226,13 +233,15 @@ int hpx_main()
                 {
                     cout << "Word number " << i + 1 << ":\n";
                     if (contraction[i])
-                        cout << "Note: This word seems to be a contraction.\nThe last two letters have been ignored.\n";
+                        cout << "Note: This word seems to be a "
+                                "contraction.\nThe last two letters have been "
+                                "ignored.\n";
                     cout << get;
                 }
             }
         }
     }
-    return hpx::finalize(); // Handles HPX shutdown
+    return hpx::finalize();    // Handles HPX shutdown
 }
 int main()
 {

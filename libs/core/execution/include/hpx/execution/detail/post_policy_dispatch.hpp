@@ -9,8 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
+#include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
 #include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
@@ -20,12 +21,38 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace execution { namespace detail {
+namespace hpx::detail {
 
     ////////////////////////////////////////////////////////////////////////////
     // forward declaration
     template <typename Policy>
     struct post_policy_dispatch;
+
+    template <>
+    struct post_policy_dispatch<launch::async_policy>
+    {
+        template <typename F, typename... Ts>
+        static void call(launch::async_policy const& policy,
+            hpx::util::thread_description const& desc,
+            threads::thread_pool_base* pool, F&& f, Ts&&... ts)
+        {
+            threads::thread_init_data data(
+                threads::make_thread_function_nullary(hpx::util::deferred_call(
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)),
+                desc, policy.priority(), policy.hint(), policy.stacksize(),
+                threads::thread_schedule_state::pending);
+
+            threads::register_work(data, pool);
+        }
+
+        template <typename F, typename... Ts>
+        static void call(launch::async_policy const& policy,
+            hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
+        {
+            call(policy, desc, threads::detail::get_self_or_default_pool(),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        }
+    };
 
     template <>
     struct post_policy_dispatch<launch::fork_policy>
@@ -37,7 +64,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         {
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(hpx::util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...)),
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)),
                 desc, policy.priority(),
                 threads::thread_schedule_hint(
                     static_cast<std::int16_t>(get_worker_thread_num())),
@@ -65,7 +92,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
         {
             call(policy, desc, threads::detail::get_self_or_default_pool(),
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -73,19 +100,43 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     struct post_policy_dispatch<launch::sync_policy>
     {
         template <typename F, typename... Ts>
-        static void call(launch::sync_policy const&,
-            hpx::util::thread_description const& /* desc */,
-            threads::thread_pool_base* /* pool */, F&& f, Ts&&... ts)
+        static void call(launch::sync_policy const& policy,
+            hpx::util::thread_description const&, threads::thread_pool_base*,
+            F&& f, Ts&&... ts)
         {
-            hpx::detail::call_sync(std::forward<F>(f), std::forward<Ts>(ts)...);
+            hpx::detail::sync_launch_policy_dispatch<launch::sync_policy>::call(
+                policy, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
-        static void call(launch::sync_policy const& /* policy */,
-            hpx::util::thread_description const& /* desc */, F&& f,
-            Ts&&... ts) noexcept
+        static void call(launch::sync_policy const& policy,
+            hpx::util::thread_description const&, F&& f, Ts&&... ts)
         {
-            hpx::detail::call_sync(std::forward<F>(f), std::forward<Ts>(ts)...);
+            hpx::detail::sync_launch_policy_dispatch<launch::sync_policy>::call(
+                policy, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        }
+    };
+
+    template <>
+    struct post_policy_dispatch<launch::deferred_policy>
+    {
+        template <typename F, typename... Ts>
+        static void call(launch::deferred_policy const& policy,
+            hpx::util::thread_description const&, threads::thread_pool_base*,
+            F&& f, Ts&&... ts)
+        {
+            hpx::detail::sync_launch_policy_dispatch<
+                launch::deferred_policy>::call(policy, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename F, typename... Ts>
+        static void call(launch::deferred_policy const& policy,
+            hpx::util::thread_description const&, F&& f, Ts&&... ts)
+        {
+            hpx::detail::sync_launch_policy_dispatch<
+                launch::deferred_policy>::call(policy, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -99,9 +150,21 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         {
             if (policy == launch::sync)
             {
-                hpx::detail::call_sync(
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
-                return;
+                auto sync_policy = launch::sync_policy(
+                    policy.priority(), policy.stacksize(), policy.hint());
+
+                post_policy_dispatch<launch::sync_policy>::call(sync_policy,
+                    desc, pool, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
+            else if (policy == launch::deferred)
+            {
+                // execute synchronously
+                auto deferred_policy = launch::deferred_policy(
+                    policy.priority(), policy.stacksize(), policy.hint());
+
+                post_policy_dispatch<launch::deferred_policy>::call(
+                    deferred_policy, desc, pool, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Ts, ts)...);
             }
             else if (policy == launch::fork)
             {
@@ -109,46 +172,24 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                     policy.priority(), policy.stacksize(), policy.hint());
 
                 post_policy_dispatch<launch::fork_policy>::call(fork_policy,
-                    desc, pool, std::forward<F>(f), std::forward<Ts>(ts)...);
-                return;
+                    desc, pool, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
+            else
+            {
+                auto async_policy = launch::async_policy(
+                    policy.priority(), policy.stacksize(), policy.hint());
 
-            threads::thread_init_data data(
-                threads::make_thread_function_nullary(hpx::util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...)),
-                desc, policy.priority(), policy.hint(), policy.stacksize(),
-                threads::thread_schedule_state::pending);
-
-            threads::register_work(data, pool);
+                post_policy_dispatch<launch::async_policy>::call(async_policy,
+                    desc, pool, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
         }
 
         template <typename F, typename... Ts>
         static void call(Policy const& policy,
             hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
         {
-            if (policy == launch::sync)
-            {
-                hpx::detail::call_sync(
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
-                return;
-            }
-            else if (policy == launch::fork)
-            {
-                auto fork_policy = launch::fork_policy(
-                    policy.priority(), policy.stacksize(), policy.hint());
-
-                post_policy_dispatch<launch::fork_policy>::call(fork_policy,
-                    desc, std::forward<F>(f), std::forward<Ts>(ts)...);
-                return;
-            }
-
-            threads::thread_init_data data(
-                threads::make_thread_function_nullary(hpx::util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(ts)...)),
-                desc, policy.priority(), policy.hint(), policy.stacksize(),
-                threads::thread_schedule_state::pending);
-
-            threads::register_work(data);
+            call(policy, desc, threads::detail::get_self_or_default_pool(),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     };
-}}}}    // namespace hpx::parallel::execution::detail
+}    // namespace hpx::detail

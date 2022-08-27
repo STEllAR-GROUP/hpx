@@ -47,7 +47,7 @@ namespace hpx { namespace util {
 
     void* one_size_heap_list::alloc(std::size_t count)
     {
-        unique_lock_type guard(mtx_);
+        std::unique_lock guard(mtx_);
 
         if (HPX_UNLIKELY(0 == count))
         {
@@ -65,7 +65,7 @@ namespace hpx { namespace util {
                     bool allocated = false;
 
                     {
-                        util::unlock_guard<unique_lock_type> ul(guard);
+                        util::unlock_guard ul(guard);
                         allocated = heap->alloc(&p, count);
                     }
 
@@ -108,7 +108,7 @@ namespace hpx { namespace util {
             bool result = false;
 
             {
-                util::unlock_guard<unique_lock_type> ul(guard);
+                util::unlock_guard ul(guard);
                 result = heap->alloc((void**) &p, count);
             }
 
@@ -147,8 +147,8 @@ namespace hpx { namespace util {
         if (nullptr == threads::get_self_ptr())
         {
             hpx::threads::thread_init_data data(
-                hpx::threads::make_thread_function_nullary(util::bind_front(
-                    &one_size_heap_list::free, this, p, count)),
+                hpx::threads::make_thread_function_nullary(
+                    hpx::bind_front(&one_size_heap_list::free, this, p, count)),
                 "one_size_heap_list::free");
             hpx::threads::register_work(data);
             return true;
@@ -158,9 +158,7 @@ namespace hpx { namespace util {
 
     void one_size_heap_list::free(void* p, std::size_t count)
     {
-        unique_lock_type ul(mtx_);
-
-        if (nullptr == p || !threads::threadmanager_is(state_running))
+        if (nullptr == p || !threads::threadmanager_is(hpx::state::running))
         {
             return;
         }
@@ -170,16 +168,20 @@ namespace hpx { namespace util {
         if (reschedule(p, count))
             return;
 
+        std::unique_lock ul(mtx_);
+
         // Find the heap which allocated this pointer.
         for (auto& heap : heap_list_)
         {
             bool did_allocate = false;
 
             {
-                util::unlock_guard<unique_lock_type> ull(ul);
+                util::unlock_guard ull(ul);
                 did_allocate = heap->did_alloc(p);
                 if (did_allocate)
+                {
                     heap->free(p, count);
+                }
             }
 
             if (did_allocate)
@@ -199,18 +201,14 @@ namespace hpx { namespace util {
 
     bool one_size_heap_list::did_alloc(void* p) const
     {
-        unique_lock_type ul(mtx_);
+        std::unique_lock ul(mtx_);
         for (typename list_type::value_type const& heap : heap_list_)
         {
-            bool did_allocate = false;
-
+            util::unlock_guard ull(ul);
+            if (heap->did_alloc(p))
             {
-                util::unlock_guard<unique_lock_type> ull(ul);
-                did_allocate = heap->did_alloc(p);
-            }
-
-            if (did_allocate)
                 return true;
+            }
         }
         return false;
     }
@@ -218,7 +216,9 @@ namespace hpx { namespace util {
     std::string one_size_heap_list::name() const
     {
         if (class_name_.empty())
+        {
             return std::string("one_size_heap_list(unknown)");
+        }
         return std::string("one_size_heap_list(") + class_name_ + ")";
     }
 }}    // namespace hpx::util

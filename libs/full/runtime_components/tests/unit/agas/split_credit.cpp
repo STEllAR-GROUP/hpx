@@ -28,9 +28,9 @@ using hpx::finalize;
 using hpx::find_here;
 using hpx::init;
 
+using hpx::id_type;
 using hpx::naming::get_locality_id_from_id;
 using hpx::naming::get_management_type_name;
-using hpx::naming::id_type;
 using hpx::naming::detail::get_credit_from_gid;
 using hpx::naming::detail::split_credits_for_gid;
 
@@ -48,7 +48,6 @@ using hpx::util::report_errors;
 
 using hpx::cout;
 using hpx::find_here;
-using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 // helper functions
@@ -60,7 +59,7 @@ inline std::int64_t get_credit(id_type const& id)
 inline id_type split_credits(id_type const& id)
 {
     return id_type(split_credits_for_gid(const_cast<id_type&>(id).get_gid()),
-        id_type::managed);
+        id_type::management_type::managed);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,7 +117,7 @@ void hpx_test_main(variables_map&, hpx::id_type const& locality)
              << "  " << g3 << " : " << get_credit(g3) << "\n"
              << "  " << g4 << " : " << get_credit(g4) << "\n"
              << "  " << g5 << " : " << get_credit(g5) << "\n"
-             << flush;
+             << std::flush;
     }
 }
 
@@ -130,14 +129,14 @@ int hpx_main(variables_map& vm)
         cout << std::string(80, '#') << "\n"
              << "simple component test: " << l << "\n"
              << std::string(80, '#') << "\n"
-             << flush;
+             << std::flush;
 
         hpx_test_main<simple_object>(vm, l);
 
         cout << std::string(80, '#') << "\n"
              << "managed component test: " << l << "\n"
              << std::string(80, '#') << "\n"
-             << flush;
+             << std::flush;
 
         hpx_test_main<managed_object>(vm, l);
     }

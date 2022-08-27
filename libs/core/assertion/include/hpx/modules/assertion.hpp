@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +13,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assertion/current_function.hpp>
 #include <hpx/assertion/evaluate_assert.hpp>
 #include <hpx/assertion/source_location.hpp>
 #include <hpx/preprocessor/stringize.hpp>
@@ -20,14 +20,15 @@
 #if defined(HPX_COMPUTE_DEVICE_CODE)
 #include <assert.h>
 #endif
+#include <cstdint>
 #include <exception>
 #include <string>
 #include <type_traits>
 
 namespace hpx { namespace assertion {
     /// The signature for an assertion handler
-    using assertion_handler = void (*)(
-        source_location const& loc, const char* expr, std::string const& msg);
+    using assertion_handler = void (*)(hpx::source_location const& loc,
+        const char* expr, std::string const& msg);
 
     /// Set the assertion handler to be used within a program. If the handler has been
     /// set already once, the call to this function will be ignored.
@@ -60,10 +61,8 @@ namespace hpx { namespace assertion {
 #define HPX_ASSERT_(expr, msg)                                                 \
     (!!(expr) ? void() :                                                       \
                 ::hpx::assertion::detail::handle_assert(                       \
-                    ::hpx::assertion::source_location{__FILE__,                \
-                        static_cast<unsigned>(__LINE__),                       \
-                        HPX_ASSERT_CURRENT_FUNCTION},                          \
-                    HPX_PP_STRINGIZE(expr), msg)) /**/
+                    HPX_CURRENT_SOURCE_LOCATION(), HPX_PP_STRINGIZE(expr),     \
+                    msg)) /**/
 
 #if defined(HPX_DEBUG)
 #if defined(HPX_COMPUTE_DEVICE_CODE)
@@ -73,11 +72,9 @@ namespace hpx { namespace assertion {
 #define HPX_ASSERT(expr) HPX_ASSERT_(expr, std::string())
 #define HPX_ASSERT_MSG(expr, msg) HPX_ASSERT_(expr, msg)
 #endif
-#define HPX_NOEXCEPT_WITH_ASSERT
 #else
 #define HPX_ASSERT(expr)
 #define HPX_ASSERT_MSG(expr, msg)
-#define HPX_NOEXCEPT_WITH_ASSERT noexcept
 #endif
 
 #define HPX_UNREACHABLE                                                        \

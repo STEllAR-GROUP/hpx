@@ -90,7 +90,7 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         HPX_FORCEINLINE static R _invoke(void* f, Ts&&... vs)
         {
-            return HPX_INVOKE_R(R, vtable::get<T>(f), std::forward<Ts>(vs)...);
+            return HPX_INVOKE_R(R, vtable::get<T>(f), HPX_FORWARD(Ts, vs)...);
         }
         R (*invoke)(void*, Ts&&...);
 

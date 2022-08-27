@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -20,18 +20,16 @@ namespace hpx {
         }    // namespace detail
 
         using component_type = std::int32_t;
-        using address_type = std::uint64_t;
+        using address_type = void*;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE std::uint32_t invalid_locality_id =
+        inline constexpr std::uint32_t invalid_locality_id =
             ~static_cast<std::uint32_t>(0);
 
-        HPX_INLINE_CONSTEXPR_VARIABLE std::int32_t component_invalid = -1;
+        inline constexpr std::int32_t component_invalid = -1;
 
         struct HPX_EXPORT address;
         struct HPX_EXPORT gid_type;
-        struct HPX_EXPORT id_type;
     }    // namespace naming
 
-    // Pulling important types into the main namespace
-    using naming::id_type;
+    struct HPX_EXPORT id_type;
 }    // namespace hpx

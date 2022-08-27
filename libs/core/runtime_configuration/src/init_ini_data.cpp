@@ -495,7 +495,7 @@ namespace hpx { namespace util {
         // make sure each node loads libraries in a different order
         std::random_device random_device;
         std::mt19937 generator(random_device());
-        std::shuffle(libdata.begin(), libdata.end(), std::move(generator));
+        std::shuffle(libdata.begin(), libdata.end(), HPX_MOVE(generator));
 
         typedef std::pair<fs::path, std::string> libdata_type;
         for (libdata_type const& p : libdata)
@@ -503,7 +503,7 @@ namespace hpx { namespace util {
             LRT_(info).format("attempting to load: {}", p.first.string());
 
             // get the handle of the library
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             hpx::util::plugin::dll d(p.first.string(), p.second);
             d.load_library(ec);
             if (ec)
@@ -524,7 +524,7 @@ namespace hpx { namespace util {
                 LRT_(info).format(
                     "skipping (load_component_factory failed): {}: {}",
                     p.first.string(), get_error_what(ec));
-                ec = error_code(lightweight);    // reinit ec
+                ec = error_code(throwmode::lightweight);    // reinit ec
             }
             else
             {
@@ -556,7 +556,7 @@ namespace hpx { namespace util {
             // store loaded library for future use
             if (must_keep_loaded)
             {
-                modules.insert(std::make_pair(p.second, std::move(d)));
+                modules.insert(std::make_pair(p.second, HPX_MOVE(d)));
             }
         }
         return plugin_registries;

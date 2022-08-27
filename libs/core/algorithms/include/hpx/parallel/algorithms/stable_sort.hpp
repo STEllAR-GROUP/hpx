@@ -238,6 +238,7 @@ namespace hpx {
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
@@ -245,8 +246,8 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/spin_sort.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -280,15 +281,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static RandomIt sequential(ExPolicy, RandomIt first, Sentinel last,
                 Compare&& comp, Proj&& proj)
             {
-                using compare_type =
-                    util::compare_projected<typename std::decay<Compare>::type,
-                        typename std::decay<Proj>::type>;
+                using compare_type = util::compare_projected<Compare&, Proj&>;
 
                 auto last_iter = detail::advance_to_sentinel(first, last);
 
-                spin_sort(first, last_iter,
-                    compare_type(
-                        std::forward<Compare>(comp), std::forward<Proj>(proj)));
+                spin_sort(first, last_iter, compare_type(comp, proj));
                 return last_iter;
             }
 
@@ -301,13 +298,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 using algorithm_result =
                     util::detail::algorithm_result<ExPolicy, RandomIt>;
-                using compare_type =
-                    util::compare_projected<typename std::decay<Compare>::type,
-                        typename std::decay<Proj>::type>;
+                using compare_type = util::compare_projected<Compare&, Proj&>;
 
                 // number of elements to sort
-                std::size_t count = detail::distance(first, last);
-                auto last_iter = detail::advance_to_sentinel(first, last);
+                auto last_iter = first;
+                std::size_t count =
+                    detail::advance_and_get_distance(last_iter, last);
 
                 // figure out the chunk size to use
                 std::size_t cores = execution::processing_units_count(
@@ -330,12 +326,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     // call the sort routine and return the right type,
                     // depending on execution policy
-                    compare_type comp(std::forward<Compare>(compare),
-                        std::forward<Proj>(proj));
+                    compare_type comp(compare, proj);
 
                     return algorithm_result::get(
                         parallel_stable_sort(policy.executor(), first,
-                            last_iter, cores, chunk_size, std::move(comp)));
+                            last_iter, cores, chunk_size, HPX_MOVE(comp)));
                 }
                 catch (...)
                 {
@@ -378,8 +373,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::stable_sort<RandomIt>().call(
-            std::forward<ExPolicy>(policy), first, last,
-            std::forward<Compare>(comp), std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), first, last,
+            HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -389,7 +384,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::stable_sort
-    HPX_INLINE_CONSTEXPR_VARIABLE struct stable_sort_t final
+    inline constexpr struct stable_sort_t final
       : hpx::detail::tag_parallel_algorithm<stable_sort_t>
     {
         // clang-format off
@@ -406,15 +401,15 @@ namespace hpx {
                 >::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(hpx::stable_sort_t, RandomIt first,
+        friend void tag_fallback_invoke(hpx::stable_sort_t, RandomIt first,
             RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
             hpx::parallel::v1::detail::stable_sort<RandomIt>().call(
-                hpx::execution::seq, first, last, std::forward<Comp>(comp),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -432,7 +427,7 @@ namespace hpx {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(hpx::stable_sort_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::stable_sort_t, ExPolicy&& policy,
             RandomIt first, RandomIt last, Comp&& comp = Comp(),
             Proj&& proj = Proj())
         {
@@ -445,8 +440,8 @@ namespace hpx {
 
             return hpx::util::void_guard<result_type>(),
                    hpx::parallel::v1::detail::stable_sort<RandomIt>().call(
-                       std::forward<ExPolicy>(policy), first, last,
-                       std::forward<Comp>(comp), std::forward<Proj>(proj));
+                       HPX_FORWARD(ExPolicy, policy), first, last,
+                       HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
     } stable_sort{};
 }    // namespace hpx

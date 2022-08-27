@@ -59,12 +59,11 @@ namespace hpx { namespace threads { namespace coroutines {
         using result_type = impl_type::result_type;
         using arg_type = impl_type::arg_type;
 
-        using functor_type =
-            util::unique_function_nonser<result_type(arg_type)>;
+        using functor_type = hpx::move_only_function<result_type(arg_type)>;
 
         coroutine(functor_type&& f, thread_id_type id,
             std::ptrdiff_t stack_size = detail::default_stack_size)
-          : impl_(std::move(f), id, stack_size)
+          : impl_(HPX_MOVE(f), id, stack_size)
         {
             HPX_ASSERT(impl_.is_ready());
         }
@@ -135,7 +134,7 @@ namespace hpx { namespace threads { namespace coroutines {
 
         void rebind(functor_type&& f, thread_id_type id)
         {
-            impl_.rebind(std::move(f), id);
+            impl_.rebind(HPX_MOVE(f), id);
         }
 
         HPX_FORCEINLINE result_type operator()(arg_type arg = arg_type())

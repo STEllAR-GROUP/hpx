@@ -8,10 +8,10 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/serialization/serialize_buffer.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/serialization/serialize_buffer.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
@@ -30,16 +30,20 @@ template <typename T>
 class test_allocator : public std::allocator<T>
 {
 public:
-    typedef T        value_type;
-    typedef T*       pointer;
+    typedef T value_type;
+    typedef T* pointer;
     typedef const T* const_pointer;
-    typedef T&       reference;
+    typedef T& reference;
     typedef const T& const_reference;
-    typedef std::size_t    size_type;
+    typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
     // we want to make sure anything else uses the std allocator
-    template <typename U> struct rebind { typedef std::allocator<U> other; };
+    template <typename U>
+    struct rebind
+    {
+        typedef std::allocator<U> other;
+    };
 
     pointer allocate(size_type n, const void* = nullptr)
     {
@@ -47,45 +51,53 @@ public:
         return std::allocator<T>::allocate(n);
     }
 
-    void deallocate(pointer p, size_type n)
+    void deallocate(pointer p, size_type n) noexcept
     {
         HPX_TEST_EQ(n, static_cast<size_type>(MEMORY_BLOCK_SIZE));
         return std::allocator<T>::deallocate(p, n);
     }
 
-    test_allocator() noexcept: std::allocator<T>() {}
-    test_allocator(const test_allocator &a) noexcept: std::allocator<T>(a) {}
+    test_allocator() noexcept
+      : std::allocator<T>()
+    {
+    }
+    test_allocator(const test_allocator& a) noexcept
+      : std::allocator<T>(a)
+    {
+    }
     ~test_allocator() noexcept {}
 };
 
 //----------------------------------------------------------------------------
-typedef hpx::serialization::serialize_buffer<char, test_allocator<char> >
+typedef hpx::serialization::serialize_buffer<char, test_allocator<char>>
     buffer_allocator_type;
 
-buffer_allocator_type allocator_message(buffer_allocator_type const& receive_buffer)
+buffer_allocator_type allocator_message(
+    buffer_allocator_type const& receive_buffer)
 {
-    HPX_TEST_EQ(receive_buffer.size(), static_cast<std::size_t>(MEMORY_BLOCK_SIZE));
+    HPX_TEST_EQ(
+        receive_buffer.size(), static_cast<std::size_t>(MEMORY_BLOCK_SIZE));
     return receive_buffer;
 }
-HPX_PLAIN_ACTION(allocator_message);
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(buffer_allocator_type,
-    serialization_buffer_char_allocator);
-HPX_REGISTER_BASE_LCO_WITH_VALUE(buffer_allocator_type,
-    serialization_buffer_char_allocator);
+HPX_PLAIN_ACTION(allocator_message)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
+    buffer_allocator_type, serialization_buffer_char_allocator)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(
+    buffer_allocator_type, serialization_buffer_char_allocator)
 
 //----------------------------------------------------------------------------
-void receive(hpx::naming::id_type dest, char* send_buffer,
-        std::size_t size, std::size_t window_size)
+void receive(hpx::id_type dest, char* send_buffer, std::size_t size,
+    std::size_t window_size)
 {
-    std::vector<hpx::future<buffer_allocator_type> > recv_buffers;
+    std::vector<hpx::future<buffer_allocator_type>> recv_buffers;
     recv_buffers.reserve(window_size);
 
     allocator_message_action msg;
-    for(std::size_t j = 0; j != window_size; ++j)
+    for (std::size_t j = 0; j != window_size; ++j)
     {
         recv_buffers.push_back(hpx::async(msg, dest,
-            buffer_allocator_type(send_buffer, size,
-                buffer_allocator_type::reference)));
+            buffer_allocator_type(
+                send_buffer, size, buffer_allocator_type::reference)));
     }
     hpx::wait_all(recv_buffers);
 }

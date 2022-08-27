@@ -114,7 +114,7 @@ private:
         buffer_type data_;
     };
 
-    static void deallocate(double* p)
+    static void deallocate(double* p) noexcept
     {
         alloc_.deallocate(p);
     }
@@ -286,7 +286,7 @@ struct partition_server : hpx::components::component_base<partition_server>
     // 'get_data_action' which represents the (possibly remote) member function
     // partition::get_data().
     HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-        partition_server, get_data, get_data_action);
+        partition_server, get_data, get_data_action)
 
 private:
     partition_data data_;
@@ -298,12 +298,12 @@ private:
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
 typedef hpx::components::component<partition_server> partition_server_type;
-HPX_REGISTER_COMPONENT(partition_server_type, partition_server);
+HPX_REGISTER_COMPONENT(partition_server_type, partition_server)
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.
 typedef partition_server::get_data_action get_data_action;
-HPX_REGISTER_ACTION(get_data_action);
+HPX_REGISTER_ACTION(get_data_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // This is a client side helper class allowing to hide some of the tedious
@@ -374,7 +374,7 @@ struct stepper_server : hpx::components::component_base<stepper_server>
     space do_work(
         std::size_t local_np, std::size_t nx, std::size_t nt, std::uint64_t nd);
 
-    HPX_DEFINE_COMPONENT_ACTION(stepper_server, do_work, do_work_action);
+    HPX_DEFINE_COMPONENT_ACTION(stepper_server, do_work, do_work_action)
 
     // receive the left-most partition from the right
     void from_right(std::size_t t, partition p)
@@ -388,8 +388,8 @@ struct stepper_server : hpx::components::component_base<stepper_server>
         left_receive_buffer_.store_received(t, std::move(p));
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(stepper_server, from_right, from_right_action);
-    HPX_DEFINE_COMPONENT_ACTION(stepper_server, from_left, from_left_action);
+    HPX_DEFINE_COMPONENT_ACTION(stepper_server, from_right, from_right_action)
+    HPX_DEFINE_COMPONENT_ACTION(stepper_server, from_left, from_left_action)
 
     // release dependencies
     void release_dependencies()
@@ -399,7 +399,7 @@ struct stepper_server : hpx::components::component_base<stepper_server>
     }
 
     HPX_DEFINE_COMPONENT_ACTION(
-        stepper_server, release_dependencies, release_dependencies_action);
+        stepper_server, release_dependencies, release_dependencies_action)
 
 protected:
     // Our operator
@@ -442,21 +442,21 @@ private:
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
 typedef hpx::components::component<stepper_server> stepper_server_type;
-HPX_REGISTER_COMPONENT(stepper_server_type, stepper_server);
+HPX_REGISTER_COMPONENT(stepper_server_type, stepper_server)
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.
 typedef stepper_server::from_right_action from_right_action;
-HPX_REGISTER_ACTION(from_right_action);
+HPX_REGISTER_ACTION(from_right_action)
 
 typedef stepper_server::from_left_action from_left_action;
-HPX_REGISTER_ACTION(from_left_action);
+HPX_REGISTER_ACTION(from_left_action)
 
 typedef stepper_server::do_work_action do_work_action;
-HPX_REGISTER_ACTION(do_work_action);
+HPX_REGISTER_ACTION(do_work_action)
 
 typedef stepper_server::release_dependencies_action release_dependencies_action;
-HPX_REGISTER_ACTION(release_dependencies_action);
+HPX_REGISTER_ACTION(release_dependencies_action)
 
 void stepper_server::send_left(std::size_t t, partition p) const
 {
@@ -516,19 +516,18 @@ partition stepper_server::heat_part(
     hpx::shared_future<partition_data> middle_data =
         middle.get_data(partition_server::middle_partition);
 
-    hpx::future<partition_data> next_middle =
-        middle_data.then(hpx::unwrapping(
-            [middle](partition_data const& m) -> partition_data {
-                HPX_UNUSED(middle);
+    hpx::future<partition_data> next_middle = middle_data.then(
+        hpx::unwrapping([middle](partition_data const& m) -> partition_data {
+            HPX_UNUSED(middle);
 
-                // All local operations are performed once the middle data of
-                // the previous time step becomes available.
-                std::size_t size = m.size();
-                partition_data next(size);
-                for (std::size_t i = 1; i != size - 1; ++i)
-                    next[i] = heat(m[i - 1], m[i], m[i + 1]);
-                return next;
-            }));
+            // All local operations are performed once the middle data of
+            // the previous time step becomes available.
+            std::size_t size = m.size();
+            partition_data next(size);
+            for (std::size_t i = 1; i != size - 1; ++i)
+                next[i] = heat(m[i - 1], m[i], m[i + 1]);
+            return next;
+        }));
 
     return hpx::dataflow(hpx::launch::async,
         hpx::unwrapping(
@@ -747,19 +746,17 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()(
         "results", "print generated results (default: false)")("nx",
         value<std::uint64_t>()->default_value(10),
-        "Local x dimension (of each partition)") ("nt",
+        "Local x dimension (of each partition)")("nt",
         value<std::uint64_t>()->default_value(45),
-        "Number of time steps") ("nd",
+        "Number of time steps")("nd", value<std::uint64_t>()->default_value(10),
+        "Number of time steps to allow the dependency tree to grow to")("np",
         value<std::uint64_t>()->default_value(10),
-        "Number of time steps to allow the dependency tree to grow to") ("np",
-        value<std::uint64_t>()->default_value(10),
-        "Number of partitions") ("k", value<double>(&k)->default_value(0.5),
-        "Heat transfer coefficient (default: 0.5)") ("dt",
+        "Number of partitions")("k", value<double>(&k)->default_value(0.5),
+        "Heat transfer coefficient (default: 0.5)")("dt",
         value<double>(&dt)->default_value(1.0),
-        "Timestep unit (default: 1.0[s])") ("dx",
-        value<double>(&dx)->default_value(1.0),
-        "Local x dimension") ("no-header",
-        "do not print out the csv header row");
+        "Timestep unit (default: 1.0[s])")(
+        "dx", value<double>(&dx)->default_value(1.0), "Local x dimension")(
+        "no-header", "do not print out the csv header row");
 
     // Initialize and run HPX, this example requires to run hpx_main on all
     // localities

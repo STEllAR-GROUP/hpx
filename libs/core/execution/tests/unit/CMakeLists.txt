@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021 Hartmut Kaiser
+# Copyright (c) 2014-2022 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,22 +6,28 @@
 
 set(tests
     algorithm_bulk
-    algorithm_detach
     algorithm_ensure_started
     algorithm_execute
     algorithm_just
-    algorithm_just_on
-    algorithm_let_value
+    algorithm_just_error
+    algorithm_just_stopped
     algorithm_let_error
-    algorithm_on
+    algorithm_let_stopped
+    algorithm_let_value
     algorithm_split
+    algorithm_start_detached
     algorithm_sync_wait
-    algorithm_transform
+    algorithm_then
+    algorithm_transfer
+    algorithm_transfer_just
+    algorithm_transfer_when_all
     algorithm_when_all
     bulk_async
+    environment_queries
     executor_parameters
     executor_parameters_dispatching
     executor_parameters_timer_hooks
+    forwarding_env_query
     future_then_executor
     minimal_async_executor
     minimal_sync_executor
@@ -47,6 +53,8 @@ foreach(test ${tests})
     HPX_PREFIX ${HPX_BUILD_PREFIX}
     FOLDER ${folder_name}
   )
+
+  target_link_libraries(${test}_test PRIVATE hpx_execution_test_utilities)
 
   add_hpx_unit_test("modules.execution" ${test} ${${test}_PARAMETERS})
 

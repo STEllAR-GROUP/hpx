@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@ namespace hpx { namespace traits {
     struct component_config_data
     {
         // by default no additional config data is injected into the factory
-        static char const* call()
+        static char const* call() noexcept
         {
             return nullptr;
         }

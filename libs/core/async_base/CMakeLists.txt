@@ -33,6 +33,6 @@ add_hpx_module(
   COMPAT_HEADERS ${async_base_compat_headers}
   SOURCES ${async_base_sources}
   MODULE_DEPENDENCIES hpx_allocator_support hpx_config hpx_coroutines
-                      hpx_tag_dispatch
+                      hpx_tag_invoke
   CMAKE_SUBDIRS examples tests
 )

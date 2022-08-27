@@ -148,7 +148,7 @@ struct block_component : hpx::components::component_base<block_component>
         return sub_block(&data_[offset], size);
     }
 
-    HPX_DEFINE_COMPONENT_DIRECT_ACTION(block_component, get_sub_block);
+    HPX_DEFINE_COMPONENT_DIRECT_ACTION(block_component, get_sub_block)
 
     std::vector<double> data_;
 };
@@ -183,12 +183,12 @@ struct block : hpx::components::client_base<block, block_component>
 // HPX_REGISTER_COMPONENT() exposes the component creation
 // through hpx::new_<>().
 typedef hpx::components::component<block_component> block_component_type;
-HPX_REGISTER_COMPONENT(block_component_type, block_component);
+HPX_REGISTER_COMPONENT(block_component_type, block_component)
 
 // HPX_REGISTER_ACTION() exposes the component member function for remote
 // invocation.
 typedef block_component::get_sub_block_action get_sub_block_action;
-HPX_REGISTER_ACTION(get_sub_block_action);
+HPX_REGISTER_ACTION(get_sub_block_action)
 
 void transpose(hpx::future<sub_block> A, hpx::future<sub_block> B,
     std::uint64_t block_order, std::uint64_t tile_size);

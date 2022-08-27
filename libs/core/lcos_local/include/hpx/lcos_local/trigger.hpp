@@ -41,9 +41,9 @@ namespace hpx { namespace lcos { namespace local {
 
         base_trigger(base_trigger&& rhs) noexcept
           : mtx_()
-          , promise_(std::move(rhs.promise_))
+          , promise_(HPX_MOVE(rhs.promise_))
           , generation_(rhs.generation_)
-          , conditions_(std::move(rhs.conditions_))
+          , conditions_(HPX_MOVE(rhs.conditions_))
         {
             rhs.generation_ = std::size_t(-1);
         }
@@ -54,10 +54,10 @@ namespace hpx { namespace lcos { namespace local {
             {
                 std::lock_guard<mutex_type> l(rhs.mtx_);
                 mtx_ = mutex_type();
-                promise_ = std::move(rhs.promise_);
+                promise_ = HPX_MOVE(rhs.promise_);
                 generation_ = rhs.generation_;
                 rhs.generation_ = std::size_t(-1);
-                conditions_ = std::move(rhs.conditions_);
+                conditions_ = HPX_MOVE(rhs.conditions_);
             }
             return *this;
         }
@@ -66,7 +66,7 @@ namespace hpx { namespace lcos { namespace local {
         bool trigger_conditions(error_code& ec = throws)
         {
             bool triggered = false;
-            error_code rc(lightweight);
+            error_code rc(throwmode::lightweight);
             for (conditional_trigger* c : conditions_)
             {
                 triggered |= c->set(rc);
@@ -78,7 +78,7 @@ namespace hpx { namespace lcos { namespace local {
 
     public:
         /// \brief get a future allowing to wait for the trigger to fire
-        future<void> get_future(std::size_t* generation_value = nullptr,
+        hpx::future<void> get_future(std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
             std::lock_guard<mutex_type> l(mtx_);
@@ -135,10 +135,10 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             template <typename Condition>
-            future<void> get_future(
+            hpx::future<void> get_future(
                 Condition&& func, error_code& ec = hpx::throws)
             {
-                return (*it_)->get_future(std::forward<Condition>(func), ec);
+                return (*it_)->get_future(HPX_FORWARD(Condition, func), ec);
             }
 
             base_trigger& this_;
@@ -177,7 +177,7 @@ namespace hpx { namespace lcos { namespace local {
                 conditional_trigger c;
                 manage_condition cond(*this, c);
 
-                future<void> f = cond.get_future(util::bind(
+                hpx::future<void> f = cond.get_future(hpx::bind(
                     &base_trigger::test_condition, this, generation_value));
 
                 {
@@ -210,7 +210,7 @@ namespace hpx { namespace lcos { namespace local {
 
     private:
         mutable mutex_type mtx_;
-        lcos::local::promise<void> promise_;
+        hpx::promise<void> promise_;
         std::size_t generation_;
         condition_list_type conditions_;
     };
@@ -228,14 +228,14 @@ namespace hpx { namespace lcos { namespace local {
         trigger() {}
 
         trigger(trigger&& rhs) noexcept
-          : base_type(std::move(static_cast<base_type&>(rhs)))
+          : base_type(HPX_MOVE(static_cast<base_type&>(rhs)))
         {
         }
 
         trigger& operator=(trigger&& rhs) noexcept
         {
             if (this != &rhs)
-                static_cast<base_type&>(*this) = std::move(rhs);
+                static_cast<base_type&>(*this) = HPX_MOVE(rhs);
             return *this;
         }
 

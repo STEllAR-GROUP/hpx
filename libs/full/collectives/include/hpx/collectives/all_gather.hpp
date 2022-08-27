@@ -128,7 +128,8 @@ namespace hpx { namespace traits {
             };
 
             lock_type l(communicator_.mtx_);
-            util::ignore_while_checking<lock_type> il(&l);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
 
             hpx::future<std::vector<arg_type>> f =
                 communicator_.gate_.get_shared_future(l).then(
@@ -137,9 +138,9 @@ namespace hpx { namespace traits {
             communicator_.gate_.synchronize(1, l);
 
             auto& data = communicator_.template access_data<arg_type>(l);
-            data[which] = std::forward<T>(t);
+            data[which] = HPX_FORWARD(T, t);
 
-            if (communicator_.gate_.set(which, std::move(l)))
+            if (communicator_.gate_.set(which, HPX_MOVE(l)))
             {
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
@@ -167,9 +168,10 @@ namespace hpx { namespace collectives {
 
         using arg_type = std::decay_t<T>;
 
-        auto all_gather_data_direct =
-            [local_result = std::forward<T>(local_result), this_site](
-                communicator&& c) -> hpx::future<std::vector<arg_type>> {
+        auto all_gather_data_direct = [local_result =
+                                              HPX_FORWARD(T, local_result),
+                                          this_site](communicator&& c) mutable
+            -> hpx::future<std::vector<arg_type>> {
             using action_type = typename detail::communicator_server::
                 template communication_get_action<
                     traits::communication::all_gather_tag,
@@ -178,15 +180,15 @@ namespace hpx { namespace collectives {
             // make sure id is kept alive as long as the returned future,
             // explicitly unwrap returned future
             hpx::future<std::vector<arg_type>> result =
-                async(action_type(), c, this_site, std::move(local_result));
+                async(action_type(), c, this_site, HPX_MOVE(local_result));
 
             traits::detail::get_shared_state(result)->set_on_completed(
-                [client = std::move(c)]() { HPX_UNUSED(client); });
+                [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
 
             return result;
         };
 
-        return fid.then(hpx::launch::sync, std::move(all_gather_data_direct));
+        return fid.then(hpx::launch::sync, HPX_MOVE(all_gather_data_direct));
     }
 
     template <typename T>
@@ -198,7 +200,7 @@ namespace hpx { namespace collectives {
     {
         return all_gather(create_communicator(basename, num_sites, this_site,
                               generation, root_site),
-            std::forward<T>(local_result), this_site);
+            HPX_FORWARD(T, local_result), this_site);
     }
 }}    // namespace hpx::collectives
 
@@ -216,7 +218,7 @@ namespace hpx { namespace lcos {
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
         return hpx::collectives::all_gather(basename,
-            std::forward<T>(local_result),
+            HPX_FORWARD(T, local_result),
             hpx::collectives::num_sites_arg(num_sites),
             hpx::collectives::this_site_arg(this_site),
             hpx::collectives::generation_arg(generation),
@@ -249,8 +251,8 @@ namespace hpx { namespace lcos {
         hpx::collectives::communicator comm, T&& local_result,
         std::size_t this_site = std::size_t(-1))
     {
-        return hpx::collectives::all_gather(std::move(comm),
-            std::forward<T>(local_result),
+        return hpx::collectives::all_gather(HPX_MOVE(comm),
+            HPX_FORWARD(T, local_result),
             hpx::collectives::this_site_arg(this_site));
     }
 
@@ -262,7 +264,7 @@ namespace hpx { namespace lcos {
         hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
     {
         return local_result.then([=](hpx::future<T>&& f) mutable {
-            hpx::collectives::all_gather(std::move(comm), f.get(),
+            hpx::collectives::all_gather(HPX_MOVE(comm), f.get(),
                 hpx::collectives::this_site_arg(this_site));
         });
     }

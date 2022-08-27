@@ -8,28 +8,23 @@
 set(tests
     after_588
     call_promise_get_gid_more_than_once
-    exception_from_continuation_1613
     lifetime_588
     lifetime_588_1
     promise_leak_996
     promise_1620
     receive_buffer_1733
-    set_hpx_limit_798
     shared_stated_leaked_1211
     sliding_semaphore_2338
-    wait_for_1751
     wait_for_action_2796
 )
 
 set(promise_1620_FLAGS DEPENDENCIES iostreams_component)
 set(after_588_PARAMETERS LOCALITIES 2)
-set(exception_from_continuation_1613_PARAMETERS THREADS_PER_LOCALITY 2)
 set(lifetime_588_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(lifetime_588_1_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY 2)
 set(receive_buffer_1733_PARAMETERS LOCALITIES 2)
 set(safely_destroy_cv_1481_PARAMETERS THREADS_PER_LOCALITY 2)
 set(sliding_semaphore_2338_PARAMETERS THREADS_PER_LOCALITY 2)
-set(wait_for_1751_PARAMETERS THREADS_PER_LOCALITY 4)
 
 # Create test cases
 foreach(test ${tests})

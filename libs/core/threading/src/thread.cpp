@@ -1,16 +1,16 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/threading.hpp>
@@ -47,15 +47,15 @@ namespace hpx {
 
     thread::thread(thread&& rhs) noexcept
     {
-        std::lock_guard<mutex_type> l(rhs.mtx_);
+        std::lock_guard l(rhs.mtx_);
         id_ = rhs.id_;
         rhs.id_ = threads::invalid_thread_id;
     }
 
     thread& thread::operator=(thread&& rhs) noexcept
     {
-        std::unique_lock<mutex_type> l(mtx_);
-        std::unique_lock<mutex_type> l2(rhs.mtx_);
+        std::unique_lock l(mtx_);
+        std::unique_lock l2(rhs.mtx_);
         if (joinable_locked())
         {
             l2.unlock();
@@ -96,8 +96,8 @@ namespace hpx {
 
     void thread::swap(thread& rhs) noexcept
     {
-        std::lock_guard<mutex_type> l(mtx_);
-        std::lock_guard<mutex_type> l2(rhs.mtx_);
+        std::lock_guard l(mtx_);
+        std::lock_guard l2(rhs.mtx_);
         std::swap(id_, rhs.id_);
     }
 
@@ -114,7 +114,7 @@ namespace hpx {
     }
 
     threads::thread_result_type thread::thread_function_nullary(
-        util::unique_function_nonser<void()> const& func)
+        hpx::move_only_function<void()> const& func)
     {
         try
         {
@@ -161,14 +161,14 @@ namespace hpx {
         return hpx::threads::hardware_concurrency();
     }
 
-    void thread::start_thread(threads::thread_pool_base* pool,
-        util::unique_function_nonser<void()>&& func)
+    void thread::start_thread(
+        threads::thread_pool_base* pool, hpx::move_only_function<void()>&& func)
     {
         HPX_ASSERT(pool);
 
         threads::thread_init_data data(
             util::one_shot(
-                util::bind(&thread::thread_function_nullary, std::move(func))),
+                hpx::bind(&thread::thread_function_nullary, HPX_MOVE(func))),
             "thread::thread_function_nullary",
             threads::thread_priority::default_, threads::thread_schedule_hint(),
             threads::thread_stacksize::default_,
@@ -176,7 +176,7 @@ namespace hpx {
 
         // create the new thread, note that id_ is guaranteed to be valid
         // before the thread function is executed
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         pool->create_thread(data, id_, ec);
         if (ec)
         {
@@ -186,14 +186,15 @@ namespace hpx {
         }
     }
 
-    static void resume_thread(threads::thread_id_type const& id)
+    static void resume_thread(threads::thread_id_ref_type const& id)
     {
-        threads::set_thread_state(id, threads::thread_schedule_state::pending);
+        threads::set_thread_state(
+            id.noref(), threads::thread_schedule_state::pending);
     }
 
     void thread::join()
     {
-        std::unique_lock<mutex_type> l(mtx_);
+        std::unique_lock l(mtx_);
 
         if (!joinable_locked())
         {
@@ -202,7 +203,8 @@ namespace hpx {
                 "trying to join a non joinable thread");
         }
 
-        native_handle_type this_id = threads::get_self_id();
+        // keep ourselves alive while being suspended
+        threads::thread_id_ref_type this_id = threads::get_self_id();
         if (this_id == id_)
         {
             l.unlock();
@@ -213,11 +215,11 @@ namespace hpx {
         this_thread::interruption_point();
 
         // register callback function to be called when thread exits
-        if (threads::add_thread_exit_callback(
-                id_.noref(), util::bind_front(&resume_thread, this_id)))
+        if (threads::add_thread_exit_callback(id_.noref(),
+                hpx::bind_front(&resume_thread, HPX_MOVE(this_id))))
         {
             // wait for thread to be terminated
-            util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+            util::unlock_guard ul(l);
             this_thread::suspend(
                 threads::thread_schedule_state::suspended, "thread::join");
         }
@@ -285,38 +287,39 @@ namespace hpx {
         struct thread_task_base : lcos::detail::future_data<void>
         {
         private:
-            typedef lcos::detail::future_data<void>::mutex_type mutex_type;
             typedef hpx::intrusive_ptr<thread_task_base> future_base_type;
 
         protected:
-            typedef lcos::detail::future_data<void>::result_type result_type;
+            using base_type = lcos::detail::future_data<void>;
+            using result_type = base_type::result_type;
+
+            using base_type::mtx_;
 
         public:
             thread_task_base(threads::thread_id_ref_type const& id)
             {
                 if (threads::add_thread_exit_callback(id.noref(),
-                        util::bind_front(
-                            &thread_task_base::thread_exit_function,
+                        hpx::bind_front(&thread_task_base::thread_exit_function,
                             future_base_type(this))))
                 {
                     id_ = id;
                 }
             }
 
-            bool valid() const
+            bool valid() const noexcept
             {
                 return id_ != threads::invalid_thread_id;
             }
 
             // cancellation support
-            bool cancelable() const
+            bool cancelable() const noexcept override
             {
                 return true;
             }
 
-            void cancel()
+            void cancel() override
             {
-                std::lock_guard<mutex_type> l(this->mtx_);
+                std::lock_guard l(mtx_);
                 if (!this->is_ready())
                 {
                     threads::interrupt_thread(id_.noref());
@@ -330,7 +333,7 @@ namespace hpx {
             void thread_exit_function()
             {
                 // might have been finished or canceled
-                std::lock_guard<mutex_type> l(this->mtx_);
+                std::lock_guard l(mtx_);
                 if (!this->is_ready())
                     this->set_data(result_type());
                 id_ = threads::invalid_thread_id;
@@ -341,13 +344,13 @@ namespace hpx {
         };
     }    // namespace detail
 
-    lcos::future<void> thread::get_future(error_code& ec)
+    hpx::future<void> thread::get_future(error_code& ec)
     {
         if (id_ == threads::invalid_thread_id)
         {
             HPX_THROWS_IF(ec, null_thread_id, "thread::get_future",
                 "null thread id encountered");
-            return lcos::future<void>();
+            return hpx::future<void>();
         }
 
         detail::thread_task_base* p = new detail::thread_task_base(id_);
@@ -356,11 +359,11 @@ namespace hpx {
         {
             HPX_THROWS_IF(ec, thread_resource_error, "thread::get_future",
                 "Could not create future as thread has been terminated.");
-            return lcos::future<void>();
+            return hpx::future<void>();
         }
 
         using traits::future_access;
-        return future_access<lcos::future<void>>::create(std::move(base));
+        return future_access<hpx::future<void>>::create(HPX_MOVE(base));
     }
 
     ///////////////////////////////////////////////////////////////////////////

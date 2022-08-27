@@ -11,8 +11,8 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -22,27 +22,32 @@
 ///////////////////////////////////////////////////////////////////////////////
 hpx::util::atomic_count count_(0);
 
-long get_count() { return count_; }
+long get_count()
+{
+    return count_;
+}
 
 HPX_PLAIN_ACTION(get_count, get_count_action)
 
 ///////////////////////////////////////////////////////////////////////////////
-struct foo
-  : public hpx::components::component_base<foo>
+struct foo : public hpx::components::component_base<foo>
 {
     foo()
     {
         ++count_;
     }
 
-    int bar() { return 42; }
+    int bar()
+    {
+        return 42;
+    }
 
-    HPX_DEFINE_COMPONENT_ACTION(foo, bar, bar_action);
+    HPX_DEFINE_COMPONENT_ACTION(foo, bar, bar_action)
 };
 
-HPX_REGISTER_ACTION(foo::bar_action, foo_bar_action);
+HPX_REGISTER_ACTION(foo::bar_action, foo_bar_action)
 
-HPX_REGISTER_COMPONENT(hpx::components::component<foo>, foo);
+HPX_REGISTER_COMPONENT(hpx::components::component<foo>, foo)
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
@@ -50,7 +55,7 @@ int hpx_main()
     std::vector<hpx::id_type> const localities =
         hpx::find_all_localities(hpx::components::get_component_type<foo>());
 
-    std::vector<hpx::future<hpx::id_type> > components;
+    std::vector<hpx::future<hpx::id_type>> components;
     for (int i = 0; i != NUM_INSTANCES; ++i)
     {
         for (std::size_t j = 0; j != localities.size(); ++j)

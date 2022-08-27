@@ -41,7 +41,7 @@ int hpx_main()
         HPX_TEST_EQ(copy_vector[0], 1);
         HPX_TEST_EQ(copy_vector[1], 2);
         HPX_TEST_EQ(copy_vector[2], 3);
-     }
+    }
 
     return hpx::finalize();
 }

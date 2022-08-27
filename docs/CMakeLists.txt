@@ -8,7 +8,6 @@
 set(doxygen_dependencies
     "${PROJECT_SOURCE_DIR}/components/component_storage/include/hpx/components/component_storage/migrate_from_storage.hpp"
     "${PROJECT_SOURCE_DIR}/components/component_storage/include/hpx/components/component_storage/migrate_to_storage.hpp"
-    "${PROJECT_SOURCE_DIR}/hpx/runtime/set_parcel_write_handler.hpp"
 )
 
 # Definitions for autodoc.doxy.in
@@ -30,7 +29,6 @@ set(doxygen_definition_list
     "extern="
     "HPX_FORCEINLINE="
     "HPX_CONCEPT_REQUIRES_(...)="
-    "HPX_STATIC_CONSTEXPR=static constexpr"
     "HPX_HOST_DEVICE="
 )
 
@@ -147,7 +145,7 @@ file(
 )
 
 # exclude api.rst...
-list(FILTER sphinx_source_files EXCLUDE REGEX "sphinx/api.rst")
+list(FILTER sphinx_source_files EXCLUDE REGEX "sphinx/api/full_api.rst")
 
 foreach(sphinx_source_file ${sphinx_source_files})
   add_custom_command(

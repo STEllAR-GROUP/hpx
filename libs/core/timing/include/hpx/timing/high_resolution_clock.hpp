@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,11 +16,12 @@
 #include <cstdint>
 
 namespace hpx { namespace chrono {
+
     struct high_resolution_clock
     {
         // This function returns a tick count with a resolution (not
         // precision!) of 1 ns.
-        static std::uint64_t now()
+        static std::uint64_t now() noexcept
         {
 #if defined(__bgq__)
             return GetTimeBase();
@@ -33,7 +34,7 @@ namespace hpx { namespace chrono {
 
         // This function returns the smallest representable time unit as
         // returned by this clock.
-        static std::uint64_t(min)()
+        static constexpr std::uint64_t(min)() noexcept
         {
             typedef std::chrono::duration_values<std::chrono::nanoseconds>
                 duration_values;
@@ -42,7 +43,7 @@ namespace hpx { namespace chrono {
 
         // This function returns the largest representable time unit as
         // returned by this clock.
-        static std::uint64_t(max)()
+        static constexpr std::uint64_t(max)() noexcept
         {
             typedef std::chrono::duration_values<std::chrono::nanoseconds>
                 duration_values;
@@ -50,10 +51,3 @@ namespace hpx { namespace chrono {
         }
     };
 }}    // namespace hpx::chrono
-
-namespace hpx { namespace util {
-    using high_resolution_clock HPX_DEPRECATED_V(1, 6,
-        "hpx::util::high_resolution_clock is deprecated. Use "
-        "hpx::chrono::high_resolution_clock instead.") =
-        hpx::chrono::high_resolution_clock;
-}}    // namespace hpx::util

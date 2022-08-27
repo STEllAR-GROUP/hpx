@@ -335,18 +335,15 @@ namespace hpx {
     /// calling thread.
     ///
     /// \returns  The \a partition_copy algorithm returns
-    ///           \a tagged_tuple<tag::in(InIter), tag::out1(OutIter1),
-    ///           tag::out2(OutIter2)>.
-    ///           The \a partition_copy algorithm returns the tuple of
-    ///           the source iterator \a last,
+    ///           \a std::pair<OutIter1, OutIter2>.
+    ///           The \a partition_copy algorithm returns the pair of
     ///           the destination iterator to the end of the \a dest_true
     ///           range, and the destination iterator to the end of the \a
     ///           dest_false range.
     ///
     template <typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename Pred, typename Proj>
-    hpx::util::tagged_tuple<tag::in(FwdIter1), tag::out1(FwdIter2),
-            tag::out2(FwdIter3)>
+    std::pair<FwdIter2 ,FwdIter3>
     partition_copy(FwdIter1 first, FwdIter1 last,
         FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj);
 
@@ -427,24 +424,18 @@ namespace hpx {
     /// within each thread.
     ///
     /// \returns  The \a partition_copy algorithm returns a
-    ///           \a hpx::future<tagged_tuple<tag::in(InIter),
-    ///           tag::out1(OutIter1), tag::out2(OutIter2)> >
+    ///           \a hpx::future<std::pair<OutIter1, OutIter2>>
     ///           if the execution policy is of type \a parallel_task_policy
     ///           and returns
-    ///           \a tagged_tuple<tag::in(InIter),
-    ///           tag::out1(OutIter1), tag::out2(OutIter2)>
-    ///           otherwise.
-    ///           The \a partition_copy algorithm returns the tuple of
-    ///           the source iterator \a last,
+    ///           \a std::pair<OutIter1, OutIter2> otherwise.
+    ///           The \a partition_copy algorithm returns the pair of
     ///           the destination iterator to the end of the \a dest_true
     ///           range, and the destination iterator to the end of the \a
     ///           dest_false range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename FwdIter3, typename Pred, typename Proj>
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_tuple<tag::in(FwdIter1), tag::out1(FwdIter2),
-            tag::out2(FwdIter3)>>::type
+    util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter2, FwdIter3>>
     partition_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred, Proj&& proj);
 
@@ -461,7 +452,6 @@ namespace hpx {
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/async_local.hpp>
-#include <hpx/parallel/util/tagged_tuple.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -471,11 +461,10 @@ namespace hpx {
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
@@ -504,6 +493,31 @@ namespace hpx {
 #include <vector>
 
 namespace hpx { namespace parallel { inline namespace v1 {
+
+    template <typename Tuple>
+    constexpr HPX_FORCEINLINE
+        std::pair<typename hpx::tuple_element<1, Tuple>::type,
+            typename hpx::tuple_element<2, Tuple>::type>
+        tuple_to_pair(Tuple&& t)
+    {
+        return std::make_pair(hpx::get<1>(t), hpx::get<2>(t));
+    }
+
+    template <typename Tuple>
+    hpx::future<std::pair<typename hpx::tuple_element<1, Tuple>::type,
+        typename hpx::tuple_element<2, Tuple>::type>>
+    tuple_to_pair(hpx::future<Tuple>&& f)
+    {
+        using result_type =
+            std::pair<typename hpx::tuple_element<1, Tuple>::type,
+                typename hpx::tuple_element<2, Tuple>::type>;
+
+        return hpx::make_future<result_type>(
+            HPX_MOVE(f), [](Tuple&& t) -> result_type {
+                return tuple_to_pair(HPX_MOVE(t));
+            });
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     // stable_partition
     namespace detail {
@@ -519,8 +533,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (chunks < 2)
                 {
                     return execution::async_execute(policy.executor(),
-                        [first, last, f = std::forward<F>(f),
-                            proj = std::forward<Proj>(proj)]() -> RandIter {
+                        [first, last, f = HPX_FORWARD(F, f),
+                            proj = HPX_FORWARD(Proj, proj)]() -> RandIter {
                             return std::stable_partition(first, last,
                                 util::invoke_projected<F, Proj>(f, proj));
                         });
@@ -561,7 +575,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                             if (!errors.empty())
                             {
-                                throw exception_list(std::move(errors));
+                                throw exception_list(HPX_MOVE(errors));
                             }
                         }
                         RandIter first = left.get();
@@ -574,7 +588,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         std::advance(first, std::distance(mid, last));
                         return first;
                     },
-                    std::move(left), std::move(right));
+                    HPX_MOVE(left), HPX_MOVE(right));
             }
         };
 
@@ -591,12 +605,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 if (HPX_INVOKE(f, HPX_INVOKE(proj, *first)))
                 {
-                    *next = std::move(*first);
+                    *next = HPX_MOVE(*first);
                     ++next;
                 }
                 else
                 {
-                    falseValues.emplace_back(std::move(*first));
+                    falseValues.emplace_back(HPX_MOVE(*first));
                 }
 
                 ++first;
@@ -621,7 +635,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy&&, BidirIter first, Sent last, F&& f, Proj&& proj)
             {
                 return stable_partition_seq(
-                    first, last, std::forward<F>(f), std::forward<Proj>(proj));
+                    first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename RandIter, typename Sent,
@@ -647,7 +661,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     if (size == 0)
                     {
-                        result = hpx::make_ready_future(std::move(last_iter));
+                        result = hpx::make_ready_future(HPX_MOVE(last_iter));
                     }
                     else
                     {
@@ -668,8 +682,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             cores, size, chunk_size, max_chunks);
 
                         result = stable_partition_helper()(
-                            std::forward<ExPolicy>(policy), first, last_iter,
-                            size, std::forward<F>(f), std::forward<Proj>(proj),
+                            HPX_FORWARD(ExPolicy, policy), first, last_iter,
+                            size, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj),
                             max_chunks);
                     }
                 }
@@ -683,10 +697,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     return algorithm_result::get(
                         detail::handle_exception<ExPolicy, RandIter>::call(
-                            std::move(result)));
+                            HPX_MOVE(result)));
                 }
 
-                return algorithm_result::get(std::move(result));
+                return algorithm_result::get(HPX_MOVE(result));
             }
         };
         /// \endcond
@@ -722,8 +736,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 !hpx::traits::is_random_access_iterator_v<BidirIter>>;
 
         return detail::stable_partition<BidirIter>().call2(
-            std::forward<ExPolicy>(policy), is_seq(), first, last,
-            std::forward<F>(f), std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), is_seq(), first, last,
+            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -741,16 +755,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
         BidirIter sequential_partition(
             BidirIter first, BidirIter last, Pred&& pred, Proj&& proj)
         {
-            using hpx::util::invoke;
-
             while (true)
             {
-                while (first != last && invoke(pred, invoke(proj, *first)))
+                while (
+                    first != last && HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
                     ++first;
                 if (first == last)
                     break;
 
-                while (first != --last && !invoke(pred, invoke(proj, *last)))
+                while (first != --last &&
+                    !HPX_INVOKE(pred, HPX_INVOKE(proj, *last)))
                     ;
                 if (first == last)
                     break;
@@ -772,9 +786,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         FwdIter sequential_partition(
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
         {
-            using hpx::util::invoke;
-
-            while (first != last && invoke(pred, invoke(proj, *first)))
+            while (first != last && HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
                 ++first;
 
             if (first == last)
@@ -782,7 +794,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             for (FwdIter it = std::next(first); it != last; ++it)
             {
-                if (invoke(pred, invoke(proj, *it)))
+                if (HPX_INVOKE(pred, HPX_INVOKE(proj, *it)))
                 {
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
                     std::ranges::iter_swap(first++, it);
@@ -970,7 +982,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     boundary_ = blocks_[left_].last;
                     blocks_[left_].block_no = left_block_no_--;
 
-                    return std::move(blocks_[left_++]);
+                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                    return HPX_MOVE(blocks_[left_++]);
                 }
 
                 // // Get block from the end of rightside of boundary.
@@ -984,7 +997,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     boundary_ = blocks_[--right_].first;
                     blocks_[right_].block_no = right_block_no_++;
 
-                    return std::move(blocks_[right_]);
+                    return HPX_MOVE(blocks_[right_]);
                 }
 
                 FwdIter boundary()
@@ -1029,8 +1042,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static block<FwdIter> partition_thread(
                 block_manager<FwdIter>& block_manager, Pred pred, Proj proj)
             {
-                using hpx::util::invoke;
-
                 block<FwdIter> left_block, right_block;
 
                 left_block = block_manager.get_left_block();
@@ -1041,7 +1052,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     while ((!left_block.empty() ||
                                !(left_block = block_manager.get_left_block())
                                     .empty()) &&
-                        invoke(pred, invoke(proj, *left_block.first)))
+                        HPX_INVOKE(pred, HPX_INVOKE(proj, *left_block.first)))
                     {
                         ++left_block.first;
                     }
@@ -1049,7 +1060,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     while ((!right_block.empty() ||
                                !(right_block = block_manager.get_right_block())
                                     .empty()) &&
-                        !invoke(pred, invoke(proj, *right_block.first)))
+                        !HPX_INVOKE(pred, HPX_INVOKE(proj, *right_block.first)))
                     {
                         ++right_block.first;
                     }
@@ -1087,8 +1098,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 while (true)
                 {
-                    using hpx::util::invoke;
-
                     while (true)
                     {
                         if (left_iter->empty())
@@ -1098,7 +1107,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 left_iter->block_no > 0)
                                 break;
                         }
-                        if (!invoke(pred, invoke(proj, *left_iter->first)))
+                        if (!HPX_INVOKE(
+                                pred, HPX_INVOKE(proj, *left_iter->first)))
                             break;
                         ++left_iter->first;
                     }
@@ -1111,7 +1121,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 (--right_iter)->block_no < 0)
                                 break;
                         }
-                        if (invoke(pred, invoke(proj, *right_iter->first)))
+                        if (HPX_INVOKE(
+                                pred, HPX_INVOKE(proj, *right_iter->first)))
                             break;
                         ++right_iter->first;
                     }
@@ -1329,11 +1340,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 // Wait sub-partitioning to be all finished.
-                hpx::wait_all(remaining_block_futures);
+                hpx::wait_all_nothrow(remaining_block_futures);
 
                 // Handle exceptions in parallel phrase.
                 std::list<std::exception_ptr> errors;
-                // TODO: Is it okay to use thing in util::detail:: ?
+
                 util::detail::handle_local_exceptions<ExPolicy>::call(
                     remaining_block_futures, errors);
 
@@ -1380,7 +1391,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         hpx::future<FwdIter> parallel_partition(ExPolicy&& policy,
             FwdIter first, FwdIter last, Pred&& pred, Proj&& proj)
         {
-            hpx::future<FwdIter> f = execution::async_execute(
+            return execution::async_execute(
                 policy.executor(), [=]() mutable -> FwdIter {
                     try
                     {
@@ -1392,14 +1403,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         util::detail::handle_local_exceptions<ExPolicy>::call(
                             std::current_exception());
                     }
-
-                    // Not reachable.
-                    HPX_ASSERT(false);
-                    return partition_helper::call(
-                        policy, first, last, pred, proj);
                 });
-
-            return f;
         }
 
         template <typename FwdIter>
@@ -1417,7 +1421,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 auto last_iter = detail::advance_to_sentinel(first, last);
                 return sequential_partition(first, last_iter,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename Sent, typename Pred,
@@ -1434,8 +1438,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 try
                 {
                     return algorithm_result::get(parallel_partition(
-                        std::forward<ExPolicy>(policy), first, last_iter,
-                        std::forward<Pred>(pred), std::forward<Proj>(proj)));
+                        HPX_FORWARD(ExPolicy, policy), first, last_iter,
+                        HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
                 }
                 catch (...)
                 {
@@ -1473,8 +1477,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::partition<FwdIter>().call(std::forward<ExPolicy>(policy),
-            first, last, std::forward<Pred>(pred), std::forward<Proj>(proj));
+        return detail::partition<FwdIter>().call(HPX_FORWARD(ExPolicy, policy),
+            first, last, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -1494,14 +1498,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             while (first != last)
             {
-                if (hpx::util::invoke(pred, hpx::util::invoke(proj, *first)))
+                if (HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
                     *dest_true++ = *first;
                 else
                     *dest_false++ = *first;
                 first++;
             }
             return hpx::make_tuple(
-                std::move(last), std::move(dest_true), std::move(dest_false));
+                HPX_MOVE(last), HPX_MOVE(dest_true), HPX_MOVE(dest_false));
         }
 
         template <typename IterTuple>
@@ -1522,8 +1526,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 auto last_iter = detail::advance_to_sentinel(first, last);
                 return sequential_partition_copy(first, last_iter, dest_true,
-                    dest_false, std::forward<Pred>(pred),
-                    std::forward<Proj>(proj));
+                    dest_false, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
@@ -1547,8 +1551,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return result::get(
                         hpx::make_tuple(first, dest_true, dest_false));
 
-                auto last_iter = detail::advance_to_sentinel(first, last);
-                difference_type count = std::distance(first, last_iter);
+                auto last_iter = first;
+                difference_type count =
+                    detail::advance_and_get_distance(last_iter, last);
 
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);
@@ -1563,17 +1568,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     hpx::tuple<FwdIter1, FwdIter2, FwdIter3>,
                     output_iterator_offset>;
 
-                auto f1 = [pred = std::forward<Pred>(pred),
-                              proj = std::forward<Proj>(proj)](
+                // Note: replacing the invoke() with HPX_INVOKE()
+                // below makes gcc generate errors
+                auto f1 = [pred = HPX_FORWARD(Pred, pred),
+                              proj = HPX_FORWARD(Proj, proj)](
                               zip_iterator part_begin,
                               std::size_t part_size) -> output_iterator_offset {
                     std::size_t true_count = 0;
 
                     // MSVC complains if pred or proj is captured by ref below
                     util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_size,
-                        [pred, proj, &true_count](zip_iterator it) mutable {
-                            using hpx::util::invoke;
-                            bool f = invoke(pred, invoke(proj, get<0>(*it)));
+                        [pred, proj, &true_count](
+                            zip_iterator it) mutable -> void {
+                            bool f = hpx::util::invoke(
+                                pred, hpx::util::invoke(proj, get<0>(*it)));
 
                             if ((get<1>(*it) = f))
                                 ++true_count;
@@ -1583,25 +1591,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         true_count, part_size - true_count);
                 };
 
-                auto f2 =
-                    hpx::unwrapping([](output_iterator_offset const& prev_sum,
-                                        output_iterator_offset const& curr)
-                                        -> output_iterator_offset {
-                        return output_iterator_offset(
-                            get<0>(prev_sum) + get<0>(curr),
-                            get<1>(prev_sum) + get<1>(curr));
-                    });
-                auto f3 =
-                    [dest_true, dest_false, flags](zip_iterator part_begin,
-                        std::size_t part_size,
-                        hpx::shared_future<output_iterator_offset> curr,
-                        hpx::shared_future<output_iterator_offset> next) mutable
-                    -> void {
+                auto f2 = [](output_iterator_offset const& prev_sum,
+                              output_iterator_offset const& curr)
+                    -> output_iterator_offset {
+                    return output_iterator_offset(
+                        get<0>(prev_sum) + get<0>(curr),
+                        get<1>(prev_sum) + get<1>(curr));
+                };
+                auto f3 = [dest_true, dest_false, flags](
+                              zip_iterator part_begin, std::size_t part_size,
+                              output_iterator_offset val) mutable -> void {
                     HPX_UNUSED(flags);
-
-                    next.get();    // rethrow exceptions
-
-                    output_iterator_offset offset = curr.get();
+                    output_iterator_offset offset = val;
                     std::size_t count_true = get<0>(offset);
                     std::size_t count_false = get<1>(offset);
                     std::advance(dest_true, count_true);
@@ -1616,15 +1617,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         });
                 };
 
-                auto f4 =
-                    [last_iter, dest_true, dest_false, flags](
-                        std::vector<
-                            hpx::shared_future<output_iterator_offset>>&& items,
-                        std::vector<hpx::future<void>>&&) mutable
+                auto f4 = [last_iter, dest_true, dest_false, flags](
+                              std::vector<output_iterator_offset>&& items,
+                              std::vector<hpx::future<void>>&&) mutable
                     -> hpx::tuple<FwdIter1, FwdIter2, FwdIter3> {
                     HPX_UNUSED(flags);
 
-                    output_iterator_offset count_pair = items.back().get();
+                    output_iterator_offset count_pair = items.back();
                     std::size_t count_true = get<0>(count_pair);
                     std::size_t count_false = get<1>(count_pair);
                     std::advance(dest_true, count_true);
@@ -1634,17 +1633,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 return scan_partitioner_type::call(
-                    std::forward<ExPolicy>(policy),
+                    HPX_FORWARD(ExPolicy, policy),
                     make_zip_iterator(first, flags.get()), count, init,
                     // step 1 performs first part of scan algorithm
-                    std::move(f1),
+                    HPX_MOVE(f1),
                     // step 2 propagates the partition results from left
                     // to right
-                    std::move(f2),
+                    HPX_MOVE(f2),
                     // step 3 runs final accumulation on each partition
-                    std::move(f3),
+                    HPX_MOVE(f3),
                     // step 4 use this return value
-                    std::move(f4));
+                    HPX_MOVE(f4));
             }
         };
         /// \endcond
@@ -1664,9 +1663,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 traits::projected<Proj, FwdIter1>>
         )>
     // clang-format on
-    util::detail::algorithm_result_t<ExPolicy,
-        hpx::util::tagged_tuple<tag::in(FwdIter1), tag::out1(FwdIter2),
-            tag::out2(FwdIter3)>>
+    util::detail::algorithm_result_t<ExPolicy, std::pair<FwdIter2, FwdIter3>>
     partition_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
         Proj&& proj = Proj())
@@ -1684,11 +1681,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
         using result_type = hpx::tuple<FwdIter1, FwdIter2, FwdIter3>;
 
-        return hpx::util::make_tagged_tuple<tag::in, tag::out1, tag::out2>(
+        return parallel::v1::tuple_to_pair(
             detail::partition_copy<result_type>().call(
-                std::forward<ExPolicy>(policy), first, last, dest_true,
-                dest_false, std::forward<Pred>(pred),
-                std::forward<Proj>(proj)));
+                HPX_FORWARD(ExPolicy, policy), first, last, dest_true,
+                dest_false, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -1698,7 +1694,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::stable_partition
-    HPX_INLINE_CONSTEXPR_VARIABLE struct stable_partition_t final
+    inline constexpr struct stable_partition_t final
       : hpx::detail::tag_parallel_algorithm<stable_partition_t>
     {
         // clang-format off
@@ -1712,7 +1708,7 @@ namespace hpx {
                     parallel::traits::projected<Proj, BidirIter>>
         )>
         // clang-format on
-        friend BidirIter tag_fallback_dispatch(hpx::stable_partition_t,
+        friend BidirIter tag_fallback_invoke(hpx::stable_partition_t,
             BidirIter first, BidirIter last, F&& f, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
@@ -1720,7 +1716,7 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::stable_partition<BidirIter>()
                 .call2(hpx::execution::seq, std::true_type{}, first, last,
-                    std::forward<F>(f), std::forward<Proj>(proj));
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1736,7 +1732,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result_t<ExPolicy,
             BidirIter>
-        tag_fallback_dispatch(hpx::stable_partition_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::stable_partition_t, ExPolicy&& policy,
             BidirIter first, BidirIter last, F&& f, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
@@ -1747,14 +1743,14 @@ namespace hpx {
                     !hpx::traits::is_random_access_iterator_v<BidirIter>>;
 
             return hpx::parallel::v1::detail::stable_partition<BidirIter>()
-                .call2(std::forward<ExPolicy>(policy), is_seq(), first, last,
-                    std::forward<F>(f), std::forward<Proj>(proj));
+                .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first, last,
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
     } stable_partition{};
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::partition
-    HPX_INLINE_CONSTEXPR_VARIABLE struct partition_t final
+    inline constexpr struct partition_t final
       : hpx::detail::tag_parallel_algorithm<partition_t>
     {
         // clang-format off
@@ -1768,15 +1764,15 @@ namespace hpx {
                     Pred, parallel::traits::projected<Proj, FwdIter>>
         )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(hpx::partition_t, FwdIter first,
+        friend FwdIter tag_fallback_invoke(hpx::partition_t, FwdIter first,
             FwdIter last, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::partition<FwdIter>().call(
-                hpx::execution::seq, first, last, std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -1792,21 +1788,21 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result_t<ExPolicy,
             FwdIter>
-        tag_fallback_dispatch(hpx::partition_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, Pred&& pred, Proj&& proj = Proj())
+        tag_fallback_invoke(hpx::partition_t, ExPolicy&& policy, FwdIter first,
+            FwdIter last, Pred&& pred, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::partition<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
     } partition{};
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::partition_copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct partition_copy_t final
+    inline constexpr struct partition_copy_t final
       : hpx::detail::tag_parallel_algorithm<partition_copy_t>
     {
         // clang-format off
@@ -1823,11 +1819,9 @@ namespace hpx {
                     parallel::traits::projected<Proj, FwdIter1>>
             )>
         // clang-format on
-        friend hpx::util::tagged_tuple<parallel::v1::tag::in(FwdIter1),
-            parallel::v1::tag::out1(FwdIter2),
-            parallel::v1::tag::out2(FwdIter3)>
-        tag_fallback_dispatch(hpx::partition_copy_t, FwdIter1 first,
-            FwdIter1 last, FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
+        friend std::pair<FwdIter2, FwdIter3> tag_fallback_invoke(
+            hpx::partition_copy_t, FwdIter1 first, FwdIter1 last,
+            FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
             Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
@@ -1839,11 +1833,10 @@ namespace hpx {
 
             using result_type = hpx::tuple<FwdIter1, FwdIter2, FwdIter3>;
 
-            return hpx::util::make_tagged_tuple<parallel::v1::tag::in,
-                parallel::v1::tag::out1, parallel::v1::tag::out2>(
+            return parallel::v1::tuple_to_pair(
                 parallel::v1::detail::partition_copy<result_type>().call(
                     hpx::execution::seq, first, last, dest_true, dest_false,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
         }
 
         // clang-format off
@@ -1861,10 +1854,8 @@ namespace hpx {
             )>
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            hpx::util::tagged_tuple<parallel::v1::tag::in(FwdIter1),
-                parallel::v1::tag::out1(FwdIter2),
-                parallel::v1::tag::out2(FwdIter3)>>
-        tag_fallback_dispatch(hpx::partition_copy_t, ExPolicy&& policy,
+            std::pair<FwdIter2, FwdIter3>>
+        tag_fallback_invoke(hpx::partition_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest_true,
             FwdIter3 dest_false, Pred&& pred, Proj&& proj = Proj())
         {
@@ -1877,12 +1868,11 @@ namespace hpx {
 
             using result_type = hpx::tuple<FwdIter1, FwdIter2, FwdIter3>;
 
-            return hpx::util::make_tagged_tuple<parallel::v1::tag::in,
-                parallel::v1::tag::out1, parallel::v1::tag::out2>(
+            return parallel::v1::tuple_to_pair(
                 parallel::v1::detail::partition_copy<result_type>().call(
-                    std::forward<ExPolicy>(policy), first, last, dest_true,
-                    dest_false, std::forward<Pred>(pred),
-                    std::forward<Proj>(proj)));
+                    HPX_FORWARD(ExPolicy, policy), first, last, dest_true,
+                    dest_false, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj)));
         }
     } partition_copy{};
 }    // namespace hpx

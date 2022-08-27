@@ -1,64 +1,20 @@
 //  Copyright (c) 2015 Daniel Bourgeois
+//  Copyright (c) 2021 Karame M.Shokooh
+//  Copyright (c) 2021 Srinivas Yadav
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/local/algorithm.hpp>
 #include <hpx/local/init.hpp>
-#include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/adjacent_difference.hpp>
-
-#include <cstddef>
 #include <iostream>
-#include <iterator>
-#include <numeric>
 #include <string>
 #include <vector>
 
-#include "test_utils.hpp"
+#include "adjacentdifference_tests.hpp"
 
 ////////////////////////////////////////////////////////////////////////////
-template <typename ExPolicy>
-void test_adjacent_difference(ExPolicy policy)
-{
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
-
-    std::vector<std::size_t> c = test::random_iota(10007);
-    std::vector<std::size_t> d(10007);
-    std::vector<std::size_t> d_ans(10007);
-
-    auto it = hpx::parallel::adjacent_difference(
-        policy, std::begin(c), std::end(c), std::begin(d));
-    std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
-
-    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
-        [](std::size_t lhs, std::size_t rhs) -> bool { return lhs == rhs; }));
-
-    HPX_TEST(std::end(d) == it);
-}
-
-template <typename ExPolicy>
-void test_adjacent_difference_async(ExPolicy p)
-{
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
-
-    std::vector<std::size_t> c = test::random_iota(10007);
-    std::vector<std::size_t> d(10007);
-    std::vector<std::size_t> d_ans(10007);
-
-    auto f_it = hpx::parallel::adjacent_difference(
-        p, std::begin(c), std::end(c), std::begin(d));
-    std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
-
-    f_it.wait();
-    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
-        [](std::size_t lhs, std::size_t rhs) -> bool { return lhs == rhs; }));
-
-    HPX_TEST(std::end(d) == f_it.get());
-}
-
 void adjacent_difference_test()
 {
     using namespace hpx::execution;

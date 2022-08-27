@@ -8,7 +8,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #if defined(_MSC_VER)
 // conversion from uint64_t -> double, possible loss of precision
-#pragma warning (disable: 4244)
+#pragma warning(disable : 4244)
 #endif
 
 #include <hpx/hpx.hpp>
@@ -17,9 +17,9 @@
 #include <hpx/cache/entries/lfu_entry.hpp>
 #include <hpx/cache/local_cache.hpp>
 #include <hpx/cache/statistics/local_full_statistics.hpp>
+#include <hpx/modules/testing.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/statistics/histogram.hpp>
-#include <hpx/modules/testing.hpp>
 
 #include <hpx/modules/program_options.hpp>
 #include <boost/accumulators/accumulators.hpp>
@@ -52,7 +52,7 @@ public:
     }
 
     explicit gva_cache_key(
-            hpx::naming::gid_type const& id, std::uint64_t count = 1)
+        hpx::naming::gid_type const& id, std::uint64_t count = 1)
       : key_(hpx::naming::detail::get_stripped_gid(id),
             hpx::naming::detail::get_stripped_gid(id) + (count - 1))
     {
@@ -106,7 +106,8 @@ struct gva_erase_policy
 {
     gva_erase_policy(hpx::naming::gid_type const& id, std::uint64_t count)
       : entry(id, count)
-    {}
+    {
+    }
 
     typedef std::pair<gva_cache_key, gva_entry_type> entry_type;
 
@@ -118,26 +119,24 @@ struct gva_erase_policy
     gva_cache_key entry;
 };
 
-typedef hpx::util::cache::local_cache<
-    gva_cache_key, gva_entry_type, std::less<gva_entry_type>,
+typedef hpx::util::cache::local_cache<gva_cache_key, gva_entry_type,
+    std::less<gva_entry_type>,
     hpx::util::cache::policies::always<gva_entry_type>,
     std::map<gva_cache_key, gva_entry_type>,
-    hpx::util::cache::statistics::local_full_statistics
-> gva_cache_type;
+    hpx::util::cache::statistics::local_full_statistics>
+    gva_cache_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-void calculate_histogram(std::string const& prefix,
-    std::vector<std::uint64_t> const& timings)
+void calculate_histogram(
+    std::string const& prefix, std::vector<std::uint64_t> const& timings)
 {
     auto minmax = std::minmax_element(timings.begin(), timings.end());
 
-    typedef boost::accumulators::accumulator_set<
-            std::uint64_t,
-            boost::accumulators::features<hpx::util::tag::histogram>
-        > histogram_collector_type;
+    typedef boost::accumulators::accumulator_set<std::uint64_t,
+        boost::accumulators::features<hpx::util::tag::histogram>>
+        histogram_collector_type;
 
-    histogram_collector_type hist(
-        hpx::util::tag::histogram::num_bins = 20,
+    histogram_collector_type hist(hpx::util::tag::histogram::num_bins = 20,
         hpx::util::tag::histogram::min_range = *minmax.first,
         hpx::util::tag::histogram::max_range = *minmax.second);
 
@@ -265,13 +264,11 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("cache_size", value<std::size_t>(),
-         "initial cache size (default: "
-         HPX_PP_STRINGIZE(HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD) ")")
-        ("num_entries,n", value<std::size_t>(),
-         "number of items to insert into cache (default: 1000)")
-        ;
+    desc_commandline.add_options()("cache_size", value<std::size_t>(),
+        "initial cache size (default: " HPX_PP_STRINGIZE(
+            HPX_AGAS_LOCAL_CACHE_SIZE_PER_THREAD) ")")("num_entries,n",
+        value<std::size_t>(),
+        "number of items to insert into cache (default: 1000)");
 
     // Initialize and run HPX
     hpx::init_params init_args;

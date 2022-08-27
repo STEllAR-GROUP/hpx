@@ -8,7 +8,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/throw_exception.hpp>
-#include <hpx/execution_base/register_locks.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/thread_data.hpp>
@@ -63,12 +63,10 @@ namespace hpx { namespace threads {
         if (k < 4)    //-V112
         {
         }
-#if defined(HPX_SMT_PAUSE)
         else if (k < 16)
         {
             HPX_SMT_PAUSE;
         }
-#endif
         else if (k < 32 || k & 1)    //-V112
         {
             do_yield(desc, hpx::threads::thread_schedule_state::pending_boost);
@@ -103,14 +101,27 @@ namespace hpx { namespace threads {
     void execution_agent::sleep_until(
         hpx::chrono::steady_time_point const& sleep_time, const char* desc)
     {
+        // Just yield until time has passed by...
         auto now = std::chrono::steady_clock::now();
 
-        // Just yield until time has passed by...
-        for (std::size_t k = 0; now < sleep_time.value(); ++k)
+        // Note: we yield at least once to allow for other threads to
+        // make progress in any case. We also use yield instead of yield_k
+        // for the same reason.
+        std::size_t k = 0;
+        do
         {
-            yield_k(k, desc);
+            if (k < 32 || k & 1)
+            {
+                do_yield(
+                    desc, hpx::threads::thread_schedule_state::pending_boost);
+            }
+            else
+            {
+                do_yield(desc, hpx::threads::thread_schedule_state::pending);
+            }
+            ++k;
             now = std::chrono::steady_clock::now();
-        }
+        } while (now < sleep_time.value());
     }
 
 #if defined(HPX_HAVE_VERIFY_LOCKS)
@@ -123,7 +134,7 @@ namespace hpx { namespace threads {
 
         ~on_exit_reset_held_lock_data()
         {
-            hpx::util::set_held_locks_data(std::move(data_));
+            hpx::util::set_held_locks_data(HPX_MOVE(data_));
         }
 
         std::unique_ptr<hpx::util::held_locks_data> data_;

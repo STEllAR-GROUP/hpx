@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,6 +10,7 @@
 #include <hpx/command_line_handling_local/late_command_line_handling_local.hpp>
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
 #include <hpx/coroutines/coroutine.hpp>
+#include <hpx/coroutines/signal_handler_debugging.hpp>
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind.hpp>
@@ -54,7 +55,6 @@
 #include <string>
 #include <thread>
 #include <utility>
-#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure the system gets properly shut down while handling Ctrl-C and other
@@ -65,15 +65,14 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     void handle_termination(char const* reason)
     {
-        if (get_config_entry("hpx.attach_debugger", "") == "exception")
+        if (hpx::threads::coroutines::attach_debugger_on_sigv)
         {
             util::attach_debugger();
         }
 
-        if (get_config_entry("hpx.diagnostics_on_terminate", "1") == "1")
+        if (hpx::threads::coroutines::diagnostics_on_terminate)
         {
-            int const verbosity = util::from_string<int>(
-                get_config_entry("hpx.exception_verbosity", "2"));
+            int const verbosity = hpx::threads::coroutines::exception_verbosity;
 
             if (verbosity >= 2)
             {
@@ -135,19 +134,17 @@ namespace hpx {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    HPX_NORETURN HPX_CORE_EXPORT void termination_handler(int signum)
+    [[noreturn]] HPX_CORE_EXPORT void termination_handler(int signum)
     {
         if (signum != SIGINT &&
-            get_config_entry("hpx.attach_debugger", "") == "exception")
+            hpx::threads::coroutines::attach_debugger_on_sigv)
         {
             util::attach_debugger();
         }
 
-        if (get_config_entry("hpx.diagnostics_on_terminate", "1") == "1")
+        if (hpx::threads::coroutines::diagnostics_on_terminate)
         {
-            int const verbosity = util::from_string<int>(
-                get_config_entry("hpx.exception_verbosity", "2"));
-
+            int const verbosity = hpx::threads::coroutines::exception_verbosity;
             char* reason = strsignal(signum);
 
             if (verbosity >= 2)
@@ -205,6 +202,20 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     void set_error_handlers()
     {
+        // initialize global variables
+        hpx::threads::coroutines::attach_debugger_on_sigv =
+            get_config_entry("hpx.attach_debugger", "") == "exception";
+        hpx::threads::coroutines::diagnostics_on_terminate =
+            get_config_entry("hpx.diagnostics_on_terminate", "1") == "1";
+        hpx::threads::coroutines::exception_verbosity = util::from_string<int>(
+            get_config_entry("hpx.exception_verbosity", "2"));
+        hpx::threads::coroutines::exception_verbosity = 0;
+#if defined(HPX_HAVE_STACKTRACES) && defined(HPX_HAVE_THREAD_BACKTRACE_DEPTH)
+        hpx::threads::coroutines::exception_verbosity =
+            util::from_string<int>(get_config_entry(
+                "hpx.trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH));
+#endif
+
 #if defined(HPX_WINDOWS)
         // Set console control handler to allow server to be stopped.
         SetConsoleCtrlHandler(hpx::termination_handler, TRUE);
@@ -228,30 +239,32 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace strings {
-        char const* const runtime_state_names[] = {
-            "state_invalid",         // -1
-            "state_initialized",     // 0
-            "state_pre_startup",     // 1
-            "state_startup",         // 2
-            "state_pre_main",        // 3
-            "state_starting",        // 4
-            "state_running",         // 5
-            "state_suspended",       // 6
-            "state_pre_sleep",       // 7
-            "state_sleeping",        // 8
-            "state_pre_shutdown",    // 9
-            "state_shutdown",        // 10
-            "state_stopping",        // 11
-            "state_terminating",     // 12
-            "state_stopped"          // 13
+        inline constexpr char const* const runtime_state_names[] = {
+            "state::invalid",         // -1
+            "state::initialized",     // 0
+            "state::pre_startup",     // 1
+            "state::startup",         // 2
+            "state::pre_main",        // 3
+            "state::starting",        // 4
+            "state::running",         // 5
+            "state::suspended",       // 6
+            "state::pre_sleep",       // 7
+            "state::sleeping",        // 8
+            "state::pre_shutdown",    // 9
+            "state::shutdown",        // 10
+            "state::stopping",        // 11
+            "state::terminating",     // 12
+            "state::stopped"          // 13
         };
     }
 
-    char const* get_runtime_state_name(state st)
+    char const* get_runtime_state_name(state s)
     {
-        if (st < state_invalid || st >= last_valid_runtime_state)
+        if (s < state::invalid || s >= state::last_valid_runtime_state)
+        {
             return "invalid (value out of bounds)";
-        return strings::runtime_state_names[st + 1];
+        }
+        return strings::runtime_state_names[static_cast<int>(s) + 1];
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -266,7 +279,7 @@ namespace hpx {
       , instance_number_(++instance_number_counter_)
       , thread_support_(new util::thread_mapper)
       , topology_(resource::get_partitioner().get_topology())
-      , state_(state_invalid)
+      , state_(state::invalid)
       , on_start_func_(global_on_start_func)
       , on_stop_func_(global_on_stop_func)
       , on_error_func_(global_on_error_func)
@@ -318,7 +331,7 @@ namespace hpx {
       , instance_number_(++instance_number_counter_)
       , thread_support_(new util::thread_mapper)
       , topology_(resource::get_partitioner().get_topology())
-      , state_(state_invalid)
+      , state_(state::invalid)
       , on_start_func_(global_on_start_func)
       , on_stop_func_(global_on_stop_func)
       , on_error_func_(global_on_error_func)
@@ -354,15 +367,15 @@ namespace hpx {
         threads::detail::network_background_callback_type
             network_background_callback)
     {
-        notifier_ = std::move(notifier);
+        notifier_ = HPX_MOVE(notifier);
 
         main_pool_.init(1);
 #ifdef HPX_HAVE_IO_POOL
-        io_pool_notifier_ = std::move(io_pool_notifier);
+        io_pool_notifier_ = HPX_MOVE(io_pool_notifier);
         io_pool_.init(rtcfg_.get_thread_pool_size("io_pool"));
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
-        timer_pool_notifier_ = std::move(timer_pool_notifier);
+        timer_pool_notifier_ = HPX_MOVE(timer_pool_notifier);
         timer_pool_.init(rtcfg_.get_thread_pool_size("timer_pool"));
 #endif
 
@@ -389,26 +402,26 @@ namespace hpx {
             for (startup_function_type& f :
                 detail::global_pre_startup_functions)
             {
-                add_pre_startup_function(std::move(f));
+                add_pre_startup_function(HPX_MOVE(f));
             }
             detail::global_pre_startup_functions.clear();
 
             for (startup_function_type& f : detail::global_startup_functions)
             {
-                add_startup_function(std::move(f));
+                add_startup_function(HPX_MOVE(f));
             }
             detail::global_startup_functions.clear();
 
             for (shutdown_function_type& f :
                 detail::global_pre_shutdown_functions)
             {
-                add_pre_shutdown_function(std::move(f));
+                add_pre_shutdown_function(HPX_MOVE(f));
             }
             detail::global_pre_shutdown_functions.clear();
 
             for (shutdown_function_type& f : detail::global_shutdown_functions)
             {
-                add_shutdown_function(std::move(f));
+                add_shutdown_function(HPX_MOVE(f));
             }
             detail::global_shutdown_functions.clear();
         }
@@ -424,7 +437,7 @@ namespace hpx {
         }
 
         // set state to initialized
-        set_state(state_initialized);
+        set_state(state::initialized);
     }
 
     runtime::~runtime()
@@ -448,7 +461,7 @@ namespace hpx {
         resource::detail::delete_partitioner();
     }
 
-    void runtime::on_exit(util::function_nonser<void()> const& f)
+    void runtime::on_exit(hpx::function<void()> const& f)
     {
         std::lock_guard<std::mutex> l(mtx_);
         on_exit_functions_.push_back(f);
@@ -456,14 +469,14 @@ namespace hpx {
 
     void runtime::starting()
     {
-        state_.store(state_pre_main);
+        state_.store(hpx::state::pre_main);
     }
 
     void runtime::stopping()
     {
-        state_.store(state_stopped);
+        state_.store(hpx::state::stopped);
 
-        using value_type = util::function_nonser<void()>;
+        using value_type = hpx::function<void()>;
 
         std::lock_guard<std::mutex> l(mtx_);
         for (value_type const& f : on_exit_functions_)
@@ -472,7 +485,7 @@ namespace hpx {
 
     bool runtime::stopped() const
     {
-        return state_.load() == state_stopped;
+        return state_.load() == hpx::state::stopped;
     }
 
     hpx::util::runtime_configuration& runtime::get_config()
@@ -566,7 +579,7 @@ namespace hpx {
         threads::policies::callback_notifier::on_startstop_type&& f)
     {
         threads::policies::callback_notifier::on_startstop_type newf =
-            std::move(f);
+            HPX_MOVE(f);
         std::swap(on_start_func_, newf);
         return newf;
     }
@@ -576,7 +589,7 @@ namespace hpx {
         threads::policies::callback_notifier::on_startstop_type&& f)
     {
         threads::policies::callback_notifier::on_startstop_type newf =
-            std::move(f);
+            HPX_MOVE(f);
         std::swap(on_stop_func_, newf);
         return newf;
     }
@@ -584,7 +597,7 @@ namespace hpx {
     threads::policies::callback_notifier::on_error_type runtime::on_error_func(
         threads::policies::callback_notifier::on_error_type&& f)
     {
-        threads::policies::callback_notifier::on_error_type newf = std::move(f);
+        threads::policies::callback_notifier::on_error_type newf = HPX_MOVE(f);
         std::swap(on_error_func_, newf);
         return newf;
     }
@@ -611,7 +624,7 @@ namespace hpx {
         return 1;
     }
 
-    lcos::future<std::uint32_t> runtime::get_num_localities() const
+    hpx::future<std::uint32_t> runtime::get_num_localities() const
     {
         return make_ready_future(std::uint32_t(1));
     }
@@ -671,11 +684,11 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
         {
-            return rt->on_start_func(std::move(f));
+            return rt->on_start_func(HPX_MOVE(f));
         }
 
         threads::policies::callback_notifier::on_startstop_type newf =
-            std::move(f);
+            HPX_MOVE(f);
         std::swap(global_on_start_func, newf);
         return newf;
     }
@@ -687,11 +700,11 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
         {
-            return rt->on_stop_func(std::move(f));
+            return rt->on_stop_func(HPX_MOVE(f));
         }
 
         threads::policies::callback_notifier::on_startstop_type newf =
-            std::move(f);
+            HPX_MOVE(f);
         std::swap(global_on_stop_func, newf);
         return newf;
     }
@@ -703,10 +716,10 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
         {
-            return rt->on_error_func(std::move(f));
+            return rt->on_error_func(HPX_MOVE(f));
         }
 
-        threads::policies::callback_notifier::on_error_type newf = std::move(f);
+        threads::policies::callback_notifier::on_error_type newf = HPX_MOVE(f);
         std::swap(global_on_error_func, newf);
         return newf;
     }
@@ -760,7 +773,7 @@ namespace hpx {
 
     /// Enumerate all OS threads that have registered with the runtime.
     bool enumerate_os_threads(
-        util::function_nonser<bool(os_thread_data const&)> const& f)
+        hpx::function<bool(os_thread_data const&)> const& f)
     {
         return get_runtime().enumerate_os_threads(f);
     }
@@ -769,7 +782,7 @@ namespace hpx {
     void report_error(std::size_t num_thread, std::exception_ptr const& e)
     {
         // Early and late exceptions
-        if (!threads::threadmanager_is(state_running))
+        if (!threads::threadmanager_is(hpx::state::running))
         {
             hpx::runtime* rt = hpx::get_runtime_ptr();
             if (rt)
@@ -785,7 +798,7 @@ namespace hpx {
     void report_error(std::exception_ptr const& e)
     {
         // Early and late exceptions
-        if (!threads::threadmanager_is(state_running))
+        if (!threads::threadmanager_is(hpx::state::running))
         {
             hpx::runtime* rt = hpx::get_runtime_ptr();
             if (rt)
@@ -799,7 +812,7 @@ namespace hpx {
         get_runtime().get_thread_manager().report_error(num_thread, e);
     }
 
-    bool register_on_exit(util::function_nonser<void()> const& f)
+    bool register_on_exit(hpx::function<void()> const& f)
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
@@ -853,8 +866,8 @@ namespace hpx {
     }
 
     void set_config_entry_callback(std::string const& key,
-        util::function_nonser<void(
-            std::string const&, std::string const&)> const& callback)
+        hpx::function<void(std::string const&, std::string const&)> const&
+            callback)
     {
         if (get_runtime_ptr() != nullptr)
         {
@@ -935,7 +948,7 @@ namespace hpx {
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
-            return rt->get_state() == state_running;
+            return rt->get_state() == hpx::state::running;
         return false;
     }
 
@@ -945,7 +958,7 @@ namespace hpx {
         {
             runtime* rt = get_runtime_ptr();
             if (nullptr != rt)
-                return rt->get_state() == state_stopped;
+                return rt->get_state() == hpx::state::stopped;
         }
         return true;    // assume stopped
     }
@@ -956,7 +969,7 @@ namespace hpx {
         if (!detail::exit_called && nullptr != rt)
         {
             state st = rt->get_state();
-            return st >= state_shutdown;
+            return st >= hpx::state::shutdown;
         }
         return true;    // assume stopped
     }
@@ -973,13 +986,13 @@ namespace hpx {
     bool is_starting()
     {
         runtime* rt = get_runtime_ptr();
-        return nullptr != rt ? rt->get_state() <= state_startup : true;
+        return nullptr != rt ? rt->get_state() <= hpx::state::startup : true;
     }
 
     bool is_pre_startup()
     {
         runtime* rt = get_runtime_ptr();
-        return nullptr != rt ? rt->get_state() < state_startup : true;
+        return nullptr != rt ? rt->get_state() < hpx::state::startup : true;
     }
 }    // namespace hpx
 
@@ -1113,18 +1126,18 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
         {
-            if (rt->get_state() > state_pre_startup)
+            if (rt->get_state() > hpx::state::pre_startup)
             {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_startup_function",
                     "Too late to register a new pre-startup function.");
                 return;
             }
-            rt->add_pre_startup_function(std::move(f));
+            rt->add_pre_startup_function(HPX_MOVE(f));
         }
         else
         {
-            detail::global_pre_startup_functions.push_back(std::move(f));
+            detail::global_pre_startup_functions.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1133,17 +1146,17 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
         {
-            if (rt->get_state() > state_startup)
+            if (rt->get_state() > hpx::state::startup)
             {
                 HPX_THROW_EXCEPTION(invalid_status, "register_startup_function",
                     "Too late to register a new startup function.");
                 return;
             }
-            rt->add_startup_function(std::move(f));
+            rt->add_startup_function(HPX_MOVE(f));
         }
         else
         {
-            detail::global_startup_functions.push_back(std::move(f));
+            detail::global_startup_functions.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1152,18 +1165,18 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
         {
-            if (rt->get_state() > state_pre_shutdown)
+            if (rt->get_state() > hpx::state::pre_shutdown)
             {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_shutdown_function",
                     "Too late to register a new pre-shutdown function.");
                 return;
             }
-            rt->add_pre_shutdown_function(std::move(f));
+            rt->add_pre_shutdown_function(HPX_MOVE(f));
         }
         else
         {
-            detail::global_pre_shutdown_functions.push_back(std::move(f));
+            detail::global_pre_shutdown_functions.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1172,18 +1185,18 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr != rt)
         {
-            if (rt->get_state() > state_shutdown)
+            if (rt->get_state() > hpx::state::shutdown)
             {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_shutdown_function",
                     "Too late to register a new shutdown function.");
                 return;
             }
-            rt->add_shutdown_function(std::move(f));
+            rt->add_shutdown_function(HPX_MOVE(f));
         }
         else
         {
-            detail::global_shutdown_functions.push_back(std::move(f));
+            detail::global_shutdown_functions.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1191,7 +1204,7 @@ namespace hpx {
     {
         if (pre_startup)
         {
-            set_state(state_pre_startup);
+            set_state(hpx::state::pre_startup);
             for (startup_function_type& f : pre_startup_functions_)
             {
                 f();
@@ -1199,7 +1212,7 @@ namespace hpx {
         }
         else
         {
-            set_state(state_startup);
+            set_state(hpx::state::startup);
             for (startup_function_type& f : startup_functions_)
             {
                 f();
@@ -1239,7 +1252,7 @@ namespace hpx {
                     // Make sure the mask does not contradict the CPU bindings
                     // returned by the system (see #973: Would like option to
                     // report HWLOC bindings).
-                    error_code ec(lightweight);
+                    error_code ec(throwmode::lightweight);
                     std::thread& blob = tm.get_os_thread_handle(i);
                     threads::mask_type boundcpu =
                         top.get_cpubind_mask(blob, ec);
@@ -1267,8 +1280,8 @@ namespace hpx {
     }    // namespace detail
 
     threads::thread_result_type runtime::run_helper(
-        util::function_nonser<runtime::hpx_main_function_type> const& func,
-        int& result, bool call_startup)
+        hpx::function<runtime::hpx_main_function_type> const& func, int& result,
+        bool call_startup)
     {
         bool caught_exception = false;
         try
@@ -1282,7 +1295,7 @@ namespace hpx {
                     lbt_ << "runtime_local::run_helper: bootstrap "
                             "aborted, bailing out";
 
-                    set_state(state_running);
+                    set_state(hpx::state::running);
                     finalize(-1.0);
 
                     return threads::thread_result_type(
@@ -1301,7 +1314,7 @@ namespace hpx {
             }
 
             lbt_ << "(4th stage) runtime::run_helper: bootstrap complete";
-            set_state(state_running);
+            set_state(hpx::state::running);
 
             // Now, execute the user supplied thread function (hpx_main)
             if (!!func)
@@ -1342,8 +1355,7 @@ namespace hpx {
     }
 
     int runtime::start(
-        util::function_nonser<hpx_main_function_type> const& func,
-        bool blocking)
+        hpx::function<hpx_main_function_type> const& func, bool blocking)
     {
 #if defined(_WIN64) && defined(HPX_DEBUG) &&                                   \
     !defined(HPX_HAVE_FIBER_BASED_COROUTINES)
@@ -1384,7 +1396,7 @@ namespace hpx {
         lbt_ << "(1st stage) runtime::start: launching run_helper "
                 "HPX thread";
 
-        threads::thread_init_data data(util::bind(&runtime::run_helper, this,
+        threads::thread_init_data data(hpx::bind(&runtime::run_helper, this,
                                            func, std::ref(result_), true),
             "run_helper", threads::thread_priority::normal,
             threads::thread_schedule_hint(0), threads::thread_stacksize::large);
@@ -1392,7 +1404,6 @@ namespace hpx {
         this->runtime::starting();
         threads::thread_id_ref_type id = threads::invalid_thread_id;
         thread_manager_->register_thread(data, id);
-
         // }}}
 
         // block if required
@@ -1402,8 +1413,9 @@ namespace hpx {
         }
         else
         {
-            // wait for at least state_running
-            util::yield_while([this]() { return get_state() < state_running; },
+            // wait for at least hpx::state::running
+            util::yield_while(
+                [this]() { return get_state() < hpx::state::running; },
                 "runtime::start");
         }
 
@@ -1412,7 +1424,7 @@ namespace hpx {
 
     int runtime::start(bool blocking)
     {
-        util::function_nonser<hpx_main_function_type> empty_main;
+        hpx::function<hpx_main_function_type> empty_main;
         return start(empty_main, blocking);
     }
 
@@ -1476,7 +1488,7 @@ namespace hpx {
         std::condition_variable cond;
         bool running = false;
 
-        std::thread t(util::bind(&runtime::wait_helper, this, std::ref(mtx),
+        std::thread t(hpx::bind(&runtime::wait_helper, this, std::ref(mtx),
             std::ref(cond), std::ref(running)));
 
         // wait for the thread to run
@@ -1526,7 +1538,7 @@ namespace hpx {
             std::condition_variable cond;
             std::unique_lock<std::mutex> l(mtx);
 
-            std::thread t(util::bind(&runtime::stop_helper, this, blocking,
+            std::thread t(hpx::bind(&runtime::stop_helper, this, blocking,
                 std::ref(cond), std::ref(mtx)));
             cond.wait(l);
 
@@ -1588,12 +1600,12 @@ namespace hpx {
     {
         LRT_(info).format("runtime_local: about to suspend runtime");
 
-        if (state_.load() == state_sleeping)
+        if (state_.load() == hpx::state::sleeping)
         {
             return 0;
         }
 
-        if (state_.load() != state_running)
+        if (state_.load() != hpx::state::running)
         {
             HPX_THROW_EXCEPTION(invalid_status, "runtime::suspend",
                 "Can only suspend runtime from running state");
@@ -1609,7 +1621,7 @@ namespace hpx {
         io_pool_.wait();
 #endif
 
-        set_state(state_sleeping);
+        set_state(hpx::state::sleeping);
 
         return 0;
     }
@@ -1618,12 +1630,12 @@ namespace hpx {
     {
         LRT_(info).format("runtime_local: about to resume runtime");
 
-        if (state_.load() == state_running)
+        if (state_.load() == hpx::state::running)
         {
             return 0;
         }
 
-        if (state_.load() != state_sleeping)
+        if (state_.load() != hpx::state::sleeping)
         {
             HPX_THROW_EXCEPTION(invalid_status, "runtime::resume",
                 "Can only resume runtime from suspended state");
@@ -1632,7 +1644,7 @@ namespace hpx {
 
         thread_manager_->resume();
 
-        set_state(state_running);
+        set_state(hpx::state::running);
 
         return 0;
     }
@@ -1671,7 +1683,7 @@ namespace hpx {
 
         // Early and late exceptions, errors outside of HPX-threads
         if (!threads::get_self_ptr() ||
-            !threads::threadmanager_is(state_running))
+            !threads::threadmanager_is(hpx::state::running))
         {
             // report the error to the local console
             if (report_exception)
@@ -1701,7 +1713,7 @@ namespace hpx {
 
     void runtime::rethrow_exception()
     {
-        if (state_.load() > state_running)
+        if (state_.load() > hpx::state::running)
         {
             std::lock_guard<std::mutex> l(mtx_);
             if (exception_)
@@ -1714,7 +1726,7 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    int runtime::run(util::function_nonser<hpx_main_function_type> const& func)
+    int runtime::run(hpx::function<hpx_main_function_type> const& func)
     {
         // start the main thread function
         start(func);
@@ -1753,21 +1765,21 @@ namespace hpx {
         typedef bool (runtime::*report_error_t)(
             std::size_t, std::exception_ptr const&, bool);
 
-        using util::placeholders::_1;
-        using util::placeholders::_2;
-        using util::placeholders::_3;
-        using util::placeholders::_4;
+        using placeholders::_1;
+        using placeholders::_2;
+        using placeholders::_3;
+        using placeholders::_4;
 
         notification_policy_type notifier;
 
         notifier.add_on_start_thread_callback(
-            util::bind(&runtime::init_tss_helper, this, prefix, type, _1, _2,
-                _3, _4, false));
+            hpx::bind(&runtime::init_tss_helper, this, prefix, type, _1, _2, _3,
+                _4, false));
         notifier.add_on_stop_thread_callback(
-            util::bind(&runtime::deinit_tss_helper, this, prefix, _1));
+            hpx::bind(&runtime::deinit_tss_helper, this, prefix, _1));
         notifier.set_on_error_callback(
-            util::bind(static_cast<report_error_t>(&runtime::report_error),
-                this, _1, _2, true));
+            hpx::bind(static_cast<report_error_t>(&runtime::report_error), this,
+                _1, _2, true));
 
         return notifier;
     }
@@ -1777,7 +1789,7 @@ namespace hpx {
         std::size_t global_thread_num, char const* pool_name,
         char const* postfix, bool service_thread)
     {
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         return init_tss_ex(context, type, local_thread_num, global_thread_num,
             pool_name, postfix, service_thread, ec);
     }
@@ -1795,7 +1807,7 @@ namespace hpx {
         if (postfix && *postfix)
             fullname += postfix;
         fullname += "#" + std::to_string(global_thread_num);
-        detail::thread_name() = std::move(fullname);
+        detail::thread_name() = HPX_MOVE(fullname);
 
         char const* name = detail::thread_name().c_str();
 
@@ -1874,7 +1886,7 @@ namespace hpx {
         if (!f.empty())
         {
             std::lock_guard<std::mutex> l(mtx_);
-            pre_startup_functions_.push_back(std::move(f));
+            pre_startup_functions_.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1883,7 +1895,7 @@ namespace hpx {
         if (!f.empty())
         {
             std::lock_guard<std::mutex> l(mtx_);
-            startup_functions_.push_back(std::move(f));
+            startup_functions_.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1892,7 +1904,7 @@ namespace hpx {
         if (!f.empty())
         {
             std::lock_guard<std::mutex> l(mtx_);
-            pre_shutdown_functions_.push_back(std::move(f));
+            pre_shutdown_functions_.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1901,7 +1913,7 @@ namespace hpx {
         if (!f.empty())
         {
             std::lock_guard<std::mutex> l(mtx_);
-            shutdown_functions_.push_back(std::move(f));
+            shutdown_functions_.push_back(HPX_MOVE(f));
         }
     }
 
@@ -1957,7 +1969,7 @@ namespace hpx {
 
     /// Enumerate all OS threads that have registered with the runtime.
     bool runtime::enumerate_os_threads(
-        util::function_nonser<bool(os_thread_data const&)> const& f) const
+        hpx::function<bool(os_thread_data const&)> const& f) const
     {
         return thread_support_->enumerate_os_threads(f);
     }
@@ -1973,7 +1985,7 @@ namespace hpx {
     std::uint32_t get_locality_id(error_code& ec)
     {
         runtime* rt = get_runtime_ptr();
-        if (nullptr == rt || rt->get_state() == state_invalid)
+        if (nullptr == rt || rt->get_state() == state::invalid)
         {
             // same as naming::invalid_locality_id
             return ~static_cast<std::uint32_t>(0);
@@ -2024,7 +2036,7 @@ namespace hpx {
         return rt->get_initial_num_localities();
     }
 
-    lcos::future<std::uint32_t> get_num_localities()
+    hpx::future<std::uint32_t> get_num_localities()
     {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)

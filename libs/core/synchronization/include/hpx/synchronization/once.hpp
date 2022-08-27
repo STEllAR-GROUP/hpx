@@ -60,7 +60,7 @@ namespace hpx { namespace lcos { namespace local {
                     // wrapped function was throwing an exception before
                     flag.event_.reset();
 
-                    HPX_INVOKE(std::forward<F>(f), std::forward<Args>(args)...);
+                    HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Args, args)...);
 
                     // set status to done, release waiting threads
                     flag.status_.store(function_complete_flag_value);

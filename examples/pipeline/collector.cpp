@@ -16,24 +16,20 @@ HPX_REGISTER_CHANNEL(int)
 hpx::future<void> f3(hpx::lcos::channel<int>& c2)
 {
     hpx::future<int> f = c2.get();
-    return f.then(
-        [&c2](hpx::future<int> f)
+    return f.then([&c2](hpx::future<int> f) {
+        try
         {
-            try
-            {
-                std::cout << "Final stage: " << f.get()
-                    << ". Executed on locality " << hpx::get_locality_id()
-                    << " " << hpx::get_locality_name()
-                    << '\n';
-                return f3(c2);
-            }
-            catch(...)
-            {
-                std::cout << "Pipeline done.\n";
-                return hpx::make_ready_future();
-            }
+            std::cout << "Final stage: " << f.get() << ". Executed on locality "
+                      << hpx::get_locality_id() << " "
+                      << hpx::get_locality_name() << '\n';
+            return f3(c2);
         }
-    );
+        catch (...)
+        {
+            std::cout << "Pipeline done.\n";
+            return hpx::make_ready_future();
+        }
+    });
 }
 
 int main()

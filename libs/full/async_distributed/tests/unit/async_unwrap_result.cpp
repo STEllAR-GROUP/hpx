@@ -29,15 +29,15 @@ struct decrement_server
         return hpx::make_ready_future(i - 1);
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(decrement_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(decrement_server, call)
 };
 
 typedef hpx::components::managed_component<decrement_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, decrement_server);
+HPX_REGISTER_COMPONENT(server_type, decrement_server)
 
 typedef decrement_server::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION_DECLARATION(call_action)
+HPX_REGISTER_ACTION(call_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server : hpx::components::component_base<test_server>
@@ -46,26 +46,26 @@ struct test_server : hpx::components::component_base<test_server>
     {
         return hpx::make_ready_future(i + 1);
     }
-    HPX_DEFINE_COMPONENT_ACTION(test_server, increment);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, increment)
 
     hpx::future<std::int32_t> increment_with_future(
         hpx::shared_future<std::int32_t> fi)
     {
         return hpx::make_ready_future(fi.get() + 1);
     }
-    HPX_DEFINE_COMPONENT_ACTION(test_server, increment_with_future);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, increment_with_future)
 };
 
 typedef hpx::components::component<test_server> test_server_type;
-HPX_REGISTER_COMPONENT(test_server_type, test_server);
+HPX_REGISTER_COMPONENT(test_server_type, test_server)
 
 typedef test_server::increment_action increment_action;
-HPX_REGISTER_ACTION_DECLARATION(increment_action);
-HPX_REGISTER_ACTION(increment_action);
+HPX_REGISTER_ACTION_DECLARATION(increment_action)
+HPX_REGISTER_ACTION(increment_action)
 
 typedef test_server::increment_with_future_action increment_with_future_action;
-HPX_REGISTER_ACTION_DECLARATION(increment_with_future_action);
-HPX_REGISTER_ACTION(increment_with_future_action);
+HPX_REGISTER_ACTION_DECLARATION(increment_with_future_action)
+HPX_REGISTER_ACTION(increment_with_future_action)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {
@@ -103,7 +103,7 @@ void test_remote_async_unwrap_result(test_client const& target)
     {
         increment_with_future_action inc;
 
-        hpx::lcos::promise<std::int32_t> p;
+        hpx::distributed::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<std::int32_t> f1 =

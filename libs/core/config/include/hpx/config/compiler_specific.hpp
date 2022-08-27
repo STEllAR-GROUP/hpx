@@ -166,4 +166,5 @@
 #  endif
 #endif
 // clang-format on
-#endif
+
+#endif    // defined(DOXYGEN)

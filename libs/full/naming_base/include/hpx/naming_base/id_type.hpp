@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,17 +24,17 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace naming {
+namespace hpx {
 
-    namespace detail {
+    namespace naming::detail {
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p);
-        HPX_EXPORT void intrusive_ptr_release(id_type_impl* p);
+        HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p) noexcept;
+        HPX_EXPORT void intrusive_ptr_release(id_type_impl* p) noexcept;
 
-        HPX_EXPORT void gid_managed_deleter(id_type_impl* p);
-        HPX_EXPORT void gid_unmanaged_deleter(id_type_impl* p);
-    }    // namespace detail
+        HPX_EXPORT void gid_managed_deleter(id_type_impl* p) noexcept;
+        HPX_EXPORT void gid_unmanaged_deleter(id_type_impl* p) noexcept;
+    }    // namespace naming::detail
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT std::ostream& operator<<(std::ostream& os, id_type const& id);
@@ -44,66 +44,80 @@ namespace hpx { namespace naming {
     struct id_type
     {
     private:
-        friend struct detail::id_type_impl;
+        friend struct naming::detail::id_type_impl;
 
     public:
-        enum management_type
+        enum class management_type
         {
             unknown_deleter = -1,
             unmanaged = 0,             ///< unmanaged GID
             managed = 1,               ///< managed GID
-            managed_move_credit = 2    ///< managed GID which will give up all
+            managed_move_credit = 2    ///< managed GID that will give up all
                                        ///< credits when sent
         };
+
+#define HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG                              \
+    "The unscoped id_type::management_type names are deprecated. Please use "  \
+    "id_type::management_type::state instead."
+
+        HPX_DEPRECATED_V(1, 8, HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        static constexpr management_type unknown_deleter =
+            management_type::unknown_deleter;
+        HPX_DEPRECATED_V(1, 8, HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        static constexpr management_type unmanaged = management_type::unmanaged;
+        HPX_DEPRECATED_V(1, 8, HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        static constexpr management_type managed = management_type::managed;
+        HPX_DEPRECATED_V(1, 8, HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG)
+        static constexpr management_type managed_move_credit =
+            management_type::managed_move_credit;
+
+#undef HPX_ID_TYPE_UNSCOPED_ENUM_DEPRECATION_MSG
+
+        friend constexpr bool operator<(
+            management_type lhs, management_type rhs) noexcept
+        {
+            return static_cast<int>(lhs) < static_cast<int>(rhs);
+        }
+        friend constexpr bool operator>(
+            management_type lhs, management_type rhs) noexcept
+        {
+            return static_cast<int>(lhs) > static_cast<int>(rhs);
+        }
 
         constexpr id_type() noexcept = default;
 
         id_type(std::uint64_t lsb_id, management_type t);
-        id_type(gid_type const& gid, management_type t);
+        id_type(naming::gid_type const& gid, management_type t);
         id_type(std::uint64_t msb_id, std::uint64_t lsb_id, management_type t);
 
-        id_type(id_type const& o) noexcept
-          : gid_(o.gid_)
-        {
-        }
-        id_type(id_type&& o) noexcept
-          : gid_(std::move(o.gid_))
-        {
-        }
+        id_type(id_type const& o) = default;
+        id_type(id_type&& o) noexcept = default;
 
-        id_type& operator=(id_type const& o) noexcept
-        {
-            gid_ = o.gid_;
-            return *this;
-        }
-        id_type& operator=(id_type&& o) noexcept
-        {
-            gid_ = std::move(o.gid_);
-            return *this;
-        }
+        id_type& operator=(id_type const& o) = default;
+        id_type& operator=(id_type&& o) noexcept = default;
 
-        gid_type& get_gid();
-        gid_type const& get_gid() const;
+        naming::gid_type& get_gid();
+        naming::gid_type const& get_gid() const;
 
         // This function is used in AGAS unit tests and application code, do not
         // remove.
-        management_type get_management_type() const;
+        management_type get_management_type() const noexcept;
 
         id_type& operator++();
         id_type operator++(int);
 
-        explicit operator bool() const;
+        explicit operator bool() const noexcept;
 
         // comparison is required as well
         friend HPX_EXPORT bool operator==(
-            id_type const& lhs, id_type const& rhs);
-        friend bool operator!=(id_type const& lhs, id_type const& rhs);
+            id_type const& lhs, id_type const& rhs) noexcept;
+        friend bool operator!=(id_type const& lhs, id_type const& rhs) noexcept;
 
         friend HPX_EXPORT bool operator<(
-            id_type const& lhs, id_type const& rhs);
-        friend bool operator<=(id_type const& lhs, id_type const& rhs);
-        friend bool operator>(id_type const& lhs, id_type const& rhs);
-        friend bool operator>=(id_type const& lhs, id_type const& rhs);
+            id_type const& lhs, id_type const& rhs) noexcept;
+        friend bool operator<=(id_type const& lhs, id_type const& rhs) noexcept;
+        friend bool operator>(id_type const& lhs, id_type const& rhs) noexcept;
+        friend bool operator>=(id_type const& lhs, id_type const& rhs) noexcept;
 
         // access the internal parts of the gid
         std::uint64_t get_msb() const;
@@ -117,11 +131,12 @@ namespace hpx { namespace naming {
         // care, or better, don't use this at all.
         void make_unmanaged() const;
 
-        hpx::intrusive_ptr<detail::id_type_impl>& impl()
+        hpx::intrusive_ptr<naming::detail::id_type_impl>& impl() noexcept
         {
             return gid_;
         }
-        hpx::intrusive_ptr<detail::id_type_impl> const& impl() const
+        constexpr hpx::intrusive_ptr<naming::detail::id_type_impl> const& impl()
+            const noexcept
         {
             return gid_;
         }
@@ -130,43 +145,50 @@ namespace hpx { namespace naming {
         friend HPX_EXPORT std::ostream& operator<<(
             std::ostream& os, id_type const& id);
 
-        hpx::intrusive_ptr<detail::id_type_impl> gid_;
+        hpx::intrusive_ptr<naming::detail::id_type_impl> gid_;
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    HPX_EXPORT char const* get_management_type_name(id_type::management_type m);
 
     ///////////////////////////////////////////////////////////////////////////
     static id_type const invalid_id = id_type();
 
-    ///////////////////////////////////////////////////////////////////////
-    // Handle conversion to/from locality_id
-    // FIXME: these names are confusing, 'id' appears in identifiers far too
-    // frequently.
-    inline id_type get_id_from_locality_id(std::uint32_t locality_id) noexcept
-    {
-        return id_type(
-            (std::uint64_t(locality_id) + 1) << gid_type::locality_id_shift, 0,
-            id_type::unmanaged);
-    }
+    namespace naming {
 
-    inline std::uint32_t get_locality_id_from_id(id_type const& id) noexcept
-    {
-        return std::uint32_t(id.get_msb() >> gid_type::locality_id_shift) - 1;
-    }
+        ///////////////////////////////////////////////////////////////////////////
+        HPX_EXPORT char const* get_management_type_name(
+            id_type::management_type m) noexcept;
 
-    inline id_type get_locality_from_id(id_type const& id) noexcept
-    {
-        return get_id_from_locality_id(get_locality_id_from_id(id));
-    }
+        ///////////////////////////////////////////////////////////////////////
+        // Handle conversion to/from locality_id
+        // FIXME: these names are confusing, 'id' appears in identifiers far too
+        // frequently.
+        inline id_type get_id_from_locality_id(
+            std::uint32_t locality_id) noexcept
+        {
+            return id_type((std::uint64_t(locality_id) + 1)
+                    << naming::gid_type::locality_id_shift,
+                0, id_type::management_type::unmanaged);
+        }
 
-    inline bool is_locality(id_type const& id) noexcept
-    {
-        return is_locality(id.get_gid());
-    }
+        inline std::uint32_t get_locality_id_from_id(id_type const& id) noexcept
+        {
+            return std::uint32_t(
+                       id.get_msb() >> naming::gid_type::locality_id_shift) -
+                1;
+        }
+
+        inline id_type get_locality_from_id(id_type const& id) noexcept
+        {
+            return get_id_from_locality_id(get_locality_id_from_id(id));
+        }
+
+        inline bool is_locality(id_type const& id) noexcept
+        {
+            return is_locality(id.get_gid());
+        }
+    }    // namespace naming
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
+    namespace naming::detail {
 
         ///////////////////////////////////////////////////////////////////////
         inline void set_dont_store_in_cache(id_type& id) noexcept
@@ -181,7 +203,7 @@ namespace hpx { namespace naming {
             HPX_NON_COPYABLE(id_type_impl);
 
         private:
-            using deleter_type = void (*)(detail::id_type_impl*);
+            using deleter_type = void (*)(detail::id_type_impl*) noexcept;
             static deleter_type get_deleter(
                 id_type::management_type t) noexcept;
 
@@ -199,7 +221,7 @@ namespace hpx { namespace naming {
             {
             }
 
-            explicit id_type_impl(init_no_addref, std::uint64_t lsb_id,
+            id_type_impl(init_no_addref, std::uint64_t lsb_id,
                 id_type::management_type t) noexcept
               : gid_type(0, lsb_id)
               , count_(1)
@@ -244,7 +266,7 @@ namespace hpx { namespace naming {
                 return alloc_.allocate(1);
             }
 
-            static void operator delete(void* p, std::size_t size)
+            static void operator delete(void* p, std::size_t size) noexcept
             {
                 if (p == nullptr)
                 {
@@ -261,92 +283,102 @@ namespace hpx { namespace naming {
 
         private:
             // custom deleter for id_type_impl
-            friend HPX_EXPORT void gid_managed_deleter(id_type_impl* p);
-            friend HPX_EXPORT void gid_unmanaged_deleter(id_type_impl* p);
+            friend HPX_EXPORT void gid_managed_deleter(
+                id_type_impl* p) noexcept;
+            friend HPX_EXPORT void gid_unmanaged_deleter(
+                id_type_impl* p) noexcept;
 
             // reference counting
-            friend HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p);
-            friend HPX_EXPORT void intrusive_ptr_release(id_type_impl* p);
+            friend HPX_EXPORT void intrusive_ptr_add_ref(
+                id_type_impl* p) noexcept;
+            friend HPX_EXPORT void intrusive_ptr_release(
+                id_type_impl* p) noexcept;
 
             util::atomic_count count_;
-            id_type::management_type type_ = id_type::unknown_deleter;
+            id_type::management_type type_ =
+                id_type::management_type::unknown_deleter;
 
             static util::internal_allocator<id_type_impl> alloc_;
         };
-    }    // namespace detail
+    }    // namespace naming::detail
 
     ///////////////////////////////////////////////////////////////////////////
     // the local gid is actually just a wrapper around the real thing
     inline id_type::id_type(std::uint64_t lsb_id, management_type t)
-      : gid_(new detail::id_type_impl(
-                 detail::id_type_impl::init_no_addref{}, 0, lsb_id, t),
+      : gid_(new naming::detail::id_type_impl(
+                 naming::detail::id_type_impl::init_no_addref{}, 0, lsb_id, t),
             false)
     {
     }
 
-    inline id_type::id_type(gid_type const& gid, management_type t)
-      : gid_(new detail::id_type_impl(
-                 detail::id_type_impl::init_no_addref{}, gid, t),
+    inline id_type::id_type(naming::gid_type const& gid, management_type t)
+      : gid_(new naming::detail::id_type_impl(
+                 naming::detail::id_type_impl::init_no_addref{}, gid, t),
             false)
     {
-        if (t == unmanaged)
+        if (t == management_type::unmanaged)
         {
-            detail::strip_internal_bits_except_dont_cache_from_gid(*gid_);
+            naming::detail::strip_internal_bits_except_dont_cache_from_gid(
+                *gid_);
         }
     }
 
     inline id_type::id_type(
         std::uint64_t msb_id, std::uint64_t lsb_id, management_type t)
-      : gid_(new detail::id_type_impl(
-                 detail::id_type_impl::init_no_addref{}, msb_id, lsb_id, t),
+      : gid_(new naming::detail::id_type_impl(
+                 naming::detail::id_type_impl::init_no_addref{}, msb_id, lsb_id,
+                 t),
             false)
     {
-        if (t == unmanaged)
+        if (t == management_type::unmanaged)
         {
-            detail::strip_internal_bits_except_dont_cache_from_gid(*gid_);
+            naming::detail::strip_internal_bits_except_dont_cache_from_gid(
+                *gid_);
         }
     }
 
-    inline gid_type& id_type::get_gid()
+    inline naming::gid_type& id_type::get_gid()
     {
         return *gid_;
     }
-    inline gid_type const& id_type::get_gid() const
+    inline naming::gid_type const& id_type::get_gid() const
     {
         return *gid_;
     }
 
     // This function is used in AGAS unit tests and application code, do not
     // remove.
-    inline id_type::management_type id_type::get_management_type() const
+    inline id_type::management_type id_type::get_management_type()
+        const noexcept
     {
-        return gid_->get_management_type();
+        return gid_ ? gid_->get_management_type() :
+                      management_type::unknown_deleter;
     }
 
-    inline id_type::operator bool() const
+    inline id_type::operator bool() const noexcept
     {
         return gid_ && *gid_;
     }
 
     // comparison is required as well
-    inline bool operator!=(id_type const& lhs, id_type const& rhs)
+    inline bool operator!=(id_type const& lhs, id_type const& rhs) noexcept
     {
         return !(lhs == rhs);
     }
 
-    inline bool operator<=(id_type const& lhs, id_type const& rhs)
+    inline bool operator<=(id_type const& lhs, id_type const& rhs) noexcept
     {
         // Deduced from <.
         return !(rhs < lhs);
     }
 
-    inline bool operator>(id_type const& lhs, id_type const& rhs)
+    inline bool operator>(id_type const& lhs, id_type const& rhs) noexcept
     {
         // Deduced from <.
         return rhs < lhs;
     }
 
-    inline bool operator>=(id_type const& lhs, id_type const& rhs)
+    inline bool operator>=(id_type const& lhs, id_type const& rhs) noexcept
     {
         // Deduced from <.
         return !(lhs < rhs);
@@ -379,44 +411,45 @@ namespace hpx { namespace naming {
     {
         gid_->set_management_type(management_type::unmanaged);
     }
-}}    // namespace hpx::naming
+}    // namespace hpx
+
+namespace hpx::naming {
+
+    using id_type HPX_DEPRECATED_V(
+        1, 8, "hpx::naming::id_type is deprecated, use hpx::id_type instead") =
+        hpx::id_type;
+}    // namespace hpx::naming
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits {
 
     template <>
-    struct get_remote_result<naming::id_type, naming::gid_type>
+    struct get_remote_result<hpx::id_type, naming::gid_type>
     {
-        HPX_EXPORT static naming::id_type call(naming::gid_type const& rhs);
+        HPX_EXPORT static hpx::id_type call(naming::gid_type const& rhs);
     };
 
     template <>
     struct promise_local_result<naming::gid_type>
     {
-        typedef naming::id_type type;
+        using type = hpx::id_type;
     };
 
     // we need to specialize this template to allow for automatic conversion of
-    // the vector<naming::gid_type> to a vector<naming::id_type>
+    // the vector<naming::gid_type> to a vector<hpx::id_type>
     template <>
-    struct get_remote_result<std::vector<naming::id_type>,
+    struct get_remote_result<std::vector<hpx::id_type>,
         std::vector<naming::gid_type>>
     {
-        HPX_EXPORT static std::vector<naming::id_type> call(
+        HPX_EXPORT static std::vector<hpx::id_type> call(
             std::vector<naming::gid_type> const& rhs);
     };
 
     template <>
     struct promise_local_result<std::vector<naming::gid_type>>
     {
-        typedef std::vector<naming::id_type> type;
+        using type = std::vector<hpx::id_type>;
     };
 }}    // namespace hpx::traits
-
-namespace hpx {
-
-    // Pulling important types into the main namespace
-    using naming::invalid_id;
-}    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>

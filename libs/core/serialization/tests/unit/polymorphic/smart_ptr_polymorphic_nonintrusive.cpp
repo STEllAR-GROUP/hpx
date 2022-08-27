@@ -39,7 +39,7 @@ struct A
     virtual const char* foo() = 0;
 };
 
-HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(A);
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(A)
 
 template <class Archive>
 void serialize(Archive& ar, A& a, unsigned)
@@ -74,8 +74,8 @@ void save(Archive& ar, const B& b, unsigned)
     ar& hpx::serialization::base_object<A>(b);
     ar& b.b;
 }
-HPX_SERIALIZATION_SPLIT_FREE(B);
-HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(B);
+HPX_SERIALIZATION_SPLIT_FREE(B)
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(B)
 
 struct C : public B
 {
@@ -103,7 +103,7 @@ void serialize(Archive& ar, C& c, unsigned)
     ar& hpx::serialization::base_object<B>(c);
     ar& c.c;
 }
-HPX_SERIALIZATION_REGISTER_CLASS(C);
+HPX_SERIALIZATION_REGISTER_CLASS(C)
 
 void test_shared()
 {
@@ -150,7 +150,7 @@ struct D
 
     virtual const char* foo() = 0;
 };
-HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(D);
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(D)
 
 template <class Archive>
 void load(Archive& ar, D& d, unsigned)
@@ -162,14 +162,14 @@ void save(Archive& ar, const D& d, unsigned)
 {
     ar& d.a;
 }
-HPX_SERIALIZATION_SPLIT_FREE(D);
+HPX_SERIALIZATION_SPLIT_FREE(D)
 
-void intrusive_ptr_add_ref(D* d)
+void intrusive_ptr_add_ref(D* d) noexcept
 {
     ++d->count;
 }
 
-void intrusive_ptr_release(D* d)
+void intrusive_ptr_release(D* d) noexcept
 {
     if (--d->count == 0)
     {
@@ -204,8 +204,8 @@ void save(Archive& ar, const E& e, unsigned)
     ar& hpx::serialization::base_object<D>(e);
     ar& e.b;
 }
-HPX_SERIALIZATION_SPLIT_FREE(E);
-HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(E);
+HPX_SERIALIZATION_SPLIT_FREE(E)
+HPX_TRAITS_NONINTRUSIVE_POLYMORPHIC(E)
 
 struct F : public E
 {
@@ -233,7 +233,7 @@ void serialize(Archive& ar, F& f, unsigned)
     ar& hpx::serialization::base_object<E>(f);
     ar& f.c;
 }
-HPX_SERIALIZATION_REGISTER_CLASS(F);
+HPX_SERIALIZATION_REGISTER_CLASS(F)
 
 void test_intrusive()
 {

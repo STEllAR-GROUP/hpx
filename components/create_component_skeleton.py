@@ -23,7 +23,7 @@ header_str = '=' * len(component_name)
 # CMake minimum version
 cmake_version = '3.18'
 
-cmake_header = f'''# Copyright (c) 2019 The STE||AR-Group
+cmake_header = f'''# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -153,7 +153,13 @@ include(HPX_Message)
 include(HPX_AddPseudoDependencies)
 include(HPX_AddPseudoTarget)
 
+# Variable used to add the components to the pkgconfig linking step
 set(HPX_COMPONENTS
+    ""
+    CACHE INTERNAL "list of HPX components" FORCE
+)
+
+set(component_dirs
 '''
 for component in components:
     components_cmakelists += f'  {component}\n'
@@ -173,22 +179,22 @@ if(HPX_WITH_TESTS)
     add_hpx_pseudo_dependencies(tests.unit tests.unit.components)
   endif()
 
-  if (HPX_WITH_EXAMPLES AND HPX_WITH_TESTS_EXAMPLES)
+  if(HPX_WITH_EXAMPLES AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_pseudo_target(tests.examples.components)
     add_hpx_pseudo_dependencies(tests.examples tests.examples.components)
   endif()
 
-  if (HPX_WITH_TESTS_REGRESSIONS)
+  if(HPX_WITH_TESTS_REGRESSIONS)
     add_hpx_pseudo_target(tests.regressions.components)
     add_hpx_pseudo_dependencies(tests.regressions tests.regressions.components)
   endif()
 
-  if (HPX_WITH_TESTS_BENCHMARKS)
+  if(HPX_WITH_TESTS_BENCHMARKS)
     add_hpx_pseudo_target(tests.performance.components)
     add_hpx_pseudo_dependencies(tests.performance tests.performance.components)
   endif()
 
-  if (HPX_WITH_TESTS_HEADERS)
+  if(HPX_WITH_TESTS_HEADERS)
     add_hpx_pseudo_target(tests.headers.components)
     add_hpx_pseudo_dependencies(tests.headers tests.headers.components)
   endif()
@@ -200,7 +206,7 @@ hpx_info("Configuring components:")
 
 add_hpx_pseudo_target(components)
 
-foreach(component ${HPX_COMPONENTS})
+foreach(component ${component_dirs})
   hpx_info("  ${component}")
   add_hpx_pseudo_target(components.${component})
   add_subdirectory(${component})

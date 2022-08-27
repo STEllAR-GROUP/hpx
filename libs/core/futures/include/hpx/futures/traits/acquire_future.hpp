@@ -34,12 +34,15 @@ namespace hpx { namespace traits {
     {
     };
 
+    template <typename T>
+    using acquire_future_t = typename acquire_future<T>::type;
+
     struct acquire_future_disp
     {
         template <typename T>
-        HPX_FORCEINLINE typename acquire_future<T>::type operator()(T&& t) const
+        HPX_FORCEINLINE acquire_future_t<T> operator()(T&& t) const
         {
-            return acquire_future<T>()(std::forward<T>(t));
+            return acquire_future<T>()(HPX_FORWARD(T, t));
         }
     };
 
@@ -48,51 +51,52 @@ namespace hpx { namespace traits {
         template <typename T, typename Enable>
         struct acquire_future_impl
         {
-            static_assert(!is_future_or_future_range<T>::value, "");
+            static_assert(!is_future_or_future_range_v<T>,
+                "!is_future_or_future_range_v<T>");
 
-            typedef T type;
+            using type = T;
 
             template <typename T_>
             HPX_FORCEINLINE T operator()(T_&& value) const
             {
-                return std::forward<T_>(value);
+                return HPX_FORWARD(T_, value);
             }
         };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename R>
-        struct acquire_future_impl<hpx::lcos::future<R>>
+        struct acquire_future_impl<hpx::future<R>>
         {
-            typedef hpx::lcos::future<R> type;
+            using type = hpx::future<R>;
 
-            HPX_FORCEINLINE hpx::lcos::future<R> operator()(
-                hpx::lcos::future<R>& future) const
+            HPX_FORCEINLINE hpx::future<R> operator()(
+                hpx::future<R>& future) const noexcept
             {
-                return std::move(future);
+                return HPX_MOVE(future);
             }
 
-            HPX_FORCEINLINE hpx::lcos::future<R> operator()(
-                hpx::lcos::future<R>&& future) const
+            HPX_FORCEINLINE hpx::future<R> operator()(
+                hpx::future<R>&& future) const noexcept
             {
-                return std::move(future);
+                return HPX_MOVE(future);
             }
         };
 
         template <typename R>
-        struct acquire_future_impl<hpx::lcos::shared_future<R>>
+        struct acquire_future_impl<hpx::shared_future<R>>
         {
-            typedef hpx::lcos::shared_future<R> type;
+            using type = hpx::shared_future<R>;
 
-            HPX_FORCEINLINE hpx::lcos::shared_future<R> operator()(
-                hpx::lcos::shared_future<R> const& future) const
+            HPX_FORCEINLINE hpx::shared_future<R> operator()(
+                hpx::shared_future<R> const& future) const
             {
                 return future;
             }
 
-            HPX_FORCEINLINE hpx::lcos::shared_future<R> operator()(
-                hpx::lcos::shared_future<R>&& future) const
+            HPX_FORCEINLINE hpx::shared_future<R> operator()(
+                hpx::shared_future<R>&& future) const noexcept
             {
-                return std::move(future);
+                return HPX_MOVE(future);
             }
         };
 
@@ -102,17 +106,14 @@ namespace hpx { namespace traits {
         ///////////////////////////////////////////////////////////////////////
         template <typename Range>
         struct acquire_future_impl<Range,
-            typename std::enable_if<
-                traits::is_future_range<Range>::value>::type>
+            std::enable_if_t<hpx::traits::is_future_range_v<Range>>>
         {
-            typedef typename traits::future_range_traits<Range>::future_type
-                future_type;
-
-            typedef Range type;
+            using future_type =
+                typename traits::future_range_traits<Range>::future_type;
+            using type = Range;
 
             template <typename Range_>
-            typename std::enable_if<
-                has_push_back<typename std::decay<Range_>::type>::value>::type
+            std::enable_if_t<has_push_back_v<std::decay_t<Range_>>>
             transform_future_disp(Range_&& futures, Range& values) const
             {
                 detail::reserve_if_random_access_by_range(values, futures);
@@ -134,7 +135,7 @@ namespace hpx { namespace traits {
             HPX_FORCEINLINE Range operator()(Range_&& futures) const
             {
                 Range values;
-                transform_future_disp(std::forward<Range_>(futures), values);
+                transform_future_disp(HPX_FORWARD(Range_, futures), values);
                 return values;
             }
         };

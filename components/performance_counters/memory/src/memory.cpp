@@ -65,5 +65,5 @@ namespace hpx { namespace performance_counters { namespace memory
 //
 // Note that this macro can be used not more than once in one module.
 HPX_REGISTER_STARTUP_MODULE_DYNAMIC(
-    hpx::performance_counters::memory::get_startup);
+    hpx::performance_counters::memory::get_startup)
 

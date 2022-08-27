@@ -5,19 +5,23 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
+
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
-#include <hpx/functional/unique_function.hpp>
-#include <hpx/futures/future_fwd.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/naming_base.hpp>
+#include <hpx/parcelset_base/parcel_interface.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <map>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -37,36 +41,36 @@ namespace hpx { namespace agas {
     }
 
     bool register_name(launch::sync_policy, std::string const& name,
-        naming::id_type const& id, error_code& ec)
+        hpx::id_type const& id, error_code& ec)
     {
         return detail::register_name_id(name, id, ec);
     }
 
     hpx::future<bool> register_name(
-        std::string const& name, naming::id_type const& id)
+        std::string const& name, hpx::id_type const& id)
     {
         return detail::register_name_async(name, id);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type unregister_name(
+    hpx::id_type unregister_name(
         launch::sync_policy, std::string const& name, error_code& ec)
     {
         return detail::unregister_name(name, ec);
     }
 
-    hpx::future<naming::id_type> unregister_name(std::string const& name)
+    hpx::future<hpx::id_type> unregister_name(std::string const& name)
     {
         return detail::unregister_name_async(name);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::id_type> resolve_name(std::string const& name)
+    hpx::future<hpx::id_type> resolve_name(std::string const& name)
     {
         return detail::resolve_name_async(name);
     }
 
-    naming::id_type resolve_name(
+    hpx::id_type resolve_name(
         launch::sync_policy, std::string const& name, error_code& ec)
     {
         return detail::resolve_name(name, ec);
@@ -136,13 +140,13 @@ namespace hpx { namespace agas {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::address> resolve(naming::id_type const& id)
+    hpx::future<naming::address> resolve(hpx::id_type const& id)
     {
         return detail::resolve_async(id);
     }
 
     naming::address resolve(
-        launch::sync_policy, naming::id_type const& id, error_code& ec)
+        launch::sync_policy, hpx::id_type const& id, error_code& ec)
     {
         return detail::resolve(id, ec);
     }
@@ -232,20 +236,20 @@ namespace hpx { namespace agas {
 
     /// \brief Invoke an asynchronous garbage collection step on the given target
     ///        locality.
-    void garbage_collect_non_blocking(naming::id_type const& id, error_code& ec)
+    void garbage_collect_non_blocking(hpx::id_type const& id, error_code& ec)
     {
         detail::garbage_collect_non_blocking_id(id, ec);
     }
 
     /// \brief Invoke a synchronous garbage collection step on the given target
     ///        locality.
-    void garbage_collect(naming::id_type const& id, error_code& ec)
+    void garbage_collect(hpx::id_type const& id, error_code& ec)
     {
         detail::garbage_collect_id(id, ec);
     }
 
     /// \brief Return an id_type referring to the console locality.
-    naming::id_type get_console_locality(error_code& ec)
+    hpx::id_type get_console_locality(error_code& ec)
     {
         return detail::get_console_locality(ec);
     }
@@ -262,6 +266,20 @@ namespace hpx { namespace agas {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
+    parcelset::endpoints_type const& resolve_locality(
+        naming::gid_type const& gid, error_code& ec)
+    {
+        return detail::resolve_locality(gid, ec);
+    }
+
+    void remove_resolved_locality(naming::gid_type const& gid)
+    {
+        return detail::remove_resolved_locality(gid);
+    }
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
     naming::gid_type get_next_id(std::size_t count, error_code& ec)
     {
         return detail::get_next_id(count, ec);
@@ -276,13 +294,13 @@ namespace hpx { namespace agas {
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::future<std::int64_t> incref(naming::gid_type const& gid,
-        std::int64_t credits, naming::id_type const& keep_alive)
+        std::int64_t credits, hpx::id_type const& keep_alive)
     {
         return detail::incref_async(gid, credits, keep_alive);
     }
 
     std::int64_t incref(launch::sync_policy, naming::gid_type const& gid,
-        std::int64_t credits, naming::id_type const& keep_alive, error_code& ec)
+        std::int64_t credits, hpx::id_type const& keep_alive, error_code& ec)
     {
         return detail::incref(gid, credits, keep_alive, ec);
     }
@@ -294,13 +312,13 @@ namespace hpx { namespace agas {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::id_type> get_colocation_id(naming::id_type const& id)
+    hpx::future<hpx::id_type> get_colocation_id(hpx::id_type const& id)
     {
         return detail::get_colocation_id_async(id);
     }
 
-    naming::id_type get_colocation_id(
-        launch::sync_policy, naming::id_type const& id, error_code& ec)
+    hpx::id_type get_colocation_id(
+        launch::sync_policy, hpx::id_type const& id, error_code& ec)
     {
         return detail::get_colocation_id(id, ec);
     }
@@ -313,30 +331,30 @@ namespace hpx { namespace agas {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<std::pair<naming::id_type, naming::address>> begin_migration(
-        naming::id_type const& id)
+    hpx::future<std::pair<hpx::id_type, naming::address>> begin_migration(
+        hpx::id_type const& id)
     {
         return detail::begin_migration(id);
     }
 
-    bool end_migration(naming::id_type const& id)
+    bool end_migration(hpx::id_type const& id)
     {
         return detail::end_migration(id);
     }
 
     hpx::future<void> mark_as_migrated(naming::gid_type const& gid,
-        util::unique_function_nonser<std::pair<bool, hpx::future<void>>()>&& f,
+        hpx::move_only_function<std::pair<bool, hpx::future<void>>()>&& f,
         bool expect_to_be_marked_as_migrating)
     {
         return detail::mark_as_migrated(
-            gid, std::move(f), expect_to_be_marked_as_migrating);
+            gid, HPX_MOVE(f), expect_to_be_marked_as_migrating);
     }
 
     std::pair<bool, components::pinned_ptr> was_object_migrated(
         naming::gid_type const& gid,
-        util::unique_function_nonser<components::pinned_ptr()>&& f)
+        hpx::move_only_function<components::pinned_ptr()>&& f)
     {
-        return detail::was_object_migrated(gid, std::move(f));
+        return detail::was_object_migrated(gid, HPX_MOVE(f));
     }
 
     void unmark_as_migrated(naming::gid_type const& gid)
@@ -344,13 +362,13 @@ namespace hpx { namespace agas {
         return detail::unmark_as_migrated(gid);
     }
 
-    hpx::future<std::map<std::string, naming::id_type>> find_symbols(
+    hpx::future<std::map<std::string, hpx::id_type>> find_symbols(
         std::string const& pattern)
     {
         return detail::find_symbols_async(pattern);
     }
 
-    std::map<std::string, naming::id_type> find_symbols(
+    std::map<std::string, hpx::id_type> find_symbols(
         hpx::launch::sync_policy, std::string const& pattern)
     {
         return detail::find_symbols(pattern);
@@ -376,4 +394,30 @@ namespace hpx { namespace agas {
         return detail::destroy_component(gid, addr);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_NETWORKING)
+    void route(parcelset::parcel&& p,
+        hpx::function<void(std::error_code const&, parcelset::parcel const&)>&&
+            f,
+        threads::thread_priority local_priority)
+    {
+        return detail::route(HPX_MOVE(p), HPX_MOVE(f), local_priority);
+    }
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    naming::address_type get_primary_ns_lva()
+    {
+        return detail::get_primary_ns_lva();
+    }
+
+    naming::address_type get_symbol_ns_lva()
+    {
+        return detail::get_symbol_ns_lva();
+    }
+
+    naming::address_type get_runtime_support_lva()
+    {
+        return detail::get_runtime_support_lva();
+    }
 }}    // namespace hpx::agas

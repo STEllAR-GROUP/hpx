@@ -13,7 +13,7 @@
 #include <hpx/include/runtime.hpp>
 
 void test(int* ptr) {}
-HPX_PLAIN_ACTION(test);
+HPX_PLAIN_ACTION(test)
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()

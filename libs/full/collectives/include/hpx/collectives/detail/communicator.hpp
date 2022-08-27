@@ -69,7 +69,7 @@ namespace hpx { namespace collectives { namespace detail {
         {
             return std::make_shared<traits::communication_operation<
                 communicator_server, Operation>>(*this)
-                ->template get<Result>(which, std::move(args)...);
+                ->template get<Result>(which, HPX_MOVE(args)...);
         }
 
         template <typename Operation, typename Result, typename... Args>
@@ -87,7 +87,7 @@ namespace hpx { namespace collectives { namespace detail {
         {
             return std::make_shared<traits::communication_operation<
                 communicator_server, Operation>>(*this)
-                ->template set<Result>(which, std::move(args)...);
+                ->template set<Result>(which, HPX_MOVE(args)...);
         }
 
         template <typename Operation, typename Result, typename... Args>

@@ -308,8 +308,7 @@ namespace test {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void make_ready(
-        std::vector<hpx::lcos::local::promise<std::size_t>>& p,
+    inline void make_ready(std::vector<hpx::promise<std::size_t>>& p,
         std::vector<std::size_t>& idx)
     {
         std::for_each(std::begin(idx), std::end(idx),
@@ -317,13 +316,11 @@ namespace test {
     }
 
     inline std::vector<hpx::future<std::size_t>> fill_with_futures(
-        std::vector<hpx::lcos::local::promise<std::size_t>>& p)
+        std::vector<hpx::promise<std::size_t>>& p)
     {
         std::vector<hpx::future<std::size_t>> f;
         std::transform(std::begin(p), std::end(p), std::back_inserter(f),
-            [](hpx::lcos::local::promise<std::size_t>& pr) {
-                return pr.get_future();
-            });
+            [](hpx::promise<std::size_t>& pr) { return pr.get_future(); });
 
         return f;
     }

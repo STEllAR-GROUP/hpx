@@ -18,44 +18,42 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-struct test_server
-  : hpx::components::component_base<test_server>
+struct test_server : hpx::components::component_base<test_server>
 {
-    ~test_server()
-    {
-    }
+    ~test_server() {}
 
     hpx::id_type create_new(hpx::id_type const& id) const;
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, create_new, create_new_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, create_new, create_new_action)
 };
 
 typedef hpx::components::component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 typedef test_server::create_new_action create_new_action;
-HPX_REGISTER_ACTION_DECLARATION(create_new_action);
-HPX_REGISTER_ACTION(create_new_action);
+HPX_REGISTER_ACTION_DECLARATION(create_new_action)
+HPX_REGISTER_ACTION(create_new_action)
 
 struct test_client
-  : hpx::components::client_base<
-        test_client, hpx::components::stub_base<test_server> >
+  : hpx::components::client_base<test_client,
+        hpx::components::stub_base<test_server>>
 {
-    typedef hpx::components::client_base<
-        test_client, hpx::components::stub_base<test_server> >
-    client_base_type;
+    typedef hpx::components::client_base<test_client,
+        hpx::components::stub_base<test_server>>
+        client_base_type;
 
     // create a new instance of a test_server
-    test_client()
-    {}
+    test_client() {}
 
     // initialize the client from a given server instance
     explicit test_client(hpx::id_type const& id)
       : client_base_type(id)
-    {}
+    {
+    }
     explicit test_client(hpx::shared_future<hpx::id_type> const& fgid)
       : client_base_type(fgid)
-    {}
+    {
+    }
 
     test_client create_new(hpx::id_type const& id) const
     {
@@ -80,7 +78,8 @@ int main()
         // repeating this a couple of times forces the issue ...
         for (int i = 0; i != 100; ++i)
         {
-            test_client c = hpx::new_<test_client>(id);  // create a new instance
+            test_client c =
+                hpx::new_<test_client>(id);    // create a new instance
 
             // this construct overwrites the original client with a newly created
             // one which causes the only reference to the initial test_server to go

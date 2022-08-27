@@ -9,40 +9,39 @@
 
 #pragma once
 
-#include "inspector.hpp"
 #include <cstddef>
+#include "inspector.hpp"
 
-namespace boost
-{
-    namespace inspect
+namespace boost { namespace inspect {
+    class length_check : public inspector
     {
-        class length_check : public inspector
+        long m_files_with_errors;
+        std::size_t limit;
+
+    public:
+        length_check(std::size_t setting);
+
+        std::string a = "*Line length limit*";
+        std::string b =
+            "The line is longer than allowed by the character limit";
+        virtual const char* name() const
         {
-            long m_files_with_errors;
-            std::size_t limit;
+            return a.c_str();
+        }
+        virtual const char* desc() const
+        {
+            return b.c_str();
+        }
 
-        public:
+        virtual void inspect(const std::string& library_name,
+            const path& full_path, const std::string& contents);
 
-            length_check(std::size_t setting);
+        virtual void print_summary(std::ostream& out)
+        {
+            string c = " files with lines exceeding the character limit";
+            out << "  " << m_files_with_errors << c << line_break();
+        }
 
-            std::string a = "*Line length limit*";
-            std::string b = "The line is longer than allowed by the character limit";
-            virtual const char * name() const { return a.c_str(); }
-            virtual const char * desc() const { return b.c_str(); }
-
-            virtual void inspect(
-                const std::string & library_name,
-                const path & full_path,
-                const std::string & contents);
-
-            virtual void print_summary(std::ostream& out)
-            {
-                string c = " files with lines exceeding the character limit";
-                out << "  " << m_files_with_errors << c << line_break();
-            }
-
-            virtual ~length_check() {}
-        };
-    }
-}
-
+        virtual ~length_check() {}
+    };
+}}    // namespace boost::inspect

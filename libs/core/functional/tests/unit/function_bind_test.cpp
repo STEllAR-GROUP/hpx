@@ -25,14 +25,12 @@ static unsigned func_impl(int arg1, bool arg2, double arg3)
 
 int main(int, char*[])
 {
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
-    hpx::util::function_nonser<unsigned(bool, double)> f1 =
-        hpx::util::bind(func_impl, 15, _1, _2);
-    hpx::util::function_nonser<unsigned(double)> f2 =
-        hpx::util::bind(f1, false, _1);
-    hpx::util::function_nonser<unsigned()> f3 = hpx::util::bind(f2, 4.0);
+    hpx::function<unsigned(bool, double)> f1 = hpx::bind(func_impl, 15, _1, _2);
+    hpx::function<unsigned(double)> f2 = hpx::bind(f1, false, _1);
+    hpx::function<unsigned()> f3 = hpx::bind(f2, 4.0);
 
     HPX_TEST_EQ(f3(), 120u);
 

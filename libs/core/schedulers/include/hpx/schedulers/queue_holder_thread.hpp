@@ -306,7 +306,7 @@ namespace hpx { namespace threads { namespace policies {
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_id_ref_type*>(&thrd),
                     "queueing thread_priority::bound");
-                bp_queue_->schedule_work(std::move(thrd), other_end);
+                bp_queue_->schedule_work(HPX_MOVE(thrd), other_end);
             }
             else if (hp_queue_ &&
                 (priority == thread_priority::high ||
@@ -317,7 +317,7 @@ namespace hpx { namespace threads { namespace policies {
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_id_ref_type*>(&thrd),
                     "queueing thread_priority::high");
-                hp_queue_->schedule_work(std::move(thrd), other_end);
+                hp_queue_->schedule_work(HPX_MOVE(thrd), other_end);
             }
             else if (lp_queue_ && (priority == thread_priority::low))
             {
@@ -325,7 +325,7 @@ namespace hpx { namespace threads { namespace policies {
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_id_ref_type*>(&thrd),
                     "queueing thread_priority::low");
-                lp_queue_->schedule_work(std::move(thrd), other_end);
+                lp_queue_->schedule_work(HPX_MOVE(thrd), other_end);
             }
             else
             {
@@ -333,7 +333,7 @@ namespace hpx { namespace threads { namespace policies {
                     queue_data_print(this),
                     debug::threadinfo<threads::thread_id_ref_type*>(&thrd),
                     "queueing thread_priority::normal");
-                np_queue_->schedule_work(std::move(thrd), other_end);
+                np_queue_->schedule_work(HPX_MOVE(thrd), other_end);
             }
         }
 
@@ -569,7 +569,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        static void deallocate(threads::thread_data* p)
+        static void deallocate(threads::thread_data* p) noexcept
         {
             using threads::thread_data;
             p->~thread_data();
@@ -937,8 +937,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ------------------------------------------------------------
-        bool enumerate_threads(
-            util::function_nonser<bool(thread_id_type)> const& f,
+        bool enumerate_threads(hpx::function<bool(thread_id_type)> const& f,
             thread_schedule_state state = thread_schedule_state::unknown) const
         {
             std::uint64_t count = thread_map_count_.data_;

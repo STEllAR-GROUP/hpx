@@ -94,22 +94,22 @@ namespace hpx { namespace util {
             // escape regex special characters
             // NOLINTNEXTLINE(bugprone-branch-clone)
             case '+':
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             case '.':
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             case '(':
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             case ')':
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             case '{':
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             case '}':
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             case '^':
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             case '$':
                 result.append("\\");
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
 
             default:
                 result.append(1, c);

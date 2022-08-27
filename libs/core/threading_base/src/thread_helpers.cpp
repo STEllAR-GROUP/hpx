@@ -11,7 +11,7 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/modules/errors.hpp>
 #ifdef HPX_HAVE_VERIFY_LOCKS
-#include <hpx/execution_base/register_locks.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #endif
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/threading_base/detail/reset_lco_description.hpp>
@@ -297,16 +297,17 @@ namespace hpx { namespace threads {
     ////////////////////////////////////////////////////////////////////////////
     static thread_local std::size_t continuation_recursion_count(0);
 
-    std::size_t& get_continuation_recursion_count()
+    std::size_t& get_continuation_recursion_count() noexcept
     {
         thread_self* self_ptr = get_self_ptr();
         if (self_ptr)
+        {
             return self_ptr->get_continuation_recursion_count();
-
+        }
         return continuation_recursion_count;
     }
 
-    void reset_continuation_recursion_count()
+    void reset_continuation_recursion_count() noexcept
     {
         continuation_recursion_count = 0;
     }
@@ -329,7 +330,7 @@ namespace hpx { namespace threads {
     }
 
     bool add_thread_exit_callback(thread_id_type const& id,
-        util::function_nonser<void()> const& f, error_code& ec)
+        hpx::function<void()> const& f, error_code& ec)
     {
         if (HPX_UNLIKELY(!id))
         {
@@ -471,14 +472,14 @@ namespace hpx { namespace this_thread {
                 auto* scheduler =
                     get_thread_id_data(nextid)->get_scheduler_base();
                 scheduler->schedule_thread(
-                    std::move(nextid), threads::thread_schedule_hint());
+                    HPX_MOVE(nextid), threads::thread_schedule_hint());
                 statex = self.yield(threads::thread_result_type(
                     state, threads::invalid_thread_id));
             }
             else
             {
                 statex = self.yield(
-                    threads::thread_result_type(state, std::move(nextid)));
+                    threads::thread_result_type(state, HPX_MOVE(nextid)));
             }
         }
 
@@ -553,7 +554,7 @@ namespace hpx { namespace this_thread {
                 auto* scheduler =
                     get_thread_id_data(nextid)->get_scheduler_base();
                 scheduler->schedule_thread(
-                    std::move(nextid), threads::thread_schedule_hint());
+                    HPX_MOVE(nextid), threads::thread_schedule_hint());
                 statex = self.yield(threads::thread_result_type(
                     threads::thread_schedule_state::suspended,
                     threads::invalid_thread_id));
@@ -562,14 +563,14 @@ namespace hpx { namespace this_thread {
             {
                 statex = self.yield(threads::thread_result_type(
                     threads::thread_schedule_state::suspended,
-                    std::move(nextid)));
+                    HPX_MOVE(nextid)));
             }
 
             if (statex != threads::thread_restart_state::timeout)
             {
                 HPX_ASSERT(statex == threads::thread_restart_state::abort ||
                     statex == threads::thread_restart_state::signaled);
-                error_code ec1(lightweight);    // do not throw
+                error_code ec1(throwmode::lightweight);    // do not throw
                 hpx::util::yield_while(
                     [&timer_started]() { return !timer_started.load(); },
                     "set_thread_state_timed");

@@ -35,7 +35,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             difference_type step = count / 2;
             Iter it = std::next(first, step);
 
-            if (hpx::util::invoke(f, hpx::util::invoke(proj, *it), value))
+            if (HPX_INVOKE(f, HPX_INVOKE(proj, *it), value))
             {
                 first = ++it;
                 count -= step + 1;
@@ -62,7 +62,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             difference_type step = count / 2;
             Iter it = std::next(first, step);
 
-            if (hpx::util::invoke(f, hpx::util::invoke(proj, *it), value))
+            if (HPX_INVOKE(f, HPX_INVOKE(proj, *it), value))
             {
                 first = ++it;
                 count -= step + 1;
@@ -93,7 +93,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             difference_type step = count / 2;
             Iter it = std::next(first, step);
 
-            if (!hpx::util::invoke(f, value, hpx::util::invoke(proj, *it)))
+            if (!HPX_INVOKE(f, value, HPX_INVOKE(proj, *it)))
             {
                 first = ++it;
                 count -= step + 1;
@@ -120,7 +120,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             difference_type step = count / 2;
             Iter it = std::next(first, step);
 
-            if (!hpx::util::invoke(f, value, hpx::util::invoke(proj, *it)))
+            if (!HPX_INVOKE(f, value, HPX_INVOKE(proj, *it)))
             {
                 first = ++it;
                 count -= step + 1;

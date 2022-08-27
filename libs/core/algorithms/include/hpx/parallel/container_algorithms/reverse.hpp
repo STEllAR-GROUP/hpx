@@ -375,7 +375,6 @@ namespace hpx { namespace ranges {
 
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/reverse.hpp>
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <type_traits>
@@ -397,7 +396,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         return detail::reverse<
             typename hpx::traits::range_iterator<Rng>::type>()
-            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng));
     }
 
@@ -416,7 +415,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     {
         return detail::reverse_copy<util::in_out_result<
             typename hpx::traits::range_iterator<Rng>::type, OutIter>>()
-            .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), dest_first);
     }
 }}}    // namespace hpx::parallel::v1
@@ -429,7 +428,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::reverse
-    HPX_INLINE_CONSTEXPR_VARIABLE struct reverse_t final
+    inline constexpr struct reverse_t final
       : hpx::detail::tag_parallel_algorithm<reverse_t>
     {
     private:
@@ -440,7 +439,7 @@ namespace hpx { namespace ranges {
             hpx::traits::is_sentinel_for<Sent, Iter>::value
         )>
         // clang-format on
-        friend Iter tag_fallback_dispatch(
+        friend Iter tag_fallback_invoke(
             hpx::ranges::reverse_t, Iter first, Sent sent)
         {
             static_assert((hpx::traits::is_bidirectional_iterator<Iter>::value),
@@ -457,7 +456,7 @@ namespace hpx { namespace ranges {
         )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_dispatch(hpx::ranges::reverse_t, Rng&& rng)
+        tag_fallback_invoke(hpx::ranges::reverse_t, Rng&& rng)
         {
             static_assert(
                 (hpx::traits::is_bidirectional_iterator<
@@ -480,14 +479,14 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::ranges::reverse_t, ExPolicy&& policy, Iter first, Sent sent)
         {
             static_assert((hpx::traits::is_bidirectional_iterator<Iter>::value),
                 "Required at least biderectional iterator.");
 
             return parallel::v1::detail::reverse<Iter>().call(
-                std::forward<ExPolicy>(policy), first, sent);
+                HPX_FORWARD(ExPolicy, policy), first, sent);
         }
 
         // clang-format off
@@ -499,7 +498,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::ranges::reverse_t, ExPolicy&& policy, Rng&& rng)
         {
             static_assert(
@@ -509,14 +508,14 @@ namespace hpx { namespace ranges {
 
             return parallel::v1::detail::reverse<
                 typename hpx::traits::range_iterator<Rng>::type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng));
         }
     } reverse{};
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::reverse_copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct reverse_copy_t final
+    inline constexpr struct reverse_copy_t final
       : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
     {
     private:
@@ -528,7 +527,7 @@ namespace hpx { namespace ranges {
             hpx::traits::is_iterator<OutIter>::value
         )>
         // clang-format on
-        friend reverse_copy_result<Iter, OutIter> tag_fallback_dispatch(
+        friend reverse_copy_result<Iter, OutIter> tag_fallback_invoke(
             hpx::ranges::reverse_copy_t, Iter first, Sent last, OutIter result)
         {
             static_assert((hpx::traits::is_bidirectional_iterator<Iter>::value),
@@ -551,7 +550,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend reverse_copy_result<
             typename hpx::traits::range_iterator<Rng>::type, OutIter>
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::ranges::reverse_copy_t, Rng&& rng, OutIter result)
         {
             static_assert(
@@ -580,7 +579,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             reverse_copy_result<Iter, FwdIter>>::type
-        tag_fallback_dispatch(hpx::ranges::reverse_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::reverse_copy_t, ExPolicy&& policy,
             Iter first, Sent last, FwdIter result)
         {
             static_assert((hpx::traits::is_bidirectional_iterator<Iter>::value),
@@ -591,7 +590,7 @@ namespace hpx { namespace ranges {
 
             return parallel::v1::detail::reverse_copy<
                 hpx::parallel::util::in_out_result<Iter, FwdIter>>()
-                .call(std::forward<ExPolicy>(policy), first, last, result);
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, result);
         }
 
         // clang-format off
@@ -605,7 +604,7 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             reverse_copy_result<typename hpx::traits::range_iterator<Rng>::type,
                 OutIter>>::type
-        tag_fallback_dispatch(hpx::ranges::reverse_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::reverse_copy_t, ExPolicy&& policy,
             Rng&& rng, OutIter result)
         {
             static_assert(
@@ -619,7 +618,7 @@ namespace hpx { namespace ranges {
             return parallel::v1::detail::reverse_copy<
                 hpx::parallel::util::in_out_result<
                     typename hpx::traits::range_iterator<Rng>::type, OutIter>>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                     hpx::util::end(rng), result);
         }
     } reverse_copy{};

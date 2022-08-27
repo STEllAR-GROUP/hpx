@@ -5,10 +5,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/modules/format.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/iostream.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -19,9 +19,9 @@
 
 #include "worker_timed.hpp"
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using hpx::get_os_thread_count;
 
@@ -31,7 +31,6 @@ using hpx::threads::get_thread_count;
 using hpx::chrono::high_resolution_timer;
 
 using hpx::cout;
-using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Command-line variables.
@@ -40,30 +39,24 @@ std::uint64_t delay = 0;
 bool header = true;
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_results(
-    std::uint64_t cores
-  , double walltime
-    )
+void print_results(std::uint64_t cores, double walltime)
 {
     if (header)
         cout << "OS-threads,Tasks,Delay (iterations),"
                 "Total Walltime (seconds),Walltime per Task (seconds)\n"
-             << flush;
+             << std::flush;
 
     std::string const cores_str = hpx::util::format("{},", cores);
     std::string const tasks_str = hpx::util::format("{},", tasks);
     std::string const delay_str = hpx::util::format("{},", delay);
 
-    hpx::util::format_to(cout,
-        "{:-21} {:-21} {:-21} {:10.12}, {:10.12}\n",
-        cores_str, tasks_str, delay_str,
-        walltime, walltime / tasks) << flush;
+    hpx::util::format_to(cout, "{:-21} {:-21} {:-21} {:10.12}, {:10.12}\n",
+        cores_str, tasks_str, delay_str, walltime, walltime / tasks)
+        << std::flush;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(
-    variables_map& vm
-    )
+int hpx_main(variables_map& vm)
 {
     if (vm.count("no-header"))
         header = false;
@@ -72,7 +65,8 @@ int hpx_main(
 
     int num_executors = vm["executors"].as<int>();
     if (num_executors <= 0)
-        throw std::invalid_argument("number of executors to use must be larger than 0");
+        throw std::invalid_argument(
+            "number of executors to use must be larger than 0");
 
     if (std::size_t(num_executors) > num_os_threads)
         throw std::invalid_argument("number of executors to use must be \
@@ -102,9 +96,11 @@ int hpx_main(
             if ((i + 1) * num_cores_per_executor > num_os_threads)
             {
                 HPX_TEST_EQ(i, std::size_t(num_executors) - 1);
-                num_cores_per_executor = num_os_threads - i * num_cores_per_executor;
+                num_cores_per_executor =
+                    num_os_threads - i * num_cores_per_executor;
             }
-            executors.push_back(local_priority_queue_executor(num_cores_per_executor));
+            executors.push_back(
+                local_priority_queue_executor(num_cores_per_executor));
         }
 
         t.restart();
@@ -112,8 +108,8 @@ int hpx_main(
         // schedule normal threads
         for (std::uint64_t i = 0; i < tasks; ++i)
             executors[i % num_executors].add(
-                hpx::util::bind(&worker_timed, delay * 1000));
-    // destructors of executors will wait for all tasks to finish executing
+                hpx::bind(&worker_timed, delay * 1000));
+        // destructors of executors will wait for all tasks to finish executing
     }
 
     print_results(num_os_threads, t.elapsed());
@@ -122,34 +118,25 @@ int hpx_main(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(
-    int argc
-  , char* argv[]
-    )
+int main(int argc, char* argv[])
 {
     // Configure application-specific options.
     options_description cmdline("usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()
-        ( "tasks"
-        , value<std::uint64_t>(&tasks)->default_value(500000)
-        , "number of tasks to invoke")
+    cmdline.add_options()("tasks",
+        value<std::uint64_t>(&tasks)->default_value(500000),
+        "number of tasks to invoke")
 
-        ( "delay"
-        , value<std::uint64_t>(&delay)->default_value(0)
-        , "number of iterations in the delay loop")
+        ("delay", value<std::uint64_t>(&delay)->default_value(0),
+            "number of iterations in the delay loop")
 
-        ( "executors,e"
-        , value<int>()->default_value(1)
-        , "number of executor instances to use")
+            ("executors,e", value<int>()->default_value(1),
+                "number of executor instances to use")
 
-        ( "cores"
-        , value<int>()->default_value(1)
-        , "number of cores to bind to each of the executor instances")
+                ("cores", value<int>()->default_value(1),
+                    "number of cores to bind to each of the executor instances")
 
-        ( "no-header"
-        , "do not print out the csv header row")
-        ;
+                    ("no-header", "do not print out the csv header row");
 
     // Initialize and run HPX.
     hpx::init_params init_args;
@@ -157,4 +144,3 @@ int main(
 
     return hpx::init(argc, argv, init_args);
 }
-

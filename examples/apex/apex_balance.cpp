@@ -8,9 +8,10 @@
 
 // Naive SMP version implemented with futures.
 
+#include <hpx/future.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/lcos.hpp>
+#include <hpx/include/runtime.hpp>
 #include <hpx/include/util.hpp>
 
 #include <apex_api.hpp>
@@ -23,31 +24,35 @@
 #include <vector>
 
 // our apex policy handle
-apex_policy_handle * periodic_policy_handle;
+apex_policy_handle* periodic_policy_handle;
 
 double do_work(std::uint64_t n);
 
-HPX_PLAIN_ACTION(do_work, do_work_action);
+HPX_PLAIN_ACTION(do_work, do_work_action)
 
-double do_work(std::uint64_t n) {
+double do_work(std::uint64_t n)
+{
     double result = 1;
-    for(std::uint64_t i = 0; i < n; ++i) {
-        result += std::sin((double)i) * (double)i;
+    for (std::uint64_t i = 0; i < n; ++i)
+    {
+        result += std::sin((double) i) * (double) i;
     }
     return result;
 }
 
-
-size_t next_locality( const std::vector<double> & probs) {
+size_t next_locality(const std::vector<double>& probs)
+{
     static std::default_random_engine generator;
     static std::uniform_real_distribution<double> distribution(0.0, 1.0);
     const double eps = 1e-9;
     double r = distribution(generator);
 
     size_t i = 0;
-    for(const double p : probs) {
+    for (const double p : probs)
+    {
         r -= p;
-        if(r < eps) {
+        if (r < eps)
+        {
             return i;
         }
         ++i;
@@ -65,38 +70,41 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // Keep track of the time required to execute.
     hpx::chrono::high_resolution_timer t;
 
-    std::vector<hpx::naming::id_type> localities = hpx::find_all_localities();
+    std::vector<hpx::id_type> localities = hpx::find_all_localities();
     std::vector<double> probabilities(localities.size());
     probabilities[0] = 1.0;
 
-    std::cout << "There are " << localities.size() << " localities." << std::endl;
+    std::cout << "There are " << localities.size() << " localities."
+              << std::endl;
     std::cout << "Units: " << units << " n: " << n << std::endl;
 
-    for(std::uint64_t block = 0; block < blocks; ++block) {
+    for (std::uint64_t block = 0; block < blocks; ++block)
+    {
         std::cout << "Block " << block << std::endl;
         std::list<std::uint64_t> work(units, n);
-        std::list<hpx::lcos::future<double> > futures;
-        for(std::uint64_t & item : work) {
+        std::list<hpx::future<double>> futures;
+        for (std::uint64_t& item : work)
+        {
             do_work_action act;
             size_t next = next_locality(probabilities);
             std::cout << "Will issue work to loc " << next << std::endl;
             futures.push_back(hpx::async(act, localities[next], item));
         }
         std::cout << "Issued work for block " << block << std::endl;
-        hpx::lcos::wait_all(futures.begin(), futures.end());
+        hpx::wait_all(futures.begin(), futures.end());
         std::cout << "Work done for block " << block << std::endl;
     }
-
 
     char const* fmt = "elapsed time: {1} [s]\n";
     hpx::util::format_to(std::cout, fmt, t.elapsed());
 
     apex::deregister_policy(periodic_policy_handle);
 
-    return hpx::finalize(); // Handles HPX shutdown
+    return hpx::finalize();    // Handles HPX shutdown
 }
 
-void register_policy(void) {
+void register_policy(void)
+{
     periodic_policy_handle =
         apex::register_periodic_policy(1000000, [](apex_context const&) {
             std::cout << "Periodic policy!" << std::endl;
@@ -108,26 +116,20 @@ void register_policy(void) {
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    hpx::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    hpx::program_options::options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ( "n-value",
-          hpx::program_options::value<std::uint64_t>()->default_value(1000000),
-          "n value for do_work")
-        ;
+    desc_commandline.add_options()("n-value",
+        hpx::program_options::value<std::uint64_t>()->default_value(1000000),
+        "n value for do_work");
 
-    desc_commandline.add_options()
-        ( "units",
-          hpx::program_options::value<std::uint64_t>()->default_value(100),
-          "units of work per block")
-        ;
+    desc_commandline.add_options()("units",
+        hpx::program_options::value<std::uint64_t>()->default_value(100),
+        "units of work per block");
 
-    desc_commandline.add_options()
-        ( "blocks",
-          hpx::program_options::value<std::uint64_t>()->default_value(10),
-          "blocks before program completion")
-        ;
+    desc_commandline.add_options()("blocks",
+        hpx::program_options::value<std::uint64_t>()->default_value(10),
+        "blocks before program completion");
     hpx::register_startup_function(register_policy);
 
     // Initialize and run HPX

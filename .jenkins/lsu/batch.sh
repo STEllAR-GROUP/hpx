@@ -17,6 +17,8 @@ mkdir -p "${build_dir}"
 source ${src_dir}/.jenkins/lsu/env-common.sh
 source ${src_dir}/.jenkins/lsu/env-${configuration_name}.sh
 
+ulimit -l unlimited
+
 set +e
 ctest \
     --verbose \

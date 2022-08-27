@@ -167,8 +167,8 @@ namespace hpx { namespace threads {
 
         struct thread_data_reference_counting;
 
-        void intrusive_ptr_add_ref(thread_data_reference_counting* p);
-        void intrusive_ptr_release(thread_data_reference_counting* p);
+        void intrusive_ptr_add_ref(thread_data_reference_counting* p) noexcept;
+        void intrusive_ptr_release(thread_data_reference_counting* p) noexcept;
 
         struct thread_data_reference_counting
         {
@@ -185,12 +185,14 @@ namespace hpx { namespace threads {
             virtual void destroy_thread() = 0;
 
             // reference counting
-            friend void intrusive_ptr_add_ref(thread_data_reference_counting* p)
+            friend void intrusive_ptr_add_ref(
+                thread_data_reference_counting* p) noexcept
             {
                 ++p->count_;
             }
 
-            friend void intrusive_ptr_release(thread_data_reference_counting* p)
+            friend void intrusive_ptr_release(
+                thread_data_reference_counting* p) noexcept
             {
                 HPX_ASSERT(p->count_ != 0);
                 if (--p->count_ == 0)
@@ -225,7 +227,7 @@ namespace hpx { namespace threads {
         {
         }
         explicit thread_id_ref(thread_id_repr&& thrd) noexcept
-          : thrd_(std::move(thrd))
+          : thrd_(HPX_MOVE(thrd))
         {
         }
 
@@ -236,7 +238,7 @@ namespace hpx { namespace threads {
         }
         thread_id_ref& operator=(thread_id_repr&& rhs) noexcept
         {
-            thrd_ = std::move(rhs);
+            thrd_ = HPX_MOVE(rhs);
             return *this;
         }
 
@@ -294,7 +296,7 @@ namespace hpx { namespace threads {
         }
         thread_id_repr&& get() && noexcept
         {
-            return std::move(thrd_);
+            return HPX_MOVE(thrd_);
         }
 
         thread_id_repr const& get() const& noexcept
@@ -305,6 +307,16 @@ namespace hpx { namespace threads {
         void reset() noexcept
         {
             thrd_.reset();
+        }
+
+        void reset(thread_repr* thrd, bool add_ref = true) noexcept
+        {
+            thrd_.reset(thrd, add_ref);
+        }
+
+        constexpr thread_repr* detach() noexcept
+        {
+            return thrd_.detach();
         }
 
         friend bool operator==(
@@ -396,7 +408,7 @@ namespace hpx { namespace threads {
     // the compiler.
     extern HPX_DEVICE thread_id invalid_thread_id;
 #else
-    HPX_INLINE_CONSTEXPR_VARIABLE thread_id const invalid_thread_id;
+    inline constexpr thread_id const invalid_thread_id;
 #endif
 }}    // namespace hpx::threads
 

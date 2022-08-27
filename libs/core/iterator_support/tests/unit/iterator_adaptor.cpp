@@ -8,9 +8,8 @@
 
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
+#include <hpx/iterator_support/tests/iterator_tests.hpp>
 #include <hpx/modules/testing.hpp>
-
-#include "iterator_tests.hpp"
 
 #include <algorithm>
 #include <cstddef>

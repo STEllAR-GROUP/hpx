@@ -13,8 +13,7 @@
 
 #include <string>
 
-namespace startup_shutdown { namespace server
-{
+namespace startup_shutdown { namespace server {
     class HPX_COMPONENT_EXPORT startup_shutdown_component
       : public hpx::components::component_base<startup_shutdown_component>
     {
@@ -35,15 +34,15 @@ namespace startup_shutdown { namespace server
         // Each of the exposed functions needs to be encapsulated into an action
         // type, allowing to generate all required boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(startup_shutdown_component, init);
+        HPX_DEFINE_COMPONENT_ACTION(startup_shutdown_component, init)
 
     private:
         std::string arg_;
     };
-}}
+}}    // namespace startup_shutdown::server
 
 HPX_REGISTER_ACTION_DECLARATION(
     startup_shutdown::server::startup_shutdown_component::init_action,
-    startup_shutdown_component_init_action);
+    startup_shutdown_component_init_action)
 
 #endif

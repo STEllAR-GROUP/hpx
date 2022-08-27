@@ -15,7 +15,7 @@
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/errors.hpp>
@@ -44,9 +44,9 @@ namespace hpx {
             {
             }
 
-            void set_task(util::unique_function_nonser<void()>&& f)
+            void set_task(hpx::move_only_function<void()>&& f)
             {
-                f_ = std::move(f);
+                f_ = HPX_MOVE(f);
             }
 
             void mark_as_started()
@@ -67,11 +67,11 @@ namespace hpx {
                         return;
                     },
                     [&](std::exception_ptr ep) {
-                        this->set_exception(std::move(ep));
+                        this->set_exception(HPX_MOVE(ep));
                     });
             }
 
-            util::unique_function_nonser<void()> f_;
+            hpx::move_only_function<void()> f_;
         };
 
         template <typename Result, typename Allocator>
@@ -95,7 +95,7 @@ namespace hpx {
             }
 
         private:
-            void destroy()
+            void destroy() noexcept
             {
                 typedef std::allocator_traits<other_allocator> traits;
 
@@ -164,10 +164,9 @@ namespace hpx {
         // state is set.
         template <typename Result, typename RemoteResult, typename SharedState>
         class promise_base
-          : public hpx::lcos::local::detail::promise_base<Result, SharedState>
+          : public hpx::detail::promise_base<Result, SharedState>
         {
-            using base_type =
-                hpx::lcos::local::detail::promise_base<Result, SharedState>;
+            using base_type = hpx::detail::promise_base<Result, SharedState>;
 
         protected:
             using result_type = Result;
@@ -191,38 +190,37 @@ namespace hpx {
             }
 
             promise_base(promise_base&& other) noexcept
-              : base_type(std::move(static_cast<base_type&&>(other)))
+              : base_type(HPX_MOVE(static_cast<base_type&&>(other)))
               , id_retrieved_(other.id_retrieved_)
-              , id_(std::move(other.id_))
-              , addr_(std::move(other.addr_))
+              , id_(HPX_MOVE(other.id_))
+              , addr_(HPX_MOVE(other.addr_))
             {
                 other.id_retrieved_ = false;
-                other.id_ = naming::invalid_id;
+                other.id_ = hpx::invalid_id;
                 other.addr_ = naming::address();
             }
 
             ~promise_base()
             {
                 check_abandon_shared_state(
-                    "lcos::detail::promise_base<R>::~promise_base()");
+                    "hpx::detail::promise_base<R>::~promise_base()");
                 this->shared_state_.reset();
             }
 
             promise_base& operator=(promise_base&& other) noexcept
             {
-                base_type::operator=(
-                    std::move(static_cast<base_type&&>(other)));
+                base_type::operator=(HPX_MOVE(static_cast<base_type&&>(other)));
                 id_retrieved_ = other.id_retrieved_;
-                id_ = std::move(other.id_);
-                addr_ = std::move(other.addr_);
+                id_ = HPX_MOVE(other.id_);
+                addr_ = HPX_MOVE(other.addr_);
 
                 other.id_retrieved_ = false;
-                other.id_ = naming::invalid_id;
+                other.id_ = hpx::invalid_id;
                 other.addr_ = naming::address();
                 return *this;
             }
 
-            naming::id_type get_id(
+            hpx::id_type get_id(
                 bool mark_as_started = true, error_code& ec = throws) const
             {
                 if (this->shared_state_ == nullptr)
@@ -230,21 +228,21 @@ namespace hpx {
                     HPX_THROWS_IF(ec, no_state,
                         "detail::promise_base<Result, RemoteResult>::get_id",
                         "this promise has no valid shared state");
-                    return naming::invalid_id;
+                    return hpx::invalid_id;
                 }
                 if (!addr_ || !id_)
                 {
                     HPX_THROWS_IF(ec, no_state,
                         "detail::promise_base<Result, RemoteResult>::get_id",
                         "this promise has no valid LCO");
-                    return naming::invalid_id;
+                    return hpx::invalid_id;
                 }
                 if (!this->future_retrieved_)
                 {
                     HPX_THROW_EXCEPTION(invalid_status,
                         "promise<Result>::get_id",
                         "future has not been retrieved from this promise yet");
-                    return naming::invalid_id;
+                    return hpx::invalid_id;
                 }
 
                 if (mark_as_started)
@@ -256,12 +254,12 @@ namespace hpx {
                 return id_;
             }
 
-            naming::id_type get_id(error_code& ec) const
+            hpx::id_type get_id(error_code& ec) const
             {
                 return get_id(true, ec);
             }
 
-            naming::id_type get_unmanaged_gid(error_code& ec = throws) const
+            hpx::id_type get_unmanaged_gid(error_code& ec = throws) const
             {
                 return get_id(false, ec);
             }
@@ -359,7 +357,7 @@ namespace hpx {
             }
             mutable bool id_retrieved_;
 
-            naming::id_type id_;
+            hpx::id_type id_;
             naming::address addr_;
         };
     }}    // namespace lcos::detail

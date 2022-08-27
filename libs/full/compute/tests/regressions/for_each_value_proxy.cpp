@@ -60,6 +60,12 @@ namespace hpx { namespace traits {
     struct is_value_proxy<test_value_proxy<T>> : std::true_type
     {
     };
+
+    template <typename T>
+    struct proxy_value<test_value_proxy<T>>
+    {
+        using type = T;
+    };
 }}    // namespace hpx::traits
 
 template <typename T>
@@ -119,7 +125,7 @@ struct test_allocator
     // pointer obtained by an earlier call to allocate(). The argument n
     // must be equal to the first argument of the call to allocate() that
     // originally produced p; otherwise, the behavior is undefined.
-    void deallocate(pointer p, size_type /* n */)
+    void deallocate(pointer p, size_type /* n */) noexcept
     {
         delete[] p;
     }

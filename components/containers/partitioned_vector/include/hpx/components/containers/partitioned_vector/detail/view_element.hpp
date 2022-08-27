@@ -16,67 +16,65 @@
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_local/get_locality_id.hpp>
 
-#include <utility>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \cond NOINTERNAL
 
-namespace hpx { namespace detail
-{
-    template<typename T, typename Data>
+namespace hpx { namespace detail {
+    template <typename T, typename Data>
     struct const_view_element;
 
-    template<typename T, typename Data>
-    struct view_element
-    : public hpx::partitioned_vector_partition<T,Data>
+    template <typename T, typename Data>
+    struct view_element : public hpx::partitioned_vector_partition<T, Data>
     {
-        using pvector_iterator = hpx::segmented::vector_iterator<T,Data>;
-        using segment_iterator
-            = typename pvector_iterator::segment_iterator;
-        using local_segment_iterator
-            = typename pvector_iterator::local_segment_iterator;
-        using traits
-            = typename hpx::traits::segmented_iterator_traits<pvector_iterator>;
+        using pvector_iterator = hpx::segmented::vector_iterator<T, Data>;
+        using segment_iterator = typename pvector_iterator::segment_iterator;
+        using local_segment_iterator =
+            typename pvector_iterator::local_segment_iterator;
+        using traits =
+            typename hpx::traits::segmented_iterator_traits<pvector_iterator>;
 
     public:
-        explicit view_element(
-            hpx::lcos::spmd_block const & block,
-                segment_iterator begin, segment_iterator end, segment_iterator it)
+        explicit view_element(hpx::lcos::spmd_block const& block,
+            segment_iterator begin, segment_iterator end, segment_iterator it)
 
-        : hpx::partitioned_vector_partition<T,Data>( it->get_id() ), it_(it)
+          : hpx::partitioned_vector_partition<T, Data>(it->get_id())
+          , it_(it)
         {
             std::uint32_t here = hpx::get_locality_id();
 
-            is_data_here_
-            = ( here == hpx::naming::get_locality_id_from_id(it_->get_id()) );
+            is_data_here_ =
+                (here == hpx::naming::get_locality_id_from_id(it_->get_id()));
 
-            is_owned_by_current_thread_ =
-                is_data_here_ && (
-                    (std::distance(
-                        local_segment_iterator(begin.base(),end.base(),here)
-                        ,local_segment_iterator(it_.base(),end.base(),here)
-                        )  %  block.get_images_per_locality() )
-                    == (block.this_image() %  block.get_images_per_locality()) );
+            is_owned_by_current_thread_ = is_data_here_ &&
+                ((std::distance(
+                      local_segment_iterator(begin.base(), end.base(), here),
+                      local_segment_iterator(it_.base(), end.base(), here)) %
+                     block.get_images_per_locality()) ==
+                    (block.this_image() % block.get_images_per_locality()));
         }
 
-        view_element(view_element const &) = default;
+        view_element(view_element const&) = default;
 
         // Not copy-assygnable
-        view_element& operator=(view_element const &) = delete;
+        view_element& operator=(view_element const&) = delete;
 
         // But movable
-        view_element(view_element && other) = default;
+        view_element(view_element&& other) = default;
 
         // Explicit conversion allows to perform Get operations
-        explicit operator Data() const { return const_data(); }
+        explicit operator Data() const
+        {
+            return const_data();
+        }
 
         // operator overloading (Useful for manual view definition)
-        segment_iterator && operator&()
+        segment_iterator&& operator&()
         {
-            return std::move(it_);
-
+            return HPX_MOVE(it_);
         }
 
     private:
@@ -87,21 +85,21 @@ namespace hpx { namespace detail
 
         Data const_data() const
         {
-            if ( is_data_here() )
+            if (is_data_here())
             {
                 return this->get_ptr()->get_data();
             }
             else
-                return this->get_copied_data(hpx::launch::sync) ;
+                return this->get_copied_data(hpx::launch::sync);
         }
 
     public:
-        Data & data()
+        Data& data()
         {
             return this->get_ptr()->get_data();
         }
 
-        Data const & data() const
+        Data const& data() const
         {
             return this->get_ptr()->get_data();
         }
@@ -113,93 +111,93 @@ namespace hpx { namespace detail
 
         // Note: Put operation. Race condition may occur, be sure that
         // operator=() is called by only one thread at a time.
-        void operator=(Data && other)
+        void operator=(Data&& other)
         {
-            if ( is_data_here() )
+            if (is_data_here())
             {
-                Data & ref = data();
+                Data& ref = data();
 
-                HPX_ASSERT_MSG( ref.size() == other.size(), \
+                HPX_ASSERT_MSG(ref.size() == other.size(),
                     "r-value vector has invalid size");
 
                 ref = other;
             }
             else
             {
-                this->set_data(hpx::launch::sync, std::move(other) );
+                this->set_data(hpx::launch::sync, HPX_MOVE(other));
             }
         }
 
         // Note: Put operation. Race condition may occur, be sure that
         // operator=() is called by only one thread at a time.
-        void operator=(Data const & other)
+        void operator=(Data const& other)
         {
-            if ( is_data_here() )
+            if (is_data_here())
             {
-                Data & ref = data();
+                Data& ref = data();
 
-                HPX_ASSERT_MSG( ref.size() == other.size(), \
+                HPX_ASSERT_MSG(ref.size() == other.size(),
                     "r-value vector has invalid size");
 
                 ref = other;
             }
             else
             {
-                this->set_data(hpx::launch::sync, Data(other) );
+                this->set_data(hpx::launch::sync, Data(other));
             }
         }
 
         // Note: Put operation. Free of race conditions.
-        void operator=(view_element<T,Data> && other)
+        void operator=(view_element<T, Data>&& other)
         {
-            if(other.is_owned_by_current_thread())
+            if (other.is_owned_by_current_thread())
             {
-                if( is_data_here() )
+                if (is_data_here())
                 {
-                    Data & ref = data();
+                    Data& ref = data();
 
-                    HPX_ASSERT_MSG( ref.size() == other.size(),
-                        "Indexed r-value element has " \
+                    HPX_ASSERT_MSG(ref.size() == other.size(),
+                        "Indexed r-value element has "
                         "invalid size");
 
                     ref = other.data();
                 }
 
                 else
-                    this->set_data(hpx::launch::sync, other.const_data() );
+                    this->set_data(hpx::launch::sync, other.const_data());
             }
         }
 
         // Note: Put operation. Free of race conditions.
-        void operator=(const_view_element<T,Data> && other)
+        void operator=(const_view_element<T, Data>&& other)
         {
-            if(other.is_owned_by_current_thread())
+            if (other.is_owned_by_current_thread())
             {
-                if( is_data_here() )
+                if (is_data_here())
                 {
-                    Data & ref = data();
+                    Data& ref = data();
 
-                    HPX_ASSERT_MSG( ref.size() == other.size(),
-                        "Indexed r-value element has " \
+                    HPX_ASSERT_MSG(ref.size() == other.size(),
+                        "Indexed r-value element has "
                         "invalid size");
 
                     ref = other.data();
                 }
 
                 else
-                    this->set_data(hpx::launch::sync, other.const_data() );
+                    this->set_data(hpx::launch::sync, other.const_data());
             }
         }
 
         T operator[](std::size_t i) const
         {
-            if( is_data_here() )
+            if (is_data_here())
             {
                 return data()[i];
             }
 
             else
-                return this->get_value(hpx::launch::sync,i);
+                return this->get_value(hpx::launch::sync, i);
         }
 
     private:
@@ -208,52 +206,54 @@ namespace hpx { namespace detail
         segment_iterator it_;
     };
 
-    template<typename T, typename Data>
+    template <typename T, typename Data>
     struct const_view_element
-    : public hpx::partitioned_vector_partition<T,Data>
+      : public hpx::partitioned_vector_partition<T, Data>
     {
         using const_pvector_iterator =
             hpx::segmented::const_vector_iterator<T, Data>;
-        using const_segment_iterator
-            = typename const_pvector_iterator::segment_iterator;
-        using const_local_segment_iterator
-            = typename const_pvector_iterator::local_segment_iterator;
-        using traits
-            = typename hpx::traits::segmented_iterator_traits<
-                const_pvector_iterator>;
+        using const_segment_iterator =
+            typename const_pvector_iterator::segment_iterator;
+        using const_local_segment_iterator =
+            typename const_pvector_iterator::local_segment_iterator;
+        using traits = typename hpx::traits::segmented_iterator_traits<
+            const_pvector_iterator>;
 
     public:
-        explicit const_view_element(
-            hpx::lcos::spmd_block const & block,
-                const_segment_iterator begin,
-                    const_segment_iterator end, const_segment_iterator it)
+        explicit const_view_element(hpx::lcos::spmd_block const& block,
+            const_segment_iterator begin, const_segment_iterator end,
+            const_segment_iterator it)
 
-        : hpx::partitioned_vector_partition<T,Data>( it->get_id() ), it_(it)
+          : hpx::partitioned_vector_partition<T, Data>(it->get_id())
+          , it_(it)
         {
             std::uint32_t here = hpx::get_locality_id();
 
-            is_data_here_
-            = ( here == hpx::naming::get_locality_id_from_id(it_->get_id()) );
+            is_data_here_ =
+                (here == hpx::naming::get_locality_id_from_id(it_->get_id()));
 
-            is_owned_by_current_thread_ =
-                is_data_here_ && (
-                    (std::distance(
-                        const_local_segment_iterator(begin.base(),end.base(),here)
-                        ,const_local_segment_iterator(it_.base(),end.base(),here)
-                        )  %  block.get_images_per_locality() )
-                    == (block.this_image() %  block.get_images_per_locality()) );
+            is_owned_by_current_thread_ = is_data_here_ &&
+                ((std::distance(const_local_segment_iterator(
+                                    begin.base(), end.base(), here),
+                      const_local_segment_iterator(
+                          it_.base(), end.base(), here)) %
+                     block.get_images_per_locality()) ==
+                    (block.this_image() % block.get_images_per_locality()));
         }
 
-        const_view_element(const_view_element const &) = default;
+        const_view_element(const_view_element const&) = default;
 
         // Not copy-assignable
-        const_view_element& operator=(const_view_element const &) = delete;
+        const_view_element& operator=(const_view_element const&) = delete;
 
         // But movable
-        const_view_element(const_view_element && other) = default;
+        const_view_element(const_view_element&& other) = default;
 
         // Explicit conversion allows to perform Get operations
-        explicit operator Data() const { return const_data(); }
+        explicit operator Data() const
+        {
+            return const_data();
+        }
 
     private:
         bool is_data_here() const
@@ -264,15 +264,15 @@ namespace hpx { namespace detail
     public:
         Data const_data() const
         {
-            if ( is_data_here() )
+            if (is_data_here())
             {
                 return this->get_ptr()->get_data();
             }
             else
-                return this->get_copied_data(hpx::launch::sync) ;
+                return this->get_copied_data(hpx::launch::sync);
         }
 
-        Data const & data() const
+        Data const& data() const
         {
             return this->get_ptr()->get_data();
         }
@@ -284,13 +284,13 @@ namespace hpx { namespace detail
 
         T operator[](std::size_t i) const
         {
-            if( is_data_here() )
+            if (is_data_here())
             {
                 return data()[i];
             }
 
             else
-                return this->get_value(hpx::launch::sync,i);
+                return this->get_value(hpx::launch::sync, i);
         }
 
     private:
@@ -298,5 +298,4 @@ namespace hpx { namespace detail
         bool is_owned_by_current_thread_;
         const_segment_iterator it_;
     };
-}}
-
+}}    // namespace hpx::detail

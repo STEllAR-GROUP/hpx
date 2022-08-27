@@ -13,7 +13,7 @@ int foo()
     return 42;
 }
 
-HPX_PLAIN_ACTION(foo);
+HPX_PLAIN_ACTION(foo)
 
 int main()
 {

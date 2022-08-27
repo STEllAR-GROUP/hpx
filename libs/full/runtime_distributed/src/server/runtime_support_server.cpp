@@ -19,18 +19,17 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/create_component.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/futures/packaged_task.hpp>
 #include <hpx/ini/ini.hpp>
-#include <hpx/lcos_local/packaged_task.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#include <hpx/modules/collectives.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/plugins/binary_filter_factory_base.hpp>
-#include <hpx/plugins/message_handler_factory_base.hpp>
+#include <hpx/plugin_factories/binary_filter_factory_base.hpp>
+#include <hpx/plugin_factories/message_handler_factory_base.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_configuration/component_commandline_base.hpp>
@@ -122,7 +121,7 @@ HPX_REGISTER_ACTION_ID(
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_DEFINE_COMPONENT_NAME(
-    hpx::components::server::runtime_support, hpx_runtime_support);
+    hpx::components::server::runtime_support, hpx_runtime_support)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(hpx::components::server::runtime_support,
     hpx::components::component_runtime_support)
 
@@ -155,14 +154,14 @@ namespace hpx { namespace components { namespace server {
     // function to be called during shutdown
     // Action: shut down this runtime system instance
     void runtime_support::shutdown(
-        double timeout, naming::id_type const& respond_to)
+        double timeout, hpx::id_type const& respond_to)
     {
         // initiate system shutdown
         stop(timeout, respond_to, false);
     }
 
     // function to be called to terminate this locality immediately
-    void runtime_support::terminate(naming::id_type const& respond_to)
+    void runtime_support::terminate(hpx::id_type const& respond_to)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // push pending logs
@@ -180,14 +179,14 @@ namespace hpx { namespace components { namespace server {
                 // execute locally, action is executed immediately as it is
                 // a direct_action
                 hpx::applier::detail::apply_l<action_type>(
-                    respond_to, std::move(addr));
+                    respond_to, HPX_MOVE(addr));
             }
 #if defined(HPX_HAVE_NETWORKING)
             else
             {
                 // apply remotely, parcel is sent synchronously
                 hpx::applier::detail::apply_r_sync<action_type>(
-                    std::move(addr), respond_to);
+                    HPX_MOVE(addr), respond_to);
             }
 #endif
         }
@@ -200,31 +199,23 @@ namespace hpx { namespace components { namespace server {
 }}}    // namespace hpx::components::server
 
 ///////////////////////////////////////////////////////////////////////////////
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-typedef hpx::components::server::runtime_support::call_shutdown_functions_action
-    call_shutdown_functions_action;
-typedef hpx::lcos::detail::make_broadcast_action<
-    call_shutdown_functions_action>::type
-    call_shutdown_functions_broadcast_action;
-#endif
-
-HPX_ACTION_USES_MEDIUM_STACK(call_shutdown_functions_broadcast_action)
-
-HPX_REGISTER_BROADCAST_ACTION_DECLARATION(
-    call_shutdown_functions_action, call_shutdown_functions_action)
-HPX_REGISTER_BROADCAST_ACTION_ID(call_shutdown_functions_action,
-    call_shutdown_functions_action,
-    hpx::actions::broadcast_call_shutdown_functions_action_id)
-
 namespace hpx { namespace components { namespace server {
-    ///////////////////////////////////////////////////////////////////////////
+
     // initiate system shutdown for all localities
     void invoke_shutdown_functions(
-        std::vector<naming::id_type> const& localities, bool pre_shutdown)
+        std::vector<hpx::id_type> const& localities, bool pre_shutdown)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        call_shutdown_functions_action act;
-        lcos::broadcast(act, localities, pre_shutdown).get();
+        std::vector<hpx::future<void>> results;
+        results.reserve(localities.size());
+        for (auto const& l : localities)
+        {
+            using call_shutdown_functions_action = hpx::components::server::
+                runtime_support::call_shutdown_functions_action;
+            results.push_back(
+                hpx::async(call_shutdown_functions_action(), l, pre_shutdown));
+        }
+        hpx::wait_all(results);
 #else
         HPX_ASSERT(false);
         HPX_UNUSED(localities);
@@ -273,7 +264,7 @@ namespace hpx { namespace components { namespace server {
         }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        naming::id_type id(naming::get_id_from_locality_id(target_locality_id));
+        hpx::id_type id(naming::get_id_from_locality_id(target_locality_id));
         apply<dijkstra_termination_action>(
             id, initiating_locality_id, num_localities, dijkstra_token);
 #else
@@ -324,7 +315,7 @@ namespace hpx { namespace components { namespace server {
     // Kick off termination detection, this is modeled after Dijkstra's paper:
     // http://www.cs.mcgill.ca/~lli22/575/termination3.pdf.
     std::size_t runtime_support::dijkstra_termination_detection(
-        std::vector<naming::id_type> const& locality_ids)
+        std::vector<hpx::id_type> const& locality_ids)
     {
 #if defined(HPX_HAVE_NETWORKING)
         std::uint32_t num_localities =
@@ -437,7 +428,7 @@ namespace hpx { namespace components { namespace server {
         threads::threadmanager& tm = appl.get_thread_manager();
         tm.resume();
 
-        std::vector<naming::id_type> locality_ids = find_all_localities();
+        std::vector<hpx::id_type> locality_ids = find_all_localities();
         std::size_t count = dijkstra_termination_detection(locality_ids);
 
         LRT_(info).format("runtime_support::shutdown_all: passed first "
@@ -465,9 +456,9 @@ namespace hpx { namespace components { namespace server {
         // way.
         std::reverse(locality_ids.begin(), locality_ids.end());
         std::uint32_t locality_id = get_locality_id();
-        std::vector<lcos::future<void>> lazy_actions;
+        std::vector<hpx::future<void>> lazy_actions;
 
-        for (naming::id_type const& id : locality_ids)
+        for (hpx::id_type const& id : locality_ids)
         {
             if (locality_id != naming::get_locality_id_from_id(id))
             {
@@ -478,14 +469,14 @@ namespace hpx { namespace components { namespace server {
         }
 
         // wait for all localities to be stopped
-        wait_all(lazy_actions);
+        hpx::wait_all(lazy_actions);
 
         LRT_(info).format("runtime_support::shutdown_all: all localities have "
                           "been shut down");
 
         // Now make sure this local locality gets shut down as well.
         // There is no need to respond...
-        stop(timeout, naming::invalid_id, false);
+        stop(timeout, hpx::invalid_id, false);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -501,25 +492,26 @@ namespace hpx { namespace components { namespace server {
         // way.
         {
             std::uint32_t locality_id = get_locality_id();
-            std::vector<lcos::future<void>> lazy_actions;
+            std::vector<hpx::future<void>> lazy_actions;
 
             for (naming::gid_type gid : locality_ids)
             {
                 if (locality_id != naming::get_locality_id_from_gid(gid))
                 {
                     using components::stubs::runtime_support;
-                    naming::id_type id(gid, naming::id_type::unmanaged);
+                    hpx::id_type id(
+                        gid, hpx::id_type::management_type::unmanaged);
                     lazy_actions.push_back(
                         runtime_support::terminate_async(id));
                 }
             }
 
             // wait for all localities to be stopped
-            wait_all(lazy_actions);
+            hpx::wait_all(lazy_actions);
         }
 
         // now make sure this local locality gets terminated as well.
-        terminate(naming::invalid_id);    //good night
+        terminate(hpx::invalid_id);    //good night
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -600,8 +592,8 @@ namespace hpx { namespace components { namespace server {
         }
     }
 
-    void runtime_support::stop(double timeout,
-        naming::id_type const& respond_to, bool remove_from_remote_caches)
+    void runtime_support::stop(double timeout, hpx::id_type const& respond_to,
+        bool remove_from_remote_caches)
     {
         std::unique_lock<std::mutex> l(mtx_);
         if (!stop_called_)
@@ -615,7 +607,7 @@ namespace hpx { namespace components { namespace server {
             threads::threadmanager& tm = appl.get_thread_manager();
             naming::resolver_client& agas_client = naming::get_agas_client();
 
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
 
             stop_called_ = true;
 
@@ -691,7 +683,7 @@ namespace hpx { namespace components { namespace server {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
                         // apply remotely, parcel is sent synchronously
                         hpx::applier::detail::apply_r_sync<action_type>(
-                            std::move(addr), respond_to);
+                            HPX_MOVE(addr), respond_to);
 #else
                         HPX_ASSERT(false);
 #endif
@@ -804,7 +796,7 @@ namespace hpx { namespace components { namespace server {
     {
         if (pre_startup)
         {
-            get_runtime().set_state(state_pre_startup);
+            get_runtime().set_state(hpx::state::pre_startup);
             for (startup_function_type& f : pre_startup_functions_)
             {
                 f();
@@ -812,7 +804,7 @@ namespace hpx { namespace components { namespace server {
         }
         else
         {
-            get_runtime().set_state(state_startup);
+            get_runtime().set_state(hpx::state::startup);
             for (startup_function_type& f : startup_functions_)
             {
                 f();
@@ -825,7 +817,7 @@ namespace hpx { namespace components { namespace server {
         runtime& rt = get_runtime();
         if (pre_shutdown)
         {
-            rt.set_state(state_pre_shutdown);
+            rt.set_state(hpx::state::pre_shutdown);
             for (shutdown_function_type& f : pre_shutdown_functions_)
             {
                 try
@@ -840,7 +832,7 @@ namespace hpx { namespace components { namespace server {
         }
         else
         {
-            rt.set_state(state_shutdown);
+            rt.set_state(hpx::state::shutdown);
             for (shutdown_function_type& f : shutdown_functions_)
             {
                 try
@@ -852,14 +844,13 @@ namespace hpx { namespace components { namespace server {
                     rt.report_error(std::current_exception());
                 }
             }
-            lcos::barrier::get_global_barrier().detach();
         }
     }
 
     // working around non-copy-ability of packaged_task
     struct indirect_packaged_task
     {
-        typedef lcos::local::packaged_task<void()> packaged_task_type;
+        typedef hpx::packaged_task<void()> packaged_task_type;
 
         indirect_packaged_task()
           : pt(std::make_shared<packaged_task_type>([]() {}))
@@ -875,7 +866,7 @@ namespace hpx { namespace components { namespace server {
         void operator()(Ts&&... /* vs */)
         {
             // This needs to be run on a HPX thread
-            hpx::apply(std::move(*pt));
+            hpx::apply(HPX_MOVE(*pt));
             pt.reset();
         }
 
@@ -890,7 +881,7 @@ namespace hpx { namespace components { namespace server {
         if (rtd == nullptr)
             return;
 
-        std::vector<naming::id_type> locality_ids = find_remote_localities();
+        std::vector<hpx::id_type> locality_ids = find_remote_localities();
 
         typedef server::runtime_support::remove_from_connection_cache_action
             action_type;
@@ -899,7 +890,7 @@ namespace hpx { namespace components { namespace server {
         callbacks.reserve(locality_ids.size());
 
         action_type act;
-        for (naming::id_type const& id : locality_ids)
+        for (hpx::id_type const& id : locality_ids)
         {
             // console is handled separately
             if (naming::get_locality_id_from_id(id) == 0)
@@ -907,11 +898,11 @@ namespace hpx { namespace components { namespace server {
 
             indirect_packaged_task ipt;
             callbacks.push_back(ipt.get_future());
-            apply_cb(act, id, std::move(ipt), agas::get_locality(),
-                rtd->endpoints());
+            apply_cb(
+                act, id, HPX_MOVE(ipt), agas::get_locality(), rtd->endpoints());
         }
 
-        wait_all(callbacks);
+        hpx::wait_all(callbacks);
 #endif
 #else
         HPX_ASSERT(false);
@@ -936,7 +927,7 @@ namespace hpx { namespace components { namespace server {
         // handle console separately
         id_type id = naming::get_id_from_locality_id(0);
         apply_cb(
-            act, id, std::move(ipt), agas::get_locality(), rtd->endpoints());
+            act, id, HPX_MOVE(ipt), agas::get_locality(), rtd->endpoints());
 
         callback.wait();
 #endif
@@ -1132,10 +1123,6 @@ namespace hpx { namespace components { namespace server {
         {
             // initialize the factory instance using the preferences from the
             // ini files
-            util::section const* glob_ini = nullptr;
-            if (ini.has_section("settings"))
-                glob_ini = ini.get_section("settings");
-
             util::section const* component_ini = nullptr;
             std::string component_section("hpx.components." + instance);
             if (ini.has_section(component_section))
@@ -1162,11 +1149,11 @@ namespace hpx { namespace components { namespace server {
             // module, same for plugins
             if (startup_handled.find(component) == startup_handled.end())
             {
-                error_code ec(lightweight);
+                error_code ec(throwmode::lightweight);
                 startup_handled.insert(component);
                 load_commandline_options_static(component, options, ec);
                 if (ec)
-                    ec = error_code(lightweight);
+                    ec = error_code(throwmode::lightweight);
                 load_startup_shutdown_functions_static(component, ec);
             }
         }
@@ -1370,11 +1357,11 @@ namespace hpx { namespace components { namespace server {
                 {
                     if (pre_startup)
                     {
-                        pre_startup_functions_.push_back(std::move(startup));
+                        pre_startup_functions_.push_back(HPX_MOVE(startup));
                     }
                     else
                     {
-                        startup_functions_.push_back(std::move(startup));
+                        startup_functions_.push_back(HPX_MOVE(startup));
                     }
                 }
             }
@@ -1387,11 +1374,11 @@ namespace hpx { namespace components { namespace server {
                 {
                     if (pre_shutdown)
                     {
-                        pre_shutdown_functions_.push_back(std::move(shutdown));
+                        pre_shutdown_functions_.push_back(HPX_MOVE(shutdown));
                     }
                     else
                     {
-                        shutdown_functions_.push_back(std::move(shutdown));
+                        shutdown_functions_.push_back(HPX_MOVE(shutdown));
                     }
                 }
             }
@@ -1491,7 +1478,7 @@ namespace hpx { namespace components { namespace server {
         }
 
         // first, try using the path as the full path to the library
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(component));
         d.load_library(ec);
         if (ec)
@@ -1544,9 +1531,9 @@ namespace hpx { namespace components { namespace server {
             if (startup_shutdown->get_startup_function(startup, pre_startup))
             {
                 if (pre_startup)
-                    pre_startup_functions_.push_back(std::move(startup));
+                    pre_startup_functions_.push_back(HPX_MOVE(startup));
                 else
-                    startup_functions_.push_back(std::move(startup));
+                    startup_functions_.push_back(HPX_MOVE(startup));
             }
 
             shutdown_function_type shutdown;
@@ -1554,9 +1541,9 @@ namespace hpx { namespace components { namespace server {
             if (startup_shutdown->get_shutdown_function(shutdown, pre_shutdown))
             {
                 if (pre_shutdown)
-                    pre_shutdown_functions_.push_back(std::move(shutdown));
+                    pre_shutdown_functions_.push_back(HPX_MOVE(shutdown));
                 else
-                    shutdown_functions_.push_back(std::move(shutdown));
+                    shutdown_functions_.push_back(HPX_MOVE(shutdown));
             }
         }
         catch (hpx::exception const&)
@@ -1645,10 +1632,6 @@ namespace hpx { namespace components { namespace server {
         {
             // initialize the factory instance using the preferences from the
             // ini files
-            util::section const* glob_ini = nullptr;
-            if (ini.has_section("settings"))
-                glob_ini = ini.get_section("settings");
-
             util::section const* component_ini = nullptr;
             std::string component_section("hpx.components." + instance);
             if (ini.has_section(component_section))
@@ -1669,11 +1652,11 @@ namespace hpx { namespace components { namespace server {
             // module, same for plugins
             if (startup_handled.find(d.get_name()) == startup_handled.end())
             {
-                error_code ec(lightweight);
+                error_code ec(throwmode::lightweight);
                 startup_handled.insert(d.get_name());
                 load_commandline_options(d, options, ec);
                 if (ec)
-                    ec = error_code(lightweight);
+                    ec = error_code(throwmode::lightweight);
                 load_startup_shutdown_functions(d, ec);
             }
         }
@@ -1847,7 +1830,7 @@ namespace hpx { namespace components { namespace server {
             if (ini.has_section(plugin_section))
                 plugin_ini = ini.get_section(plugin_section);
 
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             if (nullptr == plugin_ini ||
                 "0" == plugin_ini->get_entry("no_factory", "0"))
             {
@@ -1891,7 +1874,7 @@ namespace hpx { namespace components { namespace server {
                 startup_handled.insert(d.get_name());
                 load_commandline_options(d, options, ec);
                 if (ec)
-                    ec = error_code(lightweight);
+                    ec = error_code(throwmode::lightweight);
                 load_startup_shutdown_functions(d, ec);
             }
         }
@@ -1930,7 +1913,7 @@ namespace hpx { namespace components { namespace server {
         }
 
         // get the handle of the library
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         hpx::util::plugin::dll d(lib.string(), HPX_MANGLE_STRING(plugin));
         d.load_library(ec);
         if (ec)

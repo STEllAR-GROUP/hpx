@@ -525,6 +525,8 @@ namespace hpx { namespace threads {
         sleep(0);    // Allow the OS to pick up the change.
 #endif
         hwloc_bitmap_free(cpuset);
+#else
+        (void) mask;
 #endif    // __APPLE__
 
         if (&ec != &throws)
@@ -1236,6 +1238,7 @@ namespace hpx { namespace threads {
         mask_type mask = mask_type();
         resize(mask, get_number_of_pus());
 
+#if !defined(__APPLE__)
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
             if (hwloc_get_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
@@ -1258,6 +1261,7 @@ namespace hpx { namespace threads {
                     set(mask, detail::get_index(pu_obj));
             }
         }
+#endif    // __APPLE__
 
         hwloc_bitmap_free(cpuset);
 
@@ -1330,11 +1334,11 @@ namespace hpx { namespace threads {
         return
 #if HWLOC_API_VERSION >= 0x00010b06
             hwloc_alloc_membind(topo, len, bitmap->get_bmp(),
-                (hwloc_membind_policy_t)(policy),
+                hwloc_membind_policy_t(policy),
                 flags | HWLOC_MEMBIND_BYNODESET);
 #else
             hwloc_alloc_membind_nodeset(topo, len, bitmap->get_bmp(),
-                (hwloc_membind_policy_t)(policy), flags);
+                hwloc_membind_policy_t(policy), flags);
 #endif
     }
 
@@ -1365,6 +1369,10 @@ namespace hpx { namespace threads {
                 "hwloc_set_area_membind_nodeset failed : {}", msg);
             return false;
         }
+#else
+        (void) addr;
+        (void) len;
+        (void) nodeset;
 #endif
         return true;
     }
@@ -1449,7 +1457,7 @@ namespace hpx { namespace threads {
     }
 
     /// Free memory that was previously allocated by allocate
-    void topology::deallocate(void* addr, std::size_t len) const
+    void topology::deallocate(void* addr, std::size_t len) const noexcept
     {
         hwloc_free(topo, addr, len);
     }

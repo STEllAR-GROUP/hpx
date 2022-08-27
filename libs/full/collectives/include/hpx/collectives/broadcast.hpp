@@ -154,7 +154,7 @@ namespace hpx { namespace traits {
             using lock_type = std::unique_lock<mutex_type>;
 
             auto this_ = this->shared_from_this();
-            auto on_ready = [this_ = std::move(this_)](
+            auto on_ready = [this_ = HPX_MOVE(this_)](
                                 shared_future<void>&& f) -> arg_type {
                 HPX_UNUSED(this_);
                 f.get();    // propagate any exceptions
@@ -166,15 +166,16 @@ namespace hpx { namespace traits {
             };
 
             lock_type l(communicator_.mtx_);
-            util::ignore_while_checking<lock_type> il(&l);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
 
             hpx::future<arg_type> f =
                 communicator_.gate_.get_shared_future(l).then(
-                    hpx::launch::sync, std::move(on_ready));
+                    hpx::launch::sync, HPX_MOVE(on_ready));
 
             communicator_.gate_.synchronize(1, l);
 
-            if (communicator_.gate_.set(which, std::move(l)))
+            if (communicator_.gate_.set(which, HPX_MOVE(l)))
             {
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
@@ -191,7 +192,7 @@ namespace hpx { namespace traits {
             using lock_type = std::unique_lock<mutex_type>;
 
             auto this_ = this->shared_from_this();
-            auto on_ready = [this_ = std::move(this_)](
+            auto on_ready = [this_ = HPX_MOVE(this_)](
                                 shared_future<void>&& f) -> arg_type {
                 HPX_UNUSED(this_);
                 f.get();    // propagate any exceptions
@@ -203,18 +204,19 @@ namespace hpx { namespace traits {
             };
 
             lock_type l(communicator_.mtx_);
-            util::ignore_while_checking<lock_type> il(&l);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
 
             hpx::future<arg_type> f =
                 communicator_.gate_.get_shared_future(l).then(
-                    hpx::launch::sync, std::move(on_ready));
+                    hpx::launch::sync, HPX_MOVE(on_ready));
 
             communicator_.gate_.synchronize(1, l);
 
             auto& data = communicator_.template access_data<arg_type>(l, 1);
-            data[0] = std::forward<T>(t);
+            data[0] = HPX_FORWARD(T, t);
 
-            if (communicator_.gate_.set(which, std::move(l)))
+            if (communicator_.gate_.set(which, HPX_MOVE(l)))
             {
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
@@ -251,16 +253,16 @@ namespace hpx { namespace collectives {
             // make sure id is kept alive as long as the returned future,
             // explicitly unwrap returned future
             hpx::future<arg_type> result =
-                async(action_type(), c, this_site, std::move(local_result));
+                async(action_type(), c, this_site, HPX_MOVE(local_result));
 
             traits::detail::get_shared_state(result)->set_on_completed(
-                [client = std::move(c)]() { HPX_UNUSED(client); });
+                [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
 
             return result;
         };
 
-        return dataflow(hpx::launch::sync, std::move(broadcast_data),
-            std::move(fid), std::forward<T>(local_result));
+        return dataflow(hpx::launch::sync, HPX_MOVE(broadcast_data),
+            HPX_MOVE(fid), HPX_FORWARD(T, local_result));
     }
 
     template <typename T>
@@ -272,7 +274,7 @@ namespace hpx { namespace collectives {
         return broadcast_to(
             create_communicator(basename, num_sites, this_site, generation,
                 root_site_arg(this_site.this_site_)),
-            std::forward<T>(local_result), this_site);
+            HPX_FORWARD(T, local_result), this_site);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -296,13 +298,13 @@ namespace hpx { namespace collectives {
             hpx::future<T> result = async(action_type(), c, this_site);
 
             traits::detail::get_shared_state(result)->set_on_completed(
-                [client = std::move(c)]() { HPX_UNUSED(client); });
+                [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
 
             return result;
         };
 
-        return dataflow(hpx::launch::sync, std::move(broadcast_data_direct),
-            std::move(fid));
+        return dataflow(
+            hpx::launch::sync, HPX_MOVE(broadcast_data_direct), HPX_MOVE(fid));
     }
 
     template <typename T>
@@ -332,7 +334,7 @@ namespace hpx { namespace lcos {
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
         return hpx::collectives::broadcast_to(basename,
-            std::forward<T>(local_result),
+            HPX_FORWARD(T, local_result),
             hpx::collectives::num_sites_arg(num_sites),
             hpx::collectives::this_site_arg(this_site),
             hpx::collectives::generation_arg(generation),
@@ -365,8 +367,8 @@ namespace hpx { namespace lcos {
         hpx::collectives::communicator comm, T&& local_result,
         std::size_t this_site = std::size_t(-1))
     {
-        return hpx::collectives::broadcast_to(std::move(comm),
-            std::forward<T>(local_result),
+        return hpx::collectives::broadcast_to(HPX_MOVE(comm),
+            HPX_FORWARD(T, local_result),
             hpx::collectives::this_site_arg(this_site));
     }
 
@@ -378,7 +380,7 @@ namespace hpx { namespace lcos {
         hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
     {
         return local_result.then([=](hpx::future<T>&& f) mutable {
-            hpx::collectives::broadcast_to(std::move(comm), f.get(),
+            hpx::collectives::broadcast_to(HPX_MOVE(comm), f.get(),
                 hpx::collectives::this_site_arg(this_site));
         });
     }
@@ -405,7 +407,7 @@ namespace hpx { namespace lcos {
         std::size_t this_site = std::size_t(-1))
     {
         return hpx::collectives::broadcast_from<T>(
-            std::move(comm), hpx::collectives::this_site_arg(this_site));
+            HPX_MOVE(comm), hpx::collectives::this_site_arg(this_site));
     }
 
     HPX_DEPRECATED_V(1, 7,

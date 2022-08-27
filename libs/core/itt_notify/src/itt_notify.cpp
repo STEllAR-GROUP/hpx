@@ -248,6 +248,36 @@ bool use_ittnotify_api = false;
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace util { namespace itt {
 
+    stack_context::stack_context()
+    {
+        HPX_ITT_STACK_CREATE(itt_context_);
+    }
+
+    stack_context::~stack_context()
+    {
+        if (itt_context_)
+        {
+            HPX_ITT_STACK_DESTROY(itt_context_);
+        }
+    }
+
+    caller_context::caller_context(stack_context& ctx)
+      : ctx_(ctx)
+    {
+        if (ctx.itt_context_)
+        {
+            HPX_ITT_STACK_CALLEE_ENTER(ctx_.itt_context_);
+        }
+    }
+
+    caller_context::~caller_context()
+    {
+        if (ctx_.itt_context_)
+        {
+            HPX_ITT_STACK_CALLEE_LEAVE(ctx_.itt_context_);
+        }
+    }
+
     domain::domain(char const* name) noexcept
       : domain_(HPX_ITT_DOMAIN_CREATE(name))
     {
@@ -255,11 +285,6 @@ namespace hpx { namespace util { namespace itt {
         {
             domain_->flags = 1;
         }
-    }
-
-    domain::domain() noexcept
-      : domain_(nullptr)
-    {
     }
 
     static thread_local std::unique_ptr<___itt_domain> thread_domain_;
@@ -281,35 +306,174 @@ namespace hpx { namespace util { namespace itt {
         }
     }
 
+    id::id(domain const& domain, void* addr, unsigned long extra) noexcept
+    {
+        if (use_ittnotify_api)
+        {
+            id_ = HPX_ITT_MAKE_ID(addr, extra);
+            HPX_ITT_ID_CREATE(domain.domain_, id_);
+        }
+    }
+
+    id::~id()
+    {
+        if (use_ittnotify_api)
+        {
+            HPX_ITT_ID_DESTROY(id_);
+        }
+    }
+
+    frame_context::frame_context(domain const& domain, id* ident) noexcept
+      : domain_(domain)
+      , ident_(ident)
+    {
+        HPX_ITT_FRAME_BEGIN(domain_.domain_, ident_ ? ident_->id_ : nullptr);
+    }
+
+    frame_context::~frame_context()
+    {
+        HPX_ITT_FRAME_END(domain_.domain_, ident_ ? ident_->id_ : nullptr);
+    }
+
+    undo_frame_context::undo_frame_context(frame_context& frame) noexcept
+      : frame_(frame)
+    {
+        HPX_ITT_FRAME_END(frame_.domain_.domain_, nullptr);
+    }
+
+    undo_frame_context::~undo_frame_context()
+    {
+        HPX_ITT_FRAME_BEGIN(frame_.domain_.domain_, nullptr);
+    }
+
+    mark_context::mark_context(char const* name) noexcept
+      : itt_mark_(0)
+      , name_(name)
+    {
+        HPX_ITT_MARK_CREATE(itt_mark_, name);
+    }
+
+    mark_context::~mark_context()
+    {
+        HPX_ITT_MARK_OFF(itt_mark_);
+    }
+
+    undo_mark_context::undo_mark_context(mark_context& mark) noexcept
+      : mark_(mark)
+    {
+        HPX_ITT_MARK_OFF(mark_.itt_mark_);
+    }
+    undo_mark_context::~undo_mark_context()
+    {
+        HPX_ITT_MARK_CREATE(mark_.itt_mark_, mark_.name_);
+    }
+
+    string_handle::string_handle(char const* s) noexcept
+      : handle_(s == nullptr ? nullptr : HPX_ITT_STRING_HANDLE_CREATE(s))
+    {
+    }
+
     task::task(domain const& domain, string_handle const& name) noexcept
       : domain_(domain)
-      , id_(nullptr)
       , sh_(name)
     {
-        id_ = HPX_ITT_MAKE_ID(
-            domain_.domain_, reinterpret_cast<std::size_t>(sh_.handle_));
+        if (use_ittnotify_api)
+        {
+            id_ = HPX_ITT_MAKE_ID(
+                domain_.domain_, reinterpret_cast<std::size_t>(sh_.handle_));
 
-        HPX_ITT_TASK_BEGIN_ID(domain_.domain_, id_, sh_.handle_);
+            HPX_ITT_TASK_BEGIN_ID(domain_.domain_, id_, sh_.handle_);
+        }
     }
 
     task::task(domain const& domain, string_handle const& name,
         std::uint64_t metadata) noexcept
       : domain_(domain)
-      , id_(0)
       , sh_(name)
     {
-        id_ = HPX_ITT_MAKE_ID(
-            domain_.domain_, reinterpret_cast<std::size_t>(sh_.handle_));
+        if (use_ittnotify_api)
+        {
+            id_ = HPX_ITT_MAKE_ID(
+                domain_.domain_, reinterpret_cast<std::size_t>(sh_.handle_));
 
-        HPX_ITT_TASK_BEGIN_ID(domain_.domain_, id_, sh_.handle_);
-        add_metadata(sh_.handle_, metadata);
+            HPX_ITT_TASK_BEGIN_ID(domain_.domain_, id_, sh_.handle_);
+            add_metadata(sh_.handle_, metadata);
+        }
     }
 
     task::~task()
     {
-        HPX_ITT_TASK_END(domain_.domain_);
+        if (use_ittnotify_api)
+        {
+            HPX_ITT_TASK_END(domain_.domain_);
+            delete id_;
+        }
+    }
 
-        delete id_;
+    void task::add_metadata(
+        string_handle const& name, std::uint64_t val) noexcept
+    {
+        HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_, val);
+    }
+
+    void task::add_metadata(string_handle const& name, double val) noexcept
+    {
+        HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_, val);
+    }
+
+    void task::add_metadata(string_handle const& name, char const* val) noexcept
+    {
+        HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_, val);
+    }
+
+    void task::add_metadata(string_handle const& name, void const* val) noexcept
+    {
+        HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_, val);
+    }
+
+    heap_function::heap_function(char const* name, char const* domain) noexcept
+      : heap_function_(HPX_ITT_HEAP_FUNCTION_CREATE(name, domain))
+    {
+    }
+
+    heap_internal_access::heap_internal_access() noexcept
+    {
+        HPX_ITT_HEAP_INTERNAL_ACCESS_BEGIN();
+    }
+
+    heap_internal_access::~heap_internal_access()
+    {
+        HPX_ITT_HEAP_INTERNAL_ACCESS_END();
+    }
+
+    heap_free::heap_free(heap_function& heap_function, void* addr) noexcept
+      : heap_function_(heap_function)
+      , addr_(addr)
+    {
+        HPX_ITT_HEAP_FREE_BEGIN(heap_function_.heap_function_, addr_);
+    }
+
+    heap_free::~heap_free()
+    {
+        HPX_ITT_HEAP_FREE_END(heap_function_.heap_function_, addr_);
+    }
+
+    counter::counter(char const* name, char const* domain) noexcept
+      : id_(HPX_ITT_COUNTER_CREATE(name, domain))
+    {
+    }
+
+    counter::counter(char const* name, char const* domain, int type) noexcept
+      : id_(HPX_ITT_COUNTER_CREATE_TYPED(name, domain, type))
+    {
+    }
+
+    counter::~counter()
+    {
+        if (id_)
+        {
+            HPX_ITT_COUNTER_DESTROY(id_);
+        }
     }
 }}}    // namespace hpx::util::itt
 

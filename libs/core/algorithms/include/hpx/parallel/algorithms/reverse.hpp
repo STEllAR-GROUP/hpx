@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -182,14 +182,13 @@ namespace hpx {
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/ranges_facilities.hpp>
@@ -209,7 +208,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Iter>
         struct reverse : public detail::algorithm<reverse<Iter>, Iter>
         {
-            reverse()
+            constexpr reverse() noexcept
               : reverse::algorithm("reverse")
             {
             }
@@ -218,8 +217,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             constexpr static BidirIter sequential(
                 ExPolicy, BidirIter first, Sent last)
             {
-                auto last2{hpx::ranges::next(first, last)};
-                for (auto tail{last2}; !(first == tail or first == --tail);
+                auto last2 = detail::advance_to_sentinel(first, last);
+                for (auto tail = last2; !(first == tail || first == --tail);
                      ++first)
                 {
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
@@ -236,18 +235,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 BidirIter>::type
             parallel(ExPolicy&& policy, BidirIter first, Sent last)
             {
-                auto last2{hpx::ranges::next(first, last)};
-                typedef std::reverse_iterator<BidirIter> destination_iterator;
-                typedef hpx::util::zip_iterator<BidirIter, destination_iterator>
-                    zip_iterator;
-                typedef typename zip_iterator::reference reference;
+                using destination_iterator = std::reverse_iterator<BidirIter>;
+                using zip_iterator =
+                    hpx::util::zip_iterator<BidirIter, destination_iterator>;
+                using reference = typename zip_iterator::reference;
+
+                auto last2 = first;
+                auto size = detail::advance_and_get_distance(last2, last);
 
                 return util::detail::convert_to_result(
                     for_each_n<zip_iterator>().call(
-                        std::forward<ExPolicy>(policy),
+                        HPX_FORWARD(ExPolicy, policy),
                         hpx::util::make_zip_iterator(
                             first, destination_iterator(last2)),
-                        detail::distance(first, last2) / 2,
+                        size / 2,
                         [](reference t) -> void {
                             using hpx::get;
                             std::swap(get<0>(t), get<1>(t));
@@ -278,7 +279,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least bidirectional iterator.");
 
         return detail::reverse<BidirIter>().call(
-            std::forward<ExPolicy>(policy), first, last);
+            HPX_FORWARD(ExPolicy, policy), first, last);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -328,7 +329,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::detail::convert_to_result(
                     detail::copy<util::in_out_result<iterator, FwdIter>>().call(
-                        std::forward<ExPolicy>(policy), iterator(last2),
+                        HPX_FORWARD(ExPolicy, policy), iterator(last2),
                         iterator(first), dest_first),
                     [](util::in_out_result<iterator, FwdIter> const& p)
                         -> util::in_out_result<BidirIter, FwdIter> {
@@ -362,14 +363,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "Requires at least forward iterator.");
 
         return detail::reverse_copy<util::in_out_result<BidirIter, FwdIter>>()
-            .call(std::forward<ExPolicy>(policy), first, last, dest_first);
+            .call(HPX_FORWARD(ExPolicy, policy), first, last, dest_first);
     }
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::reverse
-    HPX_INLINE_CONSTEXPR_VARIABLE struct reverse_t final
+    inline constexpr struct reverse_t final
       : hpx::detail::tag_parallel_algorithm<reverse_t>
     {
     private:
@@ -379,7 +380,7 @@ namespace hpx {
                 hpx::traits::is_iterator<BidirIter>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(
+        friend void tag_fallback_invoke(
             hpx::reverse_t, BidirIter first, BidirIter last)
         {
             static_assert(
@@ -399,7 +400,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             void>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::reverse_t, ExPolicy&& policy, BidirIter first, BidirIter last)
         {
             static_assert(
@@ -408,13 +409,13 @@ namespace hpx {
 
             return parallel::util::detail::algorithm_result<ExPolicy>::get(
                 hpx::parallel::v1::detail::reverse<BidirIter>().call(
-                    std::forward<ExPolicy>(policy), first, last));
+                    HPX_FORWARD(ExPolicy, policy), first, last));
         }
     } reverse{};
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::reverse_copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct reverse_copy_t final
+    inline constexpr struct reverse_copy_t final
       : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
     {
     private:
@@ -425,7 +426,7 @@ namespace hpx {
                 hpx::traits::is_iterator<OutIter>::value
             )>
         // clang-format on
-        friend OutIter tag_fallback_dispatch(
+        friend OutIter tag_fallback_invoke(
             hpx::reverse_copy_t, BidirIter first, BidirIter last, OutIter dest)
         {
             static_assert(
@@ -452,7 +453,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::reverse_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::reverse_copy_t, ExPolicy&& policy,
             BidirIter first, BidirIter last, FwdIter dest)
         {
             static_assert(
@@ -465,7 +466,7 @@ namespace hpx {
             return parallel::util::get_second_element(
                 parallel::v1::detail::reverse_copy<
                     hpx::parallel::util::in_out_result<BidirIter, FwdIter>>()
-                    .call(std::forward<ExPolicy>(policy), first, last, dest));
+                    .call(HPX_FORWARD(ExPolicy, policy), first, last, dest));
         }
     } reverse_copy{};
 }    // namespace hpx

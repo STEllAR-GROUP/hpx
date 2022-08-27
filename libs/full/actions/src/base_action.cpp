@@ -119,7 +119,7 @@ namespace hpx { namespace actions {
     ///////////////////////////////////////////////////////////////////////////
     std::uint32_t base_action_data::get_locality_id()
     {
-        error_code ec(lightweight);    // ignore any errors
+        error_code ec(throwmode::lightweight);    // ignore any errors
         return hpx::get_locality_id(ec);
     }
 

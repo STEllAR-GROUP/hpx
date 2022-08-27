@@ -30,8 +30,6 @@ set(include_headers
     hpx/include/bind.hpp
     hpx/include/client.hpp
     hpx/include/components.hpp
-    hpx/include/compression.hpp
-    hpx/include/compression_registration.hpp
     hpx/include/compute.hpp
     hpx/include/dataflow.hpp
     hpx/include/datapar.hpp
@@ -92,7 +90,6 @@ set(include_headers
     hpx/include/parallel_uninitialized_move.hpp
     hpx/include/parallel_uninitialized_value_construct.hpp
     hpx/include/parallel_unique.hpp
-    hpx/include/parcel_coalescing.hpp
     hpx/include/parcelset.hpp
     hpx/include/performance_counters.hpp
     hpx/include/plain_actions.hpp
@@ -114,6 +111,7 @@ set(include_headers
     hpx/runtime.hpp
     hpx/semaphore.hpp
     hpx/shared_mutex.hpp
+    hpx/source_location.hpp
     hpx/stop_token.hpp
     hpx/system_error.hpp
     hpx/task_block.hpp

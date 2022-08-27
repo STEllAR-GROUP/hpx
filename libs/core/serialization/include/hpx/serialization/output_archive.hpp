@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,14 +29,15 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     namespace detail {
 
         template <typename Container>
         inline std::unique_ptr<erased_output_container> create_output_container(
             Container& buffer, std::vector<serialization_chunk>* chunks,
-            binary_filter* filter, std::false_type)
+            binary_filter* filter,
+            std::size_t zero_copy_serialization_threshold, std::false_type)
         {
             std::unique_ptr<erased_output_container> res;
             if (filter == nullptr)
@@ -48,7 +50,7 @@ namespace hpx { namespace serialization {
                 else
                 {
                     res.reset(new output_container<Container, vector_chunker>(
-                        buffer, chunks));
+                        buffer, chunks, zero_copy_serialization_threshold));
                 }
             }
             else
@@ -62,7 +64,8 @@ namespace hpx { namespace serialization {
                 else
                 {
                     res.reset(new filtered_output_container<Container,
-                        vector_chunker>(buffer, chunks));
+                        vector_chunker>(
+                        buffer, chunks, zero_copy_serialization_threshold));
                 }
             }
             return res;
@@ -71,19 +74,20 @@ namespace hpx { namespace serialization {
         template <typename Container>
         inline std::unique_ptr<erased_output_container> create_output_container(
             Container& buffer, std::vector<serialization_chunk>* chunks,
-            binary_filter* filter, std::true_type)
+            binary_filter* filter,
+            std::size_t zero_copy_serialization_threshold, std::true_type)
         {
             std::unique_ptr<erased_output_container> res;
             if (filter == nullptr)
             {
                 res.reset(new output_container<Container, counting_chunker>(
-                    buffer, chunks));
+                    buffer, chunks, zero_copy_serialization_threshold));
             }
             else
             {
                 res.reset(
                     new filtered_output_container<Container, counting_chunker>(
-                        buffer, chunks));
+                        buffer, chunks, zero_copy_serialization_threshold));
             }
             return res;
         }
@@ -93,12 +97,13 @@ namespace hpx { namespace serialization {
     struct output_archive : basic_archive<output_archive>
     {
     private:
-        static std::uint32_t make_flags(
-            std::uint32_t flags, std::vector<serialization_chunk>* chunks)
+        static constexpr std::uint32_t make_flags(std::uint32_t flags,
+            std::vector<serialization_chunk>* chunks) noexcept
         {
-            return flags |
-                (chunks == nullptr ? archive_flags::disable_data_chunking :
-                                     archive_flags::no_archive_flags);
+            return flags | std::uint32_t(archive_flags::archive_is_saving) |
+                std::uint32_t(chunks == nullptr ?
+                        archive_flags::disable_data_chunking :
+                        archive_flags::no_archive_flags);
         }
 
     public:
@@ -107,23 +112,34 @@ namespace hpx { namespace serialization {
         template <typename Container>
         output_archive(Container& buffer, std::uint32_t flags = 0U,
             std::vector<serialization_chunk>* chunks = nullptr,
-            binary_filter* filter = nullptr)
+            binary_filter* filter = nullptr,
+            std::size_t zero_copy_serialization_threshold = 0)
           : base_type(make_flags(flags, chunks))
           , buffer_(detail::create_output_container(buffer, chunks, filter,
+                zero_copy_serialization_threshold,
                 typename traits::serialization_access_data<
                     Container>::preprocessing_only()))
         {
+            // cache the preprocessing flag in the base class to avoid
+            // asking the buffer repeatedly
+            if (buffer_->is_preprocessing())
+            {
+                flags_ = flags_ |
+                    std::uint32_t(archive_flags::archive_is_preprocessing);
+            }
+
             // endianness needs to be saved separately as it is needed to
             // properly interpret the flags
-
             // FIXME: make bool once integer compression is implemented
-            std::uint64_t endianness =
-                this->base_type::endian_big() ? ~0ul : 0ul;
+            std::uint64_t const endianness = endian_big() ? ~0ul : 0ul;
             save(endianness);
 
             // send flags sent by the other end to make sure both ends have
             // the same assumptions about the archive format
-            save(this->flags_);
+            save(flags_);
+
+            // send the zero-copy limit
+            save(zero_copy_serialization_threshold);
 
             bool has_filter = filter != nullptr;
             save(has_filter);
@@ -135,26 +151,36 @@ namespace hpx { namespace serialization {
             }
         }
 
-        std::size_t bytes_written() const
+        template <typename Container>
+        output_archive(Container& buffer, archive_flags flags,
+            std::vector<serialization_chunk>* chunks = nullptr,
+            binary_filter* filter = nullptr,
+            std::size_t zero_copy_serialization_threshold = 0)
+          : output_archive(buffer, std::uint32_t(flags), chunks, filter,
+                zero_copy_serialization_threshold)
+        {
+        }
+
+        constexpr std::size_t bytes_written() const noexcept
         {
             return size_;
         }
 
-        std::size_t get_num_chunks() const
+        std::size_t get_num_chunks() const noexcept
         {
             return buffer_->get_num_chunks();
         }
 
         // this function is needed to avoid a MSVC linker error
-        std::size_t current_pos() const
+        constexpr std::size_t current_pos() const noexcept
         {
-            return basic_archive<output_archive>::current_pos();
+            return base_type::current_pos();
         }
 
         void reset()
         {
             buffer_->reset();
-            basic_archive<output_archive>::reset();
+            base_type::reset();
         }
 
         void flush()
@@ -162,39 +188,80 @@ namespace hpx { namespace serialization {
             buffer_->flush();
         }
 
-        bool is_preprocessing() const
-        {
-            return buffer_->is_preprocessing();
-        }
-
-    protected:
-        friend struct basic_archive<output_archive>;
-
-        template <class T>
-        friend class array;
-
         template <typename T>
-        void invoke_impl(T const& t)
+        HPX_FORCEINLINE void invoke(T const& t)
         {
             save(t);
         }
 
         template <typename T>
-        std::enable_if_t<!std::is_integral_v<T> && !std::is_enum_v<T>> save(
-            T const& t)
+        HPX_FORCEINLINE void invoke_impl(T const& t)
         {
-            using use_optimized = std::integral_constant<bool,
-                hpx::traits::is_bitwise_serializable_v<T> ||
-                    !hpx::traits::is_not_bitwise_serializable_v<T>>;
-
-            save_bitwise(t, use_optimized());
+            save(t);
         }
 
         template <typename T>
-        std::enable_if_t<std::is_integral_v<T> || std::is_enum_v<T>> save(
-            T t)    //-V659
+        void save(T const& t)
         {
-            save_integral(t, std::is_unsigned<T>());
+#if !defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
+            static_assert(!std::is_pointer_v<T>,
+                "HPX does not support serialization of raw pointers. "
+                "Please use smart pointers instead.");
+#endif
+            if constexpr (!std::is_integral_v<T> && !std::is_enum_v<T>)
+            {
+                if constexpr (hpx::traits::is_bitwise_serializable_v<T> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<T>)
+                {
+                    // bitwise serialization
+                    static_assert(!std::is_abstract_v<T>,
+                        "Can not bitwise serialize a class that is abstract");
+
+#if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
+                    if (disable_array_optimization() || endianess_differs())
+                    {
+                        access::serialize(*this, t, 0);
+                        return;
+                    }
+#else
+                    HPX_ASSERT(
+                        !(disable_array_optimization() || endianess_differs()));
+#endif
+                    save_binary(&t, sizeof(t));
+                }
+                else if constexpr (traits::is_nonintrusive_polymorphic_v<T>)
+                {
+                    // non-bitwise polymorphic serialization
+                    detail::polymorphic_nonintrusive_factory::instance().save(
+                        *this, t);
+                }
+                else
+                {
+                    // non-bitwise normal serialization
+                    access::serialize(*this, t, 0);
+                }
+            }
+#if defined(HPX_SERIALIZATION_HAVE_SUPPORTS_ENDIANESS)
+            else if constexpr (std::is_unsigned_v<T>)
+            {
+                save_integral(static_cast<std::uint64_t>(t));
+            }
+            else
+            {
+                save_integral(static_cast<std::int64_t>(t));
+            }
+#else
+            else if constexpr (std::is_unsigned_v<T>)
+            {
+                auto val = static_cast<std::uint64_t>(t);
+                save_binary(&val, sizeof(std::uint64_t));
+            }
+            else
+            {
+                auto val = static_cast<std::int64_t>(t);
+                save_binary(&val, sizeof(std::int64_t));
+            }
+#endif
         }
 
         void save(float f)
@@ -212,6 +279,16 @@ namespace hpx { namespace serialization {
             save_binary(&c, sizeof(char));
         }
 
+        void save(signed char c)
+        {
+            save_binary(&c, sizeof(signed char));
+        }
+
+        void save(unsigned char c)
+        {
+            save_binary(&c, sizeof(unsigned char));
+        }
+
         void save(bool b)
         {
             HPX_ASSERT(0 == static_cast<int>(b) || 1 == static_cast<int>(b));
@@ -226,81 +303,27 @@ namespace hpx { namespace serialization {
         }
 #endif
 
-        template <typename T>
-        void save_bitwise(T const& t, std::false_type)
+    private:
+        friend struct basic_archive<output_archive>;
+
+#if defined(HPX_SERIALIZATION_HAVE_SUPPORTS_ENDIANESS)
+        template <typename Promoted>
+        void save_integral(Promoted l)
         {
-            save_nonintrusively_polymorphic(
-                t, hpx::traits::is_nonintrusive_polymorphic<T>());
+            if (endianess_differs())
+            {
+                reverse_bytes(sizeof(Promoted), reinterpret_cast<char*>(&l));
+            }
+            save_binary(&l, sizeof(Promoted));
         }
-
-        template <typename T>
-        void save_bitwise(T const& t, std::true_type)
-        {
-            static_assert(!std::is_abstract<T>::value,
-                "Can not bitwise serialize a class that is abstract");
-
-            bool archive_endianess_differs =
-                endian::native == endian::big ? endian_little() : endian_big();
-
-#if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
-            if (disable_array_optimization() || archive_endianess_differs)
-            {
-                access::serialize(*this, t, 0);
-            }
-            else
-            {
-                save_binary(&t, sizeof(t));
-            }
-#else
-            (void) archive_endianess_differs;
-            HPX_ASSERT(
-                !(disable_array_optimization() || archive_endianess_differs));
-            save_binary(&t, sizeof(t));
 #endif
-        }
 
-        template <typename T>
-        void save_nonintrusively_polymorphic(T const& t, std::false_type)
-        {
-            access::serialize(*this, t, 0);
-        }
-
-        template <typename T>
-        void save_nonintrusively_polymorphic(T const& t, std::true_type)
-        {
-            detail::polymorphic_nonintrusive_factory::instance().save(*this, t);
-        }
-
-        template <typename T>
-        void save_integral(T val, std::false_type)
-        {
-            save_integral_impl(static_cast<std::int64_t>(val));
-        }
-
-        template <typename T>
-        void save_integral(T val, std::true_type)
-        {
-            save_integral_impl(static_cast<std::uint64_t>(val));
-        }
-
-        template <class Promoted>
-        void save_integral_impl(Promoted l)
-        {
-            const std::size_t size = sizeof(Promoted);
-            char* cptr = reinterpret_cast<char*>(&l);    //-V206
-
-            const bool endianess_differs =
-                endian::native == endian::big ? endian_little() : endian_big();
-            if (endianess_differs)
-                reverse_bytes(size, cptr);
-
-            save_binary(cptr, size);
-        }
-
+    public:
         void save_binary(void const* address, std::size_t count)
         {
             if (count == 0)
                 return;
+
             size_ += count;
             buffer_->save_binary(address, count);
         }
@@ -309,6 +332,7 @@ namespace hpx { namespace serialization {
         {
             if (count == 0)
                 return;
+
             if (disable_data_chunking())
             {
                 size_ += count;
@@ -321,8 +345,9 @@ namespace hpx { namespace serialization {
             }
         }
 
+    private:
         std::unique_ptr<erased_output_container> buffer_;
     };
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
 #include <hpx/config/warnings_suffix.hpp>

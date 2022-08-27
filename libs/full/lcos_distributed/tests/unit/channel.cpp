@@ -22,16 +22,16 @@
 
 typedef std::string string_type;
 
-HPX_REGISTER_CHANNEL(int);
-HPX_REGISTER_CHANNEL(string_type);
-HPX_REGISTER_CHANNEL(void);
+HPX_REGISTER_CHANNEL(int)
+HPX_REGISTER_CHANNEL(string_type)
+HPX_REGISTER_CHANNEL(void)
 
 ///////////////////////////////////////////////////////////////////////////////
 void sum(std::vector<int> const& s, hpx::lcos::channel<int> c)
 {
     c.set(std::accumulate(s.begin(), s.end(), 0));    // send sum to channel
 }
-HPX_PLAIN_ACTION(sum);
+HPX_PLAIN_ACTION(sum)
 
 void calculate_sum(hpx::id_type const& loc)
 {
@@ -112,7 +112,7 @@ std::pair<int, bool> dispatched_work(
 
     while (true)
     {
-        hpx::error_code ec(hpx::lightweight);
+        hpx::error_code ec(hpx::throwmode::lightweight);
         int job = jobs.get(hpx::launch::sync, ec);
         (void) job;
 
@@ -130,7 +130,7 @@ std::pair<int, bool> dispatched_work(
 
     return std::make_pair(received_jobs, was_closed);
 }
-HPX_PLAIN_ACTION(dispatched_work);
+HPX_PLAIN_ACTION(dispatched_work)
 
 void dispatch_work(hpx::id_type const& loc)
 {
@@ -273,7 +273,7 @@ int return42()
 {
     return 42;
 }
-HPX_PLAIN_ACTION(return42);
+HPX_PLAIN_ACTION(return42)
 
 void channel_as_lco(hpx::id_type const& here, hpx::id_type const& there)
 {

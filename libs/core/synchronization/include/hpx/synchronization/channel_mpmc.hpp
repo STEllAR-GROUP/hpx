@@ -70,7 +70,7 @@ namespace hpx { namespace lcos { namespace local {
           : head_(rhs.head_)
           , tail_(rhs.tail_)
           , size_(rhs.size_)
-          , buffer_(std::move(rhs.buffer_))
+          , buffer_(HPX_MOVE(rhs.buffer_))
           , closed_(rhs.closed_)
         {
             rhs.size_ = 0;
@@ -82,7 +82,7 @@ namespace hpx { namespace lcos { namespace local {
             head_ = rhs.head_;
             tail_ = rhs.tail_;
             size_ = rhs.size_;
-            buffer_ = std::move(rhs.buffer_);
+            buffer_ = HPX_MOVE(rhs.buffer_);
             closed_ = rhs.closed_;
             rhs.closed_ = true;
             return *this;
@@ -124,7 +124,7 @@ namespace hpx { namespace lcos { namespace local {
                 return true;
             }
 
-            *val = std::move(buffer_[head]);
+            *val = HPX_MOVE(buffer_[head]);
             if (++head >= size_)
             {
                 head = 0;
@@ -149,7 +149,7 @@ namespace hpx { namespace lcos { namespace local {
                 return false;
             }
 
-            buffer_[tail] = std::move(t);
+            buffer_[tail] = HPX_MOVE(t);
             if (++tail >= size_)
             {
                 tail = 0;

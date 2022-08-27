@@ -9,9 +9,9 @@
 
 .. _examples_accumulator:
 
-===================================
-Components and actions: Accumulator
-===================================
+======================
+Components and actions
+======================
 
 The accumulator example demonstrates the use of components. Components are C++
 classes that expose methods as a type of |hpx| action. These actions are called
@@ -52,15 +52,15 @@ To compile this program, go to your |hpx| build directory (see
 :ref:`hpx_build_system` for information on configuring and building |hpx|) and
 enter:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   make examples.accumulators.accumulator
+   $ make examples.accumulators.accumulator
 
 To run the program type:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ./bin/accumulator_client
+   $ ./bin/accumulator_client
 
 Once the program starts running, it will print the following prompt and then
 wait for input. An example session is given below:

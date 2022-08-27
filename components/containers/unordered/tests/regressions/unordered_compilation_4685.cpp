@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-HPX_REGISTER_UNORDERED_MAP(std::string, double);
+HPX_REGISTER_UNORDERED_MAP(std::string, double)
 
 const char* const map_name = "mobility_visit_map";
 

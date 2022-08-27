@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //  Copyright (c) 2016 Lukas Troska
 //
@@ -116,8 +116,10 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/async_combinators/detail/throw_if_exceptional.hpp>
 #include <hpx/async_combinators/when_each.hpp>
 #include <hpx/futures/traits/is_future.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
@@ -126,51 +128,127 @@ namespace hpx {
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos {
+namespace hpx {
+
     template <typename F, typename Future>
-    void wait_each(F&& f, std::vector<Future>& lazy_values)
+    void wait_each_nothrow(F&& f, std::vector<Future>& values)
     {
-        lcos::when_each(std::forward<F>(f), lazy_values).wait();
+        hpx::when_each(HPX_FORWARD(F, f), values).wait();
     }
 
     template <typename F, typename Future>
-    void wait_each(F&& f, std::vector<Future>&& lazy_values)
+    void wait_each(F&& f, std::vector<Future>& values)
     {
-        lcos::when_each(std::forward<F>(f), lazy_values).wait();
+        auto result = hpx::when_each(HPX_FORWARD(F, f), values);
+        result.wait();
+        hpx::detail::throw_if_exceptional(HPX_MOVE(result));
     }
 
-    template <typename F, typename Iterator>
+    template <typename F, typename Future>
+    void wait_each_nothrow(F&& f, std::vector<Future>&& values)
+    {
+        hpx::when_each(HPX_FORWARD(F, f), HPX_MOVE(values)).wait();
+    }
+
+    template <typename F, typename Future>
+    void wait_each(F&& f, std::vector<Future>&& values)
+    {
+        auto result = hpx::when_each(HPX_FORWARD(F, f), HPX_MOVE(values));
+        result.wait();
+        hpx::detail::throw_if_exceptional(HPX_MOVE(result));
+    }
+
+    template <typename F, typename Iterator,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    void wait_each_nothrow(F&& f, Iterator begin, Iterator end)
+    {
+        hpx::when_each(HPX_FORWARD(F, f), begin, end).wait();
+    }
+
+    template <typename F, typename Iterator,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     void wait_each(F&& f, Iterator begin, Iterator end)
     {
-        lcos::when_each(std::forward<F>(f), begin, end).wait();
+        auto result = hpx::when_each(HPX_FORWARD(F, f), begin, end);
+        result.wait();
+        hpx::detail::throw_if_exceptional(HPX_MOVE(result));
     }
 
-    template <typename F, typename Iterator>
+    template <typename F, typename Iterator,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    void wait_each_n_nothrow(F&& f, Iterator begin, std::size_t count)
+    {
+        hpx::when_each_n(HPX_FORWARD(F, f), begin, count).wait();
+    }
+
+    template <typename F, typename Iterator,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     void wait_each_n(F&& f, Iterator begin, std::size_t count)
     {
-        when_each_n(std::forward<F>(f), begin, count).wait();
+        auto result = hpx::when_each_n(HPX_FORWARD(F, f), begin, count);
+        result.wait();
+        hpx::detail::throw_if_exceptional(HPX_MOVE(result));
+    }
+
+    template <typename F>
+    void wait_each_nothrow(F&& f)
+    {
+        hpx::when_each(HPX_FORWARD(F, f)).wait();
     }
 
     template <typename F>
     void wait_each(F&& f)
     {
-        lcos::when_each(std::forward<F>(f)).wait();
+        auto result = hpx::when_each(HPX_FORWARD(F, f));
+        result.wait();
+        hpx::detail::throw_if_exceptional(HPX_MOVE(result));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename F, typename... Ts>
-    typename std::enable_if<
-        !traits::is_future<typename std::decay<F>::type>::value &&
-        util::all_of<traits::is_future<Ts>...>::value>::type
-    wait_each(F&& f, Ts&&... ts)
+    template <typename F, typename... Ts,
+        typename Enable =
+            std::enable_if_t<!traits::is_future_v<std::decay_t<F>> &&
+                util::all_of_v<traits::is_future<Ts>...>>>
+    void wait_each_nothrow(F&& f, Ts&&... ts)
     {
-        lcos::when_each(std::forward<F>(f), std::forward<Ts>(ts)...).wait();
+        hpx::when_each(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...).wait();
     }
-}}    // namespace hpx::lcos
 
-namespace hpx {
-    using lcos::wait_each;
-    using lcos::wait_each_n;
+    template <typename F, typename... Ts,
+        typename Enable =
+            std::enable_if_t<!traits::is_future_v<std::decay_t<F>> &&
+                util::all_of_v<traits::is_future<Ts>...>>>
+    void wait_each(F&& f, Ts&&... ts)
+    {
+        auto result = hpx::when_each(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        result.wait();
+        hpx::detail::throw_if_exceptional(HPX_MOVE(result));
+    }
 }    // namespace hpx
+
+namespace hpx::lcos {
+
+    template <typename F, typename... Ts>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::wait_each is deprecated. Use hpx::wait_each instead.")
+    void wait_each(F&& f, Ts&&... ts)
+    {
+        hpx::wait_each(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename F, typename Iterator,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::wait_each is deprecated. Use hpx::wait_each instead.")
+    void wait_each_n(F&& f, Iterator begin, std::size_t count)
+    {
+        hpx::wait_each_n(HPX_FORWARD(F, f), begin, count);
+    }
+}    // namespace hpx::lcos
 
 #endif    // DOXYGEN

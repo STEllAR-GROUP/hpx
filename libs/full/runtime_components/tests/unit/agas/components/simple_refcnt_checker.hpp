@@ -31,9 +31,9 @@ namespace hpx { namespace test {
             base_type;
 
     private:
-        lcos::promise<void> flag_promise_;
-        lcos::future<void> flag_;
-        naming::id_type const locality_;
+        hpx::distributed::promise<void> flag_promise_;
+        hpx::future<void> flag_;
+        hpx::id_type const locality_;
 
     public:
         typedef server::simple_refcnt_checker server_type;
@@ -49,7 +49,7 @@ namespace hpx { namespace test {
           , flag_promise_()
           , flag_(flag_promise_.get_future())
           , locality_(naming::get_locality_from_gid(locality),
-                naming::id_type::unmanaged)
+                hpx::id_type::management_type::unmanaged)
         {
             static_cast<base_type&>(*this) =
                 hpx::new_<server::simple_refcnt_checker>(
@@ -57,7 +57,7 @@ namespace hpx { namespace test {
         }
 
         /// Create a new component on the target locality.
-        explicit simple_refcnt_monitor(naming::id_type const& locality)
+        explicit simple_refcnt_monitor(hpx::id_type const& locality)
           : base_type()
           , flag_promise_()
           , flag_(flag_promise_.get_future())
@@ -68,12 +68,12 @@ namespace hpx { namespace test {
                     locality_, flag_promise_.get_id());
         }
 
-        lcos::future<void> take_reference_async(naming::id_type const& gid)
+        hpx::future<void> take_reference_async(hpx::id_type const& gid)
         {
             return this->base_type::take_reference_async(get_id(), gid);
         }
 
-        void take_reference(naming::id_type const& gid)
+        void take_reference(hpx::id_type const& gid)
         {
             return this->base_type::take_reference(get_id(), gid);
         }
@@ -121,15 +121,16 @@ namespace hpx { namespace test {
         /// Create a new component on the target locality.
         explicit simple_object(naming::gid_type const& locality)
           : base_type(hpx::new_<server::simple_refcnt_checker>(
-                naming::id_type(locality, naming::id_type::unmanaged),
-                naming::invalid_id))
+                hpx::id_type(
+                    locality, hpx::id_type::management_type::unmanaged),
+                hpx::invalid_id))
         {
         }
 
         /// Create a new component on the target locality.
-        explicit simple_object(naming::id_type const& locality)
+        explicit simple_object(hpx::id_type const& locality)
           : base_type(hpx::new_<server::simple_refcnt_checker>(
-                locality, naming::invalid_id))
+                locality, hpx::invalid_id))
         {
         }
     };

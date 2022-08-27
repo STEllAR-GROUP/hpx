@@ -41,7 +41,7 @@ struct stateless_integer_add
 
 int main(int, char*[])
 {
-    hpx::util::function_nonser<int(int, int)> f;
+    hpx::function<int(int, int)> f;
     f = stateless_integer_add();
 
     return hpx::util::report_errors();

@@ -5,15 +5,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(subdirs build lcos util)
-
-if(HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(subdirs ${subdirs} actions component)
-endif()
-
-if(HPX_WITH_NETWORKING)
-  set(subdirs ${subdirs} parcelset)
-endif()
+set(subdirs build)
 
 if(HPX_WITH_APEX)
   set(subdirs ${subdirs} apex)

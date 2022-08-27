@@ -34,7 +34,7 @@ namespace hpx { namespace agas { namespace detail {
         {
             return addr_;
         }
-        naming::id_type gid() const
+        hpx::id_type gid() const
         {
             return gid_;
         }
@@ -52,11 +52,11 @@ namespace hpx { namespace agas { namespace detail {
 
         std::string get_component_type_name(components::component_type type);
 
-        lcos::future<std::uint32_t> get_num_localities(
+        hpx::future<std::uint32_t> get_num_localities(
             components::component_type type);
 
     private:
-        naming::id_type gid_;
+        hpx::id_type gid_;
         naming::address addr_;
     };
 

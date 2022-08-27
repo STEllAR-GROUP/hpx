@@ -34,4 +34,7 @@ namespace hpx { namespace traits {
       : detail::action_remote_result_customization_point<Result>
     {
     };
+
+    template <typename Result>
+    using action_remote_result_t = typename action_remote_result<Result>::type;
 }}    // namespace hpx::traits

@@ -24,7 +24,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos {
+namespace hpx { namespace distributed {
+
     barrier::barrier(std::string const& base_name)
       : node_(new (hpx::components::component_heap<wrapping_type>().alloc())
                 wrapping_type(new wrapped_type(base_name,
@@ -89,7 +90,7 @@ namespace hpx { namespace lcos {
     barrier::barrier() = default;
 
     barrier::barrier(barrier&& other)
-      : node_(std::move(other.node_))
+      : node_(HPX_MOVE(other.node_))
     {
         other.node_.reset();
     }
@@ -97,7 +98,7 @@ namespace hpx { namespace lcos {
     barrier& barrier::operator=(barrier&& other)
     {
         release();
-        node_ = std::move(other.node_);
+        node_ = HPX_MOVE(other.node_);
         other.node_.reset();
 
         return *this;
@@ -113,7 +114,7 @@ namespace hpx { namespace lcos {
         (*node_)->wait(false).get();
     }
 
-    future<void> barrier::wait(hpx::launch::async_policy)
+    hpx::future<void> barrier::wait(hpx::launch::async_policy)
     {
         return (*node_)->wait(true);
     }
@@ -123,7 +124,7 @@ namespace hpx { namespace lcos {
         if (node_)
         {
             if (hpx::get_runtime_ptr() != nullptr &&
-                hpx::threads::threadmanager_is(state_running) &&
+                hpx::threads::threadmanager_is(hpx::state::running) &&
                 !hpx::is_stopped_or_shutting_down())
             {
                 // make sure this runs as an HPX thread
@@ -145,7 +146,7 @@ namespace hpx { namespace lcos {
                 hpx::intrusive_ptr<wrapping_type> node = node_;
                 hpx::when_all(f, wait(hpx::launch::async))
                     .then(hpx::launch::sync,
-                        [node = std::move(node)](hpx::future<void> f) {
+                        [node = HPX_MOVE(node)](hpx::future<void> f) {
                             HPX_UNUSED(node);
                             f.get();
                         })
@@ -161,7 +162,7 @@ namespace hpx { namespace lcos {
         if (node_)
         {
             if (hpx::get_runtime_ptr() != nullptr &&
-                hpx::threads::threadmanager_is(state_running) &&
+                hpx::threads::threadmanager_is(hpx::state::running) &&
                 !hpx::is_stopped_or_shutting_down())
             {
                 if ((*node_)->num_ >= (*node_)->cut_off_ ||
@@ -196,4 +197,4 @@ namespace hpx { namespace lcos {
         HPX_ASSERT(b.node_);
         b.wait();
     }
-}}    // namespace hpx::lcos
+}}    // namespace hpx::distributed

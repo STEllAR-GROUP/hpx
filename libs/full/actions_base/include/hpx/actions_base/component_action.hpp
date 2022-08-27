@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -45,29 +45,30 @@ namespace hpx { namespace actions {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Component, typename R, typename F, typename... Ts>
-        R component_invoke(std::false_type, naming::address_type lva,
+        R component_invoke(naming::address_type lva,
             naming::component_type /*comptype*/, F Component::*f, Ts&&... vs)
         {
             Component* component = get_lva<Component>::call(lva);
-            return (component->*f)(std::forward<Ts>(vs)...);
-        }
+            if constexpr (traits::is_future_v<R> || traits::is_client_v<R>)
+            {
+                // additional pinning is required such that the object becomes
+                // unpinned only after the returned future has become ready
+                components::pinned_ptr p =
+                    components::pinned_ptr::create<Component>(lva);
 
-        template <typename Component, typename R, typename F, typename... Ts>
-        R component_invoke(std::true_type, naming::address_type lva,
-            naming::component_type /* comptype */, F Component::*f, Ts&&... vs)
-        {
-            // additional pinning is required such that the object becomes
-            // unpinned only after the returned future has become ready
-            components::pinned_ptr p =
-                components::pinned_ptr::create<Component>(lva);
+                R result = (component->*f)(HPX_FORWARD(Ts, vs)...);
 
-            Component* component = get_lva<Component>::call(lva);
-            R result = (component->*f)(std::forward<Ts>(vs)...);
-
-            traits::detail::get_shared_state(result)->set_on_completed(
-                [p = std::move(p)]() {});
-
-            return result;
+                if (!result.is_ready())
+                {
+                    traits::detail::get_shared_state(result)->set_on_completed(
+                        [p = HPX_MOVE(p)]() {});
+                }
+                return result;
+            }
+            else
+            {
+                return (component->*f)(HPX_FORWARD(Ts, vs)...);
+            }
         }
     }    // namespace detail
 
@@ -79,12 +80,11 @@ namespace hpx { namespace actions {
         R (Component::*F)(Ps...), typename Derived>
     struct action<R (Component::*)(Ps...), F, Derived>
       : public basic_action<Component, R(Ps...),
-            typename detail::action_type<
-                action<R (Component::*)(Ps...), F, Derived>, Derived>::type>
+            detail::action_type_t<action<R (Component::*)(Ps...), F, Derived>,
+                Derived>>
     {
     public:
-        typedef
-            typename detail::action_type<action, Derived>::type derived_type;
+        using derived_type = detail::action_type_t<action, Derived>;
 
         static std::string get_action_name(naming::address_type lva)
         {
@@ -100,9 +100,8 @@ namespace hpx { namespace actions {
             basic_action<Component, R(Ps...),
                 derived_type>::increment_invocation_count();
 
-            using is_future = typename traits::is_future<R>::type;
             return detail::component_invoke<Component, R>(
-                is_future{}, lva, comptype, F, std::forward<Ts>(vs)...);
+                lva, comptype, F, HPX_FORWARD(Ts, vs)...);
         }
     };
 
@@ -114,13 +113,11 @@ namespace hpx { namespace actions {
         R (Component::*F)(Ps...) const, typename Derived>
     struct action<R (Component::*)(Ps...) const, F, Derived>
       : public basic_action<Component const, R(Ps...),
-            typename detail::action_type<
-                action<R (Component::*)(Ps...) const, F, Derived>,
-                Derived>::type>
+            detail::action_type_t<
+                action<R (Component::*)(Ps...) const, F, Derived>, Derived>>
     {
     public:
-        typedef
-            typename detail::action_type<action, Derived>::type derived_type;
+        using derived_type = detail::action_type_t<action, Derived>;
 
         static std::string get_action_name(naming::address_type lva)
         {
@@ -136,13 +133,8 @@ namespace hpx { namespace actions {
             basic_action<Component const, R(Ps...),
                 derived_type>::increment_invocation_count();
 
-            using is_future_or_client = typename std::integral_constant<bool,
-                traits::is_future<R>::value ||
-                    traits::is_client<R>::value>::type;
-
             return detail::component_invoke<Component const, R>(
-                is_future_or_client{}, lva, comptype, F,
-                std::forward<Ts>(vs)...);
+                lva, comptype, F, HPX_FORWARD(Ts, vs)...);
         }
     };
 
@@ -154,13 +146,11 @@ namespace hpx { namespace actions {
         R (Component::*F)(Ps...) noexcept, typename Derived>
     struct action<R (Component::*)(Ps...) noexcept, F, Derived>
       : public basic_action<Component, R(Ps...),
-            typename detail::action_type<
-                action<R (Component::*)(Ps...) noexcept, F, Derived>,
-                Derived>::type>
+            detail::action_type_t<
+                action<R (Component::*)(Ps...) noexcept, F, Derived>, Derived>>
     {
     public:
-        typedef
-            typename detail::action_type<action, Derived>::type derived_type;
+        using derived_type = detail::action_type_t<action, Derived>;
 
         static std::string get_action_name(naming::address_type lva)
         {
@@ -176,27 +166,24 @@ namespace hpx { namespace actions {
             basic_action<Component, R(Ps...),
                 derived_type>::increment_invocation_count();
 
-            using is_future = typename traits::is_future<R>::type;
             return detail::component_invoke<Component, R>(
-                is_future{}, lva, comptype, F, std::forward<Ts>(vs)...);
+                lva, comptype, F, HPX_FORWARD(Ts, vs)...);
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     //  Specialized generic const noexcept component action types allowing to
     //  hold a different number of arguments
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename R, typename... Ps,
         R (Component::*F)(Ps...) const noexcept, typename Derived>
     struct action<R (Component::*)(Ps...) const noexcept, F, Derived>
       : public basic_action<Component const, R(Ps...),
-            typename detail::action_type<
+            detail::action_type_t<
                 action<R (Component::*)(Ps...) const noexcept, F, Derived>,
-                Derived>::type>
+                Derived>>
     {
     public:
-        typedef
-            typename detail::action_type<action, Derived>::type derived_type;
+        using derived_type = detail::action_type_t<action, Derived>;
 
         static std::string get_action_name(naming::address_type lva)
         {
@@ -212,13 +199,8 @@ namespace hpx { namespace actions {
             basic_action<Component const, R(Ps...),
                 derived_type>::increment_invocation_count();
 
-            using is_future_or_client = typename std::integral_constant<bool,
-                traits::is_future<R>::value ||
-                    traits::is_client<R>::value>::type;
-
             return detail::component_invoke<Component const, R>(
-                is_future_or_client{}, lva, comptype, F,
-                std::forward<Ts>(vs)...);
+                lva, comptype, F, HPX_FORWARD(Ts, vs)...);
         }
     };
 
@@ -249,7 +231,7 @@ namespace hpx { namespace actions {
 ///           {
 ///               void print_greeting() const
 ///               {
-///                   hpx::cout << "Hey, how are you?\n" << hpx::flush;
+///                   hpx::cout << "Hey, how are you?\n" << std::flush;
 ///               }
 ///
 ///               // Component actions need to be declared, this also defines the
@@ -295,10 +277,10 @@ namespace hpx { namespace actions {
 
 #define HPX_DEFINE_COMPONENT_ACTION_3(component, func, name)                   \
     struct name                                                                \
-      : hpx::actions::make_action<decltype(&component::func),                  \
-            &component::func, name>::type                                      \
+      : hpx::actions::make_action_t<decltype(&component::func),                \
+            &component::func, name>                                            \
     {                                                                          \
-    } /**/
+    }; /**/
 #define HPX_DEFINE_COMPONENT_ACTION_2(component, func)                         \
     HPX_DEFINE_COMPONENT_ACTION_3(component, func, HPX_PP_CAT(func, _action))  \
     /**/
@@ -316,10 +298,10 @@ namespace hpx { namespace actions {
 
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(component, func, name)            \
     struct name                                                                \
-      : hpx::actions::make_direct_action<decltype(&component::func),           \
-            &component::func, name>::type                                      \
+      : hpx::actions::make_direct_action_t<decltype(&component::func),         \
+            &component::func, name>                                            \
     {                                                                          \
-    } /**/
+    }; /**/
 
 #define HPX_DEFINE_COMPONENT_DIRECT_ACTION_2(component, func)                  \
     HPX_DEFINE_COMPONENT_DIRECT_ACTION_3(                                      \

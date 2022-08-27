@@ -110,10 +110,9 @@ namespace hpx { namespace ranges {
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/destroy.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/destroy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -130,7 +129,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::destroy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct destroy_t final
+    inline constexpr struct destroy_t final
       : hpx::detail::tag_parallel_algorithm<destroy_t>
     {
     private:
@@ -143,7 +142,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_dispatch(destroy_t, ExPolicy&& policy, Rng&& rng)
+        tag_fallback_invoke(destroy_t, ExPolicy&& policy, Rng&& rng)
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
@@ -153,7 +152,7 @@ namespace hpx { namespace ranges {
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::destroy<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng));
         }
 
@@ -166,14 +165,13 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_dispatch(
-            destroy_t, ExPolicy&& policy, Iter first, Sent last)
+        tag_fallback_invoke(destroy_t, ExPolicy&& policy, Iter first, Sent last)
         {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
 
             return hpx::parallel::v1::detail::destroy<Iter>().call(
-                std::forward<ExPolicy>(policy), first, last);
+                HPX_FORWARD(ExPolicy, policy), first, last);
         }
 
         // clang-format off
@@ -183,7 +181,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_dispatch(destroy_t, Rng&& rng)
+        tag_fallback_invoke(destroy_t, Rng&& rng)
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
@@ -203,7 +201,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<Iter>::value
             )>
         // clang-format on
-        friend Iter tag_fallback_dispatch(destroy_t, Iter first, Sent last)
+        friend Iter tag_fallback_invoke(destroy_t, Iter first, Sent last)
         {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
                 "Required at least forward iterator.");
@@ -215,7 +213,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::destroy_n
-    HPX_INLINE_CONSTEXPR_VARIABLE struct destroy_n_t final
+    inline constexpr struct destroy_n_t final
       : hpx::detail::tag_parallel_algorithm<destroy_n_t>
     {
     private:
@@ -228,7 +226,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             destroy_n_t, ExPolicy&& policy, FwdIter first, Size count)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -238,11 +236,11 @@ namespace hpx { namespace ranges {
             if (hpx::parallel::v1::detail::is_negative(count))
             {
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(std::move(first));
+                    FwdIter>::get(HPX_MOVE(first));
             }
 
             return hpx::parallel::v1::detail::destroy_n<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, std::size_t(count));
+                HPX_FORWARD(ExPolicy, policy), first, std::size_t(count));
         }
 
         // clang-format off
@@ -251,7 +249,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             destroy_n_t, FwdIter first, Size count)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),

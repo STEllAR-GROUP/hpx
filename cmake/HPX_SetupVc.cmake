@@ -78,6 +78,7 @@ if(HPX_WITH_DATAPAR_VC AND NOT TARGET Vc::vc)
     )
   else()
     hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+    hpx_add_config_cond_define(_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS)
   endif()
 
   hpx_add_config_define(HPX_HAVE_DATAPAR)

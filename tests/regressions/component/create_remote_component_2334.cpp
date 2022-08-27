@@ -30,13 +30,14 @@ struct matrix_multiply_multiplier
         HPX_TEST(false);
     }
 
-    matrix_multiply_multiplier(std::vector<double> && a)
+    matrix_multiply_multiplier(std::vector<double>&& a)
       : a_(std::move(a))
-    {}
+    {
+    }
 };
 
 HPX_REGISTER_COMPONENT(hpx::components::component<matrix_multiply_multiplier>,
-    matrix_multiply_multiplier);
+    matrix_multiply_multiplier)
 
 int hpx_main()
 {
@@ -57,7 +58,7 @@ int hpx_main()
     return hpx::finalize();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     HPX_TEST_EQ(hpx::init(argc, argv), 0);
     return hpx::util::report_errors();

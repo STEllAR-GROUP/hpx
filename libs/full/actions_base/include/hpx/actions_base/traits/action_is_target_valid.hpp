@@ -20,16 +20,16 @@ namespace hpx { namespace traits {
             // by default we return true if the given id is not referring to a
             // locality
             template <typename Action>
-            static bool call(wrap_int, naming::id_type const& id) noexcept
+            static bool call(wrap_int, hpx::id_type const& id) noexcept
             {
                 // All component types requires valid id for its actions to be
                 // invoked (by default)
-                return !naming::is_locality(id);
+                return !naming::is_locality(id.get_gid());
             }
 
             // forward the call if the component implements the function
             template <typename Action>
-            static auto call(int, naming::id_type const& id) noexcept
+            static auto call(int, hpx::id_type const& id) noexcept
                 -> decltype(Action::component_type::is_target_valid(id))
             {
                 // by default we forward this to the component type
@@ -42,7 +42,7 @@ namespace hpx { namespace traits {
     template <typename Action, typename Enable = void>
     struct action_is_target_valid
     {
-        static bool call(naming::id_type const& id) noexcept
+        static bool call(hpx::id_type const& id) noexcept
         {
             return detail::is_target_valid_helper::template call<Action>(0, id);
         }

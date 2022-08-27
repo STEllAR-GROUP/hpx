@@ -25,7 +25,9 @@ bool verbose = false;
 double test_results(
     std::uint64_t order, hpx::partitioned_vector<double> const& trans);
 
-HPX_REGISTER_PARTITIONED_VECTOR(double);
+#if !defined(HPX_MSVC)
+HPX_REGISTER_PARTITIONED_VECTOR(double)
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)

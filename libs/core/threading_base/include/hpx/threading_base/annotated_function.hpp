@@ -12,6 +12,7 @@
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
+#include <hpx/threading_base/scoped_annotation.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/type_support/decay.hpp>
@@ -29,124 +30,13 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx {
     namespace detail {
         HPX_CORE_EXPORT char const* store_function_annotation(std::string name);
     }    // namespace detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-    struct HPX_NODISCARD annotate_function
-    {
-        HPX_NON_COPYABLE(annotate_function);
-
-        explicit constexpr annotate_function(char const*) noexcept {}
-
-        template <typename F>
-        explicit HPX_HOST_DEVICE constexpr annotate_function(F&&) noexcept
-        {
-        }
-
-        // add empty (but non-trivial) destructor to silence warnings
-        HPX_HOST_DEVICE ~annotate_function() {}
-    };
-#elif HPX_HAVE_ITTNOTIFY != 0
-    struct HPX_NODISCARD annotate_function
-    {
-        HPX_NON_COPYABLE(annotate_function);
-
-        explicit annotate_function(char const* name)
-          : task_(thread_domain_, hpx::util::itt::string_handle(name))
-        {
-        }
-        template <typename F>
-        explicit annotate_function(F&& f)
-          : task_(thread_domain_,
-                hpx::traits::get_function_annotation_itt<std::decay_t<F>>::call(
-                    f))
-        {
-        }
-
-    private:
-        hpx::util::itt::thread_domain thread_domain_;
-        hpx::util::itt::task task_;
-    };
-#else
-    struct HPX_NODISCARD annotate_function
-    {
-        HPX_NON_COPYABLE(annotate_function);
-
-        explicit annotate_function(char const* name)
-        {
-            auto* self = hpx::threads::get_self_ptr();
-            if (self != nullptr)
-            {
-                desc_ = threads::get_thread_id_data(self->get_thread_id())
-                            ->set_description(name);
-            }
-
-#if defined(HPX_HAVE_APEX)
-            /* update the task wrapper in APEX to use the specified name */
-            threads::set_self_timer_data(external_timer::update_task(
-                threads::get_self_timer_data(), std::string(name)));
-#endif
-        }
-
-        explicit annotate_function(std::string name)
-        {
-            auto* self = hpx::threads::get_self_ptr();
-            if (self != nullptr)
-            {
-                char const* name_c_str =
-#if defined(HPX_HAVE_APEX)
-                    detail::store_function_annotation(name);
-#else
-                    detail::store_function_annotation(std::move(name));
-#endif
-                desc_ = threads::get_thread_id_data(self->get_thread_id())
-                            ->set_description(name_c_str);
-            }
-
-#if defined(HPX_HAVE_APEX)
-            /* update the task wrapper in APEX to use the specified name */
-            threads::set_self_timer_data(external_timer::update_task(
-                threads::get_self_timer_data(), std::move(name)));
-#endif
-        }
-
-        template <typename F,
-            typename =
-                std::enable_if_t<!std::is_same_v<std::decay_t<F>, std::string>>>
-        explicit annotate_function(F&& f)
-        {
-            auto* self = hpx::threads::get_self_ptr();
-            if (self != nullptr)
-            {
-                desc_ = threads::get_thread_id_data(self->get_thread_id())
-                            ->set_description(hpx::util::thread_description(f));
-            }
-
-#if defined(HPX_HAVE_APEX)
-            /* no need to update the task description in APEX, because
-             * this same description was used when the task was created. */
-#endif
-        }
-
-        ~annotate_function()
-        {
-            auto* self = hpx::threads::get_self_ptr();
-            if (self != nullptr)
-            {
-                threads::get_thread_id_data(self->get_thread_id())
-                    ->set_description(desc_);
-            }
-        }
-
-        hpx::util::thread_description desc_;
-    };
-#endif
-
     namespace detail {
         template <typename F>
         struct annotated_function
@@ -165,16 +55,16 @@ namespace hpx { namespace util {
             }
 
             annotated_function(F&& f, char const* name)
-              : f_(std::move(f))
+              : f_(HPX_MOVE(f))
               , name_(name)
             {
             }
 
             template <typename... Ts>
-            invoke_result_t<fun_type, Ts...> operator()(Ts&&... ts)
+            hpx::util::invoke_result_t<fun_type, Ts...> operator()(Ts&&... ts)
             {
-                annotate_function annotate(get_function_annotation());
-                return HPX_INVOKE(f_, std::forward<Ts>(ts)...);
+                scoped_annotation annotate(get_function_annotation());
+                return HPX_INVOKE(f_, HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename Archive>
@@ -225,7 +115,7 @@ namespace hpx { namespace util {
     {
         typedef detail::annotated_function<std::decay_t<F>> result_type;
 
-        return result_type(std::forward<F>(f), name);
+        return result_type(HPX_FORWARD(F, f), name);
     }
 
     template <typename F>
@@ -237,69 +127,71 @@ namespace hpx { namespace util {
         // Store string in a set to ensure it lives for the entire duration of
         // the task.
         char const* name_c_str =
-            detail::store_function_annotation(std::move(name));
-        return result_type(std::forward<F>(f), name_c_str);
+            hpx::detail::store_function_annotation(HPX_MOVE(name));
+        return result_type(HPX_FORWARD(F, f), name_c_str);
     }
 
 #else
     ///////////////////////////////////////////////////////////////////////////
-    struct HPX_NODISCARD annotate_function
-    {
-        HPX_NON_COPYABLE(annotate_function);
-
-        explicit constexpr annotate_function(char const* /*name*/) noexcept {}
-
-        template <typename F>
-        explicit HPX_HOST_DEVICE constexpr annotate_function(F&& /*f*/) noexcept
-        {
-        }
-
-        // add empty (but non-trivial) destructor to silence warnings
-        HPX_HOST_DEVICE ~annotate_function() {}
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Given a function as an argument, the user can annotate_function
-    /// as well.
+    /// \brief Returns a function annotated with the given annotation.
+    ///
     /// Annotating includes setting the thread description per thread id.
     ///
     /// \param function
     template <typename F>
     constexpr F&& annotated_function(F&& f, char const* = nullptr) noexcept
     {
-        return std::forward<F>(f);
+        return HPX_FORWARD(F, f);
     }
 
     template <typename F>
     constexpr F&& annotated_function(F&& f, std::string const&) noexcept
     {
-        return std::forward<F>(f);
+        return HPX_FORWARD(F, f);
     }
 #endif
-}}    // namespace hpx::util
+}    // namespace hpx
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
-    struct get_function_address<util::detail::annotated_function<F>>
+    struct get_function_address<hpx::detail::annotated_function<F>>
     {
         static constexpr std::size_t call(
-            util::detail::annotated_function<F> const& f) noexcept
+            hpx::detail::annotated_function<F> const& f) noexcept
         {
             return f.get_function_address();
         }
     };
 
     template <typename F>
-    struct get_function_annotation<util::detail::annotated_function<F>>
+    struct get_function_annotation<hpx::detail::annotated_function<F>>
     {
         static constexpr char const* call(
-            util::detail::annotated_function<F> const& f) noexcept
+            hpx::detail::annotated_function<F> const& f) noexcept
         {
             return f.get_function_annotation();
         }
     };
 #endif
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
+
+namespace hpx::util {
+    template <typename F>
+    HPX_DEPRECATED_V(1, 8, "Please use hpx::annotated_function instead.")
+    constexpr decltype(auto)
+        annotated_function(F&& f, char const* name = nullptr) noexcept
+    {
+        return hpx::annotated_function(HPX_FORWARD(F, f), name);
+    }
+
+    template <typename F>
+    HPX_DEPRECATED_V(1, 8, "Please use hpx::annotated_function instead.")
+    constexpr decltype(auto)
+        annotated_function(F&& f, std::string const& name) noexcept
+    {
+        return hpx::annotated_function(HPX_FORWARD(F, f), name);
+    }
+}    // namespace hpx::util

@@ -9,13 +9,14 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/execution_base/register_locks.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <mutex>
 #include <utility>
@@ -108,8 +109,10 @@ namespace hpx { namespace lcos { namespace local {
         owner_id_ = threads::invalid_thread_id;
 
         {
-            util::ignore_while_checking<std::unique_lock<mutex_type>> il(&l);
-            cond_.notify_one(std::move(l), threads::thread_priority::boost, ec);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
+
+            cond_.notify_one(HPX_MOVE(l), threads::thread_priority::boost, ec);
         }
     }
 

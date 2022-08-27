@@ -15,22 +15,23 @@
 
 #include "server_1950.hpp"
 
-int hpx_main(hpx::program_options::variables_map &vm) {
-  {
-    hpx::cout << "Hello World!\n" << hpx::flush;
+int hpx_main(hpx::program_options::variables_map& vm)
+{
+    {
+        hpx::cout << "Hello World!\n" << std::flush;
 
-    hpx::id_type id = hpx::new_<test_server>(hpx::find_here()).get();
-    hpx::future<void> f = hpx::async(call_action(), id);
-    f.get();
-    HPX_TEST(test_server::called);
-  }
-  return hpx::finalize();
+        hpx::id_type id = hpx::new_<test_server>(hpx::find_here()).get();
+        hpx::future<void> f = hpx::async(call_action(), id);
+        f.get();
+        HPX_TEST(test_server::called);
+    }
+    return hpx::finalize();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    hpx::program_options::options_description
-        desc_commandline("USAGE: " HPX_APPLICATION_STRING " [options]");
+    hpx::program_options::options_description desc_commandline(
+        "USAGE: " HPX_APPLICATION_STRING " [options]");
 
     hpx::init_params init_args;
     init_args.desc_cmdline = desc_commandline;

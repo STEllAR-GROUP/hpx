@@ -31,18 +31,22 @@ else
 
     # Cancel currently running builds on the same branch, but only for pull
     # requests
-    scancel --jobname="${job_name}"
+    scancel --verbose --verbose --verbose --verbose --jobname="${job_name}"
 
     export install_hpx=0
 fi
 
+# delay things for a random amount of time
+sleep $[(RANDOM % 10) + 1].$[(RANDOM % 10)]s
+
 # Start the actual build
 set +e
 sbatch \
+    --verbose --verbose --verbose --verbose \
     --job-name="${job_name}" \
     --nodes="${configuration_slurm_num_nodes}" \
     --partition="${configuration_slurm_partition}" \
-    --time="06:00:00" \
+    --time="03:00:00" \
     --output="jenkins-hpx-${configuration_name_with_build_type}.out" \
     --error="jenkins-hpx-${configuration_name_with_build_type}.err" \
     --wait .jenkins/lsu/batch.sh
@@ -62,12 +66,21 @@ else
     github_commit_status="failure"
 fi
 
-if [[ -n "${ghprbPullId:-}" ]]; then
+# Get the CDash dashboard build id
+cdash_build_id="$(cat jenkins-hpx-${configuration_name_with_build_type}-cdash-build-id.txt)"
+
+if [[ -z "${ghprbPullId:-}" ]]; then
+    .jenkins/common/set_github_status.sh \
+        "${GITHUB_TOKEN}" \
+        "STEllAR-GROUP/hpx" \
+        "${GIT_COMMIT}" \
+        "${github_commit_status}" \
+        "${configuration_name_with_build_type}" \
+        "${cdash_build_id}" \
+        "jenkins/lsu"
+else
     # Extract just the organization and repo names "org/repo" from the full URL
     github_commit_repo="$(echo $ghprbPullLink | sed -n 's/https:\/\/github.com\/\(.*\)\/pull\/[0-9]*/\1/p')"
-
-    # Get the CDash dashboard build id
-    cdash_build_id="$(cat jenkins-hpx-${configuration_name_with_build_type}-cdash-build-id.txt)"
 
     # Set GitHub status with CDash url
     .jenkins/common/set_github_status.sh \

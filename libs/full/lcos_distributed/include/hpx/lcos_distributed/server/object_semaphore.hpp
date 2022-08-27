@@ -42,12 +42,12 @@ namespace hpx { namespace lcos { namespace server {
                 boost::intrusive::link_mode<boost::intrusive::normal_link>>
                 hook_type;
 
-            explicit queue_thread_entry(naming::id_type const& id)
+            explicit queue_thread_entry(hpx::id_type const& id)
               : id_(id)
             {
             }
 
-            naming::id_type id_;
+            hpx::id_type id_;
             hook_type slist_hook_;
         };
 
@@ -109,15 +109,15 @@ namespace hpx { namespace lcos { namespace server {
                 else
                     --value_queue_.front().count_;
 
-                naming::id_type id = thread_queue_.front().id_;
-                thread_queue_.front().id_ = naming::invalid_id;
+                hpx::id_type id = thread_queue_.front().id_;
+                thread_queue_.front().id_ = hpx::invalid_id;
                 thread_queue_.pop_front();
 
                 {
                     util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
 
                     // set the LCO's result
-                    applier::trigger(id, std::move(value));
+                    applier::trigger(id, HPX_MOVE(value));
                 }
             }
         }
@@ -145,7 +145,7 @@ namespace hpx { namespace lcos { namespace server {
             resume(l);
         }
 
-        void get(naming::id_type const& lco)
+        void get(hpx::id_type const& lco)
         {
             // push the LCO's GID onto the queue
             std::unique_ptr<queue_thread_entry> node(
@@ -169,8 +169,8 @@ namespace hpx { namespace lcos { namespace server {
 
             while (!thread_queue_.empty())
             {
-                naming::id_type id = thread_queue_.front().id_;
-                thread_queue_.front().id_ = naming::invalid_id;
+                hpx::id_type id = thread_queue_.front().id_;
+                thread_queue_.front().id_ = hpx::invalid_id;
                 thread_queue_.pop_front();
 
                 LLCO_(info).format(
@@ -203,7 +203,7 @@ namespace hpx { namespace lcos { namespace server {
 
             for (; it != end; ++it)
             {
-                naming::id_type id = it->id_;
+                hpx::id_type id = it->id_;
 
                 LLCO_(info).format(
                     "object_semapohre::wait: waiting for {}", id);
@@ -212,11 +212,11 @@ namespace hpx { namespace lcos { namespace server {
             }
         }
 
-        HPX_DEFINE_COMPONENT_ACTION(object_semaphore, signal, signal_action);
-        HPX_DEFINE_COMPONENT_ACTION(object_semaphore, get, get_action);
+        HPX_DEFINE_COMPONENT_ACTION(object_semaphore, signal, signal_action)
+        HPX_DEFINE_COMPONENT_ACTION(object_semaphore, get, get_action)
         HPX_DEFINE_COMPONENT_ACTION(
-            object_semaphore, abort_pending, abort_pending_action);
-        HPX_DEFINE_COMPONENT_ACTION(object_semaphore, wait, wait_action);
+            object_semaphore, abort_pending, abort_pending_action)
+        HPX_DEFINE_COMPONENT_ACTION(object_semaphore, wait, wait_action)
 
     private:
         value_queue_type value_queue_;

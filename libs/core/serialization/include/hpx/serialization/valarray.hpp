@@ -13,16 +13,16 @@
 #include <cstddef>
 #include <valarray>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename T>
     void serialize(input_archive& ar, std::valarray<T>& arr, int /* version */)
     {
         std::size_t sz = 0;
-        ar& sz;
+        ar >> sz;
         arr.resize(sz);
 
-        if (sz < 1)
+        if (sz == 0)
             return;
 
         for (std::size_t i = 0; i < sz; ++i)
@@ -33,9 +33,9 @@ namespace hpx { namespace serialization {
     void serialize(
         output_archive& ar, std::valarray<T> const& arr, int /* version */)
     {
-        const std::size_t sz = arr.size();
-        ar& sz;
-        for (auto v : arr)
+        std::size_t const sz = arr.size();
+        ar << sz;
+        for (auto const& v : arr)
             ar << v;
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

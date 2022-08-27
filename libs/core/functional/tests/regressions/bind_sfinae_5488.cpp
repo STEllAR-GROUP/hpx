@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// #5488: hpx::util::bind doesn't bounds-check placeholders
+// #5488: hpx::bind doesn't bounds-check placeholders
 
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/testing.hpp>
@@ -27,6 +27,6 @@ void foo(int) {}
 
 int main()
 {
-    test(hpx::util::bind(foo, hpx::util::placeholders::_1));
+    test(hpx::bind(foo, hpx::placeholders::_1));
     return hpx::util::report_errors();
 }

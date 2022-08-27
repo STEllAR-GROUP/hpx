@@ -168,6 +168,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -202,13 +203,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 for (; (first1 != last1) && (first2 != last2);
                      ++first1, (void) ++first2)
                 {
-                    if (hpx::util::invoke(pred,
-                            hpx::util::invoke(proj1, *first1),
-                            hpx::util::invoke(proj2, *first2)))
+                    if (HPX_INVOKE(pred, HPX_INVOKE(proj1, *first1),
+                            HPX_INVOKE(proj2, *first2)))
                         return true;
-                    if (hpx::util::invoke(pred,
-                            hpx::util::invoke(proj2, *first2),
-                            hpx::util::invoke(proj1, *first1)))
+                    if (HPX_INVOKE(pred, HPX_INVOKE(proj2, *first2),
+                            HPX_INVOKE(proj1, *first1)))
                         return false;
                 }
                 return (first1 == last1) && (first2 != last2);
@@ -249,11 +248,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f1 = [tok, pred, proj1, proj2](zip_iterator it,
                               std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n(base_idx, it, part_count, tok,
+                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
+                        part_count, tok,
                         [&pred, &tok, &proj1, &proj2](
-                            reference t, std::size_t i) -> void {
+                            reference t, std::size_t i) mutable -> void {
                             using hpx::get;
                             using hpx::util::invoke;
+                            // gcc10/cuda11 complains about using HPX_INVOKE here
                             if (invoke(pred, invoke(proj1, get<0>(t)),
                                     invoke(proj2, get<1>(t))) ||
                                 invoke(pred, invoke(proj2, get<1>(t)),
@@ -264,12 +265,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         });
                 };
 
-                auto f2 =
-                    [tok, first1, first2, last1, last2, pred, proj1, proj2](
-                        std::vector<hpx::future<void>>&& data) mutable -> bool {
+                auto f2 = [tok, first1, first2, last1, last2, pred, proj1,
+                              proj2](auto&& data) mutable -> bool {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
 
                     std::size_t mismatched = tok.get_data();
 
@@ -277,18 +277,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::advance(first2, mismatched);
 
                     if (first1 != last1 && first2 != last2)
-                        return hpx::util::invoke(pred,
-                            hpx::util::invoke(proj1, *first1),
-                            hpx::util::invoke(proj2, *first2));
+                    {
+                        using hpx::util::invoke;
+                        return invoke(pred, invoke(proj1, *first1),
+                            invoke(proj2, *first2));
+                    }
 
                     return first2 != last2;
                 };
 
                 using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, bool, void>::call_with_index(
-                    std::forward<ExPolicy>(policy),
-                    make_zip_iterator(first1, first2), count, 1, std::move(f1),
-                    std::move(f2));
+                    HPX_FORWARD(ExPolicy, policy),
+                    make_zip_iterator(first1, first2), count, 1, HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -325,9 +327,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::lexicographical_compare().call(
-            std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-            std::forward<Pred>(pred),
-            hpx::parallel::util::projection_identity{},
+            HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+            HPX_FORWARD(Pred, pred), hpx::parallel::util::projection_identity{},
             hpx::parallel::util::projection_identity{});
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -339,7 +340,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::lexicographical_compare
-    HPX_INLINE_CONSTEXPR_VARIABLE struct lexicographical_compare_t final
+    inline constexpr struct lexicographical_compare_t final
       : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
     {
         // clang-format off
@@ -354,7 +355,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(hpx::lexicographical_compare_t,
+        friend bool tag_fallback_invoke(hpx::lexicographical_compare_t,
             InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
             Pred&& pred = Pred())
         {
@@ -365,7 +366,7 @@ namespace hpx {
 
             return hpx::parallel::v1::detail::lexicographical_compare().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                std::forward<Pred>(pred),
+                HPX_FORWARD(Pred, pred),
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }
@@ -385,7 +386,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(hpx::lexicographical_compare_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::lexicographical_compare_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             Pred&& pred = Pred())
         {
@@ -395,8 +396,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::lexicographical_compare().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                std::forward<Pred>(pred),
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                HPX_FORWARD(Pred, pred),
                 hpx::parallel::util::projection_identity{},
                 hpx::parallel::util::projection_identity{});
         }

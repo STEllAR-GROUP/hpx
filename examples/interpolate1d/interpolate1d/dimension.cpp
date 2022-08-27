@@ -8,22 +8,20 @@
 
 #include "dimension.hpp"
 
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     ///////////////////////////////////////////////////////////////////////////////
     // implement the serialization functions
     template <typename Archive>
-    void serialize(Archive& ar, interpolate1d::dimension& dim, unsigned int const)
+    void serialize(
+        Archive& ar, interpolate1d::dimension& dim, unsigned int const)
     {
-        ar & dim.offset_ & dim.count_ & dim.size_;
+        ar& dim.offset_& dim.count_& dim.size_;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     // explicit instantiation for the correct archive types
-    template HPX_COMPONENT_EXPORT void
-    serialize(input_archive&, interpolate1d::dimension&, unsigned int const);
-    template HPX_COMPONENT_EXPORT void
-    serialize(output_archive&, interpolate1d::dimension&, unsigned int const);
-}}
-
-
+    template HPX_COMPONENT_EXPORT void serialize(
+        input_archive&, interpolate1d::dimension&, unsigned int const);
+    template HPX_COMPONENT_EXPORT void serialize(
+        output_archive&, interpolate1d::dimension&, unsigned int const);
+}}    // namespace hpx::serialization

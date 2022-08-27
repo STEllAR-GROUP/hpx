@@ -9,7 +9,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
   # setup MPI, if necessary
   include(HPX_SetupMPI)
-  setup_mpi()
+  hpx_setup_mpi()
   set(additional_dependencies Mpi::mpi)
 else()
   return()
@@ -35,7 +35,7 @@ add_hpx_module(
   SOURCES ${mpi_base_sources}
   HEADERS ${mpi_base_headers}
   COMPAT_HEADERS ${mpi_base_compat_headers}
-  MODULE_DEPENDENCIES hpx_runtime_configuration hpx_util
+  MODULE_DEPENDENCIES hpx_logging hpx_runtime_configuration hpx_util
   DEPENDENCIES ${additional_dependencies}
   CMAKE_SUBDIRS examples tests
 )

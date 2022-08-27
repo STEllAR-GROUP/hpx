@@ -1,6 +1,7 @@
 //  Copyright (c) 2007-2018 Hartmut Kaiser
 //  Copyright (c)      2015 Daniel Bourgeois
 //  Copyright (c)      2017 Taeguk Kwon
+//  Copyright (c)      2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -86,12 +87,13 @@ namespace hpx { namespace parallel { namespace util {
 
                 std::vector<hpx::shared_future<Result1>> workitems;
                 std::vector<hpx::future<Result2>> finalitems;
+                std::vector<Result1> f2results;
                 std::list<std::exception_ptr> errors;
                 try
                 {
                     // pre-initialize first intermediate result
                     workitems.push_back(
-                        make_ready_future(std::forward<T>(init)));
+                        make_ready_future(HPX_FORWARD(T, init)));
 
                     HPX_ASSERT(count > 0);
                     FwdIter first_ = first;
@@ -118,12 +120,12 @@ namespace hpx { namespace parallel { namespace util {
                         workitems.reserve(size + 2);
                         finalitems.reserve(size + 1);
 
-                        hpx::shared_future<Result1> curr = workitems[1];
-                        finalitems.push_back(dataflow(hpx::launch::sync, f3,
-                            first_, count_ - count, workitems[0], curr));
+                        finalitems.push_back(
+                            execution::async_execute(policy.executor(), f3,
+                                first_, count_ - count, workitems[0].get()));
 
-                        workitems[1] =
-                            dataflow(hpx::launch::sync, f2, workitems[0], curr);
+                        workitems[1] = make_ready_future(HPX_INVOKE(
+                            f2, workitems[0].get(), workitems[1].get()));
                     }
                     else
                     {
@@ -132,23 +134,43 @@ namespace hpx { namespace parallel { namespace util {
                     }
 
                     // Schedule first step of scan algorithm, step 2 is
-                    // performed as soon as the current partition and the
-                    // partition to the left is ready.
+                    // performed when all f1 tasks are done
                     for (auto const& elem : shape)
                     {
                         FwdIter it = hpx::get<0>(elem);
                         std::size_t size = hpx::get<1>(elem);
 
-                        hpx::shared_future<Result1> prev = workitems.back();
                         auto curr = execution::async_execute(
                             policy.executor(), f1, it, size)
                                         .share();
 
-                        finalitems.push_back(dataflow(
-                            hpx::launch::sync, f3, it, size, prev, curr));
+                        workitems.push_back(curr);
+                    }
 
-                        workitems.push_back(
-                            dataflow(hpx::launch::sync, f2, prev, curr));
+                    // Wait for all f1 tasks to finish
+                    if (hpx::wait_all_nothrow(workitems))
+                    {
+                        handle_local_exceptions::call(workitems, errors);
+                    }
+
+                    // perform f2 sequentially in one go
+                    f2results.resize(workitems.size());
+                    auto result = workitems[0].get();
+                    f2results[0] = result;
+                    for (std::size_t i = 1; i < workitems.size(); i++)
+                    {
+                        result = HPX_INVOKE(f2, result, workitems[i].get());
+                        f2results[i] = result;
+                    }
+
+                    // start all f3 tasks
+                    std::size_t i = 0;
+                    for (auto const& elem : shape)
+                    {
+                        finalitems.push_back(execution::async_execute(
+                            policy.executor(), f3, hpx::get<0>(elem),
+                            hpx::get<1>(elem), f2results[i]));
+                        i++;
                     }
 
                     scoped_params.mark_end_of_scheduling();
@@ -158,8 +180,8 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(std::move(workitems), std::move(finalitems),
-                    std::move(errors), std::forward<F4>(f4));
+                return reduce(HPX_MOVE(f2results), HPX_MOVE(finalitems),
+                    HPX_MOVE(errors), HPX_FORWARD(F4, f4));
 #endif
             }
 
@@ -192,7 +214,7 @@ namespace hpx { namespace parallel { namespace util {
                 {
                     // pre-initialize first intermediate result
                     workitems.push_back(
-                        make_ready_future(std::forward<T>(init)));
+                        make_ready_future(HPX_FORWARD(T, init)));
 
                     HPX_ASSERT(count > 0);
                     FwdIter first_ = first;
@@ -292,8 +314,8 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(
                         std::current_exception(), errors);
                 }
-                return reduce(std::move(workitems), std::move(finalitems),
-                    std::move(errors), std::forward<F4>(f4));
+                return reduce(HPX_MOVE(workitems), HPX_MOVE(finalitems),
+                    HPX_MOVE(errors), HPX_FORWARD(F4, f4));
 #endif
             }
 
@@ -302,10 +324,10 @@ namespace hpx { namespace parallel { namespace util {
             static R call(ExPolicy_&& policy, FwdIter first, std::size_t count,
                 T&& init, F1&& f1, F2&& f2, F3&& f3, F4&& f4)
             {
-                return call(ScanPartTag{}, std::forward<ExPolicy_>(policy),
-                    first, count, std::forward<T>(init), std::forward<F1>(f1),
-                    std::forward<F2>(f2), std::forward<F3>(f3),
-                    std::forward<F4>(f4));
+                return call(ScanPartTag{}, HPX_FORWARD(ExPolicy_, policy),
+                    first, count, HPX_FORWARD(T, init), HPX_FORWARD(F1, f1),
+                    HPX_FORWARD(F2, f2), HPX_FORWARD(F3, f3),
+                    HPX_FORWARD(F4, f4));
             }
 
         private:
@@ -324,16 +346,51 @@ namespace hpx { namespace parallel { namespace util {
                 return R();
 #else
                 // wait for all tasks to finish
-                hpx::wait_all(workitems, finalitems);
-
-                // always rethrow if 'errors' is not empty or 'workitems' or
-                // 'finalitems' have an exceptional future
-                handle_local_exceptions::call(workitems, errors);
-                handle_local_exceptions::call(finalitems, errors);
+                if (hpx::wait_all_nothrow(workitems, finalitems) ||
+                    !errors.empty())
+                {
+                    // always rethrow if 'errors' is not empty or 'workitems' or
+                    // 'finalitems' have an exceptional future
+                    handle_local_exceptions::call(workitems, errors);
+                    handle_local_exceptions::call(finalitems, errors);
+                }
 
                 try
                 {
-                    return f(std::move(workitems), std::move(finalitems));
+                    return f(HPX_MOVE(workitems), HPX_MOVE(finalitems));
+                }
+                catch (...)
+                {
+                    // rethrow either bad_alloc or exception_list
+                    handle_local_exceptions::call(std::current_exception());
+                }
+#endif
+            }
+
+            template <typename F>
+            static R reduce(std::vector<Result1>&& workitems,
+                std::vector<hpx::future<Result2>>&& finalitems,
+                std::list<std::exception_ptr>&& errors, F&& f)
+            {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_UNUSED(workitems);
+                HPX_UNUSED(finalitems);
+                HPX_UNUSED(errors);
+                HPX_UNUSED(f);
+                HPX_ASSERT(false);
+                return R();
+#else
+                // wait for all tasks to finish
+                if (hpx::wait_all_nothrow(finalitems) || !errors.empty())
+                {
+                    // always rethrow if 'errors' is not empty or 'finalitems'
+                    // have an exceptional future
+                    handle_local_exceptions::call(finalitems, errors);
+                }
+
+                try
+                {
+                    return f(HPX_MOVE(workitems), HPX_MOVE(finalitems));
                 }
                 catch (...)
                 {
@@ -355,16 +412,16 @@ namespace hpx { namespace parallel { namespace util {
                 std::size_t count, T&& init, F1&& f1, F2&& f2, F3&& f3, F4&& f4)
             {
                 return execution::async_execute(policy.executor(),
-                    [first, count, policy = std::forward<ExPolicy_>(policy),
-                        init = std::forward<T>(init), f1 = std::forward<F1>(f1),
-                        f2 = std::forward<F2>(f2), f3 = std::forward<F3>(f3),
-                        f4 = std::forward<F4>(f4)]() mutable -> R {
+                    [first, count, policy = HPX_FORWARD(ExPolicy_, policy),
+                        init = HPX_FORWARD(T, init), f1 = HPX_FORWARD(F1, f1),
+                        f2 = HPX_FORWARD(F2, f2), f3 = HPX_FORWARD(F3, f3),
+                        f4 = HPX_FORWARD(F4, f4)]() mutable -> R {
                         using partitioner_type =
                             scan_static_partitioner<ExPolicy, ScanPartTag, R,
                                 Result1, Result2>;
                         return partitioner_type::call(ScanPartTag{},
-                            std::forward<ExPolicy_>(policy), first, count,
-                            std::move(init), f1, f2, f3, f4);
+                            HPX_FORWARD(ExPolicy_, policy), first, count,
+                            HPX_MOVE(init), f1, f2, f3, f4);
                     });
             }
         };

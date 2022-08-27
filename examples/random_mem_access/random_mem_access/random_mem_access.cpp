@@ -13,24 +13,20 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 HPX_REGISTER_COMPONENT(
     hpx::components::component<hpx::components::server::random_mem_access>,
-    random_mem_access);
+    random_mem_access)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the random_mem_access actions
-HPX_REGISTER_ACTION(
-    hpx::components::server::random_mem_access::init_action,
-    random_mem_access_init_action);
-HPX_REGISTER_ACTION(
-    hpx::components::server::random_mem_access::add_action,
-    random_mem_access_add_action);
-HPX_REGISTER_ACTION(
-    hpx::components::server::random_mem_access::query_action,
-    random_mem_access_query_action);
-HPX_REGISTER_ACTION(
-    hpx::components::server::random_mem_access::print_action,
-    random_mem_access_print_action);
+HPX_REGISTER_ACTION(hpx::components::server::random_mem_access::init_action,
+    random_mem_access_init_action)
+HPX_REGISTER_ACTION(hpx::components::server::random_mem_access::add_action,
+    random_mem_access_add_action)
+HPX_REGISTER_ACTION(hpx::components::server::random_mem_access::query_action,
+    random_mem_access_query_action)
+HPX_REGISTER_ACTION(hpx::components::server::random_mem_access::print_action,
+    random_mem_access_print_action)
 
 #endif

@@ -17,7 +17,7 @@ HPX_PLAIN_ACTION_ID(hpx::detail::get_locality_name,
 
 namespace hpx {
 
-    future<std::string> get_locality_name(naming::id_type const& id)
+    future<std::string> get_locality_name(hpx::id_type const& id)
     {
         return async<hpx_get_locality_name_action>(id);
     }

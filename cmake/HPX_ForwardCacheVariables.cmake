@@ -23,6 +23,17 @@ set(_cache_var_file_template
 )
 set(_cache_variables)
 foreach(_var IN LISTS cache_vars)
+  if(HPX_WITH_VCPKG)
+    # avoid writing directory names into cache file
+    string(FIND ${_var} "_DIR" _pos)
+    if(NOT ${_pos} EQUAL -1)
+      continue()
+    endif()
+    string(FIND ${_var} "_PATH" _pos)
+    if(NOT ${_pos} EQUAL -1)
+      continue()
+    endif()
+  endif()
   set(_cache_variables "${_cache_variables}set(${_var} ${${_var}})\n")
 endforeach()
 

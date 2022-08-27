@@ -16,8 +16,8 @@
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/parcelset/parcel.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -101,7 +101,7 @@ namespace hpx { namespace applier {
             components::component_type type = components::component_invalid,
             error_code& ec = throws) const;
 
-        bool get_remote_localities(std::vector<naming::id_type>& locality_ids,
+        bool get_remote_localities(std::vector<hpx::id_type>& locality_ids,
             components::component_type type = components::component_invalid,
             error_code& ec = throws) const;
 
@@ -125,9 +125,9 @@ namespace hpx { namespace applier {
             components::component_type type =
                 components::component_invalid) const;
 
-        bool get_localities(std::vector<naming::id_type>& locality_ids,
+        bool get_localities(std::vector<hpx::id_type>& locality_ids,
             error_code& ec = throws) const;
-        bool get_localities(std::vector<naming::id_type>& locality_ids,
+        bool get_localities(std::vector<hpx::id_type>& locality_ids,
             components::component_type type, error_code& ec = throws) const;
 
         /// By convention the runtime_support has a gid identical to the prefix
@@ -140,7 +140,7 @@ namespace hpx { namespace applier {
 
         /// By convention the runtime_support has a gid identical to the prefix
         /// of the locality the runtime_support is responsible for
-        naming::id_type const& get_runtime_support_gid() const
+        hpx::id_type const& get_runtime_support_gid() const
         {
             HPX_ASSERT(runtime_support_id_);
             return runtime_support_id_;
@@ -151,7 +151,7 @@ namespace hpx { namespace applier {
         parcelset::parcelhandler* parcel_handler_;
 #endif
         threads::threadmanager* thread_manager_;
-        naming::id_type runtime_support_id_;
+        hpx::id_type runtime_support_id_;
     };
 }}    // namespace hpx::applier
 

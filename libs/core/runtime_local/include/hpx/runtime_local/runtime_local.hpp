@@ -98,7 +98,7 @@ namespace hpx {
         virtual ~runtime();
 
         /// \brief Manage list of functions to call on exit
-        void on_exit(util::function_nonser<void()> const& f);
+        void on_exit(hpx::function<void()> const& f);
 
         /// \brief Manage runtime 'stopped' state
         void starting();
@@ -146,8 +146,7 @@ namespace hpx {
         /// \returns          This function will return the value as returned
         ///                   as the result of the invocation of the function
         ///                   object given by the parameter \p func.
-        virtual int run(
-            util::function_nonser<hpx_main_function_type> const& func);
+        virtual int run(hpx::function<hpx_main_function_type> const& func);
 
         /// \brief Run the HPX runtime system, initially use the given number
         ///        of (OS) threads in the thread-manager and block waiting for
@@ -177,8 +176,7 @@ namespace hpx {
         ///                   return the value as returned as the result of the
         ///                   invocation of the function object given by the
         ///                   parameter \p func. Otherwise it will return zero.
-        virtual int start(
-            util::function_nonser<hpx_main_function_type> const& func,
+        virtual int start(hpx::function<hpx_main_function_type> const& func,
             bool blocking = false);
 
         /// \brief Start the runtime system
@@ -355,8 +353,9 @@ namespace hpx {
             std::string const& label) const;
 
         /// Enumerate all OS threads that have registered with the runtime.
-        virtual bool enumerate_os_threads(util::function_nonser<bool(
-                runtime_local::os_thread_data const&)> const& f) const;
+        virtual bool enumerate_os_threads(
+            hpx::function<bool(runtime_local::os_thread_data const&)> const& f)
+            const;
 
         notification_policy_type::on_startstop_type on_start_func() const;
         notification_policy_type::on_startstop_type on_stop_func() const;
@@ -378,7 +377,7 @@ namespace hpx {
 
         virtual std::uint32_t get_initial_num_localities() const;
 
-        virtual lcos::future<std::uint32_t> get_num_localities() const;
+        virtual hpx::future<std::uint32_t> get_num_localities() const;
 
         virtual std::string get_locality_name() const;
 
@@ -397,14 +396,14 @@ namespace hpx {
         void deinit_global_data();
 
         threads::thread_result_type run_helper(
-            util::function_nonser<runtime::hpx_main_function_type> const& func,
+            hpx::function<runtime::hpx_main_function_type> const& func,
             int& result, bool call_startup_functions);
 
         void wait_helper(
             std::mutex& mtx, std::condition_variable& cond, bool& running);
 
         // list of functions to call on exit
-        using on_exit_type = std::vector<util::function_nonser<void()>>;
+        using on_exit_type = std::vector<hpx::function<void()>>;
         on_exit_type on_exit_functions_;
         mutable std::mutex mtx_;
 

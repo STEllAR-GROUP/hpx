@@ -89,7 +89,7 @@ namespace hpx { namespace traits {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Iter1, typename Iter2>
-        HPX_INLINE_CONSTEXPR_VARIABLE bool iterators_are_contiguous_v =
+        inline constexpr bool iterators_are_contiguous_v =
             is_contiguous_iterator_v<Iter1>&& is_contiguous_iterator_v<Iter2>;
 
         template <typename Source, typename Dest,

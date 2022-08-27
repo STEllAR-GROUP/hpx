@@ -17,4 +17,4 @@ namespace hpx { namespace traits { namespace detail {
 using promise_lco_void = hpx::components::managed_component<
     hpx::lcos::detail::promise_lco<void, hpx::util::unused_type>>;
 
-HPX_REGISTER_COMPONENT_HEAP(promise_lco_void);
+HPX_REGISTER_COMPONENT_HEAP(promise_lco_void)

@@ -1,4 +1,5 @@
 ..
+    Copyright (c) 2021 Dimitra Karatza
     Copyright (c) 2015 Adrian Serio
     Copyright (c) 2015 Harris Brakmic
     Copyright (C) 2014 Thomas Heller
@@ -8,144 +9,21 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-.. _hpx_build_system:
-
-==================
-|hpx| build system
-==================
-
-.. _prerequisites:
-
-Prerequisites
-=============
-
-Supported platforms
--------------------
-
-At this time, |hpx| supports the following platforms. Other platforms may
-work, but we do not test |hpx| with other platforms, so please be warned.
-
-.. table:: Supported Platforms for |hpx|
-
-   ========= ================== ====================
-   Name      Minimum Version    Architectures
-   ========= ================== ====================
-   Linux     2.6                x86-32, x86-64, k1om
-   BlueGeneQ V1R2M0             PowerPC A2
-   Windows   Any Windows system x86-32, x86-64
-   Mac OSX   Any OSX system     x86-64
-   ========= ================== ====================
-
-Software and libraries
-----------------------
-
-The table below presents all the necessary prerequisites for building |hpx|.
-
-.. list-table:: Software prerequisites for |hpx|
-
-   * * Name
-     * Minimum version
-   * * **Compilers**
-     *
-   * * |gcc|_
-     * 7.0
-   * * |clang|_
-     * 7.0
-   * * |visual_cxx|_ (x64)
-     * 2015
-   * * **Build System**
-     *
-   * * |cmake|_
-     * 3.18
-   * * **Required Libraries**
-     *
-   * * |boost|_
-     * 1.71.0
-   * * |hwloc|_
-     * 1.5
-   * * |asio|_
-     * 1.12.0
-
-The most important dependencies are |boost|_ and |hwloc|_. The installation of Boost 
-is described in detail in Boost's `Getting Started <https://www.boost.org/more/getting_started/index.html>`_
-document. A recent version of hwloc is required in order to support thread
-pinning and NUMA awareness and can be found in |hwloc_downloads|_. 
-
-|hpx| is written in 99.99% Standard C++ (the remaining 0.01% is platform
-specific assembly code). As such, |hpx| is compilable with almost any standards
-compliant C++ compiler. The code base takes advantage of C++ language and 
-standard library features when available.
-
-.. note::
-
-   When building Boost using gcc, please note that it is required to specify a
-   ``cxxflags=-std=c++17`` command line argument to ``b2`` (``bjam``).
-
-.. note::
-
-   In most configurations, |hpx| depends only on header-only Boost.
-   Boost.Filesystem is required if the standard library does not support
-   filesystem. The following are not needed by default, but are required in
-   certain configurations: Boost.Chrono, Boost.DateTime, Boost.Log,
-   Boost.LogSetup, Boost.Regex, and Boost.Thread.
-
-Depending on the options you chose while building and installing |hpx|,
-you will find that |hpx| may depend on several other libraries such as those
-listed below.
-
-.. note::
-
-   In order to use a high speed parcelport, we currently recommend configuring
-   |hpx| to use MPI so that MPI can be used for communication between different
-   localities. Please set the CMake variable ``MPI_CXX_COMPILER`` to your MPI
-   C++ compiler wrapper if not detected automatically.
-
-.. list-table:: Optional software prerequisites for |hpx|
-
-   * * Name
-     * Minimum version
-   * * |google_perftools|_
-     * 1.7.1
-   * * |jemalloc|_
-     * 2.1.0
-   * * |mimalloc|_
-     * 1.0.0
-   * * |papi|
-     *
-
-.. _getting_hpx:
-
-Getting |hpx|
-==============
-
-Download a tarball of the latest release from |stellar_hpx_download|_ and
-unpack it or clone the repository directly using ``git``:
-
-.. code-block:: sh
-
-    git clone https://github.com/STEllAR-GROUP/hpx.git
-
-It is also recommended that you check out the latest stable tag:
-
-.. code-block:: sh
-    
-    cd hpx
-    git checkout 1.7.1 
-
 .. _building_hpx:
 
+==============
 Building |hpx|
 ==============
 
 .. _info:
 
 Basic information
------------------
+=================
 
 The build system for |hpx| is based on |cmake|_, a cross-platform
-build-generator tool which is not responsible for building the project 
-but rather generates the files needed by your build tool (GNU make, Visual 
-Studio, etc.) for building |hpx|. If CMake is not already installed in your 
+build-generator tool which is not responsible for building the project
+but rather generates the files needed by your build tool (GNU make, Visual
+Studio, etc.) for building |hpx|. If CMake is not already installed in your
 system, you can download it and install it here: |cmake_download|_.
 
 Once |cmake| has been run, the build process can be started. The |hpx| build
@@ -178,19 +56,71 @@ In order to use |hpx|, only the core libraries are required. In order to use the
 libraries, you need to specify them as link dependencies in your build (See
 :ref:`creating_hpx_projects`).
 
-As |hpx| is a modern C++ library which relies on C++17 by default. The use of
-more recent standards can be opted into explicitly. If you want to force |hpx|
-to use a specific C++ standard version, you can use the following CMake
-variables:
+.. _important_cmake_options:
 
-* ``HPX_WITH_CXX17``: [Deprecated] C++17 is now the default C++ standard used in HPX.
-* ``HPX_WITH_CXX20``: [Deprecated] In order to use the C++20 standard, it is preferable 
-  to set CMAKE_CXX_STANDARD and HPX_USE_CMAKE_CXX_STANDARD to ON.
+Most important |cmake| options 
+==============================
+
+While building |hpx|, you are provided with multiple CMake options which correspond 
+to different configurations. Below, there is a set of the most important and frequently 
+used CMake options.
+
+.. option:: HPX_WITH_MALLOC
+
+   Use a custom allocator. Using a custom allocator tuned for multithreaded applications is very 
+   important for the performance of |hpx| applications. When debugging applications, it's useful to set 
+   this to ``system``, as custom allocators can hide some memory-related bugs. Note that setting this to 
+   something other than ``system`` requires an external dependency.
+
+.. option:: HPX_WITH_CUDA
+
+   Enable support for CUDA. Use ``CMAKE_CUDA_COMPILER`` to set the CUDA compiler. This is a standard |cmake| variable, 
+   like ``CMAKE_CXX_COMPILER``. 
+
+.. option:: HPX_WITH_PARCELPORT_MPI
+
+   Enable the MPI parcelport. This enables the use of MPI for the networking operations in the HPX runtime. 
+   The default value is ``OFF`` because it's not available on all systems and/or requires another dependency. However, 
+   it is the recommended parcelport.
+
+.. option:: HPX_WITH_PARCELPORT_TCP
+
+   Enable the TCP parcelport. Enables the use of TCP for networking in the runtime. The default value is ``ON``. 
+   However, it's only recommended for debugging purposes, as it is slower than the MPI parcelport.
+
+.. option:: HPX_WITH_APEX
+   
+   Enable APEX integration. `APEX <https://uo-oaciss.github.io/apex/quickstarthpx/>`_ can be used to profile |hpx|
+   applications. In particular, it provides information about individual tasks in the |hpx| runtime.
+
+.. option:: HPX_WITH_GENERIC_CONTEXT_COROUTINES
+
+   Enable Boost. Context for task context switching. It must be enabled for non-x86 architectures such as ARM and Power.
+
+.. option:: HPX_WITH_MAX_CPU_COUNT
+
+   Set the maximum CPU count supported by |hpx|. The default value is 64, and should be set to a number at least as
+   high as the number of cores on a system including virtual cores such as hyperthreads.
+
+.. option:: HPX_WITH_CXX_STANDARD
+
+   Set a specific C++ standard version e.g. ``HPX_WITH_CXX_STANDARD=20``. The default and minimum value is 17. 
+
+.. option:: HPX_WITH_EXAMPLES
+
+   Build examples.
+
+.. option:: HPX_WITH_TESTS
+   
+   Build tests.
+
+For a complete list of available |cmake| variables that influence the build of
+|hpx|, see :ref:`cmake_variables`.
 
 .. _build_types:
 
 Build types
------------
+===========
 
 |cmake| can be configured to generate project files suitable for builds that
 have enabled debugging support or for an optimized build (without debugging
@@ -219,29 +149,29 @@ Available build types are:
 .. _build_recipes:
 
 Platform specific build recipes
--------------------------------
+===============================
 
 .. _unix_installation:
 
 Unix variants
-.............
+-------------
 
 Once you have the source code and the dependencies and assuming all your dependencies are in paths
 known to |cmake|, the following gets you started:
 
 #. First, set up a separate build directory to configure the project:
 
-   .. code-block:: sh
+   .. code-block:: shell-session
 
-      mkdir build && cd build
+      $ mkdir build && cd build
 
 #. To configure the project you have the following options:
 
    * To build the core |hpx| libraries and examples, and install them to your chosen location (recommended):
 
-    .. code-block:: sh
+    .. code-block:: shell-session
 
-        cmake -DCMAKE_INSTALL_PREFIX=/install/path ..
+        $ cmake -DCMAKE_INSTALL_PREFIX=/install/path ..
 
     .. tip::
 
@@ -252,15 +182,15 @@ known to |cmake|, the following gets you started:
 
    * To install |hpx| to the default system folders, simply leave out the ``CMAKE_INSTALL_PREFIX`` option:
 
-    .. code-block:: sh
+    .. code-block:: shell-session
 
-        cmake ..
+        $ cmake ..
 
    * If your dependencies are in custom locations, you may need to tell |cmake| where to find them by passing one or more options to |cmake| as shown below:
 
-    .. code-block:: sh
+    .. code-block:: shell-session
 
-        cmake -DBOOST_ROOT=/path/to/boost
+        $ cmake -DBOOST_ROOT=/path/to/boost
               -DHWLOC_ROOT=/path/to/hwloc
               -DTCMALLOC_ROOT=/path/to/tcmalloc
               -DJEMALLOC_ROOT=/path/to/jemalloc
@@ -269,15 +199,15 @@ known to |cmake|, the following gets you started:
 
     For instance:
 
-    .. code-block:: bash
+    .. code-block:: shell-session
 
-        cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_1.5.1
+        $ cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_1.5.1
 
    * If you want to try |hpx| without using a custom allocator pass ``-DHPX_WITH_MALLOC=system`` to |cmake|:
 
-    .. code-block:: sh 
+    .. code-block:: shell-session
 
-        cmake -DCMAKE_INSTALL_PREFIX=/install/path -DHPX_WITH_MALLOC=system ..
+        $ cmake -DCMAKE_INSTALL_PREFIX=/install/path -DHPX_WITH_MALLOC=system ..
 
     .. note::
        Please pay special attention to the section about :option:`HPX_WITH_MALLOC:STRING` as this is crucial for getting decent performance.
@@ -295,14 +225,14 @@ known to |cmake|, the following gets you started:
 
 #. Once the configuration is complete, to build the project you run:
 
-  .. code-block:: sh
+  .. code-block:: shell-session
 
-      cmake --build . --target install
+      $ cmake --build . --target install
 
 .. _windows_installation:
 
 Windows
-.......
+-------
 
 .. note::
 
@@ -422,54 +352,54 @@ To build |hpx| under Windows 10 x64 with Visual Studio 2015:
 .. _tests_examples:
 
 Tests and examples
-------------------
+==================
 
 Running tests
-.............
+-------------
 
 To build the tests:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-    cmake --build . --target tests
+    $ cmake --build . --target tests
 
 To control which tests to run use ``ctest``:
 
 * To run single tests, for example a test for ``for_loop``:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-    ctest --output-on-failure -R tests.unit.modules.algorithms.for_loop
+    $ ctest --output-on-failure -R tests.unit.modules.algorithms.for_loop
 
 * To run a whole group of tests:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-    ctest --output-on-failure -R tests.unit
+    $ ctest --output-on-failure -R tests.unit
 
 Running examples
-................
+----------------
 
 * To build (and install) all examples invoke:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   cmake -DHPX_WITH_EXAMPLES=On .
-   make examples
-   make install
+   $ cmake -DHPX_WITH_EXAMPLES=On .
+   $ make examples
+   $ make install
 
 * To build the ``hello_world_1`` example run:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-   make hello_world_1
+   $ make hello_world_1
 
 |hpx| executables end up in the ``bin`` directory in your build directory. You
 can now run ``hello_world_1`` and should see the following output:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-   ./bin/hello_world_1
+   $ ./bin/hello_world_1
    Hello World!
 
 You've just run an example which prints ``Hello World!`` from the |hpx| runtime.
@@ -498,5 +428,3 @@ the distributed aspects of |hpx|.
 
    It is also possible to build, for instance, all quickstart examples using ``make
    examples.quickstart``.
-
-.. include:: ../../generated/cmake_variables.rst

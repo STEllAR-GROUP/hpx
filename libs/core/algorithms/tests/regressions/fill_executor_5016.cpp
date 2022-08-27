@@ -22,8 +22,7 @@ void fill_example()
     hpx::execution::parallel_executor exec;
 
     std::vector<float> vd(5);
-    hpx::parallel::fill(
-        hpx::execution::par.on(exec), vd.begin(), vd.end(), 2.0f);
+    hpx::fill(hpx::execution::par.on(exec), vd.begin(), vd.end(), 2.0f);
 
     std::vector<float> vd1(5);
     hpx::fill(hpx::execution::par.on(exec), vd1.begin(), vd1.end(), 2.0f);

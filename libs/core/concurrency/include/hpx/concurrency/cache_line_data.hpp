@@ -19,7 +19,7 @@ namespace hpx {
     namespace threads {
         ////////////////////////////////////////////////////////////////////////
         // abstract away cache-line size
-        constexpr std::size_t get_cache_line_size()
+        constexpr std::size_t get_cache_line_size() noexcept
         {
 #if defined(HPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE)
             return std::hardware_destructive_interference_size;
@@ -41,7 +41,7 @@ namespace hpx {
             // Computes the padding required to fill up a full cache line after
             // data_size bytes.
             constexpr std::size_t get_cache_line_padding_size(
-                std::size_t data_size)
+                std::size_t data_size) noexcept
             {
                 return (threads::get_cache_line_size() -
                            (data_size % threads::get_cache_line_size())) %
@@ -78,8 +78,8 @@ namespace hpx {
             {
             }
 
-            cache_aligned_data(Data&& data)
-              : data_{std::move(data)}
+            cache_aligned_data(Data&& data) noexcept
+              : data_{HPX_MOVE(data)}
             {
             }
 
@@ -102,8 +102,8 @@ namespace hpx {
         {
             cache_aligned_data() = default;
 
-            cache_aligned_data(Data&& data)
-              : data_{std::move(data)}
+            cache_aligned_data(Data&& data) noexcept
+              : data_{HPX_MOVE(data)}
             {
             }
 
@@ -129,8 +129,8 @@ namespace hpx {
             {
             }
 
-            cache_aligned_data_derived(Data&& data)
-              : Data{std::move(data)}
+            cache_aligned_data_derived(Data&& data) noexcept
+              : Data{HPX_MOVE(data)}
             {
             }
 
@@ -150,8 +150,8 @@ namespace hpx {
         {
             cache_aligned_data_derived() = default;
 
-            cache_aligned_data_derived(Data&& data)
-              : Data{std::move(data)}
+            cache_aligned_data_derived(Data&& data) noexcept
+              : Data{HPX_MOVE(data)}
             {
             }
 

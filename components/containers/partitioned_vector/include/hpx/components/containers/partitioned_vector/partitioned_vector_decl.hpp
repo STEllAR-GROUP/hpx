@@ -91,7 +91,7 @@ namespace hpx { namespace server {
         partitioned_vector_config_data(
             std::size_t size, std::vector<partition_data>&& partitions)
           : size_(size)
-          , partitions_(std::move(partitions))
+          , partitions_(HPX_MOVE(partitions))
         {
         }
 
@@ -111,7 +111,7 @@ namespace hpx { namespace server {
 
 HPX_DISTRIBUTED_METADATA_DECLARATION(
     hpx::server::partitioned_vector_config_data,
-    hpx_server_partitioned_vector_config_data);
+    hpx_server_partitioned_vector_config_data)
 
 /// \endcond
 
@@ -201,7 +201,7 @@ namespace hpx {
             }
 
             partition_data(base_type&& base)
-              : base_type(std::move(base))
+              : base_type(HPX_MOVE(base))
             {
             }
 
@@ -425,10 +425,10 @@ namespace hpx {
         }
 
         partitioned_vector(partitioned_vector&& rhs)
-          : base_type(std::move(rhs))
+          : base_type(HPX_MOVE(rhs))
           , size_(rhs.size_)
           , partition_size_(rhs.partition_size_)
-          , partitions_(std::move(rhs.partitions_))
+          , partitions_(HPX_MOVE(rhs.partitions_))
         {
             rhs.size_ = 0;
             rhs.partition_size_ = std::size_t(-1);
@@ -482,12 +482,11 @@ namespace hpx {
         {
             if (this != &rhs)
             {
-                this->base_type::operator=(
-                    std::move(static_cast<base_type&&>(rhs)));
+                this->base_type::operator=(static_cast<base_type&&>(rhs));
 
                 size_ = rhs.size_;
                 partition_size_ = rhs.partition_size_;
-                partitions_ = std::move(rhs.partitions_);
+                partitions_ = HPX_MOVE(rhs.partitions_);
 
                 rhs.size_ = 0;
                 rhs.partition_size_ = std::size_t(-1);
@@ -698,7 +697,7 @@ namespace hpx {
             // when all values are here merge them to one vector
             // and return a future to this vector
             return dataflow(
-                launch::async, merge_func, std::move(part_values_future));
+                launch::async, merge_func, HPX_MOVE(part_values_future));
         }
 
         /// Returns the elements at the positions \a pos
@@ -861,7 +860,7 @@ namespace hpx {
         void set_value(launch::sync_policy, size_type pos, T_&& val)
         {
             return set_value(launch::sync, get_partition(pos),
-                get_local_index(pos), std::forward<T_>(val));
+                get_local_index(pos), HPX_FORWARD(T_, val));
         }
 
         /// Copy the value of \a val in the element at position \a pos in
@@ -878,12 +877,12 @@ namespace hpx {
             partition_data const& part_data = partitions_[part];
             if (part_data.local_data_)
             {
-                part_data.local_data_->set_value(pos, std::forward<T_>(val));
+                part_data.local_data_->set_value(pos, HPX_FORWARD(T_, val));
             }
             else
             {
                 partitioned_vector_partition_client(part_data.partition_)
-                    .set_value(launch::sync, pos, std::forward<T_>(val));
+                    .set_value(launch::sync, pos, HPX_FORWARD(T_, val));
             }
         }
 
@@ -899,8 +898,8 @@ namespace hpx {
         template <typename T_>
         future<void> set_value(size_type pos, T_&& val)
         {
-            return set_value(get_partition(pos), get_local_index(pos),
-                std::forward<T_>(val));
+            return set_value(
+                get_partition(pos), get_local_index(pos), HPX_FORWARD(T_, val));
         }
 
         /// Asynchronously set the element at position \a pos in
@@ -919,12 +918,12 @@ namespace hpx {
             partition_data const& part_data = partitions_[part];
             if (part_data.local_data_)
             {
-                part_data.local_data_->set_value(pos, std::forward<T_>(val));
+                part_data.local_data_->set_value(pos, HPX_FORWARD(T_, val));
                 return make_ready_future();
             }
 
             return partitioned_vector_partition_client(part_data.partition_)
-                .set_value(pos, std::forward<T_>(val));
+                .set_value(pos, HPX_FORWARD(T_, val));
         }
 
         /// Copy the values of \a val to the elements at positions \a pos in
@@ -1037,7 +1036,7 @@ namespace hpx {
                     std::vector<size_type>(pos_block_begin, pos.end())),
                 std::vector<T>(val_block_begin, val.end())));
 
-            return when_all(part_futures);
+            return hpx::when_all(part_futures);
         }
 
         void set_values(launch::sync_policy, std::vector<size_type> const& pos,

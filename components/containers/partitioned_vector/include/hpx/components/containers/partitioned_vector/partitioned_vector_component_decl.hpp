@@ -84,8 +84,11 @@ namespace hpx { namespace server {
             allocator_type const& alloc);
 
         // support components::copy
-        partitioned_vector(partitioned_vector const& rhs);
-        partitioned_vector(partitioned_vector&& rhs);
+        partitioned_vector(partitioned_vector const& rhs) = default;
+        partitioned_vector(partitioned_vector&& rhs) = default;
+
+        partitioned_vector& operator=(partitioned_vector const& rhs) = default;
+        partitioned_vector& operator=(partitioned_vector&& rhs) = default;
 
         ///////////////////////////////////////////////////////////////////////
         data_type& get_data();
@@ -246,31 +249,31 @@ namespace hpx { namespace server {
         void clear();
 
         /// Macros to define HPX component actions for all exported functions.
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, size);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, size)
 
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, max_size);
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, max_size)
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, resize);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, resize)
 
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, capacity);
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, empty);
-        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, reserve);
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, capacity)
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, empty)
+        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, reserve)
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_value);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_values);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_value)
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_values)
 
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, front);
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, back);
-        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, assign);
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, push_back);
-        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, pop_back);
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, front)
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, back)
+        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, assign)
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, push_back)
+        // HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector_partition, pop_back)
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_value);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_values);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_value)
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_values)
 
-        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, clear);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_copied_data);
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_data);
+        // HPX_DEFINE_COMPONENT_ACTION(partitioned_vector_partition, clear)
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, get_copied_data)
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(partitioned_vector, set_data)
     };
 }}    // namespace hpx::server
 
@@ -285,21 +288,21 @@ namespace hpx { namespace server {
 
 #define HPX_REGISTER_VECTOR_DECLARATION_IMPL(type, name)                       \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
-        type::get_value_action, HPX_PP_CAT(__vector_get_value_action_, name)); \
+        type::get_value_action, HPX_PP_CAT(__vector_get_value_action_, name))  \
     HPX_REGISTER_ACTION_DECLARATION(type::get_values_action,                   \
-        HPX_PP_CAT(__vector_get_values_action_, name));                        \
+        HPX_PP_CAT(__vector_get_values_action_, name))                         \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
-        type::set_value_action, HPX_PP_CAT(__vector_set_value_action_, name)); \
+        type::set_value_action, HPX_PP_CAT(__vector_set_value_action_, name))  \
     HPX_REGISTER_ACTION_DECLARATION(type::set_values_action,                   \
-        HPX_PP_CAT(__vector_set_values_action_, name));                        \
+        HPX_PP_CAT(__vector_set_values_action_, name))                         \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
-        type::size_action, HPX_PP_CAT(__vector_size_action_, name));           \
+        type::size_action, HPX_PP_CAT(__vector_size_action_, name))            \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
-        type::resize_action, HPX_PP_CAT(__vector_resize_action_, name));       \
+        type::resize_action, HPX_PP_CAT(__vector_resize_action_, name))        \
     HPX_REGISTER_ACTION_DECLARATION(type::get_copied_data_action,              \
-        HPX_PP_CAT(__vector_get_copied_data_action_, name));                   \
+        HPX_PP_CAT(__vector_get_copied_data_action_, name))                    \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
-        type::set_data_action, HPX_PP_CAT(__vector_set_data_action_, name));   \
+        type::set_data_action, HPX_PP_CAT(__vector_set_data_action_, name))    \
     /**/
 
 #define HPX_REGISTER_VECTOR_DECLARATION_1(type)                                \
@@ -487,7 +490,7 @@ namespace hpx {
         // {
         //     HPX_ASSERT(this->get_id());
         //     this->base_type::push_back_async(
-        //         this->get_id(), std::forward<T_>(val)).get();
+        //         this->get_id(), HPX_FORWARD(T_, val)).get();
         // }
 
         // void pop_back()

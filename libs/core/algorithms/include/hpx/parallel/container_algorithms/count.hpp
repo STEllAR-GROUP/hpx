@@ -158,99 +158,19 @@ namespace hpx { namespace ranges {
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
-    ///////////////////////////////////////////////////////////////////////////
-    // count
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename T,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            traits::is_projected_range<Proj, Rng>::value &&
-            hpx::traits::is_range<Rng>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::count is deprecated, use hpx::ranges::count instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<typename hpx::traits::range_traits<
-                Rng>::iterator_type>::difference_type>::type
-        count(
-            ExPolicy&& policy, Rng&& rng, T const& value, Proj&& proj = Proj())
-    {
-        using iterator_type =
-            typename hpx::traits::range_traits<Rng>::iterator_type;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        static_assert((hpx::traits::is_forward_iterator<iterator_type>::value),
-            "Required at least forward iterator.");
-
-        using difference_type =
-            typename std::iterator_traits<iterator_type>::difference_type;
-        return hpx::parallel::v1::detail::count<difference_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), value, std::forward<Proj>(proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            traits::is_projected_range<Proj, Rng>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj, Rng>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::count_if is deprecated, use "
-        "hpx::ranges::count_if instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<typename hpx::traits::range_traits<
-                Rng>::iterator_type>::difference_type>::type
-        count_if(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj())
-    {
-        using iterator_type =
-            typename hpx::traits::range_traits<Rng>::iterator_type;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        static_assert((hpx::traits::is_forward_iterator<iterator_type>::value),
-            "Required at least forward iterator.");
-
-        using difference_type =
-            typename std::iterator_traits<iterator_type>::difference_type;
-        return hpx::parallel::v1::detail::count_if<difference_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), std::forward<F>(f), std::forward<Proj>(proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
-
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::count
-    HPX_INLINE_CONSTEXPR_VARIABLE struct count_t final
+    // CPO for hpx::ranges::count
+    inline constexpr struct count_t final
       : hpx::detail::tag_parallel_algorithm<count_t>
     {
     private:
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename T,
+        template <typename ExPolicy, typename Rng,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
@@ -260,7 +180,7 @@ namespace hpx { namespace ranges {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<typename hpx::traits::range_traits<
                 Rng>::iterator_type>::difference_type>::type
-        tag_fallback_dispatch(count_t, ExPolicy&& policy, Rng&& rng,
+        tag_fallback_invoke(count_t, ExPolicy&& policy, Rng&& rng,
             T const& value, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -274,13 +194,15 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<iterator_type>::difference_type;
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), value, std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
-        template <typename ExPolicy, typename Iter, typename Sent, typename T,
+        template <typename ExPolicy, typename Iter, typename Sent,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<Iter,
+                Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
@@ -288,7 +210,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<Iter>::difference_type>::type
-        tag_fallback_dispatch(count_t, ExPolicy&& policy, Iter first, Sent last,
+        tag_fallback_invoke(count_t, ExPolicy&& policy, Iter first, Sent last,
             T const& value, Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
@@ -298,13 +220,15 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<Iter>::difference_type;
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
-                std::forward<ExPolicy>(policy), first, last, value,
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last, value,
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
-        template <typename Rng, typename T,
+        template <typename Rng,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<
+                hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::traits::is_range<Rng>::value
@@ -312,7 +236,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename std::iterator_traits<typename hpx::traits::range_traits<
             Rng>::iterator_type>::difference_type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             count_t, Rng&& rng, T const& value, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -327,18 +251,20 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                value, std::forward<Proj>(proj));
+                value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
-        template <typename Iter, typename Sent, typename T,
+        template <typename Iter, typename Sent,
             typename Proj = hpx::parallel::util::projection_identity,
+            typename T = typename hpx::parallel::traits::projected<Iter,
+                Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
         friend typename std::iterator_traits<Iter>::difference_type
-        tag_fallback_dispatch(count_t, Iter first, Sent last, T const& value,
+        tag_fallback_invoke(count_t, Iter first, Sent last, T const& value,
             Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_input_iterator<Iter>::value),
@@ -349,13 +275,13 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::count<difference_type>().call(
                 hpx::execution::seq, first, last, value,
-                std::forward<Proj>(proj));
+                HPX_FORWARD(Proj, proj));
         }
     } count{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::count_if
-    HPX_INLINE_CONSTEXPR_VARIABLE struct count_if_t final
+    // CPO for hpx::ranges::count_if
+    inline constexpr struct count_if_t final
       : hpx::detail::tag_parallel_algorithm<count_if_t>
     {
     private:
@@ -374,7 +300,7 @@ namespace hpx { namespace ranges {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<typename hpx::traits::range_traits<
                 Rng>::iterator_type>::difference_type>::type
-        tag_fallback_dispatch(count_if_t, ExPolicy&& policy, Rng&& rng, F&& f,
+        tag_fallback_invoke(count_if_t, ExPolicy&& policy, Rng&& rng, F&& f,
             Proj&& proj = Proj())
         {
             using iterator_type =
@@ -388,9 +314,9 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<iterator_type>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<F>(f),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(F, f),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -407,7 +333,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<Iter>::difference_type>::type
-        tag_fallback_dispatch(count_if_t, ExPolicy&& policy, Iter first,
+        tag_fallback_invoke(count_if_t, ExPolicy&& policy, Iter first,
             Sent last, F&& f, Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
@@ -417,8 +343,8 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<Iter>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -435,8 +361,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename std::iterator_traits<typename hpx::traits::range_traits<
             Rng>::iterator_type>::difference_type
-        tag_fallback_dispatch(
-            count_if_t, Rng&& rng, F&& f, Proj&& proj = Proj())
+        tag_fallback_invoke(count_if_t, Rng&& rng, F&& f, Proj&& proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -450,7 +375,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<F>(f), std::forward<Proj>(proj));
+                HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -466,7 +391,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename std::iterator_traits<Iter>::difference_type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             count_if_t, Iter first, Sent last, F&& f, Proj&& proj = Proj())
         {
             static_assert((hpx::traits::is_forward_iterator<Iter>::value),
@@ -476,8 +401,8 @@ namespace hpx { namespace ranges {
                 typename std::iterator_traits<Iter>::difference_type;
 
             return hpx::parallel::v1::detail::count_if<difference_type>().call(
-                hpx::execution::seq, first, last, std::forward<F>(f),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(Proj, proj));
         }
     } count_if{};
 

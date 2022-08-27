@@ -36,12 +36,12 @@ public:
         return use_count_;
     }
 
-    inline friend void intrusive_ptr_add_ref(base* p)
+    inline friend void intrusive_ptr_add_ref(base* p) noexcept
     {
         ++p->use_count_;
     }
 
-    inline friend void intrusive_ptr_release(base* p)
+    inline friend void intrusive_ptr_release(base* p) noexcept
     {
         if (--p->use_count_ == 0)
             delete p;

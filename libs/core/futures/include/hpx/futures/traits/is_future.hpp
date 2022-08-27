@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,16 +7,18 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <functional>
 #include <type_traits>
 
-namespace hpx { namespace lcos {
+namespace hpx {
     template <typename R>
     class future;
+
     template <typename R>
     class shared_future;
-}}    // namespace hpx::lcos
+}    // namespace hpx
 
 namespace hpx { namespace traits {
     namespace detail {
@@ -26,33 +28,47 @@ namespace hpx { namespace traits {
         };
 
         template <typename R>
-        struct is_unique_future<lcos::future<R>> : std::true_type
+        struct is_unique_future<hpx::future<R>> : std::true_type
         {
         };
+
+        template <typename R>
+        inline constexpr bool is_unique_future_v = is_unique_future<R>::value;
 
         template <typename Future, typename Enable = void>
         struct is_future_customization_point : std::false_type
         {
         };
+
+        template <typename R>
+        struct is_future_customization_point<hpx::future<R>> : std::true_type
+        {
+        };
+
+        template <typename R>
+        struct is_future_customization_point<hpx::shared_future<R>>
+          : std::true_type
+        {
+        };
     }    // namespace detail
 
     template <typename Future>
-    struct is_future : detail::is_future_customization_point<Future>
+    struct is_future
+      : detail::is_future_customization_point<std::decay_t<Future>>
     {
     };
 
     template <typename R>
-    struct is_future<lcos::future<R>> : std::true_type
+    inline constexpr bool is_future_v = is_future<R>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename... Ts>
+    struct is_future_any : hpx::util::any_of<is_future<Ts>...>
     {
     };
 
-    template <typename R>
-    struct is_future<lcos::shared_future<R>> : std::true_type
-    {
-    };
-
-    template <typename R>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_future_v = is_future<R>::value;
+    template <typename... Ts>
+    inline constexpr bool is_future_any_v = is_future_any<Ts...>::value;
 
     template <typename Future>
     struct is_ref_wrapped_future : std::false_type
@@ -66,6 +82,6 @@ namespace hpx { namespace traits {
     };
 
     template <typename R>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_ref_wrapped_future_v =
+    inline constexpr bool is_ref_wrapped_future_v =
         is_ref_wrapped_future<R>::value;
 }}    // namespace hpx::traits

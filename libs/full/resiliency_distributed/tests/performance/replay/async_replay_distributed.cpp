@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2018-2019 Hartmut Kaiser
+//  Copyright (c) 2018-2022 Hartmut Kaiser
 //  Copyright (c) 2018-2019 Adrian Serio
 //  Copyright (c) 2019-2020 Nikunj Gupta
 //
@@ -76,7 +76,7 @@ int universal_ans(
     return 42;
 }
 
-HPX_PLAIN_ACTION(universal_ans, universal_action);
+HPX_PLAIN_ACTION(universal_ans, universal_action)
 
 bool validate(int ans)
 {
@@ -131,7 +131,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             std::rotate(locales.begin(), locales.begin() + 1, locales.end());
         }
 
-        hpx::wait_all(tasks);
+        HPX_TEST(!hpx::wait_all_nothrow(tasks));
 
         double elapsed = t.elapsed();
 

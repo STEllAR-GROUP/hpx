@@ -12,7 +12,7 @@
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <cstddef>
@@ -78,8 +78,8 @@ namespace hpx { namespace parallel { namespace execution {
     ///        iteration the function has already executed (i.e. which
     ///        don't have to be scheduled anymore).
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct get_chunk_size_t final
-      : hpx::functional::tag_fallback<get_chunk_size_t>
+    inline constexpr struct get_chunk_size_t final
+      : hpx::functional::detail::tag_fallback<get_chunk_size_t>
     {
     private:
         // clang-format off
@@ -89,14 +89,14 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             get_chunk_size_t, Parameters&& params, Executor&& exec, F&& f,
             std::size_t cores, std::size_t num_tasks)
         {
             return detail::get_chunk_size_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec), std::forward<F>(f), cores,
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f), cores,
                 num_tasks);
         }
     } get_chunk_size{};
@@ -114,8 +114,8 @@ namespace hpx { namespace parallel { namespace execution {
     /// \param num_tasks [in] The number of tasks the chunk size should be
     ///                 determined for
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct maximal_number_of_chunks_t final
-      : hpx::functional::tag_fallback<maximal_number_of_chunks_t>
+    inline constexpr struct maximal_number_of_chunks_t final
+      : hpx::functional::detail::tag_fallback<maximal_number_of_chunks_t>
     {
     private:
         // clang-format off
@@ -125,14 +125,14 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             maximal_number_of_chunks_t, Parameters&& params, Executor&& exec,
             std::size_t cores, std::size_t num_tasks)
         {
             return detail::maximal_number_of_chunks_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec), cores, num_tasks);
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec), cores, num_tasks);
         }
     } maximal_number_of_chunks{};
 
@@ -146,8 +146,8 @@ namespace hpx { namespace parallel { namespace execution {
     /// \note This calls params.reset_thread_distribution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct reset_thread_distribution_t final
-      : hpx::functional::tag_fallback<reset_thread_distribution_t>
+    inline constexpr struct reset_thread_distribution_t final
+      : hpx::functional::detail::tag_fallback<reset_thread_distribution_t>
     {
     private:
         // clang-format off
@@ -157,13 +157,13 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             reset_thread_distribution_t, Parameters&& params, Executor&& exec)
         {
             return detail::reset_thread_distribution_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec));
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec));
         }
     } reset_thread_distribution{};
 
@@ -177,8 +177,8 @@ namespace hpx { namespace parallel { namespace execution {
     ///       exists; otherwise it forwards the request to the executor
     ///       parameters object.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct processing_units_count_t final
-      : hpx::functional::tag_fallback<processing_units_count_t>
+    inline constexpr struct processing_units_count_t final
+      : hpx::functional::detail::tag_fallback<processing_units_count_t>
     {
     private:
         // clang-format off
@@ -188,15 +188,22 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             processing_units_count_t, Parameters&& params, Executor&& exec)
         {
             return detail::processing_units_count_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec));
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec));
         }
     } processing_units_count{};
+
+    /// Generate a policy that supports setting the number of cores for
+    /// execution.
+    inline constexpr struct with_processing_units_count_t final
+      : hpx::functional::detail::tag_fallback<with_processing_units_count_t>
+    {
+    } with_processing_units_count{};
 
     /// Mark the begin of a parallel algorithm execution
     ///
@@ -206,8 +213,8 @@ namespace hpx { namespace parallel { namespace execution {
     /// \note This calls params.mark_begin_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct mark_begin_execution_t final
-      : hpx::functional::tag_fallback<mark_begin_execution_t>
+    inline constexpr struct mark_begin_execution_t final
+      : hpx::functional::detail::tag_fallback<mark_begin_execution_t>
     {
     private:
         // clang-format off
@@ -217,13 +224,13 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             mark_begin_execution_t, Parameters&& params, Executor&& exec)
         {
             return detail::mark_begin_execution_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec));
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec));
         }
     } mark_begin_execution{};
 
@@ -235,8 +242,8 @@ namespace hpx { namespace parallel { namespace execution {
     /// \note This calls params.mark_begin_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct mark_end_of_scheduling_t final
-      : hpx::functional::tag_fallback<mark_end_of_scheduling_t>
+    inline constexpr struct mark_end_of_scheduling_t final
+      : hpx::functional::detail::tag_fallback<mark_end_of_scheduling_t>
     {
     private:
         // clang-format off
@@ -246,13 +253,13 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             mark_end_of_scheduling_t, Parameters&& params, Executor&& exec)
         {
             return detail::mark_end_of_scheduling_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec));
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec));
         }
     } mark_end_of_scheduling{};
 
@@ -264,8 +271,8 @@ namespace hpx { namespace parallel { namespace execution {
     /// \note This calls params.mark_end_execution(exec) if it exists;
     ///       otherwise it does nothing.
     ///
-    HPX_INLINE_CONSTEXPR_VARIABLE struct mark_end_execution_t final
-      : hpx::functional::tag_fallback<mark_end_execution_t>
+    inline constexpr struct mark_end_execution_t final
+      : hpx::functional::detail::tag_fallback<mark_end_execution_t>
     {
     private:
         // clang-format off
@@ -275,13 +282,13 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::traits::is_executor_any<Executor>::value
             )>
         // clang-format on
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             mark_end_execution_t, Parameters&& params, Executor&& exec)
         {
             return detail::mark_end_execution_fn_helper<
                 hpx::util::decay_unwrap_t<Parameters>,
-                std::decay_t<Executor>>::call(std::forward<Parameters>(params),
-                std::forward<Executor>(exec));
+                std::decay_t<Executor>>::call(HPX_FORWARD(Parameters, params),
+                HPX_FORWARD(Executor, exec));
         }
     } mark_end_execution{};
 }}}    // namespace hpx::parallel::execution

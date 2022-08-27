@@ -32,8 +32,6 @@ namespace hpx { namespace util {
 
         using mutex_type = lcos::local::spinlock;
 
-        using unique_lock_type = std::unique_lock<mutex_type>;
-
         using heap_parameters = wrapper_heap_base::heap_parameters;
 
     private:

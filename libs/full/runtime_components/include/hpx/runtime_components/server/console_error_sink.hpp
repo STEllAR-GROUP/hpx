@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace server {
 }}}    // namespace hpx::components::server
 
 HPX_ACTION_HAS_CRITICAL_PRIORITY(
-    hpx::components::server::console_error_sink_action);
+    hpx::components::server::console_error_sink_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::console_error_sink_action,
     console_error_sink_action)

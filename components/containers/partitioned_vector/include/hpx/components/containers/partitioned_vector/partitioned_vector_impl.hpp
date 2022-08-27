@@ -25,8 +25,8 @@
 #include <hpx/runtime_distributed/copy_component.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_component_impl.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_decl.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_segmented_iterator.hpp>
 
 #include <algorithm>
@@ -41,8 +41,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
 
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT std::size_t
@@ -88,10 +87,10 @@ namespace hpx
                         .then(get_ptr_helper{l, partitions_}));
             }
         }
-        wait_all(ptrs);
+        hpx::wait_all(ptrs);
 
         partition_size_ = get_partition_size();
-        this->base_type::reset(std::move(id));
+        this->base_type::reset(HPX_MOVE(id));
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -142,14 +141,15 @@ namespace hpx
             partitions;
         partitions.reserve(partitions_.size());
 
-        std::copy(
-            partitions_.begin(), partitions_.end(), std::back_inserter(partitions));
+        std::copy(partitions_.begin(), partitions_.end(),
+            std::back_inserter(partitions));
 
-        server::partitioned_vector_config_data data(size_, std::move(partitions));
+        server::partitioned_vector_config_data data(
+            size_, HPX_MOVE(partitions));
         this->base_type::reset(
             hpx::new_<components::server::distributed_metadata_base<
                 server::partitioned_vector_config_data>>(
-                hpx::find_here(), std::move(data)));
+                hpx::find_here(), HPX_MOVE(data)));
 
         return this->base_type::register_as(symbolic_name);
     }
@@ -167,11 +167,10 @@ namespace hpx
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
     partitioned_vector<T, Data>::partitioned_vector(future<id_type>&& f)
     {
-        f.share().then(
-            [HPX_CXX20_CAPTURE_THIS(=)](
-                shared_future<id_type>&& f) -> hpx::future<void> {
-                return connect_to_helper(f.get());
-            });
+        f.share().then([HPX_CXX20_CAPTURE_THIS(=)](
+                           shared_future<id_type>&& f) -> hpx::future<void> {
+            return connect_to_helper(f.get());
+        });
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -227,7 +226,8 @@ namespace hpx
         {
             // return an iterator to the end of the last partition
             auto const& back = partitions_.back();
-            return local_iterator(back.partition_, back.size_, back.local_data_);
+            return local_iterator(
+                back.partition_, back.size_, back.local_data_);
         }
 
         std::size_t local_index = get_local_index(global_index);
@@ -250,7 +250,8 @@ namespace hpx
         {
             // return an iterator to the end of the last partition
             auto const& back = partitions_.back();
-            return local_iterator(back.partition_, back.size_, back.local_data_);
+            return local_iterator(
+                back.partition_, back.size_, back.local_data_);
         }
 
         std::size_t local_index = get_local_index(global_index);
@@ -263,7 +264,8 @@ namespace hpx
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
         typename partitioned_vector<T, Data>::segment_iterator
-        partitioned_vector<T, Data>::get_segment_iterator(size_type global_index)
+        partitioned_vector<T, Data>::get_segment_iterator(
+            size_type global_index)
     {
         std::size_t part = get_partition(global_index);
         if (part == partitions_.size())
@@ -293,8 +295,9 @@ namespace hpx
     partitioned_vector<T, Data>::create_helper1(
         DistPolicy const& policy, std::size_t count, std::size_t size)
     {
-        typedef typename partitioned_vector_partition_client::server_component_type
-            component_type;
+        typedef
+            typename partitioned_vector_partition_client::server_component_type
+                component_type;
 
         return policy.template bulk_create<component_type>(count, size);
     }
@@ -303,11 +306,12 @@ namespace hpx
     template <typename DistPolicy>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT hpx::future<
         std::vector<typename partitioned_vector<T, Data>::bulk_locality_result>>
-    partitioned_vector<T, Data>::create_helper2(
-        DistPolicy const& policy, std::size_t count, std::size_t size, T const& val)
+    partitioned_vector<T, Data>::create_helper2(DistPolicy const& policy,
+        std::size_t count, std::size_t size, T const& val)
     {
-        typedef typename partitioned_vector_partition_client::server_component_type
-            component_type;
+        typedef
+            typename partitioned_vector_partition_client::server_component_type
+                component_type;
 
         return policy.template bulk_create<component_type>(count, size, val);
     }
@@ -319,7 +323,8 @@ namespace hpx
         partitions_vector_type& partitions;
 
         void operator()(
-            future<std::shared_ptr<partitioned_vector_partition_server>>&& f) const
+            future<std::shared_ptr<partitioned_vector_partition_server>>&& f)
+            const
         {
             partitions[loc].local_data_ = f.get();
         }
@@ -357,7 +362,8 @@ namespace hpx
             std::uint32_t locality = get_locality_id_from_id(r.first);
             for (hpx::id_type const& id : r.second)
             {
-                std::size_t size = (std::min)(part_size, size_ - allocated_size);
+                std::size_t size =
+                    (std::min)(part_size, size_ - allocated_size);
                 partitions_[l] = partition_data(id, size, locality);
 
                 if (locality == this_locality)
@@ -391,7 +397,7 @@ namespace hpx
         }
         HPX_ASSERT(l == num_parts);
 
-        when_all(ptrs).get();
+        hpx::when_all(ptrs).get();
 
         // cache our partition size
         partition_size_ = get_partition_size();
@@ -410,8 +416,9 @@ namespace hpx
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT void
     partitioned_vector<T, Data>::create(T const& val, DistPolicy const& policy)
     {
-        create(policy, util::bind_back(
-            &partitioned_vector::create_helper2<DistPolicy>, std::ref(val)));
+        create(policy,
+            hpx::bind_back(&partitioned_vector::create_helper2<DistPolicy>,
+                std::ref(val)));
     }
 
     template <typename T, typename Data /*= std::vector<T> */>
@@ -424,12 +431,12 @@ namespace hpx
         const_iterator end = rhs.partitions_.end();
         for (const_iterator it = rhs.partitions_.begin(); it != end; ++it)
         {
-            typedef
-                typename partitioned_vector_partition_client::server_component_type
-                    component_type;
-            objs.push_back(hpx::components::copy<component_type>(it->partition_));
+            typedef typename partitioned_vector_partition_client::
+                server_component_type component_type;
+            objs.push_back(
+                hpx::components::copy<component_type>(it->partition_));
         }
-        wait_all(objs);
+        hpx::wait_all(objs);
 
         std::uint32_t this_locality = get_locality_id();
         std::vector<future<void>> ptrs;
@@ -443,19 +450,18 @@ namespace hpx
         {
             std::uint32_t locality = rhs.partitions_[i].locality_id_;
 
-            partitions[i] =
-                partition_data(objs[i].get(), rhs.partitions_[i].size_, locality);
+            partitions[i] = partition_data(
+                objs[i].get(), rhs.partitions_[i].size_, locality);
 
             if (locality == this_locality)
             {
-                ptrs.push_back(
-                    get_ptr<partitioned_vector_partition_server>(
-                        partitions[i].partition_)
-                        .then(get_ptr_helper{i, partitions}));
+                ptrs.push_back(get_ptr<partitioned_vector_partition_server>(
+                    partitions[i].partition_)
+                                   .then(get_ptr_helper{i, partitions}));
             }
         }
 
-        when_all(ptrs).get();
+        hpx::when_all(ptrs).get();
 
         size_ = rhs.size_;
         partition_size_ = rhs.partition_size_;
@@ -483,7 +489,8 @@ namespace hpx
 
     template <typename T, typename Data /*= std::vector<T> */>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
-    partitioned_vector<T, Data>::partitioned_vector(size_type size, T const& val)
+    partitioned_vector<T, Data>::partitioned_vector(
+        size_type size, T const& val)
       : size_(size)
       , partition_size_(std::size_t(-1))
     {
@@ -508,15 +515,14 @@ namespace hpx
     template <typename T, typename Data /*= std::vector<T> */>
     template <typename DistPolicy>
     HPX_PARTITIONED_VECTOR_SPECIALIZATION_EXPORT
-    partitioned_vector<T, Data>::partitioned_vector(size_type size, T const& val,
-        DistPolicy const& policy,
-        typename std::enable_if<
-            traits::is_distribution_policy<DistPolicy>::value>::type* /*= nullptr*/)
+    partitioned_vector<T, Data>::partitioned_vector(size_type size,
+        T const& val, DistPolicy const& policy,
+        typename std::enable_if<traits::is_distribution_policy<
+            DistPolicy>::value>::type* /*= nullptr*/)
       : size_(size)
       , partition_size_(std::size_t(-1))
     {
         if (size != 0)
             create(val, policy);
     }
-}
-
+}    // namespace hpx

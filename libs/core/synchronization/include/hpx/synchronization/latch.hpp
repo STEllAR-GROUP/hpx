@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2020 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,18 +22,19 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local {
+namespace hpx {
+
     /// Latches are a thread coordination mechanism that allow one or more
     /// threads to block until an operation is completed. An individual latch
     /// is a singleuse object; once the operation has been completed, the latch
     /// cannot be reused.
-    class cpp20_latch
+    class latch
     {
     public:
-        HPX_NON_COPYABLE(cpp20_latch);
+        HPX_NON_COPYABLE(latch);
 
     protected:
-        using mutex_type = lcos::local::spinlock;
+        using mutex_type = hpx::lcos::local::spinlock;
 
     public:
         /// Initialize the latch
@@ -42,7 +43,7 @@ namespace hpx { namespace lcos { namespace local {
         /// Synchronization: None
         /// Postconditions: counter_ == count.
         ///
-        explicit cpp20_latch(std::ptrdiff_t count)
+        explicit latch(std::ptrdiff_t count)
           : mtx_()
           , cond_()
           , counter_(count)
@@ -61,12 +62,12 @@ namespace hpx { namespace lcos { namespace local {
         ///       thread enters wait() after one thread has called the
         ///       destructor. This may require additional coordination.
 #if defined(HPX_DEBUG)
-        ~cpp20_latch()
+        ~latch()
         {
             HPX_ASSERT(counter_ == 0);
         }
 #else
-        ~cpp20_latch() = default;
+        ~latch() = default;
 #endif
 
         /// Returns:        The maximum value of counter that the implementation
@@ -94,7 +95,7 @@ namespace hpx { namespace lcos { namespace local {
 
             if (new_count == 0)
             {
-                std::unique_lock<mutex_type> l(mtx_.data_);
+                std::unique_lock l(mtx_.data_);
                 notified_ = true;
 
                 // Note: we use notify_one repeatedly instead of notify_all as we
@@ -103,9 +104,9 @@ namespace hpx { namespace lcos { namespace local {
                 // which avoids suspension of this thread when it tries to
                 // re-lock the mutex while exiting from condition_variable::wait
                 while (cond_.data_.notify_one(
-                    std::move(l), threads::thread_priority::boost))
+                    HPX_MOVE(l), threads::thread_priority::boost))
                 {
-                    l = std::unique_lock<mutex_type>(mtx_.data_);
+                    l = std::unique_lock(mtx_.data_);
                 }
             }
         }
@@ -125,10 +126,10 @@ namespace hpx { namespace lcos { namespace local {
         ///
         void wait() const
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
+            std::unique_lock l(mtx_.data_);
             if (counter_.load(std::memory_order_relaxed) > 0 || !notified_)
             {
-                cond_.data_.wait(l, "hpx::local::cpp20_latch::wait");
+                cond_.data_.wait(l, "hpx::latch::wait");
 
                 HPX_ASSERT(counter_.load(std::memory_order_relaxed) == 0);
                 HPX_ASSERT(notified_);
@@ -142,7 +143,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             HPX_ASSERT(update >= 0);
 
-            std::unique_lock<mutex_type> l(mtx_.data_);
+            std::unique_lock l(mtx_.data_);
 
             std::ptrdiff_t old_count =
                 counter_.fetch_sub(update, std::memory_order_relaxed);
@@ -150,8 +151,7 @@ namespace hpx { namespace lcos { namespace local {
 
             if (old_count > update)
             {
-                cond_.data_.wait(
-                    l, "hpx::local::cpp20_latch::count_down_and_wait");
+                cond_.data_.wait(l, "hpx::latch::arrive_and_wait");
 
                 HPX_ASSERT(counter_.load(std::memory_order_relaxed) == 0);
                 HPX_ASSERT(notified_);
@@ -166,19 +166,30 @@ namespace hpx { namespace lcos { namespace local {
                 // which avoids suspension of this thread when it tries to
                 // re-lock the mutex while exiting from condition_variable::wait
                 while (cond_.data_.notify_one(
-                    std::move(l), threads::thread_priority::boost))
+                    HPX_MOVE(l), threads::thread_priority::boost))
                 {
-                    l = std::unique_lock<mutex_type>(mtx_.data_);
+                    l = std::unique_lock(mtx_.data_);
                 }
             }
         }
 
     protected:
         mutable util::cache_line_data<mutex_type> mtx_;
-        mutable util::cache_line_data<local::detail::condition_variable> cond_;
+        mutable util::cache_line_data<
+            hpx::lcos::local::detail::condition_variable>
+            cond_;
         std::atomic<std::ptrdiff_t> counter_;
         bool notified_;
     };
+}    // namespace hpx
+
+namespace hpx::lcos::local {
+
+    /// \cond NOINTERNAL
+    using cpp20_latch HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::cpp20_latch is deprecated, use hpx::latch instead") =
+        hpx::latch;
+    /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
     /// A latch maintains an internal counter_ that is initialized when the
@@ -189,12 +200,12 @@ namespace hpx { namespace lcos { namespace local {
     /// Calls to countdown_and_wait() , count_down() , wait() , is_ready(),
     /// count_up() , and reset() behave as atomic operations.
     ///
-    /// \note   A \a local::latch is not an LCO in the sense that it has no
-    ///         global id and it can't be triggered using the action (parcel)
-    ///         mechanism. Use lcos::latch instead if this is required.
-    ///         It is just a low level synchronization primitive allowing to
-    ///         synchronize a given number of \a threads.
-    class latch : public cpp20_latch
+    /// \note   A \a hpx::latch is not an LCO in the sense that it has no global
+    /// id and it can't be triggered using the action (parcel) mechanism. Use
+    /// hpx::distributed::latch instead if this is required. It is just a low
+    /// level synchronization primitive allowing to synchronize a given number
+    /// of \a threads.
+    class latch : public hpx::latch
     {
     public:
         HPX_NON_COPYABLE(latch);
@@ -207,7 +218,7 @@ namespace hpx { namespace lcos { namespace local {
         /// Postconditions: counter_ == count.
         ///
         explicit latch(std::ptrdiff_t count)
-          : cpp20_latch(count)
+          : hpx::latch(count)
         {
         }
 
@@ -235,7 +246,7 @@ namespace hpx { namespace lcos { namespace local {
         ///
         void count_down_and_wait()
         {
-            cpp20_latch::arrive_and_wait();
+            hpx::latch::arrive_and_wait();
         }
 
         /// Returns: counter_ == 0. Does not block.
@@ -244,13 +255,13 @@ namespace hpx { namespace lcos { namespace local {
         ///
         bool is_ready() const noexcept
         {
-            return cpp20_latch::try_wait();
+            return hpx::latch::try_wait();
         }
 
         void abort_all()
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            cond_.data_.abort_all(std::move(l));
+            std::unique_lock l(mtx_.data_);
+            cond_.data_.abort_all(HPX_MOVE(l));
         }
 
         /// Increments counter_ by n. Does not block.
@@ -285,9 +296,43 @@ namespace hpx { namespace lcos { namespace local {
             HPX_ASSERT(old_count == 0);
             HPX_UNUSED(old_count);
 
-            std::unique_lock<mutex_type> l(mtx_.data_);
-            HPX_ASSERT(notified_);
+            std::scoped_lock l(mtx_.data_);
             notified_ = false;
         }
+
+        /// Effects: Equivalent to:
+        ///             if (is_ready())
+        ///                 reset(count);
+        ///             count_up(n);
+        /// Returns: true if the latch was reset
+        bool reset_if_needed_and_count_up(
+            std::ptrdiff_t n, std::ptrdiff_t count)
+        {
+            HPX_ASSERT(n >= 0);
+            HPX_ASSERT(count >= 0);
+
+            std::unique_lock l(mtx_.data_);
+
+            if (notified_)
+            {
+                notified_ = false;
+
+                std::ptrdiff_t old_count =
+                    counter_.fetch_add(n + count, std::memory_order_relaxed);
+
+                HPX_ASSERT(old_count == 0);
+                HPX_UNUSED(old_count);
+
+                return true;
+            }
+
+            std::ptrdiff_t old_count =
+                counter_.fetch_add(n, std::memory_order_relaxed);
+
+            HPX_ASSERT(old_count > 0);
+            HPX_UNUSED(old_count);
+
+            return false;
+        }
     };
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

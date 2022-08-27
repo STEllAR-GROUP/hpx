@@ -20,34 +20,32 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace components { namespace process { namespace server
-{
+namespace hpx { namespace components { namespace process { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_PROCESS_EXPORT child : public component_base<child>
     {
     public:
-        template <typename ... Ts>
-        child(Ts && ... ts)
-          : child_(process::util::execute(std::forward<Ts>(ts)...))
-        {}
+        template <typename... Ts>
+        child(Ts&&... ts)
+          : child_(process::util::execute(HPX_FORWARD(Ts, ts)...))
+        {
+        }
 
         void terminate();
         int wait_for_exit();
 
-        HPX_DEFINE_COMPONENT_ACTION(child, terminate);
-        HPX_DEFINE_COMPONENT_ACTION(child, wait_for_exit);
+        HPX_DEFINE_COMPONENT_ACTION(child, terminate)
+        HPX_DEFINE_COMPONENT_ACTION(child, wait_for_exit)
 
     private:
         process::util::child child_;
     };
-}}}}
+}}}}    // namespace hpx::components::process::server
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::process::server::child::terminate_action,
-    hpx_components_process_server_child_terminate_action);
+    hpx_components_process_server_child_terminate_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::process::server::child::wait_for_exit_action,
-    hpx_components_process_server_child_wait_for_exit);
-
-
+    hpx_components_process_server_child_wait_for_exit)

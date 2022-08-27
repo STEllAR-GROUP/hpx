@@ -173,7 +173,7 @@ namespace hpx { namespace threads { namespace policies {
           , debug_init_(false)
           , thread_init_counter_(0)
         {
-            set_scheduler_mode(scheduler_mode::default_mode);
+            set_scheduler_mode(scheduler_mode::default_);
             HPX_ASSERT(num_workers_ != 0);
         }
 
@@ -188,19 +188,17 @@ namespace hpx { namespace threads { namespace policies {
         void set_scheduler_mode(scheduler_mode mode) override
         {
             // clang-format off
-                    scheduler_base::set_scheduler_mode(mode);
-                    round_robin_ = mode & policies::assign_work_round_robin;
-                    steal_hp_first_ = mode & policies::steal_high_priority_first;
-                    core_stealing_ = mode & policies::enable_stealing;
-                    numa_stealing_ = mode & policies::enable_stealing_numa;
-                    spq_deb.debug(debug::str<>("scheduler_mode")
-                        , round_robin_ ? "round_robin" : "thread parent"
-                        , ','
-                        , steal_hp_first_ ? "steal_hp_first" : "steal after local"
-                        , ','
-                        , core_stealing_ ? "stealing" : "no stealing"
-                        , ','
-                        , numa_stealing_ ? "numa stealing" : "no numa stealing");
+            scheduler_base::set_scheduler_mode(mode);
+            round_robin_ = mode & policies::scheduler_mode::assign_work_round_robin;
+            steal_hp_first_ =
+                mode & policies::scheduler_mode::steal_high_priority_first;
+            core_stealing_ = mode & policies::scheduler_mode::enable_stealing;
+            numa_stealing_ = mode & policies::scheduler_mode::enable_stealing_numa;
+            spq_deb.debug(debug::str<>("scheduler_mode")
+                , round_robin_ ? "round_robin" : "thread parent", ','
+                , steal_hp_first_ ? "steal_hp_first" : "steal after local", ','
+                , core_stealing_ ? "stealing" : "no stealing", ','
+                , numa_stealing_ ? "numa stealing" : "no numa stealing");
             // clang-format on
         }
 
@@ -456,10 +454,10 @@ namespace hpx { namespace threads { namespace policies {
         bool steal_by_function(std::size_t domain, std::size_t q_index,
             bool steal_numa, bool steal_core, thread_holder_type* origin,
             T& var, const char* prefix,
-            util::function_nonser<bool(
+            hpx::function<bool(
                 std::size_t, std::size_t, thread_holder_type*, T&, bool, bool)>
                 operation_HP,
-            util::function_nonser<bool(
+            hpx::function<bool(
                 std::size_t, std::size_t, thread_holder_type*, T&, bool, bool)>
                 operation)
         {
@@ -932,8 +930,7 @@ namespace hpx { namespace threads { namespace policies {
 
         //---------------------------------------------------------------------
         // Enumerate matching threads from all queues
-        bool enumerate_threads(
-            util::function_nonser<bool(thread_id_type)> const& f,
+        bool enumerate_threads(hpx::function<bool(thread_id_type)> const& f,
             thread_schedule_state state =
                 thread_schedule_state::unknown) const override
         {

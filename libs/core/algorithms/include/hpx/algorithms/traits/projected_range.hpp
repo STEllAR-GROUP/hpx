@@ -45,7 +45,7 @@ namespace hpx { namespace parallel { namespace traits {
     };
 
     template <typename Proj, typename Rng>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_projected_range_v =
+    inline constexpr bool is_projected_range_v =
         is_projected_range<Proj, Rng>::value;
 
     ///////////////////////////////////////////////////////////////////////////

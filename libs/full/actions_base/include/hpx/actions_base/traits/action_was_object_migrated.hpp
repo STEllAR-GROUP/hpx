@@ -55,7 +55,7 @@ namespace hpx { namespace traits {
         }
 
         static std::pair<bool, components::pinned_ptr> call(
-            hpx::naming::id_type const& id, naming::address_type lva)
+            hpx::id_type const& id, naming::address_type lva)
         {
             return detail::was_object_migrated_helper::template call<Action>(
                 0, id.get_gid(), lva);

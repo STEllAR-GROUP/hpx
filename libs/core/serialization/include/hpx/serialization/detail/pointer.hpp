@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,7 +29,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -77,8 +78,8 @@ namespace hpx { namespace serialization {
         {
             using referred_type = typename Pointer::element_type;
 
-            erase_ptr_helper(Pointer&& t, Pointer& ptr)
-              : t_(std::move(t))
+            erase_ptr_helper(Pointer&& t, Pointer& ptr) noexcept
+              : t_(HPX_MOVE(t))
             {
                 ptr = t_;
             }
@@ -151,16 +152,16 @@ namespace hpx { namespace serialization {
             };
 
         public:
-            using type = typename util::lazy_conditional<
-                hpx::traits::is_serialized_with_id<referred_type>::value,
+            using type = util::lazy_conditional_t<
+                hpx::traits::is_serialized_with_id_v<referred_type>,
                 hpx::util::identity<polymorphic_with_id>,
                 std::conditional<
-                    hpx::traits::is_intrusive_polymorphic<referred_type>::value,
+                    hpx::traits::is_intrusive_polymorphic_v<referred_type>,
                     intrusive_polymorphic,
-                    typename std::conditional<
-                        hpx::traits::is_nonintrusive_polymorphic<
-                            referred_type>::value,
-                        nonintrusive_polymorphic, usual>::type>>::type;
+                    std::conditional_t<
+                        hpx::traits::is_nonintrusive_polymorphic_v<
+                            referred_type>,
+                        nonintrusive_polymorphic, usual>>>;
         };
 
         template <typename Pointer>
@@ -172,7 +173,7 @@ namespace hpx { namespace serialization {
             {
                 static void call(output_archive& ar, Pointer const& ptr)
                 {
-                    const std::string name = access::get_name(ptr.get());
+                    std::string const name = access::get_name(ptr.get());
                     ar << name;
                     ar << *ptr;
                 }
@@ -183,13 +184,13 @@ namespace hpx { namespace serialization {
                 static void call(output_archive& ar, Pointer const& ptr)
                 {
 #if !defined(HPX_DEBUG)
-                    const std::uint32_t id = polymorphic_id_factory::get_id(
+                    std::uint32_t const id = polymorphic_id_factory::get_id(
                         access::get_name(ptr.get()));
                     ar << id;
                     ar << *ptr;
 #else
                     std::string const name(access::get_name(ptr.get()));
-                    const std::uint32_t id =
+                    std::uint32_t const id =
                         polymorphic_id_factory::get_id(name);
                     ar << name;
                     ar << id;
@@ -202,34 +203,26 @@ namespace hpx { namespace serialization {
             {
                 static void call(output_archive& ar, Pointer const& ptr)
                 {
-                    call(ar, *ptr);
-                }
-
-                template <typename T>
-                static typename std::enable_if<
-                    !std::is_constructible<T>::value>::type
-                call(output_archive& ar, T const& val)
-                {
-                    save_construct_data(ar, &val, 0);
-                    ar << val;
-                }
-
-                template <typename T>
-                static typename std::enable_if<
-                    std::is_constructible<T>::value>::type
-                call(output_archive& ar, T const& val)
-                {
-                    ar << val;
+                    using element_type = typename Pointer::element_type;
+                    if constexpr (std::is_constructible_v<element_type>)
+                    {
+                        ar << *ptr;
+                    }
+                    else
+                    {
+                        save_construct_data(ar, ptr.get(), 0);
+                        ar << *ptr;
+                    }
                 }
             };
 
         public:
-            using type = typename std::conditional<
-                hpx::traits::is_serialized_with_id<referred_type>::value,
+            using type = std::conditional_t<
+                hpx::traits::is_serialized_with_id_v<referred_type>,
                 polymorphic_with_id,
-                typename std::conditional<
-                    hpx::traits::is_intrusive_polymorphic<referred_type>::value,
-                    intrusive_polymorphic, usual>::type>::type;
+                std::conditional_t<
+                    hpx::traits::is_intrusive_polymorphic_v<referred_type>,
+                    intrusive_polymorphic, usual>>;
         };
 
         // forwarded serialize pointer functions
@@ -272,7 +265,7 @@ namespace hpx { namespace serialization {
                             ar);
                     register_pointer(ar, pos,
                         ptr_helper_ptr(new detail::erase_ptr_helper<Pointer>(
-                            std::move(temp), ptr)));
+                            HPX_MOVE(temp), ptr)));
                 }
                 else
                 {
@@ -309,4 +302,4 @@ namespace hpx { namespace serialization {
         }
 
     }    // namespace detail
-}}       // namespace hpx::serialization
+}    // namespace hpx::serialization

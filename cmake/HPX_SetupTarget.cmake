@@ -62,19 +62,23 @@ function(hpx_setup_target target)
       set(_type "EXECUTABLE")
     endif()
   endif()
+  hpx_debug("setup_target.${target}" "TYPE: ${_type}")
 
   if(target_FOLDER)
     set_target_properties(${target} PROPERTIES FOLDER "${target_FOLDER}")
+    hpx_debug("setup_target.${target}" "FOLDER: ${target_FOLDER}")
   endif()
 
   get_target_property(target_SOURCES ${target} SOURCES)
 
   if(target_COMPILE_FLAGS)
     hpx_append_property(${target} COMPILE_FLAGS ${target_COMPILE_FLAGS})
+    hpx_debug("setup_target.${target}" "COMPILE_FLAGS: ${target_COMPILE_FLAGS}")
   endif()
 
   if(target_LINK_FLAGS)
     hpx_append_property(${target} LINK_FLAGS ${target_LINK_FLAGS})
+    hpx_debug("setup_target.${target}" "LINK_FLAGS: ${target_LINK_FLAGS}")
   endif()
 
   if(target_NAME)
@@ -103,6 +107,11 @@ function(hpx_setup_target target)
     if("${_hpx_library_type}" STREQUAL "STATIC_LIBRARY")
       set(target_STATIC_LINKING ON)
     endif()
+  endif()
+  hpx_debug("setup_target.${target}" "STATIC_LINKING: ${target_STATIC_LINKING}")
+
+  if(target_HPX_PREFIX)
+    hpx_debug("setup_target.${target}" "HPX_PREFIX: ${target_HPX_PREFIX}")
   endif()
 
   if("${_type}" STREQUAL "EXECUTABLE")
@@ -164,20 +173,42 @@ function(hpx_setup_target target)
     target_link_libraries(
       ${target} ${__tll_public} ${target_COMPONENT_DEPENDENCIES}
     )
+
+    if(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL)
+      if("${_type}" STREQUAL "EXECUTABLE")
+        target_precompile_headers(
+          ${target} REUSE_FROM hpx_exe_precompiled_headers
+        )
+      endif()
+    endif()
+  endif()
+
+  if(target_COMPONENT_DEPENDENCIES)
+    hpx_print_list(
+      "DEBUG" "setup_target.${target} COMPONENT_DEPENDENCIES: "
+      target_COMPONENT_DEPENDENCIES
+    )
   endif()
 
   target_link_libraries(${target} ${__tll_public} ${target_DEPENDENCIES})
+  if(target_COMPONENT_DEPENDENCIES)
+    hpx_print_list(
+      "DEBUG" "setup_target.${target} DEPENDENCIES: " target_DEPENDENCIES
+    )
+  endif()
 
   if(target_INTERNAL_FLAGS AND TARGET hpx_private_flags)
     target_link_libraries(${target} ${__tll_private} hpx_private_flags)
+    hpx_print_list(
+      "DEBUG" "setup_target.${target} private_flags: " hpx_private_flags
+    )
   endif()
 
   if(target_UNITY_BUILD)
     set_target_properties(${target} PROPERTIES UNITY_BUILD ON)
-  endif()
-
-  if(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL)
-    target_precompile_headers(${target} REUSE_FROM hpx_precompiled_headers)
+    hpx_debug("setup_target.${target} UNITY_BUILD: ON")
+  else()
+    hpx_debug("setup_target.${target} UNITY_BUILD: OFF")
   endif()
 
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)
@@ -189,14 +220,20 @@ function(hpx_setup_target target)
 
   if(target_INSTALL AND NOT target_EXCLUDE_FROM_ALL)
     install(TARGETS ${target} ${install_export} ${target_INSTALL_FLAGS})
+    hpx_debug("setup_target.${target}" "INSTALL_FLAGS: ${target_INSTALL_FLAGS}")
+
     if(target_INSTALL_PDB)
       install(FILES ${target_INSTALL_PDB})
+      hpx_debug("setup_target.${target}" "INSTALL_PDB: ${target_INSTALL_PDB}")
     endif()
     if(target_INSTALL_HEADERS AND (NOT target_HEADER_ROOT STREQUAL ""))
       install(
         DIRECTORY "${target_HEADER_ROOT}/"
         DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
         COMPONENT ${name}
+      )
+      hpx_debug("setup_target.${target}"
+                "INSTALL_HEADERS: ${target_INSTALL_HEADERS}"
       )
     endif()
   endif()

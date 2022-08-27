@@ -132,8 +132,8 @@ namespace hpx { namespace threads {
         mask = 0ull;
     }
 
-// clang-format off
 #else
+    // clang-format off
 #  if defined(HPX_HAVE_MAX_CPU_COUNT)
     typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> mask_type;
     typedef std::bitset<HPX_HAVE_MAX_CPU_COUNT> const& mask_cref_type;
@@ -233,6 +233,6 @@ namespace hpx { namespace threads {
 
 #endif
 
-        HPX_CORE_EXPORT std::string to_string(mask_cref_type);
-        /// \endcond
+    HPX_CORE_EXPORT std::string to_string(mask_cref_type);
+    /// \endcond
 }}    // namespace hpx::threads

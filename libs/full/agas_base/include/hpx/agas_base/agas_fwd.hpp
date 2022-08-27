@@ -35,8 +35,9 @@ namespace hpx { namespace agas {
     static constexpr std::uint64_t const locality_ns_msb = 0x100000001ULL;
     static constexpr std::uint64_t const locality_ns_lsb = 0x000000004ULL;
 
-    using iterate_types_function_type = hpx::util::function<void(
-        std::string const&, components::component_type)>;
+    using iterate_types_function_type =
+        hpx::function<void(std::string const&, components::component_type),
+            true>;
 
     struct HPX_EXPORT component_namespace;
     struct HPX_EXPORT locality_namespace;

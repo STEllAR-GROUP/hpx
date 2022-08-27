@@ -104,7 +104,7 @@ void test_async_with_executor(Executor& exec)
     }
 
     {
-        hpx::lcos::local::promise<std::int32_t> p;
+        hpx::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<std::int32_t> f1 =
@@ -118,15 +118,15 @@ void test_async_with_executor(Executor& exec)
     }
 
     {
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
 
         hpx::future<std::int32_t> f1 =
-            hpx::async(exec, hpx::util::bind_back(&increment, 42));
+            hpx::async(exec, hpx::bind_back(&increment, 42));
         HPX_TEST_EQ(f1.get(), 43);
 
         hpx::future<std::int32_t> f2 =
-            hpx::async(exec, hpx::util::bind(&increment, _1, _2), 42);
+            hpx::async(exec, hpx::bind(&increment, _1, _2), 42);
         HPX_TEST_EQ(f2.get(), 43);
     }
 
@@ -149,19 +149,19 @@ void test_async_with_executor(Executor& exec)
         mult2 mult;
 
         hpx::future<std::int32_t> f1 =
-            hpx::async(exec, hpx::util::bind_back(mult, 42));
+            hpx::async(exec, hpx::bind_back(mult, 42));
         HPX_TEST_EQ(f1.get(), 84);
 
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
 
         hpx::future<std::int32_t> f2 =
-            hpx::async(exec, hpx::util::bind(mult, _1, _2), 42);
+            hpx::async(exec, hpx::bind(mult, _1, _2), 42);
         HPX_TEST_EQ(f2.get(), 84);
 
         do_nothing_obj do_nothing_f;
         hpx::future<void> f3 =
-            hpx::async(exec, hpx::util::bind(do_nothing_f, _1, _2), 42);
+            hpx::async(exec, hpx::bind(do_nothing_f, _1, _2), 42);
         f3.get();
     }
 
@@ -181,20 +181,20 @@ void test_async_with_executor(Executor& exec)
     {
         decrement dec;
 
-        using hpx::util::placeholders::_1;
-        using hpx::util::placeholders::_2;
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
 
         hpx::future<std::int32_t> f1 =
-            hpx::async(exec, hpx::util::bind(&decrement::call, dec, _1, 42));
+            hpx::async(exec, hpx::bind(&decrement::call, dec, _1, 42));
         HPX_TEST_EQ(f1.get(), 41);
 
-        hpx::future<std::int32_t> f2 = hpx::async(
-            exec, hpx::util::bind(&decrement::call, dec, _1, _2), 42);
+        hpx::future<std::int32_t> f2 =
+            hpx::async(exec, hpx::bind(&decrement::call, dec, _1, _2), 42);
         HPX_TEST_EQ(f2.get(), 41);
 
         do_nothing_member dnm;
         hpx::future<void> f3 = hpx::async(
-            exec, hpx::util::bind(&do_nothing_member::call, dnm, _1, _2), 42);
+            exec, hpx::bind(&do_nothing_member::call, dnm, _1, _2), 42);
         f3.get();
     }
 }

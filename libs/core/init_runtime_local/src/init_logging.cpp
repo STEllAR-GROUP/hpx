@@ -35,7 +35,7 @@ namespace hpx { namespace util {
     {
         void operator()(std::ostream& to) const override
         {
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             std::size_t thread_num = hpx::get_worker_thread_num(ec);
 
             if (std::size_t(-1) != thread_num)
@@ -381,8 +381,8 @@ namespace hpx { namespace util {
             if (!settings.level_.empty())
                 lvl = detail::get_log_level(settings.level_, true);
 
-            init_agas_log(lvl, std::move(settings.dest_),
-                std::move(settings.format_), isconsole, set_console_dest,
+            init_agas_log(lvl, HPX_MOVE(settings.dest_),
+                HPX_MOVE(settings.format_), isconsole, set_console_dest,
                 define_formatters);
         }
 
@@ -431,8 +431,8 @@ namespace hpx { namespace util {
             if (!settings.level_.empty())
                 lvl = detail::get_log_level(settings.level_, true);
 
-            init_parcel_log(lvl, std::move(settings.dest_),
-                std::move(settings.format_), isconsole, set_console_dest,
+            init_parcel_log(lvl, HPX_MOVE(settings.dest_),
+                HPX_MOVE(settings.format_), isconsole, set_console_dest,
                 define_formatters);
         }
 
@@ -482,8 +482,8 @@ namespace hpx { namespace util {
             if (!settings.level_.empty())
                 lvl = detail::get_log_level(settings.level_, true);
 
-            init_timing_log(lvl, std::move(settings.dest_),
-                std::move(settings.format_), isconsole, set_console_dest,
+            init_timing_log(lvl, HPX_MOVE(settings.dest_),
+                HPX_MOVE(settings.format_), isconsole, set_console_dest,
                 define_formatters);
         }
 
@@ -568,8 +568,8 @@ namespace hpx { namespace util {
             if (!settings.level_.empty())
                 lvl = detail::get_log_level(settings.level_, true);
 
-            init_hpx_log(lvl, std::move(settings.dest_),
-                std::move(settings.format_), isconsole, set_console_dest,
+            init_hpx_log(lvl, HPX_MOVE(settings.dest_),
+                HPX_MOVE(settings.format_), isconsole, set_console_dest,
                 define_formatters);
         }
 
@@ -619,8 +619,8 @@ namespace hpx { namespace util {
             if (!settings.level_.empty())
                 lvl = detail::get_log_level(settings.level_, true);
 
-            init_app_log(lvl, std::move(settings.dest_),
-                std::move(settings.format_), isconsole, set_console_dest,
+            init_app_log(lvl, HPX_MOVE(settings.dest_),
+                HPX_MOVE(settings.format_), isconsole, set_console_dest,
                 define_formatters);
         }
 
@@ -670,8 +670,8 @@ namespace hpx { namespace util {
             if (!settings.level_.empty())
                 lvl = detail::get_log_level(settings.level_, true);
 
-            init_debuglog_log(lvl, std::move(settings.dest_),
-                std::move(settings.format_), isconsole, set_console_dest,
+            init_debuglog_log(lvl, HPX_MOVE(settings.dest_),
+                HPX_MOVE(settings.format_), isconsole, set_console_dest,
                 define_formatters);
         }
 
@@ -711,7 +711,7 @@ namespace hpx { namespace util {
                 lvl = detail::get_log_level(settings.level_, true);
 
             init_agas_console_log(
-                lvl, std::move(settings.dest_), std::move(settings.format_));
+                lvl, HPX_MOVE(settings.dest_), HPX_MOVE(settings.format_));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -751,7 +751,7 @@ namespace hpx { namespace util {
                 lvl = detail::get_log_level(settings.level_, true);
 
             init_parcel_console_log(
-                lvl, std::move(settings.dest_), std::move(settings.format_));
+                lvl, HPX_MOVE(settings.dest_), HPX_MOVE(settings.format_));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -791,7 +791,7 @@ namespace hpx { namespace util {
                 lvl = detail::get_log_level(settings.level_, true);
 
             init_timing_console_log(
-                lvl, std::move(settings.dest_), std::move(settings.format_));
+                lvl, HPX_MOVE(settings.dest_), HPX_MOVE(settings.format_));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -830,7 +830,7 @@ namespace hpx { namespace util {
                 lvl = detail::get_log_level(settings.level_, true);
 
             init_hpx_console_log(
-                lvl, std::move(settings.dest_), std::move(settings.format_));
+                lvl, HPX_MOVE(settings.dest_), HPX_MOVE(settings.format_));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -870,7 +870,7 @@ namespace hpx { namespace util {
                 lvl = detail::get_log_level(settings.level_, true);
 
             init_app_console_log(
-                lvl, std::move(settings.dest_), std::move(settings.format_));
+                lvl, HPX_MOVE(settings.dest_), HPX_MOVE(settings.format_));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -911,7 +911,7 @@ namespace hpx { namespace util {
                 lvl = detail::get_log_level(settings.level_, true);
 
             init_debuglog_console_log(
-                lvl, std::move(settings.dest_), std::move(settings.format_));
+                lvl, HPX_MOVE(settings.dest_), HPX_MOVE(settings.format_));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -1013,7 +1013,7 @@ namespace hpx { namespace util {
                 detail::default_isconsole, detail::default_set_console_dest,
                 detail::default_define_formatters);
             detail::init_hpx_console_log(
-                lvl, std::move(logdest), std::move(logformat));
+                lvl, HPX_MOVE(logdest), HPX_MOVE(logformat));
             break;
 
         case destination_timing:
@@ -1021,7 +1021,7 @@ namespace hpx { namespace util {
                 detail::default_isconsole, detail::default_set_console_dest,
                 detail::default_define_formatters);
             detail::init_debuglog_console_log(
-                lvl, std::move(logdest), std::move(logformat));
+                lvl, HPX_MOVE(logdest), HPX_MOVE(logformat));
             break;
 
         case destination_agas:
@@ -1029,7 +1029,7 @@ namespace hpx { namespace util {
                 detail::default_isconsole, detail::default_set_console_dest,
                 detail::default_define_formatters);
             detail::init_agas_console_log(
-                lvl, std::move(logdest), std::move(logformat));
+                lvl, HPX_MOVE(logdest), HPX_MOVE(logformat));
             break;
 
         case destination_parcel:
@@ -1037,7 +1037,7 @@ namespace hpx { namespace util {
                 detail::default_isconsole, detail::default_set_console_dest,
                 detail::default_define_formatters);
             detail::init_parcel_console_log(
-                lvl, std::move(logdest), std::move(logformat));
+                lvl, HPX_MOVE(logdest), HPX_MOVE(logformat));
             break;
 
         case destination_app:
@@ -1045,7 +1045,7 @@ namespace hpx { namespace util {
                 detail::default_isconsole, detail::default_set_console_dest,
                 detail::default_define_formatters);
             detail::init_app_console_log(
-                lvl, std::move(logdest), std::move(logformat));
+                lvl, HPX_MOVE(logdest), HPX_MOVE(logformat));
             break;
 
         case destination_debuglog:
@@ -1053,7 +1053,7 @@ namespace hpx { namespace util {
                 detail::default_isconsole, detail::default_set_console_dest,
                 detail::default_define_formatters);
             detail::init_debuglog_console_log(
-                lvl, std::move(logdest), std::move(logformat));
+                lvl, HPX_MOVE(logdest), HPX_MOVE(logformat));
             break;
         }
     }

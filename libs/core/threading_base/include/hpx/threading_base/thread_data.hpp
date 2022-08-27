@@ -504,7 +504,7 @@ namespace hpx { namespace threads {
 
         bool interruption_point(bool throw_on_interrupt = true);
 
-        bool add_thread_exit_callback(util::function_nonser<void()> const& f);
+        bool add_thread_exit_callback(function<void()> const& f);
         void run_thread_exit_callbacks();
         void free_thread_exit_callbacks();
 
@@ -606,7 +606,7 @@ namespace hpx { namespace threads {
             thread_id_addref addref = thread_id_addref::yes);
 
         virtual ~thread_data() override;
-        virtual void destroy() = 0;
+        virtual void destroy() noexcept = 0;
 
     protected:
         void rebind_base(thread_init_data& init_data);
@@ -647,7 +647,7 @@ namespace hpx { namespace threads {
         bool const is_stackless_;
 
         // Singly linked list (heap-allocated)
-        std::forward_list<util::function_nonser<void()>> exit_funcs_;
+        std::forward_list<hpx::function<void()>> exit_funcs_;
 
         // reference to scheduler which created/manages this thread
         policies::scheduler_base* scheduler_base_;
@@ -665,12 +665,13 @@ namespace hpx { namespace threads {
     };
 
     HPX_FORCEINLINE thread_data* get_thread_id_data(
-        thread_id_ref_type const& tid)
+        thread_id_ref_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get().get());
     }
 
-    HPX_FORCEINLINE thread_data* get_thread_id_data(thread_id_type const& tid)
+    HPX_FORCEINLINE thread_data* get_thread_id_data(
+        thread_id_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get());
     }

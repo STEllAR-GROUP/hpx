@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -40,16 +40,17 @@ namespace hpx { namespace detail {
             if (policy == launch::sync)
             {
                 return call(
-                    launch::sync, std::forward<F>(f), std::forward<Ts>(ts)...);
+                    launch::sync, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
-            lcos::local::futures_factory<result_type()> p(util::deferred_call(
-                std::forward<F>(f), std::forward<Ts>(ts)...));
+            lcos::local::futures_factory<result_type()> p(
+                util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
             if (hpx::detail::has_async_policy(policy))
             {
                 threads::thread_id_ref_type tid =
-                    p.apply(policy, policy.priority());
+                    p.apply("sync_launch_policy_dispatch<fork>", policy,
+                        policy.priority());
                 if (tid && policy == launch::fork)
                 {
                     // make sure this thread is executed last
@@ -71,7 +72,27 @@ namespace hpx { namespace detail {
         {
             try
             {
-                return HPX_INVOKE(std::forward<F>(f), std::forward<Ts>(ts)...);
+                return HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
+            catch (std::bad_alloc const& ba)
+            {
+                throw ba;
+            }
+            catch (...)
+            {
+                throw exception_list(std::current_exception());
+            }
+        }
+
+        // launch::deferred execute inline
+        template <typename F, typename... Ts>
+        HPX_FORCEINLINE static hpx::util::detail::invoke_deferred_result_t<F,
+            Ts...>
+        call(launch::deferred_policy, F&& f, Ts&&... ts)
+        {
+            try
+            {
+                return HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
             catch (std::bad_alloc const& ba)
             {

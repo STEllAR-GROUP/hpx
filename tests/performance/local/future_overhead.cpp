@@ -43,7 +43,6 @@ using hpx::program_options::variables_map;
 using hpx::apply;
 using hpx::async;
 using hpx::future;
-using hpx::lcos::wait_each;
 
 using hpx::chrono::high_resolution_timer;
 
@@ -135,7 +134,7 @@ HPX_PLAIN_ACTION(null_function, null_action)
 // Time async action execution using wait each on futures vector
 void measure_action_futures_wait_each(std::uint64_t count, bool csv)
 {
-    const hpx::naming::id_type here = hpx::find_here();
+    const hpx::id_type here = hpx::find_here();
     std::vector<future<double>> futures;
     futures.reserve(count);
 
@@ -143,7 +142,7 @@ void measure_action_futures_wait_each(std::uint64_t count, bool csv)
     high_resolution_timer walltime;
     for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async<null_action>(here));
-    wait_each(scratcher(), futures);
+    hpx::wait_each(scratcher(), futures);
 
     // stop the clock
     const double duration = walltime.elapsed();
@@ -153,7 +152,7 @@ void measure_action_futures_wait_each(std::uint64_t count, bool csv)
 // Time async action execution using wait each on futures vector
 void measure_action_futures_wait_all(std::uint64_t count, bool csv)
 {
-    const hpx::naming::id_type here = hpx::find_here();
+    const hpx::id_type here = hpx::find_here();
     std::vector<future<double>> futures;
     futures.reserve(count);
 
@@ -161,7 +160,7 @@ void measure_action_futures_wait_all(std::uint64_t count, bool csv)
     high_resolution_timer walltime;
     for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async<null_action>(here));
-    wait_all(futures);
+    hpx::wait_all(futures);
 
     // stop the clock
     const double duration = walltime.elapsed();
@@ -181,7 +180,7 @@ void measure_function_futures_wait_each(
     high_resolution_timer walltime;
     for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async(exec, &null_function));
-    wait_each(scratcher(), futures);
+    hpx::wait_each(scratcher(), futures);
 
     // stop the clock
     const double duration = walltime.elapsed();
@@ -199,7 +198,7 @@ void measure_function_futures_wait_all(
     high_resolution_timer walltime;
     for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async(exec, &null_function));
-    wait_all(futures);
+    hpx::wait_all(futures);
 
     const double duration = walltime.elapsed();
     print_stats("async", "WaitAll", exec_name(exec), count, duration, csv);
@@ -219,15 +218,16 @@ void measure_function_futures_limiting_executor(
     {
         sched->add_remove_scheduler_mode(
             // add these flags
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::enable_stealing |
-                hpx::threads::policies::assign_work_round_robin |
-                hpx::threads::policies::steal_after_local),
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::
+                    assign_work_round_robin |
+                hpx::threads::policies::scheduler_mode::steal_after_local,
             // remove these flags
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::enable_stealing_numa |
-                hpx::threads::policies::assign_work_thread_parent |
-                hpx::threads::policies::steal_high_priority_first));
+            hpx::threads::policies::scheduler_mode::enable_stealing_numa |
+                hpx::threads::policies::scheduler_mode::
+                    assign_work_thread_parent |
+                hpx::threads::policies::scheduler_mode::
+                    steal_high_priority_first);
     }
 
     // test a parallel algorithm on custom pool with high priority
@@ -239,7 +239,7 @@ void measure_function_futures_limiting_executor(
     {
         hpx::execution::experimental::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
-        hpx::for_loop(
+        hpx::experimental::for_loop(
             hpx::execution::par.with(fixed), 0, count, [&](std::uint64_t) {
                 hpx::apply(signal_exec, [&]() {
                     null_function();
@@ -306,7 +306,7 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv,
 {
     // start the clock
     high_resolution_timer walltime;
-    hpx::for_loop(
+    hpx::experimental::for_loop(
         hpx::execution::par.on(exec).with(
             hpx::execution::static_chunk_size(1), unlimited_number_of_chunks()),
         0, count, [](std::uint64_t) { null_function(); });
@@ -319,7 +319,7 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv,
 
 void measure_function_futures_register_work(std::uint64_t count, bool csv)
 {
-    hpx::lcos::local::latch l(count);
+    hpx::latch l(count);
 
     // start the clock
     high_resolution_timer walltime;
@@ -342,7 +342,7 @@ void measure_function_futures_register_work(std::uint64_t count, bool csv)
 
 void measure_function_futures_create_thread(std::uint64_t count, bool csv)
 {
-    hpx::lcos::local::latch l(count);
+    hpx::latch l(count);
 
     auto const sched = hpx::threads::get_self_id_data()->get_scheduler_base();
     auto func = [&l]() {
@@ -377,7 +377,7 @@ void measure_function_futures_create_thread(std::uint64_t count, bool csv)
 void measure_function_futures_create_thread_hierarchical_placement(
     std::uint64_t count, bool csv)
 {
-    hpx::lcos::local::latch l(count);
+    hpx::latch l(count);
 
     auto sched = hpx::threads::get_self_id_data()->get_scheduler_base();
 
@@ -385,14 +385,14 @@ void measure_function_futures_create_thread_hierarchical_placement(
         sched->get_description())
     {
         sched->add_remove_scheduler_mode(
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::assign_work_thread_parent),
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::enable_stealing |
-                hpx::threads::policies::enable_stealing_numa |
-                hpx::threads::policies::assign_work_round_robin |
-                hpx::threads::policies::steal_after_local |
-                hpx::threads::policies::steal_high_priority_first));
+            hpx::threads::policies::scheduler_mode::assign_work_thread_parent,
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::enable_stealing_numa |
+                hpx::threads::policies::scheduler_mode::
+                    assign_work_round_robin |
+                hpx::threads::policies::scheduler_mode::steal_after_local |
+                hpx::threads::policies::scheduler_mode::
+                    steal_high_priority_first);
     }
     auto const func = [&l]() {
         null_function();
@@ -447,7 +447,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
 void measure_function_futures_apply_hierarchical_placement(
     std::uint64_t count, bool csv)
 {
-    hpx::lcos::local::latch l(count);
+    hpx::latch l(count);
 
     auto const func = [&l]() {
         null_function();

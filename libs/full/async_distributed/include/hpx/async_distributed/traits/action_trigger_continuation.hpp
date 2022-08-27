@@ -26,7 +26,7 @@ namespace hpx { namespace traits {
             Ts&&... ts) noexcept
         {
             actions::trigger(
-                std::move(cont), std::forward<F>(f), std::forward<Ts>(ts)...);
+                HPX_MOVE(cont), HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     };
 }}    // namespace hpx::traits

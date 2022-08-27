@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,7 +30,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
-HPX_REGISTER_PARTITIONED_VECTOR(int);
+HPX_REGISTER_PARTITIONED_VECTOR(int)
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -136,7 +136,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     {
         // create vector on one locality, connect to it from all others
         hpx::partitioned_vector<int> v;
-        hpx::lcos::latch l;
+        hpx::distributed::latch l;
 
         if (0 == hpx::get_locality_id())
         {
@@ -146,7 +146,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 size, hpx::container_layout(localities));
             v.register_as(example_vector_name);
 
-            l = hpx::lcos::latch(localities.size());
+            l = hpx::distributed::latch(localities.size());
             l.register_as(example_latch_name);
         }
         else
@@ -174,7 +174,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
             view[i] *= 2;
 
         // Wait for all localities to reach this point.
-        l.count_down_and_wait();
+        l.arrive_and_wait();
     }
 
     return hpx::finalize();

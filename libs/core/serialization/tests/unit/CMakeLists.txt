@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    not_bitwise_serializable
     serialization_array
     serialization_brace_initializable
     serialization_valarray
@@ -26,13 +27,12 @@ set(tests
     serialization_std_variant
 )
 
+set(full_tests any_serialization serializable_any serialization_raw_pointer)
+
 if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
   set(tests ${tests} serialization_boost_variant)
+  set(full_tests ${full_tests} serializable_boost_any)
 endif()
-
-set(full_tests any_serialization not_bitwise_serializable serializable_any
-               serializable_boost_any serialization_raw_pointer
-)
 
 add_subdirectory(polymorphic)
 

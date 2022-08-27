@@ -7,36 +7,36 @@
 #include <hpx/config.hpp>
 
 #include <hpx/modules/format.hpp>
-#include <hpx/thread_support/thread_specific_ptr.hpp>
 #include <hpx/modules/timing.hpp>
+#include <hpx/thread_support/thread_specific_ptr.hpp>
 
-#include <boost/config.hpp>
 #include <hpx/modules/program_options.hpp>
+#include <boost/config.hpp>
 
-#include <thread>
 #include <cstdint>
 #include <iostream>
+#include <thread>
 #include <vector>
 
-using hpx::program_options::variables_map;
-using hpx::program_options::options_description;
-using hpx::program_options::value;
-using hpx::program_options::store;
 using hpx::program_options::command_line_parser;
 using hpx::program_options::notify;
+using hpx::program_options::options_description;
+using hpx::program_options::store;
+using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using hpx::chrono::high_resolution_timer;
 using hpx::util::thread_specific_ptr;
 
 ///////////////////////////////////////////////////////////////////////////////
 // thread local globals
-struct tag { };
+struct tag
+{
+};
 static thread_specific_ptr<double, tag> global_scratch;
 
 ///////////////////////////////////////////////////////////////////////////////
-inline void worker(
-    std::uint64_t updates
-    )
+inline void worker(std::uint64_t updates)
 {
     global_scratch.reset(new double);
 
@@ -47,10 +47,7 @@ inline void worker(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(
-    int argc
-  , char** argv
-    )
+int main(int argc, char** argv)
 {
     ///////////////////////////////////////////////////////////////////////////
     // parse command line
@@ -60,21 +57,18 @@ int main(
 
     std::uint64_t threads, updates;
 
-    cmdline.add_options()
-        ( "help,h"
-        , "print out program usage (this message)")
+    cmdline.add_options()("help,h", "print out program usage (this message)")
 
-        ( "threads,t"
-        , value<std::uint64_t>(&threads)->default_value(1),
-         "number of OS-threads")
+        ("threads,t", value<std::uint64_t>(&threads)->default_value(1),
+            "number of OS-threads")
 
-        ( "updates,u"
-        , value<std::uint64_t>(&updates)->default_value(1 << 22)
-        , "updates made to the TLS variable per OS-thread")
+            ("updates,u",
+                value<std::uint64_t>(&updates)->default_value(1 << 22),
+                "updates made to the TLS variable per OS-thread")
 
-        ( "csv"
-        , "output results as csv (format: updates,OS-threads,duration)")
-        ;
+                ("csv",
+                    "output results as csv (format: "
+                    "updates,OS-threads,duration)");
     ;
 
     store(command_line_parser(argc, argv).options(cmdline).run(), vm);
@@ -109,17 +103,11 @@ int main(
     ///////////////////////////////////////////////////////////////////////////
     // output results
     if (vm.count("csv"))
-        hpx::util::format_to(std::cout,
-            "{1},{2},{3}\n",
-            updates,
-            threads,
-            duration);
+        hpx::util::format_to(
+            std::cout, "{1},{2},{3}\n", updates, threads, duration);
     else
         hpx::util::format_to(std::cout,
             "ran {1} updates per OS-thread on {2} "
             "OS-threads in {3} seconds\n",
-            updates,
-            threads,
-            duration);
+            updates, threads, duration);
 }
-

@@ -385,7 +385,7 @@ namespace hpx { namespace ranges {
 #include <vector>
 
 namespace hpx { namespace ranges {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct lexicographical_compare_t final
+    inline constexpr struct lexicographical_compare_t final
       : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
     {
     private:
@@ -408,10 +408,10 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(
-            hpx::ranges::lexicographical_compare_t, InIter1 first1, Sent1 last1,
-            InIter2 first2, Sent2 last2, Pred&& pred = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+        friend bool tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
+            InIter1 first1, Sent1 last1, InIter2 first2, Sent2 last2,
+            Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
+            Proj2&& proj2 = Proj2())
         {
             static_assert(hpx::traits::is_input_iterator<InIter1>::value,
                 "Requires at least input iterator.");
@@ -420,8 +420,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::lexicographical_compare().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                std::forward<Pred>(pred), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -447,7 +447,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(hpx::ranges::lexicographical_compare_t,
+        tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
             ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
             Sent2 last2, Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -458,9 +458,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::lexicographical_compare().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                std::forward<Pred>(pred), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -480,10 +480,9 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(
-            hpx::ranges::lexicographical_compare_t, Rng1&& rng1, Rng2&& rng2,
-            Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+        friend bool tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
+            Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             using iterator_type1 =
                 typename hpx::traits::range_traits<Rng1>::iterator_type;
@@ -498,8 +497,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::lexicographical_compare().call(
                 hpx::execution::seq, std::begin(rng1), std::end(rng1),
-                std::begin(rng2), std::end(rng2), std::forward<Pred>(pred),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                std::begin(rng2), std::end(rng2), HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -522,7 +521,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(hpx::ranges::lexicographical_compare_t,
+        tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
             ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -540,10 +539,9 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::lexicographical_compare().call(
-                std::forward<ExPolicy>(policy), std::begin(rng1),
-                std::end(rng1), std::begin(rng2), std::end(rng2),
-                std::forward<Pred>(pred), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), std::begin(rng1), std::end(rng1),
+                std::begin(rng2), std::end(rng2), HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
     } lexicographical_compare{};
 }}    // namespace hpx::ranges

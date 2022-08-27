@@ -192,7 +192,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
@@ -200,6 +200,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
@@ -289,7 +290,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return util::partitioner_with_cleanup<ExPolicy,
                 util::in_out_result<Iter, FwdIter2>, partition_result_type>::
                 call(
-                    std::forward<ExPolicy>(policy),
+                    HPX_FORWARD(ExPolicy, policy),
                     hpx::util::make_zip_iterator(first, dest), count,
                     [tok](zip_iterator t, std::size_t part_size) mutable
                     -> partition_result_type {
@@ -302,13 +303,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                     get<0>(iters), part_size, dest, tok)));
                     },
                     // finalize, called once if no error occurred
-                    [dest, first, count](
-                        std::vector<hpx::future<partition_result_type>>&&
-                            data) mutable
+                    [dest, first, count](auto&& data) mutable
                     -> util::in_out_result<Iter, FwdIter2> {
                         // make sure iterators embedded in function object that is
                         // attached to futures are invalidated
-                        data.clear();
+                        util::detail::clear_container(data);
 
                         std::advance(first, count);
                         std::advance(dest, count);
@@ -353,7 +352,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             parallel(ExPolicy&& policy, Iter first, Sent last, FwdIter2 dest)
             {
                 return parallel_sequential_uninitialized_copy_n(
-                    std::forward<ExPolicy>(policy), first,
+                    HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), dest);
             }
         };
@@ -382,7 +381,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         return parallel::util::get_second_element(
             detail::uninitialized_copy<
                 util::in_out_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first, last, dest));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -425,7 +424,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::size_t dist = dist1 <= dist2 ? dist1 : dist2;
 
                 return parallel_sequential_uninitialized_copy_n(
-                    std::forward<ExPolicy>(policy), first, dist, dest);
+                    HPX_FORWARD(ExPolicy, policy), first, dist, dest);
             }
         };
         /// \endcond
@@ -478,7 +477,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
             {
                 return parallel_sequential_uninitialized_copy_n(
-                    std::forward<ExPolicy>(policy), first, count, dest);
+                    HPX_FORWARD(ExPolicy, policy), first, count, dest);
             }
         };
         /// \endcond
@@ -504,7 +503,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         if (detail::is_negative(count))
         {
             return util::detail::algorithm_result<ExPolicy, FwdIter2>::get(
-                std::move(dest));
+                HPX_MOVE(dest));
         }
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
@@ -513,7 +512,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         return parallel::util::get_second_element(
             detail::uninitialized_copy_n<
                 util::in_out_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first, std::size_t(count),
+                .call(HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
                     dest));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -524,7 +523,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::uninitialized_copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_copy_t final
+    inline constexpr struct uninitialized_copy_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_t>
     {
         // clang-format off
@@ -534,7 +533,7 @@ namespace hpx {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             hpx::uninitialized_copy_t, InIter first, InIter last, FwdIter dest)
         {
             static_assert(hpx::traits::is_input_iterator<InIter>::value,
@@ -558,7 +557,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::uninitialized_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::uninitialized_copy_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
@@ -569,14 +568,14 @@ namespace hpx {
             return parallel::util::get_second_element(
                 hpx::parallel::v1::detail::uninitialized_copy<
                     parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(std::forward<ExPolicy>(policy), first, last, dest));
+                    .call(HPX_FORWARD(ExPolicy, policy), first, last, dest));
         }
 
     } uninitialized_copy{};
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::uninitialized_copy_n
-    HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_copy_n_t final
+    inline constexpr struct uninitialized_copy_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_n_t>
     {
         // clang-format off
@@ -587,7 +586,7 @@ namespace hpx {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             hpx::uninitialized_copy_n_t, InIter first, Size count, FwdIter dest)
         {
             static_assert(hpx::traits::is_input_iterator<InIter>::value,
@@ -618,7 +617,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::uninitialized_copy_n_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::uninitialized_copy_n_t, ExPolicy&& policy,
             FwdIter1 first, Size count, FwdIter2 dest)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
@@ -630,13 +629,13 @@ namespace hpx {
             if (hpx::parallel::v1::detail::is_negative(count))
             {
                 return parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter2>::get(std::move(dest));
+                    FwdIter2>::get(HPX_MOVE(dest));
             }
 
             return parallel::util::get_second_element(
                 hpx::parallel::v1::detail::uninitialized_copy_n<
                     parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(std::forward<ExPolicy>(policy), first,
+                    .call(HPX_FORWARD(ExPolicy, policy), first,
                         std::size_t(count), dest));
         }
 

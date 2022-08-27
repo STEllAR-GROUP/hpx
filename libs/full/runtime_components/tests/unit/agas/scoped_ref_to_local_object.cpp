@@ -28,8 +28,8 @@ using hpx::init;
 
 using std::chrono::milliseconds;
 
+using hpx::id_type;
 using hpx::naming::get_management_type_name;
-using hpx::naming::id_type;
 
 using hpx::agas::garbage_collect;
 
@@ -39,7 +39,6 @@ using hpx::test::simple_refcnt_monitor;
 using hpx::util::report_errors;
 
 using hpx::cout;
-using hpx::flush;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Client>
@@ -58,7 +57,7 @@ void hpx_test_main(variables_map& vm)
         cout << "id: " << monitor.get_id() << " "
              << get_management_type_name(monitor.get_id().get_management_type())
              << "\n"
-             << flush;
+             << std::flush;
 
         {
             // Detach the reference.
@@ -85,14 +84,14 @@ int hpx_main(variables_map& vm)
         cout << std::string(80, '#') << "\n"
              << "simple component test\n"
              << std::string(80, '#') << "\n"
-             << flush;
+             << std::flush;
 
         hpx_test_main<simple_refcnt_monitor>(vm);
 
         cout << std::string(80, '#') << "\n"
              << "managed component test\n"
              << std::string(80, '#') << "\n"
-             << flush;
+             << std::flush;
 
         hpx_test_main<managed_refcnt_monitor>(vm);
     }

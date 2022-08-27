@@ -8,7 +8,3 @@
 
 #include <hpx/collectives/barrier.hpp>
 #include <hpx/local/barrier.hpp>
-
-namespace hpx { namespace distributed {
-    using hpx::lcos::barrier;
-}}    // namespace hpx::distributed

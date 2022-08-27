@@ -12,8 +12,8 @@
 
 #include <cstddef>
 
-typedef hpx::naming::id_type locality_id_t;
-HPX_REGISTER_CHANNEL(locality_id_t);
+typedef hpx::id_type locality_id_t;
+HPX_REGISTER_CHANNEL(locality_id_t)
 
 std::atomic<std::size_t> count(0);
 

@@ -18,12 +18,13 @@
 #include <utility>
 
 namespace ex = hpx::execution::experimental;
+namespace tt = hpx::this_thread::experimental;
 
 // NOTE: This is not a conforming sync_wait implementation. It only exists to
-// check that the tag_dispatch overload is called.
-void tag_dispatch(ex::sync_wait_t, custom_sender2 s)
+// check that the tag_invoke overload is called.
+void tag_invoke(tt::sync_wait_t, custom_sender2 s)
 {
-    s.tag_dispatch_overload_called = true;
+    s.tag_invoke_overload_called = true;
 }
 
 int hpx_main()
@@ -32,28 +33,28 @@ int hpx_main()
     {
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
-        std::atomic<bool> tag_dispatch_overload_called{false};
-        ex::sync_wait(custom_sender{
-            start_called, connect_called, tag_dispatch_overload_called});
+        std::atomic<bool> tag_invoke_overload_called{false};
+        tt::sync_wait(custom_sender{
+            start_called, connect_called, tag_invoke_overload_called});
         HPX_TEST(start_called);
         HPX_TEST(connect_called);
-        HPX_TEST(!tag_dispatch_overload_called);
+        HPX_TEST(!tag_invoke_overload_called);
     }
 
     {
-        HPX_TEST_EQ(ex::sync_wait(ex::just(3)), 3);
+        HPX_TEST_EQ(tt::sync_wait(ex::just(3)), 3);
     }
 
     {
         HPX_TEST_EQ(
-            ex::sync_wait(ex::just(custom_type_non_default_constructible{42}))
+            tt::sync_wait(ex::just(custom_type_non_default_constructible{42}))
                 .x,
             42);
     }
 
     {
         HPX_TEST_EQ(
-            ex::sync_wait(
+            tt::sync_wait(
                 ex::just(
                     custom_type_non_default_constructible_non_copyable{42}))
                 .x,
@@ -64,29 +65,29 @@ int hpx_main()
     {
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
-        std::atomic<bool> tag_dispatch_overload_called{false};
+        std::atomic<bool> tag_invoke_overload_called{false};
         custom_sender{
-            start_called, connect_called, tag_dispatch_overload_called} |
-            ex::sync_wait();
+            start_called, connect_called, tag_invoke_overload_called} |
+            tt::sync_wait();
         HPX_TEST(start_called);
         HPX_TEST(connect_called);
-        HPX_TEST(!tag_dispatch_overload_called);
+        HPX_TEST(!tag_invoke_overload_called);
     }
 
     {
-        HPX_TEST_EQ(ex::just(3) | ex::sync_wait(), 3);
+        HPX_TEST_EQ(ex::just(3) | tt::sync_wait(), 3);
     }
 
-    // tag_dispatch overload
+    // tag_invoke overload
     {
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
-        std::atomic<bool> tag_dispatch_overload_called{false};
-        ex::sync_wait(custom_sender2{custom_sender{
-            start_called, connect_called, tag_dispatch_overload_called}});
+        std::atomic<bool> tag_invoke_overload_called{false};
+        tt::sync_wait(custom_sender2{custom_sender{
+            start_called, connect_called, tag_invoke_overload_called}});
         HPX_TEST(!start_called);
         HPX_TEST(!connect_called);
-        HPX_TEST(tag_dispatch_overload_called);
+        HPX_TEST(tag_invoke_overload_called);
     }
 
     // Failure path
@@ -94,7 +95,7 @@ int hpx_main()
         bool exception_thrown = false;
         try
         {
-            ex::sync_wait(error_sender{});
+            tt::sync_wait(error_sender{});
             HPX_TEST(false);
         }
         catch (std::runtime_error const& e)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -22,7 +22,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace naming {
+namespace hpx::naming {
 
     ///////////////////////////////////////////////////////////////////////////
     bool operator==(gid_type const& lhs, gid_type const& rhs) noexcept
@@ -141,4 +141,4 @@ namespace hpx { namespace naming {
         // strip lock-bit upon receive
         gid.id_msb_ &= ~gid_type::is_locked_mask;
     }
-}}    // namespace hpx::naming
+}    // namespace hpx::naming

@@ -27,16 +27,13 @@ namespace test {
             BaseIterator, void, IteratorTag>
     {
     private:
-        typedef hpx::util::iterator_adaptor<
+        using base_type = hpx::util::iterator_adaptor<
             test_iterator<BaseIterator, IteratorTag>, BaseIterator, void,
-            IteratorTag>
-            base_type;
+            IteratorTag>;
 
     public:
-        test_iterator()
-          : base_type()
-        {
-        }
+        test_iterator() = default;
+
         explicit test_iterator(BaseIterator base)
           : base_type(base)
         {
@@ -51,13 +48,12 @@ namespace test {
             IteratorTag>
     {
     private:
-        typedef hpx::util::iterator_adaptor<
+        using base_type = hpx::util::iterator_adaptor<
             decorated_iterator<BaseIterator, IteratorTag>, BaseIterator, void,
-            IteratorTag>
-            base_type;
+            IteratorTag>;
 
     public:
-        HPX_HOST_DEVICE decorated_iterator() {}
+        HPX_HOST_DEVICE decorated_iterator() = default;
 
         HPX_HOST_DEVICE decorated_iterator(BaseIterator base)
           : base_type(base)
@@ -220,8 +216,7 @@ namespace test {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void make_ready(
-        std::vector<hpx::lcos::local::promise<std::size_t>>& p,
+    inline void make_ready(std::vector<hpx::promise<std::size_t>>& p,
         std::vector<std::size_t>& idx)
     {
         std::for_each(std::begin(idx), std::end(idx),
@@ -229,13 +224,11 @@ namespace test {
     }
 
     inline std::vector<hpx::future<std::size_t>> fill_with_futures(
-        std::vector<hpx::lcos::local::promise<std::size_t>>& p)
+        std::vector<hpx::promise<std::size_t>>& p)
     {
         std::vector<hpx::future<std::size_t>> f;
         std::transform(std::begin(p), std::end(p), std::back_inserter(f),
-            [](hpx::lcos::local::promise<std::size_t>& pr) {
-                return pr.get_future();
-            });
+            [](hpx::promise<std::size_t>& pr) { return pr.get_future(); });
 
         return f;
     }
@@ -254,6 +247,29 @@ namespace test {
         for (std::size_t i = 0; i < num_filled; /**/)
         {
             std::size_t pos = std::rand() % c.size();    //-V104
+            if (c[pos])
+                continue;
+
+            c[pos] = 1;
+            ++i;
+        }
+        return c;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    inline std::vector<T> fill_all_any_none(T size, T num_filled)
+    {
+        if (num_filled == 0)
+            return std::vector<T>(size, 0);
+
+        if (num_filled == size)
+            return std::vector<T>(size, 1);
+
+        std::vector<T> c(size, 0);
+        for (T i = 0; i < num_filled; /**/)
+        {
+            T pos = std::rand() % c.size();    //-V104
             if (c[pos])
                 continue;
 

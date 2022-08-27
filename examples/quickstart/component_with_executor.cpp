@@ -7,43 +7,43 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/parallel_executors.hpp>
+#include <hpx/iostream.hpp>
 
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define a base component which exposes the required interface
 struct hello_world_server
-  : hpx::components::executor_component<
-        hpx::execution::parallel_executor,
-        hpx::components::component_base<hello_world_server> >
+  : hpx::components::executor_component<hpx::execution::parallel_executor,
+        hpx::components::component_base<hello_world_server>>
 {
     typedef hpx::execution::parallel_executor executor_type;
-    typedef hpx::components::executor_component<
-            executor_type, hpx::components::component_base<hello_world_server>
-        > base_type;
+    typedef hpx::components::executor_component<executor_type,
+        hpx::components::component_base<hello_world_server>>
+        base_type;
 
     hello_world_server()
       : base_type(executor_type{})
-    {}
+    {
+    }
 
     void print() const
     {
-        hpx::cout << "hello world\n" << hpx::flush;
+        hpx::cout << "hello world\n" << std::flush;
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(hello_world_server, print, print_action);
+    HPX_DEFINE_COMPONENT_ACTION(hello_world_server, print, print_action)
 };
 
 typedef hpx::components::component<hello_world_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, hello_world_server);
+HPX_REGISTER_COMPONENT(server_type, hello_world_server)
 
 typedef hello_world_server::print_action print_action;
-HPX_REGISTER_ACTION_DECLARATION(print_action);
-HPX_REGISTER_ACTION(print_action);
+HPX_REGISTER_ACTION_DECLARATION(print_action)
+HPX_REGISTER_ACTION(print_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct hello_world

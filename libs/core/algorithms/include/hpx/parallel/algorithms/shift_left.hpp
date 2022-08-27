@@ -107,16 +107,14 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/reverse.hpp>
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/transfer.hpp>
@@ -169,12 +167,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             if constexpr (hpx::traits::is_random_access_iterator_v<FwdIter>)
             {
                 return parallel::util::get_second_element(
-                    util::move_n(mid, dist - n, std::move(first)));
+                    util::move_n(mid, dist - n, HPX_MOVE(first)));
             }
             else
             {
-                return parallel::util::get_second_element(util::move(
-                    std::move(mid), std::move(last), std::move(first)));
+                return parallel::util::get_second_element(
+                    util::move(HPX_MOVE(mid), HPX_MOVE(last), HPX_MOVE(first)));
             }
         }
 
@@ -212,7 +210,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (n <= 0 || static_cast<std::size_t>(n) >= dist)
                 {
                     return parallel::util::detail::algorithm_result<ExPolicy,
-                        FwdIter2>::get(std::move(first));
+                        FwdIter2>::get(HPX_MOVE(first));
                 }
 
                 return util::detail::algorithm_result<ExPolicy, FwdIter2>::get(
@@ -228,8 +226,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::shift_left
-    HPX_INLINE_CONSTEXPR_VARIABLE struct shift_left_t final
-      : hpx::functional::tag_fallback<shift_left_t>
+    inline constexpr struct shift_left_t final
+      : hpx::functional::detail::tag_fallback<shift_left_t>
     {
     private:
         // clang-format off
@@ -237,7 +235,7 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value)>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             shift_left_t, FwdIter first, FwdIter last, Size n)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -255,14 +253,14 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(shift_left_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(shift_left_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Size n)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, last, n);
+                HPX_FORWARD(ExPolicy, policy), first, last, n);
         }
     } shift_left{};
 }    // namespace hpx

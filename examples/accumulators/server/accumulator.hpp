@@ -16,8 +16,7 @@
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace examples { namespace server
-{
+namespace examples { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     /// This class is a very simple example of an HPX component. An HPX
     /// component is a class that:
@@ -46,14 +45,17 @@ namespace examples { namespace server
     //[accumulator_server_inherit
     class accumulator
       : public hpx::components::locking_hook<
-            hpx::components::component_base<accumulator> >
+            hpx::components::component_base<accumulator>>
     //]
     {
     public:
         typedef std::int64_t argument_type;
 
         //[accumulator_server_ctor
-        accumulator() : value_(0) {}
+        accumulator()
+          : value_(0)
+        {
+        }
         //]
 
         ///////////////////////////////////////////////////////////////////////
@@ -87,9 +89,9 @@ namespace examples { namespace server
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
         //[accumulator_action_types
-        HPX_DEFINE_COMPONENT_ACTION(accumulator, reset);
-        HPX_DEFINE_COMPONENT_ACTION(accumulator, add);
-        HPX_DEFINE_COMPONENT_ACTION(accumulator, query);
+        HPX_DEFINE_COMPONENT_ACTION(accumulator, reset)
+        HPX_DEFINE_COMPONENT_ACTION(accumulator, add)
+        HPX_DEFINE_COMPONENT_ACTION(accumulator, query)
         //]
 
     private:
@@ -97,21 +99,17 @@ namespace examples { namespace server
         argument_type value_;
         //]
     };
-}}
+}}    // namespace examples::server
 
 //[accumulator_registration_declarations
 HPX_REGISTER_ACTION_DECLARATION(
-    examples::server::accumulator::reset_action,
-    accumulator_reset_action);
+    examples::server::accumulator::reset_action, accumulator_reset_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    examples::server::accumulator::add_action,
-    accumulator_add_action);
+    examples::server::accumulator::add_action, accumulator_add_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
-    examples::server::accumulator::query_action,
-    accumulator_query_action);
+    examples::server::accumulator::query_action, accumulator_query_action)
 //]
-
 
 #endif

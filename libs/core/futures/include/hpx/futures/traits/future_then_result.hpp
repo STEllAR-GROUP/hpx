@@ -33,7 +33,7 @@ namespace hpx { namespace traits {
         {
             static auto error(Future future, F& f)
             {
-                f(std::move(future));
+                f(HPX_MOVE(future));
             }
 
             using type =
@@ -60,7 +60,7 @@ namespace hpx { namespace traits {
                 hpx::traits::future_traits<cont_result>,
                 hpx::util::identity<cont_result>>;
 
-            using type = hpx::lcos::future<result_type>;
+            using type = hpx::future<result_type>;
         };
 
     }    // namespace detail

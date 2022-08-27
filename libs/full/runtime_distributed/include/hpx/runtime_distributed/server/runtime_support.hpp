@@ -21,9 +21,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/plugin.hpp>
 #include <hpx/modules/program_options.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/plugins/plugin_factory_base.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/plugin_factories/plugin_factory_base.hpp>
 #include <hpx/runtime_components/components_fwd.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
@@ -110,7 +110,7 @@ namespace hpx { namespace components { namespace server {
 
         // This component type requires valid locality id for its actions to
         // be invoked
-        static bool is_target_valid(naming::id_type const& id)
+        static bool is_target_valid(hpx::id_type const& id)
         {
             return naming::is_locality(id);
         }
@@ -138,24 +138,24 @@ namespace hpx { namespace components { namespace server {
 
         template <typename Component>
         naming::gid_type migrate_component_to_here(
-            std::shared_ptr<Component> const& p, naming::id_type);
+            std::shared_ptr<Component> const& p, hpx::id_type);
 
         /// \brief Gracefully shutdown this runtime system instance
-        void shutdown(double timeout, naming::id_type const& respond_to);
+        void shutdown(double timeout, hpx::id_type const& respond_to);
 
         /// \brief Gracefully shutdown runtime system instances on all localities
         void shutdown_all(double timeout);
 
         /// \brief Shutdown this runtime system instance
-        HPX_NORETURN void terminate(naming::id_type const& respond_to);
+        [[noreturn]] void terminate(hpx::id_type const& respond_to);
 
-        void terminate_act(naming::id_type const& id)
+        void terminate_act(hpx::id_type const& id)
         {
             terminate(id);
         }
 
         /// \brief Shutdown runtime system instances on all localities
-        HPX_NORETURN void terminate_all();
+        [[noreturn]] void terminate_all();
 
         void terminate_all_act()
         {
@@ -192,30 +192,29 @@ namespace hpx { namespace components { namespace server {
         // Each of the exposed functions needs to be encapsulated into a action
         // type, allowing to generate all require boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, load_components);
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_startup_functions);
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_shutdown_functions);
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown);
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown_all);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, load_components)
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_startup_functions)
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, call_shutdown_functions)
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown)
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, shutdown_all)
         HPX_DEFINE_COMPONENT_ACTION(
-            runtime_support, terminate_act, terminate_action);
+            runtime_support, terminate_act, terminate_action)
         HPX_DEFINE_COMPONENT_ACTION(
-            runtime_support, terminate_all_act, terminate_all_action);
+            runtime_support, terminate_all_act, terminate_all_action)
 
         // even if this is not a short/minimal action, we still execute it
         // directly to avoid a deadlock condition inside the thread manager
         // waiting for this thread to finish, which waits for the thread
         // manager to exit
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(runtime_support, get_config);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(runtime_support, get_config)
 
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, garbage_collect);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, garbage_collect)
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, create_performance_counter)
         HPX_DEFINE_COMPONENT_ACTION(
-            runtime_support, create_performance_counter);
-        HPX_DEFINE_COMPONENT_ACTION(
-            runtime_support, remove_from_connection_cache);
+            runtime_support, remove_from_connection_cache)
 
 #if defined(HPX_HAVE_NETWORKING)
-        HPX_DEFINE_COMPONENT_ACTION(runtime_support, dijkstra_termination);
+        HPX_DEFINE_COMPONENT_ACTION(runtime_support, dijkstra_termination)
 #endif
 
         ///////////////////////////////////////////////////////////////////////
@@ -235,7 +234,7 @@ namespace hpx { namespace components { namespace server {
         ///        be properly stopped.
         ///
         /// \note      This function can be called from any thread.
-        void stop(double timeout, naming::id_type const& respond_to,
+        void stop(double timeout, hpx::id_type const& respond_to,
             bool remove_from_remote_caches);
 
         /// called locally only
@@ -330,7 +329,7 @@ namespace hpx { namespace components { namespace server {
 
         // the name says it all
         std::size_t dijkstra_termination_detection(
-            std::vector<naming::id_type> const& locality_ids);
+            std::vector<hpx::id_type> const& locality_ids);
 
 #if defined(HPX_HAVE_NETWORKING)
         void send_dijkstra_termination_token(std::uint32_t target_locality_id,
@@ -410,7 +409,7 @@ namespace hpx { namespace components { namespace server {
         // should be moved to allow for move-only constructor argument
         // types.
         naming::gid_type id =
-            create<wrapping_type>(std::move(v), std::move(vs)...);
+            create<wrapping_type>(HPX_MOVE(v), HPX_MOVE(vs)...);
 
         LRT_(info).format("successfully created component {} of type: {}", id,
             components::get_component_type_name(type));
@@ -475,7 +474,7 @@ namespace hpx { namespace components { namespace server {
 
         if (!local_op)
         {
-            id = create<wrapping_type>(std::move(*p));
+            id = create<wrapping_type>(HPX_MOVE(*p));
         }
         else
         {
@@ -491,7 +490,7 @@ namespace hpx { namespace components { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     naming::gid_type runtime_support::migrate_component_to_here(
-        std::shared_ptr<Component> const& p, naming::id_type to_migrate)
+        std::shared_ptr<Component> const& p, hpx::id_type to_migrate)
     {
         components::component_type const type =
             components::get_component_type<typename Component::wrapped_type>();
@@ -503,8 +502,8 @@ namespace hpx { namespace components { namespace server {
         typedef typename Component::wrapping_type wrapping_type;
         typename wrapping_type::derived_type* new_instance = nullptr;
 
-        naming::gid_type id = create_migrated<wrapping_type>(migrated_id,
-            reinterpret_cast<void**>(&new_instance), std::move(*p));
+        naming::gid_type id = create_migrated<wrapping_type>(
+            migrated_id, reinterpret_cast<void**>(&new_instance), HPX_MOVE(*p));
 
         // sanity checks
         if (!id || new_instance == nullptr)
@@ -686,7 +685,7 @@ namespace hpx { namespace components { namespace server {
     struct migrate_component_here_action
       : ::hpx::actions::action<naming::gid_type (runtime_support::*)(
                                    std::shared_ptr<Component> const&,
-                                   naming::id_type),
+                                   hpx::id_type),
             &runtime_support::migrate_component_to_here<Component>,
             migrate_component_here_action<Component>>
     {

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011-2013 Thomas Heller
-//  Copyright (c) 2011-2021 Hartmut Kaiser
+//  Copyright (c) 2011-2022 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //  Copyright (c)      2019 Mikael Simberg
 //
@@ -23,7 +23,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     template <typename... Ts>
     struct is_bitwise_serializable<::hpx::tuple<Ts...>>
@@ -38,9 +38,9 @@ namespace hpx { namespace traits {
             !is_bitwise_serializable_v<::hpx::tuple<Ts...>>>
     {
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
 
     template <typename Archive, typename Is, typename... Ts>
     struct serialize_with_index_pack;
@@ -76,16 +76,16 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         static void load_element(Archive& ar, T& t)
         {
-            using is_polymorphic = std::integral_constant<bool,
+            constexpr bool is_polymorphic =
                 hpx::traits::is_intrusive_polymorphic_v<T> ||
-                    hpx::traits::is_nonintrusive_polymorphic_v<T>>;
+                hpx::traits::is_nonintrusive_polymorphic_v<T>;
 
-            if constexpr (is_polymorphic::value)
+            if constexpr (is_polymorphic)
             {
                 std::unique_ptr<T> data(
                     serialization::detail::constructor_selector_ptr<T>::create(
                         ar));
-                t = std::move(*data);
+                t = HPX_MOVE(*data);
             }
             else
             {
@@ -104,7 +104,6 @@ namespace hpx { namespace util { namespace detail {
                      ar, const_cast<std::remove_const_t<Ts>&>(hpx::get<Is>(t))),
                     0)...};
 #endif
-
             (void) _sequencer;
         }
     };
@@ -116,7 +115,7 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         static void save_element(Archive& ar, T& t)
         {
-            if constexpr (!std::is_default_constructible<T>::value)
+            if constexpr (!std::is_default_constructible_v<T>)
             {
                 using serialization::detail::save_construct_data;
                 save_construct_data(ar, &t, 0);
@@ -131,9 +130,9 @@ namespace hpx { namespace util { namespace detail {
             (void) _sequencer;
         }
     };
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename Archive, typename... Ts>
     void serialize(Archive& ar, hpx::tuple<Ts...>& t, unsigned int version)
@@ -165,4 +164,4 @@ namespace hpx { namespace serialization {
         hpx::util::detail::save_construct_data_with_index_pack<Archive, Is,
             Ts...>::call(ar, *t, version);
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

@@ -214,4 +214,4 @@ namespace hpx { namespace performance_counters { namespace io
 
 // register component's startup function
 HPX_REGISTER_STARTUP_MODULE_DYNAMIC(
-    hpx::performance_counters::io::get_startup);
+    hpx::performance_counters::io::get_startup)

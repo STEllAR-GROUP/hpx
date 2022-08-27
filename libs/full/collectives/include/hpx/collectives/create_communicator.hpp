@@ -74,16 +74,16 @@ namespace hpx { namespace collectives {
         // construction
         communicator() = default;
 
-        explicit communicator(naming::id_type&& id)
-          : base_type(std::move(id))
+        explicit communicator(hpx::id_type&& id)
+          : base_type(HPX_MOVE(id))
         {
         }
         explicit communicator(future<hpx::id_type>&& id) noexcept
-          : base_type(std::move(id))
+          : base_type(HPX_MOVE(id))
         {
         }
         communicator(future<communicator>&& c)
-          : base_type(std::move(c))
+          : base_type(HPX_MOVE(c))
         {
         }
 

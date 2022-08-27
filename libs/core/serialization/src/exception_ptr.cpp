@@ -252,7 +252,7 @@ namespace hpx { namespace serialization {
 
             // boost::system::system_error
             case hpx::util::boost_system_error:
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
 
             // std::system_error
             case hpx::util::std_system_error:
@@ -265,8 +265,8 @@ namespace hpx { namespace serialization {
             // hpx::exception
             case hpx::util::hpx_exception:
                 e = hpx::detail::get_exception(
-                    hpx::exception(
-                        static_cast<hpx::error>(err_value), what, hpx::rethrow),
+                    hpx::exception(static_cast<hpx::error>(err_value), what,
+                        hpx::throwmode::rethrow),
                     throw_function_, throw_file_, throw_line_);
                 break;
 

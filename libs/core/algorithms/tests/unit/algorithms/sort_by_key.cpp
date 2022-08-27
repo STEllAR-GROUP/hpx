@@ -68,7 +68,7 @@ namespace debug {
 #else
 #define debug_msg(a)
 #endif
-};    // namespace debug
+}    // namespace debug
 
 #undef msg
 #define msg(a, b, c, d)                                                        \

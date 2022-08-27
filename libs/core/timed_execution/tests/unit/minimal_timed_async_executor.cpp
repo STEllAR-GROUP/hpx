@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,8 +32,7 @@ hpx::thread::id sync_test(int passed_through)
     return hpx::this_thread::get_id();
 }
 
-void apply_test(
-    hpx::lcos::local::latch& l, hpx::thread::id& id, int passed_through)
+void apply_test(hpx::latch& l, hpx::thread::id& id, int passed_through)
 {
     HPX_TEST_EQ(passed_through, 42);
     id = hpx::this_thread::get_id();
@@ -45,7 +44,7 @@ template <typename Executor>
 void test_timed_apply(Executor& exec)
 {
     {
-        hpx::lcos::local::latch l(2);
+        hpx::latch l(2);
         hpx::thread::id id;
 
         hpx::parallel::execution::timed_executor<Executor> timed_exec(
@@ -54,13 +53,13 @@ void test_timed_apply(Executor& exec)
         hpx::parallel::execution::post(
             timed_exec, &apply_test, std::ref(l), std::ref(id), 42);
 
-        l.count_down_and_wait();
+        l.arrive_and_wait();
 
         HPX_TEST_NEQ(id, hpx::this_thread::get_id());
     }
 
     {
-        hpx::lcos::local::latch l(2);
+        hpx::latch l(2);
         hpx::thread::id id;
 
         hpx::parallel::execution::timed_executor<Executor> timed_exec(
@@ -69,7 +68,7 @@ void test_timed_apply(Executor& exec)
         hpx::parallel::execution::post(
             timed_exec, &apply_test, std::ref(l), std::ref(id), 42);
 
-        l.count_down_and_wait();
+        l.arrive_and_wait();
 
         HPX_TEST_NEQ(id, hpx::this_thread::get_id());
     }

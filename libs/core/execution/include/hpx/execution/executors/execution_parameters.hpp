@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Marcin Copik
-//  Copyright (c) 2016-2021 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +14,8 @@
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/serialization/base_object.hpp>
@@ -39,13 +40,13 @@ namespace hpx { namespace parallel { namespace execution {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Property, template <typename> class CheckForProperty>
-        struct with_property_t final
-          : hpx::functional::tag_fallback<
-                with_property_t<Property, CheckForProperty>>
+        struct get_parameters_property_t final
+          : hpx::functional::detail::tag_fallback<
+                get_parameters_property_t<Property, CheckForProperty>>
         {
         private:
             using derived_propery_t =
-                with_property_t<Property, CheckForProperty>;
+                get_parameters_property_t<Property, CheckForProperty>;
 
             template <typename T>
             using check_for_property = CheckForProperty<std::decay_t<T>>;
@@ -53,11 +54,11 @@ namespace hpx { namespace parallel { namespace execution {
             // clang-format off
             template <typename Executor, typename Parameters,
                 HPX_CONCEPT_REQUIRES_(
-                    !hpx::traits::is_executor_parameters<Parameters>::value ||
+                    !hpx::traits::is_executor_parameters_v<Parameters> ||
                     !check_for_property<Parameters>::value
                 )>
             // clang-format on
-            friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+            friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
                 derived_propery_t, Executor&& /*exec*/, Parameters&& /*params*/,
                 Property prop)
             {
@@ -65,45 +66,44 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             ///////////////////////////////////////////////////////////////////
-            // Executor directly supports get_chunk_size
+            // Executor directly supports property
             // clang-format off
             template <typename Executor, typename Parameters,
                 HPX_CONCEPT_REQUIRES_(
-                    hpx::traits::is_executor_parameters<Parameters>::value &&
+                    hpx::traits::is_executor_parameters_v<Parameters> &&
                     check_for_property<Parameters>::value
                 )>
             // clang-format on
-            friend HPX_FORCEINLINE decltype(auto) tag_fallback_dispatch(
+            friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
                 derived_propery_t, Executor&& exec, Parameters&& params,
                 Property /*prop*/)
             {
                 return std::pair<Parameters&&, Executor&&>(
-                    std::forward<Parameters>(params),
-                    std::forward<Executor>(exec));
+                    HPX_FORWARD(Parameters, params),
+                    HPX_FORWARD(Executor, exec));
             }
 
             ///////////////////////////////////////////////////////////////////
-            // Executor directly supports get_chunk_size
+            // Executor directly supports property
             // clang-format off
             template <typename Executor, typename Parameters,
                 HPX_CONCEPT_REQUIRES_(
-                    hpx::traits::is_executor_any<Executor>::value &&
+                    hpx::traits::is_executor_any_v<Executor> &&
                     check_for_property<Executor>::value
                 )>
             // clang-format on
-            friend HPX_FORCEINLINE decltype(auto) tag_dispatch(
-                derived_propery_t, Executor&& exec, Parameters&& params,
-                Property /*prop*/)
+            friend HPX_FORCEINLINE decltype(auto) tag_invoke(derived_propery_t,
+                Executor&& exec, Parameters&& params, Property /*prop*/)
             {
                 return std::pair<Executor&&, Parameters&&>(
-                    std::forward<Executor>(exec),
-                    std::forward<Parameters>(params));
+                    HPX_FORWARD(Executor, exec),
+                    HPX_FORWARD(Parameters, params));
             }
         };
 
         ///////////////////////////////////////////////////////////////////////
         // define member traits
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_chunk_size);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_chunk_size)
 
         ///////////////////////////////////////////////////////////////////////
         // default property implementation allowing to handle get_chunk_size
@@ -124,30 +124,31 @@ namespace hpx { namespace parallel { namespace execution {
 
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support get_chunk_size
-        using with_get_chunk_size_t =
-            with_property_t<get_chunk_size_property, has_get_chunk_size_t>;
+        using get_parameters_chunk_size_t =
+            get_parameters_property_t<get_chunk_size_property,
+                has_get_chunk_size_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_get_chunk_size_t
-            with_get_chunk_size{};
+        inline constexpr get_parameters_chunk_size_t
+            get_parameters_chunk_size{};
 
         //////////////////////////////////////////////////////////////////////
         // customization point for interface get_chunk_size()
         template <typename Parameters, typename Executor_>
         struct get_chunk_size_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
+            std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
         {
             template <typename Executor, typename F>
             HPX_FORCEINLINE static std::size_t call(Parameters& params,
                 Executor&& exec, F&& f, std::size_t cores,
                 std::size_t num_tasks)
             {
-                auto withprop =
-                    with_get_chunk_size(std::forward<Executor>(exec), params,
-                        get_chunk_size_property{});
+                auto getprop =
+                    get_parameters_chunk_size(HPX_FORWARD(Executor, exec),
+                        params, get_chunk_size_property{});
 
-                return withprop.first.get_chunk_size(
-                    std::forward<decltype(withprop.second)>(withprop.second),
-                    std::forward<F>(f), cores, num_tasks);
+                return getprop.first.get_chunk_size(
+                    HPX_FORWARD(decltype(getprop.second), getprop.second),
+                    HPX_FORWARD(F, f), cores, num_tasks);
             }
 
             template <typename AnyParameters, typename Executor, typename F>
@@ -156,7 +157,7 @@ namespace hpx { namespace parallel { namespace execution {
                 std::size_t num_tasks)
             {
                 return call(static_cast<Parameters&>(params),
-                    std::forward<Executor>(exec), std::forward<F>(f), cores,
+                    HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f), cores,
                     num_tasks);
             }
         };
@@ -186,29 +187,29 @@ namespace hpx { namespace parallel { namespace execution {
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support
         // maximal_number_of_chunks
-        using with_maximal_number_of_chunks_t =
-            with_property_t<maximal_number_of_chunks_property,
+        using get_maximal_number_of_chunks_t =
+            get_parameters_property_t<maximal_number_of_chunks_property,
                 has_maximal_number_of_chunks_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_maximal_number_of_chunks_t
-            with_maximal_number_of_chunks{};
+        inline constexpr get_maximal_number_of_chunks_t
+            get_maximal_number_of_chunks{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface maximal_number_of_chunks()
         template <typename Parameters, typename Executor_>
         struct maximal_number_of_chunks_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
+            std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
         {
             template <typename Executor>
             HPX_FORCEINLINE static std::size_t call(Parameters& params,
                 Executor&& exec, std::size_t cores, std::size_t num_tasks)
             {
-                auto withprop =
-                    with_maximal_number_of_chunks(std::forward<Executor>(exec),
+                auto getprop =
+                    get_maximal_number_of_chunks(HPX_FORWARD(Executor, exec),
                         params, maximal_number_of_chunks_property{});
 
-                return withprop.first.maximal_number_of_chunks(
-                    std::forward<decltype(withprop.second)>(withprop.second),
+                return getprop.first.maximal_number_of_chunks(
+                    HPX_FORWARD(decltype(getprop.second), getprop.second),
                     cores, num_tasks);
             }
 
@@ -217,7 +218,7 @@ namespace hpx { namespace parallel { namespace execution {
                 Executor&& exec, std::size_t cores, std::size_t num_tasks)
             {
                 return call(static_cast<Parameters&>(params),
-                    std::forward<Executor>(exec), cores, num_tasks);
+                    HPX_FORWARD(Executor, exec), cores, num_tasks);
             }
         };
 
@@ -240,29 +241,29 @@ namespace hpx { namespace parallel { namespace execution {
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support
         // reset_thread_distribution
-        using with_reset_thread_distribution_t =
-            with_property_t<reset_thread_distribution_property,
+        using get_reset_thread_distribution_t =
+            get_parameters_property_t<reset_thread_distribution_property,
                 has_reset_thread_distribution_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_reset_thread_distribution_t
-            with_reset_thread_distribution{};
+        inline constexpr get_reset_thread_distribution_t
+            get_reset_thread_distribution{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface reset_thread_distribution()
         template <typename Parameters, typename Executor_>
         struct reset_thread_distribution_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
+            std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
         {
             template <typename Executor>
             HPX_FORCEINLINE static void call(
                 Parameters& params, Executor&& exec)
             {
-                auto withprop =
-                    with_reset_thread_distribution(std::forward<Executor>(exec),
+                auto getprop =
+                    get_reset_thread_distribution(HPX_FORWARD(Executor, exec),
                         params, reset_thread_distribution_property{});
 
-                withprop.first.reset_thread_distribution(
-                    std::forward<decltype(withprop.second)>(withprop.second));
+                getprop.first.reset_thread_distribution(
+                    HPX_FORWARD(decltype(getprop.second), getprop.second));
             }
 
             template <typename AnyParameters, typename Executor>
@@ -270,7 +271,7 @@ namespace hpx { namespace parallel { namespace execution {
                 AnyParameters params, Executor&& exec)
             {
                 call(static_cast<Parameters&>(params),
-                    std::forward<Executor>(exec));
+                    HPX_FORWARD(Executor, exec));
             }
         };
 
@@ -280,7 +281,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         ///////////////////////////////////////////////////////////////////////
         // default property implementation allowing to handle
-        // reset_thread_distribution
+        // processing_units_count_property
         struct processing_units_count_property
         {
             // default implementation
@@ -293,30 +294,30 @@ namespace hpx { namespace parallel { namespace execution {
 
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support
-        // reset_thread_distribution
-        using with_processing_units_count_t =
-            with_property_t<processing_units_count_property,
+        // processing_units_count_property
+        using get_processing_units_count_target_t =
+            get_parameters_property_t<processing_units_count_property,
                 has_processing_units_count_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_processing_units_count_t
-            with_processing_units_count{};
+        inline constexpr get_processing_units_count_target_t
+            get_processing_units_count_target{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface processing_units_count()
         template <typename Parameters, typename Executor_>
         struct processing_units_count_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
+            std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
         {
             template <typename Executor>
             HPX_FORCEINLINE static std::size_t call(
                 Parameters& params, Executor&& exec)
             {
-                auto withprop =
-                    with_processing_units_count(std::forward<Executor>(exec),
-                        params, processing_units_count_property{});
+                auto getprop = get_processing_units_count_target(
+                    HPX_FORWARD(Executor, exec), params,
+                    processing_units_count_property{});
 
-                return withprop.first.processing_units_count(
-                    std::forward<decltype(withprop.second)>(withprop.second));
+                return getprop.first.processing_units_count(
+                    HPX_FORWARD(decltype(getprop.second), getprop.second));
             }
 
             template <typename AnyParameters, typename Executor>
@@ -324,7 +325,7 @@ namespace hpx { namespace parallel { namespace execution {
                 AnyParameters params, Executor&& exec)
             {
                 return call(static_cast<Parameters&>(params),
-                    std::forward<Executor>(exec));
+                    HPX_FORWARD(Executor, exec));
             }
         };
 
@@ -347,29 +348,28 @@ namespace hpx { namespace parallel { namespace execution {
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support
         // mark_begin_execution
-        using with_mark_begin_execution_t =
-            with_property_t<mark_begin_execution_property,
+        using get_mark_begin_execution_t =
+            get_parameters_property_t<mark_begin_execution_property,
                 has_mark_begin_execution_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_mark_begin_execution_t
-            with_mark_begin_execution{};
+        inline constexpr get_mark_begin_execution_t get_mark_begin_execution{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface mark_begin_execution()
         template <typename Parameters, typename Executor_>
         struct mark_begin_execution_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
+            std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
         {
             template <typename Executor>
             HPX_FORCEINLINE static void call(
                 Parameters& params, Executor&& exec)
             {
-                auto withprop =
-                    with_mark_begin_execution(std::forward<Executor>(exec),
+                auto getprop =
+                    get_mark_begin_execution(HPX_FORWARD(Executor, exec),
                         params, mark_begin_execution_property{});
 
-                withprop.first.mark_begin_execution(
-                    std::forward<decltype(withprop.second)>(withprop.second));
+                getprop.first.mark_begin_execution(
+                    HPX_FORWARD(decltype(getprop.second), getprop.second));
             }
 
             template <typename AnyParameters, typename Executor>
@@ -377,7 +377,7 @@ namespace hpx { namespace parallel { namespace execution {
                 AnyParameters params, Executor&& exec)
             {
                 call(static_cast<Parameters&>(params),
-                    std::forward<Executor>(exec));
+                    HPX_FORWARD(Executor, exec));
             }
         };
 
@@ -400,29 +400,29 @@ namespace hpx { namespace parallel { namespace execution {
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support
         // mark_end_of_scheduling
-        using with_mark_end_of_scheduling_t =
-            with_property_t<mark_end_of_scheduling_property,
+        using get_mark_end_of_scheduling_t =
+            get_parameters_property_t<mark_end_of_scheduling_property,
                 has_mark_end_of_scheduling_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_mark_end_of_scheduling_t
-            with_mark_end_of_scheduling{};
+        inline constexpr get_mark_end_of_scheduling_t
+            get_mark_end_of_scheduling{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface mark_end_of_scheduling()
         template <typename Parameters, typename Executor_>
         struct mark_end_of_scheduling_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
+            std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
         {
             template <typename Executor>
             HPX_FORCEINLINE static void call(
                 Parameters& params, Executor&& exec)
             {
-                auto withprop =
-                    with_mark_end_of_scheduling(std::forward<Executor>(exec),
+                auto getprop =
+                    get_mark_end_of_scheduling(HPX_FORWARD(Executor, exec),
                         params, mark_end_of_scheduling_property{});
 
-                withprop.first.mark_end_of_scheduling(
-                    std::forward<decltype(withprop.second)>(withprop.second));
+                getprop.first.mark_end_of_scheduling(
+                    HPX_FORWARD(decltype(getprop.second), getprop.second));
             }
 
             template <typename AnyParameters, typename Executor>
@@ -430,7 +430,7 @@ namespace hpx { namespace parallel { namespace execution {
                 AnyParameters params, Executor&& exec)
             {
                 call(static_cast<Parameters&>(params),
-                    std::forward<Executor>(exec));
+                    HPX_FORWARD(Executor, exec));
             }
         };
 
@@ -453,29 +453,28 @@ namespace hpx { namespace parallel { namespace execution {
         //////////////////////////////////////////////////////////////////////
         // Generate a type that is guaranteed to support
         // mark_end_execution
-        using with_mark_end_execution_t =
-            with_property_t<mark_end_execution_property,
+        using get_mark_end_execution_t =
+            get_parameters_property_t<mark_end_execution_property,
                 has_mark_end_execution_t>;
 
-        HPX_INLINE_CONSTEXPR_VARIABLE with_mark_end_execution_t
-            with_mark_end_execution{};
+        inline constexpr get_mark_end_execution_t get_mark_end_execution{};
 
         ///////////////////////////////////////////////////////////////////////
         // customization point for interface mark_end_execution()
         template <typename Parameters, typename Executor_>
         struct mark_end_execution_fn_helper<Parameters, Executor_,
-            std::enable_if_t<hpx::traits::is_executor_any<Executor_>::value>>
+            std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
         {
             template <typename Executor>
             HPX_FORCEINLINE static void call(
                 Parameters& params, Executor&& exec)
             {
-                auto withprop =
-                    with_mark_end_execution(std::forward<Executor>(exec),
-                        params, mark_end_execution_property{});
+                auto getprop =
+                    get_mark_end_execution(HPX_FORWARD(Executor, exec), params,
+                        mark_end_execution_property{});
 
-                withprop.first.mark_end_execution(
-                    std::forward<decltype(withprop.second)>(withprop.second));
+                getprop.first.mark_end_execution(
+                    HPX_FORWARD(decltype(getprop.second), getprop.second));
             }
 
             template <typename AnyParameters, typename Executor>
@@ -483,7 +482,7 @@ namespace hpx { namespace parallel { namespace execution {
                 AnyParameters params, Executor&& exec)
             {
                 call(static_cast<Parameters&>(params),
-                    std::forward<Executor>(exec));
+                    HPX_FORWARD(Executor, exec));
             }
         };
         /// \endcond
@@ -527,7 +526,7 @@ namespace hpx { namespace parallel { namespace execution {
                 typename Enable = std::enable_if_t<
                     !std::is_same<std::decay_t<U>, unwrapper>::value>>
             unwrapper(U&& u)
-              : T(std::forward<U>(u))
+              : T(HPX_FORWARD(U, u))
             {
             }
         };
@@ -549,7 +548,7 @@ namespace hpx { namespace parallel { namespace execution {
                 auto& wrapped =
                     static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
                 return wrapped.maximal_number_of_chunks(
-                    std::forward<Executor>(exec), cores, num_tasks);
+                    HPX_FORWARD(Executor, exec), cores, num_tasks);
             }
         };
 
@@ -569,8 +568,8 @@ namespace hpx { namespace parallel { namespace execution {
             {
                 auto& wrapped =
                     static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
-                return wrapped.get_chunk_size(std::forward<Executor>(exec),
-                    std::forward<F>(f), cores, num_tasks);
+                return wrapped.get_chunk_size(HPX_FORWARD(Executor, exec),
+                    HPX_FORWARD(F, f), cores, num_tasks);
             }
         };
 
@@ -589,7 +588,7 @@ namespace hpx { namespace parallel { namespace execution {
             {
                 auto& wrapped =
                     static_cast<unwrapper<Wrapper>*>(this)->member_.get();
-                wrapped.mark_begin_execution(std::forward<Executor>(exec));
+                wrapped.mark_begin_execution(HPX_FORWARD(Executor, exec));
             }
         };
 
@@ -608,7 +607,7 @@ namespace hpx { namespace parallel { namespace execution {
             {
                 auto& wrapped =
                     static_cast<unwrapper<Wrapper>*>(this)->member_.get();
-                wrapped.mark_end_of_scheduling(std::forward<Executor>(exec));
+                wrapped.mark_end_of_scheduling(HPX_FORWARD(Executor, exec));
             }
         };
 
@@ -627,7 +626,7 @@ namespace hpx { namespace parallel { namespace execution {
             {
                 auto& wrapped =
                     static_cast<unwrapper<Wrapper>*>(this)->member_.get();
-                wrapped.mark_end_execution(std::forward<Executor>(exec));
+                wrapped.mark_end_execution(HPX_FORWARD(Executor, exec));
             }
         };
 
@@ -648,7 +647,7 @@ namespace hpx { namespace parallel { namespace execution {
                 auto& wrapped =
                     static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
                 return wrapped.processing_units_count(
-                    std::forward<Executor>(exec));
+                    HPX_FORWARD(Executor, exec));
             }
         };
 
@@ -667,7 +666,7 @@ namespace hpx { namespace parallel { namespace execution {
             {
                 auto& wrapped =
                     static_cast<unwrapper<Wrapper>*>(this)->member_.get();
-                wrapped.reset_thread_distribution(std::forward<Executor>(exec));
+                wrapped.reset_thread_distribution(HPX_FORWARD(Executor, exec));
             }
         };
 
@@ -716,8 +715,9 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename... Params>
         struct executor_parameters : public unwrapper<Params>...
         {
-            static_assert(hpx::util::all_of<hpx::traits::is_executor_parameters<
-                              std::decay_t<Params>>...>::value,
+            static_assert(
+                hpx::util::all_of_v<hpx::traits::is_executor_parameters<
+                    std::decay_t<Params>>...>,
                 "All passed parameters must be a proper executor parameters "
                 "objects");
             static_assert(sizeof...(Params) >= 2,
@@ -735,7 +735,7 @@ namespace hpx { namespace parallel { namespace execution {
 
             template <typename Dependent = void,
                 typename Enable = std::enable_if_t<
-                    hpx::util::all_of<std::is_constructible<Params>...>::value,
+                    hpx::util::all_of_v<std::is_constructible<Params>...>,
                     Dependent>>
             constexpr executor_parameters()
               : unwrapper<Params>()...
@@ -747,7 +747,7 @@ namespace hpx { namespace parallel { namespace execution {
                     std::enable_if_t<hpx::util::pack<Params...>::size ==
                         hpx::util::pack<Params_...>::size>>
             constexpr executor_parameters(Params_&&... params)
-              : unwrapper<Params>(std::forward<Params_>(params))...
+              : unwrapper<Params>(HPX_FORWARD(Params_, params))...
             {
             }
 
@@ -789,7 +789,7 @@ namespace hpx { namespace parallel { namespace execution {
     {
         using joined_params =
             typename executor_parameters_join<Params...>::type;
-        return joined_params(std::forward<Params>(params)...);
+        return joined_params(HPX_FORWARD(Params, params)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -806,6 +806,6 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::traits::is_executor_parameters<std::decay_t<Param>>::value,
             "The passed parameter must be a proper executor parameters object");
 
-        return std::forward<Param>(param);
+        return HPX_FORWARD(Param, param);
     }
 }}}    // namespace hpx::parallel::execution

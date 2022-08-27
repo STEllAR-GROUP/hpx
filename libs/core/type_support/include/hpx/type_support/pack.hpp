@@ -16,14 +16,14 @@ namespace hpx { namespace util {
     template <typename... Ts>
     struct pack
     {
-        typedef pack type;
+        using type = pack;
         static constexpr std::size_t size = sizeof...(Ts);
     };
 
     template <typename T, T... Vs>
     struct pack_c
     {
-        typedef pack_c type;
+        using type = pack_c;
         static constexpr std::size_t size = sizeof...(Vs);
     };
 
@@ -101,8 +101,8 @@ namespace hpx { namespace util {
         static std::false_type all_of(...);
 
         template <typename... Ts>
-        static auto all_of(int) -> always_true<
-            typename std::enable_if<is_true<Ts>::value>::type...>;
+        static auto all_of(int)
+            -> always_true<std::enable_if_t<is_true<Ts>::value>...>;
     }    // namespace detail
 
     template <typename... Ts>
@@ -117,15 +117,15 @@ namespace hpx { namespace util {
     };
 
     template <typename... Ts>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool all_of_v = all_of<Ts...>::value;
+    inline constexpr bool all_of_v = all_of<Ts...>::value;
 
     namespace detail {
         template <typename... Ts>
         static std::true_type any_of(...);
 
         template <typename... Ts>
-        static auto any_of(int) -> always_false<
-            typename std::enable_if<is_false<Ts>::value>::type...>;
+        static auto any_of(int)
+            -> always_false<std::enable_if_t<is_false<Ts>::value>...>;
     }    // namespace detail
 
     template <typename... Ts>
@@ -140,7 +140,7 @@ namespace hpx { namespace util {
     };
 
     template <typename... Ts>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool any_of_v = any_of<Ts...>::value;
+    inline constexpr bool any_of_v = any_of<Ts...>::value;
 
     template <typename... Ts>
     struct none_of : std::integral_constant<bool, !any_of<Ts...>::value>
@@ -148,7 +148,7 @@ namespace hpx { namespace util {
     };
 
     template <typename... Ts>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool none_of_v = none_of<Ts...>::value;
+    inline constexpr bool none_of_v = none_of<Ts...>::value;
 
     template <typename T, typename... Ts>
     struct contains : any_of<std::is_same<T, Ts>...>
@@ -280,6 +280,11 @@ namespace hpx { namespace util {
         template <typename... Packs>
         using concat_t = typename concat<Packs...>::type;
 
+        /// Concatenate the elements in the given packs into a single pack and then
+        /// remove duplicates.
+        template <typename... Packs>
+        using unique_concat_t = unique_t<concat_t<Packs...>>;
+
         template <typename Pack>
         struct concat_pack_of_packs;
 
@@ -289,13 +294,31 @@ namespace hpx { namespace util {
             using type = typename concat<Ts...>::type;
         };
 
-        template <typename... Packs>
-        using unique_concat_t = unique_t<concat_t<Packs...>>;
-
-        /// Concatenate the packs in the given pack into a single pack.
+        /// Concatenate the packs in the given pack into a single pack. The
+        /// outer pack is discarded.
         template <typename Pack>
         using concat_pack_of_packs_t =
             typename concat_pack_of_packs<Pack>::type;
+
+        template <typename Pack>
+        struct concat_inner_packs;
+
+        template <template <typename...> class Pack>
+        struct concat_inner_packs<Pack<>>
+        {
+            using type = Pack<>;
+        };
+
+        template <template <typename...> class Pack, typename T, typename... Ts>
+        struct concat_inner_packs<Pack<T, Ts...>>
+        {
+            using type = Pack<typename concat<T, Ts...>::type>;
+        };
+
+        /// Concatenate the packs in the given pack into a single pack. The
+        /// outer pack is kept.
+        template <typename Pack>
+        using concat_inner_packs_t = typename concat_inner_packs<Pack>::type;
 
         template <typename Pack, typename T>
         struct prepend;
@@ -322,5 +345,19 @@ namespace hpx { namespace util {
         /// Append a given type to the given pack.
         template <typename Pack, typename T>
         using append_t = typename prepend<Pack, T>::type;
+
+        template <template <typename...> class NewPack, typename OldPack>
+        struct change_pack;
+
+        template <template <typename...> class NewPack,
+            template <typename...> class OldPack, typename... Ts>
+        struct change_pack<NewPack, OldPack<Ts...>>
+        {
+            using type = NewPack<Ts...>;
+        };
+
+        /// Change a OldPack<Ts...> to NewPack<Ts...>
+        template <template <typename...> class NewPack, typename OldPack>
+        using change_pack_t = typename change_pack<NewPack, OldPack>::type;
     }    // namespace detail
 }}       // namespace hpx::util

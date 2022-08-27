@@ -14,8 +14,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/hashing/fibhash.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/thread_support/spinlock.hpp>
 

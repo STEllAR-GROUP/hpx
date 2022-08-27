@@ -20,7 +20,7 @@ void test_safe_destruction()
     hpx::future<void> outer;
 
     {
-        hpx::lcos::local::promise<void> p;
+        hpx::promise<void> p;
         hpx::shared_future<void> inner = p.get_future().share();
 
         // Delay returning from p.set_value() below to destroy the promise

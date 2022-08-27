@@ -71,8 +71,8 @@ namespace hpx { namespace iostreams { namespace server
         void write_sync(std::uint32_t locality_id,
             std::uint64_t count, detail::buffer const& in);
 
-        HPX_DEFINE_COMPONENT_ACTION(output_stream, write_async);
-        HPX_DEFINE_COMPONENT_ACTION(output_stream, write_sync);
+        HPX_DEFINE_COMPONENT_ACTION(output_stream, write_async)
+        HPX_DEFINE_COMPONENT_ACTION(output_stream, write_sync)
     };
 }}}
 

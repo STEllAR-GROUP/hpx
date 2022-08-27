@@ -23,20 +23,20 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-const std::size_t vsize_default = 1024*1024;
+const std::size_t vsize_default = 1024 * 1024;
 const std::size_t numiter_default = 5;
 
 ///////////////////////////////////////////////////////////////////////////////
-void on_recv(hpx::naming::id_type to, std::vector<double> const & in,
-    std::size_t counter);
-HPX_PLAIN_ACTION(on_recv, on_recv_action);
+void on_recv(
+    hpx::id_type to, std::vector<double> const& in, std::size_t counter);
+HPX_PLAIN_ACTION(on_recv, on_recv_action)
 
-void on_recv(hpx::naming::id_type to, std::vector<double> const & in,
-    std::size_t counter)
+void on_recv(
+    hpx::id_type to, std::vector<double> const& in, std::size_t counter)
 {
     // received vector in
-    if (--counter == 0) return;
-
+    if (--counter == 0)
+        return;
 
     // send it to remote locality (to), and wait until it is received
     std::vector<double> data(in);
@@ -46,41 +46,42 @@ void on_recv(hpx::naming::id_type to, std::vector<double> const & in,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void on_recv_ind(hpx::naming::id_type to,
-    std::shared_ptr<std::vector<double> > const& in, std::size_t counter);
-HPX_PLAIN_ACTION(on_recv_ind, on_recv_ind_action);
+void on_recv_ind(hpx::id_type to,
+    std::shared_ptr<std::vector<double>> const& in, std::size_t counter);
+HPX_PLAIN_ACTION(on_recv_ind, on_recv_ind_action)
 
-void on_recv_ind(hpx::naming::id_type to,
-    std::shared_ptr<std::vector<double> > const& in, std::size_t counter)
+void on_recv_ind(hpx::id_type to,
+    std::shared_ptr<std::vector<double>> const& in, std::size_t counter)
 {
     // received vector in
-    if (--counter == 0) return;
+    if (--counter == 0)
+        return;
 
     // send it to remote locality (to), and wait until it is received
-    std::shared_ptr<std::vector<double> > data(
-        std::make_shared<std::vector<double> >(*in));
+    std::shared_ptr<std::vector<double>> data(
+        std::make_shared<std::vector<double>>(*in));
 
     on_recv_ind_action act;
     act(to, hpx::find_here(), data, counter);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int hpx_main(hpx::program_options::variables_map &b_arg)
+int hpx_main(hpx::program_options::variables_map& b_arg)
 {
     std::size_t const vsize = b_arg["vsize"].as<std::size_t>();
     std::size_t const numiter = b_arg["numiter"].as<std::size_t>() * 2;
     bool verbose = b_arg["verbose"].as<bool>();
 
-    std::vector<hpx::naming::id_type> localities = hpx::find_remote_localities();
+    std::vector<hpx::id_type> localities = hpx::find_remote_localities();
 
-    hpx::naming::id_type to;
-    if(localities.size() == 0)
+    hpx::id_type to;
+    if (localities.size() == 0)
     {
         to = hpx::find_here();
     }
     else
     {
-        to = localities[0]; // send to first remote locality
+        to = localities[0];    // send to first remote locality
     }
 
     // test sending messages back and forth using a larger vector as one of
@@ -90,7 +91,8 @@ int hpx_main(hpx::program_options::variables_map &b_arg)
 
         hpx::chrono::high_resolution_timer timer1;
 
-        if (numiter != 0) {
+        if (numiter != 0)
+        {
             on_recv_action act;
             act(to, hpx::find_here(), data, numiter);
         }
@@ -100,7 +102,8 @@ int hpx_main(hpx::program_options::variables_map &b_arg)
             ((static_cast<double>(vsize * sizeof(double) * numiter) / time) /
                 1024) /
             1024;
-        if (verbose) {
+        if (verbose)
+        {
             std::cout << "[hpx_pingpong]" << std::endl
                       << "total_time(secs)=" << time << std::endl
                       << "vsize=" << vsize << " = " << vsize * sizeof(double)
@@ -109,7 +112,8 @@ int hpx_main(hpx::program_options::variables_map &b_arg)
                       << "localities=" << localities.size() << std::endl
                       << "numiter=" << numiter << std::endl;
         }
-        else {
+        else
+        {
             std::cout << "[hpx_pingpong]"
                       << ":total_time(secs)=" << time << ":vsize=" << vsize
                       << ":bandwidth(MiB/s)=" << bandwidth
@@ -152,14 +156,13 @@ int main(int argc, char* argv[])
     namespace po = hpx::program_options;
     po::options_description description("HPX pingpong example");
 
-    description.add_options()
-        ( "vsize", po::value<std::size_t>()->default_value(vsize_default),
-          "number of elements (doubles) to send/receive  (integer)")
-        ( "numiter", po::value<std::size_t>()->default_value(numiter_default),
-          "number of ping-pong iterations")
-        ( "verbose", po::value<bool>()->default_value(true),
-         "verbosity of output,if false output is for awk")
-        ;
+    description.add_options()("vsize",
+        po::value<std::size_t>()->default_value(vsize_default),
+        "number of elements (doubles) to send/receive  (integer)")("numiter",
+        po::value<std::size_t>()->default_value(numiter_default),
+        "number of ping-pong iterations")("verbose",
+        po::value<bool>()->default_value(true),
+        "verbosity of output,if false output is for awk");
 
     hpx::init_params init_args;
     init_args.desc_cmdline = description;

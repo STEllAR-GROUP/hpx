@@ -16,9 +16,9 @@ struct W
 {
 };
 
-void intrusive_ptr_add_ref(W*) {}
+void intrusive_ptr_add_ref(W*) noexcept {}
 
-void intrusive_ptr_release(W*) {}
+void intrusive_ptr_release(W*) noexcept {}
 
 struct X : public virtual W
 {

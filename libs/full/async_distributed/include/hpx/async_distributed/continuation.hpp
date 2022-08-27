@@ -16,7 +16,7 @@
 #include <hpx/async_distributed/continuation_fwd.hpp>
 #include <hpx/async_distributed/trigger_lco_fwd.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/functional/serialization/serializable_unique_function.hpp>
+#include <hpx/functional/serialization/serializable_move_only_function.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
@@ -44,11 +44,11 @@ namespace hpx { namespace actions {
 
         continuation();
 
-        explicit continuation(naming::id_type const& id);
-        explicit continuation(naming::id_type&& id);
+        explicit continuation(hpx::id_type const& id);
+        explicit continuation(hpx::id_type&& id);
 
-        continuation(naming::id_type const& id, naming::address&& addr);
-        continuation(naming::id_type&& id, naming::address&& addr) noexcept;
+        continuation(hpx::id_type const& id, naming::address&& addr);
+        continuation(hpx::id_type&& id, naming::address&& addr) noexcept;
 
         continuation(continuation&& o) noexcept;
         continuation& operator=(continuation&& o) noexcept;
@@ -61,7 +61,7 @@ namespace hpx { namespace actions {
         void serialize(hpx::serialization::input_archive& ar, unsigned);
         void serialize(hpx::serialization::output_archive& ar, unsigned);
 
-        constexpr naming::id_type const& get_id() const noexcept
+        constexpr hpx::id_type const& get_id() const noexcept
         {
             return id_;
         }
@@ -72,7 +72,7 @@ namespace hpx { namespace actions {
         }
 
     protected:
-        naming::id_type id_;
+        hpx::id_type id_;
         naming::address addr_;
     };
 
@@ -82,60 +82,59 @@ namespace hpx { namespace actions {
     {
     private:
         using function_type =
-            util::unique_function<void(naming::id_type, Result)>;
+            hpx::distributed::move_only_function<void(hpx::id_type, Result)>;
 
     public:
         using result_type = Result;
 
         typed_continuation() = default;
 
-        explicit typed_continuation(naming::id_type const& id)
+        explicit typed_continuation(hpx::id_type const& id)
           : continuation(id)
         {
         }
 
-        explicit typed_continuation(naming::id_type&& id) noexcept
-          : continuation(std::move(id))
+        explicit typed_continuation(hpx::id_type&& id) noexcept
+          : continuation(HPX_MOVE(id))
         {
         }
 
         template <typename F>
-        typed_continuation(naming::id_type const& id, F&& f)
+        typed_continuation(hpx::id_type const& id, F&& f)
           : continuation(id)
-          , f_(std::forward<F>(f))
+          , f_(HPX_FORWARD(F, f))
         {
         }
 
         template <typename F>
-        typed_continuation(naming::id_type&& id, F&& f)
-          : continuation(std::move(id))
-          , f_(std::forward<F>(f))
+        typed_continuation(hpx::id_type&& id, F&& f)
+          : continuation(HPX_MOVE(id))
+          , f_(HPX_FORWARD(F, f))
         {
         }
 
-        typed_continuation(naming::id_type const& id, naming::address&& addr)
-          : continuation(id, std::move(addr))
+        typed_continuation(hpx::id_type const& id, naming::address&& addr)
+          : continuation(id, HPX_MOVE(addr))
         {
         }
 
+        typed_continuation(hpx::id_type&& id, naming::address&& addr) noexcept
+          : continuation(HPX_MOVE(id), HPX_MOVE(addr))
+        {
+        }
+
+        template <typename F>
         typed_continuation(
-            naming::id_type&& id, naming::address&& addr) noexcept
-          : continuation(std::move(id), std::move(addr))
+            hpx::id_type const& id, naming::address&& addr, F&& f)
+          : continuation(id, HPX_MOVE(addr))
+          , f_(HPX_FORWARD(F, f))
         {
         }
 
         template <typename F>
-        typed_continuation(
-            naming::id_type const& id, naming::address&& addr, F&& f)
-          : continuation(id, std::move(addr))
-          , f_(std::forward<F>(f))
-        {
-        }
-
-        template <typename F>
-        typed_continuation(naming::id_type&& id, naming::address&& addr, F&& f)
-          : continuation(std::move(id), std::move(addr))
-          , f_(std::forward<F>(f))
+        typed_continuation(hpx::id_type&& id, naming::address&& addr, F&& f)
+          : continuation(HPX_MOVE(id), HPX_MOVE(addr))
+          , f_(HPX_FORWARD(F, f))
         {
         }
 
@@ -143,7 +142,7 @@ namespace hpx { namespace actions {
             typename Enable = typename std::enable_if<!std::is_same<
                 typename std::decay<F>::type, typed_continuation>::value>::type>
         explicit typed_continuation(F&& f)
-          : f_(std::forward<F>(f))
+          : f_(HPX_FORWARD(F, f))
         {
         }
 
@@ -165,11 +164,11 @@ namespace hpx { namespace actions {
                     return;
                 }
                 hpx::set_lco_value(
-                    this->get_id(), this->get_addr(), std::move(result));
+                    this->get_id(), this->get_addr(), HPX_MOVE(result));
             }
             else
             {
-                f_(this->get_id(), std::move(result));
+                f_(this->get_id(), HPX_MOVE(result));
             }
         }
 
@@ -201,55 +200,54 @@ namespace hpx { namespace actions {
     {
     private:
         using base_type = typed_continuation<RemoteResult>;
-        using function_type =
-            util::unique_function<void(naming::id_type, RemoteResult)>;
+        using function_type = hpx::distributed::move_only_function<void(
+            hpx::id_type, RemoteResult)>;
 
     public:
         typed_continuation() = default;
 
-        explicit typed_continuation(naming::id_type const& id)
+        explicit typed_continuation(hpx::id_type const& id)
           : base_type(id)
         {
         }
 
-        explicit typed_continuation(naming::id_type&& id) noexcept
-          : base_type(std::move(id))
+        explicit typed_continuation(hpx::id_type&& id) noexcept
+          : base_type(HPX_MOVE(id))
         {
         }
 
         template <typename F>
-        typed_continuation(naming::id_type const& id, F&& f)
-          : base_type(id, std::forward<F>(f))
+        typed_continuation(hpx::id_type const& id, F&& f)
+          : base_type(id, HPX_FORWARD(F, f))
         {
         }
 
         template <typename F>
-        typed_continuation(naming::id_type&& id, F&& f)
-          : base_type(std::move(id), std::forward<F>(f))
+        typed_continuation(hpx::id_type&& id, F&& f)
+          : base_type(HPX_MOVE(id), HPX_FORWARD(F, f))
         {
         }
 
-        typed_continuation(naming::id_type const& id, naming::address&& addr)
-          : base_type(id, std::move(addr))
+        typed_continuation(hpx::id_type const& id, naming::address&& addr)
+          : base_type(id, HPX_MOVE(addr))
         {
         }
 
+        typed_continuation(hpx::id_type&& id, naming::address&& addr) noexcept
+          : base_type(HPX_MOVE(id), HPX_MOVE(addr))
+        {
+        }
+
+        template <typename F>
         typed_continuation(
-            naming::id_type&& id, naming::address&& addr) noexcept
-          : base_type(std::move(id), std::move(addr))
+            hpx::id_type const& id, naming::address&& addr, F&& f)
+          : base_type(id, HPX_MOVE(addr), HPX_FORWARD(F, f))
         {
         }
 
         template <typename F>
-        typed_continuation(
-            naming::id_type const& id, naming::address&& addr, F&& f)
-          : base_type(id, std::move(addr), std::forward<F>(f))
-        {
-        }
-
-        template <typename F>
-        typed_continuation(naming::id_type&& id, naming::address&& addr, F&& f)
-          : base_type(std::move(id), std::move(addr), std::forward<F>(f))
+        typed_continuation(hpx::id_type&& id, naming::address&& addr, F&& f)
+          : base_type(HPX_MOVE(id), HPX_MOVE(addr), HPX_FORWARD(F, f))
         {
         }
 
@@ -257,7 +255,7 @@ namespace hpx { namespace actions {
             typename Enable = typename std::enable_if<!std::is_same<
                 typename std::decay<F>::type, typed_continuation>::value>::type>
         explicit typed_continuation(F&& f)
-          : base_type(std::forward<F>(f))
+          : base_type(HPX_FORWARD(F, f))
         {
         }
 
@@ -280,11 +278,11 @@ namespace hpx { namespace actions {
                     return;
                 }
                 hpx::set_lco_value(
-                    this->get_id(), this->get_addr(), std::move(result));
+                    this->get_id(), this->get_addr(), HPX_MOVE(result));
             }
             else
             {
-                this->f_(this->get_id(), std::move(result));
+                this->f_(this->get_id(), HPX_MOVE(result));
             }
         }
 
@@ -308,60 +306,60 @@ namespace hpx { namespace actions {
     struct typed_continuation<void, util::unused_type> : continuation
     {
     private:
-        using function_type = util::unique_function<void(naming::id_type)>;
+        using function_type =
+            hpx::distributed::move_only_function<void(hpx::id_type)>;
 
     public:
         using result_type = void;
 
         typed_continuation() = default;
 
-        explicit typed_continuation(naming::id_type const& id)
+        explicit typed_continuation(hpx::id_type const& id)
           : continuation(id)
         {
         }
 
-        explicit typed_continuation(naming::id_type&& id) noexcept
-          : continuation(std::move(id))
+        explicit typed_continuation(hpx::id_type&& id) noexcept
+          : continuation(HPX_MOVE(id))
         {
         }
 
         template <typename F>
-        typed_continuation(naming::id_type const& id, F&& f)
+        typed_continuation(hpx::id_type const& id, F&& f)
           : continuation(id)
-          , f_(std::forward<F>(f))
+          , f_(HPX_FORWARD(F, f))
         {
         }
 
         template <typename F>
-        typed_continuation(naming::id_type&& id, F&& f)
-          : continuation(std::move(id))
-          , f_(std::forward<F>(f))
+        typed_continuation(hpx::id_type&& id, F&& f)
+          : continuation(HPX_MOVE(id))
+          , f_(HPX_FORWARD(F, f))
         {
         }
 
-        typed_continuation(naming::id_type const& id, naming::address&& addr)
-          : continuation(id, std::move(addr))
+        typed_continuation(hpx::id_type const& id, naming::address&& addr)
+          : continuation(id, HPX_MOVE(addr))
         {
         }
 
+        typed_continuation(hpx::id_type&& id, naming::address&& addr) noexcept
+          : continuation(HPX_MOVE(id), HPX_MOVE(addr))
+        {
+        }
+
+        template <typename F>
         typed_continuation(
-            naming::id_type&& id, naming::address&& addr) noexcept
-          : continuation(std::move(id), std::move(addr))
+            hpx::id_type const& id, naming::address&& addr, F&& f)
+          : continuation(id, HPX_MOVE(addr))
+          , f_(HPX_FORWARD(F, f))
         {
         }
 
         template <typename F>
-        typed_continuation(
-            naming::id_type const& id, naming::address&& addr, F&& f)
-          : continuation(id, std::move(addr))
-          , f_(std::forward<F>(f))
-        {
-        }
-
-        template <typename F>
-        typed_continuation(naming::id_type&& id, naming::address&& addr, F&& f)
-          : continuation(std::move(id), std::move(addr))
-          , f_(std::forward<F>(f))
+        typed_continuation(hpx::id_type&& id, naming::address&& addr, F&& f)
+          : continuation(HPX_MOVE(id), HPX_MOVE(addr))
+          , f_(HPX_FORWARD(F, f))
         {
         }
 
@@ -369,7 +367,7 @@ namespace hpx { namespace actions {
             typename Enable = typename std::enable_if<!std::is_same<
                 typename std::decay<F>::type, typed_continuation>::value>::type>
         explicit typed_continuation(F&& f)
-          : f_(std::forward<F>(f))
+          : f_(HPX_FORWARD(F, f))
         {
         }
 

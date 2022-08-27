@@ -276,8 +276,8 @@ namespace hpx { namespace ranges {
 
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/stable_sort.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -315,9 +315,9 @@ namespace hpx { namespace parallel { inline namespace rangev1 {
             "Requires a random access iterator.");
 
         return parallel::v1::detail::stable_sort<iterator_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), std::forward<Compare>(comp),
-            std::forward<Proj>(proj));
+            HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), HPX_FORWARD(Compare, comp),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -327,7 +327,7 @@ namespace hpx { namespace parallel { inline namespace rangev1 {
 namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::stable_sort
-    HPX_INLINE_CONSTEXPR_VARIABLE struct stable_sort_t final
+    inline constexpr struct stable_sort_t final
       : hpx::detail::tag_parallel_algorithm<stable_sort_t>
     {
     private:
@@ -346,7 +346,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend RandomIt tag_fallback_dispatch(hpx::ranges::stable_sort_t,
+        friend RandomIt tag_fallback_invoke(hpx::ranges::stable_sort_t,
             RandomIt first, Sent last, Comp&& comp = Comp(),
             Proj&& proj = Proj())
         {
@@ -354,8 +354,8 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::stable_sort<RandomIt>().call(
-                hpx::execution::seq, first, last, std::forward<Comp>(comp),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -375,7 +375,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             RandomIt>::type
-        tag_fallback_dispatch(hpx::ranges::stable_sort_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::stable_sort_t, ExPolicy&& policy,
             RandomIt first, Sent last, Comp&& comp = Comp(),
             Proj&& proj = Proj())
         {
@@ -383,8 +383,8 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::stable_sort<RandomIt>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Comp>(comp), std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -402,7 +402,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_dispatch(hpx::ranges::stable_sort_t, Rng&& rng,
+        tag_fallback_invoke(hpx::ranges::stable_sort_t, Rng&& rng,
             Compare&& comp = Compare(), Proj&& proj = Proj())
         {
             using iterator_type =
@@ -414,7 +414,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::stable_sort<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                std::forward<Compare>(comp), std::forward<Proj>(proj));
+                HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -433,7 +433,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_dispatch(hpx::ranges::stable_sort_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::stable_sort_t, ExPolicy&& policy,
             Rng&& rng, Compare&& comp = Compare(), Proj&& proj = Proj())
         {
             using iterator_type =
@@ -444,9 +444,9 @@ namespace hpx { namespace ranges {
                 "Requires a random access iterator.");
 
             return hpx::parallel::v1::detail::stable_sort<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), std::forward<Compare>(comp),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(Compare, comp),
+                HPX_FORWARD(Proj, proj));
         }
     } stable_sort{};
 }}    // namespace hpx::ranges

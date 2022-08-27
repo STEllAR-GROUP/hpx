@@ -41,13 +41,11 @@ namespace hpx { namespace util { namespace detail {
 
     public:
         interval_timer();
-        interval_timer(util::function_nonser<bool()> const& f,
-            std::int64_t microsecs, std::string const& description,
-            bool pre_shutdown);
-        interval_timer(util::function_nonser<bool()> const& f,
-            util::function_nonser<void()> const& on_term,
-            std::int64_t microsecs, std::string const& description,
-            bool pre_shutdown);
+        interval_timer(hpx::function<bool()> const& f, std::int64_t microsecs,
+            std::string const& description, bool pre_shutdown);
+        interval_timer(hpx::function<bool()> const& f,
+            hpx::function<void()> const& on_term, std::int64_t microsecs,
+            std::string const& description, bool pre_shutdown);
 
         ~interval_timer();
 
@@ -81,10 +79,9 @@ namespace hpx { namespace util { namespace detail {
 
     private:
         mutable mutex_type mtx_;
-        util::function_nonser<bool()> f_;    ///< function to call
-        util::function_nonser<void()>
-            on_term_;               ///< function to call on termination
-        std::int64_t microsecs_;    ///< time interval
+        hpx::function<bool()> f_;          ///< function to call
+        hpx::function<void()> on_term_;    ///< function to call on termination
+        std::int64_t microsecs_;           ///< time interval
         threads::thread_id_ref_type
             id_;    ///< id of currently scheduled thread
         threads::thread_id_ref_type
@@ -109,19 +106,17 @@ namespace hpx { namespace util {
 
     public:
         interval_timer();
-        interval_timer(util::function_nonser<bool()> const& f,
-            std::int64_t microsecs, std::string const& description = "",
-            bool pre_shutdown = false);
-        interval_timer(util::function_nonser<bool()> const& f,
-            util::function_nonser<void()> const& on_term,
-            std::int64_t microsecs, std::string const& description = "",
-            bool pre_shutdown = false);
+        interval_timer(hpx::function<bool()> const& f, std::int64_t microsecs,
+            std::string const& description = "", bool pre_shutdown = false);
+        interval_timer(hpx::function<bool()> const& f,
+            hpx::function<void()> const& on_term, std::int64_t microsecs,
+            std::string const& description = "", bool pre_shutdown = false);
 
-        interval_timer(util::function_nonser<bool()> const& f,
+        interval_timer(hpx::function<bool()> const& f,
             hpx::chrono::steady_duration const& rel_time,
             char const* description = "", bool pre_shutdown = false);
-        interval_timer(util::function_nonser<bool()> const& f,
-            util::function_nonser<void()> const& on_term,
+        interval_timer(hpx::function<bool()> const& f,
+            hpx::function<void()> const& on_term,
             hpx::chrono::steady_duration const& rel_time,
             char const* description = "", bool pre_shutdown = false);
 

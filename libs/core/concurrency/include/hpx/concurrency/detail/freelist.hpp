@@ -31,7 +31,7 @@ namespace boost { namespace lockfree {
             return this->base_type::template allocate<true, false>();
         }
 
-        void deallocate(T* n)
+        void deallocate(T* n) noexcept
         {
             this->base_type::template deallocate<true>(n);
         }
@@ -53,7 +53,7 @@ namespace boost { namespace lockfree {
             return this->base_type::template allocate<true, true>();
         }
 
-        void deallocate(T* n)
+        void deallocate(T* n) noexcept
         {
             this->base_type::template deallocate<true>(n);
         }

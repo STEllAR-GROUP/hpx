@@ -17,7 +17,7 @@
 #include <hpx/components_base/server/fixed_component_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
@@ -31,7 +31,7 @@
 namespace hpx { namespace agas {
 
     HPX_EXPORT naming::gid_type bootstrap_locality_namespace_gid();
-    HPX_EXPORT naming::id_type bootstrap_locality_namespace_id();
+    HPX_EXPORT hpx::id_type bootstrap_locality_namespace_id();
 }}    // namespace hpx::agas
 
 namespace hpx { namespace agas { namespace server {
@@ -168,14 +168,13 @@ namespace hpx { namespace agas { namespace server {
         std::uint32_t get_num_overall_threads();
 
     public:
-        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, allocate);
-        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, free);
-        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, localities);
-        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, resolve_locality);
-        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, get_num_localities);
-        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, get_num_threads);
-        HPX_DEFINE_COMPONENT_ACTION(
-            locality_namespace, get_num_overall_threads);
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, allocate)
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, free)
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, localities)
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, resolve_locality)
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, get_num_localities)
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, get_num_threads)
+        HPX_DEFINE_COMPONENT_ACTION(locality_namespace, get_num_overall_threads)
     };
 
 }}}    // namespace hpx::agas::server

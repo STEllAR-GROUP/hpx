@@ -46,7 +46,7 @@ namespace hpx { namespace performance_counters { namespace server {
             base_type;
 
         // avoid warnings about using this in member initializer list
-        statistics_counter* this_()
+        constexpr statistics_counter* this_() noexcept
         {
             return this;
         }
@@ -55,13 +55,7 @@ namespace hpx { namespace performance_counters { namespace server {
         typedef statistics_counter type_holder;
         typedef base_performance_counter base_type_holder;
 
-        statistics_counter()
-          : has_prev_value_(false)
-          , parameter1_(0)
-          , parameter2_(0)
-          , reset_base_counter_(false)
-        {
-        }
+        statistics_counter();
 
         statistics_counter(counter_info const& info,
             std::string const& base_counter_name, std::size_t parameter1,
@@ -77,14 +71,12 @@ namespace hpx { namespace performance_counters { namespace server {
 
         void reset_counter_value() override;
 
-        void on_terminate() {}
+        void on_terminate();
 
         // finalize() will be called just before the instance gets destructed
-        void finalize()
-        {
-            base_performance_counter::finalize();
-            base_type::finalize();
-        }
+        void finalize();
+
+        naming::address get_current_address() const;
 
     protected:
         bool evaluate_base_counter(counter_value& value);
@@ -100,7 +92,7 @@ namespace hpx { namespace performance_counters { namespace server {
 
         // name of base counter to be queried
         std::string base_counter_name_;
-        naming::id_type base_counter_id_;
+        hpx::id_type base_counter_id_;
 
         std::unique_ptr<detail::counter_type_from_statistic_base> value_;
         counter_value prev_value_;

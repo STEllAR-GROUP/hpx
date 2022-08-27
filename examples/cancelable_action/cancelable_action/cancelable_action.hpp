@@ -15,19 +15,17 @@
 
 #include <utility>
 
-namespace examples
-{
+namespace examples {
     ///////////////////////////////////////////////////////////////////////////
     // Client side representation for for the \a server::cancelable_action
     // component.
     class cancelable_action
-      : public hpx::components::client_base<
-            cancelable_action, stubs::cancelable_action
-        >
+      : public hpx::components::client_base<cancelable_action,
+            stubs::cancelable_action>
     {
-        typedef hpx::components::client_base<
-            cancelable_action, stubs::cancelable_action
-        > base_type;
+        typedef hpx::components::client_base<cancelable_action,
+            stubs::cancelable_action>
+            base_type;
 
     public:
         // Default construct an empty client side representation (not
@@ -36,13 +34,15 @@ namespace examples
 
         /// Create a client side representation of an object which is newly
         /// created on the given locality
-        explicit cancelable_action(hpx::naming::id_type const& target_gid)
+        explicit cancelable_action(hpx::id_type const& target_gid)
           : base_type(hpx::new_<cancelable_action>(target_gid))
-        {}
+        {
+        }
 
         cancelable_action(hpx::future<hpx::id_type>&& target_gid)
           : base_type(std::move(target_gid))
-        {}
+        {
+        }
 
         ///////////////////////////////////////////////////////////////////////
         void do_it(hpx::error_code& ec = hpx::throws)
@@ -57,7 +57,6 @@ namespace examples
             this->base_type::cancel_it(this->get_id());
         }
     };
-}
-
+}    // namespace examples
 
 #endif

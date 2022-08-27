@@ -70,7 +70,7 @@ private:
 typedef hpx::components::component<test_counter> test_counter_type;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(
-    test_counter_type, test_counter, "base_performance_counter");
+    test_counter_type, test_counter, "base_performance_counter")
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::naming::gid_type test_counter_creator(

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,25 +13,24 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace naming {
+namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    util::internal_allocator<detail::id_type_impl> detail::id_type_impl::alloc_;
+    namespace naming::detail {
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
+        util::internal_allocator<id_type_impl> id_type_impl::alloc_;
 
         id_type_impl::deleter_type id_type_impl::get_deleter(
-            id_type::management_type t) noexcept
+            hpx::id_type::management_type t) noexcept
         {
             switch (t)
             {
-            case id_type::unmanaged:
+            case hpx::id_type::management_type::unmanaged:
                 return &detail::gid_unmanaged_deleter;
 
-            case id_type::managed:
-                HPX_FALLTHROUGH;
-            case id_type::managed_move_credit:
+            case hpx::id_type::management_type::managed:
+                [[fallthrough]];
+            case hpx::id_type::management_type::managed_move_credit:
                 return &detail::gid_managed_deleter;
 
             default:
@@ -42,19 +41,19 @@ namespace hpx { namespace naming {
         }
 
         // support functions for hpx::intrusive_ptr
-        void intrusive_ptr_add_ref(id_type_impl* p)
+        void intrusive_ptr_add_ref(id_type_impl* p) noexcept
         {
             ++p->count_;
         }
 
-        void intrusive_ptr_release(id_type_impl* p)
+        void intrusive_ptr_release(id_type_impl* p) noexcept
         {
             if (0 == --p->count_)
             {
                 id_type_impl::get_deleter(p->get_management_type())(p);
             }
         }
-    }    // namespace detail
+    }    // namespace naming::detail
 
     ///////////////////////////////////////////////////////////////////////////
     id_type& id_type::operator++()    // pre-increment
@@ -65,11 +64,11 @@ namespace hpx { namespace naming {
 
     id_type id_type::operator++(int)    // post-increment
     {
-        return id_type((*gid_)++, unmanaged);
+        return id_type((*gid_)++, management_type::unmanaged);
     }
 
     // comparison is required as well
-    bool operator==(id_type const& lhs, id_type const& rhs)
+    bool operator==(id_type const& lhs, id_type const& rhs) noexcept
     {
         if (!lhs)
         {
@@ -82,7 +81,7 @@ namespace hpx { namespace naming {
         return *lhs.gid_ == *rhs.gid_;
     }
 
-    bool operator<(id_type const& lhs, id_type const& rhs)
+    bool operator<(id_type const& lhs, id_type const& rhs) noexcept
     {
         // LHS is null, rhs is not.
         if (!lhs && rhs)
@@ -109,51 +108,56 @@ namespace hpx { namespace naming {
         }
         return os;
     }
+}    // namespace hpx
+
+namespace hpx::naming {
 
     ///////////////////////////////////////////////////////////////////////////
-    constexpr char const* const management_type_names[] = {
-        "unknown_deleter",       // -1
-        "unmanaged",             // 0
-        "managed",               // 1
-        "managed_move_credit"    // 2
+    inline constexpr char const* const management_type_names[] = {
+        "management_type::unknown_deleter",       // -1
+        "management_type::unmanaged",             // 0
+        "management_type::managed",               // 1
+        "management_type::managed_move_credit"    // 2
     };
 
-    char const* get_management_type_name(id_type::management_type m)
+    char const* get_management_type_name(
+        hpx::id_type::management_type m) noexcept
     {
-        if (m < id_type::unknown_deleter || m > id_type::managed_move_credit)
+        if (m < hpx::id_type::management_type::unknown_deleter ||
+            m > hpx::id_type::management_type::managed_move_credit)
         {
             return "invalid";
         }
-        return management_type_names[m + 1];
+        return management_type_names[static_cast<int>(m) + 1];
     }
-}}    // namespace hpx::naming
+}    // namespace hpx::naming
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits {
 
-    naming::id_type get_remote_result<naming::id_type, naming::gid_type>::call(
+    hpx::id_type get_remote_result<hpx::id_type, naming::gid_type>::call(
         naming::gid_type const& rhs)
     {
         bool has_credits = naming::detail::has_credits(rhs);
-        return naming::id_type(rhs,
-            has_credits ? naming::id_type::managed :
-                          naming::id_type::unmanaged);
+        return hpx::id_type(rhs,
+            has_credits ? hpx::id_type::management_type::managed :
+                          hpx::id_type::management_type::unmanaged);
     }
 
     // we need to specialize this template to allow for automatic conversion of
-    // the vector<naming::gid_type> to a vector<naming::id_type>
-    std::vector<naming::id_type> get_remote_result<std::vector<naming::id_type>,
+    // the vector<naming::gid_type> to a vector<hpx::id_type>
+    std::vector<hpx::id_type> get_remote_result<std::vector<hpx::id_type>,
         std::vector<naming::gid_type>>::
         call(std::vector<naming::gid_type> const& rhs)
     {
-        std::vector<naming::id_type> result;
+        std::vector<hpx::id_type> result;
         result.reserve(rhs.size());
         for (naming::gid_type const& r : rhs)
         {
             bool has_credits = naming::detail::has_credits(r);
-            result.push_back(naming::id_type(r,
-                has_credits ? naming::id_type::managed :
-                              naming::id_type::unmanaged));
+            result.push_back(hpx::id_type(r,
+                has_credits ? hpx::id_type::management_type::managed :
+                              hpx::id_type::management_type::unmanaged));
         }
         return result;
     }

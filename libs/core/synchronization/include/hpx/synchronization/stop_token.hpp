@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
@@ -52,8 +53,8 @@ namespace hpx {
     namespace detail {
 
         struct stop_state;
-        HPX_CORE_EXPORT void intrusive_ptr_add_ref(stop_state* p);
-        HPX_CORE_EXPORT void intrusive_ptr_release(stop_state* p);
+        HPX_CORE_EXPORT void intrusive_ptr_add_ref(stop_state* p) noexcept;
+        HPX_CORE_EXPORT void intrusive_ptr_release(stop_state* p) noexcept;
 
         ///////////////////////////////////////////////////////////////////////
         struct stop_callback_base
@@ -66,8 +67,8 @@ namespace hpx {
 
             virtual void execute() noexcept = 0;
 
-            void add_this_callback(stop_callback_base*& callbacks);
-            bool remove_this_callback();
+            void add_this_callback(stop_callback_base*& callbacks) noexcept;
+            bool remove_this_callback() noexcept;
 
         protected:
             virtual ~stop_callback_base() = default;
@@ -93,32 +94,38 @@ namespace hpx {
                 << 32;
 
         public:
-            stop_state()
+            stop_state() noexcept
               : state_(token_ref_increment)
             {
             }
 
-            bool stop_requested() const noexcept
+            ~stop_state()
+            {
+                HPX_ASSERT((state_.load(std::memory_order_relaxed) &
+                               stop_state::locked_flag) == 0);
+            }
+
+            [[nodiscard]] bool stop_requested() const noexcept
             {
                 return stop_requested(state_.load(std::memory_order_acquire));
             }
 
             // Returns: false if a stop request was not made and there are no
             //      associated stop_source objects; otherwise, true.
-            bool stop_possible() const noexcept
+            [[nodiscard]] bool stop_possible() const noexcept
             {
                 return stop_possible(state_.load(std::memory_order_acquire));
             }
 
             HPX_CORE_EXPORT bool request_stop() noexcept;
 
-            void add_source_count()
+            void add_source_count() noexcept
             {
                 state_.fetch_add(stop_state::source_ref_increment,
                     std::memory_order_relaxed);
             }
 
-            void remove_source_count()
+            void remove_source_count() noexcept
             {
                 state_.fetch_sub(stop_state::source_ref_increment,
                     std::memory_order_acq_rel);
@@ -129,17 +136,19 @@ namespace hpx {
                 stop_callback_base* cb) noexcept;
 
         private:
-            static bool is_locked(std::uint64_t state) noexcept
+            [[nodiscard]] static bool is_locked(std::uint64_t state) noexcept
             {
                 return (state & stop_state::locked_flag) != 0;
             }
 
-            static bool stop_requested(std::uint64_t state) noexcept
+            [[nodiscard]] static bool stop_requested(
+                std::uint64_t state) noexcept
             {
                 return (state & stop_state::stop_requested_flag) != 0;
             }
 
-            static bool stop_possible(std::uint64_t state) noexcept
+            [[nodiscard]] static bool stop_possible(
+                std::uint64_t state) noexcept
             {
                 // Stop may happen, if it has already been requested or if
                 // there are still interrupt_source instances in existence.
@@ -164,7 +173,7 @@ namespace hpx {
             // Effect: locks the state
             HPX_CORE_EXPORT void lock() noexcept;
 
-            void unlock() noexcept
+            HPX_FORCEINLINE void unlock() noexcept
             {
                 state_.fetch_sub(locked_flag, std::memory_order_release);
             }
@@ -173,15 +182,20 @@ namespace hpx {
             friend struct scoped_lock_if_not_stopped;
             friend struct scoped_lock_and_request_stop;
 
-            friend HPX_CORE_EXPORT void intrusive_ptr_add_ref(stop_state* p);
-            friend HPX_CORE_EXPORT void intrusive_ptr_release(stop_state* p);
+            friend HPX_CORE_EXPORT void intrusive_ptr_add_ref(
+                stop_state* p) noexcept;
+            friend HPX_CORE_EXPORT void intrusive_ptr_release(
+                stop_state* p) noexcept;
 
             std::atomic<std::uint64_t> state_;
             stop_callback_base* callbacks_ = nullptr;
             hpx::threads::thread_id_type signalling_thread_;
         };
-
     }    // namespace detail
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Callback>
+    class [[nodiscard]] stop_callback;
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -195,7 +209,15 @@ namespace hpx {
     // from an associated stop_source.
     class stop_token
     {
+    private:
+        template <typename Callback>
+        friend class stop_callback;
+        friend class stop_source;
+
     public:
+        template <typename Callback>
+        using callback_type = stop_callback<Callback>;
+
         // 32.3.3.1 constructors, copy, and assignment
 
         // Postconditions: stop_possible() is false and stop_requested() is
@@ -230,7 +252,7 @@ namespace hpx {
 
         // Returns: true if *this has ownership of a stop state that has
         //      received a stop request; otherwise, false.
-        HPX_NODISCARD bool stop_requested() const noexcept
+        [[nodiscard]] bool stop_requested() const noexcept
         {
             return !!state_ && state_->stop_requested();
         }
@@ -239,7 +261,7 @@ namespace hpx {
         //      (2.1) *this does not have ownership of a stop state, or
         //      (2.2) a stop request was not made and there are no associated
         //            stop_source objects; otherwise, true.
-        HPX_NODISCARD bool stop_possible() const noexcept
+        [[nodiscard]] bool stop_possible() const noexcept
         {
             return !!state_ && state_->stop_possible();
         }
@@ -249,31 +271,28 @@ namespace hpx {
         // Returns: true if lhs and rhs have ownership of the same stop state or
         //      if both lhs and rhs do not have ownership of a stop state;
         //      otherwise false.
-        HPX_NODISCARD friend bool operator==(
+        [[nodiscard]] friend bool operator==(
             stop_token const& lhs, stop_token const& rhs) noexcept
         {
             return lhs.state_ == rhs.state_;
         }
 
         // Returns: !(lhs==rhs).
-        HPX_NODISCARD friend bool operator!=(
+        [[nodiscard]] friend bool operator!=(
             stop_token const& lhs, stop_token const& rhs) noexcept
         {
             return !(lhs == rhs);
         }
 
     private:
-        template <typename Callback>
-        friend class stop_callback;
-        friend class stop_source;
-
-        stop_token(hpx::memory::intrusive_ptr<detail::stop_state> const& state)
+        explicit stop_token(
+            hpx::intrusive_ptr<detail::stop_state> const& state) noexcept
           : state_(state)
         {
         }
 
     private:
-        hpx::memory::intrusive_ptr<detail::stop_state> state_;
+        hpx::intrusive_ptr<detail::stop_state> state_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -292,7 +311,7 @@ namespace hpx {
         explicit nostopstate_t() = default;
     };
 
-    HPX_INLINE_CONSTEXPR_VARIABLE nostopstate_t nostopstate{};
+    inline constexpr nostopstate_t nostopstate{};
 
     class stop_source
     {
@@ -349,7 +368,7 @@ namespace hpx {
 
         // Returns: stop_token() if stop_possible() is false; otherwise a new
         //      associated stop_token object.
-        HPX_NODISCARD stop_token get_token() const noexcept
+        [[nodiscard]] stop_token get_token() const noexcept
         {
             if (!stop_possible())
             {
@@ -359,14 +378,14 @@ namespace hpx {
         }
 
         // Returns: true if *this has ownership of a stop state; otherwise, false.
-        HPX_NODISCARD bool stop_possible() const noexcept
+        [[nodiscard]] bool stop_possible() const noexcept
         {
             return !!state_;
         }
 
         // Returns: true if *this has ownership of a stop state that has
         //      received a stop request; otherwise, false.
-        HPX_NODISCARD bool stop_requested() const noexcept
+        [[nodiscard]] bool stop_requested() const noexcept
         {
             return !!state_ && state_->stop_requested();
         }
@@ -397,20 +416,20 @@ namespace hpx {
         // Returns: true if lhs and rhs have ownership of the same stop state or
         //      if both lhs and rhs do not have ownership of a stop state;
         //      otherwise false.
-        HPX_NODISCARD friend bool operator==(
+        [[nodiscard]] friend bool operator==(
             stop_source const& lhs, stop_source const& rhs) noexcept
         {
             return lhs.state_ == rhs.state_;
         }
 
-        HPX_NODISCARD friend bool operator!=(
+        [[nodiscard]] friend bool operator!=(
             stop_source const& lhs, stop_source const& rhs) noexcept
         {
             return !(lhs == rhs);
         }
 
     private:
-        hpx::memory::intrusive_ptr<detail::stop_state> state_;
+        hpx::intrusive_ptr<detail::stop_state> state_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -418,7 +437,7 @@ namespace hpx {
     // 32.3.5, class stop_callback
     //
     template <typename Callback>
-    class HPX_NODISCARD stop_callback : private detail::stop_callback_base
+    class [[nodiscard]] stop_callback : private detail::stop_callback_base
     {
     public:
         using callback_type = Callback;
@@ -429,24 +448,24 @@ namespace hpx {
         //
         // Preconditions: Callback and CB model constructible_from<Callback, CB>.
         //
-        // Effects: Initializes callback with std::forward<CB>(cb). If
-        //      st.stop_requested() is true, then std::forward<CB>(cb)() is
+        // Effects: Initializes callback with HPX_FORWARD(CB, cb). If
+        //      st.stop_requested() is true, then HPX_FORWARD(CB, cb)() is
         //      evaluated in the current thread before the constructor returns.
         //      Otherwise, if st has ownership of a stop state, acquires shared
         //      ownership of that stop state and registers the callback with
-        //      that stop state such that std::forward<CB>(cb)() is evaluated by
+        //      that stop state such that HPX_FORWARD(CB, cb)() is evaluated by
         //      the first call to request_stop() on an associated stop_source.
         //
-        // Remarks: If evaluating std::forward<CB>(cb)() exits via
+        // Remarks: If evaluating HPX_FORWARD(CB, cb)() exits via
         //      an exception, then std::terminate is called (14.6.1).
         //
         // Throws: Any exception thrown by the initialization of callback.
         template <typename CB,
-            typename Enable = typename std::enable_if<
-                std::is_constructible<Callback, CB>::value>::type>
+            typename Enable =
+                std::enable_if_t<std::is_constructible_v<Callback, CB>>>
         explicit stop_callback(stop_token const& st, CB&& cb) noexcept(
-            std::is_nothrow_constructible<Callback, CB>::value)
-          : callback_(std::forward<CB>(cb))
+            std::is_nothrow_constructible_v<Callback, CB>)
+          : callback_(HPX_FORWARD(CB, cb))
           , state_(st.state_)
         {
             if (state_)
@@ -454,12 +473,12 @@ namespace hpx {
         }
 
         template <typename CB,
-            typename Enable = typename std::enable_if<
-                std::is_constructible<Callback, CB>::value>::type>
+            typename Enable =
+                std::enable_if_t<std::is_constructible_v<Callback, CB>>>
         explicit stop_callback(stop_token&& st, CB&& cb) noexcept(
-            std::is_nothrow_constructible<Callback, CB>::value)
-          : callback_(std::forward<CB>(cb))
-          , state_(std::move(st.state_))
+            std::is_nothrow_constructible_v<Callback, CB>)
+          : callback_(HPX_FORWARD(CB, cb))
+          , state_(HPX_MOVE(st.state_))
         {
             if (state_)
                 state_->add_callback(this);
@@ -467,8 +486,8 @@ namespace hpx {
 
         // Effects: Unregisters the callback from the owned stop state, if any.
         //      The destructor does not block waiting for the execution of
-        //      another callback registered by an associated stop_callback. If
-        //      the callback is concurrently executing on another thread, then
+        //      anrhs callback registered by an associated stop_callback. If
+        //      the callback is concurrently executing on anrhs thread, then
         //      the return from the invocation of callback strongly happens
         //      before (6.9.2.1) callback is destroyed. If callback is executing
         //      on the current thread, then the destructor does not block (3.6)
@@ -493,8 +512,8 @@ namespace hpx {
         }
 
     private:
-        Callback callback_;
-        hpx::memory::intrusive_ptr<detail::stop_state> state_;
+        HPX_NO_UNIQUE_ADDRESS Callback callback_;
+        hpx::intrusive_ptr<detail::stop_state> state_;
     };
 
     ////////////////////////////////////////////////////////////////////////////
@@ -506,21 +525,6 @@ namespace hpx {
     // Expects: stop_callback is instantiated with an argument for the
     //      template parameter Callback that models both invocable and
     //      destructible.
-    template <typename Callback>
-    stop_callback<typename std::decay<Callback>::type> make_stop_callback(
-        stop_token const& st, Callback&& cb)
-    {
-        return stop_callback<typename std::decay<Callback>::type>(
-            st, std::forward<Callback>(cb));
-    }
-
-    template <typename Callback>
-    stop_callback<typename std::decay<Callback>::type> make_stop_callback(
-        stop_token&& st, Callback&& cb)
-    {
-        return stop_callback<typename std::decay<Callback>::type>(
-            std::move(st), std::forward<Callback>(cb));
-    }
 
     // clang-format produces inconsistent result between different versions
     // clang-format off
@@ -544,3 +548,361 @@ namespace hpx {
         lhs.swap(rhs);
     }
 }    // namespace hpx
+
+////////////////////////////////////////////////////////////////////////////////
+// Extensions to <stop_token> as preposed by P2300
+namespace hpx::p2300_stop_token {
+
+    // [stoptoken.inplace], class in_place_stop_token
+    class in_place_stop_token;
+
+    // [stopsource.inplace], class in_place_stop_source
+    class in_place_stop_source;
+
+    // [stopcallback.inplace], class template in_place_stop_callback
+    template <typename Callback>
+    class [[nodiscard]] in_place_stop_callback;
+
+    // [stoptoken.never], class never_stop_token
+    //
+    // The class never_stop_token provides an implementation of the
+    // unstoppable_token concept. It provides a stop token interface,
+    // but also provides static information that a stop is never
+    // possible nor requested.
+    //
+    struct never_stop_token
+    {
+    private:
+        struct callback_impl
+        {
+            template <typename Callback>
+            explicit constexpr callback_impl(
+                never_stop_token, Callback&&) noexcept
+            {
+            }
+        };
+
+    public:
+        template <typename>
+        using callback_type = callback_impl;
+
+        [[nodiscard]] static constexpr bool stop_requested() noexcept
+        {
+            return false;
+        }
+
+        [[nodiscard]] static constexpr bool stop_possible() noexcept
+        {
+            return false;
+        }
+
+        [[nodiscard]] friend constexpr bool operator==(
+            never_stop_token const&, never_stop_token const&) noexcept
+        {
+            return true;
+        }
+    };
+
+    // [stopsource.inplace], class in_place_stop_source
+    //
+    // The class in_place_stop_source implements the semantics of making a
+    // stop request, without the need for a dynamic allocation of a shared
+    // state. A stop request made on a in_place_stop_source object is visible
+    // to all associated in_place_stop_token ([stoptoken.inplace]) objects.
+    // Once a stop request has been made it cannot be withdrawn (a subsequent
+    // stop request has no effect). All uses of in_place_stop_token objects
+    // associated with a given in_place_stop_source object must happen before
+    // the invocation of the destructor of that in_place_stop_token object.
+    //
+    class in_place_stop_source
+    {
+    public:
+        in_place_stop_source() noexcept
+        {
+            state_.add_source_count();
+        }
+        ~in_place_stop_source()
+        {
+            state_.remove_source_count();
+        }
+
+        in_place_stop_source(in_place_stop_source const&) = delete;
+        in_place_stop_source(in_place_stop_source&&) noexcept = delete;
+
+        in_place_stop_source& operator=(in_place_stop_source const&) = delete;
+        in_place_stop_source& operator=(
+            in_place_stop_source&&) noexcept = delete;
+
+        [[nodiscard]] in_place_stop_token get_token() const noexcept;
+
+        // Effects: Atomically determines whether the stop state inside *this
+        // has received a stop request, and if not, makes a stop request.
+        // The determination and making of the stop request are an atomic
+        // read-modify-write operation ([intro.races]). If the request was
+        // made, the callbacks registered by associated in_place_stop_callback
+        // objects are synchronously called. If an invocation of a callback
+        // exits via an exception then terminate is invoked ([except.terminate]).
+        //
+        // Postconditions: stop_possible() is false and stop_requested() is true.
+        //
+        // Returns: true if this call made a stop request; otherwise false.
+        //
+        bool request_stop() noexcept
+        {
+            return state_.request_stop();
+        }
+
+        // Returns: true if the stop state inside *this has not yet received
+        // a stop request; otherwise, false.
+        [[nodiscard]] bool stop_requested() const noexcept
+        {
+            return state_.stop_requested();
+        }
+
+        // Returns: true if the stop state inside *this has not yet received
+        // a stop request; otherwise, false.
+        [[nodiscard]] bool stop_possible() const noexcept
+        {
+            return state_.stop_possible();
+        }
+
+    private:
+        friend class in_place_stop_token;
+        friend struct hpx::detail::stop_callback_base;
+
+        template <typename>
+        friend class in_place_stop_callback;
+
+        bool register_callback(hpx::detail::stop_callback_base* cb) noexcept
+        {
+            return state_.add_callback(cb);
+        }
+
+        void remove_callback(hpx::detail::stop_callback_base* cb) noexcept
+        {
+            state_.remove_callback(cb);
+        }
+
+        hpx::detail::stop_state state_;
+    };
+
+    // [stoptoken.inplace], class in_place_stop_token
+    //
+    // The class in_place_stop_token provides an interface for querying
+    // whether a stop request has been made (stop_requested) or can ever
+    // be made (stop_possible) using an associated in_place_stop_source
+    // object ([stopsource.inplace]). An in_place_stop_token can also be
+    // passed to an in_place_stop_callback ([stopcallback.inplace])
+    // constructor to register a callback to be called when a stop
+    // request has been made from an associated in_place_stop_source.
+    //
+    class in_place_stop_token
+    {
+    public:
+        template <typename Callback>
+        using callback_type = in_place_stop_callback<Callback>;
+
+        // Effects: initializes source_ with nullptr.
+        constexpr in_place_stop_token() noexcept
+          : source_(nullptr)
+        {
+        }
+
+        in_place_stop_token(in_place_stop_token const& rhs) noexcept = default;
+
+        in_place_stop_token(in_place_stop_token&& rhs) noexcept
+          : source_(std::exchange(rhs.source_, nullptr))
+        {
+        }
+
+        in_place_stop_token& operator=(
+            in_place_stop_token const& rhs) noexcept = default;
+
+        in_place_stop_token& operator=(in_place_stop_token&& rhs) noexcept
+        {
+            source_ = std::exchange(rhs.source_, nullptr);
+            return *this;
+        }
+
+        // Returns: source_ != nullptr && source_->stop_requested().
+        //
+        // Remarks: If source_ != nullptr, then any calls to this function
+        // must strongly happen before the beginning of invocation of the
+        // destructor of *source_.
+        //
+        [[nodiscard]] bool stop_requested() const noexcept
+        {
+            return source_ != nullptr && source_->stop_requested();
+        }
+
+        // Returns: source_ != nullptr && source_->stop_possible().
+        //
+        // Remarks: If source_ != nullptr, then any calls to this function
+        // must strongly happen before the beginning of invocation of the
+        // destructor of *source_.
+        //
+        [[nodiscard]] bool stop_possible() const noexcept
+        {
+            return source_ != nullptr && source_->stop_possible();
+        }
+
+        // Effects: Exchanges the values of source_ and rhs.source_.
+        void swap(in_place_stop_token& rhs) noexcept
+        {
+            std::swap(source_, rhs.source_);
+        }
+
+        [[nodiscard]] friend constexpr bool operator==(
+            in_place_stop_token const& lhs,
+            in_place_stop_token const& rhs) noexcept
+        {
+            return lhs.source_ == rhs.source_;
+        }
+
+        friend void swap(
+            in_place_stop_token& x, in_place_stop_token& y) noexcept
+        {
+            x.swap(y);
+        }
+
+    private:
+        friend class in_place_stop_source;
+
+        template <typename>
+        friend class in_place_stop_callback;
+
+        // Effects: initializes source_ with source.
+        explicit in_place_stop_token(
+            in_place_stop_source const* source) noexcept
+          : source_(source)
+        {
+        }
+
+        in_place_stop_source const* source_;
+    };
+
+    inline in_place_stop_token in_place_stop_source::get_token() const noexcept
+    {
+        return in_place_stop_token{this};
+    }
+
+    // [stopcallback.inplace], class template in_place_stop_callback
+    //
+    // Mandates: in_place_stop_callback is instantiated with an argument for
+    // the template parameter Callback that satisfies both invocable and
+    // destructible.
+    //
+    // Preconditions: in_place_stop_callback is instantiated with an argument
+    // for the template parameter Callback that models both invocable and
+    // destructible.
+    //
+    // Recommended practice: Implementation should use the storage of the
+    // in_place_stop_callback objects to store the state necessary for their
+    // association with an in_place_stop_source object.
+    //
+    template <typename Callback>
+    class [[nodiscard]] in_place_stop_callback
+      : private hpx::detail::stop_callback_base
+    {
+    public:
+        using callback_type = Callback;
+
+        // Constraints: Callback and CB satisfy constructible_from<Callback, CB>.
+        //
+        // Preconditions: Callback and CB model constructible_from<Callback, CB>.
+        //
+        // Effects: Initializes callback_ with std::forward<C>(cb). If
+        // st.stop_requested() is true, then std::forward<Callback>(callback_)()
+        // is evaluated in the current thread before the constructor returns.
+        // Otherwise, if st has an associated in_place_stop_source object,
+        // registers the callback with the stop state of the in_place_stop_source
+        // that st is associated with such that std::forward<Callback>(callback_)()
+        // is evaluated by the first call to request_stop() on an associated
+        // in_place_stop_source. The in_place_stop_callback object being
+        // initialized becomes associated with the in_place_stop_source object
+        // that st is associated with, if any.
+        //
+        // Throws: Any exception thrown by the initialization of callback_.
+        //
+        // Remarks: If evaluating std::forward<Callback>(callback_)() exits via
+        // an exception, then terminate is invoked ([except.terminate]).
+        //
+        template <typename CB,
+            typename Enable =
+                std::enable_if_t<std::is_constructible_v<Callback, CB>>>
+        explicit in_place_stop_callback(in_place_stop_token const& st,
+            CB&& cb) noexcept(std::is_nothrow_constructible_v<Callback, CB>)
+          : callback_(HPX_FORWARD(CB, cb))
+          , source_(const_cast<in_place_stop_source*>(st.source_))
+        {
+            if (source_ != nullptr)
+            {
+                source_->register_callback(this);
+            }
+        }
+
+        template <typename CB,
+            typename Enable =
+                std::enable_if_t<std::is_constructible_v<Callback, CB>>>
+        explicit in_place_stop_callback(in_place_stop_token&& st,
+            CB&& cb) noexcept(std::is_nothrow_constructible_v<Callback, CB>)
+          : callback_(HPX_FORWARD(CB, cb))
+          , source_(const_cast<in_place_stop_source*>(st.source_))
+        {
+            if (source_ != nullptr)
+            {
+                st.source_ = nullptr;
+                source_->register_callback(this);
+            }
+        }
+
+        // Effects: Unregisters the callback from the stop state of the
+        // associated in_place_stop_source object, if any. The destructor
+        // does not block waiting for the execution of another callback
+        // registered by an associated stop_callback. If callback_ is
+        // concurrently executing on another thread, then the return from
+        // the invocation of callback_ strongly happens before ([intro.races])
+        // callback_ is destroyed. If callback_ is executing on the current
+        // thread, then the destructor does not block ([defns.block]) waiting
+        // for the return from the invocation of callback_.
+        //
+        // Remarks: A program has undefined behavior if the invocation of
+        // this function does not strongly happen before the beginning of the
+        // invocation of the destructor of the associated in_place_stop_source
+        // object, if any.
+        //
+        ~in_place_stop_callback()
+        {
+            if (source_ != nullptr)
+                source_->remove_callback(this);
+        }
+
+        in_place_stop_callback(in_place_stop_callback const&) = delete;
+        in_place_stop_callback(in_place_stop_callback&&) noexcept = delete;
+
+        in_place_stop_callback& operator=(
+            in_place_stop_callback const&) = delete;
+        in_place_stop_callback& operator=(
+            in_place_stop_callback&&) noexcept = delete;
+
+    private:
+        void execute() noexcept override
+        {
+            HPX_FORWARD(Callback, callback_)();
+        }
+
+        HPX_NO_UNIQUE_ADDRESS Callback callback_;
+        in_place_stop_source* source_;
+    };
+
+    template <typename Callback>
+    in_place_stop_callback(in_place_stop_token, Callback)
+        -> in_place_stop_callback<Callback>;
+
+}    // namespace hpx::p2300_stop_token
+
+// For now, import all facilities as proposed by P2300 into hpx::experimental
+namespace hpx::experimental {
+
+    using namespace hpx::p2300_stop_token;
+}    // namespace hpx::experimental

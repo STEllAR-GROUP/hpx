@@ -64,13 +64,14 @@ namespace hpx { namespace collectives {
     /// \param comm     The channel communicator object to use for the data transfer
     /// \param site     The destination site
     /// \param value    The value to send
+    /// \param tag      The (optional) tag identifying the concrete operation
     ///
     /// \returns    This function returns a future<void> that becomes ready once the
     ///             data transfer operation has finished.
     ///
     template <typename T>
     hpx::future<void> set(channel_communicator comm,
-        that_site_arg site, T&& value);
+        that_site_arg site, T&& value, tag_arg tag = 0);
 
     /// Send a value to the given site
     ///
@@ -85,7 +86,8 @@ namespace hpx { namespace collectives {
     ///             received value.
     ///
     template <typename T>
-    hpx::future<T> get(channel_communicator comm, that_site_arg site);
+    hpx::future<T> get(channel_communicator comm, that_site_arg site,
+        tag_arg tag = 0);
 
 }}
 // clang-format on
@@ -111,6 +113,18 @@ namespace hpx { namespace collectives {
 namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
+    // forward declarations
+    class channel_communicator;
+
+    template <typename T>
+    hpx::future<T> get(
+        channel_communicator, that_site_arg, tag_arg = tag_arg(0));
+
+    template <typename T>
+    hpx::future<void> set(
+        channel_communicator, that_site_arg, T&&, tag_arg = tag_arg(0));
+
+    ///////////////////////////////////////////////////////////////////////////
     class channel_communicator
     {
     private:
@@ -119,10 +133,11 @@ namespace hpx { namespace collectives {
             num_sites_arg num_sites, this_site_arg this_site);
 
         template <typename T>
-        friend hpx::future<T> get(channel_communicator, that_site_arg);
+        friend hpx::future<T> get(channel_communicator, that_site_arg, tag_arg);
 
         template <typename T>
-        friend hpx::future<void> set(channel_communicator, that_site_arg, T&&);
+        friend hpx::future<void> set(
+            channel_communicator, that_site_arg, T&&, tag_arg);
 
     private:
         HPX_EXPORT channel_communicator(char const* basename,
@@ -158,16 +173,18 @@ namespace hpx { namespace collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    hpx::future<T> get(channel_communicator comm, that_site_arg site)
+    hpx::future<T> get(
+        channel_communicator comm, that_site_arg site, tag_arg tag)
     {
-        return comm.comm_->template get<T>(site.that_site_);
+        return comm.comm_->template get<T>(site.that_site_, tag.tag_);
     }
 
     template <typename T>
     hpx::future<void> set(
-        channel_communicator comm, that_site_arg site, T&& value)
+        channel_communicator comm, that_site_arg site, T&& value, tag_arg tag)
     {
-        return comm.comm_->set(site.that_site_, std::forward<T>(value));
+        return comm.comm_->set(
+            site.that_site_, HPX_FORWARD(T, value), tag.tag_);
     }
 }}    // namespace hpx::collectives
 

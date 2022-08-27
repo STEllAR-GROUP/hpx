@@ -6,6 +6,7 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
+#include <hpx/assert.hpp>
 #include <hpx/local/chrono.hpp>
 #include <hpx/local/execution.hpp>
 #include <hpx/local/future.hpp>
@@ -25,6 +26,9 @@
 #include <utility>
 #include <vector>
 
+std::size_t const max_threads = (std::min)(
+    std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
+
 int hpx_main(int argc, char* argv[])
 {
     hpx::threads::thread_pool_base& worker_pool =
@@ -33,7 +37,7 @@ int hpx_main(int argc, char* argv[])
               << worker_pool.get_scheduler()->get_description() << std::endl;
     std::size_t const num_threads = hpx::resource::get_num_threads("default");
 
-    HPX_TEST_EQ(std::size_t(4), num_threads);
+    HPX_TEST_EQ(max_threads, num_threads);
 
     hpx::threads::thread_pool_base& tp =
         hpx::resource::get_thread_pool("default");
@@ -64,7 +68,7 @@ int hpx_main(int argc, char* argv[])
 
             if (up)
             {
-                if (thread_num != hpx::resource::get_num_threads("default") - 1)
+                if (thread_num < hpx::resource::get_num_threads("default") - 1)
                 {
                     hpx::threads::suspend_processing_unit(tp, thread_num).get();
                 }
@@ -79,11 +83,13 @@ int hpx_main(int argc, char* argv[])
             }
             else
             {
-                hpx::threads::resume_processing_unit(tp, thread_num - 1).get();
+                hpx::threads::resume_processing_unit(tp, thread_num).get();
 
-                --thread_num;
-
-                if (thread_num == 0)
+                if (thread_num > 0)
+                {
+                    --thread_num;
+                }
+                else
                 {
                     up = true;
                 }
@@ -108,15 +114,14 @@ void test_scheduler(
 {
     hpx::local::init_params init_args;
 
-    init_args.cfg = {"hpx.os_threads=4"};
+    init_args.cfg = {"hpx.os_threads=" + std::to_string(max_threads)};
     init_args.rp_callback = [scheduler](auto& rp) {
         std::cout << "\nCreating pool with scheduler " << scheduler
                   << std::endl;
 
         rp.create_thread_pool("default", scheduler,
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::default_mode |
-                hpx::threads::policies::enable_elasticity));
+            hpx::threads::policies::scheduler_mode::default_ |
+                hpx::threads::policies::scheduler_mode::enable_elasticity);
     };
 
     HPX_TEST_EQ(hpx::local::init(hpx_main, argc, argv, init_args), 0);
@@ -124,6 +129,8 @@ void test_scheduler(
 
 int main(int argc, char* argv[])
 {
+    HPX_ASSERT(max_threads >= 2);
+
     // NOTE: Static schedulers do not support suspending the own worker thread
     // because they do not steal work. Periodic priority scheduler not tested
     // because it does not take into account scheduler states when scheduling

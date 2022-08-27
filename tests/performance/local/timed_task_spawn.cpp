@@ -155,7 +155,7 @@ void print_results(std::uint64_t cores, double walltime, double warmup_estimate,
 
 ///////////////////////////////////////////////////////////////////////////////
 void wait_for_tasks(
-    hpx::lcos::local::barrier& finished, std::uint64_t suspended_tasks)
+    std::shared_ptr<hpx::barrier<>> finished, std::uint64_t suspended_tasks)
 {
     std::uint64_t const pending_count =
         get_thread_count(hpx::threads::thread_priority::normal,
@@ -169,7 +169,7 @@ void wait_for_tasks(
         if (all_count != suspended_tasks + 1)
         {
             thread_init_data data(
-                make_thread_function_nullary(hpx::util::bind(
+                make_thread_function_nullary(hpx::bind(
                     &wait_for_tasks, std::ref(finished), suspended_tasks)),
                 "wait_for_tasks", hpx::threads::thread_priority::low);
             register_work(data);
@@ -177,7 +177,7 @@ void wait_for_tasks(
         }
     }
 
-    finished.wait();
+    finished->arrive_and_wait();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -197,7 +197,7 @@ hpx::threads::thread_result_type invoke_worker_timed_suspension(
 {
     worker_timed(delay * 1000);
 
-    hpx::error_code ec(hpx::lightweight);
+    hpx::error_code ec(hpx::throwmode::lightweight);
     hpx::this_thread::suspend(
         hpx::threads::thread_schedule_state::suspended, "suspend", ec);
 
@@ -301,7 +301,7 @@ void stage_workers(std::uint64_t target_thread, std::uint64_t local_tasks,
     if (num_thread != target_thread)
     {
         thread_init_data data(
-            make_thread_function_nullary(hpx::util::bind(
+            make_thread_function_nullary(hpx::bind(
                 &stage_workers, target_thread, local_tasks, stage_worker)),
             "stage_workers", hpx::threads::thread_priority::normal,
             hpx::threads::thread_schedule_hint(
@@ -468,7 +468,7 @@ int hpx_main(variables_map& vm)
                 continue;
 
             thread_init_data data(
-                make_thread_function_nullary(hpx::util::bind(
+                make_thread_function_nullary(hpx::bind(
                     &stage_workers, i, tasks_per_feeder, stage_worker)),
                 "stage_workers", hpx::threads::thread_priority::normal,
                 hpx::threads::thread_schedule_hint(
@@ -483,15 +483,16 @@ int hpx_main(variables_map& vm)
         // Schedule a low-priority thread; when it is executed, it checks to
         // make sure all the tasks (which are normal priority) have been
         // executed, and then it
-        hpx::lcos::local::barrier finished(2);
+        std::shared_ptr<hpx::barrier<>> finished =
+            std::make_shared<hpx::barrier<>>(2);
 
         thread_init_data data(
-            make_thread_function_nullary(hpx::util::bind(
-                &wait_for_tasks, std::ref(finished), total_suspended_tasks)),
+            make_thread_function_nullary(
+                hpx::bind(&wait_for_tasks, finished, total_suspended_tasks)),
             "wait_for_tasks", hpx::threads::thread_priority::low);
         register_work(data);
 
-        finished.wait();
+        finished->arrive_and_wait();
 
         // Stop the clock
         double time_elapsed = t.elapsed();

@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
-namespace hpx { namespace naming {
+namespace hpx::naming {
 
     /// The helper function \a hpx::unmanaged can be used to generate
     /// a global identifier which does not participate in the automatic
@@ -31,8 +31,8 @@ namespace hpx { namespace naming {
     ///             the user to take full responsibility for keeping the referenced
     ///             objects alive long enough.
     ///
-    HPX_EXPORT id_type unmanaged(id_type const& id);
-}}    // namespace hpx::naming
+    HPX_EXPORT hpx::id_type unmanaged(hpx::id_type const& id);
+}    // namespace hpx::naming
 
 namespace hpx {
     using naming::unmanaged;

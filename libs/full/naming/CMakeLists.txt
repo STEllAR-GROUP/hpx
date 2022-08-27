@@ -32,6 +32,6 @@ add_hpx_module(
   HEADERS ${naming_headers}
   COMPAT_HEADERS ${naming_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_agas_base hpx_checkpoint_base hpx_naming_base
+  MODULE_DEPENDENCIES hpx_checkpoint_base hpx_components_base hpx_naming_base
   CMAKE_SUBDIRS examples tests
 )

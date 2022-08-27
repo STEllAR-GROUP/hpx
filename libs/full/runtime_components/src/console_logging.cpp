@@ -76,7 +76,7 @@ namespace hpx { namespace components {
     }
 
     void console_logging_locked(
-        naming::id_type const& prefix, messages_type const& msgs)
+        hpx::id_type const& prefix, messages_type const& msgs)
     {
         // If we're not in an HPX thread, we cannot call apply as it may access
         // the AGAS components. We just throw an exception here - there's no
@@ -119,7 +119,7 @@ namespace hpx { namespace components {
 
         pending_logs()
           : prefix_mtx_()
-          , prefix_(naming::invalid_id)
+          , prefix_(hpx::invalid_id)
           , queue_mtx_()
           , activated_(false)
           , is_sending_(false)
@@ -141,7 +141,7 @@ namespace hpx { namespace components {
         bool is_active();
 
         prefix_mutex_type prefix_mtx_;
-        naming::id_type prefix_;
+        hpx::id_type prefix_;
 
         queue_mutex_type queue_mtx_;
         messages_type queue_;
@@ -153,7 +153,7 @@ namespace hpx { namespace components {
     bool pending_logs::is_active()
     {
         return threads::get_self_ptr() &&
-            threads::threadmanager_is(state_running) && activated_.load();
+            threads::threadmanager_is(hpx::state::running) && activated_.load();
     }
 
     void pending_logs::add(message_type const& msg)
@@ -219,7 +219,8 @@ namespace hpx { namespace components {
 
     void pending_logs::cleanup()
     {
-        if (threads::threadmanager_is(state_running) && threads::get_self_ptr())
+        if (threads::threadmanager_is(hpx::state::running) &&
+            threads::get_self_ptr())
         {
             send();
         }
@@ -240,12 +241,12 @@ namespace hpx { namespace components {
     bool pending_logs::ensure_prefix()
     {
         // Resolve the console prefix if it's still invalid.
-        if (HPX_UNLIKELY(naming::invalid_id == prefix_))
+        if (HPX_UNLIKELY(hpx::invalid_id == prefix_))
         {
             std::unique_lock<prefix_mutex_type> l(
                 prefix_mtx_, std::try_to_lock);
 
-            if (l.owns_lock() && (naming::invalid_id == prefix_))
+            if (l.owns_lock() && (hpx::invalid_id == prefix_))
             {
                 naming::gid_type raw_prefix;
                 {
@@ -257,8 +258,8 @@ namespace hpx { namespace components {
                 HPX_ASSERT(naming::invalid_gid != raw_prefix);
                 if (!prefix_)
                 {
-                    prefix_ =
-                        naming::id_type(raw_prefix, naming::id_type::unmanaged);
+                    prefix_ = hpx::id_type(
+                        raw_prefix, hpx::id_type::management_type::unmanaged);
                 }
                 else
                 {

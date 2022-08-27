@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2020 Hartmut Kaiser
+//  Copyright (c) 2019-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,7 +19,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         for (/**/; first != last; ++first)
         {
-            value = hpx::util::invoke(reduce_op, value, *first);
+            value = HPX_INVOKE(reduce_op, HPX_MOVE(value), *first);
         }
         return value;
     }
@@ -27,6 +27,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename Iter, typename Sent, typename T>
     inline constexpr T accumulate(Iter first, Sent last, T value)
     {
-        return accumulate(first, last, value, std::plus<T>());
+        return accumulate(first, last, HPX_MOVE(value), std::plus<T>());
     }
 }}}}    // namespace hpx::parallel::v1::detail

@@ -20,7 +20,7 @@ namespace hpx { namespace util { namespace detail {
         hpx::util::iterator_range<hpx::util::counting_iterator<Incrementable>>;
 
     template <typename Incrementable>
-    HPX_HOST_DEVICE inline counting_shape_type<Incrementable>
+    HPX_HOST_DEVICE inline constexpr counting_shape_type<Incrementable>
     make_counting_shape(Incrementable n)
     {
         return hpx::util::make_iterator_range(

@@ -35,8 +35,9 @@ void test_for_loop(ExPolicy&& policy, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::for_loop(std::forward<ExPolicy>(policy), iterator(std::begin(c)),
-        iterator(std::end(c)), [](iterator it) { *it = 42; });
+    hpx::experimental::for_loop(std::forward<ExPolicy>(policy),
+        iterator(std::begin(c)), iterator(std::end(c)),
+        [](iterator it) { *it = 42; });
 
     // verify values
     std::size_t count = 0;
@@ -56,8 +57,9 @@ void test_for_loop_async(ExPolicy&& p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    auto f = hpx::for_loop(std::forward<ExPolicy>(p), iterator(std::begin(c)),
-        iterator(std::end(c)), [](iterator it) { *it = 42; });
+    auto f = hpx::experimental::for_loop(std::forward<ExPolicy>(p),
+        iterator(std::begin(c)), iterator(std::end(c)),
+        [](iterator it) { *it = 42; });
     f.wait();
 
     // verify values
@@ -98,7 +100,7 @@ void test_for_loop_idx(ExPolicy&& policy)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    hpx::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
+    hpx::experimental::for_loop(std::forward<ExPolicy>(policy), 0, c.size(),
         [&c](std::size_t i) { c[i] = 42; });
 
     // verify values
@@ -116,7 +118,7 @@ void test_for_loop_idx_async(ExPolicy&& p)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), gen());
 
-    auto f = hpx::for_loop(std::forward<ExPolicy>(p), 0, c.size(),
+    auto f = hpx::experimental::for_loop(std::forward<ExPolicy>(p), 0, c.size(),
         [&c](std::size_t i) { c[i] = 42; });
     f.wait();
 

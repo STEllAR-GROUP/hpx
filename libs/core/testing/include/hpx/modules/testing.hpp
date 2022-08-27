@@ -27,7 +27,7 @@
 
 namespace hpx { namespace util {
 
-    using test_failure_handler_type = function_nonser<void()>;
+    using test_failure_handler_type = hpx::function<void()>;
     HPX_CORE_EXPORT void set_test_failure_handler(test_failure_handler_type f);
 
     enum counter_type
@@ -173,7 +173,7 @@ namespace hpx { namespace util {
             }
         };
 
-        HPX_CORE_EXPORT extern fixture global_fixture;
+        HPX_CORE_EXPORT fixture& global_fixture();
 
     }    // namespace detail
 
@@ -196,7 +196,7 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_TEST_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))         \
     /**/
 #define HPX_TEST_1(expr)                                                       \
-    HPX_TEST_IMPL(::hpx::util::detail::global_fixture, expr)
+    HPX_TEST_IMPL(::hpx::util::detail::global_fixture(), expr)
 #define HPX_TEST_2(strm, expr)                                                 \
     HPX_TEST_IMPL(::hpx::util::detail::fixture{strm}, expr)
 
@@ -214,7 +214,7 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_TEST_MSG_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))     \
     /**/
 #define HPX_TEST_MSG_2(expr, msg)                                              \
-    HPX_TEST_MSG_IMPL(::hpx::util::detail::global_fixture, expr, msg)
+    HPX_TEST_MSG_IMPL(::hpx::util::detail::global_fixture(), expr, msg)
 #define HPX_TEST_MSG_3(strm, expr, msg)                                        \
     HPX_TEST_MSG_IMPL(::hpx::util::detail::fixture{strm}, expr, msg)
 
@@ -232,7 +232,7 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_TEST_EQ_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))      \
     /**/
 #define HPX_TEST_EQ_2(expr1, expr2)                                            \
-    HPX_TEST_EQ_IMPL(::hpx::util::detail::global_fixture, expr1, expr2)
+    HPX_TEST_EQ_IMPL(::hpx::util::detail::global_fixture(), expr1, expr2)
 #define HPX_TEST_EQ_3(strm, expr1, expr2)                                      \
     HPX_TEST_EQ_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
@@ -251,7 +251,7 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_TEST_NEQ_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))     \
     /**/
 #define HPX_TEST_NEQ_2(expr1, expr2)                                           \
-    HPX_TEST_NEQ_IMPL(::hpx::util::detail::global_fixture, expr1, expr2)
+    HPX_TEST_NEQ_IMPL(::hpx::util::detail::global_fixture(), expr1, expr2)
 #define HPX_TEST_NEQ_3(strm, expr1, expr2)                                     \
     HPX_TEST_NEQ_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
@@ -270,7 +270,7 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_TEST_LT_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))      \
     /**/
 #define HPX_TEST_LT_2(expr1, expr2)                                            \
-    HPX_TEST_LT_IMPL(::hpx::util::detail::global_fixture, expr1, expr2)
+    HPX_TEST_LT_IMPL(::hpx::util::detail::global_fixture(), expr1, expr2)
 #define HPX_TEST_LT_3(strm, expr1, expr2)                                      \
     HPX_TEST_LT_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
@@ -289,7 +289,7 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_TEST_LTE_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))     \
     /**/
 #define HPX_TEST_LTE_2(expr1, expr2)                                           \
-    HPX_TEST_LTE_IMPL(::hpx::util::detail::global_fixture, expr1, expr2)
+    HPX_TEST_LTE_IMPL(::hpx::util::detail::global_fixture(), expr1, expr2)
 #define HPX_TEST_LTE_3(strm, expr1, expr2)                                     \
     HPX_TEST_LTE_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
@@ -309,7 +309,7 @@ namespace hpx { namespace util {
     /**/
 #define HPX_TEST_RANGE_3(expr1, expr2, expr3)                                  \
     HPX_TEST_RANGE_IMPL(                                                       \
-        ::hpx::util::detail::global_fixture, expr1, expr2, expr3)
+        ::hpx::util::detail::global_fixture(), expr1, expr2, expr3)
 #define HPX_TEST_RANGE_4(strm, expr1, expr2, expr3)                            \
     HPX_TEST_RANGE_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2, expr3)
 
@@ -329,7 +329,8 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_TEST_EQ_MSG_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))  \
     /**/
 #define HPX_TEST_EQ_MSG_3(expr1, expr2, msg)                                   \
-    HPX_TEST_EQ_MSG_IMPL(::hpx::util::detail::global_fixture, expr1, expr2, msg)
+    HPX_TEST_EQ_MSG_IMPL(                                                      \
+        ::hpx::util::detail::global_fixture(), expr1, expr2, msg)
 #define HPX_TEST_EQ_MSG_4(strm, expr1, expr2, msg)                             \
     HPX_TEST_EQ_MSG_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2, msg)
 
@@ -348,7 +349,7 @@ namespace hpx { namespace util {
     /**/
 #define HPX_TEST_NEQ_MSG_3(expr1, expr2, msg)                                  \
     HPX_TEST_NEQ_MSG_IMPL(                                                     \
-        ::hpx::util::detail::global_fixture, expr1, expr2, msg)
+        ::hpx::util::detail::global_fixture(), expr1, expr2, msg)
 #define HPX_TEST_NEQ_MSG_4(strm, expr1, expr2, msg)                            \
     HPX_TEST_NEQ_MSG_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2, msg)
 
@@ -366,7 +367,8 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_TEST_LT_MSG_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))  \
     /**/
 #define HPX_TEST_LT_MSG_3(expr1, expr2, msg)                                   \
-    HPX_TEST_LT_MSG_IMPL(::hpx::util::detail::global_fixture, expr1, expr2, msg)
+    HPX_TEST_LT_MSG_IMPL(                                                      \
+        ::hpx::util::detail::global_fixture(), expr1, expr2, msg)
 #define HPX_TEST_LT_MSG_4(strm, expr1, expr2, msg)                             \
     HPX_TEST_LT_MSG_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2, msg)
 
@@ -385,7 +387,7 @@ namespace hpx { namespace util {
     /**/
 #define HPX_TEST_LTE_MSG_3(expr1, expr2, msg)                                  \
     HPX_TEST_LTE_MSG_IMPL(                                                     \
-        ::hpx::util::detail::global_fixture, expr1, expr2, msg)
+        ::hpx::util::detail::global_fixture(), expr1, expr2, msg)
 #define HPX_TEST_LTE_MSG_4(strm, expr1, expr2, msg)                            \
     HPX_TEST_LTE_MSG_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2, msg)
 
@@ -404,7 +406,7 @@ namespace hpx { namespace util {
     /**/
 #define HPX_TEST_RANGE_MSG_4(expr1, expr2, expr3, msg)                         \
     HPX_TEST_RANGE_MSG_IMPL(                                                   \
-        ::hpx::util::detail::global_fixture, expr1, expr2, expr3, msg)
+        ::hpx::util::detail::global_fixture(), expr1, expr2, expr3, msg)
 #define HPX_TEST_RANGE_MSG_5(strm, expr1, expr2, expr3, msg)                   \
     HPX_TEST_RANGE_MSG_IMPL(                                                   \
         ::hpx::util::detail::fixture{strm}, expr1, expr2, expr3, msg)
@@ -423,7 +425,7 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_SANITY_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))       \
     /**/
 #define HPX_SANITY_1(expr)                                                     \
-    HPX_TEST_IMPL(::hpx::util::detail::global_fixture, expr)
+    HPX_TEST_IMPL(::hpx::util::detail::global_fixture(), expr)
 #define HPX_SANITY_2(strm, expr)                                               \
     HPX_SANITY_IMPL(::hpx::util::detail::fixture{strm}, expr)
 
@@ -442,7 +444,7 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_SANITY_MSG_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))   \
     /**/
 #define HPX_SANITY_MSG_2(expr, msg)                                            \
-    HPX_SANITY_MSG_IMPL(::hpx::util::detail::global_fixture, expr, msg)
+    HPX_SANITY_MSG_IMPL(::hpx::util::detail::global_fixture(), expr, msg)
 #define HPX_SANITY_MSG_3(strm, expr, msg)                                      \
     HPX_SANITY_MSG_IMPL(::hpx::util::detail::fixture{strm}, expr, msg)
 
@@ -460,7 +462,7 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_SANITY_EQ_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))    \
     /**/
 #define HPX_SANITY_EQ_2(expr1, expr2)                                          \
-    HPX_SANITY_EQ_IMPL(::hpx::util::detail::global_fixture, expr1, expr2)
+    HPX_SANITY_EQ_IMPL(::hpx::util::detail::global_fixture(), expr1, expr2)
 #define HPX_SANITY_EQ_3(strm, expr1, expr2)                                    \
     HPX_SANITY_EQ_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
@@ -480,7 +482,7 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_SANITY_NEQ_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))   \
     /**/
 #define HPX_SANITY_NEQ_2(expr1, expr2)                                         \
-    HPX_SANITY_NEQ_IMPL(::hpx::util::detail::global_fixture, expr1, expr2)
+    HPX_SANITY_NEQ_IMPL(::hpx::util::detail::global_fixture(), expr1, expr2)
 #define HPX_SANITY_NEQ_3(strm, expr1, expr2)                                   \
     HPX_SANITY_NEQ_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
@@ -500,7 +502,7 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_SANITY_LT_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))    \
     /**/
 #define HPX_SANITY_LT_2(expr1, expr2)                                          \
-    HPX_SANITY_LT_IMPL(::hpx::util::detail::global_fixture, expr1, expr2)
+    HPX_SANITY_LT_IMPL(::hpx::util::detail::global_fixture(), expr1, expr2)
 #define HPX_SANITY_LT_3(strm, expr1, expr2)                                    \
     HPX_SANITY_LT_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
@@ -520,7 +522,7 @@ namespace hpx { namespace util {
         HPX_PP_CAT(HPX_SANITY_LTE_, HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))   \
     /**/
 #define HPX_SANITY_LTE_2(expr1, expr2)                                         \
-    HPX_SANITY_LTE_IMPL(::hpx::util::detail::global_fixture, expr1, expr2)
+    HPX_SANITY_LTE_IMPL(::hpx::util::detail::global_fixture(), expr1, expr2)
 #define HPX_SANITY_LTE_3(strm, expr1, expr2)                                   \
     HPX_SANITY_LTE_IMPL(::hpx::util::detail::fixture{strm}, expr1, expr2)
 
@@ -541,7 +543,7 @@ namespace hpx { namespace util {
     /**/
 #define HPX_SANITY_RANGE_3(expr1, expr2, expr3)                                \
     HPX_SANITY_RANGE_IMPL(                                                     \
-        ::hpx::util::detail::global_fixture, expr1, expr2, expr3)
+        ::hpx::util::detail::global_fixture(), expr1, expr2, expr3)
 #define HPX_SANITY_RANGE_4(strm, expr1, expr2, expr3)                          \
     HPX_SANITY_RANGE_IMPL(                                                     \
         ::hpx::util::detail::fixture{strm}, expr1, expr2, expr3)
@@ -563,7 +565,7 @@ namespace hpx { namespace util {
     /**/
 #define HPX_SANITY_EQ_MSG_3(expr1, expr2, msg)                                 \
     HPX_SANITY_EQ_MSG_IMPL(                                                    \
-        ::hpx::util::detail::global_fixture, expr1, expr2, msg)
+        ::hpx::util::detail::global_fixture(), expr1, expr2, msg)
 #define HPX_SANITY_EQ_MSG_4(strm, expr1, expr2, msg)                           \
     HPX_SANITY_EQ_MSG_IMPL(                                                    \
         ::hpx::util::detail::fixture{strm}, expr1, expr2, msg)
@@ -583,7 +585,7 @@ namespace hpx { namespace util {
     /**/
 #define HPX_TEST_THROW_2(expression, exception)                                \
     HPX_TEST_THROW_IMPL(                                                       \
-        ::hpx::util::detail::global_fixture, expression, exception)
+        ::hpx::util::detail::global_fixture(), expression, exception)
 #define HPX_TEST_THROW_3(strm, expression, exception)                          \
     HPX_TEST_THROW_IMPL(                                                       \
         ::hpx::util::detail::fixture{strm}, expression, exception)

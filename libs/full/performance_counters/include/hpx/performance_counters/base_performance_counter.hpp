@@ -36,7 +36,7 @@ namespace hpx { namespace performance_counters {
         typedef hpx::performance_counters::server::base_performance_counter
             base_type_holder;
 
-        base_performance_counter() {}
+        base_performance_counter() = default;
 
         base_performance_counter(
             hpx::performance_counters::counter_info const& info)
@@ -49,6 +49,14 @@ namespace hpx { namespace performance_counters {
         {
             base_type_holder::finalize();
             base_type::finalize();
+        }
+
+        hpx::naming::address get_current_address() const
+        {
+            return hpx::naming::address(
+                hpx::naming::get_gid_from_locality_id(hpx::get_locality_id()),
+                hpx::components::get_component_type<Derived>(),
+                const_cast<Derived*>(static_cast<Derived const*>(this)));
         }
     };
 }}    // namespace hpx::performance_counters

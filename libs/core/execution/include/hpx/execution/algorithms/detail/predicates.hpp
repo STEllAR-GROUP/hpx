@@ -256,9 +256,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
     };
 
-    template <typename Iterable>
+    template <typename Iterable, typename Stride>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iterable next(
-        Iterable iter, std::size_t offset)
+        Iterable iter, Stride offset)
     {
         return calculate_next<typename std::decay<Iterable>::type>::call(
             iter, offset);
@@ -266,7 +266,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename Iterable, typename Stride>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iterable next(
-        Iterable iter, std::size_t max_count, Stride& offset)
+        Iterable iter, std::size_t max_count, Stride offset)
     {
         return calculate_next<typename std::decay<Iterable>::type>::call(
             iter, max_count, offset);
@@ -278,7 +278,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename T1, typename T2,
             typename Enable = typename std::enable_if<
                 hpx::traits::is_equality_comparable_with<T1, T2>::value>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool operator()(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
             return t1 == t2;
@@ -290,7 +290,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename T1, typename T2,
             typename Enable = typename std::enable_if<
                 hpx::traits::is_equality_comparable_with<T1, T2>::value>::type>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool operator()(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
             return t1 != t2;
@@ -301,7 +301,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct compare_to
     {
         HPX_HOST_DEVICE HPX_FORCEINLINE compare_to(Value&& val)
-          : value_(std::move(val))
+          : value_(HPX_MOVE(val))
         {
         }
         HPX_HOST_DEVICE HPX_FORCEINLINE compare_to(Value const& val)
@@ -323,40 +323,40 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct less
     {
         template <typename T1, typename T2>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool operator()(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
-            return std::forward<T1>(t1) < std::forward<T2>(t2);
+            return HPX_FORWARD(T1, t1) < HPX_FORWARD(T2, t2);
         }
     };
 
     struct greater
     {
         template <typename T1, typename T2>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool operator()(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
-            return std::forward<T1>(t1) > std::forward<T2>(t2);
+            return HPX_FORWARD(T1, t1) > HPX_FORWARD(T2, t2);
         }
     };
 
     struct greater_equal
     {
         template <typename T1, typename T2>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool operator()(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
-            return std::forward<T1>(t1) >= std::forward<T2>(t2);
+            return HPX_FORWARD(T1, t1) >= HPX_FORWARD(T2, t2);
         }
     };
 
     struct less_equal
     {
         template <typename T1, typename T2>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool operator()(
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
         {
-            return std::forward<T1>(t1) <= std::forward<T2>(t2);
+            return HPX_FORWARD(T1, t1) <= HPX_FORWARD(T2, t2);
         }
     };
 

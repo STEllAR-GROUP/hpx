@@ -24,9 +24,9 @@ namespace hpx { namespace lcos {
         std::rethrow_exception(e);
     }
 
-    void base_lco::connect(naming::id_type const&) {}
+    void base_lco::connect(hpx::id_type const&) {}
 
-    void base_lco::disconnect(naming::id_type const&) {}
+    void base_lco::disconnect(hpx::id_type const&) {}
 
     components::component_type base_lco::get_component_type() noexcept
     {
@@ -51,12 +51,12 @@ namespace hpx { namespace lcos {
         set_exception(e);
     }
 
-    void base_lco::connect_nonvirt(naming::id_type const& id)
+    void base_lco::connect_nonvirt(hpx::id_type const& id)
     {
         connect(id);
     }
 
-    void base_lco::disconnect_nonvirt(naming::id_type const& id)
+    void base_lco::disconnect_nonvirt(hpx::id_type const& id)
     {
         disconnect(id);
     }
@@ -85,6 +85,6 @@ HPX_REGISTER_COMPONENT_HEAP(
     hpx::components::managed_component<hpx::lcos::base_lco>)
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_DEFINE_COMPONENT_NAME(hpx::lcos::base_lco, hpx_lcos_base_lco);
+HPX_DEFINE_COMPONENT_NAME(hpx::lcos::base_lco, hpx_lcos_base_lco)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco, hpx::components::component_base_lco)

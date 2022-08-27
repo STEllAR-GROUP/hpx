@@ -19,11 +19,11 @@
 #include <utility>
 #include <vector>
 
+using hpx::future;
 using hpx::get;
+using hpx::make_ready_future;
 using hpx::make_tuple;
 using hpx::tuple;
-using hpx::lcos::future;
-using hpx::lcos::make_ready_future;
 using hpx::traits::future_traits;
 using hpx::traits::is_future;
 using hpx::util::map_pack;
@@ -192,7 +192,7 @@ struct my_allocator
         return std::allocator<T>{}.allocate(n);
     }
 
-    void deallocate(pointer p, size_type n)
+    void deallocate(pointer p, size_type n) noexcept
     {
         return std::allocator<T>{}.deallocate(p, n);
     }

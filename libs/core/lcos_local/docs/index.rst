@@ -22,8 +22,8 @@ This module provides the following local :term:`LCO`\ s:
 * :cpp:class:`hpx::lcos::local::guard_set`
 * :cpp:func:`hpx::lcos::local::run_guarded`
 * :cpp:class:`hpx::lcos::local::conditional_trigger`
-* :cpp:class:`hpx::lcos::local::packaged_task`
-* :cpp:class:`hpx::lcos::local::promise`
+* :cpp:class:`hpx::packaged_task`
+* :cpp:class:`hpx::promise`
 * :cpp:class:`hpx::lcos::local::receive_buffer`
 * :cpp:class:`hpx::lcos::local::trigger`
 

@@ -32,15 +32,15 @@ struct test_server : managed_component_base<test_server>
         HPX_TEST_NEQ(hpx::invalid_id, id);
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(test_server, check_gid, check_gid_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, check_gid, check_gid_action)
 };
 
 using server_type = managed_component<test_server>;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 using check_gid_action = test_server::check_gid_action;
-HPX_REGISTER_ACTION_DECLARATION(check_gid_action);
-HPX_REGISTER_ACTION(check_gid_action);
+HPX_REGISTER_ACTION_DECLARATION(check_gid_action)
+HPX_REGISTER_ACTION(check_gid_action)
 
 struct test_client : client_base<test_client, stub_base<test_server>>
 {
@@ -66,7 +66,7 @@ struct test_client : client_base<test_client, stub_base<test_server>>
 int main()
 {
     test_client t = hpx::new_<test_client>(find_here());
-    HPX_TEST_NEQ(hpx::naming::invalid_id, t.get_id());
+    HPX_TEST_NEQ(hpx::invalid_id, t.get_id());
 
     t.check_gid();
 

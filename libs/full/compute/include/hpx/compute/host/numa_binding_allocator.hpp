@@ -221,7 +221,7 @@ namespace hpx { namespace compute { namespace host {
 
         // Move constructor
         numa_binding_allocator(numa_binding_allocator&& rhs)
-          : binding_helper_(std::move(rhs.binding_helper_))
+          : binding_helper_(HPX_MOVE(rhs.binding_helper_))
           , policy_(rhs.policy_)
           , flags_(rhs.flags_)
           , init_mutex()
@@ -330,15 +330,22 @@ namespace hpx { namespace compute { namespace host {
         // pointer obtained by an earlier call to allocate(). The argument n
         // must be equal to the first argument of the call to allocate() that
         // originally produced p; otherwise, the behavior is undefined.
-        void deallocate(pointer p, size_type n)
+        void deallocate(pointer p, size_type n) noexcept
         {
-            nba_deb.debug(debug::str<>("deallocate"),
-                "calling membind for size (bytes) ",
-                debug::hex<2>(n * sizeof(T)));
+            try
+            {
+                nba_deb.debug(debug::str<>("deallocate"),
+                    "calling membind for size (bytes) ",
+                    debug::hex<2>(n * sizeof(T)));
 #ifdef NUMA_BINDING_ALLOCATOR_DEBUG_PAGE_BINDING
-            display_binding(p, binding_helper_);
+                display_binding(p, binding_helper_);
 #endif
-            threads::topology().deallocate(p, n * sizeof(T));
+                threads::create_topology().deallocate(p, n * sizeof(T));
+            }
+            catch (...)
+            {
+                ;    // just ignore errors from create_topology
+            }
         }
 
         // Returns the maximum theoretically possible value of n, for which the
@@ -354,7 +361,7 @@ namespace hpx { namespace compute { namespace host {
         template <class U, class... A>
         void construct(U* const p, A&&... args)
         {
-            new (p) U(std::forward<A>(args)...);
+            new (p) U(HPX_FORWARD(A, args)...);
         }
 
         template <class U>
@@ -419,6 +426,9 @@ namespace hpx { namespace compute { namespace host {
                     temp << "-";
             }
             return temp.str();
+#else
+            (void) addr;
+            (void) len;
 #endif
             return "";
         }
@@ -459,15 +469,15 @@ namespace hpx { namespace compute { namespace host {
                 nba_deb.debug("Launching First-Touch task for domain ",
                     debug::dec<2>(domain), " ", nodesets[i]);
                 auto f1 = hpx::async(numa_executor,
-                    util::bind(&numa_binding_allocator::touch_pages, this, p, n,
-                        binding_helper_, util::placeholders::_1, nodesets),
+                    hpx::bind(&numa_binding_allocator::touch_pages, this, p, n,
+                        binding_helper_, placeholders::_1, nodesets),
                     domain);
                 nba_deb.debug(debug::str<>("First-Touch"),
                     "add task future to vector for domain ",
                     debug::dec<2>(domain), " ", nodesets[i]);
-                tasks.push_back(std::move(f1));
+                tasks.push_back(HPX_MOVE(f1));
             }
-            wait_all(tasks);
+            hpx::wait_all(tasks);
             nba_deb.debug(debug::str<>("First-Touch"), "Done tasks");
         }
 

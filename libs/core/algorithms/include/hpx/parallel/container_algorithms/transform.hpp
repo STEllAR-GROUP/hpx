@@ -384,7 +384,7 @@ namespace hpx { namespace ranges {
         ranges::binary_transform_result<
             typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, FwdIter>>::type
-    tag_fallback_dispatch(hpx::ranges::transform_t, ExPolicy&& policy,
+    tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
         Rng1&& rng1, Rng2&& rng2, FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2())
 
@@ -400,145 +400,11 @@ namespace hpx { namespace ranges {
 
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <type_traits>
 #include <utility>
-
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename OutIter, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            hpx::traits::is_iterator<OutIter>::value &&
-            traits::is_projected_range<Proj, Rng>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj, Rng>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::transform is deprecated, use hpx::ranges::transform "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        util::in_out_result<typename hpx::traits::range_iterator<Rng>::type,
-            OutIter>>::type transform(ExPolicy&& policy, Rng&& rng,
-        OutIter dest, F&& f, Proj&& proj = Proj())
-    {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        using iterator_type =
-            typename hpx::traits::range_traits<Rng>::iterator_type;
-
-        static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
-            "Requires at least forward iterator.");
-
-        return transform(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), std::move(dest), std::forward<F>(f),
-            std::forward<Proj>(proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename InIter2,
-        typename OutIter, typename F,
-        typename Proj1 = util::projection_identity,
-        typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value&& hpx::traits::is_iterator<
-                InIter2>::value &&
-            hpx::traits::is_iterator<OutIter>::value &&
-            traits::is_projected_range<Proj1, Rng>::value &&
-            traits::is_projected<Proj2, InIter2>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj1, Rng>,
-                traits::projected<Proj2, InIter2>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::transform is deprecated, use hpx::ranges::transform "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        util::in_in_out_result<typename hpx::traits::range_iterator<Rng>::type,
-            InIter2, OutIter>>::type
-        transform(ExPolicy&& policy, Rng&& rng, InIter2 first2, OutIter dest,
-            F&& f, Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
-    {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        using iterator_type =
-            typename hpx::traits::range_traits<Rng>::iterator_type;
-
-        static_assert(hpx::traits::is_forward_iterator<iterator_type>::value &&
-                hpx::traits::is_forward_iterator<InIter2>::value,
-            "Requires at least forward iterator.");
-
-        return transform(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), std::move(first2), std::move(dest),
-            std::forward<F>(f), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng1, typename Rng2, typename OutIter,
-        typename F, typename Proj1 = util::projection_identity,
-        typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng1>::value &&
-            hpx::traits::is_range<Rng2>::value &&
-            hpx::traits::is_iterator<OutIter>::value &&
-            traits::is_projected_range<Proj1, Rng1>::value &&
-            traits::is_projected_range<Proj2, Rng2>::value &&
-                traits::is_indirect_callable<ExPolicy, F,
-                traits::projected_range<Proj1, Rng1>,
-                traits::projected_range<Proj2, Rng2>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::transform is deprecated, use hpx::ranges::transform "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        util::in_in_out_result<typename hpx::traits::range_iterator<Rng1>::type,
-            typename hpx::traits::range_iterator<Rng2>::type, OutIter>>::type
-        transform(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, OutIter dest,
-            F&& f, Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
-    {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        using iterator_type1 =
-            typename hpx::traits::range_traits<Rng1>::iterator_type;
-
-        using iterator_type2 =
-            typename hpx::traits::range_traits<Rng2>::iterator_type;
-
-        static_assert(hpx::traits::is_forward_iterator<iterator_type1>::value &&
-                hpx::traits::is_forward_iterator<iterator_type2>::value,
-            "Requires at least forward iterator.");
-
-        return transform(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
-            hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
-            std::move(dest), std::forward<F>(f), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
 
 namespace hpx { namespace ranges {
 
@@ -549,8 +415,8 @@ namespace hpx { namespace ranges {
     using binary_transform_result = parallel::util::in_in_out_result<I1, I2, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::transform
-    HPX_INLINE_CONSTEXPR_VARIABLE struct transform_t final
+    // a for hpx::ranges::transform
+    inline constexpr struct transform_t final
       : hpx::detail::tag_parallel_algorithm<transform_t>
     {
     private:
@@ -567,7 +433,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             ranges::unary_transform_result<FwdIter1, FwdIter2>>::type
-        tag_fallback_dispatch(hpx::ranges::transform_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
             FwdIter1 first, Sent1 last, FwdIter2 dest, F&& f,
             Proj&& proj = Proj())
         {
@@ -576,8 +442,8 @@ namespace hpx { namespace ranges {
 
             return parallel::v1::detail::transform<
                 unary_transform_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first, last, dest,
-                    std::forward<F>(f), std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -592,7 +458,7 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             ranges::unary_transform_result<
                 typename hpx::traits::range_iterator<Rng>::type, FwdIter>>::type
-        tag_fallback_dispatch(hpx::ranges::transform_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
             Rng&& rng, FwdIter dest, F&& f, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -604,9 +470,9 @@ namespace hpx { namespace ranges {
 
             return parallel::v1::detail::transform<
                 unary_transform_result<iterator_type, FwdIter>>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, std::forward<F>(f),
-                    std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng), dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -625,7 +491,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             ranges::binary_transform_result<FwdIter1, FwdIter2, FwdIter3>>::type
-        tag_fallback_dispatch(hpx::ranges::transform_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
             FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2,
             FwdIter3 dest, F&& f, Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -636,9 +502,9 @@ namespace hpx { namespace ranges {
 
             return parallel::v1::detail::transform_binary2<
                 binary_transform_result<FwdIter1, FwdIter2, FwdIter3>>()
-                .call(std::forward<ExPolicy>(policy), first1, last1, first2,
-                    last2, dest, std::forward<F>(f), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
+                    last2, dest, HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -657,7 +523,7 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng1>::type,
                 typename hpx::traits::range_iterator<Rng2>::type,
                 FwdIter>>::type
-        tag_fallback_dispatch(hpx::ranges::transform_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
             Rng1&& rng1, Rng2&& rng2, FwdIter dest, F&& f,
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -674,10 +540,10 @@ namespace hpx { namespace ranges {
             return parallel::v1::detail::transform_binary2<
                 binary_transform_result<iterator_type1, iterator_type2,
                     FwdIter>>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), dest, std::forward<F>(f),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -691,7 +557,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend ranges::unary_transform_result<FwdIter1, FwdIter2>
-        tag_fallback_dispatch(hpx::ranges::transform_t, FwdIter1 first,
+        tag_fallback_invoke(hpx::ranges::transform_t, FwdIter1 first,
             Sent1 last, FwdIter2 dest, F&& f, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_input_iterator<FwdIter1>::value,
@@ -699,8 +565,8 @@ namespace hpx { namespace ranges {
 
             return parallel::v1::detail::transform<
                 unary_transform_result<FwdIter1, FwdIter2>>()
-                .call(hpx::execution::seq, first, last, dest,
-                    std::forward<F>(f), std::forward<Proj>(proj));
+                .call(hpx::execution::seq, first, last, dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -713,7 +579,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend ranges::unary_transform_result<
             typename hpx::traits::range_iterator<Rng>::type, FwdIter>
-        tag_fallback_dispatch(hpx::ranges::transform_t, Rng&& rng, FwdIter dest,
+        tag_fallback_invoke(hpx::ranges::transform_t, Rng&& rng, FwdIter dest,
             F&& f, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -725,8 +591,8 @@ namespace hpx { namespace ranges {
             return parallel::v1::detail::transform<
                 unary_transform_result<iterator_type, FwdIter>>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, std::forward<F>(f),
-                    std::forward<Proj>(proj));
+                    hpx::util::end(rng), dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -743,7 +609,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend ranges::binary_transform_result<FwdIter1, FwdIter2, FwdIter3>
-        tag_fallback_dispatch(hpx::ranges::transform_t, FwdIter1 first1,
+        tag_fallback_invoke(hpx::ranges::transform_t, FwdIter1 first1,
             Sent1 last1, FwdIter2 first2, Sent2 last2, FwdIter3 dest, F&& f,
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -754,8 +620,8 @@ namespace hpx { namespace ranges {
             return parallel::v1::detail::transform_binary2<
                 binary_transform_result<FwdIter1, FwdIter2, FwdIter3>>()
                 .call(hpx::execution::seq, first1, last1, first2, last2, dest,
-                    std::forward<F>(f), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -771,8 +637,8 @@ namespace hpx { namespace ranges {
         friend ranges::binary_transform_result<
             typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, FwdIter>
-        tag_fallback_dispatch(hpx::ranges::transform_t, Rng1&& rng1,
-            Rng2&& rng2, FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
+        tag_fallback_invoke(hpx::ranges::transform_t, Rng1&& rng1, Rng2&& rng2,
+            FwdIter dest, F&& f, Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             using iterator_type1 =
@@ -790,8 +656,8 @@ namespace hpx { namespace ranges {
                     FwdIter>>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), dest, std::forward<F>(f),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
     } transform{};

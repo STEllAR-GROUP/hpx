@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2012-2017 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -22,7 +22,7 @@
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
+#include <hpx/parcelset/coalescing_message_handler_registration.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -74,8 +74,8 @@ namespace hpx { namespace lcos {
       , public ComponentTag
     {
     protected:
-        typedef typename std::conditional<std::is_void<Result>::value,
-            util::unused_type, Result>::type result_type;
+        using result_type = std::conditional_t<std::is_void_v<Result>,
+            util::unused_type, Result>;
 
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
@@ -91,8 +91,10 @@ namespace hpx { namespace lcos {
             // this shouldn't ever be called
             HPX_THROW_EXCEPTION(invalid_status,
                 "base_lco_with_value::set_event_nonvirt",
-                "attempt to use a non-default-constructible return type with "
-                "an action in a context where default-construction would be "
+                "attempt to use a non-default-constructible return type "
+                "with "
+                "an action in a context where default-construction would "
+                "be "
                 "required");
         }
 
@@ -138,7 +140,7 @@ namespace hpx { namespace lcos {
 
         void set_value_nonvirt(RemoteResult&& result)
         {
-            set_value(std::move(result));
+            set_value(HPX_MOVE(result));
         }
 
         /// The \a function get_result_nonvirt is called whenever a
@@ -164,12 +166,12 @@ namespace hpx { namespace lcos {
         /// \param RemoteResult [in] The type of the result to be transferred
         ///               back to this LCO instance.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco_with_value, set_value_nonvirt, set_value_action);
+            base_lco_with_value, set_value_nonvirt, set_value_action)
 
         /// The \a get_value_action may be used to query the value this LCO
         /// instance exposes as its 'result' value.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco_with_value, get_value_nonvirt, get_value_action);
+            base_lco_with_value, get_value_nonvirt, get_value_action)
     };
 
     /// The base_lco<void> specialization is used whenever the set_event action
@@ -205,7 +207,7 @@ namespace hpx { namespace lcos {
         void get_value() {}
 
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco_with_value, get_value, get_value_action);
+            base_lco_with_value, get_value, get_value_action)
     };
 }}    // namespace hpx::lcos
 
@@ -426,13 +428,12 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::naming::gid_type, gid_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<hpx::naming::gid_type>, vector_gid_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    hpx::naming::id_type, hpx::naming::gid_type, id_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    hpx::naming::id_type, naming_id_type)
-HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::vector<hpx::naming::id_type>,
+    hpx::id_type, hpx::naming::gid_type, id_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(hpx::id_type, naming_id_type)
+HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(std::vector<hpx::id_type>,
     std::vector<hpx::naming::gid_type>, vector_id_gid_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    std::vector<hpx::naming::id_type>, vector_id_type)
+    std::vector<hpx::id_type>, vector_id_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     hpx::util::unused_type, hpx_unused_type)
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(float)

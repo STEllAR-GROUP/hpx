@@ -18,7 +18,7 @@ namespace hpx { namespace performance_counters {
         //<-
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
-        virtual ~performance_counter_base() {}
+        virtual ~performance_counter_base() = default;
         //->
         // Retrieve the descriptive information about the Performance Counter.
         virtual counter_info get_counter_info() const = 0;

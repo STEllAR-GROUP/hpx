@@ -10,7 +10,7 @@ working_dir_default: &working_dir_default
 
 docker_default: &docker_default
     docker:
-      - image: stellargroup/build_env:7
+      - image: stellargroup/build_env:10
 
 defaults: &defaults
     <<: *working_dir_default
@@ -43,7 +43,10 @@ move_debug_log: &move_debug_log
 gh_pages_filter: &gh_pages_filter
     filters:
       branches:
-        ignore: gh-pages
+        ignore:
+          - gh-pages
+          - trying
+          - staging
       tags:
         ignore: stable
 
@@ -72,7 +75,7 @@ configure_local_git: &configure_local_git
         name: Configure local Git
         command: |
             git config --global user.name "StellarBot"
-            git config --global user.email "stellar@cct.lsu.edu"
+            git config --global user.email "contact@stellar-group.org"
 
 
 version: 2
@@ -161,6 +164,10 @@ jobs:
               cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
               clang-format-11 --version
               clang-format-11 -i **/*.{cpp,hpp}
+              cd /hpx/source/examples
+              clang-format-11 -i **/*.{cpp,hpp}
+              cd /hpx/source/tests
+              clang-format-11 -i **/*.{cpp,hpp}
               git diff --exit-code > /tmp/modified_clang_format_files.txt
       - store_artifacts:
           path: /tmp/modified_clang_format_files.txt
@@ -205,7 +212,7 @@ jobs:
                 -G "Ninja" \
                 -DCMAKE_BUILD_TYPE=Debug \
                 -DHPX_WITH_MALLOC=system \
-                -DHPX_WITH_FETCH_ASIO=On \
+                -DHPX_WITH_FETCH_ASIO=Off \
                 -DHPX_WITH_DATAPAR_VC=On \
                 -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} \
                 -DHPX_WITH_GIT_BRANCH="${CIRCLE_BRANCH}" \
@@ -244,7 +251,7 @@ jobs:
                 /hpx/source \
                 -G "Ninja" \
                 -DHPX_WITH_MALLOC=system \
-                -DHPX_WITH_FETCH_ASIO=On \
+                -DHPX_WITH_FETCH_ASIO=Off \
                 -DHPX_WITH_TESTS=On \
                 -DHPX_WITH_EXAMPLES=Off
             rm -rf *
@@ -255,7 +262,7 @@ jobs:
                 /hpx/source \
                 -G "Ninja" \
                 -DHPX_WITH_MALLOC=system \
-                -DHPX_WITH_FETCH_ASIO=On \
+                -DHPX_WITH_FETCH_ASIO=Off \
                 -DHPX_WITH_TESTS=Off \
                 -DHPX_WITH_EXAMPLES=On
             rm -rf *
@@ -266,7 +273,7 @@ jobs:
                 /hpx/source \
                 -G "Ninja" \
                 -DHPX_WITH_MALLOC=system \
-                -DHPX_WITH_FETCH_ASIO=On \
+                -DHPX_WITH_FETCH_ASIO=Off \
                 -DHPX_WITH_APEX=On \
                 -DHPX_WITH_TESTS=On \
                 -DHPX_WITH_EXAMPLES=On
@@ -405,16 +412,18 @@ jobs:
           paths:
             - ./build
 
-  tests.unit:
+  tests.unit.algorithms:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Unit Tests
+          name: Building Unit Tests (Algorithms)
           command: |
-              ninja -j2 -k 0 tests.unit
-              ninja -j1 -k 0 tests.unit.modules.segmented_algorithms
+              ninja -j2 -k 0 \
+                tests.unit.modules.algorithms.algorithms \
+                tests.unit.modules.algorithms.block \
+                tests.unit.modules.algorithms.datapar_algorithms
       - run:
           name: Running Unit Tests
           when: always
@@ -425,13 +434,68 @@ jobs:
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
-                --tests-regex tests.unit \
-                --exclude-regex \
-              "tests.unit.modules.segmented_algorithms|\
-              tests.unit.modules.compute.numa_allocator|\
-              tests.unit.modules.resource_partitioner.scheduler_binding_check"
+                --tests-regex \
+              "tests.unit.modules.algorithms.algorithms|\
+              tests.unit.modules.algorithms.block|\
+              tests.unit.modules.algorithms.datapar_algorithms"
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.algorithms
+      - store_artifacts:
+          path: tests.unit.algorithms
+
+  tests.unit.container_algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (Container Algorithms)
+          command: |
+              ninja -j2 -k 0 tests.unit.modules.algorithms.container_algorithms
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
               ctest \
                 --timeout 120 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex tests.unit.modules.algorithms.container_algorithms
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.container_algorithms
+      - store_artifacts:
+          path: tests.unit.container_algorithms
+
+  tests.unit.segmented_algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (Segmented Algorithms)
+          command: |
+              ninja -j2 -k 0 tests.unit.modules.segmented_algorithms
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 180 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
@@ -443,10 +507,66 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.unit
+          path: tests.unit.segmented_algorithms
       - store_artifacts:
-          path: tests.unit
+          path: tests.unit.segmented_algorithms
 
+  tests.unit1:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.targets`
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 120 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.targets | sed ':b;N;$!bb;s/\n/|/g'` \
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit1
+      - store_artifacts:
+          path: tests.unit1
+
+  tests.unit2:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests
+          command: |
+              ninja -j2 -k 0 `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.targets`
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              # NOTE: the numa_allocator test is disabled because
+              # hwloc_get_area_membind_nodeset used by it fails with EPERM.
+              ctest \
+                --timeout 120 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.targets | sed ':b;N;$!bb;s/\n/|/g'` \
+                --exclude-regex \
+              "tests.unit.modules.compute.numa_allocator|\
+              tests.unit.modules.resource_partitioner.scheduler_binding_check"
       - run:
           <<: *convert_xml
       - run:
@@ -483,21 +603,57 @@ jobs:
       - store_artifacts:
           path: tests.regressions
 
-  tests.headers:
+  tests.headers1:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Header Tests
+          name: Building Header Tests (part 1)
           command: |
-              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure -R tests.headers
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
+                -R tests.headers \
+                -E "tests.headers.modules.[a-n].*"
       - run:
           <<: *convert_xml
       - store_test_results:
-          path: tests.headers
+          path: tests.headers1
       - store_artifacts:
-          path: tests.headers
+          path: tests.headers1
+
+  tests.headers2:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Header Tests (part 2)
+          command: |
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
+                -R "tests.headers.modules.[a-g].*"
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.headers2
+      - store_artifacts:
+          path: tests.headers2
+
+  tests.headers3:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Header Tests (part 3)
+          command: |
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
+                -R "tests.headers.modules.[h-n].*"
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.headers3
+      - store_artifacts:
+          path: tests.headers3
 
   tests.performance:
     <<: *defaults
@@ -525,7 +681,8 @@ jobs:
               # not support the same vector intrinsics as this machine. The
               # "Test Docker Image" below fails with "Illegal instruction" if VC
               # is enabled, and other machines may fail similarly.
-              cmake -DHPX_WITH_DATAPAR_VC=Off .
+              cmake \
+                -DHPX_WITH_DATAPAR_VC=Off .
               ninja -j2 install
           working_directory: /hpx/build
           when: always
@@ -653,13 +810,25 @@ workflows:
           <<: *gh_pages_filter
       - tests.examples:
           <<: *core_dependency
-      - tests.unit:
+      - tests.unit.algorithms:
+          <<: *core_dependency
+      - tests.unit.container_algorithms:
+          <<: *core_dependency
+      - tests.unit.segmented_algorithms:
+          <<: *core_dependency
+      - tests.unit1:
+          <<: *core_dependency
+      - tests.unit2:
           <<: *core_dependency
       - tests.regressions:
           <<: *core_dependency
       - tests.performance:
           <<: *core_dependency
-      - tests.headers:
+      - tests.headers1:
+          <<: *core_dependency
+      - tests.headers2:
+          <<: *core_dependency
+      - tests.headers3:
           <<: *core_dependency
       - docs:
           requires:
@@ -676,10 +845,16 @@ workflows:
           requires:
             - core
             - tests.examples
-            - tests.unit
+            - tests.unit.algorithms
+            - tests.unit.container_algorithms
+            - tests.unit.segmented_algorithms
+            - tests.unit1
+            - tests.unit2
             - tests.regressions
             - tests.performance
-            - tests.headers
+            - tests.headers1
+            - tests.headers2
+            - tests.headers3
           <<: *gh_pages_filter
       - push_stable_tag:
           requires:

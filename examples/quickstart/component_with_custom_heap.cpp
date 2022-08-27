@@ -18,9 +18,9 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/iostream.hpp>
 
 #include <array>
 #include <cstddef>
@@ -34,8 +34,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Implementation of a free_list allocator, this has no bearings on the example
 // component below.
-namespace allocator
-{
+namespace allocator {
     ///////////////////////////////////////////////////////////////////////////
     constexpr std::size_t BLOCK_ALIGNMENT = 8;
     constexpr std::size_t PAGE_SIZE_ = 16384;
@@ -46,9 +45,10 @@ namespace allocator
     struct alloc_block_header
     {
         constexpr HPX_FORCEINLINE alloc_block_header(
-                alloc_page* p = nullptr) noexcept
+            alloc_page* p = nullptr) noexcept
           : page(p)
-        {}
+        {
+        }
 
         ~alloc_block_header() = default;
 
@@ -64,15 +64,16 @@ namespace allocator
     template <typename T>
     struct alloc_block : alloc_block_header
     {
-        HPX_STATIC_CONSTEXPR std::size_t allocation_size =
+        static constexpr std::size_t allocation_size =
             ((sizeof(T) + BLOCK_ALIGNMENT - 1) & ~(BLOCK_ALIGNMENT - 1)) +
             sizeof(alloc_block_header);
 
         constexpr HPX_FORCEINLINE alloc_block(
-                alloc_page* page = nullptr) noexcept
+            alloc_page* page = nullptr) noexcept
           : alloc_block_header(page)
           , next_free(nullptr)
-        {}
+        {
+        }
 
         ~alloc_block() = default;
 
@@ -87,8 +88,8 @@ namespace allocator
             return reinterpret_cast<alloc_block*>(
                 reinterpret_cast<char*>(this) + i * allocation_size);
         }
-        HPX_FORCEINLINE alloc_block const* operator[](std::size_t i) const
-            noexcept
+        HPX_FORCEINLINE alloc_block const* operator[](
+            std::size_t i) const noexcept
         {
             return reinterpret_cast<alloc_block const*>(
                 reinterpret_cast<char const*>(this) + i * allocation_size);
@@ -107,7 +108,8 @@ namespace allocator
         free_list_allocator()
           : chain(nullptr)
           , pages(nullptr)
-        {}
+        {
+        }
 
         ~free_list_allocator() = default;
 
@@ -128,7 +130,6 @@ namespace allocator
         void free(void* addr);
 
     private:
-
         friend struct alloc_page;
 
         alloc_block<T>* chain;
@@ -143,7 +144,8 @@ namespace allocator
           : next(nullptr)
           , allocated_blocks(0)
           , block_size(size)
-        {}
+        {
+        }
 
         // FIXME: loop over blocks and call destructor
         ~alloc_page() = default;
@@ -151,8 +153,8 @@ namespace allocator
         alloc_page(alloc_page const&) = delete;
         alloc_page& operator=(alloc_page const&) = delete;
 
-        alloc_page(alloc_page &&) = delete;
-        alloc_page& operator=(alloc_page &&) = delete;
+        alloc_page(alloc_page&&) = delete;
+        alloc_page& operator=(alloc_page&&) = delete;
 
         template <typename T>
         HPX_FORCEINLINE alloc_block<T>* get_block() noexcept
@@ -166,8 +168,7 @@ namespace allocator
             return reinterpret_cast<alloc_block<T>*>(&data);
         }
         template <typename T>
-        HPX_FORCEINLINE alloc_block<T> const* get_block()
-            const noexcept
+        HPX_FORCEINLINE alloc_block<T> const* get_block() const noexcept
         {
             static_assert(page_size >= alloc_block<T>::allocation_size,
                 "size of objects is larger than configured page size");
@@ -200,14 +201,14 @@ namespace allocator
             HPX_ASSERT(block_size == alloc_block<T>::allocation_size);
 
             return *reinterpret_cast<T const*>(static_cast<void const*>(
-                static_cast<alloc_block_header const*>(
-                    (*get_block<T>())[i]) + 1));
+                static_cast<alloc_block_header const*>((*get_block<T>())[i]) +
+                1));
         }
 
         // for the available page size we account for the members of this
         // class below
-        HPX_STATIC_CONSTEXPR std::size_t page_size =
-            PAGE_SIZE_ - sizeof(void*) - 2*sizeof(std::size_t);
+        static constexpr std::size_t page_size =
+            PAGE_SIZE_ - sizeof(void*) - 2 * sizeof(std::size_t);
 
         typename std::aligned_storage<page_size>::type data;
 
@@ -217,8 +218,7 @@ namespace allocator
     };
 
     template <typename T>
-    constexpr HPX_FORCEINLINE T& get(
-        alloc_page* page, std::size_t i) noexcept
+    constexpr HPX_FORCEINLINE T& get(alloc_page* page, std::size_t i) noexcept
     {
         return page->template get<T>(i);
     }
@@ -232,7 +232,7 @@ namespace allocator
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     HPX_FORCEINLINE free_list_allocator<T>&
-        free_list_allocator<T>::get_allocator()
+    free_list_allocator<T>::get_allocator()
     {
         static free_list_allocator ctx{};
         return ctx;
@@ -305,7 +305,7 @@ namespace allocator
     {
         if (addr == nullptr)
         {
-            return;     // ignore nullptr arguments
+            return;    // ignore nullptr arguments
         }
 
         std::unique_lock<mutex_type> lk(mtx);
@@ -318,23 +318,23 @@ namespace allocator
         blk->next_free = chain;
         chain = blk;
     }
-}
+}    // namespace allocator
 
 ///////////////////////////////////////////////////////////////////////////////
 // define component type
-struct hello_world_server
-  : hpx::components::component_base<hello_world_server>
+struct hello_world_server : hpx::components::component_base<hello_world_server>
 {
     hello_world_server(std::size_t cnt = 0)
       : count_(cnt)
-    {}
+    {
+    }
 
     void print(std::size_t pagenum, std::size_t item) const
     {
         if (pagenum != std::size_t(-1))
         {
             hpx::cout << "hello world from page: " << pagenum
-                << ", item: " << item << ", number: " << count_ << "\n";
+                      << ", item: " << item << ", number: " << count_ << "\n";
         }
         else
         {
@@ -343,7 +343,7 @@ struct hello_world_server
         }
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(hello_world_server, print, print_action);
+    HPX_DEFINE_COMPONENT_ACTION(hello_world_server, print, print_action)
 
     std::size_t count_;
 };
@@ -355,42 +355,41 @@ struct free_list_component_heap
     // alloc and free have to be exposed from a component heap
     static void* alloc(std::size_t)
     {
-        return allocator::free_list_allocator<Component>::
-            get_allocator().alloc();
+        return allocator::free_list_allocator<Component>::get_allocator()
+            .alloc();
     }
 
     static void free(void* p, std::size_t)
     {
-        return allocator::free_list_allocator<Component>::
-            get_allocator().free(p);
+        return allocator::free_list_allocator<Component>::get_allocator().free(
+            p);
     }
 
     // this is an additional function needed just for this example
     static allocator::alloc_page const* get_first_page()
     {
-        return allocator::free_list_allocator<Component>::
-            get_allocator().first_page();
+        return allocator::free_list_allocator<Component>::get_allocator()
+            .first_page();
     }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 // associate heap with component above
-namespace hpx { namespace traits
-{
+namespace hpx { namespace traits {
     template <>
     struct component_heap_type<hello_world_server>
     {
         using type = free_list_component_heap<hello_world_server>;
     };
-}}
+}}    // namespace hpx::traits
 
 // the component macros must come after the component_heap_type specialization
 using server_type = hpx::components::component<hello_world_server>;
-HPX_REGISTER_COMPONENT(server_type, hello_world_server);
+HPX_REGISTER_COMPONENT(server_type, hello_world_server)
 
 using print_action = hello_world_server::print_action;
-HPX_REGISTER_ACTION_DECLARATION(print_action);
-HPX_REGISTER_ACTION(print_action);
+HPX_REGISTER_ACTION_DECLARATION(print_action)
+HPX_REGISTER_ACTION(print_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()

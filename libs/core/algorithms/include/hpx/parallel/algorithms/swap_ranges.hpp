@@ -142,7 +142,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             using reference = typename zip_iterator::reference;
 
             return get_iter_in_in_result(for_each_n<zip_iterator>().call(
-                std::forward<ExPolicy>(policy),
+                HPX_FORWARD(ExPolicy, policy),
                 hpx::util::make_zip_iterator(first1, first2), n,
                 [](reference t) -> void {
                     using hpx::get;
@@ -201,7 +201,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy&& policy, FwdIter1 first1, Sent last1, FwdIter2 first2)
             {
                 return util::get_in2_element(
-                    parallel_swap_ranges(std::forward<ExPolicy>(policy), first1,
+                    parallel_swap_ranges(HPX_FORWARD(ExPolicy, policy), first1,
                         first2, detail::distance(first1, last1)));
             }
 
@@ -214,7 +214,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 auto dist1 = detail::distance(first1, last1);
                 auto dist2 = detail::distance(first2, last2);
-                return parallel_swap_ranges(std::forward<ExPolicy>(policy),
+                return parallel_swap_ranges(HPX_FORWARD(ExPolicy, policy),
                     first1, first2, dist1 < dist2 ? dist1 : dist2);
             }
         };
@@ -240,7 +240,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
         return detail::swap_ranges<FwdIter2>().call(
-            std::forward<ExPolicy>(policy), first1, last1, first2);
+            HPX_FORWARD(ExPolicy, policy), first1, last1, first2);
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -250,7 +250,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::swap_ranges
-    HPX_INLINE_CONSTEXPR_VARIABLE struct swap_ranges_t final
+    inline constexpr struct swap_ranges_t final
       : hpx::detail::tag_parallel_algorithm<swap_ranges_t>
     {
         // clang-format off
@@ -260,8 +260,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend FwdIter2 tag_fallback_dispatch(hpx::swap_ranges_t,
-            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
+        friend FwdIter2 tag_fallback_invoke(hpx::swap_ranges_t, FwdIter1 first1,
+            FwdIter1 last1, FwdIter2 first2)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -282,7 +282,7 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
-        tag_fallback_dispatch(hpx::swap_ranges_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::swap_ranges_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
@@ -291,7 +291,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::swap_ranges<FwdIter2>().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2);
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2);
         }
     } swap_ranges{};
 }    // namespace hpx

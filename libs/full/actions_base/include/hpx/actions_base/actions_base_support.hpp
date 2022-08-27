@@ -38,10 +38,13 @@ namespace hpx { namespace actions { namespace detail {
     template <threads::thread_priority Priority>
     struct thread_priority
     {
-        static threads::thread_priority call(threads::thread_priority priority)
+        constexpr static threads::thread_priority call(
+            threads::thread_priority priority) noexcept
         {
             if (priority == threads::thread_priority::default_)
+            {
                 return Priority;
+            }
             return priority;
         }
     };
@@ -51,12 +54,11 @@ namespace hpx { namespace actions { namespace detail {
     template <>
     struct thread_priority<threads::thread_priority::default_>
     {
-        static threads::thread_priority call(threads::thread_priority priority)
+        constexpr static threads::thread_priority call(
+            threads::thread_priority priority) noexcept
         {
             // The mapping to 'normal' is now done at the last possible
             // moment in the scheduler.
-            //    if (priority == threads::thread_priority::default_)
-            //        return threads::thread_priority::normal;
             return priority;
         }
     };
@@ -68,11 +70,13 @@ namespace hpx { namespace actions { namespace detail {
     template <threads::thread_stacksize Stacksize>
     struct thread_stacksize
     {
-        static threads::thread_stacksize call(
-            threads::thread_stacksize stacksize)
+        constexpr static threads::thread_stacksize call(
+            threads::thread_stacksize stacksize) noexcept
         {
             if (stacksize == threads::thread_stacksize::default_)
+            {
                 return Stacksize;
+            }
             return stacksize;
         }
     };
@@ -82,11 +86,9 @@ namespace hpx { namespace actions { namespace detail {
     template <>
     struct thread_stacksize<threads::thread_stacksize::default_>
     {
-        static threads::thread_stacksize call(
-            threads::thread_stacksize stacksize)
+        constexpr static threads::thread_stacksize call(
+            threads::thread_stacksize stacksize) noexcept
         {
-            if (stacksize == threads::thread_stacksize::default_)
-                return threads::thread_stacksize::minimal;
             return stacksize;
         }
     };
@@ -103,7 +105,7 @@ namespace hpx { namespace actions { namespace detail {
         /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
         /// but the header in which the action is defined misses a
         /// HPX_REGISTER_ACTION_DECLARATION
-        static_assert(traits::needs_automatic_registration<Action>::value,
+        static_assert(traits::needs_automatic_registration_v<Action>,
             "HPX_REGISTER_ACTION_DECLARATION missing");
         return util::debug::type_id<Action>::typeid_.type_id();
     }

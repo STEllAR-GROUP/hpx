@@ -39,9 +39,7 @@ struct registration_wrapper
 };
 
 // this function will be executed by an HPX thread
-void set_value(
-    std::shared_ptr<hpx::lcos::local::promise<int> > p,
-    int result)
+void set_value(std::shared_ptr<hpx::promise<int>> p, int result)
 {
     // notify the waiting HPX thread and return a value
     p->set_value(result);
@@ -49,8 +47,7 @@ void set_value(
 
 // this function will be executed by a dedicated OS thread
 void do_async_io(char const* string_to_write,
-    std::shared_ptr<hpx::lcos::local::promise<int> > p,
-    hpx::runtime* rt)
+    std::shared_ptr<hpx::promise<int>> p, hpx::runtime* rt)
 {
     // register this thread in order to be able to call HPX functionality
     registration_wrapper wrap(rt, "external-io");
@@ -62,21 +59,21 @@ void do_async_io(char const* string_to_write,
     // Create an HPX thread to guarantee that the promise::set_value
     // function can be invoked safely.
     hpx::threads::thread_init_data data(
-        hpx::threads::make_thread_function_nullary(
-            hpx::util::bind(&set_value, p, 0)), "set_value");
+        hpx::threads::make_thread_function_nullary(hpx::bind(&set_value, p, 0)),
+        "set_value");
     hpx::threads::register_thread(data);
 }
 
 // This function will be executed by an HPX thread
 int io(char const* string_to_write)
 {
-    std::shared_ptr<hpx::lcos::local::promise<int> > p =
-        std::make_shared<hpx::lcos::local::promise<int> >();
+    std::shared_ptr<hpx::promise<int>> p =
+        std::make_shared<hpx::promise<int>>();
 
     // Create a new external OS-thread and schedule the handler to
     // run on one of its OS-threads.
     std::thread external_os_thread(
-        hpx::util::bind(&do_async_io, string_to_write, p, hpx::get_runtime_ptr()));
+        hpx::bind(&do_async_io, string_to_write, p, hpx::get_runtime_ptr()));
 
     int result = p->get_future().get();
 
@@ -98,13 +95,14 @@ int hpx_main()
 
         // Print the returned result.
         hpx::cout << "HPX-thread: The asynchronous IO operation returned: "
-                  << result << "\n" << hpx::flush;
+                  << result << "\n"
+                  << std::flush;
     }
 
-    return hpx::finalize(); // Initiate shutdown of the runtime system.
+    return hpx::finalize();    // Initiate shutdown of the runtime system.
 }
 
 int main(int argc, char* argv[])
 {
-    return hpx::init(argc, argv); // Initialize and run HPX.
+    return hpx::init(argc, argv);    // Initialize and run HPX.
 }

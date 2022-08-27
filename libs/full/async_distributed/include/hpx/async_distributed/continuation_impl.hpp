@@ -29,7 +29,7 @@ namespace hpx { namespace actions {
 
         template <typename Cont_>
         continuation_impl(Cont_&& cont, hpx::id_type const& target)
-          : cont_(std::forward<Cont_>(cont))
+          : cont_(HPX_FORWARD(Cont_, cont))
           , target_(target)
         {
         }
@@ -40,7 +40,7 @@ namespace hpx { namespace actions {
         typename util::invoke_result<cont_type, hpx::id_type, T>::type
         operator()(hpx::id_type const& lco, T&& t) const
         {
-            hpx::apply_c(cont_, lco, target_, std::forward<T>(t));
+            hpx::apply_c(cont_, lco, target_, HPX_FORWARD(T, t));
 
             // Unfortunately we need to default construct the return value,
             // this possibly imposes an additional restriction of return types.

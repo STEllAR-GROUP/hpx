@@ -11,7 +11,7 @@ on: [pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: stellargroup/hip_build_env:7
+    container: stellargroup/hip_build_env:10
 
     steps:
     - uses: actions/checkout@v2
@@ -33,4 +33,4 @@ jobs:
       shell: bash
       run: |
           cmake --build build --target all
-          cmake --build build --target tests.{examples,unit,regressions,performance}.modules.{compute,async}_cuda
+          cmake --build build --target tests.{examples,unit,regressions,performance}.modules.async_cuda

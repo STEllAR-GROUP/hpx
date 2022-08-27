@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,6 @@ set(runtime_distributed_headers
     hpx/runtime_distributed/big_boot_barrier.hpp
     hpx/runtime_distributed/copy_component.hpp
     hpx/runtime_distributed.hpp
-    hpx/runtime_distributed/detail/runtime_fwd.hpp
     hpx/runtime_distributed/find_all_localities.hpp
     hpx/runtime_distributed/find_here.hpp
     hpx/runtime_distributed/find_localities.hpp
@@ -49,6 +48,7 @@ set(runtime_distributed_sources
     applier.cpp
     big_boot_barrier.cpp
     get_locality_name.cpp
+    locality_interface.cpp
     runtime_support.cpp
     runtime_distributed.cpp
     server/runtime_support_server.cpp
@@ -64,16 +64,21 @@ add_hpx_module(
   COMPAT_HEADERS ${runtime_distributed_compat_headers}
   DEPENDENCIES hpx_core
   MODULE_DEPENDENCIES
+    hpx_actions
+    hpx_actions_base
     hpx_agas
     hpx_agas_base
     hpx_async_colocated
     hpx_async_distributed
-    hpx_collectives
+    hpx_components
+    hpx_components_base
     hpx_command_line_handling
     hpx_distribution_policies
-    hpx_naming
     hpx_naming_base
+    hpx_parcelset
+    hpx_parcelset_base
     hpx_performance_counters
+    hpx_plugin_factories
     hpx_runtime_components
   CMAKE_SUBDIRS examples tests
 )

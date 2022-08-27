@@ -5,9 +5,21 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests future future_ref future_then make_future make_ready_future
-          shared_future
+set(tests
+    future
+    future_ref
+    future_then
+    local_promise_allocator
+    local_use_allocator
+    make_future
+    make_ready_future
+    shared_future
 )
+
+if(HPX_WITH_CXX20_COROUTINES)
+  set(tests ${tests} await)
+  set(await_PARAMETERS THREADS_PER_LOCALITY 4)
+endif()
 
 set(future_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_then_PARAMETERS THREADS_PER_LOCALITY 4)

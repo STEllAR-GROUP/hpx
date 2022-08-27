@@ -56,12 +56,21 @@ else
     github_commit_status="failure"
 fi
 
-if [[ -n "${ghprbPullId:-}" ]]; then
+# Get the CDash dashboard build id
+cdash_build_id="$(cat jenkins-hpx-${configuration_name_with_build_type}-cdash-build-id.txt)"
+
+if [[ -z "${ghprbPullId:-}" ]]; then
+    .jenkins/common/set_github_status.sh \
+        "${GITHUB_TOKEN}" \
+        "STEllAR-GROUP/hpx" \
+        "${GIT_COMMIT}" \
+        "${github_commit_status}" \
+        "${configuration_name_with_build_type}" \
+        "${cdash_build_id}" \
+        "jenkins/cscs"
+else
     # Extract just the organization and repo names "org/repo" from the full URL
     github_commit_repo="$(echo $ghprbPullLink | sed -n 's/https:\/\/github.com\/\(.*\)\/pull\/[0-9]*/\1/p')"
-
-    # Get the CDash dashboard build id
-    cdash_build_id="$(cat jenkins-hpx-${configuration_name_with_build_type}-cdash-build-id.txt)"
 
     # Set GitHub status with CDash url
     .jenkins/common/set_github_status.sh \

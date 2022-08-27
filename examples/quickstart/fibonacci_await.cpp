@@ -52,7 +52,7 @@ struct _fibonacci_frame
 {
     int state_;
     hpx::future<std::uint64_t> result_;
-    hpx::lcos::local::promise<std::uint64_t> result_promise_;
+    hpx::promise<std::uint64_t> result_promise_;
 
     _fibonacci_frame(std::uint64_t n)
       : state_(0)
@@ -117,7 +117,7 @@ void _fibonacci(std::shared_ptr<_fibonacci_frame> const& frame_)
         frame->state_ = 1;
         if (!frame->result_.valid())
             frame->result_ = frame->result_promise_.get_future();
-        frame->lhs_.then(hpx::util::bind(&_fibonacci, frame_));
+        frame->lhs_.then(hpx::bind(&_fibonacci, frame_));
         return;
     }
 
@@ -129,7 +129,7 @@ L1:
         frame->state_ = 2;
         if (!frame->result_.valid())
             frame->result_ = frame->result_promise_.get_future();
-        frame->rhs_.then(hpx::util::bind(&_fibonacci, frame_));
+        frame->rhs_.then(hpx::bind(&_fibonacci, frame_));
         return;
     }
 

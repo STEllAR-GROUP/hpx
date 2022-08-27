@@ -42,7 +42,7 @@
 #include <hpx/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 
 #include <cstddef>
 #include <utility>
@@ -64,15 +64,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         using result_type = std::pair<thread_schedule_state, thread_id_type>;
         using arg_type = thread_restart_state;
 
-        using functor_type =
-            util::unique_function_nonser<result_type(arg_type)>;
+        using functor_type = hpx::move_only_function<result_type(arg_type)>;
 
         coroutine_impl(
             functor_type&& f, thread_id_type id, std::ptrdiff_t stack_size)
           : context_base(stack_size, id)
           , m_result(thread_schedule_state::unknown, invalid_thread_id)
           , m_arg(nullptr)
-          , m_fun(std::move(f))
+          , m_fun(HPX_MOVE(f))
         {
         }
 
@@ -137,7 +136,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             m_result =
                 result_type(thread_schedule_state::unknown, invalid_thread_id);
             m_arg = nullptr;
-            m_fun = std::move(f);
+            m_fun = HPX_MOVE(f);
             this->super_type::rebind_base(id);
         }
 

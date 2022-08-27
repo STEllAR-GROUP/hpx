@@ -17,8 +17,8 @@ set(init_runtime_headers
     hpx/hpx_start_impl.hpp
     hpx/hpx_suspend.hpp
     hpx/hpx_user_main_config.hpp
-    hpx/init_runtime/detail/run_or_start.hpp
     hpx/init_runtime/detail/init_logging.hpp
+    hpx/init_runtime/detail/run_or_start.hpp
 )
 
 set(init_runtime_sources hpx_init.cpp hpx_main_winsocket.cpp init_logging.cpp)
@@ -31,7 +31,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(init_runtime_sources ${init_runtime_sources} pre_main.cpp)
 
   set(init_runtime_optional_module_dependencies
-      hpx_async_distributed hpx_naming hpx_performance_counters
+      hpx_async_distributed hpx_collectives hpx_naming hpx_performance_counters
       hpx_runtime_distributed
   )
 endif()

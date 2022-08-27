@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -46,23 +46,22 @@ namespace hpx { namespace detail {
         if (policy == launch::sync || action_type::direct_execution::value)
         {
             return hpx::detail::sync_local_invoke_direct<action_type,
-                result_type>::call(id, std::move(addr),
-                std::forward<Ts>(vs)...);
+                result_type>::call(id, HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...);
         }
         else if (hpx::detail::has_async_policy(policy))
         {
             return keep_alive(
-                hpx::async(action_invoker<action_type>(), addr.address_,
-                    addr.type_, std::forward<Ts>(vs)...),
-                id, std::move(r.second));
+                hpx::async(policy, action_invoker<action_type>(), addr.address_,
+                    addr.type_, HPX_FORWARD(Ts, vs)...),
+                id, HPX_MOVE(r.second));
         }
 
         HPX_ASSERT(policy == launch::deferred);
 
         return keep_alive(
             hpx::async(launch::deferred, action_invoker<action_type>(),
-                addr.address_, addr.type_, std::forward<Ts>(vs)...),
-            id, std::move(r.second));
+                addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...),
+            id, HPX_MOVE(r.second));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -87,7 +86,7 @@ namespace hpx { namespace detail {
             if (!r.first)
             {
                 result = async_local_unwrap_impl<Action>(
-                    policy, id, addr, r, std::forward<Ts>(vs)...);
+                    policy, id, addr, r, HPX_FORWARD(Ts, vs)...);
 
                 return true;
             }
@@ -97,7 +96,7 @@ namespace hpx { namespace detail {
         }
 
         result = async_local_unwrap_impl<Action>(
-            policy, id, addr, r, std::forward<Ts>(vs)...);
+            policy, id, addr, r, HPX_FORWARD(Ts, vs)...);
 
         return true;
     }
@@ -120,15 +119,15 @@ namespace hpx { namespace detail {
         {
             result_type result;
             if (async_local_unwrap_impl_all<Action>(
-                    policy, id, addr, r, result, std::forward<Ts>(vs)...))
+                    policy, id, addr, r, result, HPX_FORWARD(Ts, vs)...))
             {
                 return result;
             }
         }
 
         // the asynchronous result is auto-unwrapped by the return type
-        return async_remote_impl<Action>(std::forward<Launch>(policy), id,
-            std::move(addr), std::forward<Ts>(vs)...);
+        return async_remote_impl<Action>(HPX_FORWARD(Launch, policy), id,
+            HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...);
     }
     /// \endcond
 }}    // namespace hpx::detail

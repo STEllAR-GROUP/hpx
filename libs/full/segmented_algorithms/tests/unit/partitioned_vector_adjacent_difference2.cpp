@@ -53,7 +53,7 @@ template <typename ExPolicy, typename T>
 void test_adjacent_difference(ExPolicy&& policy, hpx::partitioned_vector<T>& v,
     hpx::partitioned_vector<T>& w, T val)
 {
-    hpx::parallel::adjacent_difference(policy, v.begin(), v.end(), w.begin());
+    hpx::adjacent_difference(policy, v.begin(), v.end(), w.begin());
 
     verify_values(policy, w, val);
     verify_values(policy, v);
@@ -63,8 +63,7 @@ template <typename ExPolicy, typename T>
 void test_adjacent_difference_async(ExPolicy&& policy,
     hpx::partitioned_vector<T>& v, hpx::partitioned_vector<T>& w, T val)
 {
-    hpx::parallel::adjacent_difference(policy, v.begin(), v.end(), w.begin())
-        .get();
+    hpx::adjacent_difference(policy, v.begin(), v.end(), w.begin()).get();
 
     verify_values(policy, w, val);
     verify_values(policy, v);

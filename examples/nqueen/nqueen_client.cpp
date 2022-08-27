@@ -29,7 +29,7 @@ int hpx_main(hpx::program_options::variables_map&)
 
     std::size_t soln_count_total = 0;
 
-    hpx::naming::id_type locality_ = hpx::find_here();
+    hpx::id_type locality_ = hpx::find_here();
 
     std::cout << "Enter size of board. Default size is 8." << std::endl;
     std::cout << "Command Options: size[value] | default | print | quit"
@@ -39,7 +39,7 @@ int hpx_main(hpx::program_options::variables_map&)
 
     while (std::cin.good())
     {
-        if(cmd == "size")
+        if (cmd == "size")
         {
             soln_count_total = 0;
             std::string arg;
@@ -49,60 +49,61 @@ int hpx_main(hpx::program_options::variables_map&)
             std::size_t i = 0;
             std::list<nqueen::board> b;
             nqueen::board bi = hpx::new_<nqueen::board>(locality_);
-            while(i != sz)
+            while (i != sz)
             {
                 b.push_back(bi);
                 ++i;
             }
 
-            i=0;
-            for(std::list<nqueen::board>::iterator iter = b.begin();
-                iter != b.end(); ++iter)
+            i = 0;
+            for (std::list<nqueen::board>::iterator iter = b.begin();
+                 iter != b.end(); ++iter)
             {
                 iter->init_board(sz);
-                soln_count_total+= iter->solve_board(iter->access_board(),
-                                                     sz, 0, i);
+                soln_count_total +=
+                    iter->solve_board(iter->access_board(), sz, 0, i);
                 ++i;
             }
             std::cout << "soln_count:" << soln_count_total << std::endl;
             b.clear();
         }
-        else if(cmd == "default")
+        else if (cmd == "default")
         {
             soln_count_total = 0;
             nqueen::board a = hpx::new_<nqueen::board>(locality_);
             std::size_t i = 0;
             std::vector<nqueen::board> b;
-            while(i != default_size)
+            while (i != default_size)
             {
                 b.push_back(a);
                 ++i;
             }
             i = 0;
-            for(std::vector<nqueen::board>::iterator iter = b.begin();
-                iter != b.end(); ++iter)
+            for (std::vector<nqueen::board>::iterator iter = b.begin();
+                 iter != b.end(); ++iter)
             {
                 iter->init_board(default_size);
-                soln_count_total+= iter->solve_board(iter->access_board(),
-                                                     default_size, 0, i);
+                soln_count_total +=
+                    iter->solve_board(iter->access_board(), default_size, 0, i);
                 ++i;
             }
             std::cout << "soln_count:" << soln_count_total << std::endl;
             b.clear();
         }
-        else if(cmd == "print")
+        else if (cmd == "print")
         {
             std::cout << "soln_count : " << soln_count_total << std::endl;
         }
-        else if (cmd == "quit"){
+        else if (cmd == "quit")
+        {
             //std::cout << "soln_count : " << soln_count_total << std::endl;
             break;
         }
         else
         {
             std::cout << "Invalid Command." << std::endl;
-            std::cout << "Options: size[value] | default | print "<<
-            "| quit" << std::endl;
+            std::cout << "Options: size[value] | default | print "
+                      << "| quit" << std::endl;
         }
         std::cin >> cmd;
     }

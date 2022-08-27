@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 //  Copyright (c) 2019 Tianyi Zhang
 //
@@ -69,13 +69,14 @@ int hpx_main(variables_map& vm)
             b.count_up();
 
             thread_init_data data(
-                make_thread_function_nullary(hpx::util::bind(
-                    &local_barrier_test, std::ref(b), std::ref(c))),
+                make_thread_function_nullary(
+                    hpx::bind(&local_barrier_test, std::ref(b), std::ref(c))),
                 "local_barrier_test");
             register_work(data);
         }
 
-        b.wait();    // wait for all threads to enter the barrier
+        // wait for all threads to enter the barrier
+        b.wait();
         HPX_TEST_EQ(pxthreads, c);
     }
 

@@ -16,42 +16,41 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Interpolation helper functions related to HDF5.
-namespace sheneos
-{
-    namespace detail
-    {
+namespace sheneos {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////////
-        inline void
-        read_values(H5::DataSet& dataset, H5::DataSpace& data_space,
+        inline void read_values(H5::DataSet& dataset, H5::DataSpace& data_space,
             hsize_t offset, hsize_t count, double* values)
         {
             using namespace H5;
 
             // Define the hyperslab for file based data.
-            hsize_t data_offset[1] = { offset };
-            hsize_t data_count[1] = { count };
+            hsize_t data_offset[1] = {offset};
+            hsize_t data_count[1] = {count};
             data_space.selectHyperslab(H5S_SELECT_SET, data_count, data_offset);
 
             // Memory dataspace.
-            hsize_t mem_dims[1] = { count };
-            DataSpace mem_space (1, mem_dims);
+            hsize_t mem_dims[1] = {count};
+            DataSpace mem_space(1, mem_dims);
 
             // Define the hyperslab for data in memory.
-            hsize_t mem_offset[1] = { 0 };
-            hsize_t mem_count[1] = { count };
+            hsize_t mem_offset[1] = {0};
+            hsize_t mem_count[1] = {count};
             mem_space.selectHyperslab(H5S_SELECT_SET, mem_count, mem_offset);
 
             // Read data to memory.
-            dataset.read(values, PredType::NATIVE_DOUBLE, mem_space, data_space);
+            dataset.read(
+                values, PredType::NATIVE_DOUBLE, mem_space, data_space);
         }
 
-    } // sheneos::detail
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     void extract_data(std::string const& datafilename, char const* name,
         double* values, hsize_t offset, hsize_t count)
     {
-        try {
+        try
+        {
             using namespace H5;
 
             // Turn off auto-printing on failure.
@@ -70,9 +69,10 @@ namespace sheneos
             // Read the data subset.
             detail::read_values(dataset, dataspace, offset, count, values);
         }
-        catch (H5::Exception const& e) {
-            HPX_THROW_EXCEPTION(hpx::no_success, "sheneos::extract_data",
-                e.getDetailMsg());
+        catch (H5::Exception const& e)
+        {
+            HPX_THROW_EXCEPTION(
+                hpx::no_success, "sheneos::extract_data", e.getDetailMsg());
         }
     }
 
@@ -81,7 +81,8 @@ namespace sheneos
         char const* name, double& minval, double& maxval, double& delta,
         std::size_t start, std::size_t end)
     {
-        try {
+        try
+        {
             using namespace H5;
 
             // Turn off auto-printing on failure.
@@ -114,21 +115,20 @@ namespace sheneos
             // Return size of dataset.
             return dims[0];
         }
-        catch (H5::Exception const& e) {
+        catch (H5::Exception const& e)
+        {
             std::string msg = e.getDetailMsg().c_str();
-            HPX_THROW_EXCEPTION(hpx::no_success,
-                "sheneos::extract_data_range", msg);
+            HPX_THROW_EXCEPTION(
+                hpx::no_success, "sheneos::extract_data_range", msg);
         }
 
         // This return statement keeps the compiler from whining.
         return 0;
     }
 
-    namespace detail
-    {
+    namespace detail {
         ///////////////////////////////////////////////////////////////////////
-        inline void
-        read_values(H5::DataSet& dataset, H5::DataSpace& data_space,
+        inline void read_values(H5::DataSet& dataset, H5::DataSpace& data_space,
             dimension const& dimx, dimension const& dimy, dimension const& dimz,
             double* values)
         {
@@ -136,31 +136,31 @@ namespace sheneos
 
             // Define the hyperslab for file based data.
             hsize_t data_offset[dimension::dim] = {
-                dimx.offset_, dimy.offset_, dimz.offset_
-            };
+                dimx.offset_, dimy.offset_, dimz.offset_};
             hsize_t data_count[dimension::dim] = {
-                dimx.count_, dimy.count_, dimz.count_
-            };
+                dimx.count_, dimy.count_, dimz.count_};
             data_space.selectHyperslab(H5S_SELECT_SET, data_count, data_offset);
 
             // Memory dataspace.
-            DataSpace mem_space (dimension::dim, data_count);
+            DataSpace mem_space(dimension::dim, data_count);
 
             // Define the hyperslab for data in memory.
-            hsize_t mem_offset[dimension::dim] = { 0, 0, 0 };
+            hsize_t mem_offset[dimension::dim] = {0, 0, 0};
             mem_space.selectHyperslab(H5S_SELECT_SET, data_count, mem_offset);
 
             // Read data to memory.
-            dataset.read(values, PredType::NATIVE_DOUBLE, mem_space, data_space);
+            dataset.read(
+                values, PredType::NATIVE_DOUBLE, mem_space, data_space);
         }
-    } // sheneos::detail
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     void extract_data(std::string const& datafilename, char const* name,
         double* values, dimension const& dimx, dimension const& dimy,
         dimension const& dimz)
     {
-        try {
+        try
+        {
             using namespace H5;
 
             // Turn off the auto-printing when failure occurs
@@ -176,10 +176,10 @@ namespace sheneos
             // Read the data subset.
             detail::read_values(dataset, dataspace, dimx, dimy, dimz, values);
         }
-        catch (H5::Exception const& e) {
-            HPX_THROW_EXCEPTION(hpx::no_success, "sheneos::extract_data",
-                e.getDetailMsg());
+        catch (H5::Exception const& e)
+        {
+            HPX_THROW_EXCEPTION(
+                hpx::no_success, "sheneos::extract_data", e.getDetailMsg());
         }
     }
-}
-
+}    // namespace sheneos

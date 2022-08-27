@@ -35,9 +35,6 @@ namespace hpx { namespace components { namespace detail {
     namespace one_size_heap_allocators {
 
         ///////////////////////////////////////////////////////////////////////
-        // TODO: this interface should conform to the Boost.Pool allocator
-        // interface, to maximize code reuse and consistency - wash.
-        //
         // simple allocator which gets the memory from the default malloc,
         // but which does not reallocate the heap (it doesn't grow)
         struct fixed_mallocator
@@ -46,11 +43,11 @@ namespace hpx { namespace components { namespace detail {
             {
                 return alloc_.allocate(size);
             }
-            static void free(void* p, std::size_t count)
+            static void free(void* p, std::size_t count) noexcept
             {
                 alloc_.deallocate(static_cast<char*>(p), count);
             }
-            static void* realloc(std::size_t&, void*)
+            static void* realloc(std::size_t&, void*) noexcept
             {
                 // normally this should return ::realloc(p, size), but we are
                 // not interested in growing the allocated heaps, so we just
@@ -71,7 +68,6 @@ namespace hpx { namespace components { namespace detail {
     public:
         using allocator_type = one_size_heap_allocators::fixed_mallocator;
         using mutex_type = hpx::lcos::local::spinlock;
-        using scoped_lock = std::unique_lock<mutex_type>;
         using heap_parameters = wrapper_heap_base::heap_parameters;
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
@@ -109,7 +105,7 @@ namespace hpx { namespace components { namespace detail {
         void set_gid(naming::gid_type const& g);
 
     protected:
-        bool test_release(scoped_lock& lk);
+        bool test_release(std::unique_lock<mutex_type>& lk);
         bool ensure_pool(std::size_t count);
 
         bool init_pool();
@@ -149,8 +145,8 @@ namespace hpx { namespace components { namespace detail {
 #endif
 
     private:
-        util::itt::heap_function heap_alloc_function_;
-        util::itt::heap_function heap_free_function_;
+        HPX_NO_UNIQUE_ADDRESS util::itt::heap_function heap_alloc_function_;
+        HPX_NO_UNIQUE_ADDRESS util::itt::heap_function heap_free_function_;
     };
 
     ///////////////////////////////////////////////////////////////////////////

@@ -47,6 +47,9 @@
 
 #pragma once
 
+#include <hpx/config/move.hpp>
+#include <hpx/config/forward.hpp>
+
 #if defined(__GNUC__)
 // Disable -Wconversion warnings (spuriously triggered when Traits::size_t and
 // Traits::index_t are set to < 32 bits, causing integer promotion, causing warnings
@@ -419,19 +422,19 @@ namespace details
             thread_id_converter<thread_id_t>::prehash(id)));
     }
 
-    template<typename T>
-    static inline bool circular_less_than(T a, T b)
-    {
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4554)
 #endif
+    template<typename T>
+    static inline bool circular_less_than(T a, T b)
+    {
         static_assert(std::is_integral<T>::value && !std::numeric_limits<T>::is_signed, "circular_less_than is intended to be used only with unsigned integer types");
         return static_cast<T>(a - b) > static_cast<T>(static_cast<T>(1) << static_cast<T>(sizeof(T) * CHAR_BIT - 1));
+    }
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-    }
 
     template<typename U>
     static inline char* align_for(char* ptr)
@@ -460,9 +463,9 @@ namespace details
     template<typename T>
     static inline void swap_relaxed(std::atomic<T>& left, std::atomic<T>& right)
     {
-        T temp = std::move(left.load(std::memory_order_relaxed));
-        left.store(std::move(right.load(std::memory_order_relaxed)), std::memory_order_relaxed);
-        right.store(std::move(temp), std::memory_order_relaxed);
+        T temp = HPX_MOVE(left.load(std::memory_order_relaxed));
+        left.store(HPX_MOVE(right.load(std::memory_order_relaxed)), std::memory_order_relaxed);
+        right.store(HPX_MOVE(temp), std::memory_order_relaxed);
     }
 
     template<typename T>
@@ -486,9 +489,9 @@ namespace details
     {
         template<typename U>
         static inline auto eval(U&& x)
-            -> decltype(std::forward<U>(x))
+            -> decltype(HPX_FORWARD(U, x))
         {
-            return std::forward<U>(x);
+            return HPX_FORWARD(U, x);
         }
     };
 
@@ -847,7 +850,7 @@ public:
         initialBlockPoolIndex(other.initialBlockPoolIndex.load(std::memory_order_relaxed)),
         initialBlockPool(other.initialBlockPool),
         initialBlockPoolSize(other.initialBlockPoolSize),
-        freeList(std::move(other.freeList)),
+        freeList(HPX_MOVE(other.freeList)),
         nextExplicitConsumerId(other.nextExplicitConsumerId.load(std::memory_order_relaxed)),
         globalExplicitConsumerOffset(other.globalExplicitConsumerOffset.load(std::memory_order_relaxed))
     {
@@ -939,7 +942,7 @@ public:
     inline bool enqueue(T&& item)
     {
         if (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0) return false;
-        return inner_enqueue<CanAlloc>(std::move(item));
+        return inner_enqueue<CanAlloc>(HPX_MOVE(item));
     }
 
     // Enqueues a single item (by copying it) using an explicit producer token.
@@ -957,7 +960,7 @@ public:
     // Thread-safe.
     inline bool enqueue(producer_token_t const& token, T&& item)
     {
-        return inner_enqueue<CanAlloc>(token, std::move(item));
+        return inner_enqueue<CanAlloc>(token, HPX_MOVE(item));
     }
 
     // Enqueues several items.
@@ -1004,7 +1007,7 @@ public:
     inline bool try_enqueue(T&& item)
     {
         if (INITIAL_IMPLICIT_PRODUCER_HASH_SIZE == 0) return false;
-        return inner_enqueue<CannotAlloc>(std::move(item));
+        return inner_enqueue<CannotAlloc>(HPX_MOVE(item));
     }
 
     // Enqueues a single item (by copying it) using an explicit producer token.
@@ -1020,7 +1023,7 @@ public:
     // Thread-safe.
     inline bool try_enqueue(producer_token_t const& token, T&& item)
     {
-        return inner_enqueue<CannotAlloc>(token, std::move(item));
+        return inner_enqueue<CannotAlloc>(token, HPX_MOVE(item));
     }
 
     // Enqueues several items.
@@ -1299,14 +1302,14 @@ private:
     template<AllocationMode canAlloc, typename U>
     inline bool inner_enqueue(producer_token_t const& token, U&& element)
     {
-        return static_cast<ExplicitProducer*>(token.producer)->ConcurrentQueue::ExplicitProducer::template enqueue<canAlloc>(std::forward<U>(element));
+        return static_cast<ExplicitProducer*>(token.producer)->ConcurrentQueue::ExplicitProducer::template enqueue<canAlloc>(HPX_FORWARD(U, element));
     }
 
     template<AllocationMode canAlloc, typename U>
     inline bool inner_enqueue(U&& element)
     {
         auto producer = get_or_add_implicit_producer();
-        return producer == nullptr ? false : producer->ConcurrentQueue::ImplicitProducer::template enqueue<canAlloc>(std::forward<U>(element));
+        return producer == nullptr ? false : producer->ConcurrentQueue::ImplicitProducer::template enqueue<canAlloc>(HPX_FORWARD(U, element));
     }
 
     template<AllocationMode canAlloc, typename It>
@@ -1861,11 +1864,11 @@ private:
                     ++pr_blockIndexSlotsUsed;
                 }
 
-                if (!MOODYCAMEL_NOEXCEPT_CTOR(T, U, new (nullptr) T(std::forward<U>(element)))) {
+                if (!MOODYCAMEL_NOEXCEPT_CTOR(T, U, new (nullptr) T(HPX_FORWARD(U, element)))) {
                     // The constructor may throw. We want the element not to appear in the queue in
                     // that case (without corrupting the queue):
                     MOODYCAMEL_TRY {
-                        new ((*this->tailBlock)[currentTailIndex]) T(std::forward<U>(element));
+                        new ((*this->tailBlock)[currentTailIndex]) T(HPX_FORWARD(U, element));
                     }
                     MOODYCAMEL_CATCH (...) {
                         // Revert change to the current block, but leave the new block available
@@ -1887,14 +1890,14 @@ private:
                 blockIndex.load(std::memory_order_relaxed)->front.store(pr_blockIndexFront, std::memory_order_release);
                 pr_blockIndexFront = (pr_blockIndexFront + 1) & (pr_blockIndexSize - 1);
 
-                if (!MOODYCAMEL_NOEXCEPT_CTOR(T, U, new (nullptr) T(std::forward<U>(element)))) {
+                if (!MOODYCAMEL_NOEXCEPT_CTOR(T, U, new (nullptr) T(HPX_FORWARD(U, element)))) {
                     this->tailIndex.store(newTailIndex, std::memory_order_release);
                     return true;
                 }
             }
 
             // Enqueue
-            new ((*this->tailBlock)[currentTailIndex]) T(std::forward<U>(element));
+            new ((*this->tailBlock)[currentTailIndex]) T(HPX_FORWARD(U, element));
 
             this->tailIndex.store(newTailIndex, std::memory_order_release);
             return true;
@@ -1967,7 +1970,7 @@ private:
 
                     // Dequeue
                     auto& el = *((*block)[index]);
-                    if (!MOODYCAMEL_NOEXCEPT_ASSIGN(T, T&&, element = std::move(el))) {
+                    if (!MOODYCAMEL_NOEXCEPT_ASSIGN(T, T&&, element = HPX_MOVE(el))) {
                         // Make sure the element is still fully dequeued and destroyed even if the assignment
                         // throws
                         struct Guard {
@@ -1981,10 +1984,10 @@ private:
                             }
                         } guard = { block, index };
 
-                        element = std::move(el); // NOLINT
+                        element = HPX_MOVE(el); // NOLINT
                     }
                     else {
-                        element = std::move(el); // NOLINT
+                        element = HPX_MOVE(el); // NOLINT
                         el.~T(); // NOLINT
                         block->ConcurrentQueue::Block::template set_empty<explicit_context>(index);
                     }
@@ -2225,10 +2228,10 @@ private:
                         auto endIndex = (index & ~static_cast<index_t>(BLOCK_SIZE - 1)) + static_cast<index_t>(BLOCK_SIZE);
                         endIndex = details::circular_less_than<index_t>(firstIndex + static_cast<index_t>(actualCount), endIndex) ? firstIndex + static_cast<index_t>(actualCount) : endIndex;
                         auto block = localBlockIndex->entries[indexIndex].block;
-                        if (MOODYCAMEL_NOEXCEPT_ASSIGN(T, T&&, details::deref_noexcept(itemFirst) = std::move((*(*block)[index])))) {
+                        if (MOODYCAMEL_NOEXCEPT_ASSIGN(T, T&&, details::deref_noexcept(itemFirst) = HPX_MOVE((*(*block)[index])))) {
                             while (index != endIndex) {
                                 auto& el = *((*block)[index]);
-                                *itemFirst++ = std::move(el);
+                                *itemFirst++ = HPX_MOVE(el);
                                 el.~T();
                                 ++index;
                             }
@@ -2237,7 +2240,7 @@ private:
                             MOODYCAMEL_TRY {
                                 while (index != endIndex) {
                                     auto& el = *((*block)[index]);
-                                    *itemFirst = std::move(el);
+                                    *itemFirst = HPX_MOVE(el);
                                     ++itemFirst;
                                     el.~T();
                                     ++index;
@@ -2457,10 +2460,10 @@ private:
 #endif
                 newBlock->ConcurrentQueue::Block::template reset_empty<implicit_context>();
 
-                if (!MOODYCAMEL_NOEXCEPT_CTOR(T, U, new (nullptr) T(std::forward<U>(element)))) {
+                if (!MOODYCAMEL_NOEXCEPT_CTOR(T, U, new (nullptr) T(HPX_FORWARD(U, element)))) {
                     // May throw, try to insert now before we publish the fact that we have this new block
                     MOODYCAMEL_TRY {
-                        new ((*newBlock)[currentTailIndex]) T(std::forward<U>(element));
+                        new ((*newBlock)[currentTailIndex]) T(HPX_FORWARD(U, element));
                     }
                     MOODYCAMEL_CATCH (...) {
                         rewind_block_index_tail();
@@ -2475,14 +2478,14 @@ private:
 
                 this->tailBlock = newBlock;
 
-                if (!MOODYCAMEL_NOEXCEPT_CTOR(T, U, new (nullptr) T(std::forward<U>(element)))) {
+                if (!MOODYCAMEL_NOEXCEPT_CTOR(T, U, new (nullptr) T(HPX_FORWARD(U, element)))) {
                     this->tailIndex.store(newTailIndex, std::memory_order_release);
                     return true;
                 }
             }
 
             // Enqueue
-            new ((*this->tailBlock)[currentTailIndex]) T(std::forward<U>(element));
+            new ((*this->tailBlock)[currentTailIndex]) T(HPX_FORWARD(U, element));
 
             this->tailIndex.store(newTailIndex, std::memory_order_release);
             return true;
@@ -2509,7 +2512,7 @@ private:
                     auto block = entry->value.load(std::memory_order_relaxed);
                     auto& el = *((*block)[index]);
 
-                    if (!MOODYCAMEL_NOEXCEPT_ASSIGN(T, T&&, element = std::move(el))) {
+                    if (!MOODYCAMEL_NOEXCEPT_ASSIGN(T, T&&, element = HPX_MOVE(el))) {
 #if MCDBGQ_NOLOCKFREE_IMPLICITPRODBLOCKINDEX
                         // Note: Acquiring the mutex with every dequeue instead of only when a block
                         // is released is very sub-optimal, but it is, after all, purely debug code.
@@ -2531,10 +2534,10 @@ private:
                             }
                         } guard = { block, index, entry, this->parent };
 
-                        element = std::move(el); // NOLINT
+                        element = HPX_MOVE(el); // NOLINT
                     }
                     else {
-                        element = std::move(el); // NOLINT
+                        element = HPX_MOVE(el); // NOLINT
                         el.~T(); // NOLINT
 
                         if (block->ConcurrentQueue::Block::template set_empty<implicit_context>(index)) {
@@ -2744,10 +2747,10 @@ private:
 
                         auto entry = localBlockIndex->index[indexIndex];
                         auto block = entry->value.load(std::memory_order_relaxed);
-                        if (MOODYCAMEL_NOEXCEPT_ASSIGN(T, T&&, details::deref_noexcept(itemFirst) = std::move((*(*block)[index])))) {
+                        if (MOODYCAMEL_NOEXCEPT_ASSIGN(T, T&&, details::deref_noexcept(itemFirst) = HPX_MOVE((*(*block)[index])))) {
                             while (index != endIndex) {
                                 auto& el = *((*block)[index]);
-                                *itemFirst++ = std::move(el);
+                                *itemFirst++ = HPX_MOVE(el);
                                 el.~T();
                                 ++index;
                             }
@@ -2756,7 +2759,7 @@ private:
                             MOODYCAMEL_TRY {
                                 while (index != endIndex) {
                                     auto& el = *((*block)[index]);
-                                    *itemFirst = std::move(el);
+                                    *itemFirst = HPX_MOVE(el);
                                     ++itemFirst;
                                     el.~T();
                                     ++index;
@@ -3545,7 +3548,7 @@ private:
     static inline U* create(A1&& a1)
     {
         auto p = (Traits::malloc)(sizeof(U));
-        return p != nullptr ? new (p) U(std::forward<A1>(a1)) : nullptr;
+        return p != nullptr ? new (p) U(HPX_FORWARD(A1, a1)) : nullptr;
     }
 
     template<typename U>

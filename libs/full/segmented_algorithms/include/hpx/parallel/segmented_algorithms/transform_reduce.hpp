@@ -61,7 +61,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 local_iterator_type end = traits::local(last);
                 if (beg != end)
                 {
-                    overall_result = hpx::util::invoke(red_op, overall_result,
+                    overall_result = HPX_INVOKE(red_op, overall_result,
                         dispatch(traits::get_id(sit), algo, policy,
                             std::true_type(), beg, end, red_op, conv_op));
                 }
@@ -73,7 +73,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 local_iterator_type end = traits::end(sit);
                 if (beg != end)
                 {
-                    overall_result = hpx::util::invoke(red_op, overall_result,
+                    overall_result = HPX_INVOKE(red_op, overall_result,
                         dispatch(traits::get_id(sit), algo, policy,
                             std::true_type(), beg, end, red_op, conv_op));
                 }
@@ -85,8 +85,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     end = traits::end(sit);
                     if (beg != end)
                     {
-                        overall_result = hpx::util::invoke(red_op,
-                            overall_result,
+                        overall_result = HPX_INVOKE(red_op, overall_result,
                             dispatch(traits::get_id(sit), algo, policy,
                                 std::true_type(), beg, end, red_op, conv_op));
                     }
@@ -97,13 +96,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 end = traits::local(last);
                 if (beg != end)
                 {
-                    overall_result = hpx::util::invoke(red_op, overall_result,
+                    overall_result = HPX_INVOKE(red_op, overall_result,
                         dispatch(traits::get_id(sit), algo, policy,
                             std::true_type(), beg, end, red_op, conv_op));
                 }
             }
 
-            return result::get(std::move(overall_result));
+            return result::get(HPX_MOVE(overall_result));
         }
 
         // parallel remote implementation
@@ -187,7 +186,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             return red_op(val, curr.get());
                         });
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
 
         // sequential remote implementation
@@ -223,7 +222,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 local_iterator_type1 end1 = traits1::local(last1);
                 if (beg1 != end1)
                 {
-                    overall_result = hpx::util::invoke(red_op, overall_result,
+                    overall_result = HPX_INVOKE(red_op, overall_result,
                         dispatch(traits1::get_id(sit1), algo, policy,
                             std::true_type(), beg1, end1, beg2, red_op,
                             conv_op));
@@ -237,7 +236,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 local_iterator_type1 end1 = traits1::end(sit1);
                 if (beg1 != end1)
                 {
-                    overall_result = hpx::util::invoke(red_op, overall_result,
+                    overall_result = HPX_INVOKE(red_op, overall_result,
                         dispatch(traits1::get_id(sit1), algo, policy,
                             std::true_type(), beg1, end1, beg2, red_op,
                             conv_op));
@@ -251,11 +250,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     end1 = traits1::end(sit1);
                     if (beg1 != end1)
                     {
-                        overall_result =
-                            hpx::util::invoke(red_op, overall_result,
-                                dispatch(traits1::get_id(sit1), algo, policy,
-                                    std::true_type(), beg1, end1, beg2, red_op,
-                                    conv_op));
+                        overall_result = HPX_INVOKE(red_op, overall_result,
+                            dispatch(traits1::get_id(sit1), algo, policy,
+                                std::true_type(), beg1, end1, beg2, red_op,
+                                conv_op));
                     }
                 }
 
@@ -265,14 +263,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 end1 = traits1::local(last1);
                 if (beg1 != end1)
                 {
-                    overall_result = hpx::util::invoke(red_op, overall_result,
+                    overall_result = HPX_INVOKE(red_op, overall_result,
                         dispatch(traits1::get_id(sit1), algo, policy,
                             std::true_type(), beg1, end1, beg2, red_op,
                             conv_op));
                 }
             }
 
-            return result::get(std::move(overall_result));
+            return result::get(HPX_MOVE(overall_result));
         }
 
         // parallel remote implementation
@@ -370,7 +368,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             return red_op(val, curr.get());
                         });
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
         /// \endcond
     }    // namespace detail
@@ -388,7 +386,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<SegIter>::value
         )>
     // clang-format on
-    std::decay<T> tag_dispatch(hpx::transform_reduce_t, SegIter first,
+    std::decay<T> tag_invoke(hpx::transform_reduce_t, SegIter first,
         SegIter last, T&& init, Reduce&& red_op, Convert&& conv_op)
     {
         static_assert(hpx::traits::is_input_iterator<SegIter>::value,
@@ -398,13 +396,13 @@ namespace hpx { namespace segmented {
 
         if (first == last)
         {
-            return std::forward<T>(init);
+            return HPX_FORWARD(T, init);
         }
 
         return hpx::parallel::v1::detail::segmented_transform_reduce(
             hpx::parallel::v1::detail::seg_transform_reduce<init_type>(),
-            hpx::execution::seq, first, last, std::forward<T>(init),
-            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
+            hpx::execution::seq, first, last, HPX_FORWARD(T, init),
+            HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op),
             std::true_type{});
     }
 
@@ -420,7 +418,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy,
         typename std::decay<T>::type>::type
-    tag_dispatch(hpx::transform_reduce_t, ExPolicy&& policy, SegIter first,
+    tag_invoke(hpx::transform_reduce_t, ExPolicy&& policy, SegIter first,
         SegIter last, T&& init, Reduce&& red_op, Convert&& conv_op)
     {
         static_assert(hpx::traits::is_forward_iterator<SegIter>::value,
@@ -432,13 +430,13 @@ namespace hpx { namespace segmented {
         if (first == last)
         {
             return parallel::util::detail::algorithm_result<ExPolicy,
-                init_type>::get(std::forward<T>(init));
+                init_type>::get(HPX_FORWARD(T, init));
         }
 
         return hpx::parallel::v1::detail::segmented_transform_reduce(
             hpx::parallel::v1::detail::seg_transform_reduce<init_type>(),
-            std::forward<ExPolicy>(policy), first, last, std::forward<T>(init),
-            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(T, init),
+            HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op),
             is_seq());
     }
 
@@ -453,7 +451,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<FwdIter2>::value
         )>
     // clang-format on
-    T tag_dispatch(hpx::transform_reduce_t, FwdIter1 first1, FwdIter1 last1,
+    T tag_invoke(hpx::transform_reduce_t, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
     {
         static_assert(hpx::traits::is_input_iterator<FwdIter1>::value &&
@@ -462,13 +460,13 @@ namespace hpx { namespace segmented {
 
         if (first1 == last1)
         {
-            return std::move(init);
+            return HPX_MOVE(init);
         }
 
         return hpx::parallel::v1::detail::segmented_transform_reduce(
             hpx::parallel::v1::detail::seg_transform_reduce_binary<T>(),
-            hpx::execution::seq, first1, last1, first2, std::forward<T>(init),
-            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op),
+            hpx::execution::seq, first1, last1, first2, HPX_FORWARD(T, init),
+            HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op),
             std::true_type{});
     }
 
@@ -484,7 +482,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, T>::type
-    tag_dispatch(hpx::transform_reduce_t, ExPolicy&& policy, FwdIter1 first1,
+    tag_invoke(hpx::transform_reduce_t, ExPolicy&& policy, FwdIter1 first1,
         FwdIter1 last1, FwdIter2 first2, T init, Reduce&& red_op,
         Convert&& conv_op)
     {
@@ -497,13 +495,13 @@ namespace hpx { namespace segmented {
         if (first1 == last1)
         {
             return parallel::util::detail::algorithm_result<ExPolicy, T>::get(
-                std::forward<T>(init));
+                HPX_FORWARD(T, init));
         }
 
         return hpx::parallel::v1::detail::segmented_transform_reduce(
             hpx::parallel::v1::detail::seg_transform_reduce_binary<T>(),
-            std::forward<ExPolicy>(policy), first1, last1, first2,
-            std::forward<T>(init), std::forward<Reduce>(red_op),
-            std::forward<Convert>(conv_op), is_seq());
+            HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
+            HPX_FORWARD(T, init), HPX_FORWARD(Reduce, red_op),
+            HPX_FORWARD(Convert, conv_op), is_seq());
     }
 }}    // namespace hpx::segmented

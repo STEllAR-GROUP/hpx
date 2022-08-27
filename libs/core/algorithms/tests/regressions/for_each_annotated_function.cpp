@@ -23,7 +23,7 @@ int hpx_main()
     std::iota(std::begin(c), std::end(c), std::random_device{}());
 
     hpx::ranges::for_each(hpx::execution::par, c,
-        hpx::util::annotated_function(
+        hpx::annotated_function(
             [](int) -> void {
                 hpx::util::thread_description desc(
                     hpx::threads::get_thread_description(

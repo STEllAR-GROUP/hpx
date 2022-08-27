@@ -37,20 +37,18 @@ namespace hpx { namespace parallel { namespace util {
 
         template <typename Itr, typename... Ts>
         class prefetching_iterator
-          : public std::iterator<std::random_access_iterator_tag,
-                typename std::iterator_traits<Itr>::value_type>
         {
         public:
-            typedef Itr base_iterator;
+            using base_iterator = Itr;
 
-            typedef std::random_access_iterator_tag iterator_category;
-            typedef typename std::iterator_traits<Itr>::value_type value_type;
-            typedef std::ptrdiff_t difference_type;
-            typedef value_type* pointer;
-            typedef value_type& reference;
+            using iterator_category = std::random_access_iterator_tag;
+            using value_type = typename std::iterator_traits<Itr>::value_type;
+            using difference_type = std::ptrdiff_t;
+            using pointer = value_type*;
+            using reference = value_type&;
 
         private:
-            typedef hpx::tuple<std::reference_wrapper<Ts>...> ranges_type;
+            using ranges_type = hpx::tuple<std::reference_wrapper<Ts>...>;
 
             ranges_type rngs_;
             base_iterator base_;
@@ -352,11 +350,11 @@ namespace hpx { namespace parallel { namespace util {
         template <typename ExPolicy, typename Itr, typename... Ts, typename F>
         HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr prefetching_iterator<Itr, Ts...>
-            tag_dispatch(hpx::parallel::util::loop_n_t<ExPolicy>,
+            tag_invoke(hpx::parallel::util::loop_n_t<ExPolicy>,
                 prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f)
         {
             return loop_n_helper::call(
-                it, count, std::forward<F>(f), std::true_type());
+                it, count, HPX_FORWARD(F, f), std::true_type());
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -435,11 +433,11 @@ namespace hpx { namespace parallel { namespace util {
         template <typename ExPolicy, typename Itr, typename... Ts, typename F>
         HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr prefetching_iterator<Itr, Ts...>
-            tag_dispatch(hpx::parallel::util::loop_n_ind_t<ExPolicy>,
+            tag_invoke(hpx::parallel::util::loop_n_ind_t<ExPolicy>,
                 prefetching_iterator<Itr, Ts...> it, std::size_t count, F&& f)
         {
             return loop_n_ind_helper::call(
-                it, count, std::forward<F>(f), std::true_type());
+                it, count, HPX_FORWARD(F, f), std::true_type());
         }
     }    // namespace prefetching
 
@@ -458,7 +456,7 @@ namespace hpx { namespace parallel { namespace util {
 
         auto&& ranges = ranges_type(std::cref(rngs)...);
         return prefetching::prefetcher_context<Itr, Ts const...>(
-            base_begin, base_end, std::move(ranges), p_factor);
+            base_begin, base_end, HPX_MOVE(ranges), p_factor);
     }
 
     namespace detail {

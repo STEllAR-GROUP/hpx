@@ -37,10 +37,10 @@ Now, in the directory where you put hello_world.cpp, issue the following
 commands (where ``$HPX_LOCATION`` is the build directory or
 ``CMAKE_INSTALL_PREFIX`` you used while building |hpx|):
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-   c++ -o hello_world hello_world.cpp \
+   $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+   $ c++ -o hello_world hello_world.cpp \
       `pkg-config --cflags --libs hpx_application`\
        -lhpx_iostreams -DHPX_APPLICATION_NAME=hello_world
 
@@ -67,9 +67,9 @@ commands (where ``$HPX_LOCATION`` is the build directory or
 
 To test the program, type:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ./hello_world
+   $ ./hello_world
 
 which should print ``Hello World!`` and exit.
 
@@ -112,20 +112,20 @@ Now, in the directory where you put the files, run the following command to
 build the component library. (where ``$HPX_LOCATION`` is the build directory or
 ``CMAKE_INSTALL_PREFIX`` you used while building |hpx|):
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-   c++ -o libhpx_hello_world.so hello_world_component.cpp \
+   $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+   $ c++ -o libhpx_hello_world.so hello_world_component.cpp \
       `pkg-config --cflags --libs hpx_component` \
        -lhpx_iostreams -DHPX_COMPONENT_NAME=hpx_hello_world
 
 Now pick a directory in which to install your |hpx| component libraries. For
 this example, we'll choose a directory named ``my_hpx_libs``:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   mkdir ~/my_hpx_libs
-   mv libhpx_hello_world.so ~/my_hpx_libs
+   $ mkdir ~/my_hpx_libs
+   $ mv libhpx_hello_world.so ~/my_hpx_libs
 
 .. note::
 
@@ -146,10 +146,10 @@ this example, we'll choose a directory named ``my_hpx_libs``:
 Now, to build the application that uses this component (``hello_world_client.cpp``),
 we do:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
-   c++ -o hello_world_client hello_world_client.cpp \
+   $ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HPX_LOCATION/lib/pkgconfig
+   $ c++ -o hello_world_client hello_world_client.cpp \
       ``pkg-config --cflags --libs hpx_application``\
        -L${HOME}/my_hpx_libs -lhpx_hello_world -lhpx_iostreams
 
@@ -161,10 +161,10 @@ we do:
 Finally, you'll need to set your LD_LIBRARY_PATH before you can run the program.
 To run the program, type:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/my_hpx_libs"
-   ./hello_world_client
+   $ export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/my_hpx_libs"
+   $ ./hello_world_client
 
 which should print ``Hello HPX World!`` and exit.
 
@@ -207,9 +207,9 @@ used by ``find_package(HPX)`` to set up all the necessary macros needed to use
 * Set the ``HPX_DIR`` CMake variable to point to the directory containing the
   ``HPXConfig.cmake`` script on the command line when you invoke CMake:
 
-  .. code-block:: bash
+  .. code-block:: shell-session
 
-     cmake -DHPX_DIR=$HPX_LOCATION/lib/cmake/HPX ...
+     $ cmake -DHPX_DIR=$HPX_LOCATION/lib/cmake/HPX ...
 
   where ``$HPX_LOCATION`` is the build directory or ``CMAKE_INSTALL_PREFIX`` you
   used when building/configuring |hpx|.
@@ -217,9 +217,9 @@ used by ``find_package(HPX)`` to set up all the necessary macros needed to use
 * Set the ``CMAKE_PREFIX_PATH`` variable to the root directory of your |hpx|
   build or install location on the command line when you invoke CMake:
 
-  .. code-block:: bash
+  .. code-block:: shell-session
 
-     cmake -DCMAKE_PREFIX_PATH=$HPX_LOCATION ...
+     $ cmake -DCMAKE_PREFIX_PATH=$HPX_LOCATION ...
 
   The difference between ``CMAKE_PREFIX_PATH`` and ``HPX_DIR`` is that CMake
   will add common postfixes, such as ``lib/cmake/<project``, to the
@@ -378,9 +378,9 @@ Using the |hpx| compiler wrapper ``hpxcxx``
 The ``hpxcxx`` compiler wrapper helps to compile a |hpx| component, application,
 or object file, based on the arguments passed to it.
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hpxcxx [--exe=<APPLICATION_NAME> | --comp=<COMPONENT_NAME> | -c] FLAGS FILES
+   $ hpxcxx [--exe=<APPLICATION_NAME> | --comp=<COMPONENT_NAME> | -c] FLAGS FILES
 
 The ``hpxcxx`` command **requires** that either an application or a component is
 built or ``-c`` flag is specified. If the build is against a debug build, the
@@ -501,15 +501,15 @@ Add the following code:
 
 To build the program, type:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   make
+   $ make
 
 A successful build should result in hello_world binary. To test, type:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ./hello_world
+   $ ./hello_world
 
 How to build |hpx| components with makefile
 -------------------------------------------
@@ -573,15 +573,15 @@ Now, in the directory, create a Makefile. Add the following code:
 
 To build the program, type:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   make
+   $ make
 
 A successful build should result in hello_world binary. To test, type:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   ./hello_world
+   $ ./hello_world
 
 .. note::
 

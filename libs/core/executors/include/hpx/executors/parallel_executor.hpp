@@ -1,5 +1,5 @@
 //  Copyright (c) 2019-2020 ETH Zurich
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -156,41 +156,61 @@ namespace hpx { namespace execution {
         }
 
         // property implementations
-        friend constexpr parallel_policy_executor tag_dispatch(
+        friend constexpr parallel_policy_executor tag_invoke(
             hpx::execution::experimental::with_hint_t,
             parallel_policy_executor const& exec,
             hpx::threads::thread_schedule_hint hint)
         {
             auto exec_with_hint = exec;
-            exec_with_hint.policy_ = hint;
+            hpx::execution::experimental::with_hint(
+                exec_with_hint.policy_, hint);
             return exec_with_hint;
         }
 
-        friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+        friend constexpr hpx::threads::thread_schedule_hint tag_invoke(
             hpx::execution::experimental::get_hint_t,
             parallel_policy_executor const& exec) noexcept
         {
-            return exec.policy_.hint();
+            return hpx::execution::experimental::get_hint(exec.policy_);
         }
 
-        friend constexpr parallel_policy_executor tag_dispatch(
+        friend constexpr parallel_policy_executor tag_invoke(
             hpx::execution::experimental::with_priority_t,
             parallel_policy_executor const& exec,
             hpx::threads::thread_priority priority)
         {
             auto exec_with_priority = exec;
-            exec_with_priority.policy_ = priority;
+            hpx::execution::experimental::with_priority(
+                exec_with_priority.policy_, priority);
             return exec_with_priority;
         }
 
-        friend constexpr hpx::threads::thread_priority tag_dispatch(
+        friend constexpr hpx::threads::thread_priority tag_invoke(
             hpx::execution::experimental::get_priority_t,
             parallel_policy_executor const& exec) noexcept
         {
-            return exec.policy_.priority();
+            return hpx::execution::experimental::get_priority(exec.policy_);
         }
 
         friend constexpr parallel_policy_executor tag_dispatch(
+            hpx::execution::experimental::with_stacksize_t,
+            parallel_policy_executor const& exec,
+            hpx::threads::thread_stacksize stacksize)
+        {
+            auto exec_with_stacksize = exec;
+            hpx::execution::experimental::with_stacksize(
+                exec_with_stacksize.policy_, stacksize);
+            return exec_with_stacksize;
+        }
+
+        friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+            hpx::execution::experimental::get_stacksize_t,
+            parallel_policy_executor const& exec) noexcept
+        {
+            return hpx::execution::experimental::get_stacksize(exec.policy_);
+        }
+
+        friend constexpr parallel_policy_executor tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             parallel_policy_executor const& exec, char const* annotation)
         {
@@ -199,21 +219,38 @@ namespace hpx { namespace execution {
             return exec_with_annotation;
         }
 
-        friend parallel_policy_executor tag_dispatch(
+        friend parallel_policy_executor tag_invoke(
             hpx::execution::experimental::with_annotation_t,
             parallel_policy_executor const& exec, std::string annotation)
         {
             auto exec_with_annotation = exec;
             exec_with_annotation.annotation_ =
-                util::detail::store_function_annotation(std::move(annotation));
+                detail::store_function_annotation(HPX_MOVE(annotation));
             return exec_with_annotation;
         }
 
-        friend constexpr char const* tag_dispatch(
+        friend constexpr char const* tag_invoke(
             hpx::execution::experimental::get_annotation_t,
             parallel_policy_executor const& exec) noexcept
         {
             return exec.annotation_;
+        }
+
+        friend constexpr parallel_policy_executor tag_invoke(
+            hpx::parallel::execution::with_processing_units_count_t,
+            parallel_policy_executor const& exec, std::size_t num_cores)
+        {
+            auto exec_with_num_cores = exec;
+            exec_with_num_cores.num_cores_ = num_cores;
+            return exec_with_num_cores;
+        }
+
+        template <typename Parameters>
+        friend constexpr std::size_t tag_invoke(
+            hpx::parallel::execution::processing_units_count_t, Parameters&&,
+            parallel_policy_executor const& exec)
+        {
+            return exec.get_num_cores();
         }
 
         /// \cond NOINTERNAL
@@ -243,11 +280,11 @@ namespace hpx { namespace execution {
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         sync_execute(F&& f, Ts&&... ts) const
         {
-            hpx::util::annotate_function annotate(annotation_ ?
+            hpx::scoped_annotation annotate(annotation_ ?
                     annotation_ :
                     "parallel_policy_executor::sync_execute");
             return hpx::detail::sync_launch_policy_dispatch<Policy>::call(
-                launch::sync, std::forward<F>(f), std::forward<Ts>(ts)...);
+                launch::sync, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // TwoWayExecutor interface
@@ -261,8 +298,7 @@ namespace hpx { namespace execution {
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
 
             return hpx::detail::async_launch_policy_dispatch<Policy>::call(
-                policy_, desc, pool, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                policy_, desc, pool, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename Future, typename... Ts>
@@ -275,18 +311,17 @@ namespace hpx { namespace execution {
                 typename hpx::util::detail::invoke_deferred_result<F, Future,
                     Ts...>::type;
 
-            auto&& func = hpx::util::one_shot(hpx::util::bind_back(
-                hpx::util::annotated_function(std::forward<F>(f), annotation_),
-                std::forward<Ts>(ts)...));
+            auto&& func = hpx::util::one_shot(hpx::bind_back(
+                hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
+                HPX_FORWARD(Ts, ts)...));
 
             typename hpx::traits::detail::shared_state_ptr<result_type>::type
                 p = lcos::detail::make_continuation_alloc_nounwrap<result_type>(
                     hpx::util::internal_allocator<>{},
-                    std::forward<Future>(predecessor), policy_,
-                    std::move(func));
+                    HPX_FORWARD(Future, predecessor), policy_, HPX_MOVE(func));
 
             return hpx::traits::future_access<hpx::future<result_type>>::create(
-                std::move(p));
+                HPX_MOVE(p));
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
@@ -296,25 +331,21 @@ namespace hpx { namespace execution {
             hpx::util::thread_description desc(f, annotation_);
             auto pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
-            parallel::execution::detail::post_policy_dispatch<Policy>::call(
-                policy_, desc, pool, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+            hpx::detail::post_policy_dispatch<Policy>::call(
+                policy_, desc, pool, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
-        std::vector<hpx::future<typename parallel::execution::detail::
-                bulk_function_result<F, S, Ts...>::type>>
-        bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
+        decltype(auto) bulk_async_execute(
+            F&& f, S const& shape, Ts&&... ts) const
         {
             hpx::util::thread_description desc(f, annotation_);
             auto pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
-            return parallel::execution::detail::
-                hierarchical_bulk_async_execute_helper(desc, pool, 0,
-                    pool->get_os_thread_count(), hierarchical_threshold_,
-                    policy_, std::forward<F>(f), shape,
-                    std::forward<Ts>(ts)...);
+            return parallel::execution::detail::hierarchical_bulk_async_execute(
+                desc, pool, 0, get_num_cores(), hierarchical_threshold_,
+                policy_, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename S, typename Future, typename... Ts>
@@ -325,22 +356,31 @@ namespace hpx { namespace execution {
         {
             return parallel::execution::detail::
                 hierarchical_bulk_then_execute_helper(*this, policy_,
-                    hpx::util::annotated_function(
-                        std::forward<F>(f), annotation_),
-                    shape, std::forward<Future>(predecessor),
-                    std::forward<Ts>(ts)...);
+                    hpx::annotated_function(HPX_FORWARD(F, f), annotation_),
+                    shape, HPX_FORWARD(Future, predecessor),
+                    HPX_FORWARD(Ts, ts)...);
         }
         /// \endcond
 
     private:
         /// \cond NOINTERNAL
+        std::size_t get_num_cores() const
+        {
+            if (num_cores_ != 0)
+                return num_cores_;
+
+            auto pool =
+                pool_ ? pool_ : threads::detail::get_self_or_default_pool();
+            return pool->get_os_thread_count();
+        }
+
         friend class hpx::serialization::access;
 
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int /* version */)
         {
             // clang-format off
-            ar & policy_ & hierarchical_threshold_;
+            ar & policy_ & hierarchical_threshold_ & num_cores_;
             // clang-format on
         }
         /// \endcond
@@ -352,24 +392,13 @@ namespace hpx { namespace execution {
         threads::thread_pool_base* pool_;
         Policy policy_;
         std::size_t hierarchical_threshold_ = hierarchical_threshold_default_;
+        std::size_t num_cores_ = 0;
         char const* annotation_ = nullptr;
         /// \endcond
     };
 
     using parallel_executor = parallel_policy_executor<hpx::launch>;
 }}    // namespace hpx::execution
-
-namespace hpx { namespace parallel { namespace execution {
-    using parallel_executor HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_executor is deprecated. Use "
-        "hpx::execution::parallel_executor instead.") =
-        hpx::execution::parallel_executor;
-    template <typename Policy>
-    using parallel_policy_executor HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_policy_executor is deprecated. Use "
-        "hpx::execution::parallel_policy_executor instead.") =
-        hpx::execution::parallel_policy_executor<Policy>;
-}}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL

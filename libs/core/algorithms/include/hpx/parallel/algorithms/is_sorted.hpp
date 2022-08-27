@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -231,6 +232,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -264,7 +266,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, FwdIter first, Sent last, Pred&& pred, Proj&& proj)
             {
                 return is_sorted_sequential(first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename Pred, typename Proj>
@@ -282,17 +284,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return result::get(true);
 
                 util::invoke_projected<Pred, Proj> pred_projected{
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)};
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
 
                 util::cancellation_token<> tok;
+
+                // Note: replacing the invoke() with HPX_INVOKE()
+                // below makes gcc generate errors
                 auto f1 = [tok, last,
-                              pred_projected = std::move(pred_projected)](
+                              pred_projected = HPX_MOVE(pred_projected)](
                               FwdIter part_begin,
                               std::size_t part_size) mutable -> bool {
                     FwdIter trail = part_begin++;
                     util::loop_n<std::decay_t<ExPolicy>>(part_begin,
                         part_size - 1,
-                        [&trail, &tok, &pred_projected](FwdIter it) -> void {
+                        [&trail, &tok, &pred_projected](
+                            FwdIter it) mutable -> void {
                             if (hpx::util::invoke(
                                     pred_projected, *it, *trail++))
                             {
@@ -311,7 +317,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return !tok.was_cancelled();
                 };
 
-                auto f2 = [](std::vector<hpx::future<bool>>&& results) {
+                auto f2 = [](auto&& results) {
                     return std::all_of(hpx::util::begin(results),
                         hpx::util::end(results),
                         [](hpx::future<bool>& val) -> bool {
@@ -320,28 +326,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 return util::partitioner<ExPolicy, bool>::call(
-                    std::forward<ExPolicy>(policy), first, count, std::move(f1),
-                    std::move(f2));
+                    HPX_FORWARD(ExPolicy, policy), first, count, HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
         /// \endcond
     }    // namespace detail
-
-    template <typename ExPolicy, typename FwdIter, typename Pred = detail::less>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::is_sorted is deprecated, use hpx::is_sorted instead")
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
-        is_sorted(ExPolicy&& policy, FwdIter first, FwdIter last,
-            Pred&& pred = Pred())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        return detail::is_sorted<FwdIter, FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, last,
-            std::forward<Pred>(pred), util::projection_identity());
-    }
 
     ////////////////////////////////////////////////////////////////////////////
     // is_sorted_until
@@ -361,7 +351,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, FwdIter first, Sent last, Pred&& pred, Proj&& proj)
             {
                 return is_sorted_until_sequential(first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename Pred, typename Proj>
@@ -380,18 +370,22 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 difference_type count = std::distance(first, last);
                 if (count <= 1)
-                    return result::get(std::move(last));
+                    return result::get(HPX_MOVE(last));
 
                 util::invoke_projected<Pred, Proj> pred_projected{
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)};
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
 
                 util::cancellation_token<difference_type> tok(count);
+
+                // Note: replacing the invoke() with HPX_INVOKE()
+                // below makes gcc generate errors
                 auto f1 = [tok, last,
-                              pred_projected = std::move(pred_projected)](
+                              pred_projected = HPX_MOVE(pred_projected)](
                               FwdIter part_begin, std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
                     FwdIter trail = part_begin++;
-                    util::loop_idx_n(++base_idx, part_begin, part_size - 1, tok,
+                    util::loop_idx_n<std::decay_t<ExPolicy>>(++base_idx,
+                        part_begin, part_size - 1, tok,
                         [&trail, &tok, &pred_projected](
                             reference& v, std::size_t ind) -> void {
                             if (hpx::util::invoke(pred_projected, v, *trail++))
@@ -407,51 +401,32 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     if (!tok.was_cancelled(base_idx + part_size) &&
                         trail != last)
                     {
-                        if (hpx::util::invoke(pred_projected, *trail, *i))
+                        if (HPX_INVOKE(pred_projected, *trail, *i))
                         {
                             tok.cancel(base_idx + part_size);
                         }
                     }
                 };
-                auto f2 = [first, tok](
-                              std::vector<hpx::future<void>>&& data) mutable
-                    -> FwdIter {
+                auto f2 = [first, tok](auto&& data) mutable -> FwdIter {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
 
                     difference_type loc = tok.get_data();
                     std::advance(first, loc);
-                    return std::move(first);
+                    return HPX_MOVE(first);
                 };
                 return util::partitioner<ExPolicy, FwdIter,
-                    void>::call_with_index(std::forward<ExPolicy>(policy),
-                    first, count, 1, std::move(f1), std::move(f2));
+                    void>::call_with_index(HPX_FORWARD(ExPolicy, policy), first,
+                    count, 1, HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
         /// \endcond
     }    // namespace detail
-
-    template <typename ExPolicy, typename FwdIter, typename Pred = detail::less>
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::is_sorted_until is deprecated, use "
-        "hpx::is_sorted_until instead")
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type>::type
-        is_sorted_until(ExPolicy&& policy, FwdIter first, FwdIter last,
-            Pred&& pred = Pred())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        return detail::is_sorted_until<FwdIter, FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, last,
-            std::forward<Pred>(pred), util::projection_identity());
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct is_sorted_t final
+    inline constexpr struct is_sorted_t final
       : hpx::detail::tag_parallel_algorithm<is_sorted_t>
     {
     private:
@@ -467,12 +442,11 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(
+        friend bool tag_fallback_invoke(
             hpx::is_sorted_t, FwdIter first, FwdIter last, Pred&& pred = Pred())
         {
             return hpx::parallel::v1::detail::is_sorted<FwdIter, FwdIter>()
-                .call(hpx::execution::seq, first, last,
-                    std::forward<Pred>(pred),
+                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
                     hpx::parallel::util::projection_identity());
         }
 
@@ -491,17 +465,17 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(hpx::is_sorted_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, Pred&& pred = Pred())
+        tag_fallback_invoke(hpx::is_sorted_t, ExPolicy&& policy, FwdIter first,
+            FwdIter last, Pred&& pred = Pred())
         {
             return hpx::parallel::v1::detail::is_sorted<FwdIter, FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Pred>(pred),
+                .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(Pred, pred),
                     hpx::parallel::util::projection_identity());
         }
     } is_sorted{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct is_sorted_until_t final
+    inline constexpr struct is_sorted_until_t final
       : hpx::detail::tag_parallel_algorithm<is_sorted_until_t>
     {
     private:
@@ -517,13 +491,12 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(hpx::is_sorted_until_t,
+        friend FwdIter tag_fallback_invoke(hpx::is_sorted_until_t,
             FwdIter first, FwdIter last, Pred&& pred = Pred())
         {
             return hpx::parallel::v1::detail::is_sorted_until<FwdIter,
                 FwdIter>()
-                .call(hpx::execution::seq, first, last,
-                    std::forward<Pred>(pred),
+                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
                     hpx::parallel::util::projection_identity());
         }
 
@@ -542,13 +515,13 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::is_sorted_until_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::is_sorted_until_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, Pred&& pred = Pred())
         {
             return hpx::parallel::v1::detail::is_sorted_until<FwdIter,
                 FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Pred>(pred),
+                .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(Pred, pred),
                     hpx::parallel::util::projection_identity());
         }
     } is_sorted_until{};

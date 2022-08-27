@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/execution_base/register_locks.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
@@ -19,6 +19,7 @@
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <mutex>
 #include <utility>
@@ -36,8 +37,7 @@ namespace hpx { namespace lcos { namespace local {
     {
     private:
         using mutex_type = detail::condition_variable_data::mutex_type;
-        using data_type =
-            hpx::memory::intrusive_ptr<detail::condition_variable_data>;
+        using data_type = hpx::intrusive_ptr<detail::condition_variable_data>;
 
     public:
         condition_variable()
@@ -67,13 +67,13 @@ namespace hpx { namespace lcos { namespace local {
         void notify_one(error_code& ec = throws)
         {
             std::unique_lock<mutex_type> l(data_->mtx_);
-            data_->cond_.notify_one(std::move(l), ec);
+            data_->cond_.notify_one(HPX_MOVE(l), ec);
         }
 
         void notify_all(error_code& ec = throws)
         {
             std::unique_lock<mutex_type> l(data_->mtx_);
-            data_->cond_.notify_all(std::move(l), ec);
+            data_->cond_.notify_all(HPX_MOVE(l), ec);
         }
 
         template <typename Mutex>
@@ -84,6 +84,8 @@ namespace hpx { namespace lcos { namespace local {
             auto data = data_;    // keep data alive
 
             util::ignore_all_while_checking ignore_lock;
+            HPX_UNUSED(ignore_lock);
+
             std::unique_lock<mutex_type> l(data->mtx_);
             util::unlock_guard<std::unique_lock<Mutex>> unlock(lock);
 
@@ -117,6 +119,8 @@ namespace hpx { namespace lcos { namespace local {
             auto data = data_;    // keep data alive
 
             util::ignore_all_while_checking ignore_lock;
+            HPX_UNUSED(ignore_lock);
+
             std::unique_lock<mutex_type> l(data->mtx_);
             util::unlock_guard<std::unique_lock<Mutex>> unlock(lock);
 
@@ -166,7 +170,7 @@ namespace hpx { namespace lcos { namespace local {
             hpx::chrono::steady_duration const& rel_time, Predicate pred,
             error_code& ec = throws)
         {
-            return wait_until(lock, rel_time.from_now(), std::move(pred), ec);
+            return wait_until(lock, rel_time.from_now(), HPX_MOVE(pred), ec);
         }
 
     private:
@@ -178,8 +182,7 @@ namespace hpx { namespace lcos { namespace local {
     {
     private:
         using mutex_type = detail::condition_variable_data::mutex_type;
-        using data_type =
-            hpx::memory::intrusive_ptr<detail::condition_variable_data>;
+        using data_type = hpx::intrusive_ptr<detail::condition_variable_data>;
 
     public:
         condition_variable_any()
@@ -209,13 +212,13 @@ namespace hpx { namespace lcos { namespace local {
         void notify_one(error_code& ec = throws)
         {
             std::unique_lock<mutex_type> l(data_->mtx_);
-            data_->cond_.notify_one(std::move(l), ec);
+            data_->cond_.notify_one(HPX_MOVE(l), ec);
         }
 
         void notify_all(error_code& ec = throws)
         {
             std::unique_lock<mutex_type> l(data_->mtx_);
-            data_->cond_.notify_all(std::move(l), ec);
+            data_->cond_.notify_all(HPX_MOVE(l), ec);
         }
 
         template <typename Lock>
@@ -226,6 +229,8 @@ namespace hpx { namespace lcos { namespace local {
             auto data = data_;    // keep data alive
 
             util::ignore_all_while_checking ignore_lock;
+            HPX_UNUSED(ignore_lock);
+
             std::unique_lock<mutex_type> l(data->mtx_);
             util::unlock_guard<Lock> unlock(lock);
 
@@ -258,6 +263,8 @@ namespace hpx { namespace lcos { namespace local {
             auto data = data_;    // keep data alive
 
             util::ignore_all_while_checking ignore_lock;
+            HPX_UNUSED(ignore_lock);
+
             std::unique_lock<mutex_type> l(data->mtx_);
             util::unlock_guard<Lock> unlock(lock);
 
@@ -306,7 +313,7 @@ namespace hpx { namespace lcos { namespace local {
         bool wait_for(Lock& lock, hpx::chrono::steady_duration const& rel_time,
             Predicate pred, error_code& ec = throws)
         {
-            return wait_until(lock, rel_time.from_now(), std::move(pred), ec);
+            return wait_until(lock, rel_time.from_now(), HPX_MOVE(pred), ec);
         }
 
         // 32.6.4.2, interruptible waits
@@ -323,13 +330,15 @@ namespace hpx { namespace lcos { namespace local {
 
             auto f = [&data, &ec] {
                 std::unique_lock<mutex_type> l(data->mtx_);
-                data->cond_.notify_all(std::move(l), ec);
+                data->cond_.notify_all(HPX_MOVE(l), ec);
             };
-            stop_callback<decltype(f)> cb(stoken, std::move(f));
+            stop_callback<decltype(f)> cb(stoken, HPX_MOVE(f));
 
             while (!pred())
             {
                 util::ignore_all_while_checking ignore_lock;
+                HPX_UNUSED(ignore_lock);
+
                 std::unique_lock<mutex_type> l(data->mtx_);
                 if (stoken.stop_requested())
                 {
@@ -365,15 +374,17 @@ namespace hpx { namespace lcos { namespace local {
 
             auto f = [&data, &ec] {
                 std::unique_lock<mutex_type> l(data->mtx_);
-                data->cond_.notify_all(std::move(l), ec);
+                data->cond_.notify_all(HPX_MOVE(l), ec);
             };
-            stop_callback<decltype(f)> cb(stoken, std::move(f));
+            stop_callback<decltype(f)> cb(stoken, HPX_MOVE(f));
 
             while (!pred())
             {
                 bool should_stop;
                 {
                     util::ignore_all_while_checking ignore_lock;
+                    HPX_UNUSED(ignore_lock);
+
                     std::unique_lock<mutex_type> l(data->mtx_);
                     if (stoken.stop_requested())
                     {
@@ -414,7 +425,7 @@ namespace hpx { namespace lcos { namespace local {
             error_code& ec = throws)
         {
             return wait_until(
-                lock, stoken, rel_time.from_now(), std::move(pred), ec);
+                lock, stoken, rel_time.from_now(), HPX_MOVE(pred), ec);
         }
 
     private:

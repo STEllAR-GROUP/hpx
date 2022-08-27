@@ -31,7 +31,7 @@ namespace mynamespace {
     static auto t = hpx::actions::lambda_to_action([]() { called_t = true; });
 }    // namespace mynamespace
 
-HPX_REGISTER_ACTION(mynamespace::test_action, mynamespace_test_action);
+HPX_REGISTER_ACTION(mynamespace::test_action, mynamespace_test_action)
 
 // hpx_main, is the actual main called by hpx
 int hpx_main()

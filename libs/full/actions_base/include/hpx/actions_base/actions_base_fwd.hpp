@@ -1,4 +1,5 @@
 //  Copyright (c)      2016 Thomas Heller
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/actions_base/basic_action_fwd.hpp>
 
 #include <cstdint>
 
@@ -15,9 +17,6 @@ namespace hpx { namespace actions {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Component, typename Signature, typename Derived>
-    struct basic_action;
-
     /// The type of an action defines whether this action will be executed
     /// directly or by an HPX-threads
     enum class action_flavor

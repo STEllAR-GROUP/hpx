@@ -68,10 +68,10 @@ namespace hpx {
             if (num_partitions_ != std::size_t(-1))
             {
                 return container_distribution_policy(
-                    num_partitions_, std::move(localities));
+                    num_partitions_, HPX_MOVE(localities));
             }
             return container_distribution_policy(
-                localities.size(), std::move(localities));
+                localities.size(), HPX_MOVE(localities));
         }
 
         container_distribution_policy operator()(std::size_t num_partitions,
@@ -84,7 +84,7 @@ namespace hpx {
             std::size_t num_partitions, std::vector<id_type>&& localities) const
         {
             return container_distribution_policy(
-                num_partitions, std::move(localities));
+                num_partitions, HPX_MOVE(localities));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@ namespace hpx {
 
         container_distribution_policy(
             std::size_t num_partitions, std::vector<id_type>&& localities)
-          : components::default_distribution_policy(std::move(localities))
+          : components::default_distribution_policy(HPX_MOVE(localities))
           , num_partitions_(num_partitions)
         {
         }

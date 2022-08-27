@@ -20,7 +20,7 @@ namespace hpx { namespace threads {
         if (nullptr == rt)
         {
             // we're probably either starting or stopping
-            return st <= state_starting || st >= state_stopping;
+            return st <= hpx::state::starting || st >= hpx::state::stopping;
         }
         return (rt->get_thread_manager().status() == st);
     }

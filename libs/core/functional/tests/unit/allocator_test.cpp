@@ -41,7 +41,7 @@ struct counting_allocator : public std::allocator<T>
         return std::allocator<T>::allocate(n);
     }
 
-    void deallocate(T* p, std::size_t n)
+    void deallocate(T* p, std::size_t n) noexcept
     {
         dealloc_count++;
         std::allocator<T>::deallocate(p, n);
@@ -81,7 +81,7 @@ static void do_nothing() {}
 
 int main(int, char*[])
 {
-    hpx::util::function_nonser<int(int, int)> f;
+    hpx::function<int(int, int)> f;
     f.assign(plus_int<disable_small_object_optimization>(),
         counting_allocator<int>());
     f.clear();
@@ -110,7 +110,7 @@ int main(int, char*[])
     f.assign(&do_minus, std::allocator<int>());
     f.clear();
 
-    hpx::util::function_nonser<void()> fv;
+    hpx::function<void()> fv;
     alloc_count = 0;
     dealloc_count = 0;
     fv.assign(DoNothing<disable_small_object_optimization>(),
@@ -141,7 +141,7 @@ int main(int, char*[])
     fv.assign(&do_nothing, std::allocator<int>());
     fv.clear();
 
-    hpx::util::function_nonser<void()> fv2;
+    hpx::function<void()> fv2;
     fv.assign(&do_nothing, std::allocator<int>());
     fv2.assign(fv, std::allocator<int>());
 

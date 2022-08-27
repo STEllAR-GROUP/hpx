@@ -27,14 +27,14 @@
 /// \cond NODETAIL
 namespace hpx { namespace detail {
     template <typename Exception>
-    HPX_NORETURN HPX_CORE_EXPORT void throw_exception(Exception const& e,
+    [[noreturn]] HPX_CORE_EXPORT void throw_exception(Exception const& e,
         std::string const& func, std::string const& file, long line);
 
-    HPX_NORETURN HPX_CORE_EXPORT void throw_exception(error errcode,
+    [[noreturn]] HPX_CORE_EXPORT void throw_exception(error errcode,
         std::string const& msg, std::string const& func,
         std::string const& file, long line);
 
-    HPX_NORETURN HPX_CORE_EXPORT void rethrow_exception(
+    [[noreturn]] HPX_CORE_EXPORT void rethrow_exception(
         exception const& e, std::string const& func);
 
     template <typename Exception>
@@ -62,7 +62,7 @@ namespace hpx { namespace detail {
     HPX_CORE_EXPORT void rethrows_if(
         hpx::error_code& ec, exception const& e, std::string const& func);
 
-    HPX_NORETURN HPX_CORE_EXPORT void throw_thread_interrupted_exception();
+    [[noreturn]] HPX_CORE_EXPORT void throw_thread_interrupted_exception();
 }}    // namespace hpx::detail
 /// \endcond
 
@@ -70,7 +70,7 @@ namespace hpx {
     /// \cond NOINTERNAL
 
     /// \brief throw an hpx::exception initialized from the given arguments
-    HPX_NORETURN inline void throw_exception(error e, std::string const& msg,
+    [[noreturn]] inline void throw_exception(error e, std::string const& msg,
         std::string const& func, std::string const& file = "", long line = -1)
     {
         detail::throw_exception(e, msg, func, file, line);
@@ -99,7 +99,7 @@ namespace hpx {
         __VA_ARGS__))                                                          \
 /**/
 #define HPX_GET_EXCEPTION_3(errcode, f, msg)                                   \
-    HPX_GET_EXCEPTION_4(errcode, hpx::plain, f, msg)                           \
+    HPX_GET_EXCEPTION_4(errcode, hpx::throwmode::plain, f, msg)                \
 /**/
 #define HPX_GET_EXCEPTION_4(errcode, mode, f, msg)                             \
     hpx::detail::get_exception(errcode, msg, mode, f, __FILE__, __LINE__) /**/

@@ -24,14 +24,14 @@ namespace hpx { namespace serialization {
         extra_archive_data_id_type
         extra_archive_data_helper<input_pointer_tracker>::id() noexcept
         {
-            static std::uint8_t id;
+            static std::uint8_t id = 0;
             return &id;
         }
 
         extra_archive_data_id_type
         extra_archive_data_helper<output_pointer_tracker>::id() noexcept
         {
-            static std::uint8_t id;
+            static std::uint8_t id = 0;
             return &id;
         }
 
@@ -48,7 +48,7 @@ namespace hpx { namespace serialization {
         auto& tracker = ar.get_extra_data<detail::input_pointer_tracker>();
         HPX_ASSERT(tracker.find(pos) == tracker.end());
 
-        tracker.insert(std::make_pair(pos, std::move(helper)));
+        tracker.insert(std::make_pair(pos, HPX_MOVE(helper)));
     }
 
     detail::ptr_helper& tracked_pointer(input_archive& ar, std::uint64_t pos)

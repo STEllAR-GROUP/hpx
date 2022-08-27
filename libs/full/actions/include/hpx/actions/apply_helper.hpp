@@ -40,30 +40,28 @@ namespace hpx { namespace applier { namespace detail {
         threads::thread_priority priority)
     {
         return hpx::actions::detail::thread_priority<
-            static_cast<threads::thread_priority>(
-                traits::action_priority<Action>::value)>::call(priority);
+            traits::action_priority_v<Action>>::call(priority);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
     void call_async(threads::thread_init_data&& data,
-        naming::id_type const& target, naming::address::address_type lva,
+        hpx::id_type const& target, naming::address::address_type lva,
         naming::address::component_type comptype,
         threads::thread_priority priority, Ts&&... vs)
     {
-        using continuation_type =
-            typename traits::action_continuation<Action>::type;
+        using continuation_type = traits::action_continuation_t<Action>;
 
         continuation_type cont;
         if (traits::action_decorate_continuation<Action>::call(cont))    //-V614
         {
-            data.func = Action::construct_thread_function(target,
-                std::move(cont), lva, comptype, std::forward<Ts>(vs)...);
+            data.func = Action::construct_thread_function(
+                target, HPX_MOVE(cont), lva, comptype, HPX_FORWARD(Ts, vs)...);
         }
         else
         {
             data.func = Action::construct_thread_function(
-                target, lva, comptype, std::forward<Ts>(vs)...);
+                target, lva, comptype, HPX_FORWARD(Ts, vs)...);
         }
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
@@ -78,7 +76,7 @@ namespace hpx { namespace applier { namespace detail {
         data.priority = fix_priority<Action>(priority);
         data.stacksize = traits::action_stacksize<Action>::value;
 
-        while (!threads::threadmanager_is_at_least(state_running))
+        while (!threads::threadmanager_is_at_least(hpx::state::running))
         {
             std::this_thread::sleep_for(
                 std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
@@ -89,7 +87,7 @@ namespace hpx { namespace applier { namespace detail {
 
     template <typename Action, typename Continuation, typename... Ts>
     void call_async(threads::thread_init_data&& data, Continuation&& cont,
-        naming::id_type const& target, naming::address::address_type lva,
+        hpx::id_type const& target, naming::address::address_type lva,
         naming::address::component_type comptype,
         threads::thread_priority priority, Ts&&... vs)
     {
@@ -98,8 +96,8 @@ namespace hpx { namespace applier { namespace detail {
 
         // now, schedule the thread
         data.func = Action::construct_thread_function(target,
-            std::forward<Continuation>(cont), lva, comptype,
-            std::forward<Ts>(vs)...);
+            HPX_FORWARD(Continuation, cont), lva, comptype,
+            HPX_FORWARD(Ts, vs)...);
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
@@ -114,7 +112,7 @@ namespace hpx { namespace applier { namespace detail {
         data.stacksize = static_cast<threads::thread_stacksize>(
             traits::action_stacksize<Action>::value);
 
-        while (!threads::threadmanager_is_at_least(state_running))
+        while (!threads::threadmanager_is_at_least(hpx::state::running))
         {
             std::this_thread::sleep_for(
                 std::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
@@ -127,7 +125,7 @@ namespace hpx { namespace applier { namespace detail {
     HPX_FORCEINLINE void call_sync(naming::address::address_type lva,
         naming::address::component_type comptype, Ts&&... vs)
     {
-        Action::execute_function(lva, comptype, std::forward<Ts>(vs)...);
+        Action::execute_function(lva, comptype, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Continuation, typename... Ts>
@@ -138,7 +136,7 @@ namespace hpx { namespace applier { namespace detail {
         try
         {
             cont.trigger_value(Action::execute_function(
-                lva, comptype, std::forward<Ts>(vs)...));
+                lva, comptype, HPX_FORWARD(Ts, vs)...));
         }
         catch (...)
         {
@@ -154,7 +152,7 @@ namespace hpx { namespace applier { namespace detail {
     {
         template <typename... Ts>
         static void call(threads::thread_init_data&& data,
-            naming::id_type const& target, naming::address::address_type lva,
+            hpx::id_type const& target, naming::address::address_type lva,
             naming::address::component_type comptype,
             threads::thread_priority priority, Ts&&... vs)
         {
@@ -165,18 +163,18 @@ namespace hpx { namespace applier { namespace detail {
 
             if (policy == launch::async)
             {
-                call_async<Action>(std::move(data), target, lva, comptype,
-                    priority, std::forward<Ts>(vs)...);
+                call_async<Action>(HPX_MOVE(data), target, lva, comptype,
+                    priority, HPX_FORWARD(Ts, vs)...);
             }
             else
             {
-                call_sync<Action>(lva, comptype, std::forward<Ts>(vs)...);
+                call_sync<Action>(lva, comptype, HPX_FORWARD(Ts, vs)...);
             }
         }
 
         template <typename Continuation, typename... Ts>
         static void call(threads::thread_init_data&& data, Continuation&& cont,
-            naming::id_type const& target, naming::address::address_type lva,
+            hpx::id_type const& target, naming::address::address_type lva,
             naming::address::component_type comptype,
             threads::thread_priority priority, Ts&&... vs)
         {
@@ -187,14 +185,14 @@ namespace hpx { namespace applier { namespace detail {
 
             if (policy == launch::async)
             {
-                call_async<Action>(std::move(data),
-                    std::forward<Continuation>(cont), target, lva, comptype,
-                    priority, std::forward<Ts>(vs)...);
+                call_async<Action>(HPX_MOVE(data),
+                    HPX_FORWARD(Continuation, cont), target, lva, comptype,
+                    priority, HPX_FORWARD(Ts, vs)...);
             }
             else
             {
-                call_sync<Action>(std::forward<Continuation>(cont), lva,
-                    comptype, std::forward<Ts>(vs)...);
+                call_sync<Action>(HPX_FORWARD(Continuation, cont), lva,
+                    comptype, HPX_FORWARD(Ts, vs)...);
             }
         }
     };
@@ -206,27 +204,27 @@ namespace hpx { namespace applier { namespace detail {
         // If local and to be directly executed, just call the function
         template <typename... Ts>
         HPX_FORCEINLINE static void call(threads::thread_init_data&& data,
-            naming::id_type const& target, naming::address::address_type lva,
+            hpx::id_type const& target, naming::address::address_type lva,
             naming::address::component_type comptype,
             threads::thread_priority priority, Ts&&... vs)
         {
             // Direct actions should be able to be executed from a
             // non-HPX thread as well
             if (this_thread::has_sufficient_stack_space() ||
-                !threads::threadmanager_is_at_least(state_running))
+                !threads::threadmanager_is_at_least(hpx::state::running))
             {
-                call_sync<Action>(lva, comptype, std::forward<Ts>(vs)...);
+                call_sync<Action>(lva, comptype, HPX_FORWARD(Ts, vs)...);
             }
             else
             {
-                call_async<Action>(std::move(data), target, lva, comptype,
-                    priority, std::forward<Ts>(vs)...);
+                call_async<Action>(HPX_MOVE(data), target, lva, comptype,
+                    priority, HPX_FORWARD(Ts, vs)...);
             }
         }
 
         template <typename Continuation, typename... Ts>
         HPX_FORCEINLINE static void call(threads::thread_init_data&& data,
-            Continuation&& cont, naming::id_type const& target,
+            Continuation&& cont, hpx::id_type const& target,
             naming::address::address_type lva,
             naming::address::component_type comptype,
             threads::thread_priority priority, Ts&&... vs)
@@ -234,16 +232,16 @@ namespace hpx { namespace applier { namespace detail {
             // Direct actions should be able to be executed from a
             // non-HPX thread as well
             if (this_thread::has_sufficient_stack_space() ||
-                !threads::threadmanager_is_at_least(state_running))
+                !threads::threadmanager_is_at_least(hpx::state::running))
             {
-                call_sync<Action>(std::forward<Continuation>(cont), lva,
-                    comptype, std::forward<Ts>(vs)...);
+                call_sync<Action>(HPX_FORWARD(Continuation, cont), lva,
+                    comptype, HPX_FORWARD(Ts, vs)...);
             }
             else
             {
-                call_async<Action>(std::move(data),
-                    std::forward<Continuation>(cont), target, lva, comptype,
-                    priority, std::forward<Ts>(vs)...);
+                call_async<Action>(HPX_MOVE(data),
+                    HPX_FORWARD(Continuation, cont), target, lva, comptype,
+                    priority, HPX_FORWARD(Ts, vs)...);
             }
         }
     };

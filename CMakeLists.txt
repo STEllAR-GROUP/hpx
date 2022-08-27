@@ -1,5 +1,5 @@
 # Copyright (c)      2020 Mikael Simberg
-# Copyright (c) 2007-2020 Hartmut Kaiser
+# Copyright (c) 2007-2022 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
@@ -118,7 +118,6 @@ hpx_info("HPX version: ${HPX_VERSION}")
 unset(HPX_COMPONENTS CACHE)
 unset(HPX_EXPORT_TARGETS CACHE)
 unset(HPX_EXPORT_INTERNAL_TARGETS CACHE)
-unset(HPX_LIBS CACHE)
 unset(HPX_ENABLED_MODULES CACHE)
 unset(HPX_STATIC_PARCELPORT_PLUGINS CACHE)
 
@@ -136,23 +135,7 @@ if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   unset(HPX_SOVERSION)
 endif()
 
-# Adjust a couple of build-system settings, if HPX is to be built using vcpkg
 if(MSVC)
-  set(_with_vcpkg_default OFF)
-  if(VCPKG_TOOLCHAIN)
-    set(_with_vcpkg_default ON)
-  endif()
-  hpx_option(
-    HPX_WITH_VCPKG
-    BOOL
-    "Build HPX in the context of the vcpkg build and configuration tool (default: OFF)."
-    ${_with_vcpkg_default}
-    ADVANCED
-  )
-  if(HPX_WITH_VCPKG)
-    hpx_add_config_define(HPX_HAVE_VCPKG)
-  endif()
-
   hpx_option(
     HPX_WITH_VS_STARTUP_PROJECT STRING
     "Define the startup project for the HPX solution (default: ALL_BUILD)."
@@ -321,98 +304,13 @@ hpx_option(
 )
 if(HPX_WITH_PRECOMPILED_HEADERS)
   set(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL ON)
-
-  set(system_precompiled_headers
-      <algorithm>
-      <array>
-      <atomic>
-      <bitset>
-      <cassert>
-      <cctype>
-      <cerrno>
-      <chrono>
-      <climits>
-      <cmath>
-      <complex>
-      <condition_variable>
-      <cstddef>
-      <cstdint>
-      <cstdio>
-      <cstdlib>
-      <cstring>
-      <ctime>
-      <deque>
-      <exception>
-      <execution>
-      <forward_list>
-      <fstream>
-      <functional>
-      <iomanip>
-      <ios>
-      <iosfwd>
-      <iostream>
-      <iterator>
-      <limits>
-      <list>
-      <locale>
-      <map>
-      <memory>
-      <mutex>
-      <new>
-      <numeric>
-      <ostream>
-      <random>
-      <regex>
-      <set>
-      <shared_mutex>
-      <sstream>
-      <stack>
-      <stdexcept>
-      <string>
-      <system_error>
-      <thread>
-      <tuple>
-      <type_traits>
-      <typeinfo>
-      <unordered_map>
-      <unordered_set>
-      <utility>
-      <variant>
-      <vector>
-      <hwloc.h>
-      <asio/basic_waitable_timer.hpp>
-      <asio/io_context.hpp>
-      <asio/ip/tcp.hpp>
-      <boost/config.hpp>
-      <boost/container/small_vector.hpp>
-      <boost/fusion/include/vector.hpp>
-      <boost/intrusive/slist.hpp>
-      <boost/lockfree/queue.hpp>
-      <boost/optional.hpp>
-      <boost/spirit/home/x3.hpp>
-      <boost/tokenizer.hpp>
-      <boost/utility/string_ref.hpp>
-  )
-
-  if(HPX_WITH_CXX17_FILESYSTEM)
-    list(APPEND system_precompiled_headers <filesystem>)
-  endif()
-
-  set(system_precompiled_headers_dependencies
-      hpx_dependencies_boost hpx_private_flags hpx_public_flags Asio::asio
-  )
-
+  # Only create the targets here. They will be set up later once all modules are
+  # known.
   add_library(hpx_precompiled_headers OBJECT libs/src/dummy.cpp)
-  target_link_libraries(
-    hpx_precompiled_headers
-    PRIVATE hpx_public_flags hpx_private_flags hpx_base_libraries
-            ${system_precompiled_headers_dependencies}
-  )
-  target_precompile_headers(
-    hpx_precompiled_headers PRIVATE ${system_precompiled_headers}
-  )
+  add_executable(hpx_exe_precompiled_headers libs/src/dummy.cpp)
 
   set_target_properties(hpx_precompiled_headers PROPERTIES FOLDER "Core")
+  set_target_properties(hpx_exe_precompiled_headers PROPERTIES FOLDER "Core")
 endif()
 
 # ##############################################################################
@@ -470,7 +368,30 @@ else()
 endif()
 
 # ##############################################################################
+# The cmake Ninja generator runs out of memory if the modules are being built as
+# OBJECT libraries. In this case the fallback is to build whole-archive STATIC
+# libraries.
+set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT ON)
+if("${CMAKE_MAKE_PROGRAM}" STREQUAL "ninja")
+  set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT OFF)
+endif()
 
+hpx_option(
+  HPX_WITH_MODULES_AS_STATIC_LIBRARIES
+  BOOL
+  "Compile HPX modules as STATIC (whole-archive) libraries instead of OBJECT\
+  libraries (Default: ${HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT})"
+  ${HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT}
+  ADVANCED
+)
+
+if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES)
+  hpx_info("Building modules as STATIC (whole-archive) libraries")
+else()
+  hpx_info("Building modules as OBJECT libraries")
+endif()
+
+# ##############################################################################
 hpx_option(
   HPX_WITH_EXAMPLES BOOL "Build the HPX examples (default ON)" ON
   CATEGORY "Build Targets"
@@ -600,36 +521,11 @@ hpx_option(
 )
 
 # ##############################################################################
-# HPX CUDA Compute configuration
+# HPX CUDA configuration
 # ##############################################################################
-# To avoid writing these strings out in multiple places, use vars to hold them
-set(CUDA_OPTION_STRING "Enable HPX_WITH_ASYNC_CUDA (CUDA or HIP futures) and\
- HPX_WITH_COMPUTE_CUDA (CUDA/HIP enabled parallel algorithms) (default: OFF)"
-)
-set(ASYNC_CUDA_STRING
-    "Enable HPX CUDA/HIP compute capability (parallel algorithms) module\
- (default: ON, dependent on HPX_WITH_CUDA or HPX_WITH_HIP) -\
- note: CUDA/HIP futures may be used without CUDA/HIP Compute"
-)
-set(CUDA_COMPUTE_STRING
-    "Enable HPX CUDA/HIP compute capability (parallel algorithms) module\
- (default: ON, dependent on HPX_WITH_CUDA or HPX_WITH_HIP, and HPX_WITH_ASYNC_CUDA) -\
- note: enabling this also enables CUDA/HIP futures via HPX_WITH_ASYNC_CUDA"
-)
+set(CUDA_OPTION_STRING "Enable support for CUDA (default: OFF)")
 set(HIP_OPTION_STRING "Enable compilation with HIPCC (default: OFF)")
 hpx_option(HPX_WITH_CUDA BOOL "${CUDA_OPTION_STRING}" OFF ADVANCED)
-
-# Those two will be renamed replacing CUDA with GPU
-hpx_option(HPX_WITH_COMPUTE_CUDA BOOL "${CUDA_COMPUTE_STRING}" ON ADVANCED)
-hpx_option(HPX_WITH_ASYNC_CUDA BOOL "${ASYNC_CUDA_STRING}" ON ADVANCED)
-
-# HPX_WITH_COMPUTE_CUDA requires HPX_WITH_ASYNC_CUDA
-if(HPX_WITH_COMPUTE_CUDA)
-  set(HPX_WITH_ASYNC_CUDA
-      ON
-      CACHE BOOL "${HPX_WITH_ASYNC_CUDA}" FORCE
-  )
-endif()
 
 # No need for the user to specify the option explicitly
 hpx_option(HPX_WITH_HIP BOOL "${HIP_OPTION_STRING}" OFF ADVANCED)
@@ -655,6 +551,7 @@ if(APPLE
    OR MSVC
    OR HPX_WITH_CUDA
    OR HPX_WITH_HIP
+   OR HPX_WITH_PARCELPORT_LCI
 )
   set(HPX_WITH_PKGCONFIG_DEFAULT OFF)
 endif()
@@ -776,11 +673,11 @@ endif()
 
 # Thread Manager related build options
 
-set(HPX_MAX_CPU_COUNT_DEFAULT "64")
+set(HPX_MAX_CPU_COUNT_DEFAULT "")
 hpx_option(
   HPX_WITH_MAX_CPU_COUNT
   STRING
-  "HPX applications will not use more that this number of OS-Threads (empty string means dynamic) (default: ${HPX_MAX_CPU_COUNT_DEFAULT})"
+  "HPX applications will not use more that this number of OS-Threads (empty string means dynamic) (default: \"${HPX_MAX_CPU_COUNT_DEFAULT}\")"
   "${HPX_MAX_CPU_COUNT_DEFAULT}"
   CATEGORY "Thread Manager"
   ADVANCED
@@ -1035,6 +932,7 @@ hpx_option(
   HPX_WITH_APEX BOOL "Enable APEX instrumentation support." OFF
   CATEGORY "Profiling"
 )
+
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_APEX) # tell HPX that we use APEX
   hpx_option(
@@ -1057,7 +955,7 @@ hpx_option(
   ADVANCED
 )
 hpx_option(
-  HPX_WITH_ASIO_TAG STRING "Asio repository tag or branch" "asio-1-18-2"
+  HPX_WITH_ASIO_TAG STRING "Asio repository tag or branch" "asio-1-20-0"
   CATEGORY "Build Targets"
   ADVANCED
 )
@@ -1213,6 +1111,28 @@ if(HPX_WITH_NETWORKING)
   )
 
   hpx_option(
+    HPX_WITH_PARCELPORT_LCI BOOL "Enable the LCI based parcelport." OFF
+    CATEGORY "Parcelport"
+  )
+  if(HPX_WITH_PARCELPORT_LCI)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_LCI)
+  endif()
+  # Options for automatically fetching LCI
+  hpx_option(
+    HPX_WITH_FETCH_LCI
+    BOOL
+    "Use FetchContent to fetch LCI. By default an installed LCI will be used. (default: OFF)"
+    OFF
+    CATEGORY "Build Targets"
+    ADVANCED
+  )
+  hpx_option(
+    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "v1.7"
+    CATEGORY "Build Targets"
+    ADVANCED
+  )
+
+  hpx_option(
     HPX_WITH_PARCELPORT_TCP BOOL "Enable the TCP based parcelport." ON
     CATEGORY "Parcelport"
   )
@@ -1246,8 +1166,8 @@ if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
   hpx_option(
     HPX_WITH_PARCELPORT_MPI_ENV
     STRING
-    "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK)."
-    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK"
+    "List of environment variables checked to detect MPI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID)."
+    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID"
     CATEGORY "Parcelport"
     ADVANCED
   )
@@ -1280,6 +1200,31 @@ if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
     # hpx_add_compile_flag() below does not add the extra options to the top
     # level directory
     hpx_add_config_define(OMPI_IMPORTS)
+  endif()
+endif()
+
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
+  # lci parcelport settings
+  hpx_option(
+    HPX_WITH_PARCELPORT_LCI_ENV
+    STRING
+    "List of environment variables checked to detect LCI (default: MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID)."
+    "MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID"
+    CATEGORY "Parcelport"
+    ADVANCED
+  )
+
+  # This list is to detect whether we run inside an lci environment. If one of
+  # those environment variables is set, the LCI parcelport is enabled by
+  # default. PMI_RANK: Intel MPI and MVAPICH2 OMPI_COMM_WORLD_SIZE: OpenMPI
+  # starting at version 1.3
+  if(HPX_WITH_PARCELPORT_LCI_ENV)
+    string(REPLACE ";" "," hpx_parcelport_lci_env_
+                   "${HPX_WITH_PARCELPORT_LCI_ENV}"
+    )
+    hpx_add_config_define(
+      HPX_HAVE_PARCELPORT_LCI_ENV "\"${hpx_parcelport_lci_env_}\""
+    )
   endif()
 endif()
 
@@ -1317,6 +1262,7 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
     set(HPX_WITH_EXAMPLES_QTHREADS OFF)
   endif()
 endif()
+
 hpx_option(
   HPX_WITH_EXAMPLES_HDF5 BOOL
   "Enable examples requiring HDF5 support (default: OFF)." OFF
@@ -1357,19 +1303,15 @@ hpx_option(
   OFF CATEGORY "Debugging"
 )
 
+set(HPX_WITH_VERIFY_LOCKS_DEFAULT OFF)
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+  set(HPX_WITH_VERIFY_LOCKS_DEFAULT ON)
+endif()
+
 hpx_option(
-  HPX_WITH_VERIFY_LOCKS
-  BOOL
-  "Enable lock verification code (default: OFF, implicitly enabled in debug builds)"
-  OFF
-  CATEGORY "Debugging"
-  ADVANCED
-)
-hpx_option(
-  HPX_WITH_VERIFY_LOCKS_GLOBALLY
-  BOOL
-  "Enable global lock verification code (default: OFF, implicitly enabled in debug builds)"
-  OFF
+  HPX_WITH_VERIFY_LOCKS BOOL
+  "Enable lock verification code (default: OFF, enabled in debug builds)"
+  ${HPX_WITH_VERIFY_LOCKS_DEFAULT}
   CATEGORY "Debugging"
   ADVANCED
 )
@@ -1400,9 +1342,6 @@ if(HPX_WITH_VERIFY_LOCKS)
   if(HPX_WITH_VERIFY_LOCKS_BACKTRACE)
     hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_BACKTRACE)
   endif()
-endif()
-if(HPX_WITH_VERIFY_LOCKS_GLOBALLY)
-  hpx_add_config_define(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
 endif()
 
 # Additional debug support
@@ -1476,13 +1415,14 @@ if(HPX_WITH_APEX)
 endif()
 
 if(HPX_WITH_THREAD_DEBUG_INFO)
+  hpx_add_config_define(HPX_HAVE_THREAD_TARGET_ADDRESS)
   hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
   hpx_add_config_define(HPX_HAVE_THREAD_PHASE_INFORMATION)
   hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION)
-  hpx_add_config_define(HPX_HAVE_THREAD_DEADLOCK_DETECTION)
   if(HPX_WITH_THREAD_DESCRIPTION_FULL)
     hpx_add_config_define(HPX_HAVE_THREAD_DESCRIPTION_FULL)
   endif()
+  hpx_add_config_define(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
 endif()
 
 # run hpx_main on all localities by default
@@ -1612,41 +1552,6 @@ elseif("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   hpx_info("Compiling for BlueGene/Q")
 endif()
 
-if((NOT HPX_WITH_CXX20_COROUTINES)
-   AND ((MSVC_VERSION GREATER_EQUAL 1900) AND CMAKE_CL_64)
-   OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-)
-
-  # If C++20 coroutines are not supported by the compiler there is still a
-  # chance to enable them through command line options.
-
-  hpx_option(
-    HPX_WITH_AWAIT BOOL "Enable the use of experimental co_await functionality"
-    OFF ADVANCED CATEGORY "LCOs"
-  )
-  if(HPX_WITH_AWAIT)
-    hpx_add_config_define(HPX_HAVE_AWAIT)
-
-    if((MSVC_VERSION GREATER_EQUAL 1900) AND CMAKE_CL_64)
-      hpx_add_target_compile_option(-await PUBLIC)
-    endif()
-
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-      hpx_add_target_compile_option(-Xclang -fcoroutines-ts PUBLIC)
-
-      # older Clang versions don't have <experimental/coroutine> yet
-      hpx_option(
-        HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY BOOL
-        "Use hpx/util/await_traits.hpp instead of <experimental/coroutine>" OFF
-        ADVANCED CATEGORY "LCOs"
-      )
-      if(HPX_WITH_EMULATE_COROUTINE_SUPPORT_LIBRARY)
-        hpx_add_config_define(HPX_HAVE_EMULATE_COROUTINE_SUPPORT_LIBRARY)
-      endif()
-    endif()
-  endif()
-endif()
-
 # ##############################################################################
 # Some special handling of the compilation is need on build infrastructure for
 # generating packages for target architecture, see issue #3575
@@ -1751,13 +1656,6 @@ if(WIN32)
     # even VS2017 has an ICE when compiling with -Ob2
     hpx_add_target_compile_option(-Ob1 PUBLIC CONFIGURATIONS Release)
 
-    # /RTC1 is incompatible with /await
-    if((NOT HPX_WITH_AWAIT) AND (NOT HPX_WITH_CXX20_COROUTINES))
-      hpx_add_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
-    else()
-      hpx_remove_target_compile_option(/RTC1 PUBLIC CONFIGURATIONS Debug)
-    endif()
-
     # VS2012 and above has a special flag for improving the debug experience by
     # adding more symbol information to the build (-d2Zi)
     hpx_add_target_compile_option(-d2Zi+ PUBLIC CONFIGURATIONS RelWithDebInfo)
@@ -1803,6 +1701,9 @@ if(WIN32)
 
       # Silence C++17 deprecation warnings
       hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+
+      # Silence C++20 deprecation warnings
+      hpx_add_config_cond_define(_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS)
 
       # ASan is available in Visual Studion starting V16.8
       if((MSVC_VERSION GREATER_EQUAL 1928) AND HPX_WITH_SANITIZERS)
@@ -1874,12 +1775,9 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag(-wd4800)
 
     # vcpkg enables the /utf-8 option which causes (benign) warnings in the
-    # Spirit headers
-    if(HPX_WITH_VCPKG)
-      # The file contains a character starting at offset ... that is illegal in
-      # the current source character set
-      hpx_add_compile_flag(-wd4828)
-    endif()
+    # Spirit headers: The file contains a character starting at offset ... that
+    # is illegal in the current source character set
+    hpx_add_compile_flag(-wd4828)
 
     if(HPX_WITH_DATAPAR_VC)
       # unary minus operator applied to unsigned type, result still unsigned
@@ -1896,6 +1794,7 @@ if(HPX_WITH_COMPILER_WARNINGS)
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall)
     hpx_add_compile_flag_if_available(-Wextra)
+    hpx_add_compile_flag_if_available(-Wpedantic)
     hpx_add_compile_flag_if_available(-Wno-strict-aliasing)
     hpx_add_compile_flag_if_available(-Wno-sign-promo)
     hpx_add_compile_flag_if_available(-Wno-attributes)
@@ -2075,6 +1974,7 @@ else()
     OR "${__target_arch}" STREQUAL "armv5"
     OR "${__target_arch}" STREQUAL "armv6"
     OR "${__target_arch}" STREQUAL "armv7"
+    OR "${__target_arch}" STREQUAL "arm64"
   )
     set(__has_timestamp_support ON)
   elseif("${__target_arch}" STREQUAL "ppc" OR "${__target_arch}" STREQUAL
@@ -2154,6 +2054,13 @@ add_hpx_library_headers_noglob(hpx_external)
 # Setup plugins (set here cause if we include it inside plugins, it will not be
 # defined in src/CMakeLists.txt where we call add_static_parcelports)
 include(HPX_SetupMPI) # must come before APEX
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
+  hpx_setup_mpi()
+endif()
+include(HPX_SetupLCI)
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
+  hpx_setup_lci()
+endif()
 
 # Setup packages and subprojects
 include(HPX_SetupHIP)
@@ -2279,20 +2186,19 @@ endif()
 add_hpx_pseudo_target(core)
 
 # ##############################################################################
-# Configure compression and other plugins
+# Add libraries
 # ##############################################################################
+# collect names of static parcelports
 set(HPX_STATIC_PARCELPORT_PLUGINS
     ""
     CACHE INTERNAL "" FORCE
 )
-add_hpx_pseudo_target(plugins)
-add_subdirectory(plugins)
+add_subdirectory(libs)
 
 # ##############################################################################
-# Add libraries
+# Configure parcelports
 # ##############################################################################
-add_subdirectory(src)
-add_subdirectory(libs)
+include(HPX_ParcelPorts)
 
 # ##############################################################################
 # Add static init and wrap library
@@ -2351,6 +2257,124 @@ configure_file(
   "${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
   "${PROJECT_BINARY_DIR}/bin/hpxrun.py" @ONLY
 )
+
+# Set up precompiled headers
+if(HPX_WITH_PRECOMPILED_HEADERS)
+  set(system_precompiled_headers
+      <algorithm>
+      <array>
+      <atomic>
+      <bitset>
+      <cassert>
+      <cctype>
+      <cerrno>
+      <chrono>
+      <climits>
+      <cmath>
+      <complex>
+      <condition_variable>
+      <cstddef>
+      <cstdint>
+      <cstdio>
+      <cstdlib>
+      <cstring>
+      <ctime>
+      <deque>
+      <exception>
+      <execution>
+      <forward_list>
+      <fstream>
+      <functional>
+      <iomanip>
+      <ios>
+      <iosfwd>
+      <iostream>
+      <iterator>
+      <limits>
+      <list>
+      <locale>
+      <map>
+      <memory>
+      <mutex>
+      <new>
+      <numeric>
+      <ostream>
+      <random>
+      <regex>
+      <set>
+      <shared_mutex>
+      <sstream>
+      <stack>
+      <stdexcept>
+      <string>
+      <system_error>
+      <thread>
+      <tuple>
+      <type_traits>
+      <typeinfo>
+      <unordered_map>
+      <unordered_set>
+      <utility>
+      <variant>
+      <vector>
+      <hwloc.h>
+      <asio/basic_waitable_timer.hpp>
+      <asio/io_context.hpp>
+      <asio/ip/tcp.hpp>
+      <boost/config.hpp>
+      <boost/fusion/include/vector.hpp>
+      <boost/intrusive/slist.hpp>
+      <boost/lockfree/queue.hpp>
+      <boost/optional.hpp>
+      <boost/spirit/home/x3.hpp>
+      <boost/tokenizer.hpp>
+      <boost/utility/string_ref.hpp>
+  )
+
+  if(HPX_WITH_CXX17_FILESYSTEM)
+    list(APPEND system_precompiled_headers <filesystem>)
+  endif()
+
+  set(system_precompiled_headers_dependencies
+      hpx_dependencies_boost hpx_private_flags hpx_public_flags Asio::asio
+  )
+
+  target_link_libraries(
+    hpx_precompiled_headers
+    PRIVATE hpx_public_flags hpx_private_flags hpx_base_libraries
+            ${system_precompiled_headers_dependencies}
+  )
+  target_precompile_headers(
+    hpx_precompiled_headers PRIVATE ${system_precompiled_headers}
+  )
+
+  # Headers that should be precompiled for things depending on HPX (executables,
+  # libraries).
+  set(hpx_precompiled_headers_modules ${HPX_ENABLED_MODULES})
+  # The init_runtime modules cannot be precompiled because they use macros that
+  # can depend on the application (HPX_PREFIX and HPX_APPLICATION_NAME_DEFAULT).
+  list(REMOVE_ITEM hpx_precompiled_headers_modules init_runtime
+       init_runtime_local
+  )
+  # config, version, and the include modules don't have hpx/module headers.
+  list(REMOVE_ITEM hpx_precompiled_headers_modules config include include_local
+       version
+  )
+  list(TRANSFORM hpx_precompiled_headers_modules PREPEND "<hpx/modules/")
+  list(TRANSFORM hpx_precompiled_headers_modules APPEND ".hpp>")
+
+  # We do not link to HPX::hpx as it will set HPX_APPLICATION_NAME_DEFAULT and
+  # HPX_PREFIX to values that don't match those used in tests. We instead set
+  # them manually here.
+  target_link_libraries(hpx_exe_precompiled_headers PRIVATE hpx_full)
+  target_compile_definitions(
+    hpx_exe_precompiled_headers PRIVATE "HPX_PREFIX=\"${HPX_BUILD_PREFIX}\""
+                                        "HPX_APPLICATION_EXPORTS"
+  )
+  target_precompile_headers(
+    hpx_exe_precompiled_headers PRIVATE ${hpx_precompiled_headers_modules}
+  )
+endif()
 
 # ##############################################################################
 # installation instructions

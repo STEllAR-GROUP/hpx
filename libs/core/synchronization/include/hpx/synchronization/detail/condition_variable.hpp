@@ -102,14 +102,14 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             std::unique_lock<mutex_type> lock, error_code& ec = throws)
         {
             return notify_one(
-                std::move(lock), threads::thread_priority::default_, ec);
+                HPX_MOVE(lock), threads::thread_priority::default_, ec);
         }
 
         void notify_all(
             std::unique_lock<mutex_type> lock, error_code& ec = throws)
         {
             return notify_all(
-                std::move(lock), threads::thread_priority::default_, ec);
+                HPX_MOVE(lock), threads::thread_priority::default_, ec);
         }
 
         HPX_CORE_EXPORT void abort_all(std::unique_lock<mutex_type> lock);
@@ -170,8 +170,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     struct condition_variable_data;
 
-    HPX_CORE_EXPORT void intrusive_ptr_add_ref(condition_variable_data* p);
-    HPX_CORE_EXPORT void intrusive_ptr_release(condition_variable_data* p);
+    HPX_CORE_EXPORT void intrusive_ptr_add_ref(
+        condition_variable_data* p) noexcept;
+    HPX_CORE_EXPORT void intrusive_ptr_release(
+        condition_variable_data* p) noexcept;
 
     struct condition_variable_data
     {
@@ -187,9 +189,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
     private:
         friend HPX_CORE_EXPORT void intrusive_ptr_add_ref(
-            condition_variable_data*);
+            condition_variable_data*) noexcept;
         friend HPX_CORE_EXPORT void intrusive_ptr_release(
-            condition_variable_data*);
+            condition_variable_data*) noexcept;
 
         hpx::util::atomic_count count_;
     };

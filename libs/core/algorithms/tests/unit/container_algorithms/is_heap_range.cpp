@@ -55,7 +55,7 @@ struct user_defined_type
 template <typename DataType>
 void test_is_heap(DataType)
 {
-    using hpx::util::get;
+    using hpx::get;
 
     std::size_t const size = 10007;
     std::vector<DataType> c(size);

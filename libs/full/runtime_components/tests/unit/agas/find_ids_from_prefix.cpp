@@ -28,14 +28,14 @@ struct test_server : hpx::components::component_base<test_server>
     {
         return hpx::find_here();
     }
-    HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_server, call, call_action)
 };
 
 typedef hpx::components::component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 typedef test_server::call_action call_action;
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION(call_action)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {
@@ -63,7 +63,7 @@ void test_find_all_ids_from_basename()
     test_client t1 = hpx::new_<test_client>(hpx::find_here());
     hpx::id_type client_id = t1.get_id();
 
-    HPX_TEST_NEQ(hpx::naming::invalid_id, client_id);
+    HPX_TEST_NEQ(hpx::invalid_id, client_id);
 
     // register our component with AGAS
     HPX_TEST((hpx::register_with_basename(basename, client_id).get()));
@@ -102,7 +102,7 @@ void test_find_ids_from_basename()
     test_client t1 = hpx::new_<test_client>(hpx::find_here());
     hpx::id_type client_id = t1.get_id();
 
-    HPX_TEST_NEQ(hpx::naming::invalid_id, client_id);
+    HPX_TEST_NEQ(hpx::invalid_id, client_id);
 
     // register our component with AGAS
     HPX_TEST((hpx::register_with_basename(basename, client_id).get()));
@@ -149,7 +149,7 @@ void test_find_id_from_basename()
     test_client t1 = hpx::new_<test_client>(hpx::find_here());
     hpx::id_type client_id = t1.get_id();
 
-    HPX_TEST_NEQ(hpx::naming::invalid_id, client_id);
+    HPX_TEST_NEQ(hpx::invalid_id, client_id);
 
     // register our component with AGAS
     HPX_TEST((hpx::register_with_basename(basename, client_id).get()));

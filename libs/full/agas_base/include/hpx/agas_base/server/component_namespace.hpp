@@ -33,7 +33,7 @@
 namespace hpx { namespace agas {
 
     HPX_EXPORT naming::gid_type bootstrap_component_namespace_gid();
-    HPX_EXPORT naming::id_type bootstrap_component_namespace_id();
+    HPX_EXPORT hpx::id_type bootstrap_component_namespace_id();
 }}    // namespace hpx::agas
 
 namespace hpx { namespace agas { namespace server {
@@ -169,14 +169,14 @@ namespace hpx { namespace agas { namespace server {
 
         std::uint32_t get_num_localities(components::component_type type);
 
-        HPX_DEFINE_COMPONENT_ACTION(component_namespace, bind_prefix);
-        HPX_DEFINE_COMPONENT_ACTION(component_namespace, bind_name);
-        HPX_DEFINE_COMPONENT_ACTION(component_namespace, resolve_id);
-        HPX_DEFINE_COMPONENT_ACTION(component_namespace, unbind);
-        HPX_DEFINE_COMPONENT_ACTION(component_namespace, iterate_types);
+        HPX_DEFINE_COMPONENT_ACTION(component_namespace, bind_prefix)
+        HPX_DEFINE_COMPONENT_ACTION(component_namespace, bind_name)
+        HPX_DEFINE_COMPONENT_ACTION(component_namespace, resolve_id)
+        HPX_DEFINE_COMPONENT_ACTION(component_namespace, unbind)
+        HPX_DEFINE_COMPONENT_ACTION(component_namespace, iterate_types)
         HPX_DEFINE_COMPONENT_ACTION(
-            component_namespace, get_component_type_name);
-        HPX_DEFINE_COMPONENT_ACTION(component_namespace, get_num_localities);
+            component_namespace, get_component_type_name)
+        HPX_DEFINE_COMPONENT_ACTION(component_namespace, get_num_localities)
     };
 
 }}}    // namespace hpx::agas::server

@@ -18,9 +18,9 @@ The tool `create_library_skeleton.py
 can be used to generate a basic skeleton. To create a library skeleton, run the
 tool in the ``libs`` subdirectory with the module name as an argument:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-    ./create_library_skeleton <lib_name>
+    $ ./create_library_skeleton <lib_name>
 
 This creates a skeleton with the necessary files for an |hpx| module. It will not create any actual source files. The structure of this skeleton is as follows:
 
@@ -123,37 +123,37 @@ the docker image.
 To produce the graph produced by CI run the following command (``HPX_SOURCE`` is
 assumed to hold the path to the |hpx| source directory):
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-   cpp-dependencies --dir $HPX_SOURCE/libs --graph-cycles circular_dependencies.dot
+   $ cpp-dependencies --dir $HPX_SOURCE/libs --graph-cycles circular_dependencies.dot
 
 This will produce a ``dot`` file in the current directory. You can inspect this
 manually with a text editor. You can also convert this to an image if you have
 ``graphviz`` installed:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-   dot circular_dependencies.dot -Tsvg -o circular_dependencies.svg
+   $ dot circular_dependencies.dot -Tsvg -o circular_dependencies.svg
 
 This produces an ``svg`` file in the current directory which shows the circular
 dependencies. Note that if there are no cycles the image will be empty.
 
 You can use ``cpp-dependencies`` to print the include paths between two modules.
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-   cpp-dependencies --dir $HPX_SOURCE/libs --shortest <from> <to>
+   $ cpp-dependencies --dir $HPX_SOURCE/libs --shortest <from> <to>
 
 prints all possible paths from the module ``<from>`` to the module ``<to>``. For
 example, as most modules depend on ``config``, the following should give you a
 long list of paths from ``algorithms`` to ``config``:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-   cpp-dependencies --dir $HPX_SOURCE/libs --shortest algorithms config
+   $ cpp-dependencies --dir $HPX_SOURCE/libs --shortest algorithms config
 
 The following should report that it can't find a path between the two modules:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-   cpp-dependencies --dir $HPX_SOURCE/libs --shortest config algorithms
+   $ cpp-dependencies --dir $HPX_SOURCE/libs --shortest config algorithms

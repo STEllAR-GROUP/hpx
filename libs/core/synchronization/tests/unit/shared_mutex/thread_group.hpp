@@ -78,7 +78,7 @@ namespace test {
         {
             std::lock_guard<mutex_type> guard(mtx_);
             std::unique_ptr<hpx::thread> new_thread(
-                new hpx::thread(std::forward<F>(f)));
+                new hpx::thread(HPX_FORWARD(F, f)));
             threads.push_back(new_thread.get());
             return new_thread.release();
         }

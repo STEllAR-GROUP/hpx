@@ -23,6 +23,6 @@ add_hpx_module(
   SOURCES ${threading_sources}
   HEADERS ${threading_headers}
   COMPAT_HEADERS ${threading_compat_headers}
-  MODULE_DEPENDENCIES hpx_futures hpx_errors hpx_memory
+  MODULE_DEPENDENCIES hpx_errors hpx_futures hpx_lock_registration hpx_memory
   CMAKE_SUBDIRS examples tests
 )

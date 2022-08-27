@@ -21,13 +21,13 @@ struct foo
 int main()
 {
     {
-        hpx::util::function_nonser<int()> fun = foo();
+        hpx::function<int()> fun = foo();
 
         HPX_TEST(fun.target<foo>() != nullptr);
     }
 
     {
-        hpx::util::function_nonser<int()> fun = foo();
+        hpx::function<int()> fun = foo();
 
         HPX_TEST(fun.target<foo const>() != nullptr);
     }

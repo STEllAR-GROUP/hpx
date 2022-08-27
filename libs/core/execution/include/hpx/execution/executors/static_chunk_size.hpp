@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -34,7 +34,7 @@ namespace hpx { namespace execution {
         ///       the number of available cores and the overall number of loop
         ///       iterations to schedule.
         ///
-        constexpr static_chunk_size()
+        constexpr static_chunk_size() noexcept
           : chunk_size_(0)
         {
         }
@@ -45,7 +45,7 @@ namespace hpx { namespace execution {
         ///                     number of loop iterations to run on a single
         ///                     thread.
         ///
-        constexpr explicit static_chunk_size(std::size_t chunk_size)
+        constexpr explicit static_chunk_size(std::size_t chunk_size) noexcept
           : chunk_size_(chunk_size)
         {
         }
@@ -89,7 +89,9 @@ namespace hpx { namespace execution {
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int /* version */)
         {
-            ar& chunk_size_;
+            // clang-format off
+            ar & chunk_size_;
+            // clang-format on
         }
         /// \endcond
 
@@ -99,13 +101,6 @@ namespace hpx { namespace execution {
         /// \endcond
     };
 }}    // namespace hpx::execution
-
-namespace hpx { namespace parallel { namespace execution {
-    using static_chunk_size HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::static_chunk_size is deprecated. Use "
-        "hpx::execution::static_chunk_size instead.") =
-        hpx::execution::static_chunk_size;
-}}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL

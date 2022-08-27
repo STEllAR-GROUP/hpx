@@ -18,7 +18,7 @@ void dummy() {}
 int hpx_main()
 {
     {
-        hpx::lcos::promise<void> promise;
+        hpx::distributed::promise<void> promise;
         hpx::future<void> future = promise.get_future();
 
         hpx::id_type id1 = promise.get_id();

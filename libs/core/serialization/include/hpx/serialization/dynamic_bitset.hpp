@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,9 +6,14 @@
 
 #pragma once
 
-#include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/config.hpp>
 
-#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
+// We unconditionally support serializing boost::dynamic_bitset
+// whenever it is being used in HPX.
+// see: libs/core/topology/include/hpx/topology/cpu_mask.hpp
+#if !defined(HPX_HAVE_MAX_CPU_COUNT)
+
+#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/vector.hpp>
 
 #include <cstddef>
@@ -16,7 +21,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename Block, typename Alloc>
     void serialize(output_archive& ar,
@@ -43,6 +48,6 @@ namespace hpx { namespace serialization {
         boost::from_block_range(blocks.begin(), blocks.end(), bs);
         bs.resize(num_bits);
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
 #endif

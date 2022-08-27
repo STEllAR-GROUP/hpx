@@ -15,20 +15,21 @@
 #include <system_error>
 
 namespace hpx { namespace detail {
-    HPX_NORETURN void throw_exception(error errcode, std::string const& msg,
+    [[noreturn]] void throw_exception(error errcode, std::string const& msg,
         std::string const& func, std::string const& file, long line)
     {
         filesystem::path p(file);
         hpx::detail::throw_exception(
-            hpx::exception(errcode, msg, hpx::plain), func, p.string(), line);
+            hpx::exception(errcode, msg, hpx::throwmode::plain), func,
+            p.string(), line);
     }
 
-    HPX_NORETURN void rethrow_exception(
+    [[noreturn]] void rethrow_exception(
         exception const& e, std::string const& func)
     {
         hpx::detail::throw_exception(
-            hpx::exception(e.get_error(), e.what(), hpx::rethrow), func,
-            hpx::get_error_file_name(e), hpx::get_error_line_number(e));
+            hpx::exception(e.get_error(), e.what(), hpx::throwmode::rethrow),
+            func, hpx::get_error_file_name(e), hpx::get_error_line_number(e));
     }
 
     std::exception_ptr get_exception(error errcode, std::string const& msg,
@@ -61,8 +62,8 @@ namespace hpx { namespace detail {
             ec = make_error_code(static_cast<hpx::error>(errcode), msg,
                 func.c_str(), file.c_str(), line,
                 (ec.category() == hpx::get_lightweight_hpx_category()) ?
-                    hpx::lightweight :
-                    hpx::plain);
+                    hpx::throwmode::lightweight :
+                    hpx::throwmode::plain);
         }
     }
 
@@ -79,12 +80,12 @@ namespace hpx { namespace detail {
                 hpx::get_error_file_name(e).c_str(),
                 hpx::get_error_line_number(e),
                 (ec.category() == hpx::get_lightweight_hpx_category()) ?
-                    hpx::lightweight_rethrow :
-                    hpx::rethrow);
+                    hpx::throwmode::lightweight_rethrow :
+                    hpx::throwmode::rethrow);
         }
     }
 
-    HPX_NORETURN void throw_thread_interrupted_exception()
+    [[noreturn]] void throw_thread_interrupted_exception()
     {
         throw hpx::thread_interrupted();
     }

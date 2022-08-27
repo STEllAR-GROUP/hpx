@@ -128,17 +128,17 @@ namespace hpx { namespace lcos {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Result>
     class packaged_action<Action, Result, /*DirectExecute=*/false>
-      : public promise<Result,
+      : public hpx::distributed::promise<Result,
             typename hpx::traits::extract_action<Action>::remote_result_type>
     {
     protected:
         using action_type = typename hpx::traits::extract_action<Action>::type;
         using remote_result_type = typename action_type::remote_result_type;
-        using base_type = promise<Result, remote_result_type>;
+        using base_type = hpx::distributed::promise<Result, remote_result_type>;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts>
-        void do_apply(naming::address&& addr, naming::id_type const& id,
+        void do_apply(naming::address&& addr, hpx::id_type const& id,
             threads::thread_priority priority, Ts&&... vs)
         {
             LLCO_(info).format("packaged_action::do_apply({}, {}) args({})",
@@ -150,34 +150,34 @@ namespace hpx { namespace lcos {
                 detail::parcel_write_handler<Result>{this->shared_state_};
 #else
             auto shared_state = this->shared_state_;
-            auto&& f = [shared_state = std::move(shared_state)]() {};
+            auto&& f = [shared_state = HPX_MOVE(shared_state)]() {};
 #endif
             naming::address resolved_addr(this->resolve());
-            naming::id_type cont_id(this->get_id(false));
+            hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             if (addr)
             {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
-                        std::move(cont_id), std::move(resolved_addr)),
-                    std::move(addr), id, priority, std::move(f),
-                    std::forward<Ts>(vs)...);
+                        HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
+                    HPX_MOVE(addr), id, priority, HPX_MOVE(f),
+                    HPX_FORWARD(Ts, vs)...);
             }
             else
             {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
-                        std::move(cont_id), std::move(resolved_addr)),
-                    id, priority, std::move(f), std::forward<Ts>(vs)...);
+                        HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
+                    id, priority, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
             }
 
             this->shared_state_->mark_as_started();
         }
 
         template <typename... Ts>
-        void do_apply(naming::id_type const& id,
-            threads::thread_priority priority, Ts&&... vs)
+        void do_apply(hpx::id_type const& id, threads::thread_priority priority,
+            Ts&&... vs)
         {
             LLCO_(info).format("packaged_action::do_apply({}, {}) args({})",
                 hpx::actions::detail::get_action_name<action_type>(), id,
@@ -188,23 +188,23 @@ namespace hpx { namespace lcos {
                 detail::parcel_write_handler<Result>{this->shared_state_};
 #else
             auto shared_state = this->shared_state_;
-            auto&& f = [shared_state = std::move(shared_state)]() {};
+            auto&& f = [shared_state = HPX_MOVE(shared_state)]() {};
 #endif
 
             naming::address resolved_addr(this->resolve());
-            naming::id_type cont_id(this->get_id(false));
+            hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             hpx::apply_p_cb<action_type>(
                 actions::typed_continuation<Result, remote_result_type>(
-                    std::move(cont_id), std::move(resolved_addr)),
-                id, priority, std::move(f), std::forward<Ts>(vs)...);
+                    HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
+                id, priority, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
 
             this->shared_state_->mark_as_started();
         }
 
         template <typename Callback, typename... Ts>
-        void do_apply_cb(naming::address&& addr, naming::id_type const& id,
+        void do_apply_cb(naming::address&& addr, hpx::id_type const& id,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
             LLCO_(info).format("packaged_action::do_apply_cb({}, {}) args({})",
@@ -214,38 +214,38 @@ namespace hpx { namespace lcos {
 #if defined(HPX_HAVE_NETWORKING)
             using callback_type = typename std::decay<Callback>::type;
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
-                this->shared_state_, std::forward<Callback>(cb)};
+                this->shared_state_, HPX_FORWARD(Callback, cb)};
 #else
             auto shared_state = this->shared_state_;
-            auto&& f = [shared_state = std::move(shared_state),
-                           cb = std::forward<Callback>(cb)]() { cb(); };
+            auto&& f = [shared_state = HPX_MOVE(shared_state),
+                           cb = HPX_FORWARD(Callback, cb)]() { cb(); };
 #endif
 
             naming::address resolved_addr(this->resolve());
-            naming::id_type cont_id(this->get_id(false));
+            hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             if (addr)
             {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
-                        std::move(cont_id), std::move(resolved_addr)),
-                    std::move(addr), id, priority, std::move(f),
-                    std::forward<Ts>(vs)...);
+                        HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
+                    HPX_MOVE(addr), id, priority, HPX_MOVE(f),
+                    HPX_FORWARD(Ts, vs)...);
             }
             else
             {
                 hpx::apply_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
-                        std::move(cont_id), std::move(resolved_addr)),
-                    id, priority, std::move(f), std::forward<Ts>(vs)...);
+                        HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
+                    id, priority, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
             }
 
             this->shared_state_->mark_as_started();
         }
 
         template <typename Callback, typename... Ts>
-        void do_apply_cb(naming::id_type const& id,
+        void do_apply_cb(hpx::id_type const& id,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
             LLCO_(info).format("packaged_action::do_apply_cb({}, {}) args({})",
@@ -255,21 +255,21 @@ namespace hpx { namespace lcos {
 #if defined(HPX_HAVE_NETWORKING)
             using callback_type = typename std::decay<Callback>::type;
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
-                this->shared_state_, std::forward<Callback>(cb)};
+                this->shared_state_, HPX_FORWARD(Callback, cb)};
 #else
             auto shared_state = this->shared_state_;
-            auto&& f = [shared_state = std::move(shared_state),
-                           cb = std::forward<Callback>(cb)]() { cb(); };
+            auto&& f = [shared_state = HPX_MOVE(shared_state),
+                           cb = HPX_FORWARD(Callback, cb)]() { cb(); };
 #endif
 
             naming::address resolved_addr(this->resolve());
-            naming::id_type cont_id(this->get_id(false));
+            hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             hpx::apply_p_cb<action_type>(
                 actions::typed_continuation<Result, remote_result_type>(
-                    std::move(cont_id), std::move(resolved_addr)),
-                id, priority, std::move(f), std::forward<Ts>(vs)...);
+                    HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
+                id, priority, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
 
             this->shared_state_->mark_as_started();
         }
@@ -290,71 +290,70 @@ namespace hpx { namespace lcos {
         }
 
         template <typename... Ts>
-        void apply(naming::id_type const& id, Ts&&... vs)
+        void apply(hpx::id_type const& id, Ts&&... vs)
         {
             do_apply(id, actions::action_priority<action_type>(),
-                std::forward<Ts>(vs)...);
+                HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
-        void apply(
-            naming::address&& addr, naming::id_type const& id, Ts&&... vs)
+        void apply(naming::address&& addr, hpx::id_type const& id, Ts&&... vs)
         {
-            do_apply(std::move(addr), id,
+            do_apply(HPX_MOVE(addr), id,
                 actions::action_priority<action_type>(),
-                std::forward<Ts>(vs)...);
+                HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
-        void apply_cb(naming::id_type const& id, Callback&& cb, Ts&&... vs)
+        void apply_cb(hpx::id_type const& id, Callback&& cb, Ts&&... vs)
         {
             do_apply_cb(id, actions::action_priority<action_type>(),
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
-        void apply_cb(naming::address&& addr, naming::id_type const& id,
+        void apply_cb(naming::address&& addr, hpx::id_type const& id,
             Callback&& cb, Ts&&... vs)
         {
-            do_apply_cb(std::move(addr), id,
+            do_apply_cb(HPX_MOVE(addr), id,
                 actions::action_priority<action_type>(),
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
-        void apply_p(naming::id_type const& id,
-            threads::thread_priority priority, Ts&&... vs)
+        void apply_p(hpx::id_type const& id, threads::thread_priority priority,
+            Ts&&... vs)
         {
-            do_apply(id, priority, std::forward<Ts>(vs)...);
+            do_apply(id, priority, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
-        void apply_p(naming::address&& addr, naming::id_type const& id,
+        void apply_p(naming::address&& addr, hpx::id_type const& id,
             threads::thread_priority priority, Ts&&... vs)
         {
-            do_apply(std::move(addr), id, priority, std::forward<Ts>(vs)...);
+            do_apply(HPX_MOVE(addr), id, priority, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
-        void apply_p_cb(naming::id_type const& id,
+        void apply_p_cb(hpx::id_type const& id,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
-            do_apply_cb(id, priority, std::forward<Callback>(cb),
-                std::forward<Ts>(vs)...);
+            do_apply_cb(id, priority, HPX_FORWARD(Callback, cb),
+                HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
-        void apply_p_cb(naming::address&& addr, naming::id_type const& id,
+        void apply_p_cb(naming::address&& addr, hpx::id_type const& id,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
-            do_apply_cb(std::move(addr), id, priority,
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+            do_apply_cb(HPX_MOVE(addr), id, priority, HPX_FORWARD(Callback, cb),
+                HPX_FORWARD(Ts, vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts>
         void apply_deferred(
-            naming::address&& addr, naming::id_type const& id, Ts&&... vs)
+            naming::address&& addr, hpx::id_type const& id, Ts&&... vs)
         {
             LLCO_(info).format(
                 "packaged_action::apply_deferred({}, {}) args({})",
@@ -366,22 +365,22 @@ namespace hpx { namespace lcos {
                 detail::parcel_write_handler<Result>{this->shared_state_};
 #else
             auto shared_state = this->shared_state_;
-            auto&& f = [shared_state = std::move(shared_state)]() {};
+            auto&& f = [shared_state = HPX_MOVE(shared_state)]() {};
 #endif
 
-            naming::id_type cont_id(this->get_id(false));
+            hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             auto fut = hpx::functional::apply_c_p_cb<action_type>(cont_id,
-                std::move(addr), id, actions::action_priority<action_type>(),
-                std::move(f), std::forward<Ts>(vs)...);
+                HPX_MOVE(addr), id, actions::action_priority<action_type>(),
+                HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
 
-            this->shared_state_->set_task(std::move(fut));
+            this->shared_state_->set_task(HPX_MOVE(fut));
         }
 
         template <typename Callback, typename... Ts>
-        void apply_deferred_cb(naming::address&& addr,
-            naming::id_type const& id, Callback&& cb, Ts&&... vs)
+        void apply_deferred_cb(naming::address&& addr, hpx::id_type const& id,
+            Callback&& cb, Ts&&... vs)
         {
             LLCO_(info).format(
                 "packaged_action::apply_deferred({}, {}) args({})",
@@ -391,21 +390,21 @@ namespace hpx { namespace lcos {
 #if defined(HPX_HAVE_NETWORKING)
             using callback_type = typename std::decay<Callback>::type;
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
-                this->shared_state_, std::forward<Callback>(cb)};
+                this->shared_state_, HPX_FORWARD(Callback, cb)};
 #else
             auto shared_state = this->shared_state_;
-            auto&& f = [shared_state = std::move(shared_state),
-                           cb = std::forward<Callback>(cb)]() { cb(); };
+            auto&& f = [shared_state = HPX_MOVE(shared_state),
+                           cb = HPX_FORWARD(Callback, cb)]() { cb(); };
 #endif
 
-            naming::id_type cont_id(this->get_id(false));
+            hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
             auto fut = hpx::functional::apply_c_p_cb<action_type>(cont_id,
-                std::move(addr), id, actions::action_priority<action_type>(),
-                std::move(f), std::forward<Ts>(vs)...);
+                HPX_MOVE(addr), id, actions::action_priority<action_type>(),
+                HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
 
-            this->shared_state_->set_task(std::move(fut));
+            this->shared_state_->set_task(HPX_MOVE(fut));
         }
     };
 
@@ -435,7 +434,7 @@ namespace hpx { namespace lcos {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts>
-        void apply(naming::id_type const& id, Ts&&... vs)
+        void apply(hpx::id_type const& id, Ts&&... vs)
         {
             std::pair<bool, components::pinned_ptr> r;
 
@@ -456,9 +455,9 @@ namespace hpx { namespace lcos {
                     {
                         // local, direct execution
                         auto&& result = action_type::execute_function(
-                            addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                            addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
                         this->shared_state_->mark_as_started();
-                        this->shared_state_->set_remote_data(std::move(result));
+                        this->shared_state_->set_remote_data(HPX_MOVE(result));
                         return;
                     }
                 }
@@ -466,21 +465,20 @@ namespace hpx { namespace lcos {
                 {
                     // local, direct execution
                     auto&& result = action_type::execute_function(
-                        addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                        addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
                     this->shared_state_->mark_as_started();
-                    this->shared_state_->set_remote_data(std::move(result));
+                    this->shared_state_->set_remote_data(HPX_MOVE(result));
                     return;
                 }
             }
 
             // remote execution
             this->do_apply(id, actions::action_priority<action_type>(),
-                std::forward<Ts>(vs)...);
+                HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
-        void apply(
-            naming::address&& addr, naming::id_type const& id, Ts&&... vs)
+        void apply(naming::address&& addr, hpx::id_type const& id, Ts&&... vs)
         {
             std::pair<bool, components::pinned_ptr> r;
 
@@ -501,9 +499,9 @@ namespace hpx { namespace lcos {
                     {
                         // local, direct execution
                         auto&& result = action_type::execute_function(
-                            addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                            addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
                         this->shared_state_->mark_as_started();
-                        this->shared_state_->set_remote_data(std::move(result));
+                        this->shared_state_->set_remote_data(HPX_MOVE(result));
                         return;
                     }
                 }
@@ -511,21 +509,21 @@ namespace hpx { namespace lcos {
                 {
                     // local, direct execution
                     auto&& result = action_type::execute_function(
-                        addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                        addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
                     this->shared_state_->mark_as_started();
-                    this->shared_state_->set_remote_data(std::move(result));
+                    this->shared_state_->set_remote_data(HPX_MOVE(result));
                     return;
                 }
             }
 
             // remote execution
-            this->do_apply(std::move(addr), id,
+            this->do_apply(HPX_MOVE(addr), id,
                 actions::action_priority<action_type>(),
-                std::forward<Ts>(vs)...);
+                HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
-        void apply_cb(naming::id_type const& id, Callback&& cb, Ts&&... vs)
+        void apply_cb(hpx::id_type const& id, Callback&& cb, Ts&&... vs)
         {
             std::pair<bool, components::pinned_ptr> r;
 
@@ -546,9 +544,9 @@ namespace hpx { namespace lcos {
                     {
                         // local, direct execution
                         auto&& result = action_type::execute_function(
-                            addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                            addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
                         this->shared_state_->mark_as_started();
-                        this->shared_state_->set_remote_data(std::move(result));
+                        this->shared_state_->set_remote_data(HPX_MOVE(result));
 
                         // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
@@ -564,9 +562,9 @@ namespace hpx { namespace lcos {
                 {
                     // local, direct execution
                     auto&& result = action_type::execute_function(
-                        addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                        addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
                     this->shared_state_->mark_as_started();
-                    this->shared_state_->set_remote_data(std::move(result));
+                    this->shared_state_->set_remote_data(HPX_MOVE(result));
 
                     // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
@@ -580,11 +578,11 @@ namespace hpx { namespace lcos {
 
             // remote execution
             this->do_apply_cb(id, actions::action_priority<action_type>(),
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
-        void apply_cb(naming::address&& addr, naming::id_type const& id,
+        void apply_cb(naming::address&& addr, hpx::id_type const& id,
             Callback&& cb, Ts&&... vs)
         {
             std::pair<bool, components::pinned_ptr> r;
@@ -606,9 +604,9 @@ namespace hpx { namespace lcos {
                     {
                         // local, direct execution
                         auto&& result = action_type::execute_function(
-                            addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                            addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
                         this->shared_state_->mark_as_started();
-                        this->shared_state_->set_remote_data(std::move(result));
+                        this->shared_state_->set_remote_data(HPX_MOVE(result));
 
                         // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
@@ -623,9 +621,9 @@ namespace hpx { namespace lcos {
                 {
                     // local, direct execution
                     auto&& result = action_type::execute_function(
-                        addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                        addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
                     this->shared_state_->mark_as_started();
-                    this->shared_state_->set_remote_data(std::move(result));
+                    this->shared_state_->set_remote_data(HPX_MOVE(result));
 
                     // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
@@ -638,9 +636,9 @@ namespace hpx { namespace lcos {
             }
 
             // remote execution
-            this->do_apply_cb(std::move(addr), id,
+            this->do_apply_cb(HPX_MOVE(addr), id,
                 actions::action_priority<action_type>(),
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
     };
 }}    // namespace hpx::lcos

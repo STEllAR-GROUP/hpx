@@ -54,7 +54,11 @@ namespace hpx { namespace util { namespace detail {
                 typename std::decay<T>::type>::value>::type* = nullptr>
         auto operator()(T&& future) const -> decltype(spread_this())
         {
+#if defined(HPX_CUDA_VERSION)
             std::forward<T>(future).get();
+#else
+            HPX_FORWARD(T, future).get();
+#endif
             return spread_this();
         }
 
@@ -63,10 +67,18 @@ namespace hpx { namespace util { namespace detail {
                 typename std::decay<T>::type>::value>::type* = nullptr>
         auto operator()(T&& future) const
             -> decltype(map_pack(future_unwrap_until_depth<Depth - 1>{},
+#if defined(HPX_CUDA_VERSION)
                 std::forward<T>(future).get()))
+#else
+                HPX_FORWARD(T, future).get()))
+#endif
         {
             return map_pack(future_unwrap_until_depth<Depth - 1>{},
+#if defined(HPX_CUDA_VERSION)
                 std::forward<T>(future).get());
+#else
+                HPX_FORWARD(T, future).get());
+#endif
         }
     };
     template <>
@@ -80,7 +92,11 @@ namespace hpx { namespace util { namespace detail {
                 typename std::decay<T>::type>::value>::type* = nullptr>
         auto operator()(T&& future) const -> decltype(spread_this())
         {
+#if defined(HPX_CUDA_VERSION)
             std::forward<T>(future).get();
+#else
+            HPX_FORWARD(T, future).get();
+#endif
             return spread_this();
         }
 
@@ -90,7 +106,11 @@ namespace hpx { namespace util { namespace detail {
         auto operator()(T&& future) const -> typename traits::future_traits<
             typename std::decay<T>::type>::result_type
         {
+#if defined(HPX_CUDA_VERSION)
             return std::forward<T>(future).get();
+#else
+            return HPX_FORWARD(T, future).get();
+#endif
         }
     };
     template <>
@@ -104,7 +124,11 @@ namespace hpx { namespace util { namespace detail {
                 typename std::decay<T>::type>::value>::type* = nullptr>
         auto operator()(T&& future) const -> decltype(spread_this())
         {
+#if defined(HPX_CUDA_VERSION)
             std::forward<T>(future).get();
+#else
+            HPX_FORWARD(T, future).get();
+#endif
             return spread_this();
         }
 
@@ -113,9 +137,17 @@ namespace hpx { namespace util { namespace detail {
                 typename std::decay<T>::type>::value>::type* = nullptr>
         auto operator()(T&& future) const -> decltype(
             map_pack(std::declval<future_unwrap_until_depth const&>(),
+#if defined(HPX_CUDA_VERSION)
                 std::forward<T>(future).get()))
+#else
+                HPX_FORWARD(T, future).get()))
+#endif
         {
+#if defined(HPX_CUDA_VERSION)
             return map_pack(*this, std::forward<T>(future).get());
+#else
+            return map_pack(*this, HPX_FORWARD(T, future).get());
+#endif
         }
     };
 
@@ -124,10 +156,10 @@ namespace hpx { namespace util { namespace detail {
     /// This is the main entry function for immediate unwraps.
     template <std::size_t Depth, typename... Args>
     auto unwrap_depth_impl(Args&&... args) -> decltype(map_pack(
-        future_unwrap_until_depth<Depth>{}, std::forward<Args>(args)...))
+        future_unwrap_until_depth<Depth>{}, HPX_FORWARD(Args, args)...))
     {
         return map_pack(
-            future_unwrap_until_depth<Depth>{}, std::forward<Args>(args)...);
+            future_unwrap_until_depth<Depth>{}, HPX_FORWARD(Args, args)...);
     }
 
     /// We use a specialized class here because MSVC has issues with
@@ -141,10 +173,10 @@ namespace hpx { namespace util { namespace detail {
         static auto apply(C&& callable, T&& unwrapped)
             // There is no trait for the invoke_fused result
             -> decltype(invoke_fused(
-                std::forward<C>(callable), std::forward<T>(unwrapped)))
+                HPX_FORWARD(C, callable), HPX_FORWARD(T, unwrapped)))
         {
             return invoke_fused(
-                std::forward<C>(callable), std::forward<T>(unwrapped));
+                HPX_FORWARD(C, callable), HPX_FORWARD(T, unwrapped));
         }
     };
     template <>
@@ -158,7 +190,7 @@ namespace hpx { namespace util { namespace detail {
             typename invoke_result<C, T>::type
         {
             return HPX_INVOKE(
-                std::forward<C>(callable), std::forward<T>(unwrapped));
+                HPX_FORWARD(C, callable), HPX_FORWARD(T, unwrapped));
         }
     };
 
@@ -176,13 +208,14 @@ namespace hpx { namespace util { namespace detail {
     /// - Otherwise `invoke` is used
     template <bool HadMultipleArguments, typename C, typename T>
     auto dispatch_wrapped_invocation_select(C&& callable, T&& unwrapped)
-        -> decltype(invoke_wrapped_invocation_select<
-            should_fuse_invoke<HadMultipleArguments, T>::value>::
-                apply(std::forward<C>(callable), std::forward<T>(unwrapped)))
+        -> decltype(invoke_wrapped_invocation_select<should_fuse_invoke<
+                HadMultipleArguments, T>::value>::apply(HPX_FORWARD(C,
+                                                            callable),
+            HPX_FORWARD(T, unwrapped)))
     {
         return invoke_wrapped_invocation_select<should_fuse_invoke<
-            HadMultipleArguments, T>::value>::apply(std::forward<C>(callable),
-            std::forward<T>(unwrapped));
+            HadMultipleArguments, T>::value>::apply(HPX_FORWARD(C, callable),
+            HPX_FORWARD(T, unwrapped));
     }
 
     /// Helper for routing non void result types to the corresponding
@@ -193,12 +226,12 @@ namespace hpx { namespace util { namespace detail {
         template <typename C, typename... Args>
         static auto apply(C&& callable, Args&&... args) -> decltype(
             dispatch_wrapped_invocation_select<(sizeof...(args) > 1)>(
-                std::forward<C>(callable),
-                unwrap_depth_impl<Depth>(std::forward<Args>(args)...)))
+                HPX_FORWARD(C, callable),
+                unwrap_depth_impl<Depth>(HPX_FORWARD(Args, args)...)))
         {
             return dispatch_wrapped_invocation_select<(sizeof...(args) > 1)>(
-                std::forward<C>(callable),
-                unwrap_depth_impl<Depth>(std::forward<Args>(args)...));
+                HPX_FORWARD(C, callable),
+                unwrap_depth_impl<Depth>(HPX_FORWARD(Args, args)...));
         }
     };
     template <std::size_t Depth>
@@ -206,10 +239,10 @@ namespace hpx { namespace util { namespace detail {
     {
         template <typename C, typename... Args>
         static auto apply(C&& callable, Args&&... args)
-            -> decltype(std::forward<C>(callable)())
+            -> decltype(HPX_FORWARD(C, callable)())
         {
-            unwrap_depth_impl<Depth>(std::forward<Args>(args)...);
-            return std::forward<C>(callable)();
+            unwrap_depth_impl<Depth>(HPX_FORWARD(Args, args)...);
+            return HPX_FORWARD(C, callable)();
         }
     };
 
@@ -219,13 +252,13 @@ namespace hpx { namespace util { namespace detail {
     auto invoke_wrapped(C&& callable, Args&&... args)
         -> decltype(invoke_wrapped_decorate_select<Depth,
             decltype(unwrap_depth_impl<Depth>(
-                std::forward<Args>(args)...))>::apply(std::forward<C>(callable),
-            std::forward<Args>(args)...))
+                HPX_FORWARD(Args, args)...))>::apply(HPX_FORWARD(C, callable),
+            HPX_FORWARD(Args, args)...))
     {
         return invoke_wrapped_decorate_select<Depth,
             decltype(unwrap_depth_impl<Depth>(
-                std::forward<Args>(args)...))>::apply(std::forward<C>(callable),
-            std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...))>::apply(HPX_FORWARD(C, callable),
+            HPX_FORWARD(Args, args)...);
     }
 
     /// Implements the callable object which is returned by n invocation
@@ -238,22 +271,22 @@ namespace hpx { namespace util { namespace detail {
 
     public:
         explicit functional_unwrap_impl(T wrapped)
-          : wrapped_(std::move(wrapped))
+          : wrapped_(HPX_MOVE(wrapped))
         {
         }
 
         template <typename... Args>
         auto operator()(Args&&... args) -> decltype(invoke_wrapped<Depth>(
-            std::declval<T&>(), std::forward<Args>(args)...))
+            std::declval<T&>(), HPX_FORWARD(Args, args)...))
         {
-            return invoke_wrapped<Depth>(wrapped_, std::forward<Args>(args)...);
+            return invoke_wrapped<Depth>(wrapped_, HPX_FORWARD(Args, args)...);
         }
 
         template <typename... Args>
         auto operator()(Args&&... args) const -> decltype(invoke_wrapped<Depth>(
-            std::declval<T const&>(), std::forward<Args>(args)...))
+            std::declval<T const&>(), HPX_FORWARD(Args, args)...))
         {
-            return invoke_wrapped<Depth>(wrapped_, std::forward<Args>(args)...);
+            return invoke_wrapped<Depth>(wrapped_, HPX_FORWARD(Args, args)...);
         }
     };
 
@@ -264,6 +297,6 @@ namespace hpx { namespace util { namespace detail {
         -> functional_unwrap_impl<typename std::decay<T>::type, Depth>
     {
         return functional_unwrap_impl<typename std::decay<T>::type, Depth>(
-            std::forward<T>(callable));
+            HPX_FORWARD(T, callable));
     }
 }}}    // namespace hpx::util::detail

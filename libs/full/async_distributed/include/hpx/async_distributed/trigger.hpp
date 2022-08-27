@@ -26,7 +26,7 @@ namespace hpx { namespace actions {
         try
         {
             cont.trigger_value(
-                HPX_INVOKE(std::forward<F>(f), std::forward<Ts>(vs)...));
+                HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...));
         }
         catch (...)
         {
@@ -42,7 +42,7 @@ namespace hpx { namespace actions {
     {
         try
         {
-            HPX_INVOKE(std::forward<F>(f), std::forward<Ts>(vs)...);
+            HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
             cont.trigger();
         }
         catch (...)

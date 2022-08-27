@@ -1,5 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -124,8 +125,10 @@ namespace hpx {
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
+#include <hpx/parallel/algorithms/detail/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -159,9 +162,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static InIter sequential(
                 ExPolicy, InIter first, Sent_ last, Pred&& pred, Proj&& proj)
             {
-                return std::adjacent_find(first, last,
+                return sequential_adjacent_find<ExPolicy>(first, last,
                     util::invoke_projected<Pred, Proj>(
-                        std::forward<Pred>(pred), std::forward<Proj>(proj)));
+                        HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
             }
 
             template <typename ExPolicy, typename FwdIter, typename Sent_,
@@ -172,14 +175,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     Pred&& pred, Proj&& proj)
             {
                 using zip_iterator = hpx::util::zip_iterator<FwdIter, FwdIter>;
-                using reference = typename zip_iterator::reference;
                 using difference_type =
                     typename std::iterator_traits<FwdIter>::difference_type;
 
                 if (first == last)
                 {
                     return util::detail::algorithm_result<ExPolicy,
-                        FwdIter>::get(std::move(last));
+                        FwdIter>::get(HPX_MOVE(last));
                 }
 
                 FwdIter next = first;
@@ -188,67 +190,41 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 util::cancellation_token<difference_type> tok(count);
 
                 util::invoke_projected<Pred, Proj> pred_projected{
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)};
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
 
-                auto f1 = [pred_projected = std::move(pred_projected), tok](
+                auto f1 = [pred_projected = HPX_MOVE(pred_projected), tok](
                               zip_iterator it, std::size_t part_size,
                               std::size_t base_idx) mutable {
-                    util::loop_idx_n(base_idx, it, part_size, tok,
-                        [&pred_projected, &tok](reference t, std::size_t i) {
-                            using hpx::get;
-                            if (pred_projected(get<0>(t), get<1>(t)))
-                                tok.cancel(i);
-                        });
+                    sequential_adjacent_find<std::decay_t<ExPolicy>>(
+                        base_idx, it, part_size, tok, pred_projected);
                 };
 
                 auto f2 = [tok, count, first, last](
-                              std::vector<hpx::future<void>>&& data) mutable
-                    -> FwdIter {
+                              auto&& data) mutable -> FwdIter {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    data.clear();
+                    util::detail::clear_container(data);
                     difference_type adj_find_res = tok.get_data();
                     if (adj_find_res != count)
                         std::advance(first, adj_find_res);
                     else
                         first = last;
 
-                    return std::move(first);
+                    return HPX_MOVE(first);
                 };
 
                 return util::partitioner<ExPolicy, FwdIter,
-                    void>::call_with_index(std::forward<ExPolicy>(policy),
+                    void>::call_with_index(HPX_FORWARD(ExPolicy, policy),
                     hpx::util::make_zip_iterator(first, next), count - 1, 1,
-                    std::move(f1), std::move(f2));
+                    HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
         /// \endcond
     }    // namespace detail
-
-    template <typename ExPolicy, typename FwdIter,
-        typename Pred = detail::equal_to>
-    HPX_DEPRECATED_V(1, 6, "Please use hpx::adjacent_find instead.")
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type>::type
-        adjacent_find(ExPolicy&& policy, FwdIter first, FwdIter last,
-            Pred&& pred = Pred())
-    {
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::adjacent_find<FwdIter, FwdIter>().call(
-            std::forward<ExPolicy>(policy), first, last,
-            std::forward<Pred>(pred),
-            hpx::parallel::util::projection_identity{});
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct adjacent_find_t final
+    inline constexpr struct adjacent_find_t final
       : hpx::detail::tag_parallel_algorithm<adjacent_find_t>
     {
     private:
@@ -259,14 +235,14 @@ namespace hpx {
                 hpx::traits::is_input_iterator<InIter>::value
             )>
         // clang-format on
-        friend InIter tag_fallback_dispatch(hpx::adjacent_find_t, InIter first,
+        friend InIter tag_fallback_invoke(hpx::adjacent_find_t, InIter first,
             InIter last, Pred&& pred = Pred())
         {
             static_assert((hpx::traits::is_input_iterator<InIter>::value),
                 "Requires at least input iterator.");
 
             return parallel::v1::detail::adjacent_find<InIter, InIter>().call(
-                hpx::execution::seq, first, last, std::forward<Pred>(pred),
+                hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -280,15 +256,15 @@ namespace hpx {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::adjacent_find_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::adjacent_find_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, Pred&& pred = Pred())
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least a forward iterator");
 
             return parallel::v1::detail::adjacent_find<FwdIter, FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Pred>(pred),
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Pred, pred),
                 hpx::parallel::util::projection_identity{});
         }
     } adjacent_find{};

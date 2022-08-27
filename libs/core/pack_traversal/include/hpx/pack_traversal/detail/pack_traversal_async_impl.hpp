@@ -79,8 +79,8 @@ namespace hpx {
 
         public:
             explicit resume_traversal_callable(Frame frame, State state)
-              : frame_(std::move(frame))
-              , state_(std::move(state))
+              : frame_(HPX_MOVE(frame))
+              , state_(HPX_MOVE(state))
             {
             }
 
@@ -98,7 +98,7 @@ namespace hpx {
         {
             return resume_traversal_callable<typename std::decay<Frame>::type,
                 typename std::decay<State>::type>(
-                std::forward<Frame>(frame), std::forward<State>(state));
+                HPX_FORWARD(Frame, frame), HPX_FORWARD(State, state));
         }
 
         /// Stores the visitor and the arguments to traverse
@@ -121,8 +121,8 @@ namespace hpx {
 
         public:
             explicit async_traversal_frame(Visitor visitor, Args... args)
-              : Visitor(std::move(visitor))
-              , args_(hpx::make_tuple(std::move(args)...))
+              : Visitor(HPX_MOVE(visitor))
+              , args_(hpx::make_tuple(HPX_MOVE(args)...))
               , finished_(false)
             {
             }
@@ -136,8 +136,8 @@ namespace hpx {
             template <typename MapperArg>
             explicit async_traversal_frame(async_traverse_in_place_tag<Visitor>,
                 MapperArg&& mapper_arg, Args... args)
-              : Visitor(std::forward<MapperArg>(mapper_arg))
-              , args_(hpx::make_tuple(std::move(args)...))
+              : Visitor(HPX_FORWARD(MapperArg, mapper_arg))
+              , args_(hpx::make_tuple(HPX_MOVE(args)...))
               , finished_(false)
             {
             }
@@ -155,7 +155,7 @@ namespace hpx {
                     async_traverse_visit_tag, T>::type
             {
                 return HPX_INVOKE(visitor(), async_traverse_visit_tag{},
-                    std::forward<T>(value));
+                    HPX_FORWARD(T, value));
             }
 
             /// Calls the visitor with the given element and a continuation
@@ -170,12 +170,12 @@ namespace hpx {
                 // Create a callable object which resumes the current
                 // traversal when it's called.
                 auto resumable = make_resume_traversal_callable(
-                    std::move(self), std::forward<Hierarchy>(hierarchy));
+                    HPX_MOVE(self), HPX_FORWARD(Hierarchy, hierarchy));
 
                 // Invoke the visitor with the current value and the
                 // callable object to resume the control flow.
                 HPX_INVOKE(visitor(), async_traverse_detach_tag{},
-                    std::forward<T>(value), std::move(resumable));
+                    HPX_FORWARD(T, value), HPX_MOVE(resumable));
             }
 
             /// Calls the visitor with no arguments to signalize that the
@@ -186,7 +186,7 @@ namespace hpx {
                 if (finished_.compare_exchange_strong(expected, true))
                 {
                     HPX_INVOKE(visitor(), async_traverse_complete_tag{},
-                        std::move(args_));
+                        HPX_MOVE(args_));
                 }
             }
         };
@@ -204,7 +204,7 @@ namespace hpx {
         public:
             explicit async_traversal_frame_allocator(
                 other_allocator const& alloc, Visitor visitor, Args... args)
-              : base_type(std::move(visitor), std::move(args)...)
+              : base_type(HPX_MOVE(visitor), HPX_MOVE(args)...)
               , alloc_(alloc)
             {
             }
@@ -214,14 +214,14 @@ namespace hpx {
                 other_allocator const& alloc,
                 async_traverse_in_place_tag<Visitor> tag,
                 MapperArg&& mapper_arg, Args... args)
-              : base_type(tag, std::forward<MapperArg>(mapper_arg),
-                    std::move(args)...)
+              : base_type(
+                    tag, HPX_FORWARD(MapperArg, mapper_arg), HPX_MOVE(args)...)
               , alloc_(alloc)
             {
             }
 
         private:
-            void destroy() override
+            void destroy() noexcept override
             {
                 typedef std::allocator_traits<other_allocator> traits;
 
@@ -384,8 +384,8 @@ namespace hpx {
         public:
             explicit async_traversal_point(
                 Frame frame, hpx::tuple<Hierarchy...> hierarchy, bool& detached)
-              : frame_(std::move(frame))
-              , hierarchy_(std::move(hierarchy))
+              : frame_(HPX_MOVE(frame))
+              , hierarchy_(HPX_MOVE(hierarchy))
               , detached_(detached)
             {
             }
@@ -411,11 +411,11 @@ namespace hpx {
                 // Create a new hierarchy which contains the
                 // the parent (the last traversed element).
                 auto hierarchy = hpx::tuple_cat(
-                    hpx::make_tuple(std::forward<Parent>(parent)), hierarchy_);
+                    hpx::make_tuple(HPX_FORWARD(Parent, parent)), hierarchy_);
 
                 return async_traversal_point<Frame,
                     typename std::decay<Parent>::type, Hierarchy...>(
-                    frame_, std::move(hierarchy), detached_);
+                    frame_, HPX_MOVE(hierarchy), detached_);
             }
 
             /// Forks the current traversal point and continues the child
@@ -424,10 +424,10 @@ namespace hpx {
             void fork(Child&& child, Parent&& parent)
             {
                 // Push the parent on top of the hierarchy
-                auto point = push(std::forward<Parent>(parent));
+                auto point = push(HPX_FORWARD(Parent, parent));
 
                 // Continue the traversal with the current element
-                point.async_traverse(std::forward<Child>(child));
+                point.async_traverse(HPX_FORWARD(Child, child));
             }
 
             /// Async traverse a single element, and do nothing.
@@ -464,7 +464,7 @@ namespace hpx {
                     // current execution context and call the visitor with the
                     // element and a continue callable object again.
 
-                    frame_->async_continue(*current, std::move(hierarchy));
+                    frame_->async_continue(*current, HPX_MOVE(hierarchy));
                 }
             }
 
@@ -475,7 +475,7 @@ namespace hpx {
                 container_category_tag<true, IsTupleLike>, Current&& current)
             {
                 auto range = make_dynamic_async_range(*current);
-                fork(std::move(range), std::forward<Current>(current));
+                fork(HPX_MOVE(range), HPX_FORWARD(Current, current));
             }
 
             /// Async traverse a single element which is a tuple like type only.
@@ -484,7 +484,7 @@ namespace hpx {
                 container_category_tag<false, true>, Current&& current)
             {
                 auto range = make_static_range(*current);
-                fork(std::move(range), std::forward<Current>(current));
+                fork(HPX_MOVE(range), HPX_FORWARD(Current, current));
             }
 
             /// Async traverse the current iterator
@@ -495,7 +495,7 @@ namespace hpx {
                     typename hpx::util::decay_unwrap<decltype(*current)>::type;
                 return async_traverse_one_impl(
                     container_category_of_t<ElementType>{},
-                    std::forward<Current>(current));
+                    HPX_FORWARD(Current, current));
             }
 
             /// Async traverse the current iterator but don't traverse
@@ -505,7 +505,7 @@ namespace hpx {
             {
                 if (!is_detached())
                 {
-                    async_traverse_one(std::forward<Current>(current));
+                    async_traverse_one(HPX_FORWARD(Current, current));
                 }
             }
 
@@ -562,9 +562,9 @@ namespace hpx {
                 Hierarchy&&... hierarchy) const
             {
                 bool detached = false;
-                next(detached, std::forward<Frame>(frame),
-                    std::forward<Current>(current),
-                    std::forward<Hierarchy>(hierarchy)...);
+                next(detached, HPX_FORWARD(Frame, frame),
+                    HPX_FORWARD(Current, current),
+                    HPX_FORWARD(Hierarchy, hierarchy)...);
             }
 
             template <typename Frame, typename Current>
@@ -577,7 +577,7 @@ namespace hpx {
                     traversal_point_of_t<Frame> point(
                         frame, hpx::make_tuple(), detached);
 
-                    point.async_traverse(std::forward<Current>(current));
+                    point.async_traverse(HPX_FORWARD(Current, current));
 
                     // Don't continue the frame when the execution was detached
                     if (detached)
@@ -605,7 +605,7 @@ namespace hpx {
                     traversal_point_of_t<Frame, Parent, Hierarchy...> point(
                         frame, hpx::make_tuple(parent, hierarchy...), detached);
 
-                    point.async_traverse(std::forward<Current>(current));
+                    point.async_traverse(HPX_FORWARD(Current, current));
 
                     // Don't continue the frame when the execution was detached
                     if (detached)
@@ -616,9 +616,13 @@ namespace hpx {
 
                 // Pop the top element from the hierarchy, and shift the
                 // parent element one to the right
-                next(detached, std::forward<Frame>(frame),
+                next(detached, HPX_FORWARD(Frame, frame),
+#if defined(HPX_CUDA_VERSION)
                     std::forward<Parent>(parent).next(),
-                    std::forward<Hierarchy>(hierarchy)...);
+#else
+                    HPX_FORWARD(Parent, parent).next(),
+#endif
+                    HPX_FORWARD(Hierarchy, hierarchy)...);
             }
         };
 
@@ -626,7 +630,7 @@ namespace hpx {
         void resume_traversal_callable<Frame, State>::operator()()
         {
             auto hierarchy = hpx::tuple_cat(hpx::make_tuple(frame_), state_);
-            util::invoke_fused(resume_state_callable{}, std::move(hierarchy));
+            util::invoke_fused(resume_state_callable{}, HPX_MOVE(hierarchy));
         }
 
         /// Gives access to types related to the traversal frame
@@ -664,15 +668,15 @@ namespace hpx {
             // Create an intrusive_ptr without increasing its reference count
             // (it's already 'one').
             auto frame = typename types::frame_pointer_type(new
-                typename types::frame_type(std::forward<Visitor>(visitor),
-                    std::forward<Args>(args)...),
+                typename types::frame_type(
+                    HPX_FORWARD(Visitor, visitor), HPX_FORWARD(Args, args)...),
                 false);
 
             // Create a static range for the top level tuple
             auto range = make_static_range(frame->head());
 
             auto resumer = make_resume_traversal_callable(
-                frame, hpx::make_tuple(std::move(range)));
+                frame, hpx::make_tuple(HPX_MOVE(range)));
 
             // Start the asynchronous traversal
             resumer();
@@ -707,7 +711,7 @@ namespace hpx {
             unique_ptr p(traits::allocate(frame_alloc, 1),
                 util::allocator_deleter<other_allocator>{frame_alloc});
             traits::construct(frame_alloc, p.get(), frame_alloc,
-                std::forward<Visitor>(visitor), std::forward<Args>(args)...);
+                HPX_FORWARD(Visitor, visitor), HPX_FORWARD(Args, args)...);
 
             auto frame = typename types::frame_pointer_type(p.release(), false);
 
@@ -715,7 +719,7 @@ namespace hpx {
             auto range = make_static_range(frame->head());
 
             auto resumer = make_resume_traversal_callable(
-                frame, hpx::make_tuple(std::move(range)));
+                frame, hpx::make_tuple(HPX_MOVE(range)));
 
             // Start the asynchronous traversal
             resumer();

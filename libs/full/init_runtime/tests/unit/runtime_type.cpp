@@ -52,8 +52,8 @@ int main(int argc, char* argv[])
         iparams.mode = hpx::runtime_mode::local;
         ran_hpx_main = false;
 
-        hpx::util::function_nonser<int(hpx::program_options::variables_map&)>
-            func = static_cast<hpx::hpx_main_type>(::hpx_main);
+        hpx::function<int(hpx::program_options::variables_map&)> func =
+            static_cast<hpx::hpx_main_type>(::hpx_main);
 
         hpx::init(func, argc, argv, iparams);
         HPX_TEST(ran_hpx_main);

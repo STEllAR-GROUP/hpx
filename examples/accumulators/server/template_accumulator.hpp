@@ -15,8 +15,7 @@
 #include <hpx/preprocessor/cat.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace examples { namespace server
-{
+namespace examples { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     /// This class is a very simple example of an HPX component. An HPX
     /// component is a class that:
@@ -45,12 +44,15 @@ namespace examples { namespace server
     template <typename T>
     class template_accumulator
       : public hpx::components::locking_hook<
-            hpx::components::component_base<template_accumulator<T> > >
+            hpx::components::component_base<template_accumulator<T>>>
     {
     public:
         typedef T argument_type;
 
-        template_accumulator() : value_(0) {}
+        template_accumulator()
+          : value_(0)
+        {
+        }
 
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
@@ -80,46 +82,46 @@ namespace examples { namespace server
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(template_accumulator, reset);
-        HPX_DEFINE_COMPONENT_ACTION(template_accumulator, add);
-        HPX_DEFINE_COMPONENT_ACTION(template_accumulator, query);
+        HPX_DEFINE_COMPONENT_ACTION(template_accumulator, reset)
+        HPX_DEFINE_COMPONENT_ACTION(template_accumulator, add)
+        HPX_DEFINE_COMPONENT_ACTION(template_accumulator, query)
 
     private:
         argument_type value_;
     };
-}}
+}}    // namespace examples::server
 
-#define REGISTER_TEMPLATE_ACCUMULATOR_DECLARATION(type)                       \
-    HPX_REGISTER_ACTION_DECLARATION(                                          \
-        examples::server::template_accumulator<type>::reset_action,           \
-        HPX_PP_CAT(__template_accumulator_reset_action_, type));              \
-                                                                              \
-    HPX_REGISTER_ACTION_DECLARATION(                                          \
-        examples::server::template_accumulator<type>::add_action,             \
-        HPX_PP_CAT(__template_accumulator_add_action_, type));                \
-                                                                              \
-    HPX_REGISTER_ACTION_DECLARATION(                                          \
-        examples::server::template_accumulator<type>::query_action,           \
-        HPX_PP_CAT(__template_accumulator_query_action_, type));              \
-/**/
+#define REGISTER_TEMPLATE_ACCUMULATOR_DECLARATION(type)                        \
+    HPX_REGISTER_ACTION_DECLARATION(                                           \
+        examples::server::template_accumulator<type>::reset_action,            \
+        HPX_PP_CAT(__template_accumulator_reset_action_, type))                \
+                                                                               \
+    HPX_REGISTER_ACTION_DECLARATION(                                           \
+        examples::server::template_accumulator<type>::add_action,              \
+        HPX_PP_CAT(__template_accumulator_add_action_, type))                  \
+                                                                               \
+    HPX_REGISTER_ACTION_DECLARATION(                                           \
+        examples::server::template_accumulator<type>::query_action,            \
+        HPX_PP_CAT(__template_accumulator_query_action_, type))                \
+    /**/
 
-#define REGISTER_TEMPLATE_ACCUMULATOR(type)                                   \
-    HPX_REGISTER_ACTION(                                                      \
-        examples::server::template_accumulator<type>::reset_action,           \
-        HPX_PP_CAT(__template_accumulator_reset_action_, type));              \
-                                                                              \
-    HPX_REGISTER_ACTION(                                                      \
-        examples::server::template_accumulator<type>::add_action,             \
-        HPX_PP_CAT(__template_accumulator_add_action_, type));                \
-                                                                              \
-    HPX_REGISTER_ACTION(                                                      \
-        examples::server::template_accumulator<type>::query_action,           \
-        HPX_PP_CAT(__template_accumulator_query_action_, type));              \
-                                                                              \
-    typedef ::hpx::components::component<                                     \
-        examples::server::template_accumulator<type>                          \
-    > HPX_PP_CAT(__template_accumulator_, type);                              \
-    HPX_REGISTER_COMPONENT(HPX_PP_CAT(__template_accumulator_, type))         \
-/**/
+#define REGISTER_TEMPLATE_ACCUMULATOR(type)                                    \
+    HPX_REGISTER_ACTION(                                                       \
+        examples::server::template_accumulator<type>::reset_action,            \
+        HPX_PP_CAT(__template_accumulator_reset_action_, type))                \
+                                                                               \
+    HPX_REGISTER_ACTION(                                                       \
+        examples::server::template_accumulator<type>::add_action,              \
+        HPX_PP_CAT(__template_accumulator_add_action_, type))                  \
+                                                                               \
+    HPX_REGISTER_ACTION(                                                       \
+        examples::server::template_accumulator<type>::query_action,            \
+        HPX_PP_CAT(__template_accumulator_query_action_, type))                \
+                                                                               \
+    typedef ::hpx::components::component<                                      \
+        examples::server::template_accumulator<type>>                          \
+        HPX_PP_CAT(__template_accumulator_, type);                             \
+    HPX_REGISTER_COMPONENT(HPX_PP_CAT(__template_accumulator_, type))          \
+    /**/
 
 #endif

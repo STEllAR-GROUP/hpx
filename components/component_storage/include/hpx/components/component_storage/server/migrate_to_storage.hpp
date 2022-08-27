@@ -22,8 +22,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components { namespace server
-{
+namespace hpx { namespace components { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     // Migrate given component to the component storage
     //
@@ -57,13 +56,12 @@ namespace hpx { namespace components { namespace server
     //       migrated which will delete it once the shared pointer goes out of
     //       scope.
     //
-    namespace detail
-    {
+    namespace detail {
         // clean up (source) memory of migrated object
         template <typename Component>
-        naming::id_type migrate_to_storage_here_cleanup(
-            future<naming::id_type> f, std::shared_ptr<Component> ptr,
-            naming::id_type const& /* to_migrate */)
+        hpx::id_type migrate_to_storage_here_cleanup(future<hpx::id_type> f,
+            std::shared_ptr<Component> ptr,
+            hpx::id_type const& /* to_migrate */)
         {
             ptr->mark_as_migrated();
             return f.get();
@@ -71,10 +69,9 @@ namespace hpx { namespace components { namespace server
 
         // trigger the actual migration to storage
         template <typename Component>
-        future<naming::id_type> migrate_to_storage_here_postproc(
+        future<hpx::id_type> migrate_to_storage_here_postproc(
             std::shared_ptr<Component> const& ptr,
-            naming::id_type const& to_migrate,
-            naming::id_type const& target_storage)
+            hpx::id_type const& to_migrate, hpx::id_type const& target_storage)
         {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
             using components::stubs::runtime_support;
@@ -87,9 +84,10 @@ namespace hpx { namespace components { namespace server
 
                 HPX_THROW_EXCEPTION(invalid_status,
                     "hpx::components::server::migrate_to_storage_here",
-                    "attempting to migrate an instance of a component which was "
+                    "attempting to migrate an instance of a component which "
+                    "was "
                     "already migrated");
-                return make_ready_future(naming::invalid_id);
+                return make_ready_future(hpx::invalid_id);
             }
 
             if (pin_count > 1)
@@ -100,7 +98,7 @@ namespace hpx { namespace components { namespace server
                     "hpx::components::server::migrate_to_storage_here",
                     "attempting to migrate an instance of a component which is "
                     "currently pinned");
-                return make_ready_future(naming::invalid_id);
+                return make_ready_future(hpx::invalid_id);
             }
 
             // serialize the given component
@@ -117,28 +115,26 @@ namespace hpx { namespace components { namespace server
                 action_type;
 
             return hpx::async<action_type>(
-                    target_storage, std::move(data), to_migrate, addr)
-                .then(util::bind_back(
-                    &migrate_to_storage_here_cleanup<Component>,
-                    ptr, to_migrate));
+                target_storage, HPX_MOVE(data), to_migrate, addr)
+                .then(
+                    hpx::bind_back(&migrate_to_storage_here_cleanup<Component>,
+                        ptr, to_migrate));
 #else
             HPX_ASSERT(false);
             HPX_UNUSED(ptr);
             HPX_UNUSED(to_migrate);
             HPX_UNUSED(target_storage);
-            return hpx::make_ready_future(naming::id_type{});
+            return hpx::make_ready_future(hpx::id_type{});
 #endif
         }
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // This will be executed on the locality where the object lives which is
     // to be migrated
     template <typename Component>
-    future<naming::id_type> migrate_to_storage_here(
-        naming::id_type const& to_migrate,
-        naming::address const& addr,
-        naming::id_type const& target_storage)
+    future<hpx::id_type> migrate_to_storage_here(hpx::id_type const& to_migrate,
+        naming::address const& addr, hpx::id_type const& target_storage)
     {
         if (!traits::component_supports_migration<Component>::call())
         {
@@ -146,7 +142,7 @@ namespace hpx { namespace components { namespace server
                 "hpx::components::server::migrate_to_storage_here",
                 "attempting to migrate an instance of a component which "
                 "does not support migration");
-            return make_ready_future(naming::invalid_id);
+            return make_ready_future(hpx::invalid_id);
         }
 
         // retrieve pointer to object (must be local)
@@ -160,20 +156,19 @@ namespace hpx { namespace components { namespace server
 
     template <typename Component>
     struct migrate_to_storage_here_action
-      : ::hpx::actions::action<
-            future<naming::id_type> (*)(naming::id_type const&,
-                naming::address const&, naming::id_type const&)
-          , &migrate_to_storage_here<Component>
-          , migrate_to_storage_here_action<Component> >
-    {};
+      : ::hpx::actions::action<future<hpx::id_type> (*)(hpx::id_type const&,
+                                   naming::address const&, hpx::id_type const&),
+            &migrate_to_storage_here<Component>,
+            migrate_to_storage_here_action<Component>>
+    {
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // This is executed on the locality responsible for managing the address
     // resolution for the given object.
     template <typename Component>
-    future<naming::id_type> trigger_migrate_to_storage_here(
-        naming::id_type const& to_migrate,
-        naming::id_type const& target_storage)
+    future<hpx::id_type> trigger_migrate_to_storage_here(
+        hpx::id_type const& to_migrate, hpx::id_type const& target_storage)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         if (!traits::component_supports_migration<Component>::call())
@@ -182,7 +177,7 @@ namespace hpx { namespace components { namespace server
                 "hpx::components::server::trigger_migrate_to_storage_here",
                 "attempting to migrate an instance of a component which "
                 "does not support migration");
-            return make_ready_future(naming::invalid_id);
+            return make_ready_future(hpx::invalid_id);
         }
 
         if (naming::get_locality_id_from_id(to_migrate) != get_locality_id())
@@ -191,41 +186,36 @@ namespace hpx { namespace components { namespace server
                 "hpx::components::server::trigger_migrate_to_storage_here",
                 "this function has to be executed on the locality responsible "
                 "for managing the address of the given object");
-            return make_ready_future(naming::invalid_id);
+            return make_ready_future(hpx::invalid_id);
         }
 
         auto r = agas::begin_migration(to_migrate).get();
 
         // perform actual object migration
-        typedef server::migrate_to_storage_here_action<Component>
-            action_type;
+        typedef server::migrate_to_storage_here_action<Component> action_type;
 
-        future<id_type> f = async<action_type>(r.first, to_migrate, r.second,
-            target_storage);
+        future<id_type> f =
+            async<action_type>(r.first, to_migrate, r.second, target_storage);
 
         return f.then(
-                [to_migrate](future<naming::id_type> && f) -> naming::id_type
-                {
-                    agas::end_migration(to_migrate);
-                    return f.get();
-                });
+            [to_migrate](future<hpx::id_type>&& f) -> hpx::id_type {
+                agas::end_migration(to_migrate);
+                return f.get();
+            });
 #else
         HPX_ASSERT(false);
         HPX_UNUSED(to_migrate);
         HPX_UNUSED(target_storage);
-        return hpx::make_ready_future(naming::id_type{});
+        return hpx::make_ready_future(hpx::id_type{});
 #endif
     }
 
     template <typename Component>
     struct trigger_migrate_to_storage_here_action
-      : ::hpx::actions::action<
-            future<naming::id_type> (*)(naming::id_type const&,
-                naming::id_type const&)
-          , &trigger_migrate_to_storage_here<Component>
-          , trigger_migrate_to_storage_here_action<Component> >
-    {};
-}}}
-
-
-
+      : ::hpx::actions::action<future<hpx::id_type> (*)(
+                                   hpx::id_type const&, hpx::id_type const&),
+            &trigger_migrate_to_storage_here<Component>,
+            trigger_migrate_to_storage_here_action<Component>>
+    {
+    };
+}}}    // namespace hpx::components::server

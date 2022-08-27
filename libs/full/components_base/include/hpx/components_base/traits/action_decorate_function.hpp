@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,18 +23,18 @@ namespace hpx { namespace traits {
         template <typename Component, typename F>
         F&& decorate_function(wrap_int, naming::address_type, F&& f) noexcept
         {
-            return std::forward<F>(f);
+            return HPX_FORWARD(F, f);
         }
 
         // forward the call if the component implements the function
         template <typename Component, typename F>
         auto decorate_function(int, naming::address_type lva, F&& f)
-            -> decltype(Component::decorate_action(lva, std::forward<F>(f)))
+            -> decltype(Component::decorate_action(lva, HPX_FORWARD(F, f)))
         {
-            return Component::decorate_action(lva, std::forward<F>(f));
+            return Component::decorate_action(lva, HPX_FORWARD(F, f));
         }
 
-        HPX_HAS_XXX_TRAIT_DEF(decorates_action);
+        HPX_HAS_XXX_TRAIT_DEF(decorates_action)
     }    // namespace detail
 
     template <typename Action, typename Enable = void>
@@ -43,10 +43,14 @@ namespace hpx { namespace traits {
     {
     };
 
+    template <typename Action>
+    inline constexpr bool has_decorates_action_v =
+        has_decorates_action<Action>::value;
+
     template <typename Action, typename Enable = void>
     struct action_decorate_function
     {
-        static constexpr bool value = has_decorates_action<Action>::value;
+        static constexpr bool value = has_decorates_action_v<Action>;
 
         template <typename F>
         static threads::thread_function_type call(
@@ -54,14 +58,18 @@ namespace hpx { namespace traits {
         {
             using component_type = typename Action::component_type;
             return detail::decorate_function<component_type>(
-                0, lva, std::forward<F>(f));
+                0, lva, HPX_FORWARD(F, f));
         }
     };
 
-    template <typename Action, typename Enable = void>
-    struct component_decorates_action : detail::has_decorates_action<Action>
+    template <typename Component, typename Enable = void>
+    struct component_decorates_action : detail::has_decorates_action<Component>
     {
     };
+
+    template <typename Component>
+    inline constexpr bool component_decorates_action_v =
+        component_decorates_action<Component>::value;
 
     template <typename Component, typename Enable = void>
     struct component_decorate_function
@@ -71,7 +79,7 @@ namespace hpx { namespace traits {
             naming::address_type lva, F&& f)
         {
             return detail::decorate_function<Component>(
-                0, lva, std::forward<F>(f));
+                0, lva, HPX_FORWARD(F, f));
         }
     };
 }}    // namespace hpx::traits

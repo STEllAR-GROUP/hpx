@@ -16,6 +16,7 @@
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -36,7 +37,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
             local::no_mutex no_mtx;
             std::unique_lock<local::no_mutex> lock(no_mtx);
-            abort_all<local::no_mutex>(std::move(lock));
+            abort_all<local::no_mutex>(HPX_MOVE(lock));
         }
     }
 
@@ -131,8 +132,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
                     return;
                 }
 
-                util::ignore_while_checking<std::unique_lock<mutex_type>> il(
-                    &lock);
+                util::ignore_while_checking il(&lock);
+                HPX_UNUSED(il);
+
                 ctx.resume();
 
             } while (!queue.empty());
@@ -146,7 +148,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     {
         HPX_ASSERT(lock.owns_lock());
 
-        abort_all<mutex_type>(std::move(lock));
+        abort_all<mutex_type>(HPX_MOVE(lock));
     }
 
     threads::thread_restart_state condition_variable::wait(
@@ -248,12 +250,12 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void intrusive_ptr_add_ref(condition_variable_data* p)
+    void intrusive_ptr_add_ref(condition_variable_data* p) noexcept
     {
         ++p->count_;
     }
 
-    void intrusive_ptr_release(condition_variable_data* p)
+    void intrusive_ptr_release(condition_variable_data* p) noexcept
     {
         if (0 == --p->count_)
         {

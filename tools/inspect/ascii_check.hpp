@@ -11,29 +11,31 @@
 
 #include "inspector.hpp"
 
-namespace boost
-{
-  namespace inspect
-  {
+namespace boost { namespace inspect {
     class ascii_check : public inspector
     {
-      long m_files_with_errors;
+        long m_files_with_errors;
+
     public:
+        ascii_check();
+        virtual const char* name() const
+        {
+            return "*ASCII*";
+        }
+        virtual const char* desc() const
+        {
+            return "non-ASCII chars in file";
+        }
 
-      ascii_check();
-      virtual const char * name() const { return "*ASCII*"; }
-      virtual const char * desc() const { return "non-ASCII chars in file"; }
+        virtual void inspect(const std::string& library_name,
+            const path& full_path, const std::string& contents);
 
-      virtual void inspect(
-        const std::string & library_name,
-        const path & full_path,
-        const std::string & contents );
+        virtual void print_summary(std::ostream& out)
+        {
+            out << "  " << m_files_with_errors << " files with non-ASCII chars"
+                << line_break();
+        }
 
-      virtual void print_summary(std::ostream& out)
-        { out << "  " << m_files_with_errors << " files with non-ASCII chars" << line_break(); }
-
-      virtual ~ascii_check() {}
+        virtual ~ascii_check() {}
     };
-  }
-}
-
+}}    // namespace boost::inspect

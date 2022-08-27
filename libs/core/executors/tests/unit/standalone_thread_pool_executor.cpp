@@ -86,11 +86,11 @@ void test_bulk_sync(Executor& exec)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     hpx::parallel::execution::bulk_sync_execute(
-        exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42);
+        exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42);
     hpx::parallel::execution::bulk_sync_execute(exec, &bulk_test, v, tid, 42);
 }
 
@@ -102,11 +102,11 @@ void test_bulk_async(Executor& exec)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-                      exec, hpx::util::bind(&bulk_test, _1, tid, _2), v, 42))
+                      exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42))
         .get();
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
                       exec, &bulk_test, v, tid, 42))
@@ -133,14 +133,14 @@ void test_bulk_then(Executor& exec)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    using hpx::util::placeholders::_3;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
+    using hpx::placeholders::_3;
 
     hpx::shared_future<void> f = hpx::make_ready_future();
 
     hpx::parallel::execution::bulk_then_execute(
-        exec, hpx::util::bind(&bulk_test_f, _1, _2, tid, _3), v, f, 42)
+        exec, hpx::bind(&bulk_test_f, _1, _2, tid, _3), v, f, 42)
         .get();
     hpx::parallel::execution::bulk_then_execute(
         exec, &bulk_test_f, v, f, tid, 42)
@@ -166,7 +166,8 @@ int main()
             hpx::threads::policies::local_priority_queue_scheduler<>;
 
         // Choose all the parameters for the thread pool and scheduler.
-        std::size_t const num_threads = 4;
+        std::size_t const num_threads = (std::min)(
+            std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
         std::size_t const max_cores = num_threads;
         hpx::threads::policies::detail::affinity_data ad{};
         ad.init(num_threads, max_cores, 0, 1, 0, "core", "balanced", true);
@@ -178,8 +179,8 @@ int main()
         hpx::threads::detail::network_background_callback_type
             network_callback{};
         hpx::threads::thread_pool_init_parameters thread_pool_init("my_pool", 0,
-            hpx::threads::policies::scheduler_mode::default_mode, num_threads,
-            0, notifier, ad, network_callback, 0,
+            hpx::threads::policies::scheduler_mode::default_, num_threads, 0,
+            notifier, ad, network_callback, 0,
             (std::numeric_limits<std::int64_t>::max)(),
             (std::numeric_limits<std::int64_t>::max)());
 

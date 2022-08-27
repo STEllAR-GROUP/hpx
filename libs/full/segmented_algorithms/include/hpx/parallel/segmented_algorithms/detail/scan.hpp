@@ -46,7 +46,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         T sequential_segmented_scan_T(
             InIter first, InIter last, Op&& op, Conv&& conv)
         {
-            T ret = hpx::util::invoke(conv, *first);
+            T ret = HPX_INVOKE(conv, *first);
             if (first != last)
             {
                 for (++first; first != last; ++first)
@@ -75,8 +75,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static T sequential(
                 ExPolicy&&, InIter first, InIter last, Op&& op, Conv&& conv)
             {
-                return sequential_segmented_scan_T<T>(first, last,
-                    std::forward<Op>(op), std::forward<Conv>(conv));
+                return sequential_segmented_scan_T<T>(
+                    first, last, HPX_FORWARD(Op, op), HPX_FORWARD(Conv, conv));
             }
 
             template <typename ExPolicy, typename FwdIter, typename Op,
@@ -87,23 +87,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 using execution_policy_type = std::decay_t<ExPolicy>;
                 return util::partitioner<ExPolicy, T>::call(
-                    std::forward<ExPolicy>(policy), first,
+                    HPX_FORWARD(ExPolicy, policy), first,
                     std::distance(first, last),
-                    [op, conv](FwdIter part_begin, std::size_t part_size) -> T {
+                    [op, conv](FwdIter part_begin,
+                        std::size_t part_size) mutable -> T {
                         T ret = hpx::util::invoke(conv, *part_begin);
                         if (part_size > 1)
                         {
                             // MSVC complains if 'op' is captured by reference
                             util::loop_n<execution_policy_type>(part_begin + 1,
                                 part_size - 1,
-                                [&ret, op, conv](FwdIter const& curr) {
+                                [&ret, op, conv](
+                                    FwdIter const& curr) mutable -> void {
                                     ret = hpx::util::invoke(op, ret,
                                         hpx::util::invoke(conv, *curr));
                                 });
                         }
                         return ret;
                     },
-                    hpx::unwrapping([op](std::vector<T>&& results) -> T {
+                    hpx::unwrapping([op](auto&& results) mutable -> T {
                         T ret = *results.begin();
                         if (results.size() > 1)
                         {
@@ -112,7 +114,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 results.begin() + 1, results.size() - 1,
                                 [&ret, op](
                                     typename std::vector<T>::iterator const&
-                                        curr) {
+                                        curr) mutable {
                                     ret = hpx::util::invoke(op, ret, *curr);
                                 });
                         }
@@ -138,9 +140,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 InIter first, InIter last, OutIter dest, T&& init, Op&& op,
                 Conv&& conv)
             {
-                Algo().sequential(std::forward<ExPolicy>(policy), first, last,
-                    dest, std::forward<T>(init), std::forward<Op>(op),
-                    std::forward<Conv>(conv));
+                Algo().sequential(HPX_FORWARD(ExPolicy, policy), first, last,
+                    dest, HPX_FORWARD(T, init), HPX_FORWARD(Op, op),
+                    HPX_FORWARD(Conv, conv));
 
                 return hpx::util::unused;
             }
@@ -158,9 +160,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return util::detail::algorithm_result<ExPolicy>::get();
 
                 return hpx::util::void_guard<result_type>(),
-                       Algo().parallel(std::forward<ExPolicy>(policy), first,
-                           last, dest, std::forward<T>(init),
-                           std::forward<Op>(op), std::forward<Conv>(conv));
+                       Algo().parallel(HPX_FORWARD(ExPolicy, policy), first,
+                           last, dest, HPX_FORWARD(T, init),
+                           HPX_FORWARD(Op, op), HPX_FORWARD(Conv, conv));
             }
         };
 
@@ -312,7 +314,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
 
             if (first == last)
-                return result::get(std::move(dest));
+                return result::get(HPX_MOVE(dest));
 
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits_in;
             typedef typename traits_in::segment_iterator segment_iterator_in;
@@ -406,7 +408,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 dispatch(traits_out::get_id(out_iters[i]),
                     segmented_scan_void<Algo>(), policy, std::true_type(),
                     get<0>(in_iters[i]), get<1>(in_iters[i]), out,
-                    std::forward<Conv>(conv), last_value, std::forward<Op>(op));
+                    HPX_FORWARD(Conv, conv), last_value, HPX_FORWARD(Op, op));
 
                 // 3. Step: compute new init values for the next segment
                 last_value = op(results[i], last_value);
@@ -415,7 +417,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             OutIter final_dest = dest;
             std::advance(final_dest, std::distance(first, last));
 
-            return result::get(std::move(final_dest));
+            return result::get(HPX_MOVE(final_dest));
         }
 
         // sequential non segmented OutIter implementation
@@ -429,7 +431,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
 
             if (first == last)
-                return result::get(std::move(dest));
+                return result::get(HPX_MOVE(dest));
 
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -496,7 +498,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 dest = f1(res.begin(), res.end(), dest, last_value, op);
                 last_value = f2(res, last_value);
             }
-            return result::get(std::move(dest));
+            return result::get(HPX_MOVE(dest));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -512,7 +514,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
 
             if (first == last)
-                return result::get(std::move(dest));
+                return result::get(HPX_MOVE(dest));
 
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits_in;
             typedef typename traits_in::segment_iterator segment_iterator_in;
@@ -655,8 +657,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::vector<hpx::future<void>>&&) mutable -> OutIter {
                     return final_dest;
                 },
-                std::move(results), std::move(workitems),
-                std::move(finalitems)));
+                HPX_MOVE(results), HPX_MOVE(workitems), HPX_MOVE(finalitems)));
         }
 
         // parallel non-segmented OutIter implementation
@@ -670,7 +671,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             typedef util::detail::algorithm_result<ExPolicy, OutIter> result;
 
             if (first == last)
-                return result::get(std::move(dest));
+                return result::get(HPX_MOVE(dest));
 
             typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
             typedef typename traits::segment_iterator segment_iterator;
@@ -785,8 +786,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::vector<hpx::future<void>>&&) mutable -> OutIter {
                     return final_dest;
                 },
-                std::move(results), std::move(workitems),
-                std::move(finalitems)));
+                HPX_MOVE(results), HPX_MOVE(workitems), HPX_MOVE(finalitems)));
         }
         /// \endcond
     }    // namespace detail

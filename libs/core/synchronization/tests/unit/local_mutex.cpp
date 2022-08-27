@@ -165,7 +165,7 @@ struct test_lock_times_out_if_other_thread_has_lock
             {
                 std::unique_lock<hpx::lcos::local::mutex> lk(done_mutex);
                 HPX_TEST(done_cond.wait_for(lk, std::chrono::seconds(2),
-                    hpx::util::bind(&this_type::is_done, this)));
+                    hpx::bind(&this_type::is_done, this)));
                 HPX_TEST(!locked);
             }
 

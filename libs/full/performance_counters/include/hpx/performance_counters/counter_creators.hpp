@@ -101,13 +101,12 @@ namespace hpx { namespace performance_counters {
     ///   /<objectname>(locality#<locality_id>/total)/<instancename>
     ///
     HPX_EXPORT naming::gid_type locality_raw_counter_creator(
-        counter_info const&,
-        hpx::util::function_nonser<std::int64_t(bool)> const&, error_code&);
+        counter_info const&, hpx::function<std::int64_t(bool)> const&,
+        error_code&);
 
     HPX_EXPORT naming::gid_type locality_raw_values_counter_creator(
         counter_info const&,
-        hpx::util::function_nonser<std::vector<std::int64_t>(bool)> const&,
-        error_code&);
+        hpx::function<std::vector<std::int64_t>(bool)> const&, error_code&);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Creation function for raw counters. The passed function is encapsulating
@@ -152,8 +151,7 @@ namespace hpx { namespace performance_counters {
     // Creation function for per-action parcel data counters
     HPX_EXPORT naming::gid_type per_action_data_counter_creator(
         counter_info const& info,
-        hpx::util::function_nonser<std::int64_t(
-            std::string const&, bool)> const& f,
+        hpx::function<std::int64_t(std::string const&, bool)> const& f,
         error_code& ec);
 
     // Discoverer function for per-action parcel data counters

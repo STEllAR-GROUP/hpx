@@ -20,11 +20,11 @@ namespace hpx { namespace agas { namespace detail {
             components::component_agas_component_namespace, this->ptr());
     }
 
-    naming::id_type bootstrap_component_namespace::gid() const
+    hpx::id_type bootstrap_component_namespace::gid() const
     {
-        return naming::id_type(
+        return hpx::id_type(
             naming::gid_type(agas::component_ns_msb, agas::component_ns_lsb),
-            naming::id_type::unmanaged);
+            hpx::id_type::management_type::unmanaged);
     }
 
     components::component_type bootstrap_component_namespace::bind_prefix(
@@ -62,7 +62,7 @@ namespace hpx { namespace agas { namespace detail {
         return server_.get_component_type_name(type);
     }
 
-    lcos::future<std::uint32_t>
+    hpx::future<std::uint32_t>
     bootstrap_component_namespace::get_num_localities(
         components::component_type type)
     {

@@ -1,4 +1,4 @@
-// Copyright (C) 2012 Hartmut Kaiser
+// Copyright (C) 2012-2022 Hartmut Kaiser
 // Copyright (C) 2001-2003 William E. Kempf
 // Copyright (C) 2008 Anthony Williams
 //
@@ -14,6 +14,7 @@
 
 #include <chrono>
 #include <functional>
+#include <memory>
 
 using hpx::program_options::options_description;
 using hpx::program_options::variables_map;
@@ -122,9 +123,9 @@ void test_id_comparison()
 void interruption_point_thread(hpx::lcos::local::spinlock* m, bool* failed)
 {
     std::unique_lock<hpx::lcos::local::spinlock> lk(*m);
-    hpx::util::ignore_while_checking<
-        std::unique_lock<hpx::lcos::local::spinlock>>
-        il(&lk);
+    hpx::util::ignore_while_checking il(&lk);
+    HPX_UNUSED(il);
+
     hpx::this_thread::interruption_point();
     *failed = true;
 }
@@ -149,10 +150,10 @@ void test_thread_interrupts_at_interruption_point()
 
 ///////////////////////////////////////////////////////////////////////////////
 void disabled_interruption_point_thread(
-    hpx::lcos::local::spinlock* m, hpx::lcos::local::barrier* b, bool* failed)
+    hpx::lcos::local::spinlock* m, hpx::barrier<>* b, bool* failed)
 {
     hpx::this_thread::disable_interruption dc;
-    b->wait();
+    b->arrive_and_wait();
     try
     {
         std::lock_guard<hpx::lcos::local::spinlock> lk(*m);
@@ -161,27 +162,29 @@ void disabled_interruption_point_thread(
     }
     catch (...)
     {
-        b->wait();
+        b->arrive_and_wait();
         throw;
     }
-    b->wait();
+    b->arrive_and_wait();
 }
 
 void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
 {
     hpx::lcos::local::spinlock m;
-    hpx::lcos::local::barrier b(2);
+    hpx::barrier<> b(2);
     bool caught = false;
     bool failed = true;
     hpx::thread thrd(&disabled_interruption_point_thread, &m, &b, &failed);
-    b.wait();    // Make sure the test thread has been started and marked itself
-                 // to disable interrupts.
+
+    // Make sure the test thread has been started and marked itself
+    // to disable interrupts.
+    b.arrive_and_wait();
     try
     {
         std::unique_lock<hpx::lcos::local::spinlock> lk(m);
-        hpx::util::ignore_while_checking<
-            std::unique_lock<hpx::lcos::local::spinlock>>
-            il(&lk);
+        hpx::util::ignore_while_checking il(&lk);
+        HPX_UNUSED(il);
+
         thrd.interrupt();
     }
     catch (hpx::exception& e)
@@ -190,7 +193,7 @@ void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
         caught = true;
     }
 
-    b.wait();
+    b.arrive_and_wait();
 
     thrd.join();
     HPX_TEST(!failed);
@@ -295,23 +298,24 @@ void test_creation_through_reference_wrapper()
 // }
 
 void simple_sync_thread(
-    hpx::lcos::local::barrier& b1, hpx::lcos::local::barrier& b2)
+    std::shared_ptr<hpx::barrier<>> b1, std::shared_ptr<hpx::barrier<>> b2)
 {
-    b1.wait();    // wait for both threads to be started
+    b1->arrive_and_wait();    // wait for both threads to be started
     // ... do nothing
-    b2.wait();    // wait for the tests to be completed
+    b2->arrive_and_wait();    // wait for the tests to be completed
 }
 
 void test_swap()
 {
     set_description("test_swap");
 
-    hpx::lcos::local::barrier b1(3);
-    hpx::lcos::local::barrier b2(3);
-    hpx::thread t1(&simple_sync_thread, std::ref(b1), std::ref(b2));
-    hpx::thread t2(&simple_sync_thread, std::ref(b1), std::ref(b2));
+    std::shared_ptr<hpx::barrier<>> b1 = std::make_shared<hpx::barrier<>>(3);
+    std::shared_ptr<hpx::barrier<>> b2 = std::make_shared<hpx::barrier<>>(3);
 
-    b1.wait();    // wait for both threads to be started
+    hpx::thread t1(&simple_sync_thread, b1, b2);
+    hpx::thread t2(&simple_sync_thread, b1, b2);
+
+    b1->arrive_and_wait();    // wait for both threads to be started
 
     hpx::thread::id id1 = t1.get_id();
     hpx::thread::id id2 = t2.get_id();
@@ -324,7 +328,7 @@ void test_swap()
     HPX_TEST_EQ(t1.get_id(), id1);
     HPX_TEST_EQ(t2.get_id(), id2);
 
-    b2.wait();    // wait for the tests to be completed
+    b2->arrive_and_wait();    // wait for the tests to be completed
 
     t1.join();
     t2.join();

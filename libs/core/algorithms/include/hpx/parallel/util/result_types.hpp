@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2021 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
 //  Copyright (c) 2021 Chuanqiu He
 //
@@ -7,6 +7,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/container_algorithms/copy.hpp
+
+// make sure inspect doesn't get upset about the unproteced min()/max() below
+// hpxinspect:nominmax
 
 #pragma once
 
@@ -27,21 +30,20 @@ namespace hpx { namespace parallel { namespace util {
         HPX_NO_UNIQUE_ADDRESS I2 in2;
 
         template <typename II1, typename II2,
-            typename Enable = typename std::enable_if<
-                std::is_convertible<I1 const&, II1>::value &&
-                std::is_convertible<I2 const&, II2>::value>::type>
+            typename Enable =
+                std::enable_if_t<std::is_convertible_v<I1 const&, II1> &&
+                    std::is_convertible_v<I2 const&, II2>>>
         constexpr operator in_in_result<II1, II2>() const&
         {
             return {in1, in2};
         }
 
         template <typename II1, typename II2,
-            typename Enable =
-                typename std::enable_if<std::is_convertible<I1, II1>::value &&
-                    std::is_convertible<I2, II2>::value>::type>
+            typename Enable = std::enable_if_t<std::is_convertible_v<I1, II1> &&
+                std::is_convertible_v<I2, II2>>>
         constexpr operator in_in_result<II1, II2>() &&
         {
-            return {std::move(in1), std::move(in2)};
+            return {HPX_MOVE(in1), HPX_MOVE(in2)};
         }
 
         template <typename Archive>
@@ -63,7 +65,7 @@ namespace hpx { namespace parallel { namespace util {
     hpx::future<I2> get_in2_element(hpx::future<util::in_in_result<I1, I2>>&& f)
     {
         return hpx::make_future<I2>(
-            std::move(f), [](util::in_in_result<I1, I2>&& p) { return p.in2; });
+            HPX_MOVE(f), [](util::in_in_result<I1, I2>&& p) { return p.in2; });
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -74,21 +76,20 @@ namespace hpx { namespace parallel { namespace util {
         HPX_NO_UNIQUE_ADDRESS O out;
 
         template <typename I2, typename O2,
-            typename Enable = typename std::enable_if<
-                std::is_convertible<I const&, I2>::value &&
-                std::is_convertible<O const&, O2>::value>::type>
+            typename Enable =
+                std::enable_if_t<std::is_convertible_v<I const&, I2> &&
+                    std::is_convertible_v<O const&, O2>>>
         constexpr operator in_out_result<I2, O2>() const&
         {
             return {in, out};
         }
 
         template <typename I2, typename O2,
-            typename Enable =
-                typename std::enable_if<std::is_convertible<I, I2>::value &&
-                    std::is_convertible<O, O2>::value>::type>
+            typename Enable = std::enable_if_t<std::is_convertible_v<I, I2> &&
+                std::is_convertible_v<O, O2>>>
         constexpr operator in_out_result<I2, O2>() &&
         {
-            return {std::move(in), std::move(out)};
+            return {HPX_MOVE(in), HPX_MOVE(out)};
         }
 
         template <typename Archive>
@@ -118,7 +119,7 @@ namespace hpx { namespace parallel { namespace util {
         hpx::future<util::in_out_result<I, O>>&& f)
     {
         return hpx::make_future<std::pair<I, O>>(
-            std::move(f), [](util::in_out_result<I, O>&& p) {
+            HPX_MOVE(f), [](util::in_out_result<I, O>&& p) {
                 return std::pair<I, O>{p.in, p.out};
             });
     }
@@ -128,7 +129,7 @@ namespace hpx { namespace parallel { namespace util {
         hpx::future<util::in_out_result<I, O>>&& f)
     {
         return hpx::make_future<O>(
-            std::move(f), [](util::in_out_result<I, O>&& p) { return p.out; });
+            HPX_MOVE(f), [](util::in_out_result<I, O>&& p) { return p.out; });
     }
 
     // converst a in_out_result into a iterator_range
@@ -143,10 +144,41 @@ namespace hpx { namespace parallel { namespace util {
         hpx::future<in_out_result<I, O>>&& ior)
     {
         return hpx::make_future<hpx::util::iterator_range<I, O>>(
-            std::move(ior), [](in_out_result<I, O>&& ior) {
+            HPX_MOVE(ior), [](in_out_result<I, O>&& ior) {
                 return hpx::util::iterator_range<I, O>(ior.in, ior.out);
             });
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct min_max_result
+    {
+        HPX_NO_UNIQUE_ADDRESS T min;
+        HPX_NO_UNIQUE_ADDRESS T max;
+
+        template <typename T2,
+            typename Enable =
+                std::enable_if_t<std::is_convertible_v<T const&, T>>>
+        constexpr operator min_max_result<T2>() const&
+        {
+            return {min, max};
+        }
+
+        template <typename T2,
+            typename Enable = std::enable_if_t<std::is_convertible_v<T, T2>>>
+        constexpr operator min_max_result<T2>() &&
+        {
+            return {HPX_MOVE(min), HPX_MOVE(max)};
+        }
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            // clang-format off
+            ar & min & max;
+            // clang-format on
+        }
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename I1, typename I2, typename O>
@@ -172,7 +204,7 @@ namespace hpx { namespace parallel { namespace util {
                 std::is_convertible_v<I2, II2> && std::is_convertible_v<O, O1>>>
         constexpr operator in_in_out_result<II1, II2, O1>() &&
         {
-            return {std::move(in1), std::move(in2), std::move(out)};
+            return {HPX_MOVE(in1), HPX_MOVE(in2), HPX_MOVE(out)};
         }
 
         template <typename Archive>
@@ -195,8 +227,8 @@ namespace hpx { namespace parallel { namespace util {
     hpx::future<O> get_third_element(
         hpx::future<util::in_in_out_result<I1, I2, O>>&& f)
     {
-        return lcos::make_future<O>(std::move(f),
-            [](in_in_out_result<I1, I2, O>&& p) { return p.out; });
+        return hpx::make_future<O>(
+            HPX_MOVE(f), [](in_in_out_result<I1, I2, O>&& p) { return p.out; });
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -224,7 +256,7 @@ namespace hpx { namespace parallel { namespace util {
                     std::is_convertible_v<O2, OO2>>>
         constexpr operator in_out_out_result<II, OO1, OO2>() &&
         {
-            return {std::move(in), std::move(out1), std::move(out2)};
+            return {HPX_MOVE(in), HPX_MOVE(out1), HPX_MOVE(out2)};
         }
 
         template <typename Archive>
@@ -257,9 +289,9 @@ namespace hpx { namespace parallel { namespace util {
 
         using result_type = in_out_out_result<Ts...>;
 
-        return lcos::make_future<result_type>(
-            std::move(f), [](hpx::tuple<Ts...>&& t) -> result_type {
-                return make_in_out_out_result(std::move(t));
+        return hpx::make_future<result_type>(
+            HPX_MOVE(f), [](hpx::tuple<Ts...>&& t) -> result_type {
+                return make_in_out_out_result(HPX_MOVE(t));
             });
     }
 
@@ -271,21 +303,20 @@ namespace hpx { namespace parallel { namespace util {
         HPX_NO_UNIQUE_ADDRESS F fun;
 
         template <typename I2, typename F2,
-            typename Enable = typename std::enable_if<
-                std::is_convertible<I const&, I2>::value &&
-                std::is_convertible<F const&, F2>::value>::type>
+            typename Enable =
+                std::enable_if_t<std::is_convertible_v<I const&, I2> &&
+                    std::is_convertible_v<F const&, F2>>>
         constexpr operator in_fun_result<I2, F2>() const&
         {
             return {in, fun};
         }
 
         template <typename I2, typename F2,
-            typename Enable =
-                typename std::enable_if<std::is_convertible<I, I2>::value &&
-                    std::is_convertible<F, F2>::value>::type>
+            typename Enable = std::enable_if_t<std::is_convertible_v<I, I2> &&
+                std::is_convertible_v<F, F2>>>
         constexpr operator in_fun_result<I2, F2>() &&
         {
-            return {std::move(in), std::move(fun)};
+            return {HPX_MOVE(in), HPX_MOVE(fun)};
         }
 
         template <typename Archive>
@@ -309,8 +340,8 @@ namespace hpx { namespace parallel { namespace util {
     hpx::future<hpx::util::iterator_range<Iterator, Sentinel>> make_subrange(
         hpx::future<Iterator>&& iterator, Sentinel sentinel)
     {
-        return lcos::make_future<hpx::util::iterator_range<Iterator, Sentinel>>(
-            std::move(iterator), [sentinel](Iterator&& it) {
+        return hpx::make_future<hpx::util::iterator_range<Iterator, Sentinel>>(
+            HPX_MOVE(iterator), [sentinel](Iterator&& it) {
                 return hpx::util::iterator_range<Iterator, Sentinel>(
                     it, sentinel);
             });
@@ -349,9 +380,39 @@ namespace hpx { namespace parallel { namespace util {
                 typename hpx::tuple_element<0, iterator_tuple_type>::type,
                 typename hpx::tuple_element<1, iterator_tuple_type>::type>;
 
-            return lcos::make_future<result_type>(
-                std::move(zipiter), [](ZipIter zipiter) {
-                    return get_in_out_result(std::move(zipiter));
+            return hpx::make_future<result_type>(
+                HPX_MOVE(zipiter), [](ZipIter zipiter) {
+                    return get_in_out_result(HPX_MOVE(zipiter));
+                });
+        }
+
+        template <typename ZipIter>
+        min_max_result<typename hpx::tuple_element<0,
+            typename ZipIter::iterator_tuple_type>::type>
+        get_min_max_result(ZipIter&& zipiter)
+        {
+            using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
+
+            using result_type = min_max_result<
+                typename hpx::tuple_element<0, iterator_tuple_type>::type>;
+
+            iterator_tuple_type t = zipiter.get_iterator_tuple();
+            return result_type{hpx::get<0>(t), hpx::get<1>(t)};
+        }
+
+        template <typename ZipIter>
+        hpx::future<min_max_result<typename hpx::tuple_element<0,
+            typename ZipIter::iterator_tuple_type>::type>>
+        get_min_max_result(hpx::future<ZipIter>&& zipiter)
+        {
+            using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
+
+            using result_type = min_max_result<
+                typename hpx::tuple_element<0, iterator_tuple_type>::type>;
+
+            return hpx::make_future<result_type>(
+                HPX_MOVE(zipiter), [](ZipIter zipiter) {
+                    return get_min_max_result(HPX_MOVE(zipiter));
                 });
         }
 
@@ -392,9 +453,9 @@ namespace hpx { namespace parallel { namespace util {
                 typename hpx::tuple_element<1, iterator_tuple_type>::type,
                 typename hpx::tuple_element<2, iterator_tuple_type>::type>;
 
-            return lcos::make_future<result_type>(
-                std::move(zipiter), [](ZipIter zipiter) {
-                    return get_in_in_out_result(std::move(zipiter));
+            return hpx::make_future<result_type>(
+                HPX_MOVE(zipiter), [](ZipIter zipiter) {
+                    return get_in_in_out_result(HPX_MOVE(zipiter));
                 });
         }
     }    // namespace detail
@@ -406,4 +467,5 @@ namespace hpx { namespace ranges {
     using hpx::parallel::util::in_in_result;
     using hpx::parallel::util::in_out_out_result;
     using hpx::parallel::util::in_out_result;
+    using hpx::parallel::util::min_max_result;
 }}    // namespace hpx::ranges

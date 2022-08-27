@@ -29,15 +29,15 @@ struct decrement_server
         return i - 1;
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(decrement_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(decrement_server, call)
 };
 
 typedef hpx::components::managed_component<decrement_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, decrement_server);
+HPX_REGISTER_COMPONENT(server_type, decrement_server)
 
 typedef decrement_server::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION_DECLARATION(call_action)
+HPX_REGISTER_ACTION(call_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<int> callback_called(0);

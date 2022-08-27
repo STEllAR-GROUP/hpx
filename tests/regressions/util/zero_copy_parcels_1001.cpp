@@ -23,8 +23,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::serialization::serialize_buffer<int> test(hpx::serialization
-    ::serialize_buffer<int> const& b)
+hpx::serialization::serialize_buffer<int> test(
+    hpx::serialization ::serialize_buffer<int> const& b)
 {
     return b;
 }
@@ -32,7 +32,10 @@ HPX_PLAIN_ACTION(test, test_action)
 
 struct inc
 {
-    inc() : cnt_(0) {}
+    inc()
+      : cnt_(0)
+    {
+    }
 
     int operator()()
     {
@@ -45,7 +48,7 @@ struct inc
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    std::vector<hpx::naming::id_type> localities = hpx::find_remote_localities();
+    std::vector<hpx::id_type> localities = hpx::find_remote_localities();
 
     if (localities.empty())
     {
@@ -64,7 +67,8 @@ int hpx_main()
 
             std::generate(data.begin(), data.end(), inc());
 
-            hpx::serialization::serialize_buffer<int> buffer(data.data(), data.size(),
+            hpx::serialization::serialize_buffer<int> buffer(data.data(),
+                data.size(),
                 hpx::serialization::serialize_buffer<int>::reference);
 
             hpx::serialization::serialize_buffer<int> result =

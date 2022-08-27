@@ -206,8 +206,7 @@ functions, however we believe they are still manageable.
 
 The most important macro invocation is the :c:macro:`HPX_DEFINE_COMPONENT_ACTION` in the header file
 as this defines the action type we need to invoke the member function. For a
-complete example of a simple component action see [hpx_link
-examples/quickstart/component_in_executable.cpp..component_in_executable.cpp]
+complete example of a simple component action see :download:`component_in_executable.cpp <../../examples/quickstart/component_in_executable.cpp>`.
 
 .. _action_invocation:
 

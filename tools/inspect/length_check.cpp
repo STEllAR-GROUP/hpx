@@ -10,147 +10,145 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/filesystem.hpp>
 
-#include "length_check.hpp"
 #include "function_hyper.hpp"
+#include "length_check.hpp"
 
 #include <boost/foreach.hpp>
-#include <boost/tokenizer.hpp>
 #include <boost/regex.hpp>
+#include <boost/tokenizer.hpp>
 
 #include <cstddef>
-#include <iostream>
 #include <functional>
+#include <iostream>
 #include <string>
 
 using namespace std;
 namespace fs = hpx::filesystem;
 
-namespace boost
-{
-    namespace inspect
+namespace boost { namespace inspect {
+    length_check::length_check(std::size_t setting)
+      : m_files_with_errors(0)
+      , limit(setting)
     {
-        length_check::length_check(std::size_t setting)
-            : m_files_with_errors(0), limit(setting)
+        register_signature(".c");
+        register_signature(".cpp");
+        register_signature(".css");
+        register_signature(".cu");
+        register_signature(".cxx");
+        register_signature(".h");
+        register_signature(".hpp");
+        register_signature(".hxx");
+        register_signature(".inc");
+        register_signature(".ipp");
+        register_signature(".txt");
+    }
+
+    struct pattern
+    {
+        char const* const rx_;
+        int pos_;
+    };
+
+    // lines to ignore
+    static pattern const patterns[] = {
+        {"\\s*#\\s*error", 0},      // #error
+        {"\\s*#\\s*include", 0},    // #include
+        {"https?://", -1},          // urls
+        {"///", -1}                 // doc-strings
+    };
+
+    void length_check::inspect(const string& library_name,
+        const path& full_path,     // ex: c:/foo/boost/filesystem/path.hpp
+        const string& contents)    // contents of file to be inspected
+    {
+        if (contents.find("hpxinspect:"
+                          "linelength") != string::npos)
+            return;
+
+        string pathname = full_path.string();
+        if (pathname.find("CMakeLists.txt") != string::npos)
+            return;
+
+        // Temporary, until we are ready to format documentation files in
+        // this limitation.
+        if (library_name.find(".qbk") != string::npos)
+            return;
+
+        string total, linenum;
+        long errors = 0, currline = 0;
+        std::size_t p = 0;
+        vector<string> someline, lineorder;
+
+        char_separator<char> sep("\n", "", boost::keep_empty_tokens);
+        tokenizer<char_separator<char>> tokens(contents, sep);
+        for (const auto& t : tokens)
         {
-            register_signature(".c");
-            register_signature(".cpp");
-            register_signature(".css");
-            register_signature(".cu");
-            register_signature(".cxx");
-            register_signature(".h");
-            register_signature(".hpp");
-            register_signature(".hxx");
-            register_signature(".inc");
-            register_signature(".ipp");
-            register_signature(".txt");
+            std::size_t rend = t.find_first_of("\r"), size = t.size();
+            if (rend == size - 1)
+            {
+                someline.push_back(t.substr(0, t.size() - 1));
+            }
+            else
+            {
+                char_separator<char> sep2("\r", "", boost::keep_empty_tokens);
+                tokenizer<char_separator<char>> tokens2(t, sep2);
+                for (const auto& u : tokens2)
+                {
+                    if (!u.empty() && u.back() == '\r')
+                        someline.push_back(u.substr(0, u.size() - 1));
+                    else
+                        someline.push_back(u);
+                }
+            }
         }
 
-        struct pattern
+        while (p < someline.size())
         {
-            char const* const rx_;
-            int pos_;
-        };
+            currline++;
+            bool check_not = false;
+            boost::regex error_note, http_note;
 
-        // lines to ignore
-        static pattern const patterns[] =
-        {
-            { "\\s*#\\s*error", 0 },        // #error
-            { "\\s*#\\s*include", 0 },      // #include
-            { "https?://", -1 },            // urls
-            { "///", -1 }                   // doc-strings
-        };
-
-        void length_check::inspect(
-            const string & library_name,
-            const path & full_path,   // ex: c:/foo/boost/filesystem/path.hpp
-            const string & contents)     // contents of file to be inspected
-        {
-            if (contents.find("hpxinspect:" "linelength") != string::npos)
-                return;
-
-            string pathname = full_path.string();
-            if (pathname.find("CMakeLists.txt") != string::npos)
-                return;
-
-            // Temporary, until we are ready to format documentation files in
-            // this limitation.
-            if (library_name.find(".qbk") != string::npos)
-                return;
-
-            string total, linenum;
-            long errors = 0, currline = 0;
-            std::size_t p = 0;
-            vector<string> someline, lineorder;
-
-            char_separator<char> sep("\n", "", boost::keep_empty_tokens);
-            tokenizer<char_separator<char>> tokens(contents, sep);
-            for (const auto& t : tokens) {
-                std::size_t rend = t.find_first_of("\r"), size = t.size();
-                if (rend == size - 1)
-                {
-                    someline.push_back(t.substr(0, t.size() - 1));
-                }
-                else
-                {
-                    char_separator<char> sep2("\r", "", boost::keep_empty_tokens);
-                    tokenizer<char_separator<char>> tokens2(t, sep2);
-                    for (const auto& u : tokens2) {
-                        if (!u.empty() && u.back() == '\r')
-                            someline.push_back(u.substr(0, u.size() - 1));
-                        else
-                            someline.push_back(u);
-                    }
-                }
-            }
-
-            while (p < someline.size())
+            for (std::size_t i = 0; i != sizeof(patterns) / sizeof(patterns[0]);
+                 ++i)
             {
-                currline++;
-                bool check_not = false;
-                boost::regex error_note, http_note;
-
-                for (std::size_t i = 0;
-                     i != sizeof(patterns)/sizeof(patterns[0]);
-                     ++i)
+                boost::regex rx(patterns[i].rx_);
+                boost::smatch m;
+                if (boost::regex_search(someline[p], m, rx))
                 {
-                    boost::regex rx(patterns[i].rx_);
-                    boost::smatch m;
-                    if (boost::regex_search(someline[p], m, rx))
-                    {
-                        // skip this line if either no position is specified
-                        // or the pattern was found at the given position
-                        if (patterns[i].pos_ == -1 || m.position() == patterns[i].pos_)
-                            check_not = true;
-                    }
+                    // skip this line if either no position is specified
+                    // or the pattern was found at the given position
+                    if (patterns[i].pos_ == -1 ||
+                        m.position() == patterns[i].pos_)
+                        check_not = true;
                 }
-
-                std::size_t size = someline[p].size();
-                if (size > limit && !check_not)
-                {
-                    errors++;
-                    linenum = to_string(currline);
-                    lineorder.push_back(linenum);
-                }
-                ++p;
             }
 
-            p = 0;
-            while (p < lineorder.size())
+            std::size_t size = someline[p].size();
+            if (size > limit && !check_not)
             {
-                total += linelink(full_path, lineorder[p]);
-                //linelink is located in function_hyper.hpp
-                if (p < lineorder.size() - 1)
-                {
-                    total += ", ";
-                }
-                p++;
+                errors++;
+                linenum = to_string(currline);
+                lineorder.push_back(linenum);
             }
-            if (errors > 0)
-            {
-                string errored = "*Line length limit*: " + total;
-                error(library_name, full_path, errored);
-                ++m_files_with_errors;
-            }
+            ++p;
         }
-    } // namespace inspect
-} // namespace boost
+
+        p = 0;
+        while (p < lineorder.size())
+        {
+            total += linelink(full_path, lineorder[p]);
+            //linelink is located in function_hyper.hpp
+            if (p < lineorder.size() - 1)
+            {
+                total += ", ";
+            }
+            p++;
+        }
+        if (errors > 0)
+        {
+            string errored = "*Line length limit*: " + total;
+            error(library_name, full_path, errored);
+            ++m_files_with_errors;
+        }
+    }
+}}    // namespace boost::inspect

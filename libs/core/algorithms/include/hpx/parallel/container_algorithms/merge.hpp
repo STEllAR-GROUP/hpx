@@ -392,123 +392,12 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/merge.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <type_traits>
 #include <utility>
-
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    ///////////////////////////////////////////////////////////////////////////
-    // TODO: Support forward and bidirectional iterator. (#2826)
-    // For now, only support random access iterator.
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename RandIter3, typename Comp = detail::less,
-        typename Proj1 = util::projection_identity,
-        typename Proj2 = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng1>::value &&
-            hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
-            hpx::traits::is_range<Rng2>::value &&
-            hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
-            hpx::traits::is_iterator<RandIter3>::value &&
-            hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
-                hpx::parallel::traits::projected_range<Proj1, Rng1>,
-                hpx::parallel::traits::projected_range<Proj2, Rng2>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::merge is deprecated, use hpx::ranges::merge instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            hpx::parallel::util::in_in_out_result<
-                typename hpx::traits::range_iterator<Rng1>::type,
-                typename hpx::traits::range_iterator<Rng2>::type,
-                RandIter3>>::type merge(ExPolicy&& policy, Rng1&& rng1,
-            Rng2&& rng2, RandIter3 dest, Comp&& comp = Comp(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
-    {
-        using iterator_type1 = typename hpx::traits::range_iterator<Rng1>::type;
-        using iterator_type2 = typename hpx::traits::range_iterator<Rng2>::type;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        static_assert(
-            hpx::traits::is_random_access_iterator<iterator_type1>::value,
-            "Required at least random access iterator.");
-        static_assert(
-            hpx::traits::is_random_access_iterator<iterator_type2>::value,
-            "Requires at least random access iterator.");
-        static_assert(
-            (hpx::traits::is_random_access_iterator<RandIter3>::value),
-            "Requires at least random access iterator.");
-
-        using result_type =
-            hpx::parallel::util::in_in_out_result<iterator_type1,
-                iterator_type2, RandIter3>;
-
-        return hpx::parallel::v1::detail::merge<result_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
-            hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
-            dest, std::forward<Comp>(comp), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // TODO: Support bidirectional iterator. (#2826)
-    // For now, only support random access iterator.
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename RandIter,
-        typename Comp = detail::less, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-            hpx::traits::is_iterator<RandIter>::value &&
-            hpx::parallel::traits::is_projected<Proj, RandIter>::value &&
-            hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
-                hpx::parallel::traits::projected_range<Proj, Rng>,
-                hpx::parallel::traits::projected_range<Proj, Rng>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::inplace_merge is deprecated, use "
-        "hpx::ranges::inplace_merge instead")
-        typename util::detail::algorithm_result<ExPolicy, RandIter>::type
-        inplace_merge(ExPolicy&& policy, Rng&& rng, RandIter middle,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
-    {
-        using iterator_type = typename hpx::traits::range_iterator<Rng>::type;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        static_assert(
-            hpx::traits::is_random_access_iterator<iterator_type>::value,
-            "Required at least random access iterator.");
-
-        return hpx::parallel::v1::detail::inplace_merge<RandIter>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng), middle,
-            hpx::util::end(rng), std::forward<Comp>(comp),
-            std::forward<Proj>(proj));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
 
 namespace hpx { namespace ranges {
 
@@ -516,8 +405,8 @@ namespace hpx { namespace ranges {
     using merge_result = parallel::util::in_in_out_result<I1, I2, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::merge
-    HPX_INLINE_CONSTEXPR_VARIABLE struct merge_t final
+    // CPO for hpx::ranges::merge
+    inline constexpr struct merge_t final
       : hpx::detail::tag_parallel_algorithm<merge_t>
     {
     private:
@@ -543,7 +432,7 @@ namespace hpx { namespace ranges {
             hpx::ranges::merge_result<
                 typename hpx::traits::range_iterator<Rng1>::type,
                 typename hpx::traits::range_iterator<Rng2>::type, Iter3>>::type
-        tag_fallback_dispatch(merge_t, ExPolicy&& policy, Rng1&& rng1,
+        tag_fallback_invoke(merge_t, ExPolicy&& policy, Rng1&& rng1,
             Rng2&& rng2, Iter3 dest, Comp&& comp = Comp(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -565,10 +454,10 @@ namespace hpx { namespace ranges {
                 iterator_type2, Iter3>;
 
             return hpx::parallel::v1::detail::merge<result_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), dest, std::forward<Comp>(comp),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                hpx::util::end(rng2), dest, HPX_FORWARD(Comp, comp),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -592,7 +481,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             hpx::ranges::merge_result<Iter1, Iter2, Iter3>>::type
-        tag_fallback_dispatch(merge_t, ExPolicy&& policy, Iter1 first1,
+        tag_fallback_invoke(merge_t, ExPolicy&& policy, Iter1 first1,
             Sent1 last1, Iter2 first2, Sent2 last2, Iter3 dest,
             Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
@@ -607,9 +496,9 @@ namespace hpx { namespace ranges {
             using result_type = hpx::ranges::merge_result<Iter1, Iter2, Iter3>;
 
             return hpx::parallel::v1::detail::merge<result_type>().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2, last2,
-                dest, std::forward<Comp>(comp), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+                dest, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -633,7 +522,7 @@ namespace hpx { namespace ranges {
         friend hpx::ranges::merge_result<
             typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, Iter3>
-        tag_fallback_dispatch(merge_t, Rng1&& rng1, Rng2&& rng2, Iter3 dest,
+        tag_fallback_invoke(merge_t, Rng1&& rng1, Rng2&& rng2, Iter3 dest,
             Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -657,8 +546,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::merge<result_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), dest, std::forward<Comp>(comp),
-                std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                hpx::util::end(rng2), dest, HPX_FORWARD(Comp, comp),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -681,7 +570,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend hpx::ranges::merge_result<Iter1, Iter2, Iter3>
-        tag_fallback_dispatch(merge_t, Iter1 first1, Sent1 last1, Iter2 first2,
+        tag_fallback_invoke(merge_t, Iter1 first1, Sent1 last1, Iter2 first2,
             Sent2 last2, Iter3 dest, Comp&& comp = Comp(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -696,14 +585,14 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::merge<result_type>().call(
                 hpx::execution::seq, first1, last1, first2, last2, dest,
-                std::forward<Comp>(comp), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
     } merge{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::inplace_merge
-    HPX_INLINE_CONSTEXPR_VARIABLE struct inplace_merge_t final
+    // CPO for hpx::ranges::inplace_merge
+    inline constexpr struct inplace_merge_t final
       : hpx::detail::tag_parallel_algorithm<inplace_merge_t>
     {
     private:
@@ -725,7 +614,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_dispatch(inplace_merge_t, ExPolicy&& policy, Rng&& rng,
+        tag_fallback_invoke(inplace_merge_t, ExPolicy&& policy, Rng&& rng,
             Iter middle, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             using iterator_type =
@@ -738,9 +627,9 @@ namespace hpx { namespace ranges {
                 "Required at least random access iterator.");
 
             return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng), middle,
-                hpx::util::end(rng), std::forward<Comp>(comp),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng), middle,
+                hpx::util::end(rng), HPX_FORWARD(Comp, comp),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -759,15 +648,15 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_dispatch(inplace_merge_t, ExPolicy&& policy, Iter first,
+        tag_fallback_invoke(inplace_merge_t, ExPolicy&& policy, Iter first,
             Iter middle, Sent last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
                 "Required at least random access iterator.");
 
             return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
-                std::forward<ExPolicy>(policy), first, middle, last,
-                std::forward<Comp>(comp), std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, middle, last,
+                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -786,8 +675,8 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter tag_fallback_dispatch(inplace_merge_t, Rng&& rng,
-            Iter middle, Comp&& comp = Comp(), Proj&& proj = Proj())
+        friend Iter tag_fallback_invoke(inplace_merge_t, Rng&& rng, Iter middle,
+            Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
@@ -800,8 +689,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
                 hpx::execution::seq, hpx::util::begin(rng), middle,
-                hpx::util::end(rng), std::forward<Comp>(comp),
-                std::forward<Proj>(proj));
+                hpx::util::end(rng), HPX_FORWARD(Comp, comp),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -818,7 +707,7 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend Iter tag_fallback_dispatch(inplace_merge_t, Iter first,
+        friend Iter tag_fallback_invoke(inplace_merge_t, Iter first,
             Iter middle, Sent last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
@@ -826,7 +715,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
                 hpx::execution::seq, first, middle, last,
-                std::forward<Comp>(comp), std::forward<Proj>(proj));
+                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
     } inplace_merge{};
 

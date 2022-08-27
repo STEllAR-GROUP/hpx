@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -40,7 +40,8 @@ namespace hpx { namespace execution {
         ///       types will use 80 microseconds as the minimal time for which
         ///       any of the scheduled chunks should run.
         ///
-        constexpr auto_chunk_size(std::uint64_t num_iters_for_timing = 0)
+        constexpr auto_chunk_size(
+            std::uint64_t num_iters_for_timing = 0) noexcept
           : min_time_(200000)
           , num_iters_for_timing_(num_iters_for_timing)
         {
@@ -53,17 +54,21 @@ namespace hpx { namespace execution {
         ///                     combined.
         ///
         explicit auto_chunk_size(hpx::chrono::steady_duration const& rel_time,
-            std::uint64_t num_iters_for_timing = 0)
+            std::uint64_t num_iters_for_timing = 0) noexcept
           : min_time_(rel_time.value().count())
           , num_iters_for_timing_(num_iters_for_timing)
         {
         }
 
         /// \cond NOINTERNAL
+        // This executor parameters type synchronously invokes the provided
+        // testing function in order to approximate the chunk-size.
+        using invokes_testing_function = std::true_type;
+
         // Estimate a chunk size based on number of cores used.
         template <typename Executor, typename F>
-        std::size_t get_chunk_size(
-            Executor&& exec, F&& f, std::size_t cores, std::size_t count)
+        std::size_t get_chunk_size(Executor&& exec, F&& f, std::size_t cores,
+            std::size_t count) noexcept
         {
             // by default use 1% of the iterations
             if (num_iters_for_timing_ == 0)
@@ -80,7 +85,7 @@ namespace hpx { namespace execution {
                 // use executor to launch given function for measurements
                 std::size_t test_chunk_size =
                     hpx::parallel::execution::sync_execute(
-                        std::forward<Executor>(exec), f, num_iters_for_timing_);
+                        HPX_FORWARD(Executor, exec), f, num_iters_for_timing_);
 
                 if (test_chunk_size != 0)
                 {
@@ -121,13 +126,6 @@ namespace hpx { namespace execution {
         /// \endcond
     };
 }}    // namespace hpx::execution
-
-namespace hpx { namespace parallel { namespace execution {
-    using auto_chunk_size HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::auto_chunk_size is deprecated. Use "
-        "hpx::execution::auto_chunk_size instead.") =
-        hpx::execution::auto_chunk_size;
-}}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL

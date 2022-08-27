@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2017 Hartmut Kaiser
+# Copyright (c) 2007-2021 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2013-2016 Agustin Berge
 # Copyright (c)      2017 Taeguk Kwon
@@ -57,39 +57,59 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx17_copy_elision(DEFINITIONS HPX_HAVE_CXX17_COPY_ELISION)
 
+  hpx_check_for_cxx17_memory_resource(
+    DEFINITIONS HPX_HAVE_CXX17_MEMORY_RESOURCE
+  )
+
   # C++20 feature tests
-  hpx_check_for_cxx20_coroutines(DEFINITIONS HPX_HAVE_CXX20_COROUTINES)
+  if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 20)
+    hpx_check_for_cxx20_coroutines(DEFINITIONS HPX_HAVE_CXX20_COROUTINES)
 
-  hpx_check_for_cxx20_experimental_simd(
-    DEFINITIONS HPX_HAVE_CXX20_EXPERIMENTAL_SIMD HPX_HAVE_DATAPAR
-  )
+    hpx_check_for_cxx20_experimental_simd(
+      DEFINITIONS HPX_HAVE_CXX20_EXPERIMENTAL_SIMD HPX_HAVE_DATAPAR
+    )
 
-  hpx_check_for_cxx20_lambda_capture(DEFINITIONS HPX_HAVE_CXX20_LAMBDA_CAPTURE)
+    hpx_check_for_cxx20_lambda_capture(
+      DEFINITIONS HPX_HAVE_CXX20_LAMBDA_CAPTURE
+    )
 
-  hpx_check_for_cxx20_perfect_pack_capture(
-    DEFINITIONS HPX_HAVE_CXX20_PERFECT_PACK_CAPTURE
-  )
+    hpx_check_for_cxx20_source_location(
+      DEFINITIONS HPX_HAVE_CXX20_SOURCE_LOCATION
+    )
 
-  hpx_check_for_cxx20_no_unique_address_attribute(
-    DEFINITIONS HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
-  )
+    hpx_check_for_cxx20_perfect_pack_capture(
+      DEFINITIONS HPX_HAVE_CXX20_PERFECT_PACK_CAPTURE
+    )
 
-  hpx_check_for_cxx20_paren_initialization_of_aggregates(
-    DEFINITIONS HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES
-  )
+    hpx_check_for_cxx20_no_unique_address_attribute(
+      DEFINITIONS HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
+    )
 
-  hpx_check_for_cxx20_std_disable_sized_sentinel_for(
-    DEFINITIONS HPX_HAVE_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR
-  )
+    hpx_check_for_cxx20_paren_initialization_of_aggregates(
+      DEFINITIONS HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES
+    )
 
-  hpx_check_for_cxx20_std_endian(DEFINITIONS HPX_HAVE_CXX20_STD_ENDIAN)
+    hpx_check_for_cxx20_std_disable_sized_sentinel_for(
+      DEFINITIONS HPX_HAVE_CXX20_STD_DISABLE_SIZED_SENTINEL_FOR
+    )
 
-  hpx_check_for_cxx20_std_execution_policies(
-    DEFINITIONS HPX_HAVE_CXX20_STD_EXECUTION_POLICES
-  )
+    hpx_check_for_cxx20_std_endian(DEFINITIONS HPX_HAVE_CXX20_STD_ENDIAN)
 
-  hpx_check_for_cxx20_std_ranges_iter_swap(
-    DEFINITIONS HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP
+    hpx_check_for_cxx20_std_execution_policies(
+      DEFINITIONS HPX_HAVE_CXX20_STD_EXECUTION_POLICES
+    )
+
+    hpx_check_for_cxx20_std_ranges_iter_swap(
+      DEFINITIONS HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP
+    )
+
+    hpx_check_for_cxx20_trivial_virtual_destructor(
+      DEFINITIONS HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR
+    )
+  endif()
+
+  hpx_check_for_cxx_lambda_capture_decltype(
+    DEFINITIONS HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE
   )
 
   # Check the availability of certain C++ builtins

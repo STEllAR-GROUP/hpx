@@ -110,13 +110,11 @@ namespace hpx {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/reverse.hpp>
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/transfer.hpp>
@@ -182,7 +180,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 auto mid = std::next(first, dist - n);
                 return std::move_backward(
-                    std::move(first), std::move(mid), std::move(last));
+                    HPX_MOVE(first), HPX_MOVE(mid), HPX_MOVE(last));
             }
             else
             {
@@ -194,7 +192,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     if (lead == last)
                     {
-                        std::move(std::move(first), std::move(trail), result);
+                        std::move(HPX_MOVE(first), HPX_MOVE(trail), result);
                         return result;
                     }
                 }
@@ -206,9 +204,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     {
                         if (lead == last)
                         {
-                            trail = std::move(mid, result, std::move(trail));
-                            std::move(std::move(first), std::move(mid),
-                                std::move(trail));
+                            trail = std::move(mid, result, HPX_MOVE(trail));
+                            std::move(HPX_MOVE(first), HPX_MOVE(mid),
+                                HPX_MOVE(trail));
                             return result;
                         }
                         std::iter_swap(mid, trail);
@@ -253,7 +251,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (n <= 0 || static_cast<std::size_t>(n) >= dist)
                 {
                     return parallel::util::detail::algorithm_result<ExPolicy,
-                        FwdIter2>::get(std::move(first));
+                        FwdIter2>::get(HPX_MOVE(first));
                 }
 
                 auto new_first = std::next(first, dist - n);
@@ -269,8 +267,8 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::shift_right
-    HPX_INLINE_CONSTEXPR_VARIABLE struct shift_right_t final
-      : hpx::functional::tag_fallback<shift_right_t>
+    inline constexpr struct shift_right_t final
+      : hpx::functional::detail::tag_fallback<shift_right_t>
     {
     private:
         // clang-format off
@@ -278,7 +276,7 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value)>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             shift_right_t, FwdIter first, FwdIter last, Size n)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -296,14 +294,14 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(shift_right_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(shift_right_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Size n)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::shift_right<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, last, n);
+                HPX_FORWARD(ExPolicy, policy), first, last, n);
         }
     } shift_right{};
 }    // namespace hpx

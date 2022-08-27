@@ -33,7 +33,7 @@ namespace hpx { namespace agas { namespace server {
     void component_namespace_register_counter_types(error_code& ec)
     {
         performance_counters::create_counter_func creator(
-            util::bind_back(&performance_counters::agas_raw_counter_creator,
+            hpx::bind_back(&performance_counters::agas_raw_counter_creator,
                 agas::server::component_namespace_service_name));
 
         for (std::size_t i = 0; i != detail::num_component_namespace_services;
@@ -83,7 +83,7 @@ namespace hpx { namespace agas { namespace server {
     void component_namespace_register_global_counter_types(error_code& ec)
     {
         performance_counters::create_counter_func creator(
-            util::bind_back(&performance_counters::agas_raw_counter_creator,
+            hpx::bind_back(&performance_counters::agas_raw_counter_creator,
                 agas::server::component_namespace_service_name));
 
         for (std::size_t i = 0; i != detail::num_component_namespace_services;
@@ -172,48 +172,48 @@ namespace hpx { namespace agas { namespace server {
 
         typedef component_namespace::counter_data cd;
 
-        util::function_nonser<std::int64_t(bool)> get_data_func;
+        hpx::function<std::int64_t(bool)> get_data_func;
         if (target == detail::counter_target_count)
         {
             switch (code)
             {
             case component_ns_bind_prefix:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_bind_prefix_count, &service.counter_data_);
                 service.counter_data_.bind_prefix_.enabled_ = true;
                 break;
             case component_ns_bind_name:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_bind_name_count, &service.counter_data_);
                 service.counter_data_.bind_name_.enabled_ = true;
                 break;
             case component_ns_resolve_id:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_resolve_id_count, &service.counter_data_);
                 service.counter_data_.resolve_id_.enabled_ = true;
                 break;
             case component_ns_unbind_name:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_unbind_name_count, &service.counter_data_);
                 service.counter_data_.unbind_name_.enabled_ = true;
                 break;
             case component_ns_iterate_types:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_iterate_types_count, &service.counter_data_);
                 service.counter_data_.iterate_types_.enabled_ = true;
                 break;
             case component_ns_get_component_type_name:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_component_type_name_count, &service.counter_data_);
                 service.counter_data_.get_component_type_name_.enabled_ = true;
                 break;
             case component_ns_num_localities:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_num_localities_count, &service.counter_data_);
                 service.counter_data_.num_localities_.enabled_ = true;
                 break;
             case component_ns_statistics_counter:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_overall_count, &service.counter_data_);
                 service.counter_data_.enable_all();
                 break;
@@ -230,42 +230,42 @@ namespace hpx { namespace agas { namespace server {
             switch (code)
             {
             case component_ns_bind_prefix:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_bind_prefix_time, &service.counter_data_);
                 service.counter_data_.bind_prefix_.enabled_ = true;
                 break;
             case component_ns_bind_name:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_bind_name_time, &service.counter_data_);
                 service.counter_data_.bind_name_.enabled_ = true;
                 break;
             case component_ns_resolve_id:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_resolve_id_time, &service.counter_data_);
                 service.counter_data_.resolve_id_.enabled_ = true;
                 break;
             case component_ns_unbind_name:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_unbind_name_time, &service.counter_data_);
                 service.counter_data_.unbind_name_.enabled_ = true;
                 break;
             case component_ns_iterate_types:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_iterate_types_time, &service.counter_data_);
                 service.counter_data_.iterate_types_.enabled_ = true;
                 break;
             case component_ns_get_component_type_name:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_component_type_name_time, &service.counter_data_);
                 service.counter_data_.get_component_type_name_.enabled_ = true;
                 break;
             case component_ns_num_localities:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_num_localities_time, &service.counter_data_);
                 service.counter_data_.num_localities_.enabled_ = true;
                 break;
             case component_ns_statistics_counter:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_overall_time, &service.counter_data_);
                 service.counter_data_.enable_all();
                 break;

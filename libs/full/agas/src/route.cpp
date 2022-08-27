@@ -15,8 +15,8 @@
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/parcelset/parcel.hpp>
+#include <hpx/parcelset_base/detail/parcel_route_handler.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/timing/scoped_timer.hpp>
 
@@ -25,9 +25,8 @@
 #include <cstdint>
 #include <mutex>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     void update_agas_cache(hpx::naming::gid_type const& gid,
         hpx::naming::address const& addr, std::uint64_t count,
@@ -35,14 +34,15 @@ namespace hpx { namespace detail {
     {
         hpx::agas::update_cache_entry(gid, addr, count, offset);
     }
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 HPX_PLAIN_ACTION_ID(hpx::detail::update_agas_cache, update_agas_cache_action,
     hpx::actions::update_agas_cache_action_id)
 
-namespace hpx { namespace agas { namespace server {
+namespace hpx::agas::server {
+
     void primary_namespace::route(parcelset::parcel&& p)
-    {    // {{{ route implementation
+    {
         util::scoped_timer<std::atomic<std::int64_t>> update(
             counter_data_.route_.time_, counter_data_.route_.enabled_);
         counter_data_.increment_route_count();
@@ -91,23 +91,29 @@ namespace hpx { namespace agas { namespace server {
             addr.address_ = g.lva();
         }
 
-        naming::id_type source = p.source_id();
+        hpx::id_type source = p.source_id();
 
         // either send the parcel on its way or execute actions locally
         if (naming::get_locality_id_from_gid(addr.locality_) ==
             agas::get_locality_id())
         {
             // destination is local
-            p.schedule_action();
+            if (p.schedule_action())
+            {
+                // object was migrated, route again
+                agas::route(HPX_MOVE(p),
+                    &hpx::parcelset::detail::parcel_route_handler,
+                    threads::thread_priority::normal);
+            }
         }
         else
         {
             // destination is remote
-            hpx::parcelset::put_parcel(std::move(p));
+            hpx::parcelset::put_parcel(HPX_MOVE(p));
         }
 
         runtime& rt = get_runtime();
-        if (rt.get_state() < state_pre_shutdown)
+        if (rt.get_state() < hpx::state::pre_shutdown)
         {
             // asynchronously update cache on source locality
             // update remote cache if the id is not flagged otherwise
@@ -123,7 +129,7 @@ namespace hpx { namespace agas { namespace server {
                     source, id, addr, g.count, g.offset);
             }
         }
-    }    // }}}
-}}}      // namespace hpx::agas::server
+    }
+}    // namespace hpx::agas::server
 
 #endif

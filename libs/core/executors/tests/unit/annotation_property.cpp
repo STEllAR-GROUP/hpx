@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 std::string annotation;
 
-void test_post_f(int passed_through, hpx::lcos::local::latch& l)
+void test_post_f(int passed_through, hpx::latch& l)
 {
     HPX_TEST_EQ(passed_through, 42);
 
@@ -45,7 +45,7 @@ void test_post()
         auto exec = hpx::experimental::prefer(
             hpx::execution::experimental::with_annotation, executor{}, desc);
 
-        hpx::lcos::local::latch l(2);
+        hpx::latch l(2);
         hpx::parallel::execution::post(exec, &test_post_f, 42, std::ref(l));
         l.arrive_and_wait();
 
@@ -57,7 +57,7 @@ void test_post()
         auto exec =
             hpx::execution::experimental::with_annotation(executor{}, desc);
 
-        hpx::lcos::local::latch l(2);
+        hpx::latch l(2);
         hpx::parallel::execution::post(exec, &test_post_f, 42, std::ref(l));
         l.arrive_and_wait();
 
@@ -191,8 +191,8 @@ void test_bulk_sync()
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     std::string desc("test_bulk_sync");
     {
@@ -200,7 +200,7 @@ void test_bulk_sync()
             hpx::execution::experimental::with_annotation, executor{}, desc);
 
         hpx::parallel::execution::bulk_sync_execute(
-            exec, hpx::util::bind(&bulk_test, _1, tid, _2), 107, 42);
+            exec, hpx::bind(&bulk_test, _1, tid, _2), 107, 42);
         HPX_TEST_EQ(annotation, desc);
 
         annotation.clear();
@@ -215,7 +215,7 @@ void test_bulk_sync()
 
         annotation.clear();
         hpx::parallel::execution::bulk_sync_execute(
-            exec, hpx::util::bind(&bulk_test, _1, tid, _2), 107, 42);
+            exec, hpx::bind(&bulk_test, _1, tid, _2), 107, 42);
         HPX_TEST_EQ(annotation, desc);
 
         annotation.clear();
@@ -232,16 +232,16 @@ void test_bulk_async()
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     std::string desc("test_bulk_async");
     {
         auto exec = hpx::experimental::prefer(
             hpx::execution::experimental::with_annotation, executor{}, desc);
 
-        hpx::when_all(hpx::parallel::execution::bulk_async_execute(exec,
-                          hpx::util::bind(&bulk_test, _1, tid, _2), 107, 42))
+        hpx::when_all(hpx::parallel::execution::bulk_async_execute(
+                          exec, hpx::bind(&bulk_test, _1, tid, _2), 107, 42))
             .get();
         HPX_TEST_EQ(annotation, desc);
 
@@ -257,8 +257,8 @@ void test_bulk_async()
             hpx::execution::experimental::with_annotation(executor{}, desc);
 
         annotation.clear();
-        hpx::when_all(hpx::parallel::execution::bulk_async_execute(exec,
-                          hpx::util::bind(&bulk_test, _1, tid, _2), 107, 42))
+        hpx::when_all(hpx::parallel::execution::bulk_async_execute(
+                          exec, hpx::bind(&bulk_test, _1, tid, _2), 107, 42))
             .get();
         HPX_TEST_EQ(annotation, desc);
 
@@ -295,9 +295,9 @@ void test_bulk_then()
 
     hpx::thread::id tid = hpx::this_thread::get_id();
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    using hpx::util::placeholders::_3;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
+    using hpx::placeholders::_3;
 
     hpx::shared_future<void> f = hpx::make_ready_future();
 
@@ -307,7 +307,7 @@ void test_bulk_then()
             hpx::execution::experimental::with_annotation, executor{}, desc);
 
         hpx::parallel::execution::bulk_then_execute(
-            exec, hpx::util::bind(&bulk_test_f, _1, _2, tid, _3), 107, f, 42)
+            exec, hpx::bind(&bulk_test_f, _1, _2, tid, _3), 107, f, 42)
             .get();
         HPX_TEST_EQ(annotation, desc);
 
@@ -324,7 +324,7 @@ void test_bulk_then()
 
         annotation.clear();
         hpx::parallel::execution::bulk_then_execute(
-            exec, hpx::util::bind(&bulk_test_f, _1, _2, tid, _3), 107, f, 42)
+            exec, hpx::bind(&bulk_test_f, _1, _2, tid, _3), 107, f, 42)
             .get();
         HPX_TEST_EQ(annotation, desc);
 
@@ -344,7 +344,7 @@ void test_post_policy_prefer()
         hpx::experimental::prefer(hpx::execution::experimental::with_annotation,
             hpx::execution::par, desc);
 
-    hpx::lcos::local::latch l(2);
+    hpx::latch l(2);
     hpx::parallel::execution::post(
         policy.executor(), &test_post_f, 42, std::ref(l));
     l.arrive_and_wait();
@@ -358,7 +358,7 @@ void test_post_policy()
     auto policy = hpx::execution::experimental::with_annotation(
         hpx::execution::par, desc);
 
-    hpx::lcos::local::latch l(2);
+    hpx::latch l(2);
     hpx::parallel::execution::post(
         policy.executor(), &test_post_f, 42, std::ref(l));
     l.arrive_and_wait();

@@ -15,7 +15,7 @@ The following steps will help you get started with |hpx|.
 
 
 Installing |hpx|
-=============
+================
 
 The easiest way to install |hpx| on your system is by choosing one of the steps below:
 
@@ -23,25 +23,25 @@ The easiest way to install |hpx| on your system is by choosing one of the steps 
 
    You can download and install |hpx| using the `vcpkg <https://github.com/Microsoft/vcpkg>`_ dependency manager:
 
-   .. code-block:: sh
+   .. code-block:: shell-session
 
-      vcpkg install hpx
+      $ vcpkg install hpx
 
 #. **Spack**
 
    Another way to install |hpx| is using `Spack <https://spack.readthedocs.io/en/latest/>`_:
 
-   .. code-block:: sh
+   .. code-block:: shell-session
 
-      spack install hpx
+      $ spack install hpx
 
 #. **Fedora**
 
    Installation can be done with `Fedora <https://fedoraproject.org/wiki/DNF>`_ as well:
 
-   .. code-block:: sh
+   .. code-block:: shell-session
 
-      dnf install hpx*
+      $ dnf install hpx*
 
 #. **Arch Linux**
 
@@ -52,8 +52,7 @@ More information or alternatives regarding the installation can be found in the 
 Hello, World!
 =============
 
-The following ``CMakeLists.txt`` is a minimal example of what you need in order to
-build an executable using |cmake| and |hpx|:
+To get started with this minimal example you need to create a new project directory and a file ``CMakeLists.txt`` with the contents below in order to build an executable using |cmake| and |hpx|:
 
 .. code-block:: cmake
 
@@ -63,25 +62,7 @@ build an executable using |cmake| and |hpx|:
    add_executable(my_hpx_program main.cpp)
    target_link_libraries(my_hpx_program HPX::hpx HPX::wrap_main HPX::iostreams_component)
 
-.. note::
-
-   You will most likely have more than one ``main.cpp`` file in your project.
-   See the section on :ref:`using_hpx_cmake` for more details on how to use
-   ``add_hpx_executable``.
-
-.. note::
-
-   ``HPX::wrap_main`` is required if you are implicitly using ``main()`` as the
-   runtime entry point. See :ref:`minimal` for more information.
-
-.. note::
-
-   ``HPX::iostreams_component`` is optional for a minimal project but lets us
-   use the |hpx| equivalent of ``std::cout``, i.e., the |hpx| :ref:`iostreams`
-   functionality in our application.
-
-Create a new project directory and a ``CMakeLists.txt`` with the contents above.
-Also create a ``main.cpp`` with the contents below.
+The next step is to create a ``main.cpp`` with the contents below:
 
 .. literalinclude:: ../examples/quickstart/hello_world_1.cpp
    :language: c++
@@ -90,45 +71,45 @@ Also create a ``main.cpp`` with the contents below.
 
 Then, in your project directory run the following:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-   mkdir build && cd build
-   cmake -DCMAKE_PREFIX_PATH=/path/to/hpx/installation ..
-   make all
-   ./my_hpx_program
+   $ mkdir build && cd build
+   $ cmake -DCMAKE_PREFIX_PATH=/path/to/hpx/installation ..
+   $ make all
+   $ ./my_hpx_program
+
+.. code-block:: shell-session
+
+    $ ./my_hpx_program
+    Hello World!
 
 The program looks almost like a regular C++ hello world with the exception of
-the two includes and ``hpx::cout``. When you include ``hpx_main.hpp`` some
-things will be done behind the scenes to make sure that ``main`` actually gets
-launched on the |hpx| runtime. So while it looks almost the same you can now use
-futures, ``async``, parallel algorithms and more which make use of the |hpx|
-runtime with lightweight threads. ``hpx::cout`` is a replacement for
-``std::cout`` to make sure printing never blocks a lightweight thread. You can
-read more about ``hpx::cout`` in :ref:`iostreams`. If you rebuild and run your
-program now, you should see the familiar ``Hello World!``:
+the two includes and ``hpx::cout``. 
 
-.. code-block:: sh
+* When you include ``hpx_main.hpp`` |hpx| makes sure that ``main`` actually gets
+  launched on the |hpx| runtime. So while it looks almost the same you can now use
+  futures, ``async``, parallel algorithms and more which make use of the |hpx|
+  runtime with lightweight threads. 
 
-    ./my_hpx_program
-    Hello World!
+* ``hpx::cout`` is a replacement for ``std::cout`` to make sure printing never blocks 
+  a lightweight thread. You can read more about ``hpx::cout`` in :ref:`iostreams`. 
 
 .. note::
 
-   You do not have to let |hpx| take over your main function like in the
-   example. You can instead keep your normal main function, and define a
-   separate ``hpx_main`` function which acts as the entry point to the |hpx|
-   runtime. In that case you start the |hpx| runtime explicitly by calling
-   ``hpx::init``:
+   * You will most likely have more than one ``main.cpp`` file in your project.
+     See the section on :ref:`using_hpx_cmake` for more details on how to use
+     ``add_hpx_executable``.
 
-   .. literalinclude:: ../examples/quickstart/hello_world_2.cpp
-      :language: c++
+   * ``HPX::wrap_main`` is required if you are implicitly using ``main()`` as the
+     runtime entry point. See :ref:`minimal` for more information.
 
-   You can also use :cpp:func:`hpx::start` and :cpp:func:`hpx::stop` for a
-   non-blocking alternative, or use :cpp:func:`hpx::resume` and
-   :cpp:func:`hpx::suspend` if you need to combine |hpx| with other runtimes.
+   * ``HPX::iostreams_component`` is optional for a minimal project but lets us
+     use the |hpx| equivalent of ``std::cout``, i.e., the |hpx| :ref:`iostreams`
+     functionality in our application.
 
-   See :ref:`starting_hpx` for more details on how to initialize and run the
-   |hpx| runtime.
+   * You do not have to let |hpx| take over your main function like in the
+     example. See :ref:`starting_hpx` for more details on how to initialize and run 
+     the |hpx| runtime.
 
 .. caution::
 

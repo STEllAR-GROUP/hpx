@@ -26,7 +26,7 @@
 #include <benchmarks/network/osu_coll.hpp>
 
 HPX_PLAIN_ACTION(
-    hpx::lcos::detail::broadcast_impl_action, broadcast_impl_action);
+    hpx::lcos::detail::broadcast_impl_action, broadcast_impl_action)
 
 struct broadcast_component
   : hpx::components::component_base<broadcast_component>
@@ -42,7 +42,7 @@ struct broadcast_component
         send_buffer = std::vector<char>(max_msg_size);
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, init);
+    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, init)
 
     typedef hpx::serialization::serialize_buffer<char> buffer_type;
 
@@ -69,7 +69,7 @@ struct broadcast_component
         return latency;
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, run);
+    HPX_DEFINE_COMPONENT_ACTION(broadcast_component, run)
 
     HPX_DEFINE_COMPONENT_BROADCAST(bcast, buffer_type);
     std::vector<hpx::id_type> ids;
@@ -78,7 +78,7 @@ struct broadcast_component
 };
 
 HPX_REGISTER_COMPONENT(
-    hpx::components::component<broadcast_component>, osu_broadcast_component);
+    hpx::components::component<broadcast_component>, osu_broadcast_component)
 
 void run_benchmark(params const& p)
 {
@@ -90,8 +90,8 @@ void run_benchmark(params const& p)
     if (ids.size() < 2)
     {
         hpx::cout << "This benchmark must be run with at least 2 threads"
-                  << hpx::endl
-                  << hpx::flush;
+                  << std::endl
+                  << std::flush;
         return;
     }
 

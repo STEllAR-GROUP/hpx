@@ -285,7 +285,7 @@ namespace hpx { namespace util {
     }
 
     bool thread_mapper::enumerate_os_threads(
-        util::function_nonser<bool(os_thread_data const&)> const& f) const
+        hpx::function<bool(os_thread_data const&)> const& f) const
     {
         std::lock_guard<mutex_type> m(mtx_);
         for (auto const& tinfo : thread_map_)

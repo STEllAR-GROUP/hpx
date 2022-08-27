@@ -130,7 +130,7 @@ namespace hpx { namespace compute { namespace traits {
                     typename std::allocator_traits<Allocator>::value_type;
                 using size_type =
                     typename std::allocator_traits<Allocator>::size_type;
-                value_type init_value(std::forward<Ts>(vs)...);
+                value_type init_value(HPX_FORWARD(Ts, vs)...);
                 pointer end = p + count;
                 size_type allocated = 0;
                 for (pointer it = p; it != end; ++it)
@@ -160,9 +160,9 @@ namespace hpx { namespace compute { namespace traits {
                 typename std::allocator_traits<Allocator>::pointer p,
                 typename std::allocator_traits<Allocator>::size_type count,
                 Ts&&... vs) -> decltype(alloc.bulk_construct(p, count,
-                std::forward<Ts>(vs)...))
+                HPX_FORWARD(Ts, vs)...))
             {
-                alloc.bulk_construct(p, count, std::forward<Ts>(vs)...);
+                alloc.bulk_construct(p, count, HPX_FORWARD(Ts, vs)...);
             }
         };
 
@@ -172,7 +172,7 @@ namespace hpx { namespace compute { namespace traits {
             typename std::allocator_traits<Allocator>::size_type count,
             Ts&&... vs)
         {
-            bulk_construct::call(0, alloc, p, count, std::forward<Ts>(vs)...);
+            bulk_construct::call(0, alloc, p, count, HPX_FORWARD(Ts, vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -233,7 +233,8 @@ namespace hpx { namespace compute { namespace traits {
             return alloc.allocate(n, hint);
         }
 
-        static void deallocate(Allocator& alloc, pointer p, size_type n)
+        static void deallocate(
+            Allocator& alloc, pointer p, size_type n) noexcept
         {
             alloc.deallocate(p, n);
         }
@@ -241,7 +242,7 @@ namespace hpx { namespace compute { namespace traits {
         template <class... Args>
         static void construct(Allocator& alloc, pointer p, Args&&... args)
         {
-            alloc.construct(p, std::forward<Args>(args)...);
+            alloc.construct(p, HPX_FORWARD(Args, args)...);
         }
 
         template <class... Args>
@@ -284,7 +285,7 @@ namespace hpx { namespace compute { namespace traits {
             Allocator& alloc, pointer p, size_type count, Ts&&... vs)
         {
             detail::call_bulk_construct(
-                alloc, p, count, std::forward<Ts>(vs)...);
+                alloc, p, count, HPX_FORWARD(Ts, vs)...);
         }
 
         HPX_HOST_DEVICE

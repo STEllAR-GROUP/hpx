@@ -99,7 +99,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 last = traits::compose(send, out);
             }
 
-            return result::get(std::move(last));
+            return result::get(HPX_MOVE(last));
         }
 
         // parallel remote implementation
@@ -177,7 +177,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         ExPolicy>::call(r, errors);
                     return traits::compose(send, r.back().get());
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
         /// \endcond
     }    // namespace detail
@@ -194,7 +194,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<InIter>::value
         )>
     // clang-format on
-    InIter tag_dispatch(hpx::for_each_t, InIter first, InIter last, F&& f)
+    InIter tag_invoke(hpx::for_each_t, InIter first, InIter last, F&& f)
     {
         static_assert((hpx::traits::is_forward_iterator<InIter>::value),
             "Requires at least input iterator.");
@@ -209,7 +209,7 @@ namespace hpx { namespace segmented {
         return hpx::parallel::v1::detail::segmented_for_each(
             hpx::parallel::v1::detail::for_each<
                 typename iterator_traits::local_iterator>(),
-            hpx::execution::seq, first, last, std::forward<F>(f),
+            hpx::execution::seq, first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity(), std::true_type());
     }
 
@@ -224,7 +224,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         SegIter>::type
-    tag_dispatch(
+    tag_invoke(
         hpx::for_each_t, ExPolicy&& policy, SegIter first, SegIter last, F&& f)
     {
         static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
@@ -237,7 +237,7 @@ namespace hpx { namespace segmented {
             using result =
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     SegIter>;
-            return result::get(std::move(first));
+            return result::get(HPX_MOVE(first));
         }
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
@@ -245,7 +245,7 @@ namespace hpx { namespace segmented {
         return segmented_for_each(
             hpx::parallel::v1::detail::for_each<
                 typename iterator_traits::local_iterator>(),
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity(), is_seq());
     }
 
@@ -257,7 +257,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<InIter>::value
         )>
     // clang-format on
-    InIter tag_dispatch(hpx::for_each_n_t, InIter first, Size count, F&& f)
+    InIter tag_invoke(hpx::for_each_n_t, InIter first, Size count, F&& f)
     {
         static_assert((hpx::traits::is_input_iterator<InIter>::value),
             "Requires at least input iterator.");
@@ -274,7 +274,7 @@ namespace hpx { namespace segmented {
         return hpx::parallel::v1::detail::segmented_for_each(
             hpx::parallel::v1::detail::for_each<
                 typename iterator_traits::local_iterator>(),
-            hpx::execution::seq, first, last, std::forward<F>(f),
+            hpx::execution::seq, first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity(), std::true_type());
     }
 
@@ -289,7 +289,7 @@ namespace hpx { namespace segmented {
     // clang-format on
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         SegIter>::type
-    tag_dispatch(
+    tag_invoke(
         hpx::for_each_n_t, ExPolicy&& policy, SegIter first, Size count, F&& f)
     {
         static_assert((hpx::traits::is_forward_iterator<SegIter>::value),
@@ -302,7 +302,7 @@ namespace hpx { namespace segmented {
             using result =
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     SegIter>;
-            return result::get(std::move(first));
+            return result::get(HPX_MOVE(first));
         }
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
@@ -312,7 +312,7 @@ namespace hpx { namespace segmented {
         return segmented_for_each(
             hpx::parallel::v1::detail::for_each<
                 typename iterator_traits::local_iterator>(),
-            std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
             hpx::parallel::util::projection_identity(), is_seq());
     }
 }}    // namespace hpx::segmented

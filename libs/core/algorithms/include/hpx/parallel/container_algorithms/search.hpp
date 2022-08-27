@@ -696,72 +696,9 @@ namespace hpx { namespace ranges {
 
 #else
 
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename Pred = hpx::ranges::equal_to,
-        typename Proj1 = parallel::util::projection_identity,
-        typename Proj2 = parallel::util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng1>::value &&
-            traits::is_projected_range<Proj1, Rng1>::value &&
-            hpx::traits::is_range<Rng2>::value &&
-            traits::is_projected_range<Proj2, Rng2>::value &&
-            traits::is_indirect_callable<ExPolicy,
-                Pred, traits::projected_range<Proj1, Rng1>,
-                traits::projected_range<Proj2, Rng2>
-            >::value
-        )>
-    HPX_DEPRECATED_V(1, 6, "Please use hpx::ranges::search instead.")
-    // clang-format on
-    typename util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_iterator<Rng1>::type>::type
-        search(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
-    {
-        return search(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
-            hpx::util::end(rng1), hpx::util::begin(rng2), hpx::util::end(rng2),
-            std::forward<Pred>(op), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename Pred = hpx::ranges::equal_to,
-        typename Proj1 = parallel::util::projection_identity,
-        typename Proj2 = parallel::util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng1>::value &&
-            traits::is_projected_range<Proj1, Rng1>::value &&
-            hpx::traits::is_range<Rng2>::value &&
-            traits::is_projected_range<Proj2, Rng2>::value &&
-            traits::is_indirect_callable<ExPolicy,
-                Pred, traits::projected_range<Proj1, Rng1>,
-                traits::projected_range<Proj2, Rng2>
-            >::value
-        )>
-    HPX_DEPRECATED_V(1, 6, "Please use hpx::ranges::search_n instead.")
-    // clang-format on
-    typename util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_iterator<Rng1>::type>::type
-        search_n(ExPolicy&& policy, Rng1&& rng1, std::size_t count, Rng2&& rng2,
-            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
-    {
-        return search_n(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
-            count, hpx::util::begin(rng2), hpx::util::end(rng2),
-            std::forward<Pred>(op), std::forward<Proj1>(proj1),
-            std::forward<Proj2>(proj2));
-    }
-
-}}}    // namespace hpx::parallel::v1
-
 namespace hpx { namespace ranges {
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct search_t final
+    inline constexpr struct search_t final
       : hpx::detail::tag_parallel_algorithm<search_t>
     {
     private:
@@ -785,15 +722,14 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(hpx::ranges::search_t,
-            FwdIter first, Sent last, FwdIter2 s_first, Sent2 s_last,
-            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+        friend FwdIter tag_fallback_invoke(hpx::ranges::search_t, FwdIter first,
+            Sent last, FwdIter2 s_first, Sent2 s_last, Pred&& op = Pred(),
+            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             return hpx::parallel::v1::detail::search<FwdIter, Sent>().call(
                 hpx::execution::seq, first, last, s_first, s_last,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -819,15 +755,15 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::ranges::search_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::search_t, ExPolicy&& policy,
             FwdIter first, Sent last, FwdIter2 s_first, Sent2 s_last,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             return hpx::parallel::v1::detail::search<FwdIter, Sent>().call(
-                std::forward<ExPolicy>(policy), first, last, s_first, s_last,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), first, last, s_first, s_last,
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -848,7 +784,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng1>::type
-        tag_fallback_dispatch(hpx::ranges::search_t, Rng1&& rng1, Rng2&& rng2,
+        tag_fallback_invoke(hpx::ranges::search_t, Rng1&& rng1, Rng2&& rng2,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
@@ -859,8 +795,8 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::search<fwditer_type, sent_type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -882,7 +818,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_fallback_dispatch(hpx::ranges::search_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::search_t, ExPolicy&& policy,
             Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -891,15 +827,15 @@ namespace hpx { namespace ranges {
             using sent_type = typename hpx::traits::range_sentinel<Rng1>::type;
 
             return hpx::parallel::v1::detail::search<fwditer_type, sent_type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), std::forward<Pred>(op),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2));
+                    hpx::util::end(rng2), HPX_FORWARD(Pred, op),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
     } search{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct search_n_t final
+    inline constexpr struct search_n_t final
       : hpx::detail::tag_parallel_algorithm<search_n_t>
     {
     private:
@@ -921,15 +857,15 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(hpx::ranges::search_n_t,
+        friend FwdIter tag_fallback_invoke(hpx::ranges::search_n_t,
             FwdIter first, std::size_t count, FwdIter2 s_first, Sent2 s_last,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             return hpx::parallel::v1::detail::search_n<FwdIter, FwdIter>().call(
                 hpx::execution::seq, first, count, s_first, s_last,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -953,15 +889,15 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::ranges::search_n_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::search_n_t, ExPolicy&& policy,
             FwdIter first, std::size_t count, FwdIter2 s_first, Sent2 s_last,
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             return hpx::parallel::v1::detail::search_n<FwdIter, FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, count, s_first, s_last,
-                std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                std::forward<Proj2>(proj2));
+                HPX_FORWARD(ExPolicy, policy), first, count, s_first, s_last,
+                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -982,7 +918,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_iterator<Rng1>::type
-        tag_fallback_dispatch(hpx::ranges::search_n_t, Rng1&& rng1,
+        tag_fallback_invoke(hpx::ranges::search_n_t, Rng1&& rng1,
             std::size_t count, Rng2&& rng2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -994,8 +930,8 @@ namespace hpx { namespace ranges {
                 sent_type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1), count,
                     hpx::util::begin(rng2), hpx::util::end(rng2),
-                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
@@ -1017,7 +953,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_iterator<Rng1>::type>::type
-        tag_fallback_dispatch(hpx::ranges::search_n_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::search_n_t, ExPolicy&& policy,
             Rng1&& rng1, std::size_t count, Rng2&& rng2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
@@ -1027,10 +963,10 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::search_n<fwditer_type,
                 sent_type>()
-                .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                     count, hpx::util::begin(rng2), hpx::util::end(rng2),
-                    std::forward<Pred>(op), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
         }
 
     } search_n{};

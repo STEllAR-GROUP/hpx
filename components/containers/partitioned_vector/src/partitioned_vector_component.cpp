@@ -18,7 +18,7 @@
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
 
 HPX_DISTRIBUTED_METADATA(hpx::server::partitioned_vector_config_data,
-    hpx_server_partitioned_vector_config_data);
+    hpx_server_partitioned_vector_config_data)
 
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 

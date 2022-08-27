@@ -219,8 +219,8 @@ namespace hpx { namespace ranges {
 
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/swap_ranges.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -233,7 +233,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::swap_ranges
-    HPX_INLINE_CONSTEXPR_VARIABLE struct swap_ranges_t final
+    inline constexpr struct swap_ranges_t final
       : hpx::detail::tag_parallel_algorithm<swap_ranges_t>
     {
     private:
@@ -247,7 +247,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent2, InIter2>::value
             )>
         // clang-format on
-        friend swap_ranges_result<InIter1, InIter2> tag_fallback_dispatch(
+        friend swap_ranges_result<InIter1, InIter2> tag_fallback_invoke(
             hpx::ranges::swap_ranges_t, InIter1 first1, Sent1 last1,
             InIter2 first2, Sent2 last2)
         {
@@ -274,7 +274,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             swap_ranges_result<FwdIter1, FwdIter2>>::type
-        tag_fallback_dispatch(hpx::ranges::swap_ranges_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::swap_ranges_t, ExPolicy&& policy,
             FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
@@ -284,7 +284,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::swap_ranges<
                 swap_ranges_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first1, last1, first2,
+                .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
                     last2);
         }
 
@@ -297,7 +297,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend swap_ranges_result<typename hpx::traits::range_iterator_t<Rng1>,
             typename hpx::traits::range_iterator_t<Rng2>>
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::ranges::swap_ranges_t, Rng1&& rng1, Rng2&& rng2)
         {
             using iterator_type1 = typename hpx::traits::range_iterator_t<Rng1>;
@@ -325,7 +325,7 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             swap_ranges_result<typename hpx::traits::range_iterator_t<Rng1>,
                 typename hpx::traits::range_iterator_t<Rng2>>>::type
-        tag_fallback_dispatch(hpx::ranges::swap_ranges_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::swap_ranges_t, ExPolicy&& policy,
             Rng1&& rng1, Rng2&& rng2)
         {
             using iterator_type1 = typename hpx::traits::range_iterator_t<Rng1>;
@@ -338,7 +338,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::swap_ranges<
                 swap_ranges_result<iterator_type1, iterator_type2>>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng1),
                     std::end(rng1), std::begin(rng2), std::end(rng2));
         }
     } swap_ranges{};

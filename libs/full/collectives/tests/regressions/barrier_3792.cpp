@@ -30,7 +30,7 @@ void run_barrier_test1(std::vector<size_t> locs)
 
     std::string barrier_name =
         "/loc_list/barrier" + std::to_string(locs[0]) + std::to_string(locs[1]);
-    hpx::lcos::barrier b(barrier_name, locs.size(), barrier_rank);
+    hpx::distributed::barrier b(barrier_name, locs.size(), barrier_rank);
     b.wait();
 }
 
@@ -42,7 +42,7 @@ void run_barrier_test2(std::vector<size_t> locs)
 
     std::string barrier_name =
         "/loc_list/barrier" + std::to_string(locs[0]) + std::to_string(locs[1]);
-    hpx::lcos::barrier b(barrier_name, locs, hpx::get_locality_id());
+    hpx::distributed::barrier b(barrier_name, locs, hpx::get_locality_id());
     b.wait();
 }
 

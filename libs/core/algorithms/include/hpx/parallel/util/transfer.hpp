@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/pointer_category.hpp>
-#include <hpx/functional/tag_fallback_dispatch.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
@@ -94,7 +94,7 @@ namespace hpx { namespace parallel { namespace util {
             std::advance(first, count);
             std::advance(dest, count);
             return in_out_result<InIter, OutIter>{
-                std::move(first), std::move(dest)};
+                HPX_MOVE(first), HPX_MOVE(dest)};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -110,7 +110,7 @@ namespace hpx { namespace parallel { namespace util {
                 while (first != last)
                     *dest++ = *first++;
                 return in_out_result<InIter, OutIter>{
-                    std::move(first), std::move(dest)};
+                    HPX_MOVE(first), HPX_MOVE(dest)};
             }
         };
 
@@ -163,7 +163,7 @@ namespace hpx { namespace parallel { namespace util {
                     *dest = *first;
                 }
                 return in_out_result<InIter, OutIter>{
-                    std::move(first), std::move(dest)};
+                    HPX_MOVE(first), HPX_MOVE(dest)};
             }
         };
 
@@ -180,13 +180,14 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     template <typename ExPolicy>
-    struct copy_n_t final : hpx::functional::tag_fallback<copy_n_t<ExPolicy>>
+    struct copy_n_t final
+      : hpx::functional::detail::tag_fallback<copy_n_t<ExPolicy>>
     {
     private:
         template <typename InIter, typename OutIter>
         friend HPX_HOST_DEVICE
             HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter>
-            tag_fallback_dispatch(hpx::parallel::util::copy_n_t<ExPolicy>,
+            tag_fallback_invoke(hpx::parallel::util::copy_n_t<ExPolicy>,
                 InIter first, std::size_t count, OutIter dest)
         {
             using category = hpx::traits::pointer_copy_category_t<
@@ -199,8 +200,7 @@ namespace hpx { namespace parallel { namespace util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    HPX_INLINE_CONSTEXPR_VARIABLE copy_n_t<ExPolicy> copy_n =
-        copy_n_t<ExPolicy>{};
+    inline constexpr copy_n_t<ExPolicy> copy_n = copy_n_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename InIter, typename OutIter>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter>
@@ -246,9 +246,13 @@ namespace hpx { namespace parallel { namespace util {
             call(InIter first, Sent last, OutIter dest)
             {
                 while (first != last)
-                    *dest++ = std::move(*first++);
+                {
+                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                    *dest++ = HPX_MOVE(*first++);
+                }
+
                 return in_out_result<InIter, OutIter>{
-                    std::move(first), std::move(dest)};
+                    HPX_MOVE(first), HPX_MOVE(dest)};
             }
         };
 
@@ -289,17 +293,20 @@ namespace hpx { namespace parallel { namespace util {
                 for (std::size_t i = 0; i < count;
                      (void) ++first, ++dest, i += 4)
                 {
-                    *dest = std::move(*first);
-                    *++dest = std::move(*++first);
-                    *++dest = std::move(*++first);
-                    *++dest = std::move(*++first);
+                    *dest = HPX_MOVE(*first);
+                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                    *++dest = HPX_MOVE(*++first);
+                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                    *++dest = HPX_MOVE(*++first);
+                    // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+                    *++dest = HPX_MOVE(*++first);
                 }
                 for (/**/; count < num; (void) ++first, ++dest, ++count)
                 {
-                    *dest = std::move(*first);
+                    *dest = HPX_MOVE(*first);
                 }
                 return in_out_result<InIter, OutIter>{
-                    std::move(first), std::move(dest)};
+                    HPX_MOVE(first), HPX_MOVE(dest)};
             }
         };
 

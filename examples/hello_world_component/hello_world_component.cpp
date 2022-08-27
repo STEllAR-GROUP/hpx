@@ -7,28 +7,26 @@
 //[hello_world_cpp_getting_started
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include "hello_world_component.hpp"
 #include <hpx/iostream.hpp>
+#include "hello_world_component.hpp"
 
 #include <iostream>
 
-namespace examples { namespace server
-{
+namespace examples { namespace server {
     void hello_world::invoke()
     {
         hpx::cout << "Hello HPX World!" << std::endl;
     }
-}}
+}}    // namespace examples::server
 
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 
-typedef hpx::components::component<
-    examples::server::hello_world
-> hello_world_type;
+typedef hpx::components::component<examples::server::hello_world>
+    hello_world_type;
 
-HPX_REGISTER_COMPONENT(hello_world_type, hello_world);
+HPX_REGISTER_COMPONENT(hello_world_type, hello_world)
 
 HPX_REGISTER_ACTION(
-    examples::server::hello_world::invoke_action, hello_world_invoke_action);
+    examples::server::hello_world::invoke_action, hello_world_invoke_action)
 #endif
 //]

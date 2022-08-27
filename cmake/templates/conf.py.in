@@ -19,7 +19,6 @@
 # serve to show the default.
 
 import os
-import subprocess
 import sys
 import re
 
@@ -40,6 +39,7 @@ sys.path.insert(0, os.path.abspath('.') + '/extensions')
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinxcontrib.bibtex',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
@@ -61,7 +61,7 @@ hpx_libs = {}
 
 # Scan the libs directory for source files to be included in
 # the documentation
-file_regex = re.compile('.*\.(h|hxx|hpp|ipp)$')
+file_regex = re.compile(r'.*\.(h|hxx|hpp|ipp)$')
 for lib_dir in os.listdir(hpx_libs_dir):
     # Only process subdirectories
     if not os.path.isdir(os.path.join(hpx_libs_dir, lib_dir)) or lib_dir == 'src':
@@ -77,9 +77,9 @@ for lib_dir in os.listdir(hpx_libs_dir):
         # If we are in the root of the library dir, we add all
         # subdirectories as a new breathe project
         if len(subdir) == 0:
-            for dir in dirs:
-                breathe_projects_source[dir] = (subdir_full + '/' + dir, [])
-                hpx_libs[lib_dir].append(dir)
+            for directory in dirs:
+                breathe_projects_source[directory] = (subdir_full + '/' + directory, [])
+                hpx_libs[lib_dir].append(directory)
         # We are inside a module and need to add the files
         # to the breathe project
         else:
@@ -123,15 +123,8 @@ api_ref_header = '''
 {0}
 -------------------------------------------------------------------------------
 
-The contents of this module can be included with the header
-``hpx/modules/{0}.hpp``. These headers may be used by user-code but are not
-guaranteed stable (neither header location nor contents). You are using these at
-your own risk. If you wish to use non-public functionality from a module we
-*strongly* suggest only including the module header ``hpx/modules/{0}.hpp``, not
-the particular header in which the functionality you would like to use is
-defined. See :ref:`public_api` for a list of names that are part of the public
+See :ref:`public_api` for a list of names and headers that are part of the public
 |hpx| API.
-
 '''
 
 api_ref_file = '''
@@ -142,23 +135,23 @@ api_ref_file = '''
 
 for lib in hpx_libs.keys():
     for module in sorted(hpx_libs[lib]):
-        assert(module in breathe_projects_source.keys())
+        assert module in breathe_projects_source.keys()
         module_sources = breathe_projects_source[module]
         if len(module_sources[1]) == 0:
             continue
-        basedir = os.path.abspath('.') + '/libs/' + lib + '/' + module
+        basedir = os.path.abspath('.') + '/libs/' + lib + '/' + module + '/api'
         if not os.path.exists(basedir):
             os.makedirs(basedir)
-        module_api_ref = open(basedir + '/api.rst', 'w')
+        module_api_ref = open(basedir + '/full_api.rst', 'w')
         module_api_ref.write(api_ref_header.format(module))
         for source in module_sources[1]:
             header = source[len('include/'):]
             module_api_ref.write(api_ref_file.format(header, module))
         module_api_ref.close()
-        api_refs += '   /libs/' + lib + '/' + module + '/api.rst\n'
+        api_refs += '   /libs/' + lib + '/' + module + '/api/full_api.rst\n'
 
-api_rst = open(os.path.abspath('.') + '/api.rst', 'w')
-for line in open(hpx_source_dir + '/docs/sphinx/api.rst').readlines():
+api_rst = open(os.path.abspath('.') + '/api/full_api.rst', 'w')
+for line in open(hpx_source_dir + '/docs/sphinx/api/full_api.rst').readlines():
     api_rst.write(line.format(api_refs))
 api_rst.close()
 
@@ -420,31 +413,35 @@ rst_prolog += '''
 .. |cpp17| replace:: C++17 Standard
 .. _cpp17: http://www.open-std.org/jtc1/sc22/wg21
 .. |cpp11_n3632| replace:: N3632
-.. _cpp11_n3632: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3632.html
+.. _cpp11_n3632: http://wg21.link/n3632
 .. |cpp11_n3634| replace:: N3857
-.. _cpp11_n3634: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3857.pdf
+.. _cpp11_n3634: http://wg21.link/n3857
 .. |cpp11_n3562| replace:: N3562
-.. _cpp11_n3562: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3562.pdf
+.. _cpp11_n3562: http://wg21.link/n3562
 .. |cpp11_n4088| replace:: N4411
-.. _cpp11_n4088: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4411.pdf
+.. _cpp11_n4088: http://wg21.link/n4411
 .. |cpp11_n4104| replace:: N4409
-.. _cpp11_n4104: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4409.pdf
+.. _cpp11_n4104: http://wg21.link/n4409
 .. |cpp11_n4107| replace:: N4313
-.. _cpp11_n4107: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4313.html
+.. _cpp11_n4107: http://wg21.link/n4313
 .. |cpp11_n4406| replace:: N4406
-.. _cpp11_n4406: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4406.pdf
+.. _cpp11_n4406: http://wg21.link/n4406
 .. |cpp17_n4399| replace:: N4399
-.. _cpp17_n4399: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4399.html
+.. _cpp17_n4399: http://wg21.link/n4399
 .. |cpp17_n4560| replace:: N4560
-.. _cpp17_n4560: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4560.pdf
+.. _cpp17_n4560: http://wg21.link/n4560
+.. |cpp19_n4808| replace:: N4808
+.. _cpp19_n4808: http://wg21.link/n4808
 .. |cpp20_p0075r1| replace:: P0075R1
-.. _cpp20_p0075r1: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0075r1.pdf
+.. _cpp20_p0075r1: http://wg21.link/p0075r1
 .. |cpp20_p0443| replace:: P0443
 .. _cpp20_p0443: https://github.com/executors/issaquah_2016
 .. |p1393| replace:: P1393
-.. _p1393: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/p1393r0.html
+.. _p1393: http://wg21.link/p1393
 .. |p2220| replace:: P2220
-.. _p2220: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2020/p2220r0.pdf
+.. _p2220: https://wg21.link/p2220 
+.. |p2440| replace:: P2440
+.. _p2440: https://wg21.link/p2440 
 
 .. |semver| replace:: semver
 .. _semver: https://semver.org
@@ -516,18 +513,18 @@ source_encoding = 'utf-8-sig'
 master_doc = 'index'
 
 # General information about the project.
-project = u'HPX'
-copyright = u'2008-2020, The STE||AR Group'
-author = u'The STE||AR Group'
+project = 'HPX'
+project_copyright = '2008-2021, The STE||AR Group'
+author = 'The STE||AR Group'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = u'@HPX_CONF_DOCUMENTATION_VERSION@'
+version = '@HPX_CONF_DOCUMENTATION_VERSION@'
 # The full version, including alpha/beta/rc tags.
-release = u'@HPX_CONF_DOCUMENTATION_VERSION@'
+release = '@HPX_CONF_DOCUMENTATION_VERSION@'
 
 # The language for content autogenerated by Sphinx. Refer to documentation
 # for a list of supported languages.
@@ -567,16 +564,26 @@ todo_include_todos = False
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_book_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {}
+html_theme_options = {
+    'logo_only': True,
+    "home_page_in_toc": True,
+    "repository_url": "https://github.com/STEllAR-GROUP/hpx",
+    "use_repository_button": True,
+    "use_issues_button": True
+}
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = '_static/images/HPX_STELLAR.png'
+html_logo = '_static/images/HPX_STELLAR_blue.png'
+
+# The name of an image file (relative to this directory) to place at the top
+# of the browser page.
+html_favicon = '_static/images/favicon.png'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -590,8 +597,15 @@ html_context = {
     'github_version': 'master/docs/sphinx/',
 }
 
-if not ("@HPX_WITH_GIT_COMMIT_SHORT@" == ""):
+if "@HPX_WITH_GIT_COMMIT_SHORT@" != "":
     html_context['commit'] = "@HPX_WITH_GIT_COMMIT_SHORT@"
+else:
+    html_context['commit'] = "unknown"
+
+if "@HPX_WITH_GIT_COMMIT@" != "":
+    html_context['fullcommit'] = "@HPX_WITH_GIT_COMMIT@"
+else:
+    html_context['fullcommit'] = "unknown"
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -629,6 +643,10 @@ html_search_language = 'en'
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'HPXdoc'
 
+# Files mentioned in this list are used by sphinxcontrib.bibtex extension to generate
+# references/citations
+bibtex_bibfiles = ['references.bib']
+
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
@@ -645,8 +663,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'HPX.tex', u'HPX Documentation',
-     u'The {STE\\raisebox{.05em}{\\hspace{.1em}$|$\\hspace{0.1em}$|$\\hspace{.02em}}AR} Group',
+    (master_doc, 'HPX.tex', 'HPX Documentation',
+     'The {STE\\raisebox{.05em}{\\hspace{.1em}$|$\\hspace{0.1em}$|$\\hspace{.02em}}AR} Group',
      'manual'),
 ]
 
@@ -658,7 +676,7 @@ latex_show_urls = 'footnote'
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'hpx', u'HPX Documentation',
+    (master_doc, 'hpx', 'HPX Documentation',
      [author], 1)
 ]
 
@@ -671,7 +689,7 @@ man_show_urls = True
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'HPX', u'HPX Documentation',
+    (master_doc, 'HPX', 'HPX Documentation',
      author, 'HPX', 'The C++ Standard Library for Parallelism and Concurrency.',
      'Miscellaneous'),
 ]
@@ -683,4 +701,4 @@ texinfo_documents = [
 epub_title = project
 epub_author = author
 epub_publisher = author
-epub_copyright = copyright
+epub_copyright = project_copyright

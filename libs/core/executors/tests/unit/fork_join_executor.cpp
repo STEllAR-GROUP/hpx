@@ -16,10 +16,14 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdlib>
+#include <iostream>
 #include <iterator>
 #include <numeric>
 #include <string>
+#include <utility>
 #include <vector>
+
+using hpx::execution::experimental::fork_join_executor;
 
 static std::atomic<std::size_t> count{0};
 
@@ -30,42 +34,44 @@ void bulk_test(int, int passed_through)    //-V813
     HPX_TEST_EQ(passed_through, 42);
 }
 
-void test_bulk_sync()
+template <typename... ExecutorArgs>
+void test_bulk_sync(ExecutorArgs&&... args)
 {
-    using executor = hpx::execution::experimental::fork_join_executor;
+    std::cerr << "test_bulk_sync\n";
 
     count = 0;
     std::size_t const n = 107;
     std::vector<int> v(n);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
-    executor exec;
+    fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
     hpx::parallel::execution::bulk_sync_execute(
-        exec, hpx::util::bind(&bulk_test, _1, _2), v, 42);
+        exec, hpx::bind(&bulk_test, _1, _2), v, 42);
     HPX_TEST_EQ(count.load(), n);
 
     hpx::parallel::execution::bulk_sync_execute(exec, &bulk_test, v, 42);
     HPX_TEST_EQ(count.load(), 2 * n);
 }
 
-void test_bulk_async()
+template <typename... ExecutorArgs>
+void test_bulk_async(ExecutorArgs&&... args)
 {
-    using executor = hpx::execution::experimental::fork_join_executor;
+    std::cerr << "test_bulk_async\n";
 
     count = 0;
     std::size_t const n = 107;
     std::vector<int> v(n);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
-    executor exec;
+    fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-                      exec, hpx::util::bind(&bulk_test, _1, _2), v, 42))
+                      exec, hpx::bind(&bulk_test, _1, _2), v, 42))
         .get();
     HPX_TEST_EQ(count.load(), n);
 
@@ -82,16 +88,17 @@ void bulk_test_exception(int, int passed_through)    //-V813
     throw std::runtime_error("test");
 }
 
-void test_bulk_sync_exception()
+template <typename... ExecutorArgs>
+void test_bulk_sync_exception(ExecutorArgs&&... args)
 {
-    using executor = hpx::execution::experimental::fork_join_executor;
+    std::cerr << "test_bulk_sync_exception\n";
 
     count = 0;
     std::size_t const n = 107;
     std::vector<int> v(n);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    executor exec;
+    fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
     bool caught_exception = false;
     try
     {
@@ -112,23 +119,23 @@ void test_bulk_sync_exception()
     HPX_TEST(caught_exception);
 }
 
-void test_bulk_async_exception()
+template <typename... ExecutorArgs>
+void test_bulk_async_exception(ExecutorArgs&&... args)
 {
-    using executor = hpx::execution::experimental::fork_join_executor;
+    std::cerr << "test_bulk_async_exception\n";
 
     count = 0;
     std::size_t const n = 107;
     std::vector<int> v(n);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    executor exec;
+    fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
     bool caught_exception = false;
     try
     {
         auto r = hpx::parallel::execution::bulk_async_execute(
             exec, &bulk_test_exception, v, 42);
-        HPX_TEST_EQ(r.size(), std::size_t(1));
-        r[0].get();
+        r.get();
 
         HPX_TEST(false);
     }
@@ -147,22 +154,35 @@ void test_bulk_async_exception()
 void static_check_executor()
 {
     using namespace hpx::traits;
-    using executor = hpx::execution::experimental::fork_join_executor;
 
-    static_assert(!has_sync_execute_member<executor>::value,
-        "!has_sync_execute_member<executor>::value");
-    static_assert(!has_async_execute_member<executor>::value,
-        "!has_async_execute_member<executor>::value");
-    static_assert(!has_then_execute_member<executor>::value,
-        "!has_then_execute_member<executor>::value");
-    static_assert(has_bulk_sync_execute_member<executor>::value,
-        "has_bulk_sync_execute_member<executor>::value");
-    static_assert(has_bulk_async_execute_member<executor>::value,
-        "has_bulk_async_execute_member<executor>::value");
-    static_assert(!has_bulk_then_execute_member<executor>::value,
-        "!has_bulk_then_execute_member<executor>::value");
-    static_assert(
-        !has_post_member<executor>::value, "!has_post_member<executor>::value");
+    static_assert(!has_sync_execute_member<fork_join_executor>::value,
+        "!has_sync_execute_member<fork_join_executor>::value");
+    static_assert(!has_async_execute_member<fork_join_executor>::value,
+        "!has_async_execute_member<fork_join_executor>::value");
+    static_assert(!has_then_execute_member<fork_join_executor>::value,
+        "!has_then_execute_member<fork_join_executor>::value");
+    static_assert(has_bulk_sync_execute_member<fork_join_executor>::value,
+        "has_bulk_sync_execute_member<fork_join_executor>::value");
+    static_assert(has_bulk_async_execute_member<fork_join_executor>::value,
+        "has_bulk_async_execute_member<fork_join_executor>::value");
+    static_assert(!has_bulk_then_execute_member<fork_join_executor>::value,
+        "!has_bulk_then_execute_member<fork_join_executor>::value");
+    static_assert(!has_post_member<fork_join_executor>::value,
+        "!has_post_member<fork_join_executor>::value");
+}
+
+template <typename... ExecutorArgs>
+void test_executor(hpx::threads::thread_priority priority,
+    hpx::threads::thread_stacksize stacksize,
+    fork_join_executor::loop_schedule schedule)
+{
+    std::cerr << "testing fork_join_executor with priority = " << priority
+              << ", stacksize = " << stacksize << ", schedule = " << schedule
+              << "\n";
+    test_bulk_sync(priority, stacksize, schedule);
+    test_bulk_async(priority, stacksize, schedule);
+    test_bulk_sync_exception(priority, stacksize, schedule);
+    test_bulk_async_exception(priority, stacksize, schedule);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,10 +190,31 @@ int hpx_main()
 {
     static_check_executor();
 
-    test_bulk_sync();
-    test_bulk_async();
-    test_bulk_sync_exception();
-    test_bulk_async_exception();
+    // thread_stacksize::nostack cannot be used with the fork_join_executor
+    // because it prevents other work from running when yielding. Using
+    // thread_priority::low hangs for unknown reasons.
+    for (auto const priority : {
+             // hpx::threads::thread_priority::low,
+             hpx::threads::thread_priority::normal,
+             hpx::threads::thread_priority::high,
+         })
+    {
+        for (auto const stacksize : {
+                 // hpx::threads::thread_stacksize::nostack,
+                 hpx::threads::thread_stacksize::small_,
+             })
+        {
+            for (auto const schedule : {
+                     fork_join_executor::loop_schedule::static_,
+                     fork_join_executor::loop_schedule::dynamic,
+                 })
+            {
+                {
+                    test_executor(priority, stacksize, schedule);
+                }
+            }
+        }
+    }
 
     return hpx::local::finalize();
 }

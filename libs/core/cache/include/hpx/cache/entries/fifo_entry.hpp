@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,9 +10,12 @@
 #include <hpx/cache/entries/entry.hpp>
 
 #include <chrono>
+#include <type_traits>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache { namespace entries {
+namespace hpx::util::cache::entries {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \class fifo_entry fifo_entry.hpp hpx/cache/entries/fifo_entry.hpp
     ///
@@ -33,16 +36,25 @@ namespace hpx { namespace util { namespace cache { namespace entries {
     class fifo_entry : public entry<Value, fifo_entry<Value>>
     {
     private:
-        typedef entry<Value, fifo_entry<Value>> base_type;
+        using base_type = entry<Value, fifo_entry<Value>>;
+        using time_point = std::chrono::steady_clock::time_point;
 
     public:
         /// \brief Any cache entry has to be default constructible
-        fifo_entry() {}
+        fifo_entry() = default;
 
         /// \brief Construct a new instance of a cache entry holding the given
         ///        value.
-        explicit fifo_entry(Value const& val)
+        explicit fifo_entry(Value const& val) noexcept(
+            std::is_nothrow_constructible_v<base_type, Value const&>)
           : base_type(val)
+        {
+        }
+
+        /// \brief Construct a new instance of a cache entry holding the given
+        ///        value.
+        explicit fifo_entry(Value&& val) noexcept
+          : base_type(HPX_MOVE(val))
         {
         }
 
@@ -54,25 +66,28 @@ namespace hpx { namespace util { namespace cache { namespace entries {
         /// \returns  This function should return \a true if the entry should
         ///           be added to the cache, otherwise it should return
         ///           \a false.
-        bool insert()
+        constexpr bool insert()
         {
             insertion_time_ = std::chrono::steady_clock::now();
             return true;
         }
 
-        std::chrono::steady_clock::time_point const& get_creation_time() const
+        constexpr time_point const& get_creation_time() const noexcept
         {
             return insertion_time_;
         }
 
         /// \brief Compare the 'age' of two entries. An entry is 'older' than
         ///        another entry if it has been created earlier (FIFO).
-        friend bool operator<(fifo_entry const& lhs, fifo_entry const& rhs)
+        friend bool
+        operator<(fifo_entry const& lhs, fifo_entry const& rhs) noexcept(
+            noexcept(std::declval<time_point const&>() <
+                std::declval<time_point const&>()))
         {
             return lhs.get_creation_time() < rhs.get_creation_time();
         }
 
     private:
-        std::chrono::steady_clock::time_point insertion_time_;
+        time_point insertion_time_;
     };
-}}}}    // namespace hpx::util::cache::entries
+}    // namespace hpx::util::cache::entries

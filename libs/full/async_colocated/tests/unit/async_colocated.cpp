@@ -26,13 +26,13 @@ std::int32_t increment(std::int32_t i)
 {
     return i + 1;
 }
-HPX_PLAIN_ACTION(increment);
+HPX_PLAIN_ACTION(increment)
 
 std::int32_t increment_with_future(hpx::shared_future<std::int32_t> fi)
 {
     return fi.get() + 1;
 }
-HPX_PLAIN_ACTION(increment_with_future);
+HPX_PLAIN_ACTION(increment_with_future)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct decrement_server
@@ -43,15 +43,15 @@ struct decrement_server
         return i - 1;
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(decrement_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(decrement_server, call)
 };
 
 typedef hpx::components::managed_component<decrement_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, decrement_server);
+HPX_REGISTER_COMPONENT(server_type, decrement_server)
 
 typedef decrement_server::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION_DECLARATION(call_action)
+HPX_REGISTER_ACTION(call_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server : hpx::components::component_base<test_server>
@@ -59,7 +59,7 @@ struct test_server : hpx::components::component_base<test_server>
 };
 
 typedef hpx::components::component<test_server> test_server_type;
-HPX_REGISTER_COMPONENT(test_server_type, test_server);
+HPX_REGISTER_COMPONENT(test_server_type, test_server)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {
@@ -93,7 +93,7 @@ void test_remote_async_colocated(test_client const& target)
     {
         increment_with_future_action inc;
 
-        hpx::lcos::promise<std::int32_t> p;
+        hpx::distributed::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<std::int32_t> f1 =
@@ -147,7 +147,7 @@ void test_remote_async_colocated(test_client const& target)
     {
         increment_with_future_action inc;
         hpx::shared_future<std::int32_t> f =
-            hpx::async(hpx::launch::deferred, hpx::util::bind(&increment, 42));
+            hpx::async(hpx::launch::deferred, hpx::bind(&increment, 42));
 
         hpx::future<std::int32_t> f1 =
             hpx::async(inc, hpx::colocated(target), f);

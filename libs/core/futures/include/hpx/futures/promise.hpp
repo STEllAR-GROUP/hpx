@@ -19,8 +19,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx {
+
     namespace detail {
+
         template <typename R,
             typename SharedState = lcos::detail::future_data<R>>
         class promise_base;
@@ -28,8 +30,8 @@ namespace hpx { namespace lcos { namespace local {
         template <typename R, typename SharedState>
         class promise_base
         {
-            typedef SharedState shared_state_type;
-            typedef typename shared_state_type::init_no_addref init_no_addref;
+            using shared_state_type = SharedState;
+            using init_no_addref = typename shared_state_type::init_no_addref;
 
         public:
             promise_base()
@@ -45,17 +47,17 @@ namespace hpx { namespace lcos { namespace local {
               , future_retrieved_(false)
               , shared_future_retrieved_(false)
             {
-                typedef
+                using allocator_shared_state_type =
                     typename traits::detail::shared_state_allocator<SharedState,
-                        Allocator>::type allocator_shared_state_type;
+                        Allocator>::type;
 
-                typedef typename std::allocator_traits<Allocator>::
-                    template rebind_alloc<allocator_shared_state_type>
-                        other_allocator;
-                typedef std::allocator_traits<other_allocator> traits;
-                typedef std::unique_ptr<allocator_shared_state_type,
-                    util::allocator_deleter<other_allocator>>
-                    unique_pointer;
+                using other_allocator =
+                    typename std::allocator_traits<Allocator>::
+                        template rebind_alloc<allocator_shared_state_type>;
+                using traits = std::allocator_traits<other_allocator>;
+                using unique_pointer =
+                    std::unique_ptr<allocator_shared_state_type,
+                        util::allocator_deleter<other_allocator>>;
 
                 other_allocator alloc(a);
                 unique_pointer p(traits::allocate(alloc, 1),
@@ -68,11 +70,10 @@ namespace hpx { namespace lcos { namespace local {
             }
 
             promise_base(promise_base&& other) noexcept
-              : shared_state_(std::move(other.shared_state_))
+              : shared_state_(HPX_MOVE(other.shared_state_))
               , future_retrieved_(other.future_retrieved_)
               , shared_future_retrieved_(other.shared_future_retrieved_)
             {
-                other.shared_state_ = nullptr;
                 other.future_retrieved_ = false;
                 other.shared_future_retrieved_ = false;
             }
@@ -80,7 +81,7 @@ namespace hpx { namespace lcos { namespace local {
             ~promise_base()
             {
                 check_abandon_shared_state(
-                    "local::detail::promise_base<R>::~promise_base()");
+                    "detail::promise_base<R>::~promise_base()");
             }
 
             promise_base& operator=(promise_base&& other) noexcept
@@ -88,13 +89,12 @@ namespace hpx { namespace lcos { namespace local {
                 if (this != &other)
                 {
                     this->check_abandon_shared_state(
-                        "local::detail::promise_base<R>::operator=");
+                        "detail::promise_base<R>::operator=");
 
-                    shared_state_ = std::move(other.shared_state_);
+                    shared_state_ = HPX_MOVE(other.shared_state_);
                     future_retrieved_ = other.future_retrieved_;
                     shared_future_retrieved_ = other.shared_future_retrieved_;
 
-                    other.shared_state_ = nullptr;
                     other.future_retrieved_ = false;
                     other.shared_future_retrieved_ = false;
                 }
@@ -114,61 +114,62 @@ namespace hpx { namespace lcos { namespace local {
                 return shared_state_ != nullptr;
             }
 
-            future<R> get_future(error_code& ec = throws)
+            hpx::future<R> get_future(error_code& ec = throws)
             {
                 if (future_retrieved_ || shared_future_retrieved_)
                 {
                     HPX_THROWS_IF(ec, future_already_retrieved,
-                        "local::detail::promise_base<R>::get_future",
+                        "detail::promise_base<R>::get_future",
                         "future or shared future has already been retrieved "
                         "from this promise");
-                    return future<R>();
+                    return hpx::future<R>();
                 }
 
                 if (shared_state_ == nullptr)
                 {
                     HPX_THROWS_IF(ec, no_state,
-                        "local::detail::promise_base<R>::get_future",
+                        "detail::promise_base<R>::get_future",
                         "this promise has no valid shared state");
-                    return future<R>();
+                    return hpx::future<R>();
                 }
 
                 future_retrieved_ = true;
-                return traits::future_access<future<R>>::create(shared_state_);
+                return traits::future_access<hpx::future<R>>::create(
+                    shared_state_);
             }
 
-            shared_future<R> get_shared_future(error_code& ec = throws)
+            hpx::shared_future<R> get_shared_future(error_code& ec = throws)
             {
                 if (future_retrieved_)
                 {
                     HPX_THROWS_IF(ec, future_already_retrieved,
-                        "local::detail::promise_base<R>::get_shared_future",
+                        "detail::promise_base<R>::get_shared_future",
                         "future has already been retrieved from this promise");
-                    return shared_future<R>();
+                    return hpx::shared_future<R>();
                 }
 
                 if (shared_state_ == nullptr)
                 {
                     HPX_THROWS_IF(ec, no_state,
-                        "local::detail::promise_base<R>::get_shared_future",
+                        "detail::promise_base<R>::get_shared_future",
                         "this promise has no valid shared state");
-                    return shared_future<R>();
+                    return hpx::shared_future<R>();
                 }
 
                 shared_future_retrieved_ = true;
-                return traits::future_access<shared_future<R>>::create(
+                return traits::future_access<hpx::shared_future<R>>::create(
                     shared_state_);
             }
 
             template <typename... Ts>
-            typename std::enable_if<std::is_constructible<R, Ts&&...>::value ||
-                std::is_void<R>::value>::type
+            std::enable_if_t<std::is_constructible_v<R, Ts&&...> ||
+                std::is_void_v<R>>
             set_value(Ts&&... ts)
             {
                 if (shared_state_ == nullptr)
                 {
                     HPX_THROW_EXCEPTION(no_state,
-                        "local::detail::promise_base<R>::set_value",
+                        "detail::promise_base<R>::set_value",
                         "this promise has no valid shared state");
                     return;
                 }
@@ -176,12 +177,12 @@ namespace hpx { namespace lcos { namespace local {
                 if (shared_state_->is_ready())
                 {
                     HPX_THROW_EXCEPTION(promise_already_satisfied,
-                        "local::detail::promise_base<R>::set_value",
+                        "detail::promise_base<R>::set_value",
                         "result has already been stored for this promise");
                     return;
                 }
 
-                shared_state_->set_value(std::forward<Ts>(ts)...);
+                shared_state_->set_value(HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename T>
@@ -190,7 +191,7 @@ namespace hpx { namespace lcos { namespace local {
                 if (shared_state_ == nullptr)
                 {
                     HPX_THROW_EXCEPTION(no_state,
-                        "local::detail::promise_base<R>::set_exception",
+                        "detail::promise_base<R>::set_exception",
                         "this promise has no valid shared state");
                     return;
                 }
@@ -198,12 +199,12 @@ namespace hpx { namespace lcos { namespace local {
                 if (shared_state_->is_ready())
                 {
                     HPX_THROW_EXCEPTION(promise_already_satisfied,
-                        "local::detail::promise_base<R>::set_exception",
+                        "detail::promise_base<R>::set_exception",
                         "result has already been stored for this promise");
                     return;
                 }
 
-                shared_state_->set_exception(std::forward<T>(value));
+                shared_state_->set_exception(HPX_FORWARD(T, value));
             }
 
         protected:
@@ -253,7 +254,7 @@ namespace hpx { namespace lcos { namespace local {
         ~promise() = default;
 
         // Effects: Abandons any shared state (30.6.4) and then as if
-        //          promise(std::move(other)).swap(*this).
+        //          promise(HPX_MOVE(other)).swap(*this).
         // Returns: *this.
         promise& operator=(promise&& other) noexcept = default;
 
@@ -319,7 +320,7 @@ namespace hpx { namespace lcos { namespace local {
         //   - no_state if *this has no shared state.
         void set_value(R&& r)
         {
-            base_type::set_value(std::move(r));
+            base_type::set_value(HPX_MOVE(r));
         }
 
         // Extension (see wg21.link/P0319)
@@ -342,7 +343,7 @@ namespace hpx { namespace lcos { namespace local {
         template <typename... Ts>
         void set_value(Ts&&... ts)
         {
-            base_type::set_value(std::forward<Ts>(ts)...);
+            base_type::set_value(HPX_FORWARD(Ts, ts)...);
         }
 
         // Effects: atomically stores the exception pointer p in the shared
@@ -384,7 +385,7 @@ namespace hpx { namespace lcos { namespace local {
         ~promise() = default;
 
         // Effects: Abandons any shared state (30.6.4) and then as if
-        //          promise(std::move(other)).swap(*this).
+        //          promise(HPX_MOVE(other)).swap(*this).
         // Returns: *this.
         promise& operator=(promise&& other) noexcept = default;
 
@@ -474,7 +475,7 @@ namespace hpx { namespace lcos { namespace local {
         ~promise() = default;
 
         // Effects: Abandons any shared state (30.6.4) and then as if
-        //          promise(std::move(other)).swap(*this).
+        //          promise(HPX_MOVE(other)).swap(*this).
         // Returns: *this.
         promise& operator=(promise&& other) noexcept = default;
 
@@ -543,13 +544,21 @@ namespace hpx { namespace lcos { namespace local {
     {
         x.swap(y);
     }
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx
+
+namespace hpx::lcos::local {
+
+    template <typename R>
+    using promise HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::local::promise is deprecated, use hpx::promise instead") =
+        hpx::promise<R>;
+}
 
 namespace std {
+
     // Requires: Allocator shall be an allocator (17.6.3.5)
     template <typename R, typename Allocator>
-    struct uses_allocator<hpx::lcos::local::promise<R>, Allocator>
-      : std::true_type
+    struct uses_allocator<hpx::promise<R>, Allocator> : std::true_type
     {
     };
 }    // namespace std

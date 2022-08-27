@@ -42,7 +42,7 @@ namespace hpx {
             typename util::at_index<I, Ts...>::type&&
             get(std::variant<Ts...>&& var) noexcept
         {
-            return std::get<I>(std::move(var));
+            return std::get<I>(HPX_MOVE(var));
         }
 
         template <std::size_t I, typename... Ts>
@@ -50,9 +50,9 @@ namespace hpx {
             typename util::at_index<I, Ts...>::type const&&
             get(std::variant<Ts...> const&& var) noexcept
         {
-            return std::get<I>(std::move(var));
+            return std::get<I>(HPX_MOVE(var));
         }
     }    // namespace adl_barrier
 
-    using hpx::adl_barrier::get;
+    using namespace hpx::adl_barrier;
 }    // namespace hpx

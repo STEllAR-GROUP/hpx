@@ -58,7 +58,7 @@ namespace hpx { namespace threads { namespace detail {
         }
 
         // just retry, set_state will create new thread if target is still active
-        error_code ec(lightweight);    // do not throw
+        error_code ec(throwmode::lightweight);    // do not throw
         detail::set_thread_state(thrd.noref(), newstate, newstate_ex, priority,
             thread_schedule_hint(), true, ec);
 
@@ -134,7 +134,7 @@ namespace hpx { namespace threads { namespace detail {
                         get_thread_state_name(new_state));
 
                     thread_init_data data(
-                        util::bind(&set_active_state, thread_id_ref_type(thrd),
+                        hpx::bind(&set_active_state, thread_id_ref_type(thrd),
                             new_state, new_state_ex, priority, previous_state),
                         "set state for active thread", priority);
 
@@ -185,7 +185,7 @@ namespace hpx { namespace threads { namespace detail {
             }
             break;
             case thread_schedule_state::pending:
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             case thread_schedule_state::pending_boost:
                 if (thread_schedule_state::suspended == new_state)
                 {
@@ -210,7 +210,7 @@ namespace hpx { namespace threads { namespace detail {
             case thread_schedule_state::suspended:
                 break;    // fine, just set the new state
             case thread_schedule_state::pending_do_not_schedule:
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             default:
             {
                 HPX_ASSERT_MSG(false,
@@ -242,9 +242,10 @@ namespace hpx { namespace threads { namespace detail {
 
             // state has changed since we fetched it from the thread, retry
             // NOLINTNEXTLINE(bugprone-branch-clone)
-            LTM_(error).format("set_thread_state: state has been changed since "
-                               "it was fetched, retrying, thread({}), "
-                               "description({}), new state({}), old state({})",
+            LTM_(warning).format(
+                "set_thread_state: state has been changed since it was "
+                "fetched, retrying, thread({}), description({}), new "
+                "state({}), old state({})",
                 get_thread_id_data(thrd),
                 get_thread_id_data(thrd)->get_description(),
                 get_thread_state_name(new_state),

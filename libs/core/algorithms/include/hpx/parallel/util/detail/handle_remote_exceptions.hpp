@@ -58,7 +58,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             }
 
             if (!errors.empty())
-                throw exception_list(std::move(errors));
+                throw exception_list(HPX_MOVE(errors));
         }
 
         template <typename T>
@@ -72,14 +72,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             }
 
             if (!errors.empty())
-                throw exception_list(std::move(errors));
+                throw exception_list(HPX_MOVE(errors));
         }
     };
 
     template <>
     struct handle_remote_exceptions<hpx::execution::parallel_unsequenced_policy>
     {
-        HPX_NORETURN static void call(
+        [[noreturn]] static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)
         {
             parallel_exception_termination_handler();
@@ -111,7 +111,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     template <>
     struct handle_remote_exceptions<hpx::execution::unsequenced_policy>
     {
-        HPX_NORETURN static void call(
+        [[noreturn]] static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)
         {
             parallel_exception_termination_handler();

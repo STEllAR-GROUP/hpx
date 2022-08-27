@@ -49,7 +49,7 @@ namespace hpx { namespace compute { namespace detail {
 
         target_distribution_policy(target_distribution_policy&& rhs)
           : mtx_()
-          , targets_(std::move(rhs.targets_))
+          , targets_(HPX_MOVE(rhs.targets_))
           , num_partitions_(rhs.num_partitions_)
           , next_target_(0)
         {
@@ -71,7 +71,7 @@ namespace hpx { namespace compute { namespace detail {
         {
             if (this != &rhs)
             {
-                targets_ = std::move(rhs.targets_);
+                targets_ = HPX_MOVE(rhs.targets_);
                 num_partitions_ = rhs.num_partitions_;
                 next_target_ = 0;
             }
@@ -153,7 +153,7 @@ namespace hpx { namespace compute { namespace detail {
 
         target_distribution_policy(
             std::vector<target_type>&& targets, std::size_t num_partitions)
-          : targets_(std::move(targets))
+          : targets_(HPX_MOVE(targets))
           , num_partitions_(num_partitions)
           , next_target_(0)
         {

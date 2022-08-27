@@ -19,7 +19,6 @@
 #include <hpx/config/attributes.hpp>
 #include <hpx/config/branch_hints.hpp>
 #include <hpx/config/compiler_fence.hpp>
-#include <hpx/config/compiler_native_tls.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/constexpr.hpp>
 #include <hpx/config/debug.hpp>
@@ -27,10 +26,11 @@
 #include <hpx/config/emulate_deleted.hpp>
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/forceinline.hpp>
-#include <hpx/config/lambda_capture.hpp>
+#include <hpx/config/forward.hpp>
 #include <hpx/config/lambda_capture_this.hpp>
 #include <hpx/config/manual_profiling.hpp>
 #include <hpx/config/modules_enabled.hpp>
+#include <hpx/config/move.hpp>
 #include <hpx/config/threads_stack.hpp>
 #include <hpx/config/version.hpp>
 #include <hpx/config/weak_symbol.hpp>
@@ -44,6 +44,8 @@
 
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
+
+#include <cstddef>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 // On Windows, make sure winsock.h is not included even if windows.h is
@@ -112,6 +114,18 @@
 /// HPX_PARCEL_MPI_MAX_REQUESTS).
 #if !defined(HPX_PARCEL_MPI_MAX_REQUESTS)
 #  define HPX_PARCEL_MPI_MAX_REQUESTS 2147483647
+#endif
+
+/// This defines the number of cores that perform background work for the MPI
+/// parcelport
+/// This value can be changed at runtime by setting the configuration parameter:
+///
+///   hpx.parcel.mpi.background_threads = ...
+///
+/// (or by setting the corresponding environment variable
+/// HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS).
+#if !defined(HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS)
+#  define HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS std::size_t(-1)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -201,16 +215,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// By default, enable minimal thread deadlock detection in debug builds only.
-#if !defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
-#  endif
-#endif
-#if !defined(HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION)
-#  if defined(HPX_DEBUG)
-//#    define HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-#  endif
-#endif
 #if !defined(HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT)
 #  define HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT 1073741823
 #endif
@@ -219,40 +223,6 @@
 /// This defines the default number of coroutine heaps.
 #if !defined(HPX_COROUTINE_NUM_HEAPS)
 #  define HPX_COROUTINE_NUM_HEAPS 7
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// By default, enable storing the parent thread information in debug builds
-/// only.
-#if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_THREAD_PARENT_REFERENCE
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// By default, enable storing the thread phase in debug builds only.
-#if !defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_THREAD_PHASE_INFORMATION
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// By default, enable storing the thread description in debug builds only.
-#if !defined(HPX_HAVE_THREAD_DESCRIPTION)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_THREAD_DESCRIPTION
-#  endif
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-/// By default, enable storing the target address of the data the thread is
-/// accessing in debug builds only.
-#if !defined(HPX_HAVE_THREAD_TARGET_ADDRESS)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_THREAD_TARGET_ADDRESS
-#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -368,18 +338,6 @@
 #  define HPX_PREFIX HPX_PREFIX_DEFAULT
 #endif
 
-#if defined(HPX_APPLICATION_NAME_DEFAULT) && !defined(HPX_APPLICATION_NAME)
-#  define HPX_APPLICATION_NAME HPX_APPLICATION_NAME_DEFAULT
-#endif
-
-#if !defined(HPX_APPLICATION_STRING)
-#  if defined(HPX_APPLICATION_NAME)
-#    define HPX_APPLICATION_STRING HPX_PP_STRINGIZE(HPX_APPLICATION_NAME)
-#  else
-#    define HPX_APPLICATION_STRING "unknown HPX application"
-#  endif
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 // Count number of empty (no HPX thread available) thread manager loop executions
 #if !defined(HPX_IDLE_LOOP_COUNT_MAX)
@@ -464,21 +422,6 @@
 
 #if !defined(HPX_INITIAL_GID_RANGE)
 #  define HPX_INITIAL_GID_RANGE 0xFFFFU
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Enable lock verification code which allows to check whether there are locks
-// held while HPX-threads are suspended and/or interrupted.
-#if !defined(HPX_HAVE_VERIFY_LOCKS)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_VERIFY_LOCKS
-#  endif
-#endif
-
-#if !defined(HPX_HAVE_VERIFY_LOCKS_GLOBALLY)
-#  if defined(HPX_DEBUG)
-#    define HPX_HAVE_VERIFY_LOCKS_GLOBALLY
-#  endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

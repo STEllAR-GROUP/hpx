@@ -46,8 +46,7 @@ namespace hpx { namespace util {
     bool activate_counters::find_counter(
         performance_counters::counter_info const& info, error_code& ec)
     {
-        naming::id_type id =
-            performance_counters::get_counter(info.fullname_, ec);
+        hpx::id_type id = performance_counters::get_counter(info.fullname_, ec);
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROWS_IF(ec, bad_parameter, "activate_counters::find_counter",
@@ -71,7 +70,7 @@ namespace hpx { namespace util {
         if (ids_.empty())
         {
             performance_counters::discover_counter_func func(
-                util::bind_front(&activate_counters::find_counter, this));
+                hpx::bind_front(&activate_counters::find_counter, this));
 
             ids_.reserve(names.size());
             uoms_.reserve(names.size());
@@ -112,7 +111,7 @@ namespace hpx { namespace util {
         }
 
         // wait for all counters to be started
-        wait_all(started);
+        hpx::wait_all(started);
 
         for (future<bool>& f : started)
         {
@@ -154,7 +153,7 @@ namespace hpx { namespace util {
         }
 
         // wait for all counters to be started
-        wait_all(stopped);
+        hpx::wait_all(stopped);
 
         ids_.clear();    // give up control over all performance counters
 
@@ -198,7 +197,7 @@ namespace hpx { namespace util {
         }
 
         // wait for all counters to be started
-        wait_all(reset);
+        hpx::wait_all(reset);
 
         for (future<void>& f : reset)
         {

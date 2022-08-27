@@ -13,7 +13,7 @@
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/tag_dispatch.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
@@ -30,7 +30,7 @@ namespace hpx { namespace execution { namespace experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
             std::decay_t<Future> future;
 
-            friend void tag_dispatch(start_t, operation_state& os) noexcept
+            friend void tag_invoke(start_t, operation_state& os) noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
                     [&]() {
@@ -49,12 +49,12 @@ namespace hpx { namespace execution { namespace experimental {
                         // receiver and future into the on_completed callback.
                         state->set_on_completed([&os]() mutable {
                             hpx::execution::experimental::set_value(
-                                std::move(os.receiver), std::move(os.future));
+                                HPX_MOVE(os.receiver), HPX_MOVE(os.future));
                         });
                     },
                     [&](std::exception_ptr ep) {
                         hpx::execution::experimental::set_error(
-                            std::move(os.receiver), std::move(ep));
+                            HPX_MOVE(os.receiver), HPX_MOVE(ep));
                     });
             }
         };
@@ -64,14 +64,17 @@ namespace hpx { namespace execution { namespace experimental {
         {
             std::decay_t<Future> future;
 
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types = Variant<Tuple<std::decay_t<Future>>>;
+            struct completion_signatures
+            {
+                template <template <typename...> class Tuple,
+                    template <typename...> class Variant>
+                using value_types = Variant<Tuple<std::decay_t<Future>>>;
 
-            template <template <typename...> class Variant>
-            using error_types = Variant<std::exception_ptr>;
+                template <template <typename...> class Variant>
+                using error_types = Variant<std::exception_ptr>;
 
-            static constexpr bool sends_done = false;
+                static constexpr bool sends_stopped = false;
+            };
         };
 
         template <typename Future>
@@ -89,7 +92,7 @@ namespace hpx { namespace execution { namespace experimental {
                 typename = std::enable_if_t<!std::is_same<std::decay_t<Future>,
                     keep_future_sender>::value>>
             explicit keep_future_sender(Future&& future)
-              : base_type{std::forward<Future>(future)}
+              : base_type{HPX_FORWARD(Future, future)}
             {
             }
 
@@ -99,10 +102,10 @@ namespace hpx { namespace execution { namespace experimental {
             keep_future_sender& operator=(keep_future_sender const&) = delete;
 
             template <typename Receiver>
-            friend operation_state<Receiver, future_type> tag_dispatch(
+            friend operation_state<Receiver, future_type> tag_invoke(
                 connect_t, keep_future_sender&& s, Receiver&& receiver)
             {
-                return {std::forward<Receiver>(receiver), std::move(s.future)};
+                return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.future)};
             }
         };
 
@@ -118,7 +121,7 @@ namespace hpx { namespace execution { namespace experimental {
                 typename = std::enable_if_t<!std::is_same<std::decay_t<Future>,
                     keep_future_sender>::value>>
             explicit keep_future_sender(Future&& future)
-              : base_type{std::forward<Future>(future)}
+              : base_type{HPX_FORWARD(Future, future)}
             {
             }
 
@@ -128,22 +131,22 @@ namespace hpx { namespace execution { namespace experimental {
             keep_future_sender& operator=(keep_future_sender const&) = default;
 
             template <typename Receiver>
-            friend operation_state<Receiver, future_type> tag_dispatch(
+            friend operation_state<Receiver, future_type> tag_invoke(
                 connect_t, keep_future_sender&& s, Receiver&& receiver)
             {
-                return {std::forward<Receiver>(receiver), std::move(s.future)};
+                return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.future)};
             }
 
             template <typename Receiver>
-            friend operation_state<Receiver, future_type> tag_dispatch(
+            friend operation_state<Receiver, future_type> tag_invoke(
                 connect_t, keep_future_sender& s, Receiver&& receiver)
             {
-                return {std::forward<Receiver>(receiver), s.future};
+                return {HPX_FORWARD(Receiver, receiver), s.future};
             }
         };
     }    // namespace detail
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct keep_future_t final
+    inline constexpr struct keep_future_t final
     {
         // clang-format off
         template <typename Future,
@@ -154,7 +157,7 @@ namespace hpx { namespace execution { namespace experimental {
         constexpr HPX_FORCEINLINE auto operator()(Future&& future) const
         {
             return detail::keep_future_sender<std::decay_t<Future>>(
-                std::forward<Future>(future));
+                HPX_FORWARD(Future, future));
         }
 
         constexpr HPX_FORCEINLINE auto operator()() const

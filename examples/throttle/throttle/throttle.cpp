@@ -13,11 +13,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
-HPX_REGISTER_COMPONENT_MODULE();    // create entry point for component factory
+HPX_REGISTER_COMPONENT_MODULE()    // create entry point for component factory
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef throttle::throttle throttle_client_type;
-HPX_DEFINE_GET_COMPONENT_TYPE(throttle_client_type);
-
+HPX_DEFINE_GET_COMPONENT_TYPE(throttle_client_type)
 
 #endif

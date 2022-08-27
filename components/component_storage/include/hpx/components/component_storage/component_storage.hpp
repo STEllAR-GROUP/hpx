@@ -18,8 +18,7 @@
 #include <cstddef>
 #include <vector>
 
-namespace hpx { namespace components
-{
+namespace hpx { namespace components {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_MIGRATE_TO_STORAGE_EXPORT component_storage
       : public client_base<component_storage, server::component_storage>
@@ -29,23 +28,20 @@ namespace hpx { namespace components
 
     public:
         component_storage(hpx::id_type target_locality);
-        component_storage(hpx::future<naming::id_type> && f);
+        component_storage(hpx::future<hpx::id_type>&& f);
 
-        hpx::future<naming::id_type> migrate_to_here(std::vector<char> const&,
-            naming::id_type const&, naming::address const&);
-        naming::id_type migrate_to_here(launch::sync_policy,
-            std::vector<char> const&, naming::id_type const&,
+        hpx::future<hpx::id_type> migrate_to_here(std::vector<char> const&,
+            hpx::id_type const&, naming::address const&);
+        hpx::id_type migrate_to_here(launch::sync_policy,
+            std::vector<char> const&, hpx::id_type const&,
             naming::address const&);
 
-        hpx::future<std::vector<char> > migrate_from_here(
+        hpx::future<std::vector<char>> migrate_from_here(
             naming::gid_type const&);
-        std::vector<char> migrate_from_here(launch::sync_policy,
-            naming::gid_type const&);
+        std::vector<char> migrate_from_here(
+            launch::sync_policy, naming::gid_type const&);
 
         future<std::size_t> size() const;
         std::size_t size(launch::sync_policy) const;
     };
-}}
-
-
-
+}}    // namespace hpx::components

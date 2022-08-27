@@ -80,11 +80,11 @@ What's so special about |hpx|?
    :caption: User documentation
    :maxdepth: 2
 
-   why_hpx
    quickstart
-   terminology
    examples
    manual
+   terminology
+   why_hpx
    additional_material
 
 .. include:: libs/index.rst

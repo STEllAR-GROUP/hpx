@@ -12,7 +12,7 @@
 
 #include "server/managed_refcnt_checker.hpp"
 
-HPX_REGISTER_COMPONENT_MODULE();
+HPX_REGISTER_COMPONENT_MODULE()
 
 using hpx::test::server::managed_refcnt_checker;
 
@@ -29,5 +29,5 @@ HPX_REGISTER_DISABLED_COMPONENT_FACTORY(
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION(managed_refcnt_checker::take_reference_action,
-    managed_refcnt_checker_take_reference_action);
+    managed_refcnt_checker_take_reference_action)
 #endif

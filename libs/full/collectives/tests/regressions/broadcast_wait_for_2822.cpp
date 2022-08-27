@@ -25,7 +25,7 @@ void vector_bcast(std::vector<double> bcast)
     buffer = bcast;
 }
 
-HPX_PLAIN_ACTION(vector_bcast);
+HPX_PLAIN_ACTION(vector_bcast)
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(vector_bcast_action)
 HPX_REGISTER_BROADCAST_ACTION(vector_bcast_action)
@@ -43,16 +43,16 @@ int hpx_main()
 
         auto f =
             hpx::lcos::broadcast<vector_bcast_action>(localities, bcast_array);
-        hpx::lcos::future_status status = hpx::lcos::future_status::timeout;
+        hpx::future_status status = hpx::future_status::timeout;
 
         // This test should usually test against future_status == ready. However,
         // under some circumstances, the operation might still take a little
         // longer...
-        while (status != hpx::lcos::future_status::ready)
+        while (status != hpx::future_status::ready)
         {
             status = f.wait_for(std::chrono::milliseconds(1000));
-            HPX_TEST(status == hpx::lcos::future_status::ready ||
-                status == hpx::lcos::future_status::timeout);
+            HPX_TEST(status == hpx::future_status::ready ||
+                status == hpx::future_status::timeout);
         }
 
         HPX_TEST_EQ(buffer.size(), N);

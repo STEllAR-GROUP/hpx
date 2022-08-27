@@ -14,8 +14,7 @@
 #include <cstddef>
 #include <vector>
 
-namespace jacobi
-{
+namespace jacobi {
     struct row;
 
     struct HPX_COMPONENT_EXPORT grid
@@ -23,18 +22,16 @@ namespace jacobi
         grid() {}
         grid(std::size_t nx, std::size_t ny, double value);
 
-        typedef
-            std::vector<row>
-            rows_type;
+        typedef std::vector<row> rows_type;
 
         rows_type rows;
 
         template <typename Archive>
-        void serialize(Archive & ar, unsigned)
+        void serialize(Archive& ar, unsigned)
         {
-            ar & rows;
+            ar& rows;
         }
     };
-}
+}    // namespace jacobi
 
 #endif

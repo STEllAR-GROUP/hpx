@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
@@ -46,9 +47,8 @@ namespace hpx {
     /// \cond NOINTERNAL
     namespace resource {
         // Utilities to init the thread_pools of the resource partitioner
-        using rp_callback_type =
-            hpx::util::function_nonser<void(hpx::resource::partitioner&,
-                hpx::program_options::variables_map const&)>;
+        using rp_callback_type = hpx::function<void(hpx::resource::partitioner&,
+            hpx::program_options::variables_map const&)>;
     }    // namespace resource
     /// \endcond
 

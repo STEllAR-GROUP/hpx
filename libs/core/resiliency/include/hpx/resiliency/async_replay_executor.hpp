@@ -44,9 +44,9 @@ namespace hpx { namespace resiliency { namespace experimental {
         {
             template <typename Pred_, typename F_, typename Tuple_>
             async_replay_executor_helper(Pred_&& pred, F_&& f, Tuple_&& tuple)
-              : pred_(std::forward<Pred_>(pred))
-              , f_(std::forward<F_>(f))
-              , t_(std::forward<Tuple_>(tuple))
+              : pred_(HPX_FORWARD(Pred_, pred))
+              , f_(HPX_FORWARD(F_, f))
+              , t_(HPX_FORWARD(Tuple_, tuple))
             {
             }
 
@@ -56,7 +56,7 @@ namespace hpx { namespace resiliency { namespace experimental {
             invoke(Executor&& exec, hpx::util::index_pack<Is...>)
             {
                 return hpx::parallel::execution::async_execute(
-                    std::forward<Executor>(exec), f_, std::get<Is>(t_)...);
+                    HPX_FORWARD(Executor, exec), f_, std::get<Is>(t_)...);
             }
 
             template <typename Executor>
@@ -77,8 +77,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                 // necessary
                 auto this_ = this->shared_from_this();
                 return f.then(hpx::launch::sync,
-                    [this_ = std::move(this_),
-                        exec = std::forward<Executor>(exec),
+                    [this_ = HPX_MOVE(this_),
+                        exec = HPX_FORWARD(Executor, exec),
                         n](result_type&& f) mutable {
                         if (f.has_exception())
                         {
@@ -89,7 +89,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                             // this was not the last attempt
                             if (n != 0)
                             {
-                                return this_->call(std::move(exec), n - 1);
+                                return this_->call(HPX_MOVE(exec), n - 1);
                             }
 
                             // rethrow exception if the number of replays has
@@ -105,7 +105,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                             // this was not the last attempt
                             if (n != 0)
                             {
-                                return this_->call(std::move(exec), n - 1);
+                                return this_->call(HPX_MOVE(exec), n - 1);
                             }
 
                             // throw aborting exception as attempts were
@@ -116,7 +116,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                         if (n != 0)
                         {
                             // return result
-                            return hpx::make_ready_future(std::move(result));
+                            return hpx::make_ready_future(HPX_MOVE(result));
                         }
 
                         // throw aborting exception as attempts were
@@ -138,8 +138,8 @@ namespace hpx { namespace resiliency { namespace experimental {
         {
             template <typename Pred_, typename F_, typename Tuple_>
             async_replay_executor_helper(Pred_&&, F_&& f, Tuple_&& tuple)
-              : f_(std::forward<F_>(f))
-              , t_(std::forward<Tuple_>(tuple))
+              : f_(HPX_FORWARD(F_, f))
+              , t_(HPX_FORWARD(Tuple_, tuple))
             {
             }
 
@@ -149,7 +149,7 @@ namespace hpx { namespace resiliency { namespace experimental {
             invoke(Executor&& exec, hpx::util::index_pack<Is...>)
             {
                 return hpx::parallel::execution::async_execute(
-                    std::forward<Executor>(exec), f_, std::get<Is>(t_)...);
+                    HPX_FORWARD(Executor, exec), f_, std::get<Is>(t_)...);
             }
 
             template <typename Executor>
@@ -170,8 +170,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                 // necessary
                 auto this_ = this->shared_from_this();
                 return f.then(hpx::launch::sync,
-                    [this_ = std::move(this_),
-                        exec = std::forward<Executor>(exec),
+                    [this_ = HPX_MOVE(this_),
+                        exec = HPX_FORWARD(Executor, exec),
                         n](result_type&& f) mutable {
                         if (f.has_exception())
                         {
@@ -182,7 +182,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                             // this was not the last attempt
                             if (n != 0)
                             {
-                                return this_->call(std::move(exec), n - 1);
+                                return this_->call(HPX_MOVE(exec), n - 1);
                             }
 
                             // rethrow exception if the number of replays has
@@ -216,8 +216,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                 typename std::decay<Pred>::type, typename std::decay<F>::type,
                 std::tuple<typename std::decay<Ts>::type...>>;
 
-            return std::make_shared<return_type>(std::forward<Pred>(pred),
-                std::forward<F>(f), std::make_tuple(std::forward<Ts>(ts)...));
+            return std::make_shared<return_type>(HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(F, f), std::make_tuple(HPX_FORWARD(Ts, ts)...));
         }
     }    // namespace detail
 
@@ -232,17 +232,16 @@ namespace hpx { namespace resiliency { namespace experimental {
             hpx::traits::is_two_way_executor<Executor>::value
         )>
     // clang-format on
-    decltype(auto) tag_dispatch(async_replay_validate_t, Executor&& exec,
+    decltype(auto) tag_invoke(async_replay_validate_t, Executor&& exec,
         std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
     {
         using result_type =
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
 
         auto helper = detail::make_async_replay_executor_helper<result_type>(
-            std::forward<Pred>(pred), std::forward<F>(f),
-            std::forward<Ts>(ts)...);
+            HPX_FORWARD(Pred, pred), HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
 
-        return helper->call(std::forward<Executor>(exec), n);
+        return helper->call(HPX_FORWARD(Executor, exec), n);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -255,16 +254,16 @@ namespace hpx { namespace resiliency { namespace experimental {
             hpx::traits::is_two_way_executor<Executor>::value
         )>
     // clang-format on
-    decltype(auto) tag_dispatch(
+    decltype(auto) tag_invoke(
         async_replay_t, Executor&& exec, std::size_t n, F&& f, Ts&&... ts)
     {
         using result_type =
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
 
         auto helper = detail::make_async_replay_executor_helper<result_type>(
-            detail::replay_validator{}, std::forward<F>(f),
-            std::forward<Ts>(ts)...);
+            detail::replay_validator{}, HPX_FORWARD(F, f),
+            HPX_FORWARD(Ts, ts)...);
 
-        return helper->call(std::forward<Executor>(exec), n);
+        return helper->call(HPX_FORWARD(Executor, exec), n);
     }
 }}}    // namespace hpx::resiliency::experimental

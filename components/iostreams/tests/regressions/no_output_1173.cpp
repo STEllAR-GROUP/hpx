@@ -23,9 +23,9 @@ std::uint32_t locality_id = std::uint32_t(-1);
 void worker()
 {
     locality_id = hpx::get_locality_id();
-    hpx::consolestream << "hello!" << hpx::endl;
+    hpx::consolestream << "hello!" << std::endl;
 }
-HPX_PLAIN_ACTION(worker, worker_action);
+HPX_PLAIN_ACTION(worker, worker_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void on_shutdown(std::string const& expected)
@@ -50,7 +50,7 @@ int hpx_main()
         expected += "hello!\n";
     }
 
-    hpx::register_shutdown_function(hpx::util::bind(&on_shutdown, expected));
+    hpx::register_shutdown_function(hpx::bind(&on_shutdown, expected));
     hpx::wait_all(futures);
 
     HPX_TEST_EQ(hpx::finalize(), 0);

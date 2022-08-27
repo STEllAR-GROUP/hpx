@@ -7,6 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_mpi/mpi_exception.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/execution_base.hpp>
@@ -25,6 +27,20 @@
 
 namespace hpx { namespace mpi { namespace experimental {
 
+    // -----------------------------------------------------------------
+    namespace detail {
+
+        using request_callback_function_type =
+            hpx::move_only_function<void(int)>;
+
+        HPX_CORE_EXPORT void add_request_callback(
+            request_callback_function_type&& f, MPI_Request req);
+        HPX_CORE_EXPORT void register_polling(hpx::threads::thread_pool_base&);
+        HPX_CORE_EXPORT void unregister_polling(
+            hpx::threads::thread_pool_base&);
+
+    }    // namespace detail
+
     // by convention the title is 7 chars (for alignment)
     using print_on = debug::enable_print<false>;
     static constexpr print_on mpi_debug("MPI_FUT");
@@ -32,9 +48,6 @@ namespace hpx { namespace mpi { namespace experimental {
     namespace detail {
 
         using mutex_type = hpx::lcos::local::spinlock;
-
-        // extract MPI error message
-        HPX_CORE_EXPORT std::string error_message(int code);
 
         // mutex needed to protect mpi request vector, note that the
         // mpi poll function takes place inside the main scheduling loop
@@ -58,6 +71,7 @@ namespace hpx { namespace mpi { namespace experimental {
               : hpx::lcos::detail::future_data<int>(no_addref)
               , request_(request)
             {
+                add_callback();
             }
 
             // constructor used for creation directly by invoke
@@ -66,13 +80,33 @@ namespace hpx { namespace mpi { namespace experimental {
             {
             }
 
+            // Used when the request was not available when constructing
+            // future_data
+            void add_callback()
+            {
+                add_request_callback(
+                    [fdp = hpx::intrusive_ptr<future_data>(this)](int status) {
+                        if (status == MPI_SUCCESS)
+                        {
+                            // mark the future as ready by setting the shared_state
+                            fdp->set_data(MPI_SUCCESS);
+                        }
+                        else
+                        {
+                            fdp->set_exception(
+                                std::make_exception_ptr(mpi_exception(status)));
+                        }
+                    },
+                    request_);
+            }
+
             // The native MPI request handle owned by this future data
             MPI_Request request_;
         };
 
         // -----------------------------------------------------------------
         // intrusive pointer for future_data
-        using future_data_ptr = memory::intrusive_ptr<future_data>;
+        using future_data_ptr = hpx::intrusive_ptr<future_data>;
 
         // -----------------------------------------------------------------
         // a convenience structure to hold state vars
@@ -82,11 +116,10 @@ namespace hpx { namespace mpi { namespace experimental {
             bool error_handler_initialized_ = false;
             int rank_ = -1;
             int size_ = -1;
-            // active futures holds the size of the future vector
-            // which is always the same as the mpi request vector
-            std::atomic<std::uint32_t> active_futures_size_{0};
-            // active requests returns the size of the request queue
-            std::atomic<std::uint32_t> request_queue_size_{0};
+            // requests vector holds the requests that are checked
+            std::atomic<std::uint32_t> requests_vector_size_{0};
+            // requests queue holds the requests recently added
+            std::atomic<std::uint32_t> requests_queue_size_{0};
         };
 
         // an instance of mpi_info that we store data in
@@ -105,13 +138,12 @@ namespace hpx { namespace mpi { namespace experimental {
         HPX_CORE_EXPORT void hpx_MPI_Handler(MPI_Comm*, int* errorcode, ...);
 
         // -----------------------------------------------------------------
-        // we track requests and future data in two vectors even though
-        // we have the request stored in the future data already
+        // we track requests and callbacks in two vectors even though
+        // we have the request stored in the request_callback vector already
         // the reason for this is because we can use MPI_Testany
         // with a vector of requests to save overheads compared
         // to testing one by one every item (using a list)
-        HPX_CORE_EXPORT std::vector<MPI_Request>& get_active_requests();
-        HPX_CORE_EXPORT std::vector<future_data_ptr>& get_active_futures();
+        HPX_CORE_EXPORT std::vector<MPI_Request>& get_requests_vector();
 
         // -----------------------------------------------------------------
         // define a lockfree queue type to place requests in prior to handling
@@ -119,26 +151,6 @@ namespace hpx { namespace mpi { namespace experimental {
         // returned from MPI. Instead the requests are placed into a queue
         // and the polling code pops them prior to calling Testany
         using queue_type = concurrency::ConcurrentQueue<future_data_ptr>;
-        queue_type& get_request_queue();
-
-        // -----------------------------------------------------------------
-        // used internally to add an MPI_Request to the lockfree queue
-        // that will be used by the polling routines to check when requests
-        // have completed
-        HPX_CORE_EXPORT void add_to_request_queue(future_data_ptr data);
-
-        // -----------------------------------------------------------------
-        // used internally to query how many requests are 'in flight'
-        // the limiting executor can use this to throttle back a task if
-        // too many mpi requests are being spawned at once
-        // unfortunately, the lock-free queue can only return an estimate
-        // of the queue size, so this is not guaranteed to be precise
-        HPX_CORE_EXPORT std::size_t get_number_of_enqueued_requests();
-
-        // -----------------------------------------------------------------
-        // used internally to add a request to the main polling vector
-        // that is passed to MPI_Testany
-        HPX_CORE_EXPORT void add_to_request_vector(future_data_ptr data);
 
         // -----------------------------------------------------------------
         // used internally to query how many requests are 'in flight'
@@ -169,15 +181,15 @@ namespace hpx { namespace mpi { namespace experimental {
                 new detail::future_data(detail::future_data::init_no_addref{});
 
             // invoke the call to MPI_Ixxx, ignore the returned result for now
-            int result = f(std::forward<Ts>(ts)..., &data->request_);
-            (void) result;    // silence unused var warning
+            int result = f(HPX_FORWARD(Ts, ts)..., &data->request_);
+            HPX_UNUSED(result);
 
-            // enqueue the future state internally for processing
-            detail::add_to_request_queue(data);
+            // Add callback after the request has been filled
+            data->add_callback();
 
             // return a future bound to the shared state
             using traits::future_access;
-            return future_access<hpx::future<int>>::create(std::move(data));
+            return future_access<hpx::future<int>>::create(HPX_MOVE(data));
         }
     }    // namespace detail
 
@@ -200,7 +212,7 @@ namespace hpx { namespace mpi { namespace experimental {
             {
                 return true;
             }
-            return (detail::get_mpi_info().active_futures_size_ > 0);
+            return (detail::get_mpi_info().requests_vector_size_ > 0);
         });
     }
 
@@ -214,17 +226,9 @@ namespace hpx { namespace mpi { namespace experimental {
             {
                 return true;
             }
-            return (detail::get_mpi_info().active_futures_size_ > 0) || f();
+            return (detail::get_mpi_info().requests_vector_size_ > 0) || f();
         });
     }
-
-    // -----------------------------------------------------------------
-    namespace detail {
-
-        HPX_CORE_EXPORT void register_polling(hpx::threads::thread_pool_base&);
-        HPX_CORE_EXPORT void unregister_polling(
-            hpx::threads::thread_pool_base&);
-    }    // namespace detail
 
     // initialize the hpx::mpi background request handler
     // All ranks should call this function,
@@ -238,12 +242,13 @@ namespace hpx { namespace mpi { namespace experimental {
     // -----------------------------------------------------------------
     // This RAII helper class assumes that MPI initialization/finalization is
     // handled elsewhere
-    struct HPX_NODISCARD enable_user_polling
+    struct [[nodiscard]] enable_user_polling
     {
-        enable_user_polling(std::string const& pool_name = "")
+        enable_user_polling(
+            std::string const& pool_name = "", bool init_errorhandler = false)
           : pool_name_(pool_name)
         {
-            mpi::experimental::init(false, pool_name);
+            mpi::experimental::init(false, pool_name, init_errorhandler);
         }
 
         ~enable_user_polling()
@@ -259,6 +264,6 @@ namespace hpx { namespace mpi { namespace experimental {
     template <typename... Args>
     inline void debug(Args&&... args)
     {
-        mpi_debug.debug(detail::get_mpi_info(), std::forward<Args>(args)...);
+        mpi_debug.debug(detail::get_mpi_info(), HPX_FORWARD(Args, args)...);
     }
 }}}    // namespace hpx::mpi::experimental

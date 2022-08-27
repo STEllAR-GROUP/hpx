@@ -29,8 +29,8 @@ namespace examples { namespace stubs {
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
         //[simple_central_tuplespace_stubs_write_async
-        static hpx::lcos::future<int> write_async(
-            hpx::naming::id_type const& gid, tuple_type const& tuple)
+        static hpx::future<int> write_async(
+            hpx::id_type const& gid, tuple_type const& tuple)
         {
             typedef server::simple_central_tuplespace::write_action action_type;
             return hpx::async<action_type>(gid, tuple);
@@ -40,8 +40,8 @@ namespace examples { namespace stubs {
         /// put \p tuple into tuplespace.
         ///
         /// \note This function is fully synchronous.
-        static int write(hpx::launch::sync_policy,
-            hpx::naming::id_type const& gid, tuple_type const& tuple)
+        static int write(hpx::launch::sync_policy, hpx::id_type const& gid,
+            tuple_type const& tuple)
         {
             typedef server::simple_central_tuplespace::write_action action_type;
             return hpx::async<action_type>(gid, tuple).get();
@@ -53,9 +53,8 @@ namespace examples { namespace stubs {
         /// \note This function has fire-and-forget semantics. It will not wait
         ///       for the action to be executed. Instead, it will return
         ///       immediately after the action has has been dispatched.
-        static hpx::lcos::future<tuple_type> read_async(
-            hpx::naming::id_type const& gid, tuple_type const& tp,
-            double const timeout)
+        static hpx::future<tuple_type> read_async(
+            hpx::id_type const& gid, tuple_type const& tp, double const timeout)
         {
             typedef server::simple_central_tuplespace::read_action action_type;
             return hpx::async<action_type>(gid, tp, timeout);
@@ -66,8 +65,7 @@ namespace examples { namespace stubs {
         /// \note This function is fully synchronous.
         //[simple_central_tuplespace_stubs_read_sync
         static tuple_type read(hpx::launch::sync_policy,
-            hpx::naming::id_type const& gid, tuple_type const& tp,
-            double const timeout)
+            hpx::id_type const& gid, tuple_type const& tp, double const timeout)
         {
             typedef server::simple_central_tuplespace::read_action action_type;
             return hpx::async<action_type>(gid, tp, timeout).get();
@@ -77,15 +75,14 @@ namespace examples { namespace stubs {
         ///////////////////////////////////////////////////////////////////////
         /// take tuple matching \p key from tuplespace within \p timeout.
         ///
-        /// \returns This function returns an \a hpx::lcos::future. When the
+        /// \returns This function returns an \a hpx::future. When the
         ///          value of this computation is needed, the get() method of
         ///          the future should be called. If the value is available,
         ///          get() will return immediately; otherwise, it will block
         ///          until the value is ready.
         //[simple_central_tuplespace_stubs_take_async
-        static hpx::lcos::future<tuple_type> take(hpx::launch::async_policy,
-            hpx::naming::id_type const& gid, tuple_type const& tp,
-            double const timeout)
+        static hpx::future<tuple_type> take(hpx::launch::async_policy,
+            hpx::id_type const& gid, tuple_type const& tp, double const timeout)
         {
             typedef server::simple_central_tuplespace::take_action action_type;
             return hpx::async<action_type>(gid, tp, timeout);
@@ -96,8 +93,7 @@ namespace examples { namespace stubs {
         ///
         /// \note This function is fully synchronous.
         static tuple_type take(hpx::launch::sync_policy,
-            hpx::naming::id_type const& gid, tuple_type const& tp,
-            double const timeout)
+            hpx::id_type const& gid, tuple_type const& tp, double const timeout)
         {
             // The following get yields control while the action is executed.
             return take(hpx::launch::async, gid, tp, timeout).get();

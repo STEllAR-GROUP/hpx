@@ -13,27 +13,30 @@
 #include <vector>
 
 #ifndef H5_HAVE_THREADSAFE
-#error    "This example requires that the HDF5 API is thread-safe. Please provide a suitable version of HDF5."
+#error "This example requires that the HDF5 API is thread-safe. " \
+       "Please provide a suitable version of HDF5."
 #endif
 
 using namespace H5;
 
 int main()
 {
-    double const pi = 4*std::atan(1.);
+    double const pi = 4 * std::atan(1.);
     std::size_t const num_points = 36000;
 
     std::vector<double> data;
     std::vector<double> values;
-    data.reserve(num_points+1);
-    values.reserve(num_points+1);
+    data.reserve(num_points + 1);
+    values.reserve(num_points + 1);
 
-    for (std::size_t i = 0; i <= num_points; ++i) {
-        data.push_back(2.*pi*i/num_points);
-        values.push_back(std::sin(2.*pi*i/num_points));
+    for (std::size_t i = 0; i <= num_points; ++i)
+    {
+        data.push_back(2. * pi * i / num_points);
+        values.push_back(std::sin(2. * pi * i / num_points));
     }
 
-    try {
+    try
+    {
         // Turn off the auto-printing when failure occurs
         Exception::dontPrint();
 
@@ -42,8 +45,8 @@ int main()
 
         // Define the size of the data array and create the data space for
         // fixed sized data array
-        hsize_t dimsf[1];              // dataset dimensions
-        dimsf[0] = num_points+1;
+        hsize_t dimsf[1];    // dataset dimensions
+        dimsf[0] = num_points + 1;
         DataSpace dataspace(1, dimsf);
 
         FloatType datatype(PredType::NATIVE_DOUBLE);
@@ -59,28 +62,33 @@ int main()
 
         // Create a new dataset within the file using defined dataspace and
         // datatype and default dataset creation properties.
-        DataSet dataset_values = file.createDataSet("sine", datatype, dataspace);
+        DataSet dataset_values =
+            file.createDataSet("sine", datatype, dataspace);
 
         // Write the data to the dataset using default memory space, file
         // space, and transfer properties.
         dataset_values.write(&*values.begin(), PredType::NATIVE_DOUBLE);
     }
-    catch(FileIException const& error) {
+    catch (FileIException const& error)
+    {
         // catch failure caused by the H5File operations
         error.printError();
         return -1;
     }
-    catch(DataSetIException const& error) {
+    catch (DataSetIException const& error)
+    {
         // catch failure caused by the DataSet operations
         error.printError();
         return -1;
     }
-    catch(DataSpaceIException const& error) {
+    catch (DataSpaceIException const& error)
+    {
         // catch failure caused by the DataSpace operations
         error.printError();
         return -1;
     }
-    catch(DataTypeIException const& error) {
+    catch (DataTypeIException const& error)
+    {
         // catch failure caused by the DataSpace operations
         error.printError();
         return -1;

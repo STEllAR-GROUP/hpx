@@ -7,6 +7,7 @@
 //  This code is based on boost::iterators::counting_iterator
 // (C) Copyright David Abrahams 2001.
 
+#include <hpx/iterator_support/tests/iterator_tests.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/program_options.hpp>
@@ -19,11 +20,13 @@
 #include <iostream>
 #include <iterator>
 #include <list>
+#include <random>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-#include "iterator_tests.hpp"
+int seed = std::random_device{}();
+std::mt19937 gen(seed);
 
 template <typename T>
 struct signed_assert_nonnegative
@@ -58,7 +61,8 @@ void category_test(CountingIterator start, CountingIterator finish, Value,
     difference_type distance = std::distance(start, finish);
 
     // Pick a random position internal to the range
-    difference_type offset = (unsigned) rand() % distance;
+    std::uniform_int_distribution<difference_type> dist(0, distance - 1);
+    difference_type offset = dist(gen);
 
     HPX_TEST(offset >= 0);
 
@@ -183,7 +187,8 @@ template <typename Container>
 void test_container(
     Container* = nullptr)    // default arg works around MSVC bug
 {
-    Container c(2 + (unsigned) rand() % 1673);
+    std::uniform_int_distribution<unsigned> dis(3, 1673);
+    Container c(dis(gen));
 
     typename Container::iterator const start = c.begin();
 
@@ -307,12 +312,12 @@ private:
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(nullptr);
     if (vm.count("seed"))
+    {
         seed = vm["seed"].as<unsigned int>();
-
+        gen.seed(seed);
+    }
     std::cout << "using seed: " << seed << std::endl;
-    std::srand(seed);
 
     // Test the built-in integer types.
     test_integer<char>();

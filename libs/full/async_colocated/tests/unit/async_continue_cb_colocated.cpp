@@ -26,20 +26,20 @@ std::int32_t increment(std::int32_t i)
 {
     return i + 1;
 }
-HPX_PLAIN_ACTION(increment);    // defines increment_action
+HPX_PLAIN_ACTION(increment)    // defines increment_action
 
 std::int32_t increment_with_future(hpx::shared_future<std::int32_t> fi)
 {
     return fi.get() + 1;
 }
-HPX_PLAIN_ACTION(increment_with_future);
+HPX_PLAIN_ACTION(increment_with_future)
 
 ///////////////////////////////////////////////////////////////////////////////
 std::int32_t mult2(std::int32_t i)
 {
     return i * 2;
 }
-HPX_PLAIN_ACTION(mult2);    // defines mult2_action
+HPX_PLAIN_ACTION(mult2)    // defines mult2_action
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server : hpx::components::component_base<test_server>
@@ -47,7 +47,7 @@ struct test_server : hpx::components::component_base<test_server>
 };
 
 typedef hpx::components::component<test_server> test_server_type;
-HPX_REGISTER_COMPONENT(test_server_type, test_server);
+HPX_REGISTER_COMPONENT(test_server_type, test_server)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {
@@ -94,7 +94,7 @@ int test_async_continue_cb_colocated(test_client const& target)
             inc, make_continuation(), hpx::colocated(target), &cb, 42);
         HPX_TEST_EQ(f1.get(), 43);
 
-        hpx::lcos::promise<std::int32_t> p;
+        hpx::distributed::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<int> f2 = hpx::async_continue_cb(
@@ -114,9 +114,10 @@ int test_async_continue_cb_colocated(test_client const& target)
         hpx::future<int> f1 = hpx::async_continue_cb(
             inc, make_continuation(), hpx::colocated(target), &cb, 42);
         HPX_TEST_EQ(f1.get(), 43);
+        hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
         HPX_TEST_EQ(callback_called.load(), 1);
 
-        hpx::lcos::promise<std::int32_t> p;
+        hpx::distributed::promise<std::int32_t> p;
         hpx::shared_future<std::int32_t> f = p.get_future();
 
         hpx::future<int> f2 = hpx::async_continue_cb(
@@ -126,7 +127,7 @@ int test_async_continue_cb_colocated(test_client const& target)
         HPX_TEST_EQ(f2.get(), 43);
 
         // The callback should have been called 2 times. wait for a short period
-        // of time, to allow it for it to be fully executed
+        // of time, to allow for it to be fully executed
         hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
         HPX_TEST_EQ(callback_called.load(), 2);
     }
@@ -155,7 +156,7 @@ int test_async_continue_cb_colocated(test_client const& target)
         HPX_TEST_EQ(f.get(), 87);
 
         // The callback should have been called 4 times. wait for a short period
-        // of time, to allow it for it to be fully executed
+        // of time, to allow for it to be fully executed
         hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
         HPX_TEST_EQ(callback_called.load(), 4);
     }
@@ -223,7 +224,7 @@ int test_async_continue_cb_colocated(test_client const& target)
         HPX_TEST_EQ(f.get(), 86);
 
         // The callback should have been called once. wait for a short period
-        // of time, to allow it for it to be fully executed
+        // of time, to allow for it to be fully executed
         hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
         HPX_TEST_EQ(callback_called.load(), 1);
     }

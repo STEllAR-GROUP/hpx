@@ -53,7 +53,7 @@ namespace hpx {
     ///           from an HPX-thread. It will return an empty vector otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
-    HPX_EXPORT std::vector<naming::id_type> find_all_localities(
+    HPX_EXPORT std::vector<hpx::id_type> find_all_localities(
         components::component_type type, error_code& ec = throws);
 
     /// \brief Return the list of locality ids of remote localities supporting
@@ -87,7 +87,7 @@ namespace hpx {
     ///           from an HPX-thread. It will return an empty vector otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_locality()
-    HPX_EXPORT std::vector<naming::id_type> find_remote_localities(
+    HPX_EXPORT std::vector<hpx::id_type> find_remote_localities(
         components::component_type type, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -113,7 +113,7 @@ namespace hpx {
     ///           available to this application which supports the creation of
     ///           instances of the given component type. If no locality
     ///           supporting the given component type is currently available,
-    ///           this function will return \a hpx::naming::invalid_id.
+    ///           this function will return \a hpx::invalid_id.
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
@@ -121,10 +121,10 @@ namespace hpx {
     ///           hpx::exception.
     ///
     /// \note     This function will return meaningful results only if called
-    ///           from an HPX-thread. It will return \a hpx::naming::invalid_id
+    ///           from an HPX-thread. It will return \a hpx::invalid_id
     ///           otherwise.
     ///
     /// \see      \a hpx::find_here(), \a hpx::find_all_localities()
-    HPX_EXPORT naming::id_type find_locality(
+    HPX_EXPORT hpx::id_type find_locality(
         components::component_type type, error_code& ec = throws);
 }    // namespace hpx

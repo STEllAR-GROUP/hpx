@@ -15,13 +15,11 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace components { namespace process
-{
+namespace hpx { namespace components { namespace process {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ... Ts>
-    child execute(hpx::id_type const& id, Ts && ... ts)
+    template <typename... Ts>
+    child execute(hpx::id_type const& id, Ts&&... ts)
     {
-        return hpx::new_<child>(id, std::forward<Ts>(ts)...);
+        return hpx::new_<child>(id, HPX_FORWARD(Ts, ts)...);
     }
-}}}
-
+}}}    // namespace hpx::components::process

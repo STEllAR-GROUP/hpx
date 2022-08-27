@@ -16,36 +16,33 @@
 
 #include <utility>
 
-namespace examples
-{
+namespace examples {
     ///////////////////////////////////////////////////////////////////////////
     /// Client for the \a server::managed_accumulator component.
     class template_function_accumulator
-      : public hpx::components::client_base<
-            template_function_accumulator,
-            server::template_function_accumulator
-        >
+      : public hpx::components::client_base<template_function_accumulator,
+            server::template_function_accumulator>
     {
-        typedef hpx::components::client_base<
-            template_function_accumulator,
-            server::template_function_accumulator
-        > base_type;
+        typedef hpx::components::client_base<template_function_accumulator,
+            server::template_function_accumulator>
+            base_type;
 
     public:
         /// Default construct an empty client side representation (not
         /// connected to any existing component).
-        template_function_accumulator()
-        {}
+        template_function_accumulator() {}
 
         /// Create a client side representation for the existing
         /// \a server::managed_accumulator instance with the given GID.
-        template_function_accumulator(hpx::future<hpx::id_type> && id)
+        template_function_accumulator(hpx::future<hpx::id_type>&& id)
           : base_type(std::move(id))
-        {}
+        {
+        }
 
-        template_function_accumulator(hpx::id_type && id)
+        template_function_accumulator(hpx::id_type&& id)
           : base_type(std::move(id))
-        {}
+        {
+        }
 
         ///////////////////////////////////////////////////////////////////////
         /// Reset the accumulator's value to 0.
@@ -98,8 +95,9 @@ namespace examples
         {
             HPX_ASSERT(this->get_id());
 
-            typedef typename server::template_function_accumulator::add_action<T>
-                 action_type;
+            typedef
+                typename server::template_function_accumulator::add_action<T>
+                    action_type;
             action_type()(this->get_id(), arg);
         }
         //]
@@ -107,7 +105,7 @@ namespace examples
         ///////////////////////////////////////////////////////////////////////
         /// Asynchronously query the current value of the accumulator.
         ///
-        /// \returns This function returns an \a hpx::lcos::future. When the
+        /// \returns This function returns an \a hpx::future. When the
         ///          value of this computation is needed, the get() method of
         ///          the future should be called. If the value is available,
         ///          get() will return immediately; otherwise, it will block
@@ -133,6 +131,6 @@ namespace examples
             return action_type()(this->get_id());
         }
     };
-}
+}    // namespace examples
 
 #endif

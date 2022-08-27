@@ -16,8 +16,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/naming_base/address.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/parcelset_fwd.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <boost/lockfree/queue.hpp>
@@ -53,7 +53,7 @@ namespace hpx { namespace agas {
         std::mutex mtx;
         std::size_t connected;
 
-        using thunk_type = util::unique_function_nonser<void()>*;
+        using thunk_type = hpx::move_only_function<void()>*;
         boost::lockfree::queue<thunk_type,
             hpx::util::aligned_allocator<thunk_type>>
             thunks;
@@ -89,7 +89,7 @@ namespace hpx { namespace agas {
 
         ~big_boot_barrier()
         {
-            util::unique_function_nonser<void()>* f;
+            hpx::move_only_function<void()>* f;
             while (thunks.pop(f))
                 delete f;
         }
@@ -125,7 +125,7 @@ namespace hpx { namespace agas {
         // no-op on non-bootstrap localities
         void trigger();
 
-        void add_thunk(util::unique_function_nonser<void()>* f);
+        void add_thunk(hpx::move_only_function<void()>* f);
 
         void add_locality_endpoints(std::uint32_t locality_id,
             parcelset::endpoints_type const& endpoints);

@@ -53,14 +53,14 @@ namespace hpx {
 
     /// Enumerate all OS threads that have registered with the runtime.
     HPX_CORE_EXPORT bool enumerate_os_threads(
-        util::function_nonser<bool(os_thread_data const&)> const& f);
+        hpx::function<bool(os_thread_data const&)> const& f);
 
     /// Return the runtime instance number associated with the runtime instance
     /// the current thread is running in.
     HPX_CORE_EXPORT std::size_t get_runtime_instance_number();
 
     /// Register a function to be called during system shutdown
-    HPX_CORE_EXPORT bool register_on_exit(util::function_nonser<void()> const&);
+    HPX_CORE_EXPORT bool register_on_exit(hpx::function<void()> const&);
 
     /// \cond NOINTERNAL
     namespace util {
@@ -88,7 +88,7 @@ namespace hpx {
     ///
     /// This function returns whether the runtime system is currently being
     /// started or not, e.g. whether the current state of the runtime system is
-    /// \a hpx::state_startup
+    /// \a hpx::state::startup
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
@@ -106,7 +106,7 @@ namespace hpx {
     ///
     /// This function returns whether the runtime system is currently running
     /// or not, e.g.  whether the current state of the runtime system is
-    /// \a hpx::state_running
+    /// \a hpx::state::running
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
@@ -117,7 +117,7 @@ namespace hpx {
     ///
     /// This function returns whether the runtime system is currently stopped
     /// or not, e.g.  whether the current state of the runtime system is
-    /// \a hpx::state_stopped
+    /// \a hpx::hpx::state::stopped
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
@@ -128,7 +128,7 @@ namespace hpx {
     ///
     /// This function returns whether the runtime system is currently being
     /// shut down or not, e.g.  whether the current state of the runtime system
-    /// is \a hpx::state_stopped or \a hpx::state_shutdown
+    /// is \a hpx::state::stopped or \a hpx::state::shutdown
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.

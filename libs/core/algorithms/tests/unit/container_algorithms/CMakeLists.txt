@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    adjacentdifference_range
     adjacentfind_bad_alloc_range
     adjacentfind_binary_bad_alloc_range
     adjacentfind_binary_range
@@ -22,6 +23,7 @@ set(tests
     destroy_range
     destroyn_range
     distance
+    ends_with_range
     equal_range
     equal_binary_range
     exclusive_scan_range
@@ -64,7 +66,10 @@ set(tests
     mismatch_binary_range
     mismatch_range
     move_range
+    nth_element_range
     none_of_range
+    partial_sort_range
+    partial_sort_copy_range
     partition_range
     partition_copy_range
     reduce_range
@@ -91,6 +96,7 @@ set(tests
     sort_range
     stable_partition_range
     stable_sort_range
+    starts_with_range
     swap_ranges_range
     transform_range
     transform_range_binary
@@ -138,5 +144,7 @@ foreach(test ${tests})
     ${test}_test PRIVATE hpx_iterator_support_test_utilities
   )
 
-  add_hpx_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test(
+    "modules.algorithms.container_algorithms" ${test} ${${test}_PARAMETERS}
+  )
 endforeach()

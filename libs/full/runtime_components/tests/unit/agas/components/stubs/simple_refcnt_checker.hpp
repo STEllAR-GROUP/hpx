@@ -22,8 +22,8 @@ namespace hpx { namespace test { namespace stubs {
     struct simple_refcnt_checker
       : components::stub_base<server::simple_refcnt_checker>
     {
-        static lcos::future<void> take_reference_async(
-            naming::id_type const& this_, naming::id_type const& gid)
+        static hpx::future<void> take_reference_async(
+            hpx::id_type const& this_, hpx::id_type const& gid)
         {
             typedef server::simple_refcnt_checker::take_reference_action
                 action_type;
@@ -31,7 +31,7 @@ namespace hpx { namespace test { namespace stubs {
         }
 
         static void take_reference(
-            naming::id_type const& this_, naming::id_type const& gid)
+            hpx::id_type const& this_, hpx::id_type const& gid)
         {
             take_reference_async(this_, gid).get();
         }

@@ -129,7 +129,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
         void add_exception(std::exception_ptr&& p)
         {
-            tasks_.add_exception(std::move(p));
+            tasks_.add_exception(HPX_MOVE(p));
         }
         /// \endcond
 
@@ -186,8 +186,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
                     "the task_block is not active");
             }
 
-            tasks_.run(policy_.executor(), std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+            tasks_.run(
+                policy_.executor(), HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         /// Causes the expression f() to be invoked asynchronously using the
@@ -236,8 +236,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
                     "the task_block is not active");
             }
 
-            tasks_.run(std::forward<Executor>(exec), std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+            tasks_.run(HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         /// Blocks until the tasks spawned using this task_block have
@@ -317,7 +317,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
                     "hpx::is_execution_policy<ExPolicy>::value");
 
                 using policy_type = typename std::decay<ExPolicy>::type;
-                task_block<policy_type> trh(std::forward<ExPolicy>(policy));
+                task_block<policy_type> trh(HPX_FORWARD(ExPolicy, policy));
 
                 // invoke the user supplied function
                 std::exception_ptr p;
@@ -332,7 +332,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
                 if (p)
                 {
-                    trh.add_exception(std::move(p));
+                    trh.add_exception(HPX_MOVE(p));
                 }
 
                 // regardless of whether f(trh) has thrown an exception we need
@@ -341,8 +341,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
             }
         };
 
-        HPX_INLINE_CONSTEXPR_VARIABLE define_task_block_impl
-            define_task_block{};
+        inline constexpr define_task_block_impl define_task_block{};
         /// \endcond
     }    // namespace detail
 
@@ -380,7 +379,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     hpx::future<void> define_task_block(ExPolicy&& policy, F&& f)
     {
         return hpx::async(policy.executor(), detail::define_task_block,
-            std::forward<ExPolicy>(policy), std::forward<F>(f));
+            HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(F, f));
     }
 
     // clang-format off
@@ -392,7 +391,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     void define_task_block(ExPolicy&& policy, F&& f)
     {
         detail::define_task_block(
-            std::forward<ExPolicy>(policy), std::forward<F>(f));
+            HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(F, f));
     }
 
     /// Constructs a \a task_block, tr, and invokes the expression
@@ -418,7 +417,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     template <typename F>
     void define_task_block(F&& f)
     {
-        detail::define_task_block(hpx::execution::par, std::forward<F>(f));
+        detail::define_task_block(hpx::execution::par, HPX_FORWARD(F, f));
     }
 
     /// Constructs a \a task_block, tr, and invokes the expression
@@ -456,7 +455,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         // By design we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
         return define_task_block(
-            std::forward<ExPolicy>(policy), std::forward<F>(f));
+            HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(F, f));
     }
 
     /// Constructs a \a task_block, tr, and invokes the expression
@@ -486,7 +485,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
         // By design we always return on the same (HPX-) thread as we started
         // executing define_task_block_restore_thread.
         define_task_block_restore_thread(
-            hpx::execution::par, std::forward<F>(f));
+            hpx::execution::par, HPX_FORWARD(F, f));
     }
 }}}    // namespace hpx::parallel::v2
 

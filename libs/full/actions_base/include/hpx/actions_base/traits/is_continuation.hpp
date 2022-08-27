@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
+//  Copyright (c) 2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,4 +34,8 @@ namespace hpx { namespace traits {
       : detail::is_continuation_impl<typename std::decay<Continuation>::type>
     {
     };
+
+    template <typename Continuation>
+    inline constexpr bool is_continuation_v =
+        is_continuation<Continuation>::value;
 }}    // namespace hpx::traits

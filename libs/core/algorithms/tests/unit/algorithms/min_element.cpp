@@ -18,6 +18,34 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_min_element(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::vector<std::size_t> c = test::random_iota(10007);
+
+    iterator end(std::end(c));
+    base_iterator ref_end(std::end(c));
+
+    iterator r = hpx::min_element(
+        iterator(std::begin(c)), iterator(end), std::less<std::size_t>());
+    HPX_TEST(r != end);
+
+    base_iterator ref =
+        std::min_element(std::begin(c), std::end(c), std::less<std::size_t>());
+    HPX_TEST(ref != ref_end);
+    HPX_TEST_EQ(*ref, *r);
+
+    r = hpx::min_element(iterator(std::begin(c)), iterator(std::end(c)));
+    HPX_TEST(r != end);
+
+    ref = std::min_element(std::begin(c), std::end(c));
+    HPX_TEST(ref != ref_end);
+    HPX_TEST_EQ(*ref, *r);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_min_element(ExPolicy policy, IteratorTag)
 {
@@ -32,7 +60,7 @@ void test_min_element(ExPolicy policy, IteratorTag)
     iterator end(std::end(c));
     base_iterator ref_end(std::end(c));
 
-    iterator r = hpx::parallel::min_element(policy, iterator(std::begin(c)),
+    iterator r = hpx::min_element(policy, iterator(std::begin(c)),
         iterator(end), std::less<std::size_t>());
     HPX_TEST(r != end);
 
@@ -41,7 +69,7 @@ void test_min_element(ExPolicy policy, IteratorTag)
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *r);
 
-    r = hpx::parallel::min_element(
+    r = hpx::min_element(
         policy, iterator(std::begin(c)), iterator(std::end(c)));
     HPX_TEST(r != end);
 
@@ -61,7 +89,7 @@ void test_min_element_async(ExPolicy p, IteratorTag)
     iterator end(std::end(c));
     base_iterator ref_end(std::end(c));
 
-    hpx::future<iterator> r = hpx::parallel::min_element(
+    hpx::future<iterator> r = hpx::min_element(
         p, iterator(std::begin(c)), iterator(end), std::less<std::size_t>());
     iterator rit = r.get();
     HPX_TEST(rit != end);
@@ -71,8 +99,7 @@ void test_min_element_async(ExPolicy p, IteratorTag)
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *rit);
 
-    r = hpx::parallel::min_element(
-        p, iterator(std::begin(c)), iterator(std::end(c)));
+    r = hpx::min_element(p, iterator(std::begin(c)), iterator(std::end(c)));
     rit = r.get();
     HPX_TEST(rit != end);
 
@@ -86,6 +113,7 @@ void test_min_element()
 {
     using namespace hpx::execution;
 
+    test_min_element(IteratorTag());
     test_min_element(seq, IteratorTag());
     test_min_element(par, IteratorTag());
     test_min_element(par_unseq, IteratorTag());
@@ -101,6 +129,62 @@ void min_element_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_min_element_exception(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c = test::random_iota(10007);
+
+    {
+        bool caught_exception = false;
+        try
+        {
+            hpx::min_element(decorated_iterator(std::begin(c),
+                                 []() { throw std::runtime_error("test"); }),
+                decorated_iterator(std::end(c)), std::less<std::size_t>());
+
+            HPX_TEST(false);
+        }
+        catch (hpx::exception_list const& e)
+        {
+            caught_exception = true;
+            test::test_num_exceptions<hpx::execution::sequenced_policy,
+                IteratorTag>::call(hpx::execution::seq, e);
+        }
+        catch (...)
+        {
+            HPX_TEST(false);
+        }
+        HPX_TEST(caught_exception);
+    }
+
+    {
+        bool caught_exception = false;
+        try
+        {
+            hpx::min_element(decorated_iterator(std::begin(c),
+                                 []() { throw std::runtime_error("test"); }),
+                decorated_iterator(std::end(c)));
+
+            HPX_TEST(false);
+        }
+        catch (hpx::exception_list const& e)
+        {
+            caught_exception = true;
+            test::test_num_exceptions<hpx::execution::sequenced_policy,
+                IteratorTag>::call(hpx::execution::seq, e);
+        }
+        catch (...)
+        {
+            HPX_TEST(false);
+        }
+        HPX_TEST(caught_exception);
+    }
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_min_element_exception(ExPolicy policy, IteratorTag)
 {
@@ -117,7 +201,7 @@ void test_min_element_exception(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::parallel::min_element(policy,
+            hpx::min_element(policy,
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c)), std::less<std::size_t>());
@@ -140,7 +224,7 @@ void test_min_element_exception(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::parallel::min_element(policy,
+            hpx::min_element(policy,
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c)));
@@ -175,7 +259,7 @@ void test_min_element_exception_async(ExPolicy p, IteratorTag)
 
         try
         {
-            hpx::future<decorated_iterator> f = hpx::parallel::min_element(p,
+            hpx::future<decorated_iterator> f = hpx::min_element(p,
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c)), std::less<std::size_t>());
@@ -206,7 +290,7 @@ void test_min_element_exception_async(ExPolicy p, IteratorTag)
 
         try
         {
-            hpx::future<decorated_iterator> f = hpx::parallel::min_element(p,
+            hpx::future<decorated_iterator> f = hpx::min_element(p,
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c)));
@@ -240,6 +324,7 @@ void test_min_element_exception()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_min_element_exception(IteratorTag());
     test_min_element_exception(seq, IteratorTag());
     test_min_element_exception(par, IteratorTag());
 
@@ -254,6 +339,58 @@ void min_element_exception_test()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+template <typename IteratorTag>
+void test_min_element_bad_alloc(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::decorated_iterator<base_iterator, IteratorTag>
+        decorated_iterator;
+
+    std::vector<std::size_t> c = test::random_iota(10007);
+
+    {
+        bool caught_exception = false;
+        try
+        {
+            hpx::min_element(decorated_iterator(std::begin(c),
+                                 []() { throw std::bad_alloc(); }),
+                decorated_iterator(std::end(c)), std::less<std::size_t>());
+
+            HPX_TEST(false);
+        }
+        catch (std::bad_alloc const&)
+        {
+            caught_exception = true;
+        }
+        catch (...)
+        {
+            HPX_TEST(false);
+        }
+        HPX_TEST(caught_exception);
+    }
+
+    {
+        bool caught_exception = false;
+        try
+        {
+            hpx::min_element(decorated_iterator(std::begin(c),
+                                 []() { throw std::bad_alloc(); }),
+                decorated_iterator(std::end(c)));
+
+            HPX_TEST(false);
+        }
+        catch (std::bad_alloc const&)
+        {
+            caught_exception = true;
+        }
+        catch (...)
+        {
+            HPX_TEST(false);
+        }
+        HPX_TEST(caught_exception);
+    }
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_min_element_bad_alloc(ExPolicy policy, IteratorTag)
 {
@@ -270,7 +407,7 @@ void test_min_element_bad_alloc(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::parallel::min_element(policy,
+            hpx::min_element(policy,
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),
                 decorated_iterator(std::end(c)), std::less<std::size_t>());
@@ -292,7 +429,7 @@ void test_min_element_bad_alloc(ExPolicy policy, IteratorTag)
         bool caught_exception = false;
         try
         {
-            hpx::parallel::min_element(policy,
+            hpx::min_element(policy,
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),
                 decorated_iterator(std::end(c)));
@@ -326,7 +463,7 @@ void test_min_element_bad_alloc_async(ExPolicy p, IteratorTag)
 
         try
         {
-            hpx::future<decorated_iterator> f = hpx::parallel::min_element(p,
+            hpx::future<decorated_iterator> f = hpx::min_element(p,
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),
                 decorated_iterator(std::end(c)), std::less<std::size_t>());
@@ -356,7 +493,7 @@ void test_min_element_bad_alloc_async(ExPolicy p, IteratorTag)
 
         try
         {
-            hpx::future<decorated_iterator> f = hpx::parallel::min_element(p,
+            hpx::future<decorated_iterator> f = hpx::min_element(p,
                 decorated_iterator(
                     std::begin(c), []() { throw std::bad_alloc(); }),
                 decorated_iterator(std::end(c)));
@@ -389,6 +526,7 @@ void test_min_element_bad_alloc()
     // If the execution policy object is of type vector_execution_policy,
     // std::terminate shall be called. therefore we do not test exceptions
     // with a vector execution policy
+    test_min_element_bad_alloc(IteratorTag());
     test_min_element_bad_alloc(seq, IteratorTag());
     test_min_element_bad_alloc(par, IteratorTag());
 

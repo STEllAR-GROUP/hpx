@@ -16,7 +16,7 @@
 #include <utility>
 
 void test(int&& ref) {}
-HPX_PLAIN_ACTION(test);
+HPX_PLAIN_ACTION(test)
 
 ///////////////////////////////////////////////////////////////////////////////
 int main()

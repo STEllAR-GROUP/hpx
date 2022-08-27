@@ -599,15 +599,15 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::parallel::v1::max_element`
+   * * :cpp:func:`hpx::max_element`
      * Returns the largest element in a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`max_element`
-   * * :cpp:func:`hpx::parallel::v1::min_element`
+   * * :cpp:func:`hpx::min_element`
      * Returns the smallest element in a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`min_element`
-   * * :cpp:func:`hpx::parallel::v1::minmax_element`
+   * * :cpp:func:`hpx::minmax_element`
      * Returns the smallest and the largest element in a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`minmax_element`
@@ -618,6 +618,10 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
+   * * :cpp:func:`hpx::nth_element`
+       * Partially sorts the given range making sure that it is partitioned by the given element
+       * ``<hpx/algorithm.hpp>``
+       * :cppreference-algorithm:`nth_element`
    * * :cpp:func:`hpx::is_partitioned`
      * Returns ``true`` if each true element for a predicate precedes the false elements in a range.
      * ``<hpx/algorithm.hpp>``
@@ -661,6 +665,10 @@ Parallel algorithms
      * Sorts the first elements in a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`partial_sort`
+   * * :cpp:func:`hpx::partial_sort_copy`
+       * Sorts the first elements in a range, storing the result in another range.
+       * ``<hpx/algorithm.hpp>``
+       * :cppreference-algorithm:`partial_sort_copy`
    * * :cpp:func:`hpx::parallel::v1::sort_by_key`
      * Sorts one range of data using keys supplied in another range.
      * ``<hpx/algorithm.hpp>``
@@ -673,7 +681,7 @@ Parallel algorithms
      * Description
      * In header
      * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::parallel::v1::adjacent_difference`
+   * * :cpp:func:`hpx::adjacent_difference`
      * Calculates the difference between each element in an input range and the preceding element.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`adjacent_difference`
@@ -770,16 +778,16 @@ Parallel algorithms
    * * Name
      * Description
      * In header
-   * * :cpp:func:`hpx::for_loop`
+   * * :cpp:func:`hpx::experimental::for_loop`
      * Implements loop functionality over a range specified by integral or iterator bounds.
      * ``<hpx/algorithm.hpp>``
-   * * :cpp:func:`hpx::for_loop_strided`
+   * * :cpp:func:`hpx::experimental::for_loop_strided`
      * Implements loop functionality over a range specified by integral or iterator bounds.
      * ``<hpx/algorithm.hpp>``
-   * * :cpp:func:`hpx::for_loop_n`
+   * * :cpp:func:`hpx::experimental::for_loop_n`
      * Implements loop functionality over a range specified by integral or iterator bounds.
      * ``<hpx/algorithm.hpp>``
-   * * :cpp:func:`hpx::for_loop_n_strided`
+   * * :cpp:func:`hpx::experimental::for_loop_n_strided`
      * Implements loop functionality over a range specified by integral or iterator bounds.
      * ``<hpx/algorithm.hpp>``
 

@@ -24,7 +24,6 @@ set(_hpx_full_modules
     components
     components_base
     compute
-    compute_cuda
     distribution_policies
     executors_distributed
     include
@@ -32,7 +31,14 @@ set(_hpx_full_modules
     lcos_distributed
     naming
     naming_base
+    parcelport_lci
+    parcelport_libfabric
+    parcelport_mpi
+    parcelport_tcp
+    parcelset
+    parcelset_base
     performance_counters
+    plugin_factories
     resiliency_distributed
     runtime_components
     runtime_distributed
@@ -42,7 +48,7 @@ set(_hpx_full_modules
 # cmake-format: on
 
 hpx_info("")
-hpx_info("  Configuring libhpx modules")
+hpx_info("  Configuring libhpx modules:")
 
 foreach(module ${_hpx_full_modules})
   add_subdirectory(${module})

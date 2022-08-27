@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -111,8 +111,8 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -147,16 +147,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return util::copy(first1, last1, dest);
                 }
 
-                auto&& value1 = hpx::util::invoke(proj1, *first1);
-                auto&& value2 = hpx::util::invoke(proj2, *first2);
+                auto&& value1 = HPX_INVOKE(proj1, *first1);
+                auto&& value2 = HPX_INVOKE(proj2, *first2);
 
-                if (hpx::util::invoke(comp, value1, value2))
+                if (HPX_INVOKE(comp, value1, value2))
                 {
                     *dest++ = *first1++;
                 }
                 else
                 {
-                    if (!hpx::util::invoke(comp, value2, value1))
+                    if (!HPX_INVOKE(comp, value2, value1))
                     {
                         ++first1;
                     }
@@ -184,8 +184,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Iter3 dest, F&& f, Proj1&& proj1, Proj2&& proj2)
             {
                 return sequential_set_difference(first1, last1, first2, last2,
-                    dest, std::forward<F>(f), std::forward<Proj1>(proj1),
-                    std::forward<Proj2>(proj2));
+                    dest, HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
             }
 
             template <typename ExPolicy, typename Iter1, typename Sent1,
@@ -208,13 +208,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (first1 == last1)
                 {
                     return result::get(
-                        result_type{std::move(first1), std::move(dest)});
+                        result_type{HPX_MOVE(first1), HPX_MOVE(dest)});
                 }
 
                 if (first2 == last2)
                 {
                     return detail::copy<result_type>().call(
-                        std::forward<ExPolicy>(policy), first1, last1, dest);
+                        HPX_FORWARD(ExPolicy, policy), first1, last1, dest);
                 }
 
                 using buffer_type = typename set_operations_buffer<Iter3>::type;
@@ -238,13 +238,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         result.in, part_first2, result.out};
                 };
 
-                auto last = set_operation(std::forward<ExPolicy>(policy),
-                    first1, last1, first2, last2, dest, std::forward<F>(f),
-                    std::forward<Proj1>(proj1), std::forward<Proj2>(proj2),
-                    std::move(f1), std::move(f2));
+                auto last = set_operation(HPX_FORWARD(ExPolicy, policy), first1,
+                    last1, first2, last2, dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2),
+                    HPX_MOVE(f1), HPX_MOVE(f2));
 
                 // construct return value
-                return util::detail::convert_to_result(std::move(last),
+                return util::detail::convert_to_result(HPX_MOVE(last),
                     [](util::in_in_out_result<Iter1, Iter2, Iter3> const& p)
                         -> result_type {
                         return {p.in1, p.out};
@@ -252,61 +252,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-
-    ///////////////////////////////////////////////////////////////////////////
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename FwdIter3, typename Pred = detail::less,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
-            hpx::traits::is_iterator<FwdIter3>::value &&
-            hpx::is_invocable_v<Pred,
-                typename std::iterator_traits<FwdIter1>::value_type,
-                typename std::iterator_traits<FwdIter2>::value_type
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::set_difference is deprecated, use hpx::set_difference "
-        "instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter3>::type
-        set_difference(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, FwdIter2 last2, FwdIter3 dest, Pred&& op = Pred())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter3>::value),
-            "Requires at least forward iterator.");
-
-        using is_seq = std::integral_constant<bool,
-            hpx::is_sequenced_execution_policy<ExPolicy>::value ||
-                !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
-                !hpx::traits::is_random_access_iterator<FwdIter2>::value>;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return hpx::parallel::util::get_second_element(
-            detail::set_difference<util::in_out_result<FwdIter1, FwdIter3>>()
-                .call2(std::forward<ExPolicy>(policy), is_seq(), first1, last1,
-                    first2, last2, dest, std::forward<Pred>(op),
-                    util::projection_identity(), util::projection_identity()));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::set_difference
-    HPX_INLINE_CONSTEXPR_VARIABLE struct set_difference_t final
+    // CPO for hpx::set_difference
+    inline constexpr struct set_difference_t final
       : hpx::detail::tag_parallel_algorithm<set_difference_t>
     {
     private:
@@ -326,7 +278,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter3>::type
-        tag_fallback_dispatch(set_difference_t, ExPolicy&& policy,
+        tag_fallback_invoke(set_difference_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             FwdIter3 dest, Pred&& op = Pred())
         {
@@ -349,8 +301,8 @@ namespace hpx {
 
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::set_difference<result_type>().call2(
-                    std::forward<ExPolicy>(policy), is_seq(), first1, last1,
-                    first2, last2, dest, std::forward<Pred>(op),
+                    HPX_FORWARD(ExPolicy, policy), is_seq(), first1, last1,
+                    first2, last2, dest, HPX_FORWARD(Pred, op),
                     hpx::parallel::util::projection_identity(),
                     hpx::parallel::util::projection_identity()));
         }
@@ -368,7 +320,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend FwdIter3 tag_fallback_dispatch(set_difference_t, FwdIter1 first1,
+        friend FwdIter3 tag_fallback_invoke(set_difference_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, FwdIter3 dest,
             Pred&& op = Pred())
         {
@@ -385,7 +337,7 @@ namespace hpx {
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::v1::detail::set_difference<result_type>().call(
                     hpx::execution::seq, first1, last1, first2, last2, dest,
-                    std::forward<Pred>(op),
+                    HPX_FORWARD(Pred, op),
                     hpx::parallel::util::projection_identity(),
                     hpx::parallel::util::projection_identity()));
         }

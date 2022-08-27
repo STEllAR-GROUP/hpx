@@ -7,8 +7,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include "htts2.hpp"
 #include <hpx/modules/format.hpp>
+#include "htts2.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -25,7 +25,8 @@ struct payload_precision_tracker : htts2::clocksource<BaseClock>
       , mean_lost_(0.0)
       , stdev_lost_(0.0)
       , samples_(0)
-    {}
+    {
+    }
 
     // Returns: stdev of the mean lost payload.
     double precision_stat_uncertainty() const
@@ -36,8 +37,8 @@ struct payload_precision_tracker : htts2::clocksource<BaseClock>
     // Returns: the uncertainty of the mean lost payload.
     double precision_uncertainty() const
     {
-        return (std::max)(this->clock_uncertainty()
-                      , precision_stat_uncertainty());
+        return (std::max)(
+            this->clock_uncertainty(), precision_stat_uncertainty());
     }
 
     double average_precision() const
@@ -62,7 +63,7 @@ struct payload_precision_tracker : htts2::clocksource<BaseClock>
         update_lost(lost);
     }
 
-  private:
+private:
     void update_lost(double lost)
     {
         // Based on Boost.Accumulators.
@@ -71,12 +72,11 @@ struct payload_precision_tracker : htts2::clocksource<BaseClock>
 
         ++samples_;
 
-        mean_lost_ =
-            (mean_lost_*(samples_-1.0) + lost)/samples_;
+        mean_lost_ = (mean_lost_ * (samples_ - 1.0) + lost) / samples_;
 
-        stdev_lost_ =
-            std::sqrt( ((samples_-1.0)/samples_)*(stdev_lost_*stdev_lost_)
-                     + (1.0/samples_)*(lost-mean_lost_)*(lost-mean_lost_));
+        stdev_lost_ = std::sqrt(
+            ((samples_ - 1.0) / samples_) * (stdev_lost_ * stdev_lost_) +
+            (1.0 / samples_) * (lost - mean_lost_) * (lost - mean_lost_));
     }
 
     rep expected_;
@@ -90,7 +90,8 @@ struct payload_precision_driver : htts2::driver
 {
     payload_precision_driver(int argc, char** argv)
       : htts2::driver(argc, argv)
-    {}
+    {
+    }
 
     void run() const
     {
@@ -102,7 +103,7 @@ struct payload_precision_driver : htts2::driver
         print_results(results);
     }
 
-  private:
+private:
     struct results_type
     {
         results_type()
@@ -110,19 +111,20 @@ struct payload_precision_driver : htts2::driver
           , precision_uncertainty_(0.0)
           , amortized_overhead_(0.0)
           , overhead_uncertainty_(0.0)
-        {}
+        {
+        }
 
-        results_type(
-            double average_precision,       // nanoseconds
-            double precision_uncertainty,   // nanoseconds
-            double amortized_overhead,      // nanoseconds
-            double overhead_uncertainty     // nanoseconds
+        results_type(double average_precision,    // nanoseconds
+            double precision_uncertainty,         // nanoseconds
+            double amortized_overhead,            // nanoseconds
+            double overhead_uncertainty           // nanoseconds
             )
           : average_precision_(average_precision)
           , precision_uncertainty_(precision_uncertainty)
           , amortized_overhead_(amortized_overhead)
           , overhead_uncertainty_(overhead_uncertainty)
-        {}
+        {
+        }
 
         double average_precision_;
         double precision_uncertainty_;
@@ -134,8 +136,8 @@ struct payload_precision_driver : htts2::driver
     {
         ///////////////////////////////////////////////////////////////////////
 
-        payload_precision_tracker<BaseClock>
-            p(this->payload_duration_ /* = p */);
+        payload_precision_tracker<BaseClock> p(
+            this->payload_duration_ /* = p */);
 
         htts2::timer<BaseClock> t;
 
@@ -152,16 +154,16 @@ struct payload_precision_driver : htts2::driver
         // Overhead = Measured Walltime - Theoretical Walltime
         double overhead = measured_walltime - theoretical_walltime;
 
-        results_type results(
-            p.average_precision()
-          , p.precision_uncertainty()
+        results_type results(p.average_precision(),
+            p.precision_uncertainty()
             // Average Overhead per Task
-          , overhead / this->tasks_
+            ,
+            overhead / this->tasks_
             // f = A/a with a : arbitrary constant,
             // then sigma_f = sqrt((1/a)^2*sigma_A^2)
-          , std::sqrt( (1.0/this->tasks_)*(1.0/this->tasks_)
-                     * p.clock_uncertainty()*p.clock_uncertainty())
-            );
+            ,
+            std::sqrt((1.0 / this->tasks_) * (1.0 / this->tasks_) *
+                p.clock_uncertainty() * p.clock_uncertainty()));
 
         return results;
 
@@ -182,15 +184,10 @@ struct payload_precision_driver : htts2::driver
                 << "\n";
 
         hpx::util::format_to(std::cout,
-            "{},{},{},{:.14g},{:.14g},{:.14g},{:.14g}\n",
-            this->osthreads_,
-            this->tasks_,
-            this->payload_duration_,
-            results.average_precision_,
-            results.precision_uncertainty_,
-            results.amortized_overhead_,
-            results.overhead_uncertainty_
-        );
+            "{},{},{},{:.14g},{:.14g},{:.14g},{:.14g}\n", this->osthreads_,
+            this->tasks_, this->payload_duration_, results.average_precision_,
+            results.precision_uncertainty_, results.amortized_overhead_,
+            results.overhead_uncertainty_);
     }
 };
 

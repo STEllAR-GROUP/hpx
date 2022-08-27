@@ -6,8 +6,8 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 
 #include "cancelable_action/cancelable_action.hpp"
 
@@ -28,13 +28,15 @@ void handle_interruption_using_exception(hpx::id_type const& id)
 
     // start a separate thread which will wait for a while and interrupt
     // the 'do_it' operation
-    hpx::thread t(hpx::util::bind(interrupt_do_it, ca));
+    hpx::thread t(hpx::bind(interrupt_do_it, ca));
 
-    try {
+    try
+    {
         // start some lengthy action, to be interrupted
         ca.do_it();
     }
-    catch (hpx::thread_interrupted const&) {
+    catch (hpx::thread_interrupted const&)
+    {
         // we should get an error reporting hpx::thread_interrupted
         HPX_ASSERT(true);
     }
@@ -52,10 +54,10 @@ void handle_interruption_using_error_code(hpx::id_type const& id)
 
     // start a separate thread which will wait for a while and interrupt
     // the 'do_it' operation
-    hpx::thread t(hpx::util::bind(interrupt_do_it, ca));
+    hpx::thread t(hpx::bind(interrupt_do_it, ca));
 
     // start some lengthy action, to be interrupted
-    hpx::error_code ec(hpx::lightweight);
+    hpx::error_code ec(hpx::throwmode::lightweight);
     ca.do_it(ec);
 
     // we should get an error reporting hpx::thread_interrupted

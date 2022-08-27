@@ -57,10 +57,10 @@ namespace jacobi { namespace server {
                     hpx::default_layout(hpx::find_all_localities()), ny)
                     .get();
 
-            std::vector<hpx::lcos::shared_future<void>> init_futures;
+            std::vector<hpx::shared_future<void>> init_futures;
             init_futures.reserve(ny);
             std::size_t y = 0;
-            for (hpx::naming::id_type const& id : ids)
+            for (hpx::id_type const& id : ids)
             {
                 //std::cout << y << " " << id << "\n";
                 jacobi::stencil_iterator r;
@@ -72,21 +72,24 @@ namespace jacobi { namespace server {
             }
             HPX_ASSERT(y == ny);
 
-            std::vector<hpx::lcos::shared_future<void>> boundary_futures;
-            hpx::lcos::wait(init_futures, [&](std::size_t y) {
-                if (y > 0 && y < ny - 1)
-                {
-                    HPX_ASSERT(stencil_iterators[y - 1].id);
-                    HPX_ASSERT(stencil_iterators[y].id);
-                    HPX_ASSERT(stencil_iterators[y + 1].id);
-                    hpx::wait_all(init_futures[y - 1]);
-                    hpx::wait_all(init_futures[y + 1]);
-                    boundary_futures.push_back(
-                        stencil_iterators[y].setup_boundary(
-                            stencil_iterators[y - 1],
-                            stencil_iterators[y + 1]));
-                }
-            });
+            std::vector<hpx::shared_future<void>> boundary_futures;
+            hpx::wait_each(
+                [&](std::size_t y, auto&& f) {
+                    f.get();    // rethrow exceptions
+                    if (y > 0 && y < ny - 1)
+                    {
+                        HPX_ASSERT(stencil_iterators[y - 1].id);
+                        HPX_ASSERT(stencil_iterators[y].id);
+                        HPX_ASSERT(stencil_iterators[y + 1].id);
+                        hpx::wait_all(init_futures[y - 1]);
+                        hpx::wait_all(init_futures[y + 1]);
+                        boundary_futures.push_back(
+                            stencil_iterators[y].setup_boundary(
+                                stencil_iterators[y - 1],
+                                stencil_iterators[y + 1]));
+                    }
+                },
+                init_futures);
             HPX_ASSERT(stencil_iterators[0].id);
             hpx::wait_all(boundary_futures);
             HPX_ASSERT(stencil_iterators[0].id);
@@ -111,7 +114,7 @@ namespace jacobi { namespace server {
 
             for (std::size_t iter = 0; iter < max_iterations; ++iter)
             {
-                std::vector<hpx::lcos::shared_future<void>> run_futures;
+                std::vector<hpx::shared_future<void>> run_futures;
                 run_futures.reserve(ny - 2);
                 for (std::size_t y = 1; y < ny - 1; ++y)
                 {
@@ -125,10 +128,10 @@ namespace jacobi { namespace server {
                       << ((double((nx - 2) * (ny - 2) * max_iterations) / 1e6) /
                              time_elapsed)
                       << " MLUPS\n"
-                      << hpx::flush;
+                      << std::flush;
         }
 
-        HPX_DEFINE_COMPONENT_ACTION(solver, run, run_action);
+        HPX_DEFINE_COMPONENT_ACTION(solver, run, run_action)
 
         std::size_t ny;
         std::size_t nx;

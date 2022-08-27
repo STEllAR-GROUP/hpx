@@ -93,7 +93,7 @@ namespace hpx { namespace util { namespace logging {
             ~gather_holder()
             {
                 if (!empty())
-                    m_this.write(std::move(*this));
+                    m_this.write(HPX_MOVE(*this));
             }
 
         private:
@@ -174,7 +174,7 @@ namespace hpx { namespace util { namespace logging {
             if (m_is_caching_off)
                 m_writer(msg);
             else
-                m_cache.push_back(std::move(msg));
+                m_cache.push_back(HPX_MOVE(msg));
         }
 
     private:

@@ -26,10 +26,10 @@ int hpx_main()
 {
     std::cout << "Counters:" << std::endl;
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
     hpx::performance_counters::discover_counter_types(
-        hpx::util::bind(discover_callback, _1, _2));
+        hpx::bind(discover_callback, _1, _2));
 
     return hpx::finalize();
 }

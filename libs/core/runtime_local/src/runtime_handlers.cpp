@@ -30,9 +30,8 @@
 
 namespace hpx { namespace detail {
 
-    HPX_NORETURN void assertion_handler(
-        hpx::assertion::source_location const& loc, const char* expr,
-        std::string const& msg)
+    [[noreturn]] void assertion_handler(hpx::source_location const& loc,
+        const char* expr, std::string const& msg)
     {
         static thread_local bool handling_assertion = false;
 
@@ -49,9 +48,9 @@ namespace hpx { namespace detail {
             }
 
             strm << std::endl;
-            strm << "{file}: " << loc.file_name << std::endl;
-            strm << "{line}: " << loc.line_number << std::endl;
-            strm << "{function}: " << loc.function_name << std::endl;
+            strm << "{file}: " << loc.file_name() << std::endl;
+            strm << "{line}: " << loc.line() << std::endl;
+            strm << "{function}: " << loc.function_name() << std::endl;
 
             std::cerr << strm.str();
 
@@ -71,7 +70,7 @@ namespace hpx { namespace detail {
 
         hpx::exception e(hpx::assertion_failure, strm.str());
         std::cerr << hpx::diagnostic_information(hpx::detail::get_exception(
-                         e, loc.function_name, loc.file_name, loc.line_number))
+                         e, loc.function_name(), loc.file_name(), loc.line()))
                   << std::endl;
         std::abort();
     }

@@ -65,7 +65,7 @@ namespace hpx { namespace lcos { namespace detail {
         void set_value(RemoteResult&& result)
         {
             HPX_ASSERT(shared_state_);
-            shared_state_->set_remote_data(std::move(result));
+            shared_state_->set_remote_data(HPX_MOVE(result));
         }
 
         void set_exception(std::exception_ptr const& e)
@@ -88,11 +88,11 @@ namespace hpx { namespace lcos { namespace detail {
     private:
         // intrusive reference counting, noop since we don't require
         // reference counting here.
-        friend void intrusive_ptr_add_ref(promise_lco_base* /*p*/) {}
+        friend void intrusive_ptr_add_ref(promise_lco_base* /*p*/) noexcept {}
 
         // intrusive reference counting, noop since we don't require
         // reference counting here.
-        friend void intrusive_ptr_release(promise_lco_base* /*p*/) {}
+        friend void intrusive_ptr_release(promise_lco_base* /*p*/) noexcept {}
     };
 
     template <typename Result, typename RemoteResult>
@@ -115,12 +115,12 @@ namespace hpx { namespace lcos { namespace detail {
         result_type get_value()
         {
             result_type* result = this->shared_state_->get_result();
-            return std::move(*result);
+            return HPX_MOVE(*result);
         }
         result_type get_value(error_code& ec)
         {
             result_type* result = this->shared_state_->get_result(ec);
-            return std::move(*result);
+            return HPX_MOVE(*result);
         }
 
     private:

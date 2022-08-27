@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,43 +21,51 @@
 std::atomic<std::size_t> num_threads(0);
 
 ///////////////////////////////////////////////////////////////////////////////
-void test_count_down_and_wait(hpx::lcos::local::latch& l)
+void test_count_down_and_wait(hpx::latch& l)
 {
     ++num_threads;
 
-    HPX_TEST(!l.is_ready());
-    l.count_down_and_wait();
+    HPX_TEST(!l.try_wait());
+    l.arrive_and_wait();
 }
 
-void test_count_down(hpx::lcos::local::latch& l)
+void test_count_down_and_wait2(hpx::lcos::local::latch& l)
 {
     ++num_threads;
 
-    HPX_TEST(!l.is_ready());
+    HPX_TEST(!l.try_wait());
+    l.arrive_and_wait();
+}
+
+void test_count_down(hpx::latch& l)
+{
+    ++num_threads;
+
+    HPX_TEST(!l.try_wait());
     l.count_down(NUM_THREADS);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    // count_down_and_wait
+    // arrive_and_wait
     {
-        hpx::lcos::local::latch l(NUM_THREADS + 1);
-        HPX_TEST(!l.is_ready());
+        hpx::latch l(NUM_THREADS + 1);
+        HPX_TEST(!l.try_wait());
 
         std::vector<hpx::future<void>> results;
         for (std::ptrdiff_t i = 0; i != NUM_THREADS; ++i)
             results.push_back(
                 hpx::async(&test_count_down_and_wait, std::ref(l)));
 
-        HPX_TEST(!l.is_ready());
+        HPX_TEST(!l.try_wait());
 
         // Wait for all threads to reach this point.
-        l.count_down_and_wait();
+        l.arrive_and_wait();
 
         hpx::wait_all(results);
 
-        HPX_TEST(l.is_ready());
+        HPX_TEST(l.try_wait());
         HPX_TEST_EQ(num_threads.load(), NUM_THREADS);
     }
 
@@ -65,17 +73,17 @@ int hpx_main()
     {
         num_threads.store(0);
 
-        hpx::lcos::local::latch l(NUM_THREADS + 1);
-        HPX_TEST(!l.is_ready());
+        hpx::latch l(NUM_THREADS + 1);
+        HPX_TEST(!l.try_wait());
 
         hpx::future<void> f = hpx::async(&test_count_down, std::ref(l));
 
-        HPX_TEST(!l.is_ready());
-        l.count_down_and_wait();
+        HPX_TEST(!l.try_wait());
+        l.arrive_and_wait();
 
         f.get();
 
-        HPX_TEST(l.is_ready());
+        HPX_TEST(l.try_wait());
         HPX_TEST_EQ(num_threads.load(), std::size_t(1));
     }
 
@@ -83,8 +91,8 @@ int hpx_main()
     {
         num_threads.store(0);
 
-        hpx::lcos::local::latch l(NUM_THREADS);
-        HPX_TEST(!l.is_ready());
+        hpx::latch l(NUM_THREADS);
+        HPX_TEST(!l.try_wait());
 
         std::vector<hpx::future<void>> results;
         for (std::ptrdiff_t i = 0; i != NUM_THREADS; ++i)
@@ -95,7 +103,7 @@ int hpx_main()
 
         l.wait();
 
-        HPX_TEST(l.is_ready());
+        HPX_TEST(l.try_wait());
         HPX_TEST_EQ(num_threads.load(), NUM_THREADS);
     }
 
@@ -104,24 +112,24 @@ int hpx_main()
         num_threads.store(0);
 
         hpx::lcos::local::latch l(1);
-        HPX_TEST(!l.is_ready());
+        HPX_TEST(!l.try_wait());
 
         std::vector<hpx::future<void>> results;
         for (std::ptrdiff_t i = 0; i != NUM_THREADS; ++i)
         {
             l.count_up(1);
             results.push_back(
-                hpx::async(&test_count_down_and_wait, std::ref(l)));
+                hpx::async(&test_count_down_and_wait2, std::ref(l)));
         }
 
-        HPX_TEST(!l.is_ready());
+        HPX_TEST(!l.try_wait());
 
         // Wait for all threads to reach this point.
-        l.count_down_and_wait();
+        l.arrive_and_wait();
 
         hpx::wait_all(results);
 
-        HPX_TEST(l.is_ready());
+        HPX_TEST(l.try_wait());
         HPX_TEST_EQ(num_threads.load(), NUM_THREADS);
     }
 
@@ -131,23 +139,23 @@ int hpx_main()
 
         hpx::lcos::local::latch l(0);
         l.reset(NUM_THREADS + 1);
-        HPX_TEST(!l.is_ready());
+        HPX_TEST(!l.try_wait());
 
         std::vector<hpx::future<void>> results;
         for (std::ptrdiff_t i = 0; i != NUM_THREADS; ++i)
         {
             results.push_back(
-                hpx::async(&test_count_down_and_wait, std::ref(l)));
+                hpx::async(&test_count_down_and_wait2, std::ref(l)));
         }
 
-        HPX_TEST(!l.is_ready());
+        HPX_TEST(!l.try_wait());
 
         // Wait for all threads to reach this point.
-        l.count_down_and_wait();
+        l.arrive_and_wait();
 
         hpx::wait_all(results);
 
-        HPX_TEST(l.is_ready());
+        HPX_TEST(l.try_wait());
         HPX_TEST_EQ(num_threads.load(), NUM_THREADS);
     }
 

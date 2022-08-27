@@ -13,10 +13,9 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(example_programs ${example_programs} transpose_block
                        transpose_serial_vector
   )
-endif()
-
-if(HPX_WITH_AWAIT OR HPX_WITH_CXX20_COROUTINES)
-  set(example_programs ${example_programs} transpose_await)
+  if(HPX_WITH_CXX20_COROUTINES)
+    set(example_programs ${example_programs} transpose_await)
+  endif()
 endif()
 
 set(transpose_serial_vector_FLAGS DEPENDENCIES partitioned_vector_component)

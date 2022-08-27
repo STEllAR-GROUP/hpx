@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -8,14 +8,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/actions_base/preassigned_action_id.hpp>
-#include <hpx/functional/traits/get_action_name.hpp>
-
-#if defined(HPX_HAVE_NETWORKING) &&                                            \
-    (HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX))
-#include <hpx/modules/itt_notify.hpp>
-#endif
 
 namespace hpx { namespace actions {
 

@@ -87,7 +87,7 @@ namespace hpx { namespace resource { namespace detail {
         void create_thread_pool(std::string const& name,
             scheduling_policy sched = scheduling_policy::unspecified,
             hpx::threads::policies::scheduler_mode =
-                hpx::threads::policies::scheduler_mode::default_mode);
+                hpx::threads::policies::scheduler_mode::default_);
 
         // create a thread_pool with a callback function for creating a custom
         // scheduler
@@ -172,9 +172,9 @@ namespace hpx { namespace resource { namespace detail {
         void unassign_pu(std::string const& pool_name, std::size_t virt_core);
 
         std::size_t shrink_pool(std::string const& pool_name,
-            util::function_nonser<void(std::size_t)> const& remove_pu);
+            hpx::function<void(std::size_t)> const& remove_pu);
         std::size_t expand_pool(std::string const& pool_name,
-            util::function_nonser<void(std::size_t)> const& add_pu);
+            hpx::function<void(std::size_t)> const& add_pu);
 
         void set_default_pool_name(const std::string& name)
         {

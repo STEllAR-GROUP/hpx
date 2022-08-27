@@ -26,8 +26,7 @@
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace iostreams { namespace detail
-{
+namespace hpx { namespace iostreams { namespace detail {
     std::ostream& get_coutstream() noexcept
     {
         return std::cout;
@@ -45,15 +44,15 @@ namespace hpx { namespace iostreams { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    naming::id_type return_id_type(future<bool> f, naming::id_type id)
+    hpx::id_type return_id_type(future<bool> f, hpx::id_type id)
     {
-        f.get();        //re-throw any errors
+        f.get();    //re-throw any errors
         return id;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::id_type>
-    create_ostream(char const* cout_name, std::ostream& strm)
+    hpx::future<hpx::id_type> create_ostream(
+        char const* cout_name, std::ostream& strm)
     {
         LRT_(info).format(
             "detail::create_ostream: creating '{}' stream object", cout_name);
@@ -62,12 +61,13 @@ namespace hpx { namespace iostreams { namespace detail
         {
             typedef components::component<server::output_stream> ostream_type;
 
-            naming::id_type cout_id(
+            hpx::id_type cout_id(
                 components::server::construct<ostream_type>(std::ref(strm)),
-                naming::id_type::managed);
+                hpx::id_type::management_type::managed);
 
-            return agas::register_name(cout_name, cout_id).then(
-                hpx::launch::sync, util::bind_back(&return_id_type, cout_id));
+            return agas::register_name(cout_name, cout_id)
+                .then(hpx::launch::sync,
+                    hpx::bind_back(&return_id_type, cout_id));
         }
 
         // the console locality will create the ostream during startup
@@ -75,7 +75,7 @@ namespace hpx { namespace iostreams { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void release_ostream(char const* name, naming::id_type const& /* id */)
+    void release_ostream(char const* name, hpx::id_type const& /* id */)
     {
         LRT_(info).format(
             "detail::release_ostream: destroying '{}' stream object", name);
@@ -86,10 +86,9 @@ namespace hpx { namespace iostreams { namespace detail
             agas::unregister_name(launch::sync, name);
         }
     }
-}}}
+}}}    // namespace hpx::iostreams::detail
 
-namespace hpx { namespace iostreams
-{
+namespace hpx { namespace iostreams {
     // force the creation of the singleton stream objects
     void create_cout()
     {
@@ -134,16 +133,16 @@ namespace hpx { namespace iostreams
         }
         return detail::get_consolestream();
     }
-}}
+}}    // namespace hpx::iostreams
 
 ///////////////////////////////////////////////////////////////////////////////
-HPX_PLAIN_ACTION(hpx::iostreams::create_cout, create_cout_action);
-HPX_PLAIN_ACTION(hpx::iostreams::create_cerr, create_cerr_action);
-HPX_PLAIN_ACTION(hpx::iostreams::create_consolestream, create_consolestream_action);
+HPX_PLAIN_ACTION(hpx::iostreams::create_cout, create_cout_action)
+HPX_PLAIN_ACTION(hpx::iostreams::create_cerr, create_cerr_action)
+HPX_PLAIN_ACTION(
+    hpx::iostreams::create_consolestream, create_consolestream_action)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx
-{
+namespace hpx {
     // global standard ostream objects
     iostreams::ostream<> cout;
     iostreams::ostream<> cerr;
@@ -154,5 +153,4 @@ namespace hpx
     {
         return iostreams::get_consolestream();
     }
-}
-
+}    // namespace hpx

@@ -23,11 +23,10 @@
 #include <string>
 #include <vector>
 
-namespace detail
-{
+namespace detail {
     // this function will be executed by a dedicated OS thread
     void do_async_io(std::string const& string_to_write,
-        std::shared_ptr<hpx::lcos::local::promise<int> > p)
+        std::shared_ptr<hpx::promise<int>> p)
     {
         // This IO operation will possibly block the IO thread in the
         // kernel.
@@ -37,10 +36,10 @@ namespace detail
     }
 
     // This function will be executed by an HPX thread
-    hpx::lcos::future<int> async_io_worker(std::string const& string_to_write)
+    hpx::future<int> async_io_worker(std::string const& string_to_write)
     {
-        std::shared_ptr<hpx::lcos::local::promise<int> > p =
-            std::make_shared<hpx::lcos::local::promise<int> >();
+        std::shared_ptr<hpx::promise<int>> p =
+            std::make_shared<hpx::promise<int>>();
 
         // Get a reference to one of the IO specific HPX io_service objects ...
         hpx::parallel::execution::io_pool_executor executor;
@@ -50,18 +49,18 @@ namespace detail
 
         return p->get_future();
     }
-}
+}    // namespace detail
 
 // This function will be called whenever the action async_io_action is
 // invoked. This allows to remotely execute the async_io.
 int async_io(std::string const& string_to_write)
 {
-    hpx::lcos::future<int> f = detail::async_io_worker(string_to_write);
+    hpx::future<int> f = detail::async_io_worker(string_to_write);
     return f.get();    // simply wait for the IO to finish
 }
 
 // this defines the type async_io_action
-HPX_PLAIN_ACTION(async_io, async_io_action);
+HPX_PLAIN_ACTION(async_io, async_io_action)
 
 int hpx_main()
 {
@@ -70,12 +69,11 @@ int hpx_main()
         // example is run on one locality, we perform the IO operation
         // locally, otherwise we choose one of the remote localities to
         // invoke the async_io_action.
-        hpx::naming::id_type id = hpx::find_here();    // default: local
+        hpx::id_type id = hpx::find_here();    // default: local
 
-        std::vector<hpx::naming::id_type> localities =
-            hpx::find_remote_localities();
+        std::vector<hpx::id_type> localities = hpx::find_remote_localities();
         if (!localities.empty())
-            id = localities[0];         // choose the first remote locality
+            id = localities[0];    // choose the first remote locality
 
         // Create an action instance.
         async_io_action io;
@@ -89,15 +87,16 @@ int hpx_main()
 
         // Print the returned result.
         hpx::cout << "HPX-thread: The asynchronous IO operation returned: "
-                  << result << "\n" << hpx::flush;
+                  << result << "\n"
+                  << std::flush;
     }
 
-    return hpx::finalize(); // Initiate shutdown of the runtime system.
+    return hpx::finalize();    // Initiate shutdown of the runtime system.
 }
 
 int main(int argc, char* argv[])
 {
-    return hpx::init(argc, argv); // Initialize and run HPX.
+    return hpx::init(argc, argv);    // Initialize and run HPX.
 }
 
 #endif

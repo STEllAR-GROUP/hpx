@@ -32,7 +32,7 @@ namespace hpx { namespace test { namespace server {
             hpx::util::format_to(
                 strm, "[{1}/{2}]: held references\n", prefix_, this_);
 
-            for (naming::id_type const& ref : references_)
+            for (hpx::id_type const& ref : references_)
             {
                 strm << "  " << ref << " "
                      << naming::get_management_type_name(
@@ -45,7 +45,7 @@ namespace hpx { namespace test { namespace server {
             agas::garbage_collect();
         }
 
-        if (naming::invalid_id != target_)
+        if (hpx::invalid_id != target_)
         {
             hpx::util::format_to(
                 strm, "[{1}/{2}]: destroying object\n", prefix_, this_);
@@ -59,7 +59,8 @@ namespace hpx { namespace test { namespace server {
         std::string const str = strm.str();
 
         if (!str.empty())
-            cout << str << flush;
+            cout << str << std::flush;
     }
 }}}    // namespace hpx::test::server
+
 #endif

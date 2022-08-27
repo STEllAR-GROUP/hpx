@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,40 +20,34 @@
 namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
-    lcos::future<typename traits::promise_local_result<
-        typename hpx::traits::extract_action<Action>::remote_result_type>::type>
-    async_colocated(naming::id_type const& id, Ts&&... vs);
+    hpx::future<traits::promise_local_result_t<
+        typename hpx::traits::extract_action<Action>::remote_result_type>>
+    async_colocated(hpx::id_type const& id, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename... Ts>
-    lcos::future<typename traits::promise_local_result<typename hpx::traits::
-            extract_action<Derived>::remote_result_type>::type>
-    async_colocated(
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-        ,
-        naming::id_type const& id, Ts&&... vs);
+    hpx::future<traits::promise_local_result_t<
+        typename hpx::traits::extract_action<Derived>::remote_result_type>>
+    async_colocated(hpx::actions::basic_action<Component, Signature, Derived>,
+        hpx::id_type const& id, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
     // MSVC complains about ambiguities if it sees this forward declaration
 #if !defined(HPX_MSVC)
     template <typename Action, typename Continuation, typename... Ts>
-    typename std::enable_if<traits::is_continuation<Continuation>::value,
-        lcos::future<typename traits::promise_local_result<typename hpx::
-                traits::extract_action<Action>::remote_result_type>::type>>::
-        type
-        async_colocated(
-            Continuation&& cont, naming::id_type const& id, Ts&&... vs);
+    std::enable_if_t<traits::is_continuation_v<Continuation>,
+        hpx::future<traits::promise_local_result_t<
+            typename hpx::traits::extract_action<Action>::remote_result_type>>>
+    async_colocated(Continuation&& cont, hpx::id_type const& id, Ts&&... vs);
 
     template <typename Continuation, typename Component, typename Signature,
         typename Derived, typename... Ts>
-    typename std::enable_if<traits::is_continuation<Continuation>::value,
-        lcos::future<typename traits::promise_local_result<typename hpx::
-                traits::extract_action<Derived>::remote_result_type>::type>>::
-        type
-        async_colocated(Continuation&& cont,
-            hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-            ,
-            naming::id_type const& id, Ts&&... vs);
+    std::enable_if_t<traits::is_continuation_v<Continuation>,
+        hpx::future<traits::promise_local_result_t<
+            typename hpx::traits::extract_action<Derived>::remote_result_type>>>
+    async_colocated(Continuation&& cont,
+        hpx::actions::basic_action<Component, Signature, Derived>,
+        hpx::id_type const& id, Ts&&... vs);
 #endif
 }}    // namespace hpx::detail
 

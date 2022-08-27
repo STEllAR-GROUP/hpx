@@ -23,7 +23,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 std::uint64_t factorial(std::uint64_t m);
 
-HPX_PLAIN_ACTION(factorial, factorial_action);
+HPX_PLAIN_ACTION(factorial, factorial_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 std::uint64_t factorial(std::uint64_t n)
@@ -31,7 +31,7 @@ std::uint64_t factorial(std::uint64_t n)
     if (n == 0)
         return 1;
 
-    hpx::lcos::future<std::uint64_t> n1 =
+    hpx::future<std::uint64_t> n1 =
         hpx::async<factorial_action>(hpx::find_here(), n - 1);
     return n * n1.get();
 }
@@ -64,14 +64,12 @@ int main(int argc, char* argv[])
     using hpx::program_options::value;
 
     // Configure application-specific options
-    options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ( "n-value"
-        , value<std::uint64_t>()->default_value(10)
-        , "n value for the factorial function")
-        ;
+    desc_commandline.add_options()("n-value",
+        value<std::uint64_t>()->default_value(10),
+        "n value for the factorial function");
 
     // Initialize and run HPX
     hpx::init_params init_args;

@@ -99,9 +99,9 @@ namespace jacobi_smp {
                 (*deps_dst)[block] =
                     hpx::when_all(std::move(trigger))
                         .then(hpx::launch::async,
-                            hpx::util::bind(jacobi_kernel_wrap,
-                                block_ranges[block], std::cref(A),
-                                std::ref(*dst), std::cref(*src), std::cref(b)));
+                            hpx::bind(jacobi_kernel_wrap, block_ranges[block],
+                                std::cref(A), std::ref(*dst), std::cref(*src),
+                                std::cref(b)));
             }
             std::swap(dst, src);
             std::swap(deps_dst, deps_src);

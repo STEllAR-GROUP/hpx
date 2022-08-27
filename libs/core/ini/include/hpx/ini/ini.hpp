@@ -37,8 +37,7 @@ namespace hpx { namespace util {
     class HPX_CORE_EXPORT section
     {
     public:
-        typedef util::function_nonser<void(
-            std::string const&, std::string const&)>
+        typedef hpx::function<void(std::string const&, std::string const&)>
             entry_changed_func;
         typedef std::pair<std::string, entry_changed_func> entry_type;
         typedef std::map<std::string, entry_type> entry_map;

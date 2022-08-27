@@ -352,9 +352,9 @@ of the data exposed by this counter.
 Requesting the counter data for one or more performance counters can be achieved
 by invoking ``hello_world_distributed`` with a list of counter names:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
        --hpx:print-counter=/threads{locality#0/total}/count/cumulative \
        --hpx:print-counter=/agas{locality#0/total}/count/bind
 
@@ -391,9 +391,9 @@ counters returning an array of values, like for instance a histogram).
 Requesting to query the counter data once after a constant time interval with
 this command line:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
        --hpx:print-counter=/threads{locality#0/total}/count/cumulative \
        --hpx:print-counter=/agas{locality#0/total}/count/bind \
        --hpx:print-counter-interval=20
@@ -422,9 +422,9 @@ environment for the executed program. For instance, if your program is utilizing
 four worker threads for the execution of |hpx| threads (see command line option
 :option:`--hpx:threads`) the following command line
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
        --hpx:threads=4 \
        --hpx:print-counter=/threads{locality#0/worker-thread#*}/count/cumulative
 
@@ -447,9 +447,9 @@ The command ``--hpx:print-counter-format`` takes values ``csv`` and
 
 With format as csv:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
        --hpx:threads=2 \
        --hpx:print-counter-format csv \
        --hpx:print-counter /threads{locality#*/total}/count/cumulative \
@@ -467,9 +467,9 @@ countername as a header:
 
 With format csv-short:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
        --hpx:threads 2 \
        --hpx:print-counter-format csv-short \
        --hpx:print-counter cumulative,/threads{locality#*/total}/count/cumulative \
@@ -487,9 +487,9 @@ as a header:
 
 With format csv and csv-short when used with ``--hpx:print-counter-interval``:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
        --hpx:threads 2 \
        --hpx:print-counter-format csv-short \
        --hpx:print-counter cumulative,/threads{locality#*/total}/count/cumulative \
@@ -510,9 +510,9 @@ The command ``--hpx:no-csv-header`` can be used with
 ``--hpx:print-counter-format`` to print performance counter values in CSV format
 without any header:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   hello_world_distributed \
+   $ hello_world_distributed \
    --hpx:threads 2 \
    --hpx:print-counter-format csv-short \
    --hpx:print-counter cumulative,/threads{locality#*/total}/count/cumulative \
@@ -561,7 +561,7 @@ functions of the created client component instance should be called::
     // print the current number of threads created on locality 0
     hpx::performance_counters::performance_counter count(
         "/threads{locality#0/total}/count/cumulative");
-    hpx::cout << count.get_value<int>().get() << hpx::endl;
+    hpx::cout << count.get_value<int>().get() << std::endl;
 
 For more information about the client component type, see
 :cpp:class:`hpx::performance_counters::performance_counter`
@@ -576,7 +576,7 @@ For more information about the client component type, see
        hpx::performance_counters::performance_counter count(
            "/threads{locality#0/total}/count/cumulative");
        hpx::future<int> result = count.get_value<int>();
-       hpx::cout << result.get() << hpx::endl;
+       hpx::cout << result.get() << std::endl;
 
 .. _providing:
 
@@ -715,8 +715,7 @@ a component for you. The remainder of this section will explain the process of c
 performance counter based on the Sine example, which you can find in the
 directory ``examples/performance_counters/sine/``.
 
-The base class is defined in the header file [hpx_link
-hpx/performance_counters/base_performance_counter.hpp..hpx/performance_counters/base_performance_counter.hpp]
+The base class is defined in the header file :download:`base_performance_counter.cpp <../../libs/full/performance_counters/include/hpx/performance_counters/base_performance_counter.hpp>`
 as:
 
 .. literalinclude:: ../../libs/full/performance_counters/include/hpx/performance_counters/base_performance_counter.hpp
@@ -764,6 +763,10 @@ system and application performance.
      * Description
      * Parameters
    * * ``/agas/count/<agas_service>``
+   
+       .. _agas-count-agas-service: 
+
+       :ref:`??<agas-count-agas-service>`
 
        where:
 
@@ -803,6 +806,10 @@ system and application performance.
        service since its creation.
    * * ``/agas/<agas_service_category>/count``
 
+       .. _agas-agas-service-category-count: 
+
+       :ref:`??<agas-agas-service-category-count>`
+
        where:
 
        ``<agas_service_category>`` is one of the following: ``primary``,
@@ -825,6 +832,10 @@ system and application performance.
        services provided by the given :term:`AGAS` service category since its
        creation.
    * * ``agas/time/<agas_service>``
+
+       .. _agas-time-agas-service: 
+
+       :ref:`??<agas-time-agas-service>`
 
        where:
 
@@ -866,6 +877,10 @@ system and application performance.
        since its creation (in nanoseconds).
    * * ``/agas/<agas_service_category>/time``
 
+       .. _agas-agas-service-category-time: 
+
+       :ref:`??<agas-agas-service-category-time>`
+
        where:
 
        ``<agas_service_category>`` is one of the following: ``primary``,
@@ -887,6 +902,11 @@ system and application performance.
        by the given :term:`AGAS` service category since its creation (in
        nanoseconds).
    * * ``/agas/count/entries``
+       
+       .. _agas-count-entries: 
+
+       :ref:`??<agas-count-entries>`
+     
      * ``locality#*/total``
 
        where:
@@ -898,6 +918,10 @@ system and application performance.
      * Returns the number of cache entries resident in the :term:`AGAS` cache of
        the specified :term:`locality` (see ``<cache_statistics>``).
    * * ``/agas/count/<cache_statistics>``
+
+       .. _agas-count-cache-statistics: 
+
+       :ref:`??<agas-count-cache-statistics>`
 
        where:
 
@@ -916,6 +940,10 @@ system and application performance.
        ``<cache_statistics>``).
    * * ``/agas/count/<full_cache_statistics>``
 
+       .. _agas-count-full-cache-statistics: 
+
+       :ref:`??<agas-count-full-cache-statistics>`
+
        where:
 
        ``<full_cache_statistics>`` is one of the following: ``cache/get_entry``,
@@ -931,6 +959,10 @@ system and application performance.
      * Returns the number of invocations of the specified cache API function of
        the :term:`AGAS` cache.
    * * ``/agas/time/<full_cache_statistics>``
+
+       .. _agas-time-full-cache-statistics:
+
+       :ref:`??<agas-time-full-cache-statistics>`
 
        where:
 
@@ -955,6 +987,10 @@ system and application performance.
      * Description
      * Parameters
    * * ``/data/count/<connection_type>/<operation>``
+
+       .. _data-count-connection-type-operation:
+
+       :ref:`??<data-count-connection-type-operation>`
 
        where:
 
@@ -982,6 +1018,10 @@ system and application performance.
      * None
    * * ``/data/time/<connection_type>/<operation>``
 
+       .. _data-time-connection-type-operation:
+
+       :ref:`??<data-time-connection-type-operation>`
+
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
@@ -1008,6 +1048,10 @@ system and application performance.
        Please see :ref:`cmake_variables` for more details.
      * None
    * * ``/serialize/count/<connection_type>/<operation>``
+
+       .. _serialize-count-connection-type-operation:
+
+       :ref:`??<serialize-count-connection-type-operation>`
 
        where:
 
@@ -1038,6 +1082,10 @@ system and application performance.
        bytes transmitted for the given action only.
    * * ``/serialize/time/<connection_type>/<operation>``
 
+       .. _serialize-time-connection-type-operation:
+
+       :ref:`??<serialize-time-connection-type-operation>`
+
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
@@ -1066,6 +1114,11 @@ system and application performance.
        as its parameter. In this case the counter will report the serialization
        time for the given action only.
    * * ``/parcels/count/routed``
+
+       .. _parcels-count-routed:
+
+       :ref:`??<parcels-count-routed>`
+
      * ``locality#*/total``
 
        where:
@@ -1088,6 +1141,10 @@ system and application performance.
        as its parameter. In this case the counter will report the number of
        parcels for the given action only.
    * * ``/parcels/count/<connection_type>/<operation>``
+
+       .. _parcels-count-connection-type-operation:
+
+       :ref:`??<parcels-count-connection-type-operation>`
 
        where:
 
@@ -1115,6 +1172,10 @@ system and application performance.
      * None
    * * ``/messages/count/<connection_type>/<operation>``
 
+       .. _messages-count-connection-type-operation:
+
+       :ref:`??<messages-count-connection-type-operation>`
+
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
@@ -1140,6 +1201,10 @@ system and application performance.
        Please see :ref:`cmake_variables` for more details.
      * None
    * * ``/parcelport/count/<connection_type>/<cache_statistics>``
+
+       .. _parcelport-count-connection-type-cache-statistics:
+
+       :ref:`??<parcelport-count-connection-type-cache-statistics>`
 
        where:
 
@@ -1170,6 +1235,10 @@ system and application performance.
      * None
    * * ``/parcelqueue/length/<operation>``
 
+       .. _parcelqueue-length-operation:
+
+       :ref:`??<parcelqueue-length-operation>`
+
        where:
 
        ``<operation>`` is one of the following: ``send``, ``receive``
@@ -1191,6 +1260,11 @@ system and application performance.
      * Description
      * Parameters
    * * ``/threads/count/cumulative``
+
+       .. _threads-count-cumulative:
+
+       :ref:`??<threads-count-cumulative>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1225,6 +1299,11 @@ system and application performance.
        ``ON``).
      * None
    * * ``/threads/time/average``
+
+       .. _threads-time-average:
+
+       :ref:`??<threads-time-average>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1262,6 +1341,11 @@ system and application performance.
        of measure for this counter is nanosecond [ns].
      * None
    * * ``/threads/time/average-overhead``
+       
+       .. _threads-time-average-overhead:
+
+       :ref:`??<threads-time-average-overhead>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1298,6 +1382,11 @@ system and application performance.
        unit of measure for this counter is nanosecond [ns].
      * None
    * * ``/threads/count/cumulative-phases``
+
+       .. _threads-count-cumulative-phases:
+
+       :ref:`??<threads-count-cumulative-phases>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1333,6 +1422,11 @@ system and application performance.
        nanosecond [ns].
      * None
    * * ``/threads/time/average-phase``
+
+       .. _threads-time-average-phase:
+
+       :ref:`??<threads-time-average-phase>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1369,6 +1463,11 @@ system and application performance.
        unit of measure for this counter is nanosecond [ns].
      * None
    * * ``/threads/time/average-phase-overhead``
+
+       .. _threads-time-average-phase-overhead:
+
+       :ref:`??<threads-time-average-phase-overhead>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1406,6 +1505,11 @@ system and application performance.
        unit of measure for this counter is nanosecond [ns].
      * None
    * * ``/threads/time/overall``
+
+       .. _threads-time-overall:
+
+       :ref:`??<threads-time-overall>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1440,6 +1544,11 @@ system and application performance.
        nanosecond [ns].
      * None
    * * ``/threads/time/cumulative``
+
+       .. _threads-time-cumulative:
+
+       :ref:`??<threads-time-cumulative>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1474,6 +1583,11 @@ system and application performance.
        ``HPX_THREAD_MAINTAIN_IDLE_RATES`` are set to ``ON`` (default: ``OFF``).
      * None
    * * ``/threads/time/cumulative-overheads``
+
+       .. _threads-time-cumulative-overheads:
+
+       :ref:`??<threads-time-cumulative-overheads>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1510,6 +1624,10 @@ system and application performance.
        The unit of measure for this counter is nanosecond [ns].
      * None
    * * ``threads/count/instantaneous/<thread-state>``
+
+       .. _threads-count-instantaneous-thread-state:
+
+       :ref:`??<threads-count-instantaneous-thread-state>`
 
        where:
 
@@ -1549,6 +1667,10 @@ system and application performance.
        |hpx|-threads in the given state for all worker threads separately.
      * None
    * * ``threads/wait-time/<thread-state>``
+
+       .. _threads-wait-time-thread-state:
+
+       :ref:`??<threads-wait-time-thread-state>`
 
        where:
 
@@ -1596,6 +1718,11 @@ system and application performance.
        nanosecond [ns].
      * None
    * * ``/threads/idle-rate``
+
+       .. _threads-idle-rate:
+
+       :ref:`??<threads-idle-rate>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1626,6 +1753,11 @@ system and application performance.
        (default: ``OFF``).
      * None
    * * ``/threads/creation-idle-rate``
+
+       .. _threads-creation-idle-rate:
+
+       :ref:`??<threads-creation-idle-rate>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1657,6 +1789,11 @@ system and application performance.
        ``HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES`` are set to ``ON``.
      * None
    * * ``/threads/cleanup-idle-rate``
+
+       .. _threads-cleanup-idle-rate:
+
+       :ref:`??<threads-cleanup-idle-rate>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1690,6 +1827,11 @@ system and application performance.
        ``ON``.
      * None
    * * ``/threadqueue/length``
+
+       .. _threadqueue-length:
+
+       :ref:`??<threadqueue-length>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1717,6 +1859,11 @@ system and application performance.
        on the given :term:`locality`.
      * None
    * * ``/threads/count/stack-unbinds``
+
+       .. _threads-count-stack-unbinds:
+
+       :ref:`??<threads-count-stack-unbinds>`
+
      * ``locality#*/total``
 
        where:
@@ -1729,6 +1876,11 @@ system and application performance.
        not available on Windows based platforms.
      * None
    * * ``/threads/count/stack-recycles``
+
+       .. _threads-count-stack-recycles:
+
+       :ref:`??<threads-count-stack-recycles>`
+
      * ``locality#*/total``
 
        where:
@@ -1739,6 +1891,11 @@ system and application performance.
      * Returns the total number of |hpx|-thread recycling operations performed.
      * None
    * * ``/threads/count/stolen-from-pending``
+
+       .. _threads-count-stolen-from-pending:
+
+       :ref:`??<threads-count-stolen-from-pending>`
+
      * ``locality#*/total``
 
           where:
@@ -1753,6 +1910,11 @@ system and application performance.
        ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON`` (default: ``ON``).
      * None
    * * ``/threads/count/pending-misses``
+
+       .. _threads-count-pending-misses:
+
+       :ref:`??<threads-count-pending-misses>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1783,6 +1945,11 @@ system and application performance.
        (default: ``ON``).
      * None
    * * ``/threads/count/pending-accesses``
+ 
+       .. _threads-count-pending-accesses:
+
+       :ref:`??<threads-count-pending-accesses>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1813,6 +1980,11 @@ system and application performance.
        (default: ``ON``).
      * None
    * * ``/threads/count/stolen-from-staged``
+
+       .. _threads-count-stolen-from-staged:
+
+       :ref:`??<threads-count-stolen-from-staged>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1843,6 +2015,11 @@ system and application performance.
        ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON`` (default: ``ON``).
      * None
    * * ``/threads/count/stolen-to-pending``
+
+       .. _threads-count-stolen-to-pending:
+
+       :ref:`??<threads-count-stolen-to-pending>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1873,6 +2050,11 @@ system and application performance.
        ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON`` (default: ``ON``).
      * None
    * * ``/threads/count/stolen-to-staged``
+
+       .. _threads-count-stolen-to-staged:
+
+       :ref:`??<threads-count-stolen-to-staged>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1904,6 +2086,11 @@ system and application performance.
        ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON`` (default: ``ON``).
      * None
    * * ``/threads/count/objects``
+
+       .. _threads-count-objects:
+
+       :ref:`??<threads-count-objects>`
+
      * ``locality#*/total`` or
 
        ``locality#*/allocator#*``
@@ -1926,6 +2113,11 @@ system and application performance.
        does not reflect the number of actually executed (retired) |hpx|-threads.
      * None
    * * ``/scheduler/utilization/instantaneous``
+
+       .. _scheduler-utilization-instantaneous:
+
+       :ref:`??<scheduler-utilization-instantaneous>`
+
      * ``locality#*/total``
 
        where:
@@ -1938,6 +2130,11 @@ system and application performance.
         current percentage of scheduler threads executing |hpx| threads.
      * Percent
    * * ``/threads/idle-loop-count/instantaneous``
+
+       .. _threads-idle-loop-count-instantaneous:
+
+       :ref:`??<threads-idle-loop-count-instantaneous>`
+       
      * ``locality#*/worker-thread#*`` or
 
        ``locality#*/pool#*/worker-thread#*``
@@ -1963,6 +2160,11 @@ system and application performance.
        |hpx|- worker thread or the accumulated value for all worker threads.
      * None
    * * ``/threads/busy-loop-count/instantaneous``
+
+       .. _threads-busy-loop-count-instantaneous:
+
+       :ref:`??<threads-busy-loop-count-instantaneous>`
+       
      * ``locality#*/worker-thread#*`` or
 
        ``locality#*/pool#*/worker-thread#*``
@@ -1988,6 +2190,11 @@ system and application performance.
        worker thread or the accumulated value for all worker threads.
      * None
    * * ``/threads/time/background-work-duration``
+
+       .. _threads-time-background-work-duration:
+
+       :ref:`??<threads-time-background-work-duration>`
+       
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2018,6 +2225,11 @@ system and application performance.
 
      * None
    * * ``/threads/background-overhead``
+
+       .. _threads-background-overhead:
+
+       :ref:`??<threads-background-overhead>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2045,6 +2257,11 @@ system and application performance.
        unit of measure displayed for this counter is 0.1%.
      * None
    * * ``/threads/time/background-send-duration``
+
+       .. _threads-time-background-send-duration:
+
+       :ref:`??<threads-time-background-send-duration>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2079,6 +2296,11 @@ system and application performance.
 
      * None
    * * ``/threads/background-send-overhead``
+
+       .. _threads-background-send-overhead:
+
+       :ref:`??<threads-background-send-overhead>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2109,6 +2331,11 @@ system and application performance.
        parcelport only.
      * None
    * * ``/threads/time/background-receive-duration``
+
+       .. _threads-time-background-receive-duration:
+
+       :ref:`??<threads-time-background-receive-duration>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2142,6 +2369,11 @@ system and application performance.
        parcelport only.
      * None
    * * ``/threads/background-receive-overhead``
+
+       .. _threads-background-receive-overhead:
+       
+       :ref:`??<threads-background-receive-overhead>`
+
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2179,6 +2411,11 @@ system and application performance.
      * Description
      * Parameters
    * * ``/runtime/count/component``
+
+       .. _runtime-count-component: 
+
+       :ref:`??<runtime-count-component>`
+
      * ``locality#*/total``
 
        where:
@@ -2192,6 +2429,11 @@ system and application performance.
        registering the component with |hpx|, e.g. which has been passed as the
        second parameter to the macro :c:macro:`HPX_REGISTER_COMPONENT`.
    * * ``/runtime/count/action-invocation``
+
+       .. _runtime-count-action-invocation: 
+
+       :ref:`??<runtime-count-action-invocation>`
+
      * ``locality#*/total``
 
          where:
@@ -2206,6 +2448,11 @@ system and application performance.
        to the macro :c:macro:`HPX_REGISTER_ACTION` or
        :c:macro:`HPX_REGISTER_ACTION_ID`.
    * * ``/runtime/count/remote-action-invocation``
+
+       .. _runtime-count-remote-action-invocation:
+
+       :ref:`??<runtime-count-remote-action-invocation>`
+
      * ``locality#*/total``
 
        where:
@@ -2220,6 +2467,11 @@ system and application performance.
        to the macro :c:macro:`HPX_REGISTER_ACTION` or
        :c:macro:`HPX_REGISTER_ACTION_ID`.
    * * ``/runtime/uptime``
+
+       .. _runtime-uptime:
+
+       :ref:`??<runtime-uptime>`
+
      * ``locality#*/total``
 
        where:
@@ -2231,6 +2483,11 @@ system and application performance.
        :term:`locality` in nanoseconds.
      * None
    * * ``/runtime/memory/virtual``
+
+       .. _runtime-memory-virtual:
+
+       :ref:`??<runtime-memory-virtual>`
+
      * ``locality#*/total``
 
        where:
@@ -2242,6 +2499,11 @@ system and application performance.
        referenced :term:`locality` (in bytes).
      * None
    * * ``/runtime/memory/resident``
+
+       .. _runtime-memory-resident:
+
+       :ref:`??<runtime-memory-resident>`
+
      * ``locality#*/total``
 
        where:
@@ -2253,6 +2515,11 @@ system and application performance.
        referenced :term:`locality` (in bytes).
      * None
    * * ``/runtime/memory/total``
+
+       .. _runtime-memory-total:
+
+       :ref:`??<runtime-memory-total>`
+
      * ``locality#*/total``
 
        where:
@@ -2266,6 +2533,11 @@ system and application performance.
         Windows systems only.
      * None
    * * ``/runtime/io/read_bytes_issued``
+
+       .. _runtime-io-read-bytes-issued:
+
+       :ref:`??<runtime-io-read-bytes-issued>`
+
      * ``locality#*/total``
 
        where:
@@ -2279,6 +2551,11 @@ system and application performance.
        through the /proc file system.
      * None
    * * ``/runtime/io/write_bytes_issued``
+
+       .. _runtime-io-write-bytes-issued:
+
+       :ref:`??<runtime-io-write-bytes-issued>`
+
      * ``locality#*/total``
 
        where:
@@ -2292,6 +2569,11 @@ system and application performance.
        through the /proc file system.
      * None
    * * ``/runtime/io/read_syscalls``
+
+       .. _runtime-io-read-syscalls:
+
+       :ref:`??<runtime-io-read-syscalls>`
+
      * ``locality#*/total``
 
        where:
@@ -2304,6 +2586,11 @@ system and application performance.
        related data through the /proc file system.
      * None
    * * ``/runtime/io/write_syscalls``
+
+       .. _runtime-io-write-syscalls:
+
+       :ref:`??<runtime-io-write-syscalls>`
+
      * ``locality#*/total``
 
        where:
@@ -2316,6 +2603,11 @@ system and application performance.
        related data through the /proc file system.
      * None
    * * ``/runtime/io/read_bytes_transferred``
+
+       .. _runtime-io-read-bytes-transferred:
+
+       :ref:`??<runtime-io-read-bytes-transferred>`
+
      * ``locality#*/total``
 
        where:
@@ -2328,6 +2620,11 @@ system and application performance.
        related data through the /proc file system.
      * None
    * * ``/runtime/io/write_bytes_transferred``
+
+       .. _runtime-io-write-bytes-transferred:
+
+       :ref:`??<runtime-io-write-bytes-transferred>`
+
      * ``locality#*/total``
 
        where:
@@ -2340,6 +2637,11 @@ system and application performance.
        related data through the /proc file system.
      * None
    * * ``/runtime/io/write_bytes_cancelled``
+
+       .. _runtime-io-write-bytes-cancelled:
+
+       :ref:`??<runtime-io-write-bytes-cancelled>`
+
      * ``locality#*/total``
 
        where:
@@ -2360,6 +2662,10 @@ system and application performance.
      * Description
      * Parameters
    * * ``/papi/<papi_event>``
+
+       .. _papi-papi-event:
+
+       :ref:`??<papi-papi-event>`
 
        where:
 
@@ -2401,6 +2707,11 @@ system and application performance.
      * Description
      * Parameters
    * * ``/statistics/average``
+
+       .. _statistics-average:
+
+       :ref:`??<statistics-average>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current average (mean) value calculated based on the values
@@ -2415,6 +2726,11 @@ system and application performance.
        The default value is ``0``.
 
    * * ``/statistics/rolling_average``
+
+       .. _statistics-rolling-average:
+
+       :ref:`??<statistics-rolling-average>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current rolling average (mean) value calculated based on the
@@ -2431,6 +2747,11 @@ system and application performance.
        be reset during evaluation ``1`` or not ``0``. The default value is ``0``.
 
    * * ``/statistics/stddev``
+
+       .. _statistics-stddev:
+
+       :ref:`??<statistics-stddev>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current standard deviation (stddev) value calculated based on
@@ -2445,6 +2766,11 @@ system and application performance.
        The default value is ``0``.
 
    * * ``/statistics/rolling_stddev``
+
+       .. _statistics-rolling-stddev:
+
+       :ref:`??<statistics-rolling-stddev>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current rolling variance (stddev) value calculated based on
@@ -2461,6 +2787,11 @@ system and application performance.
        during evaluation ``1`` or not ``0``. The default value is ``0``.
 
    * * ``/statistics/median``
+
+       .. _statistics-median:
+
+       :ref:`??<statistics-median>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current (statistically estimated) median value calculated
@@ -2475,6 +2806,11 @@ system and application performance.
        The default value is ``0``.
 
    * * ``/statistics/max``
+
+       .. _statistics-max:
+
+       :ref:`??<statistics-max>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current maximum value calculated based on the values queried
@@ -2488,6 +2824,11 @@ system and application performance.
        The default value is ``0``.
 
    * * ``/statistics/rolling_max``
+
+       .. _statistics-rolling-max:
+
+       :ref:`??<statistics-rolling-max>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current rolling maximum value calculated based on the values
@@ -2504,6 +2845,11 @@ system and application performance.
        during evaluation ``1`` or not ``0``. The default value is ``0``.
 
    * * ``/statistics/min``
+
+       .. _statistics-min:
+
+       :ref:`??<statistics-min>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current minimum value calculated based on the values queried
@@ -2517,6 +2863,11 @@ system and application performance.
        The default value is ``0``.
 
    * * ``/statistics/rolling_min``
+
+       .. _statistics-rolling-min:
+
+       :ref:`??<statistics-rolling-min>`
+
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
      * Returns the current rolling minimum value calculated based on the values
@@ -2539,6 +2890,11 @@ system and application performance.
      * Description
      * Parameters
    * * ``/arithmetics/add``
+
+       .. _arithmetics-add:
+
+       :ref:`??<arithmetics-add>`
+   
      * None
      * Returns the sum calculated based on the values queried from the
        underlying counters (the ones specified as the parameters).
@@ -2546,6 +2902,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/subtract``
+
+       .. _arithmetics-subtract:
+
+       :ref:`??<arithmetics-subtract>`
+
      * None
      * Returns the difference calculated based on the values queried from the
        underlying counters (the ones specified as the parameters).
@@ -2553,6 +2914,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/multiply``
+
+       .. _arithmetics-multiply:
+
+       :ref:`??<arithmetics-multiply>`
+
      * None
      * Returns the product calculated based on the values queried from the
        underlying counters (the ones specified as the parameters).
@@ -2560,6 +2926,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/divide``
+
+          .. _arithmetics-divide:
+
+       :ref:`??<arithmetics-divide>`
+
      * None
      * Returns the result of division of the values queried from the
        underlying counters (the ones specified as the parameters).
@@ -2567,6 +2938,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/mean``
+
+       .. _arithmetics-mean:
+
+       :ref:`??<arithmetics-mean>`
+
      * None
      * Returns the average value of all values queried from the
        underlying counters (the ones specified as the parameters).
@@ -2574,6 +2950,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/variance``
+
+       .. _arithmetics-variance:
+
+       :ref:`??<arithmetics-variance>`
+
      * None
      * Returns the standard deviation of all values queried from the underlying
        counters (the ones specified as the parameters).
@@ -2581,6 +2962,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/median``
+
+       .. _arithmetics-median:
+
+       :ref:`??<arithmetics-median>`
+
      * None
      * Returns the median value of all values queried from the underlying
        counters (the ones specified as the parameters).
@@ -2588,6 +2974,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/min``
+
+       .. _arithmetics-min:
+
+       :ref:`??<arithmetics-min>`
+
      * None
      * Returns the minimum value of all values queried from the underlying
        counters (the ones specified as the parameters).
@@ -2595,6 +2986,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/max``
+
+       .. _arithmetics-max:
+
+       :ref:`??<arithmetics-max>`
+
      * None
      * Returns the maximum value of all values queried from the
        underlying counters (the ones specified as the parameters).
@@ -2602,6 +2998,11 @@ system and application performance.
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
    * * ``/arithmetics/count``
+
+       .. _arithmetics-count:
+
+       :ref:`??<arithmetics-count>`
+
      * None
      * Returns the count value of all values queried from the underlying
        counters (the ones specified as the parameters).
@@ -2615,9 +3016,9 @@ system and application performance.
    counters. For this reason those have to be specified as parameters (a comma
    separated list of counters appended after a ``'@'``). For instance:
 
-   .. code-block:: bash
+   .. code-block:: shell-session
 
-      ./bin/hello_world_distributed -t2 \
+      $ ./bin/hello_world_distributed -t2 \
           --hpx:print-counter=/threads{locality#0/worker-thread#*}/count/cumulative \
           --hpx:print-counter=/arithmetics/add@/threads{locality#0/worker-thread#*}/count/cumulative
       hello world from OS-thread 0 on locality 0
@@ -2629,9 +3030,9 @@ system and application performance.
    Since all wildcards in the parameters are expanded, this example is fully
    equivalent to specifying both counters separately to ``/arithmetics/add``:
 
-   .. code-block:: bash
+   .. code-block:: shell-session
 
-      ./bin/hello_world_distributed -t2 \
+      $ ./bin/hello_world_distributed -t2 \
           --hpx:print-counter=/threads{locality#0/worker-thread#*}/count/cumulative \
           --hpx:print-counter=/arithmetics/add@\
               /threads{locality#0/worker-thread#0}/count/cumulative,\
@@ -2645,6 +3046,11 @@ system and application performance.
      * Parameters
 
    * * ``/coalescing/count/parcels``
+
+       .. _coalescing-count-parcels:
+
+       :ref:`??<coalescing-count-parcels>`
+
      * ``locality#*/total``
 
        where:
@@ -2660,6 +3066,11 @@ system and application performance.
        :c:macro:`HPX_REGISTER_ACTION_ID`.
 
    * * ``/coalescing/count/messages``
+
+       .. _coalescing-count-messages:
+
+       :ref:`??<coalescing-count-messages>`
+
      * ``locality#*/total``
 
        where:
@@ -2675,6 +3086,11 @@ system and application performance.
        :c:macro:`HPX_REGISTER_ACTION_ID`.
 
    * * ``/coalescing/count/average-parcels-per-message``
+
+       .. _coalescing-count-average-parcels-per-message:
+
+       :ref:`??<coalescing-count-average-parcels-per-message>`
+
      * ``locality#*/total``
 
        where:
@@ -2691,6 +3107,11 @@ system and application performance.
        :c:macro:`HPX_REGISTER_ACTION_ID`
 
    * * ``/coalescing/time/average-parcel-arrival``
+
+       .. _coalescing-time-average-parcel-arrival:
+
+       :ref:`??<coalescing-time-average-parcel-arrival>`
+
      * ``locality#*/total``
 
        where:
@@ -2707,6 +3128,11 @@ system and application performance.
        :c:macro:`HPX_REGISTER_ACTION_ID`
 
    * * ``/coalescing/time/parcel-arrival-histogram``
+
+       .. _coalescing-time-parcel-arrival-histogram:
+
+       :ref:`??<coalescing-time-parcel-arrival-histogram>`
+
      * ``locality#*/total``
 
        where:
@@ -2757,12 +3183,17 @@ APEX integration
 ================
 
 |hpx| provides integration with |apex|_, which is a framework for application
-profiling using task timers and various performance counters. It can be added as
-a ``git`` submodule by turning on the option :option:`HPX_WITH_APEX:BOOL` during
-|cmake| configuration. |tau|_ is an optional dependency when using |apex|.
+profiling using task timers and various performance counters :footcite:t:`2015:apex`.
+It can be added as a ``git`` submodule by turning on the option :option:`HPX_WITH_APEX:BOOL`
+during |cmake| configuration. |tau|_ is an optional dependency when using |apex|.
 
 To build |hpx| with |apex|, add :option:`HPX_WITH_APEX`\ ``=ON``, and,
 optionally, ``TAU_ROOT=$PATH_TO_TAU`` to your |cmake| configuration. In
 addition, you can override the tag used for |apex| with the
 :option:`HPX_WITH_APEX_TAG` option. Please see the |apex_hpx_doc|_ for detailed
 instructions on using |apex| with |hpx|.
+
+References
+==========
+
+.. footbibliography::

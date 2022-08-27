@@ -12,7 +12,6 @@ compute
 =======
 
 The compute module provides utilities for handling task and memory affinity on
-host systems. The :ref:`modules_compute_cuda` for extensions to CUDA programmable
-GPU devices.
+host systems.
 
 See the :ref:`API reference <modules_compute_api>` of the module for more details.

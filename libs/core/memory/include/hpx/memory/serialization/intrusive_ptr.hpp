@@ -26,5 +26,5 @@ namespace hpx { namespace serialization {
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (template <typename T>), (hpx::intrusive_ptr<T>) );
+        (template <typename T>), (hpx::intrusive_ptr<T>) )
 }}    // namespace hpx::serialization

@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/member_pack.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -16,17 +18,20 @@
 #include <cstddef>
 #include <exception>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
     namespace detail {
-        template <typename Is, typename... Ts>
+
+        template <typename CPO, typename Is, typename... Ts>
         struct just_sender;
 
-        template <typename std::size_t... Is, typename... Ts>
-        struct just_sender<hpx::util::index_pack<Is...>, Ts...>
+        template <typename CPO, std::size_t... Is, typename... Ts>
+        struct just_sender<CPO, hpx::util::index_pack<Is...>, Ts...>
         {
-            hpx::util::member_pack_for<std::decay_t<Ts>...> ts;
+            HPX_NO_UNIQUE_ADDRESS util::member_pack_for<std::decay_t<Ts>...> ts;
 
             constexpr just_sender() = default;
 
@@ -34,14 +39,14 @@ namespace hpx { namespace execution { namespace experimental {
                 typename = std::enable_if_t<
                     !std::is_same_v<std::decay_t<T>, just_sender>>>
             explicit constexpr just_sender(T&& t)
-              : ts(std::piecewise_construct, std::forward<T>(t))
+              : ts(std::piecewise_construct, HPX_FORWARD(T, t))
             {
             }
 
             template <typename T0, typename T1, typename... Ts_>
             explicit constexpr just_sender(T0&& t0, T1&& t1, Ts_&&... ts)
-              : ts(std::piecewise_construct, std::forward<T0>(t0),
-                    std::forward<T1>(t1), std::forward<Ts_>(ts)...)
+              : ts(std::piecewise_construct, HPX_FORWARD(T0, t0),
+                    HPX_FORWARD(T1, t1), HPX_FORWARD(Ts_, ts)...)
             {
             }
 
@@ -49,15 +54,6 @@ namespace hpx { namespace execution { namespace experimental {
             just_sender(just_sender const&) = default;
             just_sender& operator=(just_sender&&) = default;
             just_sender& operator=(just_sender const&) = default;
-
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types = Variant<Tuple<std::decay_t<Ts>...>>;
-
-            template <template <typename...> class Variant>
-            using error_types = Variant<std::exception_ptr>;
-
-            static constexpr bool sends_done = false;
 
             template <typename Receiver>
             struct operation_state
@@ -68,8 +64,8 @@ namespace hpx { namespace execution { namespace experimental {
                 template <typename Receiver_>
                 operation_state(Receiver_&& receiver,
                     hpx::util::member_pack_for<std::decay_t<Ts>...> ts)
-                  : receiver(std::forward<Receiver_>(receiver))
-                  , ts(std::move(ts))
+                  : receiver(HPX_FORWARD(Receiver_, receiver))
+                  , ts(HPX_MOVE(ts))
                 {
                 }
 
@@ -78,47 +74,108 @@ namespace hpx { namespace execution { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                friend void tag_dispatch(start_t, operation_state& os) noexcept
+                friend void tag_invoke(start_t, operation_state& os) noexcept
                 {
                     hpx::detail::try_catch_exception_ptr(
                         [&]() {
-                            hpx::execution::experimental::set_value(
-                                std::move(os.receiver),
-                                std::move(os.ts).template get<Is>()...);
+                            CPO{}(HPX_MOVE(os.receiver),
+                                HPX_MOVE(os.ts).template get<Is>()...);
                         },
                         [&](std::exception_ptr ep) {
                             hpx::execution::experimental::set_error(
-                                std::move(os.receiver), std::move(ep));
+                                HPX_MOVE(os.receiver), HPX_MOVE(ep));
                         });
                 }
             };
 
             template <typename Receiver>
-            friend auto tag_dispatch(
-                connect_t, just_sender&& s, Receiver&& receiver)
+            friend auto tag_invoke(
+                connect_t, just_sender&& s, Receiver&& receiver) noexcept(util::
+                    all_of_v<std::is_nothrow_move_constructible<Ts>...>)
             {
                 return operation_state<Receiver>{
-                    std::forward<Receiver>(receiver), std::move(s.ts)};
+                    HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.ts)};
             }
 
             template <typename Receiver>
-            friend auto tag_dispatch(
-                connect_t, just_sender& s, Receiver&& receiver)
+            friend auto
+            tag_invoke(connect_t, just_sender& s, Receiver&& receiver) noexcept(
+                util::all_of_v<std::is_nothrow_copy_constructible<Ts>...>)
             {
                 return operation_state<Receiver>{
-                    std::forward<Receiver>(receiver), s.ts};
+                    HPX_FORWARD(Receiver, receiver), s.ts};
             }
         };
+
+        template <typename Pack, typename... Ts, typename Env>
+        auto tag_invoke(get_completion_signatures_t,
+            just_sender<set_value_t, Pack, Ts...> const&, Env) noexcept
+            -> hpx::execution::experimental::completion_signatures<
+                set_value_t(Ts...), set_error_t(std::exception_ptr)>;
+
+        // different versions of clang-format disagree
+        // clang-format off
+        template <typename Pack, typename Error, typename Env>
+        auto tag_invoke(get_completion_signatures_t,
+            just_sender<set_error_t, Pack, Error> const&, Env) noexcept
+            -> hpx::execution::experimental::completion_signatures<
+                set_error_t(std::exception_ptr), set_error_t(Error)>;
+        // clang-format on
+
+        template <typename Pack, typename... Ts, typename Env>
+        auto tag_invoke(get_completion_signatures_t,
+            just_sender<set_stopped_t, Pack, Ts...> const&, Env) noexcept
+            -> hpx::execution::experimental::completion_signatures<
+                set_stopped_t(), set_error_t(std::exception_ptr)>;
     }    // namespace detail
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct just_t final
+    // Returns a sender with no completion schedulers, which sends the provided
+    // values. The input values are decay-copied into the returned sender. When
+    // the returned sender is connected to a receiver, the values are moved into
+    // the operation state if the sender is an rvalue; otherwise, they are
+    // copied. Then xvalues referencing the values in the operation state are
+    // passed to the receiver's set_value.
+    inline constexpr struct just_t final
     {
         template <typename... Ts>
         constexpr HPX_FORCEINLINE auto operator()(Ts&&... ts) const
         {
             return detail::just_sender<
-                typename hpx::util::make_index_pack<sizeof...(Ts)>::type,
-                Ts...>{std::forward<Ts>(ts)...};
+                hpx::execution::experimental::set_value_t,
+                hpx::util::make_index_pack_t<sizeof...(Ts)>, Ts...>{
+                HPX_FORWARD(Ts, ts)...};
         }
     } just{};
-}}}    // namespace hpx::execution::experimental
+
+    // Returns a sender with no completion schedulers, which completes with the
+    // specified error. If the provided error is an lvalue reference, a copy is
+    // made inside the returned sender and a non-const lvalue reference to the
+    // copy is sent to the receiver's set_error. If the provided value is an
+    // rvalue reference, it is moved into the returned sender and an rvalue
+    // reference to it is sent to the receiver's set_error.
+    inline constexpr struct just_error_t final
+    {
+        template <typename Error>
+        constexpr HPX_FORCEINLINE auto operator()(Error&& error) const
+        {
+            return detail::just_sender<
+                hpx::execution::experimental::set_error_t,
+                hpx::util::make_index_pack_t<std::size_t(1)>, Error>{
+                HPX_FORWARD(Error, error)};
+        }
+    } just_error{};
+
+    // Returns a sender with no completion schedulers, which completes
+    // immediately by calling the receiver's set_stopped.
+    inline constexpr struct just_stopped_t final
+    {
+        template <typename... Ts>
+        constexpr HPX_FORCEINLINE auto operator()(Ts&&... ts) const
+        {
+            return detail::just_sender<
+                hpx::execution::experimental::set_stopped_t,
+                hpx::util::make_index_pack_t<sizeof...(Ts)>, Ts...>{
+                HPX_FORWARD(Ts, ts)...};
+        }
+    } just_stopped{};
+}    // namespace hpx::execution::experimental

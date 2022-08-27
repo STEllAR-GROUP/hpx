@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,15 +16,16 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos {
+namespace hpx::distributed {
 
     class HPX_EXPORT latch
-      : public components::client_base<latch, lcos::server::latch>
+      : public components::client_base<latch, hpx::lcos::server::latch>
     {
-        typedef components::client_base<latch, lcos::server::latch> base_type;
+        typedef components::client_base<latch, hpx::lcos::server::latch>
+            base_type;
 
     public:
-        latch() {}
+        latch() = default;
 
         /// Initialize the latch
         ///
@@ -36,31 +37,30 @@ namespace hpx { namespace lcos {
 
         /// Extension: Create a client side representation for the existing
         /// \a server#latch instance with the given global id \a id.
-        latch(naming::id_type const& id)
+        latch(hpx::id_type const& id)
           : base_type(id)
         {
         }
 
         /// Extension: Create a client side representation for the existing
         /// \a server#latch instance with the given global id \a id.
-        latch(hpx::future<naming::id_type>&& f)
-          : base_type(std::move(f))
+        latch(hpx::future<hpx::id_type>&& f)
+          : base_type(HPX_MOVE(f))
         {
         }
 
         /// Extension: Create a client side representation for the existing
         /// \a server#latch instance with the given global id \a id.
-        latch(hpx::shared_future<naming::id_type> const& id)
+        latch(hpx::shared_future<hpx::id_type> const& id)
           : base_type(id)
         {
         }
-        latch(hpx::shared_future<naming::id_type>&& id)
-          : base_type(std::move(id))
+        latch(hpx::shared_future<hpx::id_type>&& id)
+          : base_type(HPX_MOVE(id))
         {
         }
 
         ///////////////////////////////////////////////////////////////////////
-
         /// Decrements counter_ by 1 . Blocks at the synchronization point
         /// until counter_ reaches 0.
         ///
@@ -72,6 +72,21 @@ namespace hpx { namespace lcos {
         /// \throws Nothing.
         ///
         void count_down_and_wait()
+        {
+            count_down_and_wait_async().get();
+        }
+
+        /// Decrements counter_ by update . Blocks at the synchronization point
+        /// until counter_ reaches 0.
+        ///
+        /// Requires: counter_ > 0.
+        ///
+        /// Synchronization: Synchronizes with all calls that block on this
+        /// latch and with all is_ready calls on this latch that return true.
+        ///
+        /// \throws Nothing.
+        ///
+        void arrive_and_wait()
         {
             count_down_and_wait_async().get();
         }
@@ -95,6 +110,15 @@ namespace hpx { namespace lcos {
         /// \throws Nothing.
         ///
         bool is_ready() const noexcept
+        {
+            return is_ready_async().get();
+        }
+
+        /// Returns: counter_ == 0. Does not block.
+        ///
+        /// \throws Nothing.
+        ///
+        bool try_wait() const noexcept
         {
             return is_ready_async().get();
         }
@@ -128,4 +152,13 @@ namespace hpx { namespace lcos {
         }
         /// \endcond
     };
-}}    // namespace hpx::lcos
+}    // namespace hpx::distributed
+
+namespace hpx::lcos {
+
+    /// \cond NOINTERNAL
+    using latch HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::latch is deprecated, use hpx::distributed::latch instead") =
+        hpx::distributed::latch;
+    /// \endcond
+}    // namespace hpx::lcos

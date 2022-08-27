@@ -6,7 +6,6 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/async_combinators/wait_each.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
@@ -41,17 +40,15 @@ using hpx::program_options::value;
 using hpx::program_options::variables_map;
 
 using hpx::find_here;
-using hpx::naming::id_type;
+using hpx::id_type;
 
 using hpx::apply;
 using hpx::async;
 using hpx::future;
-using hpx::lcos::wait_each;
 
 using hpx::chrono::high_resolution_timer;
 
 using hpx::cout;
-using hpx::flush;
 
 // global vars we stick here to make printouts easy for plotting
 static std::string queuing = "default";
@@ -152,7 +149,7 @@ struct scratcher
 void measure_function_futures_create_thread_hierarchical_placement(
     std::uint64_t count, bool csv, bool uselibcds)
 {
-    hpx::lcos::local::latch l(count);
+    hpx::latch l(count);
 
     auto sched = hpx::threads::get_self_id_data()->get_scheduler_base();
 
@@ -160,14 +157,14 @@ void measure_function_futures_create_thread_hierarchical_placement(
         sched->get_description())
     {
         sched->add_remove_scheduler_mode(
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::assign_work_thread_parent),
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::enable_stealing |
-                hpx::threads::policies::enable_stealing_numa |
-                hpx::threads::policies::assign_work_round_robin |
-                hpx::threads::policies::steal_after_local |
-                hpx::threads::policies::steal_high_priority_first));
+            hpx::threads::policies::scheduler_mode::assign_work_thread_parent,
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::enable_stealing_numa |
+                hpx::threads::policies::scheduler_mode::
+                    assign_work_round_robin |
+                hpx::threads::policies::scheduler_mode::steal_after_local |
+                hpx::threads::policies::scheduler_mode::
+                    steal_high_priority_first);
     }
     auto const func = [&]() {
         null_function(uselibcds);

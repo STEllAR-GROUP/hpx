@@ -42,7 +42,7 @@ namespace hpx { namespace actions {
         struct plain_function
         {
             // Only localities are valid targets for a plain action
-            static bool is_target_valid(naming::id_type const& id)
+            static bool is_target_valid(hpx::id_type const& id) noexcept
             {
                 return naming::is_locality(id);
             }
@@ -62,12 +62,10 @@ namespace hpx { namespace actions {
     template <typename R, typename... Ps, R (*F)(Ps...), typename Derived>
     struct action<R (*)(Ps...), F, Derived>
       : public basic_action<detail::plain_function, R(Ps...),
-            typename detail::action_type<action<R (*)(Ps...), F, Derived>,
-                Derived>::type>
+            detail::action_type_t<action<R (*)(Ps...), F, Derived>, Derived>>
     {
     public:
-        typedef
-            typename detail::action_type<action, Derived>::type derived_type;
+        using derived_type = detail::action_type_t<action, Derived>;
 
         static std::string get_action_name(
             naming::address::address_type /*lva*/)
@@ -82,7 +80,8 @@ namespace hpx { namespace actions {
         {
             basic_action<detail::plain_function, R(Ps...),
                 derived_type>::increment_invocation_count();
-            return F(std::forward<Ts>(vs)...);
+
+            return F(HPX_FORWARD(Ts, vs)...);
         }
     };
 
@@ -90,12 +89,11 @@ namespace hpx { namespace actions {
         typename Derived>
     struct action<R (*)(Ps...) noexcept, F, Derived>
       : public basic_action<detail::plain_function, R(Ps...),
-            typename detail::action_type<
-                action<R (*)(Ps...) noexcept, F, Derived>, Derived>::type>
+            detail::action_type_t<action<R (*)(Ps...) noexcept, F, Derived>,
+                Derived>>
     {
     public:
-        typedef
-            typename detail::action_type<action, Derived>::type derived_type;
+        using derived_type = detail::action_type_t<action, Derived>;
 
         static std::string get_action_name(
             naming::address::address_type /*lva*/)
@@ -110,7 +108,8 @@ namespace hpx { namespace actions {
         {
             basic_action<detail::plain_function, R(Ps...),
                 derived_type>::increment_invocation_count();
-            return F(std::forward<Ts>(vs)...);
+
+            return F(HPX_FORWARD(Ts, vs)...);
         }
     };
 
@@ -202,8 +201,7 @@ namespace hpx { namespace traits {
     } /**/
 #else
 #define HPX_DEFINE_PLAIN_ACTION_2(func, name)                                  \
-    struct name                                                                \
-      : hpx::actions::make_action<decltype(&func), &func, name>::type          \
+    struct name : hpx::actions::make_action_t<decltype(&func), &func, name>    \
     {                                                                          \
     } /**/
 #endif
@@ -214,7 +212,7 @@ namespace hpx { namespace traits {
 
 #define HPX_DEFINE_PLAIN_DIRECT_ACTION_2(func, name)                           \
     struct name                                                                \
-      : hpx::actions::make_direct_action<decltype(&func), &func, name>::type   \
+      : hpx::actions::make_direct_action_t<decltype(&func), &func, name>       \
     {                                                                          \
     } /**/
 
@@ -255,7 +253,7 @@ namespace hpx { namespace traits {
 ///
 ///     // This will define the action type 'some_global_action' which represents
 ///     // the function 'app::some_global_function'.
-///     HPX_PLAIN_ACTION(app::some_global_function, some_global_action);
+///     HPX_PLAIN_ACTION(app::some_global_function, some_global_action)
 /// \endcode
 ///
 /// \note The macro \a HPX_PLAIN_ACTION has to be used at global namespace even
@@ -326,8 +324,8 @@ namespace hpx { namespace traits {
 ///
 #define HPX_PLAIN_ACTION_ID(func, name, id)                                    \
     HPX_DEFINE_PLAIN_ACTION(func, name);                                       \
-    HPX_REGISTER_ACTION_DECLARATION(name, name);                               \
-    HPX_REGISTER_ACTION_ID(name, name, id);                                    \
+    HPX_REGISTER_ACTION_DECLARATION(name, name)                                \
+    HPX_REGISTER_ACTION_ID(name, name, id)                                     \
     /**/
 
 /// \cond NOINTERNAL
@@ -347,11 +345,11 @@ namespace hpx { namespace traits {
 /**/
 #define HPX_PLAIN_ACTION_2(func, name)                                         \
     HPX_DEFINE_PLAIN_ACTION(func, name);                                       \
-    HPX_REGISTER_ACTION_DECLARATION(name, name);                               \
-    HPX_REGISTER_ACTION(name, name);                                           \
+    HPX_REGISTER_ACTION_DECLARATION(name, name)                                \
+    HPX_REGISTER_ACTION(name, name)                                            \
 /**/
 #define HPX_PLAIN_ACTION_1(func)                                               \
-    HPX_PLAIN_ACTION_2(func, HPX_PP_CAT(func, _action));                       \
+    HPX_PLAIN_ACTION_2(func, HPX_PP_CAT(func, _action))                        \
 /**/
 
 // same for direct actions
@@ -361,16 +359,16 @@ namespace hpx { namespace traits {
 /**/
 #define HPX_PLAIN_DIRECT_ACTION_2(func, name)                                  \
     HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name);                                \
-    HPX_REGISTER_ACTION_DECLARATION(name, name);                               \
-    HPX_REGISTER_ACTION(name, name);                                           \
+    HPX_REGISTER_ACTION_DECLARATION(name, name)                                \
+    HPX_REGISTER_ACTION(name, name)                                            \
 /**/
 #define HPX_PLAIN_DIRECT_ACTION_1(func)                                        \
-    HPX_PLAIN_DIRECT_ACTION_2(func, HPX_PP_CAT(func, _action));                \
+    HPX_PLAIN_DIRECT_ACTION_2(func, HPX_PP_CAT(func, _action))                 \
 /**/
 #define HPX_PLAIN_DIRECT_ACTION_ID(func, name, id)                             \
     HPX_DEFINE_PLAIN_DIRECT_ACTION(func, name);                                \
-    HPX_REGISTER_ACTION_DECLARATION(name, name);                               \
-    HPX_REGISTER_ACTION_ID(name, name, id);                                    \
+    HPX_REGISTER_ACTION_DECLARATION(name, name)                                \
+    HPX_REGISTER_ACTION_ID(name, name, id)                                     \
     /**/
 
 /// \endcond

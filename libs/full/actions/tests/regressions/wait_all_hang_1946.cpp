@@ -27,7 +27,7 @@ void out(std::vector<unsigned int> const&)
 {
     hpx::cout << "out called " << hpx::find_here() << std::endl;
 }
-HPX_PLAIN_ACTION(out, out_action);
+HPX_PLAIN_ACTION(out, out_action)
 
 int main(int argc, char* argv[])
 {
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 int hpx_main()
 {
     // find locality info
-    std::vector<hpx::naming::id_type> locs = hpx::find_all_localities();
+    std::vector<hpx::id_type> locs = hpx::find_all_localities();
 
     // create data
     std::vector<unsigned int> vec;
@@ -56,7 +56,7 @@ int hpx_main()
             fut1.push_back(hpx::async<out_act>(locs.at(i), vec));
             hpx::cout << "Scheduled out to " << i + 1 << std::endl;
         }
-        wait_all(fut1);
+        hpx::wait_all(fut1);
         hpx::cout << j + 1 << ". round finished " << std::endl;
     }
     hpx::cout << "program finished!!!" << std::endl;

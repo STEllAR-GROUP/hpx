@@ -12,7 +12,7 @@
 
 #include <chrono>
 
-void wait_for(hpx::lcos::shared_future<int> f)
+void wait_for(hpx::shared_future<int> f)
 {
     try
     {
@@ -29,7 +29,7 @@ void wait_for(hpx::lcos::shared_future<int> f)
     HPX_TEST(false);
 }
 
-void wait_until(hpx::lcos::shared_future<int> f)
+void wait_until(hpx::shared_future<int> f)
 {
     try
     {
@@ -49,8 +49,8 @@ void wait_until(hpx::lcos::shared_future<int> f)
 
 void test_wait_for()
 {
-    hpx::lcos::local::promise<int> promise;
-    hpx::lcos::shared_future<int> future = promise.get_future();
+    hpx::promise<int> promise;
+    hpx::shared_future<int> future = promise.get_future();
 
     hpx::thread thread(&wait_for, future);
 
@@ -74,8 +74,8 @@ void test_wait_for()
 
 void test_wait_until()
 {
-    hpx::lcos::local::promise<int> promise;
-    hpx::lcos::shared_future<int> future = promise.get_future();
+    hpx::promise<int> promise;
+    hpx::shared_future<int> future = promise.get_future();
 
     hpx::thread thread(&wait_until, future);
 

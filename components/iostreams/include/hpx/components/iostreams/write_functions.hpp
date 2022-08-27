@@ -20,40 +20,37 @@
 #include <type_traits>
 #include <vector>
 
-namespace hpx { namespace iostreams
-{
+namespace hpx { namespace iostreams {
 
-typedef util::function_nonser<void(std::vector<char> const&)> write_function_type;
+    typedef hpx::function<void(std::vector<char> const&)> write_function_type;
 
-///////////////////////////////////////////////////////////////////////////////
-// Write function that works on STL OutputIterators
-template <typename Iterator>
-inline void iterator_write_function(std::vector<char> const& in, Iterator it)
-{
-    std::copy(in.begin(), in.end(), it);
-}
+    ///////////////////////////////////////////////////////////////////////////////
+    // Write function that works on STL OutputIterators
+    template <typename Iterator>
+    inline void iterator_write_function(
+        std::vector<char> const& in, Iterator it)
+    {
+        std::copy(in.begin(), in.end(), it);
+    }
 
-// Factory function
-template <typename Iterator>
-inline write_function_type make_iterator_write_function(Iterator it)
-{
-    return util::bind_back(iterator_write_function<Iterator>, it);
-}
+    // Factory function
+    template <typename Iterator>
+    inline write_function_type make_iterator_write_function(Iterator it)
+    {
+        return hpx::bind_back(iterator_write_function<Iterator>, it);
+    }
 
-///////////////////////////////////////////////////////////////////////////////
-inline void
-std_ostream_write_function(std::vector<char> const& in, std::ostream& os)
-{
-    std::copy(in.begin(), in.end(), std::ostream_iterator<char>(os));
-    os.flush();
-}
+    ///////////////////////////////////////////////////////////////////////////////
+    inline void std_ostream_write_function(
+        std::vector<char> const& in, std::ostream& os)
+    {
+        std::copy(in.begin(), in.end(), std::ostream_iterator<char>(os));
+        os.flush();
+    }
 
-// Factory function
-inline write_function_type make_std_ostream_write_function(std::ostream& os)
-{
-    return util::bind_back(std_ostream_write_function, std::ref(os));
-}
-
-}}
-
-
+    // Factory function
+    inline write_function_type make_std_ostream_write_function(std::ostream& os)
+    {
+        return hpx::bind_back(std_ostream_write_function, std::ref(os));
+    }
+}}    // namespace hpx::iostreams

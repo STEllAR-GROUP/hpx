@@ -21,9 +21,9 @@ namespace hpx {
     template <typename F, typename... Ts>
     HPX_FORCEINLINE auto sync(F&& f, Ts&&... ts)
         -> decltype(detail::sync_dispatch<std::decay_t<F>>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...))
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
     {
         return detail::sync_dispatch<std::decay_t<F>>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx

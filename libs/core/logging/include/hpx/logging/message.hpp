@@ -56,7 +56,7 @@ namespace hpx { namespace util { namespace logging {
         explicit message(std::stringstream msg)
           :
 #if defined(HPX_COMPUTE_HOST_CODE)
-          m_str(std::move(msg))
+          m_str(HPX_MOVE(msg))
           ,
 #endif
           m_full_msg_computed(false)
@@ -69,12 +69,12 @@ namespace hpx { namespace util { namespace logging {
         message(message&& other) noexcept
           :
 #if defined(HPX_COMPUTE_HOST_CODE)
-          m_str(std::move(other.m_str))
+          m_str(HPX_MOVE(other.m_str))
           ,
 #endif
           m_full_msg_computed(other.m_full_msg_computed)
 #if defined(HPX_COMPUTE_HOST_CODE)
-          , m_full_msg(std::move(other.m_full_msg))
+          , m_full_msg(HPX_MOVE(other.m_full_msg))
 #endif
         {
             other.m_full_msg_computed = false;
@@ -83,7 +83,7 @@ namespace hpx { namespace util { namespace logging {
         template <typename T>
         message& operator<<(T&& v)
         {
-            m_str << std::forward<T>(v);
+            m_str << HPX_FORWARD(T, v);
             m_full_msg_computed = false;
             return *this;
         }

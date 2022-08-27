@@ -29,9 +29,8 @@ namespace hpx { namespace actions {
 
         struct addr_add
         {
-            template <class T>
-            friend typename std::remove_reference<T>::type* operator+(
-                addr_add, T&& t)
+            template <typename T>
+            friend std::remove_reference_t<T>* operator+(addr_add, T&& t)
             {
                 return &t;
             }
@@ -57,7 +56,7 @@ namespace hpx { namespace actions {
                 // yes, this looks like this code was dereferencing a nullptr...
                 int* dummy = nullptr;
                 return reinterpret_cast<F const&>(*dummy)(    // -V522
-                    std::forward<Ts>(vs)...);
+                    HPX_FORWARD(Ts, vs)...);
             }
         };
 
@@ -75,31 +74,35 @@ namespace hpx { namespace actions {
             using type = lambda_action<F, ReturnType, Args...>;
         };
 
+        template <typename F, typename T>
+        using extract_lambda_action_t =
+            typename extract_lambda_action<F, T>::type;
+
         template <typename F>
         struct action_from_lambda
         {
-            using type = typename extract_lambda_action<F,
-                decltype(&F::operator())>::type;
+            using type = extract_lambda_action_t<F, decltype(&F::operator())>;
         };
+
+        template <typename F>
+        using action_from_lambda_t = typename action_from_lambda<F>::type;
 
         struct action_maker
         {
             template <typename F>
-            constexpr typename hpx::actions::detail::action_from_lambda<F>::type
-            operator+=(F*) const
+            constexpr action_from_lambda_t<F> operator+=(F*) const noexcept
             {
-                static_assert(std::is_empty<F>::value,
+                static_assert(std::is_empty_v<F>,
                     "lambda_to_action() needs and only needs a lambda with "
                     "empty capture list");
 
-                return typename hpx::actions::detail::action_from_lambda<
-                    F>::type();
+                return action_from_lambda_t<F>();
             }
         };
     }    // namespace detail
 
     template <typename F>
-    auto lambda_to_action(F&& f)
+    constexpr auto lambda_to_action(F&& f) noexcept
         -> decltype(hpx::actions::detail::action_maker() +=
             true ? nullptr : hpx::actions::detail::addr_add() + f)
     {

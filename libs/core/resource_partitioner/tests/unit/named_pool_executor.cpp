@@ -7,6 +7,7 @@
 // Simple test verifying basic resource partitioner
 // pool and executor
 
+#include <hpx/assert.hpp>
 #include <hpx/local/execution.hpp>
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
@@ -20,7 +21,8 @@
 #include <utility>
 #include <vector>
 
-int const max_threads = 4;
+std::size_t const max_threads = (std::min)(
+    std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
 
 // dummy function we will call using async
 void dummy_task(std::size_t n, std::string const& text)
@@ -33,20 +35,21 @@ void dummy_task(std::size_t n, std::string const& text)
 
 int hpx_main()
 {
-    HPX_TEST_EQ(std::size_t(4), hpx::resource::get_num_threads());
-    HPX_TEST_EQ(std::size_t(4), hpx::resource::get_num_thread_pools());
+    HPX_TEST_EQ(std::size_t(max_threads), hpx::resource::get_num_threads());
+    HPX_TEST_EQ(
+        std::size_t(max_threads), hpx::resource::get_num_thread_pools());
     HPX_TEST_EQ(std::size_t(0), hpx::resource::get_pool_index("default"));
     HPX_TEST_EQ(std::size_t(0), hpx::resource::get_pool_index("pool-0"));
     HPX_TEST(hpx::resource::pool_exists("default"));
     HPX_TEST(hpx::resource::pool_exists("pool-0"));
     HPX_TEST(!hpx::resource::pool_exists("nonexistent"));
-    for (int pool_index = 0; pool_index < max_threads; ++pool_index)
+    for (std::size_t pool_index = 0; pool_index < max_threads; ++pool_index)
     {
         HPX_TEST(hpx::resource::pool_exists(pool_index));
     }
     HPX_TEST(!hpx::resource::pool_exists(max_threads));
 
-    for (int i = 0; i < max_threads; ++i)
+    for (std::size_t i = 0; i < max_threads; ++i)
     {
         std::string pool_name = "pool-" + std::to_string(i);
         HPX_TEST_EQ(pool_name, hpx::resource::get_pool_name(i));
@@ -80,7 +83,7 @@ int hpx_main()
     std::vector<hpx::execution::parallel_executor> execs;
     std::vector<hpx::execution::parallel_executor> execs_hp;
     //
-    for (int i = 0; i < max_threads; ++i)
+    for (std::size_t i = 0; i < max_threads; ++i)
     {
         std::string pool_name = "pool-" + std::to_string(i);
         execs.push_back(hpx::execution::parallel_executor(
@@ -91,7 +94,7 @@ int hpx_main()
             hpx::threads::thread_priority::high));
     }
 
-    for (int i = 0; i < max_threads; ++i)
+    for (std::size_t i = 0; i < max_threads; ++i)
     {
         std::string pool_name = "pool-" + std::to_string(i);
         lotsa_futures.push_back(
@@ -108,7 +111,7 @@ int hpx_main()
         large_stack_executor, &dummy_task, 3, "true default + large stack"));
 
     // just wait until everything is done
-    when_all(lotsa_futures).get();
+    hpx::when_all(lotsa_futures).get();
 
     return hpx::local::finalize();
 }
@@ -120,7 +123,7 @@ void init_resource_partitioner_handler(
     rp.set_default_pool_name("pool-0");
 
     // create N pools
-    for (int i = 0; i < max_threads; i++)
+    for (std::size_t i = 0; i < max_threads; i++)
     {
         std::string pool_name = "pool-" + std::to_string(i);
         rp.create_thread_pool(
@@ -128,7 +131,7 @@ void init_resource_partitioner_handler(
     }
 
     // add one PU to each pool
-    int thread_count = 0;
+    std::size_t thread_count = 0;
     for (hpx::resource::numa_domain const& d : rp.numa_domains())
     {
         for (hpx::resource::core const& c : d.cores())
@@ -149,9 +152,11 @@ void init_resource_partitioner_handler(
     }
 }
 
-// this test must be run with 4 threads
+// this test must be run with at least 2 threads
 int main(int argc, char* argv[])
 {
+    HPX_ASSERT(max_threads >= 2);
+
     hpx::local::init_params init_args;
     init_args.cfg = {"hpx.os_threads=" + std::to_string(max_threads)};
     // Set the callback to init the thread_pools

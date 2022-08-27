@@ -25,7 +25,7 @@ foreach(test ${tests})
     COMPONENT_DEPENDENCIES papi_counters ${${test}_FLAGS}
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
-    FOLDER "Tests/Regressions/Components"
+    FOLDER "Tests/Regressions/Components/Counters/Papi"
   )
 
   if(NOT "${${test}_NOTEST}")

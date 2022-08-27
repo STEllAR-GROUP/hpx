@@ -52,7 +52,7 @@ namespace hpx { namespace performance_counters {
         {
             // if the full type is not available, try to locate the object name
             // as a type only
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             counter_path_elements p;
             get_counter_type_path_elements(type_name, p, ec);
             if (!ec)
@@ -70,7 +70,7 @@ namespace hpx { namespace performance_counters {
         {
             // if the full type is not available, try to locate the object name
             // as a type only
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             counter_path_elements p;
             get_counter_type_path_elements(type_name, p, ec);
             if (!ec)
@@ -152,8 +152,8 @@ namespace hpx { namespace performance_counters {
 
             if (mode == discover_counters_full)
             {
-                using hpx::util::placeholders::_1;
-                discover_counter = hpx::util::bind(
+                using hpx::placeholders::_1;
+                discover_counter = hpx::bind(
                     &expand_counter_info, _1, discover_counter, std::ref(ec));
             }
 
@@ -175,8 +175,8 @@ namespace hpx { namespace performance_counters {
 
             if (mode == discover_counters_full)
             {
-                using hpx::util::placeholders::_1;
-                discover_counter = hpx::util::bind(
+                using hpx::placeholders::_1;
+                discover_counter = hpx::bind(
                     &expand_counter_info, _1, discover_counter, std::ref(ec));
             }
 
@@ -248,13 +248,13 @@ namespace hpx { namespace performance_counters {
         discover_counter_func discover_counter_;
         if (mode == discover_counters_full)
         {
-            using hpx::util::placeholders::_1;
-            discover_counter_ = hpx::util::bind(&expand_counter_info, _1,
-                std::move(discover_counter), std::ref(ec));
+            using hpx::placeholders::_1;
+            discover_counter_ = hpx::bind(&expand_counter_info, _1,
+                HPX_MOVE(discover_counter), std::ref(ec));
         }
         else
         {
-            discover_counter_ = std::move(discover_counter);
+            discover_counter_ = HPX_MOVE(discover_counter);
         }
 
         for (counter_type_map_type::value_type const& d : countertypes_)
@@ -399,35 +399,35 @@ namespace hpx { namespace performance_counters {
     counter_status registry::create_raw_counter_value(counter_info const& info,
         std::int64_t* countervalue, naming::gid_type& id, error_code& ec)
     {
-        hpx::util::function_nonser<std::int64_t(bool)> func(
-            util::bind_front(wrap_counter, countervalue));
+        hpx::function<std::int64_t(bool)> func(
+            hpx::bind_front(wrap_counter, countervalue));
         return create_raw_counter(info, func, id, ec);
     }
 
     static std::int64_t wrap_raw_counter(
-        hpx::util::function_nonser<std::int64_t()> const& f, bool)
+        hpx::function<std::int64_t()> const& f, bool)
     {
         return f();
     }
 
     static std::vector<std::int64_t> wrap_raw_values_counter(
-        hpx::util::function_nonser<std::vector<std::int64_t>()> const& f, bool)
+        hpx::function<std::vector<std::int64_t>()> const& f, bool)
     {
         return f();
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        hpx::util::function_nonser<std::int64_t()> const& f,
-        naming::gid_type& id, error_code& ec)
+        hpx::function<std::int64_t()> const& f, naming::gid_type& id,
+        error_code& ec)
     {
-        hpx::util::function_nonser<std::int64_t(bool)> func(
-            util::bind_front(&wrap_raw_counter, f));
+        hpx::function<std::int64_t(bool)> func(
+            hpx::bind_front(&wrap_raw_counter, f));
         return create_raw_counter(info, func, id, ec);
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        hpx::util::function_nonser<std::int64_t(bool)> const& f,
-        naming::gid_type& id, error_code& ec)
+        hpx::function<std::int64_t(bool)> const& f, naming::gid_type& id,
+        error_code& ec)
     {
         // create canonical type name
         std::string type_name;
@@ -498,16 +498,16 @@ namespace hpx { namespace performance_counters {
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        hpx::util::function_nonser<std::vector<std::int64_t>()> const& f,
+        hpx::function<std::vector<std::int64_t>()> const& f,
         naming::gid_type& id, error_code& ec)
     {
-        hpx::util::function_nonser<std::vector<std::int64_t>(bool)> func(
-            util::bind_front(&wrap_raw_values_counter, f));
+        hpx::function<std::vector<std::int64_t>(bool)> func(
+            hpx::bind_front(&wrap_raw_values_counter, f));
         return create_raw_counter(info, func, id, ec);
     }
 
     counter_status registry::create_raw_counter(counter_info const& info,
-        hpx::util::function_nonser<std::vector<std::int64_t>(bool)> const& f,
+        hpx::function<std::vector<std::int64_t>(bool)> const& f,
         naming::gid_type& id, error_code& ec)
     {
         // create canonical type name
@@ -609,13 +609,13 @@ namespace hpx { namespace performance_counters {
 
             // NOLINTNEXTLINE(bugprone-branch-clone)
             case counter_raw:
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             case counter_monotonically_increasing:
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             case counter_aggregating:
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             case counter_average_count:
-                HPX_FALLTHROUGH;
+                [[fallthrough]];
             case counter_average_timer:
                 HPX_THROWS_IF(ec, bad_parameter, "registry::create_counter",
                     "need function parameter for raw_counter");
@@ -1119,7 +1119,7 @@ namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Add an existing performance counter instance to the registry
     counter_status registry::add_counter(
-        naming::id_type const& id, counter_info const& info, error_code& ec)
+        hpx::id_type const& id, counter_info const& info, error_code& ec)
     {
         // complement counter info data
         counter_info complemented_info = info;
@@ -1156,8 +1156,8 @@ namespace hpx { namespace performance_counters {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    counter_status registry::remove_counter(counter_info const& info,
-        naming::id_type const& /* id */, error_code& ec)
+    counter_status registry::remove_counter(
+        counter_info const& info, hpx::id_type const& /* id */, error_code& ec)
     {
         // make sure parent instance name is set properly
         counter_info complemented_info = info;

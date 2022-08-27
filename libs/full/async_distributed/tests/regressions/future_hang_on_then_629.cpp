@@ -88,7 +88,7 @@ double null_tree(std::uint64_t seed, std::uint64_t depth,
     std::uint64_t max_depth, std::uint64_t children,
     std::uint64_t delay_iterations, std::uint32_t num_localities);
 
-HPX_PLAIN_ACTION(null_tree, null_tree_action);
+HPX_PLAIN_ACTION(null_tree, null_tree_action)
 
 void null_callback(
     std::vector<double>& dd, std::uint64_t j, hpx::future<double> f)
@@ -119,8 +119,8 @@ double null_tree(std::uint64_t seed, std::uint64_t depth,
         hpx::future<double> f = hpx::async<null_tree_action>(target, j + p,
             depth + 1, max_depth, children, delay_iterations, num_localities);
 
-        futures.push_back(f.then(hpx::util::bind(
-            &null_callback, std::ref(dd), j, hpx::util::placeholders::_1)));
+        futures.push_back(f.then(
+            hpx::bind(&null_callback, std::ref(dd), j, hpx::placeholders::_1)));
     }
 
     null_function(seed, delay_iterations);

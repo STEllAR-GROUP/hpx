@@ -26,7 +26,7 @@ int hpx_main(hpx::program_options::variables_map&)
 
     std::uint32_t const prefix = hpx::get_locality_id();
     // use floating point instructions here to avoid measuring runtime side effects
-    using hpx::naming::id_type;
+    using hpx::id_type;
     using hpx::performance_counters::get_counter;
     using hpx::performance_counters::performance_counter;
     using hpx::performance_counters::counter_value;

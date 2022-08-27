@@ -51,6 +51,7 @@ set(agas_base_sources
     detail/bootstrap_locality_namespace.cpp
     detail/hosted_component_namespace.cpp
     detail/hosted_locality_namespace.cpp
+    gva.cpp
     locality_namespace.cpp
     primary_namespace.cpp
     server/component_namespace_server.cpp
@@ -68,7 +69,13 @@ add_hpx_module(
   HEADERS ${agas_base_headers}
   COMPAT_HEADERS ${agas_base_compat_headers}
   DEPENDENCIES hpx_core
-  MODULE_DEPENDENCIES hpx_async_colocated hpx_async_distributed hpx_collectives
-                      hpx_actions hpx_components_base hpx_naming_base
+  MODULE_DEPENDENCIES
+    hpx_actions
+    hpx_actions_base
+    hpx_async_distributed
+    hpx_components_base
+    hpx_naming
+    hpx_naming_base
+    hpx_parcelset_base
   CMAKE_SUBDIRS examples tests
 )

@@ -27,23 +27,23 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx { namespace distributed { namespace detail {
 
     struct HPX_EXPORT barrier_node;
-}}}    // namespace hpx::lcos::detail
+}}}    // namespace hpx::distributed::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits {
     template <>
-    struct managed_component_dtor_policy<lcos::detail::barrier_node>
+    struct managed_component_dtor_policy<hpx::distributed::detail::barrier_node>
     {
         typedef managed_object_is_lifetime_controlled type;
     };
 }}    // namespace hpx::traits
 
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx { namespace distributed { namespace detail {
 
-    struct barrier_node : base_lco
+    struct barrier_node : hpx::lcos::base_lco
     {
         typedef components::managed_component<barrier_node> wrapping_type;
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -56,12 +56,12 @@ namespace hpx { namespace lcos { namespace detail {
 
         hpx::future<void> wait(bool async);
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(barrier_node, gather);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(barrier_node, gather)
 
     private:
         hpx::util::atomic_count count_;
 
-        std::vector<naming::id_type> children_;
+        std::vector<hpx::id_type> children_;
 
     public:
         std::string base_name_;
@@ -71,12 +71,11 @@ namespace hpx { namespace lcos { namespace detail {
         std::size_t cut_off_;
 
     private:
-        hpx::lcos::local::promise<void> gather_promise_;
-        hpx::lcos::local::promise<void> broadcast_promise_;
-        hpx::lcos::local::barrier local_barrier_;
+        hpx::promise<void> gather_promise_;
+        hpx::promise<void> broadcast_promise_;
+        hpx::barrier<> local_barrier_;
 
-        template <typename This>
-        hpx::future<void> do_wait(This this_, hpx::future<void> future);
+        hpx::future<void> do_wait(hpx::future<void> future);
 
         template <typename>
         friend struct components::detail_adl_barrier::init;
@@ -88,13 +87,13 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         // intrusive reference counting
-        friend void intrusive_ptr_add_ref(barrier_node* p)
+        friend void intrusive_ptr_add_ref(barrier_node* p) noexcept
         {
             ++p->count_;
         }
 
         // intrusive reference counting
-        friend void intrusive_ptr_release(barrier_node* p)
+        friend void intrusive_ptr_release(barrier_node* p) noexcept
         {
             if (p && --p->count_ == 0)
             {
@@ -102,9 +101,10 @@ namespace hpx { namespace lcos { namespace detail {
             }
         }
     };
-}}}    // namespace hpx::lcos::detail
+}}}    // namespace hpx::distributed::detail
 
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::detail::barrier_node::gather_action, barrier_node_gather_action);
+    hpx::distributed::detail::barrier_node::gather_action,
+    barrier_node_gather_action)
 
 #include <hpx/config/warnings_suffix.hpp>

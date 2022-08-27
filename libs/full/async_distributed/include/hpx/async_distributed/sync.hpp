@@ -57,7 +57,7 @@ namespace hpx { namespace detail {
         {
             HPX_ASSERT(c.is_ready());
             return hpx::detail::sync_impl<Action>(
-                launch_policy, c.get_id(), std::forward<Ts>(ts)...);
+                launch_policy, c.get_id(), HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -70,11 +70,11 @@ namespace hpx { namespace detail {
         // id_type
         template <typename Policy_, typename... Ts>
         HPX_FORCEINLINE static sync_result_t<Action> call(
-            Policy_&& launch_policy, naming::id_type const& id, Ts&&... ts)
+            Policy_&& launch_policy, hpx::id_type const& id, Ts&&... ts)
         {
             return hpx::detail::sync_impl<Action>(
-                std::forward<Policy_>(launch_policy), id,
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Policy_, launch_policy), id,
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename Policy_, typename Client, typename Stub,
@@ -95,30 +95,30 @@ namespace hpx { namespace detail {
             if (c.is_ready())
             {
                 return hpx::detail::sync_impl<Action>(
-                    std::forward<Policy_>(launch_policy), c.get_id(),
-                    std::forward<Ts>(ts)...);
+                    HPX_FORWARD(Policy_, launch_policy), c.get_id(),
+                    HPX_FORWARD(Ts, ts)...);
             }
 
             // defer invocation otherwise
             return c
                 .then(util::one_shot(
-                    util::bind_back(sync_action_client_dispatch<Action>(),
-                        std::forward<Policy_>(launch_policy),
-                        std::forward<Ts>(ts)...)))
+                    hpx::bind_back(sync_action_client_dispatch<Action>(),
+                        HPX_FORWARD(Policy_, launch_policy),
+                        HPX_FORWARD(Ts, ts)...)))
                 .get();
         }
     };
 
-    // naming::id_type
+    // hpx::id_type
     template <typename Action>
-    struct sync_action_dispatch<Action, naming::id_type>
+    struct sync_action_dispatch<Action, hpx::id_type>
     {
         template <typename... Ts>
         HPX_FORCEINLINE static decltype(auto) call(
-            naming::id_type const& id, Ts&&... ts)
+            hpx::id_type const& id, Ts&&... ts)
         {
             return sync_action_dispatch<Action, hpx::detail::sync_policy>::call(
-                launch::sync, id, std::forward<Ts>(ts)...);
+                launch::sync, id, HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -132,7 +132,7 @@ namespace hpx { namespace detail {
             components::client_base<Client_, Stub> const& c, Ts&&... ts)
         {
             return sync_action_dispatch<Action, hpx::detail::sync_policy>::call(
-                launch::sync, c, std::forward<Ts>(ts)...);
+                launch::sync, c, HPX_FORWARD(Ts, ts)...);
         }
     };
 
@@ -149,7 +149,7 @@ namespace hpx { namespace detail {
                 "Policy must be a valid launch policy");
 
             return sync<Action>(
-                std::forward<Policy>(launch_policy), std::forward<Ts>(ts)...);
+                HPX_FORWARD(Policy, launch_policy), HPX_FORWARD(Ts, ts)...);
         }
     };
 }}    // namespace hpx::detail
@@ -158,10 +158,10 @@ namespace hpx {
     template <typename Action, typename F, typename... Ts>
     HPX_FORCEINLINE auto sync(F&& f, Ts&&... ts)
         -> decltype(detail::sync_action_dispatch<Action, std::decay_t<F>>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...))
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
     {
         return detail::sync_action_dispatch<Action, std::decay_t<F>>::call(
-            std::forward<F>(f), std::forward<Ts>(ts)...);
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx
 
@@ -176,9 +176,9 @@ namespace hpx { namespace detail {
             typename... Ts>
         HPX_FORCEINLINE static decltype(auto) call(
             hpx::actions::basic_action<Component, Signature, Derived> const&,
-            naming::id_type const& id, Ts&&... vs)
+            hpx::id_type const& id, Ts&&... vs)
         {
-            return sync<Derived>(launch::sync, id, std::forward<Ts>(vs)...);
+            return sync<Derived>(launch::sync, id, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Component, typename Signature, typename Derived,
@@ -195,7 +195,7 @@ namespace hpx { namespace detail {
                 "The action to invoke is not supported by the target");
 
             return sync<Derived>(
-                launch::sync, c.get_id(), std::forward<Ts>(vs)...);
+                launch::sync, c.get_id(), HPX_FORWARD(Ts, vs)...);
         }
     };
 
@@ -208,12 +208,12 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static auto call(
             Policy_&& launch_policy, F&& f, Ts&&... ts)
             -> decltype(sync_launch_policy_dispatch<std::decay_t<F>>::call(
-                std::forward<Policy_>(launch_policy), std::forward<F>(f),
-                std::forward<Ts>(ts)...))
+                HPX_FORWARD(Policy_, launch_policy), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...))
         {
             return sync_launch_policy_dispatch<std::decay_t<F>>::call(
-                std::forward<Policy_>(launch_policy), std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Policy_, launch_policy), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename Policy_, typename Component, typename Signature,
@@ -230,24 +230,24 @@ namespace hpx { namespace detail {
             static_assert(is_valid::value,
                 "The action to invoke is not supported by the target");
 
-            return sync<Derived>(std::forward<Policy_>(launch_policy),
-                c.get_id(), std::forward<Ts>(ts)...);
+            return sync<Derived>(HPX_FORWARD(Policy_, launch_policy),
+                c.get_id(), HPX_FORWARD(Ts, ts)...);
         }
     };
 }}    // namespace hpx::detail
 
 namespace hpx { namespace detail {
+
     // bound action
     template <typename Bound>
-    struct sync_dispatch<Bound,
-        std::enable_if_t<traits::is_bound_action_v<Bound>>>
+    struct sync_dispatch<Bound, std::enable_if_t<hpx::is_bound_action_v<Bound>>>
     {
         template <typename Action, typename Is, typename... Ts, typename... Us>
         HPX_FORCEINLINE static decltype(auto) call(
-            hpx::util::detail::bound_action<Action, Is, Ts...> const& bound,
+            hpx::detail::bound_action<Action, Is, Ts...> const& bound,
             Us&&... vs)
         {
-            return bound(std::forward<Us>(vs)...);
+            return bound(HPX_FORWARD(Us, vs)...);
         }
     };
 }}    // namespace hpx::detail

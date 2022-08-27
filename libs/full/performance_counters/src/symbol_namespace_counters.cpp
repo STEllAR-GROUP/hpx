@@ -33,7 +33,7 @@ namespace hpx { namespace agas { namespace server {
     void symbol_namespace_register_counter_types(error_code& ec)
     {
         performance_counters::create_counter_func creator(
-            util::bind_back(&performance_counters::agas_raw_counter_creator,
+            hpx::bind_back(&performance_counters::agas_raw_counter_creator,
                 agas::server::symbol_namespace_service_name));
 
         for (std::size_t i = 0; i != detail::num_symbol_namespace_services; ++i)
@@ -78,7 +78,7 @@ namespace hpx { namespace agas { namespace server {
     void symbol_namespace_register_global_counter_types(error_code& ec)
     {
         performance_counters::create_counter_func creator(
-            util::bind_back(&performance_counters::agas_raw_counter_creator,
+            hpx::bind_back(&performance_counters::agas_raw_counter_creator,
                 agas::server::symbol_namespace_service_name));
 
         for (std::size_t i = 0; i != detail::num_symbol_namespace_services; ++i)
@@ -163,38 +163,38 @@ namespace hpx { namespace agas { namespace server {
 
         typedef symbol_namespace::counter_data cd;
 
-        util::function_nonser<std::int64_t(bool)> get_data_func;
+        hpx::function<std::int64_t(bool)> get_data_func;
         if (target == detail::counter_target_count)
         {
             switch (code)
             {
             case symbol_ns_bind:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_bind_count, &service.counter_data_);
                 service.counter_data_.bind_.enabled_ = true;
                 break;
             case symbol_ns_resolve:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_resolve_count, &service.counter_data_);
                 service.counter_data_.resolve_.enabled_ = true;
                 break;
             case symbol_ns_unbind:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_unbind_count, &service.counter_data_);
                 service.counter_data_.unbind_.enabled_ = true;
                 break;
             case symbol_ns_iterate_names:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_iterate_names_count, &service.counter_data_);
                 service.counter_data_.iterate_names_.enabled_ = true;
                 break;
             case symbol_ns_on_event:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_on_event_count, &service.counter_data_);
                 service.counter_data_.on_event_.enabled_ = true;
                 break;
             case symbol_ns_statistics_counter:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_overall_count, &service.counter_data_);
                 service.counter_data_.enable_all();
                 break;
@@ -210,32 +210,32 @@ namespace hpx { namespace agas { namespace server {
             switch (code)
             {
             case symbol_ns_bind:
-                get_data_func = util::bind_front(
-                    &cd::get_bind_time, &service.counter_data_);
+                get_data_func =
+                    hpx::bind_front(&cd::get_bind_time, &service.counter_data_);
                 service.counter_data_.bind_.enabled_ = true;
                 break;
             case symbol_ns_resolve:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_resolve_time, &service.counter_data_);
                 service.counter_data_.resolve_.enabled_ = true;
                 break;
             case symbol_ns_unbind:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_unbind_time, &service.counter_data_);
                 service.counter_data_.unbind_.enabled_ = true;
                 break;
             case symbol_ns_iterate_names:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_iterate_names_time, &service.counter_data_);
                 service.counter_data_.iterate_names_.enabled_ = true;
                 break;
             case symbol_ns_on_event:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_on_event_time, &service.counter_data_);
                 service.counter_data_.on_event_.enabled_ = true;
                 break;
             case symbol_ns_statistics_counter:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_overall_time, &service.counter_data_);
                 service.counter_data_.enable_all();
                 break;

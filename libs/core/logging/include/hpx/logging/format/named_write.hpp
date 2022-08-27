@@ -110,9 +110,9 @@ You could have an output like this:
         {
             auto iter = find_named(formatters, name);
             if (iter != formatters.end())
-                iter->value = std::move(p);
+                iter->value = HPX_MOVE(p);
             else
-                formatters.push_back(named<ptr_type>{name, std::move(p)});
+                formatters.push_back(named<ptr_type>{name, HPX_MOVE(p)});
             compute_write_steps();
         }
 
@@ -235,9 +235,9 @@ In the above example, I know that the available destinations are @c out_file,
         {
             auto iter = find_named(destinations, name);
             if (iter != destinations.end())
-                iter->value = std::move(p);
+                iter->value = HPX_MOVE(p);
             else
-                destinations.push_back(named<ptr_type>{name, std::move(p)});
+                destinations.push_back(named<ptr_type>{name, HPX_MOVE(p)});
             compute_write_steps();
         }
 
@@ -399,7 +399,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
             m_format(out, msg);
 
 #if defined(HPX_COMPUTE_HOST_CODE)
-            message formatted(std::move(out));
+            message formatted(HPX_MOVE(out));
             m_destination(formatted);
 #endif
         }
@@ -419,7 +419,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         template <typename Formatter, typename... Args>
         void set_formatter(std::string const& name, Args&&... args)
         {
-            m_format.add(name, Formatter::make(std::forward<Args>(args)...));
+            m_format.add(name, Formatter::make(HPX_FORWARD(Args, args)...));
         }
 
         /** @brief Replaces a destination from the named destination.
@@ -438,7 +438,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         void set_destination(std::string const& name, Args&&... args)
         {
             m_destination.add(
-                name, Destination::make(std::forward<Args>(args)...));
+                name, Destination::make(HPX_FORWARD(Args, args)...));
         }
 
     private:

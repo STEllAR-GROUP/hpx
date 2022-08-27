@@ -23,7 +23,7 @@ namespace hpx { namespace util {
     // file
     struct HPX_CORE_EXPORT map_hostnames
     {
-        typedef util::function_nonser<std::string(std::string const&)>
+        typedef hpx::function<std::string(std::string const&)>
             transform_function_type;
 
         map_hostnames(bool debug = false)

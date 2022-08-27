@@ -234,7 +234,7 @@ void test_cv_thread_pred(bool call_notify)
 void test_minimal_wait(int sec)
 {
     // duration until interrupt is called
-    auto dur = std::chrono::seconds{sec};
+    auto duration = std::chrono::seconds{sec};
 
     try
     {
@@ -243,7 +243,7 @@ void test_minimal_wait(int sec)
         hpx::lcos::local::condition_variable_any ready_cv;
 
         {
-            hpx::jthread t1([&ready, &ready_mtx, &ready_cv, dur](
+            hpx::jthread t1([&ready, &ready_mtx, &ready_cv, duration](
                                 hpx::stop_token st) {
                 try
                 {
@@ -253,7 +253,7 @@ void test_minimal_wait(int sec)
                         ready_cv.wait(lg, st, [&ready] { return ready; });
                     }
                     HPX_TEST(std::chrono::steady_clock::now() <
-                        t0 + dur + std::chrono::seconds(1));
+                        t0 + duration + std::chrono::seconds(1));
                 }
                 catch (...)
                 {
@@ -261,7 +261,7 @@ void test_minimal_wait(int sec)
                 }
             });
 
-            hpx::this_thread::sleep_for(dur);
+            hpx::this_thread::sleep_for(duration);
         }    // leave scope of t1 without join() or detach() (signals cancellation)
     }
     catch (...)
@@ -315,8 +315,9 @@ void test_minimal_wait_for(int sec1, int sec2)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename Dur>
-void test_timed_cv(bool call_notify, bool /* call_interrupt */, Dur dur)
+template <typename Duration>
+void test_timed_cv(
+    bool call_notify, bool /* call_interrupt */, Duration duration)
 {
     // test the basic jthread API
     bool ready = false;
@@ -324,7 +325,7 @@ void test_timed_cv(bool call_notify, bool /* call_interrupt */, Dur dur)
     hpx::lcos::local::condition_variable_any ready_cv;
 
     {
-        hpx::jthread t1([&ready, &ready_mtx, &ready_cv, call_notify, dur](
+        hpx::jthread t1([&ready, &ready_mtx, &ready_cv, call_notify, duration](
                             hpx::stop_token st) {
             auto t0 = std::chrono::steady_clock::now();
             int times_done{0};
@@ -333,10 +334,11 @@ void test_timed_cv(bool call_notify, bool /* call_interrupt */, Dur dur)
                 {
                     std::unique_lock<hpx::lcos::local::mutex> lg{ready_mtx};
                     auto ret = ready_cv.wait_for(
-                        lg, st, dur, [&ready] { return ready; });
-                    if (dur > std::chrono::seconds(5))
+                        lg, st, duration, [&ready] { return ready; });
+                    if (duration > std::chrono::seconds(5))
                     {
-                        HPX_TEST(std::chrono::steady_clock::now() < t0 + dur);
+                        HPX_TEST(
+                            std::chrono::steady_clock::now() < t0 + duration);
                     }
                     if (ret)
                     {
@@ -375,8 +377,8 @@ void test_timed_cv(bool call_notify, bool /* call_interrupt */, Dur dur)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename Dur>
-void test_timed_wait(bool call_notify, bool call_interrupt, Dur dur)
+template <typename Duration>
+void test_timed_wait(bool call_notify, bool call_interrupt, Duration duration)
 {
     // test the basic jthread API
 
@@ -395,7 +397,7 @@ void test_timed_wait(bool call_notify, bool call_interrupt, Dur dur)
 
     state t1_feedback{state::loop};
     {
-        hpx::jthread t1([&ready_, &ready_mtx, &ready_cv, call_notify, dur,
+        hpx::jthread t1([&ready_, &ready_mtx, &ready_cv, call_notify, duration,
                             &t1_feedback](hpx::stop_token st) {
             auto t0 = std::chrono::steady_clock::now();
             int times_done{0};
@@ -405,14 +407,15 @@ void test_timed_wait(bool call_notify, bool call_interrupt, Dur dur)
                 {
                     std::unique_lock<hpx::lcos::local::mutex> lg{ready_mtx};
                     auto ret = ready_cv.wait_for(
-                        lg, st, dur, [&ready_] { return ready_; });
+                        lg, st, duration, [&ready_] { return ready_; });
                     if (st.stop_requested())
                     {
                         throw "interrupted";
                     }
-                    if (dur > std::chrono::seconds(5))
+                    if (duration > std::chrono::seconds(5))
                     {
-                        HPX_TEST(std::chrono::steady_clock::now() < t0 + dur);
+                        HPX_TEST(
+                            std::chrono::steady_clock::now() < t0 + duration);
                     }
 
                     if (ret)
@@ -500,7 +503,7 @@ void test_many_cvs(bool call_notify, bool call_interrupt)
             arr_ready_cv{};
         std::vector<hpx::jthread> vthreads_deferred;
 
-        hpx::jthread t0(hpx::util::bind_back(cv_wait, 0, std::ref(ready),
+        hpx::jthread t0(hpx::bind_back(cv_wait, 0, std::ref(ready),
             std::ref(ready_mtx), std::ref(ready_cv), call_notify));
         {
             auto t0ssource = t0.get_stop_source();

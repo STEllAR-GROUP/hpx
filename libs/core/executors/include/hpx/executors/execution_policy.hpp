@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2016 Marcin Copik
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,7 +18,6 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/executors/datapar/execution_policy.hpp>
 #include <hpx/executors/execution_policy_fwd.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/executors/sequenced_executor.hpp>
@@ -31,8 +30,10 @@
 namespace hpx { namespace execution {
 
     ///////////////////////////////////////////////////////////////////////////
-    /// Default sequential execution policy object.
-    HPX_INLINE_CONSTEXPR_VARIABLE task_policy_tag task{};
+    /// \cond NOINTERNAL
+    inline constexpr task_policy_tag task{};
+    inline constexpr non_task_policy_tag non_task{};
+    /// \endcond
 
     namespace detail {
         template <typename T, typename Enable = void>
@@ -40,12 +41,20 @@ namespace hpx { namespace execution {
         {
         };
 
+        // some of the executions policies expose a dummy implementation of the
+        // operator()(task_policy_tag), this make sure that the returned policy
+        // is actually supporting asynchronous execution
+
+        // different versions of clang-format disagree
+        // clang-format off
         template <typename T>
         struct has_async_execution_policy<T,
             std::void_t<decltype(std::declval<std::decay_t<T>>()(task))>>
-          : std::true_type
+          : hpx::is_async_execution_policy<
+                decltype(std::declval<std::decay_t<T>>()(task))>
         {
         };
+        // clang-format on
 
         template <typename T>
         inline constexpr bool has_async_execution_policy_v =
@@ -103,6 +112,13 @@ namespace hpx { namespace execution {
             return *this;
         }
 
+        /// Create a corresponding non task policy for this task policy
+        ///
+        /// \returns The non task seqeuential policy
+        ///
+        inline constexpr decltype(auto) operator()(
+            non_task_policy_tag /*tag*/) const;
+
         /// Create a new sequenced_task_policy from the given
         /// executor
         ///
@@ -126,7 +142,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor>(exec), parameters());
+                *this, HPX_FORWARD(Executor, exec), parameters());
         }
 
         /// Create a new sequenced_task_policy from the given
@@ -150,7 +166,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters>(params)...));
+                    HPX_FORWARD(Parameters, params)...));
         }
 
     public:
@@ -240,6 +256,13 @@ namespace hpx { namespace execution {
             return *this;
         }
 
+        /// Create a corresponding non task policy for this task policy
+        ///
+        /// \returns The non task seqeuential shim policy
+        ///
+        inline constexpr decltype(auto) operator()(
+            non_task_policy_tag /*tag*/) const;
+
         /// Create a new sequenced_task_policy from the given
         /// executor
         ///
@@ -263,7 +286,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor_>(exec), parameters());
+                *this, HPX_FORWARD(Executor_, exec), parameters());
         }
 
         /// Create a new sequenced_task_policy_shim from the given
@@ -287,7 +310,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
         }
 
         /// Return the associated executor object.
@@ -327,8 +350,8 @@ namespace hpx { namespace execution {
         template <typename Executor_, typename Parameters_>
         constexpr sequenced_task_policy_shim(
             Executor_&& exec, Parameters_&& params)
-          : exec_(std::forward<Executor_>(exec))
-          , params_(std::forward<Parameters_>(params))
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
         {
         }
 
@@ -396,6 +419,15 @@ namespace hpx { namespace execution {
             return sequenced_task_policy();
         }
 
+        /// Create a new sequenced_policy from itself.
+        ///
+        /// \returns The new sequenced_policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
         /// Create a new sequenced_policy from the given
         /// executor
         ///
@@ -419,7 +451,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor>(exec), parameters());
+                *this, HPX_FORWARD(Executor, exec), parameters());
         }
 
         /// Create a new sequenced_policy from the given
@@ -443,7 +475,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters>(params)...));
+                    HPX_FORWARD(Parameters, params)...));
         }
 
     public:
@@ -486,7 +518,7 @@ namespace hpx { namespace execution {
     };
 
     /// Default sequential execution policy object.
-    HPX_INLINE_CONSTEXPR_VARIABLE sequenced_policy seq{};
+    inline constexpr sequenced_policy seq{};
 
     /// The class sequenced_policy is an execution policy type used
     /// as a unique type to disambiguate parallel algorithm overloading and
@@ -531,6 +563,15 @@ namespace hpx { namespace execution {
                 exec_, params_);
         }
 
+        /// Create a new sequenced_policy from itself.
+        ///
+        /// \returns The new sequenced_policy_shim
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
         /// Create a new sequenced_policy from the given
         /// executor
         ///
@@ -554,7 +595,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor_>(exec), parameters());
+                *this, HPX_FORWARD(Executor_, exec), parameters());
         }
 
         /// Create a new sequenced_policy_shim from the given
@@ -578,7 +619,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
         }
 
     public:
@@ -618,8 +659,8 @@ namespace hpx { namespace execution {
 
         template <typename Executor_, typename Parameters_>
         constexpr sequenced_policy_shim(Executor_&& exec, Parameters_&& params)
-          : exec_(std::forward<Executor_>(exec))
-          , params_(std::forward<Parameters_>(params))
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
         {
         }
 
@@ -690,6 +731,16 @@ namespace hpx { namespace execution {
             return *this;
         }
 
+        /// Create a new non task parallel policy from itself
+        ///
+        /// \param tag          [in] Specify that the corresponding
+        ///                     execution policy should be used
+        ///
+        /// \returns The new non task parallel_policy
+        ///
+        inline constexpr decltype(auto) operator()(
+            non_task_policy_tag /*tag*/) const;
+
         /// Create a new parallel_task_policy from given executor
         ///
         /// \tparam Executor    The type of the executor to associate with this
@@ -712,7 +763,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor>(exec), parameters());
+                *this, HPX_FORWARD(Executor, exec), parameters());
         }
 
         /// Create a new parallel_policy_shim from the given
@@ -736,7 +787,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters>(params)...));
+                    HPX_FORWARD(Parameters, params)...));
         }
 
     public:
@@ -822,6 +873,16 @@ namespace hpx { namespace execution {
             return *this;
         }
 
+        /// Create a new non task parallel policy from itself
+        ///
+        /// \param tag          [in] Specify that the corresponding
+        ///                     execution policy should be used
+        ///
+        /// \returns The new non task parallel_policy_shim
+        ///
+        inline constexpr decltype(auto) operator()(
+            non_task_policy_tag /*tag*/) const;
+
         /// Create a new parallel_task_policy from the given
         /// executor
         ///
@@ -845,7 +906,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor_>(exec), parameters());
+                *this, HPX_FORWARD(Executor_, exec), parameters());
         }
 
         /// Create a new parallel_policy_shim from the given
@@ -869,7 +930,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
         }
 
     public:
@@ -910,8 +971,8 @@ namespace hpx { namespace execution {
         template <typename Executor_, typename Parameters_>
         constexpr parallel_task_policy_shim(
             Executor_&& exec, Parameters_&& params)
-          : exec_(std::forward<Executor_>(exec))
-          , params_(std::forward<Parameters_>(params))
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
         {
         }
 
@@ -978,6 +1039,18 @@ namespace hpx { namespace execution {
             return parallel_task_policy();
         }
 
+        /// Create a new parallel_policy from itself
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        ///
+        /// \returns The new parallel_policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
         /// Create a new parallel_policy referencing an executor and
         /// a chunk size.
         ///
@@ -996,7 +1069,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor>(exec), parameters());
+                *this, HPX_FORWARD(Executor, exec), parameters());
         }
 
         /// Create a new parallel_policy from the given
@@ -1019,7 +1092,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters>(params)...));
+                    HPX_FORWARD(Parameters, params)...));
         }
 
     public:
@@ -1107,6 +1180,18 @@ namespace hpx { namespace execution {
                 exec_, params_);
         }
 
+        /// Create a new parallel_policy from itself
+        ///
+        /// \param tag          [in] Specify that the corresponding asynchronous
+        ///                     execution policy should be used
+        ///
+        /// \returns The new parallel_policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
         /// Create a new parallel_policy from the given
         /// executor
         ///
@@ -1130,7 +1215,7 @@ namespace hpx { namespace execution {
                 "hpx::traits::is_executor_any<Executor>::value");
 
             return hpx::parallel::execution::create_rebound_policy(
-                *this, std::forward<Executor_>(exec), parameters());
+                *this, HPX_FORWARD(Executor_, exec), parameters());
         }
 
         /// Create a new parallel_policy_shim from the given
@@ -1153,7 +1238,7 @@ namespace hpx { namespace execution {
             return hpx::parallel::execution::create_rebound_policy(*this,
                 executor(),
                 parallel::execution::join_executor_parameters(
-                    std::forward<Parameters_>(params)...));
+                    HPX_FORWARD(Parameters_, params)...));
         }
 
     public:
@@ -1193,8 +1278,8 @@ namespace hpx { namespace execution {
 
         template <typename Executor_, typename Parameters_>
         constexpr parallel_policy_shim(Executor_&& exec, Parameters_&& params)
-          : exec_(std::forward<Executor_>(exec))
-          , params_(std::forward<Parameters_>(params))
+          : exec_(HPX_FORWARD(Executor_, exec))
+          , params_(HPX_FORWARD(Parameters_, params))
         {
         }
 
@@ -1236,9 +1321,40 @@ namespace hpx { namespace execution {
         /// policy.
         using execution_category = parallel_execution_tag;
 
+        /// Rebind the type of executor used by this execution policy.
+        template <typename Executor, typename Parameters>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            using type = parallel_unsequenced_policy;
+        };
+
         /// \cond NOINTERNAL
         constexpr parallel_unsequenced_policy() = default;
+
+        template <typename Executor, typename Parameters>
+        constexpr parallel_unsequenced_policy(Executor&&, Parameters&&) noexcept
+        {
+        }
         /// \endcond
+
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task parallel unsequenced policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
+        /// Create a new task policy from itself
+        ///
+        /// \returns The task parallel unsequenced policy
+        ///
+        constexpr decltype(auto) operator()(task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
 
     public:
         /// Return the associated executor object.
@@ -1278,7 +1394,7 @@ namespace hpx { namespace execution {
     };
 
     /// Default vector execution policy object.
-    HPX_INLINE_CONSTEXPR_VARIABLE parallel_unsequenced_policy par_unseq{};
+    inline constexpr parallel_unsequenced_policy par_unseq{};
 
     ///////////////////////////////////////////////////////////////////////////
     /// The class unsequenced_policy is an execution policy type
@@ -1299,9 +1415,40 @@ namespace hpx { namespace execution {
         /// policy.
         using execution_category = sequenced_execution_tag;
 
+        /// Rebind the type of executor used by this execution policy.
+        template <typename Executor, typename Parameters>
+        struct rebind
+        {
+            /// The type of the rebound execution policy
+            using type = unsequenced_policy;
+        };
+
         /// \cond NOINTERNAL
         constexpr unsequenced_policy() = default;
+
+        template <typename Executor, typename Parameters>
+        constexpr unsequenced_policy(Executor&&, Parameters&&) noexcept
+        {
+        }
         /// \endcond
+
+        /// Create a new non task policy from itself
+        ///
+        /// \returns The non task unsequenced policy
+        ///
+        constexpr decltype(auto) operator()(non_task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
+
+        /// Create a new task policy from itself
+        ///
+        /// \returns The task unsequenced policy
+        ///
+        constexpr decltype(auto) operator()(task_policy_tag /*tag*/) const
+        {
+            return *this;
+        }
 
     public:
         /// Return the associated executor object.
@@ -1341,87 +1488,43 @@ namespace hpx { namespace execution {
     };
 
     /// Default vector execution policy object.
-    HPX_INLINE_CONSTEXPR_VARIABLE unsequenced_policy unseq{};
+    inline constexpr unsequenced_policy unseq{};
+
+    constexpr decltype(auto) sequenced_task_policy::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return seq.on(executor()).with(parameters());
+    }
+
+    constexpr decltype(auto) parallel_task_policy::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return par.on(executor()).with(parameters());
+    }
+
+    // different versions of clang-format disagree
+    // clang-format off
+    template <typename Executor, typename Parameters>
+    constexpr decltype(auto)
+    sequenced_task_policy_shim<Executor, Parameters>::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return sequenced_policy_shim<Executor, Parameters>{}
+            .on(executor())
+            .with(parameters());
+    }
+
+    template <typename Executor, typename Parameters>
+    constexpr decltype(auto)
+    parallel_task_policy_shim<Executor, Parameters>::operator()(
+        non_task_policy_tag /*tag*/) const
+    {
+        return parallel_policy_shim<Executor, Parameters>{}
+            .on(executor())
+            .with(parameters());
+    }
+    // clang-format on
 }}    // namespace hpx::execution
-
-namespace hpx { namespace parallel { namespace execution {
-
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::par is deprecated. Please use "
-        "hpx::execution::par instead.")
-    HPX_INLINE_CONSTEXPR_VARIABLE hpx::execution::parallel_policy par{};
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::par_unseq is deprecated. Please use "
-        "hpx::execution::par_unseq instead.")
-    HPX_INLINE_CONSTEXPR_VARIABLE hpx::execution::parallel_policy par_unseq{};
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::seq is deprecated. Please use "
-        "hpx::execution::seq instead.")
-    HPX_INLINE_CONSTEXPR_VARIABLE hpx::execution::sequenced_policy seq{};
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::task is deprecated. Please use "
-        "hpx::execution::task instead.")
-    HPX_INLINE_CONSTEXPR_VARIABLE hpx::execution::task_policy_tag task{};
-    using parallel_executor HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_executor is deprecated. Please "
-        "use "
-        "hpx::execution::parallel_executor instead.") =
-        hpx::execution::parallel_executor;
-    using parallel_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_policy is deprecated. Please "
-        "use "
-        "hpx::execution::parallel_policy instead.") =
-        hpx::execution::parallel_policy;
-    template <typename Executor, typename Parameters>
-    using parallel_policy_shim HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_policy_shim is deprecated. "
-        "Please "
-        "use hpx::execution::parallel_policy_shim instead.") =
-        hpx::execution::parallel_policy_shim<Executor, Parameters>;
-    using parallel_task_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_task_policy is deprecated. "
-        "Please "
-        "use hpx::execution::parallel_task_policy instead.") =
-        hpx::execution::parallel_task_policy;
-    template <typename Executor, typename Parameters>
-    using parallel_task_policy_shim HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_task_policy_shim is "
-        "deprecated. "
-        "Please use hpx::execution::parallel_task_policy_shim instead.") =
-        hpx::execution::parallel_task_policy_shim<Executor, Parameters>;
-    using parallel_unsequenced_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::parallel_unsequenced_policy is "
-        "deprecated. "
-        "Please use hpx::execution::parallel_unsequenced_policy instead.") =
-        hpx::execution::parallel_unsequenced_policy;
-    using sequenced_executor HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::sequenced_executor is deprecated. "
-        "Please "
-        "use hpx::execution::sequenced_executor instead.") =
-        hpx::execution::sequenced_executor;
-    using sequenced_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::sequenced_policy is deprecated. Please "
-        "use "
-        "hpx::execution::sequenced_policy instead.") =
-        hpx::execution::sequenced_policy;
-    template <typename Executor, typename Parameters>
-    using sequenced_policy_shim HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::sequenced_policy_shim is deprecated. "
-        "Please "
-        "use hpx::execution::sequenced_policy_shim instead.") =
-        hpx::execution::sequenced_policy_shim<Executor, Parameters>;
-    using sequenced_task_policy HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::sequenced_task_policy is deprecated. "
-        "Please "
-        "use hpx::execution::sequenced_task_policy instead.") =
-        hpx::execution::sequenced_task_policy;
-    template <typename Executor, typename Parameters>
-    using sequenced_task_policy_shim HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::execution::sequenced_task_policy_shim is "
-        "deprecated. "
-        "Please use hpx::execution::sequenced_task_policy_shim instead.") =
-        hpx::execution::sequenced_task_policy_shim<Executor, Parameters>;
-}}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace detail {
 
@@ -1622,5 +1725,6 @@ namespace hpx { namespace detail {
       : std::true_type
     {
     };
+
     /// \endcond
 }}    // namespace hpx::detail

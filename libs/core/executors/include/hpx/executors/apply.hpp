@@ -32,7 +32,7 @@ namespace hpx { namespace detail {
         call(F&& f, Ts&&... ts)
         {
             execution::parallel_executor exec;
-            exec.post(std::forward<F>(f), std::forward<Ts>(ts)...);
+            exec.post(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             return false;
         }
     };
@@ -51,8 +51,8 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static decltype(auto) call(
             Executor_&& exec, F&& f, Ts&&... ts)
         {
-            parallel::execution::post(std::forward<Executor_>(exec),
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            parallel::execution::post(HPX_FORWARD(Executor_, exec),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             return false;
         }
     };

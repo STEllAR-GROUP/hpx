@@ -31,14 +31,14 @@ namespace hpx { namespace detail {
     {
         template <typename... Ts>
         HPX_FORCEINLINE static Result call(
-            naming::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
+            hpx::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
         {
             using remote_result_type = typename Action::remote_result_type;
             using get_remote_result_type =
                 traits::get_remote_result<Result, remote_result_type>;
 
             return get_remote_result_type::call(Action::execute_function(
-                addr.address_, addr.type_, std::forward<Ts>(vs)...));
+                addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...));
         }
     };
 
@@ -47,10 +47,10 @@ namespace hpx { namespace detail {
     {
         template <typename... Ts>
         HPX_FORCEINLINE static void call(
-            naming::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
+            hpx::id_type const& /*id*/, naming::address&& addr, Ts&&... vs)
         {
             Action::execute_function(
-                addr.address_, addr.type_, std::forward<Ts>(vs)...);
+                addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
         }
     };
 
@@ -84,8 +84,8 @@ namespace hpx { namespace detail {
                         action_type::direct_execution::value)
                     {
                         return hpx::detail::sync_local_invoke_direct<
-                            action_type, result_type>::call(id, std::move(addr),
-                            std::forward<Ts>(vs)...);
+                            action_type, result_type>::call(id, HPX_MOVE(addr),
+                            HPX_FORWARD(Ts, vs)...);
                     }
                 }
             }
@@ -93,13 +93,13 @@ namespace hpx { namespace detail {
                 action_type::direct_execution::value)
             {
                 return hpx::detail::sync_local_invoke_direct<action_type,
-                    result_type>::call(id, std::move(addr),
-                    std::forward<Ts>(vs)...);
+                    result_type>::call(id, HPX_MOVE(addr),
+                    HPX_FORWARD(Ts, vs)...);
             }
         }
 
-        return async_remote_impl<Action>(std::forward<Launch>(policy), id,
-            std::move(addr), std::forward<Ts>(vs)...)
+        return async_remote_impl<Action>(HPX_FORWARD(Launch, policy), id,
+            HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...)
             .get();
     }
     /// \endcond

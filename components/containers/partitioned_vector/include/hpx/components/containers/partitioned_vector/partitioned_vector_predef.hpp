@@ -22,7 +22,7 @@
 #if !defined(HPX_PARTITIONED_VECTOR_MODULE_EXPORTS)
 
 // partitioned_vector<double>
-HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(double);
+HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(double)
 
 extern template class hpx::server::partitioned_vector<double,
     std::vector<double>>;
@@ -37,7 +37,7 @@ extern template hpx::partitioned_vector<double,
     hpx::container_distribution_policy const&, void*);
 
 // partitioned_vector<int>
-HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(int);
+HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(int)
 
 extern template class hpx::server::partitioned_vector<int, std::vector<int>>;
 extern template class hpx::partitioned_vector_partition<int, std::vector<int>>;
@@ -51,7 +51,7 @@ extern template hpx::partitioned_vector<int,
 
 // partitioned_vector<long long>
 typedef long long long_long;
-HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(long_long);
+HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(long_long)
 
 extern template class hpx::server::partitioned_vector<long long, std::vector<long long>>;
 extern template class hpx::partitioned_vector_partition<long long,
@@ -68,7 +68,7 @@ extern template hpx::partitioned_vector<long long,
 using partitioned_vector_std_string_argument = std::string;
 
 HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(
-    partitioned_vector_std_string_argument);
+    partitioned_vector_std_string_argument)
 
 extern template class hpx::server::partitioned_vector<std::string,
     std::vector<std::string>>;

@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,8 +20,8 @@ set(HPX_COMPONENTS
     CACHE INTERNAL "list of HPX components" FORCE
 )
 
-set(component_dirs component_storage containers iostreams performance_counters
-                   process
+set(component_dirs component_storage containers iostreams parcel_plugins
+                   performance_counters process
 )
 
 # add example pseudo targets needed for components
@@ -53,12 +53,11 @@ if(HPX_WITH_TESTS)
   endif()
 
   if(HPX_WITH_TESTS_HEADERS)
-    add_custom_target(tests.headers.components)
+    add_hpx_pseudo_target(tests.headers.components)
     add_hpx_pseudo_dependencies(tests.headers tests.headers.components)
   endif()
 endif()
 
-hpx_info("")
 hpx_info("Configuring components:")
 
 add_hpx_pseudo_target(components)

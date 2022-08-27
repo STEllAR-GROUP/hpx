@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //  Copyright (c) 2015-2016 Anton Bikineev
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -144,8 +144,10 @@ namespace hpx_test {
         template <typename Archive>
         void serialize(Archive& ar, unsigned int)
         {
-            ar& ids;
-            ar& strings;
+            // clang-format off
+            ar & ids;
+            ar & strings;
+            // clang-format on
         }
     };
 

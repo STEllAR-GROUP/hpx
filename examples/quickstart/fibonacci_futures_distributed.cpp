@@ -31,7 +31,7 @@ std::size_t get_serial_execution_count()
 {
     return serial_execution_count.load();
 }
-HPX_PLAIN_ACTION(get_serial_execution_count);
+HPX_PLAIN_ACTION(get_serial_execution_count)
 
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<std::size_t> next_locality(0);
@@ -40,13 +40,10 @@ hpx::id_type here;
 
 struct when_all_wrapper
 {
-    typedef hpx::tuple<
-            hpx::lcos::future<std::uint64_t>
-          , hpx::lcos::future<std::uint64_t> > data_type;
+    typedef hpx::tuple<hpx::future<std::uint64_t>, hpx::future<std::uint64_t>>
+        data_type;
 
-    std::uint64_t operator()(
-        hpx::lcos::future<data_type> data
-    ) const
+    std::uint64_t operator()(hpx::future<data_type> data) const
     {
         data_type v = data.get();
         return hpx::get<0>(v).get() + hpx::get<1>(v).get();
@@ -58,7 +55,7 @@ HPX_NOINLINE std::uint64_t fibonacci_serial_sub(std::uint64_t n)
 {
     if (n < 2)
         return n;
-    return fibonacci_serial_sub(n-1) + fibonacci_serial_sub(n-2);
+    return fibonacci_serial_sub(n - 1) + fibonacci_serial_sub(n - 2);
 }
 
 std::uint64_t fibonacci_serial(std::uint64_t n)
@@ -75,7 +72,7 @@ hpx::id_type const& get_next_locality(std::uint64_t next)
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::future<std::uint64_t> fibonacci_future(std::uint64_t n);
-HPX_PLAIN_ACTION(fibonacci_future);
+HPX_PLAIN_ACTION(fibonacci_future)
 
 hpx::future<std::uint64_t> fibonacci_future(std::uint64_t n)
 {
@@ -89,17 +86,19 @@ hpx::future<std::uint64_t> fibonacci_future(std::uint64_t n)
     hpx::id_type loc1 = here;
     hpx::id_type loc2 = here;
 
-    if (n == distribute_at) {
+    if (n == distribute_at)
+    {
         loc2 = get_next_locality(++next_locality);
     }
-    else if (n-1 == distribute_at) {
+    else if (n - 1 == distribute_at)
+    {
         std::uint64_t next = next_locality += 2;
-        loc1 = get_next_locality(next-1);
+        loc1 = get_next_locality(next - 1);
         loc2 = get_next_locality(next);
     }
 
-    hpx::future<std::uint64_t> f = hpx::async(fib, loc1, n-1);
-    hpx::future<std::uint64_t> r = fib(loc2, n-2);
+    hpx::future<std::uint64_t> f = hpx::async(fib, loc1, n - 1);
+    hpx::future<std::uint64_t> r = fib(loc2, n - 2);
 
     return hpx::when_all(f, r).then(when_all_wrapper());
 }
@@ -112,11 +111,13 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::string test = vm["test"].as<std::string>();
     std::uint64_t max_runs = vm["n-runs"].as<std::uint64_t>();
 
-    if (max_runs == 0) {
+    if (max_runs == 0)
+    {
         std::cerr << "fibonacci_futures_distributed: wrong command "
-            "line argument value for "
-            "option 'n-runs', should not be zero" << std::endl;
-        return hpx::finalize(); // Handles HPX shutdown
+                     "line argument value for "
+                     "option 'n-runs', should not be zero"
+                  << std::endl;
+        return hpx::finalize();    // Handles HPX shutdown
     }
 
     bool executed_one = false;
@@ -130,10 +131,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
         // Synchronous execution, use as reference only.
         r = fibonacci_serial(n);
 
-//        double d = double(hpx::chrono::high_resolution_clock::now() - start) / 1.e9;
         std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
         char const* fmt = "fibonacci_serial({1}) == {2},"
-            "elapsed time:,{3},[s]\n";
+                          "elapsed time:,{3},[s]\n";
         hpx::util::format_to(std::cout, fmt, n, r, d);
 
         executed_one = true;
@@ -151,18 +151,18 @@ int hpx_main(hpx::program_options::variables_map& vm)
             r = fibonacci_future(n).get();
         }
 
-//        double d = double(hpx::chrono::high_resolution_clock::now() - start) / 1.e9;
         std::uint64_t d = hpx::chrono::high_resolution_clock::now() - start;
-        char const* fmt = "fibonacci_future({1}) == {2},elapsed time:,{3},[s],{4}\n";
-        hpx::util::format_to(std::cout, fmt, n, r, d / max_runs,
-            next_locality.load());
+        char const* fmt =
+            "fibonacci_future({1}) == {2},elapsed time:,{3},[s],{4}\n";
+        hpx::util::format_to(
+            std::cout, fmt, n, r, d / max_runs, next_locality.load());
 
         get_serial_execution_count_action serial_count;
         for (hpx::id_type const& loc : hpx::find_all_localities())
         {
             std::size_t count = serial_count(loc);
-            hpx::util::format_to(std::cout, "  serial-count,{1},{2}\n",
-                loc, count / max_runs);
+            hpx::util::format_to(
+                std::cout, "  serial-count,{1},{2}\n", loc, count / max_runs);
         }
 
         executed_one = true;
@@ -170,36 +170,37 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     if (!executed_one)
     {
-        std::cerr << "fibonacci_futures_distributed: wrong command line argument "
-            "value for option 'tests', should be either 'all' or a number between "
-            "zero and 1, value specified: " << test << std::endl;
+        std::cerr
+            << "fibonacci_futures_distributed: wrong command line argument "
+               "value for option 'tests', should be either 'all' or a number "
+               "between "
+               "zero and 1, value specified: "
+            << test << std::endl;
     }
 
-    return hpx::finalize(); // Handles HPX shutdown
+    return hpx::finalize();    // Handles HPX shutdown
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 hpx::program_options::options_description get_commandline_options()
 {
     // Configure application-specific options
-    hpx::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    hpx::program_options::options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
     using hpx::program_options::value;
-    desc_commandline.add_options()
-        ( "n-value", value<std::uint64_t>()->default_value(10),
-          "n value for the Fibonacci function")
-        ( "n-runs", value<std::uint64_t>()->default_value(1),
-          "number of runs to perform")
-        ( "threshold", value<unsigned int>()->default_value(2),
-          "threshold for switching to serial code")
-        ( "distribute-at", value<unsigned int>()->default_value(2),
-          "threshold for distribution to other nodes")
-        ( "test", value<std::string>()->default_value("all"),
-          "select tests to execute (0-7, default: all)")
-        ( "loc-repeat", value<int>()->default_value(1),
-          "how often should a locality > 0 be used")
-    ;
+    desc_commandline.add_options()("n-value",
+        value<std::uint64_t>()->default_value(10),
+        "n value for the Fibonacci function")("n-runs",
+        value<std::uint64_t>()->default_value(1), "number of runs to perform")(
+        "threshold", value<unsigned int>()->default_value(2),
+        "threshold for switching to serial code")("distribute-at",
+        value<unsigned int>()->default_value(2),
+        "threshold for distribution to other nodes")("test",
+        value<std::string>()->default_value("all"),
+        "select tests to execute (0-7, default: all)")("loc-repeat",
+        value<int>()->default_value(1),
+        "how often should a locality > 0 be used");
     return desc_commandline;
 }
 
@@ -208,7 +209,8 @@ void init_globals()
 {
     // Retrieve command line using the Boost.ProgramOptions library.
     hpx::program_options::variables_map vm;
-    if (!hpx::util::retrieve_commandline_arguments(get_commandline_options(), vm))
+    if (!hpx::util::retrieve_commandline_arguments(
+            get_commandline_options(), vm))
     {
         HPX_THROW_EXCEPTION(hpx::commandline_option_error,
             "fibonacci_futures_distributed",
@@ -219,7 +221,8 @@ void init_globals()
     std::uint64_t n = vm["n-value"].as<std::uint64_t>();
 
     threshold = vm["threshold"].as<unsigned int>();
-    if (threshold < 2 || threshold > n) {
+    if (threshold < 2 || threshold > n)
+    {
         HPX_THROW_EXCEPTION(hpx::commandline_option_error,
             "fibonacci_futures_distributed",
             "wrong command line argument value for option 'threshold', "
@@ -229,7 +232,8 @@ void init_globals()
     }
 
     distribute_at = vm["distribute-at"].as<unsigned int>();
-    if (distribute_at < 2 || distribute_at > n) {
+    if (distribute_at < 2 || distribute_at > n)
+    {
         HPX_THROW_EXCEPTION(hpx::commandline_option_error,
             "fibonacci_futures_distributed",
             "wrong command line argument value for option 'distribute-at', "
@@ -246,7 +250,7 @@ void init_globals()
     std::vector<hpx::id_type> locs = hpx::find_all_localities();
     std::size_t num_repeats = vm["loc-repeat"].as<int>();
 
-    localities.push_back(here);      // add ourselves
+    localities.push_back(here);    // add ourselves
     for (std::size_t j = 0; j != num_repeats; ++j)
     {
         for (std::size_t i = 0; i != locs.size(); ++i)

@@ -32,19 +32,19 @@ namespace hpx {
     //////////////////////////////////////////////////////////////////////////
     // forward declare the required overload of apply.
     template <typename Action, typename... Ts>
-    bool apply(naming::id_type const& gid, Ts&&... vs);
+    bool apply(hpx::id_type const& gid, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename Cont, typename... Ts>
     bool apply_continue(
         hpx::actions::basic_action<Component, Signature, Derived>, Cont&& cont,
-        naming::id_type const& gid, Ts&&... vs);
+        hpx::id_type const& gid, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename... Ts>
     inline bool apply_c(
         hpx::actions::basic_action<Component, Signature, Derived>,
-        naming::id_type const& contgid, naming::id_type const& gid, Ts&&... vs);
+        hpx::id_type const& contgid, hpx::id_type const& gid, Ts&&... vs);
     /// \endcond
 
     /// \cond NOINTERNAL
@@ -57,7 +57,7 @@ namespace hpx {
             template <typename U>
             HPX_FORCEINLINE static T&& call(U& u)
             {
-                return std::move(u);
+                return HPX_MOVE(u);
             }
         };
 
@@ -111,23 +111,24 @@ namespace hpx {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Action, typename Result>
-        void set_lco_value(naming::id_type const& id, naming::address&& addr,
+        void set_lco_value(hpx::id_type const& id, naming::address&& addr,
             Result&& t, bool move_credits)
         {
             if (move_credits &&
-                id.get_management_type() != naming::id_type::unmanaged)
+                id.get_management_type() !=
+                    hpx::id_type::management_type::unmanaged)
             {
-                naming::id_type target(
-                    id.get_gid(), naming::id_type::managed_move_credit);
+                hpx::id_type target(id.get_gid(),
+                    hpx::id_type::management_type::managed_move_credit);
                 id.make_unmanaged();
 
-                detail::apply_impl<Action>(target, std::move(addr),
+                detail::apply_impl<Action>(target, HPX_MOVE(addr),
                     actions::action_priority<Action>(),
                     detail::make_rvalue<Result>(t));
             }
             else
             {
-                detail::apply_impl<Action>(id, std::move(addr),
+                detail::apply_impl<Action>(id, HPX_MOVE(addr),
                     actions::action_priority<Action>(),
                     detail::make_rvalue<Result>(t));
             }
@@ -136,27 +137,28 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////
         template <typename LocalResult, typename RemoteResult, typename Action,
             typename Result>
-        void set_lco_value(naming::id_type const& id, naming::address&& addr,
-            Result&& t, naming::id_type const& cont, bool move_credits)
+        void set_lco_value(hpx::id_type const& id, naming::address&& addr,
+            Result&& t, hpx::id_type const& cont, bool move_credits)
         {
             if (move_credits &&
-                id.get_management_type() != naming::id_type::unmanaged)
+                id.get_management_type() !=
+                    hpx::id_type::management_type::unmanaged)
             {
-                naming::id_type target(
-                    id.get_gid(), naming::id_type::managed_move_credit);
+                hpx::id_type target(id.get_gid(),
+                    hpx::id_type::management_type::managed_move_credit);
                 id.make_unmanaged();
 
                 detail::apply_impl<Action>(
                     actions::typed_continuation<LocalResult, RemoteResult>(
                         cont),
-                    target, std::move(addr), detail::make_rvalue<Result>(t));
+                    target, HPX_MOVE(addr), detail::make_rvalue<Result>(t));
             }
             else
             {
                 detail::apply_impl<Action>(
                     actions::typed_continuation<LocalResult, RemoteResult>(
                         cont),
-                    id, std::move(addr), detail::make_rvalue<Result>(t));
+                    id, HPX_MOVE(addr), detail::make_rvalue<Result>(t));
             }
         }
     }    // namespace detail
@@ -164,7 +166,7 @@ namespace hpx {
 
     /// \cond NOINTERNAL
     template <typename Result>
-    void set_lco_value(naming::id_type const& id, naming::address&& addr,
+    void set_lco_value(hpx::id_type const& id, naming::address&& addr,
         Result&& t, bool move_credits)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -181,7 +183,7 @@ namespace hpx {
                 set_value_action;
 
             detail::set_lco_value<set_value_action>(
-                id, std::move(addr), std::forward<Result>(t), move_credits);
+                id, HPX_MOVE(addr), HPX_FORWARD(Result, t), move_credits);
         }
         else
         {
@@ -196,7 +198,7 @@ namespace hpx {
                 set_value_action;
 
             detail::set_lco_value<set_value_action>(
-                id, std::move(addr), std::forward<Result>(t), move_credits);
+                id, HPX_MOVE(addr), HPX_FORWARD(Result, t), move_credits);
         }
 #else
         HPX_UNUSED(id);
@@ -208,8 +210,8 @@ namespace hpx {
     }
 
     template <typename Result>
-    void set_lco_value(naming::id_type const& id, naming::address&& addr,
-        Result&& t, naming::id_type const& cont, bool move_credits)
+    void set_lco_value(hpx::id_type const& id, naming::address&& addr,
+        Result&& t, hpx::id_type const& cont, bool move_credits)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef typename std::decay<Result>::type remote_result_type;
@@ -225,8 +227,8 @@ namespace hpx {
                 set_value_action;
 
             detail::set_lco_value<local_result_type, remote_result_type,
-                set_value_action>(id, std::move(addr), std::forward<Result>(t),
-                cont, move_credits);
+                set_value_action>(
+                id, HPX_MOVE(addr), HPX_FORWARD(Result, t), cont, move_credits);
         }
         else
         {
@@ -240,8 +242,8 @@ namespace hpx {
                 set_value_action;
 
             detail::set_lco_value<local_result_type, remote_result_type,
-                set_value_action>(id, std::move(addr), std::forward<Result>(t),
-                cont, move_credits);
+                set_value_action>(
+                id, HPX_MOVE(addr), HPX_FORWARD(Result, t), cont, move_credits);
         }
 #else
         HPX_UNUSED(id);

@@ -37,16 +37,15 @@ namespace hpx { namespace parallel { namespace execution {
         public:
             template <typename Executor_, typename F_>
             then_execute_helper(Executor_&& exec, F_&& call)
-              : exec_(std::forward<Executor_>(exec))
-              , call_(std::forward<F_>(call))
+              : exec_(HPX_FORWARD(Executor_, exec))
+              , call_(HPX_FORWARD(F_, call))
             {
             }
 
             auto operator()(hpx::future<void>&& fut) -> decltype(Tag()(
-                std::move(fut), std::declval<Executor>(), std::declval<F>()))
+                HPX_MOVE(fut), std::declval<Executor>(), std::declval<F>()))
             {
-                return Tag()(
-                    std::move(fut), std::move(exec_), std::move(call_));
+                return Tag()(HPX_MOVE(fut), HPX_MOVE(exec_), HPX_MOVE(call_));
             }
 
         private:
@@ -59,7 +58,7 @@ namespace hpx { namespace parallel { namespace execution {
             typename std::decay<F>::type>
         make_then_execute_helper(Executor&& exec, F&& call)
         {
-            return {std::forward<Executor>(exec), std::forward<F>(call)};
+            return {HPX_FORWARD(Executor, exec), HPX_FORWARD(F, call)};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -70,11 +69,11 @@ namespace hpx { namespace parallel { namespace execution {
             auto operator()(
                 hpx::future<void>&& fut, Executor&& exec, F&& f) const
                 -> decltype(execution::sync_execute(
-                    std::forward<Executor>(exec), std::forward<F>(f)))
+                    HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f)))
             {
                 fut.get();    // rethrow exceptions
                 return execution::sync_execute(
-                    std::forward<Executor>(exec), std::forward<F>(f));
+                    HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f));
             }
 
             template <typename Executor, typename F, typename... Ts>
@@ -82,17 +81,17 @@ namespace hpx { namespace parallel { namespace execution {
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts)
                 -> decltype(
-                    execution::async_execute(std::forward<Executor>(exec),
-                        std::forward<F>(f), std::forward<Ts>(ts)...)
+                    execution::async_execute(HPX_FORWARD(Executor, exec),
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)
                         .get())
             {
                 auto predecessor = make_ready_future_at(abs_time);
                 return execution::then_execute(
                     hpx::execution::sequenced_executor(),
                     make_then_execute_helper<sync_execute_at_helper>(
-                        std::forward<Executor>(exec),
+                        HPX_FORWARD(Executor, exec),
                         hpx::util::deferred_call(
-                            std::forward<F>(f), std::forward<Ts>(ts)...)),
+                            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)),
                     predecessor)
                     .get();
             }
@@ -101,10 +100,10 @@ namespace hpx { namespace parallel { namespace execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.sync_execute_at(abs_time,
-                std::forward<F>(f), std::forward<Ts>(ts)...))
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return exec.sync_execute_at(
-                    abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+                    abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
         };
 
@@ -115,23 +114,22 @@ namespace hpx { namespace parallel { namespace execution {
             static auto call(hpx::traits::detail::wrap_int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts)
-                -> decltype(
-                    execution::sync_execute(std::forward<Executor>(exec),
-                        std::forward<F>(f), std::forward<Ts>(ts)...))
+                -> decltype(execution::sync_execute(HPX_FORWARD(Executor, exec),
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 this_thread::sleep_until(abs_time);
-                return execution::sync_execute(std::forward<Executor>(exec),
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                return execution::sync_execute(HPX_FORWARD(Executor, exec),
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename Executor, typename F, typename... Ts>
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.sync_execute_at(abs_time,
-                std::forward<F>(f), std::forward<Ts>(ts)...))
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return exec.sync_execute_at(
-                    abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+                    abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
         };
 
@@ -142,15 +140,15 @@ namespace hpx { namespace parallel { namespace execution {
             -> decltype(sync_execute_at_helper<
                 typename hpx::traits::executor_execution_category<
                     typename std::decay<Executor>::type>::type>::call(0,
-                std::forward<Executor>(exec), abs_time, std::forward<F>(f),
-                std::forward<Ts>(ts)...))
+                HPX_FORWARD(Executor, exec), abs_time, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...))
         {
             typedef typename hpx::traits::executor_execution_category<
                 typename std::decay<Executor>::type>::type tag;
 
             return sync_execute_at_helper<tag>::call(0,
-                std::forward<Executor>(exec), abs_time, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Executor, exec), abs_time, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -161,11 +159,11 @@ namespace hpx { namespace parallel { namespace execution {
             auto operator()(
                 hpx::future<void>&& fut, Executor&& exec, F&& f) const
                 -> decltype(execution::async_execute(
-                    std::forward<Executor>(exec), std::forward<F>(f)))
+                    HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f)))
             {
                 fut.get();    // rethrow exceptions
                 return execution::async_execute(
-                    std::forward<Executor>(exec), std::forward<F>(f));
+                    HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f));
             }
 
             template <typename Executor, typename F, typename... Ts>
@@ -173,16 +171,16 @@ namespace hpx { namespace parallel { namespace execution {
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts)
                 -> decltype(
-                    execution::async_execute(std::forward<Executor>(exec),
-                        std::forward<F>(f), std::forward<Ts>(ts)...))
+                    execution::async_execute(HPX_FORWARD(Executor, exec),
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 auto predecessor = make_ready_future_at(abs_time);
                 return execution::then_execute(
                     hpx::execution::sequenced_executor(),
                     make_then_execute_helper<async_execute_at_helper>(
-                        std::forward<Executor>(exec),
+                        HPX_FORWARD(Executor, exec),
                         hpx::util::deferred_call(
-                            std::forward<F>(f), std::forward<Ts>(ts)...)),
+                            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)),
                     predecessor);
             }
 
@@ -190,10 +188,10 @@ namespace hpx { namespace parallel { namespace execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.async_execute_at(abs_time,
-                std::forward<F>(f), std::forward<Ts>(ts)...))
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return exec.async_execute_at(
-                    abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+                    abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
         };
 
@@ -205,22 +203,22 @@ namespace hpx { namespace parallel { namespace execution {
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts)
                 -> decltype(
-                    execution::async_execute(std::forward<Executor>(exec),
-                        std::forward<F>(f), std::forward<Ts>(ts)...))
+                    execution::async_execute(HPX_FORWARD(Executor, exec),
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 this_thread::sleep_until(abs_time);
-                return execution::async_execute(std::forward<Executor>(exec),
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                return execution::async_execute(HPX_FORWARD(Executor, exec),
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename Executor, typename F, typename... Ts>
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.async_execute_at(abs_time,
-                std::forward<F>(f), std::forward<Ts>(ts)...))
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return exec.async_execute_at(
-                    abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+                    abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
         };
 
@@ -231,14 +229,14 @@ namespace hpx { namespace parallel { namespace execution {
             -> decltype(async_execute_at_helper<
                 typename hpx::traits::executor_execution_category<
                     typename std::decay<Executor>::type>::type>::call(0,
-                std::forward<Executor>(exec), abs_time, std::forward<F>(f),
-                std::forward<Ts>(ts)...))
+                HPX_FORWARD(Executor, exec), abs_time, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...))
         {
             typedef typename hpx::traits::executor_execution_category<
                 typename std::decay<Executor>::type>::type tag;
             return async_execute_at_helper<tag>::call(0,
-                std::forward<Executor>(exec), abs_time, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                HPX_FORWARD(Executor, exec), abs_time, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -250,8 +248,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::future<void>&& fut, Executor&& exec, F&& f) const
             {
                 fut.get();    // rethrow exceptions
-                execution::post(
-                    std::forward<Executor>(exec), std::forward<F>(f));
+                execution::post(HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f));
             }
 
             template <typename Executor, typename F, typename... Ts>
@@ -262,9 +259,9 @@ namespace hpx { namespace parallel { namespace execution {
                 auto predecessor = make_ready_future_at(abs_time);
                 execution::then_execute(hpx::execution::sequenced_executor(),
                     make_then_execute_helper<post_at_helper>(
-                        std::forward<Executor>(exec),
+                        HPX_FORWARD(Executor, exec),
                         hpx::util::deferred_call(
-                            std::forward<F>(f), std::forward<Ts>(ts)...)),
+                            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)),
                     predecessor);
             }
 
@@ -272,10 +269,10 @@ namespace hpx { namespace parallel { namespace execution {
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.post_at(abs_time,
-                std::forward<F>(f), std::forward<Ts>(ts)...))
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 return exec.post_at(
-                    abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+                    abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
         };
 
@@ -288,18 +285,18 @@ namespace hpx { namespace parallel { namespace execution {
                 Ts&&... ts)
             {
                 this_thread::sleep_until(abs_time);
-                execution::post(std::forward<Executor>(exec),
-                    std::forward<F>(f), std::forward<Ts>(ts)...);
+                execution::post(HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+                    HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename Executor, typename F, typename... Ts>
             static auto call(int, Executor&& exec,
                 std::chrono::steady_clock::time_point const& abs_time, F&& f,
                 Ts&&... ts) -> decltype(exec.post_at(abs_time,
-                std::forward<F>(f), std::forward<Ts>(ts)...))
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
                 exec.post_at(
-                    abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+                    abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
         };
 
@@ -311,8 +308,8 @@ namespace hpx { namespace parallel { namespace execution {
             typedef typename hpx::traits::executor_execution_category<
                 typename std::decay<Executor>::type>::type tag;
 
-            return post_at_helper<tag>::call(0, std::forward<Executor>(exec),
-                abs_time, std::forward<F>(f), std::forward<Ts>(ts)...);
+            return post_at_helper<tag>::call(0, HPX_FORWARD(Executor, exec),
+                abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
         /// \endcond
     }    // namespace detail
@@ -345,7 +342,7 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Executor>
         timed_executor(
             Executor&& exec, hpx::chrono::steady_time_point const& abs_time)
-          : exec_(std::forward<Executor>(exec))
+          : exec_(HPX_FORWARD(Executor, exec))
           , execute_at_(abs_time.value())
         {
         }
@@ -353,7 +350,7 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Executor>
         timed_executor(
             Executor&& exec, hpx::chrono::steady_duration const& rel_time)
-          : exec_(std::forward<Executor>(exec))
+          : exec_(HPX_FORWARD(Executor, exec))
           , execute_at_(rel_time.from_now())
         {
         }
@@ -380,8 +377,8 @@ namespace hpx { namespace parallel { namespace execution {
         typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type
         sync_execute(F&& f, Ts&&... ts)
         {
-            return detail::call_sync_execute_at(exec_, execute_at_,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return detail::call_sync_execute_at(
+                exec_, execute_at_, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // TwoWayExecutor interface
@@ -390,16 +387,16 @@ namespace hpx { namespace parallel { namespace execution {
             typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type>
         async_execute(F&& f, Ts&&... ts)
         {
-            return detail::call_async_execute_at(exec_, execute_at_,
-                std::forward<F>(f), std::forward<Ts>(ts)...);
+            return detail::call_async_execute_at(
+                exec_, execute_at_, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename... Ts>
         void post(F&& f, Ts&&... ts)
         {
-            detail::call_post_at(exec_, execute_at_, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+            detail::call_post_at(
+                exec_, execute_at_, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         BaseExecutor exec_;

@@ -23,9 +23,9 @@
 
 typedef unsigned long ulong;
 
-HPX_REGISTER_PARTITIONED_VECTOR(ulong);
-HPX_REGISTER_PARTITIONED_VECTOR(long);
-HPX_REGISTER_PARTITIONED_VECTOR(unsigned);
+HPX_REGISTER_PARTITIONED_VECTOR(ulong)
+HPX_REGISTER_PARTITIONED_VECTOR(long)
+HPX_REGISTER_PARTITIONED_VECTOR(unsigned)
 
 template <typename T>
 void test(T minval, T maxval)
@@ -34,22 +34,20 @@ void test(T minval, T maxval)
         std::vector<char> buffer;
 
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
 
         std::size_t sz = static_cast<std::size_t>(maxval - minval);
 
         hpx::partitioned_vector<T> os(sz);
         os.register_as("test_vector");
-        hpx::fill(
-            hpx::execution::par, std::begin(os), std::end(os), 42);
+        hpx::fill(hpx::execution::par, std::begin(os), std::end(os), 42);
 
         oarchive << os;
 
         hpx::serialization::input_archive iarchive(buffer);
 
         hpx::partitioned_vector<T> is(os.size());
-        hpx::fill(
-            hpx::execution::par, std::begin(is), std::end(is), 0);
+        hpx::fill(hpx::execution::par, std::begin(is), std::end(is), 0);
 
         iarchive >> is;
 

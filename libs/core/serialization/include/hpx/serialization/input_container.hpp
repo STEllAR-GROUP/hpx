@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,7 +21,7 @@
 #include <memory>
 #include <vector>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename Container>
     struct input_container : erased_input_container
@@ -29,32 +29,35 @@ namespace hpx { namespace serialization {
     private:
         using access_traits = traits::serialization_access_data<Container>;
 
-        std::size_t get_chunk_size(std::size_t chunk) const
+        std::size_t get_chunk_size(std::size_t chunk) const noexcept
         {
             return (*chunks_)[chunk].size_;
         }
 
-        std::uint8_t get_chunk_type(std::size_t chunk) const
+        chunk_type get_chunk_type(std::size_t chunk) const noexcept
         {
             return (*chunks_)[chunk].type_;
         }
 
-        chunk_data get_chunk_data(std::size_t chunk) const
+        chunk_data get_chunk_data(std::size_t chunk) const noexcept
         {
             return (*chunks_)[chunk].data_;
         }
 
-        std::size_t get_num_chunks() const
+        std::size_t get_num_chunks() const noexcept
         {
             return chunks_->size();
         }
 
     public:
-        input_container(Container const& cont, std::size_t inbound_data_size)
+        input_container(
+            Container const& cont, std::size_t inbound_data_size) noexcept
           : cont_(cont)
           , current_(0)
           , filter_()
           , decompressed_size_(inbound_data_size)
+          , zero_copy_serialization_threshold_(
+                HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
           , chunks_(nullptr)
           , current_chunk_(std::size_t(-1))
           , current_chunk_size_(0)
@@ -63,11 +66,13 @@ namespace hpx { namespace serialization {
 
         input_container(Container const& cont,
             std::vector<serialization_chunk> const* chunks,
-            std::size_t inbound_data_size)
+            std::size_t inbound_data_size) noexcept
           : cont_(cont)
           , current_(0)
           , filter_()
           , decompressed_size_(inbound_data_size)
+          , zero_copy_serialization_threshold_(
+                HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
           , chunks_(nullptr)
           , current_chunk_(std::size_t(-1))
           , current_chunk_size_(0)
@@ -79,7 +84,7 @@ namespace hpx { namespace serialization {
             }
         }
 
-        void set_filter(binary_filter* filter)    // override
+        void set_filter(binary_filter* filter) override
         {
             filter_.reset(filter);
             if (filter)
@@ -97,9 +102,21 @@ namespace hpx { namespace serialization {
             }
         }
 
-        void load_binary(void* address, std::size_t count)
+        void set_zero_copy_serialization_threshold(
+            std::size_t zero_copy_serialization_threshold) override
         {
-            if (filter_)
+            zero_copy_serialization_threshold_ =
+                zero_copy_serialization_threshold;
+            if (zero_copy_serialization_threshold_ == 0)
+            {
+                zero_copy_serialization_threshold_ =
+                    HPX_ZERO_COPY_SERIALIZATION_THRESHOLD;
+            }
+        }
+
+        void load_binary(void* address, std::size_t count) override
+        {
+            if (filter_ != nullptr)
             {
                 filter_->load(address, count);
             }
@@ -118,7 +135,7 @@ namespace hpx { namespace serialization {
 
                 current_ = new_current;
 
-                if (chunks_)
+                if (chunks_ != nullptr)
                 {
                     current_chunk_size_ += count;
 
@@ -144,12 +161,13 @@ namespace hpx { namespace serialization {
             }
         }
 
-        void load_binary_chunk(void* address, std::size_t count)    // override
+        void load_binary_chunk(void* address, std::size_t count) override
         {
             HPX_ASSERT((std::int64_t) count >= 0);
 
             if (chunks_ == nullptr ||
-                count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD || filter_)
+                count < zero_copy_serialization_threshold_ ||
+                filter_ != nullptr)
             {
                 // fall back to serialization_chunk-less archive
                 this->input_container::load_binary(address, count);
@@ -157,8 +175,8 @@ namespace hpx { namespace serialization {
             else
             {
                 HPX_ASSERT(current_chunk_ != std::size_t(-1));
-                HPX_ASSERT(
-                    get_chunk_type(current_chunk_) == chunk_type_pointer);
+                HPX_ASSERT(get_chunk_type(current_chunk_) ==
+                    chunk_type::chunk_type_pointer);
 
                 if (get_chunk_size(current_chunk_) != count)
                 {
@@ -181,9 +199,10 @@ namespace hpx { namespace serialization {
         std::size_t current_;
         std::unique_ptr<binary_filter> filter_;
         std::size_t decompressed_size_;
+        std::size_t zero_copy_serialization_threshold_;
 
         std::vector<serialization_chunk> const* chunks_;
         std::size_t current_chunk_;
         std::size_t current_chunk_size_;
     };
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

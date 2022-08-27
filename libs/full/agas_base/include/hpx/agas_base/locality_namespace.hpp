@@ -13,7 +13,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
+#include <hpx/parcelset_base/locality.hpp>
 
 #include <cstdint>
 #include <string>
@@ -27,7 +27,7 @@ namespace hpx { namespace agas {
 
         virtual naming::address::address_type ptr() const = 0;
         virtual naming::address addr() const = 0;
-        virtual naming::id_type gid() const = 0;
+        virtual hpx::id_type gid() const = 0;
 
         virtual std::uint32_t allocate(
             parcelset::endpoints_type const& endpoints, std::uint64_t count,

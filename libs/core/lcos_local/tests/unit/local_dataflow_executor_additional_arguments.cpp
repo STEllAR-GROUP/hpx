@@ -27,8 +27,8 @@ using hpx::program_options::options_description;
 using hpx::program_options::value;
 using hpx::program_options::variables_map;
 
+using hpx::bind;
 using hpx::dataflow;
-using hpx::util::bind;
 
 using hpx::async;
 using hpx::future;
@@ -356,7 +356,7 @@ void plain_deferred_arguments(Executor& exec)
     }
 }
 
-HPX_INLINE_CONSTEXPR_VARIABLE struct void_f_wrapper
+inline constexpr struct void_f_wrapper
 {
     // This should not be instantiated by the dataflow internals for launch
     // policies, since that would not add an additional argument and compilation

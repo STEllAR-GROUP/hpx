@@ -274,7 +274,7 @@ namespace hpx { namespace ranges {
 #include <vector>
 
 namespace hpx { namespace ranges {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_default_construct_t final
+    inline constexpr struct uninitialized_default_construct_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_default_construct_t>
     {
     private:
@@ -285,7 +285,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             hpx::ranges::uninitialized_default_construct_t, FwdIter first,
             Sent last)
         {
@@ -307,7 +307,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::ranges::uninitialized_default_construct_t,
+        tag_fallback_invoke(hpx::ranges::uninitialized_default_construct_t,
             ExPolicy&& policy, FwdIter first, Sent last)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -315,7 +315,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::uninitialized_default_construct<
                 FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, last);
+                .call(HPX_FORWARD(ExPolicy, policy), first, last);
         }
 
         // clang-format off
@@ -325,7 +325,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::ranges::uninitialized_default_construct_t, Rng&& rng)
         {
             using iterator_type =
@@ -349,7 +349,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>::type
-        tag_fallback_dispatch(hpx::ranges::uninitialized_default_construct_t,
+        tag_fallback_invoke(hpx::ranges::uninitialized_default_construct_t,
             ExPolicy&& policy, Rng&& rng)
         {
             using iterator_type =
@@ -361,13 +361,12 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::uninitialized_default_construct<
                 iterator_type>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng),
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
                     std::end(rng));
         }
     } uninitialized_default_construct{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_default_construct_n_t
-        final
+    inline constexpr struct uninitialized_default_construct_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_default_construct_n_t>
     {
     private:
@@ -377,7 +376,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             hpx::ranges::uninitialized_default_construct_n_t, FwdIter first,
             Size count)
         {
@@ -398,7 +397,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(hpx::ranges::uninitialized_default_construct_n_t,
+        tag_fallback_invoke(hpx::ranges::uninitialized_default_construct_n_t,
             ExPolicy&& policy, FwdIter first, Size count)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
@@ -406,7 +405,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::uninitialized_default_construct_n<
                 FwdIter>()
-                .call(std::forward<ExPolicy>(policy), first, count);
+                .call(HPX_FORWARD(ExPolicy, policy), first, count);
         }
     } uninitialized_default_construct_n{};
 }}    // namespace hpx::ranges

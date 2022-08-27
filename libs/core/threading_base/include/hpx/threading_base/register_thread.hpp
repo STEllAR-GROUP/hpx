@@ -99,14 +99,14 @@ namespace hpx { namespace threads {
     thread_function_type make_thread_function(F&& f)
     {
         return {detail::thread_function<typename std::decay<F>::type>{
-            std::forward<F>(f)}};
+            HPX_FORWARD(F, f)}};
     }
 
     template <typename F>
     thread_function_type make_thread_function_nullary(F&& f)
     {
         return {detail::thread_function_nullary<typename std::decay<F>::type>{
-            std::forward<F>(f)}};
+            HPX_FORWARD(F, f)}};
     }
 
     ///////////////////////////////////////////////////////////////////////////

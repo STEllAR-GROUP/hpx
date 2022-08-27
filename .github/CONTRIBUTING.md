@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2014-2020 Hartmut Kaiser                                       -->
+<!-- Copyright (c) 2014-2022 Hartmut Kaiser                                       -->
 <!--                                                                              -->
 <!-- SPDX-License-Identifier: BSL-1.0                                             -->
 <!-- Distributed under the Boost Software License, Version 1.0. (See accompanying -->
@@ -19,12 +19,13 @@ i.e. pull requests.
 
 The easiest ways to get in contact with us are listed here:
 
-* Mailing list: [hpx-users@stellar.cct.lsu.edu](email:hpx-users@stellar.cct.lsu.edu), [hpx-devel@stellar.cct.lsu.edu](email:hpx-devel@stellar.cct.lsu.edu)
-* IRC channel:  #ste||ar on irc.freenode.net
-* Blog:         [stellar.cct.lsu.edu](stellar.cct.lsu.edu)
+* Mailing list: [hpx-users@stellar-group.org](email:hpx-users@stellar-group.org), [hpx-devel@stellar-group.org](email:hpx-devel@stellar-group.org)
+* IRC channel:  #ste||ar on Libra.Chat
+* Blog:         [hpx.stellar-group.org](hpx.stellar-group.org)
+* More options: See our [support page](https://github.com/STEllAR-GROUP/hpx/blob/master/.github/SUPPORT.md)
 
 The basic approach is to find something fun you want to fix, hack it up, and
-send a `git diff` as a mail attachment to [hpx-devel@stellar.cct.lsu.edu](email:hpx-devel@stellar.cct.lsu.edu)
+send a `git diff` as a mail attachment to [hpx-devel@stellar-group.org](email:hpx-devel@stellar-group.org)
 with a Subject prefixed with 'PATCH', as well as: "made available under the Boost
 Software License V1" license statement. We also need a real name for the git
 commit logs if you usually use an alias. Alternatively, you can create a pull
@@ -157,5 +158,5 @@ Community is an important part of all we do.
 For our project, you can talk to the following people to receive help in
 working through your first bugfix and thinking through the problem:
 
-* @hkaiser, @heller, @wash, @jbjnr
+* @hkaiser, @msimberg, @heller, @wash, @jbjnr
 

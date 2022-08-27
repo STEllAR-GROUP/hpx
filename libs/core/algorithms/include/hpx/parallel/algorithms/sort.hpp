@@ -243,10 +243,11 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
+#include <hpx/parallel/algorithms/detail/pivot.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -267,73 +268,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \cond NOINTERNAL
         static const std::size_t sort_limit_per_task = 65536ul;
 
-        /// Return the iterator to the mid value of the three values
-        /// passed as parameters
-        ///
-        /// \param iter_1 : iterator to the first value
-        /// \param iter_2 : iterator to the second value
-        /// \param iter_3 : iterator to the third value
-        /// \param comp : object for comparing two values
-        /// \return iterator to mid value
-        template <typename Iter, typename Comp>
-        inline constexpr Iter mid3(
-            Iter iter_1, Iter iter_2, Iter iter_3, Comp&& comp)
-        {
-            return HPX_INVOKE(comp, *iter_1, *iter_2) ?
-                (HPX_INVOKE(comp, *iter_2, *iter_3) ?
-                        iter_2 :
-                        (HPX_INVOKE(comp, *iter_1, *iter_3) ? iter_3 :
-                                                              iter_1)) :
-                (HPX_INVOKE(comp, *iter_3, *iter_2) ?
-                        iter_2 :
-                        (HPX_INVOKE(comp, *iter_3, *iter_1) ? iter_3 : iter_1));
-        }
-
-        /// Return the iterator to the mid value of the nine values
-        /// passed as parameters
-        //
-        /// \param iter_1   iterator to the first value
-        /// \param iter_2   iterator to the second value
-        /// \param iter_3   iterator to the third value
-        /// \param iter_4   iterator to the fourth value
-        /// \param iter_5   iterator to the fifth value
-        /// \param iter_6   iterator to the sixth value
-        /// \param iter_7   iterator to the seventh value
-        /// \param iter_8   iterator to the eighth value
-        /// \param iter_9   iterator to the ninth value
-        /// \return iterator to the mid value
-        template <typename Iter, typename Comp>
-        inline constexpr Iter mid9(Iter iter_1, Iter iter_2, Iter iter_3,
-            Iter iter_4, Iter iter_5, Iter iter_6, Iter iter_7, Iter iter_8,
-            Iter iter_9, Comp&& comp)
-        {
-            return mid3(mid3(iter_1, iter_2, iter_3, comp),
-                mid3(iter_4, iter_5, iter_6, comp),
-                mid3(iter_7, iter_8, iter_9, comp), comp);
-        }
-
-        /// Receive a range between first and last, obtain 9 values
-        /// between the elements  including the first and the previous
-        /// to the last. Obtain the iterator to the mid value and swap
-        /// with the first position
-        //
-        /// \param first    iterator to the first element
-        /// \param last     iterator to the last element
-        /// \param comp     object for to Comp two elements
-        template <typename Iter, typename Comp>
-        inline constexpr void pivot9(Iter first, Iter last, Comp&& comp)
-        {
-            std::size_t chunk = (last - first) >> 3;
-            Iter itaux = mid9(first + 1, first + chunk, first + 2 * chunk,
-                first + 3 * chunk, first + 4 * chunk, first + 5 * chunk,
-                first + 6 * chunk, first + 7 * chunk, last - 1, comp);
-#if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
-            std::ranges::iter_swap(first, itaux);
-#else
-            std::iter_swap(first, itaux);
-#endif
-        }
-
         /// \brief this function is the work assigned to each thread in the
         ///        parallel process
         /// \exception
@@ -347,7 +281,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             if (std::size_t(N) <= chunk_size)
             {
                 return execution::async_execute(policy.executor(),
-                    [first, last, comp = std::move(comp)]() -> RandomIt {
+                    [first, last, comp = HPX_MOVE(comp)]() -> RandomIt {
                         std::sort(first, last, comp);
                         return last;
                     });
@@ -419,11 +353,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         if (right.has_exception())
                             errors.push_back(right.get_exception_ptr());
 
-                        throw exception_list(std::move(errors));
+                        throw exception_list(HPX_MOVE(errors));
                     }
                     return last;
                 },
-                std::move(left), std::move(right));
+                HPX_MOVE(left), HPX_MOVE(right));
         }
 
         /// \param [in] first   iterator to the first element to sort
@@ -474,8 +408,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return execution::async_execute(policy.executor(),
                 &sort_thread<typename std::decay<ExPolicy>::type, RandomIt,
                     Comp>,
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<Comp>(comp), chunk_size);
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Comp, comp), chunk_size);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -495,8 +429,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 auto last_iter = detail::advance_to_sentinel(first, last);
                 std::sort(first, last_iter,
-                    util::compare_projected<Comp, Proj>(
-                        std::forward<Comp>(comp), std::forward<Proj>(proj)));
+                    util::compare_projected<Comp&, Proj&>(comp, proj));
                 return last_iter;
             }
 
@@ -516,10 +449,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     // call the sort routine and return the right type,
                     // depending on execution policy
                     return algorithm_result::get(parallel_sort_async(
-                        std::forward<ExPolicy>(policy), first, last,
-                        util::compare_projected<Comp, Proj>(
-                            std::forward<Comp>(comp),
-                            std::forward<Proj>(proj))));
+                        HPX_FORWARD(ExPolicy, policy), first, last,
+                        util::compare_projected<Comp&, Proj&>(comp, proj)));
                 }
                 catch (...)
                 {
@@ -559,8 +490,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return detail::sort<RandomIt>().call(std::forward<ExPolicy>(policy),
-            first, last, std::forward<Comp>(comp), std::forward<Proj>(proj));
+        return detail::sort<RandomIt>().call(HPX_FORWARD(ExPolicy, policy),
+            first, last, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -570,7 +501,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::sort
-    HPX_INLINE_CONSTEXPR_VARIABLE struct sort_t final
+    inline constexpr struct sort_t final
       : hpx::detail::tag_parallel_algorithm<sort_t>
     {
         // clang-format off
@@ -587,15 +518,15 @@ namespace hpx {
                 >::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(hpx::sort_t, RandomIt first,
+        friend void tag_fallback_invoke(hpx::sort_t, RandomIt first,
             RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
             hpx::parallel::v1::detail::sort<RandomIt>().call(
-                hpx::execution::seq, first, last, std::forward<Comp>(comp),
-                std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -613,7 +544,7 @@ namespace hpx {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(hpx::sort_t, ExPolicy&& policy, RandomIt first,
+        tag_fallback_invoke(hpx::sort_t, ExPolicy&& policy, RandomIt first,
             RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
@@ -625,8 +556,8 @@ namespace hpx {
 
             return hpx::util::void_guard<result_type>(),
                    hpx::parallel::v1::detail::sort<RandomIt>().call(
-                       std::forward<ExPolicy>(policy), first, last,
-                       std::forward<Comp>(comp), std::forward<Proj>(proj));
+                       HPX_FORWARD(ExPolicy, policy), first, last,
+                       HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
     } sort{};
 }    // namespace hpx

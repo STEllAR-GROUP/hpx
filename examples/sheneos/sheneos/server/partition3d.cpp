@@ -18,17 +18,15 @@
 #include <utility>
 #include <vector>
 
-#include "partition3d.hpp"
 #include "../read_values.hpp"
+#include "partition3d.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace sheneos
-{
+namespace sheneos {
     mutex_type mtx_{};
 }
 
-namespace sheneos { namespace server
-{
+namespace sheneos { namespace server {
     partition3d::partition3d()
       : energy_shift_(0)
     {
@@ -37,9 +35,9 @@ namespace sheneos { namespace server
         std::memset(delta_, 0, sizeof(delta_));
     }
 
-    inline void
-    partition3d::init_dimension(std::string const& datafilename, int d,
-        dimension const& dim, char const* name, std::unique_ptr<double[]>& values)
+    inline void partition3d::init_dimension(std::string const& datafilename,
+        int d, dimension const& dim, char const* name,
+        std::unique_ptr<double[]>& values)
     {
         // Store all parameters.
         dim_[d] = dim;
@@ -48,24 +46,24 @@ namespace sheneos { namespace server
         // interval (the interpolation algorithm we're using does not go beyond
         // the left hand side).
         std::size_t count = dim.count_;
-        if (dim.offset_ + dim.count_ < dim.size_-2) {
+        if (dim.offset_ + dim.count_ < dim.size_ - 2)
+        {
             dim_[d].count_ += 2;
             ++count;
         }
 
         // Read the full data range.
         values.reset(new double[dim_[d].count_]);
-        extract_data(datafilename, name, values.get(), dim.offset_,
-            dim_[d].count_);
+        extract_data(
+            datafilename, name, values.get(), dim.offset_, dim_[d].count_);
 
         // Extract range (without ghost-zones).
         min_value_[d] = values[0];
-        max_value_[d] = values[count-1];
+        max_value_[d] = values[count - 1];
         delta_[d] = values[1] - values[0];
     }
 
-    inline void
-    partition3d::init_data(std::string const& datafilename,
+    inline void partition3d::init_data(std::string const& datafilename,
         char const* name, std::unique_ptr<double[]>& values,
         std::size_t array_size)
     {
@@ -80,8 +78,10 @@ namespace sheneos { namespace server
         std::lock_guard<mutex_type> l(mtx_);
 
         init_dimension(datafilename, dimension::ye, dimx, "ye", ye_values_);
-        init_dimension(datafilename, dimension::temp, dimy, "logtemp", logtemp_values_);
-        init_dimension(datafilename, dimension::rho, dimz, "logrho", logrho_values_);
+        init_dimension(
+            datafilename, dimension::temp, dimy, "logtemp", logtemp_values_);
+        init_dimension(
+            datafilename, dimension::rho, dimz, "logrho", logrho_values_);
 
         // Initialize the energy shift.
         extract_data(datafilename, "energy_shift", &energy_shift_, 0, 1);
@@ -113,19 +113,18 @@ namespace sheneos { namespace server
 #endif
     }
 
-    inline std::size_t
-    partition3d::get_index(dimension::type d, double value) const
+    inline std::size_t partition3d::get_index(
+        dimension::type d, double value) const
     {
         if (value < min_value_[d] || value > max_value_[d])
         {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                "sheneos::partition3d::get_index",
-                "argument out of range");
+                "sheneos::partition3d::get_index", "argument out of range");
             return 0;
         }
 
-        std::size_t index = static_cast<std::size_t>(
-            (value - min_value_[d]) / delta_[d]);
+        std::size_t index =
+            static_cast<std::size_t>((value - min_value_[d]) / delta_[d]);
 
         // Either the index has to be inside bounds or the requested value
         // corresponds to the right end edge of the managed data range.
@@ -136,49 +135,50 @@ namespace sheneos { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline std::size_t
-    index(std::size_t x, std::size_t y, std::size_t z, dimension const* dim)
+    inline std::size_t index(
+        std::size_t x, std::size_t y, std::size_t z, dimension const* dim)
     {
-        std::size_t idx = z + (y + x * dim[dimension::temp].count_) *
-            dim[dimension::rho].count_;
+        std::size_t idx = z +
+            (y + x * dim[dimension::temp].count_) * dim[dimension::rho].count_;
 
         HPX_ASSERT(idx < dim[dimension::ye].count_ *
-            dim[dimension::temp].count_ * dim[dimension::rho].count_);
+                dim[dimension::temp].count_ * dim[dimension::rho].count_);
 
         return idx;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline double partition3d::tl_interpolate(double* values,
-        std::size_t idx_x, std::size_t idx_y, std::size_t idx_z,
-        double delta_ye, double delta_logtemp, double delta_logrho) const
+    inline double partition3d::tl_interpolate(double* values, std::size_t idx_x,
+        std::size_t idx_y, std::size_t idx_z, double delta_ye,
+        double delta_logtemp, double delta_logrho) const
     {
-        double value000 = values[index(idx_x,   idx_y,   idx_z,   dim_)];
-        double value001 = values[index(idx_x,   idx_y,   idx_z+1, dim_)];
-        double value010 = values[index(idx_x,   idx_y+1, idx_z,   dim_)];
-        double value011 = values[index(idx_x,   idx_y+1, idx_z+1, dim_)];
-        double value100 = values[index(idx_x+1, idx_y,   idx_z,   dim_)];
-        double value101 = values[index(idx_x+1, idx_y,   idx_z+1, dim_)];
-        double value110 = values[index(idx_x+1, idx_y+1, idx_z,   dim_)];
-        double value111 = values[index(idx_x+1, idx_y+1, idx_z+1, dim_)];
+        double value000 = values[index(idx_x, idx_y, idx_z, dim_)];
+        double value001 = values[index(idx_x, idx_y, idx_z + 1, dim_)];
+        double value010 = values[index(idx_x, idx_y + 1, idx_z, dim_)];
+        double value011 = values[index(idx_x, idx_y + 1, idx_z + 1, dim_)];
+        double value100 = values[index(idx_x + 1, idx_y, idx_z, dim_)];
+        double value101 = values[index(idx_x + 1, idx_y, idx_z + 1, dim_)];
+        double value110 = values[index(idx_x + 1, idx_y + 1, idx_z, dim_)];
+        double value111 = values[index(idx_x + 1, idx_y + 1, idx_z + 1, dim_)];
 
         double comp_delta_ye = 1. - delta_ye;
         double comp_delta_logtemp = 1. - delta_logtemp;
         double comp_delta_logrho = 1. - delta_logrho;
 
-        return value000 * comp_delta_ye * comp_delta_logtemp * comp_delta_logrho +
-               value001 * comp_delta_ye * comp_delta_logtemp * delta_logrho +
-               value010 * comp_delta_ye * delta_logtemp      * comp_delta_logrho +
-               value011 * comp_delta_ye * delta_logtemp      * delta_logrho +
-               value100 * delta_ye      * comp_delta_logtemp * comp_delta_logrho +
-               value101 * delta_ye      * comp_delta_logtemp * delta_logrho +
-               value110 * delta_ye      * delta_logtemp      * comp_delta_logrho +
-               value111 * delta_ye      * delta_logtemp      * delta_logrho;
+        return value000 * comp_delta_ye * comp_delta_logtemp *
+            comp_delta_logrho +
+            value001 * comp_delta_ye * comp_delta_logtemp * delta_logrho +
+            value010 * comp_delta_ye * delta_logtemp * comp_delta_logrho +
+            value011 * comp_delta_ye * delta_logtemp * delta_logrho +
+            value100 * delta_ye * comp_delta_logtemp * comp_delta_logrho +
+            value101 * delta_ye * comp_delta_logtemp * delta_logrho +
+            value110 * delta_ye * delta_logtemp * comp_delta_logrho +
+            value111 * delta_ye * delta_logtemp * delta_logrho;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::vector<double> partition3d::interpolate(double ye, double temp,
-        double rho, std::uint32_t eosvalues) const
+    std::vector<double> partition3d::interpolate(
+        double ye, double temp, double rho, std::uint32_t eosvalues) const
     {
         double logrho = std::log10(rho);
         double logtemp = std::log10(temp);
@@ -188,64 +188,69 @@ namespace sheneos { namespace server
         std::size_t idx_logrho = get_index(dimension::rho, logrho);
 
         double delta_ye = (ye - ye_values_[idx_ye]) / delta_[dimension::ye];
-        double delta_logtemp = (logtemp - logtemp_values_[idx_logtemp])
-            / delta_[dimension::temp];
-        double delta_logrho = (logrho - logrho_values_[idx_logrho])
-            / delta_[dimension::rho];
+        double delta_logtemp =
+            (logtemp - logtemp_values_[idx_logtemp]) / delta_[dimension::temp];
+        double delta_logrho =
+            (logrho - logrho_values_[idx_logrho]) / delta_[dimension::rho];
 
         std::vector<double> results;
         results.reserve(19);
 
         // Calculate all required values.
-        if (eosvalues & logpress) {
-            double value = tl_interpolate(logpress_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho);
+        if (eosvalues & logpress)
+        {
+            double value = tl_interpolate(logpress_values_.get(), idx_ye,
+                idx_logtemp, idx_logrho, delta_ye, delta_logtemp, delta_logrho);
             results.push_back(std::pow(10., value));
         }
-        if (eosvalues & logenergy) {
-            double value = tl_interpolate(logenergy_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho);
+        if (eosvalues & logenergy)
+        {
+            double value = tl_interpolate(logenergy_values_.get(), idx_ye,
+                idx_logtemp, idx_logrho, delta_ye, delta_logtemp, delta_logrho);
             results.push_back(std::pow(10., value) - energy_shift_);
         }
-        if (eosvalues & entropy) {
-            results.push_back(tl_interpolate(entropy_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho));
+        if (eosvalues & entropy)
+        {
+            results.push_back(
+                tl_interpolate(entropy_values_.get(), idx_ye, idx_logtemp,
+                    idx_logrho, delta_ye, delta_logtemp, delta_logrho));
         }
-        if (eosvalues & munu) {
-            results.push_back(tl_interpolate(munu_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho));
+        if (eosvalues & munu)
+        {
+            results.push_back(
+                tl_interpolate(munu_values_.get(), idx_ye, idx_logtemp,
+                    idx_logrho, delta_ye, delta_logtemp, delta_logrho));
         }
-        if (eosvalues & cs2) {
-            results.push_back(tl_interpolate(cs2_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho));
+        if (eosvalues & cs2)
+        {
+            results.push_back(
+                tl_interpolate(cs2_values_.get(), idx_ye, idx_logtemp,
+                    idx_logrho, delta_ye, delta_logtemp, delta_logrho));
         }
-        if (eosvalues & dedt) {
-            results.push_back(tl_interpolate(dedt_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho));
+        if (eosvalues & dedt)
+        {
+            results.push_back(
+                tl_interpolate(dedt_values_.get(), idx_ye, idx_logtemp,
+                    idx_logrho, delta_ye, delta_logtemp, delta_logrho));
         }
-        if (eosvalues & dpdrhoe) {
-            results.push_back(tl_interpolate(dpdrhoe_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho));
+        if (eosvalues & dpdrhoe)
+        {
+            results.push_back(
+                tl_interpolate(dpdrhoe_values_.get(), idx_ye, idx_logtemp,
+                    idx_logrho, delta_ye, delta_logtemp, delta_logrho));
         }
-        if (eosvalues & dpderho) {
-            results.push_back(tl_interpolate(dpderho_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho));
+        if (eosvalues & dpderho)
+        {
+            results.push_back(
+                tl_interpolate(dpderho_values_.get(), idx_ye, idx_logtemp,
+                    idx_logrho, delta_ye, delta_logtemp, delta_logrho));
         }
 
         return results;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace detail
-    {
+    namespace detail {
         inline int numberof_setbits(std::uint32_t i)
         {
             i = i - ((i >> 1) & 0x55555555);
@@ -257,11 +262,11 @@ namespace sheneos { namespace server
         {
             return numberof_setbits(i) > 1;
         }
-    }
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    double partition3d::interpolate_one(double ye, double temp,
-        double rho, std::uint32_t eosvalue) const
+    double partition3d::interpolate_one(
+        double ye, double temp, double rho, std::uint32_t eosvalue) const
     {
         double logrho = std::log10(rho);
         double logtemp = std::log10(temp);
@@ -271,63 +276,57 @@ namespace sheneos { namespace server
         std::size_t idx_logrho = get_index(dimension::rho, logrho);
 
         double delta_ye = (ye - ye_values_[idx_ye]) / delta_[dimension::ye];
-        double delta_logtemp = (logtemp - logtemp_values_[idx_logtemp])
-            / delta_[dimension::temp];
-        double delta_logrho = (logrho - logrho_values_[idx_logrho])
-            / delta_[dimension::rho];
+        double delta_logtemp =
+            (logtemp - logtemp_values_[idx_logtemp]) / delta_[dimension::temp];
+        double delta_logrho =
+            (logrho - logrho_values_[idx_logrho]) / delta_[dimension::rho];
 
-        if (detail::more_than_one_value_requested(eosvalue)) {
+        if (detail::more_than_one_value_requested(eosvalue))
+        {
             HPX_THROW_EXCEPTION(hpx::bad_parameter,
                 "partition3d::interpolate_one",
                 "requested to interpolate more than one physical value: " +
-                std::to_string(eosvalue));
+                    std::to_string(eosvalue));
         }
 
         // Calculate all required values.
-        switch (eosvalue) {
+        switch (eosvalue)
+        {
         case logpress:
-            {
-                double value = tl_interpolate(logpress_values_.get(),
-                    idx_ye, idx_logtemp, idx_logrho,
-                    delta_ye, delta_logtemp, delta_logrho);
-                return std::pow(10., value);
-            }
+        {
+            double value = tl_interpolate(logpress_values_.get(), idx_ye,
+                idx_logtemp, idx_logrho, delta_ye, delta_logtemp, delta_logrho);
+            return std::pow(10., value);
+        }
         case logenergy:
-            {
-                double value = tl_interpolate(logenergy_values_.get(),
-                    idx_ye, idx_logtemp, idx_logrho,
-                    delta_ye, delta_logtemp, delta_logrho);
-                return std::pow(10., value) - energy_shift_;
-            }
+        {
+            double value = tl_interpolate(logenergy_values_.get(), idx_ye,
+                idx_logtemp, idx_logrho, delta_ye, delta_logtemp, delta_logrho);
+            return std::pow(10., value) - energy_shift_;
+        }
         case entropy:
-            return tl_interpolate(entropy_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho);
+            return tl_interpolate(entropy_values_.get(), idx_ye, idx_logtemp,
+                idx_logrho, delta_ye, delta_logtemp, delta_logrho);
 
         case munu:
-            return tl_interpolate(munu_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho);
+            return tl_interpolate(munu_values_.get(), idx_ye, idx_logtemp,
+                idx_logrho, delta_ye, delta_logtemp, delta_logrho);
 
         case cs2:
-            return tl_interpolate(cs2_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho);
+            return tl_interpolate(cs2_values_.get(), idx_ye, idx_logtemp,
+                idx_logrho, delta_ye, delta_logtemp, delta_logrho);
 
         case dedt:
-            return tl_interpolate(dedt_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho);
+            return tl_interpolate(dedt_values_.get(), idx_ye, idx_logtemp,
+                idx_logrho, delta_ye, delta_logtemp, delta_logrho);
 
         case dpdrhoe:
-            return tl_interpolate(dpdrhoe_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho);
+            return tl_interpolate(dpdrhoe_values_.get(), idx_ye, idx_logtemp,
+                idx_logrho, delta_ye, delta_logtemp, delta_logrho);
 
         case dpderho:
-            return tl_interpolate(dpderho_values_.get(),
-                idx_ye, idx_logtemp, idx_logrho,
-                delta_ye, delta_logtemp, delta_logrho);
+            return tl_interpolate(dpderho_values_.get(), idx_ye, idx_logtemp,
+                idx_logrho, delta_ye, delta_logtemp, delta_logrho);
 
         default:
             break;
@@ -335,14 +334,14 @@ namespace sheneos { namespace server
 
         HPX_THROW_EXCEPTION(hpx::bad_parameter, "partition3d::interpolate_one",
             "requested to interpolate unknown physical value: " +
-            std::to_string(eosvalue));
+                std::to_string(eosvalue));
 
         return 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline double partition3d::interpolate_one(sheneos_coord const& c,
-        std::uint32_t eosvalue) const
+    inline double partition3d::interpolate_one(
+        sheneos_coord const& c, std::uint32_t eosvalue) const
     {
         return interpolate_one(c.ye_, c.temp_, c.rho_, eosvalue);
     }
@@ -354,9 +353,8 @@ namespace sheneos { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::vector<double>
-    partition3d::interpolate_one_bulk(std::vector<sheneos_coord> const& coords,
-        std::uint32_t eosvalue) const
+    std::vector<double> partition3d::interpolate_one_bulk(
+        std::vector<sheneos_coord> const& coords, std::uint32_t eosvalue) const
     {
         std::vector<double> result;
         result.reserve(coords.size());
@@ -371,11 +369,10 @@ namespace sheneos { namespace server
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::vector<std::vector<double> >
-    partition3d::interpolate_bulk(std::vector<sheneos_coord> const& coords,
-        std::uint32_t eosvalues) const
+    std::vector<std::vector<double>> partition3d::interpolate_bulk(
+        std::vector<sheneos_coord> const& coords, std::uint32_t eosvalues) const
     {
-        std::vector<std::vector<double> > result;
+        std::vector<std::vector<double>> result;
         result.reserve(coords.size());
 
         // interpolate as requested
@@ -386,57 +383,55 @@ namespace sheneos { namespace server
 
         return result;
     }
-}}
+}}    // namespace sheneos::server
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization
-{
+namespace hpx { namespace serialization {
     ///////////////////////////////////////////////////////////////////////////
     // Implement the serialization functions.
-    void serialize(input_archive& ar,
-        sheneos::sheneos_coord& coord, unsigned int const)
+    void serialize(
+        input_archive& ar, sheneos::sheneos_coord& coord, unsigned int const)
     {
-        ar & coord.ye_ & coord.temp_ & coord.rho_;
+        ar& coord.ye_& coord.temp_& coord.rho_;
     }
 
-    void serialize(output_archive& ar,
-        sheneos::sheneos_coord& coord, unsigned int const)
+    void serialize(
+        output_archive& ar, sheneos::sheneos_coord& coord, unsigned int const)
     {
-        ar & coord.ye_ & coord.temp_ & coord.rho_;
+        ar& coord.ye_& coord.temp_& coord.rho_;
     }
-}}
+}}    // namespace hpx::serialization
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef sheneos::server::partition3d partition3d_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Serialization support for the actions.
-HPX_REGISTER_ACTION(partition3d_type::init_action,
-    sheneos_partition3d_init_action);
+HPX_REGISTER_ACTION(
+    partition3d_type::init_action, sheneos_partition3d_init_action)
 HPX_REGISTER_ACTION(partition3d_type::interpolate_action,
-    sheneos_partition3d_interpolate_action);
+    sheneos_partition3d_interpolate_action)
 HPX_REGISTER_ACTION(partition3d_type::interpolate_one_action,
-    sheneos_partition3d_interpolate_one_action);
+    sheneos_partition3d_interpolate_one_action)
 HPX_REGISTER_ACTION(partition3d_type::interpolate_bulk_action,
-    sheneos_partition3d_interpolate_bulk_action);
+    sheneos_partition3d_interpolate_bulk_action)
 HPX_REGISTER_ACTION(partition3d_type::interpolate_one_bulk_action,
-    sheneos_partition3d_interpolate_one_bulk_action);
+    sheneos_partition3d_interpolate_one_bulk_action)
 
 HPX_REGISTER_COMPONENT(
-    hpx::components::component<partition3d_type>,
-    sheneos_partition_type);
+    hpx::components::component<partition3d_type>, sheneos_partition_type)
 
-HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<std::vector<std::vector<double> > >::set_value_action,
-    set_value_action_vector_vector_double);
+HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<
+                        std::vector<std::vector<double>>>::set_value_action,
+    set_value_action_vector_vector_double)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<std::vector<std::vector<double> > >,
+    hpx::lcos::base_lco_with_value<std::vector<std::vector<double>>>,
     hpx::components::component_base_lco_with_value);
 
 HPX_REGISTER_ACTION(
-    hpx::lcos::base_lco_with_value<std::vector<double> >::set_value_action,
-    set_value_action_vector_double);
+    hpx::lcos::base_lco_with_value<std::vector<double>>::set_value_action,
+    set_value_action_vector_double)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::base_lco_with_value<std::vector<double> >,
+    hpx::lcos::base_lco_with_value<std::vector<double>>,
     hpx::components::component_base_lco_with_value);
 #endif

@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
+//  Copyright (c) 2019-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +13,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
 
     using extra_archive_data_id_type = void*;
 
@@ -47,7 +48,7 @@ namespace hpx { namespace serialization { namespace detail {
 
     struct extra_archive_data_node
     {
-        extra_archive_data_node() noexcept
+        constexpr extra_archive_data_node() noexcept
           : ptr_()
           , id_(nullptr)
         {
@@ -61,7 +62,7 @@ namespace hpx { namespace serialization { namespace detail {
             extra_archive_data_node&&) noexcept = default;
 
         template <typename T>
-        inline T* get() noexcept;
+        inline T* get() const noexcept;
 
         std::unique_ptr<extra_archive_data_member_base> ptr_;
         extra_archive_data_id_type id_;
@@ -69,8 +70,9 @@ namespace hpx { namespace serialization { namespace detail {
 
     struct extra_archive_data_member_base
     {
-        extra_archive_data_member_base(extra_archive_data_node&& next) noexcept
-          : next_(std::move(next))
+        explicit extra_archive_data_member_base(
+            extra_archive_data_node&& next) noexcept
+          : next_(HPX_MOVE(next))
         {
         }
 
@@ -83,24 +85,24 @@ namespace hpx { namespace serialization { namespace detail {
     template <typename T>
     struct extra_archive_data_member : extra_archive_data_member_base
     {
-        extra_archive_data_member(extra_archive_data_node&& next)
-          : extra_archive_data_member_base(std::move(next))
+        explicit constexpr extra_archive_data_member(
+            extra_archive_data_node&& next) noexcept
+          : extra_archive_data_member_base(HPX_MOVE(next))
         {
         }
 
-        extra_archive_data_member(
-            extra_archive_data_member const&) noexcept = delete;
+        extra_archive_data_member(extra_archive_data_member const&) = delete;
         extra_archive_data_member& operator=(
-            extra_archive_data_member const&) noexcept = delete;
+            extra_archive_data_member const&) = delete;
 
-        T* value() noexcept
+        constexpr T* value() const noexcept
         {
-            return std::addressof(t_);
+            return std::addressof(const_cast<T&>(t_));
         }
 
         void reset() override
         {
-            reset_extra_archive_data(&t_);
+            reset_extra_archive_data(value());
         }
 
         T t_;
@@ -109,13 +111,13 @@ namespace hpx { namespace serialization { namespace detail {
     template <typename T>
     extra_archive_data_node::extra_archive_data_node(
         T*, extra_archive_data_node&& next)
-      : ptr_(new extra_archive_data_member<T>(std::move(next)))
+      : ptr_(new extra_archive_data_member<T>(HPX_MOVE(next)))
       , id_(extra_archive_data_id<T>())
     {
     }
 
     template <typename T>
-    T* extra_archive_data_node::get() noexcept
+    T* extra_archive_data_node::get() const noexcept
     {
         auto id = extra_archive_data_id<T>();
         if (id_ == nullptr)
@@ -125,7 +127,6 @@ namespace hpx { namespace serialization { namespace detail {
         }
 
         HPX_ASSERT(ptr_);
-
         if (id_ == id)
         {
             return static_cast<extra_archive_data_member<T>*>(ptr_.get())
@@ -140,7 +141,7 @@ namespace hpx { namespace serialization { namespace detail {
         extra_archive_data() noexcept = default;
 
         template <typename T>
-        T& get() noexcept
+        T& get()
         {
             if (T* t = try_get<T>())
             {
@@ -148,12 +149,12 @@ namespace hpx { namespace serialization { namespace detail {
             }
 
             head_ = extra_archive_data_node(
-                static_cast<T*>(nullptr), std::move(head_));
+                static_cast<T*>(nullptr), HPX_MOVE(head_));
             return *try_get<T>();
         }
 
         template <typename T>
-        T* try_get() noexcept
+        T* try_get() const noexcept
         {
             return head_.get<T>();
         }
@@ -171,5 +172,4 @@ namespace hpx { namespace serialization { namespace detail {
 
         extra_archive_data_node head_;
     };
-
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail

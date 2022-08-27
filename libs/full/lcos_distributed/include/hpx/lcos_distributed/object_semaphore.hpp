@@ -30,13 +30,13 @@ namespace hpx { namespace lcos {
 
         object_semaphore() = default;
 
-        explicit object_semaphore(naming::id_type gid)
-          : base_type(std::move(gid))
+        explicit object_semaphore(hpx::id_type gid)
+          : base_type(HPX_MOVE(gid))
         {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        lcos::future<void> signal(
+        hpx::future<void> signal(
             launch::async_policy, ValueType const& val, std::uint64_t count = 1)
         {
             HPX_ASSERT(this->get_id());
@@ -51,7 +51,7 @@ namespace hpx { namespace lcos {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        lcos::future<ValueType> get(launch::async_policy)
+        hpx::future<ValueType> get(launch::async_policy)
         {
             HPX_ASSERT(this->get_id());
             typedef typename server_type::get_action action_type;

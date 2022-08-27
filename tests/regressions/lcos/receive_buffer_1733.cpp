@@ -43,7 +43,8 @@ public:
     test_receive_buffer_server()
       : from_(hpx::find_from_basename(
             buffer_basename, idx(hpx::get_locality_id(), -1)))
-    {}
+    {
+    }
 
     void from(std::size_t t, std::size_t d)
     {
@@ -52,8 +53,9 @@ public:
 
     void do_work();
 
-    HPX_DEFINE_COMPONENT_ACTION(test_receive_buffer_server, from, from_action);
-    HPX_DEFINE_COMPONENT_ACTION(test_receive_buffer_server, do_work, do_work_action);
+    HPX_DEFINE_COMPONENT_ACTION(test_receive_buffer_server, from, from_action)
+    HPX_DEFINE_COMPONENT_ACTION(
+        test_receive_buffer_server, do_work, do_work_action)
 
 protected:
     hpx::future<std::size_t> receive(std::size_t t)
@@ -70,31 +72,30 @@ private:
     hpx::lcos::local::receive_buffer<std::size_t> buffer_;
 };
 
-typedef hpx::components::component<
-        test_receive_buffer_server
-    > server_type;
-HPX_REGISTER_COMPONENT(server_type, server_type);
+typedef hpx::components::component<test_receive_buffer_server> server_type;
+HPX_REGISTER_COMPONENT(server_type, server_type)
 
 typedef server_type::from_action from_action;
-HPX_REGISTER_ACTION(from_action);
+HPX_REGISTER_ACTION(from_action)
 
 typedef server_type::do_work_action do_work_action;
-HPX_REGISTER_ACTION(do_work_action);
+HPX_REGISTER_ACTION(do_work_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_receive_buffer
-  : hpx::components::client_base<test_receive_buffer, test_receive_buffer_server>
+  : hpx::components::client_base<test_receive_buffer,
+        test_receive_buffer_server>
 {
-    typedef hpx::components::client_base<
-            test_receive_buffer, test_receive_buffer_server
-        > base_type;
+    typedef hpx::components::client_base<test_receive_buffer,
+        test_receive_buffer_server>
+        base_type;
 
     // construct new instances/wrap existing steppers from other localities
     test_receive_buffer()
       : base_type(hpx::new_<test_receive_buffer_server>(hpx::find_here()))
     {
-        hpx::register_with_basename(buffer_basename, get_id(),
-            hpx::get_locality_id());
+        hpx::register_with_basename(
+            buffer_basename, get_id(), hpx::get_locality_id());
     }
 
     ~test_receive_buffer()
@@ -102,9 +103,10 @@ struct test_receive_buffer
         hpx::unregister_with_basename(buffer_basename, hpx::get_locality_id());
     }
 
-    test_receive_buffer(hpx::future<hpx::id_type> && id)
+    test_receive_buffer(hpx::future<hpx::id_type>&& id)
       : base_type(std::move(id))
-    {}
+    {
+    }
 
     hpx::future<void> do_work()
     {
@@ -114,23 +116,20 @@ struct test_receive_buffer
 
 void test_receive_buffer_server::do_work()
 {
-    send(0, 0);        // send initial value
+    send(0, 0);    // send initial value
 
-    std::vector<hpx::future<std::size_t> > steps;
+    std::vector<hpx::future<std::size_t>> steps;
     steps.reserve(MAX_ITERATIONS);
 
     for (std::size_t i = 0; i != MAX_ITERATIONS; ++i)
     {
         hpx::future<std::size_t> f = receive(i);
         steps.push_back(
-            f.then(
-                [this, i](hpx::future<std::size_t> && f) -> std::size_t
-                {
-                    std::size_t val = f.get();
-                    send(i + 1, val + 1);
-                    return val;
-                })
-        );
+            f.then([this, i](hpx::future<std::size_t>&& f) -> std::size_t {
+                std::size_t val = f.get();
+                send(i + 1, val + 1);
+                return val;
+            }));
     }
 
     // receive final value
@@ -160,9 +159,7 @@ int hpx_main()
 int main(int argc, char* argv[])
 {
     // This test requires to run hpx_main on all localities
-    std::vector<std::string> const cfg = {
-        "hpx.run_hpx_main!=1"
-    };
+    std::vector<std::string> const cfg = {"hpx.run_hpx_main!=1"};
 
     hpx::init_params init_args;
     init_args.cfg = cfg;

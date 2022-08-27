@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,7 +18,9 @@
 #include <hpx/init_runtime/pre_main.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/performance_counters/agas_counter_types.hpp>
+#include <hpx/performance_counters/parcelhandler_counter_types.hpp>
 #include <hpx/performance_counters/threadmanager_counter_types.hpp>
 #include <hpx/runtime_components/console_logging.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
@@ -64,7 +66,8 @@ namespace hpx { namespace detail {
                 "counter types";
 
 #if defined(HPX_HAVE_NETWORKING)
-        applier::get_applier().get_parcel_handler().register_counter_types();
+        performance_counters::register_parcelhandler_counter_types(
+            applier::get_applier().get_parcel_handler());
         lbt_ << "(2nd stage) pre_main: registered parcelset performance "
                 "counter types";
 #endif
@@ -75,9 +78,10 @@ namespace hpx { namespace detail {
     static void register_message_handlers()
     {
         runtime_distributed& rtd = get_runtime_distributed();
-        for (auto const& t : detail::get_message_handler_registrations())
+        for (auto const& t :
+            parcelset::detail::get_message_handler_registrations())
         {
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             rtd.register_message_handler(hpx::get<0>(t), hpx::get<1>(t), ec);
         }
         lbt_ << "(3rd stage) pre_main: registered message handlers";
@@ -118,11 +122,11 @@ namespace hpx { namespace detail {
             // executed.
             register_counter_types();
 
-            rt.set_state(state_pre_startup);
+            rt.set_state(hpx::state::pre_startup);
             runtime_support::call_startup_functions(find_here(), true);
             lbt_ << "(3rd stage) pre_main: ran pre-startup functions";
 
-            rt.set_state(state_startup);
+            rt.set_state(hpx::state::startup);
             runtime_support::call_startup_functions(find_here(), false);
             lbt_ << "(4th stage) pre_main: ran startup functions";
         }
@@ -155,13 +159,13 @@ namespace hpx { namespace detail {
             }
 
             // create our global barrier...
-            hpx::lcos::barrier::get_global_barrier() =
-                hpx::lcos::barrier::create_global_barrier();
+            hpx::distributed::barrier::get_global_barrier() =
+                hpx::distributed::barrier::create_global_barrier();
 
             // Second stage bootstrap synchronizes component loading across all
             // localities, ensuring that the component namespace tables are fully
             // populated before user code is executed.
-            lcos::barrier::synchronize();
+            distributed::barrier::synchronize();
             lbt_ << "(2nd stage) pre_main: passed 2nd stage boot barrier";
 
             // Work on registration requests for message handler plugins
@@ -174,14 +178,14 @@ namespace hpx { namespace detail {
 
             // Second stage bootstrap synchronizes performance counter loading
             // across all localities.
-            lcos::barrier::synchronize();
+            distributed::barrier::synchronize();
             lbt_ << "(3rd stage) pre_main: passed 3rd stage boot barrier";
 
             runtime_support::call_startup_functions(find_here(), true);
             lbt_ << "(3rd stage) pre_main: ran pre-startup functions";
 
             // Third stage separates pre-startup and startup function phase.
-            lcos::barrier::synchronize();
+            distributed::barrier::synchronize();
             lbt_ << "(4th stage) pre_main: passed 4th stage boot barrier";
 
             runtime_support::call_startup_functions(find_here(), false);
@@ -191,7 +195,7 @@ namespace hpx { namespace detail {
             // localities. This is done after component loading to guarantee that
             // all user code, including startup functions, are only run after the
             // component tables are populated.
-            lcos::barrier::synchronize();
+            distributed::barrier::synchronize();
             lbt_ << "(5th stage) pre_main: passed 4th stage boot barrier";
         }
 
@@ -221,9 +225,9 @@ namespace hpx { namespace detail {
                  << connect_back_to;
 
             // inform launching process that this locality is up and running
-            hpx::lcos::latch l;
+            hpx::distributed::latch l;
             l.connect_to(connect_back_to);
-            l.count_down_and_wait();
+            l.arrive_and_wait();
 
             lbt_ << "(6th stage) runtime::run_helper: "
                     "synchronized with latch: "
@@ -231,6 +235,12 @@ namespace hpx { namespace detail {
         }
 
         return 0;
+    }
+
+    void post_main()
+    {
+        // simply destroy global barrier
+        hpx::distributed::barrier::get_global_barrier().detach();
     }
 }}    // namespace hpx::detail
 

@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2017-2020 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -256,11 +256,11 @@ namespace hpx {
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -301,8 +301,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename Reduce_, typename Convert_>
             HPX_HOST_DEVICE transform_reduce_iteration(
                 Reduce_&& reduce, Convert_&& convert)
-              : reduce_(std::forward<Reduce_>(reduce))
-              , convert_(std::forward<Convert_>(convert))
+              : reduce_(HPX_FORWARD(Reduce_, reduce))
+              , convert_(HPX_FORWARD(Convert_, convert))
             {
             }
 
@@ -320,8 +320,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             HPX_HOST_DEVICE transform_reduce_iteration(
                 transform_reduce_iteration&& rhs)
-              : reduce_(std::move(rhs.reduce_))
-              , convert_(std::move(rhs.convert_))
+              : reduce_(HPX_MOVE(rhs.reduce_))
+              , convert_(HPX_MOVE(rhs.convert_))
             {
             }
 #endif
@@ -338,13 +338,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using reference =
                     typename std::iterator_traits<Iter>::reference;
 
-                T val = hpx::util::invoke(convert_, *part_begin);
+                T val = HPX_INVOKE(convert_, *part_begin);
                 return util::accumulate_n(++part_begin, --part_size,
-                    std::move(val),
+                    HPX_MOVE(val),
                     [HPX_CXX20_CAPTURE_THIS(=)](
                         T const& res, reference next) mutable -> T {
-                        return hpx::util::invoke(
-                            reduce_, res, hpx::util::invoke(convert_, next));
+                        return HPX_INVOKE(
+                            reduce_, res, HPX_INVOKE(convert_, next));
                     });
             }
         };
@@ -366,10 +366,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using value_type =
                     typename std::iterator_traits<Iter>::value_type;
 
-                return detail::accumulate(first, last, std::forward<T_>(init),
+                return detail::accumulate(first, last, HPX_FORWARD(T_, init),
                     [&r, &conv](T const& res, value_type const& next) -> T {
-                        return hpx::util::invoke(
-                            r, res, hpx::util::invoke(conv, next));
+                        return HPX_INVOKE(r, res, HPX_INVOKE(conv, next));
                     });
             }
 
@@ -383,66 +382,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     T init_ = init;
                     return util::detail::algorithm_result<ExPolicy, T>::get(
-                        std::move(init_));
+                        HPX_MOVE(init_));
                 }
 
                 auto f1 =
                     transform_reduce_iteration<T, ExPolicy, Reduce, Convert>(
-                        std::forward<Reduce>(r), std::forward<Convert>(conv));
+                        HPX_FORWARD(Reduce, r), HPX_FORWARD(Convert, conv));
 
                 return util::partitioner<ExPolicy, T>::call(
-                    std::forward<ExPolicy>(policy), first,
-                    detail::distance(first, last), std::move(f1),
-                    hpx::unwrapping([init = std::forward<T_>(init),
-                                        r = std::forward<Reduce>(r)](
-                                        std::vector<T>&& results) mutable -> T {
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1),
+                    hpx::unwrapping([init = HPX_FORWARD(T_, init),
+                                        r = HPX_FORWARD(Reduce, r)](
+                                        auto&& results) mutable -> T {
                         return util::accumulate_n(hpx::util::begin(results),
                             hpx::util::size(results), init, r);
                     }));
             }
         };
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename T, typename Reduce,
-        typename Convert,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value &&
-            hpx::is_invocable_v<Convert,
-                typename std::iterator_traits<FwdIter>::value_type> &&
-            hpx::is_invocable_v<Reduce,
-                typename hpx::util::invoke_result<
-                    Convert, typename std::iterator_traits<FwdIter>::value_type
-                >::type,
-                typename hpx::util::invoke_result<
-                    Convert, typename std::iterator_traits<FwdIter>::value_type
-                >::type
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::transform_reduce is deprecated, use "
-        "hpx::transform_reduce instead")
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce(ExPolicy&& policy, FwdIter first, FwdIter last, T init,
-            Reduce&& red_op, Convert&& conv_op)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-            "Requires at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::transform_reduce<T>().call(
-            std::forward<ExPolicy>(policy), first, last, std::forward<T>(init),
-            std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // transform_reduce_binary
     namespace detail {
@@ -453,10 +411,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
             F f_;
 
             template <typename Iter1, typename Iter2>
-            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(Iter1 it1,
-                Iter2 it2) -> decltype(hpx::util::invoke(f_, *it1, *it2))
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
+                Iter1 it1, Iter2 it2) -> decltype(HPX_INVOKE(f_, *it1, *it2))
             {
-                return hpx::util::invoke(f_, *it1, *it2);
+                return HPX_INVOKE(f_, *it1, *it2);
             }
         };
 
@@ -473,8 +431,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
                 Iter1 it1, Iter2 it2)
             {
-                part_sum_ = hpx::util::invoke(
-                    op1_, part_sum_, hpx::util::invoke(op2_, *it1, *it2));
+                part_sum_ =
+                    HPX_INVOKE(op1_, part_sum_, HPX_INVOKE(op2_, *it1, *it2));
             }
         };
 
@@ -503,7 +461,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::loop2<ExPolicy>(std::false_type(), first1, last1,
                         first2,
                         transform_reduce_binary_partition<Op1, Op2, T>{
-                            std::forward<Op1>(op1), std::forward<Op2>(op2),
+                            HPX_FORWARD(Op1, op1), HPX_FORWARD(Op2, op2),
                             init});
                     return init;
                 }
@@ -521,9 +479,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // of the elements of a value-pack
                 auto result = util::detail::accumulate_values<ExPolicy>(
                     [&op1](T const& sum, T&& val) -> T {
-                        return hpx::util::invoke(op1, sum, val);
+                        return HPX_INVOKE(op1, sum, val);
                     },
-                    std::move(part_sum), std::move(init));
+                    HPX_MOVE(part_sum), HPX_MOVE(init));
 
                 // the vectorization might not cover all of the sequences,
                 // handle the remainder directly
@@ -532,8 +490,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::loop2<ExPolicy>(std::false_type(), p.first, last1,
                         p.second,
                         transform_reduce_binary_partition<Op1, Op2,
-                            decltype(result)>{std::forward<Op1>(op1),
-                            std::forward<Op2>(op2), result});
+                            decltype(result)>{HPX_FORWARD(Op1, op1),
+                            HPX_FORWARD(Op2, op2), result});
                 }
 
                 return util::detail::extract_value<ExPolicy>(result);
@@ -552,12 +510,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 if (first1 == last1)
                 {
-                    return result::get(std::forward<T_>(init));
+                    return result::get(HPX_FORWARD(T_, init));
                 }
 
                 difference_type count = detail::distance(first1, last1);
 
-                auto f1 = [op1, op2 = std::forward<Op2>(op2)](
+                auto f1 = [op1, op2 = HPX_FORWARD(Op2, op2)](
                               zip_iterator part_begin,
                               std::size_t part_size) mutable -> T {
                     auto iters = part_begin.get_iterator_tuple();
@@ -578,8 +536,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         util::loop2<ExPolicy>(std::false_type(), it1, last1,
                             it2,
                             transform_reduce_binary_partition<Op1, Op2,
-                                decltype(result)>{std::forward<Op1>(op1),
-                                std::forward<Op2>(op2), result});
+                                decltype(result)>{HPX_FORWARD(Op1, op1),
+                                HPX_FORWARD(Op2, op2), result});
 
                         return util::detail::extract_value<ExPolicy>(result);
                     }
@@ -597,7 +555,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     // for each of the elements of a value-pack
                     auto result = util::detail::accumulate_values<ExPolicy>(
                         [&op1](T const& sum, T&& val) -> T {
-                            return hpx::util::invoke(op1, sum, val);
+                            return HPX_INVOKE(op1, sum, val);
                         },
                         part_sum);
 
@@ -608,8 +566,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         util::loop2<ExPolicy>(std::false_type(), p.first, last1,
                             p.second,
                             transform_reduce_binary_partition<Op1, Op2,
-                                decltype(result)>{std::forward<Op1>(op1),
-                                std::forward<Op2>(op2), result});
+                                decltype(result)>{HPX_FORWARD(Op1, op1),
+                                HPX_FORWARD(Op2, op2), result});
                     }
 
                     return util::detail::extract_value<ExPolicy>(result);
@@ -618,91 +576,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using hpx::util::make_zip_iterator;
 
                 return util::partitioner<ExPolicy, T>::call(
-                    std::forward<ExPolicy>(policy),
-                    make_zip_iterator(first1, first2), count, std::move(f1),
-                    [init = std::forward<T_>(init),
-                        op1 = std::forward<Op1>(op1)](
-                        std::vector<hpx::future<T>>&& results) mutable -> T {
-                        T ret = std::move(init);
+                    HPX_FORWARD(ExPolicy, policy),
+                    make_zip_iterator(first1, first2), count, HPX_MOVE(f1),
+                    [init = HPX_FORWARD(T_, init), op1 = HPX_FORWARD(Op1, op1)](
+                        auto&& results) mutable -> T {
+                        T ret = HPX_MOVE(init);
                         for (auto&& fut : results)
                         {
-                            ret = hpx::util::invoke(
-                                op1, std::move(ret), fut.get());
+                            ret = HPX_INVOKE(op1, HPX_MOVE(ret), fut.get());
                         }
                         return ret;
                     });
             }
         };
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::transform_reduce is deprecated, use "
-        "hpx::transform_reduce instead")
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, T init)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
-            "Requires at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
-            "Requires at least forward iterator.");
-
-        return detail::transform_reduce_binary<T>().call(
-            std::forward<ExPolicy>(policy), first1, last1, first2,
-            std::move(init), detail::plus(), detail::multiplies());
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T, typename Reduce, typename Convert,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
-            hpx::is_invocable_v<Convert,
-                typename std::iterator_traits<FwdIter1>::value_type,
-                typename std::iterator_traits<FwdIter2>::value_type
-            > &&
-            hpx::is_invocable_v<Reduce,
-                typename hpx::util::invoke_result<Convert,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type
-                >::type,
-                typename hpx::util::invoke_result<Convert,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type
-                >::type
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::transform_reduce is deprecated, use "
-        "hpx::transform_reduce instead")
-        typename util::detail::algorithm_result<ExPolicy, T>::type
-        transform_reduce(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
-            FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
-            "Requires at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
-            "Requires at least forward iterator.");
-
-        return detail::transform_reduce_binary<T>().call(
-            std::forward<ExPolicy>(policy), first1, last1, first2,
-            std::move(init), std::forward<Reduce>(red_op),
-            std::forward<Convert>(conv_op));
-    }
-
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #include <hpx/functional/traits/get_function_address.hpp>
@@ -769,8 +657,8 @@ namespace hpx { namespace traits {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::transform_reduce
-    HPX_INLINE_CONSTEXPR_VARIABLE struct transform_reduce_t final
+    // CPO for hpx::transform_reduce
+    inline constexpr struct transform_reduce_t final
       : hpx::detail::tag_parallel_algorithm<transform_reduce_t>
     {
     private:
@@ -794,7 +682,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_fallback_dispatch(transform_reduce_t, ExPolicy&& policy,
+        tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T init, Reduce&& red_op,
             Convert&& conv_op)
         {
@@ -802,9 +690,9 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce<T>().call(
-                std::forward<ExPolicy>(policy), first, last,
-                std::forward<T>(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op));
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(T, init), HPX_FORWARD(Reduce, red_op),
+                HPX_FORWARD(Convert, conv_op));
         }
 
         // clang-format off
@@ -824,15 +712,15 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend T tag_fallback_dispatch(transform_reduce_t, InIter first,
+        friend T tag_fallback_invoke(transform_reduce_t, InIter first,
             InIter last, T init, Reduce&& red_op, Convert&& conv_op)
         {
             static_assert(hpx::traits::is_input_iterator<InIter>::value,
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce<T>().call(
-                hpx::execution::seq, first, last, std::forward<T>(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
+                hpx::execution::seq, first, last, HPX_FORWARD(T, init),
+                HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op));
         }
 
         // clang-format off
@@ -846,7 +734,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_fallback_dispatch(transform_reduce_t, ExPolicy&& policy,
+        tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, T init)
         {
             static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
@@ -855,8 +743,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2,
-                std::move(init), hpx::parallel::v1::detail::plus(),
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
+                HPX_MOVE(init), hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies());
         }
 
@@ -867,7 +755,7 @@ namespace hpx {
                 hpx::traits::is_iterator<InIter2>::value
             )>
         // clang-format on
-        friend T tag_fallback_dispatch(transform_reduce_t, InIter1 first1,
+        friend T tag_fallback_invoke(transform_reduce_t, InIter1 first1,
             InIter1 last1, InIter2 first2, T init)
         {
             static_assert(hpx::traits::is_input_iterator<InIter1>::value,
@@ -876,7 +764,7 @@ namespace hpx {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                hpx::execution::seq, first1, last1, first2, std::move(init),
+                hpx::execution::seq, first1, last1, first2, HPX_MOVE(init),
                 hpx::parallel::v1::detail::plus(),
                 hpx::parallel::v1::detail::multiplies());
         }
@@ -906,7 +794,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             T>::type
-        tag_fallback_dispatch(transform_reduce_t, ExPolicy&& policy,
+        tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, T init,
             Reduce&& red_op, Convert&& conv_op)
         {
@@ -916,9 +804,9 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                std::forward<ExPolicy>(policy), first1, last1, first2,
-                std::move(init), std::forward<Reduce>(red_op),
-                std::forward<Convert>(conv_op));
+                HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
+                HPX_MOVE(init), HPX_FORWARD(Reduce, red_op),
+                HPX_FORWARD(Convert, conv_op));
         }
 
         // clang-format off
@@ -943,7 +831,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend T tag_fallback_dispatch(transform_reduce_t, InIter1 first1,
+        friend T tag_fallback_invoke(transform_reduce_t, InIter1 first1,
             InIter1 last1, InIter2 first2, T init, Reduce&& red_op,
             Convert&& conv_op)
         {
@@ -953,8 +841,8 @@ namespace hpx {
                 "Requires at least input iterator.");
 
             return hpx::parallel::v1::detail::transform_reduce_binary<T>().call(
-                hpx::execution::seq, first1, last1, first2, std::move(init),
-                std::forward<Reduce>(red_op), std::forward<Convert>(conv_op));
+                hpx::execution::seq, first1, last1, first2, HPX_MOVE(init),
+                HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op));
         }
     } transform_reduce{};
 }    // namespace hpx

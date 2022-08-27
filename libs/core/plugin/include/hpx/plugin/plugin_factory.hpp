@@ -113,8 +113,7 @@ namespace hpx { namespace util { namespace plugin {
         get_abstract_factory(dll const& d, std::string const& class_name,
             std::string const& base_name, error_code& ec = throws)
         {
-            typedef hpx::util::function_nonser<void(get_plugins_list_type)>
-                DeleterType;
+            typedef hpx::function<void(get_plugins_list_type)> DeleterType;
 
             std::string plugin_entry(HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR
                 "_exported_plugins_list_");
@@ -148,8 +147,7 @@ namespace hpx { namespace util { namespace plugin {
             std::string const& base_name, std::vector<std::string>& names,
             error_code& ec = throws)
         {
-            typedef hpx::util::function_nonser<void(get_plugins_list_type)>
-                DeleterType;
+            typedef hpx::function<void(get_plugins_list_type)> DeleterType;
 
             std::string plugin_entry(HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR
                 "_exported_plugins_list_");

@@ -18,14 +18,8 @@ endforeach()
 # add tests
 set(tests
     adjacentdifference
-    adjacentdifference_exception
-    adjacentdifference_bad_alloc
     adjacentfind
-    adjacentfind_exception
-    adjacentfind_bad_alloc
     adjacentfind_binary
-    adjacentfind_binary_exception
-    adjacentfind_binary_bad_alloc
     all_of
     any_of
     copy
@@ -38,6 +32,7 @@ set(tests
     countif
     destroy
     destroyn
+    ends_with
     equal
     equal_binary
     exclusive_scan
@@ -53,8 +48,6 @@ set(tests
     findfirstof_binary
     findif
     findifnot
-    findifnot_exception
-    findifnot_bad_alloc
     foreach
     foreach_executors
     foreach_prefetching
@@ -89,10 +82,11 @@ set(tests
     mismatch
     mismatch_binary
     move
+    nth_element
     none_of
     parallel_sort
     partial_sort
-    partial_sort_parallel
+    partial_sort_copy
     partition
     partition_copy
     reduce_
@@ -126,6 +120,7 @@ set(tests
     stable_partition
     stable_sort
     stable_sort_exceptions
+    starts_with
     swapranges
     transform
     transform_binary
@@ -172,5 +167,7 @@ foreach(test ${tests})
     FOLDER ${folder_name}
   )
 
-  add_hpx_unit_test("modules.algorithms" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test(
+    "modules.algorithms.algorithms" ${test} ${${test}_PARAMETERS}
+  )
 endforeach()

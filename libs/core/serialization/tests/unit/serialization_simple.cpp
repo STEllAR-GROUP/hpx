@@ -66,7 +66,7 @@ namespace foo {
     HPX_SERIALIZATION_SPLIT_FREE(bap)
 }    // namespace foo
 
-HPX_IS_BITWISE_SERIALIZABLE(foo::bap);
+HPX_IS_BITWISE_SERIALIZABLE(foo::bap)
 
 int main()
 {

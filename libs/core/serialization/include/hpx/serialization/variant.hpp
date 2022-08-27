@@ -21,7 +21,7 @@
 #include <utility>
 #include <variant>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     namespace detail {
 
@@ -57,7 +57,7 @@ namespace hpx { namespace serialization {
                 {
                     T value;
                     ar >> value;
-                    v.template emplace<T>(std::move(value));
+                    v.template emplace<T>(HPX_MOVE(value));
                     return;
                 }
                 std_variant_impl<Ts...>::load(ar, which - 1, v);
@@ -101,5 +101,5 @@ namespace hpx { namespace serialization {
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (template <typename... Ts>), (std::variant<Ts...>) );
-}}    // namespace hpx::serialization
+        (template <typename... Ts>), (std::variant<Ts...>) )
+}    // namespace hpx::serialization

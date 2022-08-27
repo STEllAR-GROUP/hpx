@@ -231,15 +231,14 @@ namespace hpx { namespace performance_counters {
     // This declares the type of a function, which will be
     // called by HPX whenever a new performance counter instance of a
     // particular type needs to be created.
-    typedef hpx::util::function_nonser<naming::gid_type(
-        counter_info const&, error_code&)>
+    typedef hpx::function<naming::gid_type(counter_info const&, error_code&)>
         create_counter_func;
 
     ///////////////////////////////////////////////////////////////////////////
     // This declares a type of a function, which will be passed to
     // a \a discover_counters_func in order to be called for each
     // discovered performance counter instance.
-    typedef hpx::util::function_nonser<bool(counter_info const&, error_code&)>
+    typedef hpx::function<bool(counter_info const&, error_code&)>
         discover_counter_func;
 
     enum discover_counters_mode
@@ -251,7 +250,7 @@ namespace hpx { namespace performance_counters {
     // This declares the type of a function, which will be called by
     // HPX whenever it needs to discover all performance counter
     // instances of a particular type.
-    typedef hpx::util::function_nonser<bool(counter_info const&,
+    typedef hpx::function<bool(counter_info const&,
         discover_counter_func const&, discover_counters_mode, error_code&)>
         discover_counters_func;
 
@@ -347,7 +346,7 @@ namespace hpx { namespace performance_counters {
             std::int64_t scaling = 1, bool scale_inverse = false)
           : time_()
           , count_(0)
-          , values_(std::move(values))
+          , values_(HPX_MOVE(values))
           , scaling_(scaling)
           , status_(status_new_data)
           , scale_inverse_(scale_inverse)
@@ -495,19 +494,19 @@ namespace hpx { namespace performance_counters {
     /// \brief Get the global id of an existing performance counter, if the
     ///        counter does not exist yet, the function attempts to create the
     ///        counter based on the given counter name.
-    HPX_EXPORT lcos::future<naming::id_type> get_counter_async(
+    HPX_EXPORT hpx::future<hpx::id_type> get_counter_async(
         std::string name, error_code& ec = throws);
 
-    inline naming::id_type get_counter(
+    inline hpx::id_type get_counter(
         std::string const& name, error_code& ec = throws);
 
     /// \brief Get the global id of an existing performance counter, if the
     ///        counter does not exist yet, the function attempts to create the
     ///        counter based on the given counter info.
-    HPX_EXPORT lcos::future<naming::id_type> get_counter_async(
+    HPX_EXPORT hpx::future<hpx::id_type> get_counter_async(
         counter_info const& info, error_code& ec = throws);
 
-    inline naming::id_type get_counter(
+    inline hpx::id_type get_counter(
         counter_info const& info, error_code& ec = throws);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -523,36 +522,34 @@ namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         /// \brief Add an existing performance counter instance to the registry
-        HPX_EXPORT counter_status add_counter(naming::id_type const& id,
+        HPX_EXPORT counter_status add_counter(hpx::id_type const& id,
             counter_info const& info, error_code& ec = throws);
 
         /// \brief Remove an existing performance counter instance with the
         ///        given id (as returned from \a create_counter)
         HPX_EXPORT counter_status remove_counter(counter_info const& info,
-            naming::id_type const& id, error_code& ec = throws);
+            hpx::id_type const& id, error_code& ec = throws);
 
         ///////////////////////////////////////////////////////////////////////
         // Helper function for creating counters encapsulating a function
         // returning the counter value.
         HPX_EXPORT naming::gid_type create_raw_counter(counter_info const&,
-            hpx::util::function_nonser<std::int64_t()> const&, error_code&);
+            hpx::function<std::int64_t()> const&, error_code&);
 
         // Helper function for creating counters encapsulating a function
         // returning the counter value.
         HPX_EXPORT naming::gid_type create_raw_counter(counter_info const&,
-            hpx::util::function_nonser<std::int64_t(bool)> const&, error_code&);
+            hpx::function<std::int64_t(bool)> const&, error_code&);
 
         // Helper function for creating counters encapsulating a function
         // returning the counter values array.
         HPX_EXPORT naming::gid_type create_raw_counter(counter_info const&,
-            hpx::util::function_nonser<std::vector<std::int64_t>()> const&,
-            error_code&);
+            hpx::function<std::vector<std::int64_t>()> const&, error_code&);
 
         // Helper function for creating counters encapsulating a function
         // returning the counter values array.
         HPX_EXPORT naming::gid_type create_raw_counter(counter_info const&,
-            hpx::util::function_nonser<std::vector<std::int64_t>(bool)> const&,
-            error_code&);
+            hpx::function<std::vector<std::int64_t>(bool)> const&, error_code&);
 
         // Helper function for creating a new performance counter instance
         // based on a given counter value.

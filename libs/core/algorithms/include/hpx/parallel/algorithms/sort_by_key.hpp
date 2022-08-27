@@ -9,10 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <hpx/parallel/algorithms/sort.hpp>
-#include <hpx/parallel/tagspec.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <algorithm>
@@ -21,6 +19,10 @@
 #include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1 {
+
+    template <typename KeyIter, typename ValueIter>
+    using sort_by_key_result = std::pair<KeyIter, ValueIter>;
+
     ///////////////////////////////////////////////////////////////////////////
     // sort
     namespace detail {
@@ -29,9 +31,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             template <typename Tuple>
             auto operator()(Tuple&& t) const
-                -> decltype(hpx::get<0>(std::forward<Tuple>(t)))
+                -> decltype(hpx::get<0>(HPX_FORWARD(Tuple, t)))
             {
-                return hpx::get<0>(std::forward<Tuple>(t));
+                return hpx::get<0>(HPX_FORWARD(Tuple, t));
             }
         };
         /// \endcond
@@ -100,11 +102,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a sort_by-key algorithm returns a
-    /// \a hpx::future<tagged_pair<tag::in1(KeyIter>, tag::in2(ValueIter)> >
+    /// \a hpx::future<sort_by_key_result<KeyIter, ValueIter>>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a
-    ///           \a tagged_pair<tag::in1(KeyIter), tag::in2(ValueIter)>
+    ///           \a sort_by_key_result<KeyIter, ValueIter>
     ///           otherwise.
     ///           The algorithm returns a pair holding an iterator pointing to
     ///           the first element after the last element in the input key
@@ -114,8 +116,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
     template <typename ExPolicy, typename KeyIter, typename ValueIter,
         typename Compare = detail::less>
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::util::tagged_pair<tag::in1(KeyIter), tag::in2(ValueIter)>>::type
+    util::detail::algorithm_result_t<ExPolicy,
+        sort_by_key_result<KeyIter, ValueIter>>
     sort_by_key(ExPolicy&& policy, KeyIter key_first, KeyIter key_last,
         ValueIter value_first, Compare&& comp = Compare())
     {
@@ -124,10 +126,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             "sort_by_key is not supported unless HPX_HAVE_TUPLE_RVALUE_SWAP "
             "is defined");
 #else
-        static_assert((hpx::traits::is_random_access_iterator<KeyIter>::value),
+        static_assert((hpx::traits::is_random_access_iterator_v<KeyIter>),
             "Requires a random access iterator.");
-        static_assert(
-            (hpx::traits::is_random_access_iterator<ValueIter>::value),
+        static_assert((hpx::traits::is_random_access_iterator_v<ValueIter>),
             "Requires a random access iterator.");
 
         ValueIter value_last = value_first;
@@ -135,11 +136,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         using iterator_type = hpx::util::zip_iterator<KeyIter, ValueIter>;
 
-        return detail::get_iter_tagged_pair<tag::in1, tag::in2>(
-            detail::sort<iterator_type>().call(std::forward<ExPolicy>(policy),
+        return detail::get_iter_pair<iterator_type>(
+            detail::sort<iterator_type>().call(HPX_FORWARD(ExPolicy, policy),
                 hpx::util::make_zip_iterator(key_first, value_first),
                 hpx::util::make_zip_iterator(key_last, value_last),
-                std::forward<Compare>(comp), detail::extract_key()));
+                HPX_FORWARD(Compare, comp), detail::extract_key()));
 #endif
     }
 }}}    // namespace hpx::parallel::v1

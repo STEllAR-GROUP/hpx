@@ -102,9 +102,9 @@ namespace hpx { namespace actions { namespace detail {
             naming::address::address_type lva, F&& f, std::false_type)
         {
             return util::one_shot(
-                util::bind_back(&action_decorate_function::thread_function,
+                hpx::bind_back(&action_decorate_function::thread_function,
                     traits::action_decorate_function<action_wrapper>::call(
-                        lva, std::forward<F>(f))));
+                        lva, HPX_FORWARD(F, f))));
         }
 
         // If the action returns a future we wait on the semaphore as well,
@@ -121,10 +121,10 @@ namespace hpx { namespace actions { namespace detail {
         static threads::thread_function_type call(
             naming::address::address_type lva, F&& f, std::true_type)
         {
-            return util::one_shot(util::bind_back(
+            return util::one_shot(hpx::bind_back(
                 &action_decorate_function::thread_function_future,
                 traits::action_decorate_function<action_wrapper>::call(
-                    lva, std::forward<F>(f))));
+                    lva, HPX_FORWARD(F, f))));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -134,7 +134,7 @@ namespace hpx { namespace actions { namespace detail {
         {
             typedef typename Action::result_type result_type;
             typedef traits::is_future<result_type> is_future;
-            return call(lva, std::forward<F>(f), is_future());
+            return call(lva, HPX_FORWARD(F, f), is_future());
         }
     };
 
@@ -148,16 +148,16 @@ namespace hpx { namespace actions { namespace detail {
         naming::address addr_;
 
         template <typename T>
-        void operator()(naming::id_type const& id, T&& t)
+        void operator()(hpx::id_type const& id, T&& t)
         {
             if (id)
             {
-                hpx::set_lco_value(id, std::move(addr_), std::forward<T>(t));
+                hpx::set_lco_value(id, std::move(addr_), HPX_FORWARD(T, t));
             }
             construct_semaphore_type::get_sem().signal();
         }
 
-        void operator()(naming::id_type const& id)
+        void operator()(hpx::id_type const& id)
         {
             if (id)
             {

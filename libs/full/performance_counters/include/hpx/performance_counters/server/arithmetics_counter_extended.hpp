@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -35,7 +35,7 @@ namespace hpx { namespace performance_counters { namespace server {
         using type_holder = arithmetics_counter_extended;
         using base_type_holder = base_performance_counter;
 
-        arithmetics_counter_extended() = default;
+        arithmetics_counter_extended();
 
         arithmetics_counter_extended(counter_info const& info,
             std::vector<std::string> const& base_counter_names);
@@ -48,11 +48,9 @@ namespace hpx { namespace performance_counters { namespace server {
         bool stop() override;
         void reset_counter_value() override;
 
-        void finalize()
-        {
-            base_performance_counter::finalize();
-            base_type::finalize();
-        }
+        void finalize();
+
+        naming::address get_current_address() const;
 
     private:
         // base counters to be queried

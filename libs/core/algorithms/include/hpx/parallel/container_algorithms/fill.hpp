@@ -10,7 +10,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx {
+namespace hpx { namespace ranges {
     // clang-format off
 
     /// Assigns the given value to the elements in the range [first, last).
@@ -100,13 +100,13 @@ namespace hpx {
     fill_n(ExPolicy&& policy, Iterator first, Size count, T const& value);
 
     // clang-format on
-}    // namespace hpx
+}}    // namespace hpx::ranges
 
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 
@@ -116,82 +116,18 @@ namespace hpx {
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename T,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::fill is deprecated, use hpx::ranges::fill instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_traits<Rng>::iterator_type>::type
-        fill(ExPolicy&& policy, Rng&& rng, T value)
-    {
-        using iterator_type =
-            typename hpx::traits::range_traits<Rng>::iterator_type;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
-            "Requires at least forward iterator.");
-
-        return detail::fill<iterator_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), value);
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename Size, typename T,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 6,
-        "hpx::parallel::fill_n is deprecated, use hpx::ranges::fill_n instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_traits<Rng>::iterator_type>::type
-        fill_n(ExPolicy&& policy, Rng& rng, Size count, T value)
-    {
-        using iterator_type =
-            typename hpx::traits::range_traits<Rng>::iterator_type;
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        static_assert(hpx::traits::is_forward_iterator<iterator_type>::value,
-            "Requires at least forward iterator.");
-
-        return detail::fill_n<iterator_type>().call(
-            std::forward<ExPolicy>(policy), hpx::util::begin(rng), count,
-            value);
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-}}}    // namespace hpx::parallel::v1
-
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::fill
-    HPX_INLINE_CONSTEXPR_VARIABLE struct fill_t final
+    // CPO for hpx::ranges::fill
+    inline constexpr struct fill_t final
       : hpx::detail::tag_parallel_algorithm<fill_t>
     {
     private:
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename T,
+        template <typename ExPolicy, typename Rng,
+            typename T = typename std::iterator_traits<
+                hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value
@@ -199,7 +135,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename hpx::traits::range_traits<Rng>::iterator_type>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             fill_t, ExPolicy&& policy, Rng&& rng, T const& value)
         {
             using iterator_type =
@@ -210,12 +146,13 @@ namespace hpx { namespace ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::fill<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), value);
         }
 
         // clang-format off
-        template <typename ExPolicy, typename Iter, typename Sent, typename T,
+        template <typename ExPolicy, typename Iter, typename Sent,
+            typename T = typename std::iterator_traits<Iter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
@@ -223,24 +160,26 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             Iter>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             fill_t, ExPolicy&& policy, Iter first, Sent last, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::v1::detail::fill<Iter>().call(
-                std::forward<ExPolicy>(policy), first, last, value);
+                HPX_FORWARD(ExPolicy, policy), first, last, value);
         }
 
         // clang-format off
-        template <typename Rng, typename T,
+        template <typename Rng,
+            typename T = typename std::iterator_traits<
+                hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend typename hpx::traits::range_traits<Rng>::iterator_type
-        tag_fallback_dispatch(fill_t, Rng&& rng, T const& value)
+        friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
+            fill_t, Rng&& rng, T const& value)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -255,12 +194,13 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename Iter, typename Sent, typename T,
+        template <typename Iter, typename Sent,
+            typename T = typename std::iterator_traits<Iter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
-        friend Iter tag_fallback_dispatch(
+        friend Iter tag_fallback_invoke(
             fill_t, Iter first, Sent last, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator<Iter>::value,
@@ -272,21 +212,23 @@ namespace hpx { namespace ranges {
     } fill{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::fill_n
-    HPX_INLINE_CONSTEXPR_VARIABLE struct fill_n_t final
+    // CPO for hpx::ranges::fill_n
+    inline constexpr struct fill_n_t final
       : hpx::detail::tag_parallel_algorithm<fill_n_t>
     {
     private:
         // clang-format off
-        template <typename ExPolicy, typename Rng, typename T,
+        template <typename ExPolicy, typename Rng,
+            typename T = typename std::iterator_traits<
+                hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_traits<Rng>::iterator_type>::type
-        tag_fallback_dispatch(
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            hpx::traits::range_iterator_t<Rng>>
+        tag_fallback_invoke(
             fill_n_t, ExPolicy&& policy, Rng&& rng, T const& value)
         {
             using iterator_type =
@@ -301,16 +243,17 @@ namespace hpx { namespace ranges {
             {
                 auto first = hpx::util::begin(rng);
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                    iterator_type>::get(std::move(first));
+                    iterator_type>::get(HPX_MOVE(first));
             }
 
             return hpx::parallel::v1::detail::fill_n<iterator_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::size(rng), value);
         }
 
         // clang-format off
-        template <typename ExPolicy, typename FwdIter, typename Size, typename T,
+        template <typename ExPolicy, typename FwdIter, typename Size,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
@@ -318,7 +261,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_dispatch(fill_n_t, ExPolicy&& policy, FwdIter first,
+        tag_fallback_invoke(fill_n_t, ExPolicy&& policy, FwdIter first,
             Size count, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
@@ -328,22 +271,24 @@ namespace hpx { namespace ranges {
             if (hpx::parallel::v1::detail::is_negative(count))
             {
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(std::move(first));
+                    FwdIter>::get(HPX_MOVE(first));
             }
 
             return hpx::parallel::v1::detail::fill_n<FwdIter>().call(
-                std::forward<ExPolicy>(policy), first, std::size_t(count),
+                HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
                 value);
         }
 
         // clang-format off
-        template <typename Rng, typename T,
+        template <typename Rng,
+            typename T = typename std::iterator_traits<
+                hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
-        tag_fallback_dispatch(fill_n_t, Rng&& rng, T const& value)
+        tag_fallback_invoke(fill_n_t, Rng&& rng, T const& value)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -364,12 +309,13 @@ namespace hpx { namespace ranges {
         }
 
         // clang-format off
-        template <typename FwdIter, typename Size, typename T,
+        template <typename FwdIter, typename Size,
+            typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend FwdIter tag_fallback_dispatch(
+        friend FwdIter tag_fallback_invoke(
             fill_n_t, FwdIter first, Size count, T const& value)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),

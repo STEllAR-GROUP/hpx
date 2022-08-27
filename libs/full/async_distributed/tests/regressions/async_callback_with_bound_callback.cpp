@@ -23,7 +23,7 @@ void async_callback(uint64_t) {}
 #endif
 
 void func() {}
-HPX_PLAIN_ACTION(func);
+HPX_PLAIN_ACTION(func)
 
 int main()
 {
@@ -32,11 +32,11 @@ int main()
         uint64_t buffer_index = 0;
 #if defined(HPX_HAVE_NETWORKING)
         hpx::future<void> f = hpx::async_cb(func_action(), id,
-            hpx::util::bind(&async_callback, buffer_index,
-                hpx::util::placeholders::_1, hpx::util::placeholders::_2));
+            hpx::bind(&async_callback, buffer_index, hpx::placeholders::_1,
+                hpx::placeholders::_2));
 #else
         hpx::future<void> f = hpx::async_cb(
-            func_action(), id, hpx::util::bind(&async_callback, buffer_index));
+            func_action(), id, hpx::bind(&async_callback, buffer_index));
 #endif
         f.get();
     }

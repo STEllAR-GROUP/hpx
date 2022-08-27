@@ -68,9 +68,9 @@ namespace hpx { namespace threads { namespace policies {
         bool push(rvalue_reference val, bool /*other_end*/ = false)
         {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-            return queue_.push_left(std::move(val));
+            return queue_.push_left(HPX_MOVE(val));
 #else
-            return queue_.push(std::move(val));
+            return queue_.push(HPX_MOVE(val));
 #endif
         }
 
@@ -127,7 +127,7 @@ namespace hpx { namespace threads { namespace policies {
 
         bool push(rvalue_reference val, bool /*other_end*/ = false)
         {
-            return queue_.enqueue(std::move(val));
+            return queue_.enqueue(HPX_MOVE(val));
         }
 
         bool pop(reference val, bool /* steal */ = true)
@@ -186,8 +186,8 @@ namespace hpx { namespace threads { namespace policies {
         bool push(rvalue_reference val, bool other_end = false)
         {
             if (other_end)
-                return queue_.push_right(std::move(val));
-            return queue_.push_left(std::move(val));
+                return queue_.push_right(HPX_MOVE(val));
+            return queue_.push_left(HPX_MOVE(val));
         }
 
         bool pop(reference val, bool /* steal */ = true)
@@ -244,7 +244,7 @@ namespace hpx { namespace threads { namespace policies {
 
         bool push(rvalue_reference val, bool /*other_end*/ = false)
         {
-            return queue_.push_left(std::move(val));
+            return queue_.push_left(HPX_MOVE(val));
         }
 
         bool pop(reference val, bool steal = true)
@@ -298,8 +298,8 @@ namespace hpx { namespace threads { namespace policies {
         bool push(const_reference val, bool other_end = false)
         {
             if (other_end)
-                return queue_.push_right(std::move(val));
-            return queue_.push_left(std::move(val));
+                return queue_.push_right(HPX_MOVE(val));
+            return queue_.push_left(HPX_MOVE(val));
         }
 
         bool push(rvalue_reference val, bool other_end = false)

@@ -25,15 +25,14 @@ namespace hpx {
             std::false_type, F&& f, stop_token&& /* st */, Ts&&... ts)
         {
             // started thread does not expect a stop token:
-            HPX_INVOKE(std::forward<F>(f), std::forward<Ts>(ts)...);
+            HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename... Ts>
         static void invoke(std::true_type, F&& f, stop_token&& st, Ts&&... ts)
         {
             // pass the stop_token as first argument to the started thread:
-            HPX_INVOKE(
-                std::forward<F>(f), std::move(st), std::forward<Ts>(ts)...);
+            HPX_INVOKE(HPX_FORWARD(F, f), HPX_MOVE(st), HPX_FORWARD(Ts, ts)...);
         }
 
     public:
@@ -56,13 +55,13 @@ namespace hpx {
         // Requires: F and each T in Ts meet the Cpp17MoveConstructible
         //      requirements. Either
         //
-        //      INVOKE(decay-copy(std::forward<F>(f)), get_stop_token(),
-        //             decay-copy(std::forward<Ts>(ts))...)
+        //      INVOKE(decay-copy(HPX_FORWARD(F, f)), get_stop_token(),
+        //             decay-copy(HPX_FORWARD(Ts, ts))...)
         //
         //      is a valid expression or
         //
-        //      INVOKE(decay-copy(std::forward<F>(f)),
-        //             decay-copy(std::forward<Ts>(ts))...)
+        //      INVOKE(decay-copy(HPX_FORWARD(F, f)),
+        //             decay-copy(HPX_FORWARD(Ts, ts))...)
         //
         //      is a valid expression.
         //
@@ -71,13 +70,13 @@ namespace hpx {
         // Effects: Initializes ssource_ and constructs an object of type
         //      jthread. The new thread of execution executes
         //
-        //      INVOKE(decay-copy(std::forward<F>(f)), get_stop_token(),
-        //             decay-copy(std::forward<Ts>(ts))...)
+        //      INVOKE(decay-copy(HPX_FORWARD(F, f)), get_stop_token(),
+        //             decay-copy(HPX_FORWARD(Ts, ts))...)
         //
         //      if that expression is well-formed, otherwise
         //
-        //      INVOKE(decay-copy(std::forward<F>(f)),
-        //             decay-copy(std::forward<Ts>(ts))...)
+        //      INVOKE(decay-copy(HPX_FORWARD(F, f)),
+        //             decay-copy(HPX_FORWARD(Ts, ts))...)
         //
         //      with the calls to decay-copy being evaluated in the
         //      constructing thread. Any return value from this invocation
@@ -111,13 +110,12 @@ namespace hpx {
                     using use_stop_token =
                         typename is_invocable<F, stop_token, Ts...>::type;
 
-                    jthread::invoke(use_stop_token{}, std::forward<F>(f),
-                        std::move(st), std::forward<Ts>(ts)...);
+                    jthread::invoke(use_stop_token{}, HPX_FORWARD(F, f),
+                        HPX_MOVE(st), HPX_FORWARD(Ts, ts)...);
                 },
                 // not captured due to possible races if immediately set
-                ssource_.get_token(),
-                std::forward<F>(f),        // pass callable
-                std::forward<Ts>(ts)...    // pass arguments for callable
+                ssource_.get_token(), HPX_FORWARD(F, f),    // pass callable
+                HPX_FORWARD(Ts, ts)...    // pass arguments for callable
             }
         {
         }
@@ -169,7 +167,7 @@ namespace hpx {
         }
 
         // Returns: get_id() != id().
-        HPX_NODISCARD bool joinable() const noexcept
+        [[nodiscard]] bool joinable() const noexcept
         {
             return thread_.joinable();
         }
@@ -218,14 +216,14 @@ namespace hpx {
         // Returns: A default constructed id object if *this does not
         //      represent a thread, otherwise thisthread_::get_id() for
         //      the thread of execution represented by *this.
-        HPX_NODISCARD id get_id() const noexcept
+        [[nodiscard]] id get_id() const noexcept
         {
             return thread_.get_id();
         }
 
         // The presence of native_handle() and its semantic is
         //      implementation-defined.
-        HPX_NODISCARD native_handle_type native_handle()
+        [[nodiscard]] native_handle_type native_handle()
         {
             return thread_.native_handle();
         }
@@ -233,13 +231,13 @@ namespace hpx {
         // 32.4.3.2, stop token handling
 
         // Effects: Equivalent to: return ssource_;
-        HPX_NODISCARD stop_source get_stop_source() noexcept
+        [[nodiscard]] stop_source get_stop_source() noexcept
         {
             return ssource_;
         }
 
         // Effects: Equivalent to: return ssource_.get_token();
-        HPX_NODISCARD stop_token get_stop_token() const noexcept
+        [[nodiscard]] stop_token get_stop_token() const noexcept
         {
             return ssource_.get_token();
         }
@@ -253,7 +251,7 @@ namespace hpx {
         // 32.4.3.5, static members
 
         // Returns: thread::hardware_concurrency().
-        HPX_NODISCARD static unsigned int hardware_concurrency()
+        [[nodiscard]] static unsigned int hardware_concurrency()
         {
             return hpx::threads::hardware_concurrency();
         }

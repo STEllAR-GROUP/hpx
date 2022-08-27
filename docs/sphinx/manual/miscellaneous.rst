@@ -172,9 +172,7 @@ from ``hpx::cerr`` will be dispatched to ``std::cerr`` on the console
 .. note::
 
    All existing standard manipulators can be used in conjunction with
-   ``hpx::cout`` and ``hpx::cerr`` Historically, |hpx| also defines
-   ``hpx::endl`` and ``hpx::flush`` but those are just aliases for the
-   corresponding standard manipulators.
+   ``hpx::cout`` and ``hpx::cerr``.
 
 In order to use either ``hpx::cout`` or ``hpx::cerr``, application codes need to
 ``#include <hpx/include/iostreams.hpp>``. For an example, please see the

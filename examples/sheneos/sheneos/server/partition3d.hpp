@@ -18,14 +18,16 @@
 
 #include "../dimension.hpp"
 
-namespace sheneos
-{
+namespace sheneos {
     ///////////////////////////////////////////////////////////////////////////
     struct sheneos_coord
     {
         sheneos_coord(double ye = 0.0, double temp = 0.0, double rho = 0.0)
-          : ye_(ye), temp_(temp), rho_(rho)
-        {}
+          : ye_(ye)
+          , temp_(temp)
+          , rho_(rho)
+        {
+        }
 
         double ye_;
         double temp_;
@@ -36,10 +38,9 @@ namespace sheneos
     // one mutex per application instance
     typedef hpx::lcos::local::spinlock mutex_type;
     extern mutex_type mtx_;
-}
+}    // namespace sheneos
 
-namespace sheneos { namespace server
-{
+namespace sheneos { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_COMPONENT_EXPORT partition3d
       : public hpx::components::component_base<partition3d>
@@ -48,45 +49,45 @@ namespace sheneos { namespace server
         inline void init_dimension(std::string const&, int, dimension const&,
             char const*, std::unique_ptr<double[]>&);
 
-        inline void init_data(std::string const& datafilename,
-            char const* name, std::unique_ptr<double[]>& values,
-            std::size_t array_size);
+        inline void init_data(std::string const& datafilename, char const* name,
+            std::unique_ptr<double[]>& values, std::size_t array_size);
 
         /// Get index of a given value in the one-dimensional array-slice.
         inline std::size_t get_index(dimension::type d, double value) const;
 
         /// Tri-linear interpolation routine.
-        inline double tl_interpolate(double* values,
-            std::size_t idx_x, std::size_t idx_y, std::size_t idx_z,
-            double delta_ye, double delta_logtemp, double delta_logrho) const;
+        inline double tl_interpolate(double* values, std::size_t idx_x,
+            std::size_t idx_y, std::size_t idx_z, double delta_ye,
+            double delta_logtemp, double delta_logrho) const;
 
     public:
-        enum eos_values {
-            logpress = 0x00000001,  ///< pressure
-            logenergy = 0x00000002, ///< specific internal energy
-            entropy = 0x00000004,   ///< specific entropy
-            munu = 0x00000008,      ///< mu_e - mun + mu_p
-            cs2 = 0x00000010,       ///< speed of sound squared
+        enum eos_values
+        {
+            logpress = 0x00000001,     ///< pressure
+            logenergy = 0x00000002,    ///< specific internal energy
+            entropy = 0x00000004,      ///< specific entropy
+            munu = 0x00000008,         ///< mu_e - mun + mu_p
+            cs2 = 0x00000010,          ///< speed of sound squared
             // Derivatives.
-            dedt = 0x00000020,      ///< C_v
-            dpdrhoe = 0x00000040,   ///< dp/deps|rho
-            dpderho = 0x00000080,   ///< dp/drho|eps
+            dedt = 0x00000020,       ///< C_v
+            dpdrhoe = 0x00000040,    ///< dp/deps|rho
+            dpderho = 0x00000080,    ///< dp/drho|eps
             small_api_values = 0x000000FF,
 #if SHENEOS_SUPPORT_FULL_API
             // Chemical potentials.
-            muhat = 0x00000100,     ///< mu_n - mu_p
-            mu_e = 0x00000200,      ///< electron chemical potential
-                                    ///< including electron rest mass
-            mu_p = 0x00000400,      ///< proton chemical potential
-            mu_n = 0x00000800,      ///< neutron chemical potential
+            muhat = 0x00000100,    ///< mu_n - mu_p
+            mu_e = 0x00000200,     ///< electron chemical potential
+                                   ///< including electron rest mass
+            mu_p = 0x00000400,     ///< proton chemical potential
+            mu_n = 0x00000800,     ///< neutron chemical potential
             // Compositions.
-            xa = 0x00001000,        ///< alpha particle number fraction
-            xh = 0x00002000,        ///< heavy nucleus number fraction
-            xn = 0x00004000,        ///< neutron number fraction
-            xp = 0x00008000,        ///< proton number fraction
-            abar = 0x00010000,      ///< average heavy nucleus A
-            zbar = 0x00020000,      ///< average heavy nucleus Z
-            gamma = 0x00040000,     ///< Gamma_1
+            xa = 0x00001000,       ///< alpha particle number fraction
+            xh = 0x00002000,       ///< heavy nucleus number fraction
+            xn = 0x00004000,       ///< neutron number fraction
+            xp = 0x00008000,       ///< proton number fraction
+            abar = 0x00010000,     ///< average heavy nucleus A
+            zbar = 0x00020000,     ///< average heavy nucleus Z
+            gamma = 0x00040000,    ///< Gamma_1
             full_api_values = 0x0007FFFF,
 #endif
         };
@@ -108,8 +109,8 @@ namespace sheneos { namespace server
         /// \param rho       [in] Rest mass density of the plasma.
         /// \param eosvalues [in] The EOS values to interpolate. Must be
         ///                  in the range of this partition.
-        std::vector<double> interpolate(double ye, double temp, double rho,
-            std::uint32_t eosvalues) const;
+        std::vector<double> interpolate(
+            double ye, double temp, double rho, std::uint32_t eosvalues) const;
 
         /// Perform an interpolation of one given field on this partition.
         ///
@@ -118,8 +119,8 @@ namespace sheneos { namespace server
         /// \param rho       [in] Rest mass density of the plasma.
         /// \param eosvalues [in] The EOS value to interpolate. Must be
         ///                  in the range of this partition.
-        double interpolate_one(double ye, double temp, double rho,
-            std::uint32_t eosvalue) const;
+        double interpolate_one(
+            double ye, double temp, double rho, std::uint32_t eosvalue) const;
 
         /// Perform several interpolations of all given fields on this partition.
         ///
@@ -127,8 +128,8 @@ namespace sheneos { namespace server
         ///                  and rest mass densities of the plasma.
         /// \param eosvalues [in] The EOS values to interpolate. Must be
         ///                  in the range of this partition.
-        std::vector<std::vector<double> >
-        interpolate_bulk(std::vector<sheneos_coord> const& coords,
+        std::vector<std::vector<double>> interpolate_bulk(
+            std::vector<sheneos_coord> const& coords,
             std::uint32_t eosvalues) const;
 
         /// Perform several interpolations of one given field on this partition.
@@ -137,25 +138,25 @@ namespace sheneos { namespace server
         ///                  and rest mass densities of the plasma.
         /// \param eosvalue  [in] The EOS value to interpolate. Must be
         ///                  in the range of this partition.
-        std::vector<double>
-        interpolate_one_bulk(std::vector<sheneos_coord> const& coords,
+        std::vector<double> interpolate_one_bulk(
+            std::vector<sheneos_coord> const& coords,
             std::uint32_t eosvalue) const;
 
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
         // serialization, etc.
-        HPX_DEFINE_COMPONENT_ACTION(partition3d, init);
-        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate);
-        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_one);
-        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_bulk);
-        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_one_bulk);
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, init)
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate)
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_one)
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_bulk)
+        HPX_DEFINE_COMPONENT_ACTION(partition3d, interpolate_one_bulk)
 
     protected:
-        double interpolate_one(sheneos_coord const& c,
-            std::uint32_t eosvalue) const;
-        std::vector<double> interpolate(sheneos_coord const& c,
-            std::uint32_t eosvalues) const;
+        double interpolate_one(
+            sheneos_coord const& c, std::uint32_t eosvalue) const;
+        std::vector<double> interpolate(
+            sheneos_coord const& c, std::uint32_t eosvalues) const;
 
     private:
         dimension dim_[dimension::dim];
@@ -194,47 +195,43 @@ namespace sheneos { namespace server
         std::unique_ptr<double[]> gamma_values_;
 #endif
     };
-}}
+}}    // namespace sheneos::server
 
 ///////////////////////////////////////////////////////////////////////////////
 // Non-intrusive serialization.
-namespace hpx { namespace serialization
-{
-    HPX_COMPONENT_EXPORT void
-    serialize(input_archive& ar,
-        sheneos::sheneos_coord& coord, unsigned int const);
+namespace hpx { namespace serialization {
+    HPX_COMPONENT_EXPORT void serialize(
+        input_archive& ar, sheneos::sheneos_coord& coord, unsigned int const);
 
-    HPX_COMPONENT_EXPORT void
-    serialize(output_archive& ar,
-        sheneos::sheneos_coord& coord, unsigned int const);
-}}
+    HPX_COMPONENT_EXPORT void serialize(
+        output_archive& ar, sheneos::sheneos_coord& coord, unsigned int const);
+}}    // namespace hpx::serialization
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION_DECLARATION(
-    sheneos::server::partition3d::init_action,
-    sheneos_partition3d_init_action);
+    sheneos::server::partition3d::init_action, sheneos_partition3d_init_action)
 HPX_ACTION_USES_LARGE_STACK(sheneos::server::partition3d::init_action);
 
 HPX_REGISTER_ACTION_DECLARATION(
     sheneos::server::partition3d::interpolate_action,
-    sheneos_partition3d_interpolate_action);
+    sheneos_partition3d_interpolate_action)
 HPX_REGISTER_ACTION_DECLARATION(
     sheneos::server::partition3d::interpolate_one_action,
-    sheneos_partition3d_interpolate_one_action);
+    sheneos_partition3d_interpolate_one_action)
 
 HPX_REGISTER_ACTION_DECLARATION(
     sheneos::server::partition3d::interpolate_bulk_action,
-    sheneos_partition3d_interpolate_bulk_action);
+    sheneos_partition3d_interpolate_bulk_action)
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::base_lco_with_value<std::vector<std::vector<double> > >::set_value_action,
-    set_value_action_vector_vector_double);
+    hpx::lcos::base_lco_with_value<
+        std::vector<std::vector<double>>>::set_value_action,
+    set_value_action_vector_vector_double)
 
 HPX_REGISTER_ACTION_DECLARATION(
     sheneos::server::partition3d::interpolate_one_bulk_action,
-    sheneos_partition3d_interpolate_one_bulk_action);
+    sheneos_partition3d_interpolate_one_bulk_action)
 HPX_REGISTER_ACTION_DECLARATION(
-    hpx::lcos::base_lco_with_value<std::vector<double> >::set_value_action,
-    set_value_action_vector_double);
-
+    hpx::lcos::base_lco_with_value<std::vector<double>>::set_value_action,
+    set_value_action_vector_double)
 
 #endif

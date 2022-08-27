@@ -19,13 +19,13 @@
 namespace hpx { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    void intrusive_ptr_add_ref(stop_state* p)
+    void intrusive_ptr_add_ref(stop_state* p) noexcept
     {
         p->state_.fetch_add(
             stop_state::token_ref_increment, std::memory_order_relaxed);
     }
 
-    void intrusive_ptr_release(stop_state* p)
+    void intrusive_ptr_release(stop_state* p) noexcept
     {
         std::uint64_t old_state = p->state_.fetch_sub(
             stop_state::token_ref_increment, std::memory_order_acq_rel);
@@ -38,7 +38,8 @@ namespace hpx { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void stop_callback_base::add_this_callback(stop_callback_base*& callbacks)
+    void stop_callback_base::add_this_callback(
+        stop_callback_base*& callbacks) noexcept
     {
         next_ = callbacks;
         if (next_ != nullptr)
@@ -50,7 +51,7 @@ namespace hpx { namespace detail {
     }
 
     // returns true if the callback was successfully removed
-    bool stop_callback_base::remove_this_callback()
+    bool stop_callback_base::remove_this_callback() noexcept
     {
         if (prev_ != nullptr)
         {
@@ -69,10 +70,7 @@ namespace hpx { namespace detail {
     void stop_state::lock() noexcept
     {
         auto old_state = state_.load(std::memory_order_relaxed);
-
-        while (!state_.compare_exchange_weak(old_state,
-            old_state | stop_state::locked_flag, std::memory_order_acquire,
-            std::memory_order_relaxed))
+        do
         {
             for (std::size_t k = 0; is_locked(old_state); ++k)
             {
@@ -80,7 +78,9 @@ namespace hpx { namespace detail {
                     k, "stop_state::lock");
                 old_state = state_.load(std::memory_order_relaxed);
             }
-        }
+        } while (!state_.compare_exchange_weak(old_state,
+            old_state | stop_state::locked_flag, std::memory_order_acquire,
+            std::memory_order_relaxed));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -91,10 +91,7 @@ namespace hpx { namespace detail {
         if (stop_requested(old_state))
             return false;
 
-        while (!state_.compare_exchange_weak(old_state,
-            old_state | stop_state::stop_requested_flag |
-                stop_state::locked_flag,
-            std::memory_order_acquire, std::memory_order_relaxed))
+        do
         {
             for (std::size_t k = 0; is_locked(old_state); ++k)
             {
@@ -105,7 +102,10 @@ namespace hpx { namespace detail {
                 if (stop_requested(old_state))
                     return false;
             }
-        }
+        } while (!state_.compare_exchange_weak(old_state,
+            old_state | stop_state::stop_requested_flag |
+                stop_state::locked_flag,
+            std::memory_order_acquire, std::memory_order_relaxed));
         return true;
     }
 
@@ -117,6 +117,8 @@ namespace hpx { namespace detail {
         if (stop_requested(old_state))
         {
             cb->execute();
+            cb->callback_finished_executing_.store(
+                true, std::memory_order_release);
             return false;
         }
         else if (!stop_possible(old_state))
@@ -124,9 +126,7 @@ namespace hpx { namespace detail {
             return false;
         }
 
-        while (!state_.compare_exchange_weak(old_state,
-            old_state | stop_state::locked_flag, std::memory_order_acquire,
-            std::memory_order_relaxed))
+        do
         {
             for (std::size_t k = 0; is_locked(old_state); ++k)
             {
@@ -137,6 +137,8 @@ namespace hpx { namespace detail {
                 if (stop_requested(old_state))
                 {
                     cb->execute();
+                    cb->callback_finished_executing_.store(
+                        true, std::memory_order_release);
                     return false;
                 }
                 else if (!stop_possible(old_state))
@@ -144,7 +146,10 @@ namespace hpx { namespace detail {
                     return false;
                 }
             }
-        }
+        } while (!state_.compare_exchange_weak(old_state,
+            old_state | stop_state::locked_flag, std::memory_order_acquire,
+            std::memory_order_relaxed));
+
         return true;
     }
 
@@ -261,21 +266,21 @@ namespace hpx { namespace detail {
             auto* cb = callbacks_;
             callbacks_ = cb->next_;
 
-            const bool more_callbacks = callbacks_ != nullptr;
-            if (more_callbacks)
+            if (callbacks_ != nullptr)
                 callbacks_->prev_ = &callbacks_;
 
             // Mark this item as removed from the list.
             cb->prev_ = nullptr;
 
-            // Don't hold lock while executing callback so we don't block other
-            // threads from unregistering callbacks.
-            util::unlock_guard<stop_state> ul(*this);
-
             bool is_removed = false;
             cb->is_removed_ = &is_removed;
 
-            cb->execute();
+            {
+                // Don't hold lock while executing callback so we don't
+                // block other threads from unregistering callbacks.
+                util::unlock_guard ul(*this);
+                cb->execute();
+            }
 
             if (!is_removed)
             {

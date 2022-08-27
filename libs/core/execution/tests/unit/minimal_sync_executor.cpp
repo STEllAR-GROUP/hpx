@@ -132,12 +132,12 @@ void test_bulk_sync(Executor& exec)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     std::vector<hpx::thread::id> ids =
         hpx::parallel::execution::bulk_sync_execute(
-            exec, hpx::util::bind(&sync_bulk_test, _1, tid, _2), v, 42);
+            exec, hpx::bind(&sync_bulk_test, _1, tid, _2), v, 42);
     for (auto const& id : ids)
     {
         HPX_TEST_EQ(id, hpx::this_thread::get_id());
@@ -151,7 +151,7 @@ void test_bulk_sync(Executor& exec)
     }
 
     hpx::parallel::execution::bulk_sync_execute(
-        exec, hpx::util::bind(&sync_bulk_test_void, _1, tid, _2), v, 42);
+        exec, hpx::bind(&sync_bulk_test_void, _1, tid, _2), v, 42);
     hpx::parallel::execution::bulk_sync_execute(
         exec, &sync_bulk_test_void, v, tid, 42);
 }
@@ -164,19 +164,18 @@ void test_bulk_async(Executor& exec)
     std::vector<int> v(107);
     std::iota(std::begin(v), std::end(v), std::rand());
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
-    hpx::when_all(hpx::parallel::execution::bulk_async_execute(exec,
-                      hpx::util::bind(&sync_bulk_test, _1, tid, _2), v, 42))
+    hpx::when_all(hpx::parallel::execution::bulk_async_execute(
+                      exec, hpx::bind(&sync_bulk_test, _1, tid, _2), v, 42))
         .get();
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
                       exec, &sync_bulk_test, v, tid, 42))
         .get();
 
-    hpx::when_all(
-        hpx::parallel::execution::bulk_async_execute(
-            exec, hpx::util::bind(&sync_bulk_test_void, _1, tid, _2), v, 42))
+    hpx::when_all(hpx::parallel::execution::bulk_async_execute(exec,
+                      hpx::bind(&sync_bulk_test_void, _1, tid, _2), v, 42))
         .get();
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
                       exec, &sync_bulk_test_void, v, tid, 42))

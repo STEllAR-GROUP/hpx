@@ -205,7 +205,7 @@ namespace hpx { namespace components { namespace server {
     // resolution for the given object.
     template <typename Component, typename DistPolicy>
     future<id_type> trigger_migrate_component(id_type const& to_migrate,
-        DistPolicy const& policy, naming::id_type const& id,
+        DistPolicy const& policy, hpx::id_type const& id,
         naming::address const& addr)
     {
         if (!traits::component_supports_migration<Component>::call())
@@ -258,14 +258,14 @@ namespace hpx { namespace components { namespace server {
                         throw;
                     }
                 }
-                return std::move(f);
+                return HPX_MOVE(f);
             });
     }
 
     template <typename Component, typename DistPolicy>
     struct trigger_migrate_component_action
       : ::hpx::actions::action<future<id_type> (*)(id_type const&,
-                                   DistPolicy const&, naming::id_type const&,
+                                   DistPolicy const&, hpx::id_type const&,
                                    naming::address const&),
             &trigger_migrate_component<Component, DistPolicy>,
             trigger_migrate_component_action<Component, DistPolicy>>
@@ -296,13 +296,12 @@ namespace hpx { namespace components { namespace server {
                 [=](future<std::shared_ptr<Component>>&& f) -> future<id_type> {
                     std::shared_ptr<Component> ptr = f.get();
 
-                    using bm_result =
-                        std::pair<naming::id_type, naming::address>;
+                    using bm_result = std::pair<hpx::id_type, naming::address>;
 
                     // mark object in AGAS as being migrated first
                     return agas::begin_migration(to_migrate)
                         .then(launch::sync,
-                            [ptr = std::move(ptr), to_migrate, policy](
+                            [ptr = HPX_MOVE(ptr), to_migrate, policy](
                                 hpx::future<bm_result>&& bmf) mutable
                             -> future<id_type> {
                                 auto r = bmf.get();    // propagate exceptions

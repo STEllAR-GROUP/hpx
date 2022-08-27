@@ -33,7 +33,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename Sent, typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_sentinel_for_v =
+    inline constexpr bool is_sentinel_for_v =
         is_sentinel_for<Sent, Iter>::value;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ namespace hpx { namespace traits {
         std::disable_sized_sentinel_for<Sent, Iter>;
 #else
     template <typename Sent, typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool disable_sized_sentinel_for = false;
+    inline constexpr bool disable_sized_sentinel_for = false;
 #endif
 
     template <typename Sent, typename Iter, typename Enable = void>
@@ -64,7 +64,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename Sent, typename Iter>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_sized_sentinel_for_v =
+    inline constexpr bool is_sized_sentinel_for_v =
         is_sized_sentinel_for<Sent, Iter>::value;
 
 }}    // namespace hpx::traits

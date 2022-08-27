@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <utility>
 #include <vector>
@@ -28,7 +29,7 @@ using hpx::program_options::variables_map;
 
 using std::chrono::milliseconds;
 
-using hpx::lcos::local::barrier;
+using hpx::barrier;
 using hpx::lcos::local::mutex;
 
 using hpx::threads::make_thread_function_nullary;
@@ -46,11 +47,11 @@ typedef std::pair<thread_id_type, std::size_t> value_type;
 typedef std::vector<value_type> fifo_type;
 
 ///////////////////////////////////////////////////////////////////////////////
-void lock_and_wait(mutex& m, barrier& b0, barrier& b1, value_type& entry,
-    std::size_t /* wait */)
+void lock_and_wait(mutex& m, std::shared_ptr<barrier<>> b0,
+    std::shared_ptr<barrier<>> b1, value_type& entry, std::size_t /* wait */)
 {
     // Wait for all hpxthreads in this iteration to be created.
-    b0.wait();
+    b0->arrive_and_wait();
 
     // keep this thread alive while being suspended
     thread_id_ref_type this_ = get_self_id();
@@ -76,7 +77,7 @@ void lock_and_wait(mutex& m, barrier& b0, barrier& b1, value_type& entry,
     }
 
     // Make hpx_main wait for us to finish.
-    b1.wait();
+    b1->arrive_and_wait();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -111,7 +112,10 @@ int hpx_main(variables_map& vm)
 
         // Allocate the mutexes.
         std::vector<mutex> m(mutex_count);
-        barrier b0(hpxthread_count + 1), b1(hpxthread_count + 1);
+        std::shared_ptr<barrier<>> b0 =
+            std::make_shared<barrier<>>(hpxthread_count + 1);
+        std::shared_ptr<barrier<>> b1 =
+            std::make_shared<barrier<>>(hpxthread_count + 1);
 
         // keep created threads alive while they are suspended
         std::vector<thread_id_ref_type> ids;
@@ -121,18 +125,17 @@ int hpx_main(variables_map& vm)
             const std::size_t index = j % mutex_count;
 
             thread_init_data data(
-                make_thread_function_nullary(hpx::util::bind(&lock_and_wait,
-                    std::ref(m[index]), std::ref(b0), std::ref(b1),
-                    std::ref(hpxthreads[j]), wait)),
+                make_thread_function_nullary(hpx::bind(&lock_and_wait,
+                    std::ref(m[index]), b0, b1, std::ref(hpxthreads[j]), wait)),
                 "lock_and_wait");
             ids.push_back(register_thread(data));
         }
 
         // Tell all hpxthreads that they can start running.
-        b0.wait();
+        b0->arrive_and_wait();
 
         // Wait for all hpxthreads to finish.
-        b1.wait();
+        b1->arrive_and_wait();
 
         // {{{ Print results for this iteration.
         for (value_type& entry : hpxthreads)

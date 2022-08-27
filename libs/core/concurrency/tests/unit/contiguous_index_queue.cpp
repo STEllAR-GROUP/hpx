@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <functional>
 #include <iterator>
+#include <memory>
 #include <random>
 #include <vector>
 
@@ -99,7 +100,8 @@ enum class pop_mode
 };
 
 void test_concurrent_worker(pop_mode m, std::size_t thread_index,
-    hpx::barrier<>& b, hpx::concurrency::detail::contiguous_index_queue<>& q,
+    std::shared_ptr<hpx::barrier<>> b,
+    hpx::concurrency::detail::contiguous_index_queue<>& q,
     std::vector<std::uint32_t>& popped_indices)
 {
     hpx::optional<std::uint32_t> curr;
@@ -107,7 +109,7 @@ void test_concurrent_worker(pop_mode m, std::size_t thread_index,
     std::uniform_int_distribution<> d(0, 1);
 
     // Make sure all threads start roughly at the same time.
-    b.arrive_and_wait();
+    b->arrive_and_wait();
 
     switch (m)
     {
@@ -146,12 +148,13 @@ void test_concurrent(pop_mode m)
     std::vector<hpx::future<void>> fs;
     std::vector<std::vector<std::uint32_t>> popped_indices(num_threads);
     fs.reserve(num_threads);
-    hpx::barrier<> b(num_threads);
+    std::shared_ptr<hpx::barrier<>> b =
+        std::make_shared<hpx::barrier<>>(num_threads);
 
     for (std::size_t i = 0; i < num_threads; ++i)
     {
-        fs.push_back(hpx::async(test_concurrent_worker, m, i, std::ref(b),
-            std::ref(q), std::ref(popped_indices[i])));
+        fs.push_back(hpx::async(test_concurrent_worker, m, i, b, std::ref(q),
+            std::ref(popped_indices[i])));
     }
 
     hpx::wait_all(fs);

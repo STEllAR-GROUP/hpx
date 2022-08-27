@@ -25,11 +25,11 @@ buffer_plain_type bounce_plain(buffer_plain_type const& receive_buffer)
 {
     return receive_buffer;
 }
-HPX_PLAIN_ACTION(bounce_plain);
+HPX_PLAIN_ACTION(bounce_plain)
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
-    buffer_plain_type, serialization_buffer_char);
-HPX_REGISTER_BASE_LCO_WITH_VALUE(buffer_plain_type, serialization_buffer_char);
+    buffer_plain_type, serialization_buffer_char)
+HPX_REGISTER_BASE_LCO_WITH_VALUE(buffer_plain_type, serialization_buffer_char)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Buffer, typename Action>
@@ -136,7 +136,7 @@ void test_initialization_from_vector(std::size_t max_size)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    std::size_t const max_size = 1 << 22;
+    std::size_t const max_size = 1 << 20;
     std::unique_ptr<char[]> send_buffer(new char[max_size]);
 
     for (hpx::id_type const& loc : hpx::find_all_localities())

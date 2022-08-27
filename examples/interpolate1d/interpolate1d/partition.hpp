@@ -16,8 +16,7 @@
 #include "server/partition.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace interpolate1d
-{
+namespace interpolate1d {
     class partition
       : public hpx::components::client_base<partition, server::partition>
     {
@@ -28,30 +27,30 @@ namespace interpolate1d
     public:
         // create a new partition instance and initialize it synchronously
         partition(std::string const& datafilename, dimension const& dim,
-                std::size_t num_nodes)
+            std::size_t num_nodes)
           : base_type(hpx::new_<server::partition>(hpx::find_here()))
         {
             init(datafilename, dim, num_nodes);
         }
 
         partition(hpx::id_type id, std::string const& datafilename,
-                dimension const& dim, std::size_t num_nodes)
+            dimension const& dim, std::size_t num_nodes)
           : base_type(hpx::new_<server::partition>(id))
         {
             init(datafilename, dim, num_nodes);
         }
         explicit partition(hpx::id_type gid)
           : base_type(std::move(gid))
-        {}
+        {
+        }
 
         // initialize this partition
-        hpx::lcos::future<void>
-        init_async(std::string const& datafilename, dimension const& dim,
-            std::size_t num_nodes)
+        hpx::future<void> init_async(std::string const& datafilename,
+            dimension const& dim, std::size_t num_nodes)
         {
             typedef server::partition::init_action init_action;
-            return hpx::async(init_action(), this->get_id(), datafilename,
-                dim, num_nodes);
+            return hpx::async(
+                init_action(), this->get_id(), datafilename, dim, num_nodes);
         }
 
         void init(std::string const& datafilename, dimension const& dim,
@@ -62,8 +61,7 @@ namespace interpolate1d
 
         // ask this partition to interpolate, note that value must be in the
         // range valid for this partition
-        hpx::lcos::future<double>
-        interpolate_async(double value) const
+        hpx::future<double> interpolate_async(double value) const
         {
             typedef server::partition::interpolate_action interpolate_action;
             return hpx::async(interpolate_action(), this->get_id(), value);
@@ -74,7 +72,4 @@ namespace interpolate1d
             return interpolate_async(value).get();
         }
     };
-}
-
-
-
+}    // namespace interpolate1d

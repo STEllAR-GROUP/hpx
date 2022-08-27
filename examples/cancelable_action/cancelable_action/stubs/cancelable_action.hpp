@@ -13,34 +13,31 @@
 #include "../server/cancelable_action.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace examples { namespace stubs
-{
+namespace examples { namespace stubs {
     ///////////////////////////////////////////////////////////////////////////
     struct cancelable_action
       : hpx::components::stub_base<server::cancelable_action>
     {
         // Do some lengthy work
-        static hpx::lcos::future<void>
-        do_it_async(hpx::naming::id_type const& gid)
+        static hpx::future<void> do_it_async(hpx::id_type const& gid)
         {
             typedef server::cancelable_action::do_it_action action_type;
             return hpx::async<action_type>(gid);
         }
 
-        static void do_it(hpx::naming::id_type const& gid,
-            hpx::error_code& ec = hpx::throws)
+        static void do_it(
+            hpx::id_type const& gid, hpx::error_code& ec = hpx::throws)
         {
             do_it_async(gid).get(ec);
         }
 
         // Cancel the lengthy action above
-        static void cancel_it(hpx::naming::id_type const& gid)
+        static void cancel_it(hpx::id_type const& gid)
         {
             typedef server::cancelable_action::cancel_it_action action_type;
             hpx::apply<action_type>(gid);
         }
     };
-}}
-
+}}    // namespace examples::stubs
 
 #endif

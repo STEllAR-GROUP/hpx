@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -17,7 +17,6 @@
 #include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -30,34 +29,35 @@ namespace hpx { namespace traits {
             typename Enable = void>
         struct future_then_executor_result
         {
-            typedef typename continuation_not_callable<Future, F>::type type;
+            using type = typename continuation_not_callable<Future, F>::type;
         };
 
         template <typename Executor, typename Future, typename F>
         struct future_then_executor_result<Executor, Future, F,
-            typename hpx::util::always_void<
-                typename hpx::util::invoke_result<F&, Future>::type>::type>
+            hpx::util::always_void_t<hpx::util::invoke_result_t<F&, Future>>>
         {
-            typedef typename hpx::util::invoke_result<F&, Future>::type
-                func_result_type;
+            using func_result_type = hpx::util::invoke_result_t<F&, Future>;
 
-            typedef typename traits::executor_future<Executor, func_result_type,
-                Future>::type cont_result;
+            using cont_result =
+                traits::executor_future_t<Executor, func_result_type, Future>;
 
             // perform unwrapping of future<future<R>>
-            typedef typename util::lazy_conditional<
-                hpx::traits::detail::is_unique_future<cont_result>::value,
+            using result_type = util::lazy_conditional_t<
+                hpx::traits::detail::is_unique_future_v<cont_result>,
                 hpx::traits::future_traits<cont_result>,
-                hpx::util::identity<cont_result>>::type result_type;
+                hpx::util::identity<cont_result>>;
 
-            typedef hpx::lcos::future<result_type> type;
+            using type = hpx::future<result_type>;
         };
     }    // namespace detail
 
     template <typename Executor, typename Future, typename F>
     struct future_then_executor_result
-      : detail::future_then_executor_result<typename std::decay<Executor>::type,
-            Future, F>
+      : detail::future_then_executor_result<std::decay_t<Executor>, Future, F>
     {
     };
+
+    template <typename Executor, typename Future, typename F>
+    using future_then_executor_result_t =
+        typename future_then_executor_result<Executor, Future, F>::type;
 }}    // namespace hpx::traits

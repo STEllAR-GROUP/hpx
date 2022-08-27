@@ -10,6 +10,8 @@
 
 // System Header Files
 #include <cerrno>
+#include <cstddef>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -444,7 +446,7 @@ namespace hpx { namespace util {
             if (it != entries_.end())
             {
                 auto& e = it->second;
-                e.first = std::move(val);
+                e.first = HPX_MOVE(val);
                 if (!e.second.empty())
                 {
                     std::string value = e.first;
@@ -530,8 +532,8 @@ namespace hpx { namespace util {
     public:
         template <typename A1, typename A2>
         compose_callback_impl(A1&& f1, A2&& f2)
-          : f1_(std::forward<A1>(f1))
-          , f2_(std::forward<A2>(f2))
+          : f1_(HPX_FORWARD(A1, f1))
+          , f2_(HPX_FORWARD(A2, f2))
         {
         }
 
@@ -548,19 +550,19 @@ namespace hpx { namespace util {
 
     template <typename F1, typename F2>
     static HPX_FORCEINLINE
-        util::function_nonser<void(std::string const&, std::string const&)>
+        hpx::function<void(std::string const&, std::string const&)>
         compose_callback(F1&& f1, F2&& f2)
     {
         if (!f1)
-            return std::forward<F2>(f2);
+            return HPX_FORWARD(F2, f2);
         else if (!f2)
-            return std::forward<F1>(f1);
+            return HPX_FORWARD(F1, f1);
 
         // otherwise create a combined callback
         typedef compose_callback_impl<typename std::decay<F1>::type,
             typename std::decay<F2>::type>
             result_type;
-        return result_type(std::forward<F1>(f1), std::forward<F2>(f2));
+        return result_type(HPX_FORWARD(F1, f1), HPX_FORWARD(F2, f2));
     }
 
     void section::add_notification_callback(std::unique_lock<mutex_type>& l,
@@ -981,28 +983,19 @@ namespace hpx { namespace util {
     }
 
     ///////////////////////////////////////////////////////////////////////////////
-    // explicit instantiation for the correct archive types
-    void serialize(serialization::output_archive& ar,
-        section::entry_type const& data, unsigned int /* version */)
-    {
-        ar << data.first;
-        // do not handle callback function
-    }
-
-    void serialize(serialization::input_archive& ar, section::entry_type& data,
-        unsigned int /* version */)
-    {
-        ar >> data.first;
-        // do not handle callback function
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////
     template <typename Archive>
     void section::save(Archive& ar, const unsigned int /* version */) const
     {
         ar << name_;
         ar << parent_name_;
-        ar << entries_;
+
+        std::uint64_t size = entries_.size();
+        ar << size;
+        for (auto const& val : entries_)
+        {
+            ar << val.first;
+        }
+
         ar << sections_;
     }
 
@@ -1011,7 +1004,20 @@ namespace hpx { namespace util {
     {
         ar >> name_;
         ar >> parent_name_;
-        ar >> entries_;
+
+        std::uint64_t size;
+        ar >> size;    //-V128
+
+        entries_.clear();
+        for (std::size_t i = 0; i < size; ++i)
+        {
+            using value_type = typename entry_map::value_type;
+
+            value_type v;
+            ar >> const_cast<std::string&>(v.first);
+            entries_.insert(entries_.end(), HPX_MOVE(v));
+        }
+
         ar >> sections_;
 
         set_root(this, true);    // make this the current root

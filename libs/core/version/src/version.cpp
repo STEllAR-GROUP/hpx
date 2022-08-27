@@ -41,6 +41,11 @@
 
 #endif
 
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
+    defined(HPX_HAVE_MODULE_LCI_BASE)
+#include <lci.h>
+#endif
+
 #include <hwloc.h>
 
 #include <algorithm>
@@ -109,6 +114,16 @@ namespace hpx {
 #else
         strm << ", unknown MPI version";
 #endif
+        return strm.str();
+    }
+#endif
+
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
+    defined(HPX_HAVE_MODULE_LCI_BASE)
+    std::string lci_version()
+    {
+        std::ostringstream strm;
+        strm << "the one and only LCI";
         return strm.str();
     }
 #endif
@@ -272,6 +287,10 @@ namespace hpx {
                                                 "  HPX: {}\n"
                                                 "  Boost: {}\n"
                                                 "  Hwloc: {}\n"
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
+    defined(HPX_HAVE_MODULE_LCI_BASE)
+                                                "  LCI: {}\n"
+#endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_MODULE_MPI_BASE)
                                                 "  MPI: {}\n"
@@ -284,6 +303,10 @@ namespace hpx {
                                                 "  Compiler: {}\n"
                                                 "  Standard Library: {}\n",
             build_string(), boost_version(), hwloc_version(),
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
+    defined(HPX_HAVE_MODULE_LCI_BASE)
+            lci_version(),
+#endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_MODULE_MPI_BASE)
             mpi_version(),

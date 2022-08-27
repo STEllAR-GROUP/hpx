@@ -17,7 +17,7 @@
 #include <cstdint>
 
 HPX_PLAIN_ACTION_ID(hpx::components::server::destroy_component,
-    hpx_destroy_component_action, hpx::actions::free_component_action_id);
+    hpx_destroy_component_action, hpx::actions::free_component_action_id)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server {
@@ -58,8 +58,8 @@ namespace hpx { namespace components { namespace server {
         }
 
         // apply remotely (only if runtime is not stopping)
-        naming::id_type id = get_colocation_id(
-            launch::sync, naming::id_type(gid, naming::id_type::unmanaged));
+        hpx::id_type id = get_colocation_id(launch::sync,
+            hpx::id_type(gid, hpx::id_type::management_type::unmanaged));
 
         hpx_destroy_component_action()(id, gid, addr);
     }

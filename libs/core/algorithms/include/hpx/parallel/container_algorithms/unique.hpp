@@ -10,7 +10,6 @@
 #pragma once
 
 #if defined(DOXYGEN)
-
 namespace hpx { namespace ranges {
     // clang-format off
 
@@ -585,7 +584,7 @@ namespace hpx { namespace ranges {
     // clang-format on
 }}    // namespace hpx::ranges
 
-#else
+#else    // DOXYGEN
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -594,7 +593,6 @@ namespace hpx { namespace ranges {
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/parallel/util/tagged_pair.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
@@ -628,9 +626,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return unique(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-            hpx::util::end(rng), std::forward<Pred>(pred),
-            std::forward<Proj>(proj));
+        return unique(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -661,9 +659,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return unique_copy(std::forward<ExPolicy>(policy),
-            hpx::util::begin(rng), hpx::util::end(rng), dest,
-            std::forward<Pred>(pred), std::forward<Proj>(proj));
+        return unique_copy(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
+            HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
@@ -678,7 +676,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::unique
-    HPX_INLINE_CONSTEXPR_VARIABLE struct unique_t final
+    inline constexpr struct unique_t final
       : hpx::detail::tag_parallel_algorithm<unique_t>
     {
     private:
@@ -696,7 +694,7 @@ namespace hpx { namespace ranges {
                     parallel::traits::projected<Proj, FwdIter>>::value
             )>
         // clang-format on
-        friend subrange_t<FwdIter, Sent> tag_fallback_dispatch(
+        friend subrange_t<FwdIter, Sent> tag_fallback_invoke(
             hpx::ranges::unique_t, FwdIter first, Sent last,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
@@ -705,8 +703,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::util::make_subrange<FwdIter, Sent>(
                 hpx::parallel::v1::detail::unique<FwdIter>().call(
-                    hpx::execution::seq, first, last, std::forward<Pred>(pred),
-                    std::forward<Proj>(proj)),
+                    hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj)),
                 last);
         }
 
@@ -727,7 +725,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             subrange_t<FwdIter, Sent>>::type
-        tag_fallback_dispatch(hpx::ranges::unique_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::unique_t, ExPolicy&& policy,
             FwdIter first, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
@@ -736,8 +734,8 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::util::make_subrange<FwdIter, Sent>(
                 hpx::parallel::v1::detail::unique<FwdIter>().call(
-                    std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj)),
+                    HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)),
                 last);
         }
 
@@ -756,7 +754,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend subrange_t<hpx::traits::range_iterator_t<Rng>,
             hpx::traits::range_iterator_t<Rng>>
-        tag_fallback_dispatch(hpx::ranges::unique_t, Rng&& rng,
+        tag_fallback_invoke(hpx::ranges::unique_t, Rng&& rng,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
@@ -770,8 +768,8 @@ namespace hpx { namespace ranges {
                 hpx::parallel::v1::detail::unique<
                     hpx::traits::range_iterator_t<Rng>>()
                     .call(hpx::execution::seq, hpx::util::begin(rng),
-                        hpx::util::end(rng), std::forward<Pred>(pred),
-                        std::forward<Proj>(proj)),
+                        hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                        HPX_FORWARD(Proj, proj)),
                 hpx::util::end(rng));
         }
 
@@ -792,8 +790,8 @@ namespace hpx { namespace ranges {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             subrange_t<hpx::traits::range_iterator_t<Rng>,
                 hpx::traits::range_iterator_t<Rng>>>::type
-        tag_fallback_dispatch(hpx::ranges::unique_t, ExPolicy&& policy,
-            Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj())
+        tag_fallback_invoke(hpx::ranges::unique_t, ExPolicy&& policy, Rng&& rng,
+            Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
@@ -805,9 +803,9 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::v1::detail::unique<
                     hpx::traits::range_iterator_t<Rng>>()
-                    .call(std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                        hpx::util::end(rng), std::forward<Pred>(pred),
-                        std::forward<Proj>(proj)),
+                    .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                        hpx::util::end(rng), HPX_FORWARD(Pred, pred),
+                        HPX_FORWARD(Proj, proj)),
                 hpx::util::end(rng));
         }
     } unique{};
@@ -817,7 +815,7 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::ranges::unique_copy
-    HPX_INLINE_CONSTEXPR_VARIABLE struct unique_copy_t final
+    inline constexpr struct unique_copy_t final
       : hpx::detail::tag_parallel_algorithm<unique_copy_t>
     {
     private:
@@ -835,7 +833,7 @@ namespace hpx { namespace ranges {
                     parallel::traits::projected<Proj, InIter>>::value
             )>
         // clang-format on
-        friend unique_copy_result<InIter, O> tag_fallback_dispatch(
+        friend unique_copy_result<InIter, O> tag_fallback_invoke(
             hpx::ranges::unique_copy_t, InIter first, Sent last, O dest,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
@@ -845,8 +843,8 @@ namespace hpx { namespace ranges {
             using result_type = unique_copy_result<InIter, O>;
 
             return hpx::parallel::v1::detail::unique_copy<result_type>().call(
-                hpx::execution::seq, first, last, dest,
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                hpx::execution::seq, first, last, dest, HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -867,7 +865,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             unique_copy_result<FwdIter, O>>::type
-        tag_fallback_dispatch(hpx::ranges::unique_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::unique_copy_t, ExPolicy&& policy,
             FwdIter first, Sent last, O dest, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
@@ -877,8 +875,8 @@ namespace hpx { namespace ranges {
             using result_type = unique_copy_result<FwdIter, O>;
 
             return hpx::parallel::v1::detail::unique_copy<result_type>().call(
-                std::forward<ExPolicy>(policy), first, last, dest,
-                std::forward<Pred>(pred), std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -895,7 +893,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend unique_copy_result<hpx::traits::range_iterator_t<Rng>, O>
-        tag_fallback_dispatch(hpx::ranges::unique_copy_t, Rng&& rng, O dest,
+        tag_fallback_invoke(hpx::ranges::unique_copy_t, Rng&& rng, O dest,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
@@ -907,7 +905,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::unique_copy<result_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                dest, std::forward<Pred>(pred), std::forward<Proj>(proj));
+                dest, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -926,7 +924,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             unique_copy_result<hpx::traits::range_iterator_t<Rng>, O>>::type
-        tag_fallback_dispatch(hpx::ranges::unique_copy_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::unique_copy_t, ExPolicy&& policy,
             Rng&& rng, O dest, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
@@ -937,11 +935,11 @@ namespace hpx { namespace ranges {
             using result_type = unique_copy_result<iterator_type, O>;
 
             return hpx::parallel::v1::detail::unique_copy<result_type>().call(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
-                hpx::util::end(rng), dest, std::forward<Pred>(pred),
-                std::forward<Proj>(proj));
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
     } unique_copy{};
 }}    // namespace hpx::ranges
 
-#endif
+#endif    // DOXYGEN

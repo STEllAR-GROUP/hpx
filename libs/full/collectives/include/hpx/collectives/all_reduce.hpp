@@ -121,7 +121,7 @@ namespace hpx { namespace traits {
 
             auto this_ = this->shared_from_this();
             auto on_ready =
-                [this_ = std::move(this_), op = std::forward<F>(op)](
+                [this_ = HPX_MOVE(this_), op = HPX_FORWARD(F, op)](
                     hpx::shared_future<void> f) mutable -> arg_type {
                 HPX_UNUSED(this_);
                 f.get();    // propagate any exceptions
@@ -129,7 +129,8 @@ namespace hpx { namespace traits {
                 auto& communicator = this_->communicator_;
 
                 lock_type l(communicator.mtx_);
-                util::ignore_while_checking<lock_type> il(&l);
+                util::ignore_while_checking il(&l);
+                HPX_UNUSED(il);
 
                 auto& data = communicator.template access_data<arg_type>(l);
                 if (!communicator.data_available_)
@@ -143,18 +144,19 @@ namespace hpx { namespace traits {
             };
 
             lock_type l(communicator_.mtx_);
-            util::ignore_while_checking<lock_type> il(&l);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
 
             hpx::future<arg_type> f =
                 communicator_.gate_.get_shared_future(l).then(
-                    hpx::launch::sync, std::move(on_ready));
+                    hpx::launch::sync, HPX_MOVE(on_ready));
 
             communicator_.gate_.synchronize(1, l);
 
             auto& data = communicator_.template access_data<arg_type>(l);
-            data[which] = std::forward<T>(t);
+            data[which] = HPX_FORWARD(T, t);
 
-            if (communicator_.gate_.set(which, std::move(l)))
+            if (communicator_.gate_.set(which, HPX_MOVE(l)))
             {
                 l = lock_type(communicator_.mtx_);
                 communicator_.invalidate_data(l);
@@ -183,8 +185,8 @@ namespace hpx { namespace collectives {
         using arg_type = std::decay_t<T>;
 
         auto all_reduce_data_direct =
-            [op = std::forward<F>(op),
-                local_result = std::forward<T>(local_result),
+            [op = HPX_FORWARD(F, op),
+                local_result = HPX_FORWARD(T, local_result),
                 this_site](communicator&& c) mutable -> hpx::future<arg_type> {
             using func_type = std::decay_t<F>;
             using action_type = typename detail::communicator_server::
@@ -195,15 +197,15 @@ namespace hpx { namespace collectives {
             // make sure id is kept alive as long as the returned future,
             // explicitly unwrap returned future
             hpx::future<arg_type> result = async(action_type(), c, this_site,
-                std::forward<T>(local_result), std::forward<F>(op));
+                HPX_FORWARD(T, local_result), HPX_FORWARD(F, op));
 
             traits::detail::get_shared_state(result)->set_on_completed(
-                [client = std::move(c)]() { HPX_UNUSED(client); });
+                [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
 
             return result;
         };
 
-        return fid.then(hpx::launch::sync, std::move(all_reduce_data_direct));
+        return fid.then(hpx::launch::sync, HPX_MOVE(all_reduce_data_direct));
     }
 
     template <typename T, typename F>
@@ -215,7 +217,7 @@ namespace hpx { namespace collectives {
     {
         return all_reduce(create_communicator(basename, num_sites, this_site,
                               generation, root_site),
-            std::forward<T>(local_result), std::forward<F>(op), this_site);
+            HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site);
     }
 }}    // namespace hpx::collectives
 
@@ -233,7 +235,7 @@ namespace hpx { namespace lcos {
         std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
     {
         return hpx::collectives::all_reduce(basename,
-            std::forward<T>(local_result), std::forward<F>(op),
+            HPX_FORWARD(T, local_result), HPX_FORWARD(F, op),
             hpx::collectives::num_sites_arg(num_sites),
             hpx::collectives::this_site_arg(this_site),
             hpx::collectives::generation_arg(generation),
@@ -254,7 +256,7 @@ namespace hpx { namespace lcos {
             // silence bogus clang-tidy error
             return hpx::collectives::all_reduce(basename, f.get(),
                 // NOLINTNEXTLINE(bugprone-move-forwarding-reference)
-                std::move(op), hpx::collectives::num_sites_arg(num_sites),
+                HPX_MOVE(op), hpx::collectives::num_sites_arg(num_sites),
                 hpx::collectives::this_site_arg(this_site),
                 hpx::collectives::generation_arg(generation),
                 hpx::collectives::root_site_arg(root_site));
@@ -268,8 +270,8 @@ namespace hpx { namespace lcos {
     hpx::future<std::decay_t<T>> all_reduce(hpx::collectives::communicator comm,
         T&& local_result, F&& op, std::size_t this_site = std::size_t(-1))
     {
-        return hpx::collectives::all_reduce(std::move(comm),
-            std::forward<T>(local_result), std::forward<F>(op),
+        return hpx::collectives::all_reduce(HPX_MOVE(comm),
+            HPX_FORWARD(T, local_result), HPX_FORWARD(F, op),
             hpx::collectives::this_site_arg(this_site));
     }
 
@@ -283,9 +285,9 @@ namespace hpx { namespace lcos {
     {
         return local_result.then([=](hpx::future<T>&& f) mutable {
             // silence bogus clang-tidy error
-            hpx::collectives::all_reduce(std::move(comm), f.get(),
+            hpx::collectives::all_reduce(HPX_MOVE(comm), f.get(),
                 // NOLINTNEXTLINE(bugprone-move-forwarding-reference)
-                std::move(op), hpx::collectives::this_site_arg(this_site));
+                HPX_MOVE(op), hpx::collectives::this_site_arg(this_site));
         });
     }
 

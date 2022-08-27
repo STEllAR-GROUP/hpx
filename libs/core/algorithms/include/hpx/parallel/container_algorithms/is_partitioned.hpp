@@ -9,228 +9,226 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx {
-    namespace ranges {
-        /// Determines if the range [first, last) is partitioned.
-        ///
-        /// \note   Complexity: at most (N) predicate evaluations where
-        ///         \a N = distance(first, last).
-        ///
-        /// \tparam FwdIter     The type of the source iterators used for the
-        ///                     This iterator type must meet the requirements of a
-        ///                     forward iterator.
-        /// \tparam Sent        The type of the source sentinel (deduced). This
-        ///                     sentinel type must be a sentinel for FwdIter.
-        /// \tparam Proj        The type of an optional projection function. This
-        ///                     defaults to \a hpx::parallel::util::projection_identity.
-        /// \tparam Pred        The type of the function/function object to use
-        ///                     (deduced).
-        /// \param first        Refers to the beginning of the sequence of elements
-        ///                     of that the algorithm will be applied to.
-        /// \param last         Refers to the end of the sequence of elements of
-        ///                     that the algorithm will be applied to.
-        /// \param pred         Refers to the unary predicate which returns true
-        ///                     for elements expected to be found in the beginning
-        ///                     of the range. The signature of the function
-        ///                     should be equivalent to
-        ///                     \code
-        ///                     bool pred(const Type &a);
-        ///                     \endcode \n
-        ///                     The signature does not need to have const &, but
-        ///                     the function must not modify the objects passed to
-        ///                     it. The type \a Type must be such that objects of
-        ///                     types \a FwdIter can be dereferenced and then
-        ///                     implicitly converted to Type.
-        /// \param proj         Specifies the function (or function object) which
-        ///                     will be invoked for each of the elements as a
-        ///                     projection operation before the actual predicate
-        ///                     \a is invoked.
-        ///
-        /// \returns  The \a is_partitioned algorithm returns \a bool.
-        ///           The \a is_partitioned algorithm returns true if each element
-        ///           in the sequence for which pred returns true precedes those for
-        ///           which pred returns false. Otherwise is_partitioned returns
-        ///           false. If the range [first, last) contains less than two
-        ///           elements, the function is always true.
-        ///
-        template <typename FwdIter, typename Sent, typename Pred,
-            typename Proj = hpx::parallel::util::projection_identity>
-        bool is_partitioned(
-            FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj());
+namespace hpx { namespace ranges {
+    /// Determines if the range [first, last) is partitioned.
+    ///
+    /// \note   Complexity: at most (N) predicate evaluations where
+    ///         \a N = distance(first, last).
+    ///
+    /// \tparam FwdIter     The type of the source iterators used for the
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a hpx::parallel::util::projection_identity.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced).
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of that the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     that the algorithm will be applied to.
+    /// \param pred         Refers to the unary predicate which returns true
+    ///                     for elements expected to be found in the beginning
+    ///                     of the range. The signature of the function
+    ///                     should be equivalent to
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// \returns  The \a is_partitioned algorithm returns \a bool.
+    ///           The \a is_partitioned algorithm returns true if each element
+    ///           in the sequence for which pred returns true precedes those for
+    ///           which pred returns false. Otherwise is_partitioned returns
+    ///           false. If the range [first, last) contains less than two
+    ///           elements, the function is always true.
+    ///
+    template <typename FwdIter, typename Sent, typename Pred,
+        typename Proj = hpx::parallel::util::projection_identity>
+    bool is_partitioned(
+        FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj());
 
-        /// Determines if the range [first, last) is partitioned.
-        ///
-        /// \note   Complexity: at most (N) predicate evaluations where
-        ///         \a N = distance(first, last).
-        ///
-        /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-        ///                     It describes the manner in which the execution
-        ///                     of the algorithm may be parallelized and the manner
-        ///                     in which it executes the assignments.
-        /// \tparam FwdIter     The type of the source iterators used for the
-        ///                     This iterator type must meet the requirements of a
-        ///                     forward iterator.
-        /// \tparam Sent        The type of the source sentinel (deduced). This
-        ///                     sentinel type must be a sentinel for FwdIter.
-        /// \tparam Proj        The type of an optional projection function. This
-        ///                     defaults to \a hpx::parallel::util::projection_identity.
-        /// \tparam Pred        The type of the function/function object to use
-        ///                     (deduced). \a Pred must be \a CopyConstructible
-        ///                     when using a parallel policy.
-        /// \param policy       The execution policy to use for the scheduling of
-        ///                     the iterations.
-        /// \param first        Refers to the beginning of the sequence of elements
-        ///                     of that the algorithm will be applied to.
-        /// \param last         Refers to the end of the sequence of elements of
-        ///                     that the algorithm will be applied to.
-        /// \param pred         Refers to the unary predicate which returns true
-        ///                     for elements expected to be found in the beginning
-        ///                     of the range. The signature of the function
-        ///                     should be equivalent to
-        ///                     \code
-        ///                     bool pred(const Type &a);
-        ///                     \endcode \n
-        ///                     The signature does not need to have const &, but
-        ///                     the function must not modify the objects passed to
-        ///                     it. The type \a Type must be such that objects of
-        ///                     types \a FwdIter can be dereferenced and then
-        ///                     implicitly converted to Type.
-        /// \param proj         Specifies the function (or function object) which
-        ///                     will be invoked for each of the elements as a
-        ///                     projection operation before the actual predicate
-        ///                     \a is invoked.
-        ///
-        /// The predicate operations in the parallel \a is_partitioned algorithm invoked
-        /// with an execution policy object of type \a sequenced_policy
-        /// executes in sequential order in the calling thread.
-        ///
-        /// The comparison operations in the parallel \a is_partitioned algorithm invoked
-        /// with an execution policy object of type \a parallel_policy
-        /// or \a parallel_task_policy are permitted to execute in an unordered
-        /// fashion in unspecified threads, and indeterminately sequenced
-        /// within each thread.
-        ///
-        /// \returns  The \a is_partitioned algorithm returns a \a hpx::future<bool>
-        ///           if the execution policy is of type \a task_execution_policy
-        ///           and returns \a bool otherwise.
-        ///           The \a is_partitioned algorithm returns true if each element
-        ///           in the sequence for which pred returns true precedes those for
-        ///           which pred returns false. Otherwise is_partitioned returns
-        ///           false. If the range [first, last) contains less than two
-        ///           elements, the function is always true.
-        ///
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename Pred,
-            typename Proj = hpx::parallel::util::projection_identity>
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        is_partitioned(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
-            Proj&& proj = Proj());
+    /// Determines if the range [first, last) is partitioned.
+    ///
+    /// \note   Complexity: at most (N) predicate evaluations where
+    ///         \a N = distance(first, last).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used for the
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a hpx::parallel::util::projection_identity.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). \a Pred must be \a CopyConstructible
+    ///                     when using a parallel policy.
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of that the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     that the algorithm will be applied to.
+    /// \param pred         Refers to the unary predicate which returns true
+    ///                     for elements expected to be found in the beginning
+    ///                     of the range. The signature of the function
+    ///                     should be equivalent to
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The predicate operations in the parallel \a is_partitioned algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// executes in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a is_partitioned algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a is_partitioned algorithm returns a \a hpx::future<bool>
+    ///           if the execution policy is of type \a task_execution_policy
+    ///           and returns \a bool otherwise.
+    ///           The \a is_partitioned algorithm returns true if each element
+    ///           in the sequence for which pred returns true precedes those for
+    ///           which pred returns false. Otherwise is_partitioned returns
+    ///           false. If the range [first, last) contains less than two
+    ///           elements, the function is always true.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename Sent, typename Pred,
+        typename Proj = hpx::parallel::util::projection_identity>
+    typename util::detail::algorithm_result<ExPolicy, bool>::type
+    is_partitioned(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
+        Proj&& proj = Proj());
 
-        /// Determines if the range rng is partitioned.
-        ///
-        /// \note   Complexity: at most (N) predicate evaluations where
-        ///         \a N = std::size(rng).
-        ///
-        /// \tparam Rng         The type of the source range used (deduced).
-        ///                     The iterators extracted from this range type must
-        ///                     meet the requirements of an forward iterator.
-        /// \tparam Proj        The type of an optional projection function. This
-        ///                     defaults to \a hpx::parallel::util::projection_identity.
-        /// \tparam Pred        The type of the function/function object to use
-        ///                     (deduced).
-        /// \param rng          Refers to the sequence of elements the algorithm
-        ///                     will be applied to.
-        /// \param pred         Refers to the unary predicate which returns true
-        ///                     for elements expected to be found in the beginning
-        ///                     of the range. The signature of the function
-        ///                     should be equivalent to
-        ///                     \code
-        ///                     bool pred(const Type &a);
-        ///                     \endcode \n
-        ///                     The signature does not need to have const &, but
-        ///                     the function must not modify the objects passed to
-        ///                     it. The type \a Type must be such that objects of
-        ///                     types \a FwdIter can be dereferenced and then
-        ///                     implicitly converted to Type.
-        /// \param proj         Specifies the function (or function object) which
-        ///                     will be invoked for each of the elements as a
-        ///                     projection operation before the actual predicate
-        ///                     \a is invoked.
-        ///
-        /// \returns  The \a is_partitioned algorithm returns \a bool.
-        ///           The \a is_partitioned algorithm returns true if each element
-        ///           in the sequence for which pred returns true precedes those for
-        ///           which pred returns false. Otherwise is_partitioned returns
-        ///           false. If the range rng contains less than two
-        ///           elements, the function is always true.
-        ///
-        template <typename Rng, typename Pred,
-            typename Proj = hpx::parallel::util::projection_identity>
-        bool is_partitioned(Rng&& rng, Pred&& pred, Proj&& proj = Proj());
+    /// Determines if the range rng is partitioned.
+    ///
+    /// \note   Complexity: at most (N) predicate evaluations where
+    ///         \a N = std::size(rng).
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a hpx::parallel::util::projection_identity.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced).
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param pred         Refers to the unary predicate which returns true
+    ///                     for elements expected to be found in the beginning
+    ///                     of the range. The signature of the function
+    ///                     should be equivalent to
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// \returns  The \a is_partitioned algorithm returns \a bool.
+    ///           The \a is_partitioned algorithm returns true if each element
+    ///           in the sequence for which pred returns true precedes those for
+    ///           which pred returns false. Otherwise is_partitioned returns
+    ///           false. If the range rng contains less than two
+    ///           elements, the function is always true.
+    ///
+    template <typename Rng, typename Pred,
+        typename Proj = hpx::parallel::util::projection_identity>
+    bool is_partitioned(Rng&& rng, Pred&& pred, Proj&& proj = Proj());
 
-        /// Determines if the range [first, last) is partitioned.
-        ///
-        /// \note   Complexity: at most (N) predicate evaluations where
-        ///         \a N = std::size(rng).
-        ///
-        /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-        ///                     It describes the manner in which the execution
-        ///                     of the algorithm may be parallelized and the manner
-        ///                     in which it executes the assignments.
-        /// \tparam Rng         The type of the source range used (deduced).
-        ///                     The iterators extracted from this range type must
-        ///                     meet the requirements of an forward iterator.
-        /// \tparam Proj        The type of an optional projection function. This
-        ///                     defaults to \a hpx::parallel::util::projection_identity.
-        /// \tparam Pred        The type of the function/function object to use
-        ///                     (deduced). \a Pred must be \a CopyConstructible
-        ///                     when using a parallel policy.
-        /// \param policy       The execution policy to use for the scheduling of
-        ///                     the iterations.
-        /// \param rng          Refers to the sequence of elements the algorithm
-        ///                     will be applied to.
-        /// \param pred         Refers to the unary predicate which returns true
-        ///                     for elements expected to be found in the beginning
-        ///                     of the range. The signature of the function
-        ///                     should be equivalent to
-        ///                     \code
-        ///                     bool pred(const Type &a);
-        ///                     \endcode \n
-        ///                     The signature does not need to have const &, but
-        ///                     the function must not modify the objects passed to
-        ///                     it. The type \a Type must be such that objects of
-        ///                     types \a FwdIter can be dereferenced and then
-        ///                     implicitly converted to Type.
-        /// \param proj         Specifies the function (or function object) which
-        ///                     will be invoked for each of the elements as a
-        ///                     projection operation before the actual predicate
-        ///                     \a is invoked.
-        ///
-        /// The predicate operations in the parallel \a is_partitioned algorithm invoked
-        /// with an execution policy object of type \a sequenced_policy
-        /// executes in sequential order in the calling thread.
-        ///
-        /// The comparison operations in the parallel \a is_partitioned algorithm invoked
-        /// with an execution policy object of type \a parallel_policy
-        /// or \a parallel_task_policy are permitted to execute in an unordered
-        /// fashion in unspecified threads, and indeterminately sequenced
-        /// within each thread.
-        ///
-        /// \returns  The \a is_partitioned algorithm returns a \a hpx::future<bool>
-        ///           if the execution policy is of type \a task_execution_policy
-        ///           and returns \a bool otherwise.
-        ///           The \a is_partitioned algorithm returns true if each element
-        ///           in the sequence for which pred returns true precedes those for
-        ///           which pred returns false. Otherwise is_partitioned returns
-        ///           false. If the range rng contains less than two
-        ///           elements, the function is always true.
-        ///
-        template <typename ExPolicy, typename Rng, typename Pred,
-            typename Proj = hpx::parallel::util::projection_identity>
-        typename util::detail::algorithm_result<ExPolicy, bool>::type
-        is_partitioned(
-            ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj());
-    }    // namespace ranges
+    /// Determines if the range [first, last) is partitioned.
+    ///
+    /// \note   Complexity: at most (N) predicate evaluations where
+    ///         \a N = std::size(rng).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a hpx::parallel::util::projection_identity.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). \a Pred must be \a CopyConstructible
+    ///                     when using a parallel policy.
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param pred         Refers to the unary predicate which returns true
+    ///                     for elements expected to be found in the beginning
+    ///                     of the range. The signature of the function
+    ///                     should be equivalent to
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The predicate operations in the parallel \a is_partitioned algorithm invoked
+    /// with an execution policy object of type \a sequenced_policy
+    /// executes in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a is_partitioned algorithm invoked
+    /// with an execution policy object of type \a parallel_policy
+    /// or \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a is_partitioned algorithm returns a \a hpx::future<bool>
+    ///           if the execution policy is of type \a task_execution_policy
+    ///           and returns \a bool otherwise.
+    ///           The \a is_partitioned algorithm returns true if each element
+    ///           in the sequence for which pred returns true precedes those for
+    ///           which pred returns false. Otherwise is_partitioned returns
+    ///           false. If the range rng contains less than two
+    ///           elements, the function is always true.
+    ///
+    template <typename ExPolicy, typename Rng, typename Pred,
+        typename Proj = hpx::parallel::util::projection_identity>
+    typename util::detail::algorithm_result<ExPolicy, bool>::type
+    is_partitioned(
+        ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj());
+}}    // namespace hpx::ranges
 #else
 
 #include <hpx/config.hpp>
@@ -252,7 +250,7 @@ namespace hpx {
 #include <vector>
 
 namespace hpx { namespace ranges {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct is_partitioned_t final
+    inline constexpr struct is_partitioned_t final
       : hpx::detail::tag_parallel_algorithm<is_partitioned_t>
     {
     private:
@@ -269,12 +267,12 @@ namespace hpx { namespace ranges {
                     hpx::parallel::traits::projected<Proj, FwdIter>>::value
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(hpx::ranges::is_partitioned_t,
+        friend bool tag_fallback_invoke(hpx::ranges::is_partitioned_t,
             FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, Sent>()
-                .call(hpx::execution::seq, first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -292,12 +290,12 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(hpx::ranges::is_partitioned_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::is_partitioned_t, ExPolicy&& policy,
             FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
         {
             return hpx::parallel::v1::detail::is_partitioned<FwdIter, Sent>()
-                .call(std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -312,7 +310,7 @@ namespace hpx { namespace ranges {
                     hpx::parallel::traits::projected_range<Proj, Rng>>::value
             )>
         // clang-format on
-        friend bool tag_fallback_dispatch(hpx::ranges::is_partitioned_t,
+        friend bool tag_fallback_invoke(hpx::ranges::is_partitioned_t,
             Rng&& rng, Pred&& pred, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -321,7 +319,7 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::is_partitioned<iterator_type,
                 iterator_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng),
-                    std::forward<Pred>(pred), std::forward<Proj>(proj));
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
@@ -339,7 +337,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_dispatch(hpx::ranges::is_partitioned_t, ExPolicy&& policy,
+        tag_fallback_invoke(hpx::ranges::is_partitioned_t, ExPolicy&& policy,
             Rng&& rng, Pred&& pred, Proj&& proj = Proj())
         {
             using iterator_type =
@@ -347,9 +345,9 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::is_partitioned<iterator_type,
                 iterator_type>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng),
-                    std::end(rng), std::forward<Pred>(pred),
-                    std::forward<Proj>(proj));
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
+                    std::end(rng), HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
         }
     } is_partitioned{};
 }}    // namespace hpx::ranges

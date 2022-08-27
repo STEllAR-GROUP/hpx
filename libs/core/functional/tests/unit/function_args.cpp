@@ -49,8 +49,6 @@ struct counter
     }
 
 private:
-    ;
-
     counter& operator=(counter const&);
     counter& operator=(counter&&);
 };
@@ -64,7 +62,7 @@ void f_value(counter) {}
 
 void test_by_value()
 {
-    hpx::util::function_nonser<void(counter)> f = f_value;
+    hpx::function<void(counter)> f = f_value;
 
     counter::reset();
 
@@ -83,7 +81,7 @@ void f_lvalue_ref(counter&) {}
 
 void test_by_lvalue_ref()
 {
-    hpx::util::function_nonser<void(counter&)> f = f_lvalue_ref;
+    hpx::function<void(counter&)> f = f_lvalue_ref;
 
     counter::reset();
 
@@ -102,7 +100,7 @@ void f_const_lvalue_ref(counter const&) {}
 
 void test_by_const_lvalue_ref()
 {
-    hpx::util::function_nonser<void(counter const&)> f = f_const_lvalue_ref;
+    hpx::function<void(counter const&)> f = f_const_lvalue_ref;
 
     counter::reset();
 
@@ -121,7 +119,7 @@ void f_rvalue_ref(counter&&) {}
 
 void test_by_rvalue_ref()
 {
-    hpx::util::function_nonser<void(counter &&)> f = f_rvalue_ref;
+    hpx::function<void(counter &&)> f = f_rvalue_ref;
 
     counter::reset();
 

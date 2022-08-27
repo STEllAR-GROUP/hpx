@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2014 Thomas Heller
 //  Copyright (c)      2015 Anton Bikineev
 //
@@ -17,83 +17,89 @@
 
 #include <cstddef>    // for size_t
 #include <cstdint>
-#include <cstring>    // for memcpy
 #include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
         struct basic_chunker
         {
-            constexpr basic_chunker(std::vector<serialization_chunk>*) {}
+            explicit constexpr basic_chunker(
+                std::vector<serialization_chunk>*) noexcept
+            {
+            }
 
-            static constexpr std::size_t get_chunk_size()
+            static constexpr std::size_t get_chunk_size() noexcept
             {
                 return 0;
             }
 
-            static void set_chunk_size(std::size_t) {}
+            static constexpr void set_chunk_size(std::size_t) noexcept {}
 
-            static constexpr std::uint8_t get_chunk_type()
+            static constexpr chunk_type get_chunk_type() noexcept
             {
-                return chunk_type_index;
+                return chunk_type::chunk_type_index;
             }
 
-            static constexpr std::size_t get_chunk_data_index()
+            static constexpr std::size_t get_chunk_data_index() noexcept
             {
                 return 0;
             }
 
-            static constexpr std::size_t get_num_chunks()
+            static constexpr std::size_t get_num_chunks() noexcept
             {
                 return 1;
             }
 
-            static void push_back(serialization_chunk&& /*chunk*/) {}
+            static constexpr void push_back(
+                serialization_chunk&& /*chunk*/) noexcept
+            {
+            }
 
-            static void reset() {}
+            static constexpr void reset() noexcept {}
         };
 
         struct vector_chunker
         {
-            vector_chunker(std::vector<serialization_chunk>* chunks)
+            explicit constexpr vector_chunker(
+                std::vector<serialization_chunk>* chunks) noexcept
               : chunks_(chunks)
             {
             }
 
-            std::size_t get_chunk_size() const
+            std::size_t get_chunk_size() const noexcept
             {
                 return chunks_->back().size_;
             }
 
-            void set_chunk_size(std::size_t size)
+            void set_chunk_size(std::size_t size) noexcept
             {
                 chunks_->back().size_ = size;
             }
 
-            std::uint8_t get_chunk_type() const
+            chunk_type get_chunk_type() const noexcept
             {
                 return chunks_->back().type_;
             }
 
-            std::size_t get_chunk_data_index() const
+            std::size_t get_chunk_data_index() const noexcept
             {
                 return chunks_->back().data_.index_;
             }
 
-            std::size_t get_num_chunks() const
+            std::size_t get_num_chunks() const noexcept
             {
                 return chunks_->size();
             }
 
             void push_back(serialization_chunk&& chunk)
             {
-                chunks_->push_back(std::move(chunk));
+                chunks_->push_back(HPX_MOVE(chunk));
             }
 
             void reset()
@@ -107,44 +113,45 @@ namespace hpx { namespace serialization {
 
         struct counting_chunker
         {
-            counting_chunker(std::vector<serialization_chunk>*)
+            explicit constexpr counting_chunker(
+                std::vector<serialization_chunk>*) noexcept
               : chunk_()
               , num_chunks_(0)
             {
             }
 
-            std::size_t get_chunk_size() const
+            constexpr std::size_t get_chunk_size() const noexcept
             {
                 return chunk_.size_;
             }
 
-            void set_chunk_size(std::size_t size)
+            void set_chunk_size(std::size_t size) noexcept
             {
                 chunk_.size_ = size;
             }
 
-            std::uint8_t get_chunk_type() const
+            constexpr chunk_type get_chunk_type() const noexcept
             {
                 return chunk_.type_;
             }
 
-            std::size_t get_chunk_data_index() const
+            constexpr std::size_t get_chunk_data_index() const noexcept
             {
                 return chunk_.data_.index_;
             }
 
-            std::size_t get_num_chunks() const
+            constexpr std::size_t get_num_chunks() const noexcept
             {
                 return num_chunks_;
             }
 
-            void push_back(serialization_chunk&& chunk)
+            void push_back(serialization_chunk&& chunk) noexcept
             {
-                chunk_ = std::move(chunk);
+                chunk_ = HPX_MOVE(chunk);
                 ++num_chunks_;
             }
 
-            void reset()
+            void reset() noexcept
             {
                 chunk_ = create_index_chunk(0, 0);
                 num_chunks_ = 1;
@@ -161,12 +168,20 @@ namespace hpx { namespace serialization {
     {
         using access_traits = traits::serialization_access_data<Container>;
 
-        output_container(
-            Container& cont, std::vector<serialization_chunk>* chunks = nullptr)
+        explicit output_container(Container& cont,
+            std::vector<serialization_chunk>* chunks = nullptr,
+            std::size_t zero_copy_serialization_threshold = 0) noexcept
           : cont_(cont)
           , current_(0)
           , chunker_(chunks)
+          , zero_copy_serialization_threshold_(
+                zero_copy_serialization_threshold)
         {
+            if (zero_copy_serialization_threshold_ == 0)
+            {
+                zero_copy_serialization_threshold_ =
+                    HPX_ZERO_COPY_SERIALIZATION_THRESHOLD;
+            }
             chunker_.reset();
         }
 
@@ -174,11 +189,12 @@ namespace hpx { namespace serialization {
 
         void flush() override
         {
-            HPX_ASSERT(chunker_.get_chunk_type() == chunk_type_index ||
+            HPX_ASSERT(
+                chunker_.get_chunk_type() == chunk_type::chunk_type_index ||
                 chunker_.get_chunk_size() != 0);
 
             // complement current serialization_chunk by setting its length
-            if (chunker_.get_chunk_type() == chunk_type_index)
+            if (chunker_.get_chunk_type() == chunk_type::chunk_type_index)
             {
                 HPX_ASSERT(chunker_.get_chunk_size() == 0);
 
@@ -187,7 +203,7 @@ namespace hpx { namespace serialization {
             }
         }
 
-        std::size_t get_num_chunks() const override
+        std::size_t get_num_chunks() const noexcept override
         {
             return chunker_.get_num_chunks();
         }
@@ -211,7 +227,7 @@ namespace hpx { namespace serialization {
 
             // make sure there is a current serialization_chunk descriptor
             // available
-            if (chunker_.get_chunk_type() == chunk_type_pointer ||
+            if (chunker_.get_chunk_type() == chunk_type::chunk_type_pointer ||
                 chunker_.get_chunk_size() != 0)
             {
                 // add a new serialization_chunk,
@@ -231,7 +247,7 @@ namespace hpx { namespace serialization {
         std::size_t save_binary_chunk(
             void const* address, std::size_t count) override
         {
-            if (count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
+            if (count < zero_copy_serialization_threshold_)
             {
                 // fall back to serialization_chunk-less archive
                 this->output_container::save_binary(address, count);
@@ -241,11 +257,12 @@ namespace hpx { namespace serialization {
             }
             else
             {
-                HPX_ASSERT(chunker_.get_chunk_type() == chunk_type_index ||
+                HPX_ASSERT(
+                    chunker_.get_chunk_type() == chunk_type::chunk_type_index ||
                     chunker_.get_chunk_size() != 0);
 
                 // complement current serialization_chunk by setting its length
-                if (chunker_.get_chunk_type() == chunk_type_index)
+                if (chunker_.get_chunk_type() == chunk_type::chunk_type_index)
                 {
                     HPX_ASSERT(chunker_.get_chunk_size() == 0);
 
@@ -256,12 +273,13 @@ namespace hpx { namespace serialization {
                 // add a new serialization_chunk referring to the external
                 // buffer
                 chunker_.push_back(create_pointer_chunk(address, count));
+
                 // the container did not grow
                 return 0;
             }
         }
 
-        bool is_preprocessing() const override
+        bool is_preprocessing() const noexcept override
         {
             return access_traits::is_preprocessing();
         }
@@ -270,6 +288,7 @@ namespace hpx { namespace serialization {
         Container& cont_;
         std::size_t current_;
         Chunker chunker_;
+        std::size_t zero_copy_serialization_threshold_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -279,9 +298,10 @@ namespace hpx { namespace serialization {
         using access_traits = traits::serialization_access_data<Container>;
         using base_type = output_container<Container, Chunker>;
 
-        filtered_output_container(
-            Container& cont, std::vector<serialization_chunk>* chunks = nullptr)
-          : base_type(cont, chunks)
+        explicit filtered_output_container(Container& cont,
+            std::vector<serialization_chunk>* chunks = nullptr,
+            std::size_t zero_copy_serialization_threshold = 0) noexcept
+          : base_type(cont, chunks, zero_copy_serialization_threshold)
           , start_compressing_at_(0)
           , filter_(nullptr)
         {
@@ -289,7 +309,7 @@ namespace hpx { namespace serialization {
 
         ~filtered_output_container() = default;
 
-        void flush()
+        void flush() override
         {
             std::size_t written = 0;
 
@@ -318,7 +338,7 @@ namespace hpx { namespace serialization {
             access_traits::resize(this->cont_, this->current_);
         }
 
-        void set_filter(binary_filter* filter)    // override
+        void set_filter(binary_filter* filter) override
         {
             HPX_ASSERT(nullptr == filter_ && filter != nullptr);
             filter_ = filter;
@@ -327,7 +347,7 @@ namespace hpx { namespace serialization {
             this->base_type::set_filter(nullptr);
         }
 
-        void save_binary(void const* address, std::size_t count)    // override
+        void save_binary(void const* address, std::size_t count) override
         {
             HPX_ASSERT(count != 0);
 
@@ -338,9 +358,9 @@ namespace hpx { namespace serialization {
         }
 
         std::size_t save_binary_chunk(
-            void const* address, std::size_t count)    // override
+            void const* address, std::size_t count) override
         {
-            if (count < HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
+            if (count < this->zero_copy_serialization_threshold_)
             {
                 // fall back to serialization_chunk-less archive
                 HPX_ASSERT(count != 0);
@@ -358,4 +378,4 @@ namespace hpx { namespace serialization {
         std::size_t start_compressing_at_;
         binary_filter* filter_;
     };
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

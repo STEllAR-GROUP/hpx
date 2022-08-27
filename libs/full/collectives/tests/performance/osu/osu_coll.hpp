@@ -60,22 +60,22 @@ params process_args(hpx::program_options::variables_map& vm)
 
 void print_header(std::string const& benchmark)
 {
-    hpx::cout << "# " << benchmark << hpx::endl
-              << "# Size    Latency (microsec)" << hpx::endl
-              << hpx::flush;
+    hpx::cout << "# " << benchmark << std::endl
+              << "# Size    Latency (microsec)" << std::endl
+              << std::flush;
 }
 
 void print_data(double elapsed, std::size_t size, std::size_t iterations)
 {
-    hpx::cout << std::left << std::setw(10) << size << elapsed << hpx::endl
-              << hpx::flush;
+    hpx::cout << std::left << std::setw(10) << size << elapsed << std::endl
+              << std::flush;
 }
 
 inline std::pair<std::size_t, std::vector<hpx::util::remote_locality_result>>
 distribute_component(
     std::vector<hpx::id_type> localities, hpx::components::component_type type);
 
-HPX_PLAIN_ACTION(distribute_component);
+HPX_PLAIN_ACTION(distribute_component)
 
 inline std::pair<std::size_t, std::vector<hpx::util::remote_locality_result>>
 distribute_component(

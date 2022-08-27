@@ -28,14 +28,14 @@ namespace hpx { namespace components {
     struct executor_component : BaseComponent
     {
     private:
-        typedef BaseComponent base_type;
-        typedef Executor executor_type;
-        typedef typename base_type::this_component_type this_component_type;
+        using base_type = BaseComponent;
+        using executor_type = Executor;
+        using this_component_type = typename base_type::this_component_type;
 
     public:
         template <typename... Arg>
         executor_component(executor_type const& exec, Arg&&... arg)
-          : base_type(std::forward<Arg>(arg)...)
+          : base_type(HPX_FORWARD(Arg, arg)...)
           , exec_(exec)
         {
         }
@@ -63,9 +63,9 @@ namespace hpx { namespace components {
             hpx::parallel::execution::async_execute(
                 hpx::get_lva<executor_component>::call(lva)->exec_,
                 hpx::util::deferred_call(
-                    hpx::util::annotated_function(
+                    hpx::annotated_function(
                         &executor_component::execute, desc.get_description()),
-                    std::move(data.func)));
+                    HPX_MOVE(data.func)));
         }
 
     protected:

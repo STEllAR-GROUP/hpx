@@ -4,6 +4,7 @@
 # Copyright (c) 2017 Google
 # Copyright (c) 2017 Taeguk Kwon
 # Copyright (c) 2020 Giannis Gonidelis
+# Copyright (c) 2021 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +18,7 @@ function(add_hpx_config_test variable)
   set(options FILE EXECUTE CUDA)
   set(one_value_args SOURCE ROOT CMAKECXXFEATURE)
   set(multi_value_args
+      CXXFLAGS
       INCLUDE_DIRECTORIES
       LINK_DIRECTORIES
       COMPILE_DEFINITIONS
@@ -126,7 +128,9 @@ function(add_hpx_config_test variable)
 
     if(${variable}_EXECUTE)
       if(NOT CMAKE_CROSSCOMPILING)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${additional_cmake_flags}")
+        set(CMAKE_CXX_FLAGS
+            "${CMAKE_CXX_FLAGS} ${additional_cmake_flags} ${${variable}_CXXFLAGS}"
+        )
         # cmake-format: off
         try_run(
           ${variable}_RUN_RESULT ${variable}_COMPILE_RESULT
@@ -156,8 +160,12 @@ function(add_hpx_config_test variable)
       if(HPX_WITH_CUDA)
         set(cuda_parameters CUDA_STANDARD ${CMAKE_CUDA_STANDARD})
       endif()
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${additional_cmake_flags}")
-      set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} ${additional_cmake_flags}")
+      set(CMAKE_CXX_FLAGS
+          "${CMAKE_CXX_FLAGS} ${additional_cmake_flags} ${${variable}_CXXFLAGS}"
+      )
+      set(CMAKE_CUDA_FLAGS
+          "${CMAKE_CUDA_FLAGS} ${additional_cmake_flags} ${${variable}_CXXFLAGS}"
+      )
       # cmake-format: off
       try_compile(
         ${variable}_RESULT
@@ -420,7 +428,20 @@ function(hpx_check_for_cxx17_copy_elision)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx17_memory_resource)
+  add_hpx_config_test(
+    HPX_WITH_CXX17_MEMORY_RESOURCE
+    SOURCE cmake/tests/cxx17_memory_resource.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_cxx20_coroutines)
+  if(NOT HPX_WITH_CXX20_COROUTINES)
+    unset(HPX_CXX20_COROUTINES_FLAGS)
+  endif()
+
   add_hpx_config_test(
     HPX_WITH_CXX20_COROUTINES
     SOURCE cmake/tests/cxx20_coroutines.cpp
@@ -433,6 +454,15 @@ function(hpx_check_for_cxx20_lambda_capture)
   add_hpx_config_test(
     HPX_WITH_CXX20_LAMBDA_CAPTURE
     SOURCE cmake/tests/cxx20_lambda_capture.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx20_source_location)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_SOURCE_LOCATION
+    SOURCE cmake/tests/cxx20_source_location.cpp
     FILE ${ARGN}
   )
 endfunction()
@@ -505,6 +535,24 @@ function(hpx_check_for_cxx20_std_ranges_iter_swap)
   add_hpx_config_test(
     HPX_WITH_CXX20_STD_RANGES_ITER_SWAP
     SOURCE cmake/tests/cxx20_std_ranges_iter_swap.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx20_trivial_virtual_destructor)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR
+    SOURCE cmake/tests/cxx20_trivial_virtual_destructor.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx_lambda_capture_decltype)
+  add_hpx_config_test(
+    HPX_WITH_CXX_LAMBDA_CAPTURE_DECLTYPE
+    SOURCE cmake/tests/cxx_lambda_capture_decltype.cpp
     FILE ${ARGN}
   )
 endfunction()

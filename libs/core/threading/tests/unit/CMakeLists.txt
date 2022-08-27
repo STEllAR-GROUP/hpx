@@ -11,6 +11,9 @@ set(threading_tests
     condition_variable4
     condition_variable_race
     error_callback
+    in_place_stop_token_cb1
+    in_place_stop_token_race
+    in_place_stop_token_race2
     jthread1
     jthread2
     stack_check
@@ -37,6 +40,9 @@ set(condition_variable2_PARAMETERS THREADS_PER_LOCALITY 4)
 set(condition_variable3_PARAMETERS THREADS_PER_LOCALITY 4)
 set(condition_variable4_PARAMETERS THREADS_PER_LOCALITY 4)
 set(condition_variable_race_PARAMETERS THREADS_PER_LOCALITY 4)
+set(in_place_stop_token_cb1_PARAMETERS THREADS_PER_LOCALITY 4)
+set(in_place_stop_token_race_PARAMETERS THREADS_PER_LOCALITY 4)
+set(in_place_stop_token_race2_PARAMETERS THREADS_PER_LOCALITY 1)
 set(jthread1_PARAMETERS THREADS_PER_LOCALITY 4)
 set(jthread2_PARAMETERS THREADS_PER_LOCALITY 4)
 set(stop_token_cb1_PARAMETERS THREADS_PER_LOCALITY 4)

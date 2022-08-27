@@ -8,20 +8,23 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/include/components.hpp>
 #include <hpx/include/actions.hpp>
+#include <hpx/include/components.hpp>
 
 struct HPX_COMPONENT_EXPORT test_server
   : hpx::components::simple_component_base<test_server>
 {
     test_server() {}
 
-    void call() { called = true; }
+    void call()
+    {
+        called = true;
+    }
     HPX_DEFINE_COMPONENT_ACTION(test_server, call);
 
     static bool called;
 };
 
 typedef test_server::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
+HPX_REGISTER_ACTION_DECLARATION(call_action)
 #endif

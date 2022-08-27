@@ -20,6 +20,7 @@ set(executors_headers
     hpx/executors/exception_list.hpp
     hpx/executors/execution_policy_annotation.hpp
     hpx/executors/execution_policy_fwd.hpp
+    hpx/executors/execution_policy_parameters.hpp
     hpx/executors/execution_policy.hpp
     hpx/executors/fork_join_executor.hpp
     hpx/executors/limiting_executor.hpp
@@ -64,7 +65,9 @@ set(executors_compat_headers
 )
 # cmake-format: on
 
-set(executors_sources current_executor.cpp exception_list_callbacks.cpp)
+set(executors_sources current_executor.cpp exception_list_callbacks.cpp
+                      fork_join_executor.cpp
+)
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -75,10 +78,14 @@ add_hpx_module(
   COMPAT_HEADERS ${executors_compat_headers}
   MODULE_DEPENDENCIES
     hpx_async_base
+    hpx_concepts
     hpx_config
+    hpx_errors
     hpx_execution
     hpx_futures
+    hpx_hardware
     hpx_io_service
+    hpx_itt_notify
     hpx_properties
     hpx_threading
     hpx_errors

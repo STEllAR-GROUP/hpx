@@ -285,7 +285,7 @@ void test6()
     in_place_merge(&A[0], &A[10], &A[20], &B[0], comp);
     for (std::uint32_t i = 0; i < 20; ++i)
         HPX_TEST(A[i] == i);
-};
+}
 
 // TEST OF in_place_MERGE
 void test7()

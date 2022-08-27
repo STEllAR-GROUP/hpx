@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,10 +12,10 @@
 
 #include <utility>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename T>
-    void save(output_archive& ar, hpx::util::optional<T> const& o, unsigned)
+    void save(output_archive& ar, hpx::optional<T> const& o, unsigned)
     {
         bool const valid = bool(o);
         ar << valid;
@@ -26,7 +26,7 @@ namespace hpx { namespace serialization {
     }
 
     template <typename T>
-    void load(input_archive& ar, hpx::util::optional<T>& o, unsigned)
+    void load(input_archive& ar, hpx::optional<T>& o, unsigned)
     {
         bool valid = false;
         ar >> valid;
@@ -38,9 +38,9 @@ namespace hpx { namespace serialization {
 
         T value;
         ar >> value;
-        o.emplace(std::move(value));
+        o.emplace(HPX_MOVE(value));
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
-        (template <typename T>), (hpx::util::optional<T>) );
-}}    // namespace hpx::serialization
+        (template <typename T>), (hpx::optional<T>) )
+}    // namespace hpx::serialization

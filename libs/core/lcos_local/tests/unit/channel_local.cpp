@@ -134,7 +134,7 @@ void dispatch_work()
     hpx::apply([jobs, done, &received_jobs, &was_closed]() mutable {
         while (true)
         {
-            hpx::error_code ec(hpx::lightweight);
+            hpx::error_code ec(hpx::throwmode::lightweight);
             int next = jobs.get(hpx::launch::sync, ec);
             (void) next;
             if (!ec)

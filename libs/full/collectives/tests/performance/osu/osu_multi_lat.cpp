@@ -63,11 +63,10 @@ hpx::serialization::serialize_buffer<char> isend(
 {
     return receive_buffer;
 }
-HPX_PLAIN_ACTION(isend);
+HPX_PLAIN_ACTION(isend)
 
 ///////////////////////////////////////////////////////////////////////////////
-double ireceive(
-    hpx::naming::id_type dest, std::size_t size, std::size_t window_size)
+double ireceive(hpx::id_type dest, std::size_t size, std::size_t window_size)
 {
     int loop = LOOP_SMALL;
     int skip = SKIP_SMALL;
@@ -111,7 +110,7 @@ double ireceive(
     double elapsed = t.elapsed();
     return (elapsed * 1e6) / static_cast<double>(2 * loop * window_size);
 }
-HPX_PLAIN_ACTION(ireceive);
+HPX_PLAIN_ACTION(ireceive)
 
 ///////////////////////////////////////////////////////////////////////////////
 void print_header()

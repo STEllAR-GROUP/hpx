@@ -8,8 +8,8 @@
 // schedule an IO task onto one of the IO-threads in HPX (which are OS-threads)
 // and how to synchronize the result of this IO task with a waiting HPX thread.
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/iostream.hpp>
@@ -56,7 +56,7 @@ int hpx_main()
         // Print the returned result.
         hpx::cout << "HPX-thread: The asynchronous IO operation returned: "
                   << result << "\n"
-                  << hpx::flush;
+                  << std::flush;
     }
 
     return hpx::finalize();    // Initiate shutdown of the runtime system.

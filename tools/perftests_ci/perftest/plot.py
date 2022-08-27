@@ -8,6 +8,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 '''
 
 import functools
+import json
 import pathlib
 import typing
 
@@ -21,6 +22,9 @@ from perftest import html
 
 plt.style.use('ggplot')
 
+def _load_json(filename):
+    with open(filename, 'r') as file:
+        return json.load(file)
 
 class _OutputKey(typing.NamedTuple):
     name: str
@@ -159,6 +163,11 @@ def _add_comparison_table(report, cis):
                 name_cell.set('class', row_class_qualifier[0])
                 exitcode = exitcode or row_class_qualifier[1]
 
+    log.debug('Generated performance comparison table')
+    return exitcode
+
+
+def _add_explanation_of_symbols(report):
     with report.table('Explanation of Symbols') as table:
 
         def add_help(string, meaning):
@@ -181,9 +190,6 @@ def _add_comparison_table(report, cis):
             '(confidence interval with ±5%)')
         add_help('??', 'Unclear result, very large uncertainty (±10%)')
         add_help('???', 'Something unexpected…')
-
-    log.debug('Generated performance comparison table')
-    return exitcode
 
 
 def _histogram_plot(title, before, after, output):
@@ -229,20 +235,32 @@ def _add_info(report, labels, data):
                     row.cell(d['environment'].get(k, '—'))
 
 
-def compare(before, after, output):
+def compare_one(report, before, after, output):
     before_outs = _OutputKey.outputs_by_key(before)
     after_outs = _OutputKey.outputs_by_key(after)
     cis = {
         k: _ConfidenceInterval.compare_medians(before_outs[k], v)
         for k, v in after_outs.items() if k in before_outs
     }
+    # Fill report
+    exitcode = _add_comparison_table(report, cis)
+    _add_comparison_plots(report, before_outs, after_outs, cis)
+    _add_info(report, ['Before', 'After'], [before, after])
+    return exitcode
 
+
+def compare_all(results, references, output):
+    index = 0
+    global_exitcode = 0
     title = var._project_name + ' Performance'
     with html.Report(output, title) as report:
-        exitcode = _add_comparison_table(report, cis)
-        _add_comparison_plots(report, before_outs, after_outs, cis)
-        _add_info(report, ['Before', 'After'], [before, after])
-    return exitcode
+        for res in results:
+            ref = references[index]
+            exitcode = compare_one(report, _load_json(ref), _load_json(res), output)
+            global_exitcode = global_exitcode or exitcode
+            index += 1
+        _add_explanation_of_symbols(report)
+    return global_exitcode
 
 
 class _Measurements(typing.NamedTuple):

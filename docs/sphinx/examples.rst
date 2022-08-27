@@ -23,6 +23,7 @@ powerful |hpx| concepts.
    :maxdepth: 1
 
    examples/fibonacci_local
+   examples/matrix_multiplication
    examples/fibonacci
    examples/hello_world
    examples/accumulator

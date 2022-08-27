@@ -1,5 +1,6 @@
 //  Copyright (c) 2013-2015 Thomas Heller
 //  Copyright (c)      2020 Google
+//  Copyright (c)      2022 Patrick Diehl
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +8,7 @@
 
 #include <hpx/config.hpp>
 
+#include <hpx/modules/logging.hpp>
 #include <hpx/modules/mpi_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/util.hpp>
@@ -33,16 +35,23 @@ namespace hpx { namespace util {
             std::string mpi_environment_strings =
                 cfg.get_entry("hpx.parcel.mpi.env", default_env);
 
-            typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
             boost::char_separator<char> sep(";,: ");
-            tokenizer tokens(mpi_environment_strings, sep);
-            for (tokenizer::iterator it = tokens.begin(); it != tokens.end();
-                 ++it)
+            boost::tokenizer<boost::char_separator<char>> tokens(
+                mpi_environment_strings, sep);
+            for (auto const& tok : tokens)
             {
-                char* env = std::getenv(it->c_str());
+                char* env = std::getenv(tok.c_str());
                 if (env)
+                {
+                    LBT_(debug)
+                        << "Found MPI environment variable: " << tok << "="
+                        << std::string(env) << ", enabling MPI support\n";
                     return true;
+                }
             }
+
+            LBT_(info) << "No known MPI environment variable found, disabling "
+                          "MPI support\n";
             return false;
 #endif
         }
@@ -58,11 +67,20 @@ namespace hpx { namespace util {
         // - The application is not run in an MPI environment
         // - The TCP parcelport is enabled and has higher priority
         if (get_entry_as(cfg, "hpx.parcel.mpi.enable", 1) == 0 ||
-            !detail::detect_mpi_environment(cfg, HPX_HAVE_PARCELPORT_MPI_ENV) ||
             (get_entry_as(cfg, "hpx.parcel.tcp.enable", 1) &&
                 (get_entry_as(cfg, "hpx.parcel.tcp.priority", 1) >
+                    get_entry_as(cfg, "hpx.parcel.mpi.priority", 0))) ||
+            (get_entry_as(cfg, "hpx.parcel.lci.enable", 1) &&
+                (get_entry_as(cfg, "hpx.parcel.lci.priority", 1) >
                     get_entry_as(cfg, "hpx.parcel.mpi.priority", 0))))
         {
+            LBT_(info) << "MPI support disabled via configuration settings\n";
+            return false;
+        }
+
+        if (!detail::detect_mpi_environment(cfg, HPX_HAVE_PARCELPORT_MPI_ENV))
+        {
+            // log message was already generated
             return false;
         }
 
@@ -92,7 +110,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     int mpi_environment::init(
-        int*, char***, const int required, const int minimal, int& provided)
+        int*, char***, const int minimal, const int required, int& provided)
     {
         has_called_init_ = false;
 
@@ -143,7 +161,6 @@ namespace hpx { namespace util {
         rtcfg.add_entry("hpx.parcel.bootstrap", "mpi");
 
         int required = MPI_THREAD_SINGLE;
-        int minimal = MPI_THREAD_SINGLE;
 #if defined(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
         required =
             (get_entry_as(rtcfg, "hpx.parcel.mpi.multithreaded", 1) != 0) ?
@@ -155,10 +172,17 @@ namespace hpx { namespace util {
         if (required == MPI_THREAD_MULTIPLE)
             setenv("MV2_ENABLE_AFFINITY", "0", 1);
 #endif
+
+#if defined(MPICH) && defined(_POSIX_SOURCE)
+        // This enables multi threading support in MPICH if requested.
+        if (required == MPI_THREAD_MULTIPLE)
+            setenv("MPICH_MAX_THREAD_SAFETY", "multiple", 1);
+#endif
+
 #endif
 
         int retval =
-            init(argc, argv, required, minimal, provided_threading_flag_);
+            init(argc, argv, required, required, provided_threading_flag_);
         if (MPI_SUCCESS != retval && MPI_ERR_OTHER != retval)
         {
             // explicitly disable mpi if not run by mpirun

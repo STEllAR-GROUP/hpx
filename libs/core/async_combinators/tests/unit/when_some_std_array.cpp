@@ -28,15 +28,15 @@ int make_int_slowly()
 void test_wait_for_either_of_two_futures_list()
 {
     std::array<hpx::future<int>, 2> futures;
-    hpx::lcos::local::packaged_task<int()> pt1(make_int_slowly);
+    hpx::packaged_task<int()> pt1(make_int_slowly);
     futures[0] = pt1.get_future();
-    hpx::lcos::local::packaged_task<int()> pt2(make_int_slowly);
+    hpx::packaged_task<int()> pt2(make_int_slowly);
     futures[1] = pt2.get_future();
 
     pt1();
 
-    hpx::lcos::future<hpx::when_some_result<std::array<hpx::future<int>, 2>>>
-        r = hpx::when_some(1u, futures);
+    hpx::future<hpx::when_some_result<std::array<hpx::future<int>, 2>>> r =
+        hpx::when_some(1u, futures);
     hpx::when_some_result<std::array<hpx::future<int>, 2>> raw = r.get();
 
     HPX_TEST_EQ(raw.indices.size(), 1u);
@@ -55,7 +55,7 @@ void test_wait_for_either_of_two_futures_list()
 using hpx::program_options::options_description;
 using hpx::program_options::variables_map;
 
-using hpx::lcos::future;
+using hpx::future;
 
 int hpx_main(variables_map&)
 {

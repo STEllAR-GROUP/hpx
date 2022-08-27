@@ -11,8 +11,8 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/apply.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/iostream.hpp>
 
 #include <numeric>
 #include <string>
@@ -22,14 +22,14 @@
 //[channel
 // channel components need to be registered for each used type (not needed
 // for hpx::lcos::local::channel)
-HPX_REGISTER_CHANNEL(double);
+HPX_REGISTER_CHANNEL(double)
 
 void channel_sender(hpx::lcos::channel<double> c)
 {
     for (double d : c)
         hpx::cout << d << std::endl;
 }
-HPX_PLAIN_ACTION(channel_sender);
+HPX_PLAIN_ACTION(channel_sender)
 
 void channel()
 {

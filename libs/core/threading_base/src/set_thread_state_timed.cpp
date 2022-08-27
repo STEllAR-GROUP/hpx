@@ -61,7 +61,7 @@ namespace hpx { namespace threads { namespace detail {
 
         if (!triggered->load())
         {
-            error_code ec(lightweight);    // do not throw
+            error_code ec(throwmode::lightweight);    // do not throw
             set_thread_state(timer_id, thread_schedule_state::pending,
                 my_statex, thread_priority::boost, thread_schedule_hint(),
                 retry_on_active, ec);
@@ -96,7 +96,7 @@ namespace hpx { namespace threads { namespace detail {
             std::make_shared<std::atomic<bool>>(false));
 
         thread_init_data data(
-            util::bind_front(&wake_timer_thread, thrd, newstate, newstate_ex,
+            hpx::bind_front(&wake_timer_thread, thrd, newstate, newstate_ex,
                 priority, self_id.noref(), triggered, retry_on_active),
             "wake_timer", priority, thread_schedule_hint(),
             thread_stacksize::small_, thread_schedule_state::suspended, true);
@@ -113,7 +113,7 @@ namespace hpx { namespace threads { namespace detail {
         deadline_timer t(*s, abs_time);
 
         // let the timer invoke the set_state on the new (suspended) thread
-        t.async_wait([wake_id = std::move(wake_id), priority, retry_on_active](
+        t.async_wait([wake_id = HPX_MOVE(wake_id), priority, retry_on_active](
                          std::error_code const& ec) {
             if (ec == std::make_error_code(std::errc::operation_canceled))
             {
@@ -182,7 +182,7 @@ namespace hpx { namespace threads { namespace detail {
         // this creates a new thread which creates the timer and handles the
         // requested actions
         thread_init_data data(
-            util::bind(&at_timer, scheduler, abs_time.value(),
+            hpx::bind(&at_timer, scheduler, abs_time.value(),
                 thread_id_ref_type(thrd), newstate, newstate_ex, priority,
                 started, retry_on_active),
             "at_timer (expire at)", priority, schedulehint,

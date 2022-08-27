@@ -18,7 +18,7 @@ namespace hpx { namespace components { namespace server
 
     ///////////////////////////////////////////////////////////////////////////
     naming::gid_type component_storage::migrate_to_here(
-        std::vector<char> const& data, naming::id_type id,
+        std::vector<char> const& data, hpx::id_type id,
         naming::address const& current_lva)
     {
         naming::gid_type gid(naming::detail::get_stripped_gid(id.get_gid()));
@@ -26,7 +26,7 @@ namespace hpx { namespace components { namespace server
 
         // rebind the object to this storage locality
         naming::address addr(current_lva);
-        addr.address_ = 0;       // invalidate lva
+        addr.address_ = nullptr;       // invalidate lva
         if (!agas::bind(launch::sync, gid, addr, this->gid_))
         {
             HPX_THROW_EXCEPTION(duplicate_component_address,

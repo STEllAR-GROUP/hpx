@@ -83,8 +83,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/unique_function.hpp>
-#include <hpx/lcos_local/packaged_task.hpp>
+#include <hpx/functional/move_only_function.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -97,7 +96,7 @@ namespace hpx { namespace lcos { namespace local {
         struct debug_object
         {
 #ifdef HPX_DEBUG
-            HPX_STATIC_CONSTEXPR int debug_magic = 0x2cab;
+            static constexpr int debug_magic = 0x2cab;
 
             int magic;
 
@@ -128,7 +127,7 @@ namespace hpx { namespace lcos { namespace local {
 
         HPX_CORE_EXPORT void free(guard_task* task);
 
-        typedef util::unique_function_nonser<void()> guard_function;
+        typedef hpx::move_only_function<void()> guard_function;
     }    // namespace detail
 
     class guard : public detail::debug_object
@@ -190,7 +189,7 @@ namespace hpx { namespace lcos { namespace local {
     {
         return run_guarded(guard,
             detail::guard_function(util::deferred_call(
-                std::forward<F>(f), std::forward<Args>(args)...)));
+                HPX_FORWARD(F, f), HPX_FORWARD(Args, args)...)));
     }
 
     /// Conceptually, a guard_set acts like a set of mutexes on an asynchronous task.
@@ -203,6 +202,6 @@ namespace hpx { namespace lcos { namespace local {
     {
         return run_guarded(guards,
             detail::guard_function(util::deferred_call(
-                std::forward<F>(f), std::forward<Args>(args)...)));
+                HPX_FORWARD(F, f), HPX_FORWARD(Args, args)...)));
     }
 }}}    // namespace hpx::lcos::local

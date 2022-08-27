@@ -11,31 +11,31 @@
 
 #include "inspector.hpp"
 
-namespace boost
-{
-  namespace inspect
-  {
+namespace boost { namespace inspect {
     class pragma_once_check : public header_inspector
     {
-      long m_files_with_errors;
+        long m_files_with_errors;
+
     public:
+        pragma_once_check();
+        virtual const char* name() const
+        {
+            return "*PRAGMA-ONCE*";
+        }
+        virtual const char* desc() const
+        {
+            return "missing #pragma once";
+        }
 
-      pragma_once_check();
-      virtual const char * name() const { return "*PRAGMA-ONCE*"; }
-      virtual const char * desc() const { return "missing #pragma once"; }
+        virtual void inspect(const std::string& library_name,
+            const path& full_path, const std::string& contents);
 
-      virtual void inspect(
-        const std::string & library_name,
-        const path & full_path,
-        const std::string & contents );
+        virtual void print_summary(std::ostream& out)
+        {
+            out << "  " << m_files_with_errors
+                << " header files missing #pragma once" << line_break();
+        }
 
-      virtual void print_summary(std::ostream& out)
-        { out << "  " << m_files_with_errors
-              << " header files missing #pragma once"
-              << line_break(); }
-
-      virtual ~pragma_once_check() {}
+        virtual ~pragma_once_check() {}
     };
-  }
-}
-
+}}    // namespace boost::inspect

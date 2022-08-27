@@ -482,7 +482,7 @@ void test_inplace_merge_etc(IteratorTag, DataType, int rand_base)
     typedef typename std::vector<DataType>::iterator base_iterator;
 
     std::size_t const left_size = 300007, right_size = 123456;
-    std::vector<DataType> res(left_size + right_size), sol, org;
+    std::vector<DataType> res(left_size + right_size), sol;
 
     base_iterator res_first = std::begin(res);
     base_iterator res_middle = res_first + left_size;
@@ -493,7 +493,7 @@ void test_inplace_merge_etc(IteratorTag, DataType, int rand_base)
     std::sort(res_first, res_middle);
     std::sort(res_middle, res_last);
 
-    org = sol = res;
+    sol = res;
     base_iterator sol_first = std::begin(sol);
     base_iterator sol_middle = sol_first + left_size;
     base_iterator sol_last = std::end(sol);
@@ -501,8 +501,6 @@ void test_inplace_merge_etc(IteratorTag, DataType, int rand_base)
     // Test default comparison.
     {
         typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-        sol = res = org;
 
         hpx::inplace_merge(
             iterator(res_first), iterator(res_middle), iterator(res_last));
@@ -524,7 +522,7 @@ void test_inplace_merge_etc(
     typedef typename std::vector<DataType>::iterator base_iterator;
 
     std::size_t const left_size = 300007, right_size = 123456;
-    std::vector<DataType> res(left_size + right_size), sol, org;
+    std::vector<DataType> res(left_size + right_size), sol;
 
     base_iterator res_first = std::begin(res);
     base_iterator res_middle = res_first + left_size;
@@ -535,7 +533,7 @@ void test_inplace_merge_etc(
     std::sort(res_first, res_middle);
     std::sort(res_middle, res_last);
 
-    org = sol = res;
+    sol = res;
     base_iterator sol_first = std::begin(sol);
     base_iterator sol_middle = sol_first + left_size;
     base_iterator sol_last = std::end(sol);
@@ -543,8 +541,6 @@ void test_inplace_merge_etc(
     // Test default comparison.
     {
         typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-        sol = res = org;
 
         hpx::inplace_merge(policy, iterator(res_first), iterator(res_middle),
             iterator(res_last));

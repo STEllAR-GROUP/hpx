@@ -20,13 +20,13 @@ std::uint32_t f1()
 {
     return hpx::get_locality_id();
 }
-HPX_PLAIN_ACTION(f1);
+HPX_PLAIN_ACTION(f1)
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f1_action)
 HPX_REGISTER_BROADCAST_ACTION(f1_action)
 
 void f2() {}
-HPX_PLAIN_ACTION(f2);
+HPX_PLAIN_ACTION(f2)
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f2_action)
 HPX_REGISTER_BROADCAST_ACTION(f2_action)
@@ -35,13 +35,13 @@ std::uint32_t f3(std::uint32_t i)
 {
     return hpx::get_locality_id() + i;
 }
-HPX_PLAIN_ACTION(f3);
+HPX_PLAIN_ACTION(f3)
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f3_action)
 HPX_REGISTER_BROADCAST_ACTION(f3_action)
 
 void f4(std::uint32_t) {}
-HPX_PLAIN_ACTION(f4);
+HPX_PLAIN_ACTION(f4)
 
 HPX_REGISTER_BROADCAST_ACTION_DECLARATION(f4_action)
 HPX_REGISTER_BROADCAST_ACTION(f4_action)
@@ -50,13 +50,13 @@ std::uint32_t f1_idx(std::size_t)
 {
     return hpx::get_locality_id();
 }
-HPX_PLAIN_ACTION(f1_idx);
+HPX_PLAIN_ACTION(f1_idx)
 
 HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f1_idx_action)
 HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f1_idx_action)
 
 void f2_idx(std::size_t) {}
-HPX_PLAIN_ACTION(f2_idx);
+HPX_PLAIN_ACTION(f2_idx)
 
 HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f2_idx_action)
 HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f2_idx_action)
@@ -65,13 +65,13 @@ std::uint32_t f3_idx(std::uint32_t i, std::size_t)
 {
     return hpx::get_locality_id() + i;
 }
-HPX_PLAIN_ACTION(f3_idx);
+HPX_PLAIN_ACTION(f3_idx)
 
 HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f3_idx_action)
 HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f3_idx_action)
 
 void f4_idx(std::uint32_t, std::size_t) {}
-HPX_PLAIN_ACTION(f4_idx);
+HPX_PLAIN_ACTION(f4_idx)
 
 HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION_DECLARATION(f4_idx_action)
 HPX_REGISTER_BROADCAST_WITH_INDEX_ACTION(f4_idx_action)

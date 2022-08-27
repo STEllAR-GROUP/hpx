@@ -42,15 +42,15 @@ struct A : hpx::components::abstract_managed_component_base<A>
     {
         return test0();
     }
-    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action);
+    HPX_DEFINE_COMPONENT_ACTION(A, test0_nonvirt, test0_action)
 };
 
-HPX_REGISTER_COMPONENT_HEAP(hpx::components::managed_component<A>);
-HPX_DEFINE_GET_COMPONENT_TYPE(A);
+HPX_REGISTER_COMPONENT_HEAP(hpx::components::managed_component<A>)
+HPX_DEFINE_GET_COMPONENT_TYPE(A)
 
 typedef A::test0_action test0_action;
-HPX_REGISTER_ACTION_DECLARATION(test0_action);
-HPX_REGISTER_ACTION(test0_action);
+HPX_REGISTER_ACTION_DECLARATION(test0_action)
+HPX_REGISTER_ACTION(test0_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Abstract
@@ -83,15 +83,15 @@ struct B
     {
         return test1();
     }
-    HPX_DEFINE_COMPONENT_ACTION(B, test1_nonvirt, test1_action);
+    HPX_DEFINE_COMPONENT_ACTION(B, test1_nonvirt, test1_action)
 };
 
-HPX_REGISTER_COMPONENT_HEAP(hpx::components::managed_component<B>);
-HPX_DEFINE_GET_COMPONENT_TYPE(B);
+HPX_REGISTER_COMPONENT_HEAP(hpx::components::managed_component<B>)
+HPX_DEFINE_GET_COMPONENT_TYPE(B)
 
 typedef B::test1_action test1_action;
-HPX_REGISTER_ACTION_DECLARATION(test1_action);
-HPX_REGISTER_ACTION(test1_action);
+HPX_REGISTER_ACTION_DECLARATION(test1_action)
+HPX_REGISTER_ACTION(test1_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Concrete
@@ -128,15 +128,15 @@ struct C
     {
         return "C";
     }
-    HPX_DEFINE_COMPONENT_ACTION(C, test2, test2_action);
+    HPX_DEFINE_COMPONENT_ACTION(C, test2, test2_action)
 };
 
 typedef hpx::components::managed_component<C> serverC_type;
-HPX_REGISTER_DERIVED_COMPONENT_FACTORY(serverC_type, C, "B");
+HPX_REGISTER_DERIVED_COMPONENT_FACTORY(serverC_type, C, "B")
 
 typedef C::test2_action test2_action;
-HPX_REGISTER_ACTION_DECLARATION(test2_action);
-HPX_REGISTER_ACTION(test2_action);
+HPX_REGISTER_ACTION_DECLARATION(test2_action)
+HPX_REGISTER_ACTION(test2_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct clientA : hpx::components::client_base<clientA, A>

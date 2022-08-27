@@ -14,16 +14,11 @@
 namespace hpx { namespace actions {
 
     template <typename Action>
-    threads::thread_priority action_priority()
+    constexpr threads::thread_priority action_priority() noexcept
     {
-        typedef typename hpx::traits::extract_action<Action>::type action_type_;
-        threads::thread_priority priority =
-            static_cast<threads::thread_priority>(
-                traits::action_priority<action_type_>::value);
         //  The mapping to 'normal' is now done at the last possible moment in
         //  the scheduler.
-        //  if (priority == threads::thread_priority::default_)
-        //      priority = threads::thread_priority::normal;
-        return priority;
+        using action_type = typename hpx::traits::extract_action<Action>::type;
+        return hpx::traits::action_priority_v<action_type>;
     }
 }}    // namespace hpx::actions

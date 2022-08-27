@@ -25,51 +25,49 @@
 #include <memory>
 #include <utility>
 
-namespace hpx { namespace iostreams { namespace detail
-{
-    void buffer::save(serialization::output_archive & ar, unsigned) const
+namespace hpx { namespace iostreams { namespace detail {
+    void buffer::save(serialization::output_archive& ar, unsigned) const
     {
         bool valid = (data_.get() && !data_->empty());
-        ar & valid;
-        if(valid)
+        ar& valid;
+        if (valid)
         {
-            ar & data_;
+            ar& data_;
         }
     }
 
     void buffer::load(serialization::input_archive& ar, unsigned)
     {
         bool valid = false;
-        ar & valid;
+        ar& valid;
         if (valid)
         {
-            ar & data_;
+            ar& data_;
         }
     }
-}}}
+}}}    // namespace hpx::iostreams::detail
 
-namespace hpx { namespace iostreams { namespace server
-{
+namespace hpx { namespace iostreams { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     void output_stream::call_write_async(std::uint32_t locality_id,
         std::uint64_t count, detail::buffer const& in, hpx::id_type /*this_id*/)
-    { // {{{
+    {    // {{{
         // Perform the IO operation.
         pending_output_.output(locality_id, count, in, write_f, mtx_);
-    } // }}}
+    }    // }}}
 
     void output_stream::write_async(std::uint32_t locality_id,
         std::uint64_t count, detail::buffer const& buf_in)
-    { // {{{
+    {    // {{{
         // Perform the IO in another OS thread.
         detail::buffer in(buf_in);
         // we need to capture the GID of the component to keep it alive long
         // enough.
         hpx::id_type this_id = this->get_id();
         hpx::get_thread_pool("io_pool")->get_io_service().post(
-            util::bind_front(&output_stream::call_write_async, this,
-                locality_id, count, std::move(in), std::move(this_id)));
-    } // }}}
+            hpx::bind_front(&output_stream::call_write_async, this, locality_id,
+                count, HPX_MOVE(in), HPX_MOVE(this_id)));
+    }    // }}}
 
     ///////////////////////////////////////////////////////////////////////////
     void output_stream::call_write_sync(std::uint32_t locality_id,
@@ -86,16 +84,15 @@ namespace hpx { namespace iostreams { namespace server
 
     void output_stream::write_sync(std::uint32_t locality_id,
         std::uint64_t count, detail::buffer const& buf_in)
-    { // {{{
+    {    // {{{
         // Perform the IO in another OS thread.
         detail::buffer in(buf_in);
-        hpx::get_thread_pool("io_pool")->get_io_service().post(
-            util::bind_front(&output_stream::call_write_sync, this, locality_id,
-                count, std::ref(in),
-                threads::thread_id_ref_type(threads::get_self_id())));
+        hpx::get_thread_pool("io_pool")->get_io_service().post(hpx::bind_front(
+            &output_stream::call_write_sync, this, locality_id, count,
+            std::ref(in), threads::thread_id_ref_type(threads::get_self_id())));
 
         // Sleep until the worker thread wakes us up.
         this_thread::suspend(threads::thread_schedule_state::suspended,
             "output_stream::write_sync");
-    } // }}}
-}}}
+    }    // }}}
+}}}      // namespace hpx::iostreams::server

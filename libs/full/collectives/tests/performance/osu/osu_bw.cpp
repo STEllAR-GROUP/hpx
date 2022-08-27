@@ -52,10 +52,10 @@ unsigned long getpagesize()
 
 ///////////////////////////////////////////////////////////////////////////////
 void isend(hpx::serialization::serialize_buffer<char> const&) {}
-HPX_PLAIN_ACTION(isend);
+HPX_PLAIN_ACTION(isend)
 
 ///////////////////////////////////////////////////////////////////////////////
-double ireceive(hpx::naming::id_type dest, std::size_t loop, std::size_t size,
+double ireceive(hpx::id_type dest, std::size_t loop, std::size_t size,
     std::size_t window_size)
 {
     std::size_t skip = SKIP;

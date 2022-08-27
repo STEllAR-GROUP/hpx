@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Anton Bikineev
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,29 +10,29 @@
 #include <hpx/serialization/detail/pointer.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
 
     template <typename T>
     struct raw_ptr_type
     {
         using element_type = T;
 
-        raw_ptr_type(T* t)
+        constexpr raw_ptr_type(T* t) noexcept
           : t(t)
         {
         }
 
-        T* get() const
+        constexpr T* get() const noexcept
         {
             return t;
         }
 
-        T& operator*() const
+        constexpr T& operator*() const noexcept
         {
             return *t;
         }
 
-        operator bool() const
+        explicit constexpr operator bool() const noexcept
         {
             return t != nullptr;
         }
@@ -43,12 +44,12 @@ namespace hpx { namespace serialization { namespace detail {
     template <typename T>
     struct raw_ptr_proxy
     {
-        raw_ptr_proxy(T*& t)
+        constexpr raw_ptr_proxy(T*& t) noexcept
           : t(t)
         {
         }
 
-        raw_ptr_proxy(T* const& t)
+        constexpr raw_ptr_proxy(T* const& t) noexcept
           : t(const_cast<T*&>(t))
         {
         }
@@ -69,13 +70,13 @@ namespace hpx { namespace serialization { namespace detail {
     };
 
     template <typename T>
-    HPX_FORCEINLINE raw_ptr_proxy<T> raw_ptr(T*& t)
+    HPX_FORCEINLINE constexpr raw_ptr_proxy<T> raw_ptr(T*& t) noexcept
     {
         return raw_ptr_proxy<T>(t);
     }
 
     template <typename T>
-    HPX_FORCEINLINE raw_ptr_proxy<T> raw_ptr(T* const& t)
+    HPX_FORCEINLINE constexpr raw_ptr_proxy<T> raw_ptr(T* const& t) noexcept
     {
         return raw_ptr_proxy<T>(t);
     }
@@ -112,4 +113,4 @@ namespace hpx { namespace serialization { namespace detail {
         t.serialize(ar);
         return ar;
     }
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail

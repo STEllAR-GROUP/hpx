@@ -36,8 +36,7 @@ void test_wait_for_all_from_array()
         task.apply();
     }
 
-    hpx::lcos::future<std::array<hpx::future<int>, 10>> r =
-        hpx::when_all(futures);
+    hpx::future<std::array<hpx::future<int>, 10>> r = hpx::when_all(futures);
 
     std::array<hpx::future<int>, 10> result = r.get();
 
@@ -51,7 +50,7 @@ void test_wait_for_all_from_array()
 using hpx::program_options::options_description;
 using hpx::program_options::variables_map;
 
-using hpx::lcos::future;
+using hpx::future;
 
 int hpx_main(variables_map&)
 {

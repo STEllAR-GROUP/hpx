@@ -124,4 +124,25 @@ namespace hpx { namespace collectives {
 
         std::size_t root_site_;
     };
+
+    struct tag_arg
+    {
+        explicit constexpr tag_arg(std::size_t tag = std::size_t(0)) noexcept
+          : tag_(tag)
+        {
+        }
+
+        constexpr tag_arg& operator=(std::size_t tag) noexcept
+        {
+            tag_ = tag;
+            return *this;
+        }
+
+        constexpr operator std::size_t() const noexcept
+        {
+            return tag_;
+        }
+
+        std::size_t tag_;
+    };
 }}    // namespace hpx::collectives

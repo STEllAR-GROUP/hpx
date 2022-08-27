@@ -14,13 +14,13 @@
 
 namespace hpx {
 
-    naming::id_type get_colocation_id(
-        launch::sync_policy, naming::id_type const& id, error_code& ec)
+    hpx::id_type get_colocation_id(
+        launch::sync_policy, hpx::id_type const& id, error_code& ec)
     {
         return agas::get_colocation_id(launch::sync, id, ec);
     }
 
-    future<naming::id_type> get_colocation_id(naming::id_type const& id)
+    future<hpx::id_type> get_colocation_id(hpx::id_type const& id)
     {
         return agas::get_colocation_id(id);
     }

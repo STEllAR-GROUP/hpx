@@ -46,7 +46,7 @@ struct print_direct_action
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    hpx::naming::id_type console = hpx::find_root_locality();
+    hpx::id_type console = hpx::find_root_locality();
 
     // print something to the console
     {

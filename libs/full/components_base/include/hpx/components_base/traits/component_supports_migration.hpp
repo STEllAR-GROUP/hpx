@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,7 +22,7 @@ namespace hpx { namespace traits {
             // by default we return 'false' (component does not support
             // migration)
             template <typename Component>
-            static constexpr bool call(wrap_int)
+            static constexpr bool call(wrap_int) noexcept
             {
                 return false;
             }

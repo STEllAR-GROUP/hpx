@@ -84,7 +84,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
             "CUDA event polling has not been enabled on any pool. Make sure "
             "that CUDA event polling is enabled on at least one thread pool.");
 
-        get_event_callback_queue().enqueue(std::move(continuation));
+        get_event_callback_queue().enqueue(HPX_MOVE(continuation));
 
         cud_debug.debug(debug::str<>("event queued"), "event",
             debug::hex<8>(continuation.event), "enqueued events",
@@ -94,7 +94,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
 
     void add_to_event_callback_vector(event_callback&& continuation)
     {
-        get_event_callback_vector().push_back(std::move(continuation));
+        get_event_callback_vector().push_back(HPX_MOVE(continuation));
 
         cud_debug.debug(
             debug::str<>("event callback moved from queue to vector"), "event",
@@ -114,8 +114,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         }
         check_cuda_error(cudaEventRecord(event, stream));
 
-        detail::add_to_event_callback_queue(
-            event_callback{event, std::move(f)});
+        detail::add_to_event_callback_queue(event_callback{event, HPX_MOVE(f)});
     }
 
     // Background progress function for async CUDA operations. Checks for completed
@@ -178,7 +177,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
                         "active events",
                         debug::dec<3>(get_number_of_active_events()));
                     continuation.f(status);
-                    pool.push(std::move(continuation.event));
+                    pool.push(HPX_MOVE(continuation.event));
                     return true;
                 }),
             event_callback_vector.end());
@@ -190,7 +189,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
 
             if (status == cudaErrorNotReady)
             {
-                add_to_event_callback_vector(std::move(continuation));
+                add_to_event_callback_vector(HPX_MOVE(continuation));
             }
             else
             {
@@ -200,7 +199,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
                     "active events",
                     debug::dec<3>(get_number_of_active_events()));
                 continuation.f(status);
-                pool.push(std::move(continuation.event));
+                pool.push(HPX_MOVE(continuation.event));
             }
         }
 

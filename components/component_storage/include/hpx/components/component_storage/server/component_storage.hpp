@@ -23,8 +23,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server
-{
+namespace hpx { namespace components { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_MIGRATE_TO_STORAGE_EXPORT component_storage
       : public component_base<component_storage>
@@ -34,33 +33,33 @@ namespace hpx { namespace components { namespace server
     public:
         component_storage();
 
-        naming::gid_type migrate_to_here(std::vector<char> const&,
-            naming::id_type, naming::address const&);
+        naming::gid_type migrate_to_here(
+            std::vector<char> const&, hpx::id_type, naming::address const&);
         std::vector<char> migrate_from_here(naming::gid_type const&);
-        std::size_t size() const { return data_.size(); }
+        std::size_t size() const
+        {
+            return data_.size();
+        }
 
-        HPX_DEFINE_COMPONENT_ACTION(component_storage, migrate_to_here);
-        HPX_DEFINE_COMPONENT_ACTION(component_storage, migrate_from_here);
-        HPX_DEFINE_COMPONENT_ACTION(component_storage, size);
+        HPX_DEFINE_COMPONENT_ACTION(component_storage, migrate_to_here)
+        HPX_DEFINE_COMPONENT_ACTION(component_storage, migrate_from_here)
+        HPX_DEFINE_COMPONENT_ACTION(component_storage, size)
 
     private:
-        hpx::unordered_map<naming::gid_type, std::vector<char> > data_;
+        hpx::unordered_map<naming::gid_type, std::vector<char>> data_;
     };
-}}}
+}}}    // namespace hpx::components::server
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::component_storage::migrate_to_here_action,
-    component_storage_migrate_component_to_here_action);
+    component_storage_migrate_component_to_here_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::component_storage::migrate_from_here_action,
-    component_storage_migrate_component_from_here_action);
+    component_storage_migrate_component_from_here_action)
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::component_storage::size_action,
-    component_storage_size_action);
+    component_storage_size_action)
 
 typedef std::vector<char> hpx_component_storage_data_type;
 HPX_REGISTER_UNORDERED_MAP_DECLARATION(
     hpx::naming::gid_type, hpx_component_storage_data_type)
-
-
-

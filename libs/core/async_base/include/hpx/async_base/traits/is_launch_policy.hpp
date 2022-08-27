@@ -32,6 +32,5 @@ namespace hpx { namespace traits {
     };
 
     template <typename Policy>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_launch_policy_v =
-        is_launch_policy<Policy>::value;
+    inline constexpr bool is_launch_policy_v = is_launch_policy<Policy>::value;
 }}    // namespace hpx::traits

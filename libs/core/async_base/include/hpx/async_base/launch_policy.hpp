@@ -221,7 +221,7 @@ namespace hpx {
             {
             }
 
-            friend async_policy tag_dispatch(
+            friend async_policy tag_invoke(
                 hpx::execution::experimental::with_priority_t,
                 async_policy policy, threads::thread_priority priority) noexcept
             {
@@ -230,14 +230,14 @@ namespace hpx {
                 return policy_with_priority;
             }
 
-            friend constexpr hpx::threads::thread_priority tag_dispatch(
+            friend constexpr hpx::threads::thread_priority tag_invoke(
                 hpx::execution::experimental::get_priority_t,
                 async_policy policy) noexcept
             {
                 return policy.priority();
             }
 
-            friend async_policy tag_dispatch(
+            friend async_policy tag_invoke(
                 hpx::execution::experimental::with_stacksize_t,
                 async_policy policy,
                 threads::thread_stacksize stacksize) noexcept
@@ -247,14 +247,14 @@ namespace hpx {
                 return policy_with_stacksize;
             }
 
-            friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+            friend constexpr hpx::threads::thread_stacksize tag_invoke(
                 hpx::execution::experimental::get_stacksize_t,
                 async_policy policy) noexcept
             {
                 return policy.stacksize();
             }
 
-            friend async_policy tag_dispatch(
+            friend async_policy tag_invoke(
                 hpx::execution::experimental::with_hint_t, async_policy policy,
                 threads::thread_schedule_hint hint) noexcept
             {
@@ -263,7 +263,7 @@ namespace hpx {
                 return policy_with_hint;
             }
 
-            friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+            friend constexpr hpx::threads::thread_schedule_hint tag_invoke(
                 hpx::execution::experimental::get_hint_t,
                 async_policy policy) noexcept
             {
@@ -283,7 +283,7 @@ namespace hpx {
             {
             }
 
-            friend fork_policy tag_dispatch(
+            friend fork_policy tag_invoke(
                 hpx::execution::experimental::with_priority_t,
                 fork_policy policy, threads::thread_priority priority) noexcept
             {
@@ -292,14 +292,14 @@ namespace hpx {
                 return policy_with_priority;
             }
 
-            friend constexpr hpx::threads::thread_priority tag_dispatch(
+            friend constexpr hpx::threads::thread_priority tag_invoke(
                 hpx::execution::experimental::get_priority_t,
                 fork_policy policy) noexcept
             {
                 return policy.priority();
             }
 
-            friend fork_policy tag_dispatch(
+            friend fork_policy tag_invoke(
                 hpx::execution::experimental::with_stacksize_t,
                 fork_policy policy,
                 threads::thread_stacksize stacksize) noexcept
@@ -309,14 +309,14 @@ namespace hpx {
                 return policy_with_stacksize;
             }
 
-            friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+            friend constexpr hpx::threads::thread_stacksize tag_invoke(
                 hpx::execution::experimental::get_stacksize_t,
                 fork_policy policy) noexcept
             {
                 return policy.stacksize();
             }
 
-            friend fork_policy tag_dispatch(
+            friend fork_policy tag_invoke(
                 hpx::execution::experimental::with_hint_t, fork_policy policy,
                 threads::thread_schedule_hint hint) noexcept
             {
@@ -325,7 +325,7 @@ namespace hpx {
                 return policy_with_hint;
             }
 
-            friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+            friend constexpr hpx::threads::thread_schedule_hint tag_invoke(
                 hpx::execution::experimental::get_hint_t,
                 fork_policy policy) noexcept
             {
@@ -335,8 +335,9 @@ namespace hpx {
 
         struct sync_policy : policy_holder<sync_policy>
         {
-            constexpr sync_policy(threads::thread_priority priority =
-                                      threads::thread_priority::default_,
+            constexpr explicit sync_policy(
+                threads::thread_priority priority =
+                    threads::thread_priority::default_,
                 threads::thread_stacksize stacksize =
                     threads::thread_stacksize::default_,
                 threads::thread_schedule_hint hint = {}) noexcept
@@ -345,7 +346,7 @@ namespace hpx {
             {
             }
 
-            friend sync_policy tag_dispatch(
+            friend sync_policy tag_invoke(
                 hpx::execution::experimental::with_priority_t,
                 sync_policy policy, threads::thread_priority priority) noexcept
             {
@@ -354,14 +355,14 @@ namespace hpx {
                 return policy_with_priority;
             }
 
-            friend constexpr hpx::threads::thread_priority tag_dispatch(
+            friend constexpr hpx::threads::thread_priority tag_invoke(
                 hpx::execution::experimental::get_priority_t,
                 sync_policy policy) noexcept
             {
                 return policy.priority();
             }
 
-            friend sync_policy tag_dispatch(
+            friend sync_policy tag_invoke(
                 hpx::execution::experimental::with_stacksize_t,
                 sync_policy policy,
                 threads::thread_stacksize stacksize) noexcept
@@ -371,14 +372,14 @@ namespace hpx {
                 return policy_with_stacksize;
             }
 
-            friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+            friend constexpr hpx::threads::thread_stacksize tag_invoke(
                 hpx::execution::experimental::get_stacksize_t,
                 sync_policy policy) noexcept
             {
                 return policy.stacksize();
             }
 
-            friend sync_policy tag_dispatch(
+            friend sync_policy tag_invoke(
                 hpx::execution::experimental::with_hint_t, sync_policy policy,
                 threads::thread_schedule_hint hint) noexcept
             {
@@ -387,7 +388,7 @@ namespace hpx {
                 return policy_with_hint;
             }
 
-            friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+            friend constexpr hpx::threads::thread_schedule_hint tag_invoke(
                 hpx::execution::experimental::get_hint_t,
                 sync_policy policy) noexcept
             {
@@ -397,8 +398,9 @@ namespace hpx {
 
         struct deferred_policy : policy_holder<deferred_policy>
         {
-            constexpr deferred_policy(threads::thread_priority priority =
-                                          threads::thread_priority::default_,
+            constexpr explicit deferred_policy(
+                threads::thread_priority priority =
+                    threads::thread_priority::default_,
                 threads::thread_stacksize stacksize =
                     threads::thread_stacksize::default_,
                 threads::thread_schedule_hint hint = {}) noexcept
@@ -407,7 +409,7 @@ namespace hpx {
             {
             }
 
-            friend deferred_policy tag_dispatch(
+            friend deferred_policy tag_invoke(
                 hpx::execution::experimental::with_priority_t,
                 deferred_policy policy,
                 threads::thread_priority priority) noexcept
@@ -417,14 +419,14 @@ namespace hpx {
                 return policy_with_priority;
             }
 
-            friend constexpr hpx::threads::thread_priority tag_dispatch(
+            friend constexpr hpx::threads::thread_priority tag_invoke(
                 hpx::execution::experimental::get_priority_t,
                 deferred_policy policy) noexcept
             {
                 return policy.priority();
             }
 
-            friend deferred_policy tag_dispatch(
+            friend deferred_policy tag_invoke(
                 hpx::execution::experimental::with_stacksize_t,
                 deferred_policy policy,
                 threads::thread_stacksize stacksize) noexcept
@@ -434,14 +436,14 @@ namespace hpx {
                 return policy_with_stacksize;
             }
 
-            friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+            friend constexpr hpx::threads::thread_stacksize tag_invoke(
                 hpx::execution::experimental::get_stacksize_t,
                 deferred_policy policy) noexcept
             {
                 return policy.stacksize();
             }
 
-            friend deferred_policy tag_dispatch(
+            friend deferred_policy tag_invoke(
                 hpx::execution::experimental::with_hint_t,
                 deferred_policy policy,
                 threads::thread_schedule_hint hint) noexcept
@@ -451,7 +453,7 @@ namespace hpx {
                 return policy_with_hint;
             }
 
-            friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+            friend constexpr hpx::threads::thread_schedule_hint tag_invoke(
                 hpx::execution::experimental::get_hint_t,
                 deferred_policy policy) noexcept
             {
@@ -461,8 +463,9 @@ namespace hpx {
 
         struct apply_policy : policy_holder<apply_policy>
         {
-            constexpr apply_policy(threads::thread_priority priority =
-                                       threads::thread_priority::default_,
+            constexpr explicit apply_policy(
+                threads::thread_priority priority =
+                    threads::thread_priority::default_,
                 threads::thread_stacksize stacksize =
                     threads::thread_stacksize::default_,
                 threads::thread_schedule_hint hint = {}) noexcept
@@ -471,7 +474,7 @@ namespace hpx {
             {
             }
 
-            friend apply_policy tag_dispatch(
+            friend apply_policy tag_invoke(
                 hpx::execution::experimental::with_priority_t,
                 apply_policy policy, threads::thread_priority priority) noexcept
             {
@@ -480,14 +483,14 @@ namespace hpx {
                 return policy_with_priority;
             }
 
-            friend constexpr hpx::threads::thread_priority tag_dispatch(
+            friend constexpr hpx::threads::thread_priority tag_invoke(
                 hpx::execution::experimental::get_priority_t,
                 apply_policy policy) noexcept
             {
                 return policy.priority();
             }
 
-            friend apply_policy tag_dispatch(
+            friend apply_policy tag_invoke(
                 hpx::execution::experimental::with_stacksize_t,
                 apply_policy policy,
                 threads::thread_stacksize stacksize) noexcept
@@ -497,14 +500,14 @@ namespace hpx {
                 return policy_with_stacksize;
             }
 
-            friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+            friend constexpr hpx::threads::thread_stacksize tag_invoke(
                 hpx::execution::experimental::get_stacksize_t,
                 apply_policy policy) noexcept
             {
                 return policy.stacksize();
             }
 
-            friend apply_policy tag_dispatch(
+            friend apply_policy tag_invoke(
                 hpx::execution::experimental::with_hint_t, apply_policy policy,
                 threads::thread_schedule_hint hint) noexcept
             {
@@ -513,7 +516,7 @@ namespace hpx {
                 return policy_with_hint;
             }
 
-            friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+            friend constexpr hpx::threads::thread_schedule_hint tag_invoke(
                 hpx::execution::experimental::get_hint_t,
                 apply_policy policy) noexcept
             {
@@ -535,7 +538,7 @@ namespace hpx {
                 threads::thread_schedule_hint hint = {})    // NOLINT
               : policy_holder<select_policy<Pred>>(
                     launch_policy::async, priority, stacksize, hint)
-              , pred_(std::forward<F>(f))
+              , pred_(HPX_FORWARD(F, f))
             {
             }
 
@@ -550,7 +553,7 @@ namespace hpx {
                 return true;
             }
 
-            friend select_policy tag_dispatch(
+            friend select_policy tag_invoke(
                 hpx::execution::experimental::with_priority_t,
                 select_policy const& policy,
                 threads::thread_priority priority) noexcept
@@ -560,14 +563,14 @@ namespace hpx {
                 return policy_with_priority;
             }
 
-            friend constexpr hpx::threads::thread_priority tag_dispatch(
+            friend constexpr hpx::threads::thread_priority tag_invoke(
                 hpx::execution::experimental::get_priority_t,
                 select_policy const& policy) noexcept
             {
                 return policy.priority();
             }
 
-            friend select_policy tag_dispatch(
+            friend select_policy tag_invoke(
                 hpx::execution::experimental::with_stacksize_t,
                 select_policy const& policy,
                 threads::thread_stacksize stacksize) noexcept
@@ -577,14 +580,14 @@ namespace hpx {
                 return policy_with_stacksize;
             }
 
-            friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+            friend constexpr hpx::threads::thread_stacksize tag_invoke(
                 hpx::execution::experimental::get_stacksize_t,
                 select_policy const& policy) noexcept
             {
                 return policy.stacksize();
             }
 
-            friend select_policy tag_dispatch(
+            friend select_policy tag_invoke(
                 hpx::execution::experimental::with_hint_t,
                 select_policy const& policy,
                 threads::thread_schedule_hint hint) noexcept
@@ -594,7 +597,7 @@ namespace hpx {
                 return policy_with_hint;
             }
 
-            friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+            friend constexpr hpx::threads::thread_schedule_hint tag_invoke(
                 hpx::execution::experimental::get_hint_t,
                 select_policy const& policy) noexcept
             {
@@ -624,7 +627,7 @@ namespace hpx {
                 threads::thread_schedule_hint hint = {}) const
             {
                 return select_policy<std::decay_t<F>>(
-                    std::forward<F>(f), priority, stacksize, hint);
+                    HPX_FORWARD(F, f), priority, stacksize, hint);
             }
         };
 
@@ -792,24 +795,22 @@ namespace hpx {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        friend launch tag_dispatch(
-            hpx::execution::experimental::with_priority_t, launch const& policy,
-            threads::thread_priority priority) noexcept
+        friend launch tag_invoke(hpx::execution::experimental::with_priority_t,
+            launch const& policy, threads::thread_priority priority) noexcept
         {
             auto policy_with_priority = policy;
             policy_with_priority.set_priority(priority);
             return policy_with_priority;
         }
 
-        friend constexpr hpx::threads::thread_priority tag_dispatch(
+        friend constexpr hpx::threads::thread_priority tag_invoke(
             hpx::execution::experimental::get_priority_t,
             launch const& policy) noexcept
         {
             return policy.priority();
         }
 
-        friend launch tag_dispatch(
-            hpx::execution::experimental::with_stacksize_t,
+        friend launch tag_invoke(hpx::execution::experimental::with_stacksize_t,
             launch const& policy, threads::thread_stacksize stacksize) noexcept
         {
             auto policy_with_stacksize = policy;
@@ -817,14 +818,14 @@ namespace hpx {
             return policy_with_stacksize;
         }
 
-        friend constexpr hpx::threads::thread_stacksize tag_dispatch(
+        friend constexpr hpx::threads::thread_stacksize tag_invoke(
             hpx::execution::experimental::get_stacksize_t,
             launch const& policy) noexcept
         {
             return policy.stacksize();
         }
 
-        friend launch tag_dispatch(hpx::execution::experimental::with_hint_t,
+        friend launch tag_invoke(hpx::execution::experimental::with_hint_t,
             launch const& policy, threads::thread_schedule_hint hint) noexcept
         {
             auto policy_with_hint = policy;
@@ -832,7 +833,7 @@ namespace hpx {
             return policy_with_hint;
         }
 
-        friend constexpr hpx::threads::thread_schedule_hint tag_dispatch(
+        friend constexpr hpx::threads::thread_schedule_hint tag_invoke(
             hpx::execution::experimental::get_hint_t,
             launch const& policy) noexcept
         {

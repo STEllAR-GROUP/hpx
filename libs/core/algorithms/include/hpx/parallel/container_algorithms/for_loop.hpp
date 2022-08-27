@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,7 +9,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx { namespace ranges {
+namespace hpx { namespace ranges { namespace experimental {
     /// The for_loop implements loop functionality over a range specified by
     /// iterator bounds. These algorithms resemble for_each from the
     /// Parallelism TS, but leave to the programmer when and if to dereference
@@ -712,7 +712,7 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename Rng, typename S, typename... Args>
     typename util::detail::algorithm_result<ExPolicy>::type for_loop_strided(
         ExPolicy&& policy, Rng&& rng, S stride, Args&&... args);
-}}    // namespace hpx::ranges
+}}}    // namespace hpx::ranges::experimental
 
 #else
 
@@ -732,8 +732,9 @@ namespace hpx { namespace ranges {
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace ranges {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_t final
+namespace hpx::ranges::experimental {
+
+    inline constexpr struct for_loop_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_t>
     {
     private:
@@ -745,18 +746,19 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(hpx::ranges::for_loop_t, ExPolicy&& policy,
-            Iter first, Sent last, Args&&... args)
+        friend typename hpx::parallel::util::detail::algorithm_result<
+            ExPolicy>::type
+        tag_fallback_invoke(hpx::ranges::experimental::for_loop_t,
+            ExPolicy&& policy, Iter first, Sent last, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop must be called with at least a function object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(
-                std::forward<ExPolicy>(policy), first, last, 1,
+            return hpx::parallel::v2::detail::for_loop(
+                HPX_FORWARD(ExPolicy, policy), first, last, 1,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -766,16 +768,17 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(
-            hpx::ranges::for_loop_t, Iter first, Sent last, Args&&... args)
+        friend void tag_fallback_invoke(hpx::ranges::experimental::for_loop_t,
+            Iter first, Sent last, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop must be called with at least a function object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(hpx::execution::seq, first,
-                last, 1, typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+            return hpx::parallel::v2::detail::for_loop(hpx::execution::seq,
+                first, last, 1,
+                typename make_index_pack<sizeof...(Args) - 1>::type(),
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -785,19 +788,20 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<R>::value
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(
-            hpx::ranges::for_loop_t, ExPolicy&& policy, R&& rng, Args&&... args)
+        friend typename hpx::parallel::util::detail::algorithm_result<
+            ExPolicy>::type
+        tag_fallback_invoke(hpx::ranges::experimental::for_loop_t,
+            ExPolicy&& policy, R&& rng, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop must be called with at least a function object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            return hpx::parallel::v2::detail::for_loop(
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), 1,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -806,21 +810,21 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(
-            hpx::ranges::for_loop_t, Rng&& rng, Args&&... args)
+        friend void tag_fallback_invoke(
+            hpx::ranges::experimental::for_loop_t, Rng&& rng, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop must be called with at least a function object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(hpx::execution::seq,
+            return hpx::parallel::v2::detail::for_loop(hpx::execution::seq,
                 hpx::util::begin(rng), hpx::util::end(rng), 1,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
     } for_loop{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct for_loop_strided_t final
+    inline constexpr struct for_loop_strided_t final
       : hpx::detail::tag_parallel_algorithm<for_loop_strided_t>
     {
     private:
@@ -835,7 +839,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(hpx::ranges::for_loop_strided_t,
+        tag_fallback_invoke(hpx::ranges::experimental::for_loop_strided_t,
             ExPolicy&& policy, Iter first, Sent last, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
@@ -843,10 +847,10 @@ namespace hpx { namespace ranges {
                 "object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(
-                std::forward<ExPolicy>(policy), first, last, stride,
+            return hpx::parallel::v2::detail::for_loop(
+                HPX_FORWARD(ExPolicy, policy), first, last, stride,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -857,18 +861,19 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(hpx::ranges::for_loop_strided_t,
-            Iter first, Sent last, S stride, Args&&... args)
+        friend void tag_fallback_invoke(
+            hpx::ranges::experimental::for_loop_strided_t, Iter first,
+            Sent last, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_strided must be called with at least a function "
                 "object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(hpx::execution::seq, first,
-                last, stride,
+            return hpx::parallel::v2::detail::for_loop(hpx::execution::seq,
+                first, last, stride,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -879,8 +884,9 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_dispatch(hpx::ranges::for_loop_strided_t,
+        friend typename hpx::parallel::util::detail::algorithm_result<
+            ExPolicy>::type
+        tag_fallback_invoke(hpx::ranges::experimental::for_loop_strided_t,
             ExPolicy&& policy, Rng&& rng, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
@@ -888,11 +894,11 @@ namespace hpx { namespace ranges {
                 "object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(
-                std::forward<ExPolicy>(policy), hpx::util::begin(rng),
+            return hpx::parallel::v2::detail::for_loop(
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), stride,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
 
         // clang-format off
@@ -902,20 +908,35 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(hpx::ranges::for_loop_strided_t,
-            Rng&& rng, S stride, Args&&... args)
+        friend void tag_fallback_invoke(
+            hpx::ranges::experimental::for_loop_strided_t, Rng&& rng, S stride,
+            Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_strided must be called with at least a function "
                 "object");
 
             using hpx::util::make_index_pack;
-            return parallel::v2::detail::for_loop(hpx::execution::seq,
+            return hpx::parallel::v2::detail::for_loop(hpx::execution::seq,
                 hpx::util::begin(rng), hpx::util::end(rng), stride,
                 typename make_index_pack<sizeof...(Args) - 1>::type(),
-                std::forward<Args>(args)...);
+                HPX_FORWARD(Args, args)...);
         }
     } for_loop_strided{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges::experimental
 
-#endif
+namespace hpx::ranges {
+
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::ranges::for_loop is deprecated. Please use "
+        "hpx::ranges::experimental::for_loop instead.")
+    inline constexpr hpx::ranges::experimental::for_loop_t for_loop{};
+
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::ranges::for_loop_strided is deprecated. Please use "
+        "hpx::ranges::experimental::for_loop_strided instead.")
+    inline constexpr hpx::ranges::experimental::for_loop_strided_t
+        for_loop_strided{};
+}    // namespace hpx::ranges
+
+#endif    // DOXYGEN

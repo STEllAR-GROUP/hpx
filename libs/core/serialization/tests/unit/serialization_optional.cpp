@@ -45,7 +45,9 @@ struct A
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& t_;
+        // clang-format off
+        ar & t_;
+        // clang-format on
     }
 };
 
@@ -56,47 +58,47 @@ int main()
     hpx::serialization::input_archive iar(buf);
 
     {
-        hpx::util::optional<int> ovar;
-        hpx::util::optional<int> ivar;
+        hpx::optional<int> ovar;
+        hpx::optional<int> ivar;
         oar << ovar;
         iar >> ivar;
 
         HPX_TEST_EQ(ivar.has_value(), ovar.has_value());
         HPX_TEST(ivar == ovar);
-        HPX_TEST(ivar == hpx::util::nullopt);
+        HPX_TEST(ivar == hpx::nullopt);
     }
 
     {
-        hpx::util::optional<int> ovar = 42;
-        hpx::util::optional<int> ivar;
+        hpx::optional<int> ovar(42);
+        hpx::optional<int> ivar;
         oar << ovar;
         iar >> ivar;
 
         HPX_TEST_EQ(ivar.has_value(), ovar.has_value());
         HPX_TEST(ivar == ovar);
-        HPX_TEST(ivar != hpx::util::nullopt);
+        HPX_TEST(ivar != hpx::nullopt);
     }
 
     {
-        hpx::util::optional<double> ovar = 2.5;
-        hpx::util::optional<double> ivar;
+        hpx::optional<double> ovar(2.5);
+        hpx::optional<double> ivar;
         oar << ovar;
         iar >> ivar;
 
         HPX_TEST_EQ(ivar.has_value(), ovar.has_value());
         HPX_TEST(ivar == ovar);
-        HPX_TEST(ivar != hpx::util::nullopt);
+        HPX_TEST(ivar != hpx::nullopt);
     }
 
     {
-        hpx::util::optional<A<int>> ovar = A<int>{2};
-        hpx::util::optional<A<int>> ivar;
+        hpx::optional<A<int>> ovar(A<int>{2});
+        hpx::optional<A<int>> ivar;
         oar << ovar;
         iar >> ivar;
 
         HPX_TEST_EQ(ivar.has_value(), ovar.has_value());
         HPX_TEST(ivar == ovar);
-        HPX_TEST(ivar != hpx::util::nullopt);
+        HPX_TEST(ivar != hpx::nullopt);
     }
 
     return hpx::util::report_errors();

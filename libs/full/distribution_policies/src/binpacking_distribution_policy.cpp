@@ -19,12 +19,10 @@ namespace hpx { namespace components { namespace detail {
         std::size_t count, std::vector<std::uint64_t> const& values)
     {
         std::size_t maxcount = 0;
-        std::size_t existing = 0;
 
         for (std::uint64_t value : values)
         {
             maxcount = (std::max)(maxcount, std::size_t(value));
-            existing += std::size_t(value);
         }
 
         // distribute the number of components to create in a way, so that
@@ -79,7 +77,7 @@ namespace hpx { namespace components { namespace detail {
             hpx::launch::sync,
             [](std::vector<hpx::future<std::uint64_t>>&& values)
                 -> std::vector<std::uint64_t> { return hpx::unwrap(values); },
-            std::move(values));
+            HPX_MOVE(values));
     }
 
     hpx::future<std::vector<std::uint64_t>> get_counter_values(
@@ -105,7 +103,7 @@ namespace hpx { namespace components { namespace detail {
                 counters.emplace_back(counter_name, id);
         }
 
-        return hpx::dataflow(&retrieve_counter_values, std::move(counters));
+        return hpx::dataflow(&retrieve_counter_values, HPX_MOVE(counters));
     }
 
     hpx::id_type const& get_best_locality(

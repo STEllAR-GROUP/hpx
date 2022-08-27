@@ -12,10 +12,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx {
-    namespace execution {
-        namespace experimental {
-            namespace detail {
+namespace hpx::execution::experimental::detail {
+
     template <typename Tag, typename IsPack, typename... Ts>
     struct partial_algorithm_base;
 
@@ -28,7 +26,7 @@ namespace hpx {
     public:
         template <typename... Ts_>
         explicit constexpr partial_algorithm_base(Ts_&&... ts)
-          : ts(std::piecewise_construct, std::forward<Ts_>(ts)...)
+          : ts(std::piecewise_construct, HPX_FORWARD(Ts_, ts)...)
         {
         }
 
@@ -43,11 +41,11 @@ namespace hpx {
             U&& u, partial_algorithm_base p)
         {
             return Tag{}(
-                std::forward<U>(u), std::move(p.ts).template get<Is>()...);
+                HPX_FORWARD(U, u), HPX_MOVE(p.ts).template get<Is>()...);
         }
     };
 
     template <typename Tag, typename... Ts>
     using partial_algorithm = partial_algorithm_base<Tag,
-        typename hpx::util::make_index_pack<sizeof...(Ts)>::type, Ts...>;
-}}}}    // namespace hpx::execution::experimental::detail
+        hpx::util::make_index_pack_t<sizeof...(Ts)>, Ts...>;
+}    // namespace hpx::execution::experimental::detail

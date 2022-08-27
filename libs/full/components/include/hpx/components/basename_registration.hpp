@@ -46,7 +46,7 @@ namespace hpx {
         std::string base_name, std::size_t num_ids)
     {
         return components::make_clients<Client>(
-            find_all_from_basename(std::move(base_name), num_ids));
+            find_all_from_basename(HPX_MOVE(base_name), num_ids));
     }
 
     /// Return registered clients from the given base name and sequence numbers.
@@ -75,7 +75,7 @@ namespace hpx {
         std::string base_name, std::vector<std::size_t> const& ids)
     {
         return components::make_clients<Client>(
-            find_from_basename(std::move(base_name), ids));
+            find_from_basename(HPX_MOVE(base_name), ids));
     }
 
     /// \brief Return registered id from the given base name and sequence number.
@@ -103,7 +103,7 @@ namespace hpx {
     Client find_from_basename(std::string base_name, std::size_t sequence_nr)
     {
         return components::make_client<Client>(
-            find_from_basename(std::move(base_name), sequence_nr));
+            find_from_basename(HPX_MOVE(base_name), sequence_nr));
     }
 
     /// Register the id wrapped in the given client using the given base name.
@@ -135,11 +135,11 @@ namespace hpx {
         components::client_base<Client, Stub>& client, std::size_t sequence_nr)
     {
         return client.then(
-            [sequence_nr, base_name = std::move(base_name)](
+            [sequence_nr, base_name = HPX_MOVE(base_name)](
                 components::client_base<Client, Stub>&& c) mutable
             -> hpx::future<bool> {
                 return register_with_basename(
-                    std::move(base_name), c.get_id(), sequence_nr);
+                    HPX_MOVE(base_name), c.get_id(), sequence_nr);
             });
     }
 
@@ -164,6 +164,6 @@ namespace hpx {
         std::string base_name, std::size_t sequence_nr)
     {
         return components::make_client<Client>(
-            unregister_with_basename(std::move(base_name), sequence_nr));
+            unregister_with_basename(HPX_MOVE(base_name), sequence_nr));
     }
 }    // namespace hpx

@@ -26,14 +26,14 @@ set(functional_headers
     hpx/functional/invoke.hpp
     hpx/functional/invoke_fused.hpp
     hpx/functional/mem_fn.hpp
+    hpx/functional/move_only_function.hpp
     hpx/functional/one_shot.hpp
     hpx/functional/protect.hpp
-    hpx/functional/unique_function.hpp
     hpx/functional/serialization/detail/serializable_basic_function.hpp
     hpx/functional/serialization/detail/vtable/serializable_function_vtable.hpp
     hpx/functional/serialization/detail/vtable/serializable_vtable.hpp
     hpx/functional/serialization/serializable_function.hpp
-    hpx/functional/serialization/serializable_unique_function.hpp
+    hpx/functional/serialization/serializable_move_only_function.hpp
     hpx/functional/traits/get_action_name.hpp
     hpx/functional/traits/get_function_address.hpp
     hpx/functional/traits/get_function_annotation.hpp
@@ -88,7 +88,7 @@ add_hpx_module(
     hpx_errors
     hpx_itt_notify
     hpx_serialization
-    hpx_tag_dispatch
+    hpx_tag_invoke
     hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

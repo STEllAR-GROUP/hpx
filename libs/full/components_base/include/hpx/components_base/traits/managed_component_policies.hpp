@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,11 +30,14 @@ namespace hpx { namespace traits {
 
     template <typename Component>
     struct managed_component_ctor_policy<Component,
-        typename util::always_void<
-            typename Component::has_managed_component_base>::type>
+        util::always_void_t<typename Component::has_managed_component_base>>
     {
         using type = typename Component::ctor_policy;
     };
+
+    template <typename T>
+    using managed_component_ctor_policy_t =
+        typename managed_component_ctor_policy<T>::type;
 
     ///////////////////////////////////////////////////////////////////////////
     // control the way managed_components are destructed
@@ -54,9 +57,12 @@ namespace hpx { namespace traits {
 
     template <typename Component>
     struct managed_component_dtor_policy<Component,
-        typename util::always_void<
-            typename Component::has_managed_component_base>::type>
+        util::always_void<typename Component::has_managed_component_base>>
     {
         using type = typename Component::dtor_policy;
     };
+
+    template <typename T>
+    using managed_component_dtor_policy_t =
+        typename managed_component_dtor_policy<T>::type;
 }}    // namespace hpx::traits

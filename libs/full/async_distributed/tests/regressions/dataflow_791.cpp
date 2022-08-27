@@ -28,9 +28,8 @@
 
 using hpx::async;
 using hpx::dataflow;
+using hpx::shared_future;
 using hpx::unwrapping;
-using hpx::wait_all;
-using hpx::lcos::shared_future;
 using std::vector;
 
 struct block
@@ -130,7 +129,7 @@ int main(int argc, char* argv[])
 void LU(int numBlocks)
 {
     printf("LU\n");
-    hpx::naming::id_type here = hpx::find_here();
+    hpx::id_type here = hpx::find_here();
     vector<vector<block>> blockList;
     getBlockList(blockList, numBlocks);
     vector<vector<vector<shared_future<block>>>> dfArray(numBlocks);
@@ -188,7 +187,7 @@ void LU(int numBlocks)
             }
         }
     }
-    wait_all(dfArray[numBlocks - 1][numBlocks - 1][numBlocks - 1]);
+    hpx::wait_all(dfArray[numBlocks - 1][numBlocks - 1][numBlocks - 1]);
 }
 
 void getBlockList(vector<vector<block>>& blockList, int numBlocks)
@@ -349,7 +348,7 @@ void InitMatrix3()
     {
         futures.push_back(async(initLoop, i));
     }
-    wait_all(futures);
+    hpx::wait_all(futures);
 }
 
 void initLoop(int i)

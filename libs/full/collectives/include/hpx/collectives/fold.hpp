@@ -293,7 +293,7 @@ namespace hpx { namespace lcos {
             Result operator()(
                 hpx::future<std::vector<hpx::future<Result>>> r) const
             {
-                std::vector<hpx::future<Result>> fres = std::move(r.get());
+                std::vector<hpx::future<Result>> fres = HPX_MOVE(r.get());
                 HPX_ASSERT(!fres.empty());
 
                 // we're at the beginning of the folding chain, incorporate the
@@ -338,7 +338,7 @@ namespace hpx { namespace lcos {
                     std::vector<id_type> ids_next(ids.begin() + 1, ids.end());
                     fold_futures.push_back(
                         hpx::detail::async_colocated<fold_impl_action>(
-                            ids_next.front(), act, std::move(ids_next), fold_op,
+                            ids_next.front(), act, HPX_MOVE(ids_next), fold_op,
                             init, global_idx + 1, vs...));
                 }
             }
@@ -372,7 +372,7 @@ namespace hpx { namespace lcos {
             Action>::template fold_invoker<FoldOp>::type fold_impl_action;
 
         return hpx::detail::async_colocated<fold_impl_action>(ids[0], Action(),
-            ids, std::forward<FoldOp>(fold_op), std::forward<Init>(init), 0,
+            ids, HPX_FORWARD(FoldOp, fold_op), HPX_FORWARD(Init, init), 0,
             vs...);
     }
 
@@ -384,8 +384,8 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const& ids, FoldOp&& fold_op, Init&& init,
         Ts const&... vs)
     {
-        return fold<Derived>(ids, std::forward<FoldOp>(fold_op),
-            std::forward<Init>(init), vs...);
+        return fold<Derived>(
+            ids, HPX_FORWARD(FoldOp, fold_op), HPX_FORWARD(Init, init), vs...);
     }
 
     template <typename Action, typename FoldOp, typename Init, typename... Ts>
@@ -393,8 +393,8 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const& ids, FoldOp&& fold_op, Init&& init,
         Ts const&... vs)
     {
-        return fold<detail::fold_with_index<Action>>(ids,
-            std::forward<FoldOp>(fold_op), std::forward<Init>(init), vs...);
+        return fold<detail::fold_with_index<Action>>(
+            ids, HPX_FORWARD(FoldOp, fold_op), HPX_FORWARD(Init, init), vs...);
     }
 
     template <typename Component, typename Signature, typename Derived,
@@ -405,8 +405,8 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const& ids, FoldOp&& fold_op, Init&& init,
         Ts const&... vs)
     {
-        return fold<detail::fold_with_index<Derived>>(ids,
-            std::forward<FoldOp>(fold_op), std::forward<Init>(init), vs...);
+        return fold<detail::fold_with_index<Derived>>(
+            ids, HPX_FORWARD(FoldOp, fold_op), HPX_FORWARD(Init, init), vs...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -438,8 +438,8 @@ namespace hpx { namespace lcos {
         }
 
         return hpx::detail::async_colocated<fold_impl_action>(inverted_ids[0],
-            Action(), inverted_ids, std::forward<FoldOp>(fold_op),
-            std::forward<Init>(init),
+            Action(), inverted_ids, HPX_FORWARD(FoldOp, fold_op),
+            HPX_FORWARD(Init, init),
             -static_cast<long>(inverted_ids.size() - 1), vs...);
     }
 
@@ -451,8 +451,8 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const& ids, FoldOp&& fold_op, Init&& init,
         Ts const&... vs)
     {
-        return inverse_fold<Derived>(ids, std::forward<FoldOp>(fold_op),
-            std::forward<Init>(init), vs...);
+        return inverse_fold<Derived>(
+            ids, HPX_FORWARD(FoldOp, fold_op), HPX_FORWARD(Init, init), vs...);
     }
 
     template <typename Action, typename FoldOp, typename Init, typename... Ts>
@@ -460,8 +460,8 @@ namespace hpx { namespace lcos {
     inverse_fold_with_index(std::vector<hpx::id_type> const& ids,
         FoldOp&& fold_op, Init&& init, Ts const&... vs)
     {
-        return inverse_fold<detail::fold_with_index<Action>>(ids,
-            std::forward<FoldOp>(fold_op), std::forward<Init>(init), vs...);
+        return inverse_fold<detail::fold_with_index<Action>>(
+            ids, HPX_FORWARD(FoldOp, fold_op), HPX_FORWARD(Init, init), vs...);
     }
 
     template <typename Component, typename Signature, typename Derived,
@@ -473,8 +473,8 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const& ids, FoldOp&& fold_op, Init&& init,
         Ts const&... vs)
     {
-        return inverse_fold<detail::fold_with_index<Derived>>(ids,
-            std::forward<FoldOp>(fold_op), std::forward<Init>(init), vs...);
+        return inverse_fold<detail::fold_with_index<Derived>>(
+            ids, HPX_FORWARD(FoldOp, fold_op), HPX_FORWARD(Init, init), vs...);
     }
 }}    // namespace hpx::lcos
 

@@ -58,14 +58,14 @@ namespace hpx { namespace performance_counters {
     // Creation function for per-action parcel data counters
     naming::gid_type per_action_data_counter_creator(counter_info const& info,
         hpx::actions::detail::per_action_data_counter_registry& registry,
-        hpx::util::function_nonser<std::int64_t(
-            std::string const&, bool)> const& counter_func,
+        hpx::function<std::int64_t(std::string const&, bool)> const&
+            counter_func,
         error_code& ec)
     {
         switch (info.type_)
         {
         case counter_elapsed_time:
-            HPX_FALLTHROUGH;
+            [[fallthrough]];
         case counter_monotonically_increasing:
         {
             counter_path_elements paths;
@@ -87,16 +87,16 @@ namespace hpx { namespace performance_counters {
                 // if no parameters (action name) is given assume that this
                 // counter should report the overall value for all actions
                 auto const& f =
-                    util::bind_front(counter_func, paths.parameters_);
+                    hpx::bind_front(counter_func, paths.parameters_);
                 return performance_counters::locality_raw_counter_creator(
                     info, f, ec);
             }
 
             // ask registry
-            hpx::util::function_nonser<std::int64_t(bool)> f =
+            hpx::function<std::int64_t(bool)> f =
                 registry.get_counter(paths.parameters_, counter_func);
 
-            return detail::create_raw_counter(info, std::move(f), ec);
+            return detail::create_raw_counter(info, HPX_MOVE(f), ec);
         }
         break;
 
@@ -108,8 +108,7 @@ namespace hpx { namespace performance_counters {
     }
 
     naming::gid_type per_action_data_counter_creator(counter_info const& info,
-        hpx::util::function_nonser<std::int64_t(
-            std::string const&, bool)> const& f,
+        hpx::function<std::int64_t(std::string const&, bool)> const& f,
         error_code& ec)
     {
         using hpx::actions::detail::per_action_data_counter_registry;

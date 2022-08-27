@@ -94,7 +94,7 @@ namespace hpx { namespace threads {
         return get_thread_manager().get_idle_core_mask();
     }
 
-    bool enumerate_threads(util::function_nonser<bool(thread_id_type)> const& f,
+    bool enumerate_threads(hpx::function<bool(thread_id_type)> const& f,
         thread_schedule_state state)
     {
         return get_thread_manager().enumerate_threads(f, state);

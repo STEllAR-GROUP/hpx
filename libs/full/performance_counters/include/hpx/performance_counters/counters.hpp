@@ -367,21 +367,20 @@ namespace hpx { namespace performance_counters {
     /// \brief This declares the type of a function, which will be
     ///        called by HPX whenever a new performance counter instance of a
     ///        particular type needs to be created.
-    typedef hpx::util::function_nonser<naming::gid_type(
-        counter_info const&, error_code&)>
+    typedef hpx::function<naming::gid_type(counter_info const&, error_code&)>
         create_counter_func;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief This declares a type of a function, which will be passed to
     ///        a \a discover_counters_func in order to be called for each
     ///        discovered performance counter instance.
-    typedef hpx::util::function_nonser<bool(counter_info const&, error_code&)>
+    typedef hpx::function<bool(counter_info const&, error_code&)>
         discover_counter_func;
 
     /// \brief This declares the type of a function, which will be called by
     ///        HPX whenever it needs to discover all performance counter
     ///        instances of a particular type.
-    typedef hpx::util::function_nonser<bool(counter_info const&,
+    typedef hpx::function<bool(counter_info const&,
         discover_counter_func const&, discover_counters_mode, error_code&)>
         discover_counters_func;
 
@@ -393,20 +392,20 @@ namespace hpx { namespace performance_counters {
             info, create_counter_func(), discover_counters_func(), ec);
     }
 
-    inline naming::id_type get_counter(std::string const& name, error_code& ec)
+    inline hpx::id_type get_counter(std::string const& name, error_code& ec)
     {
-        lcos::future<naming::id_type> f = get_counter_async(name, ec);
+        hpx::future<hpx::id_type> f = get_counter_async(name, ec);
         if (ec)
-            return naming::invalid_id;
+            return hpx::invalid_id;
 
         return f.get(ec);
     }
 
-    inline naming::id_type get_counter(counter_info const& info, error_code& ec)
+    inline hpx::id_type get_counter(counter_info const& info, error_code& ec)
     {
-        lcos::future<naming::id_type> f = get_counter_async(info, ec);
+        hpx::future<hpx::id_type> f = get_counter_async(info, ec);
         if (ec)
-            return naming::invalid_id;
+            return hpx::invalid_id;
 
         return f.get(ec);
     }

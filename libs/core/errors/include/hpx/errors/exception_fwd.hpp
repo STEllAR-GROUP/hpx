@@ -12,6 +12,8 @@
 #include <hpx/config.hpp>
 #include <hpx/errors/error.hpp>
 
+#include <cstdint>
+
 namespace hpx {
     /// \cond NOINTERNAL
     // forward declaration
@@ -24,16 +26,39 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Encode error category for new error_code.
-    enum throwmode
+    enum class throwmode : std::uint8_t
     {
         plain = 0,
         rethrow = 1,
-        lightweight =
-            0x80,    // do not generate an exception for this error_code
+
+        // do not generate an exception for this error_code
+        lightweight = 0x80,
+
         /// \cond NODETAIL
-        lightweight_rethrow = lightweight | rethrow
+        lightweight_rethrow = 0x81    // lightweight | rethrow
         /// \endcond
     };
+
+    inline constexpr bool operator&(throwmode lhs, throwmode rhs) noexcept
+    {
+        return static_cast<int>(lhs) & static_cast<int>(rhs);
+    }
+
+#define HPX_THROWMODE_UNSCOPED_ENUM_DEPRECATION_MSG                            \
+    "The unscoped throwmode names are deprecated. Please use "                 \
+    "throwmode::<mode> instead."
+
+    HPX_DEPRECATED_V(1, 8, HPX_THROWMODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr throwmode plain = throwmode::plain;
+    HPX_DEPRECATED_V(1, 8, HPX_THROWMODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr throwmode rethrow = throwmode::rethrow;
+    HPX_DEPRECATED_V(1, 8, HPX_THROWMODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr throwmode lightweight = throwmode::lightweight;
+    HPX_DEPRECATED_V(1, 8, HPX_THROWMODE_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr throwmode lightweight_rethrow =
+        throwmode::lightweight_rethrow;
+
+#undef HPX_THROWMODE_UNSCOPED_ENUM_DEPRECATION_MSG
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Predefined error_code object used as "throw on error" tag.

@@ -6,40 +6,35 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/iostream.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/serialization.hpp>
+#include <hpx/iostream.hpp>
 
-#include <cstddef>
 #include <complex>
+#include <cstddef>
 #include <string>
 #include <vector>
 
-namespace pingpong
-{
-    namespace server
+namespace pingpong { namespace server {
+    std::complex<double> get_element()
     {
-        std::complex<double> get_element()
-        {
-            return std::complex<double>(13.3,-23.8);
-        }
+        return std::complex<double>(13.3, -23.8);
     }
-}
+}}    // namespace pingpong::server
 
-HPX_PLAIN_ACTION(pingpong::server::get_element, pingpong_get_element_action);
-//HPX_ACTION_USES_MESSAGE_COALESCING(pingpong_get_element_action);
-
+HPX_PLAIN_ACTION(pingpong::server::get_element, pingpong_get_element_action)
+//HPX_ACTION_USES_MESSAGE_COALESCING(pingpong_get_element_action)
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-   //Commandline specific code
+    //Commandline specific code
     std::size_t const n = vm["nparcels"].as<std::size_t>();
 
     if (0 == hpx::get_locality_id())
     {
-        hpx::cout << "Running With nparcel = " << n << "\n" << hpx::flush;
+        hpx::cout << "Running With nparcel = " << n << "\n" << std::flush;
     }
 
     //Create instance of the actions
@@ -49,18 +44,18 @@ int hpx_main(hpx::program_options::variables_map& vm)
     vec.reserve(n);
     received.reserve(n);
     //Find the other locality
-    std::vector<hpx::naming::id_type> dummy = hpx::find_remote_localities();
-    hpx::naming::id_type other_locality = dummy[0];
+    std::vector<hpx::id_type> dummy = hpx::find_remote_localities();
+    hpx::id_type other_locality = dummy[0];
 
-
-    for(std::size_t i=0; i<n; ++i)
+    for (std::size_t i = 0; i < n; ++i)
     {
-        vec.push_back(hpx::async(act,other_locality));
+        vec.push_back(hpx::async(act, other_locality));
     }
 
-    hpx::when_all(vec).then(
-        [&received, n](hpx::future<std::vector<hpx::future<std::complex<double>>>> dummy)
-        {
+    hpx::when_all(vec)
+        .then([&received, n](
+                  hpx::future<std::vector<hpx::future<std::complex<double>>>>
+                      dummy) {
             std::vector<hpx::future<std::complex<double>>> number = dummy.get();
             for (std::size_t i = 0; i < n; ++i)
             {
@@ -68,9 +63,10 @@ int hpx_main(hpx::program_options::variables_map& vm)
             }
             hpx::evaluate_active_counters(false, " All Futures Done");
             hpx::cout << "Now Done With Lambda and the last received value is "
-                      <<received[n-1]<< "\n" << hpx::flush;
-        }
-    ).get();
+                      << received[n - 1] << "\n"
+                      << std::flush;
+        })
+        .get();
     return hpx::finalize();
 }
 
@@ -80,11 +76,9 @@ int main(int argc, char* argv[])
     hpx::program_options::options_description cmdline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()
-        ("nparcels,n",
-         hpx::program_options::value<std::size_t>()->default_value(100),
-         "the number of parcels to create")
-        ;
+    cmdline.add_options()("nparcels,n",
+        hpx::program_options::value<std::size_t>()->default_value(100),
+        "the number of parcels to create");
     // Initialize and run HPX
     std::vector<std::string> cfg;
     cfg.push_back("hpx.run_hpx_main!=1");

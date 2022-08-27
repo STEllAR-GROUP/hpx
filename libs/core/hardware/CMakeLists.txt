@@ -8,31 +8,23 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/hardware/include
 set(hardware_headers
-    hpx/hardware/cpuid/linux_x86.hpp
-    hpx/hardware/cpuid/msvc.hpp
     hpx/hardware/timestamp/bgq.hpp
     hpx/hardware/timestamp/cuda.hpp
     hpx/hardware/timestamp/linux_generic.hpp
     hpx/hardware/timestamp/linux_x86_32.hpp
     hpx/hardware/timestamp/linux_x86_64.hpp
     hpx/hardware/timestamp/msvc.hpp
-    hpx/hardware/bit_manipulation.hpp
-    hpx/hardware/cpuid.hpp
     hpx/hardware/timestamp.hpp
 )
 
 # Default location is $HPX_ROOT/libs/hardware/include_compatibility
 # cmake-format: off
 set(hardware_compat_headers
-    hpx/util/hardware/cpuid/linux_x86.hpp => hpx/modules/hardware.hpp
-    hpx/util/hardware/cpuid/msvc.hpp => hpx/modules/hardware.hpp
     hpx/util/hardware/timestamp/bgq.hpp => hpx/modules/hardware.hpp
     hpx/util/hardware/timestamp/linux_generic.hpp => hpx/modules/hardware.hpp
     hpx/util/hardware/timestamp/linux_x86_32.hpp => hpx/modules/hardware.hpp
     hpx/util/hardware/timestamp/linux_x86_64.hpp => hpx/modules/hardware.hpp
     hpx/util/hardware/timestamp/msvc.hpp => hpx/modules/hardware.hpp
-    hpx/util/hardware/bit_manipulation.hpp => hpx/modules/hardware.hpp
-    hpx/util/hardware/cpuid.hpp => hpx/modules/hardware.hpp
     hpx/util/hardware/timestamp.hpp => hpx/modules/hardware.hpp
 )
 # cmake-format: on
@@ -45,8 +37,6 @@ include(HPX_AddModule)
 add_hpx_module(
   core hardware
   EXCLUDE_FROM_GLOBAL_HEADER
-    "hpx/hardware/cpuid/linux_x86.hpp"
-    "hpx/hardware/cpuid/msvc.hpp"
     "hpx/hardware/timestamp/bgq.hpp"
     "hpx/hardware/timestamp/cuda.hpp"
     "hpx/hardware/timestamp/linux_generic.hpp"

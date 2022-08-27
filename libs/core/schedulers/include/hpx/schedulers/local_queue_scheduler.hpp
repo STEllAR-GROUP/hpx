@@ -358,8 +358,8 @@ namespace hpx { namespace threads { namespace policies {
                 return false;
             }
 
-            bool numa_stealing =
-                has_scheduler_mode(policies::enable_stealing_numa);
+            bool numa_stealing = has_scheduler_mode(
+                policies::scheduler_mode::enable_stealing_numa);
             if (!numa_stealing)
             {
                 // steal work items: first try to steal from other cores in
@@ -634,8 +634,7 @@ namespace hpx { namespace threads { namespace policies {
 
         ///////////////////////////////////////////////////////////////////////
         // Enumerate matching threads from all queues
-        bool enumerate_threads(
-            util::function_nonser<bool(thread_id_type)> const& f,
+        bool enumerate_threads(hpx::function<bool(thread_id_type)> const& f,
             thread_schedule_state state =
                 thread_schedule_state::unknown) const override
         {
@@ -726,8 +725,8 @@ namespace hpx { namespace threads { namespace policies {
                 return true;
             }
 
-            bool numa_stealing_ =
-                has_scheduler_mode(policies::enable_stealing_numa);
+            bool numa_stealing_ = has_scheduler_mode(
+                policies::scheduler_mode::enable_stealing_numa);
             // limited or no stealing across domains
             if (!numa_stealing_)
             {
@@ -845,17 +844,17 @@ namespace hpx { namespace threads { namespace policies {
                 {
                     if (running)
                     {
-                        LTM_(error).format("pool({}), scheduler({}), "
-                                           "queue({}): no new work available, "
-                                           "are we deadlocked?",
+                        LTM_(warning).format(
+                            "pool({}), scheduler({}), queue({}): no new work "
+                            "available, are we deadlocked?",
                             *this->get_parent_pool(), *this, num_thread);
                     }
                     else
                     {
-                        LHPX_CONSOLE_(hpx::util::logging::level::error)
-                            .format("  [TM] pool({}), scheduler({}), "
-                                    "queue({}): no new work available, are we "
-                                    "deadlocked?\n",
+                        LHPX_CONSOLE_(hpx::util::logging::level::warning)
+                            .format(
+                                "  [TM] pool({}), scheduler({}), queue({}): no "
+                                "new work available, are we deadlocked?\n",
                                 *this->get_parent_pool(), *this, num_thread);
                     }
                 }
@@ -908,8 +907,8 @@ namespace hpx { namespace threads { namespace policies {
             else
                 first_mask = core_mask;
 
-            bool numa_stealing =
-                has_scheduler_mode(policies::enable_stealing_numa);
+            bool numa_stealing = has_scheduler_mode(
+                policies::scheduler_mode::enable_stealing_numa);
             if (numa_stealing && any(first_mask & core_mask))
             {
 #if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only

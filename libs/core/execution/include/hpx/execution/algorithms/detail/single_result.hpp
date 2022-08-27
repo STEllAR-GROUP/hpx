@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,64 +8,113 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/pack.hpp>
+#include <hpx/type_support/meta.hpp>
 
+#include <cstddef>
 #include <type_traits>
 #include <variant>
 
-namespace hpx {
-    namespace execution {
-        namespace experimental {
-            namespace detail {
+namespace hpx::execution::experimental::detail {
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Variants>
     struct single_result
     {
         static_assert(sizeof(Variants) == 0,
             "expected a single variant with a single type in "
-            "sender_traits<>::value_types");
+            "value_types_of_t");
     };
 
     template <>
-    struct single_result<hpx::util::pack<hpx::util::pack<>>>
+    struct single_result<meta::pack<>>
+    {
+        using type = void;
+    };
+
+    template <>
+    struct single_result<meta::pack<meta::pack<>>>
     {
         using type = void;
     };
 
     template <typename T>
-    struct single_result<hpx::util::pack<hpx::util::pack<T>>>
+    struct single_result<meta::pack<meta::pack<T>>>
     {
         using type = T;
     };
 
     template <typename T, typename U, typename... Ts>
-    struct single_result<hpx::util::pack<hpx::util::pack<T, U, Ts...>>>
+    struct single_result<meta::pack<meta::pack<T, U, Ts...>>>
     {
         static_assert(sizeof(T) == 0,
             "expected a single variant with a single type in "
-            "sender_traits<>::value_types (single variant with two or more "
+            "value_types_of_t (single variant with two or more "
             "types given)");
     };
 
     template <typename T, typename U, typename... Ts>
-    struct single_result<hpx::util::pack<T, U, Ts...>>
+    struct single_result<meta::pack<T, U, Ts...>>
     {
         static_assert(sizeof(T) == 0,
             "expected a single variant with a single type in "
-            "sender_traits<>::value_types (two or more variants)");
+            "value_types_of_t (two or more variants)");
     };
 
     template <typename Variants>
-    using single_result_t = typename single_result<Variants>::type;
+    using single_result_t = meta::type<single_result<Variants>>;
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Variants>
     struct single_result_non_void
     {
-        using type = typename single_result<Variants>::type;
-        static_assert(!std::is_void<type>::value,
-            "expected a non-void type in single_result");
+        using type = single_result_t<Variants>;
+        static_assert(
+            !std::is_void_v<type>, "expected a non-void type in single_result");
     };
 
     template <typename Variants>
     using single_result_non_void_t =
-        typename single_result_non_void<Variants>::type;
-}}}}    // namespace hpx::execution::experimental::detail
+        meta::type<single_result_non_void<Variants>>;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Variants>
+    struct single_variant
+    {
+        static_assert(sizeof(Variants) == 0,
+            "expected a single variant completion_signatures<>::value_types");
+    };
+
+    template <typename T>
+    struct single_variant<util::pack<T>>
+    {
+        using type = T;
+    };
+
+    template <typename Variants>
+    using single_variant_t = meta::type<single_variant<Variants>>;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Variants>
+    struct single_variant_tuple_size
+    {
+        static_assert(sizeof(Variants) == 0,
+            "expected a single variant completion_signatures<>::value_types");
+    };
+
+    template <template <typename...> typename Variants>
+    struct single_variant_tuple_size<Variants<>>
+    {
+        static constexpr std::size_t size = 0;
+    };
+
+    template <template <typename...> typename Variants,
+        template <typename...> typename Tuple, typename... Ts>
+    struct single_variant_tuple_size<Variants<Tuple<Ts...>>>
+    {
+        static constexpr std::size_t size = sizeof...(Ts);
+    };
+
+    template <typename Variants>
+    inline constexpr std::size_t single_variant_tuple_size_v =
+        single_variant_tuple_size<Variants>::size;
+}    // namespace hpx::execution::experimental::detail

@@ -58,7 +58,7 @@ function(add_hpx_library_headers_noglob name)
     )
 
     hpx_print_list(
-      "DEBUG" "add_hpx_library_sources_noglob.${name}" "Sources for ${name}"
+      "DEBUG" "add_hpx_library_sources_noglob.${name}: Sources for ${name}"
       HEADERS_HEADERS
     )
 

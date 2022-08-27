@@ -1,11 +1,11 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file lcos/wait_any.hpp
+/// \file wait_any.hpp
 
 #pragma once
 
@@ -21,22 +21,18 @@ namespace hpx {
     /// \param last     [in] The iterator pointing to the last element of a
     ///                 sequence of \a future or \a shared_future objects for
     ///                 which \a wait_any should wait.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \note The function \a wait_any returns after at least one future has
     ///       become ready. All input futures are still valid after \a wait_any
     ///       returns.
     ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           \a hpx::exception.
+    /// \note           The function wait_any will rethrow any exceptions
+    ///                 captured by the futures while becoming ready. If this
+    ///                 behavior is undesirable, use \a wait_any_nothrow
+    ///                 instead.
     ///
-    /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
-    void wait_any(InputIter first, InputIter last, error_code& ec = throws);
+    void wait_any(InputIter first, InputIter last);
 
     /// The function \a wait_any is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns after one future of
@@ -45,22 +41,18 @@ namespace hpx {
     /// \param futures  [in] A vector holding an arbitrary amount of \a future or
     ///                 \a shared_future objects for which \a wait_any should
     ///                 wait.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \note The function \a wait_any returns after at least one future has
     ///       become ready. All input futures are still valid after \a wait_any
     ///       returns.
     ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           \a hpx::exception.
+    /// \note           The function wait_any will rethrow any exceptions
+    ///                 captured by the futures while becoming ready. If this
+    ///                 behavior is undesirable, use \a wait_any_nothrow
+    ///                 instead.
     ///
-    /// \note     None of the futures in the input sequence are invalidated.
     template <typename R>
-    void wait_any(std::vector<future<R>>& futures, error_code& ec = throws);
+    void wait_any(std::vector<future<R>>& futures);
 
     /// The function \a wait_any is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns after one future of
@@ -69,47 +61,18 @@ namespace hpx {
     /// \param futures  [in] Amn array holding an arbitrary amount of \a future or
     ///                 \a shared_future objects for which \a wait_any should
     ///                 wait.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \note The function \a wait_any returns after at least one future has
     ///       become ready. All input futures are still valid after \a wait_any
     ///       returns.
     ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           \a hpx::exception.
+    /// \note           The function wait_any will rethrow any exceptions
+    ///                 captured by the futures while becoming ready. If this
+    ///                 behavior is undesirable, use \a wait_any_nothrow
+    ///                 instead.
     ///
-    /// \note     None of the futures in the input sequence are invalidated.
-    template <typename R, std:;
-    size_t N > void wait_any(
-                   std::array<future<R>, N>& futures, error_code& ec = throws);
-
-    /// The function \a wait_any is a non-deterministic choice operator. It
-    /// OR-composes all future objects given and returns after one future of
-    /// that list finishes execution.
-    ///
-    /// \param futures  [in] An arbitrary number of \a future or \a shared_future
-    ///                 objects, possibly holding different types for which
-    ///                 \a wait_any should wait.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
-    ///
-    /// \note The function \a wait_any returns after at least one future has
-    ///       become ready. All input futures are still valid after \a wait_any
-    ///       returns.
-    ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           \a hpx::exception.
-    ///
-    /// \note     None of the futures in the input sequence are invalidated.
-    template <typename... T>
-    void wait_any(error_code& ec, T&&... futures);
+    template <typename R, std::size_t N>
+    void wait_any(std::array<future<R>, N>& futures);
 
     /// The function \a wait_any is a non-deterministic choice operator. It
     /// OR-composes all future objects given and returns after one future of
@@ -123,7 +86,11 @@ namespace hpx {
     ///       become ready. All input futures are still valid after \a wait_any
     ///       returns.
     ///
-    /// \note     None of the futures in the input sequence are invalidated.
+    /// \note           The function wait_any will rethrow any exceptions
+    ///                 captured by the futures while becoming ready. If this
+    ///                 behavior is undesirable, use \a wait_any_nothrow
+    ///                 instead.
+    ///
     template <typename... T>
     void wait_any(T&&... futures);
 
@@ -136,27 +103,18 @@ namespace hpx {
     ///                 which \a wait_any_n should wait.
     /// \param count    [in] The number of elements in the sequence starting at
     ///                 \a first.
-    /// \param ec       [in,out] this represents the error status on exit, if
-    ///                 this is pre-initialized to \a hpx#throws the function
-    ///                 will throw on error instead.
     ///
     /// \note The function \a wait_any_n returns after at least one future has
     ///       become ready. All input futures are still valid after \a wait_any_n
     ///       returns.
     ///
-    /// \return         The function \a wait_all_n will return an iterator
-    ///                 referring to the first element in the input sequence
-    ///                 after the last processed element.
+    /// \note           The function wait_any_n will rethrow any exceptions
+    ///                 captured by the futures while becoming ready. If this
+    ///                 behavior is undesirable, use \a wait_any_n_nothrow
+    ///                 instead.
     ///
-    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
-    ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
-    ///           \a hpx::exception.
-    ///
-    /// \note     None of the futures in the input sequence are invalidated.
     template <typename InputIter>
-    InputIter wait_any_n(
-        InputIter first, std::size_t count, error_code& ec = throws);
+    void wait_any_n(InputIter first, std::size_t count);
 }    // namespace hpx
 
 #else    // DOXYGEN
@@ -165,6 +123,7 @@ namespace hpx {
 #include <hpx/async_combinators/wait_some.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/type_support/always_void.hpp>
 
@@ -174,88 +133,233 @@ namespace hpx {
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos {
+namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
-    void wait_any(std::vector<Future> const& futures, error_code& ec = throws)
+    bool wait_any_nothrow(std::vector<Future> const& futures)
     {
-        return lcos::wait_some(1, futures, ec);
+        return hpx::wait_some_nothrow(1, futures);
     }
 
     template <typename Future>
-    void wait_any(std::vector<Future>& lazy_values, error_code& ec = throws)
+    void wait_any(std::vector<Future> const& futures)
     {
-        return lcos::wait_any(
-            const_cast<std::vector<Future> const&>(lazy_values), ec);
+        hpx::wait_some(1, futures);
     }
 
     template <typename Future>
-    void wait_any(std::vector<Future>&& lazy_values, error_code& ec = throws)
+    bool wait_any_nothrow(std::vector<Future>& lazy_values)
     {
-        return lcos::wait_any(
-            const_cast<std::vector<Future> const&>(lazy_values), ec);
+        return hpx::wait_any_nothrow(
+            const_cast<std::vector<Future> const&>(lazy_values));
+    }
+
+    template <typename Future>
+    void wait_any(std::vector<Future>& lazy_values)
+    {
+        hpx::wait_any(const_cast<std::vector<Future> const&>(lazy_values));
+    }
+
+    template <typename Future>
+    bool wait_any_nothrow(std::vector<Future>&& lazy_values)
+    {
+        return hpx::wait_any_nothrow(
+            const_cast<std::vector<Future> const&>(lazy_values));
+    }
+
+    template <typename Future>
+    void wait_any(std::vector<Future>&& lazy_values)
+    {
+        hpx::wait_any(const_cast<std::vector<Future> const&>(lazy_values));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, std::size_t N>
-    void wait_any(std::array<Future, N> const& futures, error_code& ec = throws)
+    bool wait_any_nothrow(std::array<Future, N> const& futures)
     {
-        return lcos::wait_some(1, futures, ec);
+        return hpx::wait_some_nothrow(1, futures);
     }
 
     template <typename Future, std::size_t N>
-    void wait_any(std::array<Future, N>& lazy_values, error_code& ec = throws)
+    void wait_any(std::array<Future, N> const& futures)
     {
-        return lcos::wait_any(
-            const_cast<std::array<Future, N> const&>(lazy_values), ec);
+        hpx::wait_some(1, futures);
     }
 
     template <typename Future, std::size_t N>
-    void wait_any(std::array<Future, N>&& lazy_values, error_code& ec = throws)
+    bool wait_any_nothrow(std::array<Future, N>& lazy_values)
     {
-        return lcos::wait_any(
-            const_cast<std::array<Future, N> const&>(lazy_values), ec);
+        return hpx::wait_any_nothrow(
+            const_cast<std::array<Future, N> const&>(lazy_values));
+    }
+
+    template <typename Future, std::size_t N>
+    void wait_any(std::array<Future, N>& lazy_values)
+    {
+        hpx::wait_any(const_cast<std::array<Future, N> const&>(lazy_values));
+    }
+
+    template <typename Future, std::size_t N>
+    bool wait_any_nothrow(std::array<Future, N>&& lazy_values)
+    {
+        return hpx::wait_any_nothrow(
+            const_cast<std::array<Future, N> const&>(lazy_values));
+    }
+
+    template <typename Future, std::size_t N>
+    void wait_any(std::array<Future, N>&& lazy_values)
+    {
+        hpx::wait_any(const_cast<std::array<Future, N> const&>(lazy_values));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator>
-    typename util::always_void<
-        typename lcos::detail::future_iterator_traits<Iterator>::type>::type
-    wait_any(Iterator begin, Iterator end, error_code& ec = throws)
+    template <typename Iterator,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    bool wait_any_nothrow(Iterator begin, Iterator end)
     {
-        return lcos::wait_some(1, begin, end, ec);
+        return hpx::wait_some_nothrow(1, begin, end);
     }
 
-    inline void wait_any(error_code& ec = throws)
+    template <typename Iterator,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    void wait_any(Iterator begin, Iterator end)
     {
-        return lcos::wait_some(1, ec);
+        hpx::wait_some(1, begin, end);
+    }
+
+    inline bool wait_any_nothrow()
+    {
+        return hpx::wait_some_nothrow(0);
+    }
+
+    inline void wait_any()
+    {
+        hpx::wait_some(0);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator>
-    Iterator wait_any_n(
-        Iterator begin, std::size_t count, error_code& ec = throws)
+    template <typename Iterator,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    bool wait_any_n_nothrow(Iterator begin, std::size_t count)
     {
-        return wait_some_n(1, begin, count, ec);
+        return hpx::wait_some_n_nothrow(1, begin, count);
+    }
+
+    template <typename Iterator,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    void wait_any_n(Iterator begin, std::size_t count)
+    {
+        hpx::wait_some_n(1, begin, count);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename... Ts>
-    void wait_any(error_code& ec, Ts&&... ts)
+    bool wait_any_nothrow(Ts&&... ts)
     {
-        return lcos::wait_some(1, ec, std::forward<Ts>(ts)...);
+        return hpx::wait_some_nothrow(1, HPX_FORWARD(Ts, ts)...);
     }
 
     template <typename... Ts>
     void wait_any(Ts&&... ts)
     {
-        return lcos::wait_some(1, std::forward<Ts>(ts)...);
+        hpx::wait_some(1, HPX_FORWARD(Ts, ts)...);
     }
-}}    // namespace hpx::lcos
-
-namespace hpx {
-    using lcos::wait_any;
-    using lcos::wait_any_n;
 }    // namespace hpx
+
+namespace hpx::lcos {
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Future>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
+    void wait_any(std::vector<Future> const& futures, error_code& = throws)
+    {
+        hpx::wait_some(1, futures);
+    }
+
+    template <typename Future>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
+    void wait_any(std::vector<Future>& lazy_values, error_code& = throws)
+    {
+        hpx::wait_any(const_cast<std::vector<Future> const&>(lazy_values));
+    }
+
+    template <typename Future>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
+    void wait_any(std::vector<Future>&& lazy_values, error_code& = throws)
+    {
+        hpx::wait_any(const_cast<std::vector<Future> const&>(lazy_values));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Future, std::size_t N>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
+    void wait_any(std::array<Future, N> const& futures, error_code& = throws)
+    {
+        hpx::wait_some(1, futures);
+    }
+
+    template <typename Future, std::size_t N>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
+    void wait_any(std::array<Future, N>& lazy_values, error_code& = throws)
+    {
+        hpx::wait_any(const_cast<std::array<Future, N> const&>(lazy_values));
+    }
+
+    template <typename Future, std::size_t N>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
+    void wait_any(std::array<Future, N>&& lazy_values, error_code& = throws)
+    {
+        hpx::wait_any(const_cast<std::array<Future, N> const&>(lazy_values));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iterator,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
+    void wait_any(Iterator begin, Iterator end, error_code& = throws)
+    {
+        hpx::wait_some(1, begin, end);
+    }
+
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
+    inline void wait_any(error_code& = throws)
+    {
+        hpx::wait_some(0);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iterator,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
+    void wait_any_n(Iterator begin, std::size_t count, error_code& = throws)
+    {
+        hpx::wait_some_n(1, begin, count);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename... Ts>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::wait_any is deprecated. Use hpx::wait_any instead.")
+    void wait_any(Ts&&... ts)
+    {
+        hpx::wait_some(1, HPX_FORWARD(Ts, ts)...);
+    }
+}    // namespace hpx::lcos
 
 #endif    // DOXYGEN

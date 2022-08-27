@@ -26,45 +26,43 @@ double runner(double now)
 
 HPX_PLAIN_ACTION(runner, runner_action)
 
-void run(widget * w, std::size_t num_threads)
+void run(widget* w, std::size_t num_threads)
 {
-    std::vector<hpx::lcos::future<double> > futures(num_threads);
+    std::vector<hpx::future<double>> futures(num_threads);
 
-    for(std::size_t i = 0; i < num_threads; ++i)
+    for (std::size_t i = 0; i < num_threads; ++i)
     {
         runner_action a;
-        futures[i] = hpx::async(a,
-                                hpx::find_here(),
-                                high_resolution_timer::now());
+        futures[i] =
+            hpx::async(a, hpx::find_here(), high_resolution_timer::now());
     }
 
-    hpx::lcos::wait(
-                futures,
-                [w](std::size_t i, double t){ w->threadsafe_add_label(i, t); }
-    );
+    hpx::wait_each(
+        [w](std::size_t i, auto&& f) { w->threadsafe_add_label(i, f.get()); },
+        futures);
     w->threadsafe_run_finished();
 }
 
-void qt_main(int argc, char ** argv)
+void qt_main(int argc, char** argv)
 {
     QApplication app(argc, argv);
 
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    widget main(hpx::util::bind(run, _1, _2));
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
+    widget main(hpx::bind(run, _1, _2));
     main.show();
 
     app.exec();
 }
 
-int hpx_main(int argc, char ** argv)
+int hpx_main(int argc, char** argv)
 {
     {
         // Get a reference to one of the main thread
         hpx::parallel::execution::main_pool_executor scheduler;
         // run an async function on the main thread to start the Qt application
-        hpx::future<void> qt_application
-            = hpx::async(scheduler, qt_main, argc, argv);
+        hpx::future<void> qt_application =
+            hpx::async(scheduler, qt_main, argc, argv);
 
         // do something else while qt is executing in the background ...
 
@@ -73,7 +71,7 @@ int hpx_main(int argc, char ** argv)
     return hpx::finalize();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     return hpx::init(argc, argv);
 }

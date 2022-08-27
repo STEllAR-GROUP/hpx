@@ -8,11 +8,12 @@
 
 #include <ostream>
 
-namespace hpx { namespace assertion {
-    std::ostream& operator<<(std::ostream& os, source_location const& loc)
+namespace hpx {
+
+    std::ostream& operator<<(std::ostream& os, hpx::source_location const& loc)
     {
-        os << loc.file_name << ":" << loc.line_number << ": "
-           << loc.function_name;
+        os << loc.file_name() << ":" << loc.line() << ": "
+           << loc.function_name();
         return os;
     }
-}}    // namespace hpx::assertion
+}    // namespace hpx

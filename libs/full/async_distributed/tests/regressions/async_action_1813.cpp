@@ -24,7 +24,7 @@ hpx::id_type get_locality()
 {
     return hpx::find_here();
 }
-HPX_PLAIN_ACTION(get_locality);
+HPX_PLAIN_ACTION(get_locality)
 
 ///////////////////////////////////////////////////////////////////////////////
 struct get_locality_server
@@ -35,15 +35,15 @@ struct get_locality_server
         return hpx::find_here();
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(get_locality_server, call);
+    HPX_DEFINE_COMPONENT_ACTION(get_locality_server, call)
 };
 
 typedef hpx::components::component<get_locality_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, get_locality_server);
+HPX_REGISTER_COMPONENT(server_type, get_locality_server)
 
 typedef get_locality_server::call_action call_action;
-HPX_REGISTER_ACTION_DECLARATION(call_action);
-HPX_REGISTER_ACTION(call_action);
+HPX_REGISTER_ACTION_DECLARATION(call_action)
+HPX_REGISTER_ACTION(call_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_remote_async(hpx::id_type target)

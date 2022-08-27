@@ -1,5 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,7 +24,7 @@ namespace hpx { namespace serialization {
             typename hpx::traits::is_intrusive_polymorphic<Derived>::type>
     struct base_object_type
     {
-        base_object_type(Derived& d)
+        constexpr explicit base_object_type(Derived& d) noexcept
           : d_(d)
         {
         }
@@ -33,9 +34,7 @@ namespace hpx { namespace serialization {
         void serialize(Archive& ar, unsigned)
         {
             access::serialize(ar,
-                static_cast<Base&>(
-                    const_cast<typename std::decay<Derived>::type&>(d_)),
-                0);
+                static_cast<Base&>(const_cast<std::decay_t<Derived>&>(d_)), 0);
         }
     };
 
@@ -45,28 +44,29 @@ namespace hpx { namespace serialization {
     template <typename Derived, typename Base>
     struct base_object_type<Derived, Base, std::true_type>
     {
-        base_object_type(Derived& d)
+        constexpr explicit base_object_type(Derived& d) noexcept
           : d_(d)
         {
         }
         Derived& d_;
 
-        template <class Archive>
+        template <typename Archive>
         void save(Archive& ar, unsigned) const
         {
-            access::save_base_object(ar, static_cast<const Base&>(d_), 0);
+            access::save_base_object(ar, static_cast<Base const&>(d_), 0);
         }
 
-        template <class Archive>
+        template <typename Archive>
         void load(Archive& ar, unsigned)
         {
             access::load_base_object(ar, static_cast<Base&>(d_), 0);
         }
+
         HPX_SERIALIZATION_SPLIT_MEMBER();
     };
 
     template <typename Base, typename Derived>
-    base_object_type<Derived, Base> base_object(Derived& d)
+    constexpr base_object_type<Derived, Base> base_object(Derived& d) noexcept
     {
         return base_object_type<Derived, Base>(d);
     }
@@ -78,7 +78,7 @@ namespace hpx { namespace serialization {
     HPX_FORCEINLINE output_archive& operator<<(
         output_archive& ar, base_object_type<D, B> t)
     {
-        ar.invoke(t);
+        ar.save(t);
         return ar;
     }
 
@@ -86,7 +86,7 @@ namespace hpx { namespace serialization {
     HPX_FORCEINLINE input_archive& operator>>(
         input_archive& ar, base_object_type<D, B> t)
     {
-        ar.invoke(t);
+        ar.load(t);
         return ar;
     }
 
@@ -94,7 +94,7 @@ namespace hpx { namespace serialization {
     HPX_FORCEINLINE output_archive& operator&(
         output_archive& ar, base_object_type<D, B> t)    //-V524
     {
-        ar.invoke(t);
+        ar.save(t);
         return ar;
     }
 
@@ -102,7 +102,7 @@ namespace hpx { namespace serialization {
     HPX_FORCEINLINE input_archive& operator&(
         input_archive& ar, base_object_type<D, B> t)    //-V524
     {
-        ar.invoke(t);
+        ar.load(t);
         return ar;
     }
 }}    // namespace hpx::serialization

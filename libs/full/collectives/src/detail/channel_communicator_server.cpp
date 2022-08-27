@@ -22,7 +22,7 @@
 using channel_communicator_component = hpx::components::component<
     hpx::collectives::detail::channel_communicator_server>;
 
-HPX_REGISTER_COMPONENT(channel_communicator_component);
+HPX_REGISTER_COMPONENT(channel_communicator_component)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace collectives { namespace detail {
@@ -34,7 +34,7 @@ namespace hpx { namespace collectives { namespace detail {
       , clients_(find_all_from_basename<client_type>(basename, num_sites))
     {
         // replace reference to our own client (manages base-name registration)
-        clients_[this_site] = std::move(here);
+        clients_[this_site] = HPX_MOVE(here);
     }
 }}}    // namespace hpx::collectives::detail
 

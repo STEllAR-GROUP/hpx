@@ -31,10 +31,15 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server {
 
+    raw_values_counter::raw_values_counter()
+      : reset_(false)
+    {
+    }
+
     raw_values_counter::raw_values_counter(counter_info const& info,
-        hpx::util::function_nonser<std::vector<std::int64_t>(bool)> f)
+        hpx::function<std::vector<std::int64_t>(bool)> f)
       : base_type_holder(info)
-      , f_(std::move(f))
+      , f_(HPX_MOVE(f))
       , reset_(false)
     {
         if (info.type_ != counter_histogram && info.type_ != counter_raw_values)
@@ -63,5 +68,19 @@ namespace hpx { namespace performance_counters { namespace server {
     void raw_values_counter::reset_counter_value()
     {
         f_(true);
+    }
+
+    void raw_values_counter::finalize()
+    {
+        base_performance_counter::finalize();
+        base_type::finalize();
+    }
+
+    naming::address raw_values_counter::get_current_address() const
+    {
+        return naming::address(
+            naming::get_gid_from_locality_id(agas::get_locality_id()),
+            components::get_component_type<raw_values_counter>(),
+            const_cast<raw_values_counter*>(this));
     }
 }}}    // namespace hpx::performance_counters::server

@@ -42,7 +42,7 @@ public:
     };
 };
 
-HPX_REGISTER_COMPONENT(hpx::components::component<tree>, tree);
+HPX_REGISTER_COMPONENT(hpx::components::component<tree>, tree)
 
 int hpx_main(int argc, char* argv[])
 {

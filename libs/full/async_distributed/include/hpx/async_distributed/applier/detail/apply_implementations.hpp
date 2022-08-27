@@ -16,7 +16,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/runtime/parcelset/parcel.hpp>
+#include <hpx/parcelset/parcel.hpp>
 
 #include <system_error>
 #include <type_traits>
@@ -51,23 +51,22 @@ namespace hpx { namespace detail {
                 if (!r.first)
                 {
                     return applier::detail::apply_l_p<Action>(
-                        std::forward<Continuation>(c), id, std::move(addr),
-                        priority, std::forward<Ts>(vs)...);
+                        HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr),
+                        priority, HPX_FORWARD(Ts, vs)...);
                 }
             }
             else
             {
                 return applier::detail::apply_l_p<Action>(
-                    std::forward<Continuation>(c), id, std::move(addr),
-                    priority, std::forward<Ts>(vs)...);
+                    HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), priority,
+                    HPX_FORWARD(Ts, vs)...);
             }
         }
 
 #if defined(HPX_HAVE_NETWORKING)
         // apply remotely
-        return applier::detail::apply_r_p<Action>(std::move(addr),
-            std::forward<Continuation>(c), id, priority,
-            std::forward<Ts>(vs)...);
+        return applier::detail::apply_r_p<Action>(HPX_MOVE(addr),
+            HPX_FORWARD(Continuation, c), id, priority, HPX_FORWARD(Ts, vs)...);
 #else
         HPX_THROW_EXCEPTION(invalid_status, "hpx::apply_impl",
             "unexpected attempt to send a parcel with networking disabled");
@@ -105,15 +104,15 @@ namespace hpx { namespace detail {
                     if (!r.first)
                     {
                         return applier::detail::apply_l_p<Action>(
-                            std::forward<Continuation>(c), id, std::move(addr),
-                            priority, std::forward<Ts>(vs)...);
+                            HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr),
+                            priority, HPX_FORWARD(Ts, vs)...);
                     }
                 }
                 else
                 {
                     return applier::detail::apply_l_p<Action>(
-                        std::forward<Continuation>(c), id, std::move(addr),
-                        priority, std::forward<Ts>(vs)...);
+                        HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr),
+                        priority, HPX_FORWARD(Ts, vs)...);
                 }
             }
             // object was migrated or is not local
@@ -121,9 +120,9 @@ namespace hpx { namespace detail {
             {
                 // apply remotely
 #if defined(HPX_HAVE_NETWORKING)
-                return applier::detail::apply_r_p<Action>(std::move(addr),
-                    std::forward<Continuation>(c), id, priority,
-                    std::forward<Ts>(vs)...);
+                return applier::detail::apply_r_p<Action>(HPX_MOVE(addr),
+                    HPX_FORWARD(Continuation, c), id, priority,
+                    HPX_FORWARD(Ts, vs)...);
 #else
                 HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::apply_impl",
                     "unexpected attempt to send a parcel with networking "
@@ -132,8 +131,8 @@ namespace hpx { namespace detail {
             }
         }
 
-        return apply_impl<Action>(std::forward<Continuation>(c), id, priority,
-            std::forward<Ts>(vs)...);
+        return apply_impl<Action>(
+            HPX_FORWARD(Continuation, c), id, priority, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename... Ts>
@@ -162,20 +161,20 @@ namespace hpx { namespace detail {
                 if (!r.first)
                 {
                     return applier::detail::apply_l_p<Action>(
-                        id, std::move(addr), priority, std::forward<Ts>(vs)...);
+                        id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
                 }
             }
             else
             {
                 return applier::detail::apply_l_p<Action>(
-                    id, std::move(addr), priority, std::forward<Ts>(vs)...);
+                    id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
             }
         }
 
 #if defined(HPX_HAVE_NETWORKING)
         // apply remotely
         return applier::detail::apply_r_p<Action>(
-            std::move(addr), id, priority, std::forward<Ts>(vs)...);
+            HPX_MOVE(addr), id, priority, HPX_FORWARD(Ts, vs)...);
 #else
         HPX_THROW_EXCEPTION(invalid_status, "hpx::apply_impl",
             "unexpected attempt to send a parcel with networking disabled");
@@ -211,13 +210,13 @@ namespace hpx { namespace detail {
                     if (!r.first)
                     {
                         return applier::detail::apply_l_p<Action>(id,
-                            std::move(addr), priority, std::forward<Ts>(vs)...);
+                            HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
                     }
                 }
                 else
                 {
                     return applier::detail::apply_l_p<Action>(
-                        id, std::move(addr), priority, std::forward<Ts>(vs)...);
+                        id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
                 }
             }
             // object was migrated or is not local
@@ -226,7 +225,7 @@ namespace hpx { namespace detail {
                 // apply remotely
 #if defined(HPX_HAVE_NETWORKING)
                 return applier::detail::apply_r_p<Action>(
-                    std::move(addr), id, priority, std::forward<Ts>(vs)...);
+                    HPX_MOVE(addr), id, priority, HPX_FORWARD(Ts, vs)...);
 #else
                 HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::apply_impl",
                     "unexpected attempt to send a parcel with networking "
@@ -234,7 +233,7 @@ namespace hpx { namespace detail {
 #endif
             }
         }
-        return apply_impl<Action>(id, priority, std::forward<Ts>(vs)...);
+        return apply_impl<Action>(id, priority, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Continuation, typename Callback,
@@ -266,8 +265,8 @@ namespace hpx { namespace detail {
                 if (!r.first)
                 {
                     bool result = applier::detail::apply_l_p<Action>(
-                        std::forward<Continuation>(c), id, std::move(addr),
-                        priority, std::forward<Ts>(vs)...);
+                        HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr),
+                        priority, HPX_FORWARD(Ts, vs)...);
 
                     // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
@@ -281,8 +280,8 @@ namespace hpx { namespace detail {
             else
             {
                 bool result = applier::detail::apply_l_p<Action>(
-                    std::forward<Continuation>(c), id, std::move(addr),
-                    priority, std::forward<Ts>(vs)...);
+                    HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), priority,
+                    HPX_FORWARD(Ts, vs)...);
 
                 // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
@@ -296,9 +295,9 @@ namespace hpx { namespace detail {
 
 #if defined(HPX_HAVE_NETWORKING)
         // apply remotely
-        return applier::detail::apply_r_p_cb<Action>(std::move(addr),
-            std::forward<Continuation>(c), id, priority,
-            std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        return applier::detail::apply_r_p_cb<Action>(HPX_MOVE(addr),
+            HPX_FORWARD(Continuation, c), id, priority,
+            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
 #else
         HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::apply_cb_impl",
             "unexpected attempt to send a parcel with networking disabled");
@@ -331,7 +330,7 @@ namespace hpx { namespace detail {
                 if (!r.first)
                 {
                     bool result = applier::detail::apply_l_p<Action>(
-                        id, std::move(addr), priority, std::forward<Ts>(vs)...);
+                        id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
 
                     // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
@@ -345,7 +344,7 @@ namespace hpx { namespace detail {
             else
             {
                 bool result = applier::detail::apply_l_p<Action>(
-                    id, std::move(addr), priority, std::forward<Ts>(vs)...);
+                    id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
 
                 // invoke callback
 #if defined(HPX_HAVE_NETWORKING)
@@ -359,8 +358,8 @@ namespace hpx { namespace detail {
 
 #if defined(HPX_HAVE_NETWORKING)
         // apply remotely
-        return applier::detail::apply_r_p_cb<Action>(std::move(addr), id,
-            priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+        return applier::detail::apply_r_p_cb<Action>(HPX_MOVE(addr), id,
+            priority, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
 #else
         HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::apply_cb_impl",
             "unexpected attempt to send a parcel with networking disabled");

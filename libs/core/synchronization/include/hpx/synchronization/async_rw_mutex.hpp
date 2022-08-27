@@ -8,14 +8,14 @@
 
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/datastructures/optional.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/synchronization/mutex.hpp>
-
-#include <boost/container/small_vector.hpp>
 
 #include <exception>
 #include <memory>
@@ -36,12 +36,11 @@ namespace hpx { namespace experimental {
         {
             using shared_state_ptr_type =
                 std::shared_ptr<async_rw_mutex_shared_state>;
-            hpx::util::optional<T> value;
+            hpx::optional<T> value;
             shared_state_ptr_type next_state;
             hpx::lcos::local::mutex mtx;
-            boost::container::small_vector<
-                hpx::util::unique_function_nonser<void(shared_state_ptr_type)>,
-                1>
+            hpx::detail::small_vector<
+                hpx::move_only_function<void(shared_state_ptr_type)>, 1>
                 continuations;
 
             async_rw_mutex_shared_state() = default;
@@ -69,7 +68,7 @@ namespace hpx { namespace experimental {
                 {
                     // The current state has now finished all accesses to the
                     // wrapped value, so we move the value to the next state.
-                    next_state->set_value(std::move(value.value()));
+                    next_state->set_value(HPX_MOVE(value.value()));
 
                     for (auto& continuation : continuations)
                     {
@@ -82,7 +81,7 @@ namespace hpx { namespace experimental {
             void set_value(U&& u)
             {
                 HPX_ASSERT(!value);
-                value.emplace(std::forward<U>(u));
+                value.emplace(HPX_FORWARD(U, u));
             }
 
             void set_next_state(
@@ -90,14 +89,14 @@ namespace hpx { namespace experimental {
             {
                 // The next state should only be set once
                 HPX_ASSERT(!next_state);
-                next_state = std::move(state);
+                next_state = HPX_MOVE(state);
             }
 
             template <typename F>
             void add_continuation(F&& continuation)
             {
                 std::lock_guard<hpx::lcos::local::mutex> l(mtx);
-                continuations.emplace_back(std::forward<F>(continuation));
+                continuations.emplace_back(HPX_FORWARD(F, continuation));
             }
         };
 
@@ -108,9 +107,8 @@ namespace hpx { namespace experimental {
                 std::shared_ptr<async_rw_mutex_shared_state>;
             shared_state_ptr_type next_state;
             hpx::lcos::local::mutex mtx;
-            boost::container::small_vector<
-                hpx::util::unique_function_nonser<void(shared_state_ptr_type)>,
-                1>
+            hpx::detail::small_vector<
+                hpx::move_only_function<void(shared_state_ptr_type)>, 1>
                 continuations;
 
             async_rw_mutex_shared_state() = default;
@@ -140,14 +138,14 @@ namespace hpx { namespace experimental {
             {
                 // The next state should only be set once
                 HPX_ASSERT(!next_state);
-                next_state = std::move(state);
+                next_state = HPX_MOVE(state);
             }
 
             template <typename F>
             void add_continuation(F&& continuation)
             {
                 std::lock_guard<hpx::lcos::local::mutex> l(mtx);
-                continuations.emplace_back(std::forward<F>(continuation));
+                continuations.emplace_back(HPX_FORWARD(F, continuation));
             }
         };
 
@@ -167,7 +165,7 @@ namespace hpx { namespace experimental {
         public:
             async_rw_mutex_access_wrapper() = delete;
             async_rw_mutex_access_wrapper(shared_state_type state)
-              : state(std::move(state))
+              : state(HPX_MOVE(state))
             {
             }
             async_rw_mutex_access_wrapper(
@@ -213,7 +211,7 @@ namespace hpx { namespace experimental {
         public:
             async_rw_mutex_access_wrapper() = delete;
             async_rw_mutex_access_wrapper(shared_state_type state)
-              : state(std::move(state))
+              : state(HPX_MOVE(state))
             {
             }
             async_rw_mutex_access_wrapper(
@@ -253,7 +251,7 @@ namespace hpx { namespace experimental {
         public:
             async_rw_mutex_access_wrapper() = delete;
             explicit async_rw_mutex_access_wrapper(shared_state_type state)
-              : state(std::move(state))
+              : state(HPX_MOVE(state))
             {
             }
             async_rw_mutex_access_wrapper(
@@ -278,7 +276,7 @@ namespace hpx { namespace experimental {
         public:
             async_rw_mutex_access_wrapper() = delete;
             explicit async_rw_mutex_access_wrapper(shared_state_type state)
-              : state(std::move(state))
+              : state(HPX_MOVE(state))
             {
             }
             async_rw_mutex_access_wrapper(
@@ -383,7 +381,7 @@ namespace hpx { namespace experimental {
         {
             if (prev_access == detail::async_rw_mutex_access_type::readwrite)
             {
-                prev_state = std::move(state);
+                prev_state = HPX_MOVE(state);
                 state = std::allocate_shared<shared_state_type, allocator_type>(
                     alloc);
                 prev_access = detail::async_rw_mutex_access_type::read;
@@ -402,7 +400,7 @@ namespace hpx { namespace experimental {
 
         sender<detail::async_rw_mutex_access_type::readwrite> readwrite()
         {
-            prev_state = std::move(state);
+            prev_state = HPX_MOVE(state);
             state =
                 std::allocate_shared<shared_state_type, allocator_type>(alloc);
             prev_access = detail::async_rw_mutex_access_type::readwrite;
@@ -414,7 +412,7 @@ namespace hpx { namespace experimental {
             {
                 prev_state->set_next_state(state);
             }
-            return {std::move(prev_state), state};
+            return {HPX_MOVE(prev_state), state};
         }
 
     private:
@@ -427,14 +425,24 @@ namespace hpx { namespace experimental {
             using access_type =
                 detail::async_rw_mutex_access_wrapper<readwrite_type, read_type,
                     AccessType>;
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types = Variant<Tuple<access_type>>;
 
-            template <template <typename...> class Variant>
-            using error_types = Variant<std::exception_ptr>;
+            template <typename Env>
+            struct generate_completion_signatures
+            {
+                template <template <typename...> typename Tuple,
+                    template <typename...> typename Variant>
+                using value_types = Variant<Tuple<access_type>>;
 
-            static constexpr bool sends_done = false;
+                template <template <typename...> typename Variant>
+                using error_types = Variant<std::exception_ptr>;
+
+                static constexpr bool sends_stopped = false;
+            };
+
+            template <typename Env>
+            friend auto tag_invoke(
+                hpx::execution::experimental::get_completion_signatures_t,
+                sender const&, Env) -> generate_completion_signatures<Env>;
 
             template <typename R>
             struct operation_state
@@ -446,9 +454,9 @@ namespace hpx { namespace experimental {
                 template <typename R_>
                 operation_state(R_&& r, shared_state_ptr_type prev_state,
                     shared_state_ptr_type state)
-                  : r(std::forward<R_>(r))
-                  , prev_state(std::move(prev_state))
-                  , state(std::move(state))
+                  : r(HPX_FORWARD(R_, r))
+                  , prev_state(HPX_MOVE(prev_state))
+                  , state(HPX_MOVE(state))
                 {
                 }
 
@@ -457,7 +465,7 @@ namespace hpx { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                friend void tag_dispatch(hpx::execution::experimental::start_t,
+                friend void tag_invoke(hpx::execution::experimental::start_t,
                     operation_state& os) noexcept
                 {
                     HPX_ASSERT_MSG(os.state,
@@ -465,25 +473,23 @@ namespace hpx { namespace experimental {
                         "empty, was the sender already started?");
 
                     auto continuation =
-                        [r = std::move(os.r)](
+                        [r = HPX_MOVE(os.r)](
                             shared_state_ptr_type state) mutable {
                             try
                             {
                                 hpx::execution::experimental::set_value(
-                                    std::move(r),
-                                    access_type{std::move(state)});
+                                    HPX_MOVE(r), access_type{HPX_MOVE(state)});
                             }
                             catch (...)
                             {
                                 hpx::execution::experimental::set_error(
-                                    std::move(r), std::current_exception());
+                                    HPX_MOVE(r), std::current_exception());
                             }
                         };
 
                     if (os.prev_state)
                     {
-                        os.prev_state->add_continuation(
-                            std::move(continuation));
+                        os.prev_state->add_continuation(HPX_MOVE(continuation));
 
                         // We release prev_state here to allow continuations to
                         // run. The operation state may otherwise keep it alive
@@ -494,17 +500,17 @@ namespace hpx { namespace experimental {
                     {
                         // There is no previous state on the first access. We
                         // can immediately trigger the continuation.
-                        continuation(std::move(os.state));
+                        continuation(HPX_MOVE(os.state));
                     }
                 }
             };
 
             template <typename R>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 hpx::execution::experimental::connect_t, sender&& s, R&& r)
             {
-                return operation_state<R>{std::forward<R>(r),
-                    std::move(s.prev_state), std::move(s.state)};
+                return operation_state<R>{HPX_FORWARD(R, r),
+                    HPX_MOVE(s.prev_state), HPX_MOVE(s.state)};
             }
         };
 
@@ -550,7 +556,7 @@ namespace hpx { namespace experimental {
             typename = std::enable_if_t<
                 !std::is_same<std::decay_t<U>, async_rw_mutex>::value>>
         explicit async_rw_mutex(U&& u, allocator_type const& alloc = {})
-          : value(std::forward<U>(u))
+          : value(HPX_FORWARD(U, u))
           , alloc(alloc)
         {
         }
@@ -563,7 +569,7 @@ namespace hpx { namespace experimental {
         {
             if (prev_access == detail::async_rw_mutex_access_type::readwrite)
             {
-                prev_state = std::move(state);
+                prev_state = HPX_MOVE(state);
                 state = std::allocate_shared<shared_state_type, allocator_type>(
                     alloc);
                 prev_access = detail::async_rw_mutex_access_type::read;
@@ -579,7 +585,7 @@ namespace hpx { namespace experimental {
                 }
                 else
                 {
-                    state->set_value(std::move(value));
+                    state->set_value(HPX_MOVE(value));
                 }
             }
             return {prev_state, state};
@@ -587,7 +593,7 @@ namespace hpx { namespace experimental {
 
         sender<detail::async_rw_mutex_access_type::readwrite> readwrite()
         {
-            prev_state = std::move(state);
+            prev_state = HPX_MOVE(state);
             state =
                 std::allocate_shared<shared_state_type, allocator_type>(alloc);
 
@@ -601,10 +607,10 @@ namespace hpx { namespace experimental {
             }
             else
             {
-                state->set_value(std::move(value));
+                state->set_value(HPX_MOVE(value));
             }
             prev_access = detail::async_rw_mutex_access_type::readwrite;
-            return {std::move(prev_state), state};
+            return {HPX_MOVE(prev_state), state};
         }
 
     private:
@@ -621,14 +627,24 @@ namespace hpx { namespace experimental {
             using access_type =
                 detail::async_rw_mutex_access_wrapper<readwrite_type, read_type,
                     AccessType>;
-            template <template <typename...> class Tuple,
-                template <typename...> class Variant>
-            using value_types = Variant<Tuple<access_type>>;
 
-            template <template <typename...> class Variant>
-            using error_types = Variant<std::exception_ptr>;
+            template <typename Env>
+            struct generate_completion_signatures
+            {
+                template <template <typename...> typename Tuple,
+                    template <typename...> typename Variant>
+                using value_types = Variant<Tuple<access_type>>;
 
-            static constexpr bool sends_done = false;
+                template <template <typename...> typename Variant>
+                using error_types = Variant<std::exception_ptr>;
+
+                static constexpr bool sends_stopped = false;
+            };
+
+            template <typename Env>
+            friend auto tag_invoke(
+                hpx::execution::experimental::get_completion_signatures_t,
+                sender const&, Env) -> generate_completion_signatures<Env>;
 
             template <typename R>
             struct operation_state
@@ -640,9 +656,9 @@ namespace hpx { namespace experimental {
                 template <typename R_>
                 operation_state(R_&& r, shared_state_ptr_type prev_state,
                     shared_state_ptr_type state)
-                  : r(std::forward<R_>(r))
-                  , prev_state(std::move(prev_state))
-                  , state(std::move(state))
+                  : r(HPX_FORWARD(R_, r))
+                  , prev_state(HPX_MOVE(prev_state))
+                  , state(HPX_MOVE(state))
                 {
                 }
 
@@ -651,7 +667,7 @@ namespace hpx { namespace experimental {
                 operation_state(operation_state const&) = delete;
                 operation_state& operator=(operation_state const&) = delete;
 
-                friend void tag_dispatch(hpx::execution::experimental::start_t,
+                friend void tag_invoke(hpx::execution::experimental::start_t,
                     operation_state& os) noexcept
                 {
                     HPX_ASSERT_MSG(os.state,
@@ -659,25 +675,23 @@ namespace hpx { namespace experimental {
                         "empty, was the sender already started?");
 
                     auto continuation =
-                        [r = std::move(os.r)](
+                        [r = HPX_MOVE(os.r)](
                             shared_state_ptr_type state) mutable {
                             try
                             {
                                 hpx::execution::experimental::set_value(
-                                    std::move(r),
-                                    access_type{std::move(state)});
+                                    HPX_MOVE(r), access_type{HPX_MOVE(state)});
                             }
                             catch (...)
                             {
                                 hpx::execution::experimental::set_error(
-                                    std::move(r), std::current_exception());
+                                    HPX_MOVE(r), std::current_exception());
                             }
                         };
 
                     if (os.prev_state)
                     {
-                        os.prev_state->add_continuation(
-                            std::move(continuation));
+                        os.prev_state->add_continuation(HPX_MOVE(continuation));
                         // We release prev_state here to allow continuations to
                         // run. The operation state may otherwise keep it alive
                         // longer than needed.
@@ -687,17 +701,17 @@ namespace hpx { namespace experimental {
                     {
                         // There is no previous state on the first access. We
                         // can immediately trigger the continuation.
-                        continuation(std::move(os.state));
+                        continuation(HPX_MOVE(os.state));
                     }
                 }
             };
 
             template <typename R>
-            friend auto tag_dispatch(
+            friend auto tag_invoke(
                 hpx::execution::experimental::connect_t, sender&& s, R&& r)
             {
-                return operation_state<R>{std::forward<R>(r),
-                    std::move(s.prev_state), std::move(s.state)};
+                return operation_state<R>{HPX_FORWARD(R, r),
+                    HPX_MOVE(s.prev_state), HPX_MOVE(s.state)};
             }
         };
 

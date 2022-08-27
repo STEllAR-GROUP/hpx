@@ -16,6 +16,7 @@
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstdint>
 #include <mutex>
@@ -35,9 +36,17 @@ namespace hpx { namespace components {
         using this_component_type = typename base_type::this_component_type;
 
     public:
-        template <typename... Arg>
-        migration_support(Arg&&... arg)
-          : base_type(std::forward<Arg>(arg)...)
+        migration_support() noexcept
+          : pin_count_(0)
+          , was_marked_for_migration_(false)
+        {
+        }
+
+        template <typename T, typename... Ts,
+            typename Enable = std::enable_if_t<
+                !std::is_same_v<std::decay_t<T>, migration_support>>>
+        explicit migration_support(T&& t, Ts&&... ts)
+          : base_type(HPX_FORWARD(T, t), HPX_FORWARD(Ts, ts)...)
           , pin_count_(0)
           , was_marked_for_migration_(false)
         {
@@ -56,18 +65,16 @@ namespace hpx { namespace components {
         naming::gid_type get_base_gid(
             naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
-            naming::gid_type result =
-                this->BaseComponent::get_base_gid_dynamic(assign_gid,
-                    static_cast<this_component_type const&>(*this)
-                        .get_current_address(),
-                    [](naming::gid_type gid) -> naming::gid_type {
-                        // we don't store migrating objects in the AGAS cache
-                        naming::detail::set_dont_store_in_cache(gid);
-                        // also mark gid as migratable
-                        naming::detail::set_is_migratable(gid);
-                        return gid;
-                    });
-            return result;
+            return this->BaseComponent::get_base_gid_dynamic(assign_gid,
+                static_cast<this_component_type const&>(*this)
+                    .get_current_address(),
+                [](naming::gid_type gid) -> naming::gid_type {
+                    // we don't store migrating objects in the AGAS cache
+                    naming::detail::set_dont_store_in_cache(gid);
+                    // also mark gid as migratable
+                    naming::detail::set_is_migratable(gid);
+                    return gid;
+                });
         }
 
         // This component type supports migration.
@@ -77,9 +84,9 @@ namespace hpx { namespace components {
         }
 
         // Pinning functionality
-        void pin()
+        void pin() noexcept
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard l(mtx_);
             HPX_ASSERT(pin_count_ != ~0x0u);
             if (pin_count_ != ~0x0u)
             {
@@ -88,12 +95,10 @@ namespace hpx { namespace components {
         }
         bool unpin()
         {
-            using lock_type = std::unique_lock<mutex_type>;
-
             {
                 // no need to go through AGAS if the object is currently pinned
                 // more than once
-                lock_type l(this->mtx_);
+                std::unique_lock l(this->mtx_);
 
                 if (pin_count_ != ~0x0u && pin_count_ > 1)
                 {
@@ -120,10 +125,11 @@ namespace hpx { namespace components {
                 this->gid_,
                 [this, &was_migrated]() mutable
                 -> std::pair<bool, hpx::future<void>> {
-                    lock_type l(this->mtx_);
+                    std::unique_lock l(this->mtx_);
 
                     // avoid locking errors while handling asserts below
-                    util::ignore_while_checking<lock_type> il(&l);
+                    util::ignore_while_checking il(&l);
+                    HPX_UNUSED(il);
 
                     was_migrated = this->pin_count_ == ~0x0u;
                     HPX_ASSERT(this->pin_count_ != 0);
@@ -138,7 +144,7 @@ namespace hpx { namespace components {
                             {
                                 was_marked_for_migration_ = false;
 
-                                hpx::lcos::local::promise<void> p;
+                                hpx::promise<void> p;
                                 std::swap(p, trigger_migration_);
 
                                 l.unlock();
@@ -157,18 +163,19 @@ namespace hpx { namespace components {
             return was_migrated;
         }
 
-        std::uint32_t pin_count() const
+        std::uint32_t pin_count() const noexcept
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            std::lock_guard l(mtx_);
             return pin_count_;
         }
         void mark_as_migrated()
         {
-            using lock_type = std::unique_lock<mutex_type>;
-            lock_type l(mtx_);
+            std::unique_lock l(mtx_);
 
             // avoid locking errors while handling asserts below
-            util::ignore_while_checking<lock_type> il(&l);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
+
             HPX_ASSERT(1 == pin_count_);
 
             pin_count_ = ~0x0u;
@@ -181,7 +188,7 @@ namespace hpx { namespace components {
             return agas::mark_as_migrated(
                 to_migrate.get_gid(),
                 [this]() mutable -> std::pair<bool, hpx::future<void>> {
-                    std::unique_lock<mutex_type> l(mtx_);
+                    std::unique_lock l(mtx_);
 
                     // make sure that no migration is currently in flight
                     if (was_marked_for_migration_)
@@ -205,7 +212,7 @@ namespace hpx { namespace components {
                     hpx::future<void> f = trigger_migration_.get_future();
 
                     l.unlock();
-                    return std::make_pair(true, std::move(f));
+                    return std::make_pair(true, HPX_MOVE(f));
                 },
                 false);
         }
@@ -227,10 +234,10 @@ namespace hpx { namespace components {
             // which will also unpin it once the thread runs to completion (the
             // bound object goes out of scope).
             return util::one_shot(
-                util::bind_front(&migration_support::thread_function,
+                hpx::bind_front(&migration_support::thread_function,
                     get_lva<this_component_type>::call(lva),
                     traits::component_decorate_function<base_type>::call(
-                        lva, std::forward<F>(f)),
+                        lva, HPX_FORWARD(F, f)),
                     components::pinned_ptr::create<this_component_type>(lva)));
         }
 
@@ -259,7 +266,7 @@ namespace hpx { namespace components {
     private:
         mutable mutex_type mtx_;
         std::uint32_t pin_count_;
-        hpx::lcos::local::promise<void> trigger_migration_;
+        hpx::promise<void> trigger_migration_;
         bool was_marked_for_migration_;
     };
 }}    // namespace hpx::components

@@ -38,9 +38,9 @@ namespace hpx {
     ///           hpx::exception.
     ///
     /// \note     This function will return meaningful results only if called
-    ///           from an HPX-thread. It will return \a hpx::naming::invalid_id
+    ///           from an HPX-thread. It will return \a hpx::invalid_id
     ///           otherwise.
     ///
     /// \see      \a hpx::find_all_localities(), \a hpx::find_locality()
-    HPX_EXPORT naming::id_type find_here(error_code& ec = throws);
+    HPX_EXPORT hpx::id_type find_here(error_code& ec = throws);
 }    // namespace hpx

@@ -66,7 +66,7 @@ namespace hpx { namespace components {
             /// is not invalid.
             if (naming::invalid_gid != gid_)
             {
-                error_code ec(lightweight);    // ignore errors
+                error_code ec(throwmode::lightweight);    // ignore errors
                 agas::unbind_gid_local(gid_, ec);
                 gid_ = naming::gid_type();    // invalidate GID
             }
@@ -90,7 +90,8 @@ namespace hpx { namespace components {
                 naming::address addr(
                     naming::get_gid_from_locality_id(agas::get_locality_id()),
                     components::get_component_type<wrapped_type>(),
-                    std::size_t(static_cast<this_component_type const*>(this)));
+                    const_cast<this_component_type*>(
+                        static_cast<this_component_type const*>(this)));
 
                 gid_ = naming::gid_type(msb_, lsb_);
 
@@ -109,20 +110,20 @@ namespace hpx { namespace components {
         }
 
     public:
-        naming::id_type get_id() const
+        hpx::id_type get_id() const
         {
             // fixed_address components are created without any credits
             naming::gid_type gid = derived().get_base_gid();
             HPX_ASSERT(!naming::detail::has_credits(gid));
 
             agas::replenish_credits(gid);
-            return naming::id_type(gid, naming::id_type::managed);
+            return hpx::id_type(gid, hpx::id_type::management_type::managed);
         }
 
-        naming::id_type get_unmanaged_id() const
+        hpx::id_type get_unmanaged_id() const
         {
-            return naming::id_type(
-                derived().get_base_gid(), naming::id_type::unmanaged);
+            return hpx::id_type(derived().get_base_gid(),
+                hpx::id_type::management_type::unmanaged);
         }
 
         void set_locality_id(std::uint32_t locality_id, error_code& ec = throws)
@@ -141,7 +142,7 @@ namespace hpx { namespace components {
             }
         }
 
-        static void mark_as_migrated()
+        static void mark_as_migrated() noexcept
         {
             // If this assertion is triggered then this component instance is being
             // migrated even if the component type has not been enabled to support
@@ -149,7 +150,7 @@ namespace hpx { namespace components {
             HPX_ASSERT(false);
         }
 
-        static void on_migrated()
+        static void on_migrated() noexcept
         {
             // If this assertion is triggered then this component instance is being
             // migrated even if the component type has not been enabled to support
@@ -168,12 +169,12 @@ namespace hpx { namespace components {
         ///////////////////////////////////////////////////////////////////////
         struct fixed_heap
         {
-            static void* alloc(std::size_t)
+            static void* alloc(std::size_t) noexcept
             {
                 HPX_ASSERT(false);    // this shouldn't ever be called
                 return nullptr;
             }
-            static void free(void*, std::size_t)
+            static void free(void*, std::size_t) noexcept
             {
                 HPX_ASSERT(false);    // this shouldn't ever be called
             }
@@ -192,7 +193,7 @@ namespace hpx { namespace components {
 
         /// \brief  The function \a create is used for allocation and
         ///         initialization of instances of the derived components.
-        static Component* create(std::size_t /* count */)
+        static Component* create(std::size_t /* count */) noexcept
         {
             HPX_ASSERT(false);    // this shouldn't ever be called
             return nullptr;
@@ -200,7 +201,8 @@ namespace hpx { namespace components {
 
         /// \brief  The function \a destroy is used for destruction and
         ///         de-allocation of instances of the derived components.
-        static void destroy(Component* /* p */, std::size_t /* count */ = 1)
+        static void destroy(
+            Component* /* p */, std::size_t /* count */ = 1) noexcept
         {
             HPX_ASSERT(false);    // this shouldn't ever be called
         }

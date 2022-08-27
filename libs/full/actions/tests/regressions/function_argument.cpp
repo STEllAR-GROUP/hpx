@@ -20,13 +20,13 @@ using hpx::program_options::options_description;
 using hpx::program_options::variables_map;
 
 using hpx::async;
-using hpx::naming::id_type;
+using hpx::id_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 bool invoked_f = false;
 bool invoked_g = false;
 
-bool f(hpx::util::function<bool()> func)
+bool f(hpx::distributed::function<bool()> func)
 {
     HPX_TEST(!invoked_f);
     invoked_f = true;
@@ -63,7 +63,7 @@ struct g
 int hpx_main(variables_map&)
 {
     {
-        hpx::util::function<bool()> f = g();
+        hpx::distributed::function<bool()> f = g();
         std::vector<id_type> prefixes = hpx::find_all_localities();
 
         for (id_type const& prefix : prefixes)

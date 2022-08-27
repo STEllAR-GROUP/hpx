@@ -9,9 +9,9 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
-#include <hpx/iostream.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/components.hpp>
+#include <hpx/iostream.hpp>
 
 #include <string>
 #include <utility>
@@ -20,42 +20,59 @@ using hpx::components::client_base;
 using hpx::components::component;
 using hpx::components::component_base;
 
-using hpx::id_type;
-using hpx::find_here;
 using hpx::async;
+using hpx::find_here;
+using hpx::id_type;
 
 using hpx::cout;
-using hpx::flush;
 
 struct message_server : component_base<message_server>
 {
     std::string msg;
 
-    message_server() : msg("uninitialized\n") {}
+    message_server()
+      : msg("uninitialized\n")
+    {
+    }
 
-    message_server(std::string const& msg_) : msg(msg_) {}
+    message_server(std::string const& msg_)
+      : msg(msg_)
+    {
+    }
 
-    void print() const { cout << msg << flush; }
+    void print() const
+    {
+        cout << msg << std::flush;
+    }
 
-    HPX_DEFINE_COMPONENT_ACTION(message_server, print, print_action);
+    HPX_DEFINE_COMPONENT_ACTION(message_server, print, print_action)
 };
 
 typedef component<message_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, message_server);
+HPX_REGISTER_COMPONENT(server_type, message_server)
 
 typedef message_server::print_action print_action;
-HPX_REGISTER_ACTION_DECLARATION(print_action);
-HPX_REGISTER_ACTION(print_action);
+HPX_REGISTER_ACTION_DECLARATION(print_action)
+HPX_REGISTER_ACTION(print_action)
 
 struct message : client_base<message, message_server>
 {
     typedef client_base<message, message_server> base_type;
 
-    explicit message(hpx::id_type const& id) : base_type(id) {}
+    explicit message(hpx::id_type const& id)
+      : base_type(id)
+    {
+    }
 
-    message(hpx::future<hpx::id_type> && id) : base_type(std::move(id)) {}
+    message(hpx::future<hpx::id_type>&& id)
+      : base_type(std::move(id))
+    {
+    }
 
-    void print() { async<print_action>(this->get_id()).get(); }
+    void print()
+    {
+        async<print_action>(this->get_id()).get();
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -9,10 +9,12 @@
 
 #include <hpx/parallel/algorithm.hpp>
 
+#include <hpx/parallel/container_algorithms/adjacent_difference.hpp>
 #include <hpx/parallel/container_algorithms/adjacent_find.hpp>
 #include <hpx/parallel/container_algorithms/all_any_none.hpp>
 #include <hpx/parallel/container_algorithms/copy.hpp>
 #include <hpx/parallel/container_algorithms/count.hpp>
+#include <hpx/parallel/container_algorithms/ends_with.hpp>
 #include <hpx/parallel/container_algorithms/equal.hpp>
 #include <hpx/parallel/container_algorithms/fill.hpp>
 #include <hpx/parallel/container_algorithms/find.hpp>
@@ -29,6 +31,9 @@
 #include <hpx/parallel/container_algorithms/minmax.hpp>
 #include <hpx/parallel/container_algorithms/mismatch.hpp>
 #include <hpx/parallel/container_algorithms/move.hpp>
+#include <hpx/parallel/container_algorithms/nth_element.hpp>
+#include <hpx/parallel/container_algorithms/partial_sort.hpp>
+#include <hpx/parallel/container_algorithms/partial_sort_copy.hpp>
 #include <hpx/parallel/container_algorithms/partition.hpp>
 #include <hpx/parallel/container_algorithms/reduce.hpp>
 #include <hpx/parallel/container_algorithms/remove.hpp>
@@ -45,6 +50,7 @@
 #include <hpx/parallel/container_algorithms/shift_right.hpp>
 #include <hpx/parallel/container_algorithms/sort.hpp>
 #include <hpx/parallel/container_algorithms/stable_sort.hpp>
+#include <hpx/parallel/container_algorithms/starts_with.hpp>
 #include <hpx/parallel/container_algorithms/swap_ranges.hpp>
 #include <hpx/parallel/container_algorithms/transform.hpp>
 #include <hpx/parallel/container_algorithms/unique.hpp>

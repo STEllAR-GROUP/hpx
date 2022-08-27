@@ -21,9 +21,8 @@
 #include <hpx/components_base/server/fixed_component_base.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/parcelset_base/traits/action_get_embedded_parcel.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
-#include <hpx/traits/action_message_handler.hpp>
-#include <hpx/traits/action_serialization_filter.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -41,7 +40,7 @@
 namespace hpx { namespace agas {
 
     HPX_EXPORT naming::gid_type bootstrap_primary_namespace_gid();
-    HPX_EXPORT naming::id_type bootstrap_primary_namespace_id();
+    HPX_EXPORT hpx::id_type bootstrap_primary_namespace_id();
 }}    // namespace hpx::agas
 
 /// \brief AGAS's primary namespace maps 128-bit global identifiers (GIDs) to
@@ -106,7 +105,7 @@ namespace hpx { namespace agas {
 ///         locality.
 ///
 
-namespace hpx { namespace agas { namespace server {
+namespace hpx::agas::server {
 
     // Base name used to register the component
     static constexpr char const* const primary_namespace_service_name =
@@ -271,13 +270,13 @@ namespace hpx { namespace agas { namespace server {
             naming::gid_type const& locality);
 
         // API
-        std::pair<naming::id_type, naming::address> begin_migration(
+        std::pair<hpx::id_type, naming::address> begin_migration(
             naming::gid_type id);
         bool end_migration(naming::gid_type const& id);
 
         resolved_type resolve_gid(naming::gid_type const& id);
 
-        naming::id_type colocate(naming::gid_type const& id);
+        hpx::id_type colocate(naming::gid_type const& id);
 
         naming::address unbind_gid(std::uint64_t count, naming::gid_type id);
 
@@ -334,30 +333,20 @@ namespace hpx { namespace agas { namespace server {
             error_code& ec);
 
     public:
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, allocate);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, bind_gid);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, colocate);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, begin_migration);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, end_migration);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, decrement_credit);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, increment_credit);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, resolve_gid);
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, unbind_gid);
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, allocate)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, bind_gid)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, colocate)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, begin_migration)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, end_migration)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, decrement_credit)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, increment_credit)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, resolve_gid)
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, unbind_gid)
 #if defined(HPX_HAVE_NETWORKING)
-        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route);
-#endif
-
-#if defined(HPX_HAVE_NETWORKING)
-        static parcelset::policies::message_handler* get_message_handler(
-            parcelset::parcelhandler* ph, parcelset::locality const& loc,
-            parcelset::parcel const& p);
-
-        static serialization::binary_filter* get_serialization_filter(
-            parcelset::parcel const& p);
+        HPX_DEFINE_COMPONENT_ACTION(primary_namespace, route)
 #endif
     };
-
-}}}    // namespace hpx::agas::server
+}    // namespace hpx::agas::server
 
 HPX_ACTION_USES_MEDIUM_STACK(
     hpx::agas::server::primary_namespace::allocate_action)
@@ -435,8 +424,7 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
 typedef hpx::tuple<hpx::naming::gid_type, hpx::agas::gva, hpx::naming::gid_type>
     gva_tuple_type;
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(gva_tuple_type, gva_tuple)
-typedef std::pair<hpx::naming::id_type, hpx::naming::address>
-    std_pair_address_id_type;
+typedef std::pair<hpx::id_type, hpx::naming::address> std_pair_address_id_type;
 HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std_pair_address_id_type, std_pair_address_id_type)
 typedef std::pair<hpx::naming::gid_type, hpx::naming::gid_type>
@@ -447,32 +435,22 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<std::int64_t>, vector_std_int64_type)
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_NETWORKING)
-namespace hpx { namespace traits {
-
-    // Parcel routing forwards the message handler request to the routed action
-    template <>
-    struct action_message_handler<agas::server::primary_namespace::route_action>
-    {
-        static parcelset::policies::message_handler* call(
-            parcelset::parcelhandler* ph, parcelset::locality const& loc,
-            parcelset::parcel const& p)
-        {
-            return agas::server::primary_namespace::get_message_handler(
-                ph, loc, p);
-        }
-    };
+namespace hpx::traits {
 
     // Parcel routing forwards the binary filter request to the routed action
     template <>
-    struct action_serialization_filter<
+    struct action_get_embedded_parcel<
         agas::server::primary_namespace::route_action>
     {
-        static serialization::binary_filter* call(parcelset::parcel const& p)
+        static hpx::optional<parcelset::parcel> call(
+            hpx::actions::transfer_base_action<
+                agas::server::primary_namespace::route_action> const& act)
         {
-            return agas::server::primary_namespace::get_serialization_filter(p);
+            auto p = hpx::actions::get<0>(act);
+            return hpx::optional<parcelset::parcel>(HPX_MOVE(p));
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 #endif
 
 #include <hpx/config/warnings_suffix.hpp>

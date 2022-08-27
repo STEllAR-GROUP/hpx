@@ -114,13 +114,13 @@ namespace hpx { namespace lcos { namespace local {
         void signal(std::int64_t lower_limit)
         {
             std::unique_lock<mutex_type> l(mtx_);
-            sem_.signal(std::move(l), lower_limit);
+            sem_.signal(HPX_MOVE(l), lower_limit);
         }
 
         std::int64_t signal_all()
         {
             std::unique_lock<mutex_type> l(mtx_);
-            return sem_.signal_all(std::move(l));
+            return sem_.signal_all(HPX_MOVE(l));
         }
 
     private:

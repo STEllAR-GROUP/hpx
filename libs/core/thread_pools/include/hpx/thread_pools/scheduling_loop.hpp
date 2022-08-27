@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
@@ -97,7 +97,7 @@ namespace hpx { namespace threads { namespace detail {
         {
             prev_state_ = thread_state(
                 new_state.first, prev_state_.state_ex(), prev_state_.tag() + 1);
-            next_thread_id_ = std::move(new_state.second);
+            next_thread_id_ = HPX_MOVE(new_state.second);
             return prev_state_;
         }
 
@@ -139,7 +139,7 @@ namespace hpx { namespace threads { namespace detail {
 
         thread_id_ref_type move_next_thread()
         {
-            return std::move(next_thread_id_);
+            return HPX_MOVE(next_thread_id_);
         }
 
     private:
@@ -183,7 +183,7 @@ namespace hpx { namespace threads { namespace detail {
         {
             prev_state_ = thread_state(
                 new_state.first, prev_state_.state_ex(), prev_state_.tag() + 1);
-            next_thread_id_ = std::move(new_state.second);
+            next_thread_id_ = HPX_MOVE(new_state.second);
             return prev_state_;
         }
 
@@ -225,7 +225,7 @@ namespace hpx { namespace threads { namespace detail {
 
         thread_id_ref_type move_next_thread()
         {
-            return std::move(next_thread_id_);
+            return HPX_MOVE(next_thread_id_);
         }
 
     private:
@@ -398,8 +398,8 @@ namespace hpx { namespace threads { namespace detail {
 
     struct scheduling_callbacks
     {
-        using callback_type = util::unique_function_nonser<void()>;
-        using background_callback_type = util::unique_function_nonser<bool()>;
+        using callback_type = hpx::move_only_function<void()>;
+        using background_callback_type = hpx::move_only_function<bool()>;
 
         explicit scheduling_callbacks(callback_type&& outer,
             callback_type&& inner = callback_type(),
@@ -408,9 +408,9 @@ namespace hpx { namespace threads { namespace detail {
                 (std::numeric_limits<std::size_t>::max)(),
             std::size_t max_idle_loop_count = HPX_IDLE_LOOP_COUNT_MAX,
             std::size_t max_busy_loop_count = HPX_BUSY_LOOP_COUNT_MAX)
-          : outer_(std::move(outer))
-          , inner_(std::move(inner))
-          , background_(std::move(background))
+          : outer_(HPX_MOVE(outer))
+          , inner_(HPX_MOVE(inner))
+          , background_(HPX_MOVE(background))
           , max_background_threads_(max_background_threads)
           , max_idle_loop_count_(max_idle_loop_count)
           , max_busy_loop_count_(max_busy_loop_count)
@@ -528,13 +528,13 @@ namespace hpx { namespace threads { namespace detail {
                         {
                             if (next_thrd == nullptr)
                             {
-                                next_thrd = std::move(next);
+                                next_thrd = HPX_MOVE(next);
                             }
                             else
                             {
                                 auto* scheduler = get_thread_id_data(next)
                                                       ->get_scheduler_base();
-                                scheduler->schedule_thread(std::move(next),
+                                scheduler->schedule_thread(HPX_MOVE(next),
                                     threads::thread_schedule_hint(
                                         static_cast<std::int16_t>(num_thread)),
                                     true);
@@ -605,7 +605,7 @@ namespace hpx { namespace threads { namespace detail {
         thread_id_ref_type background_thread;
 
         if (scheduler.SchedulingPolicy::has_scheduler_mode(
-                policies::do_background_work) &&
+                policies::scheduler_mode::do_background_work) &&
             num_thread < params.max_background_threads_ &&
             !params.background_.empty())
         {
@@ -623,17 +623,16 @@ namespace hpx { namespace threads { namespace detail {
         thread_id_ref_type next_thrd;
         while (true)
         {
-            thread_id_ref_type thrd = std::move(next_thrd);
-            next_thrd = thread_id_ref_type();
+            thread_id_ref_type thrd = HPX_MOVE(next_thrd);
 
             // Get the next HPX thread from the queue
-            bool running =
-                this_state.load(std::memory_order_relaxed) < state_pre_sleep;
+            bool running = this_state.load(std::memory_order_relaxed) <
+                hpx::state::pre_sleep;
 
             // extract the stealing mode once per loop iteration
             bool enable_stealing =
                 scheduler.SchedulingPolicy::has_scheduler_mode(
-                    policies::enable_stealing);
+                    policies::scheduler_mode::enable_stealing);
 
             // stealing staged threads is enabled if:
             // - fast idle mode is on: same as normal stealing
@@ -641,7 +640,7 @@ namespace hpx { namespace threads { namespace detail {
             //                       a while
             bool enable_stealing_staged = enable_stealing;
             if (!scheduler.SchedulingPolicy::has_scheduler_mode(
-                    policies::fast_idle_mode))
+                    policies::scheduler_mode::fast_idle_mode))
             {
                 enable_stealing_staged = enable_stealing_staged &&
                     idle_loop_count > params.max_idle_loop_count_ / 2;
@@ -791,7 +790,7 @@ namespace hpx { namespace threads { namespace detail {
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
                         scheduler.SchedulingPolicy::schedule_thread_last(
-                            std::move(thrd),
+                            HPX_MOVE(thrd),
                             threads::thread_schedule_hint(
                                 static_cast<std::int16_t>(num_thread)),
                             true);
@@ -810,7 +809,7 @@ namespace hpx { namespace threads { namespace detail {
                             if (HPX_UNLIKELY(busy_loop_count >
                                     params.max_busy_loop_count_))
                             {
-                                next_thrd = std::move(thrd);
+                                next_thrd = HPX_MOVE(thrd);
                             }
                             else
                             {
@@ -822,7 +821,7 @@ namespace hpx { namespace threads { namespace detail {
                                 // schedule this thread again immediately with
                                 // boosted priority
                                 scheduler.SchedulingPolicy::schedule_thread(
-                                    std::move(thrd),
+                                    HPX_MOVE(thrd),
                                     threads::thread_schedule_hint(
                                         static_cast<std::int16_t>(num_thread)),
                                     true, thread_priority::boost);
@@ -835,7 +834,7 @@ namespace hpx { namespace threads { namespace detail {
                             // schedule this thread again immediately with
                             // boosted priority
                             scheduler.SchedulingPolicy::schedule_thread(
-                                std::move(thrd),
+                                HPX_MOVE(thrd),
                                 threads::thread_schedule_hint(
                                     static_cast<std::int16_t>(num_thread)),
                                 true, thread_priority::boost);
@@ -859,7 +858,7 @@ namespace hpx { namespace threads { namespace detail {
                     // scheduler queue already but the state has not been reset
                     // yet
                     auto priority = thrdptr->get_priority();
-                    scheduler.SchedulingPolicy::schedule_thread(std::move(thrd),
+                    scheduler.SchedulingPolicy::schedule_thread(HPX_MOVE(thrd),
                         threads::thread_schedule_hint(
                             static_cast<std::int16_t>(num_thread)),
                         true, priority);
@@ -895,7 +894,7 @@ namespace hpx { namespace threads { namespace detail {
                         scheduler.SchedulingPolicy::get_queue_length(
                             num_thread) == 0;
 
-                    if (this_state.load() == state_pre_sleep)
+                    if (this_state.load() == hpx::state::pre_sleep)
                     {
                         if (can_exit)
                         {
@@ -912,7 +911,7 @@ namespace hpx { namespace threads { namespace detail {
                         if (can_exit)
                         {
                             if (!scheduler.SchedulingPolicy::has_scheduler_mode(
-                                    policies::delay_exit))
+                                    policies::scheduler_mode::delay_exit))
                             {
                                 // If this is an inner scheduler, try to exit immediately
                                 if (background_thread != nullptr)
@@ -926,7 +925,7 @@ namespace hpx { namespace threads { namespace detail {
                                     scheduler.SchedulingPolicy::
                                         decrement_background_thread_count();
                                     scheduler.SchedulingPolicy::schedule_thread(
-                                        std::move(background_thread),
+                                        HPX_MOVE(background_thread),
                                         threads::thread_schedule_hint(
                                             static_cast<std::int16_t>(
                                                 num_thread)),
@@ -939,7 +938,7 @@ namespace hpx { namespace threads { namespace detail {
                                 }
                                 else
                                 {
-                                    this_state.store(state_stopped);
+                                    this_state.store(hpx::state::stopped);
                                     break;
                                 }
                             }
@@ -955,7 +954,7 @@ namespace hpx { namespace threads { namespace detail {
                 }
                 else if (!may_exit && added == 0 &&
                     (scheduler.SchedulingPolicy::has_scheduler_mode(
-                        policies::fast_idle_mode)))
+                        policies::scheduler_mode::fast_idle_mode)))
                 {
                     // speed up idle suspend if no work was stolen
                     idle_loop_count += params.max_idle_loop_count_ / 1024;
@@ -1006,7 +1005,7 @@ namespace hpx { namespace threads { namespace detail {
             }
 
             // something went badly wrong, give up
-            if (HPX_UNLIKELY(this_state.load() == state_terminating))
+            if (HPX_UNLIKELY(this_state.load() == hpx::state::terminating))
                 break;
 
             if (busy_loop_count > params.max_busy_loop_count_)
@@ -1059,7 +1058,7 @@ namespace hpx { namespace threads { namespace detail {
                 // break if we were idling after 'may_exit'
                 if (may_exit)
                 {
-                    HPX_ASSERT(this_state.load() != state_pre_sleep);
+                    HPX_ASSERT(this_state.load() != hpx::state::pre_sleep);
 
                     if (background_thread)
                     {
@@ -1071,7 +1070,7 @@ namespace hpx { namespace threads { namespace detail {
                         scheduler.SchedulingPolicy::
                             decrement_background_thread_count();
                         scheduler.SchedulingPolicy::schedule_thread(
-                            std::move(background_thread),
+                            HPX_MOVE(background_thread),
                             threads::thread_schedule_hint(
                                 static_cast<std::int16_t>(num_thread)),
                             true, priority);
@@ -1093,7 +1092,7 @@ namespace hpx { namespace threads { namespace detail {
 
                         if (can_exit)
                         {
-                            this_state.store(state_stopped);
+                            this_state.store(hpx::state::stopped);
                             break;
                         }
                     }

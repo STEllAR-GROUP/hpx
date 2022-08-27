@@ -38,7 +38,7 @@ namespace hpx { namespace segmented {
             hpx::traits::is_segmented_iterator<OutIter>::value
         )>
     // clang-format on
-    OutIter tag_dispatch(hpx::transform_exclusive_scan_t, InIter first,
+    OutIter tag_invoke(hpx::transform_exclusive_scan_t, InIter first,
         InIter last, OutIter dest, T init, Op&& op, Conv&& conv)
     {
         static_assert(hpx::traits::is_input_iterator<InIter>::value,
@@ -51,8 +51,8 @@ namespace hpx { namespace segmented {
             return dest;
 
         return hpx::parallel::v1::detail::segmented_exclusive_scan(
-            hpx::execution::seq, first, last, dest, std::move(init),
-            std::forward<Op>(op), std::true_type{}, std::forward<Conv>(conv));
+            hpx::execution::seq, first, last, dest, HPX_MOVE(init),
+            HPX_FORWARD(Op, op), std::true_type{}, HPX_FORWARD(Conv, conv));
     }
 
     // clang-format off
@@ -67,7 +67,7 @@ namespace hpx { namespace segmented {
         )>
     // clang-format on
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
-    tag_dispatch(hpx::transform_exclusive_scan_t, ExPolicy&& policy,
+    tag_invoke(hpx::transform_exclusive_scan_t, ExPolicy&& policy,
         FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init, Op&& op,
         Conv&& conv)
     {
@@ -79,12 +79,12 @@ namespace hpx { namespace segmented {
 
         if (first == last)
             return parallel::util::detail::algorithm_result<ExPolicy,
-                FwdIter2>::get(std::move(dest));
+                FwdIter2>::get(HPX_MOVE(dest));
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
         return hpx::parallel::v1::detail::segmented_exclusive_scan(
-            std::forward<ExPolicy>(policy), first, last, dest, std::move(init),
-            std::forward<Op>(op), is_seq(), std::forward<Conv>(conv));
+            HPX_FORWARD(ExPolicy, policy), first, last, dest, HPX_MOVE(init),
+            HPX_FORWARD(Op, op), is_seq(), HPX_FORWARD(Conv, conv));
     }
 }}    // namespace hpx::segmented

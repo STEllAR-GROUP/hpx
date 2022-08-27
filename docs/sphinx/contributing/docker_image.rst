@@ -22,9 +22,9 @@ directly run the docker image. The image is based on Debian and Clang, and can
 be found on |docker_build_env|_. To start a container using the |hpx| build
 environment, run:
 
-.. code-block:: bash
+.. code-block:: shell-session
 
-   docker run --interactive --tty stellargroup/build_env:latest bash
+   $ docker run --interactive --tty stellargroup/build_env:latest bash
 
 You are now in an environment where all the |hpx| build and runtime dependencies
 are present. You can install additional packages according to your own needs.

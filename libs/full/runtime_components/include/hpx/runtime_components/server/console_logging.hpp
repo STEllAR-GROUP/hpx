@@ -74,7 +74,7 @@ namespace hpx { namespace components { namespace server {
             try
             {
                 // call the function, ignoring the return value
-                console_logging(std::forward<T>(v));
+                console_logging(HPX_FORWARD(T, v));
             }
             catch (...)
             {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
@@ -91,8 +92,8 @@ namespace hpx { namespace parallel { namespace execution {
         static void sync_execute(F&& f, Ts&&... ts)
         {
             return hpx::detail::sync_launch_policy_dispatch<
-                launch::sync_policy>::call(launch::sync, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                launch::sync_policy>::call(launch::sync, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // TwoWayExecutor interface
@@ -100,7 +101,7 @@ namespace hpx { namespace parallel { namespace execution {
         static hpx::future<void> async_execute(F&& f, Ts&&... ts)
         {
             return hpx::detail::async_launch_policy_dispatch<Policy>::call(
-                Policy{}, std::forward<F>(f), std::forward<Ts>(ts)...);
+                Policy{}, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
@@ -110,8 +111,8 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::util::thread_description desc(
                 f, "parallel_executor_aggregated::post");
 
-            detail::post_policy_dispatch<Policy>::call(
-                Policy{}, desc, std::forward<F>(f), std::forward<Ts>(ts)...);
+            hpx::detail::post_policy_dispatch<Policy>::call(
+                Policy{}, desc, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
     private:
@@ -136,7 +137,7 @@ namespace hpx { namespace parallel { namespace execution {
                 lcos::local::spinlock mtx_e;
 
                 std::size_t size = hpx::util::size(shape);
-                lcos::local::latch l(size);
+                hpx::latch l(size);
                 if (hpx::detail::has_async_policy(Policy{}))
                 {
                     spawn_hierarchical(l, size, num_tasks, f,
@@ -155,31 +156,28 @@ namespace hpx { namespace parallel { namespace execution {
                 // concurrently
                 if (e)
                 {
-                    std::rethrow_exception(std::move(e));
+                    std::rethrow_exception(HPX_MOVE(e));
                 }
             }
 
             template <typename F, typename Iter, typename... Ts>
-            void spawn_sequential(lcos::local::latch& l, std::size_t size,
-                F&& f, Iter it, std::exception_ptr& e,
-                lcos::local::spinlock& mtx_e, Ts&&... ts) const
+            void spawn_sequential(hpx::latch& l, std::size_t size, F&& f,
+                Iter it, std::exception_ptr& e, lcos::local::spinlock& mtx_e,
+                Ts&&... ts) const
             {
                 // spawn tasks sequentially
                 for (std::size_t i = 0; i != size; ++i, ++it)
                 {
                     post([&, it] {
                         // properly handle all exceptions thrown from 'f'
-                        try
-                        {
-                            HPX_INVOKE(f, *it, ts...);
-                        }
-                        catch (...)
-                        {
-                            // store the first caught exception only
-                            std::lock_guard<lcos::local::spinlock> l(mtx_e);
-                            if (!e)
-                                e = std::current_exception();
-                        }
+                        hpx::detail::try_catch_exception_ptr(
+                            [&]() { HPX_INVOKE(f, *it, ts...); },
+                            [&](std::exception_ptr ep) {
+                                // store the first caught exception only
+                                std::lock_guard<lcos::local::spinlock> l(mtx_e);
+                                if (!e)
+                                    e = HPX_MOVE(ep);
+                            });
                         // count down the latch in any case
                         l.count_down(1);
                     });
@@ -187,7 +185,7 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             template <typename F, typename Iter, typename... Ts>
-            void spawn_hierarchical(lcos::local::latch& l, std::size_t size,
+            void spawn_hierarchical(hpx::latch& l, std::size_t size,
                 std::size_t num_tasks, F&& f, Iter it, std::exception_ptr& e,
                 lcos::local::spinlock& mtx_e, Ts&&... ts) const
             {
@@ -229,7 +227,7 @@ namespace hpx { namespace parallel { namespace execution {
             // change the executor and algorithm infrastructure
             std::vector<hpx::future<void>> result;
             result.push_back(async_execute(sync_exec{num_spread_, num_tasks_},
-                std::forward<F>(f), shape, std::forward<Ts>(ts)...));
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...));
             return result;
         }
 
@@ -305,8 +303,8 @@ namespace hpx { namespace parallel { namespace execution {
         static void sync_execute(F&& f, Ts&&... ts)
         {
             return hpx::detail::sync_launch_policy_dispatch<
-                launch::sync_policy>::call(launch::sync, std::forward<F>(f),
-                std::forward<Ts>(ts)...);
+                launch::sync_policy>::call(launch::sync, HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...);
         }
 
         // TwoWayExecutor interface
@@ -314,7 +312,7 @@ namespace hpx { namespace parallel { namespace execution {
         hpx::future<void> async_execute(F&& f, Ts&&... ts) const
         {
             return hpx::detail::async_launch_policy_dispatch<hpx::launch>::call(
-                policy_, std::forward<F>(f), std::forward<Ts>(ts)...);
+                policy_, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // NonBlockingOneWayExecutor (adapted) interface
@@ -324,8 +322,8 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::util::thread_description desc(
                 f, "parallel_executor_aggregated::post");
 
-            detail::post_policy_dispatch<hpx::launch>::call(
-                policy_, desc, std::forward<F>(f), std::forward<Ts>(ts)...);
+            hpx::detail::post_policy_dispatch<hpx::launch>::call(
+                policy_, desc, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
     private:
@@ -350,7 +348,7 @@ namespace hpx { namespace parallel { namespace execution {
                 lcos::local::spinlock mtx_e;
 
                 std::size_t size = hpx::util::size(shape);
-                lcos::local::latch l(size);
+                hpx::latch l(size);
                 if (hpx::detail::has_async_policy(policy_))
                 {
                     spawn_hierarchical(l, size, num_tasks, f,
@@ -369,14 +367,14 @@ namespace hpx { namespace parallel { namespace execution {
                 // concurrently
                 if (e)
                 {
-                    std::rethrow_exception(std::move(e));
+                    std::rethrow_exception(HPX_MOVE(e));
                 }
             }
 
             template <typename F, typename Iter, typename... Ts>
-            void spawn_sequential(lcos::local::latch& l, std::size_t size,
-                F&& f, Iter it, std::exception_ptr& e,
-                lcos::local::spinlock& mtx_e, Ts&&... ts) const
+            void spawn_sequential(hpx::latch& l, std::size_t size, F&& f,
+                Iter it, std::exception_ptr& e, lcos::local::spinlock& mtx_e,
+                Ts&&... ts) const
             {
                 // spawn tasks sequentially
                 hpx::util::thread_description desc(
@@ -384,20 +382,18 @@ namespace hpx { namespace parallel { namespace execution {
 
                 for (std::size_t i = 0; i != size; ++i, ++it)
                 {
-                    detail::post_policy_dispatch<hpx::launch>::call(
+                    hpx::detail::post_policy_dispatch<hpx::launch>::call(
                         policy_, desc, [&, it]() -> void {
                             // properly handle all exceptions thrown from 'f'
-                            try
-                            {
-                                HPX_INVOKE(f, *it, ts...);
-                            }
-                            catch (...)
-                            {
-                                // store the first caught exception only
-                                std::lock_guard<lcos::local::spinlock> l(mtx_e);
-                                if (!e)
-                                    e = std::current_exception();
-                            }
+                            hpx::detail::try_catch_exception_ptr(
+                                [&]() { HPX_INVOKE(f, *it, ts...); },
+                                [&](std::exception_ptr ep) {
+                                    // store the first caught exception only
+                                    std::lock_guard<lcos::local::spinlock> l(
+                                        mtx_e);
+                                    if (!e)
+                                        e = HPX_MOVE(ep);
+                                });
                             // count down the latch in any case
                             l.count_down(1);
                         });
@@ -405,7 +401,7 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             template <typename F, typename Iter, typename... Ts>
-            void spawn_hierarchical(lcos::local::latch& l, std::size_t size,
+            void spawn_hierarchical(hpx::latch& l, std::size_t size,
                 std::size_t num_tasks, F&& f, Iter it, std::exception_ptr& e,
                 lcos::local::spinlock& mtx_e, Ts&&... ts) const
             {
@@ -421,7 +417,7 @@ namespace hpx { namespace parallel { namespace execution {
 
                     while (size > chunk_size)
                     {
-                        detail::post_policy_dispatch<hpx::launch>::call(
+                        hpx::detail::post_policy_dispatch<hpx::launch>::call(
                             policy_, desc, [&, chunk_size, num_tasks, it] {
                                 spawn_hierarchical(l, chunk_size, num_tasks, f,
                                     it, e, mtx_e, ts...);
@@ -445,16 +441,10 @@ namespace hpx { namespace parallel { namespace execution {
     public:
         // BulkTwoWayExecutor interface
         template <typename F, typename S, typename... Ts>
-        std::vector<hpx::future<void>> bulk_async_execute(
-            F&& f, S const& shape, Ts&&... ts) const
+        auto bulk_async_execute(F&& f, S const& shape, Ts&&... ts) const
         {
-            // for now, wrap single future in a vector to avoid having to
-            // change the executor and algorithm infrastructure
-            std::vector<hpx::future<void>> result;
-            result.push_back(
-                async_execute(sync_exec{policy_, num_spread_, num_tasks_},
-                    std::forward<F>(f), shape, std::forward<Ts>(ts)...));
-            return result;
+            return async_execute(sync_exec{policy_, num_spread_, num_tasks_},
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
         }
 
     private:

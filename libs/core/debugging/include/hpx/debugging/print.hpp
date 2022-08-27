@@ -138,8 +138,7 @@ namespace hpx { namespace debug {
             }
         };
 
-        template <typename Int>
-        HPX_CORE_EXPORT void print_ptr(std::ostream& os, Int v, int n);
+        HPX_CORE_EXPORT void print_ptr(std::ostream& os, void* v, int n);
 
         template <int N, typename T>
         struct hex<N, T,

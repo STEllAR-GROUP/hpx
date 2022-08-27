@@ -139,8 +139,8 @@ using stencil = std::vector<partition_data>;
 // Setup HPX channel boilerplate
 using communication_type = partition_data;
 
-HPX_REGISTER_CHANNEL_DECLARATION(communication_type);
-HPX_REGISTER_CHANNEL(communication_type, stencil_communication);
+HPX_REGISTER_CHANNEL_DECLARATION(communication_type)
+HPX_REGISTER_CHANNEL(communication_type, stencil_communication)
 
 double stencil_operation(double left, double center, double right)
 {
@@ -191,7 +191,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     for (stencil& s : U)
         s.resize(num_subdomains);
 
-    hpx::for_loop(hpx::execution::par, 0, num_subdomains,
+    hpx::experimental::for_loop(hpx::execution::par, 0, num_subdomains,
         [&U, subdomain_width, num_subdomains](std::size_t i) {
             U[0][i] =
                 partition_data(subdomain_width, double(i), num_subdomains);
@@ -263,7 +263,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
                     std::ref(current[i - 1]), std::ref(current[i + 1]));
         }
 
-        hpx::for_loop(hpx::execution::par, 1, num_subdomains - 1,
+        hpx::experimental::for_loop(hpx::execution::par, 1, num_subdomains - 1,
             [&next, &futures](
                 std::size_t i) { next[i] = futures[i - 1].get(); });
 

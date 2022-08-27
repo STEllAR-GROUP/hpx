@@ -85,7 +85,7 @@ namespace hpx { namespace util {
         {
             value_construct(*pv);
             reinit_register(
-                util::bind_front(
+                hpx::bind_front(
                     &reinitializable_static::template value_construct<U>, *pv),
                 &reinitializable_static::destruct);
         }
@@ -109,7 +109,7 @@ namespace hpx { namespace util {
 #if !defined(__CUDACC__)
             // do not rely on ADL to find the proper call_once
             std::call_once(constructed_,
-                util::bind_front(
+                hpx::bind_front(
                     &reinitializable_static::template value_constructor<U>,
                     const_cast<U const*>(std::addressof(val))));
 #else

@@ -26,7 +26,6 @@ using hpx::program_options::variables_map;
 using hpx::apply;
 using hpx::async;
 using hpx::future;
-using hpx::lcos::wait_each;
 
 using hpx::chrono::high_resolution_timer;
 
@@ -77,14 +76,14 @@ void measure_function_futures_create_thread_hierarchical_placement(
         sched->get_description())
     {
         sched->add_remove_scheduler_mode(
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::assign_work_thread_parent),
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::enable_stealing |
-                hpx::threads::policies::enable_stealing_numa |
-                hpx::threads::policies::assign_work_round_robin |
-                hpx::threads::policies::steal_after_local |
-                hpx::threads::policies::steal_high_priority_first));
+            hpx::threads::policies::scheduler_mode::assign_work_thread_parent,
+            hpx::threads::policies::scheduler_mode::enable_stealing |
+                hpx::threads::policies::scheduler_mode::enable_stealing_numa |
+                hpx::threads::policies::scheduler_mode::
+                    assign_work_round_robin |
+                hpx::threads::policies::scheduler_mode::steal_after_local |
+                hpx::threads::policies::scheduler_mode::
+                    steal_high_priority_first);
     }
     auto const desc = hpx::util::thread_description();
     auto prio = hpx::threads::thread_priority::normal;
@@ -92,10 +91,10 @@ void measure_function_futures_create_thread_hierarchical_placement(
     auto const num_threads = hpx::get_num_worker_threads();
     hpx::error_code ec;
 
-    hpx::util::perf_test_report(
+    hpx::util::perftests_report(
         "future overhead - create_thread_hierarchical - latch", "no-executor",
         repetitions, [&]() -> void {
-            hpx::lcos::local::latch l(count);
+            hpx::latch l(count);
 
             auto const func = [&l]() {
                 null_function();
@@ -124,9 +123,13 @@ void measure_function_futures_create_thread_hierarchical_placement(
                         sched->create_thread(init, nullptr, ec);
                     }
                 };
+
+                // different versions of clang-format disagree
+                // clang-format off
                 auto const thread_spawn_func =
-                    hpx::threads::detail::thread_function_nullary<decltype(
-                        spawn_func)>{spawn_func};
+                    hpx::threads::detail::thread_function_nullary<
+                        decltype(spawn_func)>{spawn_func};
+                // clang-format on
 
                 hpx::threads::thread_init_data init(
                     hpx::threads::thread_function_type(thread_spawn_func), desc,
@@ -136,6 +139,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
             }
             l.wait();
         });
+    hpx::util::perftests_print_times();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -18,6 +18,7 @@
 #include <functional>
 #include <iostream>
 #include <map>
+#include <memory>
 
 template <typename T>
 using queue =
@@ -27,7 +28,7 @@ using hpx::program_options::options_description;
 using hpx::program_options::value;
 using hpx::program_options::variables_map;
 
-using hpx::lcos::local::barrier;
+using hpx::barrier;
 
 using hpx::threads::register_work;
 using hpx::threads::thread_init_data;
@@ -47,11 +48,12 @@ double delay()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void get_os_thread_num(barrier& barr, queue<std::size_t>& os_threads)
+void get_os_thread_num(
+    std::shared_ptr<barrier<>> barr, queue<std::size_t>& os_threads)
 {
     global_scratch = delay();
     os_threads.push(hpx::get_worker_thread_num());
-    barr.wait();
+    barr->arrive_and_wait();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -76,20 +78,21 @@ int hpx_main(variables_map& vm)
             // Have the queue preallocate the nodes.
             queue<std::size_t> os_threads(pxthreads);
 
-            barrier barr(pxthreads + 1);
+            std::shared_ptr<barrier<>> barr =
+                std::make_shared<barrier<>>(pxthreads + 1);
 
             for (std::size_t j = 0; j < pxthreads; ++j)
             {
                 thread_init_data data(
-                    hpx::threads::make_thread_function_nullary(
-                        hpx::util::bind(&get_os_thread_num, std::ref(barr),
-                            std::ref(os_threads))),
+                    hpx::threads::make_thread_function_nullary(hpx::bind(
+                        &get_os_thread_num, barr, std::ref(os_threads))),
                     "get_os_thread_num", hpx::threads::thread_priority::normal,
                     hpx::threads::thread_schedule_hint(0));
                 register_work(data);
             }
 
-            barr.wait();    // wait for all PX threads to enter the barrier
+            // wait for all HPX threads to enter the barrier
+            barr->arrive_and_wait();
 
             std::size_t shepherd = 0;
 

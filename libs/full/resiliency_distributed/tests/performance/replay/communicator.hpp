@@ -139,7 +139,7 @@ struct communicator
     {
         // Send our data to the neighbor n using fire and forget semantics
         // Synchronization happens when receiving values.
-        send[n].set(std::move(t), step);
+        send[n].set(HPX_MOVE(t), step);
     }
 
     hpx::future<T> get(neighbor n, std::size_t step)

@@ -90,7 +90,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                 this->bind_result(result_last);
             }
 
-            this->do_return(status, std::move(tinfo));
+            this->do_return(status, HPX_MOVE(tinfo));
         } while (this->m_state == super_type::ctx_running);
 
         // should not get here, never

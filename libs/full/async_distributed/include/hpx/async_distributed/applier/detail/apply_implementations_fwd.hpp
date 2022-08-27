@@ -17,30 +17,29 @@
 namespace hpx { namespace applier { namespace detail {
     // forward declaration only
     template <typename Action, typename Continuation, typename... Ts>
-    inline bool apply_l_p(Continuation&& c, naming::id_type const& target,
+    inline bool apply_l_p(Continuation&& c, hpx::id_type const& target,
         naming::address&& addr, threads::thread_priority priority, Ts&&... vs);
 
     template <typename Action, typename... Ts>
-    inline bool apply_l_p(naming::id_type const& target, naming::address&& addr,
+    inline bool apply_l_p(hpx::id_type const& target, naming::address&& addr,
         threads::thread_priority priority, Ts&&... vs);
 
     template <typename Action, typename Continuation, typename... Ts>
     inline bool apply_r_p(naming::address&& addr, Continuation&& c,
-        naming::id_type const& id, threads::thread_priority priority,
-        Ts&&... vs);
+        hpx::id_type const& id, threads::thread_priority priority, Ts&&... vs);
 
     template <typename Action, typename... Ts>
-    inline bool apply_r_p(naming::address&& addr, naming::id_type const& id,
+    inline bool apply_r_p(naming::address&& addr, hpx::id_type const& id,
         threads::thread_priority priority, Ts&&... vs);
 
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
     inline bool apply_r_p_cb(naming::address&& addr, Continuation&& c,
-        naming::id_type const& id, threads::thread_priority priority,
+        hpx::id_type const& id, threads::thread_priority priority,
         Callback&& cb, Ts&&... vs);
 
     template <typename Action, typename Callback, typename... Ts>
-    inline bool apply_r_p_cb(naming::address&& addr, naming::id_type const& id,
+    inline bool apply_r_p_cb(naming::address&& addr, hpx::id_type const& id,
         threads::thread_priority priority, Callback&& cb, Ts&&... vs);
 }}}    // namespace hpx::applier::detail
 

@@ -13,24 +13,24 @@
 #include <unordered_set>
 #include <utility>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::detail {
     char const* store_function_annotation(std::string name)
     {
         static thread_local std::unordered_set<std::string> names;
-        auto r = names.emplace(std::move(name));
+        auto r = names.emplace(HPX_MOVE(name));
         return (*std::get<0>(r)).c_str();
     }
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::detail
 
 #else
 
 #include <string>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::detail {
     char const* store_function_annotation(std::string)
     {
         return "<unknown>";
     }
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::detail
 
 #endif

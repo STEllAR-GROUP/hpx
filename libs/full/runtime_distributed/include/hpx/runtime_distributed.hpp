@@ -11,14 +11,16 @@
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/components_base/generate_unique_ids.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/parcelset/message_handler_fwd.hpp>
+#include <hpx/parcelset/parcelhandler.hpp>
+#include <hpx/parcelset_base/locality.hpp>
+#include <hpx/parcelset_base/parcelport.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/performance_counters/registry.hpp>
-#include <hpx/runtime/parcelset/locality.hpp>
-#include <hpx/runtime/parcelset/parcelhandler.hpp>
-#include <hpx/runtime/parcelset/parcelport.hpp>
 #include <hpx/runtime_components/server/console_error_sink_singleton.hpp>
 #include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/find_localities.hpp>
+#include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
@@ -37,12 +39,6 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx {
-    namespace detail {
-
-        // Get access to the registry of registered message handlers
-        HPX_EXPORT std::vector<hpx::tuple<char const*, char const*>>&
-        get_message_handler_registrations();
-    }    // namespace detail
 
     /// The \a runtime class encapsulates the HPX runtime system in a simple to
     /// use way. It makes sure all required parts of the HPX runtime system are
@@ -55,7 +51,8 @@ namespace hpx {
         /// \param locality_mode  [in] This is the mode the given runtime
         ///                       instance should be executed in.
         explicit runtime_distributed(util::runtime_configuration& rtcfg,
-            int (*pre_main)(runtime_mode) = nullptr);
+            int (*pre_main)(runtime_mode) = nullptr,
+            void (*post_main)() = nullptr);
 
         /// \brief The destructor makes sure all HPX runtime services are
         ///        properly shut down before exiting.
@@ -79,7 +76,7 @@ namespace hpx {
         ///                   return the value as returned as the result of the
         ///                   invocation of the function object given by the
         ///                   parameter \p func. Otherwise it will return zero.
-        int start(util::function_nonser<hpx_main_function_type> const& func,
+        int start(hpx::function<hpx_main_function_type> const& func,
             bool blocking = false) override;
 
         ///  \brief Start the runtime system
@@ -182,8 +179,7 @@ namespace hpx {
         /// \returns          This function will return the value as returned
         ///                   as the result of the invocation of the function
         ///                   object given by the parameter \p func.
-        int run(
-            util::function_nonser<hpx_main_function_type> const& func) override;
+        int run(hpx::function<hpx_main_function_type> const& func) override;
 
         /// \brief Run the HPX runtime system, initially use the given number
         ///        of (OS) threads in the thread-manager and block waiting for
@@ -200,7 +196,7 @@ namespace hpx {
             F&& sink)
         {
             return components::server::get_error_dispatcher().set_error_sink(
-                std::forward<F>(sink));
+                HPX_FORWARD(F, sink));
         }
 
         /// \brief Allow access to the registry counter registry instance used
@@ -263,7 +259,7 @@ namespace hpx {
         /// \brief Returns a string of the locality endpoints (usable in debug output)
         std::string here() const override;
 
-        std::uint64_t get_runtime_support_lva() const;
+        naming::address_type get_runtime_support_lva() const;
 
         naming::gid_type get_next_id(std::size_t count = 1);
 
@@ -354,14 +350,14 @@ namespace hpx {
 
         std::uint32_t get_initial_num_localities() const override;
 
-        lcos::future<std::uint32_t> get_num_localities() const override;
+        hpx::future<std::uint32_t> get_num_localities() const override;
 
         std::string get_locality_name() const override;
 
         std::uint32_t get_num_localities(hpx::launch::sync_policy,
             components::component_type type, error_code& ec) const;
 
-        lcos::future<std::uint32_t> get_num_localities(
+        hpx::future<std::uint32_t> get_num_localities(
             components::component_type type) const;
 
         std::uint32_t assign_cores(std::string const& locality_basename,
@@ -371,7 +367,7 @@ namespace hpx {
 
     private:
         threads::thread_result_type run_helper(
-            util::function_nonser<runtime::hpx_main_function_type> const& func,
+            hpx::function<runtime::hpx_main_function_type> const& func,
             int& result);
 
         void init_global_data();
@@ -411,6 +407,7 @@ namespace hpx {
         std::shared_ptr<util::query_counters> active_counters_;
 
         int (*pre_main_)(runtime_mode);
+        void (*post_main_)();
     };
 }    // namespace hpx
 

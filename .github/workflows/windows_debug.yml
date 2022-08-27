@@ -16,17 +16,17 @@ jobs:
     - uses: actions/checkout@v2
     - uses: jwlawson/actions-setup-cmake@v1.9
       with:
-        cmake-version: '3.18.x'
+        cmake-version: '3.22.x'
     - name: Install dependencies
       run: |
         md C:\projects
         $client = new-object System.Net.WebClient
-        $client.DownloadFile("https://rostam.cct.lsu.edu/download/builder/vcpkg-export-hpx-dependencies.7z","C:\projects\vcpkg-export-hpx-dependencies.7z")
+        $client.DownloadFile("https://rostam.cct.lsu.edu/download/builder/vcpkg-export-hpx-dependencies-2022.7z","C:\projects\vcpkg-export-hpx-dependencies.7z")
         7z x C:\projects\vcpkg-export-hpx-dependencies.7z -y -oC:\projects\vcpkg
     - name: Configure
       shell: bash
       run: |
-          cmake . -Bbuild -G'Visual Studio 16 2019' \
+          cmake . -Bbuild -G'Visual Studio 17 2022' \
               -DCMAKE_BUILD_TYPE=Debug \
               -DCMAKE_TOOLCHAIN_FILE='C:/projects/vcpkg/scripts/buildsystems/vcpkg.cmake' \
               -DHPX_WITH_FETCH_ASIO=ON \
@@ -36,7 +36,8 @@ jobs:
               -DHPX_WITH_DEPRECATION_WARNINGS=OFF \
               -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
               -DHPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION=ON \
-              -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On
+              -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On \
+              -DCMAKE_CXX_FLAGS=-permissive-
     - name: Build
       shell: bash
       run: |
@@ -89,4 +90,5 @@ jobs:
           tests.examples.quickstart.1d_wave_equation|\
           tests.examples.quickstart.partitioned_vector_spmd_foreach|\
           tests.examples.quickstart.sort_by_key_demo|\
-          tests.examples.transpose.transpose_block_numa"
+          tests.examples.transpose.transpose_block_numa|\
+          tests.examples.modules.collectives.distributed.tcp.channel_communicator"

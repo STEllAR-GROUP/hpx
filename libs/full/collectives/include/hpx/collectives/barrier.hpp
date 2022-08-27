@@ -22,7 +22,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace lcos {
+namespace hpx::distributed {
 
     /// \cond NOINTERNAL
     namespace detail {
@@ -35,7 +35,7 @@ namespace hpx { namespace lcos {
     /// participating threads. The different threads don't have to be on the
     /// same locality. This barrier can be invoked in a distributed application.
     ///
-    /// For a local only barrier \see hpx::lcos::local::barrier.
+    /// For a local only barrier \see hpx::barrier.
     class HPX_EXPORT barrier
     {
         /// \cond NOINTERNAL
@@ -133,6 +133,14 @@ namespace hpx { namespace lcos {
         hpx::intrusive_ptr<wrapping_type> node_;
         /// \endcond
     };
-}}    // namespace hpx::lcos
+}    // namespace hpx::distributed
 
+/// \cond NOINTERNAL
+namespace hpx::lcos {
+
+    using barrier HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::barrier is deprecated, use hpx::distributed::barrier "
+        "instead") = hpx::distributed::barrier;
+}
+/// \endcond
 #include <hpx/config/warnings_suffix.hpp>

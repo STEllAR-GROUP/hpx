@@ -11,26 +11,30 @@
 #include <functional>
 
 namespace hpx { namespace util {
+
     template <typename T>
     struct unwrap_reference
     {
-        typedef T type;
+        using type = T;
     };
 
     template <typename T>
     struct unwrap_reference<std::reference_wrapper<T>>
     {
-        typedef T type;
+        using type = T;
     };
 
     template <typename T>
     struct unwrap_reference<std::reference_wrapper<T> const>
     {
-        typedef T type;
+        using type = T;
     };
 
     template <typename T>
-    HPX_FORCEINLINE typename unwrap_reference<T>::type& unwrap_ref(T& t)
+    using unwrap_reference_t = typename unwrap_reference<T>::type;
+
+    template <typename T>
+    HPX_FORCEINLINE unwrap_reference_t<T>& unwrap_ref(T& t)
     {
         return t;
     }

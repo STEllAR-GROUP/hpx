@@ -1,11 +1,11 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file lcos/when_any.hpp
+/// \file when_any.hpp
 
 #pragma once
 
@@ -18,8 +18,8 @@ namespace hpx {
     struct when_any_result
     {
         std::size_t index;    ///< The index of a future which has become ready
-        Sequence
-            futures;    ///< The sequence of futures as passed to \a hpx::when_any
+        Sequence futures;     ///< The sequence of futures as passed to
+                              ///< \a hpx::when_any
     };
 
     /// The function \a when_any is a non-deterministic choice operator. It
@@ -146,24 +146,25 @@ namespace hpx {
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos {
+namespace hpx {
+
     template <typename Sequence>
     struct when_any_result
     {
-        static std::size_t index_error()
+        static constexpr std::size_t index_error() noexcept
         {
             return static_cast<std::size_t>(-1);
         }
 
-        when_any_result()
-          : index(static_cast<size_t>(index_error()))
+        when_any_result() noexcept
+          : index(index_error())
           , futures()
         {
         }
 
-        explicit when_any_result(Sequence&& futures)
+        explicit when_any_result(Sequence&& futures) noexcept
           : index(index_error())
-          , futures(std::move(futures))
+          , futures(HPX_MOVE(futures))
         {
         }
 
@@ -173,9 +174,9 @@ namespace hpx { namespace lcos {
         {
         }
 
-        when_any_result(when_any_result&& rhs)
+        when_any_result(when_any_result&& rhs) noexcept
           : index(rhs.index)
-          , futures(std::move(rhs.futures))
+          , futures(HPX_MOVE(rhs.futures))
         {
             rhs.index = index_error();
         }
@@ -190,13 +191,13 @@ namespace hpx { namespace lcos {
             return *this;
         }
 
-        when_any_result& operator=(when_any_result&& rhs)
+        when_any_result& operator=(when_any_result&& rhs) noexcept
         {
             if (this != &rhs)
             {
                 index = rhs.index;
                 rhs.index = index_error();
-                futures = std::move(rhs.futures);
+                futures = HPX_MOVE(rhs.futures);
             }
             return *this;
         }
@@ -205,7 +206,8 @@ namespace hpx { namespace lcos {
         Sequence futures;
     };
 
-    namespace detail {
+    namespace lcos { namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Sequence>
         struct when_any;
@@ -213,40 +215,39 @@ namespace hpx { namespace lcos {
         template <typename Sequence>
         struct set_when_any_callback_impl
         {
-            explicit set_when_any_callback_impl(when_any<Sequence>& when)
+            explicit set_when_any_callback_impl(
+                when_any<Sequence>& when) noexcept
               : when_(when)
               , idx_(0)
             {
             }
 
             template <typename Future>
-            void operator()(Future& future,
-                typename std::enable_if<
-                    traits::is_future<Future>::value>::type* = nullptr) const
+            std::enable_if_t<hpx::traits::is_future_v<Future>> operator()(
+                Future& future) const
             {
                 std::size_t index =
                     when_.index_.load(std::memory_order_seq_cst);
+
                 if (index == when_any_result<Sequence>::index_error())
                 {
-                    typedef typename traits::detail::shared_state_ptr_for<
-                        Future>::type shared_state_ptr;
+                    using shared_state_ptr =
+                        hpx::traits::detail::shared_state_ptr_for_t<Future>;
                     shared_state_ptr const& shared_state =
                         traits::detail::get_shared_state(future);
 
-                    if (shared_state.get() != nullptr &&
-                        !shared_state->is_ready())
+                    if (shared_state && !shared_state->is_ready())
                     {
                         // handle future only if not enough futures are ready
                         // yet also, do not touch any futures which are already
                         // ready
-
                         shared_state->execute_deferred();
 
                         // execute_deferred might have made the future ready
                         if (!shared_state->is_ready())
                         {
                             shared_state->set_on_completed(util::deferred_call(
-                                &when_any<Sequence>::on_future_ready,
+                                &detail::when_any<Sequence>::on_future_ready,
                                 when_.shared_from_this(), idx_,
                                 hpx::execution_base::this_thread::agent()));
                             ++idx_;
@@ -263,17 +264,16 @@ namespace hpx { namespace lcos {
             }
 
             template <typename Sequence_>
-            HPX_FORCEINLINE void operator()(Sequence_& sequence,
-                typename std::enable_if<
-                    traits::is_future_range<Sequence_>::value>::type* =
-                    nullptr) const
+            HPX_FORCEINLINE
+                std::enable_if_t<hpx::traits::is_future_range_v<Sequence_>>
+                operator()(Sequence_& sequence) const
             {
                 apply(sequence);
             }
 
             template <typename Tuple, std::size_t... Is>
             HPX_FORCEINLINE void apply(
-                Tuple& tuple, util::index_pack<Is...>) const
+                Tuple& tuple, hpx::util::index_pack<Is...>) const
             {
                 int const _sequencer[] = {
                     (((*this)(hpx::get<Is>(tuple))), 0)...};
@@ -283,8 +283,7 @@ namespace hpx { namespace lcos {
             template <typename... Ts>
             HPX_FORCEINLINE void apply(hpx::tuple<Ts...>& sequence) const
             {
-                apply(sequence,
-                    typename util::make_index_pack<sizeof...(Ts)>::type());
+                apply(sequence, hpx::util::make_index_pack_t<sizeof...(Ts)>());
             }
 
             template <typename Sequence_>
@@ -293,12 +292,13 @@ namespace hpx { namespace lcos {
                 std::for_each(sequence.begin(), sequence.end(), *this);
             }
 
-            when_any<Sequence>& when_;
+            detail::when_any<Sequence>& when_;
             mutable std::size_t idx_;
         };
 
         template <typename Sequence>
-        HPX_FORCEINLINE void set_on_completed_callback(when_any<Sequence>& when)
+        HPX_FORCEINLINE void set_on_completed_callback(
+            detail::when_any<Sequence>& when)
         {
             set_when_any_callback_impl<Sequence> callback(when);
             callback.apply(when.lazy_values_.futures);
@@ -319,22 +319,28 @@ namespace hpx { namespace lcos {
                 {
                     // reactivate waiting thread only if it's not us
                     if (ctx != hpx::execution_base::this_thread::agent())
+                    {
                         ctx.resume();
+                    }
                     else
+                    {
                         goal_reached_on_calling_thread_ = true;
+                    }
                 }
             }
 
         private:
-            // workaround gcc regression wrongly instantiating constructors
-            when_any();
-            when_any(when_any const&);
+            when_any(when_any const&) = delete;
+            when_any(when_any&) = delete;
+
+            when_any& operator=(when_any const&) = delete;
+            when_any& operator=(when_any&&) = delete;
 
         public:
-            typedef Sequence argument_type;
+            using argument_type = Sequence;
 
-            when_any(argument_type&& lazy_values)
-              : lazy_values_(std::move(lazy_values))
+            when_any(argument_type&& lazy_values) noexcept
+              : lazy_values_(HPX_MOVE(lazy_values))
               , index_(when_any_result<Sequence>::index_error())
               , goal_reached_on_calling_thread_(false)
             {
@@ -360,119 +366,132 @@ namespace hpx { namespace lcos {
                     index_.load() != when_any_result<Sequence>::index_error());
 
                 lazy_values_.index = index_.load();
-                return std::move(lazy_values_);
+                return HPX_MOVE(lazy_values_);
             }
 
             when_any_result<Sequence> lazy_values_;
             std::atomic<std::size_t> index_;
             bool goal_reached_on_calling_thread_;
         };
-    }    // namespace detail
+    }}    // namespace lcos::detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Range>
-    typename std::enable_if<traits::is_future_range<Range>::value,
-        lcos::future<when_any_result<typename std::decay<Range>::type>>>::type
-    when_any(Range&& lazy_values)
+    std::enable_if_t<hpx::traits::is_future_range_v<Range>,
+        hpx::future<hpx::when_any_result<std::decay_t<Range>>>>
+    when_any(Range&& values)
     {
-        typedef typename std::decay<Range>::type result_type;
+        using result_type = std::decay_t<Range>;
 
-        result_type lazy_values_ =
-            traits::acquire_future<result_type>()(lazy_values);
+        auto f = std::make_shared<lcos::detail::when_any<result_type>>(
+            hpx::traits::acquire_future<result_type>()(values));
 
-        std::shared_ptr<detail::when_any<result_type>> f =
-            std::make_shared<detail::when_any<result_type>>(
-                std::move(lazy_values_));
-
-        lcos::local::futures_factory<when_any_result<result_type>()> p(
-            [f = std::move(f)]() -> when_any_result<result_type> {
+        lcos::local::futures_factory<hpx::when_any_result<result_type>()> p(
+            [f = HPX_MOVE(f)]() -> hpx::when_any_result<result_type> {
                 return (*f)();
             });
 
+        auto result = p.get_future();
         p.apply();
-        return p.get_future();
+
+        return result;
     }
 
     template <typename Iterator,
-        typename Container = std::vector<
-            typename lcos::detail::future_iterator_traits<Iterator>::type>>
-    lcos::future<when_any_result<Container>> when_any(
+        typename Container =
+            std::vector<hpx::lcos::detail::future_iterator_traits_t<Iterator>>,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    hpx::future<hpx::when_any_result<Container>> when_any(
         Iterator begin, Iterator end)
     {
-        Container lazy_values_;
+        Container values;
+        traits::detail::reserve_if_random_access_by_range(values, begin, end);
 
-        typename std::iterator_traits<Iterator>::difference_type difference =
-            std::distance(begin, end);
-        if (difference > 0)
-            traits::detail::reserve_if_reservable(
-                lazy_values_, static_cast<std::size_t>(difference));
-
-        std::transform(begin, end, std::back_inserter(lazy_values_),
-            traits::acquire_future_disp());
-
-        return lcos::when_any(std::move(lazy_values_));
+        std::move(begin, end, std::back_inserter(values));
+        return hpx::when_any(HPX_MOVE(values));
     }
 
-    inline lcos::future<when_any_result<hpx::tuple<>>>    //-V524
-    when_any()
+    inline auto when_any()
     {
-        typedef when_any_result<hpx::tuple<>> result_type;
-
-        return lcos::make_ready_future(result_type());
+        return hpx::make_ready_future(hpx::when_any_result<hpx::tuple<>>());
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator,
-        typename Container = std::vector<
-            typename lcos::detail::future_iterator_traits<Iterator>::type>>
-    lcos::future<when_any_result<Container>> when_any_n(
+        typename Container =
+            std::vector<hpx::lcos::detail::future_iterator_traits_t<Iterator>>,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    hpx::future<hpx::when_any_result<Container>> when_any_n(
         Iterator begin, std::size_t count)
     {
-        Container lazy_values_;
-        traits::detail::reserve_if_reservable(lazy_values_, count);
+        Container values;
+        traits::detail::reserve_if_reservable(values, count);
 
-        traits::acquire_future_disp func;
-        for (std::size_t i = 0; i != count; ++i)
-            lazy_values_.push_back(func(*begin++));
-
-        return lcos::when_any(lazy_values_);
+        while (count-- != 0)
+        {
+            // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
+            values.push_back(HPX_MOVE(*begin++));
+        }
+        return hpx::when_any(HPX_MOVE(values));
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename... Ts>
-    typename std::enable_if<!(traits::is_future_range<T>::value &&
-                                sizeof...(Ts) == 0),
-        lcos::future<
-            when_any_result<hpx::tuple<typename traits::acquire_future<T>::type,
-                typename traits::acquire_future<Ts>::type...>>>>::type
+    template <typename T, typename... Ts,
+        typename Enable = std::enable_if_t<!(
+            hpx::traits::is_future_range_v<T> && sizeof...(Ts) == 0)>>
+    hpx::future<
+        hpx::when_any_result<hpx::tuple<hpx::traits::acquire_future_t<T>,
+            hpx::traits::acquire_future_t<Ts>...>>>
     when_any(T&& t, Ts&&... ts)
     {
-        typedef hpx::tuple<typename traits::acquire_future<T>::type,
-            typename traits::acquire_future<Ts>::type...>
-            result_type;
+        using result_type = hpx::tuple<hpx::traits::acquire_future_t<T>,
+            hpx::traits::acquire_future_t<Ts>...>;
 
-        traits::acquire_future_disp func;
-        result_type lazy_values(
-            func(std::forward<T>(t)), func(std::forward<Ts>(ts))...);
+        hpx::traits::acquire_future_disp func;
+        result_type values(
+            func(HPX_FORWARD(T, t)), func(HPX_FORWARD(Ts, ts))...);
 
-        std::shared_ptr<detail::when_any<result_type>> f =
-            std::make_shared<detail::when_any<result_type>>(
-                std::move(lazy_values));
+        auto f = std::make_shared<lcos::detail::when_any<result_type>>(
+            HPX_MOVE(values));
 
-        lcos::local::futures_factory<when_any_result<result_type>()> p(
-            [f = std::move(f)]() -> when_any_result<result_type> {
+        lcos::local::futures_factory<hpx::when_any_result<result_type>()> p(
+            [f = HPX_MOVE(f)]() -> hpx::when_any_result<result_type> {
                 return (*f)();
             });
 
+        auto result = p.get_future();
         p.apply();
-        return p.get_future();
-    }
-}}    // namespace hpx::lcos
 
-namespace hpx {
-    using lcos::when_any;
-    using lcos::when_any_n;
-    using lcos::when_any_result;
+        return result;
+    }
 }    // namespace hpx
+
+namespace hpx::lcos {
+
+    template <typename... Ts>
+    HPX_DEPRECATED_V(
+        1, 8, "hpx::lcos::when_any is deprecated. Use hpx::when_any instead.")
+    auto when_any(Ts&&... ts)
+    {
+        return hpx::when_any(HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename Iterator,
+        typename Enable =
+            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::when_any_n is deprecated. Use hpx::when_any_n instead.")
+    auto when_any_n(Iterator begin, std::size_t count)
+    {
+        return hpx::when_any_n(begin, count);
+    }
+
+    template <typename Container>
+    using when_any_result HPX_DEPRECATED_V(1, 8,
+        "hpx::lcos::when_all_result is deprecated. Use hpx::when_all_result "
+        "instead.") = hpx::when_any_result<Container>;
+}    // namespace hpx::lcos
 
 #endif    // DOXYGEN

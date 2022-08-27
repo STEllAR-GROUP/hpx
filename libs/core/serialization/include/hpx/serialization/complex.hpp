@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Agustin Berge
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +14,7 @@
 #include <complex>
 #include <type_traits>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename T>
     void serialize(input_archive& ar, std::complex<T>& c, unsigned)
@@ -29,13 +30,13 @@ namespace hpx { namespace serialization {
     {
         ar << c.real() << c.imag();
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     template <typename T>
     struct is_bitwise_serializable<std::complex<T>>
-      : is_bitwise_serializable<typename std::remove_const<T>::type>
+      : is_bitwise_serializable<std::remove_const_t<T>>
     {
     };
 
@@ -45,4 +46,4 @@ namespace hpx { namespace traits {
             !is_bitwise_serializable_v<std::complex<T>>>
     {
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

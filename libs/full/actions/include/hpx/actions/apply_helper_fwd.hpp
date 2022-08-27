@@ -17,13 +17,13 @@ namespace hpx { namespace applier { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
     void call_async(threads::thread_init_data&& data,
-        naming::id_type const& target, naming::address::address_type lva,
+        hpx::id_type const& target, naming::address::address_type lva,
         naming::address::component_type comptype,
         threads::thread_priority priority, Ts&&... vs);
 
     template <typename Action, typename Continuation, typename... Ts>
     void call_async(threads::thread_init_data&& data, Continuation&& cont,
-        naming::id_type const& target, naming::address::address_type lva,
+        hpx::id_type const& target, naming::address::address_type lva,
         naming::address::component_type comptype,
         threads::thread_priority priority, Ts&&... vs);
 

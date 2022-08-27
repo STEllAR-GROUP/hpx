@@ -25,9 +25,6 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/version.hpp>
-#if defined(HPX_HAVE_MODULE_COMPUTE_CUDA)
-#include <hpx/modules/compute_cuda.hpp>
-#endif
 
 #include <cstddef>
 #include <iostream>
@@ -59,25 +56,25 @@ double mysecond()
 int checktick()
 {
     static const std::size_t M = 20;
-    int minDelta, Delta;
-    double t1, t2, timesfound[M];
+    double timesfound[M];
 
     // Collect a sequence of M unique time values from the system.
     for (std::size_t i = 0; i < M; i++)
     {
-        t1 = mysecond();
+        double const t1 = mysecond();
+        double t2;
         while (((t2 = mysecond()) - t1) < 1.0E-6)
             ;
-        timesfound[i] = t1 = t2;
+        timesfound[i] = t2;
     }
 
     // Determine the minimum difference between these M values.
     // This result will be our estimate (in microseconds) for the
     // clock granularity.
-    minDelta = 1000000;
+    int minDelta = 1000000;
     for (std::size_t i = 1; i < M; i++)
     {
-        Delta = (int) (1.0E6 * (timesfound[i] - timesfound[i - 1]));
+        int Delta = (int) (1.0E6 * (timesfound[i] - timesfound[i - 1]));
         minDelta = (std::min)(minDelta, (std::max)(Delta, 0));
     }
 
@@ -516,33 +513,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     double time_total = mysecond();
     std::vector<std::vector<double>> timing;
 
-#if defined(HPX_HAVE_MODULE_COMPUTE_CUDA)
-    bool use_accel = false;
-    if (vm.count("use-accelerator"))
-        use_accel = true;
-
-    if (use_accel)
-    {
-        using executor_type = hpx::cuda::experimental::concurrent_executor<>;
-        using allocator_type = hpx::cuda::experimental::allocator<STREAM_TYPE>;
-
-        // Get the cuda targets we want to run on
-        hpx::cuda::experimental::target target;
-
-        // Get the host targets we want to run on
-        auto host_targets = hpx::compute::host::get_local_targets();
-
-        allocator_type alloc(target);
-        executor_type exec(target, host_targets);
-        auto policy = hpx::execution::par.on(exec);
-
-        // perform benchmark
-        timing = run_benchmark<>(warmup_iterations, iterations, vector_size,
-            std::move(alloc), std::move(policy));
-        //iterations, vector_size, std::move(target));
-    }
-    else
-#endif
     {
         if (executor == 0)
         {
@@ -743,11 +713,6 @@ int main(int argc, char* argv[])
         (   "executor",
             hpx::program_options::value<std::size_t>()->default_value(2),
             "executor to use (0-4) (default: 2, parallel_executor)")
-
-#if defined(HPX_HAVE_COMPUTE)
-        (   "use-accelerator",
-            "Use this flag to run the stream benchmark on the GPU")
-#endif
         ;
     // clang-format on
 

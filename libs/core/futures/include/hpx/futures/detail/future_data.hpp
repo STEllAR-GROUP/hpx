@@ -10,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
+#include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/future_fwd.hpp>
@@ -25,8 +26,6 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <boost/container/small_vector.hpp>
-
 #include <atomic>
 #include <chrono>
 #include <cstddef>
@@ -40,7 +39,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos {
+namespace hpx {
     enum class future_status
     {
         ready,
@@ -48,12 +47,25 @@ namespace hpx { namespace lcos {
         deferred,
         uninitialized
     };
-}}    // namespace hpx::lcos
+
+    namespace lcos {
+        enum class HPX_DEPRECATED_V(1, 8,
+            "hpx::lcos::future_status is deprecated. Use "
+            "hpx::future_status instead.") future_status
+        {
+            ready = static_cast<int>(hpx::future_status::ready),
+            timeout = static_cast<int>(hpx::future_status::timeout),
+            deferred = static_cast<int>(hpx::future_status::deferred),
+            uninitialized = static_cast<int>(hpx::future_status::uninitialized)
+        };
+    }    // namespace lcos
+}    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail {
+
     using run_on_completed_error_handler_type =
-        util::function_nonser<void(std::exception_ptr const& e)>;
+        hpx::function<void(std::exception_ptr const& e)>;
     HPX_CORE_EXPORT void set_run_on_completed_error_handler(
         run_on_completed_error_handler_type f);
 
@@ -64,29 +76,36 @@ namespace hpx { namespace lcos { namespace detail {
     ///////////////////////////////////////////////////////////////////////
     struct future_data_refcnt_base;
 
-    void intrusive_ptr_add_ref(future_data_refcnt_base* p);
-    void intrusive_ptr_release(future_data_refcnt_base* p);
+    void intrusive_ptr_add_ref(future_data_refcnt_base* p) noexcept;
+    void intrusive_ptr_release(future_data_refcnt_base* p) noexcept;
 
     ///////////////////////////////////////////////////////////////////////
     struct HPX_CORE_EXPORT future_data_refcnt_base
     {
-    public:
-        typedef util::unique_function_nonser<void()> completed_callback_type;
-        typedef boost::container::small_vector<completed_callback_type, 1>
-            completed_callback_vector_type;
+        // future shared states are non-copyable and non-movable
+        future_data_refcnt_base(future_data_refcnt_base const&) = delete;
+        future_data_refcnt_base(future_data_refcnt_base&&) = delete;
+        future_data_refcnt_base& operator=(
+            future_data_refcnt_base const&) = delete;
+        future_data_refcnt_base& operator=(future_data_refcnt_base&&) = delete;
 
-        typedef void has_future_data_refcnt_base;
+    public:
+        using completed_callback_type = hpx::move_only_function<void()>;
+        using completed_callback_vector_type =
+            hpx::detail::small_vector<completed_callback_type, 1>;
+
+        using has_future_data_refcnt_base = void;
 
         virtual ~future_data_refcnt_base();
 
         virtual void set_on_completed(completed_callback_type) = 0;
 
-        virtual bool requires_delete()
+        virtual bool requires_delete() noexcept
         {
             return 0 == --count_;
         }
 
-        virtual void destroy()
+        virtual void destroy() noexcept
         {
             delete this;
         }
@@ -98,57 +117,59 @@ namespace hpx { namespace lcos { namespace detail {
         };
 
     protected:
-        future_data_refcnt_base()
+        future_data_refcnt_base() noexcept
           : count_(0)
         {
         }
-        future_data_refcnt_base(init_no_addref)
+        explicit future_data_refcnt_base(init_no_addref) noexcept
           : count_(1)
         {
         }
 
         // reference counting
-        friend void intrusive_ptr_add_ref(future_data_refcnt_base* p);
-        friend void intrusive_ptr_release(future_data_refcnt_base* p);
+        friend void intrusive_ptr_add_ref(future_data_refcnt_base* p) noexcept;
+        friend void intrusive_ptr_release(future_data_refcnt_base* p) noexcept;
 
         util::atomic_count count_;
     };
 
     /// support functions for hpx::intrusive_ptr
-    inline void intrusive_ptr_add_ref(future_data_refcnt_base* p)
+    inline void intrusive_ptr_add_ref(future_data_refcnt_base* p) noexcept
     {
         ++p->count_;
     }
-    inline void intrusive_ptr_release(future_data_refcnt_base* p)
+    inline void intrusive_ptr_release(future_data_refcnt_base* p) noexcept
     {
         if (p->requires_delete())
+        {
             p->destroy();
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
     struct future_data_result
     {
-        typedef Result type;
+        using type = Result;
 
         template <typename U>
-        HPX_FORCEINLINE static U&& set(U&& u)
+        HPX_FORCEINLINE static constexpr U&& set(U&& u) noexcept
         {
-            return std::forward<U>(u);
+            return HPX_FORWARD(U, u);
         }
     };
 
     template <typename Result>
     struct future_data_result<Result&>
     {
-        typedef Result* type;
+        using type = Result*;
 
-        HPX_FORCEINLINE static Result* set(Result* u)
+        HPX_FORCEINLINE static constexpr Result* set(Result* u) noexcept
         {
             return u;
         }
 
-        HPX_FORCEINLINE static Result* set(Result& u)
+        HPX_FORCEINLINE static constexpr Result* set(Result& u) noexcept
         {
             return &u;
         }
@@ -157,36 +178,42 @@ namespace hpx { namespace lcos { namespace detail {
     template <>
     struct future_data_result<void>
     {
-        typedef util::unused_type type;
+        using type = util::unused_type;
 
-        HPX_FORCEINLINE static util::unused_type set(util::unused_type u)
+        HPX_FORCEINLINE static constexpr util::unused_type set(
+            util::unused_type u) noexcept
         {
             return u;
         }
     };
 
+    template <typename Result>
+    using future_data_result_t = typename future_data_result<Result>::type;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename R>
     struct future_data_storage
     {
-        typedef typename future_data_result<R>::type value_type;
-        typedef std::exception_ptr error_type;
+        using value_type = future_data_result_t<R>;
+        using error_type = std::exception_ptr;
 
         // determine the required alignment, define aligned storage of proper
         // size
-        HPX_STATIC_CONSTEXPR std::size_t max_alignment =
-            (std::alignment_of<value_type>::value >
-                std::alignment_of<error_type>::value) ?
-            std::alignment_of<value_type>::value :
-            std::alignment_of<error_type>::value;
+        static constexpr std::size_t max_alignment =
+            (std::alignment_of_v<value_type> >
+                std::alignment_of_v<error_type>) ?
+            std::alignment_of_v<value_type> :
+            std::alignment_of_v<error_type>;
 
-        HPX_STATIC_CONSTEXPR std::size_t max_size =
+        static constexpr std::size_t max_size =
             (sizeof(value_type) > sizeof(error_type)) ? sizeof(value_type) :
                                                         sizeof(error_type);
 
-        typedef
-            typename std::aligned_storage<max_size, max_alignment>::type type;
+        using type = std::aligned_storage_t<max_size, max_alignment>;
     };
+
+    template <typename Result>
+    using future_data_storage_t = typename future_data_storage<Result>::type;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
@@ -196,12 +223,14 @@ namespace hpx { namespace lcos { namespace detail {
     struct HPX_CORE_EXPORT future_data_base<traits::detail::future_data_void>
       : future_data_refcnt_base
     {
-        future_data_base()
+        using mutex_type = lcos::local::spinlock;
+
+        future_data_base() noexcept
           : state_(empty)
         {
         }
 
-        future_data_base(init_no_addref no_addref)
+        explicit future_data_base(init_no_addref no_addref) noexcept
           : future_data_refcnt_base(no_addref)
           , state_(empty)
         {
@@ -209,9 +238,8 @@ namespace hpx { namespace lcos { namespace detail {
 
         using future_data_refcnt_base::completed_callback_type;
         using future_data_refcnt_base::completed_callback_vector_type;
-        typedef lcos::local::spinlock mutex_type;
-        typedef util::unused_type result_type;
-        typedef future_data_refcnt_base::init_no_addref init_no_addref;
+        using result_type = util::unused_type;
+        using init_no_addref = future_data_refcnt_base::init_no_addref;
 
         virtual ~future_data_base();
 
@@ -225,17 +253,18 @@ namespace hpx { namespace lcos { namespace detail {
 
         /// Return whether or not the data is available for this
         /// \a future.
-        bool is_ready(std::memory_order order = std::memory_order_acquire) const
+        bool is_ready(
+            std::memory_order order = std::memory_order_acquire) const noexcept
         {
             return (state_.load(order) & ready) != 0;
         }
 
-        bool has_value() const
+        bool has_value() const noexcept
         {
             return state_.load(std::memory_order_acquire) == value;
         }
 
-        bool has_exception() const
+        bool has_exception() const noexcept
         {
             return state_.load(std::memory_order_acquire) == exception;
         }
@@ -243,7 +272,7 @@ namespace hpx { namespace lcos { namespace detail {
         virtual void execute_deferred(error_code& /*ec*/ = throws) {}
 
         // cancellation is disabled by default
-        virtual bool cancelable() const
+        virtual bool cancelable() const noexcept
         {
             return false;
         }
@@ -280,7 +309,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         virtual state wait(error_code& ec = throws);
 
-        virtual future_status wait_until(
+        virtual hpx::future_status wait_until(
             std::chrono::steady_clock::time_point const& abs_time,
             error_code& ec = throws);
 
@@ -318,8 +347,6 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename Result>
     struct future_data_base : future_data_base<traits::detail::future_data_void>
     {
-        HPX_NON_COPYABLE(future_data_base);
-
     private:
         static void construct(void* p)
         {
@@ -330,23 +357,26 @@ namespace hpx { namespace lcos { namespace detail {
         static void construct(void* p, T&& t, Ts&&... ts)
         {
             ::new (p)
-                result_type(future_data_result<Result>::set(std::forward<T>(t)),
-                    std::forward<Ts>(ts)...);
+                result_type(future_data_result<Result>::set(HPX_FORWARD(T, t)),
+                    HPX_FORWARD(Ts, ts)...);
         }
 
     public:
-        typedef typename future_data_result<Result>::type result_type;
-        typedef future_data_base<traits::detail::future_data_void> base_type;
-        typedef lcos::local::spinlock mutex_type;
-        typedef typename base_type::init_no_addref init_no_addref;
-        typedef
-            typename base_type::completed_callback_type completed_callback_type;
-        typedef typename base_type::completed_callback_vector_type
-            completed_callback_vector_type;
+        using result_type = future_data_result_t<Result>;
+        using base_type = future_data_base<traits::detail::future_data_void>;
+        using init_no_addref = typename base_type::init_no_addref;
+        using completed_callback_type =
+            typename base_type::completed_callback_type;
+        using completed_callback_vector_type =
+            typename base_type::completed_callback_vector_type;
 
+    protected:
+        using mutex_type = typename base_type::mutex_type;
+
+    public:
         future_data_base() = default;
 
-        future_data_base(init_no_addref no_addref)
+        explicit future_data_base(init_no_addref no_addref) noexcept
           : base_type(no_addref)
         {
         }
@@ -356,7 +386,7 @@ namespace hpx { namespace lcos { namespace detail {
           : base_type(no_addref)
         {
             result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
-            construct(value_ptr, std::forward<Ts>(ts)...);
+            construct(value_ptr, HPX_FORWARD(Ts, ts)...);
             state_.store(value, std::memory_order_relaxed);
         }
 
@@ -373,11 +403,11 @@ namespace hpx { namespace lcos { namespace detail {
         {
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*) exception_ptr) std::exception_ptr(std::move(e));
+            ::new ((void*) exception_ptr) std::exception_ptr(HPX_MOVE(e));
             state_.store(exception, std::memory_order_relaxed);
         }
 
-        virtual ~future_data_base() noexcept
+        ~future_data_base() noexcept override
         {
             reset();
         }
@@ -401,7 +431,9 @@ namespace hpx { namespace lcos { namespace detail {
         virtual result_type* get_result(error_code& ec = throws)
         {
             if (get_result_void(ec) != nullptr)
+            {
                 return reinterpret_cast<result_type*>(&storage_);
+            }
             return nullptr;
         }
 
@@ -422,14 +454,14 @@ namespace hpx { namespace lcos { namespace detail {
 
             // set the data
             result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
-            construct(value_ptr, std::forward<Ts>(ts)...);
+            construct(value_ptr, HPX_FORWARD(Ts, ts)...);
 
             // At this point the lock needs to be acquired to safely access the
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
 
             // handle all threads waiting for the future to become ready
-            auto on_completed = std::move(on_completed_);
+            auto on_completed = HPX_MOVE(on_completed_);
             on_completed_.clear();
 
             // The value has been set, changing the state to 'value' at this
@@ -455,7 +487,7 @@ namespace hpx { namespace lcos { namespace detail {
             //       which avoids suspension of this thread when it tries to
             //       re-lock the mutex while exiting from condition_variable::wait
             while (
-                cond_.notify_one(std::move(l), threads::thread_priority::boost))
+                cond_.notify_one(HPX_MOVE(l), threads::thread_priority::boost))
             {
                 l = std::unique_lock<mutex_type>(mtx_);
             }
@@ -466,7 +498,7 @@ namespace hpx { namespace lcos { namespace detail {
             // invoke the callback (continuation) function
             if (!on_completed.empty())
             {
-                handle_on_completed(std::move(on_completed));
+                handle_on_completed(HPX_MOVE(on_completed));
             }
         }
 
@@ -481,14 +513,14 @@ namespace hpx { namespace lcos { namespace detail {
             // set the data
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*) exception_ptr) std::exception_ptr(std::move(data));
+            ::new ((void*) exception_ptr) std::exception_ptr(HPX_MOVE(data));
 
             // At this point the lock needs to be acquired to safely access the
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
 
             // handle all threads waiting for the future to become ready
-            auto on_completed = std::move(on_completed_);
+            auto on_completed = HPX_MOVE(on_completed_);
             on_completed_.clear();
 
             // The value has been set, changing the state to 'exception' at this
@@ -514,7 +546,7 @@ namespace hpx { namespace lcos { namespace detail {
             //       which avoids suspension of this thread when it tries to
             //       re-lock the mutex while exiting from condition_variable::wait
             while (
-                cond_.notify_one(std::move(l), threads::thread_priority::boost))
+                cond_.notify_one(HPX_MOVE(l), threads::thread_priority::boost))
             {
                 l = std::unique_lock<mutex_type>(mtx_);
             }
@@ -525,7 +557,7 @@ namespace hpx { namespace lcos { namespace detail {
             // invoke the callback (continuation) function
             if (!on_completed.empty())
             {
-                handle_on_completed(std::move(on_completed));
+                handle_on_completed(HPX_MOVE(on_completed));
             }
         }
 
@@ -535,8 +567,8 @@ namespace hpx { namespace lcos { namespace detail {
         void set_data(T&& result)
         {
             hpx::detail::try_catch_exception_ptr(
-                [&]() { set_value(std::forward<T>(result)); },
-                [&](std::exception_ptr ep) { set_exception(std::move(ep)); });
+                [&]() { set_value(HPX_FORWARD(T, result)); },
+                [&](std::exception_ptr ep) { set_exception(HPX_MOVE(ep)); });
         }
 
         // helper functions for setting data (if successful) or the error (if
@@ -546,16 +578,16 @@ namespace hpx { namespace lcos { namespace detail {
         {
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    typedef typename std::decay<T>::type naked_type;
+                    using naked_type = std::decay_t<T>;
 
-                    typedef traits::get_remote_result<result_type, naked_type>
-                        get_remote_result_type;
+                    using get_remote_result_type =
+                        traits::get_remote_result<result_type, naked_type>;
 
                     // store the value
-                    set_value(std::move(
-                        get_remote_result_type::call(std::forward<T>(result))));
+                    set_value(
+                        get_remote_result_type::call(HPX_FORWARD(T, result)));
                 },
-                [&](std::exception_ptr ep) { set_exception(std::move(ep)); });
+                [&](std::exception_ptr ep) { set_exception(HPX_MOVE(ep)); });
         }
 
         // trigger the future with the given error condition
@@ -563,7 +595,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             hpx::detail::try_catch_exception_ptr(
                 [&]() { HPX_THROW_EXCEPTION(e, f, msg); },
-                [&](std::exception_ptr ep) { set_exception(std::move(ep)); });
+                [&](std::exception_ptr ep) { set_exception(HPX_MOVE(ep)); });
         }
 
         /// Reset the promise to allow to restart an asynchronous
@@ -610,7 +642,7 @@ namespace hpx { namespace lcos { namespace detail {
 
     private:
         using base_type::cond_;
-        typename future_data_storage<Result>::type storage_;
+        future_data_storage_t<Result> storage_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -619,14 +651,12 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename Result>
     struct future_data : future_data_base<Result>
     {
-        HPX_NON_COPYABLE(future_data);
-
-        typedef
-            typename future_data_base<Result>::init_no_addref init_no_addref;
+        using init_no_addref =
+            typename future_data_base<Result>::init_no_addref;
 
         future_data() = default;
 
-        future_data(init_no_addref no_addref)
+        explicit future_data(init_no_addref no_addref) noexcept
           : future_data_base<Result>(no_addref)
         {
         }
@@ -634,7 +664,7 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename... Ts>
         future_data(init_no_addref no_addref, in_place in_place, Ts&&... ts)
           : future_data_base<Result>(
-                no_addref, in_place, std::forward<Ts>(ts)...)
+                no_addref, in_place, HPX_FORWARD(Ts, ts)...)
         {
         }
 
@@ -643,7 +673,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
         }
         future_data(init_no_addref no_addref, std::exception_ptr&& e)
-          : future_data_base<Result>(no_addref, std::move(e))
+          : future_data_base<Result>(no_addref, HPX_MOVE(e))
         {
         }
 
@@ -654,23 +684,22 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename Result, typename Allocator, typename Derived = void>
     struct future_data_allocator : future_data<Result>
     {
-        typedef typename future_data<Result>::init_no_addref init_no_addref;
+        using init_no_addref = typename future_data<Result>::init_no_addref;
 
-        typedef typename std::conditional<std::is_void<Derived>::value,
-            future_data_allocator, Derived>::type allocated_type;
+        using allocated_type = std::conditional_t<std::is_void_v<Derived>,
+            future_data_allocator, Derived>;
 
-        typedef typename std::allocator_traits<
-            Allocator>::template rebind_alloc<allocated_type>
-            other_allocator;
+        using other_allocator = typename std::allocator_traits<
+            Allocator>::template rebind_alloc<allocated_type>;
 
-        future_data_allocator(other_allocator const& alloc)
+        explicit future_data_allocator(other_allocator const& alloc) noexcept
           : future_data<Result>()
           , alloc_(alloc)
         {
         }
 
         future_data_allocator(
-            init_no_addref no_addref, other_allocator const& alloc)
+            init_no_addref no_addref, other_allocator const& alloc) noexcept
           : future_data<Result>(no_addref)
           , alloc_(alloc)
         {
@@ -679,7 +708,7 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename... T>
         future_data_allocator(init_no_addref no_addref, in_place in_place,
             other_allocator const& alloc, T&&... ts)
-          : future_data<Result>(no_addref, in_place, std::forward<T>(ts)...)
+          : future_data<Result>(no_addref, in_place, HPX_FORWARD(T, ts)...)
           , alloc_(alloc)
         {
         }
@@ -693,15 +722,15 @@ namespace hpx { namespace lcos { namespace detail {
 
         future_data_allocator(init_no_addref no_addref, std::exception_ptr&& e,
             other_allocator const& alloc)
-          : future_data<Result>(no_addref, std::move(e))
+          : future_data<Result>(no_addref, HPX_MOVE(e))
           , alloc_(alloc)
         {
         }
 
     protected:
-        void destroy() override
+        void destroy() noexcept override
         {
-            typedef std::allocator_traits<other_allocator> traits;
+            using traits = std::allocator_traits<other_allocator>;
 
             other_allocator alloc(alloc_);
             traits::destroy(alloc, static_cast<allocated_type*>(this));
@@ -717,12 +746,11 @@ namespace hpx { namespace lcos { namespace detail {
     struct timed_future_data : future_data<Result>
     {
     public:
-        typedef future_data<Result> base_type;
-        typedef typename base_type::result_type result_type;
-        typedef typename base_type::mutex_type mutex_type;
+        using base_type = future_data<Result>;
+        using result_type = typename base_type::result_type;
 
     public:
-        timed_future_data() {}
+        timed_future_data() = default;
 
         template <typename Result_>
         timed_future_data(std::chrono::steady_clock::time_point const& abs_time,
@@ -733,8 +761,7 @@ namespace hpx { namespace lcos { namespace detail {
             error_code ec;
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(
-                    [this_ = std::move(this_),
-                        init = std::forward<Result_>(init)]() {
+                    [this_, init = HPX_FORWARD(Result_, init)]() {
                         this_->set_value(init);
                     }),
                 "timed_future_data<Result>::timed_future_data",
@@ -770,59 +797,65 @@ namespace hpx { namespace lcos { namespace detail {
     struct task_base : future_data<Result>
     {
     protected:
-        typedef future_data<Result> base_type;
-        typedef typename future_data<Result>::mutex_type mutex_type;
-        typedef hpx::intrusive_ptr<task_base> future_base_type;
-        typedef typename future_data<Result>::result_type result_type;
-        typedef typename base_type::init_no_addref init_no_addref;
+        using base_type = future_data<Result>;
+        using future_base_type = hpx::intrusive_ptr<task_base>;
+        using result_type = typename future_data<Result>::result_type;
+        using init_no_addref = typename base_type::init_no_addref;
+
+        using mutex_type = typename base_type::mutex_type;
+        using base_type::mtx_;
 
     public:
-        task_base()
-          : started_(false)
-        {
-        }
+        task_base() = default;
 
-        task_base(init_no_addref no_addref)
+        explicit task_base(init_no_addref no_addref) noexcept
           : base_type(no_addref)
-          , started_(false)
         {
         }
 
-        virtual void execute_deferred(error_code& /*ec*/ = throws)
+        void execute_deferred(error_code& /*ec*/ = throws) override
         {
             if (!started_test_and_set())
+            {
                 this->do_run();
+            }
         }
 
         // retrieving the value
-        virtual result_type* get_result(error_code& ec = throws)
+        result_type* get_result(error_code& ec = throws) override
         {
             if (!started_test_and_set())
+            {
                 this->do_run();
+            }
             return this->future_data<Result>::get_result(ec);
         }
 
         // wait support
-        virtual typename base_type::state wait(error_code& ec = throws)
+        typename base_type::state wait(error_code& ec = throws) override
         {
             if (!started_test_and_set())
+            {
                 this->do_run();
+            }
             return this->future_data<Result>::wait(ec);
         }
 
-        virtual future_status wait_until(
+        hpx::future_status wait_until(
             std::chrono::steady_clock::time_point const& abs_time,
-            error_code& ec = throws)
+            error_code& ec = throws) override
         {
             if (!started_test())
-                return future_status::deferred;    //-V110
+            {
+                return hpx::future_status::deferred;    //-V110
+            }
             return this->future_data<Result>::wait_until(abs_time, ec);
         }
 
     private:
-        bool started_test() const
+        bool started_test() const noexcept
         {
-            std::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return started_;
         }
 
@@ -831,8 +864,9 @@ namespace hpx { namespace lcos { namespace detail {
         {
             HPX_ASSERT_OWNS_LOCK(l);
             if (started_)
+            {
                 return true;
-
+            }
             started_ = true;
             return false;
         }
@@ -840,13 +874,13 @@ namespace hpx { namespace lcos { namespace detail {
     protected:
         bool started_test_and_set()
         {
-            std::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return started_test_and_set_locked(l);
         }
 
         void check_started()
         {
-            std::unique_lock<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             if (started_)
             {
                 l.unlock();
@@ -885,12 +919,12 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename T>
         void set_data(T&& result)
         {
-            this->future_data<Result>::set_data(std::forward<T>(result));
+            this->future_data<Result>::set_data(HPX_FORWARD(T, result));
         }
 
-        void set_exception(std::exception_ptr e)
+        void set_exception(std::exception_ptr e) override
         {
-            this->future_data<Result>::set_exception(std::move(e));
+            this->future_data<Result>::set_exception(HPX_MOVE(e));
         }
 
         virtual void do_run()
@@ -899,7 +933,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
     protected:
-        bool started_;
+        bool started_ = false;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -907,30 +941,33 @@ namespace hpx { namespace lcos { namespace detail {
     struct cancelable_task_base : task_base<Result>
     {
     protected:
-        typedef typename task_base<Result>::mutex_type mutex_type;
-        typedef hpx::intrusive_ptr<cancelable_task_base> future_base_type;
-        typedef typename future_data<Result>::result_type result_type;
-        typedef typename task_base<Result>::init_no_addref init_no_addref;
+        using base_type = task_base<Result>;
+        using future_base_type = hpx::intrusive_ptr<cancelable_task_base>;
+        using result_type = typename future_data<Result>::result_type;
+        using init_no_addref = typename task_base<Result>::init_no_addref;
+
+        using mutex_type = typename base_type::mutex_type;
+        using base_type::mtx_;
 
     protected:
-        threads::thread_id_type get_thread_id() const
+        threads::thread_id_type get_thread_id() const noexcept
         {
-            std::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return id_;
         }
-        void set_thread_id(threads::thread_id_type id)
+        void set_thread_id(threads::thread_id_type id) noexcept
         {
-            std::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             id_ = id;
         }
 
     public:
-        cancelable_task_base()
+        cancelable_task_base() noexcept
           : id_(threads::invalid_thread_id)
         {
         }
 
-        cancelable_task_base(init_no_addref no_addref)
+        explicit cancelable_task_base(init_no_addref no_addref) noexcept
           : task_base<Result>(no_addref)
           , id_(threads::invalid_thread_id)
         {
@@ -960,21 +997,25 @@ namespace hpx { namespace lcos { namespace detail {
 
     public:
         // cancellation support
-        bool cancelable() const
+        bool cancelable() const noexcept override
         {
             return true;
         }
 
-        void cancel()
+        void cancel() override
         {
-            std::unique_lock<mutex_type> l(this->mtx_);
+            std::unique_lock<mutex_type> l(mtx_);
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
                     if (!this->started_)
+                    {
                         HPX_THROW_THREAD_INTERRUPTED_EXCEPTION();
+                    }
 
                     if (this->is_ready())
+                    {
                         return;    // nothing we can do
+                    }
 
                     if (id_ != threads::invalid_thread_id)
                     {
@@ -999,7 +1040,7 @@ namespace hpx { namespace lcos { namespace detail {
                 [&](std::exception_ptr ep) {
                     this->started_ = true;
                     this->set_exception(ep);
-                    std::rethrow_exception(std::move(ep));
+                    std::rethrow_exception(HPX_MOVE(ep));
                 });
         }
 
@@ -1013,7 +1054,7 @@ namespace hpx { namespace traits { namespace detail {
     template <typename R, typename Allocator>
     struct shared_state_allocator<lcos::detail::future_data<R>, Allocator>
     {
-        typedef lcos::detail::future_data_allocator<R, Allocator> type;
+        using type = lcos::detail::future_data_allocator<R, Allocator>;
     };
 }}}    // namespace hpx::traits::detail
 

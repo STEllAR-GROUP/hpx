@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Hartmut Kaiser
+// Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,32 +9,32 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_WINDOWS)
-#include <hpx/modules/collectives.hpp>
 #include <hpx/components/process/util/windows/initializers/initializer_base.hpp>
+#include <hpx/modules/collectives.hpp>
 #include <hpx/serialization/string.hpp>
 
 #include <string>
 
-namespace hpx { namespace components { namespace process { namespace windows
-{
-    namespace initializers
-    {
+namespace hpx { namespace components { namespace process { namespace windows {
+    namespace initializers {
+
         class wait_on_latch : public initializer_base
         {
         public:
-            wait_on_latch() {}
+            wait_on_latch() = default;
 
             explicit wait_on_latch(std::string const& connect_to)
               : connect_to_(connect_to)
-            {}
+            {
+            }
 
             template <typename WindowsExecutor>
-            void on_CreateProcess_success(WindowsExecutor &) const
+            void on_CreateProcess_success(WindowsExecutor&) const
             {
                 // wait for the newly launched HPX locality to connect back here
-                hpx::lcos::latch l(2);
+                hpx::distributed::latch l(2);
                 l.register_as(connect_to_);
-                l.count_down_and_wait();
+                l.arrive_and_wait();
             }
 
         private:
@@ -43,12 +43,13 @@ namespace hpx { namespace components { namespace process { namespace windows
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
             {
+                // clang-format off
                 ar & connect_to_;
+                // clang-format on
             }
 
             std::string connect_to_;
         };
-    }
-}}}}
+}}}}}    // namespace hpx::components::process::windows::initializers
 
 #endif

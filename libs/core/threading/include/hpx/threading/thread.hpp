@@ -10,7 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/functional/unique_function.hpp>
+#include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/future_fwd.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -33,7 +33,7 @@
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     using thread_termination_handler_type =
-        util::function_nonser<void(std::exception_ptr const& e)>;
+        hpx::function<void(std::exception_ptr const& e)>;
     HPX_CORE_EXPORT void set_thread_termination_handler(
         thread_termination_handler_type f);
 
@@ -56,7 +56,7 @@ namespace hpx {
             auto thrd_data = threads::get_self_id_data();
             HPX_ASSERT(thrd_data);
             start_thread(thrd_data->get_scheduler_base()->get_parent_pool(),
-                util::deferred_call(std::forward<F>(f)));
+                util::deferred_call(HPX_FORWARD(F, f)));
         }
 
         template <typename F, typename... Ts>
@@ -65,22 +65,20 @@ namespace hpx {
             auto thrd_data = threads::get_self_id_data();
             HPX_ASSERT(thrd_data);
             start_thread(thrd_data->get_scheduler_base()->get_parent_pool(),
-                util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(vs)...));
+                util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...));
         }
 
         template <typename F>
         thread(threads::thread_pool_base* pool, F&& f)
         {
-            start_thread(pool, util::deferred_call(std::forward<F>(f)));
+            start_thread(pool, util::deferred_call(HPX_FORWARD(F, f)));
         }
 
         template <typename F, typename... Ts>
         thread(threads::thread_pool_base* pool, F&& f, Ts&&... vs)
         {
             start_thread(pool,
-                util::deferred_call(
-                    std::forward<F>(f), std::forward<Ts>(vs)...));
+                util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...));
         }
 
         ~thread();
@@ -111,7 +109,7 @@ namespace hpx {
             return id_.noref();
         }
 
-        HPX_NODISCARD static unsigned int hardware_concurrency() noexcept;
+        [[nodiscard]] static unsigned int hardware_concurrency() noexcept;
 
         // extensions
         void interrupt(bool flag = true);
@@ -119,7 +117,7 @@ namespace hpx {
 
         static void interrupt(id, bool flag = true);
 
-        lcos::future<void> get_future(error_code& ec = throws);
+        hpx::future<void> get_future(error_code& ec = throws);
 
         std::size_t get_thread_data() const;
         std::size_t set_thread_data(std::size_t);
@@ -143,9 +141,9 @@ namespace hpx {
             id_ = threads::invalid_thread_id;
         }
         void start_thread(threads::thread_pool_base* pool,
-            util::unique_function_nonser<void()>&& func);
+            hpx::move_only_function<void()>&& func);
         static threads::thread_result_type thread_function_nullary(
-            util::unique_function_nonser<void()> const& func);
+            hpx::move_only_function<void()> const& func);
 
         mutable mutex_type mtx_;
         threads::thread_id_ref_type id_;
@@ -189,7 +187,7 @@ namespace hpx {
         {
         }
         explicit id(threads::thread_id_type&& i) noexcept
-          : id_(std::move(i))
+          : id_(HPX_MOVE(i))
         {
         }
 
@@ -198,7 +196,7 @@ namespace hpx {
         {
         }
         explicit id(threads::thread_id_ref_type&& i) noexcept
-          : id_(std::move(i).get().get())
+          : id_(HPX_MOVE(i).get().get())
         {
         }
 

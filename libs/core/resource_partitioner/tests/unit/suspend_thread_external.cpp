@@ -6,6 +6,7 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
+#include <hpx/assert.hpp>
 #include <hpx/local/chrono.hpp>
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
@@ -23,11 +24,14 @@
 #include <utility>
 #include <vector>
 
+std::size_t const max_threads = (std::min)(
+    std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
+
 int hpx_main()
 {
     std::size_t const num_threads = hpx::resource::get_num_threads("worker");
 
-    HPX_TEST_EQ(std::size_t(3), num_threads);
+    HPX_TEST_EQ(std::size_t(max_threads - 1), num_threads);
 
     hpx::threads::thread_pool_base& tp =
         hpx::resource::get_thread_pool("worker");
@@ -71,21 +75,25 @@ int hpx_main()
 
             fs.clear();
 
-            // Launching 4 (i.e. same as number of threads) tasks may deadlock
+            // Launching the same number of tasks as worker threads may deadlock
             // as no thread is available to steal from the current thread.
-            fs.push_back(hpx::threads::suspend_processing_unit(tp, thread_num));
-            fs.push_back(hpx::threads::suspend_processing_unit(tp, thread_num));
-            fs.push_back(hpx::threads::suspend_processing_unit(tp, thread_num));
+            for (std::size_t i = 0; i < max_threads - 1; ++i)
+            {
+                fs.push_back(
+                    hpx::threads::suspend_processing_unit(tp, thread_num));
+            }
 
             hpx::wait_all(fs);
 
             fs.clear();
 
-            // Launching 4 (i.e. same as number of threads) tasks may deadlock
+            // Launching the same number of tasks as worker threads may deadlock
             // as no thread is available to steal from the current thread.
-            fs.push_back(hpx::threads::resume_processing_unit(tp, thread_num));
-            fs.push_back(hpx::threads::resume_processing_unit(tp, thread_num));
-            fs.push_back(hpx::threads::resume_processing_unit(tp, thread_num));
+            for (std::size_t i = 0; i < max_threads - 1; ++i)
+            {
+                fs.push_back(
+                    hpx::threads::resume_processing_unit(tp, thread_num));
+            }
 
             hpx::wait_all(fs);
         }
@@ -122,11 +130,13 @@ int hpx_main()
             }
             else
             {
-                hpx::threads::resume_processing_unit(tp, thread_num - 1).get();
+                hpx::threads::resume_processing_unit(tp, thread_num).get();
 
-                --thread_num;
-
-                if (thread_num == 0)
+                if (thread_num > 0)
+                {
+                    --thread_num;
+                }
+                else
                 {
                     up = true;
                 }
@@ -151,16 +161,15 @@ void test_scheduler(
 {
     hpx::local::init_params init_args;
 
-    init_args.cfg = {"hpx.os_threads=4"};
+    init_args.cfg = {"hpx.os_threads=" + std::to_string(max_threads)};
     init_args.rp_callback = [scheduler](auto& rp,
                                 hpx::program_options::variables_map const&) {
         rp.create_thread_pool("worker", scheduler,
-            hpx::threads::policies::scheduler_mode(
-                hpx::threads::policies::default_mode |
-                hpx::threads::policies::enable_elasticity));
+            hpx::threads::policies::scheduler_mode::default_ |
+                hpx::threads::policies::scheduler_mode::enable_elasticity);
 
-        int const worker_pool_threads = 3;
-        int worker_pool_threads_added = 0;
+        std::size_t const worker_pool_threads = max_threads - 1;
+        std::size_t worker_pool_threads_added = 0;
 
         for (hpx::resource::numa_domain const& d : rp.numa_domains())
         {
@@ -183,13 +192,13 @@ void test_scheduler(
 
 int main(int argc, char* argv[])
 {
+    HPX_ASSERT(max_threads >= 2);
+
     std::vector<hpx::resource::scheduling_policy> schedulers = {
         hpx::resource::scheduling_policy::local,
         hpx::resource::scheduling_policy::local_priority_fifo,
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         hpx::resource::scheduling_policy::local_priority_lifo,
-#endif
-#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         hpx::resource::scheduling_policy::abp_priority_fifo,
         hpx::resource::scheduling_policy::abp_priority_lifo,
 #endif

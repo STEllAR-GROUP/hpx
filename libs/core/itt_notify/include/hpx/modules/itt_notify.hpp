@@ -175,26 +175,18 @@ namespace hpx { namespace util { namespace itt {
 
     struct stack_context
     {
-        stack_context()
-          : itt_context_(nullptr)
-        {
-            HPX_ITT_STACK_CREATE(itt_context_);
-        }
-        ~stack_context()
-        {
-            if (itt_context_)
-                HPX_ITT_STACK_DESTROY(itt_context_);
-        }
+        HPX_CORE_EXPORT stack_context();
+        HPX_CORE_EXPORT ~stack_context();
 
         stack_context(stack_context const& rhs) = delete;
-        stack_context(stack_context&& rhs)
+        stack_context(stack_context&& rhs) noexcept
           : itt_context_(rhs.itt_context_)
         {
             rhs.itt_context_ = nullptr;
         }
 
         stack_context& operator=(stack_context const& rhs) = delete;
-        stack_context& operator=(stack_context&& rhs)
+        stack_context& operator=(stack_context&& rhs) noexcept
         {
             if (this != &rhs)
             {
@@ -204,20 +196,13 @@ namespace hpx { namespace util { namespace itt {
             return *this;
         }
 
-        struct ___itt_caller* itt_context_;
+        struct ___itt_caller* itt_context_ = nullptr;
     };
 
     struct caller_context
     {
-        caller_context(stack_context& ctx)
-          : ctx_(ctx)
-        {
-            HPX_ITT_STACK_CALLEE_ENTER(ctx_.itt_context_);
-        }
-        ~caller_context()
-        {
-            HPX_ITT_STACK_CALLEE_LEAVE(ctx_.itt_context_);
-        }
+        HPX_CORE_EXPORT caller_context(stack_context& ctx);
+        HPX_CORE_EXPORT ~caller_context();
 
         stack_context& ctx_;
     };
@@ -227,10 +212,10 @@ namespace hpx { namespace util { namespace itt {
     {
         HPX_NON_COPYABLE(domain);
 
+        domain() = default;
         HPX_CORE_EXPORT domain(char const*) noexcept;
-        HPX_CORE_EXPORT domain() noexcept;
 
-        ___itt_domain* domain_;
+        ___itt_domain* domain_ = nullptr;
     };
 
     struct thread_domain : domain
@@ -242,15 +227,9 @@ namespace hpx { namespace util { namespace itt {
 
     struct id
     {
-        id(domain const& domain, void* addr, unsigned long extra = 0) noexcept
-        {
-            id_ = HPX_ITT_MAKE_ID(addr, extra);
-            HPX_ITT_ID_CREATE(domain.domain_, id_);
-        }
-        ~id()
-        {
-            HPX_ITT_ID_DESTROY(id_);
-        }
+        HPX_CORE_EXPORT id(
+            domain const& domain, void* addr, unsigned long extra = 0) noexcept;
+        HPX_CORE_EXPORT ~id();
 
         id(id const& rhs) = delete;
         id(id&& rhs) noexcept
@@ -270,39 +249,24 @@ namespace hpx { namespace util { namespace itt {
             return *this;
         }
 
-        ___itt_id* id_;
+        ___itt_id* id_ = nullptr;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     struct frame_context
     {
-        frame_context(domain const& domain, id* ident = nullptr) noexcept
-          : domain_(domain)
-          , ident_(ident)
-        {
-            HPX_ITT_FRAME_BEGIN(
-                domain_.domain_, ident_ ? ident_->id_ : nullptr);
-        }
-        ~frame_context()
-        {
-            HPX_ITT_FRAME_END(domain_.domain_, ident_ ? ident_->id_ : nullptr);
-        }
+        HPX_CORE_EXPORT frame_context(
+            domain const& domain, id* ident = nullptr) noexcept;
+        HPX_CORE_EXPORT ~frame_context();
 
         domain const& domain_;
-        id* ident_;
+        id* ident_ = nullptr;
     };
 
     struct undo_frame_context
     {
-        undo_frame_context(frame_context& frame) noexcept
-          : frame_(frame)
-        {
-            HPX_ITT_FRAME_END(frame_.domain_.domain_, nullptr);
-        }
-        ~undo_frame_context()
-        {
-            HPX_ITT_FRAME_BEGIN(frame_.domain_.domain_, nullptr);
-        }
+        HPX_CORE_EXPORT undo_frame_context(frame_context& frame) noexcept;
+        HPX_CORE_EXPORT ~undo_frame_context();
 
         frame_context& frame_;
     };
@@ -310,32 +274,17 @@ namespace hpx { namespace util { namespace itt {
     ///////////////////////////////////////////////////////////////////////////
     struct mark_context
     {
-        mark_context(char const* name) noexcept
-          : itt_mark_(0)
-          , name_(name)
-        {
-            HPX_ITT_MARK_CREATE(itt_mark_, name);
-        }
-        ~mark_context()
-        {
-            HPX_ITT_MARK_OFF(itt_mark_);
-        }
+        HPX_CORE_EXPORT mark_context(char const* name) noexcept;
+        HPX_CORE_EXPORT ~mark_context();
 
         int itt_mark_;
-        char const* name_;
+        char const* name_ = nullptr;
     };
 
     struct undo_mark_context
     {
-        undo_mark_context(mark_context& mark) noexcept
-          : mark_(mark)
-        {
-            HPX_ITT_MARK_OFF(mark_.itt_mark_);
-        }
-        ~undo_mark_context()
-        {
-            HPX_ITT_MARK_CREATE(mark_.itt_mark_, mark_.name_);
-        }
+        HPX_CORE_EXPORT undo_mark_context(mark_context& mark) noexcept;
+        HPX_CORE_EXPORT ~undo_mark_context();
 
         mark_context& mark_;
     };
@@ -343,17 +292,31 @@ namespace hpx { namespace util { namespace itt {
     ///////////////////////////////////////////////////////////////////////////
     struct string_handle
     {
-        string_handle() noexcept
-          : handle_(nullptr)
-        {
-        }
-        string_handle(char const* s) noexcept
-          : handle_(s == nullptr ? nullptr : HPX_ITT_STRING_HANDLE_CREATE(s))
-        {
-        }
+        string_handle() noexcept = default;
+
+        HPX_CORE_EXPORT string_handle(char const* s) noexcept;
+
         string_handle(___itt_string_handle* h) noexcept
           : handle_(h)
         {
+        }
+
+        string_handle(string_handle const&) = default;
+        string_handle(string_handle&& rhs)
+          : handle_(rhs.handle_)
+        {
+            rhs.handle_ = nullptr;
+        }
+
+        string_handle& operator=(string_handle const&) = default;
+        string_handle& operator=(string_handle&& rhs) noexcept
+        {
+            if (this != &rhs)
+            {
+                handle_ = rhs.handle_;
+                rhs.handle_ = nullptr;
+            }
+            return *this;
         }
 
         string_handle& operator=(___itt_string_handle* h) noexcept
@@ -362,12 +325,12 @@ namespace hpx { namespace util { namespace itt {
             return *this;
         }
 
-        explicit operator bool() const noexcept
+        explicit constexpr operator bool() const noexcept
         {
             return handle_ != nullptr;
         }
 
-        ___itt_string_handle* handle_;
+        ___itt_string_handle* handle_ = nullptr;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -378,52 +341,39 @@ namespace hpx { namespace util { namespace itt {
         HPX_CORE_EXPORT task(domain const&, string_handle const&) noexcept;
         HPX_CORE_EXPORT ~task();
 
-        void add_metadata(string_handle const& name, std::uint64_t val) noexcept
-        {
-            HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_, val);
-        }
-        void add_metadata(string_handle const& name, double val) noexcept
-        {
-            HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_, val);
-        }
-        void add_metadata(string_handle const& name, char const* val) noexcept
-        {
-            HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_, val);
-        }
+        HPX_CORE_EXPORT void add_metadata(
+            string_handle const& name, std::uint64_t val) noexcept;
+        HPX_CORE_EXPORT void add_metadata(
+            string_handle const& name, double val) noexcept;
+        HPX_CORE_EXPORT void add_metadata(
+            string_handle const& name, char const* val) noexcept;
+        HPX_CORE_EXPORT void add_metadata(
+            string_handle const& name, void const* val) noexcept;
+
         template <typename T>
         void add_metadata(string_handle const& name, T const& val) noexcept
         {
-            HPX_ITT_METADATA_ADD(domain_.domain_, id_, name.handle_,
-                static_cast<void const*>(&val));
+            add_metadata(name, static_cast<void const*>(&val));
         }
 
         domain const& domain_;
-        ___itt_id* id_;
+        ___itt_id* id_ = nullptr;
         string_handle sh_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     struct heap_function
     {
-        heap_function(char const* name, char const* domain) noexcept
-          : heap_function_(HPX_ITT_HEAP_FUNCTION_CREATE(name, domain))
-        {
-        }
+        HPX_CORE_EXPORT heap_function(
+            char const* name, char const* domain) noexcept;
 
-        __itt_heap_function heap_function_;
+        __itt_heap_function heap_function_ = nullptr;
     };
 
     struct heap_internal_access
     {
-        heap_internal_access() noexcept
-        {
-            HPX_ITT_HEAP_INTERNAL_ACCESS_BEGIN();
-        }
-
-        ~heap_internal_access()
-        {
-            HPX_ITT_HEAP_INTERNAL_ACCESS_END();
-        }
+        HPX_CORE_EXPORT heap_internal_access() noexcept;
+        HPX_CORE_EXPORT ~heap_internal_access();
     };
 
     struct heap_allocate
@@ -436,14 +386,20 @@ namespace hpx { namespace util { namespace itt {
           , size_(size)
           , init_(init)
         {
-            HPX_ITT_HEAP_ALLOCATE_BEGIN(
-                heap_function_.heap_function_, size_, init_);
+            if (use_ittnotify_api)
+            {
+                HPX_ITT_HEAP_ALLOCATE_BEGIN(
+                    heap_function_.heap_function_, size_, init_);
+            }
         }
 
         ~heap_allocate()
         {
-            HPX_ITT_HEAP_ALLOCATE_END(
-                heap_function_.heap_function_, addr_, size_, init_);
+            if (use_ittnotify_api)
+            {
+                HPX_ITT_HEAP_ALLOCATE_END(
+                    heap_function_.heap_function_, addr_, size_, init_);
+            }
         }
 
     private:
@@ -455,17 +411,9 @@ namespace hpx { namespace util { namespace itt {
 
     struct heap_free
     {
-        heap_free(heap_function& heap_function, void* addr) noexcept
-          : heap_function_(heap_function)
-          , addr_(addr)
-        {
-            HPX_ITT_HEAP_FREE_BEGIN(heap_function_.heap_function_, addr_);
-        }
-
-        ~heap_free()
-        {
-            HPX_ITT_HEAP_FREE_END(heap_function_.heap_function_, addr_);
-        }
+        HPX_CORE_EXPORT heap_free(
+            heap_function& heap_function, void* addr) noexcept;
+        HPX_CORE_EXPORT ~heap_free();
 
     private:
         heap_function& heap_function_;
@@ -475,24 +423,15 @@ namespace hpx { namespace util { namespace itt {
     ///////////////////////////////////////////////////////////////////////////
     struct counter
     {
-        counter(char const* name, char const* domain) noexcept
-          : id_(HPX_ITT_COUNTER_CREATE(name, domain))
-        {
-        }
-        counter(char const* name, char const* domain, int type) noexcept
-          : id_(HPX_ITT_COUNTER_CREATE_TYPED(name, domain, type))
-        {
-        }
-        ~counter()
-        {
-            if (id_)
-                HPX_ITT_COUNTER_DESTROY(id_);
-        }
+        HPX_CORE_EXPORT counter(char const* name, char const* domain) noexcept;
+        HPX_CORE_EXPORT counter(
+            char const* name, char const* domain, int type) noexcept;
+        HPX_CORE_EXPORT ~counter();
 
         template <typename T>
         void set_value(T const& value) noexcept
         {
-            if (id_)
+            if (use_ittnotify_api && id_)
             {
                 HPX_ITT_COUNTER_SET_VALUE(
                     id_, const_cast<void*>(static_cast<const void*>(&value)));
@@ -518,7 +457,7 @@ namespace hpx { namespace util { namespace itt {
         }
 
     private:
-        ___itt_counter* id_;
+        ___itt_counter* id_ = nullptr;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -540,7 +479,7 @@ namespace hpx { namespace util { namespace itt {
         }
 
     private:
-        int event_;
+        int event_ = 0;
     };
 
     struct mark_event

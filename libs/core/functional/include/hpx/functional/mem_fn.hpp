@@ -32,7 +32,7 @@ namespace hpx { namespace util {
             constexpr typename util::invoke_result<MemberPointer, Ts...>::type
             operator()(Ts&&... vs) const
             {
-                return HPX_INVOKE(_pm, std::forward<Ts>(vs)...);
+                return HPX_INVOKE(_pm, HPX_FORWARD(Ts, vs)...);
             }
 
             MemberPointer _pm;

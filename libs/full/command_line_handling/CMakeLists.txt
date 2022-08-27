@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2021 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,6 +24,17 @@ set(command_line_handling_sources
     parse_command_line.cpp
 )
 
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
+  include(HPX_SetupMPI)
+  hpx_setup_mpi()
+  set(additional_dependencies ${additional_dependencies} Mpi::mpi)
+endif()
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
+  include(HPX_SetupLCI)
+  hpx_setup_lci()
+  set(additional_dependencies ${additional_dependencies} Mpi::mpi LCI::LCI)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   full command_line_handling
@@ -31,6 +42,6 @@ add_hpx_module(
   SOURCES ${command_line_handling_sources}
   HEADERS ${command_line_handling_headers}
   COMPAT_HEADERS ${command_line_handling_compat_headers}
-  DEPENDENCIES hpx_core
+  DEPENDENCIES hpx_core ${additional_dependencies}
   CMAKE_SUBDIRS tests
 )

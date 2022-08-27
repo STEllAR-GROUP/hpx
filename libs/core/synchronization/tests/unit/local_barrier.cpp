@@ -14,6 +14,7 @@
 #include <atomic>
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -25,7 +26,7 @@ using hpx::threads::make_thread_function_nullary;
 using hpx::threads::register_work;
 using hpx::threads::thread_init_data;
 
-using hpx::lcos::local::barrier;
+using hpx::barrier;
 
 using hpx::local::finalize;
 using hpx::local::init;
@@ -33,20 +34,21 @@ using hpx::local::init;
 using hpx::util::report_errors;
 
 ///////////////////////////////////////////////////////////////////////////////
-void local_barrier_test(barrier& b, std::atomic<std::size_t>& c)
+void local_barrier_test(
+    std::shared_ptr<hpx::barrier<>> b, std::atomic<std::size_t>& c)
 {
     ++c;
     // wait for all threads to enter the barrier
-    b.wait();
+    b->arrive_and_wait();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(variables_map& vm)
 {
-    std::size_t pxthreads = 0;
+    std::size_t threads = 0;
 
-    if (vm.count("pxthreads"))
-        pxthreads = vm["pxthreads"].as<std::size_t>();
+    if (vm.count("threads"))
+        threads = vm["threads"].as<std::size_t>();
 
     std::size_t iterations = 0;
 
@@ -56,22 +58,24 @@ int hpx_main(variables_map& vm)
     for (std::size_t i = 0; i < iterations; ++i)
     {
         // create a barrier waiting on 'count' threads
-        barrier b(pxthreads + 1);
+        std::shared_ptr<hpx::barrier<>> b =
+            std::make_shared<hpx::barrier<>>(threads + 1);
 
         std::atomic<std::size_t> c(0);
 
         // create the threads which will wait on the barrier
-        for (std::size_t i = 0; i < pxthreads; ++i)
+        for (std::size_t i = 0; i < threads; ++i)
         {
             thread_init_data data(
-                make_thread_function_nullary(hpx::util::bind(
-                    &local_barrier_test, std::ref(b), std::ref(c))),
+                make_thread_function_nullary(
+                    hpx::bind(&local_barrier_test, std::ref(b), std::ref(c))),
                 "local_barrier_test");
             register_work(data);
         }
 
-        b.wait();    // wait for all threads to enter the barrier
-        HPX_TEST_EQ(pxthreads, c);
+        // wait for all threads to enter the barrier
+        b->arrive_and_wait();
+        HPX_TEST_EQ(threads, c);
     }
 
     // initiate shutdown of the runtime system
@@ -86,7 +90,7 @@ int main(int argc, char* argv[])
     options_description desc_commandline(
         "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()("pxthreads,T",
+    desc_commandline.add_options()("threads,T",
         value<std::size_t>()->default_value(64),
         "the number of PX threads to invoke")("iterations",
         value<std::size_t>()->default_value(64),

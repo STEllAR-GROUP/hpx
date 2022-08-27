@@ -25,15 +25,15 @@ namespace hpx { namespace components { namespace detail {
         using base_type = util::one_size_heap_list;
         using value_type = typename Heap::value_type;
 
-        using storage_type = typename std::aligned_storage<sizeof(value_type),
-            std::alignment_of<value_type>::value>::type;
+        using storage_type = std::aligned_storage_t<sizeof(value_type),
+            std::alignment_of<value_type>::value>;
 
         enum
         {
             // default initial number of elements
             heap_capacity = 0xFFF,
             // Alignment of one element
-            heap_element_alignment = std::alignment_of<value_type>::value,
+            heap_element_alignment = std::alignment_of_v<value_type>,
             // size of one element in the heap
             heap_element_size = sizeof(storage_type)
         };
@@ -52,7 +52,7 @@ namespace hpx { namespace components { namespace detail {
 
         naming::gid_type get_gid(void* p)
         {
-            typename base_type::unique_lock_type guard(this->mtx_);
+            std::unique_lock guard(this->mtx_);
 
             using iterator = typename base_type::const_iterator;
 
@@ -61,8 +61,7 @@ namespace hpx { namespace components { namespace detail {
             {
                 if ((*it)->did_alloc(p))
                 {
-                    util::unlock_guard<typename base_type::unique_lock_type> ul(
-                        guard);
+                    util::unlock_guard ul(guard);
                     return (*it)->get_gid(id_range_, p, type_);
                 }
             }
@@ -72,7 +71,7 @@ namespace hpx { namespace components { namespace detail {
         void set_range(
             naming::gid_type const& lower, naming::gid_type const& upper)
         {
-            typename base_type::unique_lock_type guard(this->mtx_);
+            std::scoped_lock guard(this->mtx_);
             id_range_.set_range(lower, upper);
         }
 

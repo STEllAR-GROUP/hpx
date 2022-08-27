@@ -14,12 +14,12 @@ functional
 This module provides function wrappers and helpers for managing functions and
 their arguments.
 
-* :cpp:class:`hpx::util::function`
-* :cpp:class:`hpx::util::function_ref`
-* :cpp:class:`hpx::util::unique_function`
-* :cpp:func:`hpx::util::bind`
-* :cpp:func:`hpx::util::bind_back`
-* :cpp:func:`hpx::util::bind_front`
+* :cpp:class:`hpx::function`
+* :cpp:class:`hpx::function_ref_`
+* :cpp:class:`hpx::move_only_function`
+* :cpp:func:`hpx::bind`
+* :cpp:func:`hpx::bind_back`
+* :cpp:func:`hpx::bind_front`
 * :cpp:func:`hpx::util::deferred_call`
 * :cpp:func:`hpx::util::invoke`
 * :cpp:func:`hpx::util::invoke_fused`
@@ -27,6 +27,11 @@ their arguments.
 * :cpp:func:`hpx::util::one_shot`
 * :cpp:func:`hpx::util::protect`
 * :cpp:class:`hpx::util::result_of`
+
+* :cpp:var:`hpx::placeholders::_1`
+* :cpp:var:`hpx::placeholders::_2`
+* ...
+* :cpp:var:`hpx::placeholders::_9`
 
 See the :ref:`API reference <modules_functional_api>` of the module for more
 details.

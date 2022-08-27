@@ -16,7 +16,7 @@ void thrower()
 {
     throw std::exception();
 }
-HPX_PLAIN_ACTION(thrower, thrower_action);
+HPX_PLAIN_ACTION(thrower, thrower_action)
 
 int main()
 {

@@ -25,20 +25,20 @@ void null_thread()
 {
     null_action_executed = true;
 }
-HPX_PLAIN_ACTION(null_thread, null_action);
+HPX_PLAIN_ACTION(null_thread, null_action)
 
 int int_thread()
 {
     int_action_executed = true;
     return 42;
 }
-HPX_PLAIN_ACTION(int_thread, int_action);
+HPX_PLAIN_ACTION(int_thread, int_action)
 
 hpx::id_type get_locality()
 {
     return hpx::find_here();
 }
-HPX_PLAIN_ACTION(get_locality, get_locality_action);
+HPX_PLAIN_ACTION(get_locality, get_locality_action)
 
 int main()
 {

@@ -84,5 +84,5 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_allocator_v = is_allocator<T>::value;
+    inline constexpr bool is_allocator_v = is_allocator<T>::value;
 }}    // namespace hpx::traits

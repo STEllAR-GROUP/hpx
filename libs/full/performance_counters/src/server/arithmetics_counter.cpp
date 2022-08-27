@@ -70,6 +70,9 @@ namespace hpx { namespace performance_counters { namespace server {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Operation>
+    arithmetics_counter<Operation>::arithmetics_counter() = default;
+
+    template <typename Operation>
     arithmetics_counter<Operation>::arithmetics_counter(
         counter_info const& info,
         std::vector<std::string> const& base_counter_names)
@@ -149,6 +152,22 @@ namespace hpx { namespace performance_counters { namespace server {
     void arithmetics_counter<Operation>::reset_counter_value()
     {
         counters_.reset(hpx::launch::sync);
+    }
+
+    template <typename Operation>
+    void arithmetics_counter<Operation>::finalize()
+    {
+        base_performance_counter::finalize();
+        base_type::finalize();
+    }
+
+    template <typename Operation>
+    naming::address arithmetics_counter<Operation>::get_current_address() const
+    {
+        return naming::address(
+            naming::get_gid_from_locality_id(agas::get_locality_id()),
+            components::get_component_type<arithmetics_counter>(),
+            const_cast<arithmetics_counter*>(this));
     }
 }}}    // namespace hpx::performance_counters::server
 

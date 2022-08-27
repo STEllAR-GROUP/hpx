@@ -136,7 +136,7 @@ void test_for_each_exception_seq(IteratorTag, Proj&& proj)
 
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_exception = true;
     }

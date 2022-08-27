@@ -13,6 +13,7 @@
 #include <utility>
 
 namespace hpx { namespace traits {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator, typename Enable = void>
     struct segmented_iterator_traits
@@ -50,12 +51,12 @@ namespace hpx { namespace traits {
 
         static local_raw_iterator local(local_iterator&& it)
         {
-            return std::move(it);
+            return HPX_MOVE(it);
         }
 
         static local_iterator remote(local_raw_iterator&& it)
         {
-            return std::move(it);
+            return HPX_MOVE(it);
         }
     };
 

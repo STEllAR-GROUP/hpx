@@ -18,3 +18,6 @@ packages
 .ccls-cache
 .clangd
 /out
+.vs
+.idea
+cmake-build*

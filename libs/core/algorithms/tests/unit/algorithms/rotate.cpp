@@ -169,7 +169,7 @@ void test_rotate_exception(IteratorTag)
             decorated_iterator(mid), decorated_iterator(std::end(c)));
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_exception = true;
     }

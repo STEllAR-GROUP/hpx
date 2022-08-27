@@ -21,7 +21,7 @@
 
 #include <hpx/functional/bind.hpp>
 
-namespace placeholders = hpx::util::placeholders;
+namespace placeholders = hpx::placeholders;
 
 #include <iostream>
 #include <memory>
@@ -55,7 +55,7 @@ int main()
 {
     Y y;
 
-    HPX_TEST_EQ(hpx::util::bind(&X::f, hpx::util::bind(&Y::f, &y))(), 42);
+    HPX_TEST_EQ(hpx::bind(&X::f, hpx::bind(&Y::f, &y))(), 42);
 
     return hpx::util::report_errors();
 }

@@ -31,7 +31,7 @@ namespace hpx { namespace test { namespace server {
         }
 
         HPX_DEFINE_COMPONENT_ACTION(
-            simple_mobile_object, get_lva, get_lva_action);
+            simple_mobile_object, get_lva, get_lva_action)
 
         // the tests using this object rely on rebind-able gids
         naming::gid_type get_base_gid(
@@ -45,6 +45,6 @@ namespace hpx { namespace test { namespace server {
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::test::server::simple_mobile_object::get_lva_action,
-    simple_mobile_object_get_lva_action);
+    simple_mobile_object_get_lva_action)
 
 #endif

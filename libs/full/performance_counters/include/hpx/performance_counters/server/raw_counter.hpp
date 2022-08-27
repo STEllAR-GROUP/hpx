@@ -26,27 +26,22 @@ namespace hpx { namespace performance_counters { namespace server {
         using type_holder = raw_counter;
         using base_type_holder = base_performance_counter;
 
-        raw_counter()
-          : reset_(false)
-        {
-        }
+        raw_counter();
 
-        raw_counter(counter_info const& info,
-            hpx::util::function_nonser<std::int64_t(bool)> f);
+        raw_counter(
+            counter_info const& info, hpx::function<std::int64_t(bool)> f);
 
         hpx::performance_counters::counter_value get_counter_value(
             bool reset = false) override;
         void reset_counter_value() override;
 
         // finalize() will be called just before the instance gets destructed
-        void finalize()
-        {
-            base_performance_counter::finalize();
-            base_type::finalize();
-        }
+        void finalize();
+
+        naming::address get_current_address() const;
 
     private:
-        hpx::util::function_nonser<std::int64_t(bool)> f_;
+        hpx::function<std::int64_t(bool)> f_;
         bool reset_;
     };
 }}}    // namespace hpx::performance_counters::server

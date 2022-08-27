@@ -39,11 +39,11 @@ namespace hpx { namespace lcos { namespace detail {
             [&]() {
                 traits::future_access<Future>::transfer_result(
                     traits::future_access<Future>::create(
-                        std::forward<SourceState>(src)),
+                        HPX_FORWARD(SourceState, src)),
                     *dest);
             },
             [&](std::exception_ptr ep) {
-                (*dest).set_exception(std::move(ep));
+                (*dest).set_exception(HPX_MOVE(ep));
             });
     }
 
@@ -53,8 +53,8 @@ namespace hpx { namespace lcos { namespace detail {
     {
         hpx::intrusive_ptr<Continuation> keep_alive(&cont);
         hpx::detail::try_catch_exception_ptr(
-            [&]() { cont.set_value(func(std::forward<Future>(future))); },
-            [&](std::exception_ptr ep) { cont.set_exception(std::move(ep)); });
+            [&]() { cont.set_value(func(HPX_FORWARD(Future, future))); },
+            [&](std::exception_ptr ep) { cont.set_exception(HPX_MOVE(ep)); });
     }
 
     template <typename Func, typename Future, typename Continuation>
@@ -64,10 +64,10 @@ namespace hpx { namespace lcos { namespace detail {
         hpx::intrusive_ptr<Continuation> keep_alive(&cont);
         hpx::detail::try_catch_exception_ptr(
             [&]() {
-                func(std::forward<Future>(future));
+                func(HPX_FORWARD(Future, future));
                 cont.set_value(util::unused);
             },
-            [&](std::exception_ptr ep) { cont.set_exception(std::move(ep)); });
+            [&](std::exception_ptr ep) { cont.set_exception(HPX_MOVE(ep)); });
     }
 
     template <typename Func, typename Future, typename Continuation>
@@ -77,9 +77,9 @@ namespace hpx { namespace lcos { namespace detail {
     {
         using is_void = std::is_void<util::invoke_result_t<Func, Future>>;
 
-        hpx::util::annotate_function annotate(func);
+        hpx::scoped_annotation annotate(func);
         invoke_continuation_nounwrap(
-            func, std::forward<Future>(future), cont, is_void());
+            func, HPX_FORWARD(Future, future), cont, is_void());
     }
 
     template <typename Func, typename Future, typename Continuation>
@@ -96,7 +96,7 @@ namespace hpx { namespace lcos { namespace detail {
                 // take by value, as the future may go away immediately
                 inner_shared_state_ptr inner_state =
                     traits::detail::get_shared_state(
-                        func(std::forward<Future>(future)));
+                        func(HPX_FORWARD(Future, future)));
                 typename inner_shared_state_ptr::element_type* ptr =
                     inner_state.get();
 
@@ -111,27 +111,14 @@ namespace hpx { namespace lcos { namespace detail {
                 hpx::intrusive_ptr<Continuation> cont_(&cont);
                 ptr->execute_deferred();
                 ptr->set_on_completed(
-                    [inner_state = std::move(inner_state),
-                        cont_ = std::move(cont_)]() mutable -> void {
+                    [inner_state = HPX_MOVE(inner_state),
+                        cont_ = HPX_MOVE(cont_)]() mutable -> void {
                         return transfer_result<inner_future>(
-                            std::move(inner_state), std::move(cont_));
+                            HPX_MOVE(inner_state), HPX_MOVE(cont_));
                     });
             },
-            [&](std::exception_ptr ep) { cont.set_exception(std::move(ep)); });
+            [&](std::exception_ptr ep) { cont.set_exception(HPX_MOVE(ep)); });
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename ContResult>
-    struct continuation_result
-    {
-        using type = ContResult;
-    };
-
-    template <typename ContResult>
-    struct continuation_result<future<ContResult>>
-    {
-        using type = ContResult;
-    };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename F, typename ContResult>
@@ -144,14 +131,16 @@ namespace hpx { namespace lcos { namespace detail {
         using result_type = typename base_type::result_type;
 
     protected:
+        using base_type::mtx_;
+
         threads::thread_id_type get_id() const
         {
-            std::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             return id_;
         }
         void set_id(threads::thread_id_type const& id)
         {
-            std::lock_guard<mutex_type> l(this->mtx_);
+            std::lock_guard<mutex_type> l(mtx_);
             id_ = id;
         }
 
@@ -180,7 +169,7 @@ namespace hpx { namespace lcos { namespace detail {
         continuation(Func&& f)
           : started_(false)
           , id_(threads::invalid_thread_id)
-          , f_(std::forward<Func>(f))
+          , f_(HPX_FORWARD(Func, f))
         {
         }
 
@@ -189,15 +178,15 @@ namespace hpx { namespace lcos { namespace detail {
           : base_type(no_addref)
           , started_(false)
           , id_(threads::invalid_thread_id)
-          , f_(std::forward<Func>(f))
+          , f_(HPX_FORWARD(Func, f))
         {
         }
 
     protected:
         void run_impl(traits::detail::shared_state_ptr_for_t<Future>&& f)
         {
-            Future future = traits::future_access<Future>::create(std::move(f));
-            invoke_continuation(f_, std::move(future), *this);
+            Future future = traits::future_access<Future>::create(HPX_MOVE(f));
+            invoke_continuation(f_, HPX_MOVE(future), *this);
         }
 
         void run_impl_nounwrap(
@@ -205,9 +194,9 @@ namespace hpx { namespace lcos { namespace detail {
         {
             using is_void = std::is_void<util::invoke_result_t<F, Future>>;
 
-            Future future = traits::future_access<Future>::create(std::move(f));
+            Future future = traits::future_access<Future>::create(HPX_MOVE(f));
             invoke_continuation_nounwrap(
-                f_, std::move(future), *this, is_void{});
+                f_, HPX_MOVE(future), *this, is_void{});
         }
 
     public:
@@ -215,7 +204,7 @@ namespace hpx { namespace lcos { namespace detail {
             error_code& ec = throws)
         {
             {
-                std::lock_guard<mutex_type> l(this->mtx_);
+                std::lock_guard<mutex_type> l(mtx_);
                 if (started_)
                 {
                     HPX_THROWS_IF(ec, task_already_started, "continuation::run",
@@ -225,7 +214,7 @@ namespace hpx { namespace lcos { namespace detail {
                 started_ = true;
             }
 
-            run_impl(std::move(f));
+            run_impl(HPX_MOVE(f));
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -235,7 +224,7 @@ namespace hpx { namespace lcos { namespace detail {
             error_code& ec = throws)
         {
             {
-                std::lock_guard<mutex_type> l(this->mtx_);
+                std::lock_guard<mutex_type> l(mtx_);
                 if (started_)
                 {
                     HPX_THROWS_IF(ec, task_already_started,
@@ -246,7 +235,7 @@ namespace hpx { namespace lcos { namespace detail {
                 started_ = true;
             }
 
-            run_impl_nounwrap(std::move(f));
+            run_impl_nounwrap(HPX_MOVE(f));
 
             if (&ec != &throws)
                 ec = make_success_code();
@@ -257,8 +246,8 @@ namespace hpx { namespace lcos { namespace detail {
         {
             reset_id r(*this);
 
-            Future future = traits::future_access<Future>::create(std::move(f));
-            invoke_continuation(f_, std::move(future), *this);
+            Future future = traits::future_access<Future>::create(HPX_MOVE(f));
+            invoke_continuation(f_, HPX_MOVE(future), *this);
         }
 
         void async_impl_nounwrap(
@@ -268,9 +257,9 @@ namespace hpx { namespace lcos { namespace detail {
 
             reset_id r(*this);
 
-            Future future = traits::future_access<Future>::create(std::move(f));
+            Future future = traits::future_access<Future>::create(HPX_MOVE(f));
             invoke_continuation_nounwrap(
-                f_, std::move(future), *this, is_void{});
+                f_, HPX_MOVE(future), *this, is_void{});
         }
 
     public:
@@ -295,8 +284,8 @@ namespace hpx { namespace lcos { namespace detail {
             hpx::intrusive_ptr<continuation> this_(this);
             hpx::util::thread_description desc(f_, "async");
             spawner(
-                [this_ = std::move(this_), f = std::move(f)]() mutable -> void {
-                    this_->async_impl(std::move(f));
+                [this_ = HPX_MOVE(this_), f = HPX_MOVE(f)]() mutable -> void {
+                    this_->async_impl(HPX_MOVE(f));
                 },
                 desc);
 
@@ -325,8 +314,8 @@ namespace hpx { namespace lcos { namespace detail {
             hpx::intrusive_ptr<continuation> this_(this);
             hpx::util::thread_description desc(f_, "async_nounwrap");
             spawner(
-                [this_ = std::move(this_), f = std::move(f)]() mutable -> void {
-                    this_->async_impl_nounwrap(std::move(f));
+                [this_ = HPX_MOVE(this_), f = HPX_MOVE(f)]() mutable -> void {
+                    this_->async_impl_nounwrap(HPX_MOVE(f));
                 },
                 desc);
 
@@ -336,7 +325,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
         // cancellation support
-        bool cancelable() const
+        bool cancelable() const noexcept
         {
             return true;
         }
@@ -375,7 +364,7 @@ namespace hpx { namespace lcos { namespace detail {
                 [&](std::exception_ptr ep) {
                     this->started_ = true;
                     this->set_exception(ep);
-                    std::rethrow_exception(std::move(ep));
+                    std::rethrow_exception(HPX_MOVE(ep));
                 });
         }
 
@@ -404,16 +393,16 @@ namespace hpx { namespace lcos { namespace detail {
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [this_ = std::move(this_), state = std::move(state),
-                    policy = std::forward<Policy>(policy),
+                [this_ = HPX_MOVE(this_), state = HPX_MOVE(state),
+                    policy = HPX_FORWARD(Policy, policy),
                     &spawner]() mutable -> void {
                     if (hpx::detail::has_async_policy(policy))
                     {
-                        this_->async(std::move(state), spawner);
+                        this_->async(HPX_MOVE(state), spawner);
                     }
                     else
                     {
-                        this_->run(std::move(state));
+                        this_->run(HPX_MOVE(state));
                     }
                 });
         }
@@ -440,16 +429,16 @@ namespace hpx { namespace lcos { namespace detail {
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [this_ = std::move(this_), state = std::move(state),
-                    policy = std::forward<Policy>(policy),
-                    spawner = std::move(spawner)]() mutable -> void {
+                [this_ = HPX_MOVE(this_), state = HPX_MOVE(state),
+                    policy = HPX_FORWARD(Policy, policy),
+                    spawner = HPX_MOVE(spawner)]() mutable -> void {
                     if (hpx::detail::has_async_policy(policy))
                     {
-                        this_->async(std::move(state), std::move(spawner));
+                        this_->async(HPX_MOVE(state), HPX_MOVE(spawner));
                     }
                     else
                     {
-                        this_->run(std::move(state));
+                        this_->run(HPX_MOVE(state));
                     }
                 });
         }
@@ -477,16 +466,16 @@ namespace hpx { namespace lcos { namespace detail {
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [this_ = std::move(this_), state = std::move(state),
-                    policy = std::forward<Policy>(policy),
+                [this_ = HPX_MOVE(this_), state = HPX_MOVE(state),
+                    policy = HPX_FORWARD(Policy, policy),
                     &spawner]() mutable -> void {
                     if (hpx::detail::has_async_policy(policy))
                     {
-                        this_->async_nounwrap(std::move(state), spawner);
+                        this_->async_nounwrap(HPX_MOVE(state), spawner);
                     }
                     else
                     {
-                        this_->run_nounwrap(std::move(state));
+                        this_->run_nounwrap(HPX_MOVE(state));
                     }
                 });
         }
@@ -513,17 +502,17 @@ namespace hpx { namespace lcos { namespace detail {
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [this_ = std::move(this_), state = std::move(state),
-                    policy = std::forward<Policy>(policy),
-                    spawner = std::move(spawner)]() mutable -> void {
+                [this_ = HPX_MOVE(this_), state = HPX_MOVE(state),
+                    policy = HPX_FORWARD(Policy, policy),
+                    spawner = HPX_MOVE(spawner)]() mutable -> void {
                     if (hpx::detail::has_async_policy(policy))
                     {
                         this_->async_nounwrap(
-                            std::move(state), std::move(spawner));
+                            HPX_MOVE(state), HPX_MOVE(spawner));
                     }
                     else
                     {
-                        this_->run_nounwrap(std::move(state));
+                        this_->run_nounwrap(HPX_MOVE(state));
                     }
                 });
         }
@@ -548,7 +537,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         template <typename Func>
         continuation_allocator(other_allocator const& alloc, Func&& f)
-          : base_type(std::forward<Func>(f))
+          : base_type(HPX_FORWARD(Func, f))
           , alloc_(alloc)
         {
         }
@@ -556,13 +545,13 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Func>
         continuation_allocator(
             init_no_addref no_addref, other_allocator const& alloc, Func&& f)
-          : base_type(no_addref, std::forward<Func>(f))
+          : base_type(no_addref, HPX_FORWARD(Func, f))
           , alloc_(alloc)
         {
         }
 
     private:
-        void destroy() override
+        void destroy() noexcept override
         {
             using traits = std::allocator_traits<other_allocator>;
 
@@ -597,7 +586,7 @@ namespace hpx { namespace lcos { namespace detail {
         void on_inner_ready(
             traits::detail::shared_state_ptr_for_t<Inner>&& inner_state)
         {
-            transfer_result<Inner>(std::move(inner_state), this);
+            transfer_result<Inner>(HPX_MOVE(inner_state), this);
         }
 
         template <typename Outer>
@@ -616,7 +605,7 @@ namespace hpx { namespace lcos { namespace detail {
                 [&]() {
                     // if we get here, this future is ready
                     Outer outer = traits::future_access<Outer>::create(
-                        std::move(outer_state));
+                        HPX_MOVE(outer_state));
 
                     // take by value, as the future will go away immediately
                     inner_shared_state_ptr inner_state =
@@ -633,15 +622,15 @@ namespace hpx { namespace lcos { namespace detail {
 
                     ptr->execute_deferred();
                     ptr->set_on_completed(
-                        [this_ = std::move(this_),
+                        [this_ = HPX_MOVE(this_),
                             inner_state =
-                                std::move(inner_state)]() mutable -> void {
+                                HPX_MOVE(inner_state)]() mutable -> void {
                             return this_->template on_inner_ready<inner_future>(
-                                std::move(inner_state));
+                                HPX_MOVE(inner_state));
                         });
                 },
                 [&](std::exception_ptr ep) {
-                    this->set_exception(std::move(ep));
+                    this->set_exception(HPX_MOVE(ep));
                 });
         }
 
@@ -679,10 +668,10 @@ namespace hpx { namespace lcos { namespace detail {
 
             ptr->execute_deferred();
             ptr->set_on_completed(
-                [this_ = std::move(this_),
-                    outer_state = std::move(outer_state)]() mutable -> void {
+                [this_ = HPX_MOVE(this_),
+                    outer_state = HPX_MOVE(outer_state)]() mutable -> void {
                     return this_->template on_outer_ready<Future>(
-                        std::move(outer_state));
+                        HPX_MOVE(outer_state));
                 });
         }
     };
@@ -711,7 +700,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
     private:
-        void destroy() override
+        void destroy() noexcept override
         {
             using traits = std::allocator_traits<other_allocator>;
 
@@ -736,15 +725,14 @@ namespace hpx { namespace traits { namespace detail {
 
 namespace hpx { namespace lcos { namespace detail {
     template <typename Allocator, typename Future>
-    inline traits::detail::shared_state_ptr_t<
-        typename future_unwrap_result<Future>::result_type>
+    inline traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>>
     unwrap_impl_alloc(Allocator const& a, Future&& future, error_code& /*ec*/)
     {
         using base_allocator = Allocator;
-        using result_type = typename future_unwrap_result<Future>::result_type;
+        using result_type = future_unwrap_result_t<Future>;
 
-        using shared_state = typename traits::detail::shared_state_allocator<
-            detail::unwrap_continuation<result_type>, base_allocator>::type;
+        using shared_state = traits::shared_state_allocator_t<
+            detail::unwrap_continuation<result_type>, base_allocator>;
 
         using other_allocator = typename std::allocator_traits<
             base_allocator>::template rebind_alloc<shared_state>;
@@ -765,32 +753,29 @@ namespace hpx { namespace lcos { namespace detail {
         hpx::traits::detail::shared_state_ptr_t<result_type> result(
             p.release(), false);
         static_cast<shared_state*>(result.get())
-            ->attach(std::forward<Future>(future));
+            ->attach(HPX_FORWARD(Future, future));
         return result;
     }
 
     template <typename Future>
-    inline traits::detail::shared_state_ptr_t<
-        typename future_unwrap_result<Future>::result_type>
+    inline traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>>
     unwrap_impl(Future&& future, error_code& ec)
     {
         return unwrap_impl_alloc(
-            util::internal_allocator<>{}, std::forward<Future>(future), ec);
+            util::internal_allocator<>{}, HPX_FORWARD(Future, future), ec);
     }
 
     template <typename Allocator, typename Future>
-    inline traits::detail::shared_state_ptr_t<
-        typename future_unwrap_result<Future>::result_type>
+    inline traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>>
     unwrap_alloc(Allocator const& a, Future&& future, error_code& ec)
     {
-        return unwrap_impl_alloc(a, std::forward<Future>(future), ec);
+        return unwrap_impl_alloc(a, HPX_FORWARD(Future, future), ec);
     }
 
     template <typename Future>
-    inline traits::detail::shared_state_ptr_t<
-        typename future_unwrap_result<Future>::result_type>
+    inline traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>>
     unwrap(Future&& future, error_code& ec)
     {
-        return unwrap_impl(std::forward<Future>(future), ec);
+        return unwrap_impl(HPX_FORWARD(Future, future), ec);
     }
 }}}    // namespace hpx::lcos::detail

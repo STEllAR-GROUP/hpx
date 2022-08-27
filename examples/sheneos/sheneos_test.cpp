@@ -6,8 +6,8 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
+#include <hpx/hpx_init.hpp>
 
 #include <cstddef>
 #include <cstdlib>
@@ -19,8 +19,8 @@
 
 #include "sheneos/interpolator.hpp"
 
-#include <boost/dynamic_bitset.hpp>
 #include <hpx/modules/program_options.hpp>
+#include <boost/dynamic_bitset.hpp>
 
 char const* const shen_symbolic_name = "/sheneos/interpolator_test";
 
@@ -54,7 +54,8 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     std::vector<double> values_ye(num_ye_points);
     std::vector<std::size_t> sequence_ye(num_ye_points);
     double ye = min_ye;
-    for (std::size_t i = 0; i < num_ye_points; ++i) {
+    for (std::size_t i = 0; i < num_ye_points; ++i)
+    {
         values_ye[i] = ye;
         sequence_ye[i] = i;
         ye += delta_ye;
@@ -63,7 +64,8 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     std::vector<double> values_temp(num_temp_points);
     std::vector<std::size_t> sequence_temp(num_temp_points);
     double temp = min_temp;
-    for (std::size_t i = 0; i < num_temp_points; ++i) {
+    for (std::size_t i = 0; i < num_temp_points; ++i)
+    {
         values_temp[i] = temp;
         sequence_temp[i] = i;
         temp += delta_temp;
@@ -72,7 +74,8 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     std::vector<double> values_rho(num_rho_points);
     std::vector<std::size_t> sequence_rho(num_rho_points);
     double rho = min_rho;
-    for (std::size_t i = 0; i < num_rho_points; ++i) {
+    for (std::size_t i = 0; i < num_rho_points; ++i)
+    {
         values_rho[i] = rho;
         sequence_rho[i] = i;
         rho += delta_rho;
@@ -89,7 +92,7 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
     std::random_shuffle(sequence_rho.begin(), sequence_rho.end());
 
     // Create the three-dimensional future grid.
-    std::vector<hpx::lcos::future<std::vector<double> > > tests;
+    std::vector<hpx::future<std::vector<double>>> tests;
     for (std::size_t const& ii : sequence_ye)
     {
         for (std::size_t const& jj : sequence_temp)
@@ -107,7 +110,7 @@ void test_sheneos(std::size_t num_ye_points, std::size_t num_temp_points,
 
 HPX_DECLARE_ACTION(test_sheneos, test_action);
 HPX_ACTION_USES_MEDIUM_STACK(test_action);
-HPX_PLAIN_ACTION(test_sheneos, test_action);
+HPX_PLAIN_ACTION(test_sheneos, test_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the test function. It will be invoked on all localities that the
@@ -139,7 +142,8 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
     std::vector<double> values_ye(num_ye_points);
     std::vector<std::size_t> sequence_ye(num_ye_points);
     double ye = min_ye;
-    for (std::size_t i = 0; i < num_ye_points; ++i) {
+    for (std::size_t i = 0; i < num_ye_points; ++i)
+    {
         values_ye[i] = ye;
         sequence_ye[i] = i;
         ye += delta_ye;
@@ -148,7 +152,8 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
     std::vector<double> values_temp(num_temp_points);
     std::vector<std::size_t> sequence_temp(num_temp_points);
     double temp = min_temp;
-    for (std::size_t i = 0; i < num_temp_points; ++i) {
+    for (std::size_t i = 0; i < num_temp_points; ++i)
+    {
         values_temp[i] = temp;
         sequence_temp[i] = i;
         temp += delta_temp;
@@ -157,7 +162,8 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
     std::vector<double> values_rho(num_rho_points);
     std::vector<std::size_t> sequence_rho(num_rho_points);
     double rho = min_rho;
-    for (std::size_t i = 0; i < num_rho_points; ++i) {
+    for (std::size_t i = 0; i < num_rho_points; ++i)
+    {
         values_rho[i] = rho;
         sequence_rho[i] = i;
         rho += delta_rho;
@@ -177,7 +183,7 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
     std::vector<sheneos::sheneos_coord> values;
     values.reserve(num_ye_points * num_temp_points * num_rho_points);
 
-    std::vector<hpx::lcos::future<std::vector<double> > > tests;
+    std::vector<hpx::future<std::vector<double>>> tests;
     for (std::size_t const& ii : sequence_ye)
     {
         for (std::size_t const& jj : sequence_temp)
@@ -191,9 +197,9 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
     }
 
     // Execute bulk operation
-    hpx::lcos::future<std::vector<double> > bulk_one_tests =
-        shen.interpolate_one_bulk_async(values,
-            sheneos::server::partition3d::logpress);
+    hpx::future<std::vector<double>> bulk_one_tests =
+        shen.interpolate_one_bulk_async(
+            values, sheneos::server::partition3d::logpress);
 
     std::vector<double> results = hpx::unwrap(bulk_one_tests);
     (void) results;
@@ -201,13 +207,13 @@ void test_sheneos_one_bulk(std::size_t num_ye_points,
 
 HPX_DECLARE_ACTION(test_sheneos_one_bulk, test_one_bulk_action);
 HPX_ACTION_USES_MEDIUM_STACK(test_one_bulk_action);
-HPX_PLAIN_ACTION(test_sheneos_one_bulk, test_one_bulk_action);
+HPX_PLAIN_ACTION(test_sheneos_one_bulk, test_one_bulk_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is the test function for interpolate_bulk. It will be invoked on all
 /// localities that the benchmark is being run on.
-void test_sheneos_bulk(std::size_t num_ye_points,
-    std::size_t num_temp_points, std::size_t num_rho_points, std::size_t seed)
+void test_sheneos_bulk(std::size_t num_ye_points, std::size_t num_temp_points,
+    std::size_t num_rho_points, std::size_t seed)
 {
     // Create a client instance connected to the already existing interpolation
     // object.
@@ -233,7 +239,8 @@ void test_sheneos_bulk(std::size_t num_ye_points,
     std::vector<double> values_ye(num_ye_points);
     std::vector<std::size_t> sequence_ye(num_ye_points);
     double ye = min_ye;
-    for (std::size_t i = 0; i < num_ye_points; ++i) {
+    for (std::size_t i = 0; i < num_ye_points; ++i)
+    {
         values_ye[i] = ye;
         sequence_ye[i] = i;
         ye += delta_ye;
@@ -242,7 +249,8 @@ void test_sheneos_bulk(std::size_t num_ye_points,
     std::vector<double> values_temp(num_temp_points);
     std::vector<std::size_t> sequence_temp(num_temp_points);
     double temp = min_temp;
-    for (std::size_t i = 0; i < num_temp_points; ++i) {
+    for (std::size_t i = 0; i < num_temp_points; ++i)
+    {
         values_temp[i] = temp;
         sequence_temp[i] = i;
         temp += delta_temp;
@@ -251,7 +259,8 @@ void test_sheneos_bulk(std::size_t num_ye_points,
     std::vector<double> values_rho(num_rho_points);
     std::vector<std::size_t> sequence_rho(num_rho_points);
     double rho = min_rho;
-    for (std::size_t i = 0; i < num_rho_points; ++i) {
+    for (std::size_t i = 0; i < num_rho_points; ++i)
+    {
         values_rho[i] = rho;
         sequence_rho[i] = i;
         rho += delta_rho;
@@ -271,7 +280,7 @@ void test_sheneos_bulk(std::size_t num_ye_points,
     std::vector<sheneos::sheneos_coord> values;
     values.reserve(num_ye_points * num_temp_points * num_rho_points);
 
-    std::vector<hpx::lcos::future<std::vector<double> > > tests;
+    std::vector<hpx::future<std::vector<double>>> tests;
     for (std::size_t const& ii : sequence_ye)
     {
         for (std::size_t const& jj : sequence_temp)
@@ -285,7 +294,7 @@ void test_sheneos_bulk(std::size_t num_ye_points,
     }
 
     // Execute bulk operation
-    hpx::lcos::future<std::vector<std::vector<double> > > bulk_tests =
+    hpx::future<std::vector<std::vector<double>>> bulk_tests =
         shen.interpolate_bulk_async(values);
 
     std::vector<std::vector<double>> results = hpx::unwrap(bulk_tests);
@@ -294,7 +303,7 @@ void test_sheneos_bulk(std::size_t num_ye_points,
 
 HPX_DECLARE_ACTION(test_sheneos_bulk, test_bulk_action);
 HPX_ACTION_USES_MEDIUM_STACK(test_bulk_action);
-HPX_PLAIN_ACTION(test_sheneos_bulk, test_bulk_action);
+HPX_PLAIN_ACTION(test_sheneos_bulk, test_bulk_action)
 
 ///////////////////////////////////////////////////////////////////////////////
 void wait_for_task(std::size_t i, hpx::chrono::high_resolution_timer& t)
@@ -303,10 +312,11 @@ void wait_for_task(std::size_t i, hpx::chrono::high_resolution_timer& t)
               << std::endl;
 }
 
-void wait_for_bulk_one_task(std::size_t i, hpx::chrono::high_resolution_timer& t)
+void wait_for_bulk_one_task(
+    std::size_t i, hpx::chrono::high_resolution_timer& t)
 {
-    std::cout << "Finished bulk-one task " << i << ": " << t.elapsed()
-        << " [s]" << std::endl;
+    std::cout << "Finished bulk-one task " << i << ": " << t.elapsed() << " [s]"
+              << std::endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -334,7 +344,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         // Create a distributed interpolation object with the name
         // shen_symbolic_name. The interpolation object will have
         // num_partitions partitions
-        sheneos::interpolator shen(datafilename, shen_symbolic_name, num_partitions);
+        sheneos::interpolator shen(
+            datafilename, shen_symbolic_name, num_partitions);
 
         std::cout << "Created interpolator: " << t.elapsed() << " [s]"
                   << std::endl;
@@ -344,62 +355,23 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         t.restart();
 
-//         // Kick off the computation asynchronously. On each locality,
-//         // num_workers test_actions are created.
-//         std::vector<hpx::lcos::future<void> > tests;
-//         for (hpx::naming::id_type const& id : locality_ids)
-//         {
-//             using hpx::async;
-//             for (std::size_t i = 0; i < num_workers; ++i)
-//                 tests.push_back(async<test_action>(id, num_ye_points,
-//                     num_temp_points, num_rho_points, seed));
-//         }
-//
-//         using hpx::util::placeholders::_1;
-//         hpx::lcos::wait(tests,
-//             hpx::util::bind(wait_for_task, _1, std::ref(t)));
-//
-//         std::cout << "Completed tests: " << t.elapsed() << " [s]" << std::endl;
-//
-//         t.restart();
-//
-//         // Kick off the computation asynchronously. On each locality,
-//         // num_workers test_actions are created.
-//         std::vector<hpx::lcos::future<void> > bulk_one_tests;
-//         for (hpx::naming::id_type const& id : locality_ids)
-//         {
-//             using hpx::async;
-//             for (std::size_t i = 0; i < num_workers; ++i)
-//                 bulk_one_tests.push_back(async<test_one_bulk_action>(id,
-//                     num_ye_points, num_temp_points, num_rho_points, seed));
-//         }
-//
-//         using hpx::util::placeholders::_1;
-//         hpx::lcos::wait(bulk_one_tests,
-//             hpx::util::bind(wait_for_bulk_one_task, _1, std::ref(t)));
-//
-//         std::cout << "Completed bulk-one tests: " << t.elapsed() << " [s]"
-//             << std::endl;
-//
-//         t.restart();
-
         // Kick off the computation asynchronously. On each locality,
         // num_workers test_actions are created.
-        std::vector<hpx::future<void> > bulk_tests;
-        for (hpx::naming::id_type const& id : locality_ids)
+        std::vector<hpx::future<void>> bulk_tests;
+        for (hpx::id_type const& id : locality_ids)
         {
             for (std::size_t i = 0; i < num_workers; ++i)
             {
-                bulk_tests.push_back(hpx::async<test_bulk_action>(id,
-                    num_ye_points, num_temp_points, num_rho_points, seed));
+                bulk_tests.push_back(hpx::async<test_bulk_action>(
+                    id, num_ye_points, num_temp_points, num_rho_points, seed));
             }
         }
         hpx::wait_all(bulk_tests);
 
         std::cout << "Completed bulk tests: " << t.elapsed() << " [s]"
-            << std::endl;
+                  << std::endl;
 
-    } // Ensure that everything is out of scope before shutdown.
+    }    // Ensure that everything is out of scope before shutdown.
 
     // Shutdown the runtime system.
     return hpx::finalize();
@@ -414,24 +386,23 @@ int main(int argc, char* argv[])
     // Configure application-specific options.
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()
-        ("file", value<std::string>()->default_value(
-                "sheneos_220r_180t_50y_extT_analmu_20100322_SVNr28.h5"),
-            "name of HDF5 data file containing the Shen EOS tables")
-        ("num-ye-points,Y", value<std::size_t>()->default_value(40),
-            "number of points to interpolate on the ye axis")
-        ("num-temp-points,T", value<std::size_t>()->default_value(40),
-            "number of points to interpolate on the temp axis")
-        ("num-rho-points,R", value<std::size_t>()->default_value(40),
-            "number of points to interpolate on the rho axis")
-        ("num-partitions", value<std::size_t>()->default_value(32),
-            "number of partitions to create")
-        ("num-workers", value<std::size_t>()->default_value(1),
-            "number of worker/measurement threads to create")
-        ("seed", value<std::size_t>()->default_value(0),
-            "the seed for the pseudo random number generator (if 0, a seed "
-            "is chosen based on the current system time)")
-    ;
+    cmdline.add_options()("file",
+        value<std::string>()->default_value(
+            "sheneos_220r_180t_50y_extT_analmu_20100322_SVNr28.h5"),
+        "name of HDF5 data file containing the Shen EOS tables")(
+        "num-ye-points,Y", value<std::size_t>()->default_value(40),
+        "number of points to interpolate on the ye axis")("num-temp-points,T",
+        value<std::size_t>()->default_value(40),
+        "number of points to interpolate on the temp axis")("num-rho-points,R",
+        value<std::size_t>()->default_value(40),
+        "number of points to interpolate on the rho axis")("num-partitions",
+        value<std::size_t>()->default_value(32),
+        "number of partitions to create")("num-workers",
+        value<std::size_t>()->default_value(1),
+        "number of worker/measurement threads to create")("seed",
+        value<std::size_t>()->default_value(0),
+        "the seed for the pseudo random number generator (if 0, a seed "
+        "is chosen based on the current system time)");
 
     // Initialize and run HPX.
     hpx::init_params init_args;

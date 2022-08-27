@@ -45,7 +45,7 @@ namespace hpx { namespace threads {
             // Using the optional for storing the returned result value
             // allows to support non-default-constructible and move-only
             // types.
-            hpx::util::optional<result_type> result;
+            hpx::optional<result_type> result;
             std::exception_ptr exception;
 
             // Create the HPX thread
@@ -55,7 +55,7 @@ namespace hpx { namespace threads {
                     {
                         // Execute the given function, forward all parameters,
                         // store result.
-                        result.emplace(HPX_INVOKE(f, std::forward<Ts>(ts)...));
+                        result.emplace(HPX_INVOKE(f, HPX_FORWARD(Ts, ts)...));
                     }
                     catch (...)
                     {
@@ -82,7 +82,7 @@ namespace hpx { namespace threads {
             if (exception)
                 std::rethrow_exception(exception);
 
-            return std::move(*result);
+            return HPX_MOVE(*result);
         }
 
         // This is the overload for running functions which return void.
@@ -104,7 +104,7 @@ namespace hpx { namespace threads {
                     try
                     {
                         // Execute the given function, forward all parameters.
-                        HPX_INVOKE(f, std::forward<Ts>(ts)...);
+                        HPX_INVOKE(f, HPX_FORWARD(Ts, ts)...);
                     }
                     catch (...)
                     {
@@ -145,6 +145,6 @@ namespace hpx { namespace threads {
             typename util::invoke_result<F, Ts...>::type>::type result_is_void;
 
         return detail::run_as_hpx_thread(
-            result_is_void(), f, std::forward<Ts>(vs)...);
+            result_is_void(), f, HPX_FORWARD(Ts, vs)...);
     }
 }}    // namespace hpx::threads

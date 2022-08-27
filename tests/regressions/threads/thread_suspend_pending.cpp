@@ -13,6 +13,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -22,15 +23,13 @@ using hpx::program_options::variables_map;
 
 using hpx::threads::register_work;
 
-using hpx::lcos::local::barrier;
-
 using hpx::finalize;
 using hpx::init;
 
 using hpx::util::report_errors;
 
 ///////////////////////////////////////////////////////////////////////////////
-void suspend_test(barrier& b, std::size_t iterations)
+void suspend_test(std::shared_ptr<hpx::barrier<>> b, std::size_t iterations)
 {
     for (std::size_t i = 0; i < iterations; ++i)
     {
@@ -40,7 +39,7 @@ void suspend_test(barrier& b, std::size_t iterations)
     }
 
     // Wait for all hpx-threads to enter the barrier.
-    b.wait();
+    b->arrive_and_wait();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,19 +56,20 @@ int hpx_main(variables_map& vm)
         iterations = vm["iterations"].as<std::size_t>();
 
     {
-        barrier b(pxthreads + 1);
+        std::shared_ptr<hpx::barrier<>> b =
+            std::make_shared<hpx::barrier<>>(pxthreads + 1);
 
         // Create the hpx-threads.
         for (std::size_t i = 0; i < pxthreads; ++i)
         {
             hpx::threads::thread_init_data data(
                 hpx::threads::make_thread_function_nullary(
-                    hpx::util::bind(&suspend_test, std::ref(b), iterations)),
+                    hpx::bind(&suspend_test, b, iterations)),
                 "suspend_test");
             register_work(data);
         }
 
-        b.wait();    // Wait for all hpx-threads to enter the barrier.
+        b->arrive_and_wait();    // Wait for all hpx-threads to enter the barrier.
     }
 
     // Initiate shutdown of the runtime system.

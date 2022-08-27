@@ -95,7 +95,7 @@ struct B
     }
 };
 
-HPX_IS_NOT_BITWISE_SERIALIZABLE(B);
+HPX_IS_NOT_BITWISE_SERIALIZABLE(B)
 
 int hpx_main()
 {

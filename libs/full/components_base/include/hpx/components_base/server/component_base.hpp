@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,39 +32,24 @@ namespace hpx { namespace components {
 
         struct base_component : traits::detail::component_tag
         {
-            base_component() = default;
-
+            constexpr base_component() = default;
             HPX_EXPORT ~base_component();
 
-            // Copy construction and copy assignment should not copy the gid_.
-            base_component(base_component const& /*rhs*/) noexcept {}
-            base_component& operator=(base_component const& /*rhs*/) noexcept
-            {
-                return *this;
-            }
+            base_component(base_component const&) = default;
+            base_component& operator=(base_component const&) = default;
 
             // just move our gid_
-            base_component(base_component&& rhs) noexcept
-              : gid_(std::move(rhs.gid_))
-            {
-            }
-            base_component& operator=(base_component&& rhs) noexcept
-            {
-                if (this != &rhs)
-                {
-                    gid_ = std::move(rhs.gid_);
-                }
-                return *this;
-            }
+            base_component(base_component&& rhs) noexcept = default;
+            base_component& operator=(base_component&& rhs) noexcept = default;
 
             // finalize() will be called just before the instance gets destructed
             static constexpr void finalize() noexcept {}
 
-            HPX_EXPORT naming::id_type get_id(naming::gid_type gid) const;
-            HPX_EXPORT naming::id_type get_unmanaged_id(
+            HPX_EXPORT hpx::id_type get_id(naming::gid_type gid) const;
+            HPX_EXPORT hpx::id_type get_unmanaged_id(
                 naming::gid_type const& gid) const;
 
-            static void mark_as_migrated()
+            static void mark_as_migrated() noexcept
             {
                 // If this assertion is triggered then this component instance
                 // is being migrated even if the component type has not been
@@ -71,7 +57,7 @@ namespace hpx { namespace components {
                 HPX_ASSERT(false);
             }
 
-            static void on_migrated()
+            static void on_migrated() noexcept
             {
                 // If this assertion is triggered then this component instance
                 // is being migrated even if the component type has not been
@@ -103,9 +89,9 @@ namespace hpx { namespace components {
     class component_base : public detail::base_component
     {
     protected:
-        using this_component_type = typename std::conditional<
-            std::is_same<Component, components::detail::this_type>::value,
-            component_base, Component>::type;
+        using this_component_type = std::conditional_t<
+            std::is_same_v<Component, components::detail::this_type>,
+            component_base, Component>;
 
     public:
         using wrapped_type = this_component_type;
@@ -113,10 +99,16 @@ namespace hpx { namespace components {
         using wrapping_type = component<this_component_type>;
 
         // Construct an empty component
-        component_base() = default;
+        constexpr component_base() = default;
 
         // Destruct a component
         ~component_base() = default;
+
+        component_base(component_base const&) = default;
+        component_base(component_base&& rhs) noexcept = default;
+
+        component_base& operator=(component_base const&) = default;
+        component_base& operator=(component_base&& rhs) noexcept = default;
 
     public:
         naming::address get_current_address() const
@@ -124,17 +116,17 @@ namespace hpx { namespace components {
             return naming::address(
                 naming::get_gid_from_locality_id(agas::get_locality_id()),
                 components::get_component_type<wrapped_type>(),
-                std::uint64_t(static_cast<this_component_type const*>(this)));
+                const_cast<component_base*>(this));
         }
 
-        naming::id_type get_id() const
+        hpx::id_type get_id() const
         {
             // all credits should have been taken already
             return this->detail::base_component::get_id(
                 static_cast<Component const&>(*this).get_base_gid());
         }
 
-        naming::id_type get_unmanaged_id() const
+        hpx::id_type get_unmanaged_id() const
         {
             return this->detail::base_component::get_unmanaged_id(
                 static_cast<Component const&>(*this).get_base_gid());

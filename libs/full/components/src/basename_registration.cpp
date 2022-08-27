@@ -6,11 +6,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/components/basename_registration.hpp>
-#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
+
+#include <hpx/components/basename_registration.hpp>
+#include <hpx/components_base/agas_interface.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
 #include <cstddef>
@@ -51,11 +52,11 @@ namespace hpx {
             if (basename[0] != '/')
             {
                 name = '/';
-                name += std::move(basename);
+                name += HPX_MOVE(basename);
             }
             else
             {
-                name = std::move(basename);
+                name = HPX_MOVE(basename);
             }
 
             if (name[name.size() - 1] != '/')
@@ -83,7 +84,7 @@ namespace hpx {
         {
             std::string name = detail::name_from_basename(basename, i);
             results.push_back(
-                agas::on_symbol_namespace_event(std::move(name), true));
+                agas::on_symbol_namespace_event(HPX_MOVE(name), true));
         }
         return results;
     }
@@ -103,7 +104,7 @@ namespace hpx {
             std::string name =
                 detail::name_from_basename(basename, i);    //-V106
             results.push_back(
-                agas::on_symbol_namespace_event(std::move(name), true));
+                agas::on_symbol_namespace_event(HPX_MOVE(name), true));
         }
         return results;
     }
@@ -123,8 +124,8 @@ namespace hpx {
         }
 
         std::string name =
-            detail::name_from_basename(std::move(basename), sequence_nr);
-        return agas::on_symbol_namespace_event(std::move(name), true);
+            detail::name_from_basename(HPX_MOVE(basename), sequence_nr);
+        return agas::on_symbol_namespace_event(HPX_MOVE(name), true);
     }
 
     hpx::future<bool> register_with_basename(std::string basename,
@@ -142,18 +143,18 @@ namespace hpx {
         }
 
         std::string name =
-            detail::name_from_basename(std::move(basename), sequence_nr);
-        return agas::register_name(std::move(name), id);
+            detail::name_from_basename(HPX_MOVE(basename), sequence_nr);
+        return agas::register_name(HPX_MOVE(name), id);
     }
 
     hpx::future<bool> register_with_basename(std::string base_name,
         hpx::future<hpx::id_type> f, std::size_t sequence_nr)
     {
         return f.then(hpx::launch::sync,
-            [sequence_nr, base_name = std::move(base_name)](
+            [sequence_nr, base_name = HPX_MOVE(base_name)](
                 hpx::future<hpx::id_type>&& f) mutable -> hpx::future<bool> {
                 return register_with_basename(
-                    std::move(base_name), f.get(), sequence_nr);
+                    HPX_MOVE(base_name), f.get(), sequence_nr);
             });
     }
 
@@ -172,7 +173,7 @@ namespace hpx {
         }
 
         std::string name =
-            detail::name_from_basename(std::move(basename), sequence_nr);
-        return agas::unregister_name(std::move(name));
+            detail::name_from_basename(HPX_MOVE(basename), sequence_nr);
+        return agas::unregister_name(HPX_MOVE(name));
     }
 }    // namespace hpx

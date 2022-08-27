@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,10 +14,12 @@
 #include <cstddef>
 #include <list>
 #include <map>
+#include <type_traits>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace cache {
+namespace hpx::util::cache {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \class lru_cache lru_cache.hpp hpx/cache/lru_cache.hpp
     ///
@@ -38,16 +41,16 @@ namespace hpx { namespace util { namespace cache {
     class lru_cache
     {
     public:
-        typedef Key key_type;
-        typedef Entry entry_type;
-        typedef Statistics statistics_type;
-        typedef std::pair<key_type, entry_type> entry_pair;
-        typedef std::list<entry_pair> storage_type;
-        typedef std::map<Key, typename storage_type::iterator> map_type;
-        typedef std::size_t size_type;
+        using key_type = Key;
+        using entry_type = Entry;
+        using statistics_type = Statistics;
+        using entry_pair = std::pair<key_type, entry_type>;
+        using storage_type = std::list<entry_pair>;
+        using map_type = std::map<Key, typename storage_type::iterator>;
+        using size_type = std::size_t;
 
     private:
-        typedef typename statistics_type::update_on_exit update_on_exit;
+        using update_on_exit = typename statistics_type::update_on_exit;
 
     public:
         ///////////////////////////////////////////////////////////////////////
@@ -61,24 +64,16 @@ namespace hpx { namespace util { namespace cache {
         ///
         lru_cache(size_type max_size = 0)
           : max_size_(max_size)
-          , current_size_(0)
         {
         }
 
-        lru_cache(lru_cache&& other)
-          : max_size_(other.max_size_)
-          , current_size_(0)
-          , storage_(std::move(other.storage_))
-          , map_(std::move(other.map_))
-          , statistics_(std::move(other.statistics_))
-        {
-        }
+        lru_cache(lru_cache&& other) = default;
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Return current size of the cache.
         ///
         /// \returns The current size of this cache instance.
-        size_type size() const
+        constexpr size_type size() const noexcept
         {
             return current_size_;
         }
@@ -93,7 +88,7 @@ namespace hpx { namespace util { namespace cache {
         /// \returns    The maximum size this cache instance is currently
         ///             allowed to reach. If this number is zero the cache has
         ///             no limitation with regard to a maximum size.
-        size_type capacity() const
+        constexpr size_type capacity() const noexcept
         {
             return max_size_;
         }
@@ -132,7 +127,7 @@ namespace hpx { namespace util { namespace cache {
         ///
         /// \returns      This function returns \a true if the cache holds the
         ///               referenced entry, otherwise it returns \a false.
-        bool holds_key(key_type const& key)
+        bool holds_key(key_type const& key) const
         {
             return map_.find(key) != map_.end();
         }
@@ -154,7 +149,7 @@ namespace hpx { namespace util { namespace cache {
         bool get_entry(
             key_type const& key, key_type& realkey, entry_type& entry)
         {
-            update_on_exit update(statistics_, statistics::method_get_entry);
+            update_on_exit update(statistics_, statistics::method::get_entry);
 
             auto it = map_.find(key);
 
@@ -173,13 +168,14 @@ namespace hpx { namespace util { namespace cache {
             // got hit
             realkey = it->first;
             entry = it->second->second;
+
             return true;
         }
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Get a specific entry identified by the given key.
         ///
-        /// \param key     [in] The key for the entry which should be retrieved
+        /// \param key    [in] The key for the entry which should be retrieved
         ///               from the cache.
         /// \param entry  [out] If the entry indexed by the key is found in the
         ///               cache this value on successful return will be a copy
@@ -190,7 +186,7 @@ namespace hpx { namespace util { namespace cache {
         ///
         /// \returns      This function returns \a true if the cache holds the
         ///               referenced entry, otherwise it returns \a false.
-        bool get_entry(key_type const& key, entry_type& entry)
+        bool get_entry(key_type const& key, entry_type const& entry)
         {
             key_type tmp;
             return get_entry(key, tmp, entry);
@@ -205,22 +201,30 @@ namespace hpx { namespace util { namespace cache {
         /// \note         This function assumes that the entry is not in the
         ///               cache already. Inserting an already existing entry
         ///               is considered undefined behavior
-        bool insert(key_type const& key, entry_type const& entry)
+        template <typename Entry_,
+            typename = std::enable_if_t<
+                std::is_convertible_v<std::decay_t<Entry_>, entry_type>>>
+        bool insert(key_type const& key, Entry_&& entry)
         {
-            update_on_exit update(statistics_, statistics::method_insert_entry);
+            update_on_exit update(
+                statistics_, statistics::method::insert_entry);
             if (map_.find(key) != map_.end())
             {
                 return false;
             }
 
-            insert_nonexist(key, entry);
+            insert_nonexist(key, HPX_FORWARD(Entry_, entry));
             return true;
         }
 
-        void insert_nonexist(key_type const& key, entry_type const& entry)
+    private:
+        template <typename Entry_,
+            typename = std::enable_if_t<
+                std::is_convertible_v<std::decay_t<Entry_>, entry_type>>>
+        void insert_nonexist(key_type const& key, Entry_&& entry)
         {
             // insert ...
-            storage_.push_front(entry_pair(key, entry));
+            storage_.push_front(entry_pair(key, HPX_FORWARD(Entry_, entry)));
             map_[key] = storage_.begin();
             ++current_size_;
 
@@ -235,6 +239,7 @@ namespace hpx { namespace util { namespace cache {
             }
         }
 
+    public:
         ///////////////////////////////////////////////////////////////////////
         /// \brief Update an existing element in this cache
         ///
@@ -251,25 +256,28 @@ namespace hpx { namespace util { namespace cache {
         ///               value only, while the other overload replaces the
         ///               whole cache entry, updating the cache entry
         ///               properties.
-        void update(key_type const& key, entry_type const& entry)
+        template <typename Entry_,
+            typename = std::enable_if_t<
+                std::is_convertible_v<std::decay_t<Entry_>, entry_type>>>
+        void update(key_type const& key, Entry_&& entry)
         {
-            update_on_exit update(statistics_, statistics::method_update_entry);
+            update_on_exit update(
+                statistics_, statistics::method::update_entry);
 
             // Is it already in the cache?
             auto it = map_.find(key);
             if (it == map_.end())
             {
-                statistics_.got_miss();    // update statistics
                 // got miss
-                update_on_exit update(
-                    statistics_, statistics::method_insert_entry);
-                insert_nonexist(key, entry);
+                statistics_.got_miss();    // update statistics
+                insert_nonexist(key, HPX_FORWARD(Entry_, entry));
                 return;
             }
 
             // got hit!
-            it->second->second = entry;
+            it->second->second = HPX_FORWARD(Entry_, entry);
             touch(it->second);
+
             // update statistics
             statistics_.got_hit();
         }
@@ -300,19 +308,22 @@ namespace hpx { namespace util { namespace cache {
         ///               If the entry currently is not held by the cache it is
         ///               added and the return value reflects the outcome of
         ///               the corresponding insert operation.
-        template <typename F>
-        bool update_if(key_type const& key, entry_type const& entry, F&& f)
+        template <typename F, typename Entry_,
+            std::enable_if_t<
+                std::is_convertible_v<std::decay_t<Entry_>, entry_type>, int> =
+                0>
+        bool update_if(key_type const& key, Entry_&& entry, F&& f)
         {
-            update_on_exit update(statistics_, statistics::method_update_entry);
+            update_on_exit update(
+                statistics_, statistics::method::update_entry);
+
             // Is it already in the cache?
             auto it = map_.find(key);
             if (it == map_.end())
             {
                 // got miss
                 statistics_.got_miss();    // update statistics
-                update_on_exit update(
-                    statistics_, statistics::method_insert_entry);
-                insert_nonexist(key, entry);
+                insert_nonexist(key, HPX_FORWARD(Entry_, entry));
                 return true;
             }
 
@@ -321,7 +332,7 @@ namespace hpx { namespace util { namespace cache {
 
             // got hit!
             touch(it->second);
-            it->second->second = entry;
+            it->second->second = HPX_FORWARD(Entry_, entry);
 
             // update statistics
             statistics_.got_hit();
@@ -346,7 +357,7 @@ namespace hpx { namespace util { namespace cache {
         template <typename Func>
         size_type erase(Func const& ep)
         {
-            update_on_exit update(statistics_, statistics::method_erase_entry);
+            update_on_exit update(statistics_, statistics::method::erase_entry);
 
             size_type erased = 0;
             for (auto it = map_.begin(); it != map_.end();)
@@ -401,12 +412,12 @@ namespace hpx { namespace util { namespace cache {
         ///
         /// \returns      This function returns a reference to the statistics
         ///               instance embedded inside this cache
-        statistics_type const& get_statistics() const
+        constexpr statistics_type const& get_statistics() const noexcept
         {
             return statistics_;
         }
 
-        statistics_type& get_statistics()
+        statistics_type& get_statistics() noexcept
         {
             return statistics_;
         }
@@ -425,12 +436,13 @@ namespace hpx { namespace util { namespace cache {
             --current_size_;
         }
 
+    private:
         size_type max_size_;
-        size_type current_size_;
+        size_type current_size_ = 0;
 
         storage_type storage_;
         map_type map_;
 
         statistics_type statistics_;
     };
-}}}    // namespace hpx::util::cache
+}    // namespace hpx::util::cache

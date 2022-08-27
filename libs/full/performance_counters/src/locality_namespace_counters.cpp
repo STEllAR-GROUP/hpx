@@ -33,7 +33,7 @@ namespace hpx { namespace agas { namespace server {
     void locality_namespace_register_counter_types(error_code& ec)
     {
         performance_counters::create_counter_func creator(
-            util::bind_back(&performance_counters::agas_raw_counter_creator,
+            hpx::bind_back(&performance_counters::agas_raw_counter_creator,
                 agas::server::locality_namespace_service_name));
 
         for (std::size_t i = 0; i != detail::num_locality_namespace_services;
@@ -83,7 +83,7 @@ namespace hpx { namespace agas { namespace server {
     void locality_namespace_register_global_counter_types(error_code& ec)
     {
         performance_counters::create_counter_func creator(
-            util::bind_back(&performance_counters::agas_raw_counter_creator,
+            hpx::bind_back(&performance_counters::agas_raw_counter_creator,
                 agas::server::locality_namespace_service_name));
 
         for (std::size_t i = 0; i != detail::num_locality_namespace_services;
@@ -172,43 +172,43 @@ namespace hpx { namespace agas { namespace server {
 
         typedef locality_namespace::counter_data cd;
 
-        util::function_nonser<std::int64_t(bool)> get_data_func;
+        hpx::function<std::int64_t(bool)> get_data_func;
         if (target == detail::counter_target_count)
         {
             switch (code)
             {
             case locality_ns_allocate:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_allocate_count, &service.counter_data_);
                 service.counter_data_.allocate_.enabled_ = true;
                 break;
             case locality_ns_resolve_locality:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_resolve_locality_count, &service.counter_data_);
                 service.counter_data_.resolve_locality_.enabled_ = true;
                 break;
             case locality_ns_free:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_free_count, &service.counter_data_);
                 service.counter_data_.free_.enabled_ = true;
                 break;
             case locality_ns_localities:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_localities_count, &service.counter_data_);
                 service.counter_data_.localities_.enabled_ = true;
                 break;
             case locality_ns_num_localities:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_num_localities_count, &service.counter_data_);
                 service.counter_data_.num_localities_.enabled_ = true;
                 break;
             case locality_ns_num_threads:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_num_threads_count, &service.counter_data_);
                 service.counter_data_.num_threads_.enabled_ = true;
                 break;
             case locality_ns_statistics_counter:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_overall_count, &service.counter_data_);
                 service.counter_data_.enable_all();
                 break;
@@ -224,37 +224,37 @@ namespace hpx { namespace agas { namespace server {
             switch (code)
             {
             case locality_ns_allocate:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_allocate_time, &service.counter_data_);
                 service.counter_data_.allocate_.enabled_ = true;
                 break;
             case locality_ns_resolve_locality:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_resolve_locality_time, &service.counter_data_);
                 service.counter_data_.resolve_locality_.enabled_ = true;
                 break;
             case locality_ns_free:
-                get_data_func = util::bind_front(
-                    &cd::get_free_time, &service.counter_data_);
+                get_data_func =
+                    hpx::bind_front(&cd::get_free_time, &service.counter_data_);
                 service.counter_data_.free_.enabled_ = true;
                 break;
             case locality_ns_localities:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_localities_time, &service.counter_data_);
                 service.counter_data_.localities_.enabled_ = true;
                 break;
             case locality_ns_num_localities:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_num_localities_time, &service.counter_data_);
                 service.counter_data_.num_localities_.enabled_ = true;
                 break;
             case locality_ns_num_threads:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_num_threads_time, &service.counter_data_);
                 service.counter_data_.num_threads_.enabled_ = true;
                 break;
             case locality_ns_statistics_counter:
-                get_data_func = util::bind_front(
+                get_data_func = hpx::bind_front(
                     &cd::get_overall_time, &service.counter_data_);
                 service.counter_data_.enable_all();
                 break;

@@ -78,12 +78,12 @@ namespace hpx { namespace actions {
         ///       continuations.
         template <std::size_t... Is>
         threads::thread_function_type get_thread_function(
-            util::index_pack<Is...>, naming::id_type&& target,
+            util::index_pack<Is...>, hpx::id_type&& target,
             naming::address::address_type lva,
             naming::address::component_type comptype);
 
-        threads::thread_function_type get_thread_function(
-            naming::id_type&& target, naming::address::address_type lva,
+        threads::thread_function_type get_thread_function(hpx::id_type&& target,
+            naming::address::address_type lva,
             naming::address::component_type comptype) override;
 
         template <std::size_t... Is>
@@ -115,7 +115,7 @@ namespace hpx { namespace actions {
     template <typename Action>
     template <typename... Ts>
     transfer_action<Action>::transfer_action(Ts&&... vs)
-      : base_type(std::forward<Ts>(vs)...)
+      : base_type(HPX_FORWARD(Ts, vs)...)
     {
     }
 
@@ -123,7 +123,7 @@ namespace hpx { namespace actions {
     template <typename... Ts>
     transfer_action<Action>::transfer_action(
         threads::thread_priority priority, Ts&&... vs)
-      : base_type(priority, std::forward<Ts>(vs)...)
+      : base_type(priority, HPX_FORWARD(Ts, vs)...)
     {
     }
 
@@ -136,23 +136,23 @@ namespace hpx { namespace actions {
     template <typename Action>
     template <std::size_t... Is>
     threads::thread_function_type transfer_action<Action>::get_thread_function(
-        util::index_pack<Is...>, naming::id_type&& target,
+        util::index_pack<Is...>, hpx::id_type&& target,
         naming::address::address_type lva,
         naming::address::component_type comptype)
     {
         return base_type::derived_type::construct_thread_function(
-            std::move(target), lva, comptype,
-            hpx::get<Is>(std::move(this->arguments_))...);
+            HPX_MOVE(target), lva, comptype,
+            hpx::get<Is>(HPX_MOVE(this->arguments_))...);
     }
 
     template <typename Action>
     threads::thread_function_type transfer_action<Action>::get_thread_function(
-        naming::id_type&& target, naming::address::address_type lva,
+        hpx::id_type&& target, naming::address::address_type lva,
         naming::address::component_type comptype)
     {
         return get_thread_function(
             typename util::make_index_pack<Action::arity>::type(),
-            std::move(target), lva, comptype);
+            HPX_MOVE(target), lva, comptype);
     }
 
     template <typename Action>
@@ -161,10 +161,11 @@ namespace hpx { namespace actions {
         naming::gid_type const& target_gid, naming::address::address_type lva,
         naming::address::component_type comptype, std::size_t /*num_thread*/)
     {
-        naming::id_type target;
+        hpx::id_type target;
         if (naming::detail::has_credits(target_gid))
         {
-            target = naming::id_type(target_gid, naming::id_type::managed);
+            target = hpx::id_type(
+                target_gid, hpx::id_type::management_type::managed);
         }
 
         threads::thread_init_data data;
@@ -180,8 +181,8 @@ namespace hpx { namespace actions {
             data.description, data.parent_locality_id, data.parent_id);
 #endif
         applier::detail::apply_helper<typename base_type::derived_type>::call(
-            std::move(data), target, lva, comptype, this->priority_,
-            std::move(hpx::get<Is>(this->arguments_))...);
+            HPX_MOVE(data), target, lva, comptype, this->priority_,
+            HPX_MOVE(hpx::get<Is>(this->arguments_))...);
     }
 
     template <typename Action>
@@ -233,7 +234,7 @@ namespace hpx { namespace actions {
             }
         }
 
-        schedule_thread(std::move(target), lva, comptype, num_thread);
+        schedule_thread(HPX_MOVE(target), lva, comptype, num_thread);
     }
 
     // define registration function
@@ -252,7 +253,7 @@ namespace hpx { namespace actions {
     }
 }}    // namespace hpx::actions
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
     /// \cond NOINTERNAL
     template <typename Action>
     struct needs_automatic_registration<hpx::actions::transfer_action<Action>>
@@ -260,7 +261,7 @@ namespace hpx { namespace traits {
     {
     };
     /// \endcond
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
 #include <hpx/config/warnings_suffix.hpp>
 

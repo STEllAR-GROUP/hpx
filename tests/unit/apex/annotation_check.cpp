@@ -114,16 +114,16 @@ execution_string(const Policy& policy)
 }
 
 // --------------------------------------------------------------------------
-// use annotate_function
-void test_annotate_function()
+// use scoped_annotation
+void test_scoped_annotation()
 {
     hpx::async([]() {
-        hpx::util::annotate_function annotate("4-char annotate_function");
+        hpx::scoped_annotation annotate("4-char scoped_annotation");
     }).get();
 
     hpx::async([]() {
-        std::string s("4-string annotate_function");
-        hpx::util::annotate_function annotate(std::move(s));
+        std::string s("4-string scoped_annotation");
+        hpx::scoped_annotation annotate(std::move(s));
     }).get();
 }
 
@@ -140,22 +140,21 @@ hpx::future<void> test_none()
         hpx::future<int> f1 = hpx::async([]() { return 5; });
         hpx::future<int> f2 = hpx::make_ready_future(5);
         results.emplace_back(hpx::dataflow(
-            hpx::util::annotated_function(
+            hpx::annotated_function(
                 [](auto&&, auto&&) { dummy_task(std::size_t(1000)); }, dfs),
             f1, f2));
     }
 
     {
         hpx::future<int> f1 = hpx::async([]() { return 5; });
-        results.emplace_back(f1.then(hpx::util::annotated_function(
+        results.emplace_back(f1.then(hpx::annotated_function(
             [](auto&&) { dummy_task(std::size_t(1000)); }, pcs)));
     }
 
     {
         hpx::future<int> f1 = hpx::async([]() { return 5; });
-        results.emplace_back(
-            f1.then(hpx::unwrapping(hpx::util::annotated_function(
-                [](auto&&) { dummy_task(std::size_t(1000)); }, pcsu))));
+        results.emplace_back(f1.then(hpx::unwrapping(hpx::annotated_function(
+            [](auto&&) { dummy_task(std::size_t(1000)); }, pcsu))));
     }
 
     // wait for completion
@@ -180,20 +179,20 @@ hpx::future<void> test_execution(Execution& exec)
         hpx::future<int> f1 = hpx::async([]() { return 5; });
         hpx::future<int> f2 = hpx::make_ready_future(5);
         results.emplace_back(hpx::dataflow(exec,
-            hpx::util::annotated_function(
+            hpx::annotated_function(
                 [](auto&&, auto&&) { dummy_task(std::size_t(1000)); }, dfs),
             f1, f2));
     }
     {
         hpx::future<int> f1 = hpx::async([]() { return 5; });
         results.emplace_back(f1.then(exec,
-            hpx::util::annotated_function(
+            hpx::annotated_function(
                 [](auto&&) { dummy_task(std::size_t(1000)); }, pcs)));
     }
     {
         hpx::future<int> f1 = hpx::async([]() { return 5; });
         results.emplace_back(f1.then(exec,
-            hpx::unwrapping(hpx::util::annotated_function(
+            hpx::unwrapping(hpx::annotated_function(
                 [](auto&&) { dummy_task(std::size_t(1000)); }, pcsu))));
     }
     // wait for completion
@@ -205,7 +204,7 @@ int hpx_main()
     // setup executors
     hpx::execution::parallel_executor par_exec{};
 
-    test_annotate_function();
+    test_scoped_annotation();
     //
     test_none().get();
     //

@@ -18,7 +18,7 @@ namespace hpx { namespace serialization { namespace detail {
     extra_archive_data_id_type
     extra_archive_data_helper<preprocess_futures>::id() noexcept
     {
-        static std::uint8_t id;
+        static std::uint8_t id = 0;
         return &id;
     }
 }}}    // namespace hpx::serialization::detail

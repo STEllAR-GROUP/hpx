@@ -28,12 +28,12 @@
 
 char const* benchmark_name = "Serial LIFO Overhead";
 
-using hpx::program_options::variables_map;
-using hpx::program_options::options_description;
-using hpx::program_options::value;
-using hpx::program_options::store;
 using hpx::program_options::command_line_parser;
 using hpx::program_options::notify;
+using hpx::program_options::options_description;
+using hpx::program_options::store;
+using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 namespace compat = hpx::compat;
 using hpx::chrono::high_resolution_timer;
@@ -53,64 +53,51 @@ std::string format_build_date()
     std::time_t current_time = std::chrono::system_clock::to_time_t(now);
 
     std::string ts = std::ctime(&current_time);
-    ts.resize(ts.size()-1);     // remove trailing '\n'
+    ts.resize(ts.size() - 1);    // remove trailing '\n'
     return ts;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_results(
-    variables_map& vm
-  , std::pair<double, double> elapsed_control
-  , std::pair<double, double> elapsed_lockfree
-    )
+void print_results(variables_map& vm, std::pair<double, double> elapsed_control,
+    std::pair<double, double> elapsed_lockfree)
 {
     if (header)
     {
         std::cout << "# BENCHMARK: " << benchmark_name << "\n";
 
         std::cout << "# VERSION: " << format_build_date() << "\n"
-             << "#\n";
+                  << "#\n";
 
         // Note that if we change the number of fields above, we have to
         // change the constant that we add when printing out the field # for
         // performance counters below (e.g. the last_index part).
-        std::cout <<
-            "## 0:ITER:Iterations per OS-thread - Independent Variable\n"
-            "## 1:BSIZE:Maximum Queue Depth - Independent Variable\n"
-            "## 2:OSTHRDS:OS-thread - Independent Variable\n"
-            "## 3:WTIME_CTL_PUSH:Total Walltime/Push for "
-                "std::vector [nanoseconds]\n"
-            "## 4:WTIME_CTL_POP:Total Walltime/Pop for "
-                "std::vector [nanoseconds]\n"
-            "## 5:WTIME_LF_PUSH:Total Walltime/Push for "
-                "boost::lockfree::stack [nanoseconds]\n"
-            "## 6:WTIME_LF_POP:Total Walltime/Pop for "
-                "boost::lockfree::stack [nanoseconds]\n"
-                ;
+        std::cout
+            << "## 0:ITER:Iterations per OS-thread - Independent Variable\n"
+               "## 1:BSIZE:Maximum Queue Depth - Independent Variable\n"
+               "## 2:OSTHRDS:OS-thread - Independent Variable\n"
+               "## 3:WTIME_CTL_PUSH:Total Walltime/Push for "
+               "std::vector [nanoseconds]\n"
+               "## 4:WTIME_CTL_POP:Total Walltime/Pop for "
+               "std::vector [nanoseconds]\n"
+               "## 5:WTIME_LF_PUSH:Total Walltime/Push for "
+               "boost::lockfree::stack [nanoseconds]\n"
+               "## 6:WTIME_LF_POP:Total Walltime/Pop for "
+               "boost::lockfree::stack [nanoseconds]\n";
     }
 
     if (iterations != 0)
         hpx::util::format_to(std::cout,
-            "{} {} {} {:.14g} {:.14g} {:.14g} {:.14g}\n",
-            iterations,
-            blocksize,
-            threads,
-            (elapsed_lockfree.first / (threads*iterations)) * 1e9,
-            (elapsed_lockfree.second / (threads*iterations)) * 1e9,
-            (elapsed_control.first / (threads*iterations)) * 1e9,
-            (elapsed_control.second / (threads*iterations)) * 1e9
-        );
+            "{} {} {} {:.14g} {:.14g} {:.14g} {:.14g}\n", iterations, blocksize,
+            threads, (elapsed_lockfree.first / (threads * iterations)) * 1e9,
+            (elapsed_lockfree.second / (threads * iterations)) * 1e9,
+            (elapsed_control.first / (threads * iterations)) * 1e9,
+            (elapsed_control.second / (threads * iterations)) * 1e9);
     else
         hpx::util::format_to(std::cout,
-            "{} {} {} {:.14g} {:.14g} {:.14g} {:.14g}\n",
-            iterations,
-            blocksize,
-            threads,
-            elapsed_lockfree.first * 1e9,
-            elapsed_lockfree.second * 1e9,
-            elapsed_control.first * 1e9,
-            elapsed_control.second * 1e9
-        );
+            "{} {} {} {:.14g} {:.14g} {:.14g} {:.14g}\n", iterations, blocksize,
+            threads, elapsed_lockfree.first * 1e9,
+            elapsed_lockfree.second * 1e9, elapsed_control.first * 1e9,
+            elapsed_control.second * 1e9);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -140,8 +127,7 @@ void pop(Lifo& lifo)
 }
 
 template <typename Lifo>
-std::pair<double, double>
-bench_lifo(Lifo& lifo, std::uint64_t local_iterations)
+std::pair<double, double> bench_lifo(Lifo& lifo, std::uint64_t local_iterations)
 {
     ///////////////////////////////////////////////////////////////////////////
     // Push.
@@ -152,9 +138,8 @@ bench_lifo(Lifo& lifo, std::uint64_t local_iterations)
     // Start the clock.
     high_resolution_timer t;
 
-    for ( std::uint64_t block = 0
-        ; block < (local_iterations / blocksize)
-        ; ++block)
+    for (std::uint64_t block = 0; block < (local_iterations / blocksize);
+         ++block)
     {
         // Restart the clock.
         t.restart();
@@ -184,11 +169,9 @@ bench_lifo(Lifo& lifo, std::uint64_t local_iterations)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void perform_iterations(
-    hpx::util::barrier& b
-  , std::pair<double, double>& elapsed_control
-  , std::pair<double, double>& elapsed_lockfree
-    )
+void perform_iterations(hpx::util::barrier& b,
+    std::pair<double, double>& elapsed_control,
+    std::pair<double, double>& elapsed_lockfree)
 {
     {
         std::vector<std::uint64_t> lifo;
@@ -211,24 +194,18 @@ void perform_iterations(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int app_main(
-    variables_map& vm
-    )
+int app_main(variables_map& vm)
 {
-    std::vector<std::pair<double, double> >
-        elapsed_control(threads, std::pair<double, double>(0.0, 0.0));
-    std::vector<std::pair<double, double> >
-        elapsed_lockfree(threads, std::pair<double, double>(0.0, 0.0));
+    std::vector<std::pair<double, double>> elapsed_control(
+        threads, std::pair<double, double>(0.0, 0.0));
+    std::vector<std::pair<double, double>> elapsed_lockfree(
+        threads, std::pair<double, double>(0.0, 0.0));
     std::vector<std::thread> workers;
     hpx::util::barrier b(threads);
 
     for (std::uint32_t i = 0; i != threads; ++i)
-        workers.push_back(std::thread(
-            perform_iterations,
-            std::ref(b),
-            std::ref(elapsed_control[i]),
-            std::ref(elapsed_lockfree[i])
-            ));
+        workers.push_back(std::thread(perform_iterations, std::ref(b),
+            std::ref(elapsed_control[i]), std::ref(elapsed_lockfree[i])));
 
     for (std::thread& thread : workers)
     {
@@ -241,10 +218,10 @@ int app_main(
 
     for (std::uint64_t i = 0; i < elapsed_control.size(); ++i)
     {
-        total_elapsed_control.first  += elapsed_control[i].first;
+        total_elapsed_control.first += elapsed_control[i].first;
         total_elapsed_control.second += elapsed_control[i].second;
 
-        total_elapsed_lockfree.first  += elapsed_lockfree[i].first;
+        total_elapsed_lockfree.first += elapsed_lockfree[i].first;
         total_elapsed_lockfree.second += elapsed_lockfree[i].second;
     }
 
@@ -255,10 +232,7 @@ int app_main(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(
-    int argc
-  , char* argv[]
-    )
+int main(int argc, char* argv[])
 {
     ///////////////////////////////////////////////////////////////////////////
     // Parse command line.
@@ -266,25 +240,21 @@ int main(
 
     options_description cmdline("Usage: serial_lifo_overhead [options]");
 
-    cmdline.add_options()
-        ( "help,h"
-        , "print out program usage (this message)")
+    cmdline.add_options()("help,h", "print out program usage (this message)")
 
-        ( "threads,t"
-        , value<std::uint64_t>(&threads)->default_value(1)
-        , "number of threads to use")
+        ("threads,t", value<std::uint64_t>(&threads)->default_value(1),
+            "number of threads to use")
 
-        ( "iterations"
-        , value<std::uint64_t>(&iterations)->default_value(2000000)
-        , "number of iterations to perform (most be divisible by block size)")
+            ("iterations",
+                value<std::uint64_t>(&iterations)->default_value(2000000),
+                "number of iterations to perform (most be divisible by block "
+                "size)")
 
-        ( "blocksize"
-        , value<std::uint64_t>(&blocksize)->default_value(10000)
-        , "size of each block")
+                ("blocksize",
+                    value<std::uint64_t>(&blocksize)->default_value(10000),
+                    "size of each block")
 
-        ( "no-header"
-        , "do not print out the header")
-        ;
+                    ("no-header", "do not print out the header");
 
     store(command_line_parser(argc, argv).options(cmdline).run(), vm);
 
@@ -306,4 +276,3 @@ int main(
 
     return app_main(vm);
 }
-

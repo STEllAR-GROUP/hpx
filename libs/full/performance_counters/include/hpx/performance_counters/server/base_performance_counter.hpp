@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,8 +12,6 @@
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/server/component.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter_base.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
@@ -21,67 +19,25 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace performance_counters { namespace server {
 
-    class base_performance_counter
+    class HPX_EXPORT base_performance_counter
       : public hpx::performance_counters::performance_counter_base
       , public hpx::traits::detail::component_tag
     {
     protected:
-        /// the following functions are not implemented by default, they will
-        /// just throw
-        void reset_counter_value() override
-        {
-            HPX_THROW_EXCEPTION(invalid_status, "reset_counter_value",
-                "reset_counter_value is not implemented for this counter");
-        }
-
-        void set_counter_value(counter_value const& /*value*/) override
-        {
-            HPX_THROW_EXCEPTION(invalid_status, "set_counter_value",
-                "set_counter_value is not implemented for this counter");
-        }
-
-        counter_value get_counter_value(bool /*reset*/) override
-        {
-            HPX_THROW_EXCEPTION(invalid_status, "get_counter_value",
-                "get_counter_value is not implemented for this counter");
-            return {};
-        }
-
-        counter_values_array get_counter_values_array(bool /*reset*/) override
-        {
-            HPX_THROW_EXCEPTION(invalid_status, "get_counter_values_array",
-                "get_counter_values_array is not implemented for this "
-                "counter");
-            return {};
-        }
-
-        bool start() override
-        {
-            return false;    // nothing to do
-        }
-
-        bool stop() override
-        {
-            return false;    // nothing to do
-        }
-
-        void reinit(bool /*reset*/) override {}
-
-        counter_info get_counter_info() const override
-        {
-            return info_;
-        }
+        // the following functions are not implemented by default, they will
+        // just throw
+        void reset_counter_value() override;
+        void set_counter_value(counter_value const& /*value*/) override;
+        counter_value get_counter_value(bool /*reset*/) override;
+        counter_values_array get_counter_values_array(bool /*reset*/) override;
+        bool start() override;
+        bool stop() override;
+        void reinit(bool /*reset*/) override;
+        counter_info get_counter_info() const override;
 
     public:
-        base_performance_counter()
-          : invocation_count_(0)
-        {
-        }
-        base_performance_counter(counter_info const& info)
-          : info_(info)
-          , invocation_count_(0)
-        {
-        }
+        base_performance_counter();
+        explicit base_performance_counter(counter_info const& info);
 
         // components must contain a typedef for wrapping_type defining the
         // component type used to encapsulate instances of this
@@ -89,8 +45,7 @@ namespace hpx { namespace performance_counters { namespace server {
         using wrapping_type = components::component<base_performance_counter>;
         using base_type_holder = base_performance_counter;
 
-        /// \brief finalize() will be called just before the instance gets
-        ///        destructed
+        // finalize() will be called just before the instance gets destructed
         constexpr void finalize() {}
 
         static components::component_type get_component_type() noexcept
@@ -103,84 +58,53 @@ namespace hpx { namespace performance_counters { namespace server {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        counter_info get_counter_info_nonvirt() const
-        {
-            return this->get_counter_info();
-        }
+        counter_info get_counter_info_nonvirt() const;
+        counter_value get_counter_value_nonvirt(bool reset);
+        counter_values_array get_counter_values_array_nonvirt(bool reset);
+        void set_counter_value_nonvirt(counter_value const& info);
+        void reset_counter_value_nonvirt();
+        bool start_nonvirt();
+        bool stop_nonvirt();
+        void reinit_nonvirt(bool reset);
 
-        counter_value get_counter_value_nonvirt(bool reset)
-        {
-            return this->get_counter_value(reset);
-        }
-
-        counter_values_array get_counter_values_array_nonvirt(bool reset)
-        {
-            return this->get_counter_values_array(reset);
-        }
-
-        void set_counter_value_nonvirt(counter_value const& info)
-        {
-            this->set_counter_value(info);
-        }
-
-        void reset_counter_value_nonvirt()
-        {
-            this->reset_counter_value();
-        }
-
-        bool start_nonvirt()
-        {
-            return this->start();
-        }
-
-        bool stop_nonvirt()
-        {
-            return this->stop();
-        }
-
-        void reinit_nonvirt(bool reset)
-        {
-            reinit(reset);
-        }
-
-        /// Each of the exposed functions needs to be encapsulated into an action
-        /// type, allowing to generate all required boilerplate code for threads,
-        /// serialization, etc.
+        // Each of the exposed functions needs to be encapsulated into an action
+        // type, allowing to generate all required boilerplate code for threads,
+        // serialization, etc.
 
         /// The \a get_counter_info_action retrieves a performance counters
         /// information.
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            get_counter_info_nonvirt, get_counter_info_action);
+            get_counter_info_nonvirt, get_counter_info_action)
 
         /// The \a get_counter_value_action queries the value of a performance
         /// counter.
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            get_counter_value_nonvirt, get_counter_value_action);
+            get_counter_value_nonvirt, get_counter_value_action)
 
         /// The \a get_counter_value_action queries the value of a performance
         /// counter.
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            get_counter_values_array_nonvirt, get_counter_values_array_action);
+            get_counter_values_array_nonvirt, get_counter_values_array_action)
 
         /// The \a set_counter_value_action
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            set_counter_value_nonvirt, set_counter_value_action);
+            set_counter_value_nonvirt, set_counter_value_action)
 
         /// The \a reset_counter_value_action
         HPX_DEFINE_COMPONENT_ACTION(base_performance_counter,
-            reset_counter_value_nonvirt, reset_counter_value_action);
+            reset_counter_value_nonvirt, reset_counter_value_action)
 
         /// The \a start_action
         HPX_DEFINE_COMPONENT_ACTION(
-            base_performance_counter, start_nonvirt, start_action);
+            base_performance_counter, start_nonvirt, start_action)
 
         /// The \a stop_action
         HPX_DEFINE_COMPONENT_ACTION(
-            base_performance_counter, stop_nonvirt, stop_action);
+            base_performance_counter, stop_nonvirt, stop_action)
 
         /// The \a reinit_action
         HPX_DEFINE_COMPONENT_ACTION(
-            base_performance_counter, reinit_nonvirt, reinit_action);
+            base_performance_counter, reinit_nonvirt, reinit_action)
 
     protected:
         hpx::performance_counters::counter_info info_;

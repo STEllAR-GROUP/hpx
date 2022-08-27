@@ -9,11 +9,11 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/futures/packaged_task.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
-#include <hpx/lcos_local/packaged_task.hpp>
 #include <hpx/lcos_local/receive_buffer.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
@@ -55,7 +55,7 @@ namespace hpx { namespace lcos { namespace local {
             {
                 return 0 == release();
             }
-            virtual void destroy()
+            virtual void destroy() noexcept
             {
                 delete this;
             }
@@ -85,7 +85,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         template <typename T>
-        void intrusive_ptr_release(channel_impl_base<T>* p)
+        void intrusive_ptr_release(channel_impl_base<T>* p) noexcept
         {
             if (p->requires_delete())
             {
@@ -193,7 +193,7 @@ namespace hpx { namespace lcos { namespace local {
                 if (generation == std::size_t(-1))
                     generation = set_generation_;
 
-                buffer_.store_received(generation, std::move(t), &l);
+                buffer_.store_received(generation, HPX_MOVE(t), &l);
                 return hpx::make_ready_future();
             }
 
@@ -219,7 +219,7 @@ namespace hpx { namespace lcos { namespace local {
                 {
                     util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     e = HPX_GET_EXCEPTION(hpx::future_cancelled,
-                        hpx::lightweight, "hpx::lcos::local::close",
+                        hpx::throwmode::lightweight, "hpx::lcos::local::close",
                         "canceled waiting on this entry");
                 }
 
@@ -248,7 +248,7 @@ namespace hpx { namespace lcos { namespace local {
             template <typename T1>
             void set(T1&& val)
             {
-                val_ = std::forward<T1>(val);
+                val_ = HPX_FORWARD(T1, val);
                 empty_ = false;
                 push_active_ = false;
             }
@@ -262,7 +262,7 @@ namespace hpx { namespace lcos { namespace local {
                 noexcept
 #endif
             {
-                val_ = std::move(val);
+                val_ = HPX_MOVE(val);
                 empty_ = false;
                 push_active_ = false;
             }
@@ -271,20 +271,19 @@ namespace hpx { namespace lcos { namespace local {
             {
                 empty_ = true;
                 pop_active_ = false;
-                return std::move(val_);
+                return HPX_MOVE(val_);
             }
 
             template <typename T1>
-            local::packaged_task<void()> push_pt(T1&& val)
+            hpx::packaged_task<void()> push_pt(T1&& val)
             {
-                return local::packaged_task<void()>(
+                return hpx::packaged_task<void()>(
                     util::deferred_call(&one_element_queue_async::set_deferred,
-                        this, std::forward<T1>(val)));
+                        this, HPX_FORWARD(T1, val)));
             }
-            local::packaged_task<T()> pop_pt()
+            hpx::packaged_task<T()> pop_pt()
             {
-                return local::packaged_task<T()>(
-                    [this]() -> T { return get(); });
+                return hpx::packaged_task<T()>([this]() -> T { return get(); });
             }
 
         public:
@@ -311,16 +310,17 @@ namespace hpx { namespace lcos { namespace local {
                                 "attempting to write to a busy queue"));
                     }
 
-                    push_ = push_pt(std::forward<T1>(val));
+                    push_ = push_pt(HPX_FORWARD(T1, val));
                     push_active_ = true;
                     return push_.get_future();
                 }
 
-                set(std::forward<T1>(val));
+                set(HPX_FORWARD(T1, val));
                 if (pop_active_)
                 {
                     // avoid lock-being-held errors
                     util::ignore_while_checking<Lock> il(&l);
+                    HPX_UNUSED(il);
 
                     pop_();    // trigger waiting pop
                 }
@@ -366,21 +366,22 @@ namespace hpx { namespace lcos { namespace local {
                 {
                     // avoid lock-being-held errors
                     util::ignore_while_checking<Lock> il(&l);
+                    HPX_UNUSED(il);
 
                     push_();    // trigger waiting push
                 }
-                return hpx::make_ready_future(std::move(val));
+                return hpx::make_ready_future(HPX_MOVE(val));
             }
 
             template <typename Lock>
-            bool is_empty(Lock& l) const HPX_NOEXCEPT_WITH_ASSERT
+            bool is_empty(Lock& l) const noexcept
             {
                 HPX_ASSERT_OWNS_LOCK(l);
                 return empty_;
             }
 
             template <typename Lock>
-            bool has_pending_request(Lock& l) const HPX_NOEXCEPT_WITH_ASSERT
+            bool has_pending_request(Lock& l) const noexcept
             {
                 HPX_ASSERT_OWNS_LOCK(l);
                 return push_active_;
@@ -388,8 +389,8 @@ namespace hpx { namespace lcos { namespace local {
 
         private:
             T val_;
-            local::packaged_task<void()> push_;
-            local::packaged_task<T()> pop_;
+            hpx::packaged_task<void()> push_;
+            hpx::packaged_task<T()> pop_;
             bool empty_;
             bool push_active_;
             bool pop_active_;
@@ -481,7 +482,7 @@ namespace hpx { namespace lcos { namespace local {
                         "attempting to write to a closed channel"));
                 }
 
-                return buffer_.push(std::move(t), l);
+                return buffer_.push(HPX_MOVE(t), l);
             }
 
             std::size_t close(bool /*force_delete_entries*/ = false)
@@ -514,7 +515,7 @@ namespace hpx { namespace lcos { namespace local {
                         "canceled waiting on this entry"));
                 }
 
-                return buffer_.cancel(std::move(e), l);
+                return buffer_.cancel(HPX_MOVE(e), l);
             }
 
             void set_exception(std::exception_ptr e)
@@ -631,7 +632,7 @@ namespace hpx { namespace lcos { namespace local {
             hpx::future<T> f;
             if (channel_->try_get(std::size_t(-1), &f))
             {
-                return std::make_pair(std::move(f), true);
+                return std::make_pair(HPX_MOVE(f), true);
             }
             return std::make_pair(hpx::future<T>(), false);
         }
@@ -655,7 +656,7 @@ namespace hpx { namespace lcos { namespace local {
         typename base_type::reference dereference() const
         {
             HPX_ASSERT(data_.second);
-            return std::move(data_.first);
+            return HPX_MOVE(data_.first);
         }
 
     private:
@@ -723,17 +724,17 @@ namespace hpx { namespace lcos { namespace local {
             ///////////////////////////////////////////////////////////////////
             void set(T val, std::size_t generation = std::size_t(-1))
             {
-                channel_->set(generation, std::move(val)).get();
+                channel_->set(generation, HPX_MOVE(val)).get();
             }
             void set(launch::sync_policy, T val,
                 std::size_t generation = std::size_t(-1))
             {
-                channel_->set(generation, std::move(val)).get();
+                channel_->set(generation, HPX_MOVE(val)).get();
             }
             hpx::future<void> set(launch::async_policy, T val,
                 std::size_t generation = std::size_t(-1))
             {
-                return channel_->set(generation, std::move(val));
+                return channel_->set(generation, HPX_MOVE(val));
             }
 
             std::size_t close(bool force_delete_entries = false)

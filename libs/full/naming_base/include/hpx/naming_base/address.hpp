@@ -13,6 +13,7 @@
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
 #include <cstdint>
+#include <ostream>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -21,7 +22,7 @@
 #define HPX_ADDRESS_VERSION 0x20
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace naming {
+namespace hpx::naming {
 
     struct address
     {
@@ -40,26 +41,19 @@ namespace hpx { namespace naming {
         {
         }
 
-        address(gid_type const& l, component_type t, void* lva) noexcept
-          : locality_(l)
-          , type_(t)
-          , address_(reinterpret_cast<address_type>(lva))
-        {
-        }
-
         constexpr address(
-            gid_type const& l, component_type t, address_type a) noexcept
+            gid_type const& l, component_type t, void* lva) noexcept
           : locality_(l)
           , type_(t)
-          , address_(a)
+          , address_(lva)
         {
         }
 
         // local only addresses
-        explicit address(
+        explicit constexpr address(
             void* lva, component_type t = component_invalid) noexcept
           : type_(t)
-          , address_(reinterpret_cast<address_type>(lva))
+          , address_(lva)
         {
         }
 
@@ -70,7 +64,8 @@ namespace hpx { namespace naming {
 
         explicit constexpr operator bool() const noexcept
         {
-            return !!locality_ && (component_invalid != type_ || 0 != address_);
+            return !!locality_ &&
+                (component_invalid != type_ || nullptr != address_);
         }
 
         friend constexpr bool operator==(
@@ -82,7 +77,7 @@ namespace hpx { namespace naming {
 
         gid_type locality_;
         component_type type_ = component_invalid;
-        address_type address_ = 0;    /// address (local virtual address)
+        address_type address_ = nullptr;    // address (local virtual address)
 
     private:
         // serialization support
@@ -96,7 +91,9 @@ namespace hpx { namespace naming {
 
         HPX_SERIALIZATION_SPLIT_MEMBER();
     };
-}}    // namespace hpx::naming
+
+    HPX_EXPORT std::ostream& operator<<(std::ostream& os, address const& addr);
+}    // namespace hpx::naming
 
 HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::address)
 

@@ -98,7 +98,7 @@ namespace hpx { namespace threads { namespace detail {
         std::unique_ptr<Scheduler> sched,
         thread_pool_init_parameters const& init)
       : thread_pool_base(init)
-      , sched_(std::move(sched))
+      , sched_(HPX_MOVE(sched))
       , thread_count_(0)
       , tasks_scheduled_(0)
       , network_background_callback_(init.network_background_callback_)
@@ -115,7 +115,7 @@ namespace hpx { namespace threads { namespace detail {
     {
         if (!threads_.empty())
         {
-            if (!sched_->Scheduler::has_reached_state(state_suspended))
+            if (!sched_->Scheduler::has_reached_state(hpx::state::suspended))
             {
                 // still running
                 std::mutex mtx;
@@ -147,7 +147,7 @@ namespace hpx { namespace threads { namespace detail {
     void scheduled_thread_pool<Scheduler>::report_error(
         std::size_t global_thread_num, std::exception_ptr const& e)
     {
-        sched_->Scheduler::set_all_states_at_least(state_terminating);
+        sched_->Scheduler::set_all_states_at_least(hpx::state::terminating);
         this->thread_pool_base::report_error(global_thread_num, e);
         sched_->Scheduler::on_error(global_thread_num, e);
     }
@@ -230,7 +230,7 @@ namespace hpx { namespace threads { namespace detail {
             resume_internal(blocking, throws);
 
             // set state to stopping
-            sched_->Scheduler::set_all_states_at_least(state_stopping);
+            sched_->Scheduler::set_all_states_at_least(hpx::state::stopping);
 
             // make sure we're not waiting
             sched_->Scheduler::do_some_work(std::size_t(-1));
@@ -287,7 +287,7 @@ namespace hpx { namespace threads { namespace detail {
         }
 
         if (!threads_.empty() ||
-            sched_->Scheduler::has_reached_state(state_running))
+            sched_->Scheduler::has_reached_state(hpx::state::running))
         {
             return true;    // do nothing if already running
         }
@@ -396,9 +396,9 @@ namespace hpx { namespace threads { namespace detail {
 
         for (std::size_t i = 0; i != threads_.size(); ++i)
         {
-            hpx::state expected = state_running;
+            hpx::state expected = hpx::state::running;
             sched_->Scheduler::get_state(i).compare_exchange_strong(
-                expected, state_pre_sleep);
+                expected, hpx::state::pre_sleep);
         }
 
         for (std::size_t i = 0; i != threads_.size(); ++i)
@@ -435,7 +435,7 @@ namespace hpx { namespace threads { namespace detail {
         if (LHPX_ENABLED(debug))
             topo.write_to_log();
 
-        error_code ec(lightweight);
+        error_code ec(throwmode::lightweight);
         if (any(mask))
         {
             topo.set_thread_affinity_mask(mask, ec);
@@ -458,7 +458,7 @@ namespace hpx { namespace threads { namespace detail {
         // be done in order to give the parcel pool threads higher
         // priority
         if (get_scheduler()->has_scheduler_mode(
-                policies::reduce_thread_priority))
+                policies::scheduler_mode::reduce_thread_priority))
         {
             topo.reduce_thread_priority(ec);
             if (ec)
@@ -478,8 +478,8 @@ namespace hpx { namespace threads { namespace detail {
         // set state to running
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(thread_num);
-        hpx::state oldstate = state.exchange(state_running);
-        HPX_ASSERT(oldstate <= state_running);
+        hpx::state oldstate = state.exchange(hpx::state::running);
+        HPX_ASSERT(oldstate <= hpx::state::running);
         HPX_UNUSED(oldstate);
 
         // wait for all threads to start up before before starting HPX work
@@ -526,7 +526,7 @@ namespace hpx { namespace threads { namespace detail {
                     max_idle_loop_count_, max_busy_loop_count_);
 
                 if (get_scheduler()->has_scheduler_mode(
-                        policies::do_background_work) &&
+                        policies::scheduler_mode::do_background_work) &&
                     network_background_callback_)
                 {
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
@@ -551,7 +551,8 @@ namespace hpx { namespace threads { namespace detail {
                          thread_schedule_state::suspended,
                          thread_priority::default_, thread_num) == 0 &&
                         sched_->Scheduler::get_queue_length(thread_num) == 0) ||
-                    sched_->Scheduler::get_state(thread_num) > state_stopping);
+                    sched_->Scheduler::get_state(thread_num) >
+                        hpx::state::stopping);
             }
             catch (hpx::exception const& e)
             {
@@ -601,7 +602,8 @@ namespace hpx { namespace threads { namespace detail {
         thread_init_data& data, thread_id_ref_type& id, error_code& ec)
     {
         // verify state
-        if (thread_count_ == 0 && !sched_->Scheduler::is_state(state_running))
+        if (thread_count_ == 0 &&
+            !sched_->Scheduler::is_state(hpx::state::running))
         {
             // thread-manager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
@@ -621,7 +623,8 @@ namespace hpx { namespace threads { namespace detail {
         thread_init_data& data, error_code& ec)
     {
         // verify state
-        if (thread_count_ == 0 && !sched_->Scheduler::is_state(state_running))
+        if (thread_count_ == 0 &&
+            !sched_->Scheduler::is_state(hpx::state::running))
         {
             // thread-manager is not currently running
             HPX_THROWS_IF(ec, invalid_status,
@@ -686,7 +689,7 @@ namespace hpx { namespace threads { namespace detail {
     {
         while (first != last)
         {
-            init = std::move(init) + HPX_INVOKE(proj, *first++);
+            init = HPX_MOVE(init) + HPX_INVOKE(proj, *first++);
         }
         return init;
     }
@@ -1870,12 +1873,13 @@ namespace hpx { namespace threads { namespace detail {
 
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
-        hpx::state oldstate = state.exchange(state_initialized);
-        HPX_ASSERT(oldstate == state_stopped || oldstate == state_initialized);
+        hpx::state oldstate = state.exchange(hpx::state::initialized);
+        HPX_ASSERT(oldstate == hpx::state::stopped ||
+            oldstate == hpx::state::initialized);
         HPX_UNUSED(oldstate);
 
         threads_[virt_core] = std::thread(&scheduled_thread_pool::thread_func,
-            this, virt_core, thread_num, std::move(startup));
+            this, virt_core, thread_num, HPX_MOVE(startup));
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -1902,18 +1906,20 @@ namespace hpx { namespace threads { namespace detail {
             sched_->Scheduler::get_state(virt_core);
 
         // inform the scheduler to stop the virtual core
-        hpx::state oldstate = state.exchange(state_stopping);
+        hpx::state oldstate = state.exchange(hpx::state::stopping);
 
-        if (oldstate > state_stopping)
+        if (oldstate > hpx::state::stopping)
         {
             // If thread was terminating or already stopped we don't want to
             // change the value back to stopping, so we restore the old state.
             state.store(oldstate);
         }
 
-        HPX_ASSERT(oldstate == state_starting || oldstate == state_running ||
-            oldstate == state_stopping || oldstate == state_stopped ||
-            oldstate == state_terminating);
+        HPX_ASSERT(oldstate == hpx::state::starting ||
+            oldstate == hpx::state::running ||
+            oldstate == hpx::state::stopping ||
+            oldstate == hpx::state::stopped ||
+            oldstate == hpx::state::terminating);
 
         std::thread t;
         std::swap(threads_[virt_core], t);
@@ -1961,16 +1967,17 @@ namespace hpx { namespace threads { namespace detail {
             sched_->Scheduler::get_state(virt_core);
 
         // Inform the scheduler to suspend the virtual core only if running
-        hpx::state expected = state_running;
-        state.compare_exchange_strong(expected, state_pre_sleep);
+        hpx::state expected = hpx::state::running;
+        state.compare_exchange_strong(expected, hpx::state::pre_sleep);
 
         l.unlock();
 
-        HPX_ASSERT(expected == state_running || expected == state_pre_sleep ||
-            expected == state_sleeping);
+        HPX_ASSERT(expected == hpx::state::running ||
+            expected == hpx::state::pre_sleep ||
+            expected == hpx::state::sleeping);
 
         util::yield_while(
-            [&state]() { return state.load() == state_pre_sleep; },
+            [&state]() { return state.load() == hpx::state::pre_sleep; },
             "scheduled_thread_pool::suspend_processing_unit_direct");
     }
 
@@ -2003,7 +2010,7 @@ namespace hpx { namespace threads { namespace detail {
         util::yield_while(
             [this, &state, virt_core]() {
                 this->sched_->Scheduler::resume(virt_core);
-                return state.load() == state_sleeping;
+                return state.load() == hpx::state::sleeping;
             },
             "scheduled_thread_pool::resume_processing_unit_direct");
     }

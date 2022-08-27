@@ -1,10 +1,14 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
+// Clang V11 ICE's on this test, Clang V8 reports a bogus constexpr problem
+#if !defined(HPX_CLANG_VERSION) ||                                             \
+    ((HPX_CLANG_VERSION / 10000) != 11 && (HPX_CLANG_VERSION / 10000) != 8)
 
 #include <hpx/local/execution.hpp>
 #include <hpx/local/future.hpp>
@@ -23,7 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 bool executed = false;
 
-void test_post_f(int passed_through, hpx::lcos::local::latch& l)
+void test_post_f(int passed_through, hpx::latch& l)
 {
     HPX_TEST_EQ(passed_through, 42);
 
@@ -37,7 +41,7 @@ void test_post(Executor&& exec)
 {
     executed = false;
 
-    hpx::lcos::local::latch l(2);
+    hpx::latch l(2);
     hpx::parallel::execution::post(exec, &test_post_f, 42, std::ref(l));
     l.arrive_and_wait();
 
@@ -123,13 +127,13 @@ int bulk_test(int seq, int passed_through)    //-V813
 template <typename Executor>
 void test_bulk_sync_void(Executor&& exec)
 {
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     executed = false;
 
     hpx::parallel::execution::bulk_sync_execute(
-        exec, hpx::util::bind(&bulk_test, _1, _2), 107, 42);
+        exec, hpx::bind(&bulk_test, _1, _2), 107, 42);
 
     HPX_TEST(executed);
 
@@ -143,13 +147,13 @@ void test_bulk_sync_void(Executor&& exec)
 template <typename Executor>
 void test_bulk_async_void(Executor&& exec)
 {
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     executed = false;
 
     auto result = hpx::parallel::execution::bulk_async_execute(
-        exec, hpx::util::bind(&bulk_test, _1, _2), 107, 42);
+        exec, hpx::bind(&bulk_test, _1, _2), 107, 42);
     hpx::when_all(std::move(result)).get();
 
     HPX_TEST(executed);
@@ -166,14 +170,14 @@ void test_bulk_async_void(Executor&& exec)
 template <typename Executor>
 void test_bulk_async(Executor&& exec)
 {
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
 
     executed = false;
     int const n = 107;
 
     auto fut_result = hpx::parallel::execution::bulk_async_execute(
-        exec, hpx::util::bind(&bulk_test, _1, _2), n, 42);
+        exec, hpx::bind(&bulk_test, _1, _2), n, 42);
     auto result = hpx::when_all(std::move(fut_result)).get();
 
     for (int i = 0; i < n; ++i)
@@ -213,9 +217,9 @@ int bulk_test_f(int seq, hpx::shared_future<void> f,
 template <typename Executor>
 void test_bulk_then(Executor&& exec)
 {
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    using hpx::util::placeholders::_3;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
+    using hpx::placeholders::_3;
 
     hpx::shared_future<void> f = hpx::make_ready_future();
 
@@ -223,7 +227,7 @@ void test_bulk_then(Executor&& exec)
         executed = false;
 
         auto result = hpx::parallel::execution::bulk_then_execute(
-            exec, hpx::util::bind(&bulk_test_f, _1, _2, _3), 107, f, 42)
+            exec, hpx::bind(&bulk_test_f, _1, _2, _3), 107, f, 42)
                           .get();
 
         HPX_TEST(executed);
@@ -275,16 +279,16 @@ void bulk_test_f_void(int seq, hpx::shared_future<void> f,
 template <typename Executor>
 void test_bulk_then_void(Executor&& exec)
 {
-    using hpx::util::placeholders::_1;
-    using hpx::util::placeholders::_2;
-    using hpx::util::placeholders::_3;
+    using hpx::placeholders::_1;
+    using hpx::placeholders::_2;
+    using hpx::placeholders::_3;
 
     hpx::shared_future<void> f = hpx::make_ready_future();
 
     executed = false;
 
     hpx::parallel::execution::bulk_then_execute(
-        exec, hpx::util::bind(&bulk_test_f_void, _1, _2, _3), 107, f, 42)
+        exec, hpx::bind(&bulk_test_f_void, _1, _2, _3), 107, f, 42)
         .get();
 
     HPX_TEST(executed);
@@ -340,3 +344,9 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
+#else
+int main()
+{
+    return 0;
+}
+#endif

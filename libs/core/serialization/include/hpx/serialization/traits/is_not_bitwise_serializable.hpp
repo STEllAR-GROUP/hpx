@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
 
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     // This traits can be used in systems that assume that all types are bitwise
     // serializable by default (like SHAD), while still enforcing normal
@@ -30,7 +30,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_not_bitwise_serializable_v =
+    inline constexpr bool is_not_bitwise_serializable_v =
         is_not_bitwise_serializable<T>::value;
 #else
     template <typename T>
@@ -39,17 +39,16 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_not_bitwise_serializable_v = true;
+    inline constexpr bool is_not_bitwise_serializable_v = true;
 #endif
 
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
 #define HPX_IS_NOT_BITWISE_SERIALIZABLE(T)                                     \
-    namespace hpx { namespace traits {                                         \
-            template <>                                                        \
-            struct is_not_bitwise_serializable<T> : std::true_type             \
-            {                                                                  \
-            };                                                                 \
-        }                                                                      \
+    namespace hpx::traits {                                                    \
+        template <>                                                            \
+        struct is_not_bitwise_serializable<T> : std::true_type                 \
+        {                                                                      \
+        };                                                                     \
     }                                                                          \
     /**/

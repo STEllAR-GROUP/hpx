@@ -77,7 +77,7 @@ namespace hpx { namespace components {
         default_distribution_policy operator()(
             std::vector<id_type>&& locs) const
         {
-            return default_distribution_policy(std::move(locs));
+            return default_distribution_policy(HPX_MOVE(locs));
         }
 
         /// Create a new \a default_distribution policy representing the given
@@ -112,7 +112,7 @@ namespace hpx { namespace components {
                     if (get_num_items(1, loc) != 0)
                     {
                         return create_async<Component>(
-                            loc, std::forward<Ts>(vs)...);
+                            loc, HPX_FORWARD(Ts, vs)...);
                     }
                 }
             }
@@ -121,7 +121,7 @@ namespace hpx { namespace components {
             // locality
             return create_async<Component>(
                 naming::get_id_from_locality_id(agas::get_locality_id()),
-                std::forward<Ts>(vs)...);
+                HPX_FORWARD(Ts, vs)...);
         }
 
         /// \cond NOINTERNAL
@@ -161,7 +161,7 @@ namespace hpx { namespace components {
                 auto localities = localities_;
                 return hpx::dataflow(
                     hpx::launch::sync,
-                    [localities = std::move(localities)](
+                    [localities = HPX_MOVE(localities)](
                         std::vector<hpx::future<std::vector<hpx::id_type>>>&&
                             v) mutable -> std::vector<bulk_locality_result> {
                         HPX_ASSERT(localities->size() == v.size());
@@ -175,18 +175,17 @@ namespace hpx { namespace components {
                         }
                         return result;
                     },
-                    std::move(objs));
+                    HPX_MOVE(objs));
             }
 
             // handle special cases
             hpx::id_type id = get_next_target();
 
             hpx::future<std::vector<hpx::id_type>> f =
-                bulk_create_async<Component>(
-                    id, count, std::forward<Ts>(vs)...);
+                bulk_create_async<Component>(id, count, HPX_FORWARD(Ts, vs)...);
 
             return f.then(hpx::launch::sync,
-                [id = std::move(id)](hpx::future<std::vector<hpx::id_type>>&& f)
+                [id = HPX_MOVE(id)](hpx::future<std::vector<hpx::id_type>>&& f)
                     -> std::vector<bulk_locality_result> {
                     std::vector<bulk_locality_result> result;
                     result.emplace_back(id, f.get());
@@ -210,7 +209,7 @@ namespace hpx { namespace components {
             launch policy, Ts&&... vs) const
         {
             return hpx::detail::async_impl<Action>(
-                policy, get_next_target(), std::forward<Ts>(vs)...);
+                policy, get_next_target(), HPX_FORWARD(Ts, vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
@@ -221,7 +220,7 @@ namespace hpx { namespace components {
             launch policy, Callback&& cb, Ts&&... vs) const
         {
             return hpx::detail::async_cb_impl<Action>(policy, get_next_target(),
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
@@ -231,16 +230,15 @@ namespace hpx { namespace components {
         bool apply(Continuation&& c, threads::thread_priority priority,
             Ts&&... vs) const
         {
-            return hpx::detail::apply_impl<Action>(
-                std::forward<Continuation>(c), get_next_target(), priority,
-                std::forward<Ts>(vs)...);
+            return hpx::detail::apply_impl<Action>(HPX_FORWARD(Continuation, c),
+                get_next_target(), priority, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action, typename... Ts>
         bool apply(threads::thread_priority priority, Ts&&... vs) const
         {
             return hpx::detail::apply_impl<Action>(
-                get_next_target(), priority, std::forward<Ts>(vs)...);
+                get_next_target(), priority, HPX_FORWARD(Ts, vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
@@ -252,8 +250,8 @@ namespace hpx { namespace components {
             Callback&& cb, Ts&&... vs) const
         {
             return hpx::detail::apply_cb_impl<Action>(
-                std::forward<Continuation>(c), get_next_target(), priority,
-                std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                HPX_FORWARD(Continuation, c), get_next_target(), priority,
+                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action, typename Callback, typename... Ts>
@@ -261,7 +259,7 @@ namespace hpx { namespace components {
             threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
         {
             return hpx::detail::apply_cb_impl<Action>(get_next_target(),
-                priority, std::forward<Callback>(cb), std::forward<Ts>(vs)...);
+                priority, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         /// Returns the number of associated localities for this distribution
@@ -336,7 +334,7 @@ namespace hpx { namespace components {
 
         explicit default_distribution_policy(std::vector<id_type>&& localities)
           : localities_(
-                std::make_shared<std::vector<id_type>>(std::move(localities)))
+                std::make_shared<std::vector<id_type>>(HPX_MOVE(localities)))
         {
             if (localities_->empty())
             {

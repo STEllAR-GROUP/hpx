@@ -41,7 +41,7 @@ struct pipeline
             tasks.push_back(hpx::async(grep, "Error.*", std::move(s)));
         }
 
-        wait_all(tasks);
+        hpx::wait_all(tasks);
     }
 };
 

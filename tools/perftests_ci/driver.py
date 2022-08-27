@@ -40,7 +40,7 @@ def driver(verbose, logfile):
           help='only execute CMake but do not build')
 @args.arg('--build-dir', '-o', required=True, help='build directory')
 @args.arg('--build-type', '-b', choices=['release', 'debug'], required=True)
-@args.arg('--environment', '-e', help='path to environment file')
+@args.arg('--environment', '-e', nargs='?', help='path to environment file')
 @args.arg('--install-dir', '-i', help='install directory')
 @args.arg('--source-dir', help= var._project_name +' source directory')
 @args.arg('--target', '-t', nargs='+', help='make targets to build')
@@ -55,7 +55,6 @@ def build(build_type, environment, target, source_dir, build_dir, install_dir,
     env.set_cmake_arg('PYUTILS_HPX_WITH_FETCH_ASIO', 'ON')
     env.set_cmake_arg('PYUTILS_HPX_WITH_MALLOC', 'jemalloc')
     env.set_cmake_arg('PYUTILS_HPX_WITH_TESTS_BENCHMARKS', 'ON')
-    env.set_cmake_arg('PYUTILS_HPX_WITH_MAX_CPU_COUNT', '72')
     env.set_cmake_arg('PYUTILS_CMAKE_BUILD_TYPE', 'Release')
     env.set_cmake_arg('-GNinja', '')
     # For possibly more stable/focused results
@@ -119,28 +118,18 @@ if buildinfo:
     @args.arg('--local',
               default=False,
               help='run without slurm')
-    @args.arg('--scheduling-policy',
-              '-s',
-              default='local-priority-fifo',
-              help='scheduling policy (default is local-priority-fifo)')
-    @args.arg('--threads',
-              default='4',
-              type=int,
-              help='number of runs to do for each test')
     @args.arg('--run_output',
               '-o',
               required=True,
               help='output file path, extension .json is added if not given')
-    @args.arg('--extra-opts',
+    @args.arg('--targets-and-opts',
               nargs='+',
               type=str,
               help='extra arguments to pass to the test\nWarning prefer = to \
               space to assign values to hpx options')
-    def run(local, scheduling_policy, threads, run_output, extra_opts):
+    def run(local, run_output, targets_and_opts):
         # options
-        scheduling_policy='--hpx:queuing=' + scheduling_policy
-        threads='--hpx:threads=' + str(threads)
-        extra_opts = ' '.join(extra_opts).lstrip()
+        targets_and_opts = ' '.join(targets_and_opts).lstrip()
 
         if not run_output.lower().endswith('.json'):
             run_output += '.json'
@@ -148,7 +137,7 @@ if buildinfo:
         mkdirp(run_output)
 
         import perftest
-        data = perftest.run(local, scheduling_policy, threads, extra_opts)
+        data = perftest.run(local, targets_and_opts)
         with open(run_output, 'w') as outfile:
             json.dump(data, outfile, indent='  ')
             log.info(f'Successfully saved perftests output to {run_output}')
@@ -159,18 +148,16 @@ def plot():
     pass
 
 
-def _load_json(filename):
-    with open(filename, 'r') as file:
-        return json.load(file)
-
-
 @plot.command(description='plot performance comparison')
 @args.arg('--output', '-o', required=True, help='output directory')
-@args.arg('--input', '-i', required=True, nargs=2, help='two input files')
-def compare(output, input):
+@args.arg('--references', required=True, nargs='+', help='List of \
+    references for all corresponding results')
+@args.arg('--results', required=True, nargs='+', help='List of \
+    references for all corresponding results')
+def compare(output, references, results):
     mkdirp(output)
     from perftest import plot
-    exitcode = plot.compare(*(_load_json(i) for i in input), output)
+    exitcode = plot.compare_all(results, references, output)
     print("exit code in compare function " + str(exitcode))
     raise SystemExit(exitcode)
 
@@ -194,7 +181,7 @@ def compare(output, input):
 def history(h_output, h_input, date, limit):
     from perftest import plot
 
-    plot.history([_load_json(i) for i in h_input], h_output, date, limit)
+    plot.history([plot._load_json(i) for i in h_input], h_output, date, limit)
 
 
 @plot.command(description='plot backends comparison')
@@ -207,7 +194,7 @@ def history(h_output, h_input, date, limit):
 def compare_backends(cb_output, cb_input):
     from perftest import plot
 
-    plot.compare_backends([_load_json(i) for i in cb_input], cb_output)
+    plot.compare_backends([plot._load_json(i) for i in cb_input], cb_output)
 
 
 # We disable this warning as the parameter has a default value (see argparse)

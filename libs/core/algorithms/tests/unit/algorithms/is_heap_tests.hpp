@@ -520,9 +520,9 @@ void test_is_heap(bool test_for_is_heap = true)
     test_is_heap_with_pred(
         seq, IteratorTag(), int(), std::greater<int>(), test_for_is_heap);
     test_is_heap_with_pred(
-        par, IteratorTag(), int(), std::less<int>(), test_for_is_heap);
-    test_is_heap_with_pred(par_unseq, IteratorTag(), int(),
-        std::greater_equal<int>(), test_for_is_heap);
+        par, IteratorTag(), int(), std::greater<int>(), test_for_is_heap);
+    test_is_heap_with_pred(
+        par_unseq, IteratorTag(), int(), std::greater<int>(), test_for_is_heap);
 
     test_is_heap_async(seq(task), IteratorTag(), int(), test_for_is_heap);
     test_is_heap_async(par(task), IteratorTag(), int(), test_for_is_heap);

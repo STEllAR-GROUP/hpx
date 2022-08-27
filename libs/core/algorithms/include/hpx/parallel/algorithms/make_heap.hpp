@@ -105,10 +105,10 @@ namespace hpx {
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
@@ -158,15 +158,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
             RndIter child_i = first + child;
 
             if ((child + 1) < len &&
-                hpx::util::invoke(comp, hpx::util::invoke(proj, *child_i),
-                    hpx::util::invoke(proj, *(child_i + 1))))
+                HPX_INVOKE(comp, HPX_INVOKE(proj, *child_i),
+                    HPX_INVOKE(proj, *(child_i + 1))))
             {
                 ++child_i;
                 ++child;
             }
 
-            if (hpx::util::invoke(comp, hpx::util::invoke(proj, *child_i),
-                    hpx::util::invoke(proj, *start)))
+            if (HPX_INVOKE(
+                    comp, HPX_INVOKE(proj, *child_i), HPX_INVOKE(proj, *start)))
                 return;
 
             typename std::iterator_traits<RndIter>::value_type top = *start;
@@ -183,15 +183,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 child_i = first + child;
 
                 if ((child + 1) < len &&
-                    hpx::util::invoke(comp, hpx::util::invoke(proj, *child_i),
-                        hpx::util::invoke(proj, *(child_i + 1))))
+                    HPX_INVOKE(comp, HPX_INVOKE(proj, *child_i),
+                        HPX_INVOKE(proj, *(child_i + 1))))
                 {
                     ++child_i;
                     ++child;
                 }
 
-            } while (!hpx::util::invoke(comp, hpx::util::invoke(proj, *child_i),
-                hpx::util::invoke(proj, top)));
+            } while (!HPX_INVOKE(
+                comp, HPX_INVOKE(proj, *child_i), HPX_INVOKE(proj, top)));
 
             *start = top;
         }
@@ -241,7 +241,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 ExPolicy, RndIter first, Sent last, Comp&& comp, Proj&& proj)
             {
                 return sequential_make_heap(first, last,
-                    std::forward<Comp>(comp), std::forward<Proj>(proj));
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename RndIter, typename Sent,
@@ -256,7 +256,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 if (n <= 1)
                 {
                     return util::detail::algorithm_result<ExPolicy,
-                        RndIter>::get(std::move(first));
+                        RndIter>::get(HPX_MOVE(first));
                 }
 
                 using execution_policy = typename std::decay<ExPolicy>::type;
@@ -271,7 +271,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 scoped_executor_parameters scoped_params(
                     policy.parameters(), policy.executor());
 
-                std::vector<hpx::future<void>> workitems;
                 std::list<std::exception_ptr> errors;
 
                 using tuple_type = hpx::tuple<RndIter, std::size_t>;
@@ -341,16 +340,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             }
 
                             // Reserve items/chunk_size spaces for async calls
-                            workitems = execution::bulk_async_execute(
+                            auto&& workitems = execution::bulk_async_execute(
                                 policy.executor(), op, shapes);
 
                             // Required synchronization per level
-                            hpx::wait_all(workitems);
-
-                            // collect exceptions
-                            util::detail::handle_local_exceptions<
-                                ExPolicy>::call(workitems, errors, false);
-                            workitems.clear();
+                            if (hpx::wait_all_nothrow(workitems))
+                            {
+                                // collect exceptions
+                                util::detail::handle_local_exceptions<
+                                    ExPolicy>::call(workitems, errors, false);
+                            }
                         }
 
                         if (!errors.empty())
@@ -362,8 +361,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     scoped_params.mark_end_of_scheduling();
 
                     // Perform sift down for the head node
-                    sift_down(first, comp = std::forward<Comp>(comp),
-                        proj = std::forward<Proj>(proj), n, first);
+                    sift_down(first, comp = HPX_FORWARD(Comp, comp),
+                        proj = HPX_FORWARD(Proj, proj), n, first);
                 }
                 catch (...)
                 {
@@ -372,12 +371,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 // rethrow exceptions, if any
-                util::detail::handle_local_exceptions<ExPolicy>::call(
-                    workitems, errors);
+                util::detail::handle_local_exceptions<ExPolicy>::call(errors);
 
                 std::advance(first, n);
                 return util::detail::algorithm_result<ExPolicy, RndIter>::get(
-                    std::move(first));
+                    HPX_MOVE(first));
             }
 
             template <typename ExPolicy, typename RndIter, typename Sent,
@@ -387,8 +385,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 parallel(ExPolicy&& policy, RndIter first, Sent last,
                     Comp&& comp, Proj&& proj)
             {
-                return make_heap_thread(std::forward<ExPolicy>(policy), first,
-                    last, std::forward<Comp>(comp), std::forward<Proj>(proj));
+                return make_heap_thread(HPX_FORWARD(ExPolicy, policy), first,
+                    last, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
             }
 
             template <typename RndIter, typename Sent, typename Comp,
@@ -399,10 +397,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Sent last, Comp&& comp, Proj&& proj)
             {
                 return execution::async_execute(policy.executor(),
-                    [=, comp = std::forward<Comp>(comp),
-                        proj = std::forward<Proj>(proj)]() mutable {
+                    [=, comp = HPX_FORWARD(Comp, comp),
+                        proj = HPX_FORWARD(Proj, proj)]() mutable {
                         return make_heap_thread(policy, first, last,
-                            std::forward<Comp>(comp), std::forward<Proj>(proj));
+                            HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
                     });
             }
         };
@@ -413,7 +411,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // DPO for hpx::make_heap
-    HPX_INLINE_CONSTEXPR_VARIABLE struct make_heap_t final
+    inline constexpr struct make_heap_t final
       : hpx::detail::tag_parallel_algorithm<make_heap_t>
     {
     private:
@@ -430,7 +428,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_fallback_dispatch(make_heap_t, ExPolicy&& policy, RndIter first,
+        tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RndIter first,
             RndIter last, Comp&& comp)
         {
             static_assert(
@@ -439,8 +437,8 @@ namespace hpx {
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
                 hpx::parallel::v1::detail::make_heap<RndIter>().call(
-                    std::forward<ExPolicy>(policy), first, last,
-                    std::forward<Comp>(comp),
+                    HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(Comp, comp),
                     hpx::parallel::util::projection_identity{}));
         }
 
@@ -453,7 +451,7 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
             ExPolicy>::type
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             make_heap_t, ExPolicy&& policy, RndIter first, RndIter last)
         {
             static_assert(
@@ -465,7 +463,7 @@ namespace hpx {
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
                 hpx::parallel::v1::detail::make_heap<RndIter>().call(
-                    std::forward<ExPolicy>(policy), first, last,
+                    HPX_FORWARD(ExPolicy, policy), first, last,
                     std::less<value_type>(),
                     hpx::parallel::util::projection_identity{}));
         }
@@ -480,7 +478,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(
+        friend void tag_fallback_invoke(
             make_heap_t, RndIter first, RndIter last, Comp&& comp)
         {
             static_assert(
@@ -488,7 +486,7 @@ namespace hpx {
                 "Requires random access iterator.");
 
             hpx::parallel::v1::detail::make_heap<RndIter>().call(
-                hpx::execution::seq, first, last, std::forward<Comp>(comp),
+                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
                 hpx::parallel::util::projection_identity{});
         }
 
@@ -498,7 +496,7 @@ namespace hpx {
                 hpx::traits::is_iterator<RndIter>::value
             )>
         // clang-format on
-        friend void tag_fallback_dispatch(
+        friend void tag_fallback_invoke(
             make_heap_t, RndIter first, RndIter last)
         {
             static_assert(

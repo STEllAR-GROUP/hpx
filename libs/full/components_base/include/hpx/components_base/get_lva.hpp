@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -29,44 +29,28 @@ namespace hpx {
     /// \tparam Component  This is the type of the component implementing the
     ///                    action to execute.
     template <typename Component, typename Enable = void>
-    struct get_lva;
-
-    template <typename Component>
-    struct get_lva<Component,
-        typename std::enable_if<
-            !traits::is_managed_component<Component>::value>::type>
+    struct get_lva
     {
-        static Component* call(naming::address_type lva)
+        constexpr static Component* call(naming::address_type lva) noexcept
         {
-            return reinterpret_cast<Component*>(lva);
-        }
-    };
-
-    template <typename Component>
-    struct get_lva<Component,
-        typename std::enable_if<
-            traits::is_managed_component<Component>::value &&
-            !std::is_const<Component>::value>::type>
-    {
-        static Component* call(naming::address_type lva)
-        {
-            typedef typename Component::wrapping_type wrapping_type;
-            return reinterpret_cast<wrapping_type*>(lva)->get_checked();
-        }
-    };
-
-    template <typename Component>
-    struct get_lva<Component,
-        typename std::enable_if<
-            traits::is_managed_component<Component>::value &&
-            std::is_const<Component>::value>::type>
-    {
-        static Component* call(naming::address_type lva)
-        {
-            typedef
-                typename std::add_const<typename Component::wrapping_type>::type
-                    wrapping_type;
-            return reinterpret_cast<wrapping_type*>(lva)->get_checked();
+            if constexpr (traits::is_managed_component_v<Component>)
+            {
+                if constexpr (std::is_const_v<Component>)
+                {
+                    using wrapping_type =
+                        std::add_const_t<typename Component::wrapping_type>;
+                    return static_cast<wrapping_type*>(lva)->get();
+                }
+                else
+                {
+                    using wrapping_type = typename Component::wrapping_type;
+                    return static_cast<wrapping_type*>(lva)->get();
+                }
+            }
+            else
+            {
+                return static_cast<Component*>(lva);
+            }
         }
     };
 }    // namespace hpx

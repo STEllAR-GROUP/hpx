@@ -31,9 +31,9 @@ using hpx::init;
 
 using std::chrono::milliseconds;
 
+using hpx::id_type;
 using hpx::naming::get_locality_id_from_id;
 using hpx::naming::get_management_type_name;
-using hpx::naming::id_type;
 using hpx::naming::detail::get_credit_from_gid;
 
 using hpx::components::component_type;
@@ -52,11 +52,10 @@ using hpx::util::report_errors;
 
 using hpx::cout;
 using hpx::find_here;
-using hpx::flush;
 
 void split(id_type const& from, id_type const& target, std::int64_t old_credit);
 
-HPX_PLAIN_ACTION(split);
+HPX_PLAIN_ACTION(split)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions.
@@ -71,7 +70,7 @@ void split(id_type const& from, id_type const& target, std::int64_t old_credit)
     cout << "[" << find_here() << "/" << target << "]: " << old_credit << ", "
          << get_credit(target) << ", "
          << get_management_type_name(target.get_management_type()) << "\n"
-         << flush;
+         << std::flush;
 
     // If we have more credits than the sender, then we're done.
     if (old_credit < get_credit(target))
@@ -88,7 +87,7 @@ void split(id_type const& from, id_type const& target, std::int64_t old_credit)
     // Recursively call split on the sender locality.
     async<split_action>(from, here, target, get_credit(target)).get();
 
-    cout << "  after split: " << get_credit(target) << "\n" << flush;
+    cout << "  after split: " << get_credit(target) << "\n" << std::flush;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -114,12 +113,12 @@ void hpx_test_main(variables_map& vm)
 
         cout << "id: " << id << " "
              << get_management_type_name(id.get_management_type()) << "\n"
-             << flush;
+             << std::flush;
 
         async<split_action>(remote_localities[0], here, id, get_credit(id))
             .get();
 
-        cout << "after split: " << get_credit(id) << "\n" << flush;
+        cout << "after split: " << get_credit(id) << "\n" << std::flush;
     }
 
     // Flush pending reference counting operations.
@@ -139,14 +138,14 @@ int hpx_main(variables_map& vm)
         cout << std::string(80, '#') << "\n"
              << "simple component test\n"
              << std::string(80, '#') << "\n"
-             << flush;
+             << std::flush;
 
         hpx_test_main<simple_refcnt_monitor>(vm);
 
         cout << std::string(80, '#') << "\n"
              << "managed component test\n"
              << std::string(80, '#') << "\n"
-             << flush;
+             << std::flush;
 
         hpx_test_main<managed_refcnt_monitor>(vm);
     }

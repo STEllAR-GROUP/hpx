@@ -11,29 +11,30 @@
 #include <utility>
 #include <vector>
 
-#include "read_values.hpp"
-#include "partition.hpp"
 #include "interpolate1d.hpp"
+#include "partition.hpp"
+#include "read_values.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality
-HPX_REGISTER_COMPONENT_MODULE();    // create entry point for component factory
+HPX_REGISTER_COMPONENT_MODULE()    // create entry point for component factory
 
 ///////////////////////////////////////////////////////////////////////////////
 typedef interpolate1d::partition partition_client_type;
-HPX_DEFINE_GET_COMPONENT_TYPE(partition_client_type);
+HPX_DEFINE_GET_COMPONENT_TYPE(partition_client_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Interpolation client
-namespace interpolate1d
-{
+namespace interpolate1d {
     // create one partition on each of the localities, initialize the partitions
-    interpolate1d::interpolate1d(std::string const& datafilename,
-            std::size_t num_instances)
-      : num_elements_(0), minval_(0), delta_(0)
+    interpolate1d::interpolate1d(
+        std::string const& datafilename, std::size_t num_instances)
+      : num_elements_(0)
+      , minval_(0)
+      , delta_(0)
     {
         // we want to create 'partition' instances
-        hpx::future<std::vector<partition> > result = hpx::new_<partition[]>(
+        hpx::future<std::vector<partition>> result = hpx::new_<partition[]>(
             hpx::default_layout(hpx::find_all_localities()), num_instances);
 
         // initialize the partitions and store the mappings
@@ -41,11 +42,12 @@ namespace interpolate1d
     }
 
     void interpolate1d::fill_partitions(std::string const& datafilename,
-        hpx::future<std::vector<partition> > && future)
+        hpx::future<std::vector<partition>>&& future)
     {
         // read required data from file
         double maxval = 0;
-        num_elements_ = extract_data_range(datafilename, minval_, maxval, delta_);
+        num_elements_ =
+            extract_data_range(datafilename, minval_, maxval, delta_);
 
         // initialize the partitions
         partitions_ = future.get();
@@ -55,17 +57,19 @@ namespace interpolate1d
 
         std::size_t partition_size = num_elements_ / num_localities;
         std::size_t last_partition_size =
-            num_elements_ - partition_size * (num_localities-1);
+            num_elements_ - partition_size * (num_localities - 1);
 
         for (std::size_t i = 0; i != num_localities; ++i)
         {
             dimension dim;
-            if (i == num_localities-1) {
+            if (i == num_localities - 1)
+            {
                 dim.offset_ = partition_size * i;
                 dim.count_ = last_partition_size;
                 dim.size_ = num_elements_;
             }
-            else {
+            else
+            {
                 dim.offset_ = partition_size * i;
                 dim.count_ = partition_size;
                 dim.size_ = num_elements_;
@@ -87,5 +91,4 @@ namespace interpolate1d
 
         return partitions_[index];
     }
-}
-
+}    // namespace interpolate1d

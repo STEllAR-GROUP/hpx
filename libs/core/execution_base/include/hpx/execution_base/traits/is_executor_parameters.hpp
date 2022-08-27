@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2021 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //  Copyright (c) 2016 Marcin Copik
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <functional>
 #include <type_traits>
@@ -38,30 +37,56 @@ namespace hpx { namespace parallel { namespace execution {
 
     template <typename Executor>
     struct extract_executor_parameters<Executor,
-        typename hpx::util::always_void<
-            typename Executor::executor_parameters_type>::type>
+        std::void_t<typename Executor::executor_parameters_type>>
     {
         using type = typename Executor::executor_parameters_type;
     };
 
-    ///////////////////////////////////////////////////////////////////////
-    // If a parameters type exposes 'has_variable_chunk_size' aliased to
-    // std::true_type it is assumed that the number of loop iterations to
-    // combine is different for each of the generated chunks.
+    template <typename Executor>
+    using extract_executor_parameters_t =
+        typename extract_executor_parameters<Executor>::type;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // If a parameters type exposes an embedded type  'has_variable_chunk_size'
+    // it is assumed that the number of loop iterations to combine is different
+    // for each of the generated chunks.
     template <typename Parameters, typename Enable = void>
-    struct extract_has_variable_chunk_size
+    struct extract_has_variable_chunk_size : std::false_type
     {
         // by default, assume equally sized chunks
-        using type = std::false_type;
     };
 
     template <typename Parameters>
     struct extract_has_variable_chunk_size<Parameters,
-        typename hpx::util::always_void<
-            typename Parameters::has_variable_chunk_size>::type>
+        std::void_t<typename Parameters::has_variable_chunk_size>>
+      : std::true_type
     {
-        using type = typename Parameters::has_variable_chunk_size;
     };
+
+    template <typename Parameters>
+    inline constexpr bool extract_has_variable_chunk_size_v =
+        extract_has_variable_chunk_size<Parameters>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // If a parameters type exposes an embedded type 'invokes_testing_function'
+    // it is assumed that the parameters object uses the given function to
+    // determine the number of chunks to apply.
+    template <typename Parameters, typename Enable = void>
+    struct extract_invokes_testing_function : std::false_type
+    {
+        // by default, assume equally sized chunks
+    };
+
+    template <typename Parameters>
+    struct extract_invokes_testing_function<Parameters,
+        std::void_t<typename Parameters::invokes_testing_function>>
+      : std::true_type
+    {
+    };
+
+    template <typename Parameters>
+    inline constexpr bool extract_invokes_testing_function_v =
+        extract_invokes_testing_function<Parameters>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -95,7 +120,7 @@ namespace hpx { namespace parallel { namespace execution {
     using is_executor_parameters_t = typename is_executor_parameters<T>::type;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_executor_parameters_v =
+    inline constexpr bool is_executor_parameters_v =
         is_executor_parameters<T>::value;
 }}}    // namespace hpx::parallel::execution
 
@@ -111,6 +136,6 @@ namespace hpx { namespace traits {
     using is_executor_parameters_t = typename is_executor_parameters<T>::type;
 
     template <typename T>
-    HPX_INLINE_CONSTEXPR_VARIABLE bool is_executor_parameters_v =
+    inline constexpr bool is_executor_parameters_v =
         is_executor_parameters<T>::value;
 }}    // namespace hpx::traits

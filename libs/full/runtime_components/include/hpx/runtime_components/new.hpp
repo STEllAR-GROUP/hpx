@@ -258,14 +258,14 @@ namespace hpx { namespace components {
             static type call(hpx::id_type const& locality, Ts&&... vs)
             {
                 return components::create_async<Component>(
-                    locality, std::forward<Ts>(vs)...);
+                    locality, HPX_FORWARD(Ts, vs)...);
             }
 
             template <typename DistPolicy, typename... Ts>
             static type call(DistPolicy const& policy, Ts&&... vs)
             {
                 return policy.template create<Component>(
-                    std::forward<Ts>(vs)...);
+                    HPX_FORWARD(Ts, vs)...);
             }
         };
 
@@ -280,7 +280,7 @@ namespace hpx { namespace components {
                 hpx::id_type const& locality, std::size_t count, Ts&&... vs)
             {
                 return components::bulk_create_async<Component>(
-                    locality, count, std::forward<Ts>(vs)...);
+                    locality, count, HPX_FORWARD(Ts, vs)...);
             }
 
             template <typename DistPolicy, typename... Ts>
@@ -292,7 +292,7 @@ namespace hpx { namespace components {
 
                 hpx::future<std::vector<bulk_locality_result>> f =
                     policy.template bulk_create<Component>(
-                        count, std::forward<Ts>(vs)...);
+                        count, HPX_FORWARD(Ts, vs)...);
 
                 return f.then(launch::sync,
                     [count](hpx::future<std::vector<bulk_locality_result>>&& f)
@@ -322,9 +322,9 @@ namespace hpx { namespace components {
                 using component_type = typename Component::wrapping_type;
 
                 hpx::id_type id(components::server::create<component_type>(
-                                    std::forward<Ts>(ts)...),
-                    hpx::id_type::managed);
-                return hpx::make_ready_future(std::move(id));
+                                    HPX_FORWARD(Ts, ts)...),
+                    hpx::id_type::management_type::managed);
+                return hpx::make_ready_future(HPX_MOVE(id));
             }
         };
 
@@ -345,7 +345,7 @@ namespace hpx { namespace components {
                 {
                     result.push_back(hpx::id_type(
                         components::server::create<component_type>(ts...),
-                        hpx::id_type::managed));
+                        hpx::id_type::management_type::managed));
                 }
 
                 return hpx::make_ready_future(result);
@@ -364,8 +364,8 @@ namespace hpx { namespace components {
                 using component_type = typename Component::wrapping_type;
 
                 hpx::id_type id(components::server::create<component_type>(
-                                    std::forward<Ts>(ts)...),
-                    hpx::id_type::managed);
+                                    HPX_FORWARD(Ts, ts)...),
+                    hpx::id_type::management_type::managed);
 
                 return id;
             }
@@ -388,7 +388,7 @@ namespace hpx { namespace components {
                 {
                     result.push_back(hpx::id_type(
                         components::server::create<component_type>(ts...),
-                        hpx::id_type::managed));
+                        hpx::id_type::management_type::managed));
                 }
 
                 return result;
@@ -407,11 +407,11 @@ namespace hpx { namespace components {
             agas::get_locality_id())
         {
             return detail::local_new_component<Component>::call(
-                std::forward<Ts>(vs)...);
+                HPX_FORWARD(Ts, vs)...);
         }
 
         return detail::new_component<Component>::call(
-            locality, std::forward<Ts>(vs)...);
+            locality, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Component, typename DistPolicy, typename... Ts>
@@ -422,7 +422,7 @@ namespace hpx { namespace components {
     new_(DistPolicy const& policy, Ts&&... vs)
     {
         return detail::new_component<Component>::call(
-            policy, std::forward<Ts>(vs)...);
+            policy, HPX_FORWARD(Ts, vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -440,7 +440,7 @@ namespace hpx { namespace components {
             {
                 return make_client<Client>(
                     components::create_async<component_type>(
-                        locality, std::forward<Ts>(vs)...));
+                        locality, HPX_FORWARD(Ts, vs)...));
             }
 
             template <typename DistPolicy, typename... Ts>
@@ -448,7 +448,7 @@ namespace hpx { namespace components {
             {
                 return make_client<Client>(
                     policy.template create<component_type>(
-                        std::forward<Ts>(vs)...));
+                        HPX_FORWARD(Ts, vs)...));
             }
         };
 
@@ -463,7 +463,7 @@ namespace hpx { namespace components {
             static type call(Ts&&... vs)
             {
                 return new_component<component_type[]>::call(
-                    std::forward<Ts>(vs)...)
+                    HPX_FORWARD(Ts, vs)...)
                     .then(hpx::launch::sync,
                         [](hpx::future<std::vector<hpx::id_type>>&& v)
                             -> std::vector<Client> {
@@ -484,9 +484,9 @@ namespace hpx { namespace components {
             static type call(Ts&&... ts)
             {
                 hpx::id_type id(components::server::create<component_type>(
-                                    std::forward<Ts>(ts)...),
-                    hpx::id_type::managed);
-                return make_client<Client>(std::move(id));
+                                    HPX_FORWARD(Ts, ts)...),
+                    hpx::id_type::management_type::managed);
+                return make_client<Client>(HPX_MOVE(id));
             }
         };
 
@@ -501,7 +501,7 @@ namespace hpx { namespace components {
             static type call(Ts&&... ts)
             {
                 return local_new_component<component_type[]>::call(
-                    std::forward<Ts>(ts)...)
+                    HPX_FORWARD(Ts, ts)...)
                     .then(hpx::launch::sync,
                         [](hpx::future<std::vector<hpx::id_type>>&& v)
                             -> std::vector<Client> {
@@ -522,11 +522,11 @@ namespace hpx { namespace components {
             agas::get_locality_id())
         {
             return detail::local_new_client<Client>::call(
-                std::forward<Ts>(vs)...);
+                HPX_FORWARD(Ts, vs)...);
         }
 
         return detail::new_client<Client>::call(
-            locality, std::forward<Ts>(vs)...);
+            locality, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Client, typename DistPolicy, typename... Ts>
@@ -536,8 +536,7 @@ namespace hpx { namespace components {
         detail::new_client<Client>>::type
     new_(DistPolicy const& policy, Ts&&... vs)
     {
-        return detail::new_client<Client>::call(
-            policy, std::forward<Ts>(vs)...);
+        return detail::new_client<Client>::call(policy, HPX_FORWARD(Ts, vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -562,7 +561,7 @@ namespace hpx { namespace components {
     local_new(T1&& t1, Ts&&... ts)
     {
         return detail::local_new_component<Component>::call(
-            std::forward<T1>(t1), std::forward<Ts>(ts)...);
+            HPX_FORWARD(T1, t1), HPX_FORWARD(Ts, ts)...);
     }
 
     template <typename Component, typename... Ts>
@@ -572,7 +571,7 @@ namespace hpx { namespace components {
     local_new(launch::sync_policy, Ts&&... ts)
     {
         return detail::local_new_component_sync<Component>::call(
-            std::forward<Ts>(ts)...);
+            HPX_FORWARD(Ts, ts)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -582,7 +581,7 @@ namespace hpx { namespace components {
         detail::local_new_client<Client>>::type
     local_new(Ts&&... ts)
     {
-        return detail::local_new_client<Client>::call(std::forward<Ts>(ts)...);
+        return detail::local_new_client<Client>::call(HPX_FORWARD(Ts, ts)...);
     }
 }}    // namespace hpx::components
 

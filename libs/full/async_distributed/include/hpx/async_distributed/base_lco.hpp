@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,8 +16,7 @@
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
-
-#include <hpx/plugins/parcel/coalescing_message_handler_registration.hpp>
+#include <hpx/parcelset/coalescing_message_handler_registration.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -35,10 +34,10 @@ namespace hpx { namespace lcos {
         virtual void set_exception(std::exception_ptr const& e);
 
         // noop by default
-        virtual void connect(naming::id_type const&);
+        virtual void connect(hpx::id_type const&);
 
         // noop by default
-        virtual void disconnect(naming::id_type const&);
+        virtual void disconnect(hpx::id_type const&);
 
         // components must contain a typedef for wrapping_type defining the
         // managed_component type used to encapsulate instances of this
@@ -78,7 +77,7 @@ namespace hpx { namespace lcos {
         /// overloaded by the derived concrete LCO.
         ///
         /// \param id [in] target id
-        void connect_nonvirt(naming::id_type const& id);
+        void connect_nonvirt(hpx::id_type const& id);
 
         /// The \a function disconnect_nonvirt is called whenever a
         /// \a disconnect_action is applied on a instance of a LCO. This function
@@ -86,7 +85,7 @@ namespace hpx { namespace lcos {
         /// overloaded by the derived concrete LCO.
         ///
         /// \param id [in] target id
-        void disconnect_nonvirt(naming::id_type const& id);
+        void disconnect_nonvirt(hpx::id_type const& id);
 
     public:
         /// Each of the exposed functions needs to be encapsulated into an action
@@ -96,7 +95,7 @@ namespace hpx { namespace lcos {
         /// The \a set_event_action may be used to unconditionally trigger any
         /// LCO instances, it carries no additional parameters.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco, set_event_nonvirt, set_event_action);
+            base_lco, set_event_nonvirt, set_event_action)
 
         /// The \a set_exception_action may be used to transfer arbitrary error
         /// information from the remote site to the LCO instance specified as
@@ -106,38 +105,40 @@ namespace hpx { namespace lcos {
         ///               [in] The exception encapsulating the error to report
         ///               to this LCO instance.
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco, set_exception_nonvirt, set_exception_action);
+            base_lco, set_exception_nonvirt, set_exception_action)
 
         /// The \a connect_action may be used to
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco, connect_nonvirt, connect_action);
+            base_lco, connect_nonvirt, connect_action)
 
         /// The \a set_exception_action may be used to
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
-            base_lco, disconnect_nonvirt, disconnect_action);
+            base_lco, disconnect_nonvirt, disconnect_action)
     };
 }}    // namespace hpx::lcos
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     template <>
     struct get_lva<lcos::base_lco>
     {
-        static lcos::base_lco* call(naming::address_type lva)
+        constexpr static lcos::base_lco* call(naming::address_type lva) noexcept
         {
-            typedef typename lcos::base_lco::wrapping_type wrapping_type;
-            return reinterpret_cast<wrapping_type*>(lva)->get_checked();
+            using wrapping_type = typename lcos::base_lco::wrapping_type;
+            return static_cast<wrapping_type*>(lva)->get();
         }
     };
 
     template <>
     struct get_lva<lcos::base_lco const>
     {
-        static lcos::base_lco const* call(naming::address_type lva)
+        constexpr static lcos::base_lco const* call(
+            naming::address_type lva) noexcept
         {
-            typedef typename std::add_const<
-                typename lcos::base_lco::wrapping_type>::type wrapping_type;
-            return reinterpret_cast<wrapping_type*>(lva)->get_checked();
+            using wrapping_type =
+                std::add_const_t<typename lcos::base_lco::wrapping_type>;
+            return static_cast<wrapping_type*>(lva)->get();
         }
     };
 }    // namespace hpx

@@ -13,36 +13,36 @@
 
 #include "inspector.hpp"
 
-namespace boost
-{
-  namespace inspect
-  {
+namespace boost { namespace inspect {
     class file_name_check : public inspector
     {
-      long m_name_errors;
+        long m_name_errors;
 
     public:
+        file_name_check();
 
-      file_name_check();
+        virtual const char* name() const
+        {
+            return "*N*";
+        }
+        virtual const char* desc() const
+        {
+            return "file and directory name issues";
+        }
 
-      virtual const char * name() const { return "*N*"; }
-      virtual const char * desc() const { return "file and directory name issues"; }
+        virtual void inspect(const string& library_name, const path& full_path);
 
-      virtual void inspect(
-        const string & library_name,
-        const path & full_path );
+        virtual void inspect(const string&,    // "filesystem"
+            const path&,    // "c:/foo/boost/filesystem/path.hpp"
+            const string&)
+        { /* empty */
+        }
 
-      virtual void inspect(
-        const string &, // "filesystem"
-        const path &,   // "c:/foo/boost/filesystem/path.hpp"
-        const string &)
-      { /* empty */ }
+        virtual void print_summary(std::ostream& out)
+        {
+            out << "  " << m_name_errors << " " << desc() << line_break();
+        }
 
-      virtual void print_summary(std::ostream& out)
-        { out << "  " << m_name_errors << " " << desc() << line_break(); }
-
-      virtual ~file_name_check() {}
+        virtual ~file_name_check() {}
     };
-  }
-}
-
+}}    // namespace boost::inspect

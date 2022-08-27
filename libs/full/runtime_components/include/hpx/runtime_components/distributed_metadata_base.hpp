@@ -55,7 +55,7 @@ namespace hpx { namespace components { namespace server {
             return data_;
         }
 
-        HPX_DEFINE_COMPONENT_DIRECT_ACTION(distributed_metadata_base, get);
+        HPX_DEFINE_COMPONENT_DIRECT_ACTION(distributed_metadata_base, get)
 
     private:
         ConfigData data_;
@@ -77,7 +77,7 @@ namespace hpx { namespace components { namespace server {
     HPX_REGISTER_ACTION_DECLARATION(                                           \
         ::hpx::components::server::distributed_metadata_base<                  \
             config>::get_action,                                               \
-        HPX_PP_CAT(__distributed_metadata_get_action_, name));                 \
+        HPX_PP_CAT(__distributed_metadata_get_action_, name))                  \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
         ::hpx::lcos::base_lco_with_value<config>::set_value_action,            \
         HPX_PP_CAT(__set_value_distributed_metadata_config_data_, name))       \
@@ -97,7 +97,7 @@ namespace hpx { namespace components { namespace server {
 #define HPX_DISTRIBUTED_METADATA_2(config, name)                               \
     HPX_REGISTER_ACTION(::hpx::components::server::distributed_metadata_base<  \
                             config>::get_action,                               \
-        HPX_PP_CAT(__distributed_metadata_get_action_, name));                 \
+        HPX_PP_CAT(__distributed_metadata_get_action_, name))                  \
     HPX_REGISTER_ACTION(                                                       \
         ::hpx::lcos::base_lco_with_value<config>::set_value_action,            \
         HPX_PP_CAT(__set_value_distributed_metadata_config_data_, name))       \

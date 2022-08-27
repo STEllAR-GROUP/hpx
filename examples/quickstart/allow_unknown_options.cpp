@@ -17,7 +17,7 @@
 int hpx_main(int argc, char* argv[])
 {
     for (int i = 0; i != argc; ++i)
-        hpx::cout << "arg(" << i << "): " << argv[i] << hpx::endl;
+        hpx::cout << "arg(" << i << "): " << argv[i] << std::endl;
 
     return hpx::finalize();
 }
@@ -25,8 +25,8 @@ int hpx_main(int argc, char* argv[])
 int main(int argc, char* argv[])
 {
     std::vector<std::string> const cfg = {
-        "hpx.commandline.aliasing=0",       // disable aliasing
-        "hpx.commandline.allow_unknown=1"   // allow for unknown options
+        "hpx.commandline.aliasing=0",        // disable aliasing
+        "hpx.commandline.allow_unknown=1"    // allow for unknown options
     };
 
     hpx::init_params init_args;

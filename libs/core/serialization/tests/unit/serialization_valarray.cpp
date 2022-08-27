@@ -50,7 +50,7 @@ void test(T minval, T maxval)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         std::vector<T> os;
         for (T c = minval; c < maxval; ++c)
         {
@@ -71,7 +71,7 @@ void test(T minval, T maxval)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         std::vector<A<T>> os;
         for (T c = minval; c < maxval; ++c)
         {
@@ -97,7 +97,7 @@ void test_fp(T minval, T maxval)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         std::vector<T> os;
         for (T c = minval; c < maxval; c += static_cast<T>(0.5))
         {
@@ -118,7 +118,7 @@ void test_fp(T minval, T maxval)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         std::vector<A<T>> os;
         for (T c = minval; c < maxval; c += static_cast<T>(0.5))
         {
@@ -144,7 +144,7 @@ void test_std_valarray(T first)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         std::valarray<T> oarray(N);
         std::iota(std::begin(oarray), std::end(oarray), first);
         oarchive << oarray;
@@ -160,7 +160,7 @@ void test_std_valarray(T first)
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(
-            buffer, hpx::serialization::disable_data_chunking);
+            buffer, hpx::serialization::archive_flags::disable_data_chunking);
         std::valarray<A<T>> oarray(N);
         std::iota(std::begin(oarray), std::end(oarray), first);
         oarchive << oarray;

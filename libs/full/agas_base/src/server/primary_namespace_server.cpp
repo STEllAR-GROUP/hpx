@@ -9,12 +9,11 @@
 #include <hpx/config.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/execution_base/register_locks.hpp>
 #include <hpx/format.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
@@ -41,10 +40,10 @@ namespace hpx { namespace agas {
         return naming::gid_type(agas::primary_ns_msb, agas::primary_ns_lsb);
     }
 
-    naming::id_type bootstrap_primary_namespace_id()
+    hpx::id_type bootstrap_primary_namespace_id()
     {
-        return naming::id_type(agas::primary_ns_msb, agas::primary_ns_lsb,
-            naming::id_type::unmanaged);
+        return hpx::id_type(agas::primary_ns_msb, agas::primary_ns_lsb,
+            hpx::id_type::management_type::unmanaged);
     }
 }}    // namespace hpx::agas
 
@@ -80,44 +79,14 @@ namespace hpx { namespace agas { namespace server {
     {
         if (!instance_name_.empty())
         {
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             agas::unregister_name(launch::sync, instance_name_, ec);
         }
     }
 
-#if defined(HPX_HAVE_NETWORKING) && !defined(HPX_COMPUTE_DEVICE_CODE)
-    // Parcel routing forwards the message handler request to the routed action
-    parcelset::policies::message_handler*
-    primary_namespace::get_message_handler(parcelset::parcelhandler* ph,
-        parcelset::locality const& loc, parcelset::parcel const& p)
-    {
-        typedef hpx::actions::transfer_action<
-            server::primary_namespace::route_action>
-            action_type;
-
-        action_type* act = static_cast<action_type*>(p.get_action());
-
-        parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
-        return routed_p.get_message_handler(ph, loc);
-    }
-
-    serialization::binary_filter* primary_namespace::get_serialization_filter(
-        parcelset::parcel const& p)
-    {
-        typedef hpx::actions::transfer_action<
-            server::primary_namespace::route_action>
-            action_type;
-
-        action_type* act = static_cast<action_type*>(p.get_action());
-
-        parcelset::parcel const& routed_p = hpx::actions::get<0>(*act);
-        return routed_p.get_serialization_filter();
-    }
-#endif
-
     // start migration of the given object
-    std::pair<naming::id_type, naming::address>
-    primary_namespace::begin_migration(naming::gid_type id)
+    std::pair<hpx::id_type, naming::address> primary_namespace::begin_migration(
+        naming::gid_type id)
     {
         util::scoped_timer<std::atomic<std::int64_t>> update(
             counter_data_.begin_migration_.time_,
@@ -137,7 +106,7 @@ namespace hpx { namespace agas { namespace server {
                                 "response(no_success)",
                 id);
 
-            return std::make_pair(naming::invalid_id, naming::address());
+            return std::make_pair(hpx::invalid_id, naming::address());
         }
 
         migration_table_type::iterator it = migrating_objects_.find(id);
@@ -159,7 +128,8 @@ namespace hpx { namespace agas { namespace server {
 
         gva const& g(hpx::get<1>(r));
         naming::address addr(g.prefix, g.type, g.lva());
-        naming::id_type loc(hpx::get<2>(r), id_type::unmanaged);
+        hpx::id_type loc(
+            hpx::get<2>(r), hpx::id_type::management_type::unmanaged);
         return std::make_pair(loc, addr);
     }
 
@@ -182,7 +152,7 @@ namespace hpx { namespace agas { namespace server {
             get<0>(it->second) = false;
             if (get<1>(it->second) != 0)
             {
-                get<2>(it->second).notify_all(std::move(l), hpx::throws);
+                get<2>(it->second).notify_all(HPX_MOVE(l), hpx::throws);
             }
             else
             {
@@ -445,10 +415,10 @@ namespace hpx { namespace agas { namespace server {
         return r;
     }    // }}}
 
-    naming::id_type primary_namespace::colocate(naming::gid_type const& id)
+    hpx::id_type primary_namespace::colocate(naming::gid_type const& id)
     {
-        return naming::id_type(
-            hpx::get<2>(resolve_gid(id)), naming::id_type::unmanaged);
+        return hpx::id_type(hpx::get<2>(resolve_gid(id)),
+            hpx::id_type::management_type::unmanaged);
     }
 
     naming::address primary_namespace::unbind_gid(
@@ -632,7 +602,7 @@ namespace hpx { namespace agas { namespace server {
             }
 
             // Otherwise, correct
-            lower = naming::gid_type(upper.get_msb(), 0);
+            lower = naming::gid_type(upper.get_msb(), nullptr);
             upper = lower + real_count;
         }
 
@@ -979,7 +949,7 @@ namespace hpx { namespace agas { namespace server {
         for (free_entry const& e : free_list)
         {
             // Bail if we're in late shutdown and non-local.
-            if (HPX_UNLIKELY(!threads::threadmanager_is(state_running)) &&
+            if (HPX_UNLIKELY(!threads::threadmanager_is(hpx::state::running)) &&
                 e.locality_ != locality_)
             {
                 LAGAS_(info).format(
@@ -1010,7 +980,7 @@ namespace hpx { namespace agas { namespace server {
                             std::to_string(e.gva_.type));
                     return;
                 }
-                deleter(e.gid_, std::move(addr));
+                deleter(e.gid_, HPX_MOVE(addr));
             }
             else
             {

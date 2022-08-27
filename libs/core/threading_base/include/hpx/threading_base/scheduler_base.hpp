@@ -62,7 +62,7 @@ namespace hpx { namespace threads { namespace policies {
 
         scheduler_base(std::size_t num_threads, char const* description = "",
             thread_queue_init_parameters thread_queue_init = {},
-            scheduler_mode mode = nothing_special);
+            scheduler_mode mode = scheduler_mode::nothing_special);
 
         virtual ~scheduler_base() = default;
 
@@ -167,7 +167,7 @@ namespace hpx { namespace threads { namespace policies {
         // depending on the predicate
         std::vector<std::size_t> domain_threads(std::size_t local_id,
             const std::vector<std::size_t>& ts,
-            util::function_nonser<bool(std::size_t, std::size_t)> pred);
+            hpx::function<bool(std::size_t, std::size_t)> pred);
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         virtual std::uint64_t get_creation_time(bool reset) = 0;
@@ -209,7 +209,7 @@ namespace hpx { namespace threads { namespace policies {
 
         // Enumerate all matching threads
         virtual bool enumerate_threads(
-            util::function_nonser<bool(thread_id_type)> const& f,
+            hpx::function<bool(thread_id_type)> const& f,
             thread_schedule_state state =
                 thread_schedule_state::unknown) const = 0;
 

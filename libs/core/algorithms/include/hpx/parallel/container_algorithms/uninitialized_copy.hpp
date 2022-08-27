@@ -326,7 +326,7 @@ namespace hpx { namespace ranges {
 #include <vector>
 
 namespace hpx { namespace ranges {
-    HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_copy_t final
+    inline constexpr struct uninitialized_copy_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_t>
     {
     private:
@@ -340,7 +340,7 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend hpx::parallel::util::in_out_result<InIter, FwdIter>
-        tag_fallback_dispatch(hpx::ranges::uninitialized_copy_t, InIter first1,
+        tag_fallback_invoke(hpx::ranges::uninitialized_copy_t, InIter first1,
             Sent1 last1, FwdIter first2, Sent2 last2)
         {
             static_assert(hpx::traits::is_input_iterator<InIter>::value,
@@ -366,7 +366,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
-        tag_fallback_dispatch(hpx::ranges::uninitialized_copy_t,
+        tag_fallback_invoke(hpx::ranges::uninitialized_copy_t,
             ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
             Sent2 last2)
         {
@@ -377,7 +377,7 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::uninitialized_copy_sent<
                 parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first1, last1, first2,
+                .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
                     last2);
         }
 
@@ -391,7 +391,7 @@ namespace hpx { namespace ranges {
         friend hpx::parallel::util::in_out_result<
             typename hpx::traits::range_traits<Rng1>::iterator_type,
             typename hpx::traits::range_traits<Rng2>::iterator_type>
-        tag_fallback_dispatch(
+        tag_fallback_invoke(
             hpx::ranges::uninitialized_copy_t, Rng1&& rng1, Rng2&& rng2)
         {
             using iterator_type1 =
@@ -424,7 +424,7 @@ namespace hpx { namespace ranges {
             hpx::parallel::util::in_out_result<
                 typename hpx::traits::range_traits<Rng1>::iterator_type,
                 typename hpx::traits::range_traits<Rng2>::iterator_type>>::type
-        tag_fallback_dispatch(hpx::ranges::uninitialized_copy_t,
+        tag_fallback_invoke(hpx::ranges::uninitialized_copy_t,
             ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2)
         {
             using iterator_type1 =
@@ -442,12 +442,12 @@ namespace hpx { namespace ranges {
 
             return hpx::parallel::v1::detail::uninitialized_copy_sent<
                 parallel::util::in_out_result<iterator_type1, iterator_type2>>()
-                .call(std::forward<ExPolicy>(policy), std::begin(rng1),
+                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng1),
                     std::end(rng1), std::begin(rng2), std::end(rng2));
         }
     } uninitialized_copy{};
 
-    HPX_INLINE_CONSTEXPR_VARIABLE struct uninitialized_copy_n_t final
+    inline constexpr struct uninitialized_copy_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_n_t>
     {
     private:
@@ -460,8 +460,8 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend hpx::parallel::util::in_out_result<InIter, FwdIter>
-        tag_fallback_dispatch(hpx::ranges::uninitialized_copy_n_t,
-            InIter first1, Size count, FwdIter first2, Sent2 last2)
+        tag_fallback_invoke(hpx::ranges::uninitialized_copy_n_t, InIter first1,
+            Size count, FwdIter first2, Sent2 last2)
         {
             static_assert(hpx::traits::is_input_iterator<InIter>::value,
                 "Requires at least input iterator.");
@@ -487,7 +487,7 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
-        tag_fallback_dispatch(hpx::ranges::uninitialized_copy_n_t,
+        tag_fallback_invoke(hpx::ranges::uninitialized_copy_n_t,
             ExPolicy&& policy, FwdIter1 first1, Size count, FwdIter2 first2,
             Sent2 last2)
         {
@@ -499,7 +499,7 @@ namespace hpx { namespace ranges {
             std::size_t d = parallel::v1::detail::distance(first2, last2);
             return hpx::parallel::v1::detail::uninitialized_copy_n<
                 parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                .call(std::forward<ExPolicy>(policy), first1,
+                .call(HPX_FORWARD(ExPolicy, policy), first1,
                     count <= d ? count : d, first2);
         }
     } uninitialized_copy_n{};

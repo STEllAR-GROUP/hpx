@@ -23,7 +23,7 @@ namespace hpx { namespace actions {
 
     continuation::continuation() = default;
 
-    continuation::continuation(naming::id_type const& id)
+    continuation::continuation(hpx::id_type const& id)
       : id_(id)
     {
         // Try to resolve the address locally ...
@@ -33,8 +33,8 @@ namespace hpx { namespace actions {
         }
     }
 
-    continuation::continuation(naming::id_type&& id)
-      : id_(std::move(id))
+    continuation::continuation(hpx::id_type&& id)
+      : id_(HPX_MOVE(id))
     {
         // Try to resolve the address locally ...
         if (id_ && !agas::is_local_address_cached(id_, addr_))
@@ -43,17 +43,16 @@ namespace hpx { namespace actions {
         }
     }
 
-    continuation::continuation(
-        naming::id_type const& id, naming::address&& addr)
+    continuation::continuation(hpx::id_type const& id, naming::address&& addr)
       : id_(id)
-      , addr_(std::move(addr))
+      , addr_(HPX_MOVE(addr))
     {
     }
 
     continuation::continuation(
-        naming::id_type&& id, naming::address&& addr) noexcept
-      : id_(std::move(id))
-      , addr_(std::move(addr))
+        hpx::id_type&& id, naming::address&& addr) noexcept
+      : id_(HPX_MOVE(id))
+      , addr_(HPX_MOVE(addr))
     {
     }
 
@@ -85,7 +84,7 @@ namespace hpx { namespace actions {
         }
 
         LLCO_(info).format("continuation::trigger_error({})", id_);
-        set_lco_error(id_, this->get_addr(), std::move(e));
+        set_lco_error(id_, this->get_addr(), HPX_MOVE(e));
     }
 
     void continuation::serialize(

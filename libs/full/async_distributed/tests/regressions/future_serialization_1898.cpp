@@ -31,7 +31,7 @@ struct test_server : hpx::components::component_base<test_server>
 };
 
 typedef hpx::components::component<test_server> server_type;
-HPX_REGISTER_COMPONENT(server_type, test_server);
+HPX_REGISTER_COMPONENT(server_type, test_server)
 
 std::atomic<int> test_server::alive(0);
 
@@ -42,7 +42,7 @@ hpx::id_type test(hpx::future<hpx::id_type> fid)
     return id;
 }
 
-HPX_PLAIN_ACTION(test);
+HPX_PLAIN_ACTION(test)
 
 int main()
 {
@@ -71,7 +71,7 @@ int main()
             }
 
             {
-                hpx::lcos::local::promise<hpx::id_type> pid;
+                hpx::promise<hpx::id_type> pid;
 
                 hpx::future<hpx::id_type> test_fid = pid.get_future();
                 hpx::future<hpx::id_type> fid =

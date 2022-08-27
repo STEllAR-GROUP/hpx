@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -90,23 +91,14 @@ namespace hpx { namespace util {
     void yield_while(Predicate&& predicate, const char* thread_name = nullptr,
         bool allow_timed_suspension = true)
     {
-        if (allow_timed_suspension)
+        for (std::size_t k = 0; predicate(); ++k)
         {
-            for (std::size_t k = 0; predicate(); ++k)
-            {
-                detail::yield_k(k, thread_name);
-            }
-        }
-        else
-        {
-            for (std::size_t k = 0; predicate(); ++k)
-            {
-                detail::yield_k(k % 16, thread_name);
-            }
+            detail::yield_k(allow_timed_suspension ? k : k % 16, thread_name);
         }
     }
 
     namespace detail {
+
         // yield_while_count yields until the predicate returns true
         // required_count times consecutively. This function is used in cases
         // where there is a small false positive rate and repeatedly calling the
@@ -121,40 +113,20 @@ namespace hpx { namespace util {
             bool allow_timed_suspension = true)
         {
             std::size_t count = 0;
-            if (allow_timed_suspension)
+            for (std::size_t k = 0; /**/; ++k)
             {
-                for (std::size_t k = 0;; ++k)
+                if (!predicate())
                 {
-                    if (!predicate())
+                    if (++count > required_count)
                     {
-                        if (++count > required_count)
-                        {
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        count = 0;
-                        detail::yield_k(k, thread_name);
+                        return;
                     }
                 }
-            }
-            else
-            {
-                for (std::size_t k = 0;; ++k)
+                else
                 {
-                    if (!predicate())
-                    {
-                        if (++count > required_count)
-                        {
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        count = 0;
-                        detail::yield_k(k % 16, thread_name);
-                    }
+                    count = 0;
+                    detail::yield_k(
+                        allow_timed_suspension ? k : k % 16, thread_name);
                 }
             }
         }
@@ -164,7 +136,7 @@ namespace hpx { namespace util {
         // is stopped and the function returns false. If the predicate is
         // successfully waited for the function returns true.
         template <typename Predicate>
-        HPX_NODISCARD bool yield_while_count_timeout(Predicate&& predicate,
+        [[nodiscard]] bool yield_while_count_timeout(Predicate&& predicate,
             std::size_t required_count, std::chrono::duration<double> timeout,
             const char* thread_name = nullptr,
             bool allow_timed_suspension = true)
@@ -172,55 +144,36 @@ namespace hpx { namespace util {
             // Seconds represented using a double
             using duration_type = std::chrono::duration<double>;
 
+            // Initialize timer only if needed
             bool use_timeout = timeout >= duration_type(0.0);
+            hpx::chrono::high_resolution_timer t(
+                hpx::chrono::high_resolution_timer::init::no_init);
+
+            if (use_timeout)
+            {
+                t.restart();
+            }
 
             std::size_t count = 0;
-            hpx::chrono::high_resolution_timer t;
-
-            if (allow_timed_suspension)
+            for (std::size_t k = 0; /**/; ++k)
             {
-                for (std::size_t k = 0;; ++k)
+                if (use_timeout && duration_type(t.elapsed()) > timeout)
                 {
-                    if (use_timeout && duration_type(t.elapsed()) > timeout)
-                    {
-                        return false;
-                    }
+                    return false;
+                }
 
-                    if (!predicate())
+                if (!predicate())
+                {
+                    if (++count > required_count)
                     {
-                        if (++count > required_count)
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        count = 0;
-                        detail::yield_k(k, thread_name);
+                        return true;
                     }
                 }
-            }
-            else
-            {
-                for (std::size_t k = 0;; ++k)
+                else
                 {
-                    if (use_timeout && duration_type(t.elapsed()) > timeout)
-                    {
-                        return false;
-                    }
-
-                    if (!predicate())
-                    {
-                        if (++count > required_count)
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        count = 0;
-                        detail::yield_k(k % 16, thread_name);
-                    }
+                    count = 0;
+                    detail::yield_k(
+                        allow_timed_suspension ? k : k % 16, thread_name);
                 }
             }
         }

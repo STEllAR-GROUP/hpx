@@ -192,7 +192,7 @@ int hpx_main(variables_map& vm)
         // Queue the tasks in a serial loop.
         for (std::uint64_t i = 0; i < tasks; ++i)
         {
-            thread_init_data data(make_thread_function_nullary(hpx::util::bind(
+            thread_init_data data(make_thread_function_nullary(hpx::bind(
                                       &worker_timed, payloads[i] * 1000)),
                 "worker_timed");
             register_work(data);

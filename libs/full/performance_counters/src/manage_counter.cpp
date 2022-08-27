@@ -21,7 +21,7 @@ namespace hpx { namespace performance_counters {
     struct manage_counter
     {
         manage_counter()
-          : counter_(naming::invalid_id)
+          : counter_(hpx::invalid_id)
         {
         }
 
@@ -31,21 +31,21 @@ namespace hpx { namespace performance_counters {
         }
 
         // install an (existing) counter
-        counter_status install(naming::id_type const& id,
-            counter_info const& info, error_code& ec = throws);
+        counter_status install(hpx::id_type const& id, counter_info const& info,
+            error_code& ec = throws);
 
         // uninstall the counter
         void uninstall();
 
     private:
         counter_info info_;
-        naming::id_type counter_;
+        hpx::id_type counter_;
     };
 
     counter_status manage_counter::install(
-        naming::id_type const& id, counter_info const& info, error_code& ec)
+        hpx::id_type const& id, counter_info const& info, error_code& ec)
     {
-        if (counter_ != naming::invalid_id)
+        if (counter_ != hpx::invalid_id)
         {
             HPX_THROWS_IF(ec, hpx::invalid_status, "manage_counter::install",
                 "counter has been already installed");
@@ -62,9 +62,9 @@ namespace hpx { namespace performance_counters {
     {
         if (counter_)
         {
-            error_code ec(lightweight);
+            error_code ec(throwmode::lightweight);
             detail::remove_counter(info_, counter_, ec);
-            counter_ = naming::invalid_id;
+            counter_ = hpx::invalid_id;
         }
     }
 
@@ -76,7 +76,7 @@ namespace hpx { namespace performance_counters {
     }
 
     void install_counter(
-        naming::id_type const& id, counter_info const& info, error_code& ec)
+        hpx::id_type const& id, counter_info const& info, error_code& ec)
     {
         std::shared_ptr<manage_counter> p = std::make_shared<manage_counter>();
 
@@ -85,6 +85,6 @@ namespace hpx { namespace performance_counters {
 
         // Register the shutdown function which will clean up this counter.
         get_runtime().add_shutdown_function(
-            util::bind_front(&counter_shutdown, p));
+            hpx::bind_front(&counter_shutdown, p));
     }
 }}    // namespace hpx::performance_counters

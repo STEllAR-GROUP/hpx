@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2017 Taeguk Kwon
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,8 +14,11 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
 
+#include <array>
+#include <cstddef>
 #include <exception>
 #include <list>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -29,12 +32,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         ///////////////////////////////////////////////////////////////////////
         // std::bad_alloc has to be handled separately
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-        static void call(std::exception_ptr const&)
+        [[noreturn]] static void call(std::exception_ptr const&)
         {
-            HPX_ASSERT(false);
+            std::terminate();
         }
 #else
-        HPX_NORETURN static void call(std::exception_ptr const& e)
+        [[noreturn]] static void call(std::exception_ptr const& e)
         {
             try
             {
@@ -74,81 +77,292 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 #endif
         }
 
+        static void call(std::list<std::exception_ptr>& errors)
+        {
+            if (!errors.empty())
+            {
+                throw exception_list(HPX_MOVE(errors));
+            }
+        }
+
+    private:
+        template <typename Future>
+        static void call_helper_single(Future const& f,
+            std::list<std::exception_ptr>& errors, bool throw_errors)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(f);
+            HPX_UNUSED(errors);
+            HPX_UNUSED(throw_errors);
+            HPX_ASSERT(false);
+#else
+            // extract exception from future and handle as needed
+            if (f.has_exception())
+            {
+                call(f.get_exception_ptr(), errors);
+            }
+
+            if (throw_errors && !errors.empty())
+            {
+                throw exception_list(HPX_MOVE(errors));
+            }
+#endif
+        }
+
+        template <typename Future>
+        static void call_helper_single(Future const& f, bool throw_errors)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(f);
+            HPX_UNUSED(throw_errors);
+            HPX_ASSERT(false);
+#else
+            // extract exception from future and handle as needed
+            if (f.has_exception())
+            {
+                std::list<std::exception_ptr> errors;
+                call(f.get_exception_ptr(), errors);
+                if (throw_errors && !errors.empty())
+                {
+                    throw exception_list(HPX_MOVE(errors));
+                }
+            }
+#endif
+        }
+
+    public:
+        template <typename T>
+        static void call(hpx::future<T> const& f,
+            std::list<std::exception_ptr>& errors, bool throw_errors = true)
+        {
+            return call_helper_single(f, errors, throw_errors);
+        }
+
+        template <typename T>
+        static void call(hpx::shared_future<T> const& f,
+            std::list<std::exception_ptr>& errors, bool throw_errors = true)
+        {
+            return call_helper_single(f, errors, throw_errors);
+        }
+
+        template <typename T>
+        static void call(hpx::future<T> const& f, bool throw_errors = true)
+        {
+            return call_helper_single(f, throw_errors);
+        }
+
+        template <typename T>
+        static void call(
+            hpx::shared_future<T> const& f, bool throw_errors = true)
+        {
+            return call_helper_single(f, throw_errors);
+        }
+
+    private:
+        template <typename Cont>
+        static void call_helper(Cont const& workitems,
+            std::list<std::exception_ptr>& errors, bool throw_errors)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_UNUSED(errors);
+            HPX_UNUSED(throw_errors);
+            HPX_ASSERT(false);
+#else
+            if (workitems.empty() && errors.empty())
+            {
+                return;
+            }
+
+            // first extract exception from all futures
+            for (auto const& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    // rethrow std::bad_alloc or store exception
+                    call(f.get_exception_ptr(), errors);
+                }
+            }
+
+            if (throw_errors && !errors.empty())
+            {
+                throw exception_list(HPX_MOVE(errors));
+            }
+#endif
+        }
+
+        template <typename Cont>
+        static void call_helper(Cont const& workitems, bool throw_errors)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_UNUSED(throw_errors);
+            HPX_ASSERT(false);
+#else
+            if (workitems.empty())
+            {
+                return;
+            }
+
+            // first detect whether there are exceptional futures
+            bool found_exception = false;
+            for (auto const& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    found_exception = true;
+                    break;
+                }
+            }
+
+            // nothing needs to be done
+            if (!found_exception)
+            {
+                return;
+            }
+
+            // now extract exception from all futures
+            std::list<std::exception_ptr> errors;
+            for (auto const& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    // rethrow std::bad_alloc or store exception
+                    call(f.get_exception_ptr(), errors);
+                }
+            }
+
+            if (throw_errors && !errors.empty())
+            {
+                throw exception_list(HPX_MOVE(errors));
+            }
+#endif
+        }
+
+    public:
         template <typename T>
         static void call(std::vector<hpx::future<T>> const& workitems,
             std::list<std::exception_ptr>& errors, bool throw_errors = true)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(workitems);
-            HPX_UNUSED(errors);
-            HPX_UNUSED(throw_errors);
-            HPX_ASSERT(false);
-#else
-            // first extract exception from all futures
-            std::vector<std::exception_ptr> exceptions;
-            exceptions.reserve(workitems.size());
-            for (auto const& f : workitems)
-            {
-                if (f.has_exception())
-                {
-                    exceptions.reserve(workitems.size());
-                    exceptions.push_back(f.get_exception_ptr());
-                }
-            }
-
-            // now handle exceptions as needed
-            for (auto& e : exceptions)
-            {
-                call(e, errors);
-            }
-
-            if (throw_errors && !errors.empty())
-            {
-                throw exception_list(std::move(errors));
-            }
-#endif
+            return call_helper(workitems, errors, throw_errors);
         }
 
-        ///////////////////////////////////////////////////////////////////////
+        template <typename T, std::size_t N>
+        static void call(std::array<hpx::future<T>, N> const& workitems,
+            std::list<std::exception_ptr>& errors, bool throw_errors = true)
+        {
+            return call_helper(workitems, errors, throw_errors);
+        }
+
         template <typename T>
         static void call(std::vector<hpx::shared_future<T>> const& workitems,
             std::list<std::exception_ptr>& errors, bool throw_errors = true)
         {
+            return call_helper(workitems, errors, throw_errors);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(std::array<hpx::shared_future<T>, N> const& workitems,
+            std::list<std::exception_ptr>& errors, bool throw_errors = true)
+        {
+            return call_helper(workitems, errors, throw_errors);
+        }
+
+        template <typename T>
+        static void call(std::vector<hpx::future<T>> const& workitems,
+            bool throw_errors = true)
+        {
+            return call_helper(workitems, throw_errors);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(std::array<hpx::future<T>, N> const& workitems,
+            bool throw_errors = true)
+        {
+            return call_helper(workitems, throw_errors);
+        }
+
+        template <typename T>
+        static void call(std::vector<hpx::shared_future<T>> const& workitems,
+            bool throw_errors = true)
+        {
+            return call_helper(workitems, throw_errors);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(std::array<hpx::shared_future<T>, N> const& workitems,
+            bool throw_errors = true)
+        {
+            return call_helper(workitems, throw_errors);
+        }
+
+    private:
+        template <typename Future>
+        static void call_with_cleanup_helper_single(Future const& f,
+            std::list<std::exception_ptr>& errors, bool throw_errors)
+        {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(workitems);
+            HPX_UNUSED(f);
             HPX_UNUSED(errors);
             HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
-            // first extract exception from all futures
-            std::vector<std::exception_ptr> exceptions;
-            exceptions.reserve(workitems.size());
-            for (auto const& f : workitems)
+            if (f.has_exception())
             {
-                if (f.has_exception())
-                {
-                    exceptions.reserve(workitems.size());
-                    exceptions.push_back(f.get_exception_ptr());
-                }
-            }
-
-            // now handle exceptions as needed
-            for (auto& e : exceptions)
-            {
-                call(e, errors);
+                call(f.get_exception_ptr(), errors);
             }
 
             if (throw_errors && !errors.empty())
             {
-                throw exception_list(std::move(errors));
+                throw exception_list(HPX_MOVE(errors));
             }
 #endif
         }
 
+        template <typename Future>
+        static void call_with_cleanup_helper_single(
+            Future const& f, bool throw_errors)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(f);
+            HPX_UNUSED(throw_errors);
+            HPX_ASSERT(false);
+#else
+            if (f.has_exception())
+            {
+                std::list<std::exception_ptr> errors;
+                call(f.get_exception_ptr(), errors);
+                if (throw_errors && !errors.empty())
+                {
+                    throw exception_list(HPX_MOVE(errors));
+                }
+            }
+#endif
+        }
+
+    public:
         template <typename T, typename Cleanup>
-        static void call_with_cleanup(std::vector<hpx::future<T>>& workitems,
-            std::list<std::exception_ptr>& errors, Cleanup&& cleanup,
+        static void call_with_cleanup(hpx::future<T> const& f,
+            std::list<std::exception_ptr>& errors, Cleanup&&,
             bool throw_errors = true)
+        {
+            return call_with_cleanup_helper_single(f, errors, throw_errors);
+        }
+
+        template <typename T, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(
+            hpx::future<T> const& f, Cleanup&&, bool throw_errors = true)
+        {
+            return call_with_cleanup_helper_single(f, throw_errors);
+        }
+
+    private:
+        template <typename Cont, typename Cleanup>
+        static void call_with_cleanup_helper(Cont& workitems,
+            std::list<std::exception_ptr>& errors, Cleanup&& cleanup,
+            bool throw_errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_UNUSED(workitems);
@@ -157,6 +371,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
+            if (workitems.empty() && errors.empty())
+            {
+                return;
+            }
+
             bool has_exception = false;
             std::exception_ptr bad_alloc_exception;
             for (auto& f : workitems)
@@ -201,9 +420,134 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
             if (throw_errors && !errors.empty())
             {
-                throw exception_list(std::move(errors));
+                throw exception_list(HPX_MOVE(errors));
             }
 #endif
+        }
+
+        template <typename Cont, typename Cleanup>
+        static void call_with_cleanup_helper(
+            Cont& workitems, Cleanup&& cleanup, bool throw_errors)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(workitems);
+            HPX_UNUSED(cleanup);
+            HPX_UNUSED(throw_errors);
+            HPX_ASSERT(false);
+#else
+            if (workitems.empty())
+            {
+                return;
+            }
+
+            // first detect whether there are exceptional futures
+            bool found_exception = false;
+            for (auto const& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    found_exception = true;
+                    break;
+                }
+            }
+
+            // nothing needs to be done
+            if (!found_exception)
+            {
+                return;
+            }
+
+            // now, handle exceptions and cleanup partitions
+            std::list<std::exception_ptr> errors;
+            std::exception_ptr bad_alloc_exception;
+            for (auto& f : workitems)
+            {
+                if (f.has_exception())
+                {
+                    std::exception_ptr e = f.get_exception_ptr();
+                    bool store_exception = false;
+                    try
+                    {
+                        std::rethrow_exception(e);
+                    }
+                    catch (std::bad_alloc const&)
+                    {
+                        bad_alloc_exception = e;
+                    }
+                    catch (...)
+                    {
+                        store_exception = true;
+                    }
+
+                    // store the exception outside of the catch(...) block to
+                    // avoid problems caused by suspending threads
+                    if (store_exception)
+                    {
+                        errors.push_back(e);
+                    }
+                }
+            }
+
+            // As at least one partition failed with an exception, call
+            // the cleanup function for all others (the failed partitioned
+            // are assumed to have already run the cleanup).
+            for (auto& f : workitems)
+            {
+                if (!f.has_exception())
+                {
+                    cleanup(f.get());
+                }
+            }
+
+            if (bad_alloc_exception)
+            {
+                std::rethrow_exception(bad_alloc_exception);
+            }
+
+            if (throw_errors && !errors.empty())
+            {
+                throw exception_list(HPX_MOVE(errors));
+            }
+#endif
+        }
+
+    public:
+        template <typename T, typename Cleanup>
+        static void call_with_cleanup(std::vector<hpx::future<T>>& workitems,
+            std::list<std::exception_ptr>& errors, Cleanup&& cleanup,
+            bool throw_errors = true)
+        {
+            return call_with_cleanup_helper(
+                workitems, errors, HPX_FORWARD(Cleanup, cleanup), throw_errors);
+        }
+
+        template <typename T, std::size_t N, typename Cleanup>
+        static void call_with_cleanup(std::array<hpx::future<T>, N>& workitems,
+            std::list<std::exception_ptr>& errors, Cleanup&& cleanup,
+            bool throw_errors = true)
+        {
+            return call_with_cleanup_helper(
+                workitems, errors, HPX_FORWARD(Cleanup, cleanup), throw_errors);
+        }
+
+        template <typename T, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(std::vector<hpx::future<T>>& workitems,
+            Cleanup&& cleanup, bool throw_errors = true)
+        {
+            return call_with_cleanup_helper(
+                workitems, HPX_FORWARD(Cleanup, cleanup), throw_errors);
+        }
+
+        template <typename T, std::size_t N, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(std::array<hpx::future<T>, N>& workitems,
+            Cleanup&& cleanup, bool throw_errors = true)
+        {
+            return call_with_cleanup_helper(
+                workitems, HPX_FORWARD(Cleanup, cleanup), throw_errors);
         }
     };
 
@@ -212,34 +556,84 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     {
         ///////////////////////////////////////////////////////////////////////
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-        static void call(std::exception_ptr const&)
+        [[noreturn]] static void call(std::exception_ptr const&)
         {
-            HPX_ASSERT(false);
+            std::terminate();
         }
 #else
-        HPX_NORETURN static void call(std::exception_ptr const&)
+        [[noreturn]] static void call(std::exception_ptr const&)
         {
             parallel_exception_termination_handler();
         }
 #endif
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-        static void call(
+        [[noreturn]] static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)
         {
-            HPX_ASSERT(false);
+            std::terminate();
         }
 #else
-        HPX_NORETURN static void call(
+        [[noreturn]] static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)
         {
             parallel_exception_termination_handler();
         }
 #endif
 
+        static void call(std::list<std::exception_ptr>& errors)
+        {
+            if (!errors.empty())
+            {
+                parallel_exception_termination_handler();
+            }
+        }
+
+    private:
+        template <typename Future>
+        static void call_helper_single(Future const& f)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(f);
+            HPX_ASSERT(false);
+#else
+            if (f.has_exception())
+            {
+                parallel_exception_termination_handler();
+            }
+#endif
+        }
+
+    public:
         template <typename T>
-        static void call(std::vector<hpx::future<T>> const& workitems,
+        static void call(hpx::future<T> const& f,
             std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+        template <typename T>
+        static void call(hpx::shared_future<T> const& f,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+        template <typename T>
+        static void call(hpx::future<T> const& f, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+        template <typename T>
+        static void call(hpx::shared_future<T> const& f, bool = true)
+        {
+            return call_helper_single(f);
+        }
+
+    private:
+        template <typename Cont>
+        static void call_helper(Cont const& workitems)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_UNUSED(workitems);
@@ -253,12 +647,101 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 }
             }
 #endif
+        }
+
+    public:
+        template <typename T>
+        static void call(std::vector<hpx::future<T>> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(std::array<hpx::future<T>, N> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
         }
 
         template <typename T>
         static void call(std::vector<hpx::shared_future<T>> const& workitems,
             std::list<std::exception_ptr>&, bool = true)
         {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(std::array<hpx::shared_future<T>, N> const& workitems,
+            std::list<std::exception_ptr>&, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T>
+        static void call(
+            std::vector<hpx::future<T>> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(
+            std::array<hpx::future<T>, N> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T>
+        static void call(
+            std::vector<hpx::shared_future<T>> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+        template <typename T, std::size_t N>
+        static void call(
+            std::array<hpx::shared_future<T>, N> const& workitems, bool = true)
+        {
+            return call_helper(workitems);
+        }
+
+    private:
+        template <typename Future>
+        static void call_with_cleanup_helper_single(Future const& f)
+        {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+            HPX_UNUSED(f);
+            HPX_ASSERT(false);
+#else
+            if (f.has_exception())
+            {
+                parallel_exception_termination_handler();
+            }
+#endif
+        }
+
+    public:
+        template <typename T, typename Cleanup>
+        static void call_with_cleanup(hpx::future<T> const& f,
+            std::list<std::exception_ptr>&, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper_single(f);
+        }
+
+        template <typename T, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(
+            hpx::future<T> const& f, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper_single(f);
+        }
+
+    private:
+        template <typename Cont>
+        static void call_with_cleanup_helper(Cont const& workitems)
+        {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_UNUSED(workitems);
             HPX_ASSERT(false);
@@ -273,109 +756,47 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 #endif
         }
 
+    public:
         template <typename T, typename Cleanup>
         static void call_with_cleanup(
             std::vector<hpx::future<T>> const& workitems,
             std::list<std::exception_ptr>&, Cleanup&&, bool = true)
         {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(workitems);
-            HPX_ASSERT(false);
-#else
-            for (auto const& f : workitems)
-            {
-                if (f.has_exception())
-                {
-                    parallel_exception_termination_handler();
-                }
-            }
-#endif
+            call_with_cleanup_helper(workitems);
+        }
+
+        template <typename T, std::size_t N, typename Cleanup>
+        static void call_with_cleanup(
+            std::array<hpx::future<T>, N> const& workitems,
+            std::list<std::exception_ptr>&, Cleanup&&, bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+
+        template <typename T, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(
+            std::vector<hpx::future<T>> const& workitems, Cleanup&&,
+            bool = true)
+        {
+            call_with_cleanup_helper(workitems);
+        }
+
+        template <typename T, std::size_t N, typename Cleanup,
+            typename Enable = std::enable_if_t<!std::is_same_v<
+                std::decay_t<Cleanup>, std::list<std::exception_ptr>>>>
+        static void call_with_cleanup(
+            std::array<hpx::future<T>, N> const& workitems, Cleanup&&,
+            bool = true)
+        {
+            call_with_cleanup_helper(workitems);
         }
     };
 
     template <>
     struct handle_local_exceptions<hpx::execution::unsequenced_policy>
+      : handle_local_exceptions<hpx::execution::parallel_unsequenced_policy>
     {
-        ///////////////////////////////////////////////////////////////////////
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-        static void call(std::exception_ptr const&)
-        {
-            HPX_ASSERT(false);
-        }
-#else
-        HPX_NORETURN static void call(std::exception_ptr const&)
-        {
-            parallel_exception_termination_handler();
-        }
-#endif
-
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-        static void call(
-            std::exception_ptr const&, std::list<std::exception_ptr>&)
-        {
-            HPX_ASSERT(false);
-        }
-#else
-        HPX_NORETURN static void call(
-            std::exception_ptr const&, std::list<std::exception_ptr>&)
-        {
-            parallel_exception_termination_handler();
-        }
-#endif
-
-        template <typename T>
-        static void call(std::vector<hpx::future<T>> const& workitems,
-            std::list<std::exception_ptr>&, bool = true)
-        {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(workitems);
-            HPX_ASSERT(false);
-#else
-            for (auto const& f : workitems)
-            {
-                if (f.has_exception())
-                {
-                    parallel_exception_termination_handler();
-                }
-            }
-#endif
-        }
-
-        template <typename T>
-        static void call(std::vector<hpx::shared_future<T>> const& workitems,
-            std::list<std::exception_ptr>&, bool = true)
-        {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(workitems);
-            HPX_ASSERT(false);
-#else
-            for (auto const& f : workitems)
-            {
-                if (f.has_exception())
-                {
-                    parallel_exception_termination_handler();
-                }
-            }
-#endif
-        }
-
-        template <typename T, typename Cleanup>
-        static void call_with_cleanup(
-            std::vector<hpx::future<T>> const& workitems,
-            std::list<std::exception_ptr>&, Cleanup&&, bool = true)
-        {
-#if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(workitems);
-            HPX_ASSERT(false);
-#else
-            for (auto const& f : workitems)
-            {
-                if (f.has_exception())
-                {
-                    parallel_exception_termination_handler();
-                }
-            }
-#endif
-        }
     };
 }}}}    // namespace hpx::parallel::util::detail

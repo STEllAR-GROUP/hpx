@@ -116,12 +116,10 @@ void test_partition_copy(IteratorTag, DataType, Pred pred, int rand_base)
     auto solution = std::partition_copy(std::begin(c), std::end(c),
         std::begin(d_true_sol), std::begin(d_false_sol), pred);
 
-    HPX_TEST(get<0>(result).base() == std::end(c));
-
     bool equality_true = test::equal(std::begin(d_true_res),
-        get<1>(result).base(), std::begin(d_true_sol), get<0>(solution));
+        result.first.base(), std::begin(d_true_sol), solution.first);
     bool equality_false = test::equal(std::begin(d_false_res),
-        get<2>(result).base(), std::begin(d_false_sol), get<1>(solution));
+        result.second.base(), std::begin(d_false_sol), solution.second);
 
     HPX_TEST(equality_true);
     HPX_TEST(equality_false);
@@ -152,12 +150,10 @@ void test_partition_copy(
     auto solution = std::partition_copy(std::begin(c), std::end(c),
         std::begin(d_true_sol), std::begin(d_false_sol), pred);
 
-    HPX_TEST(get<0>(result).base() == std::end(c));
-
     bool equality_true = test::equal(std::begin(d_true_res),
-        get<1>(result).base(), std::begin(d_true_sol), get<0>(solution));
+        result.first.base(), std::begin(d_true_sol), solution.first);
     bool equality_false = test::equal(std::begin(d_false_res),
-        get<2>(result).base(), std::begin(d_false_sol), get<1>(solution));
+        result.second.base(), std::begin(d_false_sol), solution.second);
 
     HPX_TEST(equality_true);
     HPX_TEST(equality_false);
@@ -189,12 +185,10 @@ void test_partition_copy_async(
     auto solution = std::partition_copy(std::begin(c), std::end(c),
         std::begin(d_true_sol), std::begin(d_false_sol), pred);
 
-    HPX_TEST(get<0>(result).base() == std::end(c));
-
     bool equality_true = test::equal(std::begin(d_true_res),
-        get<1>(result).base(), std::begin(d_true_sol), get<0>(solution));
+        result.first.base(), std::begin(d_true_sol), solution.first);
     bool equality_false = test::equal(std::begin(d_false_res),
-        get<2>(result).base(), std::begin(d_false_sol), get<1>(solution));
+        result.second.base(), std::begin(d_false_sol), solution.second);
 
     HPX_TEST(equality_true);
     HPX_TEST(equality_false);

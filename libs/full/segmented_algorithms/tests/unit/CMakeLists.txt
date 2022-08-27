@@ -18,6 +18,12 @@ set(tests
     partitioned_vector_generate
     partitioned_vector_handle_values
     partitioned_vector_iter
+    partitioned_vector_max_element1
+    partitioned_vector_max_element2
+    partitioned_vector_min_element1
+    partitioned_vector_min_element2
+    partitioned_vector_minmax_element1
+    partitioned_vector_minmax_element2
     partitioned_vector_move
     partitioned_vector_target
     partitioned_vector_transform1
@@ -43,13 +49,6 @@ set(tests
     partitioned_vector_transform_scan2
     partitioned_vector_reduce
 )
-
-# add dependencies to partitioned_vector_target when Cuda is enabled
-if(HPX_WITH_COMPUTE_CUDA)
-  set(partitioned_vector_target_LIBRARIES ${CUDA_LIBRARIES}
-                                          ${CUDA_CUBLAS_LIBRARIES}
-  )
-endif()
 
 set(partitioned_vector_inclusive_scan_PARAMETERS RUN_SERIAL)
 set(partitioned_vector_inclusive_scan2_PARAMETERS RUN_SERIAL)
@@ -77,11 +76,6 @@ foreach(test ${tests})
     HPX_PREFIX ${HPX_BUILD_PREFIX}
     FOLDER ${folder_name}
   )
-
-  if(HPX_WITH_COMPUTE_CUDA)
-    target_include_directories(${test}_test SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
-    target_link_libraries(${test}_test PRIVATE ${${${test}}_LIBRARIES})
-  endif()
 
   add_hpx_unit_test(
     "modules.segmented_algorithms" ${test} ${${test}_PARAMETERS}

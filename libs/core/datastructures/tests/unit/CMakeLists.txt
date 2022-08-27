@@ -1,10 +1,14 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests any boost_any is_tuple_like unique_any tagged tuple)
+set(tests any boost_any is_tuple_like unique_any tuple)
+
+if(HPX_WITH_CXX17_MEMORY_RESOURCE)
+  set(tests ${tests} small_vector)
+endif()
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

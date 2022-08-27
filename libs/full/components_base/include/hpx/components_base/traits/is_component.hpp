@@ -46,8 +46,7 @@ namespace hpx { namespace traits {
     // Simple components are components
     template <typename Component>
     struct is_component<Component,
-        typename std::enable_if<
-            std::is_base_of<detail::component_tag, Component>::value>::type>
+        std::enable_if_t<std::is_base_of_v<detail::component_tag, Component>>>
       : std::true_type
     {
     };
@@ -55,18 +54,23 @@ namespace hpx { namespace traits {
     // Fixed components are components
     template <typename Component>
     struct is_component<Component,
-        typename std::enable_if<std::is_base_of<detail::fixed_component_tag,
-            Component>::value>::type> : std::true_type
+        std::enable_if_t<
+            std::is_base_of_v<detail::fixed_component_tag, Component>>>
+      : std::true_type
     {
     };
 
     // Managed components are components
     template <typename Component>
     struct is_component<Component,
-        typename std::enable_if<std::is_base_of<detail::managed_component_tag,
-            Component>::value>::type> : std::true_type
+        std::enable_if_t<
+            std::is_base_of_v<detail::managed_component_tag, Component>>>
+      : std::true_type
     {
     };
+
+    template <typename Component>
+    inline constexpr bool is_component_v = is_component<Component>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
@@ -84,12 +88,14 @@ namespace hpx { namespace traits {
     {
     };
 
+    template <typename Component>
+    inline constexpr bool is_component_or_component_array_v =
+        is_component_or_component_array<Component>::value;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     struct is_fixed_component
-      : std::integral_constant<bool,
-            std::is_base_of<traits::detail::fixed_component_tag,
-                Component>::value>
+      : std::is_base_of<traits::detail::fixed_component_tag, Component>
     {
     };
 
@@ -99,10 +105,13 @@ namespace hpx { namespace traits {
     };
 
     template <typename Component>
+    inline constexpr bool is_fixed_component_v =
+        is_fixed_component<Component>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Component>
     struct is_managed_component
-      : std::integral_constant<bool,
-            std::is_base_of<traits::detail::managed_component_tag,
-                Component>::value>
+      : std::is_base_of<traits::detail::managed_component_tag, Component>
     {
     };
 
@@ -111,4 +120,9 @@ namespace hpx { namespace traits {
       : is_managed_component<Component>
     {
     };
+
+    template <typename Component>
+    inline constexpr bool is_managed_component_v =
+        is_managed_component<Component>::value;
+
 }}    // namespace hpx::traits

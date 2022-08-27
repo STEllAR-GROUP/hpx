@@ -15,6 +15,7 @@
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
 #include <exception>
@@ -25,6 +26,10 @@
 #include <vector>
 
 namespace hpx { namespace parallel { inline namespace v1 {
+
+    template <typename T>
+    using minmax_element_result = hpx::parallel::util::min_max_result<T>;
+
     ///////////////////////////////////////////////////////////////////////////
     // segmented_minmax
     namespace detail {
@@ -34,18 +39,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename F, typename Proj>
-        static typename util::detail::algorithm_result<ExPolicy, SegIter>::type
+        static util::detail::algorithm_result_t<ExPolicy, SegIter>
         segmented_minormax(Algo&& algo, ExPolicy const& policy, SegIter first,
             SegIter last, F&& f, Proj&& proj, std::true_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
+            using traits = hpx::traits::segmented_iterator_traits<SegIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
+            using result = util::detail::algorithm_result<ExPolicy, SegIter>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
 
             std::vector<SegIter> positions;
+            positions.reserve(std::distance(sit, send) + 1);
 
             if (sit == send)
             {
@@ -101,31 +108,31 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
             }
 
-            return Algo::sequential_minmax_element_ind(
-                policy, positions.begin(), positions.size(), f, proj);
+            return result::get(Algo::sequential_minmax_element_ind(policy,
+                positions.begin(), positions.size(), HPX_FORWARD(F, f),
+                HPX_FORWARD(Proj, proj)));
         }
 
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename F, typename Proj>
-        static typename util::detail::algorithm_result<ExPolicy, SegIter>::type
+        static util::detail::algorithm_result_t<ExPolicy, SegIter>
         segmented_minormax(Algo&& algo, ExPolicy const& policy, SegIter first,
             SegIter last, F&& f, Proj&& proj, std::false_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
+            using traits = hpx::traits::segmented_iterator_traits<SegIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
+            using result = util::detail::algorithm_result<ExPolicy, SegIter>;
 
-            typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<SegIter>::value>
-                forced_seq;
-            typedef util::detail::algorithm_result<ExPolicy, SegIter> result;
+            using forced_seq = std::integral_constant<bool,
+                !hpx::traits::is_forward_iterator_v<SegIter>>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
 
             std::vector<future<SegIter>> segments;
-            segments.reserve(std::distance(sit, send));
+            segments.reserve(std::distance(sit, send) + 1);
 
             if (sit == send)
             {
@@ -137,8 +144,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     segments.push_back(hpx::make_future<SegIter>(
                         dispatch_async(traits::get_id(sit), algo, policy,
                             forced_seq(), beg, end, f, proj),
-                        [send](local_iterator_type const& out) -> SegIter {
-                            return traits::compose(send, out);
+                        [sit](local_iterator_type const& out) -> SegIter {
+                            return traits::compose(sit, out);
                         }));
                 }
             }
@@ -194,76 +201,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     parallel::util::detail::handle_remote_exceptions<
                         ExPolicy>::call(r, errors);
 
-                    std::vector<SegIter> res = hpx::unwrap(std::move(r));
+                    std::vector<SegIter> res = hpx::unwrap(HPX_MOVE(r));
                     return Algo::sequential_minmax_element_ind(
                         policy, res.begin(), res.size(), f, proj);
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        // segmented implementation
-        template <typename ExPolicy, typename SegIter, typename F,
-            typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy, SegIter>::type
-        min_element_(ExPolicy&& policy, SegIter first, SegIter last, F&& f,
-            Proj&& proj, std::true_type)
-        {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
-            SegIter result = first;
-            if (first == last || ++first == last)
-            {
-                return util::detail::algorithm_result<ExPolicy, SegIter>::get(
-                    std::move(result));
-            }
-
-            typedef hpx::traits::segmented_iterator_traits<SegIter>
-                iterator_traits;
-
-            return segmented_minormax(
-                min_element<typename iterator_traits::local_iterator>(),
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-                std::forward<Proj>(proj), is_seq());
-        }
-
-        template <typename ExPolicy, typename SegIter, typename F,
-            typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy, SegIter>::type
-        max_element_(ExPolicy&& policy, SegIter first, SegIter last, F&& f,
-            Proj&& proj, std::true_type)
-        {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-
-            SegIter result = first;
-            if (first == last || ++first == last)
-            {
-                return util::detail::algorithm_result<ExPolicy, SegIter>::get(
-                    std::move(result));
-            }
-
-            typedef hpx::traits::segmented_iterator_traits<SegIter>
-                iterator_traits;
-
-            return segmented_minormax(
-                max_element<typename iterator_traits::local_iterator>(),
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-                std::forward<Proj>(proj), is_seq());
-        }
-
-        // forward declare the non-segmented version of those algorithm
-        template <typename ExPolicy, typename FwdIter, typename F,
-            typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        min_element_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-            Proj&& proj, std::false_type);
-
-        template <typename ExPolicy, typename FwdIter, typename F,
-            typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        max_element_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-            Proj&& proj, std::false_type);
-
         /// \endcond
     }    // namespace detail
 
@@ -276,23 +219,26 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // sequential remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename F, typename Proj>
-        static typename util::detail::algorithm_result<ExPolicy,
-            std::pair<SegIter, SegIter>>::type
+        static util::detail::algorithm_result_t<ExPolicy,
+            minmax_element_result<SegIter>>
         segmented_minmax(Algo&& algo, ExPolicy const& policy, SegIter first,
             SegIter last, F&& f, Proj&& proj, std::true_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
-            typedef std::pair<SegIter, SegIter> result_type;
+            using traits = hpx::traits::segmented_iterator_traits<SegIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
+            using result_type = minmax_element_result<SegIter>;
+            using local_iterator_pair_type =
+                minmax_element_result<local_iterator_type>;
 
-            typedef std::pair<local_iterator_type, local_iterator_type>
-                local_iterator_pair_type;
+            using result =
+                util::detail::algorithm_result<ExPolicy, result_type>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
 
             std::vector<result_type> positions;
+            positions.reserve(std::distance(sit, send) + 1);
 
             if (sit == send)
             {
@@ -304,9 +250,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     local_iterator_pair_type out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, f, proj);
 
-                    positions.push_back(
-                        std::make_pair(traits::compose(send, out.first),
-                            traits::compose(send, out.second)));
+                    positions.emplace_back(
+                        result_type{traits::compose(send, out.min),
+                            traits::compose(send, out.max)});
                 }
             }
             else
@@ -320,9 +266,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     local_iterator_pair_type out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, f, proj);
 
-                    positions.push_back(
-                        std::make_pair(traits::compose(sit, out.first),
-                            traits::compose(sit, out.second)));
+                    positions.emplace_back(
+                        result_type{traits::compose(sit, out.min),
+                            traits::compose(sit, out.max)});
                 }
 
                 // handle all of the full partitions
@@ -337,9 +283,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             dispatch(traits::get_id(sit), algo, policy,
                                 std::true_type(), beg, end, f, proj);
 
-                        positions.push_back(
-                            std::make_pair(traits::compose(sit, out.first),
-                                traits::compose(sit, out.second)));
+                        positions.emplace_back(
+                            result_type{traits::compose(sit, out.min),
+                                traits::compose(sit, out.max)});
                     }
                 }
 
@@ -351,43 +297,44 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     local_iterator_pair_type out = dispatch(traits::get_id(sit),
                         algo, policy, std::true_type(), beg, end, f, proj);
 
-                    positions.push_back(
-                        std::make_pair(traits::compose(sit, out.first),
-                            traits::compose(sit, out.second)));
+                    positions.emplace_back(
+                        result_type{traits::compose(sit, out.min),
+                            traits::compose(sit, out.max)});
                 }
             }
 
-            return Algo::sequential_minmax_element_ind(
-                policy, positions.begin(), positions.size(), f, proj);
+            return result::get(Algo::sequential_minmax_element_ind(policy,
+                positions.begin(), positions.size(), HPX_FORWARD(F, f),
+                HPX_FORWARD(Proj, proj)));
         }
 
         // parallel remote implementation
         template <typename Algo, typename ExPolicy, typename SegIter,
             typename F, typename Proj>
-        static typename util::detail::algorithm_result<ExPolicy,
-            std::pair<SegIter, SegIter>>::type
+        static util::detail::algorithm_result_t<ExPolicy,
+            minmax_element_result<SegIter>>
         segmented_minmax(Algo&& algo, ExPolicy const& policy, SegIter first,
             SegIter last, F&& f, Proj&& proj, std::false_type)
         {
-            typedef hpx::traits::segmented_iterator_traits<SegIter> traits;
-            typedef typename traits::segment_iterator segment_iterator;
-            typedef typename traits::local_iterator local_iterator_type;
+            using traits = hpx::traits::segmented_iterator_traits<SegIter>;
+            using segment_iterator = typename traits::segment_iterator;
+            using local_iterator_type = typename traits::local_iterator;
 
-            typedef std::integral_constant<bool,
-                !hpx::traits::is_forward_iterator<SegIter>::value>
-                forced_seq;
-            typedef std::pair<SegIter, SegIter> result_type;
-            typedef util::detail::algorithm_result<ExPolicy, result_type>
-                result;
+            using forced_seq = std::integral_constant<bool,
+                !hpx::traits::is_forward_iterator_v<SegIter>>;
 
-            typedef std::pair<local_iterator_type, local_iterator_type>
-                local_iterator_pair_type;
+            using result_type = minmax_element_result<SegIter>;
+            using local_iterator_pair_type =
+                minmax_element_result<local_iterator_type>;
+
+            using result =
+                util::detail::algorithm_result<ExPolicy, result_type>;
 
             segment_iterator sit = traits::segment(first);
             segment_iterator send = traits::segment(last);
 
             std::vector<future<result_type>> segments;
-            segments.reserve(std::distance(sit, send));
+            segments.reserve(std::distance(sit, send) + 1);
 
             if (sit == send)
             {
@@ -399,10 +346,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     segments.push_back(hpx::make_future<result_type>(
                         dispatch_async(traits::get_id(sit), algo, policy,
                             forced_seq(), beg, end, f, proj),
-                        [send](local_iterator_pair_type out) -> result_type {
-                            return std::make_pair(
-                                traits::compose(send, out.first),
-                                traits::compose(send, out.second));
+                        [sit](local_iterator_pair_type out) -> result_type {
+                            return {traits::compose(sit, out.min),
+                                traits::compose(sit, out.max)};
                         }));
                 }
             }
@@ -418,9 +364,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             forced_seq(), beg, end, f, proj),
                         [sit](local_iterator_pair_type const& out)
                             -> result_type {
-                            return std::make_pair(
-                                traits::compose(sit, out.first),
-                                traits::compose(sit, out.second));
+                            return {traits::compose(sit, out.min),
+                                traits::compose(sit, out.max)};
                         }));
                 }
 
@@ -436,9 +381,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 forced_seq(), beg, end, f, proj),
                             [sit](local_iterator_pair_type const& out)
                                 -> result_type {
-                                return std::make_pair(
-                                    traits::compose(sit, out.first),
-                                    traits::compose(sit, out.second));
+                                return {traits::compose(sit, out.min),
+                                    traits::compose(sit, out.max)};
                             }));
                     }
                 }
@@ -453,9 +397,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             forced_seq(), beg, end, f, proj),
                         [sit](local_iterator_pair_type const& out)
                             -> result_type {
-                            return std::make_pair(
-                                traits::compose(sit, out.first),
-                                traits::compose(sit, out.second));
+                            return {traits::compose(sit, out.min),
+                                traits::compose(sit, out.max)};
                         }));
                 }
             }
@@ -467,49 +410,203 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     parallel::util::detail::handle_remote_exceptions<
                         ExPolicy>::call(r, errors);
 
-                    std::vector<result_type> res = hpx::unwrap(std::move(r));
+                    std::vector<result_type> res = hpx::unwrap(HPX_MOVE(r));
                     return Algo::sequential_minmax_element_ind(
                         policy, res.begin(), res.size(), f, proj);
                 },
-                std::move(segments)));
+                HPX_MOVE(segments)));
         }
-
-        ///////////////////////////////////////////////////////////////////////
-        // segmented implementation
-        template <typename ExPolicy, typename SegIter, typename F,
-            typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy,
-            std::pair<SegIter, SegIter>>::type
-        minmax_element_(ExPolicy&& policy, SegIter first, SegIter last, F&& f,
-            Proj&& proj, std::true_type)
-        {
-            using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
-            using result_type = std::pair<SegIter, SegIter>;
-
-            result_type result(first, first);
-            if (first == last || ++first == last)
-            {
-                return util::detail::algorithm_result<ExPolicy,
-                    result_type>::get(std::move(result));
-            }
-
-            typedef hpx::traits::segmented_iterator_traits<SegIter>
-                iterator_traits;
-
-            return segmented_minmax(
-                minmax_element<typename iterator_traits::local_iterator>(),
-                std::forward<ExPolicy>(policy), first, last, std::forward<F>(f),
-                std::forward<Proj>(proj), is_seq());
-        }
-
-        // forward declare the non-segmented version of this algorithm
-        template <typename ExPolicy, typename FwdIter, typename F,
-            typename Proj>
-        inline typename util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter, FwdIter>>::type
-        minmax_element_(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-            Proj&& proj, std::false_type);
-
         /// \endcond
     }    // namespace detail
 }}}      // namespace hpx::parallel::v1
+
+// The segmented iterators we support all live in namespace hpx::segmented
+namespace hpx { namespace segmented {
+
+    template <typename T>
+    using minmax_element_result = hpx::parallel::util::min_max_result<T>;
+
+    // clang-format off
+    template <typename SegIter,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>
+        )>
+    // clang-format on
+    SegIter tag_invoke(hpx::min_element_t, SegIter first, SegIter last, F&& f)
+    {
+        static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
+            "Requires at least forward iterator.");
+
+        if (first == last || std::next(first) == last)
+        {
+            return first;
+        }
+
+        using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
+
+        return hpx::parallel::v1::detail::segmented_minormax(
+            hpx::parallel::v1::detail::min_element<
+                typename iterator_traits::local_iterator>(),
+            hpx::execution::seq, first, last, HPX_FORWARD(F, f),
+            hpx::parallel::util::projection_identity{}, std::true_type{});
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename SegIter,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>
+        )>
+    // clang-format on
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
+    tag_invoke(hpx::min_element_t, ExPolicy&& policy, SegIter first,
+        SegIter last, F&& f)
+    {
+        static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
+            "Requires at least forward iterator.");
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        if (first == last || std::next(first) == last)
+        {
+            return hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                SegIter>::get(HPX_MOVE(first));
+        }
+
+        using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
+
+        return hpx::parallel::v1::detail::segmented_minormax(
+            hpx::parallel::v1::detail::min_element<
+                typename iterator_traits::local_iterator>(),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+            hpx::parallel::util::projection_identity{}, is_seq());
+    }
+
+    // clang-format off
+    template <typename SegIter,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>
+        )>
+    // clang-format on
+    SegIter tag_invoke(hpx::max_element_t, SegIter first, SegIter last, F&& f)
+    {
+        static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
+            "Requires at least forward iterator.");
+
+        if (first == last || std::next(first) == last)
+        {
+            return first;
+        }
+
+        using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
+
+        return hpx::parallel::v1::detail::segmented_minormax(
+            hpx::parallel::v1::detail::max_element<
+                typename iterator_traits::local_iterator>(),
+            hpx::execution::seq, first, last, HPX_FORWARD(F, f),
+            hpx::parallel::util::projection_identity{}, std::true_type{});
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename SegIter,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>
+        )>
+    // clang-format on
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, SegIter>
+    tag_invoke(hpx::max_element_t, ExPolicy&& policy, SegIter first,
+        SegIter last, F&& f)
+    {
+        static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
+            "Requires at least forward iterator.");
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+
+        if (first == last || std::next(first) == last)
+        {
+            return hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                SegIter>::get(HPX_MOVE(first));
+        }
+
+        using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
+
+        return hpx::parallel::v1::detail::segmented_minormax(
+            hpx::parallel::v1::detail::max_element<
+                typename iterator_traits::local_iterator>(),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+            hpx::parallel::util::projection_identity{}, is_seq());
+    }
+
+    // clang-format off
+    template <typename SegIter,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>
+        )>
+    // clang-format on
+    minmax_element_result<SegIter> tag_invoke(
+        hpx::minmax_element_t, SegIter first, SegIter last, F&& f)
+    {
+        static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
+            "Requires at least forward iterator.");
+
+        if (first == last || std::next(first) == last)
+        {
+            return {first, first};
+        }
+
+        using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
+
+        return hpx::parallel::v1::detail::segmented_minmax(
+            hpx::parallel::v1::detail::minmax_element<
+                typename iterator_traits::local_iterator>(),
+            hpx::execution::seq, first, last, HPX_FORWARD(F, f),
+            hpx::parallel::util::projection_identity{}, std::true_type{});
+    }
+
+    // clang-format off
+    template <typename ExPolicy, typename SegIter,
+        typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<SegIter> &&
+            hpx::traits::is_segmented_iterator_v<SegIter>
+        )>
+    // clang-format on
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+        minmax_element_result<SegIter>>
+    tag_invoke(hpx::minmax_element_t, ExPolicy&& policy, SegIter first,
+        SegIter last, F&& f)
+    {
+        static_assert((hpx::traits::is_forward_iterator_v<SegIter>),
+            "Requires at least forward iterator.");
+
+        using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
+        using result_type = minmax_element_result<SegIter>;
+
+        if (first == last || std::next(first) == last)
+        {
+            result_type result = {first, first};
+            return hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                result_type>::get(HPX_MOVE(result));
+        }
+
+        using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
+
+        return hpx::parallel::v1::detail::segmented_minmax(
+            hpx::parallel::v1::detail::minmax_element<
+                typename iterator_traits::local_iterator>(),
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+            hpx::parallel::util::projection_identity{}, is_seq());
+    }
+}}    // namespace hpx::segmented

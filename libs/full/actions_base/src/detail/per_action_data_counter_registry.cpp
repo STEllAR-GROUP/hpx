@@ -38,14 +38,13 @@ namespace hpx { namespace actions { namespace detail {
         auto it = map_.find(name);
         if (it == map_.end())
         {
-            map_.emplace(std::move(name));
+            map_.emplace(HPX_MOVE(name));
         }
     }
 
     per_action_data_counter_registry::counter_function_type
     per_action_data_counter_registry::get_counter(std::string const& name,
-        hpx::util::function_nonser<std::int64_t(
-            std::string const&, bool)> const& f) const
+        hpx::function<std::int64_t(std::string const&, bool)> const& f) const
     {
         map_type::const_iterator it = map_.find(name);
         if (it == map_.end())
@@ -55,7 +54,7 @@ namespace hpx { namespace actions { namespace detail {
                 "unknown action type");
             return nullptr;
         }
-        return util::bind_front(f, name);
+        return hpx::bind_front(f, name);
     }
 }}}    // namespace hpx::actions::detail
 

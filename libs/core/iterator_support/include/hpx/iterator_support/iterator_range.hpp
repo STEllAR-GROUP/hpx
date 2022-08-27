@@ -21,34 +21,30 @@ namespace hpx { namespace util {
     class iterator_range
     {
     public:
-        iterator_range()
-          : _iterator()
-          , _sentinel()
+        iterator_range() = default;
+
+        constexpr iterator_range(Iterator iterator, Sentinel sentinel) noexcept
+          : _iterator(HPX_MOVE(iterator))
+          , _sentinel(HPX_MOVE(sentinel))
         {
         }
 
-        iterator_range(Iterator iterator, Sentinel sentinel)
-          : _iterator(std::move(iterator))
-          , _sentinel(std::move(sentinel))
-        {
-        }
-
-        Iterator begin() const
+        constexpr Iterator begin() const
         {
             return _iterator;
         }
 
-        Iterator end() const
+        constexpr Iterator end() const
         {
             return _sentinel;
         }
 
-        std::ptrdiff_t size() const
+        constexpr std::ptrdiff_t size() const
         {
             return std::distance(_iterator, _sentinel);
         }
 
-        bool empty() const
+        constexpr bool empty() const
         {
             return _iterator == _sentinel;
         }
@@ -59,31 +55,32 @@ namespace hpx { namespace util {
     };
 
     template <typename Range,
-        typename Iterator = typename traits::range_iterator<Range>::type,
-        typename Sentinel = typename traits::range_iterator<Range>::type>
-    typename std::enable_if<traits::is_range<Range>::value,
-        iterator_range<Iterator, Sentinel>>::type
+        typename Iterator = traits::range_iterator_t<Range>,
+        typename Sentinel = traits::range_iterator_t<Range>>
+    constexpr std::enable_if_t<traits::is_range_v<Range>,
+        iterator_range<Iterator, Sentinel>>
     make_iterator_range(Range& r)
     {
         return iterator_range<Iterator, Sentinel>(util::begin(r), util::end(r));
     }
 
     template <typename Range,
-        typename Iterator = typename traits::range_iterator<Range const>::type,
-        typename Sentinel = typename traits::range_iterator<Range const>::type>
-    typename std::enable_if<traits::is_range<Range>::value,
-        iterator_range<Iterator, Sentinel>>::type
+        typename Iterator = traits::range_iterator_t<Range const>,
+        typename Sentinel = traits::range_iterator_t<Range const>>
+    constexpr std::enable_if_t<traits::is_range_v<Range>,
+        iterator_range<Iterator, Sentinel>>
     make_iterator_range(Range const& r)
     {
         return iterator_range<Iterator, Sentinel>(util::begin(r), util::end(r));
     }
 
     template <typename Iterator, typename Sentinel = Iterator>
-    typename std::enable_if<traits::is_iterator<Iterator>::value,
-        iterator_range<Iterator, Sentinel>>::type
-    make_iterator_range(Iterator iterator, Sentinel sentinel)
+    constexpr std::enable_if_t<traits::is_iterator_v<Iterator>,
+        iterator_range<Iterator, Sentinel>>
+    make_iterator_range(Iterator iterator, Sentinel sentinel) noexcept
     {
-        return iterator_range<Iterator, Sentinel>(iterator, sentinel);
+        return iterator_range<Iterator, Sentinel>(
+            HPX_MOVE(iterator), HPX_MOVE(sentinel));
     }
 }}    // namespace hpx::util
 

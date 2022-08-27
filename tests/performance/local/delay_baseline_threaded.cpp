@@ -24,12 +24,12 @@
 
 char const* benchmark_name = "Delay Baseline";
 
-using hpx::program_options::variables_map;
-using hpx::program_options::options_description;
-using hpx::program_options::value;
-using hpx::program_options::store;
 using hpx::program_options::command_line_parser;
 using hpx::program_options::notify;
+using hpx::program_options::options_description;
+using hpx::program_options::store;
+using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using hpx::chrono::high_resolution_timer;
 
@@ -50,16 +50,12 @@ std::string format_build_date()
     std::time_t current_time = std::chrono::system_clock::to_time_t(now);
 
     std::string ts = std::ctime(&current_time);
-    ts.resize(ts.size()-1);     // remove trailing '\n'
+    ts.resize(ts.size() - 1);    // remove trailing '\n'
     return ts;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_results(
-    variables_map& vm
-  , double sum_
-  , double mean_
-    )
+void print_results(variables_map& vm, double sum_, double mean_)
 {
     if (header)
     {
@@ -71,26 +67,21 @@ void print_results(
         // Note that if we change the number of fields above, we have to
         // change the constant that we add when printing out the field # for
         // performance counters below (e.g. the last_index part).
-        cout <<
-                "## 0:DELAY:Delay [micro-seconds] - Independent Variable\n"
+        cout << "## 0:DELAY:Delay [micro-seconds] - Independent Variable\n"
                 "## 1:TASKS:# of Tasks - Independent Variable\n"
                 "## 2:OSTHRDS:OS-threads - Independent Variable\n"
-                "## 3:WTIME_THR:Total Walltime/Thread [micro-seconds]\n"
-                ;
+                "## 3:WTIME_THR:Total Walltime/Thread [micro-seconds]\n";
     }
 
     std::string const tasks_str = hpx::util::format("{},", tasks);
     std::string const delay_str = hpx::util::format("{},", delay);
 
-    hpx::util::format_to(cout, "{} {} {} {:.14g}\n",
-        delay, tasks, threads, mean_);
+    hpx::util::format_to(
+        cout, "{} {} {} {:.14g}\n", delay, tasks, threads, mean_);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void invoke_n_workers_nowait(
-    double& elapsed
-  , std::uint64_t workers
-    )
+void invoke_n_workers_nowait(double& elapsed, std::uint64_t workers)
 {
     // Warmup.
     for (std::uint64_t i = 0; i < tasks; ++i)
@@ -115,10 +106,7 @@ void invoke_n_workers_nowait(
 }
 
 void invoke_n_workers(
-    hpx::util::barrier& b
-  , double& elapsed
-  , std::uint64_t workers
-    )
+    hpx::util::barrier& b, double& elapsed, std::uint64_t workers)
 {
     b.wait();
 
@@ -126,9 +114,7 @@ void invoke_n_workers(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int app_main(
-    variables_map& vm
-    )
+int app_main(variables_map& vm)
 {
     if (0 == tasks)
         throw std::invalid_argument("error: count of 0 tasks specified\n");
@@ -139,8 +125,8 @@ int app_main(
 
     for (std::uint32_t i = 0; i != threads - 1; ++i)
     {
-        workers.push_back(std::thread(invoke_n_workers,
-            std::ref(b), std::ref(elapsed[i]), tasks));
+        workers.push_back(std::thread(
+            invoke_n_workers, std::ref(b), std::ref(elapsed[i]), tasks));
     }
 
     double total_elapsed = 0;
@@ -160,17 +146,14 @@ int app_main(
     }
 
     // Print out the results.
-    print_results(vm, total_elapsed / double(threads)
-                , (total_elapsed * 1e6) / double(tasks * threads));
+    print_results(vm, total_elapsed / double(threads),
+        (total_elapsed * 1e6) / double(tasks * threads));
 
     return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int main(
-    int argc
-  , char* argv[]
-    )
+int main(int argc, char* argv[])
 {
     ///////////////////////////////////////////////////////////////////////////
     // Parse command line.
@@ -178,25 +161,18 @@ int main(
 
     options_description cmdline("Usage: " HPX_APPLICATION_STRING " [options]");
 
-    cmdline.add_options()
-        ( "help,h"
-        , "print out program usage (this message)")
+    cmdline.add_options()("help,h", "print out program usage (this message)")
 
-        ( "threads,t"
-        , value<std::uint64_t>(&threads)->default_value(1)
-        , "number of threads to use")
+        ("threads,t", value<std::uint64_t>(&threads)->default_value(1),
+            "number of threads to use")
 
-        ( "tasks"
-        , value<std::uint64_t>(&tasks)->default_value(500000)
-        , "number of tasks to invoke")
+            ("tasks", value<std::uint64_t>(&tasks)->default_value(500000),
+                "number of tasks to invoke")
 
-        ( "delay"
-        , value<std::uint64_t>(&delay)->default_value(5)
-        , "duration of delay in microseconds")
+                ("delay", value<std::uint64_t>(&delay)->default_value(5),
+                    "duration of delay in microseconds")
 
-        ( "no-header"
-        , "do not print out the csv header row")
-        ;
+                    ("no-header", "do not print out the csv header row");
 
     store(command_line_parser(argc, argv).options(cmdline).run(), vm);
 
@@ -214,4 +190,3 @@ int main(
 
     return app_main(vm);
 }
-

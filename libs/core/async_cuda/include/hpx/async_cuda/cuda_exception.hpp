@@ -18,7 +18,7 @@ namespace hpx { namespace cuda { namespace experimental {
 
     // -------------------------------------------------------------------------
     // exception type for failed launch of cuda functions
-    struct HPX_CORE_EXPORT cuda_exception : hpx::exception
+    struct cuda_exception : hpx::exception
     {
         cuda_exception(const std::string& msg, cudaError_t err)
           : hpx::exception(hpx::bad_function_call, msg)

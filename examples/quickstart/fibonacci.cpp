@@ -26,7 +26,7 @@ std::uint64_t fibonacci(std::uint64_t n);
 
 // This is to generate the required boilerplate we need for the remote
 // invocation to work.
-HPX_PLAIN_ACTION(fibonacci, fibonacci_action);
+HPX_PLAIN_ACTION(fibonacci, fibonacci_action)
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -37,19 +37,18 @@ std::uint64_t fibonacci(std::uint64_t n)
         return n;
 
     // We restrict ourselves to execute the Fibonacci function locally.
-    hpx::naming::id_type const locality_id = hpx::find_here();
+    hpx::id_type const locality_id = hpx::find_here();
 
     // Invoking the Fibonacci algorithm twice is inefficient.
     // However, we intentionally demonstrate it this way to create some
     // heavy workload.
 
     fibonacci_action fib;
-    hpx::future<std::uint64_t> n1 =
-        hpx::async(fib, locality_id, n - 1);
-    hpx::future<std::uint64_t> n2 =
-        hpx::async(fib, locality_id, n - 2);
+    hpx::future<std::uint64_t> n1 = hpx::async(fib, locality_id, n - 1);
+    hpx::future<std::uint64_t> n2 = hpx::async(fib, locality_id, n - 2);
 
-    return n1.get() + n2.get();   // wait for the Futures to return their values
+    return n1.get() +
+        n2.get();    // wait for the Futures to return their values
 }
 //]
 
@@ -72,7 +71,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::util::format_to(std::cout, fmt, n, r, t.elapsed());
     }
 
-    return hpx::finalize(); // Handles HPX shutdown
+    return hpx::finalize();    // Handles HPX shutdown
 }
 //]
 
@@ -81,14 +80,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    hpx::program_options::options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    hpx::program_options::options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ( "n-value",
-          hpx::program_options::value<std::uint64_t>()->default_value(10),
-          "n value for the Fibonacci function")
-        ;
+    desc_commandline.add_options()("n-value",
+        hpx::program_options::value<std::uint64_t>()->default_value(10),
+        "n value for the Fibonacci function");
 
     // Initialize and run HPX
     hpx::init_params init_args;

@@ -14,7 +14,7 @@
 
 #include <vector>
 
-HPX_REGISTER_PARTITIONED_VECTOR(double);
+HPX_REGISTER_PARTITIONED_VECTOR(double)
 
 // an out-of-line definition of a member of a class template cannot have default
 // arguments

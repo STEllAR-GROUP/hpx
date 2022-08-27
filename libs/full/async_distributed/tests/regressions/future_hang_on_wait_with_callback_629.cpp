@@ -87,7 +87,7 @@ double null_tree(std::uint64_t seed, std::uint64_t children,
     std::uint64_t depth, std::uint64_t max_depth,
     std::uint64_t delay_iterations);
 
-HPX_PLAIN_ACTION(null_tree, null_tree_action);
+HPX_PLAIN_ACTION(null_tree, null_tree_action)
 
 double null_tree(std::uint64_t seed, std::uint64_t children,
     std::uint64_t depth, std::uint64_t max_depth,
@@ -113,7 +113,7 @@ double null_tree(std::uint64_t seed, std::uint64_t children,
 
     null_function(seed, delay_iterations);
 
-    hpx::lcos::wait_each(hpx::unwrapping([&](double r) { d += r; }), futures);
+    hpx::wait_each(hpx::unwrapping([&](double r) { d += r; }), futures);
 
     return d;
 }

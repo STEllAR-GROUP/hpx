@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2019 Austin McCartney
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,12 +8,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
@@ -22,14 +22,20 @@ namespace hpx { namespace traits {
         {
         };
 
+        // different versions of clang-format disagree
+        // clang-format off
         template <typename T, typename U>
         struct equality_result<T, U,
-            typename util::always_void<decltype(
-                std::declval<const T&>() == std::declval<const U&>())>::type>
+            std::void_t<decltype(
+                std::declval<T const&>() == std::declval<U const&>())>>
         {
             using type =
-                decltype(std::declval<const T&>() == std::declval<const U&>());
+                decltype(std::declval<T const&>() == std::declval<U const&>());
         };
+        // clang-format on
+
+        template <typename T, typename U>
+        using equality_result_t = typename equality_result<T, U>::type;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename U, typename Enable = void>
@@ -37,14 +43,20 @@ namespace hpx { namespace traits {
         {
         };
 
+        // different versions of clang-format disagree
+        // clang-format off
         template <typename T, typename U>
         struct inequality_result<T, U,
-            typename util::always_void<decltype(
-                std::declval<const T&>() != std::declval<const U&>())>::type>
+            std::void_t<decltype(
+                std::declval<T const&>() != std::declval<U const&>())>>
         {
             using type =
-                decltype(std::declval<const T&>() != std::declval<const U&>());
+                decltype(std::declval<T const&>() != std::declval<U const&>());
         };
+        // clang-format on
+
+        template <typename T, typename U>
+        using inequality_result_t = typename inequality_result<T, U>::type;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename U, typename Enable = void>
@@ -54,36 +66,45 @@ namespace hpx { namespace traits {
 
         template <typename T, typename U>
         struct is_weakly_equality_comparable_with<T, U,
-            typename util::always_void<
-                typename detail::equality_result<T, U>::type,
-                typename detail::equality_result<U, T>::type,
-                typename detail::inequality_result<T, U>::type,
-                typename detail::inequality_result<U, T>::type>::type>
-          : std::true_type
+            std::void_t<detail::equality_result_t<T, U>,
+                detail::equality_result_t<U, T>,
+                detail::inequality_result_t<T, U>,
+                detail::inequality_result_t<U, T>>> : std::true_type
         {
         };
-
     }    // namespace detail
 
     template <typename T, typename U>
     struct is_weakly_equality_comparable_with
-      : detail::is_weakly_equality_comparable_with<typename std::decay<T>::type,
-            typename std::decay<U>::type>
+      : detail::is_weakly_equality_comparable_with<std::decay_t<T>,
+            std::decay_t<U>>
     {
     };
+
+    template <typename T, typename U>
+    inline constexpr bool is_weakly_equality_comparable_with_v =
+        is_weakly_equality_comparable_with<T, U>::value;
 
     // for now is_equality_comparable is equivalent to its weak version
     template <typename T, typename U>
     struct is_equality_comparable_with
-      : detail::is_weakly_equality_comparable_with<typename std::decay<T>::type,
-            typename std::decay<U>::type>
+      : detail::is_weakly_equality_comparable_with<std::decay_t<T>,
+            std::decay_t<U>>
+    {
+    };
+
+    template <typename T, typename U>
+    inline constexpr bool is_equality_comparable_with_v =
+        is_equality_comparable_with<T, U>::value;
+
+    template <typename T>
+    struct is_equality_comparable
+      : detail::is_weakly_equality_comparable_with<std::decay_t<T>,
+            std::decay_t<T>>
     {
     };
 
     template <typename T>
-    struct is_equality_comparable
-      : detail::is_weakly_equality_comparable_with<typename std::decay<T>::type,
-            typename std::decay<T>::type>
-    {
-    };
-}}    // namespace hpx::traits
+    inline constexpr bool is_equality_comparable_v =
+        is_equality_comparable<T>::value;
+}    // namespace hpx::traits

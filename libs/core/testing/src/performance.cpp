@@ -6,6 +6,7 @@
 
 #include <hpx/testing/performance.hpp>
 
+#include <chrono>
 #include <cstddef>
 #include <iostream>
 #include <string>
@@ -27,10 +28,44 @@ namespace hpx { namespace util {
             times().add(test_name, executor, time);
         }
 
+        HPX_CORE_EXPORT std::ostream& operator<<(
+            std::ostream& strm, json_perf_times const& obj)
+        {
+            strm << "{\n";
+            strm << "  \"outputs\" : [";
+            int outputs = 0;
+            for (auto&& item : obj.m_map)
+            {
+                if (outputs)
+                    strm << ",";
+                strm << "\n    {\n";
+                strm << "      \"name\" : \"" << std::get<0>(item.first)
+                     << "\",\n";
+                strm << "      \"executor\" : \"" << std::get<1>(item.first)
+                     << "\",\n";
+                strm << "      \"series\" : [";
+                int series = 0;
+                for (auto val : item.second)
+                {
+                    if (series)
+                        strm << ", ";
+                    strm << val;
+                    ++series;
+                }
+                strm << "]\n";
+                strm << "    }";
+                ++outputs;
+            }
+            if (outputs)
+                strm << "\n  ";
+            strm << "]\n";
+            strm << "}\n";
+            return strm;
+        }
     }    // namespace detail
 
-    void perf_test_report(std::string const& name, std::string const& exec,
-        const std::size_t steps, function_nonser<void(void)>&& test)
+    void perftests_report(std::string const& name, std::string const& exec,
+        const std::size_t steps, hpx::function<void(void)>&& test)
     {
         if (steps == 0)
             return;
@@ -50,7 +85,10 @@ namespace hpx { namespace util {
                     timer::now() - start);
             detail::add_time(name, exec, time.count());
         }
-        std::cout << detail::times();
     }
 
+    void perftests_print_times()
+    {
+        std::cout << detail::times();
+    }
 }}    // namespace hpx::util

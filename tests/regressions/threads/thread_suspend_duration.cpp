@@ -14,26 +14,28 @@
 #include <chrono>
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
-using hpx::program_options::variables_map;
 using hpx::program_options::options_description;
 using hpx::program_options::value;
+using hpx::program_options::variables_map;
 
 using hpx::threads::register_work;
 
-using hpx::lcos::local::barrier;
+using hpx::barrier;
 
-using hpx::init;
 using hpx::finalize;
+using hpx::init;
 
 using hpx::util::report_errors;
 
 using std::chrono::microseconds;
 
 ///////////////////////////////////////////////////////////////////////////////
-void suspend_test(barrier& b, std::size_t iterations, std::size_t n)
+void suspend_test(
+    std::shared_ptr<barrier<>> b, std::size_t iterations, std::size_t n)
 {
     for (std::size_t i = 0; i < iterations; ++i)
     {
@@ -42,7 +44,7 @@ void suspend_test(barrier& b, std::size_t iterations, std::size_t n)
     }
 
     // Wait for all hpx-threads to enter the barrier.
-    b.wait();
+    b->arrive_and_wait();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,20 +66,20 @@ int hpx_main(variables_map& vm)
         suspend_duration = vm["suspend-duration"].as<std::size_t>();
 
     {
-        barrier b(pxthreads + 1);
+        std::shared_ptr<barrier<>> b =
+            std::make_shared<barrier<>>(pxthreads + 1);
 
         // Create the hpx-threads.
         for (std::size_t i = 0; i < pxthreads; ++i)
         {
             hpx::threads::thread_init_data data(
                 hpx::threads::make_thread_function_nullary(
-                    hpx::util::bind(
-                        &suspend_test, std::ref(b), iterations, suspend_duration)),
+                    hpx::bind(&suspend_test, b, iterations, suspend_duration)),
                 "suspend_test");
             register_work(data);
         }
 
-        b.wait(); // Wait for all hpx-threads to enter the barrier.
+        b->arrive_and_wait();    // Wait for all hpx-threads to enter the barrier.
     }
 
     // Initiate shutdown of the runtime system.
@@ -88,22 +90,19 @@ int hpx_main(variables_map& vm)
 int main(int argc, char* argv[])
 {
     // Configure application-specific options
-    options_description
-       desc_commandline("Usage: " HPX_APPLICATION_STRING " [options]");
+    options_description desc_commandline(
+        "Usage: " HPX_APPLICATION_STRING " [options]");
 
-    desc_commandline.add_options()
-        ("pxthreads,T", value<std::size_t>()->default_value(0x100),
-            "the number of PX threads to invoke")
-        ("iterations", value<std::size_t>()->default_value(32),
-            "the number of iterations to execute in each thread")
-        ("suspend-duration", value<std::size_t>()->default_value(1000),
-            "the number of microseconds to wait in each thread")
-        ;
+    desc_commandline.add_options()("pxthreads,T",
+        value<std::size_t>()->default_value(0x100),
+        "the number of PX threads to invoke")("iterations",
+        value<std::size_t>()->default_value(32),
+        "the number of iterations to execute in each thread")(
+        "suspend-duration", value<std::size_t>()->default_value(1000),
+        "the number of microseconds to wait in each thread");
 
     // We force this test to use several threads by default.
-    std::vector<std::string> const cfg = {
-        "hpx.os_threads=all"
-    };
+    std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
     hpx::init_params init_args;
@@ -114,4 +113,3 @@ int main(int argc, char* argv[])
         "HPX main exited with non-zero status");
     return report_errors();
 }
-

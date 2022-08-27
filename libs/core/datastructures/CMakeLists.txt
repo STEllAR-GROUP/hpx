@@ -21,13 +21,12 @@ endif()
 
 set(datastructures_headers
     hpx/datastructures/any.hpp
+    hpx/datastructures/detail/small_vector.hpp
+    hpx/datastructures/detail/optional.hpp
     hpx/datastructures/detail/variant.hpp
     hpx/datastructures/member_pack.hpp
     hpx/datastructures/optional.hpp
     hpx/datastructures/tuple.hpp
-    hpx/datastructures/tagged.hpp
-    hpx/datastructures/tagged_pair.hpp
-    hpx/datastructures/tagged_tuple.hpp
     hpx/datastructures/traits/supports_streaming_with_any.hpp
     hpx/datastructures/traits/is_tuple_like.hpp
     hpx/datastructures/variant.hpp
@@ -41,7 +40,6 @@ set(datastructures_compat_headers
     hpx/traits/is_tuple_like.hpp => hpx/modules/datastructures.hpp
     hpx/util/any.hpp => hpx/any.hpp
     hpx/util/optional.hpp => hpx/optional.hpp
-    hpx/util/tagged.hpp => hpx/modules/datastructures.hpp
     hpx/util/tuple.hpp => hpx/tuple.hpp
 )
 # cmake-format: on

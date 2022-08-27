@@ -1,12 +1,19 @@
 # Copyright (c) 2019 Thomas Heller
-# Copyright (c) 2020 Hartmut Kaiser
+# Copyright (c) 2020-2022 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests any_sender basic_operation_state basic_receiver basic_sender
-          basic_schedule execution_context
+set(tests
+    any_sender
+    basic_operation_state
+    basic_receiver
+    basic_sender
+    basic_schedule
+    completion_signatures
+    execution_context
+    get_env
 )
 
 foreach(test ${tests})
@@ -23,6 +30,8 @@ foreach(test ${tests})
     EXCLUDE_FROM_ALL
     FOLDER "Tests/Unit/Modules/Core/ExecutionBase"
   )
+
+  target_link_libraries(${test}_test PRIVATE hpx_execution_test_utilities)
 
   add_hpx_unit_test("modules.execution_base" ${test} ${${test}_PARAMETERS})
   target_compile_definitions(${test}_test PRIVATE -DHPX_MODULE_STATIC_LINKING)
