@@ -69,14 +69,6 @@ namespace hpx { namespace execution { namespace experimental {
 
 #endif
 
-    struct is_debug_env_t
-    {
-        template <typename Env,
-            typename = std::enable_if_t<
-                hpx::functional::is_tag_invocable_v<is_debug_env_t, Env>>>
-        void operator()(Env&&) const noexcept;
-    };
-
     // execution::connect is used to connect a sender with a receiver, producing
     // an operation state object that represents the work that needs to be
     // performed to satisfy the receiver contract of the receiver with values

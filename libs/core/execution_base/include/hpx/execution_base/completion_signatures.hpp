@@ -739,6 +739,14 @@ namespace hpx::execution::experimental {
 
     struct connect_awaitable_t;
 
+    struct is_debug_env_t
+    {
+        template <typename Env,
+            typename = std::enable_if_t<
+                hpx::functional::is_tag_invocable_v<is_debug_env_t, Env>>>
+        void operator()(Env&&) const noexcept;
+    };
+
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct connect_t
       : hpx::functional::tag<connect_t>
     {
