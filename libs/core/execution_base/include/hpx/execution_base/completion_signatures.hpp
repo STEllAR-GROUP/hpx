@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution_base/get_env.hpp>
@@ -20,6 +21,7 @@
 #include <hpx/type_support/pack.hpp>
 
 #include <exception>
+#include <system_error>
 #include <type_traits>
 
 namespace hpx::execution::experimental {
@@ -819,6 +821,46 @@ namespace hpx::execution::experimental {
     } connect{};
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
+
+    template <typename Sender, typename Receiver>
+    inline constexpr bool has_nothrow_connect = noexcept(
+        connect(std::declval<Sender>(), std::declval<Receiver>()));
+
+    // 4.18. Cancellation of a sender can unwind a stack of coroutines
+    // As described in the section "All awaitables are senders", the sender
+    // customization points recognize awaitables and adapt them transparently
+    // to model the sender concept. When connect-ing an awaitable and a
+    // receiver, the adaptation layer awaits the awaitable within a coroutine
+    // that implements unhandled_stopped in its promise type. The effect of
+    // this is that an "uncatchable" stopped exception propagates seamlessly
+    // out of awaitables, causing execution::set_stopped to be called on the
+    // receiver.
+    // Obviously, unhandled_stopped is a library extension of the
+    // coroutine promise interface. Many promise types will not implement
+    // unhandled_stopped. When an uncatchable stopped exception tries to
+    // propagate through such a coroutine, it is treated as an unhandled
+    // exception and terminate is called. The solution, as described above, is
+    // to use a sender adaptor to handle the stopped exception before awaiting
+    // it. It goes without saying that any future Standard Library coroutine
+    // types ought to implement unhandled_stopped. The author of Add lazy
+    // coroutine (coroutine task) type, which proposes a standard coroutine
+    // task type, is in agreement.
+    template <typename Promise, typename = void>
+    inline constexpr bool has_unhandled_stopped = false;
+
+    template <typename Promise>
+    inline constexpr bool has_unhandled_stopped<Promise,
+        std::void_t<decltype(std::declval<Promise>().unhandled_stopped())>> =
+        true;
+
+    template <typename Promise, typename = void>
+    inline constexpr bool has_convertible_unhandled_stopped = false;
+
+    template <typename Promise>
+    inline constexpr bool has_convertible_unhandled_stopped<Promise,
+        std::enable_if_t<std::is_convertible_v<
+            decltype(std::declval<Promise>().unhandled_stopped()),
+            hpx::coro::coroutine_handle<>>>> = true;
 
     struct as_awaitable_t;
 
