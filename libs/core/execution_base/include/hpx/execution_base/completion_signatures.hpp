@@ -737,6 +737,8 @@ namespace hpx::execution::experimental {
     template <typename Sender, typename Env = no_env>
     using single_sender_value_t = value_types_of_t<Sender, Env>;
 
+    struct connect_awaitable_t;
+
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct connect_t
       : hpx::functional::tag<connect_t>
     {
