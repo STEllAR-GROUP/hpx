@@ -1042,6 +1042,7 @@ namespace hpx::execution::experimental {
     }    // namespace detail
 
     inline constexpr struct as_awaitable_t
+      : hpx::functional::tag<as_awaitable_t>
     {
         template <typename T, typename Promise>
         static constexpr bool is_noexcept() noexcept
@@ -1068,7 +1069,7 @@ namespace hpx::execution::experimental {
         }
 
         template <typename T, typename Promise>
-        decltype(auto) operator()(T&& t, Promise& promise) const
+        decltype(auto) tag_invoke(T&& t, Promise& promise) const
             noexcept(is_noexcept<T, Promise>())
         {
             if constexpr (detail::is_custom_tag_invoke_awaiter_v<T, Promise>)
