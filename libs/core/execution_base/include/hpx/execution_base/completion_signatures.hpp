@@ -789,7 +789,7 @@ namespace hpx::execution::experimental {
                 hpx::is_invocable_v<connect_awaitable_t, Sender, Receiver> ||
                 hpx::functional::is_tag_invocable_v<is_debug_env_t,
                     env_of_t<Receiver>>>>
-        auto operator()(Sender&& sndr, Receiver&& rcvr) const
+        auto tag_invoke(Sender&& sndr, Receiver&& rcvr) const
             noexcept(nothrow_connect<Sender, Receiver>())
         {
             if constexpr (is_connectable_with_tag_invoke_v<Sender, Receiver>)
