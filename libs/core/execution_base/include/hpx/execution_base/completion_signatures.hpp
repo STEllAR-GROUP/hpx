@@ -23,6 +23,7 @@
 #include <exception>
 #include <system_error>
 #include <type_traits>
+#include <utility>
 
 namespace hpx::execution::experimental {
 
@@ -1107,9 +1108,10 @@ namespace hpx::execution::experimental {
                 {
                     stopped_callback = [](void* address) noexcept
                         -> hpx::coro::coroutine_handle<> {
-                        // This causes the rest of the coroutine (the part after the co_await
-                        // of the sender) to be skipped and invokes the calling coroutine's
-                        // stopped handler.
+                        // This causes the rest of the coroutine
+                        // (the part after the co_await of the sender)
+                        // to be skipped and invokes the calling
+                        //  coroutine'sstopped handler.
                         return hpx::coro::coroutine_handle<
                             OtherPromise>::from_address(address)
                             .promise()

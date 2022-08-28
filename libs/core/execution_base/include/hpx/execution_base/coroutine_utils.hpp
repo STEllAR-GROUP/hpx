@@ -66,7 +66,7 @@ namespace hpx::execution::experimental {
     // such that if a sender completes by calling execution::set_stopped, it
     // is treated as if an uncatchable "stopped" exception were thrown from
     // the await-expression. In practice, the coroutine is never resumed, and
-    // the unhandled_stopped of the coroutine caller’s promise type is called.
+    // the unhandled_stopped of the coroutine caller's promise type is called.
     //
     template <typename Promise>
     struct with_awaitable_senders;
