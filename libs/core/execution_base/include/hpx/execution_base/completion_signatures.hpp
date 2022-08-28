@@ -827,6 +827,9 @@ namespace hpx::execution::experimental {
 
     } connect{};
 
+    template <typename S, typename R>
+    using connect_result_t = hpx::util::invoke_result_t<connect_t, S, R>;
+
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 
     template <typename Sender, typename Receiver>
@@ -870,9 +873,6 @@ namespace hpx::execution::experimental {
             hpx::coro::coroutine_handle<>>>> = true;
 
     struct as_awaitable_t;
-
-    template <typename S, typename R>
-    using connect_result_t = hpx::util::invoke_result_t<connect_t, S, R>;
 
     namespace detail {
         template <typename T, typename U>
