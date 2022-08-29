@@ -194,7 +194,7 @@ namespace hpx { namespace ranges {
     /// \tparam Rng2        The type of the destination range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random iterator.
-    /// \tparam Comp     The type of the function/function object to use
+    /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Comp defaults to detail::less.
     /// \tparam Proj1       The type of an optional projection function for the
     ///                     input range. This defaults to
@@ -261,7 +261,7 @@ namespace hpx { namespace ranges {
     /// \tparam Rng2        The type of the destination range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of a random iterator.
-    /// \tparam Comp     The type of the function/function object to use
+    /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced). Comp defaults to detail::less.
     /// \tparam Proj1       The type of an optional projection function for the
     ///                     input range. This defaults to
@@ -273,7 +273,7 @@ namespace hpx { namespace ranges {
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param rng1         Refers to the source range.
-    /// \param rng1         Refers to the destination range.
+    /// \param rng2         Refers to the destination range.
     /// \param comp         comp is a callable object. The return value of the
     ///                     INVOKE operation applied to an object of type Comp,
     ///                     when contextually converted to bool, yields true if

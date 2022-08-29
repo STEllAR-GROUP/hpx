@@ -138,7 +138,8 @@ namespace hpx { namespace parallel { namespace util {
         private:
             template <typename F, typename Items1, typename Items2,
                 typename FwdIter>
-            static decltype(auto) reduce(
+
+            static auto reduce(
                 std::pair<Items1, Items2>&& items, F&& f, FwdIter last)
             {
                 // wait for all tasks to finish
@@ -150,7 +151,9 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(hpx::get<0>(items));
                     handle_local_exceptions::call(hpx::get<1>(items));
                 }
-                return HPX_INVOKE(f, HPX_MOVE(last));
+
+                // gcc 9 complains here if HPX_INVOKE is used.
+                return hpx::util::invoke(f, HPX_MOVE(last));
             }
 
             template <typename F, typename Items, typename FwdIter>

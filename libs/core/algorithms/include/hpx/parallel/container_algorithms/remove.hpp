@@ -150,7 +150,7 @@ namespace hpx { namespace ranges {
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param pred         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the

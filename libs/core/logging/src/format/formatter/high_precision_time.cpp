@@ -110,7 +110,13 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
             size_t start_pos = m_format.find(from);
             if (start_pos == std::string::npos)
                 return false;
-            m_format.replace(start_pos, std::strlen(from), to);
+
+            // MSVC: using std::string::replace triggers ASAN reports
+            // m_format.replace(start_pos, std::strlen(from), to);
+            std::string fmt(m_format.substr(0, start_pos));
+            fmt += to;
+            fmt += m_format.substr(start_pos + std::strlen(from));
+            m_format = HPX_MOVE(fmt);
             return true;
         }
 

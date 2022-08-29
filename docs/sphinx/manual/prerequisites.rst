@@ -39,8 +39,8 @@ The table below shows the supported compilers for |hpx|.
    Name                Minimum Version
    =================== ==================
    |gcc|_              8.0
-   |clang|_            8.0
-   |visual_cxx|_ (x64) 2015
+   |clang|_            10.0
+   |visual_cxx|_ (x64) 2019
    =================== ==================
 
 Software and libraries

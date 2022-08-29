@@ -232,7 +232,7 @@ namespace hpx { namespace ranges {
     ///
     /// \returns  The \a reverse_copy algorithm returns a
     ///           \a ranges::reverse_copy_result<
-    ///           typename hpx::traits::range_iterator<Rng>::type, OutIter>>::type.
+    ///           typename hpx::traits::range_iterator<Rng>::type, OutIter>.
     ///           The \a reverse_copy algorithm returns
     ///           an object equal to {last, result + N} where N = last - first
     ///

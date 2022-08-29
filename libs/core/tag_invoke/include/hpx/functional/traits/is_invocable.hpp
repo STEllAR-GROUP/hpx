@@ -69,4 +69,29 @@ namespace hpx {
 
     template <typename R, typename F, typename... Ts>
     inline constexpr bool is_invocable_r_v = is_invocable_r<R, F, Ts...>::value;
+
+    namespace detail {
+
+        template <typename Sig, bool Invocable>
+        struct is_nothrow_invocable_impl : std::false_type
+        {
+        };
+
+        template <typename F, typename... Ts>
+        struct is_nothrow_invocable_impl<F(Ts...), true>
+          : std::integral_constant<bool,
+                noexcept(std::declval<F>()(std::declval<Ts>()...))>
+        {
+        };
+    }    // namespace detail
+
+    template <typename F, typename... Ts>
+    struct is_nothrow_invocable
+      : detail::is_nothrow_invocable_impl<F(Ts...), is_invocable_v<F, Ts...>>
+    {
+    };
+
+    template <typename F, typename... Ts>
+    inline constexpr bool is_nothrow_invocable_v =
+        is_nothrow_invocable<F, Ts...>::value;
 }    // namespace hpx

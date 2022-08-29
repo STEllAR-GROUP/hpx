@@ -66,13 +66,14 @@ namespace hpx { namespace cuda { namespace experimental {
 
         template <typename Allocator>
         struct future_data<Allocator, event_mode>
-          : lcos::detail::future_data_allocator<void, Allocator>
+          : lcos::detail::future_data_allocator<void, Allocator,
+                future_data<Allocator, event_mode>>
         {
             HPX_NON_COPYABLE(future_data);
 
             using init_no_addref =
-                typename lcos::detail::future_data_allocator<void,
-                    Allocator>::init_no_addref;
+                typename lcos::detail::future_data_allocator<void, Allocator,
+                    future_data>::init_no_addref;
 
             using other_allocator = typename std::allocator_traits<
                 Allocator>::template rebind_alloc<future_data>;
@@ -81,8 +82,8 @@ namespace hpx { namespace cuda { namespace experimental {
 
             future_data(init_no_addref no_addref, other_allocator const& alloc,
                 cudaStream_t stream)
-              : lcos::detail::future_data_allocator<void, Allocator>(
-                    no_addref, alloc)
+              : lcos::detail::future_data_allocator<void, Allocator,
+                    future_data>(no_addref, alloc)
             {
                 add_event_callback(
                     [fdp = hpx::intrusive_ptr<future_data>(this)](
@@ -109,13 +110,14 @@ namespace hpx { namespace cuda { namespace experimental {
 
         template <typename Allocator>
         struct future_data<Allocator, callback_mode>
-          : lcos::detail::future_data_allocator<void, Allocator>
+          : lcos::detail::future_data_allocator<void, Allocator,
+                future_data<Allocator, callback_mode>>
         {
             HPX_NON_COPYABLE(future_data);
 
             using init_no_addref =
-                typename lcos::detail::future_data_allocator<void,
-                    Allocator>::init_no_addref;
+                typename lcos::detail::future_data_allocator<void, Allocator,
+                    future_data>::init_no_addref;
 
             using other_allocator = typename std::allocator_traits<
                 Allocator>::template rebind_alloc<future_data>;
@@ -127,8 +129,8 @@ namespace hpx { namespace cuda { namespace experimental {
 
             future_data(init_no_addref no_addref, other_allocator const& alloc,
                 cudaStream_t stream)
-              : lcos::detail::future_data_allocator<void, Allocator>(
-                    no_addref, alloc)
+              : lcos::detail::future_data_allocator<void, Allocator,
+                    future_data>(no_addref, alloc)
               , rt_(hpx::get_runtime_ptr())
             {
                 // Hold on to the shared state on behalf of the cuda runtime
@@ -231,3 +233,15 @@ namespace hpx { namespace cuda { namespace experimental {
         HPX_CORE_EXPORT hpx::future<void> get_future_with_event(cudaStream_t);
     }    // namespace detail
 }}}      // namespace hpx::cuda::experimental
+
+namespace hpx { namespace traits { namespace detail {
+
+    template <typename Allocator, typename Mode, typename NewAllocator>
+    struct shared_state_allocator<
+        hpx::cuda::experimental::detail::future_data<Allocator, Mode>,
+        NewAllocator>
+    {
+        using type =
+            hpx::cuda::experimental::detail::future_data<NewAllocator, Mode>;
+    };
+}}}    // namespace hpx::traits::detail

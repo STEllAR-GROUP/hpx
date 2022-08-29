@@ -33,9 +33,9 @@ namespace hpx { namespace ranges {
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
-    /// \tparam Op          The type of the binary function object used for
+    /// \tparam BinOp       The type of the binary function object used for
     ///                     the reduction operation.
-    /// \tparam Conv        The type of the unary function object used for
+    /// \tparam UnOp        The type of the unary function object used for
     ///                     the conversion operation.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
@@ -43,7 +43,7 @@ namespace hpx { namespace ranges {
     /// \param last         Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param op           Specifies the function (or function object) which
+    /// \param binary_op    Specifies the function (or function object) which
     ///                     will be invoked for each of the values of the input
     ///                     sequence. This is a
     ///                     binary predicate. The signature of this predicate
@@ -58,7 +58,7 @@ namespace hpx { namespace ranges {
     ///                     such that an object of a type as given by the input
     ///                     sequence can be implicitly converted to any
     ///                     of those types.
-    /// \param conv         Specifies the function (or function object) which
+    /// \param unary_op     Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
     ///                     sequence specified by [first, last). This is a
     ///                     unary predicate. The signature of this predicate
@@ -126,9 +126,9 @@ namespace hpx { namespace ranges {
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam Op          The type of the binary function object used for
+    /// \tparam BinOp       The type of the binary function object used for
     ///                     the reduction operation.
-    /// \tparam Conv        The type of the unary function object used for
+    /// \tparam UnOp        The type of the unary function object used for
     ///                     the conversion operation.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -138,7 +138,7 @@ namespace hpx { namespace ranges {
     /// \param last         Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param op           Specifies the function (or function object) which
+    /// \param binary_op    Specifies the function (or function object) which
     ///                     will be invoked for each of the values of the input
     ///                     sequence. This is a
     ///                     binary predicate. The signature of this predicate
@@ -153,7 +153,7 @@ namespace hpx { namespace ranges {
     ///                     such that an object of a type as given by the input
     ///                     sequence can be implicitly converted to any
     ///                     of those types.
-    /// \param conv         Specifies the function (or function object) which
+    /// \param unary_op     Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
     ///                     sequence specified by [first, last). This is a
     ///                     unary predicate. The signature of this predicate
@@ -226,14 +226,15 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of an input iterator.
     /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
-    /// \tparam Op          The type of the binary function object used for
+    /// \tparam BinOp       The type of the binary function object used for
     ///                     the reduction operation.
-    /// \tparam Conv        The type of the unary function object used for
+    /// \tparam UnOp        The type of the unary function object used for
     ///                     the conversion operation.
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
-    /// \param op           Specifies the function (or function object) which
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param binary_op    Specifies the function (or function object) which
     ///                     will be invoked for each of the values of the input
     ///                     sequence. This is a
     ///                     binary predicate. The signature of this predicate
@@ -248,7 +249,7 @@ namespace hpx { namespace ranges {
     ///                     such that an object of a type as given by the input
     ///                     sequence can be implicitly converted to any
     ///                     of those types.
-    /// \param conv         Specifies the function (or function object) which
+    /// \param unary_op     Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
     ///                     sequence specified by [first, last). This is a
     ///                     unary predicate. The signature of this predicate
@@ -289,9 +290,8 @@ namespace hpx { namespace ranges {
     /// The behavior of transform_inclusive_scan may be non-deterministic for
     /// a non-associative predicate.
     ///
-    template <typename Rng, typename O, typename BinOp,
-        typename UnOp>
-    transform_inclusive_scan_result<traits::range_iterator_t<Rng>, O>
+    template <typename Rng, typename O, typename BinOp, typename UnOp>
+    transform_inclusive_scan_result<hpx::traits::range_iterator_t<Rng>, O>
     transform_inclusive_scan(Rng&& rng, O dest, BinOp&& binary_op,
         UnOp&& unary_op);
 
@@ -317,17 +317,17 @@ namespace hpx { namespace ranges {
     ///                     forward iterator.
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam Conv        The type of the unary function object used for
-    ///                     the conversion operation.
-    /// \tparam Op          The type of the binary function object used for
+    /// \tparam BinOp       The type of the binary function object used for
     ///                     the reduction operation.
+    /// \tparam UnOp        The type of the unary function object used for
+    ///                     the conversion operation.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param op           Specifies the function (or function object) which
+    /// \param binary_op    Specifies the function (or function object) which
     ///                     will be invoked for each of the values of the input
     ///                     sequence. This is a
     ///                     binary predicate. The signature of this predicate
@@ -342,7 +342,7 @@ namespace hpx { namespace ranges {
     ///                     such that an object of a type as given by the input
     ///                     sequence can be implicitly converted to any
     ///                     of those types.
-    /// \param conv         Specifies the function (or function object) which
+    /// \param unary_op     Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
     ///                     sequence specified by [first, last). This is a
     ///                     unary predicate. The signature of this predicate
@@ -397,7 +397,8 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename Rng,  typename O,
         typename BinOp, typename UnOp>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        transform_inclusive_scan_result<traits::range_iterator_t<Rng>, O>>::type
+        transform_inclusive_scan_result<hpx::traits::range_iterator_t<Rng>,
+            O>>::type
     transform_inclusive_scan(ExPolicy&& policy, Rng&& rng, O dest,
         BinOp&& binary_op, UnOp&& unary_op);
 
@@ -419,10 +420,10 @@ namespace hpx { namespace ranges {
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     output iterator.
-    /// \tparam Conv        The type of the unary function object used for
-    ///                     the conversion operation.
-    /// \tparam Op          The type of the binary function object used for
+    /// \tparam BinOp       The type of the binary function object used for
     ///                     the reduction operation.
+    /// \tparam UnOp        The type of the unary function object used for
+    ///                     the conversion operation.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     ///
@@ -431,22 +432,7 @@ namespace hpx { namespace ranges {
     /// \param last         Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param conv         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). This is a
-    ///                     unary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     R fun(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
-    ///                     implicitly converted to Type.
-    ///                     The type \a R must be such that an object of this
-    ///                     type can be implicitly converted to \a T.
-    /// \param op           Specifies the function (or function object) which
+    /// \param binary_op    Specifies the function (or function object) which
     ///                     will be invoked for each of the values of the input
     ///                     sequence. This is a
     ///                     binary predicate. The signature of this predicate
@@ -461,6 +447,21 @@ namespace hpx { namespace ranges {
     ///                     such that an object of a type as given by the input
     ///                     sequence can be implicitly converted to any
     ///                     of those types.
+    /// \param unary_op     Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is a
+    ///                     unary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     R fun(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///                     The type \a R must be such that an object of this
+    ///                     type can be implicitly converted to \a T.
     /// \param init         The initial value for the generalized sum.
     ///
     /// The reduce operations in the parallel \a transform_inclusive_scan
@@ -488,7 +489,8 @@ namespace hpx { namespace ranges {
     /// a non-associative predicate.
     ///
     template <typename InIter, typename Sent, typename OutIter,
-        typename BinOp, typename UnOp, typename T>
+        typename BinOp, typename UnOp,
+        typename T = typename std::iterator_traits<InIter>::value_type>
     transform_inclusive_scan_result<InIter, OutIter> transform_inclusive_scan(
         InIter first, Sent last, OutIter dest, BinOp&& binary_op,
         UnOp&& unary_op, T init);
@@ -515,10 +517,10 @@ namespace hpx { namespace ranges {
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam Conv        The type of the unary function object used for
-    ///                     the conversion operation.
-    /// \tparam Op          The type of the binary function object used for
+    /// \tparam BinOp       The type of the binary function object used for
     ///                     the reduction operation.
+    /// \tparam UnOp        The type of the unary function object used for
+    ///                     the conversion operation.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     ///
@@ -529,22 +531,7 @@ namespace hpx { namespace ranges {
     /// \param last         Refers to sentinel value denoting the end of the
     ///                     sequence of elements the algorithm will be applied.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param conv         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). This is a
-    ///                     unary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     R fun(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
-    ///                     implicitly converted to Type.
-    ///                     The type \a R must be such that an object of this
-    ///                     type can be implicitly converted to \a T.
-    /// \param op           Specifies the function (or function object) which
+    /// \param binary_op    Specifies the function (or function object) which
     ///                     will be invoked for each of the values of the input
     ///                     sequence. This is a
     ///                     binary predicate. The signature of this predicate
@@ -559,6 +546,21 @@ namespace hpx { namespace ranges {
     ///                     such that an object of a type as given by the input
     ///                     sequence can be implicitly converted to any
     ///                     of those types.
+    /// \param unary_op     Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is a
+    ///                     unary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     R fun(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///                     The type \a R must be such that an object of this
+    ///                     type can be implicitly converted to \a T.
     /// \param init         The initial value for the generalized sum.
     ///
     /// The reduce operations in the parallel \a transform_inclusive_scan
@@ -598,7 +600,8 @@ namespace hpx { namespace ranges {
     /// a non-associative predicate.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Sent,
-        typename FwdIter2, typename BinOp, typename UnOp, typename T>
+        typename FwdIter2, typename BinOp, typename UnOp,
+        typename T = typename std::iterator_traits<FwdIter1>::value_type>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         transform_inclusive_result<FwdIter1, FwdIter2>>::type
     transform_inclusive_scan(ExPolicy&& policy, FwdIter1 first, Sent last,
@@ -618,31 +621,17 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of an input iterator.
     /// \tparam O           The type of the iterator representing the
     ///                     destination range (deduced).
-    /// \tparam Conv        The type of the unary function object used for
-    ///                     the conversion operation.
-    /// \tparam Op          The type of the binary function object used for
+    /// \tparam BinOp       The type of the binary function object used for
     ///                     the reduction operation.
+    /// \tparam UnOp        The type of the unary function object used for
+    ///                     the conversion operation.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
-    /// \param conv         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). This is a
-    ///                     unary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     R fun(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
-    ///                     implicitly converted to Type.
-    ///                     The type \a R must be such that an object of this
-    ///                     type can be implicitly converted to \a T.
-    /// \param op           Specifies the function (or function object) which
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param binary_op    Specifies the function (or function object) which
     ///                     will be invoked for each of the values of the input
     ///                     sequence. This is a
     ///                     binary predicate. The signature of this predicate
@@ -657,6 +646,21 @@ namespace hpx { namespace ranges {
     ///                     such that an object of a type as given by the input
     ///                     sequence can be implicitly converted to any
     ///                     of those types.
+    /// \param unary_op     Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is a
+    ///                     unary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     R fun(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///                     The type \a R must be such that an object of this
+    ///                     type can be implicitly converted to \a T.
     /// \param init         The initial value for the generalized sum.
     ///
     /// The reduce operations in the parallel \a transform_inclusive_scan
@@ -684,9 +688,10 @@ namespace hpx { namespace ranges {
     /// The behavior of transform_inclusive_scan may be non-deterministic for
     /// a non-associative predicate.
     ///
-    template <typename Rng, typename O, typename BinOp,
-        typename UnOp, typename T>
-    transform_inclusive_scan_result<traits::range_iterator_t<Rng>, O>
+    template <typename Rng, typename O, typename BinOp, typename UnOp,
+        typename T = typename std::iterator_traits<
+            hpx::traits::range_iterator_t<Rng>>::value_type>
+    transform_inclusive_scan_result<hpx::traits::range_iterator_t<Rng>, O>
     transform_inclusive_scan(Rng&& rng, O dest, BinOp&& binary_op,
         UnOp&& unary_op, T init);
 
@@ -712,10 +717,10 @@ namespace hpx { namespace ranges {
     ///                     forward iterator.
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam Conv        The type of the unary function object used for
-    ///                     the conversion operation.
-    /// \tparam Op          The type of the binary function object used for
+    /// \tparam BinOp       The type of the binary function object used for
     ///                     the reduction operation.
+    /// \tparam UnOp        The type of the unary function object used for
+    ///                     the conversion operation.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     ///
@@ -724,22 +729,7 @@ namespace hpx { namespace ranges {
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
-    /// \param conv         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). This is a
-    ///                     unary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     R fun(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter1 can be dereferenced and then
-    ///                     implicitly converted to Type.
-    ///                     The type \a R must be such that an object of this
-    ///                     type can be implicitly converted to \a T.
-    /// \param op           Specifies the function (or function object) which
+    /// \param binary_op    Specifies the function (or function object) which
     ///                     will be invoked for each of the values of the input
     ///                     sequence. This is a
     ///                     binary predicate. The signature of this predicate
@@ -754,6 +744,21 @@ namespace hpx { namespace ranges {
     ///                     such that an object of a type as given by the input
     ///                     sequence can be implicitly converted to any
     ///                     of those types.
+    /// \param unary_op     Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is a
+    ///                     unary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     R fun(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///                     The type \a R must be such that an object of this
+    ///                     type can be implicitly converted to \a T.
     /// \param init         The initial value for the generalized sum.
     ///
     /// The reduce operations in the parallel \a transform_inclusive_scan
@@ -793,9 +798,12 @@ namespace hpx { namespace ranges {
     /// a non-associative predicate.
     ///
     template <typename ExPolicy, typename Rng,  typename O,
-        typename BinOp, typename UnOp, typename T>
+        typename BinOp, typename UnOp,
+        typename T = typename std::iterator_traits<
+            hpx::traits::range_iterator_t<Rng>>::value_type>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        transform_inclusive_scan_result<traits::range_iterator_t<Rng>, O>>::type
+        transform_inclusive_scan_result<hpx::traits::range_iterator_t<Rng>,
+            O>>::type
     transform_inclusive_scan(ExPolicy&& policy, Rng&& rng, O dest,
         BinOp&& binary_op, UnOp&& unary_op, T init);
 

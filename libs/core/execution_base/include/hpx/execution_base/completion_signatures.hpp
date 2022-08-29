@@ -370,15 +370,17 @@ namespace hpx::execution::experimental {
     // A sender is a type that is describing an asynchronous operation. The
     // operation itself might not have started yet. In order to get the result
     // of this asynchronous operation, a sender needs to be connected to a
-    // receiver with the corresponding value, error and done channels:
+    // receiver with the corresponding value, error and stopped channels:
+    //
     //     * `hpx::execution::experimental::connect`
     //
-    // In addition, `hpx::execution::experimental::sender_traits ` needs to
-    // be specialized in some form.
+    // A sender describes a potentially asynchronous operation. A sender's
+    // responsibility is to fulfill the receiver contract of a connected
+    // receiver by delivering one of the receiver completion-signals.
     //
     // A sender's destructor shall not block pending completion of submitted
     // operations.
-    template <typename Sender, typename Env = empty_env>
+    template <typename Sender, typename Env = no_env>
     struct is_sender;
 
     // \see is_sender
@@ -607,7 +609,7 @@ namespace hpx::execution::experimental {
     {
     };
 
-    template <typename Sender, typename Env = empty_env>
+    template <typename Sender, typename Env = no_env>
     inline constexpr bool is_sender_v = is_sender<Sender, Env>::value;
 
     namespace detail {
@@ -632,13 +634,24 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
+    // The sender_of concept defines the requirements for a sender type that on
+    // successful completion sends the specified set of value types.
+    //
+    //      template <typename S, typename E = no_env, typename... Ts>
+    //      concept sender_of =
+    //          sender<S, E> &&
+    //          same_as<
+    //              type-list<Ts...>,
+    //              value_types_of_t<S, E, type-list, type_identity_t>
+    //          >;
+    //
     template <typename S, typename E, typename... Ts>
     struct is_sender_of
       : detail::is_sender_of_impl<is_sender_v<S, E>, S, E, Ts...>
     {
     };
 
-    template <typename S, typename E, typename... Ts>
+    template <typename S, typename E = no_env, typename... Ts>
     inline constexpr bool is_sender_of_v = is_sender_of<S, E, Ts...>::value;
 
     template <typename Sender, typename Receiver>

@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -89,15 +90,12 @@ struct error_sender
         friend void tag_invoke(
             hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
-            try
-            {
-                throw std::runtime_error("error");
-            }
-            catch (...)
-            {
-                hpx::execution::experimental::set_error(
-                    std::move(os.r), std::current_exception());
-            }
+            hpx::detail::try_catch_exception_ptr(
+                []() { throw std::runtime_error("error"); },
+                [&](std::exception_ptr ep) {
+                    hpx::execution::experimental::set_error(
+                        std::move(os.r), std::move(ep));
+                });
         }
     };
 
@@ -285,15 +283,12 @@ struct error_typed_sender
         friend void tag_invoke(
             hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
-            try
-            {
-                throw std::runtime_error("error");
-            }
-            catch (...)
-            {
-                hpx::execution::experimental::set_error(
-                    std::move(os.r), std::current_exception());
-            }
+            hpx::detail::try_catch_exception_ptr(
+                []() { throw std::runtime_error("error"); },
+                [&](std::exception_ptr ep) {
+                    hpx::execution::experimental::set_error(
+                        std::move(os.r), std::move(ep));
+                });
         };
     };
 
@@ -341,7 +336,14 @@ struct custom_sender_tag_invoke
     struct operation_state
     {
         std::decay_t<R> r;
-        void start() noexcept
+
+        friend void tag_invoke(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
+        {
+            os.start();
+        }
+
+        void start() & noexcept
         {
             hpx::execution::experimental::set_value(std::move(r));
         }

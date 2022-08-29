@@ -13,7 +13,9 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
+#include <hpx/execution/algorithms/run_loop.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/get_env.hpp>
@@ -35,13 +37,15 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename PredecessorSender, typename F>
+        template <typename PredecessorSender, typename F,
+            typename Scheduler = no_scheduler>
         struct let_value_sender
         {
             using predecessor_sender_t = std::decay_t<PredecessorSender>;
 
             HPX_NO_UNIQUE_ADDRESS predecessor_sender_t predecessor_sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
 
             template <typename Env = empty_env>
             struct generate_completion_signatures
@@ -125,6 +129,39 @@ namespace hpx::execution::experimental {
             friend auto tag_invoke(get_completion_signatures_t,
                 let_value_sender const&, Env) noexcept
                 -> generate_completion_signatures<Env>;
+
+            // clang-format off
+            template <typename CPO, typename Scheduler_ = Scheduler,
+                HPX_CONCEPT_REQUIRES_(
+                   !hpx::execution::experimental::is_scheduler_v<Scheduler_> &&
+                    hpx::execution::experimental::detail::is_receiver_cpo_v<CPO> &&
+                    hpx::execution::experimental::detail::has_completion_scheduler_v<
+                        CPO, predecessor_sender_t>
+                )>
+            // clang-format on
+            friend constexpr auto tag_invoke(
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>
+                    tag,
+                let_value_sender const& sender)
+            {
+                return tag(sender.predecessor_sender);
+            }
+
+            // clang-format off
+            template <typename CPO, typename Scheduler_ = Scheduler,
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::execution::experimental::is_scheduler_v<Scheduler_> &&
+                    hpx::execution::experimental::detail::is_receiver_cpo_v<CPO>
+                )>
+            // clang-format on
+            friend constexpr auto tag_invoke(
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>,
+                let_value_sender const& sender)
+            {
+                return sender.scheduler;
+            }
+
+            // TODO: add forwarding_sender_query
 
             template <typename Receiver>
             struct operation_state
@@ -374,7 +411,7 @@ namespace hpx::execution::experimental {
         // clang-format off
         template <typename PredecessorSender, typename F,
             HPX_CONCEPT_REQUIRES_(
-                is_sender_v<PredecessorSender> &&
+                hpx::execution::experimental::is_sender_v<PredecessorSender> &&
                 experimental::detail::is_completion_scheduler_tag_invocable_v<
                     hpx::execution::experimental::set_value_t,
                     PredecessorSender, let_value_t, F
@@ -398,7 +435,23 @@ namespace hpx::execution::experimental {
         // clang-format off
         template <typename PredecessorSender, typename F,
             HPX_CONCEPT_REQUIRES_(
-                is_sender_v<PredecessorSender>
+                hpx::execution::experimental::is_sender_v<PredecessorSender>
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_invoke(let_value_t,
+            hpx::execution::experimental::run_loop_scheduler const& sched,
+            PredecessorSender&& predecessor_sender, F&& f)
+        {
+            return detail::let_value_sender<PredecessorSender, F,
+                hpx::execution::experimental::run_loop_scheduler>{
+                HPX_FORWARD(PredecessorSender, predecessor_sender),
+                HPX_FORWARD(F, f), sched};
+        }
+
+        // clang-format off
+        template <typename PredecessorSender, typename F,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_sender_v<PredecessorSender>
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
@@ -406,7 +459,21 @@ namespace hpx::execution::experimental {
         {
             return detail::let_value_sender<PredecessorSender, F>{
                 HPX_FORWARD(PredecessorSender, predecessor_sender),
-                HPX_FORWARD(F, f)};
+                HPX_FORWARD(F, f), detail::no_scheduler{}};
+        }
+
+        // clang-format off
+        template <typename F, typename Scheduler,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduler_v<Scheduler>
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+            let_value_t, Scheduler&& scheduler, F&& f)
+        {
+            return hpx::execution::experimental::detail::inject_scheduler<
+                let_value_t, Scheduler, F>{
+                HPX_FORWARD(Scheduler, scheduler), HPX_FORWARD(F, f)};
         }
 
         template <typename F>

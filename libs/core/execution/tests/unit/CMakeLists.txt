@@ -14,6 +14,7 @@ set(tests
     algorithm_let_error
     algorithm_let_stopped
     algorithm_let_value
+    algorithm_run_loop
     algorithm_split
     algorithm_start_detached
     algorithm_sync_wait
@@ -29,6 +30,7 @@ set(tests
     executor_parameters_timer_hooks
     forwarding_env_query
     forwarding_scheduler_query
+    forwarding_sender_query
     future_then_executor
     minimal_async_executor
     minimal_sync_executor

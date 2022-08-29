@@ -17,8 +17,10 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
+#include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
+#include <hpx/execution/algorithms/run_loop.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/operation_state.hpp>
@@ -82,9 +84,12 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <typename Sender, typename Allocator, submission_type Type>
+        template <typename Sender, typename Allocator, submission_type Type,
+            typename Scheduler = no_scheduler>
         struct split_sender
         {
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
+
             template <typename Tuple>
             struct value_types_helper
             {
@@ -116,6 +121,22 @@ namespace hpx::execution::experimental {
             friend auto tag_invoke(
                 get_completion_signatures_t, split_sender const&, Env)
                 -> generate_completion_signatures<Env>;
+
+            // clang-format off
+            template <typename CPO, typename Scheduler_ = Scheduler,
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::execution::experimental::is_scheduler_v<Scheduler_> &&
+                    is_receiver_cpo_v<std::decay_t<CPO>>
+                )>
+            // clang-format on
+            friend constexpr auto tag_invoke(
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>,
+                split_sender const& sender)
+            {
+                return sender.scheduler;
+            }
+
+            // TODO: add forwarding_sender_query
 
             struct shared_state
             {
@@ -226,7 +247,8 @@ namespace hpx::execution::experimental {
                 // clang-format off
                 template <typename Sender_,
                     HPX_CONCEPT_REQUIRES_(
-                        meta::value<meta::none_of<shared_state, Sender_>>
+                        meta::value<meta::none_of<
+                            shared_state, std::decay_t<Sender_>>>
                     )>
                 // clang-format on
                 shared_state(Sender_&& sender, allocator_type const& alloc)
@@ -236,7 +258,7 @@ namespace hpx::execution::experimental {
                 {
                 }
 
-                ~shared_state()
+                virtual ~shared_state()
                 {
                     HPX_ASSERT_MSG(start_called,
                         "start was never called on the operation state of "
@@ -276,7 +298,7 @@ namespace hpx::execution::experimental {
                     }
                 };
 
-                void set_predecessor_done()
+                virtual void set_predecessor_done()
                 {
                     predecessor_done = true;
 
@@ -413,10 +435,40 @@ namespace hpx::execution::experimental {
                 }
             };
 
+            struct shared_state_run_loop : shared_state
+            {
+                run_loop& loop;
+
+                // clang-format off
+                template <typename Sender_,
+                    HPX_CONCEPT_REQUIRES_(
+                        meta::value<meta::none_of<
+                            shared_state_run_loop, std::decay<Sender_>>>
+                    )>
+                // clang-format on
+                shared_state_run_loop(Sender_&& sender,
+                    typename shared_state::allocator_type const& alloc,
+                    run_loop& loop)
+                  : shared_state(HPX_FORWARD(Sender_, sender), alloc)
+                  , loop(loop)
+                {
+                }
+
+                ~shared_state_run_loop() override = default;
+
+                void set_predecessor_done() override
+                {
+                    shared_state::set_predecessor_done();
+                    loop.finish();
+                }
+            };
+
             hpx::intrusive_ptr<shared_state> state;
 
-            template <typename Sender_>
-            split_sender(Sender_&& sender, Allocator const& allocator)
+            template <typename Sender_, typename Scheduler_ = no_scheduler>
+            split_sender(Sender_&& sender, Allocator const& allocator,
+                Scheduler_&& scheduler = Scheduler_{})
+              : scheduler(HPX_FORWARD(Scheduler_, scheduler))
             {
                 using allocator_type = Allocator;
                 using other_allocator = typename std::allocator_traits<
@@ -431,6 +483,37 @@ namespace hpx::execution::experimental {
 
                 allocator_traits::construct(
                     alloc, p.get(), HPX_FORWARD(Sender_, sender), allocator);
+                state = p.release();
+
+                // Eager submission means that we start the predecessor
+                // operation state already when creating the sender. We don't
+                // wait for another receiver to be connected.
+                if constexpr (Type == submission_type::eager)
+                {
+                    state->start();
+                }
+            }
+
+            template <typename Sender_>
+            split_sender(Sender_&& sender, Allocator const& allocator,
+                run_loop_scheduler const& sched)
+              : scheduler(sched)
+            {
+                using allocator_type = Allocator;
+                using other_allocator =
+                    typename std::allocator_traits<allocator_type>::
+                        template rebind_alloc<shared_state_run_loop>;
+                using allocator_traits = std::allocator_traits<other_allocator>;
+                using unique_ptr = std::unique_ptr<shared_state_run_loop,
+                    util::allocator_deleter<other_allocator>>;
+
+                other_allocator alloc(allocator);
+                unique_ptr p(allocator_traits::allocate(alloc, 1),
+                    hpx::util::allocator_deleter<other_allocator>{alloc});
+
+                allocator_traits::construct(alloc, p.get(),
+                    HPX_FORWARD(Sender_, sender), allocator,
+                    sched.get_run_loop());
                 state = p.release();
 
                 // Eager submission means that we start the predecessor
@@ -547,7 +630,25 @@ namespace hpx::execution::experimental {
         template <typename Sender,
             typename Allocator = hpx::util::internal_allocator<>,
             HPX_CONCEPT_REQUIRES_(
-                is_sender_v<Sender> &&
+                hpx::execution::experimental::is_sender_v<Sender> &&
+                hpx::traits::is_allocator_v<Allocator>
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_invoke(split_t,
+            hpx::execution::experimental::run_loop_scheduler const& sched,
+            Sender&& sender, Allocator const& allocator = {})
+        {
+            return detail::split_sender<Sender, Allocator,
+                detail::submission_type::lazy,
+                hpx::execution::experimental::run_loop_scheduler>{
+                HPX_FORWARD(Sender, sender), allocator, sched};
+        }
+
+        // clang-format off
+        template <typename Sender,
+            typename Allocator = hpx::util::internal_allocator<>,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_sender_v<Sender> &&
                 hpx::traits::is_allocator_v<Allocator>
             )>
         // clang-format on
@@ -567,6 +668,21 @@ namespace hpx::execution::experimental {
             Allocator const& = {})
         {
             return sender;
+        }
+
+        // clang-format off
+        template <typename Scheduler, typename Allocator,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduler_v<Scheduler> &&
+                hpx::traits::is_allocator_v<Allocator>
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+            split_t, Scheduler&& scheduler, Allocator const& allocator = {})
+        {
+            return hpx::execution::experimental::detail::inject_scheduler<
+                split_t, Scheduler, Allocator>{
+                HPX_FORWARD(Scheduler, scheduler), allocator};
         }
 
         // clang-format off
