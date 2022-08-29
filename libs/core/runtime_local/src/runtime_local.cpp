@@ -93,6 +93,8 @@ namespace hpx {
             std::cerr << "{what}: " << (reason ? reason : "Unknown reason")
                       << "\n";
         }
+
+        std::terminate();
     }
 
     HPX_CORE_EXPORT BOOL WINAPI termination_handler(DWORD ctrl_type)
