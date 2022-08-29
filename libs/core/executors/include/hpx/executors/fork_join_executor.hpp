@@ -554,7 +554,8 @@ namespace hpx { namespace execution { namespace experimental {
                             }
                         },
                         [&](std::exception_ptr&& ep) {
-                            std::lock_guard l(exception_mutex);
+                            std::lock_guard<decltype(exception_mutex)> l(
+                                exception_mutex);
                             if (!exception)
                             {
                                 exception = HPX_MOVE(ep);
@@ -629,7 +630,8 @@ namespace hpx { namespace execution { namespace experimental {
                             }
                         },
                         [&](std::exception_ptr&& ep) {
-                            std::lock_guard l(exception_mutex);
+                            std::lock_guard<decltype(exception_mutex)> l(
+                                exception_mutex);
                             if (!exception)
                             {
                                 exception = HPX_MOVE(ep);
