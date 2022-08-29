@@ -320,7 +320,7 @@ namespace hpx { namespace util {
     bool split_ip_address(
         std::string const& v, std::string& host, std::uint16_t& port)
     {
-        std::string::size_type p = v.find_first_of(':');
+        std::string::size_type p = v.find_last_of(':');
 
         std::string tmp_host;
         std::uint16_t tmp_port = 0;
@@ -329,9 +329,40 @@ namespace hpx { namespace util {
         {
             if (p != std::string::npos)
             {
-                tmp_host = v.substr(0, p);
-                tmp_port =
-                    hpx::util::from_string<std::uint16_t>(v.substr(p + 1));
+                if (v.find_first_of(':') != p)
+                {
+                    // IPv6
+                    std::string::size_type begin_of_address =
+                        v.find_first_of('[');
+                    if (begin_of_address != std::string::npos)
+                    {
+                        // IPv6 with a port has to be written as: [address]:port
+                        std::string::size_type end_of_address =
+                            v.find_last_of(']');
+                        if (end_of_address == std::string::npos)
+                            return false;
+
+                        tmp_host =
+                            v.substr(begin_of_address + 1, end_of_address - 1);
+                        if (end_of_address < p)
+                        {
+                            tmp_port = hpx::util::from_string<std::uint16_t>(
+                                v.substr(p + 1));
+                        }
+                    }
+                    else
+                    {
+                        // IPv6 without a port
+                        tmp_host = v;
+                    }
+                }
+                else
+                {
+                    // IPv4
+                    tmp_host = v.substr(0, p);
+                    tmp_port =
+                        hpx::util::from_string<std::uint16_t>(v.substr(p + 1));
+                }
             }
             else
             {
