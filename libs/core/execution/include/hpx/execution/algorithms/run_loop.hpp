@@ -320,7 +320,7 @@ namespace hpx::execution::experimental {
         void finish()
         {
             std::unique_lock l(mtx);
-            hpx::util::ignore_while_checking il(&l);
+            hpx::util::ignore_while_checking<decltype(l)> il(&l);
             HPX_UNUSED(il);
             stop = true;
             cond_var.notify_all();

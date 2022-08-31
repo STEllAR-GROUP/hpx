@@ -34,7 +34,17 @@ namespace hpx { namespace execution {
     /// Default sequential execution policy object.
     inline constexpr hpx::execution::experimental::to_task_t task{};
 
+    using task_policy_tag HPX_DEPRECATED_V(1, 9,
+        "hpx::execution::task_policy_tag is deprecated, use "
+        "hpx::execution::experimental::to_task_t instead") =
+        hpx::execution::experimental::to_task_t;
+
     inline constexpr hpx::execution::experimental::to_non_task_t non_task{};
+
+    using non_task_policy_tag HPX_DEPRECATED_V(1, 9,
+        "hpx::execution::non_task_policy_tag is deprecated, use "
+        "hpx::execution::experimental::to_non_task_t instead") =
+        hpx::execution::experimental::to_non_task_t;
 
     namespace detail {
         template <typename T, typename Enable = void>
@@ -52,10 +62,8 @@ namespace hpx { namespace execution {
         template <typename T>
         inline constexpr bool has_async_execution_policy_v =
             has_async_execution_policy<T>::value;
-    }    // namespace detail
 
-    namespace detail {
-
+        ////////////////////////////////////////////////////////////////////////
         // Base execution policy
         template <template <class, class> typename Derived, typename Executor,
             typename Parameters = void, typename Category = void>
@@ -212,9 +220,6 @@ namespace hpx { namespace execution {
             executor_type exec_;
             executor_parameters_type params_;
         };
-    }    // namespace detail
-
-    namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
         // Extension: The class sequenced_task_policy_shim is an execution
