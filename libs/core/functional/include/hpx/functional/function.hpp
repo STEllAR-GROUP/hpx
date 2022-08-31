@@ -6,6 +6,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file function.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -22,6 +24,17 @@
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
+    /// Class template hpx::function is a general-purpose polymorphic function
+    /// wrapper. Instances of hpx::function can store, copy, and invoke any
+    /// CopyConstructible Callable target -- functions, lambda expressions,
+    /// bind expressions, or other function objects, as well as pointers to
+    /// member functions and pointers to data members.
+    /// The stored callable object is called the target of hpx::function.
+    /// If an hpx::function contains no target, it is called empty. Invoking the
+    /// target of an empty hpx::function results in hpx::bad_function_call
+    /// exception being thrown.
+    /// hpx::function satisfies the requirements of CopyConstructible and
+    /// CopyAssignable.
     template <typename Sig, bool Serializable = false>
     class function;
 
