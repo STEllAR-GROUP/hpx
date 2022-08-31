@@ -742,6 +742,15 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
+    // Alias template single-sender-value-type is defined as follows:
+    //
+    // 1. If value_types_of_t<S, E, Tuple, Variant> would have the form
+    // Variant<Tuple<T>>, then single-sender-value-type<S, E> is an alias for
+    // type T.
+    // 2. Otherwise, if value_types_of_t<S, E, Tuple, Variant> would
+    // have the form Variant<Tuple<>> or Variant<>, then
+    // single-sender-value-type<S, E> is an alias for type void.
+    // 3. Otherwise, single-sender-value-type<S, E> is ill-formed.
     template <typename Sender, typename Env = no_env>
     using single_sender_value_t =
         detail::value_types_from<detail::completion_signatures_of<Sender, Env>,
