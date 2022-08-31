@@ -93,8 +93,6 @@ namespace hpx {
             std::cerr << "{what}: " << (reason ? reason : "Unknown reason")
                       << "\n";
         }
-
-        std::terminate();
     }
 
     HPX_CORE_EXPORT BOOL WINAPI termination_handler(DWORD ctrl_type)
@@ -103,23 +101,23 @@ namespace hpx {
         {
         case CTRL_C_EVENT:
             handle_termination("Ctrl-C");
-            return TRUE;
+            break;
 
         case CTRL_BREAK_EVENT:
             handle_termination("Ctrl-Break");
-            return TRUE;
+            break;
 
         case CTRL_CLOSE_EVENT:
             handle_termination("Ctrl-Close");
-            return TRUE;
+            break;
 
         case CTRL_LOGOFF_EVENT:
             handle_termination("Logoff");
-            return TRUE;
+            break;
 
         case CTRL_SHUTDOWN_EVENT:
             handle_termination("Shutdown");
-            return TRUE;
+            break;
 
         default:
             break;
