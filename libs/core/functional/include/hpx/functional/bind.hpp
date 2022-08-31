@@ -5,6 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file bind.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -40,6 +42,16 @@ namespace hpx {
         struct placeholder<0>;    // not a valid placeholder
     }                             // namespace detail
 
+    /// The hpx::placeholders namespace contains the placeholder objects [_1, ..., _N]
+    /// where N is an implementation defined maximum number.
+    /// When used as an argument in a hpx::bind expression, the placeholder objects are
+    /// stored in the generated function object, and when that function object is invoked
+    /// with unbound arguments, each placeholder _N is replaced by the corresponding Nth
+    /// unbound argument.
+    /// The types of the placeholder objects are DefaultConstructible and CopyConstructible,
+    /// their default copy/move constructors do not throw exceptions, and for any placeholder
+    /// _N, the type hpx::is_placeholder<decltype(_N)> is defined, where
+    /// hpx::is_placeholder<decltype(_N)> is derived from std::integral_constant<int, N>.
     namespace placeholders {
 
         inline constexpr detail::placeholder<1> _1 = {};
