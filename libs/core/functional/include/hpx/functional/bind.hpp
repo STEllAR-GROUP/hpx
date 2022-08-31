@@ -249,6 +249,17 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
+    /// The function template \a bind generates a forwarding call wrapper for \a f.
+    /// Calling this wrapper is equivalent to invoking \a f with some of its
+    /// arguments bound to \a vs.
+    ///
+    /// \param f 	Callable object (function object, pointer to function,
+    ///             reference to function, pointer to member function, or pointer
+    ///             to data member) that will be bound to some arguments
+    /// \param vs   list of arguments to bind, with the unbound arguments replaced
+    ///             by the placeholders _1, _2, _3... of namespace \a hpx::placeholders
+    /// \returns    A function object of unspecified type \a T, for which
+    ///             \code hpx::is_bind_expression<T>::value == true. \endcode
     template <typename F, typename... Ts,
         typename Enable =
             std::enable_if_t<!traits::is_action_v<std::decay_t<F>>>>
