@@ -759,12 +759,12 @@ namespace hpx::execution::experimental {
 
     struct connect_awaitable_t;
 
-    struct is_debug_env_t
+    struct is_debug_env_t : hpx::functional::tag<is_debug_env_t>
     {
         template <typename Env,
             typename = std::enable_if_t<
                 hpx::functional::is_tag_invocable_v<is_debug_env_t, Env>>>
-        void operator()(Env&&) const noexcept;
+        void tag_invoke(Env&&) const noexcept;
     };
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct connect_t
@@ -799,7 +799,7 @@ namespace hpx::execution::experimental {
                 hpx::is_invocable_v<connect_awaitable_t, Sender, Receiver> ||
                 hpx::functional::is_tag_invocable_v<is_debug_env_t,
                     env_of_t<Receiver>>>>
-        auto tag_invoke(Sender&& sndr, Receiver&& rcvr) const
+        auto tag_invoke(connect_t, Sender&& sndr, Receiver&& rcvr) const
             noexcept(nothrow_connect<Sender, Receiver>())
         {
             if constexpr (is_connectable_with_tag_invoke_v<Sender, Receiver>)
@@ -941,6 +941,7 @@ namespace hpx::execution::experimental {
 
         template <typename PromiseId, typename Value>
         struct sender_awaitable_base
+          : hpx::functional::tag<sender_awaitable_base<PromiseId, Value>>
         {
             using Promise = hpx::meta::hidden<PromiseId>;
             struct receiver : receiver_base<Value>
@@ -1052,8 +1053,9 @@ namespace hpx::execution::experimental {
     }    // namespace detail
 
     inline constexpr struct as_awaitable_t
-      : hpx::functional::tag<as_awaitable_t>
+      : hpx::functional::detail::tag_fallback<as_awaitable_t>
     {
+        // static to call this function without creating an object
         template <typename T, typename Promise>
         static constexpr bool is_noexcept() noexcept
         {
@@ -1079,12 +1081,13 @@ namespace hpx::execution::experimental {
         }
 
         template <typename T, typename Promise>
-        decltype(auto) tag_invoke(T&& t, Promise& promise) const
-            noexcept(is_noexcept<T, Promise>())
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+            as_awaitable_t, T&& t,
+            Promise& promise) noexcept(is_noexcept<T, Promise>())
         {
             if constexpr (detail::is_custom_tag_invoke_awaiter_v<T, Promise>)
             {
-                return tag_invoke(*this, HPX_FORWARD(T, t), promise);
+                return tag_invoke(as_awaitable_t{}, HPX_FORWARD(T, t), promise);
             }
             else if constexpr (is_awaitable_v<T, Promise>)
             {
@@ -1127,8 +1130,9 @@ namespace hpx::execution::experimental {
                             .unhandled_stopped();
                     };
                 }
-                // If OtherPromise doesn't implement unhandled_stopped(), then if a "stopped" unwind
-                // reaches this point, it's considered an unhandled exception and terminate()
+                // If OtherPromise doesn't implement unhandled_stopped(),
+                // then if a "stopped" unwind reaches this point,
+                // it's considered an unhandled exception and terminate()
                 // is called.
             }
 
