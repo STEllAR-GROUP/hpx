@@ -29,6 +29,45 @@
 #include <vector>
 
 namespace hpx::parcelset::policies::lci {
+    struct BufferWrapper
+    {
+        struct FakeAllocator
+        {
+        };
+        using allocator_type = FakeAllocator;
+        void* ptr;
+        size_t length;
+        BufferWrapper() = default;
+        BufferWrapper(const BufferWrapper& wrapper) = default;
+        BufferWrapper& operator=(const BufferWrapper& wrapper) = default;
+        BufferWrapper(const allocator_type& alloc)
+        {
+            HPX_UNUSED(alloc);
+            ptr = nullptr;
+            length = 0;
+        }
+        BufferWrapper(const BufferWrapper& wrapper, const allocator_type& alloc)
+        {
+            HPX_UNUSED(alloc);
+            ptr = wrapper.ptr;
+            length = wrapper.length;
+        }
+        char& operator[](size_t i) const
+        {
+            HPX_ASSERT(i < length);
+            char* p = (char*) ptr;
+            return p[i];
+        }
+        void* data() const
+        {
+            return ptr;
+        }
+        size_t size() const
+        {
+            return length;
+        }
+    };
+
     template <typename Parcelport>
     struct receiver
     {
@@ -38,8 +77,8 @@ namespace hpx::parcelset::policies::lci {
         using connection_type = receiver_connection<Parcelport>;
         using connection_ptr = std::shared_ptr<connection_type>;
         using connection_list = std::deque<connection_ptr>;
-        using data_type = std::vector<char>;
-        using buffer_type = parcel_buffer<data_type, data_type>;
+        using buffer_type = parcel_buffer<BufferWrapper, BufferWrapper>;
+        //        using buffer_type = parcel_buffer<std::vector<char>, BufferWrapper>;
 
         explicit receiver(Parcelport& pp) noexcept
           : pp_(pp)
@@ -57,6 +96,7 @@ namespace hpx::parcelset::policies::lci {
             {
                 buffer_type buffer = decode_request(request);
                 decode_parcels(pp_, HPX_MOVE(buffer), -1);
+                free_request(request);
                 return true;
             }
             return false;
@@ -85,49 +125,54 @@ namespace hpx::parcelset::policies::lci {
         buffer_type decode_request(LCI_request_t request)
         {
             buffer_type buffer_;
-            header header_;
+            header* header_;
             // decode header
             if (request.type == LCI_MEDIUM)
             {
                 // only header
-                header_ = *(header*) (request.data.mbuffer.address);
-                header_.assert_valid();
+                header_ = (header*) (request.data.mbuffer.address);
+                header_->assert_valid();
 
-                HPX_ASSERT(header_.piggy_back());
-                HPX_ASSERT(header_.num_chunks().first == 0);
+                HPX_ASSERT(header_->piggy_back());
+                HPX_ASSERT(header_->num_chunks().first == 0);
             }
             else
             {
                 // iovec
                 HPX_ASSERT(request.type == LCI_IOVEC);
-                header_ = *(header*) (request.data.iovec.piggy_back.address);
-                header_.assert_valid();
+                header_ = (header*) (request.data.iovec.piggy_back.address);
+                header_->assert_valid();
             }
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             hpx::chrono::high_resolution_timer timer_;
             parcelset::data_point& data = buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
-            data.bytes_ = static_cast<std::size_t>(header_.numbytes());
+            data.bytes_ = static_cast<std::size_t>(header_->numbytes());
 #endif
             int i = 0;
             // decode data
-            buffer_.data_.resize(header_.size());
-            char* piggy_back = header_.piggy_back();
+            char* piggy_back = header_->piggy_back();
             if (piggy_back)
             {
-                std::memcpy(&buffer_.data_[0], piggy_back, header_.size());
+                buffer_.data_.length = header_->size();
+                buffer_.data_.ptr = piggy_back;
+                // buffer_.data_.resize(header_->size());
+                // std::memcpy(&buffer_.data_[0], piggy_back, header_->size());
             }
             else
             {
                 HPX_ASSERT(request.type == LCI_IOVEC);
-                HPX_ASSERT((size_t) header_.size() ==
+                HPX_ASSERT((size_t) header_->size() ==
                     request.data.iovec.lbuffers[i].length);
-                std::memcpy(&buffer_.data_[0],
-                    request.data.iovec.lbuffers[i].address, header_.size());
+                buffer_.data_.length = header_->size();
+                buffer_.data_.ptr = request.data.iovec.lbuffers[i].address;
+                // buffer_.data_.resize(header_->size());
+                // std::memcpy(&buffer_.data_[0],
+                //  request.data.iovec.lbuffers[i].address, header_->size());
                 ++i;
             }
             // decode transmission chunk
-            buffer_.num_chunks_ = header_.num_chunks();
+            buffer_.num_chunks_ = header_->num_chunks();
             int num_zero_copy_chunks =
                 static_cast<int>(buffer_.num_chunks_.first);
             int num_non_zero_copy_chunks =
@@ -152,10 +197,9 @@ namespace hpx::parcelset::policies::lci {
                         buffer_.transmission_chunks_[j].second;
                     HPX_ASSERT(
                         request.data.iovec.lbuffers[i].length == chunk_size);
-                    data_type& c = buffer_.chunks_[j];
-                    c.resize(chunk_size);
-                    std::memcpy((void*) c.data(),
-                        request.data.iovec.lbuffers[i].address, chunk_size);
+                    BufferWrapper& c = buffer_.chunks_[j];
+                    c.length = chunk_size;
+                    c.ptr = request.data.iovec.lbuffers[i].address;
                     ++i;
                 }
             }
@@ -165,6 +209,11 @@ namespace hpx::parcelset::policies::lci {
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             data.time_ = timer_.elapsed_nanoseconds() - data.time_;
 #endif
+            return buffer_;
+        }
+
+        void free_request(LCI_request_t request)
+        {
             if (request.type == LCI_IOVEC)
             {
                 for (int j = 0; j < request.data.iovec.count; ++j)
@@ -178,8 +227,6 @@ namespace hpx::parcelset::policies::lci {
             {
                 LCI_mbuffer_free(request.data.mbuffer);
             }
-
-            return buffer_;
         }
 
         LCI_request_t accept() noexcept
