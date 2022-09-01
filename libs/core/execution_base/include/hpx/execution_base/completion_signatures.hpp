@@ -719,7 +719,7 @@ namespace hpx::execution::experimental {
         template <typename A, typename... As>
         struct front
         {
-            using type = std::enable_if_t<sizeof...(As) != 0, A>;
+            using type = A;
         };
 
         template <template <typename...> typename Fn>

@@ -54,6 +54,10 @@ int main()
             single_sender_value_t<non_awaitable_sender<decltype(signature_all(
                 std::exception_ptr(), int()))>>,
             int>);
+        static_assert(
+            std::is_same_v<single_sender_value_t<non_awaitable_sender<
+                               decltype(signature_all(std::exception_ptr()))>>,
+                void>);
     }
 
     // as_awaitable
