@@ -115,7 +115,7 @@ namespace hpx {
     ///           copied.
     ///
     template <typename BidirIter, typename OutIter>
-    OutIter reverse_copy(BidirIter first, BidirIter last, Outiter dest);
+    OutIter reverse_copy(BidirIter first, BidirIter last, OutIter dest);
 
     /// Copies the elements from the range [first, last) to another range
     /// beginning at dest in such a way that the elements in the new

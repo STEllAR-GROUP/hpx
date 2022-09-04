@@ -13,6 +13,8 @@
 
 namespace hpx { namespace parallel { namespace util {
     ///////////////////////////////////////////////////////////////////////////
+    /// \struct projection_identity
+    /// \brief this represents the projection identity
     struct projection_identity
     {
         using is_transparent = std::true_type;
