@@ -373,31 +373,31 @@ namespace hpx { namespace lcos { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ContResult, typename Future, typename Policy, typename F>
     inline traits::detail::shared_state_ptr_t<continuation_result_t<ContResult>>
-    make_continuation(Future const& future, Policy&& policy, F&& f);
+    make_continuation(Future&& future, Policy&& policy, F&& f);
 
     // create non-unwrapping continuations
     template <typename ContResult, typename Future, typename Executor,
         typename F>
     inline traits::detail::shared_state_ptr_t<ContResult>
-    make_continuation_exec(Future const& future, Executor&& exec, F&& f);
+    make_continuation_exec(Future&& future, Executor&& exec, F&& f);
 
     template <typename ContResult, typename Future, typename Executor,
         typename Policy, typename F>
     inline traits::detail::shared_state_ptr_t<ContResult>
     make_continuation_exec_policy(
-        Future const& future, Executor&& exec, Policy&& policy, F&& f);
+        Future&& future, Executor&& exec, Policy&& policy, F&& f);
 
     template <typename ContResult, typename Allocator, typename Future,
         typename Policy, typename F>
     inline traits::detail::shared_state_ptr_t<continuation_result_t<ContResult>>
     make_continuation_alloc(
-        Allocator const& a, Future const& future, Policy&& policy, F&& f);
+        Allocator const& a, Future&& future, Policy&& policy, F&& f);
 
     template <typename ContResult, typename Allocator, typename Future,
         typename Policy, typename F>
     inline traits::detail::shared_state_ptr_t<ContResult>
     make_continuation_alloc_nounwrap(
-        Allocator const& a, Future const& future, Policy&& policy, F&& f);
+        Allocator const& a, Future&& future, Policy&& policy, F&& f);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename FD, typename Enable = void>

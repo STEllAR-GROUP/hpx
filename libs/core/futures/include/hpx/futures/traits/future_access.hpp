@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/futures/future_fwd.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -16,18 +17,6 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-
-namespace hpx {
-    template <typename R>
-    class future;
-    template <typename R>
-    class shared_future;
-
-    namespace lcos::detail {
-        template <typename Result>
-        struct future_data_base;
-    }    // namespace lcos::detail
-}    // namespace hpx
 
 namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
@@ -74,12 +63,8 @@ namespace hpx { namespace traits {
         ///////////////////////////////////////////////////////////////////////
         template <typename Future, typename Enable = void>
         struct shared_state_ptr_for
-          : shared_state_ptr<typename traits::future_traits<Future>::type>
-        {
-        };
-
-        template <typename Future>
-        struct shared_state_ptr_for<Future const> : shared_state_ptr_for<Future>
+          : shared_state_ptr<
+                traits::future_traits_t<std::remove_const_t<Future>>>
         {
         };
 
@@ -196,28 +181,19 @@ namespace hpx { namespace traits {
             return f.shared_state_.detach();
         }
 
-    private:
-        template <typename Destination>
-        HPX_FORCEINLINE static void transfer_result_impl(
-            hpx::future<R>&& src, Destination& dest, std::false_type)
-        {
-            dest.set_value(src.get());
-        }
-
-        template <typename Destination>
-        HPX_FORCEINLINE static void transfer_result_impl(
-            hpx::future<R>&& src, Destination& dest, std::true_type)
-        {
-            src.get();
-            dest.set_value(util::unused);
-        }
-
-    public:
         template <typename Destination>
         HPX_FORCEINLINE static void transfer_result(
             hpx::future<R>&& src, Destination& dest)
         {
-            transfer_result_impl(HPX_MOVE(src), dest, std::is_void<R>{});
+            if constexpr (std::is_void_v<R>)
+            {
+                src.get();
+                dest.set_value(util::unused);
+            }
+            else
+            {
+                dest.set_value(src.get());
+            }
         }
     };
 
@@ -274,28 +250,19 @@ namespace hpx { namespace traits {
             return f.shared_state_.get();
         }
 
-    private:
-        template <typename Destination>
-        HPX_FORCEINLINE static void transfer_result_impl(
-            hpx::shared_future<R>&& src, Destination& dest, std::false_type)
-        {
-            dest.set_value(src.get());
-        }
-
-        template <typename Destination>
-        HPX_FORCEINLINE static void transfer_result_impl(
-            hpx::shared_future<R>&& src, Destination& dest, std::true_type)
-        {
-            src.get();
-            dest.set_value(util::unused);
-        }
-
-    public:
         template <typename Destination>
         HPX_FORCEINLINE static void transfer_result(
             hpx::shared_future<R>&& src, Destination& dest)
         {
-            transfer_result_impl(HPX_MOVE(src), dest, std::is_void<R>{});
+            if constexpr (std::is_void_v<R>)
+            {
+                src.get();
+                dest.set_value(util::unused);
+            }
+            else
+            {
+                dest.set_value(src.get());
+            }
         }
     };
 
