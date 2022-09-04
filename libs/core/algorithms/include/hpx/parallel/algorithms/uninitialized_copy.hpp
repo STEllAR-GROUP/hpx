@@ -46,6 +46,7 @@ namespace hpx {
     /// Copies the elements in the range, defined by [first, last), to an
     /// uninitialized memory area beginning at \a dest. If an exception is
     /// thrown during the copy operation, the function has no effects.
+    /// Executed according to the policy.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
@@ -101,12 +102,12 @@ namespace hpx {
     /// \note   Complexity: Performs exactly \a count assignments, if
     ///         count > 0, no assignments otherwise.
     ///
-    /// \tparam FwdIter1      The type of the source iterators used (deduced).
+    /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
-    /// \tparam FwdIter2     The type of the iterator representing the
+    /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
@@ -122,7 +123,7 @@ namespace hpx {
     /// in the calling thread.
     ///
     /// \returns  The \a uninitialized_copy_n algorithm returns a
-    ///           returns \a FwdIter2.
+    ///           returns \a FwdIter.
     ///           The \a uninitialized_copy_n algorithm returns the output
     ///           iterator to the element in the destination range, one past
     ///           the last element copied.
@@ -142,12 +143,12 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1      The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
-    /// \tparam FwdIter2     The type of the iterator representing the
+    /// \tparam FwdIter2    The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
