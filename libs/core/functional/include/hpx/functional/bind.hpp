@@ -253,7 +253,7 @@ namespace hpx {
     /// Calling this wrapper is equivalent to invoking \a f with some of its
     /// arguments bound to \a vs.
     ///
-    /// \param f 	Callable object (function object, pointer to function,
+    /// \param f    Callable object (function object, pointer to function,
     ///             reference to function, pointer to member function, or pointer
     ///             to data member) that will be bound to some arguments
     /// \param vs   list of arguments to bind, with the unbound arguments replaced

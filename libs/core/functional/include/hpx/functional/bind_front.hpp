@@ -160,7 +160,7 @@ namespace hpx {
     /// Calling this wrapper is equivalent to invoking \a f with its (1) first or
     /// (2) last \a sizeof...(Ts) parameters bound to \a vs.
     ///
-    /// \param f 	Callable object (function object, pointer to function,
+    /// \param f    Callable object (function object, pointer to function,
     ///             reference to function, pointer to member function, or pointer
     ///             to data member) that will be bound to some arguments
     /// \param vs   list of the arguments to bind to the (1) first or
