@@ -140,7 +140,7 @@ namespace hpx { namespace ranges {
     /// \returns  The \a fill algorithm returns \a void.
     ///
     template <typename Iter, typename Sent,
-        typename T = typename std::iterator_traits<Iter>::value_type,
+        typename T = typename std::iterator_traits<Iter>::value_type>
     Iter fill(Iter first, Sent last, T const& value);
 
     /// Assigns the given value value to the first count elements in the range
@@ -228,7 +228,7 @@ namespace hpx { namespace ranges {
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
-    template <<typename ExPolicy, typename FwdIter, typename Size,
+    template <typename ExPolicy, typename FwdIter, typename Size,
         typename T = typename std::iterator_traits<FwdIter>::value_type>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         FwdIter>::type

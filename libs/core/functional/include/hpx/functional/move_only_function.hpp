@@ -6,6 +6,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file move_only_function.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -22,6 +24,22 @@
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
+    /// Class template hpx::move_only_function is a general-purpose polymorphic
+    /// function wrapper. hpx::move_only_function objects can store and invoke
+    /// any constructible (not required to be move constructible) Callable
+    /// target -- functions, lambda expressions, bind expressions, or other
+    /// function objects, as well as pointers to member functions and pointers
+    /// to member objects.
+    /// The stored callable object is called the target of hpx::move_only_function.
+    /// If an hpx::move_only_function contains no target, it is called empty. Unlike
+    /// hpx::function, invoking an empty hpx::move_only_function results in undefined
+    /// behavior.
+    /// hpx::move_only_functions supports every possible combination of cv-qualifiers,
+    /// ref-qualifiers, and noexcept-specifiers not including volatile provided
+    /// in its template parameter. These qualifiers and specifier (if any) are added
+    /// to its operator().
+    /// hpx::move_only_function satisfies the requirements of MoveConstructible and
+    /// MoveAssignable, but does not satisfy CopyConstructible or CopyAssignable.
     template <typename Sig, bool Serializable = false>
     class move_only_function;
 

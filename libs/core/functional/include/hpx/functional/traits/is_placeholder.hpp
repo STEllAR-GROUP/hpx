@@ -6,6 +6,8 @@
 
 // make inspect happy: hpxinspect:nodeprecatedname:boost::is_placeholder
 
+/// \file is_placeholder.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>

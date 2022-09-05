@@ -5,6 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file bind_front.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -154,6 +156,18 @@ namespace hpx {
         };
     }    // namespace detail
 
+    /// Function template \a bind_front generates a forwarding call wrapper for \a f.
+    /// Calling this wrapper is equivalent to invoking \a f with its (1) first or
+    /// (2) last \a sizeof...(Ts) parameters bound to \a vs.
+    ///
+    /// \param f    Callable object (function object, pointer to function,
+    ///             reference to function, pointer to member function, or pointer
+    ///             to data member) that will be bound to some arguments
+    /// \param vs   list of the arguments to bind to the (1) first or
+    ///             (2) last \a sizeof...(Ts) parameters of f
+    /// \returns    A function object of type \a T that is unspecified, except that
+    ///             the types of objects returned by two calls to \a hpx::bind_front
+    ///             with the same arguments are the same.
     template <typename F, typename... Ts>
     constexpr detail::bound_front<std::decay_t<F>,
         util::make_index_pack_t<sizeof...(Ts)>, util::decay_unwrap_t<Ts>...>
