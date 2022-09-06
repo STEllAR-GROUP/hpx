@@ -185,12 +185,12 @@ namespace hpx { namespace components {
 
     // Returns the (unique) name for a given component
     template <typename Component, typename Enable = void>
-    constexpr char const* get_component_name() noexcept;
+    HPX_ALWAYS_EXPORT char const* get_component_name() noexcept;
 
     // Returns the (unique) name of the base component. If there is none,
     // nullptr is returned
     template <typename Component, typename Enable = void>
-    constexpr const char* get_component_base_name() noexcept;
+    HPX_ALWAYS_EXPORT const char* get_component_base_name() noexcept;
 
     template <typename Component>
     inline component_type get_component_type() noexcept
@@ -261,7 +261,6 @@ namespace hpx { namespace naming {
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(component, type)                  \
     namespace hpx { namespace traits {                                         \
-            typedef void static_;                                              \
             template <>                                                        \
             HPX_ALWAYS_EXPORT components::component_type                       \
             component_type_database<component>::get() noexcept                 \
@@ -288,13 +287,13 @@ namespace hpx { namespace naming {
 #define HPX_DEFINE_COMPONENT_NAME_2(Component, name)                           \
     namespace hpx { namespace components {                                     \
             template <>                                                        \
-            constexpr char const*                                              \
+            HPX_ALWAYS_EXPORT char const*                                      \
             get_component_name<Component, void>() noexcept                     \
             {                                                                  \
                 return HPX_PP_STRINGIZE(name);                                 \
             }                                                                  \
             template <>                                                        \
-            constexpr char const*                                              \
+            HPX_ALWAYS_EXPORT char const*                                      \
             get_component_base_name<Component, void>() noexcept                \
             {                                                                  \
                 return nullptr;                                                \
@@ -306,13 +305,13 @@ namespace hpx { namespace naming {
 #define HPX_DEFINE_COMPONENT_NAME_3(Component, name, base_name)                \
     namespace hpx { namespace components {                                     \
             template <>                                                        \
-            constexpr char const*                                              \
+            HPX_ALWAYS_EXPORT char const*                                      \
             get_component_name<Component, void>() noexcept                     \
             {                                                                  \
                 return HPX_PP_STRINGIZE(name);                                 \
             }                                                                  \
             template <>                                                        \
-            constexpr char const*                                              \
+            HPX_ALWAYS_EXPORT char const*                                      \
             get_component_base_name<Component, void>() noexcept                \
             {                                                                  \
                 return base_name;                                              \
