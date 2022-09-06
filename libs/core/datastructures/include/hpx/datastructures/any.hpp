@@ -13,6 +13,8 @@
     It adds support for HPX serialization, move assignment, == operator.
 ==============================================================================*/
 
+/// \file any.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -1471,6 +1473,7 @@ namespace hpx { namespace util {
     }
 }}    // namespace hpx::util
 
+/// Top level HPX namespace
 namespace hpx {
     template <typename T, typename... Ts>
     util::basic_any<void, void, void, std::true_type> make_any_nonser(
@@ -1523,6 +1526,12 @@ namespace hpx {
     using unique_any_nonser =
         util::basic_any<void, void, void, std::false_type>;
 
+    /// \brief Performs type-safe access to the contained object.
+    ///
+    /// \param operand target any object
+    /// \returns  If operand is not a null pointer, and the \a typeid of the requested
+    ///           \a T matches that of the contents of \a operand, a pointer to the value
+    ///           contained by \a operand, otherwise a null pointer.
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
     inline T* any_cast(
@@ -1536,6 +1545,7 @@ namespace hpx {
         return nullptr;
     }
 
+    /// \copydoc any_cast(util::basic_any<IArch, OArch, Char, Copyable>* operand)
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
     inline T const* any_cast(
@@ -1546,6 +1556,12 @@ namespace hpx {
                 operand));
     }
 
+    /// \brief \copybrief hpx::any_cast(util::basic_any<IArch,OArch,Char,Copyable>* operand)
+    /// Let \a U be \a std::remove_cv_t<std::remove_reference_t<T>>
+    /// The program is ill-formed if \a std::is_constructible_v<T, U&> is false.
+    ///
+    /// \param operand target any object
+    /// \returns static_cast<T>(*std::any_cast<U>(&operand))
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
     T any_cast(util::basic_any<IArch, OArch, Char, Copyable>& operand)
@@ -1558,6 +1574,12 @@ namespace hpx {
         return static_cast<T>(*result);
     }
 
+    /// \brief \copybrief hpx::any_cast(util::basic_any<IArch,OArch,Char,Copyable>* operand)
+    /// Let \a U be \a std::remove_cv_t<std::remove_reference_t<T>>
+    /// The program is ill-formed if \a std::is_constructible_v<T, const U&> is false.
+    ///
+    /// \param operand target any object
+    /// \returns static_cast<T>(*std::any_cast<U>(&operand))
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
     T const& any_cast(
