@@ -522,12 +522,12 @@ namespace hpx { namespace lcos { namespace detail {
                         }
                     };
 
-                    if (!state->is_ready())
+                    if (!state->is_ready(std::memory_order_relaxed))
                     {
                         state->execute_deferred();
 
                         // execute_deferred might have made the future ready
-                        if (!state->is_ready())
+                        if (!state->is_ready(std::memory_order_relaxed))
                         {
                             // The operation state has to be kept alive until
                             // set_value is called, which means that we don't

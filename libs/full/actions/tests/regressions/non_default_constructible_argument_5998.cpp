@@ -76,7 +76,7 @@ void print_params(
     HPX_TEST(eventContext.requested() == std::vector({"a"s, "b"s}));
     HPX_TEST(data == std::vector({"foo"s, "bar"s}));
 }
-HPX_PLAIN_ACTION(print_params, print_params_action);
+HPX_PLAIN_ACTION(print_params, print_params_action)
 
 auto call_remote()
 {
@@ -93,7 +93,7 @@ auto call_remote()
     return hpx::when_all(futures);
 }
 
-int main(int argc, char** argv)
+int main(int, char**)
 {
     auto futures{call_remote()};
     futures.wait();

@@ -253,7 +253,7 @@ namespace hpx { namespace lcos { namespace detail {
         if (!data_sink)
             return;
 
-        if (is_ready())
+        if (is_ready(std::memory_order_relaxed))
         {
             // invoke the callback (continuation) function right away
             handle_on_completed(HPX_MOVE(data_sink));
