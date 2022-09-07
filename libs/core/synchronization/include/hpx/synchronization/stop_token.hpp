@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file stop_token.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -311,6 +313,9 @@ namespace hpx {
         explicit nostopstate_t() = default;
     };
 
+    /// This is a constant object instance of hpx::nostopstate_t for use in
+    /// constructing an empty hpx::stop_source, as a placeholder value in the
+    /// non-default constructor.
     inline constexpr nostopstate_t nostopstate{};
 
     class stop_source
