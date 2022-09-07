@@ -5,6 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file source_location.hpp
+
 #pragma once
 
 #include <hpx/config/export_definitions.hpp>
@@ -24,6 +26,24 @@ namespace hpx {
 #if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
     using std::source_location;
 #else
+    /// The \a source_location class represents certain information about the
+    /// source code, such as file names, line numbers, and function names.
+    /// Previously, functions that desire to obtain this information about
+    /// the call site (for logging, testing, or debugging purposes) must
+    /// use macros so that predefined macros like \a __LINE__ and \a __FILE__
+    /// are expanded in the context of the caller. The \a source_location class
+    /// provides a better alternative.
+    /// \a source_location meets the \a DefaultConstructible, \a CopyConstructible,
+    /// \a CopyAssignable and \a Destructible requirements. Lvalue of \a
+    /// source_locationmeets the Swappable requirement. Additionally, the following
+    /// conditions are true:
+    /// - \code std::is_nothrow_move_constructible_v<std::source_location> \endcode
+    /// - \code std::is_nothrow_move_assignable_v<std::source_location> \endcode
+    /// - \code std::is_nothrow_swappable_v<std::source_location> \endcode
+    /// It is intended that source_location has a small size and can be copied
+    /// efficiently.
+    /// It is unspecified whether the copy/move constructors and the copy/move
+    /// assignment operators of \a source_location are trivial and/or constexpr.
     struct source_location
     {
         const char* filename;
@@ -31,21 +51,25 @@ namespace hpx {
         const char* functionname;
 
         // compatibility with C++20 std::source_location
+        /// return the line number represented by this object
         constexpr std::uint_least32_t line() const noexcept
         {
             return line_number;
         }
 
+        /// return the column number represented by this object
         constexpr std::uint_least32_t column() const noexcept
         {
             return 0;
         }
 
+        /// return the file name represented by this object
         constexpr const char* file_name() const noexcept
         {
             return filename;
         }
 
+        /// return the name of the function represented by this object, if any
         constexpr const char* function_name() const noexcept
         {
             return functionname;
