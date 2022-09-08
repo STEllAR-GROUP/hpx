@@ -72,7 +72,6 @@ namespace hpx {
         /// \brief Constructs the \a mutex. The \a mutex is in unlocked state
         ///        after the constructor completes.
         ///
-        ///       FIXME(bhumit->hkaiser): true for hpx::mutex?
         /// \note Because the default constructor is \a constexpr, static
         ///       mutexes are initialized as part of static non-local
         ///       initialization, before any dynamic non-local initialization
@@ -98,13 +97,11 @@ namespace hpx {
         ///        If lock is called by a thread that already owns the mutex,
         ///        the behavior is undefined: for example, the program may
         ///        deadlock.
-        ///        FIXME(bhumit->hkaiser) do we follow either of the following?
-        ///        An implementation that can detect the invalid
-        ///        usage is encouraged to throw a \a std::system_error with
-        ///        error condition \a resource_deadlock_would_occur instead of
-        ///        deadlocking.
-        ///        Prior \a unlock() operations on the same mutex synchronize -
-        ///        with(as defined in \a std::memory_order) this operation.
+        ///        \a hpx::mutex can detect the invalid usage and throws
+        ///        a \a std::system_error with error condition
+        ///        \a resource_deadlock_would_occur instead of deadlocking.
+        ///        Prior \a unlock() operations on the same mutex synchronize-
+        ///        with (as defined in \a std::memory_order) this operation.
         ///
         /// \note \a lock() is usually not called directly: \a std::unique_lock,
         ///       \a std::scoped_lock, and \a std::lock_guard are used to
@@ -127,11 +124,9 @@ namespace hpx {
         ///        If lock is called by a thread that already owns the mutex,
         ///        the behavior is undefined: for example, the program may
         ///        deadlock.
-        ///        FIXME(bhumit->hkaiser) do we follow either of the following?
-        ///        An implementation that can detect the invalid
-        ///        usage is encouraged to throw a \a std::system_error with
-        ///        error condition \a resource_deadlock_would_occur instead of
-        ///        deadlocking.
+        ///        \a hpx::mutex can detect the invalid usage and throws
+        ///        a \a std::system_error with error condition
+        ///        \a resource_deadlock_would_occur instead of deadlocking.
         ///        Prior \a unlock() operations on the same mutex synchronize -
         ///        with(as defined in \a std::memory_order) this operation.
         ///
@@ -162,7 +157,6 @@ namespace hpx {
         ///        other thread.
         ///        If \a try_lock is called by a thread that already owns the
         ///        \a mutex, the behavior is undefined.
-        ///        FIXME(bhumit->hkaiser) do we follow this?
         ///        Prior \a unlock() operation on the same mutex
         ///        synchronizes-with (as defined in \a std::memory_order) this
         ///        operation if it returns \a true. Note that prior \a lock()
@@ -189,7 +183,6 @@ namespace hpx {
         ///        other thread.
         ///        If \a try_lock is called by a thread that already owns the
         ///        \a mutex, the behavior is undefined.
-        ///        FIXME(bhumit->hkaiser) do we follow this?
         ///        Prior \a unlock() operation on the same mutex
         ///        synchronizes-with (as defined in \a std::memory_order) this
         ///        operation if it returns \a true. Note that prior \a lock()
@@ -219,7 +212,6 @@ namespace hpx {
         /// \brief  Unlocks the \a mutex. The \a mutex must be locked by the
         ///         current thread of execution, otherwise, the behavior is
         ///         undefined.
-        ///         FIXME(bhumit->hkaiser) do we follow this?
         ///         This operation \a synchronizes-with (as defined in
         ///         \a std::memory_order) any subsequent \a lock operation that
         ///         obtains ownership of the same \a mutex.
@@ -289,7 +281,6 @@ namespace hpx {
         ///        spuriously and return \a false even if the mutex was not
         ///        locked by any other thread at some point before
         ///        \a abs_time.
-        ///        FIXME(bhumit->hkaiser) we follow this?
         ///        Prior \a unlock() operation on the same mutex
         ///        \a synchronizes-with (as defined in \a std::memory_order)
         ///        this operation if it returns \a true.
@@ -320,7 +311,6 @@ namespace hpx {
         ///        spuriously and return \a false even if the mutex was not
         ///        locked by any other thread at some point before
         ///        \a abs_time.
-        ///        FIXME(bhumit->hkaiser) we follow this?
         ///        Prior \a unlock() operation on the same mutex
         ///        \a synchronizes-with (as defined in \a std::memory_order)
         ///        this operation if it returns \a true.
@@ -358,11 +348,6 @@ namespace hpx {
         ///        function behaves like \a try_lock().
         ///        This function may block for longer than \a rel_time due to
         ///        scheduling or resource contention delays.
-        ///        FIXME(bhumit->hkaiser) what does our implementation use?
-        ///        The standard recommends that a \a steady_clock is used to
-        ///        measure the duration. If an implementation uses a
-        ///        \a system_clock instead, the wait time may also be sensitive
-        ///        to clock adjustments.
         ///        As with \a try_lock(), this function is allowed to fail
         ///        spuriously and return \a false even if the mutex was not
         ///        locked by any other thread at some point during \a rel_time.
@@ -396,11 +381,6 @@ namespace hpx {
         ///        function behaves like \a try_lock().
         ///        This function may block for longer than \a rel_time due to
         ///        scheduling or resource contention delays.
-        ///        FIXME(bhumit->hkaiser) what does our implementation use?
-        ///        The standard recommends that a \a steady_clock is used to
-        ///        measure the duration. If an implementation uses a
-        ///        \a system_clock instead, the wait time may also be sensitive
-        ///        to clock adjustments.
         ///        As with \a try_lock(), this function is allowed to fail
         ///        spuriously and return \a false even if the mutex was not
         ///        locked by any other thread at some point during \a rel_time.
