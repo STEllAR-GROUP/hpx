@@ -226,12 +226,13 @@ namespace hpx::lcos::detail {
             {
                 auto next_future_data = traits::detail::get_shared_state(*next);
 
-                if (next_future_data && !next_future_data->is_ready())
+                if (next_future_data &&
+                    !next_future_data->is_ready(std::memory_order_relaxed))
                 {
                     next_future_data->execute_deferred();
 
                     // execute_deferred might have made the future ready
-                    if (!next_future_data->is_ready())
+                    if (!next_future_data->is_ready(std::memory_order_relaxed))
                     {
                         // Attach a continuation to this future which will
                         // re-evaluate it and continue to the next argument
@@ -287,12 +288,13 @@ namespace hpx::lcos::detail {
 
             future_type& fut = hpx::get<I>(t_);
             auto next_future_data = traits::detail::get_shared_state(fut);
-            if (next_future_data && !next_future_data->is_ready())
+            if (next_future_data &&
+                !next_future_data->is_ready(std::memory_order_relaxed))
             {
                 next_future_data->execute_deferred();
 
                 // execute_deferred might have made the future ready
-                if (!next_future_data->is_ready())
+                if (!next_future_data->is_ready(std::memory_order_relaxed))
                 {
                     // Attach a continuation to this future which will
                     // re-evaluate it and continue to the next argument

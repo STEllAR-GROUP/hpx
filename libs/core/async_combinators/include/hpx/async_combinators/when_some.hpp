@@ -254,12 +254,13 @@ namespace hpx::lcos::detail {
 
                 auto shared_state = traits::detail::get_shared_state(future);
 
-                if (shared_state && !shared_state->is_ready())
+                if (shared_state &&
+                    !shared_state->is_ready(std::memory_order_relaxed))
                 {
                     shared_state->execute_deferred();
 
                     // execute_deferred might have made the future ready
-                    if (!shared_state->is_ready())
+                    if (!shared_state->is_ready(std::memory_order_relaxed))
                     {
                         shared_state->set_on_completed(util::deferred_call(
                             &detail::when_some<Sequence>::on_future_ready,

@@ -236,7 +236,8 @@ namespace hpx::lcos::detail {
                 shared_state_ptr const& shared_state =
                     traits::detail::get_shared_state(future);
 
-                if (shared_state && !shared_state->is_ready())
+                if (shared_state &&
+                    !shared_state->is_ready(std::memory_order_relaxed))
                 {
                     // handle future only if not enough futures are ready
                     // yet also, do not touch any futures which are already
@@ -244,7 +245,7 @@ namespace hpx::lcos::detail {
                     shared_state->execute_deferred();
 
                     // execute_deferred might have made the future ready
-                    if (!shared_state->is_ready())
+                    if (!shared_state->is_ready(std::memory_order_relaxed))
                     {
                         shared_state->set_on_completed(util::deferred_call(
                             &detail::when_any<Sequence>::on_future_ready,
