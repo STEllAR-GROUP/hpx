@@ -31,6 +31,42 @@ void test_for_each_explicit_sender_direct(
     std::iota(std::begin(c), std::end(c), std::rand());
 
     namespace ex = hpx::execution::experimental;
+
+    auto rng = hpx::util::make_iterator_range(
+        iterator(std::begin(c)), iterator(std::end(c)));
+
+    auto f = [](std::size_t& v) { v = 42; };
+
+    using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
+    auto result = hpx::ranges::for_each(policy.on(exec), rng, f);
+    HPX_TEST(result == iterator(std::end(c)));
+
+    // verify values
+    std::size_t count = 0;
+    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
+        HPX_TEST_EQ(v, std::size_t(42));
+        ++count;
+    });
+    HPX_TEST_EQ(count, c.size());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename Policy, typename ExPolicy, typename IteratorTag>
+void test_for_each_explicit_sender_direct_async(
+    Policy l, ExPolicy&& policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
 
     auto rng = hpx::util::make_iterator_range(
@@ -58,6 +94,9 @@ void test_for_each_explicit_sender_direct(
 template <typename Policy, typename ExPolicy, typename IteratorTag>
 void test_for_each_explicit_sender(Policy l, ExPolicy&& policy, IteratorTag)
 {
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
     using base_iterator = std::vector<std::size_t>::iterator;
     using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
@@ -101,13 +140,13 @@ void test_for_each_sender_direct()
     test_for_each_explicit_sender_direct(
         hpx::launch::async, par_unseq, IteratorTag());
 
-    test_for_each_explicit_sender_direct(
+    test_for_each_explicit_sender_direct_async(
         hpx::launch::sync, seq(task), IteratorTag());
-    test_for_each_explicit_sender_direct(
+    test_for_each_explicit_sender_direct_async(
         hpx::launch::sync, unseq(task), IteratorTag());
-    test_for_each_explicit_sender_direct(
+    test_for_each_explicit_sender_direct_async(
         hpx::launch::async, par(task), IteratorTag());
-    test_for_each_explicit_sender_direct(
+    test_for_each_explicit_sender_direct_async(
         hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
@@ -115,11 +154,6 @@ template <typename IteratorTag>
 void test_for_each_sender()
 {
     using namespace hpx::execution;
-
-    test_for_each_explicit_sender(hpx::launch::sync, seq, IteratorTag());
-    test_for_each_explicit_sender(hpx::launch::sync, unseq, IteratorTag());
-    test_for_each_explicit_sender(hpx::launch::async, par, IteratorTag());
-    test_for_each_explicit_sender(hpx::launch::async, par_unseq, IteratorTag());
 
     test_for_each_explicit_sender(hpx::launch::sync, seq(task), IteratorTag());
     test_for_each_explicit_sender(

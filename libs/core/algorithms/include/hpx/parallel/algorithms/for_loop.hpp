@@ -1108,10 +1108,11 @@ namespace hpx::parallel { inline namespace v2 {
 
                 if constexpr (sizeof...(Ts) == 0)
                 {
-                    return util::partitioner<ExPolicy>::call(
-                        HPX_FORWARD(ExPolicy, policy), first, size,
-                        part_iterations<ExPolicy, F>{HPX_FORWARD(F, f)},
-                        hpx::util::empty_function{});
+                    return util::detail::algorithm_result<ExPolicy>::get(
+                        util::partitioner<ExPolicy>::call(
+                            HPX_FORWARD(ExPolicy, policy), first, size,
+                            part_iterations<ExPolicy, F>{HPX_FORWARD(F, f)},
+                            hpx::util::empty_function{}));
                 }
                 else
                 {
@@ -1122,17 +1123,20 @@ namespace hpx::parallel { inline namespace v2 {
                     args_type args =
                         hpx::forward_as_tuple(HPX_FORWARD(Ts, ts)...);
 
-                    return util::partitioner<ExPolicy>::call_with_index(policy,
-                        first, size, 1,
-                        part_iterations<ExPolicy, F, void, args_type>{
-                            HPX_FORWARD(F, f), args},
-                        [=](auto&&) mutable -> void {
-                            auto pack =
-                                hpx::util::make_index_pack_t<sizeof...(Ts)>();
-                            // make sure live-out variables are properly set on
-                            // return
-                            detail::exit_iteration(args, pack, size);
-                        });
+                    return util::detail::algorithm_result<ExPolicy>::get(
+                        util::partitioner<ExPolicy>::call_with_index(policy,
+                            first, size, 1,
+                            part_iterations<ExPolicy, F, void, args_type>{
+                                HPX_FORWARD(F, f), args},
+                            [=](auto&&) mutable {
+                                auto pack =
+                                    hpx::util::make_index_pack_t<sizeof...(
+                                        Ts)>();
+                                // make sure live-out variables are properly set on
+                                // return
+                                detail::exit_iteration(args, pack, size);
+                                return hpx::util::unused;
+                            }));
                 }
             }
         };
@@ -1268,19 +1272,21 @@ namespace hpx::parallel { inline namespace v2 {
                     {
                         if (stride == 1)
                         {
-                            return util::partitioner<ExPolicy>::call(
-                                HPX_FORWARD(ExPolicy, policy), first, size,
-                                part_iterations<ExPolicy, F, S>{
-                                    HPX_FORWARD(F, f)},
-                                hpx::util::empty_function{});
+                            return util::detail::algorithm_result<ExPolicy>::
+                                get(util::partitioner<ExPolicy>::call(
+                                    HPX_FORWARD(ExPolicy, policy), first, size,
+                                    part_iterations<ExPolicy, F, S>{
+                                        HPX_FORWARD(F, f)},
+                                    [](auto&&) { return hpx::util::unused; }));
                         }
                     }
 
-                    return util::partitioner<ExPolicy>::call_with_index(
-                        HPX_FORWARD(ExPolicy, policy), first, size, stride,
-                        part_iterations<ExPolicy, F, S>{
-                            HPX_FORWARD(F, f), stride},
-                        hpx::util::empty_function{});
+                    return util::detail::algorithm_result<ExPolicy>::get(
+                        util::partitioner<ExPolicy>::call_with_index(
+                            HPX_FORWARD(ExPolicy, policy), first, size, stride,
+                            part_iterations<ExPolicy, F, S>{
+                                HPX_FORWARD(F, f), stride},
+                            [](auto&&) { return hpx::util::unused; }));
                 }
                 else
                 {
@@ -1291,17 +1297,20 @@ namespace hpx::parallel { inline namespace v2 {
                     args_type args =
                         hpx::forward_as_tuple(HPX_FORWARD(Ts, ts)...);
 
-                    return util::partitioner<ExPolicy>::call_with_index(policy,
-                        first, size, stride,
-                        part_iterations<ExPolicy, F, S, args_type>{
-                            HPX_FORWARD(F, f), stride, args},
-                        [=](auto&&) mutable -> void {
-                            auto pack =
-                                hpx::util::make_index_pack_t<sizeof...(Ts)>();
-                            // make sure live-out variables are properly set on
-                            // return
-                            detail::exit_iteration(args, pack, size);
-                        });
+                    return util::detail::algorithm_result<ExPolicy>::get(
+                        util::partitioner<ExPolicy>::call_with_index(policy,
+                            first, size, stride,
+                            part_iterations<ExPolicy, F, S, args_type>{
+                                HPX_FORWARD(F, f), stride, args},
+                            [=](auto&&) mutable {
+                                auto pack =
+                                    hpx::util::make_index_pack_t<sizeof...(
+                                        Ts)>();
+                                // make sure live-out variables are properly set on
+                                // return
+                                detail::exit_iteration(args, pack, size);
+                                return hpx::util::unused;
+                            }));
                 }
             }
         };

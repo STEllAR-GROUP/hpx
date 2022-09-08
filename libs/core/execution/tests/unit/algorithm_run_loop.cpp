@@ -216,7 +216,8 @@ void test_sender_receiver_then_sync_wait()
         ++then_count;
         return 42;
     });
-    auto result = hpx::get<0>(*(tt::sync_wait(std::move(work))));
+    auto work_result = tt::sync_wait(std::move(work));
+    auto result = hpx::get<0>(*work_result);
     HPX_TEST_EQ(then_count, std::size_t(1));
     static_assert(
         std::is_same<int, typename std::decay<decltype(result)>::type>::value,
@@ -251,7 +252,8 @@ void test_sender_receiver_then_arguments()
         ++then_count;
         return 2 * s.size();
     });
-    auto result = hpx::get<0>(*tt::sync_wait(std::move(work3)));
+    auto work_result = tt::sync_wait(std::move(work3));
+    auto result = hpx::get<0>(*work_result);
     HPX_TEST_EQ(then_count, std::size_t(3));
     static_assert(std::is_same<std::size_t,
                       typename std::decay<decltype(result)>::type>::value,
@@ -335,7 +337,8 @@ void test_transfer_arguments()
         return s + "!";
     });
 
-    auto result = hpx::get<0>(*tt::sync_wait(work5));
+    auto work_result = tt::sync_wait(work5);
+    auto result = hpx::get<0>(*work_result);
     static_assert(std::is_same_v<std::string, std::decay_t<decltype(result)>>,
         "result should be a std::string");
     HPX_TEST_EQ(result, std::string("result: 0!"));
@@ -625,9 +628,9 @@ void test_future_sender()
         ex::run_loop loop;
         auto sched = loop.get_scheduler();
 
-        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(
-                        sched, ex::make_future(ex::transfer_just(sched, 42)))),
-            42);
+        auto result =
+            tt::sync_wait(sched, ex::make_future(ex::transfer_just(sched, 42)));
+        HPX_TEST_EQ(hpx::get<0>(*result), 42);
     }
 
     std::cout << "7\n";
@@ -684,7 +687,8 @@ void test_ensure_started()
         auto sched = loop.get_scheduler();
 
         auto s = ex::transfer_just(sched, 42) | ex::ensure_started();
-        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(std::move(s))), 42);
+        auto result = tt::sync_wait(std::move(s));
+        HPX_TEST_EQ(hpx::get<0>(*result), 42);
     }
 
     {
@@ -693,7 +697,8 @@ void test_ensure_started()
 
         auto s = ex::transfer_just(sched, 42) | ex::ensure_started() |
             ex::transfer(sched);
-        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(std::move(s))), 42);
+        auto result = tt::sync_wait(std::move(s));
+        HPX_TEST_EQ(hpx::get<0>(*result), 42);
     }
 
     {

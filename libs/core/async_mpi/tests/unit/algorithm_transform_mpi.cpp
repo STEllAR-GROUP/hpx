@@ -60,7 +60,8 @@ int hpx_main()
                 }
                 auto s = mpi::transform_mpi(
                     ex::just(&data, count, datatype, 0, comm), MPI_Ibcast);
-                auto result = hpx::get<0>(*tt::sync_wait(HPX_MOVE(s)));
+                auto mpi_result = tt::sync_wait(HPX_MOVE(s));
+                auto result = hpx::get<0>(*mpi_result);
                 if (rank != 0)
                 {
                     HPX_TEST_EQ(data, 42);
@@ -85,7 +86,8 @@ int hpx_main()
                         return MPI_Ibcast(
                             data, count, datatype, i, comm, request);
                     });
-                auto result = hpx::get<0>(*tt::sync_wait(HPX_MOVE(s)));
+                auto mpi_result = tt::sync_wait(HPX_MOVE(s));
+                auto result = hpx::get<0>(*mpi_result);
                 if (rank != 0)
                 {
                     HPX_TEST_EQ(data, 42);

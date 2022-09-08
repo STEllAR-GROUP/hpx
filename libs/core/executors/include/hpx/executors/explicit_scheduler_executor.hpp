@@ -29,6 +29,7 @@
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 
+#include <cstddef>
 #include <exception>
 #include <string>
 #include <type_traits>
@@ -134,9 +135,19 @@ namespace hpx::execution::experimental {
         friend auto tag_invoke(hpx::parallel::execution::sync_execute_t,
             explicit_scheduler_executor const& exec, F&& f, Ts&&... ts)
         {
-            return *hpx::this_thread::experimental::sync_wait(
+            auto result = hpx::this_thread::experimental::sync_wait(
                 hpx::parallel::execution::async_execute(
                     exec, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+            constexpr std::size_t size =
+                hpx::tuple_size<std::decay_t<decltype(*result)>>::value;
+            if constexpr (size == 0)
+            {
+                return;
+            }
+            else
+            {
+                return hpx::get<0>(HPX_MOVE(*result));
+            }
         }
 
         // TwoWayExecutor interface
@@ -234,7 +245,7 @@ namespace hpx::execution::experimental {
         -> explicit_scheduler_executor<std::decay_t<BaseScheduler>>;
 }    // namespace hpx::execution::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     /// \cond NOINTERNAL
     template <typename BaseScheduler>
@@ -273,4 +284,4 @@ namespace hpx { namespace parallel { namespace execution {
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

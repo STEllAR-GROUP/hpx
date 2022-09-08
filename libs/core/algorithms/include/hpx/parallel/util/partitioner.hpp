@@ -17,6 +17,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/type_support/empty_function.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/executors/execution.hpp>
@@ -323,6 +324,7 @@ namespace hpx { namespace parallel { namespace util {
                         // future
                         handle_local_exceptions::call(items);
                     }
+                    return hpx::util::unused;
                 }
             }
 
@@ -483,7 +485,7 @@ namespace hpx { namespace parallel { namespace util {
 
                         handle_local_exceptions::call(r);
 
-                        return f(HPX_MOVE(r));
+                        return hpx::util::void_guard<R>(), f(HPX_MOVE(r));
                     },
                     HPX_MOVE(workitems));
 #endif
