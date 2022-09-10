@@ -701,7 +701,7 @@ jobs:
           name: Building Header Tests (part 2)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.[a-g].*"
+                -R "tests.headers.modules.[a-c].*"
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -718,13 +718,30 @@ jobs:
           name: Building Header Tests (part 3)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.[h-n].*"
+                -R "tests.headers.modules.[d-g].*"
       - run:
           <<: *convert_xml
       - store_test_results:
           path: tests.headers3
       - store_artifacts:
           path: tests.headers3
+
+  tests.headers4:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Header Tests (part 4)
+          command: |
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
+                -R "tests.headers.modules.[h-n].*"
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.headers4
+      - store_artifacts:
+          path: tests.headers4
 
   tests.performance:
     <<: *defaults
@@ -905,6 +922,8 @@ workflows:
           <<: *core_dependency
       - tests.headers3:
           <<: *core_dependency
+      - tests.headers4:
+          <<: *core_dependency
       - docs-html:
           requires:
             - configure
@@ -953,6 +972,7 @@ workflows:
             - tests.headers1
             - tests.headers2
             - tests.headers3
+            - tests.headers4
             # prevent docs from being rebuilt
             - docs-html
             - docs-singlehtml
