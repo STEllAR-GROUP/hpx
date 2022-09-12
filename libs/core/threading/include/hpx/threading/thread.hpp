@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file thread.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -37,6 +39,25 @@ namespace hpx {
     HPX_CORE_EXPORT void set_thread_termination_handler(
         thread_termination_handler_type f);
 
+    /// \brief The class thread represents a single thread of execution.
+    ///        Threads allow multiple functions to execute concurrently.
+    ///        hreads begin execution immediately upon construction of the
+    ///        associated thread object (pending any OS scheduling delays),
+    ///        starting at the top-level function provided as a constructor
+    ///        argument. The return value of the top-level function is ignored
+    ///        and if it terminates by throwing an exception, \a hpx::terminate
+    ///        is called. The top-level function may communicate its return
+    ///        value or an exception to the caller via \a hpx::promise or by
+    ///        modifying shared variables (which may require synchronization,
+    ///        see hpx::mutex and hpx::atomic)
+    ///        hpx::thread objects may also be in the state that does not
+    ///        represent any thread (after default construction, move from,
+    ///        detach, or join), and a thread of execution may not be associated
+    ///        with any thread objects (after detach).
+    ///        No two hpx::thread objects may represent the same thread of
+    ///        execution; \a hpx::thread is not \a CopyConstructible or \a
+    ///        CopyAssignable, although it is \a MoveConstructible and \a
+    ///        MoveAssignable.
     class HPX_CORE_EXPORT thread
     {
         typedef hpx::spinlock mutex_type;
@@ -87,28 +108,36 @@ namespace hpx {
         thread(thread&&) noexcept;
         thread& operator=(thread&&) noexcept;
 
+        /// \brief swaps two thread objects
         void swap(thread&) noexcept;
+        /// \brief checks whether the thread is joinable, i.e.
+        ///        potentially running in parallel context
         bool joinable() const noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             return joinable_locked();
         }
 
+        /// \brief waits for the thread to finish its execution
         void join();
+        /// \brief permits the thread to execute independently from the thread handle
         void detach()
         {
             std::lock_guard<mutex_type> l(mtx_);
             detach_locked();
         }
 
+        /// \brief returns the id of the thread
         id get_id() const noexcept;
 
+        /// \brief returns the underlying implementation-defined thread handle
         native_handle_type native_handle() const    //-V659
         {
             std::lock_guard<mutex_type> l(mtx_);
             return id_.noref();
         }
 
+        /// \brief returns the number of concurrent threads supported by the implementation
         [[nodiscard]] static unsigned int hardware_concurrency() noexcept;
 
         // extensions
@@ -154,7 +183,6 @@ namespace hpx {
         x.swap(y);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
     class thread::id
     {
     private:
