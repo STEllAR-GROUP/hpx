@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/preprocessor/cat.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <type_traits>
 

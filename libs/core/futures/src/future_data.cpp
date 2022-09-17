@@ -4,10 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
+
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 
-#include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/this_thread.hpp>

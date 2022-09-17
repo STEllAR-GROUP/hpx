@@ -1,5 +1,5 @@
 //  Copyright (c) 2020      ETH Zurich
-//                2007-2017 Hartmut Kaiser
+//                2007-2022 Hartmut Kaiser
 //                2017-2018 Taeguk Kwon
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -7,6 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/executors/exception_list.hpp>
 
 #include <exception>

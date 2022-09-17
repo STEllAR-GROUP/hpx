@@ -8,4 +8,4 @@
 
 #pragma once
 
-@module_headers@
+@cppm_module_prefix@@module_headers@@cppm_module_postfix@

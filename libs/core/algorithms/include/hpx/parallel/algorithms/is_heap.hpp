@@ -206,11 +206,11 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -461,13 +461,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
 
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::is_heap
-    inline constexpr struct is_heap_t final
-      : hpx::detail::tag_parallel_algorithm<is_heap_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::is_heap
+inline constexpr struct is_heap_t final
+  : hpx::detail::tag_parallel_algorithm<is_heap_t>
+{
+private:
+// clang-format off
         template <typename ExPolicy, typename RandIter,
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
@@ -478,23 +478,21 @@ namespace hpx {
                     typename std::iterator_traits<RandIter>::value_type
                 >
             )>
-        // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
-        tag_fallback_invoke(is_heap_t, ExPolicy&& policy, RandIter first,
-            RandIter last, Comp&& comp = Comp())
-        {
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter>::value),
-                "Requires a random access iterator.");
+// clang-format on
+friend
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+    tag_fallback_invoke(is_heap_t, ExPolicy&& policy, RandIter first,
+        RandIter last, Comp&& comp = Comp())
+{
+    static_assert((hpx::traits::is_random_access_iterator<RandIter>::value),
+        "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::is_heap<RandIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Comp, comp),
-                hpx::parallel::util::projection_identity{});
-        }
+    return hpx::parallel::v1::detail::is_heap<RandIter>().call(
+        HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(Comp, comp),
+        hpx::parallel::util::projection_identity{});
+}
 
-        // clang-format off
+// clang-format off
         template <typename RandIter,
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
@@ -504,27 +502,26 @@ namespace hpx {
                     typename std::iterator_traits<RandIter>::value_type
                 >
             )>
-        // clang-format on
-        friend bool tag_fallback_invoke(
-            is_heap_t, RandIter first, RandIter last, Comp&& comp = Comp())
-        {
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter>::value),
-                "Requires a random access iterator.");
+// clang-format on
+friend bool tag_fallback_invoke(
+    is_heap_t, RandIter first, RandIter last, Comp&& comp = Comp())
+{
+    static_assert((hpx::traits::is_random_access_iterator<RandIter>::value),
+        "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::is_heap<RandIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
-                hpx::parallel::util::projection_identity{});
-        }
-    } is_heap{};
+    return hpx::parallel::v1::detail::is_heap<RandIter>().call(
+        hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
+        hpx::parallel::util::projection_identity{});
+}
+} is_heap{};
 
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::is_heap_until
-    inline constexpr struct is_heap_until_t final
-      : hpx::detail::tag_parallel_algorithm<is_heap_until_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::is_heap_until
+inline constexpr struct is_heap_until_t final
+  : hpx::detail::tag_parallel_algorithm<is_heap_until_t>
+{
+private:
+// clang-format off
         template <typename ExPolicy, typename RandIter,
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
@@ -535,23 +532,21 @@ namespace hpx {
                     typename std::iterator_traits<RandIter>::value_type
                 >
             )>
-        // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            RandIter>::type
-        tag_fallback_invoke(is_heap_until_t, ExPolicy&& policy, RandIter first,
-            RandIter last, Comp&& comp = Comp())
-        {
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter>::value),
-                "Requires a random access iterator.");
+// clang-format on
+friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+    RandIter>::type
+tag_fallback_invoke(is_heap_until_t, ExPolicy&& policy, RandIter first,
+    RandIter last, Comp&& comp = Comp())
+{
+    static_assert((hpx::traits::is_random_access_iterator<RandIter>::value),
+        "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::is_heap_until<RandIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Comp, comp),
-                hpx::parallel::util::projection_identity{});
-        }
+    return hpx::parallel::v1::detail::is_heap_until<RandIter>().call(
+        HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(Comp, comp),
+        hpx::parallel::util::projection_identity{});
+}
 
-        // clang-format off
+// clang-format off
         template <typename RandIter,
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
@@ -561,19 +556,18 @@ namespace hpx {
                     typename std::iterator_traits<RandIter>::value_type
                 >
             )>
-        // clang-format on
-        friend RandIter tag_fallback_invoke(is_heap_until_t, RandIter first,
-            RandIter last, Comp&& comp = Comp())
-        {
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter>::value),
-                "Requires a random access iterator.");
+// clang-format on
+friend RandIter tag_fallback_invoke(
+    is_heap_until_t, RandIter first, RandIter last, Comp&& comp = Comp())
+{
+    static_assert((hpx::traits::is_random_access_iterator<RandIter>::value),
+        "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::is_heap_until<RandIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
-                hpx::parallel::util::projection_identity{});
-        }
-    } is_heap_until{};
+    return hpx::parallel::v1::detail::is_heap_until<RandIter>().call(
+        hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
+        hpx::parallel::util::projection_identity{});
+}
+} is_heap_until{};
 
 }    // namespace hpx
 

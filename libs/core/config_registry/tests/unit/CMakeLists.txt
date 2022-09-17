@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The STE||AR-Group
+# Copyright (c) 2020-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,7 @@ foreach(test ${tests})
 
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
-    SOURCES ${sources} ${${test}_FLAGS} ${${test}_LIBRARIES}
+    SOURCES ${sources} ${${test}_FLAGS}
     NOLIBS
     DEPENDENCIES hpx_config_registry
     EXCLUDE_FROM_ALL

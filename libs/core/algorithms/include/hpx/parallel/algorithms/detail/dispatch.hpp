@@ -9,12 +9,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>

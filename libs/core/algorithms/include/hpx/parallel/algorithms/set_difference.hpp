@@ -178,9 +178,9 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
@@ -325,13 +325,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
 
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::set_difference
-    inline constexpr struct set_difference_t final
-      : hpx::detail::tag_parallel_algorithm<set_difference_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// CPO for hpx::set_difference
+inline constexpr struct set_difference_t final
+  : hpx::detail::tag_parallel_algorithm<set_difference_t>
+{
+private:
+// clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename FwdIter3, typename Pred = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
@@ -344,39 +344,38 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
             )>
-        // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter3>::type
-        tag_fallback_invoke(set_difference_t, ExPolicy&& policy,
-            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
-            FwdIter3 dest, Pred&& op = Pred())
-        {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-                "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter3>::value ||
-                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
-                        hpx::traits::is_output_iterator<FwdIter3>::value),
-                "Requires at least forward iterator or sequential execution.");
+// clang-format on
+friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+    FwdIter3>::type
+tag_fallback_invoke(set_difference_t, ExPolicy&& policy, FwdIter1 first1,
+    FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, FwdIter3 dest,
+    Pred&& op = Pred())
+{
+    static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+        "Requires at least forward iterator.");
+    static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+        "Requires at least forward iterator.");
+    static_assert(hpx::traits::is_forward_iterator<FwdIter3>::value ||
+            (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
+                hpx::traits::is_output_iterator<FwdIter3>::value),
+        "Requires at least forward iterator or sequential execution.");
 
-            using is_seq = std::integral_constant<bool,
-                hpx::is_sequenced_execution_policy<ExPolicy>::value ||
-                    !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
-                    !hpx::traits::is_random_access_iterator<FwdIter2>::value>;
+    using is_seq = std::integral_constant<bool,
+        hpx::is_sequenced_execution_policy<ExPolicy>::value ||
+            !hpx::traits::is_random_access_iterator<FwdIter1>::value ||
+            !hpx::traits::is_random_access_iterator<FwdIter2>::value>;
 
-            using result_type =
-                hpx::parallel::util::in_out_result<FwdIter1, FwdIter3>;
+    using result_type = hpx::parallel::util::in_out_result<FwdIter1, FwdIter3>;
 
-            return hpx::parallel::util::get_second_element(
-                hpx::parallel::v1::detail::set_difference<result_type>().call2(
-                    HPX_FORWARD(ExPolicy, policy), is_seq(), first1, last1,
-                    first2, last2, dest, HPX_FORWARD(Pred, op),
-                    hpx::parallel::util::projection_identity(),
-                    hpx::parallel::util::projection_identity()));
-        }
+    return hpx::parallel::util::get_second_element(
+        hpx::parallel::v1::detail::set_difference<result_type>().call2(
+            HPX_FORWARD(ExPolicy, policy), is_seq(), first1, last1, first2,
+            last2, dest, HPX_FORWARD(Pred, op),
+            hpx::parallel::util::projection_identity(),
+            hpx::parallel::util::projection_identity()));
+}
 
-        // clang-format off
+// clang-format off
         template <typename FwdIter1, typename FwdIter2, typename FwdIter3,
             typename Pred = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
@@ -388,29 +387,27 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
             )>
-        // clang-format on
-        friend FwdIter3 tag_fallback_invoke(set_difference_t, FwdIter1 first1,
-            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, FwdIter3 dest,
-            Pred&& op = Pred())
-        {
-            static_assert((hpx::traits::is_input_iterator<FwdIter1>::value),
-                "Requires at least input iterator.");
-            static_assert((hpx::traits::is_input_iterator<FwdIter2>::value),
-                "Requires at least input iterator.");
-            static_assert((hpx::traits::is_output_iterator<FwdIter3>::value),
-                "Requires at least output iterator.");
+// clang-format on
+friend FwdIter3 tag_fallback_invoke(set_difference_t, FwdIter1 first1,
+    FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, FwdIter3 dest,
+    Pred&& op = Pred())
+{
+    static_assert((hpx::traits::is_input_iterator<FwdIter1>::value),
+        "Requires at least input iterator.");
+    static_assert((hpx::traits::is_input_iterator<FwdIter2>::value),
+        "Requires at least input iterator.");
+    static_assert((hpx::traits::is_output_iterator<FwdIter3>::value),
+        "Requires at least output iterator.");
 
-            using result_type =
-                hpx::parallel::util::in_out_result<FwdIter1, FwdIter3>;
+    using result_type = hpx::parallel::util::in_out_result<FwdIter1, FwdIter3>;
 
-            return hpx::parallel::util::get_second_element(
-                hpx::parallel::v1::detail::set_difference<result_type>().call(
-                    hpx::execution::seq, first1, last1, first2, last2, dest,
-                    HPX_FORWARD(Pred, op),
-                    hpx::parallel::util::projection_identity(),
-                    hpx::parallel::util::projection_identity()));
-        }
-    } set_difference{};
+    return hpx::parallel::util::get_second_element(
+        hpx::parallel::v1::detail::set_difference<result_type>().call(
+            hpx::execution::seq, first1, last1, first2, last2, dest,
+            HPX_FORWARD(Pred, op), hpx::parallel::util::projection_identity(),
+            hpx::parallel::util::projection_identity()));
+}
+} set_difference{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

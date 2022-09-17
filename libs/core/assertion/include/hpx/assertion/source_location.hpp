@@ -7,11 +7,13 @@
 
 #pragma once
 
-#include <hpx/config/export_definitions.hpp>
+#include <hpx/config.hpp>
 #include <hpx/assertion/current_function.hpp>
+#include <hpx/assertion/export_definitions.hpp>
 
 #include <cstdint>
 #include <iosfwd>
+#include <ostream>
 
 #if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
 #include <source_location>
@@ -53,7 +55,7 @@ namespace hpx {
     };
 #endif
 
-    HPX_CORE_EXPORT std::ostream& operator<<(
+    HPX_CORE_ASSERTION_EXPORT std::ostream& operator<<(
         std::ostream& os, source_location const& loc);
 }    // namespace hpx
 
@@ -61,17 +63,5 @@ namespace hpx::assertion {
 
     using source_location HPX_DEPRECATED_V(1, 8,
         "hpx::assertion::source_location is deprecated, use "
-        "hpx::source_location "
-        "instead") = hpx::source_location;
+        "hpx::source_location instead") = hpx::source_location;
 }
-
-#if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
-#define HPX_CURRENT_SOURCE_LOCATION() ::hpx::source_location::current()
-#else
-#define HPX_CURRENT_SOURCE_LOCATION()                                          \
-    ::hpx::source_location                                                     \
-    {                                                                          \
-        __FILE__, static_cast<std::uint_least32_t>(__LINE__),                  \
-            HPX_ASSERT_CURRENT_FUNCTION                                        \
-    }
-#endif

@@ -148,8 +148,8 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
@@ -292,102 +292,98 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
 
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::destroy
-    inline constexpr struct destroy_t final
-      : hpx::detail::tag_parallel_algorithm<destroy_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// CPO for hpx::destroy
+inline constexpr struct destroy_t final
+  : hpx::detail::tag_parallel_algorithm<destroy_t>
+{
+private:
+// clang-format off
         template <typename ExPolicy, typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
-        // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<
-            ExPolicy>::type
-        tag_fallback_invoke(
-            destroy_t, ExPolicy&& policy, FwdIter first, FwdIter last)
-        {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Required at least forward iterator.");
+// clang-format on
+friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy>::type
+tag_fallback_invoke(destroy_t, ExPolicy&& policy, FwdIter first, FwdIter last)
+{
+    static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+        "Required at least forward iterator.");
 
-            return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
-                hpx::parallel::v1::detail::destroy<FwdIter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, last));
-        }
+    return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
+        hpx::parallel::v1::detail::destroy<FwdIter>().call(
+            HPX_FORWARD(ExPolicy, policy), first, last));
+}
 
-        // clang-format off
+// clang-format off
         template <typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value
             )>
-        // clang-format on
-        friend void tag_fallback_invoke(destroy_t, FwdIter first, FwdIter last)
-        {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Required at least forward iterator.");
+// clang-format on
+friend void tag_fallback_invoke(destroy_t, FwdIter first, FwdIter last)
+{
+    static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+        "Required at least forward iterator.");
 
-            hpx::parallel::v1::detail::destroy<FwdIter>().call(
-                hpx::execution::seq, first, last);
-        }
-    } destroy{};
+    hpx::parallel::v1::detail::destroy<FwdIter>().call(
+        hpx::execution::seq, first, last);
+}
+} destroy{};
 
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::destroy_n
-    inline constexpr struct destroy_n_t final
-      : hpx::detail::tag_parallel_algorithm<destroy_n_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// CPO for hpx::destroy_n
+inline constexpr struct destroy_n_t final
+  : hpx::detail::tag_parallel_algorithm<destroy_n_t>
+{
+private:
+// clang-format off
         template <typename ExPolicy, typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
-        // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(
-            destroy_n_t, ExPolicy&& policy, FwdIter first, Size count)
-        {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Requires at least forward iterator.");
+// clang-format on
+friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+    FwdIter>::type
+tag_fallback_invoke(destroy_n_t, ExPolicy&& policy, FwdIter first, Size count)
+{
+    static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+        "Requires at least forward iterator.");
 
-            // if count is representing a negative value, we do nothing
-            if (hpx::parallel::v1::detail::is_negative(count))
-            {
-                return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(HPX_MOVE(first));
-            }
+    // if count is representing a negative value, we do nothing
+    if (hpx::parallel::v1::detail::is_negative(count))
+    {
+        return hpx::parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter>::get(HPX_MOVE(first));
+    }
 
-            return hpx::parallel::v1::detail::destroy_n<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, std::size_t(count));
-        }
+    return hpx::parallel::v1::detail::destroy_n<FwdIter>().call(
+        HPX_FORWARD(ExPolicy, policy), first, std::size_t(count));
+}
 
-        // clang-format off
+// clang-format off
         template <typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value
             )>
-        // clang-format on
-        friend FwdIter tag_fallback_invoke(
-            destroy_n_t, FwdIter first, Size count)
-        {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Requires at least forward iterator.");
+// clang-format on
+friend FwdIter tag_fallback_invoke(destroy_n_t, FwdIter first, Size count)
+{
+    static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+        "Requires at least forward iterator.");
 
-            // if count is representing a negative value, we do nothing
-            if (hpx::parallel::v1::detail::is_negative(count))
-            {
-                return first;
-            }
+    // if count is representing a negative value, we do nothing
+    if (hpx::parallel::v1::detail::is_negative(count))
+    {
+        return first;
+    }
 
-            return hpx::parallel::v1::detail::destroy_n<FwdIter>().call(
-                hpx::execution::seq, first, std::size_t(count));
-        }
-    } destroy_n{};
+    return hpx::parallel::v1::detail::destroy_n<FwdIter>().call(
+        hpx::execution::seq, first, std::size_t(count));
+}
+} destroy_n{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>

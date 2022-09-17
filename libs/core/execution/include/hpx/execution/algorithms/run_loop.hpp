@@ -8,13 +8,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/queries/get_scheduler.hpp>
 #include <hpx/execution/queries/get_stop_token.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/get_env.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/lock_registration.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>

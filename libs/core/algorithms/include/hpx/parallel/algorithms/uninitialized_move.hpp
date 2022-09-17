@@ -195,9 +195,9 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -590,126 +590,125 @@ namespace hpx { namespace parallel { inline namespace v1 {
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx {
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_move
-    inline constexpr struct uninitialized_move_t final
-      : hpx::detail::tag_parallel_algorithm<uninitialized_move_t>
-    {
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::uninitialized_move
+inline constexpr struct uninitialized_move_t final
+  : hpx::detail::tag_parallel_algorithm<uninitialized_move_t>
+{
+// clang-format off
         template <typename InIter, typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<InIter>::value &&
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
-        // clang-format on
-        friend FwdIter tag_fallback_invoke(
-            hpx::uninitialized_move_t, InIter first, InIter last, FwdIter dest)
-        {
-            static_assert(hpx::traits::is_input_iterator<InIter>::value,
-                "Required at least input iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-                "Requires at least forward iterator.");
+// clang-format on
+friend FwdIter tag_fallback_invoke(
+    hpx::uninitialized_move_t, InIter first, InIter last, FwdIter dest)
+{
+    static_assert(hpx::traits::is_input_iterator<InIter>::value,
+        "Required at least input iterator.");
+    static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+        "Requires at least forward iterator.");
 
-            return parallel::util::get_second_element(
-                hpx::parallel::v1::detail::uninitialized_move<
-                    parallel::util::in_out_result<InIter, FwdIter>>()
-                    .call(hpx::execution::seq, first, last, dest));
-        }
+    return parallel::util::get_second_element(
+        hpx::parallel::v1::detail::uninitialized_move<
+            parallel::util::in_out_result<InIter, FwdIter>>()
+            .call(hpx::execution::seq, first, last, dest));
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_forward_iterator<FwdIter1>::value &&
                 hpx::traits::is_forward_iterator<FwdIter2>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
-        tag_fallback_invoke(hpx::uninitialized_move_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest)
-        {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
-                "Requires at least forward iterator.");
+// clang-format on
+friend
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    tag_fallback_invoke(hpx::uninitialized_move_t, ExPolicy&& policy,
+        FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+{
+    static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+        "Requires at least forward iterator.");
+    static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+        "Requires at least forward iterator.");
 
-            return parallel::util::get_second_element(
-                hpx::parallel::v1::detail::uninitialized_move<
-                    parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(HPX_FORWARD(ExPolicy, policy), first, last, dest));
-        }
+    return parallel::util::get_second_element(
+        hpx::parallel::v1::detail::uninitialized_move<
+            parallel::util::in_out_result<FwdIter1, FwdIter2>>()
+            .call(HPX_FORWARD(ExPolicy, policy), first, last, dest));
+}
 
-    } uninitialized_move{};
+} uninitialized_move{};
 
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_move_n
-    inline constexpr struct uninitialized_move_n_t final
-      : hpx::detail::tag_parallel_algorithm<uninitialized_move_n_t>
-    {
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::uninitialized_move_n
+inline constexpr struct uninitialized_move_n_t final
+  : hpx::detail::tag_parallel_algorithm<uninitialized_move_n_t>
+{
+// clang-format off
         template <typename InIter, typename Size,
             typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<InIter>::value &&
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
-        // clang-format on
-        friend std::pair<InIter, FwdIter> tag_fallback_invoke(
-            hpx::uninitialized_move_n_t, InIter first, Size count, FwdIter dest)
-        {
-            static_assert(hpx::traits::is_input_iterator<InIter>::value,
-                "Required at least input iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-                "Requires at least forward iterator.");
+// clang-format on
+friend std::pair<InIter, FwdIter> tag_fallback_invoke(
+    hpx::uninitialized_move_n_t, InIter first, Size count, FwdIter dest)
+{
+    static_assert(hpx::traits::is_input_iterator<InIter>::value,
+        "Required at least input iterator.");
+    static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+        "Requires at least forward iterator.");
 
-            // if count is representing a negative value, we do nothing
-            if (hpx::parallel::v1::detail::is_negative(count))
-            {
-                return std::pair<InIter, FwdIter>(first, dest);
-            }
+    // if count is representing a negative value, we do nothing
+    if (hpx::parallel::v1::detail::is_negative(count))
+    {
+        return std::pair<InIter, FwdIter>(first, dest);
+    }
 
-            return parallel::util::get_pair(
-                hpx::parallel::v1::detail::uninitialized_move_n<
-                    parallel::util::in_out_result<InIter, FwdIter>>()
-                    .call(
-                        hpx::execution::seq, first, std::size_t(count), dest));
-        }
+    return parallel::util::get_pair(
+        hpx::parallel::v1::detail::uninitialized_move_n<
+            parallel::util::in_out_result<InIter, FwdIter>>()
+            .call(hpx::execution::seq, first, std::size_t(count), dest));
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Size, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_forward_iterator<FwdIter1>::value &&
                 hpx::traits::is_forward_iterator<FwdIter2>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            std::pair<FwdIter1, FwdIter2>>::type
-        tag_fallback_invoke(hpx::uninitialized_move_n_t, ExPolicy&& policy,
-            FwdIter1 first, Size count, FwdIter2 dest)
-        {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
-                "Requires at least forward iterator.");
+// clang-format on
+friend typename parallel::util::detail::algorithm_result<ExPolicy,
+    std::pair<FwdIter1, FwdIter2>>::type
+tag_fallback_invoke(hpx::uninitialized_move_n_t, ExPolicy&& policy,
+    FwdIter1 first, Size count, FwdIter2 dest)
+{
+    static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+        "Requires at least forward iterator.");
+    static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+        "Requires at least forward iterator.");
 
-            // if count is representing a negative value, we do nothing
-            if (hpx::parallel::v1::detail::is_negative(count))
-            {
-                return parallel::util::detail::algorithm_result<ExPolicy,
-                    std::pair<FwdIter1, FwdIter2>>::get(std::pair<FwdIter1,
-                    FwdIter2>(first, dest));
-            }
+    // if count is representing a negative value, we do nothing
+    if (hpx::parallel::v1::detail::is_negative(count))
+    {
+        return parallel::util::detail::algorithm_result<ExPolicy,
+            std::pair<FwdIter1, FwdIter2>>::get(std::pair<FwdIter1,
+            FwdIter2>(first, dest));
+    }
 
-            return parallel::util::get_pair(
-                hpx::parallel::v1::detail::uninitialized_move_n<
-                    parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(HPX_FORWARD(ExPolicy, policy), first,
-                        std::size_t(count), dest));
-        }
+    return parallel::util::get_pair(
+        hpx::parallel::v1::detail::uninitialized_move_n<
+            parallel::util::in_out_result<FwdIter1, FwdIter2>>()
+            .call(HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
+                dest));
+}
 
-    } uninitialized_move_n{};
+} uninitialized_move_n{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

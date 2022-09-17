@@ -8,13 +8,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/topology.hpp>
 
 #include <cstddef>

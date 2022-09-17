@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
@@ -392,7 +393,11 @@ namespace hpx { namespace detail {
     hpx::exception_info custom_exception_info(std::string const& func,
         std::string const& file, long line, std::string const& auxinfo)
     {
+#if defined(HPX_MSVC)
+        std::int64_t pid = ::_getpid();
+#else
         std::int64_t pid = ::getpid();
+#endif
 
         std::size_t const trace_depth =
             util::from_string<std::size_t>(get_config_entry(

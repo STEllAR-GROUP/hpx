@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
@@ -21,6 +20,7 @@
 #include <hpx/functional/detail/tag_priority_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/counting_shape.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <exception>

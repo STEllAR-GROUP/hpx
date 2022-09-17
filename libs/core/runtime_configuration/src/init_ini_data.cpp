@@ -12,6 +12,7 @@
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/plugin.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/init_ini_data.hpp>
@@ -54,7 +55,7 @@ namespace hpx { namespace util {
     bool handle_ini_file_env(
         section& ini, char const* env_var, char const* file_suffix)
     {
-        char const* env = getenv(env_var);
+        char const* env = hpx::util::getenv(env_var);
         if (nullptr != env)
         {
             namespace fs = filesystem;

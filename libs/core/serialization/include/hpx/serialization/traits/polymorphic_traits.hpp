@@ -8,9 +8,8 @@
 
 #pragma once
 
-#include <hpx/concepts/has_member_xxx.hpp>
-#include <hpx/concepts/has_xxx.hpp>
-#include <hpx/preprocessor/strip_parens.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <type_traits>
 

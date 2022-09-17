@@ -294,9 +294,9 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
@@ -809,12 +809,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx {
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::unique
-    inline constexpr struct unique_t final
-      : hpx::detail::tag_parallel_algorithm<unique_t>
-    {
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::unique
+inline constexpr struct unique_t final
+  : hpx::detail::tag_parallel_algorithm<unique_t>
+{
+// clang-format off
         template <typename FwdIter,
             typename Pred = hpx::parallel::v1::detail::equal_to,
             typename Proj = parallel::util::projection_identity,
@@ -826,19 +826,19 @@ namespace hpx {
                     parallel::traits::projected<Proj, FwdIter>,
                     parallel::traits::projected<Proj, FwdIter>>::value
             )>
-        // clang-format on
-        friend FwdIter tag_fallback_invoke(hpx::unique_t, FwdIter first,
-            FwdIter last, Pred&& pred = Pred(), Proj&& proj = Proj())
-        {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
+// clang-format on
+friend FwdIter tag_fallback_invoke(hpx::unique_t, FwdIter first, FwdIter last,
+    Pred&& pred = Pred(), Proj&& proj = Proj())
+{
+    static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+        "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::unique<FwdIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
-                HPX_FORWARD(Proj, proj));
-        }
+    return hpx::parallel::v1::detail::unique<FwdIter>().call(
+        hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+        HPX_FORWARD(Proj, proj));
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename Pred = hpx::parallel::v1::detail::equal_to,
             typename Proj = parallel::util::projection_identity,
@@ -850,27 +850,27 @@ namespace hpx {
                     parallel::traits::projected<Proj, FwdIter>,
                     parallel::traits::projected<Proj, FwdIter>>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(hpx::unique_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred&& pred = Pred(), Proj&& proj = Proj())
-        {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
+// clang-format on
+friend
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    tag_fallback_invoke(hpx::unique_t, ExPolicy&& policy, FwdIter first,
+        FwdIter last, Pred&& pred = Pred(), Proj&& proj = Proj())
+{
+    static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+        "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::unique<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
-        }
-    } unique{};
+    return hpx::parallel::v1::detail::unique<FwdIter>().call(
+        HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(Pred, pred),
+        HPX_FORWARD(Proj, proj));
+}
+} unique{};
 
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::unique_copy
-    inline constexpr struct unique_copy_t final
-      : hpx::detail::tag_parallel_algorithm<unique_copy_t>
-    {
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::unique_copy
+inline constexpr struct unique_copy_t final
+  : hpx::detail::tag_parallel_algorithm<unique_copy_t>
+{
+// clang-format off
         template <typename InIter, typename OutIter,
             typename Pred = hpx::parallel::v1::detail::equal_to,
             typename Proj = parallel::util::projection_identity,
@@ -882,23 +882,22 @@ namespace hpx {
                     parallel::traits::projected<Proj, InIter>,
                     parallel::traits::projected<Proj, InIter>>::value
             )>
-        // clang-format on
-        friend OutIter tag_fallback_invoke(hpx::unique_copy_t, InIter first,
-            InIter last, OutIter dest, Pred&& pred = Pred(),
-            Proj&& proj = Proj())
-        {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
-                "Requires at least input iterator.");
+// clang-format on
+friend OutIter tag_fallback_invoke(hpx::unique_copy_t, InIter first,
+    InIter last, OutIter dest, Pred&& pred = Pred(), Proj&& proj = Proj())
+{
+    static_assert(hpx::traits::is_input_iterator_v<InIter>,
+        "Requires at least input iterator.");
 
-            using result_type = parallel::util::in_out_result<InIter, OutIter>;
+    using result_type = parallel::util::in_out_result<InIter, OutIter>;
 
-            return parallel::util::get_second_element<InIter, OutIter>(
-                hpx::parallel::v1::detail::unique_copy<result_type>().call(
-                    hpx::execution::seq, first, last, dest,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
-        }
+    return parallel::util::get_second_element<InIter, OutIter>(
+        hpx::parallel::v1::detail::unique_copy<result_type>().call(
+            hpx::execution::seq, first, last, dest, HPX_FORWARD(Pred, pred),
+            HPX_FORWARD(Proj, proj)));
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred = hpx::parallel::v1::detail::equal_to,
             typename Proj = parallel::util::projection_identity,
@@ -910,25 +909,24 @@ namespace hpx {
                     parallel::traits::projected<Proj, FwdIter1>,
                     parallel::traits::projected<Proj, FwdIter1>>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
-        tag_fallback_invoke(hpx::unique_copy_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred&& pred = Pred(),
-            Proj&& proj = Proj())
-        {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
-                "Requires at least forward iterator.");
+// clang-format on
+friend
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    tag_fallback_invoke(hpx::unique_copy_t, ExPolicy&& policy, FwdIter1 first,
+        FwdIter1 last, FwdIter2 dest, Pred&& pred = Pred(),
+        Proj&& proj = Proj())
+{
+    static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
+        "Requires at least forward iterator.");
 
-            using result_type =
-                parallel::util::in_out_result<FwdIter1, FwdIter2>;
+    using result_type = parallel::util::in_out_result<FwdIter1, FwdIter2>;
 
-            return parallel::util::get_second_element<FwdIter1, FwdIter2>(
-                hpx::parallel::v1::detail::unique_copy<result_type>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
-        }
-    } unique_copy{};
+    return parallel::util::get_second_element<FwdIter1, FwdIter2>(
+        hpx::parallel::v1::detail::unique_copy<result_type>().call(
+            HPX_FORWARD(ExPolicy, policy), first, last, dest,
+            HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
+}
+} unique_copy{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

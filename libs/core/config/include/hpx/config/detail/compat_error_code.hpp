@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 #include <boost/system/error_code.hpp>
 
 #include <system_error>

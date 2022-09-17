@@ -12,7 +12,6 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -30,6 +29,7 @@
 #include <hpx/functional/detail/tag_priority_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>

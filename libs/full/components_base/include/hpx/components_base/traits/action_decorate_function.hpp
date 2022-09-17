@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/concepts/has_xxx.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/naming_base/naming_base.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>

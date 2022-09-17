@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/operation_state.hpp>
@@ -17,6 +16,7 @@
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
+#include <hpx/modules/concepts.hpp>
 
 #include <exception>
 #include <type_traits>

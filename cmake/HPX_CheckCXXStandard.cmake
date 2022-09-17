@@ -61,6 +61,10 @@ endif()
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Compiler flags support tests
+include(CheckCXXCompilerFlag)
+
 # We explicitly set the default to 98 to force CMake to emit a -std=c++XX flag.
 # Some compilers (clang) have a different default standard for cpp and cu files,
 # but CMake does not know about this difference. If the standard is set to the
@@ -68,4 +72,29 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # standard for .cu files.
 set(CMAKE_CXX_STANDARD_DEFAULT 98)
 
-hpx_info("Using C++${HPX_CXX_STANDARD}")
+if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 20)
+  hpx_option(
+    HPX_WITH_CXX20_MODULES STRING "Enable C++20 modules. (default: OFF)" "OFF"
+  )
+  if(HPX_WITH_CXX20_MODULES)
+    # FIXME: add other compilers as needed
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+      # MSVC compiler flags for modules were changed at version 16.8
+      set(HPX_CXX_MODULES_CHECK /experimental:module)
+    endif()
+  
+    # Check if used compiler version supports modules
+    check_cxx_compiler_flag(${HPX_CXX_MODULES_CHECK} __cxx_modules)
+
+    if(__cxx_modules AND MSVC_VERSION GREATER_EQUAL 1932)
+      set(__additional_comment " (with Modules)")
+    else()
+      hpx_warn(
+        "C++20 Modules are supported only starting VS2022, disabling HPX_WITH_CXX20_MODULES"
+      )
+      set(HPX_WITH_CXX20_MODULES OFF)
+    endif()
+  endif()
+endif()
+
+hpx_info("Using C++${HPX_CXX_STANDARD}${__additional_comment}")

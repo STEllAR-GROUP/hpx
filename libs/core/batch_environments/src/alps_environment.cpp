@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/batch_environments/alps_environment.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <cstddef>
@@ -20,7 +21,7 @@ namespace hpx { namespace util { namespace batch_environments {
       , num_localities_(0)
       , valid_(false)
     {
-        char* node_num = std::getenv("ALPS_APP_PE");
+        char* node_num = hpx::util::getenv("ALPS_APP_PE");
         valid_ = node_num != nullptr;
         if (valid_)
         {
@@ -28,7 +29,7 @@ namespace hpx { namespace util { namespace batch_environments {
             node_num_ = from_string<std::size_t>(node_num);
 
             // Get the number of threads
-            char* num_threads = std::getenv("ALPS_APP_DEPTH");
+            char* num_threads = hpx::util::getenv("ALPS_APP_DEPTH");
             if (!num_threads)
             {
                 valid_ = false;
@@ -37,7 +38,7 @@ namespace hpx { namespace util { namespace batch_environments {
             num_threads_ = from_string<std::size_t>(num_threads);
 
             // Get the number of localities
-            char* total_num_threads = std::getenv("PBS_NP");
+            char* total_num_threads = hpx::util::getenv("PBS_NP");
             if (!total_num_threads)
             {
                 valid_ = false;

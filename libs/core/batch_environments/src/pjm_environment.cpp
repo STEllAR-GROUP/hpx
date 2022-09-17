@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/batch_environments/pjm_environment.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <boost/tokenizer.hpp>
@@ -36,7 +37,7 @@ namespace hpx::util::batch_environments {
       , num_localities_(0)
       , valid_(false)
     {
-        char* num_nodes = std::getenv("PJM_NODE");
+        char* num_nodes = hpx::util::getenv("PJM_NODE");
         valid_ = num_nodes != nullptr;
         if (valid_)
         {
@@ -46,7 +47,7 @@ namespace hpx::util::batch_environments {
             if (have_mpi)
             {
                 // Initialize our node number, if available
-                char* var = std::getenv("PMIX_RANK");
+                char* var = hpx::util::getenv("PMIX_RANK");
                 if (var != nullptr)
                 {
                     node_num_ = from_string<std::size_t>(var);
@@ -58,16 +59,17 @@ namespace hpx::util::batch_environments {
             }
 
             // Get the number of threads, if available
-            char* var = std::getenv("PJM_NODE_CORE");
+            char* var = hpx::util::getenv("PJM_NODE_CORE");
             if (var != nullptr)
             {
                 num_threads_ = from_string<std::size_t>(var);
             }
-            else if ((var = std::getenv("PJM_TOTAL_CORE")) != nullptr)
+            else if ((var = hpx::util::getenv("PJM_TOTAL_CORE")) != nullptr)
             {
                 num_threads_ = from_string<std::size_t>(var) / num_localities_;
             }
-            else if ((var = std::getenv("FLIB_AFFINITY_ON_PROCESS")) != nullptr)
+            else if ((var = hpx::util::getenv("FLIB_AFFINITY_ON_PROCESS")) !=
+                nullptr)
             {
                 boost::char_separator<char> sep(",");
                 boost::tokenizer<boost::char_separator<char>> tok(

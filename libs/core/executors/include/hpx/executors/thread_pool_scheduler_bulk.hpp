@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/concurrency/detail/contiguous_index_queue.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -28,6 +27,7 @@
 #include <hpx/iterator_support/counting_iterator.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/type_support/pack.hpp>

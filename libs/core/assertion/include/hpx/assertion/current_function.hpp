@@ -16,7 +16,7 @@
 
 namespace hpx { namespace assertion { namespace detail {
 
-    constexpr inline void current_function_helper()
+    constexpr inline void current_function_helper() noexcept
     {
 #if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) ||    \
     (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__) ||                  \

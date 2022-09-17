@@ -9,8 +9,7 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
+#include <hpx/modules/string_util.hpp>
 
 #include <chrono>
 #include <cstdint>

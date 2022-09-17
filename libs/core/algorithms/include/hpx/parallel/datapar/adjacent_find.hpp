@@ -9,12 +9,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR)
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/execution/traits/vector_pack_all_any_none.hpp>
 #include <hpx/execution/traits/vector_pack_find.hpp>
 #include <hpx/executors/datapar/execution_policy.hpp>
 #include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_find.hpp>
 #include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>

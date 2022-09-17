@@ -11,6 +11,7 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/mpi_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/util.hpp>
 
 #include <boost/tokenizer.hpp>
@@ -40,7 +41,7 @@ namespace hpx { namespace util {
                 mpi_environment_strings, sep);
             for (auto const& tok : tokens)
             {
-                char* env = std::getenv(tok.c_str());
+                char* env = hpx::util::getenv(tok.c_str());
                 if (env)
                 {
                     LBT_(debug)

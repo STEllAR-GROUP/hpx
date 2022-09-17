@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors/exception_list.hpp>
 #include <hpx/execution_base/execution.hpp>
@@ -19,6 +18,7 @@
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/futures/detail/future_data.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/synchronization/latch.hpp>

@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/batch_environments/slurm_environment.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <array>
@@ -137,7 +138,7 @@ static auto threadspercore_exclusive_test() -> void
 int main()
 {
     // disabled for run in slurm environment
-    if (std::getenv("SLURM_PROCID"))
+    if (hpx::util::getenv("SLURM_PROCID"))
     {
         return 0;
     }

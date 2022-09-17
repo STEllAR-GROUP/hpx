@@ -106,9 +106,9 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_local/dataflow.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/type_support/decay.hpp>
 
@@ -563,11 +563,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
 
-    inline constexpr struct partial_sort_t final
-      : hpx::detail::tag_parallel_algorithm<partial_sort_t>
-    {
-    private:
-        // clang-format off
+inline constexpr struct partial_sort_t final
+  : hpx::detail::tag_parallel_algorithm<partial_sort_t>
+{
+private:
+// clang-format off
         template <typename RandIter,
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
@@ -577,20 +577,19 @@ namespace hpx {
                     typename std::iterator_traits<RandIter>::value_type
                 >
             )>
-        // clang-format on
-        friend RandIter tag_fallback_invoke(hpx::partial_sort_t, RandIter first,
-            RandIter middle, RandIter last, Comp&& comp = Comp())
-        {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RandIter>::value,
-                "Requires at least random access iterator.");
+// clang-format on
+friend RandIter tag_fallback_invoke(hpx::partial_sort_t, RandIter first,
+    RandIter middle, RandIter last, Comp&& comp = Comp())
+{
+    static_assert(hpx::traits::is_random_access_iterator<RandIter>::value,
+        "Requires at least random access iterator.");
 
-            return parallel::v1::partial_sort<RandIter>().call(
-                hpx::execution::seq, first, middle, last,
-                HPX_FORWARD(Comp, comp), parallel::util::projection_identity());
-        }
+    return parallel::v1::partial_sort<RandIter>().call(hpx::execution::seq,
+        first, middle, last, HPX_FORWARD(Comp, comp),
+        parallel::util::projection_identity());
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename RandIter,
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
@@ -601,27 +600,23 @@ namespace hpx {
                     typename std::iterator_traits<RandIter>::value_type
                 >
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            RandIter>::type
-        tag_fallback_invoke(hpx::partial_sort_t, ExPolicy&& policy,
-            RandIter first, RandIter middle, RandIter last,
-            Comp&& comp = Comp())
-        {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RandIter>::value,
-                "Requires at least random access iterator.");
+// clang-format on
+friend
+    typename parallel::util::detail::algorithm_result<ExPolicy, RandIter>::type
+    tag_fallback_invoke(hpx::partial_sort_t, ExPolicy&& policy, RandIter first,
+        RandIter middle, RandIter last, Comp&& comp = Comp())
+{
+    static_assert(hpx::traits::is_random_access_iterator<RandIter>::value,
+        "Requires at least random access iterator.");
 
-            using algorithm_result =
-                parallel::util::detail::algorithm_result<ExPolicy, RandIter>;
+    using algorithm_result =
+        parallel::util::detail::algorithm_result<ExPolicy, RandIter>;
 
-            return algorithm_result::get(
-                parallel::v1::partial_sort<RandIter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, middle, last,
-                    HPX_FORWARD(Comp, comp),
-                    parallel::util::projection_identity()));
-        }
-    } partial_sort{};
+    return algorithm_result::get(parallel::v1::partial_sort<RandIter>().call(
+        HPX_FORWARD(ExPolicy, policy), first, middle, last,
+        HPX_FORWARD(Comp, comp), parallel::util::projection_identity()));
+}
+} partial_sort{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

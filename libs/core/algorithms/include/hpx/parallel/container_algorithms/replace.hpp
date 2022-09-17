@@ -1088,9 +1088,9 @@ namespace hpx { namespace ranges {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/algorithms/traits/projected_range.hpp>
@@ -1211,23 +1211,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx { namespace ranges {
 
-    /// `replace_copy_if_result` is equivalent to
-    /// `hpx::parallel::util::in_out_result`
-    template <typename I, typename O>
-    using replace_copy_if_result = hpx::parallel::util::in_out_result<I, O>;
+/// `replace_copy_if_result` is equivalent to
+/// `hpx::parallel::util::in_out_result`
+template <typename I, typename O>
+using replace_copy_if_result = hpx::parallel::util::in_out_result<I, O>;
 
-    /// `replace_copy_result` is equivalent to
-    /// `hpx::parallel::util::in_out_result`
-    template <typename I, typename O>
-    using replace_copy_result = hpx::parallel::util::in_out_result<I, O>;
+/// `replace_copy_result` is equivalent to
+/// `hpx::parallel::util::in_out_result`
+template <typename I, typename O>
+using replace_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::replace_if
-    inline constexpr struct replace_if_t final
-      : hpx::detail::tag_parallel_algorithm<replace_if_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::ranges::replace_if
+inline constexpr struct replace_if_t final
+  : hpx::detail::tag_parallel_algorithm<replace_if_t>
+{
+private:
+    // clang-format off
         template <typename Iter, typename Sent, typename Pred,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T = typename hpx::parallel::traits::projected<Iter,
@@ -1240,19 +1240,19 @@ namespace hpx { namespace ranges {
                     typename std::iterator_traits<Iter>::value_type
                 >
             )>
-        // clang-format on
-        friend Iter tag_fallback_invoke(hpx::ranges::replace_if_t, Iter first,
-            Sent sent, Pred&& pred, T const& new_value, Proj&& proj = Proj())
-        {
-            static_assert((hpx::traits::is_input_iterator<Iter>::value),
-                "Required at least input iterator.");
+    // clang-format on
+    friend Iter tag_fallback_invoke(hpx::ranges::replace_if_t, Iter first,
+        Sent sent, Pred&& pred, T const& new_value, Proj&& proj = Proj())
+    {
+        static_assert((hpx::traits::is_input_iterator<Iter>::value),
+            "Required at least input iterator.");
 
-            return hpx::parallel::v1::detail::replace_if<Iter>().call(
-                hpx::execution::seq, first, sent, HPX_FORWARD(Pred, pred),
-                new_value, HPX_FORWARD(Proj, proj));
-        }
+        return hpx::parallel::v1::detail::replace_if<Iter>().call(
+            hpx::execution::seq, first, sent, HPX_FORWARD(Pred, pred),
+            new_value, HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename Rng, typename Pred,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T = typename hpx::parallel::traits::projected<
@@ -1266,24 +1266,24 @@ namespace hpx { namespace ranges {
                     >::value_type
                 >
             )>
-        // clang-format on
-        friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_invoke(hpx::ranges::replace_if_t, Rng&& rng, Pred&& pred,
-            T const& new_value, Proj&& proj = Proj())
-        {
-            static_assert(
-                (hpx::traits::is_input_iterator<
-                    typename hpx::traits::range_iterator<Rng>::type>::value),
-                "Required at least input iterator.");
+    // clang-format on
+    friend typename hpx::traits::range_iterator<Rng>::type tag_fallback_invoke(
+        hpx::ranges::replace_if_t, Rng&& rng, Pred&& pred, T const& new_value,
+        Proj&& proj = Proj())
+    {
+        static_assert(
+            (hpx::traits::is_input_iterator<
+                typename hpx::traits::range_iterator<Rng>::type>::value),
+            "Required at least input iterator.");
 
-            return hpx::parallel::v1::detail::replace_if<
-                typename hpx::traits::range_iterator<Rng>::type>()
-                .call(hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), HPX_FORWARD(Pred, pred), new_value,
-                    HPX_FORWARD(Proj, proj));
-        }
+        return hpx::parallel::v1::detail::replace_if<
+            typename hpx::traits::range_iterator<Rng>::type>()
+            .call(hpx::execution::seq, hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(Pred, pred), new_value,
+                HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent, typename Pred,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T = typename hpx::parallel::traits::projected<Iter,
@@ -1296,22 +1296,22 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_indirect_callable<ExPolicy,
                     Pred, hpx::parallel::traits::projected<Proj, Iter>>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type
+    // clang-format on
+    friend
+        typename parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
         tag_fallback_invoke(hpx::ranges::replace_if_t, ExPolicy&& policy,
             Iter first, Sent sent, Pred&& pred, T const& new_value,
             Proj&& proj = Proj())
-        {
-            static_assert((hpx::traits::is_forward_iterator<Iter>::value),
-                "Required at least forward iterator.");
+    {
+        static_assert((hpx::traits::is_forward_iterator<Iter>::value),
+            "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::replace_if<Iter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, sent,
-                HPX_FORWARD(Pred, pred), new_value, HPX_FORWARD(Proj, proj));
-        }
+        return hpx::parallel::v1::detail::replace_if<Iter>().call(
+            HPX_FORWARD(ExPolicy, policy), first, sent, HPX_FORWARD(Pred, pred),
+            new_value, HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename ExPolicy, typename Rng, typename Pred,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T = typename hpx::parallel::traits::projected<
@@ -1323,32 +1323,32 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_indirect_callable<ExPolicy,
                     Pred, hpx::parallel::traits::projected_range<Proj, Rng>>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_invoke(hpx::ranges::replace_if_t, ExPolicy&& policy,
-            Rng&& rng, Pred&& pred, T const& new_value, Proj&& proj = Proj())
-        {
-            static_assert(
-                (hpx::traits::is_forward_iterator<
-                    typename hpx::traits::range_iterator<Rng>::type>::value),
-                "Required at least forward iterator.");
-
-            return hpx::parallel::v1::detail::replace_if<
-                typename hpx::traits::range_iterator<Rng>::type>()
-                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), HPX_FORWARD(Pred, pred), new_value,
-                    HPX_FORWARD(Proj, proj));
-        }
-    } replace_if{};
-
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::replace
-    inline constexpr struct replace_t final
-      : hpx::detail::tag_parallel_algorithm<replace_t>
+    // clang-format on
+    friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_iterator<Rng>::type>::type
+    tag_fallback_invoke(hpx::ranges::replace_if_t, ExPolicy&& policy, Rng&& rng,
+        Pred&& pred, T const& new_value, Proj&& proj = Proj())
     {
-    private:
-        // clang-format off
+        static_assert(
+            (hpx::traits::is_forward_iterator<
+                typename hpx::traits::range_iterator<Rng>::type>::value),
+            "Required at least forward iterator.");
+
+        return hpx::parallel::v1::detail::replace_if<
+            typename hpx::traits::range_iterator<Rng>::type>()
+            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), HPX_FORWARD(Pred, pred), new_value,
+                HPX_FORWARD(Proj, proj));
+    }
+} replace_if{};
+
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::ranges::replace
+inline constexpr struct replace_t final
+  : hpx::detail::tag_parallel_algorithm<replace_t>
+{
+private:
+    // clang-format off
         template <typename Iter, typename Sent,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T1 = typename hpx::parallel::traits::projected<Iter,
@@ -1359,23 +1359,23 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
-        // clang-format on
-        friend Iter tag_fallback_invoke(hpx::ranges::replace_t, Iter first,
-            Sent sent, T1 const& old_value, T2 const& new_value,
-            Proj&& proj = Proj())
-        {
-            static_assert((hpx::traits::is_input_iterator<Iter>::value),
-                "Required at least input iterator.");
+    // clang-format on
+    friend Iter tag_fallback_invoke(hpx::ranges::replace_t, Iter first,
+        Sent sent, T1 const& old_value, T2 const& new_value,
+        Proj&& proj = Proj())
+    {
+        static_assert((hpx::traits::is_input_iterator<Iter>::value),
+            "Required at least input iterator.");
 
-            typedef typename std::iterator_traits<Iter>::value_type Type;
+        typedef typename std::iterator_traits<Iter>::value_type Type;
 
-            return hpx::ranges::replace_if(
-                first, sent,
-                [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, HPX_FORWARD(Proj, proj));
-        }
+        return hpx::ranges::replace_if(
+            first, sent,
+            [old_value](Type const& a) -> bool { return old_value == a; },
+            new_value, HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename Rng,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T1 = typename hpx::parallel::traits::projected<
@@ -1385,27 +1385,26 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value
             )>
-        // clang-format on
-        friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_invoke(hpx::ranges::replace_t, Rng&& rng,
-            T1 const& old_value, T2 const& new_value, Proj&& proj = Proj())
-        {
-            static_assert(
-                (hpx::traits::is_input_iterator<
-                    typename hpx::traits::range_iterator<Rng>::type>::value),
-                "Required at least input iterator.");
+    // clang-format on
+    friend typename hpx::traits::range_iterator<Rng>::type tag_fallback_invoke(
+        hpx::ranges::replace_t, Rng&& rng, T1 const& old_value,
+        T2 const& new_value, Proj&& proj = Proj())
+    {
+        static_assert(
+            (hpx::traits::is_input_iterator<
+                typename hpx::traits::range_iterator<Rng>::type>::value),
+            "Required at least input iterator.");
 
-            typedef typename std::iterator_traits<
-                typename hpx::traits::range_iterator<Rng>::type>::value_type
-                Type;
+        typedef typename std::iterator_traits<
+            typename hpx::traits::range_iterator<Rng>::type>::value_type Type;
 
-            return hpx::ranges::replace_if(
-                HPX_FORWARD(Rng, rng),
-                [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, HPX_FORWARD(Proj, proj));
-        }
+        return hpx::ranges::replace_if(
+            HPX_FORWARD(Rng, rng),
+            [old_value](Type const& a) -> bool { return old_value == a; },
+            new_value, HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T1 = typename hpx::parallel::traits::projected<Iter,
@@ -1417,25 +1416,25 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type
+    // clang-format on
+    friend
+        typename parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
         tag_fallback_invoke(hpx::ranges::replace_t, ExPolicy&& policy,
             Iter first, Sent sent, T1 const& old_value, T2 const& new_value,
             Proj&& proj = Proj())
-        {
-            static_assert((hpx::traits::is_forward_iterator<Iter>::value),
-                "Required at least forward iterator.");
+    {
+        static_assert((hpx::traits::is_forward_iterator<Iter>::value),
+            "Required at least forward iterator.");
 
-            typedef typename std::iterator_traits<Iter>::value_type Type;
+        typedef typename std::iterator_traits<Iter>::value_type Type;
 
-            return hpx::ranges::replace_if(
-                HPX_FORWARD(ExPolicy, policy), first, sent,
-                [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, HPX_FORWARD(Proj, proj));
-        }
+        return hpx::ranges::replace_if(
+            HPX_FORWARD(ExPolicy, policy), first, sent,
+            [old_value](Type const& a) -> bool { return old_value == a; },
+            new_value, HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename ExPolicy, typename Rng,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T1 = typename hpx::parallel::traits::projected<
@@ -1446,36 +1445,34 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_iterator<Rng>::type>::type
-        tag_fallback_invoke(hpx::ranges::replace_t, ExPolicy&& policy,
-            Rng&& rng, T1 const& old_value, T2 const& new_value,
-            Proj&& proj = Proj())
-        {
-            static_assert(
-                (hpx::traits::is_forward_iterator<
-                    typename hpx::traits::range_iterator<Rng>::type>::value),
-                "Required at least forward iterator.");
-
-            typedef typename std::iterator_traits<
-                typename hpx::traits::range_iterator<Rng>::type>::value_type
-                Type;
-
-            return hpx::ranges::replace_if(
-                HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Rng, rng),
-                [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, HPX_FORWARD(Proj, proj));
-        }
-    } replace{};
-
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::replace_copy_if
-    inline constexpr struct replace_copy_if_t final
-      : hpx::detail::tag_parallel_algorithm<replace_copy_if_t>
+    // clang-format on
+    friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_iterator<Rng>::type>::type
+    tag_fallback_invoke(hpx::ranges::replace_t, ExPolicy&& policy, Rng&& rng,
+        T1 const& old_value, T2 const& new_value, Proj&& proj = Proj())
     {
-    private:
-        // clang-format off
+        static_assert(
+            (hpx::traits::is_forward_iterator<
+                typename hpx::traits::range_iterator<Rng>::type>::value),
+            "Required at least forward iterator.");
+
+        typedef typename std::iterator_traits<
+            typename hpx::traits::range_iterator<Rng>::type>::value_type Type;
+
+        return hpx::ranges::replace_if(
+            HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Rng, rng),
+            [old_value](Type const& a) -> bool { return old_value == a; },
+            new_value, HPX_FORWARD(Proj, proj));
+    }
+} replace{};
+
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::ranges::replace_copy_if
+inline constexpr struct replace_copy_if_t final
+  : hpx::detail::tag_parallel_algorithm<replace_copy_if_t>
+{
+private:
+    // clang-format off
         template <typename InIter, typename Sent, typename OutIter,
             typename Pred,
             typename T = typename std::iterator_traits<OutIter>::value_type,
@@ -1489,25 +1486,24 @@ namespace hpx { namespace ranges {
                     typename std::iterator_traits<InIter>::value_type
                 >
             )>
-        // clang-format on
-        friend replace_copy_if_result<InIter, OutIter> tag_fallback_invoke(
-            hpx::ranges::replace_copy_if_t, InIter first, Sent sent,
-            OutIter dest, Pred&& pred, T const& new_value, Proj&& proj = Proj())
-        {
-            static_assert((hpx::traits::is_input_iterator<InIter>::value),
-                "Required at least input iterator.");
+    // clang-format on
+    friend replace_copy_if_result<InIter, OutIter> tag_fallback_invoke(
+        hpx::ranges::replace_copy_if_t, InIter first, Sent sent, OutIter dest,
+        Pred&& pred, T const& new_value, Proj&& proj = Proj())
+    {
+        static_assert((hpx::traits::is_input_iterator<InIter>::value),
+            "Required at least input iterator.");
 
-            static_assert((hpx::traits::is_output_iterator<OutIter>::value),
-                "Required at least output iterator.");
+        static_assert((hpx::traits::is_output_iterator<OutIter>::value),
+            "Required at least output iterator.");
 
-            return hpx::parallel::v1::detail::replace_copy_if<
-                hpx::parallel::util::in_out_result<InIter, OutIter>>()
-                .call(hpx::execution::seq, first, sent, dest,
-                    HPX_FORWARD(Pred, pred), new_value,
-                    HPX_FORWARD(Proj, proj));
-        }
+        return hpx::parallel::v1::detail::replace_copy_if<
+            hpx::parallel::util::in_out_result<InIter, OutIter>>()
+            .call(hpx::execution::seq, first, sent, dest,
+                HPX_FORWARD(Pred, pred), new_value, HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename Rng, typename OutIter, typename Pred,
             typename T = typename std::iterator_traits<OutIter>::value_type,
             typename Proj = hpx::parallel::util::projection_identity,
@@ -1521,29 +1517,29 @@ namespace hpx { namespace ranges {
                     >::value_type
                 >
             )>
-        // clang-format on
-        friend replace_copy_if_result<
-            typename hpx::traits::range_iterator<Rng>::type, OutIter>
-        tag_fallback_invoke(hpx::ranges::replace_copy_if_t, Rng&& rng,
-            OutIter dest, Pred&& pred, T const& new_value, Proj&& proj = Proj())
-        {
-            static_assert(
-                (hpx::traits::is_input_iterator<
-                    typename hpx::traits::range_iterator<Rng>::type>::value),
-                "Required at least input iterator.");
+    // clang-format on
+    friend replace_copy_if_result<
+        typename hpx::traits::range_iterator<Rng>::type, OutIter>
+    tag_fallback_invoke(hpx::ranges::replace_copy_if_t, Rng&& rng, OutIter dest,
+        Pred&& pred, T const& new_value, Proj&& proj = Proj())
+    {
+        static_assert(
+            (hpx::traits::is_input_iterator<
+                typename hpx::traits::range_iterator<Rng>::type>::value),
+            "Required at least input iterator.");
 
-            static_assert((hpx::traits::is_output_iterator<OutIter>::value),
-                "Required at least output iterator.");
+        static_assert((hpx::traits::is_output_iterator<OutIter>::value),
+            "Required at least output iterator.");
 
-            return hpx::parallel::v1::detail::replace_copy_if<
-                hpx::parallel::util::in_out_result<
-                    typename hpx::traits::range_iterator<Rng>::type, OutIter>>()
-                .call(hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
-                    new_value, HPX_FORWARD(Proj, proj));
-        }
+        return hpx::parallel::v1::detail::replace_copy_if<
+            hpx::parallel::util::in_out_result<
+                typename hpx::traits::range_iterator<Rng>::type, OutIter>>()
+            .call(hpx::execution::seq, hpx::util::begin(rng),
+                hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred), new_value,
+                HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent,
             typename FwdIter2, typename Pred,
             typename T = typename std::iterator_traits<FwdIter2>::value_type,
@@ -1557,27 +1553,26 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_indirect_callable<ExPolicy,
                     Pred, hpx::parallel::traits::projected<Proj, FwdIter1>>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            replace_copy_if_result<FwdIter1, FwdIter2>>::type
-        tag_fallback_invoke(hpx::ranges::replace_copy_if_t, ExPolicy&& policy,
-            FwdIter1 first, Sent sent, FwdIter2 dest, Pred&& pred,
-            T const& new_value, Proj&& proj = Proj())
-        {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-                "Required at least forward iterator.");
+    // clang-format on
+    friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        replace_copy_if_result<FwdIter1, FwdIter2>>::type
+    tag_fallback_invoke(hpx::ranges::replace_copy_if_t, ExPolicy&& policy,
+        FwdIter1 first, Sent sent, FwdIter2 dest, Pred&& pred,
+        T const& new_value, Proj&& proj = Proj())
+    {
+        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            "Required at least forward iterator.");
 
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-                "Required at least forward iterator.");
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::replace_copy_if<
-                hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, sent, dest,
-                    HPX_FORWARD(Pred, pred), new_value,
-                    HPX_FORWARD(Proj, proj));
-        }
+        return hpx::parallel::v1::detail::replace_copy_if<
+            hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
+            .call(HPX_FORWARD(ExPolicy, policy), first, sent, dest,
+                HPX_FORWARD(Pred, pred), new_value, HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename ExPolicy, typename Rng, typename FwdIter, typename Pred,
             typename T = typename std::iterator_traits<FwdIter>::value_type,
             typename Proj = hpx::parallel::util::projection_identity,
@@ -1589,38 +1584,38 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_indirect_callable<ExPolicy,
                     Pred, hpx::parallel::traits::projected_range<Proj, Rng>>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            replace_copy_if_result<
-                typename hpx::traits::range_iterator<Rng>::type, FwdIter>>::type
-        tag_fallback_invoke(hpx::ranges::replace_copy_if_t, ExPolicy&& policy,
-            Rng&& rng, FwdIter dest, Pred&& pred, T const& new_value,
-            Proj&& proj = Proj())
-        {
-            static_assert(
-                (hpx::traits::is_forward_iterator<
-                    typename hpx::traits::range_iterator<Rng>::type>::value),
-                "Required at least forward iterator.");
-
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Required at least forward iterator.");
-
-            return hpx::parallel::v1::detail::replace_copy_if<
-                hpx::parallel::util::in_out_result<
-                    typename hpx::traits::range_iterator<Rng>::type, FwdIter>>()
-                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
-                    new_value, HPX_FORWARD(Proj, proj));
-        }
-    } replace_copy_if{};
-
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::replace_copy
-    inline constexpr struct replace_copy_t final
-      : hpx::detail::tag_parallel_algorithm<replace_copy_t>
+    // clang-format on
+    friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        replace_copy_if_result<typename hpx::traits::range_iterator<Rng>::type,
+            FwdIter>>::type
+    tag_fallback_invoke(hpx::ranges::replace_copy_if_t, ExPolicy&& policy,
+        Rng&& rng, FwdIter dest, Pred&& pred, T const& new_value,
+        Proj&& proj = Proj())
     {
-    private:
-        // clang-format off
+        static_assert(
+            (hpx::traits::is_forward_iterator<
+                typename hpx::traits::range_iterator<Rng>::type>::value),
+            "Required at least forward iterator.");
+
+        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Required at least forward iterator.");
+
+        return hpx::parallel::v1::detail::replace_copy_if<
+            hpx::parallel::util::in_out_result<
+                typename hpx::traits::range_iterator<Rng>::type, FwdIter>>()
+            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred), new_value,
+                HPX_FORWARD(Proj, proj));
+    }
+} replace_copy_if{};
+
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::ranges::replace_copy
+inline constexpr struct replace_copy_t final
+  : hpx::detail::tag_parallel_algorithm<replace_copy_t>
+{
+private:
+    // clang-format off
         template <typename InIter, typename Sent,
             typename OutIter,
             typename Proj = hpx::parallel::util::projection_identity,
@@ -1631,26 +1626,26 @@ namespace hpx { namespace ranges {
                 hpx::parallel::traits::is_projected<Proj, InIter>::value &&
                 hpx::traits::is_sentinel_for<Sent, InIter>::value
             )>
-        // clang-format on
-        friend replace_copy_result<InIter, OutIter> tag_fallback_invoke(
-            hpx::ranges::replace_copy_t, InIter first, Sent sent, OutIter dest,
-            T1 const& old_value, T2 const& new_value, Proj&& proj = Proj())
-        {
-            static_assert((hpx::traits::is_input_iterator<InIter>::value),
-                "Required at least input iterator.");
+    // clang-format on
+    friend replace_copy_result<InIter, OutIter> tag_fallback_invoke(
+        hpx::ranges::replace_copy_t, InIter first, Sent sent, OutIter dest,
+        T1 const& old_value, T2 const& new_value, Proj&& proj = Proj())
+    {
+        static_assert((hpx::traits::is_input_iterator<InIter>::value),
+            "Required at least input iterator.");
 
-            static_assert((hpx::traits::is_output_iterator<OutIter>::value),
-                "Required at least output iterator.");
+        static_assert((hpx::traits::is_output_iterator<OutIter>::value),
+            "Required at least output iterator.");
 
-            typedef typename std::iterator_traits<InIter>::value_type Type;
+        typedef typename std::iterator_traits<InIter>::value_type Type;
 
-            return hpx::ranges::replace_copy_if(
-                hpx::execution::seq, first, sent, dest,
-                [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, HPX_FORWARD(Proj, proj));
-        }
+        return hpx::ranges::replace_copy_if(
+            hpx::execution::seq, first, sent, dest,
+            [old_value](Type const& a) -> bool { return old_value == a; },
+            new_value, HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename Rng, typename OutIter,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T1 = typename hpx::parallel::traits::projected<
@@ -1660,33 +1655,30 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value
             )>
-        // clang-format on
-        friend replace_copy_result<
-            typename hpx::traits::range_iterator<Rng>::type, OutIter>
-        tag_fallback_invoke(hpx::ranges::replace_copy_t, Rng&& rng,
-            OutIter dest, T1 const& old_value, T2 const& new_value,
-            Proj&& proj = Proj())
-        {
-            static_assert(
-                (hpx::traits::is_input_iterator<
-                    typename hpx::traits::range_iterator<Rng>::type>::value),
-                "Required at least input iterator.");
+    // clang-format on
+    friend replace_copy_result<typename hpx::traits::range_iterator<Rng>::type,
+        OutIter>
+    tag_fallback_invoke(hpx::ranges::replace_copy_t, Rng&& rng, OutIter dest,
+        T1 const& old_value, T2 const& new_value, Proj&& proj = Proj())
+    {
+        static_assert(
+            (hpx::traits::is_input_iterator<
+                typename hpx::traits::range_iterator<Rng>::type>::value),
+            "Required at least input iterator.");
 
-            static_assert((hpx::traits::is_output_iterator<OutIter>::value),
-                "Required at least output iterator.");
+        static_assert((hpx::traits::is_output_iterator<OutIter>::value),
+            "Required at least output iterator.");
 
-            typedef typename std::iterator_traits<
-                typename hpx::traits::range_iterator<Rng>::type>::value_type
-                Type;
+        typedef typename std::iterator_traits<
+            typename hpx::traits::range_iterator<Rng>::type>::value_type Type;
 
-            return hpx::ranges::replace_copy_if(
-                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                dest,
-                [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, HPX_FORWARD(Proj, proj));
-        }
+        return hpx::ranges::replace_copy_if(
+            hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
+            dest, [old_value](Type const& a) -> bool { return old_value == a; },
+            new_value, HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename ExPolicy, typename FwdIter1,
             typename Sent, typename FwdIter2,
             typename Proj = hpx::parallel::util::projection_identity,
@@ -1699,28 +1691,28 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_sentinel_for<Sent, FwdIter1>::value &&
                 hpx::parallel::traits::is_projected<Proj, FwdIter1>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            replace_copy_result<FwdIter1, FwdIter2>>::type
-        tag_fallback_invoke(hpx::ranges::replace_copy_t, ExPolicy&& policy,
-            FwdIter1 first, Sent sent, FwdIter2 dest, T1 const& old_value,
-            T2 const& new_value, Proj&& proj = Proj())
-        {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-                "Required at least forward iterator.");
+    // clang-format on
+    friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        replace_copy_result<FwdIter1, FwdIter2>>::type
+    tag_fallback_invoke(hpx::ranges::replace_copy_t, ExPolicy&& policy,
+        FwdIter1 first, Sent sent, FwdIter2 dest, T1 const& old_value,
+        T2 const& new_value, Proj&& proj = Proj())
+    {
+        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            "Required at least forward iterator.");
 
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-                "Required at least forward iterator.");
+        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            "Required at least forward iterator.");
 
-            typedef typename std::iterator_traits<FwdIter1>::value_type Type;
+        typedef typename std::iterator_traits<FwdIter1>::value_type Type;
 
-            return hpx::ranges::replace_copy_if(
-                HPX_FORWARD(ExPolicy, policy), first, sent, dest,
-                [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, HPX_FORWARD(Proj, proj));
-        }
+        return hpx::ranges::replace_copy_if(
+            HPX_FORWARD(ExPolicy, policy), first, sent, dest,
+            [old_value](Type const& a) -> bool { return old_value == a; },
+            new_value, HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename ExPolicy, typename Rng, typename FwdIter,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T1 = typename hpx::parallel::traits::projected<
@@ -1731,33 +1723,32 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            replace_copy_result<typename hpx::traits::range_iterator<Rng>::type,
-                FwdIter>>::type
-        tag_fallback_invoke(hpx::ranges::replace_copy_t, ExPolicy&& policy,
-            Rng&& rng, FwdIter dest, T1 const& old_value, T2 const& new_value,
-            Proj&& proj = Proj())
-        {
-            static_assert(
-                (hpx::traits::is_forward_iterator<
-                    typename hpx::traits::range_iterator<Rng>::type>::value),
-                "Required at least forward iterator.");
+    // clang-format on
+    friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        replace_copy_result<typename hpx::traits::range_iterator<Rng>::type,
+            FwdIter>>::type
+    tag_fallback_invoke(hpx::ranges::replace_copy_t, ExPolicy&& policy,
+        Rng&& rng, FwdIter dest, T1 const& old_value, T2 const& new_value,
+        Proj&& proj = Proj())
+    {
+        static_assert(
+            (hpx::traits::is_forward_iterator<
+                typename hpx::traits::range_iterator<Rng>::type>::value),
+            "Required at least forward iterator.");
 
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Required at least forward iterator.");
+        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+            "Required at least forward iterator.");
 
-            typedef typename std::iterator_traits<
-                typename hpx::traits::range_iterator<Rng>::type>::value_type
-                Type;
+        typedef typename std::iterator_traits<
+            typename hpx::traits::range_iterator<Rng>::type>::value_type Type;
 
-            return hpx::ranges::replace_copy_if(
-                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), dest,
-                [old_value](Type const& a) -> bool { return old_value == a; },
-                new_value, HPX_FORWARD(Proj, proj));
-        }
-    } replace_copy{};
+        return hpx::ranges::replace_copy_if(
+            HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+            hpx::util::end(rng), dest,
+            [old_value](Type const& a) -> bool { return old_value == a; },
+            new_value, HPX_FORWARD(Proj, proj));
+    }
+} replace_copy{};
 }}    // namespace hpx::ranges
 
 #endif    // DOXYGEN

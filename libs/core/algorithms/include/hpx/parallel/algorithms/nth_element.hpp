@@ -132,9 +132,9 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
@@ -344,12 +344,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 }}}      // namespace hpx::parallel::v1
 
 namespace hpx {
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::nth_element
-    inline constexpr struct nth_element_t final
-      : hpx::detail::tag_parallel_algorithm<nth_element_t>
-    {
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// CPO for hpx::nth_element
+inline constexpr struct nth_element_t final
+  : hpx::detail::tag_parallel_algorithm<nth_element_t>
+{
+// clang-format off
         template <typename RandomIt,
             typename Pred = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
@@ -359,19 +359,19 @@ namespace hpx {
                     typename std::iterator_traits<RandomIt>::value_type
                 >
             )>
-        // clang-format on
-        friend void tag_fallback_invoke(hpx::nth_element_t, RandomIt first,
-            RandomIt nth, RandomIt last, Pred&& pred = Pred())
-        {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
-                "Requires at least random iterator.");
+// clang-format on
+friend void tag_fallback_invoke(hpx::nth_element_t, RandomIt first,
+    RandomIt nth, RandomIt last, Pred&& pred = Pred())
+{
+    static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+        "Requires at least random iterator.");
 
-            hpx::parallel::v1::detail::nth_element<RandomIt>().call(
-                hpx::execution::seq, first, nth, last, HPX_FORWARD(Pred, pred),
-                hpx::parallel::util::projection_identity{});
-        }
+    hpx::parallel::v1::detail::nth_element<RandomIt>().call(hpx::execution::seq,
+        first, nth, last, HPX_FORWARD(Pred, pred),
+        hpx::parallel::util::projection_identity{});
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename RandomIt,
             typename Pred = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
@@ -382,24 +382,24 @@ namespace hpx {
                     typename std::iterator_traits<RandomIt>::value_type
                 >
             )>
-        // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy>
-        tag_fallback_invoke(hpx::nth_element_t, ExPolicy&& policy,
-            RandomIt first, RandomIt nth, RandomIt last, Pred&& pred = Pred())
-        {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
-                "Requires at least random iterator.");
+// clang-format on
+friend parallel::util::detail::algorithm_result_t<ExPolicy> tag_fallback_invoke(
+    hpx::nth_element_t, ExPolicy&& policy, RandomIt first, RandomIt nth,
+    RandomIt last, Pred&& pred = Pred())
+{
+    static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+        "Requires at least random iterator.");
 
-            using result_type =
-                hpx::parallel::util::detail::algorithm_result_t<ExPolicy>;
+    using result_type =
+        hpx::parallel::util::detail::algorithm_result_t<ExPolicy>;
 
-            return hpx::util::void_guard<result_type>(),
-                   hpx::parallel::v1::detail::nth_element<RandomIt>().call(
-                       HPX_FORWARD(ExPolicy, policy), first, nth, last,
-                       HPX_FORWARD(Pred, pred),
-                       hpx::parallel::util::projection_identity{});
-        }
-    } nth_element{};
+    return hpx::util::void_guard<result_type>(),
+           hpx::parallel::v1::detail::nth_element<RandomIt>().call(
+               HPX_FORWARD(ExPolicy, policy), first, nth, last,
+               HPX_FORWARD(Pred, pred),
+               hpx::parallel::util::projection_identity{});
+}
+} nth_element{};
 }    // namespace hpx
 
 #endif

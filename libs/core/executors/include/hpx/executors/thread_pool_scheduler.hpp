@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
@@ -20,6 +19,7 @@
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 

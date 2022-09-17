@@ -14,6 +14,7 @@ hpx_include(
   AddCompileTest
   AddLinkFlag
   AddComponent
+  AddDefinitions
   AddLibrary
   AddExecutable
   AddTest

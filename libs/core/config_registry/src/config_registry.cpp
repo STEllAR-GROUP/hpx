@@ -5,9 +5,13 @@
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/modules/config_registry.hpp>
+#if !defined(HPX_HAVE_CXX20_MODULES)
+#include <hpx/config_registry/config_registry.hpp>
 
 #include <vector>
+#else
+module hpx.core.config_registry;
+#endif
 
 namespace hpx { namespace config_registry {
     namespace detail {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,6 +8,7 @@
 #include <hpx/batch_environments/pbs_environment.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <cstddef>
@@ -25,7 +26,7 @@ namespace hpx { namespace util { namespace batch_environments {
       , num_threads_(std::size_t(-1))
       , valid_(false)
     {
-        char* node_num = std::getenv("PBS_NODENUM");
+        char* node_num = hpx::util::getenv("PBS_NODENUM");
         valid_ = node_num != nullptr;
         if (valid_)
         {
@@ -45,7 +46,7 @@ namespace hpx { namespace util { namespace batch_environments {
                 read_nodelist(nodelist, debug);
             }
 
-            char* thread_num = std::getenv("PBS_NUM_PPN");
+            char* thread_num = hpx::util::getenv("PBS_NUM_PPN");
             if (thread_num != nullptr)
             {
                 // Initialize number of cores to run on
@@ -58,7 +59,7 @@ namespace hpx { namespace util { namespace batch_environments {
     void pbs_environment::read_nodefile(
         std::vector<std::string>& nodelist, bool have_mpi, bool debug)
     {
-        char* node_file = std::getenv("PBS_NODEFILE");
+        char* node_file = hpx::util::getenv("PBS_NODEFILE");
         if (!node_file)
         {
             valid_ = false;

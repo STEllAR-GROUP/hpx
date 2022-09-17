@@ -15,7 +15,7 @@
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>

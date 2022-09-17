@@ -15,11 +15,8 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/component_type_database.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/naming_base/address.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/preprocessor/strip_parens.hpp>
 
 #include <boost/utility/string_ref.hpp>
 
@@ -128,8 +125,8 @@ namespace hpx { namespace traits {
 
     template <>
     HPX_ALWAYS_EXPORT inline void
-        component_type_database<hpx::actions::detail::plain_function>::set(
-            components::component_type)
+    component_type_database<hpx::actions::detail::plain_function>::set(
+        components::component_type)
     {
         HPX_ASSERT(false);    // shouldn't be ever called
     }

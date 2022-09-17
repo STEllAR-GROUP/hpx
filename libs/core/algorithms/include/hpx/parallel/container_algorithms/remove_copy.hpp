@@ -580,10 +580,10 @@ namespace hpx { namespace ranges {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/modules/concepts.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
@@ -659,18 +659,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx { namespace ranges {
 
-    template <typename I, typename O>
-    using remove_copy_result = hpx::parallel::util::in_out_result<I, O>;
+template <typename I, typename O>
+using remove_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
-    template <typename I, typename O>
-    using remove_copy_if_result = hpx::parallel::util::in_out_result<I, O>;
+template <typename I, typename O>
+using remove_copy_if_result = hpx::parallel::util::in_out_result<I, O>;
 
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::remove_copy_if
-    inline constexpr struct remove_copy_if_t final
-      : hpx::detail::tag_parallel_algorithm<remove_copy_if_t>
-    {
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::ranges::remove_copy_if
+inline constexpr struct remove_copy_if_t final
+  : hpx::detail::tag_parallel_algorithm<remove_copy_if_t>
+{
+    // clang-format off
         template <typename I, typename Sent, typename O, typename Pred,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
@@ -682,24 +682,24 @@ namespace hpx { namespace ranges {
                     typename std::iterator_traits<I>::value_type
                 >
             )>
-        // clang-format on
-        friend remove_copy_if_result<I, O> tag_fallback_invoke(
-            hpx::ranges::remove_copy_if_t, I first, Sent last, O dest,
-            Pred&& pred, Proj&& proj = Proj())
-        {
-            static_assert((hpx::traits::is_input_iterator<I>::value),
-                "Required input iterator.");
+    // clang-format on
+    friend remove_copy_if_result<I, O> tag_fallback_invoke(
+        hpx::ranges::remove_copy_if_t, I first, Sent last, O dest, Pred&& pred,
+        Proj&& proj = Proj())
+    {
+        static_assert((hpx::traits::is_input_iterator<I>::value),
+            "Required input iterator.");
 
-            static_assert((hpx::traits::is_output_iterator<O>::value),
-                "Required output iterator.");
+        static_assert((hpx::traits::is_output_iterator<O>::value),
+            "Required output iterator.");
 
-            return hpx::parallel::v1::detail::remove_copy_if<
-                hpx::parallel::util::in_out_result<I, O>>()
-                .call(hpx::execution::seq, first, last, dest,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
-        }
+        return hpx::parallel::v1::detail::remove_copy_if<
+            hpx::parallel::util::in_out_result<I, O>>()
+            .call(hpx::execution::seq, first, last, dest,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename Rng, typename O, typename Pred,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
@@ -711,26 +711,26 @@ namespace hpx { namespace ranges {
                     >::value_type
                 >
             )>
-        // clang-format on
-        friend remove_copy_if_result<
-            typename hpx::traits::range_iterator<Rng>::type, O>
-        tag_fallback_invoke(hpx::ranges::remove_copy_if_t, Rng&& rng, O dest,
-            Pred&& pred, Proj&& proj = Proj())
-        {
-            static_assert(
-                (hpx::traits::is_input_iterator<
-                    typename hpx::traits::range_iterator<Rng>::type>::value),
-                "Required at least input iterator.");
+    // clang-format on
+    friend remove_copy_if_result<
+        typename hpx::traits::range_iterator<Rng>::type, O>
+    tag_fallback_invoke(hpx::ranges::remove_copy_if_t, Rng&& rng, O dest,
+        Pred&& pred, Proj&& proj = Proj())
+    {
+        static_assert(
+            (hpx::traits::is_input_iterator<
+                typename hpx::traits::range_iterator<Rng>::type>::value),
+            "Required at least input iterator.");
 
-            return hpx::parallel::v1::detail::remove_copy_if<
-                hpx::parallel::util::in_out_result<
-                    typename hpx::traits::range_iterator<Rng>::type, O>>()
-                .call(hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
-                    HPX_FORWARD(Proj, proj));
-        }
+        return hpx::parallel::v1::detail::remove_copy_if<
+            hpx::parallel::util::in_out_result<
+                typename hpx::traits::range_iterator<Rng>::type, O>>()
+            .call(hpx::execution::seq, hpx::util::begin(rng),
+                hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename ExPolicy, typename I, typename Sent, typename O,
          typename Pred, typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
@@ -743,25 +743,25 @@ namespace hpx { namespace ranges {
                     typename std::iterator_traits<I>::value_type
                 >
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            remove_copy_if_result<I, O>>::type
-        tag_fallback_invoke(hpx::ranges::remove_copy_if_t, ExPolicy&& policy,
-            I first, Sent last, O dest, Pred&& pred, Proj&& proj = Proj())
-        {
-            static_assert((hpx::traits::is_forward_iterator<I>::value),
-                "Required at least forward iterator.");
+    // clang-format on
+    friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        remove_copy_if_result<I, O>>::type
+    tag_fallback_invoke(hpx::ranges::remove_copy_if_t, ExPolicy&& policy,
+        I first, Sent last, O dest, Pred&& pred, Proj&& proj = Proj())
+    {
+        static_assert((hpx::traits::is_forward_iterator<I>::value),
+            "Required at least forward iterator.");
 
-            static_assert((hpx::traits::is_forward_iterator<O>::value),
-                "Required at least forward iterator.");
+        static_assert((hpx::traits::is_forward_iterator<O>::value),
+            "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::remove_copy_if<
-                hpx::parallel::util::in_out_result<I, O>>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
-        }
+        return hpx::parallel::v1::detail::remove_copy_if<
+            hpx::parallel::util::in_out_result<I, O>>()
+            .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename ExPolicy, typename Rng, typename O, typename Pred,
             typename Proj = hpx::parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
@@ -774,34 +774,34 @@ namespace hpx { namespace ranges {
                     >::value_type
                 >
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            remove_copy_if_result<
-                typename hpx::traits::range_iterator<Rng>::type, O>>::type
-        tag_fallback_invoke(hpx::ranges::remove_copy_if_t, ExPolicy&& policy,
-            Rng&& rng, O dest, Pred&& pred, Proj&& proj = Proj())
-        {
-            static_assert(
-                (hpx::traits::is_forward_iterator<
-                    typename hpx::traits::range_iterator<Rng>::type>::value),
-                "Required at least forward iterator.");
-
-            return hpx::parallel::v1::detail::remove_copy_if<
-                hpx::parallel::util::in_out_result<
-                    typename hpx::traits::range_iterator<Rng>::type, O>>()
-                .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
-                    HPX_FORWARD(Proj, proj));
-        }
-    } remove_copy_if{};
-
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::remove_copy
-    inline constexpr struct remove_copy_t final
-      : hpx::detail::tag_parallel_algorithm<remove_copy_t>
+    // clang-format on
+    friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        remove_copy_if_result<typename hpx::traits::range_iterator<Rng>::type,
+            O>>::type
+    tag_fallback_invoke(hpx::ranges::remove_copy_if_t, ExPolicy&& policy,
+        Rng&& rng, O dest, Pred&& pred, Proj&& proj = Proj())
     {
-    private:
-        // clang-format off
+        static_assert(
+            (hpx::traits::is_forward_iterator<
+                typename hpx::traits::range_iterator<Rng>::type>::value),
+            "Required at least forward iterator.");
+
+        return hpx::parallel::v1::detail::remove_copy_if<
+            hpx::parallel::util::in_out_result<
+                typename hpx::traits::range_iterator<Rng>::type, O>>()
+            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), dest, HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
+    }
+} remove_copy_if{};
+
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::ranges::remove_copy
+inline constexpr struct remove_copy_t final
+  : hpx::detail::tag_parallel_algorithm<remove_copy_t>
+{
+private:
+    // clang-format off
         template <typename I, typename Sent, typename O,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T = typename hpx::parallel::traits::projected<I,
@@ -812,23 +812,23 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<O>::value &&
                 hpx::parallel::traits::is_projected<Proj, I>::value
             )>
-        // clang-format on
-        friend remove_copy_result<I, O> tag_fallback_invoke(
-            hpx::ranges::remove_copy_t, I first, Sent last, O dest,
-            T const& value, Proj&& proj = Proj())
-        {
-            static_assert((hpx::traits::is_input_iterator<I>::value),
-                "Required at least input iterator.");
+    // clang-format on
+    friend remove_copy_result<I, O> tag_fallback_invoke(
+        hpx::ranges::remove_copy_t, I first, Sent last, O dest, T const& value,
+        Proj&& proj = Proj())
+    {
+        static_assert((hpx::traits::is_input_iterator<I>::value),
+            "Required at least input iterator.");
 
-            typedef typename std::iterator_traits<I>::value_type Type;
+        typedef typename std::iterator_traits<I>::value_type Type;
 
-            return hpx::ranges::remove_copy_if(
-                first, last, dest,
-                [value](Type const& a) -> bool { return value == a; },
-                HPX_FORWARD(Proj, proj));
-        }
+        return hpx::ranges::remove_copy_if(
+            first, last, dest,
+            [value](Type const& a) -> bool { return value == a; },
+            HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename Rng, typename O,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T = typename hpx::parallel::traits::projected<
@@ -837,28 +837,27 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value
             )>
-        // clang-format on
-        friend remove_copy_result<
-            typename hpx::traits::range_iterator<Rng>::type, O>
-        tag_fallback_invoke(hpx::ranges::remove_copy_t, Rng&& rng, O dest,
-            T const& value, Proj&& proj = Proj())
-        {
-            static_assert(
-                (hpx::traits::is_input_iterator<
-                    typename hpx::traits::range_iterator<Rng>::type>::value),
-                "Required at input forward iterator.");
+    // clang-format on
+    friend remove_copy_result<typename hpx::traits::range_iterator<Rng>::type,
+        O>
+    tag_fallback_invoke(hpx::ranges::remove_copy_t, Rng&& rng, O dest,
+        T const& value, Proj&& proj = Proj())
+    {
+        static_assert(
+            (hpx::traits::is_input_iterator<
+                typename hpx::traits::range_iterator<Rng>::type>::value),
+            "Required at input forward iterator.");
 
-            typedef typename std::iterator_traits<
-                typename hpx::traits::range_iterator<Rng>::type>::value_type
-                Type;
+        typedef typename std::iterator_traits<
+            typename hpx::traits::range_iterator<Rng>::type>::value_type Type;
 
-            return hpx::ranges::remove_copy_if(
-                HPX_FORWARD(Rng, rng), dest,
-                [value](Type const& a) -> bool { return value == a; },
-                HPX_FORWARD(Proj, proj));
-        }
+        return hpx::ranges::remove_copy_if(
+            HPX_FORWARD(Rng, rng), dest,
+            [value](Type const& a) -> bool { return value == a; },
+            HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename ExPolicy, typename I, typename Sent, typename O,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T = typename hpx::parallel::traits::projected<I,
@@ -870,24 +869,24 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_iterator<O>::value &&
                 hpx::parallel::traits::is_projected<Proj, I>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            remove_copy_result<I, O>>::type
-        tag_fallback_invoke(hpx::ranges::remove_copy_t, ExPolicy&& policy,
-            I first, Sent last, O dest, T const& value, Proj&& proj = Proj())
-        {
-            static_assert((hpx::traits::is_forward_iterator<I>::value),
-                "Required at least forward iterator.");
+    // clang-format on
+    friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        remove_copy_result<I, O>>::type
+    tag_fallback_invoke(hpx::ranges::remove_copy_t, ExPolicy&& policy, I first,
+        Sent last, O dest, T const& value, Proj&& proj = Proj())
+    {
+        static_assert((hpx::traits::is_forward_iterator<I>::value),
+            "Required at least forward iterator.");
 
-            typedef typename std::iterator_traits<I>::value_type Type;
+        typedef typename std::iterator_traits<I>::value_type Type;
 
-            return hpx::ranges::remove_copy_if(
-                HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                [value](Type const& a) -> bool { return value == a; },
-                HPX_FORWARD(Proj, proj));
-        }
+        return hpx::ranges::remove_copy_if(
+            HPX_FORWARD(ExPolicy, policy), first, last, dest,
+            [value](Type const& a) -> bool { return value == a; },
+            HPX_FORWARD(Proj, proj));
+    }
 
-        // clang-format off
+    // clang-format off
         template <typename ExPolicy, typename Rng, typename O,
             typename Proj = hpx::parallel::util::projection_identity,
             typename T = typename hpx::parallel::traits::projected<
@@ -897,29 +896,28 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            remove_copy_result<typename hpx::traits::range_iterator<Rng>::type,
-                O>>::type
-        tag_fallback_invoke(hpx::ranges::remove_copy_t, ExPolicy&& policy,
-            Rng&& rng, O dest, T const& value, Proj&& proj = Proj())
-        {
-            static_assert(
-                (hpx::traits::is_forward_iterator<
-                    typename hpx::traits::range_iterator<Rng>::type>::value),
-                "Required at least forward iterator.");
+    // clang-format on
+    friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        remove_copy_result<typename hpx::traits::range_iterator<Rng>::type,
+            O>>::type
+    tag_fallback_invoke(hpx::ranges::remove_copy_t, ExPolicy&& policy,
+        Rng&& rng, O dest, T const& value, Proj&& proj = Proj())
+    {
+        static_assert(
+            (hpx::traits::is_forward_iterator<
+                typename hpx::traits::range_iterator<Rng>::type>::value),
+            "Required at least forward iterator.");
 
-            typedef typename std::iterator_traits<
-                typename hpx::traits::range_iterator<Rng>::type>::value_type
-                Type;
+        typedef typename std::iterator_traits<
+            typename hpx::traits::range_iterator<Rng>::type>::value_type Type;
 
-            return hpx::ranges::remove_copy_if(
-                HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Rng, rng), dest,
-                [value](Type const& a) -> bool { return value == a; },
-                HPX_FORWARD(Proj, proj));
-        }
+        return hpx::ranges::remove_copy_if(
+            HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Rng, rng), dest,
+            [value](Type const& a) -> bool { return value == a; },
+            HPX_FORWARD(Proj, proj));
+    }
 
-    } remove_copy{};
+} remove_copy{};
 }}    // namespace hpx::ranges
 
 #endif    // DOXYGEN

@@ -6,6 +6,9 @@
 
 #pragma once
 
+//#if !defined(HPX_HAVE_CXX20_MODULES)
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#define _WINSOCKAPI_
 #include <winsock2.h>
 #endif
+//#endif

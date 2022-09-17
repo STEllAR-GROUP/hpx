@@ -183,10 +183,10 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/async_local/dataflow.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 
@@ -436,113 +436,111 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 // create new APIs, tag_fallback_invoke overloads.
 namespace hpx {
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::rotate
-    inline constexpr struct rotate_t final
-      : hpx::detail::tag_parallel_algorithm<rotate_t>
-    {
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::rotate
+inline constexpr struct rotate_t final
+  : hpx::detail::tag_parallel_algorithm<rotate_t>
+{
+// clang-format off
         template <typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<FwdIter>
             )>
-        // clang-format on
-        friend FwdIter tag_fallback_invoke(
-            hpx::rotate_t, FwdIter first, FwdIter new_first, FwdIter last)
-        {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
+// clang-format on
+friend FwdIter tag_fallback_invoke(
+    hpx::rotate_t, FwdIter first, FwdIter new_first, FwdIter last)
+{
+    static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+        "Requires at least forward iterator.");
 
-            return parallel::util::get_second_element(
-                hpx::parallel::v1::detail::rotate<
-                    hpx::parallel::util::in_out_result<FwdIter, FwdIter>>()
-                    .call(hpx::execution::seq, first, new_first, last));
-        }
-        // clang-format off
+    return parallel::util::get_second_element(
+        hpx::parallel::v1::detail::rotate<
+            hpx::parallel::util::in_out_result<FwdIter, FwdIter>>()
+            .call(hpx::execution::seq, first, new_first, last));
+}
+// clang-format off
         template <typename ExPolicy, typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(hpx::rotate_t, ExPolicy&& policy, FwdIter first,
-            FwdIter new_first, FwdIter last)
-        {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
-                "Requires at least forward iterator.");
+// clang-format on
+friend
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    tag_fallback_invoke(hpx::rotate_t, ExPolicy&& policy, FwdIter first,
+        FwdIter new_first, FwdIter last)
+{
+    static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
+        "Requires at least forward iterator.");
 
-            using is_seq = std::integral_constant<bool,
-                hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !hpx::traits::is_bidirectional_iterator_v<FwdIter>>;
+    using is_seq = std::integral_constant<bool,
+        hpx::is_sequenced_execution_policy_v<ExPolicy> ||
+            !hpx::traits::is_bidirectional_iterator_v<FwdIter>>;
 
-            return parallel::util::get_second_element(
-                hpx::parallel::v1::detail::rotate<
-                    hpx::parallel::util::in_out_result<FwdIter, FwdIter>>()
-                    .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first,
-                        new_first, last));
-        }
+    return parallel::util::get_second_element(
+        hpx::parallel::v1::detail::rotate<
+            hpx::parallel::util::in_out_result<FwdIter, FwdIter>>()
+            .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first, new_first,
+                last));
+}
 
-    } rotate{};
+} rotate{};
 
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::rotate_copy
-    inline constexpr struct rotate_copy_t final
-      : hpx::detail::tag_parallel_algorithm<rotate_copy_t>
-    {
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::rotate_copy
+inline constexpr struct rotate_copy_t final
+  : hpx::detail::tag_parallel_algorithm<rotate_copy_t>
+{
+// clang-format off
         template <typename FwdIter, typename OutIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_iterator_v<OutIter>
             )>
-        // clang-format on
-        friend OutIter tag_fallback_invoke(hpx::rotate_copy_t, FwdIter first,
-            FwdIter new_first, FwdIter last, OutIter dest_first)
-        {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
-                "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_output_iterator_v<OutIter>),
-                "Requires at least output iterator.");
+// clang-format on
+friend OutIter tag_fallback_invoke(hpx::rotate_copy_t, FwdIter first,
+    FwdIter new_first, FwdIter last, OutIter dest_first)
+{
+    static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
+        "Requires at least forward iterator.");
+    static_assert((hpx::traits::is_output_iterator_v<OutIter>),
+        "Requires at least output iterator.");
 
-            return parallel::util::get_second_element(
-                hpx::parallel::v1::detail::rotate_copy<
-                    hpx::parallel::util::in_out_result<FwdIter, OutIter>>()
-                    .call(hpx::execution::seq, first, new_first, last,
-                        dest_first));
-        }
+    return parallel::util::get_second_element(
+        hpx::parallel::v1::detail::rotate_copy<
+            hpx::parallel::util::in_out_result<FwdIter, OutIter>>()
+            .call(hpx::execution::seq, first, new_first, last, dest_first));
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
-        tag_fallback_invoke(hpx::rotate_copy_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 new_first, FwdIter1 last,
-            FwdIter2 dest_first)
-        {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
-                "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
-                "Requires at least forward iterator.");
+// clang-format on
+friend
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    tag_fallback_invoke(hpx::rotate_copy_t, ExPolicy&& policy, FwdIter1 first,
+        FwdIter1 new_first, FwdIter1 last, FwdIter2 dest_first)
+{
+    static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+        "Requires at least forward iterator.");
+    static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+        "Requires at least forward iterator.");
 
-            using is_seq = std::integral_constant<bool,
-                hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                    !hpx::traits::is_forward_iterator_v<FwdIter1>>;
+    using is_seq = std::integral_constant<bool,
+        hpx::is_sequenced_execution_policy_v<ExPolicy> ||
+            !hpx::traits::is_forward_iterator_v<FwdIter1>>;
 
-            return parallel::util::get_second_element(
-                hpx::parallel::v1::detail::rotate_copy<
-                    hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first,
-                        new_first, last, dest_first));
-        }
-    } rotate_copy{};
+    return parallel::util::get_second_element(
+        hpx::parallel::v1::detail::rotate_copy<
+            hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
+            .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first, new_first,
+                last, dest_first));
+}
+} rotate_copy{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

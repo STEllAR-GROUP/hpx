@@ -8,8 +8,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/batch_environments/slurm_environment.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <boost/fusion/include/vector.hpp>
@@ -173,190 +172,197 @@ namespace {
 }    // namespace
 
 namespace hpx { namespace util { namespace batch_environments {
-    slurm_environment::slurm_environment(
-        std::vector<std::string>& nodelist, bool debug)
-      : node_num_(0)
-      , num_threads_(0)
-      , num_tasks_(0)
-      , num_localities_(0)
-      , valid_(false)
-    {
-        char* node_num = std::getenv("SLURM_PROCID");
-        valid_ = node_num != nullptr;
-        if (valid_)
-        {
-            // Initialize our node number
-            node_num_ = from_string<std::size_t>(node_num);
-
-            // Retrieve number of localities
-            retrieve_number_of_localities(debug);
-
-            // Retrieve number of tasks
-            retrieve_number_of_tasks(debug);
-
-            // Get the list of nodes
-            if (nodelist.empty())
+            slurm_environment::slurm_environment(
+                std::vector<std::string>& nodelist, bool debug)
+              : node_num_(0)
+              , num_threads_(0)
+              , num_tasks_(0)
+              , num_localities_(0)
+              , valid_(false)
             {
-                retrieve_nodelist(nodelist, debug);
-            }
-
-            // Determine how many threads to use
-            retrieve_number_of_threads();
-        }
-    }
-
-    void slurm_environment::retrieve_number_of_localities(bool debug)
-    {
-        char* total_num_tasks = std::getenv("SLURM_STEP_NUM_TASKS");
-        if (total_num_tasks)
-        {
-            num_localities_ = from_string<std::size_t>(total_num_tasks);
-        }
-        else
-        {
-            if (debug)
-            {
-                std::cerr
-                    << "SLURM_STEP_NUM_TASKS not found: set num_localities to 1"
-                    << std::endl;
-            }
-            num_localities_ = 1;
-        }
-    }
-
-    void slurm_environment::retrieve_number_of_tasks(bool debug)
-    {
-        char* slurm_step_tasks_per_node =
-            std::getenv("SLURM_STEP_TASKS_PER_NODE");
-        if (slurm_step_tasks_per_node)
-        {
-            std::vector<std::string> tokens;
-            hpx::string_util::split(tokens, slurm_step_tasks_per_node,
-                hpx::string_util::is_any_of(","));
-
-            char* slurm_node_id = std::getenv("SLURM_NODEID");
-            HPX_ASSERT(slurm_node_id != nullptr);
-            if (slurm_node_id)
-            {
-                std::size_t node_id = from_string<std::size_t>(slurm_node_id);
-                std::size_t task_count = 0;
-                for (auto& token : tokens)
+                char* node_num = hpx::util::getenv("SLURM_PROCID");
+                valid_ = node_num != nullptr;
+                if (valid_)
                 {
-                    std::size_t paren_pos = token.find_first_of('(');
-                    if (paren_pos != std::string::npos)
+                    // Initialize our node number
+                    node_num_ = from_string<std::size_t>(node_num);
+
+                    // Retrieve number of localities
+                    retrieve_number_of_localities(debug);
+
+                    // Retrieve number of tasks
+                    retrieve_number_of_tasks(debug);
+
+                    // Get the list of nodes
+                    if (nodelist.empty())
                     {
-                        HPX_ASSERT(token[paren_pos + 1] == 'x');
-                        HPX_ASSERT(token[token.size() - 1] == ')');
-                        std::size_t begin = paren_pos + 2;
-                        std::size_t end = token.size() - 1;
-                        task_count += from_string<std::size_t>(
-                            token.substr(paren_pos + 2, end - begin));
-                    }
-                    else
-                    {
-                        task_count += 1;
+                        retrieve_nodelist(nodelist, debug);
                     }
 
-                    if (task_count > node_id)
-                    {
-                        num_tasks_ = from_string<std::size_t>(
-                            token.substr(0, paren_pos));
-                        break;
-                    }
-                }
-                HPX_ASSERT(num_tasks_);
-            }
-        }
-        else
-        {
-            if (debug)
-            {
-                std::cerr
-                    << "SLURM_STEP_TASKS_PER_NODE not found: set num_tasks to 1"
-                    << std::endl;
-            }
-            num_tasks_ = 1;
-        }
-    }
-
-    void slurm_environment::retrieve_nodelist(
-        std::vector<std::string>& nodes, bool debug)
-    {
-        char* slurm_nodelist_env = std::getenv("SLURM_STEP_NODELIST");
-        if (slurm_nodelist_env)
-        {
-            if (debug)
-            {
-                std::cerr << "SLURM nodelist found (SLURM_STEP_NODELIST): "
-                          << slurm_nodelist_env << std::endl;
-            }
-
-            std::string nodelist_str(slurm_nodelist_env);
-            std::string::iterator begin = nodelist_str.begin();
-            std::string::iterator end = nodelist_str.end();
-
-            if (!x3::parse(begin, end, nodelist, nodes) || begin != end)
-            {
-                if (debug)
-                {
-                    std::cerr << "failed to parse SLURM nodelist "
-                                 "(SLURM_STEP_NODELIST): "
-                              << slurm_nodelist_env << std::endl;
+                    // Determine how many threads to use
+                    retrieve_number_of_threads();
                 }
             }
-        }
-    }
 
-    void slurm_environment::retrieve_number_of_threads()
-    {
-        char* slurm_cpus_per_task = std::getenv("SLURM_CPUS_PER_TASK");
-        if (slurm_cpus_per_task)
-            num_threads_ = from_string<std::size_t>(slurm_cpus_per_task);
-        else
-        {
-            char* slurm_job_cpus_on_node =
-                std::getenv("SLURM_JOB_CPUS_PER_NODE");
-            HPX_ASSERT(slurm_job_cpus_on_node != nullptr);
-            if (slurm_job_cpus_on_node)
+            void slurm_environment::retrieve_number_of_localities(bool debug)
             {
-                std::vector<std::string> tokens;
-                hpx::string_util::split(tokens, slurm_job_cpus_on_node,
-                    hpx::string_util::is_any_of(","));
-
-                char* slurm_node_id = std::getenv("SLURM_NODEID");
-                HPX_ASSERT(slurm_node_id != nullptr);
-                if (slurm_node_id)
+                char* total_num_tasks =
+                    hpx::util::getenv("SLURM_STEP_NUM_TASKS");
+                if (total_num_tasks)
                 {
-                    std::size_t node_id =
-                        from_string<std::size_t>(slurm_node_id);
-                    std::size_t task_count = 0;
-                    for (auto& token : tokens)
+                    num_localities_ = from_string<std::size_t>(total_num_tasks);
+                }
+                else
+                {
+                    if (debug)
                     {
-                        std::size_t paren_pos = token.find_first_of('(');
-                        if (paren_pos != std::string::npos)
-                        {
-                            HPX_ASSERT(token[paren_pos + 1] == 'x');
-                            HPX_ASSERT(token[token.size() - 1] == ')');
-                            std::size_t begin = paren_pos + 2;
-                            std::size_t end = token.size() - 1;
-                            task_count += from_string<std::size_t>(
-                                token.substr(paren_pos + 2, end - begin));
-                        }
-                        else
-                        {
-                            task_count += 1;
-                        }
-                        if (task_count > node_id)
-                        {
-                            num_threads_ = from_string<std::size_t>(
-                                               token.substr(0, paren_pos)) /
-                                num_tasks_;
-                            break;
-                        }
+                        std::cerr << "SLURM_STEP_NUM_TASKS not found: set "
+                                     "num_localities to 1"
+                                  << std::endl;
                     }
-                    HPX_ASSERT(num_threads_);
+                    num_localities_ = 1;
                 }
             }
-        }
-    }
+
+            void slurm_environment::retrieve_number_of_tasks(bool debug)
+            {
+                char* slurm_step_tasks_per_node =
+                    hpx::util::getenv("SLURM_STEP_TASKS_PER_NODE");
+                if (slurm_step_tasks_per_node)
+                {
+                    std::vector<std::string> tokens;
+                    hpx::string_util::split(tokens, slurm_step_tasks_per_node,
+                        hpx::string_util::is_any_of(","));
+
+                    char* slurm_node_id = hpx::util::getenv("SLURM_NODEID");
+                    HPX_ASSERT(slurm_node_id != nullptr);
+                    if (slurm_node_id)
+                    {
+                        std::size_t node_id =
+                            from_string<std::size_t>(slurm_node_id);
+                        std::size_t task_count = 0;
+                        for (auto& token : tokens)
+                        {
+                            std::size_t paren_pos = token.find_first_of('(');
+                            if (paren_pos != std::string::npos)
+                            {
+                                HPX_ASSERT(token[paren_pos + 1] == 'x');
+                                HPX_ASSERT(token[token.size() - 1] == ')');
+                                std::size_t begin = paren_pos + 2;
+                                std::size_t end = token.size() - 1;
+                                task_count += from_string<std::size_t>(
+                                    token.substr(paren_pos + 2, end - begin));
+                            }
+                            else
+                            {
+                                task_count += 1;
+                            }
+
+                            if (task_count > node_id)
+                            {
+                                num_tasks_ = from_string<std::size_t>(
+                                    token.substr(0, paren_pos));
+                                break;
+                            }
+                        }
+                        HPX_ASSERT(num_tasks_);
+                    }
+                }
+                else
+                {
+                    if (debug)
+                    {
+                        std::cerr << "SLURM_STEP_TASKS_PER_NODE not found: set "
+                                     "num_tasks to 1"
+                                  << std::endl;
+                    }
+                    num_tasks_ = 1;
+                }
+            }
+
+            void slurm_environment::retrieve_nodelist(
+                std::vector<std::string>& nodes, bool debug)
+            {
+                char* slurm_nodelist_env = hpx::util::getenv("SLURM_STEP_NODELIST");
+                if (slurm_nodelist_env)
+                {
+                    if (debug)
+                    {
+                        std::cerr
+                            << "SLURM nodelist found (SLURM_STEP_NODELIST): "
+                            << slurm_nodelist_env << std::endl;
+                    }
+
+                    std::string nodelist_str(slurm_nodelist_env);
+                    std::string::iterator begin = nodelist_str.begin();
+                    std::string::iterator end = nodelist_str.end();
+
+                    if (!x3::parse(begin, end, nodelist, nodes) || begin != end)
+                    {
+                        if (debug)
+                        {
+                            std::cerr << "failed to parse SLURM nodelist "
+                                         "(SLURM_STEP_NODELIST): "
+                                      << slurm_nodelist_env << std::endl;
+                        }
+                    }
+                }
+            }
+
+            void slurm_environment::retrieve_number_of_threads()
+            {
+                char* slurm_cpus_per_task = hpx::util::getenv("SLURM_CPUS_PER_TASK");
+                if (slurm_cpus_per_task)
+                    num_threads_ =
+                        from_string<std::size_t>(slurm_cpus_per_task);
+                else
+                {
+                    char* slurm_job_cpus_on_node =
+                        hpx::util::getenv("SLURM_JOB_CPUS_PER_NODE");
+                    HPX_ASSERT(slurm_job_cpus_on_node != nullptr);
+                    if (slurm_job_cpus_on_node)
+                    {
+                        std::vector<std::string> tokens;
+                        hpx::string_util::split(tokens, slurm_job_cpus_on_node,
+                            hpx::string_util::is_any_of(","));
+
+                        char* slurm_node_id = hpx::util::getenv("SLURM_NODEID");
+                        HPX_ASSERT(slurm_node_id != nullptr);
+                        if (slurm_node_id)
+                        {
+                            std::size_t node_id =
+                                from_string<std::size_t>(slurm_node_id);
+                            std::size_t task_count = 0;
+                            for (auto& token : tokens)
+                            {
+                                std::size_t paren_pos =
+                                    token.find_first_of('(');
+                                if (paren_pos != std::string::npos)
+                                {
+                                    HPX_ASSERT(token[paren_pos + 1] == 'x');
+                                    HPX_ASSERT(token[token.size() - 1] == ')');
+                                    std::size_t begin = paren_pos + 2;
+                                    std::size_t end = token.size() - 1;
+                                    task_count +=
+                                        from_string<std::size_t>(token.substr(
+                                            paren_pos + 2, end - begin));
+                                }
+                                else
+                                {
+                                    task_count += 1;
+                                }
+                                if (task_count > node_id)
+                                {
+                                    num_threads_ =
+                                        from_string<std::size_t>(
+                                            token.substr(0, paren_pos)) /
+                                        num_tasks_;
+                                    break;
+                                }
+                            }
+                            HPX_ASSERT(num_threads_);
+                        }
+                    }
+                }
+            }
 }}}    // namespace hpx::util::batch_environments

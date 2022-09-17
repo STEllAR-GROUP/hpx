@@ -29,6 +29,7 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
@@ -46,8 +47,6 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
 #include <hpx/threading/thread.hpp>
 #include <hpx/threading_base/detail/get_default_timer_service.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -105,15 +104,16 @@ namespace hpx_startup {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail {
-    // forward declarations only
-    void console_print(std::string const&);
+        // forward declarations only
+        void console_print(std::string const&);
 }}    // namespace hpx::detail
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
 namespace hpx { namespace detail {
-    // forward declarations only
-    void list_symbolic_name(std::string const&, hpx::id_type const&);
-    void list_component_type(std::string const&, components::component_type);
+        // forward declarations only
+        void list_symbolic_name(std::string const&, hpx::id_type const&);
+        void list_component_type(
+            std::string const&, components::component_type);
 }}    // namespace hpx::detail
 
 HPX_PLAIN_ACTION_ID(hpx::detail::console_print, console_print_action,
@@ -136,178 +136,182 @@ HPX_UTIL_REGISTER_FUNCTION(
 #endif
 
 namespace hpx { namespace detail {
-    ///////////////////////////////////////////////////////////////////////////
-    // print string on the console
-    void console_print(std::string const& name)
-    {
-        std::cout << name << std::endl;
-    }
+        ///////////////////////////////////////////////////////////////////////////
+        // print string on the console
+        void console_print(std::string const& name)
+        {
+            std::cout << name << std::endl;
+        }
 
-    inline void print(std::string const& name, error_code& ec = throws)
-    {
+        inline void print(std::string const& name, error_code& ec = throws)
+        {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-        hpx::id_type console(agas::get_console_locality(ec));
-        if (ec)
-            return;
+            hpx::id_type console(agas::get_console_locality(ec));
+            if (ec)
+                return;
 
-        hpx::async<console_print_action>(console, name).get(ec);
-        if (ec)
-            return;
+            hpx::async<console_print_action>(console, name).get(ec);
+            if (ec)
+                return;
 #else
-        console_print(name);
+            console_print(name);
 #endif
-        if (&ec != &throws)
-            ec = make_success_code();
-    }
+            if (&ec != &throws)
+                ec = make_success_code();
+        }
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-    ///////////////////////////////////////////////////////////////////////////
-    // redirect the printing of the given counter name to the console
-    bool list_counter(
-        performance_counters::counter_info const& info, error_code& ec)
-    {
-        print(info.fullname_, ec);
-        return true;
-    }
-
-    // List the names of all registered performance counters.
-    void list_counter_names_header(bool skeleton)
-    {
-        // print header
-        print("List of available counter instances");
-        if (skeleton)
-            print("(replace '*' below with the appropriate sequence number)");
-        print(std::string(78, '-'));
-    }
-
-    void list_counter_names_minimal()
-    {
-        // list all counter names
-        list_counter_names_header(true);
-        performance_counters::discover_counter_types(&list_counter,
-            performance_counters::discover_counters_mode::minimal);
-    }
-
-    void list_counter_names_full()
-    {
-        // list all counter names
-        list_counter_names_header(false);
-        performance_counters::discover_counter_types(
-            &list_counter, performance_counters::discover_counters_mode::full);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // redirect the printing of the full counter info to the console
-    bool list_counter_info(
-        performance_counters::counter_info const& info, error_code& ec)
-    {
-        // compose the information to be printed for each of the counters
-        std::ostringstream strm;
-
-        strm << std::string(78, '-') << '\n';
-        strm << "fullname: " << info.fullname_ << '\n';
-        strm << "helptext: " << info.helptext_ << '\n';
-        strm << "type:     "
-             << performance_counters::get_counter_type_name(info.type_) << '\n';
-
-        strm << "version:  ";    // 0xMMmmrrrr
-        hpx::util::format_to(strm, "{}.{}.{}\n", info.version_ / 0x1000000,
-            info.version_ / 0x10000 % 0x100, info.version_ % 0x10000);
-        strm << std::string(78, '-') << '\n';
-
-        print(strm.str(), ec);
-
-        if (&ec != &throws)
-            ec = make_success_code();
-        return true;
-    }
-
-    // List the names of all registered performance counters.
-    void list_counter_infos_header(bool skeleton)
-    {
-        // print header
-        print("Information about available counter instances");
-        if (skeleton)
-            print("(replace '*' below with the appropriate sequence number)");
-        print("--------------------------------------------------------");
-    }
-
-    void list_counter_infos_minimal()
-    {
-        // list all counter information
-        list_counter_infos_header(true);
-        performance_counters::discover_counter_types(&list_counter_info,
-            performance_counters::discover_counters_mode::minimal);
-    }
-
-    void list_counter_infos_full()
-    {
-        // list all counter information
-        list_counter_infos_header(false);
-        performance_counters::discover_counter_types(&list_counter_info,
-            performance_counters::discover_counters_mode::full);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    void list_symbolic_name(std::string const& name, hpx::id_type const& id)
-    {
-        std::string str = hpx::util::format("{}, {}, {}", name, id,
-            (id.get_management_type() == id_type::management_type::managed ?
-                    "management_type::managed" :
-                    "management_type::unmanaged"));
-        print(str);
-    }
-
-    void list_symbolic_names()
-    {
-        print(std::string("List of all registered symbolic names:"));
-        print(std::string("--------------------------------------"));
-
-        std::map<std::string, hpx::id_type> entries =
-            agas::find_symbols(hpx::launch::sync);
-
-        for (auto const& e : entries)
+        ///////////////////////////////////////////////////////////////////////////
+        // redirect the printing of the given counter name to the console
+        bool list_counter(
+            performance_counters::counter_info const& info, error_code& ec)
         {
-            list_symbolic_name(e.first, e.second);
+            print(info.fullname_, ec);
+            return true;
         }
-    }
 
-    ///////////////////////////////////////////////////////////////////////////
-    void list_component_type(
-        std::string const& name, components::component_type ctype)
-    {
-        print(hpx::util::format(
-            "{1:-40}, {2}", name, components::get_component_type_name(ctype)));
-    }
-
-    void list_component_types()
-    {
-        print(std::string("List of all registered component types:"));
-        print(std::string("---------------------------------------"));
-
-        using hpx::placeholders::_1;
-        using hpx::placeholders::_2;
-
-        hpx::id_type console(agas::get_console_locality());
-        naming::get_agas_client().iterate_types(
-            hpx::bind<list_component_type_action>(console, _1, _2));
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    void start_counters(std::shared_ptr<util::query_counters> const& qc)
-    {
-        try
+        // List the names of all registered performance counters.
+        void list_counter_names_header(bool skeleton)
         {
-            HPX_ASSERT(qc);
-            qc->start();
+            // print header
+            print("List of available counter instances");
+            if (skeleton)
+                print(
+                    "(replace '*' below with the appropriate sequence number)");
+            print(std::string(78, '-'));
         }
-        catch (...)
+
+        void list_counter_names_minimal()
         {
-            std::cerr << hpx::diagnostic_information(std::current_exception())
-                      << std::flush;
-            hpx::terminate();
+            // list all counter names
+            list_counter_names_header(true);
+            performance_counters::discover_counter_types(&list_counter,
+                performance_counters::discover_counters_mode::minimal);
         }
-    }
+
+        void list_counter_names_full()
+        {
+            // list all counter names
+            list_counter_names_header(false);
+            performance_counters::discover_counter_types(&list_counter,
+                performance_counters::discover_counters_mode::full);
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        // redirect the printing of the full counter info to the console
+        bool list_counter_info(
+            performance_counters::counter_info const& info, error_code& ec)
+        {
+            // compose the information to be printed for each of the counters
+            std::ostringstream strm;
+
+            strm << std::string(78, '-') << '\n';
+            strm << "fullname: " << info.fullname_ << '\n';
+            strm << "helptext: " << info.helptext_ << '\n';
+            strm << "type:     "
+                 << performance_counters::get_counter_type_name(info.type_)
+                 << '\n';
+
+            strm << "version:  ";    // 0xMMmmrrrr
+            hpx::util::format_to(strm, "{}.{}.{}\n", info.version_ / 0x1000000,
+                info.version_ / 0x10000 % 0x100, info.version_ % 0x10000);
+            strm << std::string(78, '-') << '\n';
+
+            print(strm.str(), ec);
+
+            if (&ec != &throws)
+                ec = make_success_code();
+            return true;
+        }
+
+        // List the names of all registered performance counters.
+        void list_counter_infos_header(bool skeleton)
+        {
+            // print header
+            print("Information about available counter instances");
+            if (skeleton)
+                print(
+                    "(replace '*' below with the appropriate sequence number)");
+            print("--------------------------------------------------------");
+        }
+
+        void list_counter_infos_minimal()
+        {
+            // list all counter information
+            list_counter_infos_header(true);
+            performance_counters::discover_counter_types(&list_counter_info,
+                performance_counters::discover_counters_mode::minimal);
+        }
+
+        void list_counter_infos_full()
+        {
+            // list all counter information
+            list_counter_infos_header(false);
+            performance_counters::discover_counter_types(&list_counter_info,
+                performance_counters::discover_counters_mode::full);
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        void list_symbolic_name(std::string const& name, hpx::id_type const& id)
+        {
+            std::string str = hpx::util::format("{}, {}, {}", name, id,
+                (id.get_management_type() == id_type::management_type::managed ?
+                        "management_type::managed" :
+                        "management_type::unmanaged"));
+            print(str);
+        }
+
+        void list_symbolic_names()
+        {
+            print(std::string("List of all registered symbolic names:"));
+            print(std::string("--------------------------------------"));
+
+            std::map<std::string, hpx::id_type> entries =
+                agas::find_symbols(hpx::launch::sync);
+
+            for (auto const& e : entries)
+            {
+                list_symbolic_name(e.first, e.second);
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        void list_component_type(
+            std::string const& name, components::component_type ctype)
+        {
+            print(hpx::util::format("{1:-40}, {2}", name,
+                components::get_component_type_name(ctype)));
+        }
+
+        void list_component_types()
+        {
+            print(std::string("List of all registered component types:"));
+            print(std::string("---------------------------------------"));
+
+            using hpx::placeholders::_1;
+            using hpx::placeholders::_2;
+
+            hpx::id_type console(agas::get_console_locality());
+            naming::get_agas_client().iterate_types(
+                hpx::bind<list_component_type_action>(console, _1, _2));
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        void start_counters(std::shared_ptr<util::query_counters> const& qc)
+        {
+            try
+            {
+                HPX_ASSERT(qc);
+                qc->start();
+            }
+            catch (...)
+            {
+                std::cerr << hpx::diagnostic_information(
+                                 std::current_exception())
+                          << std::flush;
+                hpx::terminate();
+            }
+        }
 #endif
 }}    // namespace hpx::detail
 

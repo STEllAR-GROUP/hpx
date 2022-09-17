@@ -180,8 +180,8 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/executors/execution_policy.hpp>
@@ -369,107 +369,100 @@ namespace hpx { namespace parallel { inline namespace v1 {
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx {
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::reverse
-    inline constexpr struct reverse_t final
-      : hpx::detail::tag_parallel_algorithm<reverse_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::reverse
+inline constexpr struct reverse_t final
+  : hpx::detail::tag_parallel_algorithm<reverse_t>
+{
+private:
+// clang-format off
         template <typename BidirIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<BidirIter>::value
             )>
-        // clang-format on
-        friend void tag_fallback_invoke(
-            hpx::reverse_t, BidirIter first, BidirIter last)
-        {
-            static_assert(
-                (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
-                "Requires at least bidirectional iterator.");
+// clang-format on
+friend void tag_fallback_invoke(hpx::reverse_t, BidirIter first, BidirIter last)
+{
+    static_assert((hpx::traits::is_bidirectional_iterator<BidirIter>::value),
+        "Requires at least bidirectional iterator.");
 
-            hpx::parallel::v1::detail::reverse<BidirIter>().call(
-                hpx::execution::sequenced_policy{}, first, last);
-        }
+    hpx::parallel::v1::detail::reverse<BidirIter>().call(
+        hpx::execution::sequenced_policy{}, first, last);
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename BidirIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<BidirIter>::value &&
                 hpx::is_execution_policy<ExPolicy>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            void>::type
-        tag_fallback_invoke(
-            hpx::reverse_t, ExPolicy&& policy, BidirIter first, BidirIter last)
-        {
-            static_assert(
-                (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
-                "Requires at least bidirectional iterator.");
+// clang-format on
+friend typename parallel::util::detail::algorithm_result<ExPolicy, void>::type
+tag_fallback_invoke(
+    hpx::reverse_t, ExPolicy&& policy, BidirIter first, BidirIter last)
+{
+    static_assert((hpx::traits::is_bidirectional_iterator<BidirIter>::value),
+        "Requires at least bidirectional iterator.");
 
-            return parallel::util::detail::algorithm_result<ExPolicy>::get(
-                hpx::parallel::v1::detail::reverse<BidirIter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, last));
-        }
-    } reverse{};
+    return parallel::util::detail::algorithm_result<ExPolicy>::get(
+        hpx::parallel::v1::detail::reverse<BidirIter>().call(
+            HPX_FORWARD(ExPolicy, policy), first, last));
+}
+} reverse{};
 
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::reverse_copy
-    inline constexpr struct reverse_copy_t final
-      : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::reverse_copy
+inline constexpr struct reverse_copy_t final
+  : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
+{
+private:
+// clang-format off
         template <typename BidirIter, typename OutIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<BidirIter>::value &&
                 hpx::traits::is_iterator<OutIter>::value
             )>
-        // clang-format on
-        friend OutIter tag_fallback_invoke(
-            hpx::reverse_copy_t, BidirIter first, BidirIter last, OutIter dest)
-        {
-            static_assert(
-                (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
-                "Requires at least bidirectional iterator.");
+// clang-format on
+friend OutIter tag_fallback_invoke(
+    hpx::reverse_copy_t, BidirIter first, BidirIter last, OutIter dest)
+{
+    static_assert((hpx::traits::is_bidirectional_iterator<BidirIter>::value),
+        "Requires at least bidirectional iterator.");
 
-            static_assert((hpx::traits::is_output_iterator<OutIter>::value),
-                "Requires at least output iterator.");
+    static_assert((hpx::traits::is_output_iterator<OutIter>::value),
+        "Requires at least output iterator.");
 
-            return parallel::util::get_second_element(
-                parallel::v1::detail::reverse_copy<
-                    hpx::parallel::util::in_out_result<BidirIter, OutIter>>()
-                    .call(
-                        hpx::execution::sequenced_policy{}, first, last, dest));
-        }
+    return parallel::util::get_second_element(
+        parallel::v1::detail::reverse_copy<
+            hpx::parallel::util::in_out_result<BidirIter, OutIter>>()
+            .call(hpx::execution::sequenced_policy{}, first, last, dest));
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename BidirIter, typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<BidirIter>::value &&
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(hpx::reverse_copy_t, ExPolicy&& policy,
-            BidirIter first, BidirIter last, FwdIter dest)
-        {
-            static_assert(
-                (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
-                "Requires at least bidirectional iterator.");
+// clang-format on
+friend
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    tag_fallback_invoke(hpx::reverse_copy_t, ExPolicy&& policy, BidirIter first,
+        BidirIter last, FwdIter dest)
+{
+    static_assert((hpx::traits::is_bidirectional_iterator<BidirIter>::value),
+        "Requires at least bidirectional iterator.");
 
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Requires at least forward iterator.");
+    static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+        "Requires at least forward iterator.");
 
-            return parallel::util::get_second_element(
-                parallel::v1::detail::reverse_copy<
-                    hpx::parallel::util::in_out_result<BidirIter, FwdIter>>()
-                    .call(HPX_FORWARD(ExPolicy, policy), first, last, dest));
-        }
-    } reverse_copy{};
+    return parallel::util::get_second_element(
+        parallel::v1::detail::reverse_copy<
+            hpx::parallel::util::in_out_result<BidirIter, FwdIter>>()
+            .call(HPX_FORWARD(ExPolicy, policy), first, last, dest));
+}
+} reverse_copy{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

@@ -21,11 +21,9 @@
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/coalescing_message_handler_registration.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
@@ -251,41 +249,41 @@ namespace hpx { namespace traits {
 
 namespace hpx { namespace components { namespace detail {
 
-    template <typename Result, typename RemoteResult>
-    struct component_heap_impl<
-        hpx::components::managed_component<hpx::lcos::base_lco_with_value<
-            Result, RemoteResult, traits::detail::managed_component_tag>>>
-    {
-        using valid = void;
-        using component_type =
+        template <typename Result, typename RemoteResult>
+        struct component_heap_impl<
             hpx::components::managed_component<hpx::lcos::base_lco_with_value<
-                Result, RemoteResult, traits::detail::managed_component_tag>>;
-
-        HPX_ALWAYS_EXPORT static typename component_type::heap_type& call()
+                Result, RemoteResult, traits::detail::managed_component_tag>>>
         {
-            util::reinitializable_static<typename component_type::heap_type>
-                heap;
-            return heap.get();
-        }
-    };
+            using valid = void;
+            using component_type = hpx::components::managed_component<
+                hpx::lcos::base_lco_with_value<Result, RemoteResult,
+                    traits::detail::managed_component_tag>>;
 
-    template <typename Result, typename RemoteResult>
-    struct component_heap_impl<
-        hpx::components::managed_component<hpx::lcos::base_lco_with_value<
-            Result, RemoteResult, traits::detail::component_tag>>>
-    {
-        using valid = void;
-        using component_type =
+            HPX_ALWAYS_EXPORT static typename component_type::heap_type& call()
+            {
+                util::reinitializable_static<typename component_type::heap_type>
+                    heap;
+                return heap.get();
+            }
+        };
+
+        template <typename Result, typename RemoteResult>
+        struct component_heap_impl<
             hpx::components::managed_component<hpx::lcos::base_lco_with_value<
-                Result, RemoteResult, traits::detail::component_tag>>;
-
-        HPX_ALWAYS_EXPORT static typename component_type::heap_type& call()
+                Result, RemoteResult, traits::detail::component_tag>>>
         {
-            util::reinitializable_static<typename component_type::heap_type>
-                heap;
-            return heap.get();
-        }
-    };
+            using valid = void;
+            using component_type = hpx::components::managed_component<
+                hpx::lcos::base_lco_with_value<Result, RemoteResult,
+                    traits::detail::component_tag>>;
+
+            HPX_ALWAYS_EXPORT static typename component_type::heap_type& call()
+            {
+                util::reinitializable_static<typename component_type::heap_type>
+                    heap;
+                return heap.get();
+            }
+        };
 }}}    // namespace hpx::components::detail
 
 ///////////////////////////////////////////////////////////////////////////////

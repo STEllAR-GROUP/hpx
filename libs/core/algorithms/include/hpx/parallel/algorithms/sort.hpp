@@ -149,9 +149,9 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_local/dataflow.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
@@ -419,12 +419,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx {
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::sort
-    inline constexpr struct sort_t final
-      : hpx::detail::tag_parallel_algorithm<sort_t>
-    {
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::sort
+inline constexpr struct sort_t final
+  : hpx::detail::tag_parallel_algorithm<sort_t>
+{
+// clang-format off
         template <typename RandomIt,
             typename Comp = hpx::parallel::v1::detail::less,
             typename Proj = parallel::util::projection_identity,
@@ -437,19 +437,18 @@ namespace hpx {
                     parallel::traits::projected<Proj, RandomIt>
                 >::value
             )>
-        // clang-format on
-        friend void tag_fallback_invoke(hpx::sort_t, RandomIt first,
-            RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
-        {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
-                "Requires a random access iterator.");
+// clang-format on
+friend void tag_fallback_invoke(hpx::sort_t, RandomIt first, RandomIt last,
+    Comp&& comp = Comp(), Proj&& proj = Proj())
+{
+    static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+        "Requires a random access iterator.");
 
-            hpx::parallel::v1::detail::sort<RandomIt>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
-                HPX_FORWARD(Proj, proj));
-        }
+    hpx::parallel::v1::detail::sort<RandomIt>().call(hpx::execution::seq, first,
+        last, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename RandomIt,
             typename Comp = hpx::parallel::v1::detail::less,
             typename Proj = parallel::util::projection_identity,
@@ -462,24 +461,23 @@ namespace hpx {
                     parallel::traits::projected<Proj, RandomIt>
                 >::value
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
-        tag_fallback_invoke(hpx::sort_t, ExPolicy&& policy, RandomIt first,
-            RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
-        {
-            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
-                "Requires a random access iterator.");
+// clang-format on
+friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
+tag_fallback_invoke(hpx::sort_t, ExPolicy&& policy, RandomIt first,
+    RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
+{
+    static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
+        "Requires a random access iterator.");
 
-            using result_type =
-                typename hpx::parallel::util::detail::algorithm_result<
-                    ExPolicy>::type;
+    using result_type =
+        typename hpx::parallel::util::detail::algorithm_result<ExPolicy>::type;
 
-            return hpx::util::void_guard<result_type>(),
-                   hpx::parallel::v1::detail::sort<RandomIt>().call(
-                       HPX_FORWARD(ExPolicy, policy), first, last,
-                       HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
-        }
-    } sort{};
+    return hpx::util::void_guard<result_type>(),
+           hpx::parallel::v1::detail::sort<RandomIt>().call(
+               HPX_FORWARD(ExPolicy, policy), first, last,
+               HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+}
+} sort{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

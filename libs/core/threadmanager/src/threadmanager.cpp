@@ -9,6 +9,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/execution_base/this_thread.hpp>

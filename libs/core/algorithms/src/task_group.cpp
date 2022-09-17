@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/lcos_local/detail/preprocess_future.hpp>

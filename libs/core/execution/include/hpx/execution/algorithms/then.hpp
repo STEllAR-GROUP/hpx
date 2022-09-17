@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution_base/completion_scheduler.hpp>
@@ -16,6 +15,7 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_priority_invoke.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>
 

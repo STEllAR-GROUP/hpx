@@ -9,9 +9,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/prefix/find_prefix.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime_configuration/agas_service_mode.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/init_ini_data.hpp>
@@ -88,6 +87,11 @@ namespace hpx { namespace util {
         if (!need_to_call_pre_initialize)
             return;
 
+#if defined(HPX_MSVC)
+        std::int64_t pid = ::_getpid();
+#else
+        std::int64_t pid = ::getpid();
+#endif
         std::vector<std::string> lines = {
             // clang-format off
             // create an empty application section
@@ -95,7 +99,7 @@ namespace hpx { namespace util {
 
             // create system and application instance specific entries
             "[system]",
-            "pid = " + std::to_string(getpid()),
+            "pid = " + std::to_string(pid),
             "prefix = " + find_prefix(),
 #if defined(__linux) || defined(linux) || defined(__linux__)
             "executable_prefix = " + get_executable_prefix(argv0),
@@ -742,18 +746,6 @@ namespace hpx { namespace util {
         medium_stacksize = init_medium_stack_size();
         large_stacksize = init_large_stack_size();
         huge_stacksize = init_huge_stack_size();
-    }
-
-    std::size_t runtime_configuration::get_ipc_data_buffer_cache_size() const
-    {
-        if (util::section const* sec = get_section("hpx.parcel.ipc");
-            nullptr != sec)
-        {
-            return hpx::util::get_entry_as<std::size_t>(*sec,
-                "data_buffer_cache_size",
-                HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE);
-        }
-        return HPX_PARCEL_IPC_DATA_BUFFER_CACHE_SIZE;
     }
 
     agas::service_mode runtime_configuration::get_agas_service_mode() const

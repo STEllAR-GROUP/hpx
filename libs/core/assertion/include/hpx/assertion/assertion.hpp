@@ -15,7 +15,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion/evaluate_assert.hpp>
 #include <hpx/assertion/source_location.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
 #include <assert.h>
@@ -24,17 +24,6 @@
 #include <exception>
 #include <string>
 #include <type_traits>
-
-namespace hpx { namespace assertion {
-    /// The signature for an assertion handler
-    using assertion_handler = void (*)(hpx::source_location const& loc,
-        const char* expr, std::string const& msg);
-
-    /// Set the assertion handler to be used within a program. If the handler has been
-    /// set already once, the call to this function will be ignored.
-    /// \note This function is not thread safe
-    HPX_CORE_EXPORT void set_assertion_handler(assertion_handler handler);
-}}    // namespace hpx::assertion
 
 #if defined(DOXYGEN)
 /// \def HPX_ASSERT(expr, msg)
@@ -57,7 +46,19 @@ namespace hpx { namespace assertion {
 /// \see HPX_ASSERT
 #define HPX_ASSERT_MSG(expr, msg)
 #else
+
 /// \cond NOINTERNAL
+#if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
+#define HPX_CURRENT_SOURCE_LOCATION() ::hpx::source_location::current()
+#else
+#define HPX_CURRENT_SOURCE_LOCATION()                                          \
+    ::hpx::source_location                                                     \
+    {                                                                          \
+        __FILE__, static_cast<std::uint_least32_t>(__LINE__),                  \
+            HPX_ASSERT_CURRENT_FUNCTION                                        \
+    }
+#endif
+
 #define HPX_ASSERT_(expr, msg)                                                 \
     (!!(expr) ? void() :                                                       \
                 ::hpx::assertion::detail::handle_assert(                       \

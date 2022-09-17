@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2017 Hartmut Kaiser
+//  Copyright (c) 2012-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,9 +12,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/plugin.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/prefix/find_prefix.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #if defined(HPX_WINDOWS)
@@ -178,7 +177,7 @@ namespace hpx { namespace util {
             }
 
             // Search PATH
-            char const* epath = ::getenv("PATH");
+            char const* epath = hpx::util::getenv("PATH");
             if (epath)
             {
                 std::vector<std::string> path_dirs;

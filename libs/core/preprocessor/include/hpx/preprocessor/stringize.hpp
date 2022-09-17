@@ -32,7 +32,7 @@
 #define HPX_PP_STRINGIZE(X)
 #else
 
-#include <hpx/preprocessor/config.hpp>
+#include <hpx/preprocessor/detail/config.hpp>
 
 #if HPX_PP_CONFIG_FLAGS() & HPX_PP_CONFIG_MSVC()
 #define HPX_PP_STRINGIZE(text) HPX_PP_STRINGIZE_A((text))

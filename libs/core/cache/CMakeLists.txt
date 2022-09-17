@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,13 +8,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Default location is $HPX_ROOT/libs/cache/include
 set(cache_headers
-    hpx/cache/local_cache.hpp
-    hpx/cache/lru_cache.hpp
     hpx/cache/entries/entry.hpp
     hpx/cache/entries/fifo_entry.hpp
     hpx/cache/entries/lfu_entry.hpp
     hpx/cache/entries/lru_entry.hpp
     hpx/cache/entries/size_entry.hpp
+    hpx/cache/local_cache.hpp
+    hpx/cache/lru_cache.hpp
     hpx/cache/policies/always.hpp
     hpx/cache/statistics/local_full_statistics.hpp
     hpx/cache/statistics/local_statistics.hpp
@@ -41,11 +41,17 @@ set(cache_compat_headers
 # Default location is $HPX_ROOT/libs/cache/src
 set(cache_sources)
 
+if(HPX_WITH_CXX20_MODULES)
+  set(cache_modulefiles hpx.core.cache.cppm)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   core cache
+  GLOBAL_HEADER_GEN MODULE
   SOURCES ${cache_sources}
   HEADERS ${cache_headers}
+  MODULES ${cache_modulefiles}
   COMPAT_HEADERS ${cache_compat_headers}
   MODULE_DEPENDENCIES hpx_config
   CMAKE_SUBDIRS examples tests

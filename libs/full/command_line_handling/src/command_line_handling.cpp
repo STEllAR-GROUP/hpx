@@ -19,11 +19,11 @@
 #if defined(HPX_HAVE_MODULE_LCI_BASE)
 #include <hpx/modules/lci_base.hpp>
 #endif
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
 

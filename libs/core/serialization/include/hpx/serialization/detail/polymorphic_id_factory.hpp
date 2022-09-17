@@ -12,7 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/serialization/detail/polymorphic_intrusive_factory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>

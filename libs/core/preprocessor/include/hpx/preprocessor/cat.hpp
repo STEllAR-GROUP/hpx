@@ -22,7 +22,7 @@
 #define HPX_PP_CAT(A, B)
 #else
 
-#include <hpx/preprocessor/config.hpp>
+#include <hpx/preprocessor/detail/config.hpp>
 
 #if ~HPX_PP_CONFIG_FLAGS() & HPX_PP_CONFIG_MWCC()
 #define HPX_PP_CAT(a, b) HPX_PP_CAT_I(a, b)

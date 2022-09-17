@@ -147,9 +147,9 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
@@ -344,13 +344,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 }}}}    // namespace hpx::parallel::v1::detail
 
 namespace hpx {
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::partial_sort_copy
-    inline constexpr struct partial_sort_copy_t final
-      : hpx::detail::tag_parallel_algorithm<partial_sort_copy_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::partial_sort_copy
+inline constexpr struct partial_sort_copy_t final
+  : hpx::detail::tag_parallel_algorithm<partial_sort_copy_t>
+{
+private:
+// clang-format off
         template <typename InIter, typename RandIter,
             typename Comp = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
@@ -361,28 +361,26 @@ namespace hpx {
                     typename std::iterator_traits<InIter>::value_type
                 >
             )>
-        // clang-format on
-        friend RandIter tag_fallback_invoke(hpx::partial_sort_copy_t,
-            InIter first, InIter last, RandIter d_first, RandIter d_last,
-            Comp&& comp = Comp())
-        {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
-                "Requires at least input iterator.");
+// clang-format on
+friend RandIter tag_fallback_invoke(hpx::partial_sort_copy_t, InIter first,
+    InIter last, RandIter d_first, RandIter d_last, Comp&& comp = Comp())
+{
+static_assert(hpx::traits::is_input_iterator_v<InIter>,
+    "Requires at least input iterator.");
 
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
-                "Requires at least random access iterator.");
+static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+    "Requires at least random access iterator.");
 
-            using result_type = parallel::util::in_out_result<InIter, RandIter>;
+using result_type = parallel::util::in_out_result<InIter, RandIter>;
 
-            return parallel::util::get_second_element(
-                parallel::v1::detail::partial_sort_copy<result_type>().call(
-                    hpx::execution::seq, first, last, d_first, d_last,
-                    HPX_FORWARD(Comp, comp),
-                    parallel::util::projection_identity{},
-                    parallel::util::projection_identity{}));
-        }
+return parallel::util::get_second_element(
+    parallel::v1::detail::partial_sort_copy<result_type>().call(
+        hpx::execution::seq, first, last, d_first, d_last,
+        HPX_FORWARD(Comp, comp), parallel::util::projection_identity{},
+        parallel::util::projection_identity{}));
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename RandIter,
             typename Comp = hpx::parallel::v1::detail::less,
@@ -395,29 +393,26 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter>::value_type
                 >
             )>
-        // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, RandIter>
-        tag_fallback_invoke(hpx::partial_sort_copy_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, RandIter d_first, RandIter d_last,
-            Comp&& comp = Comp())
-        {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
+// clang-format on
+friend parallel::util::detail::algorithm_result_t<ExPolicy, RandIter>
+tag_fallback_invoke(hpx::partial_sort_copy_t, ExPolicy&& policy, FwdIter first,
+    FwdIter last, RandIter d_first, RandIter d_last, Comp&& comp = Comp())
+{
+static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+    "Requires at least forward iterator.");
 
-            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
-                "Requires at least random access iterator.");
+static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
+    "Requires at least random access iterator.");
 
-            using result_type =
-                parallel::util::in_out_result<FwdIter, RandIter>;
+using result_type = parallel::util::in_out_result<FwdIter, RandIter>;
 
-            return parallel::util::get_second_element(
-                parallel::v1::detail::partial_sort_copy<result_type>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, last, d_first, d_last,
-                    HPX_FORWARD(Comp, comp),
-                    parallel::util::projection_identity{},
-                    parallel::util::projection_identity{}));
-        }
-    } partial_sort_copy{};
+return parallel::util::get_second_element(
+    parallel::v1::detail::partial_sort_copy<result_type>().call(
+        HPX_FORWARD(ExPolicy, policy), first, last, d_first, d_last,
+        HPX_FORWARD(Comp, comp), parallel::util::projection_identity{},
+        parallel::util::projection_identity{}));
+}
+} partial_sort_copy{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

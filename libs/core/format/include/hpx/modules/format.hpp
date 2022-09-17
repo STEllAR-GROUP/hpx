@@ -80,9 +80,14 @@ namespace hpx { namespace util {
                     conv_spec = type_specifier<T>::value();
 
                 // copy spec to a null terminated buffer
-                char format[16];
+                char format[20];
+#if defined(HPX_MSVC)
+                sprintf_s(format, sizeof(format) - 1, "%%%.*s%s", (int) spec.size(),
+                    spec.data(), conv_spec);
+#else
                 std::sprintf(format, "%%%.*s%s", (int) spec.size(), spec.data(),
                     conv_spec);
+#endif
 
                 T const& value = *static_cast<T const*>(ptr);
                 std::size_t length = std::snprintf(nullptr, 0, format, value);
@@ -137,9 +142,14 @@ namespace hpx { namespace util {
                 else
                 {
                     // copy spec to a null terminated buffer
-                    char format[16];
+                    char format[20];
+#if defined(HPX_MSVC)
+                    sprintf_s(format, sizeof(format) - 1, "%%%.*ss",
+                        (int) spec.size(), spec.data());
+#else
                     std::sprintf(
                         format, "%%%.*ss", (int) spec.size(), spec.data());
+#endif
 
                     std::size_t length =
                         std::snprintf(nullptr, 0, format, value);

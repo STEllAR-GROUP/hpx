@@ -294,7 +294,14 @@ hpx_option(
   "Enable unity build for certain build targets (default OFF)" OFF ADVANCED
 )
 if(HPX_WITH_UNITY_BUILD)
-  set(HPX_WITH_UNITY_BUILD_OPTION UNITY_BUILD)
+  if(HPX_WITH_CXX20_MODULES)
+    hpx_warn(
+      "Support for C++20 modules was enabled, disabling unity build support"
+    )
+    set(HPX_WITH_UNITY_BUILD OFF)
+  else()
+    set(HPX_WITH_UNITY_BUILD_OPTION UNITY_BUILD)
+  endif()
 endif()
 
 hpx_option(
@@ -305,14 +312,23 @@ hpx_option(
   ADVANCED
 )
 if(HPX_WITH_PRECOMPILED_HEADERS)
-  set(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL ON)
-  # Only create the targets here. They will be set up later once all modules are
-  # known.
-  add_library(hpx_precompiled_headers OBJECT libs/src/dummy.cpp)
-  add_executable(hpx_exe_precompiled_headers libs/src/dummy.cpp)
+  if(HPX_WITH_CXX20_MODULES)
+    hpx_warn(
+      "Support for C++20 modules was enabled, disabling precompiled header support"
+    )
+    set(HPX_WITH_PRECOMPILED_HEADERS OFF)
+    set(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL OFF)
+  else()
+    set(HPX_WITH_PRECOMPILED_HEADERS_INTERNAL ON)
 
-  set_target_properties(hpx_precompiled_headers PROPERTIES FOLDER "Core")
-  set_target_properties(hpx_exe_precompiled_headers PROPERTIES FOLDER "Core")
+    # Only create the targets here. They will be set up later once all modules
+    # are known.
+    add_library(hpx_precompiled_headers OBJECT libs/src/dummy.cpp)
+    add_executable(hpx_exe_precompiled_headers libs/src/dummy.cpp)
+
+    set_target_properties(hpx_precompiled_headers PROPERTIES FOLDER "Core")
+    set_target_properties(hpx_exe_precompiled_headers PROPERTIES FOLDER "Core")
+  endif()
 endif()
 
 # ##############################################################################
@@ -371,7 +387,7 @@ endif()
 
 # ##############################################################################
 # The cmake Ninja generator runs out of memory if the modules are being built as
-# OBJECT libraries. In this case the fallback is to build whole-archive STATIC
+# whole-archive STATIC libraries. In this case the fallback is to build OBJECT
 # libraries.
 set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT ON)
 if("${CMAKE_MAKE_PROGRAM}" STREQUAL "ninja")
@@ -386,6 +402,13 @@ hpx_option(
   ${HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT}
   ADVANCED
 )
+
+if(HPX_WITH_CXX20_MODULES AND NOT HPX_WITH_MODULES_AS_STATIC_LIBRARIES)
+  hpx_warn(
+    "Support for C++20 modules was enabled, building modules as whole-archive libraries"
+  )
+  set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES ON)
+endif()
 
 if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES)
   hpx_info("Building modules as STATIC (whole-archive) libraries")
@@ -1700,17 +1723,22 @@ if(WIN32)
       # Make sure that __cplusplus is properly defined
       hpx_add_target_compile_option(-Zc:__cplusplus PUBLIC)
 
-      # Silence C++17 deprecation warnings
-      hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
-
-      # Silence C++20 deprecation warnings
-      hpx_add_config_cond_define(_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS)
+      if(NOT HPX_WITH_CXX20_MODULES)
+        # Silence C++17/20 deprecation warnings
+        hpx_add_config_cond_define(_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+        hpx_add_config_cond_define(_SILENCE_ALL_CXX20_DEPRECATION_WARNINGS)
+      endif()
 
       # ASan is available in Visual Studion starting V16.8
       if((MSVC_VERSION GREATER_EQUAL 1928) AND HPX_WITH_SANITIZERS)
         hpx_add_target_compile_option(
           -fsanitize=address PUBLIC CONFIGURATIONS RelWithDebInfo Debug
         )
+      endif()
+
+      # Possible incompatible environment while importing module
+      if((MSVC_VERSION GREATER_EQUAL 1932) AND HPX_WITH_CXX20_MODULES)
+        hpx_add_compile_flag(-wd5050)
       endif()
     endif()
 
@@ -1730,14 +1758,16 @@ if(WIN32)
   add_definitions(-D_WINDOWS)
   add_definitions(-D_WIN32)
   hpx_add_config_cond_define(_WIN32_WINNT 0x0602)
-  hpx_add_config_cond_define(_SCL_SECURE_NO_WARNINGS)
-  hpx_add_config_cond_define(_CRT_SECURE_NO_WARNINGS)
-  hpx_add_config_cond_define(_SCL_SECURE_NO_DEPRECATE)
-  hpx_add_config_cond_define(_CRT_SECURE_NO_DEPRECATE)
-  hpx_add_config_cond_define(_CRT_NONSTDC_NO_WARNINGS)
-  hpx_add_config_cond_define(_WINSOCK_DEPRECATED_NO_WARNINGS)
-  hpx_add_config_cond_define(_CRT_NON_CONFORMING_SWPRINTFS)
-  hpx_add_config_cond_define(_SILENCE_FPOS_SEEKPOS_DEPRECATION_WARNING)
+  if(NOT HPX_WITH_CXX20_MODULES)
+    hpx_add_config_cond_define(_SCL_SECURE_NO_WARNINGS)
+    hpx_add_config_cond_define(_CRT_SECURE_NO_WARNINGS)
+    hpx_add_config_cond_define(_SCL_SECURE_NO_DEPRECATE)
+    hpx_add_config_cond_define(_CRT_SECURE_NO_DEPRECATE)
+    hpx_add_config_cond_define(_CRT_NONSTDC_NO_WARNINGS)
+    hpx_add_config_cond_define(_WINSOCK_DEPRECATED_NO_WARNINGS)
+    hpx_add_config_cond_define(_CRT_NON_CONFORMING_SWPRINTFS)
+    hpx_add_config_cond_define(_SILENCE_FPOS_SEEKPOS_DEPRECATION_WARNING)
+  endif()
 
   # ############################################################################
   # Boost

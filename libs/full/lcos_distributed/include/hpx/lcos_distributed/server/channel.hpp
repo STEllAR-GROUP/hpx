@@ -17,10 +17,7 @@
 #include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/futures/traits/promise_remote_result.hpp>
 #include <hpx/lcos_local/channel.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <cstddef>
 #include <exception>

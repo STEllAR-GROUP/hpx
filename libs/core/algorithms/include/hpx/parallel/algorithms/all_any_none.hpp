@@ -321,13 +321,14 @@ namespace hpx {
 
     // clang-format on
 }    // namespace hpx
+
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
@@ -539,137 +540,131 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
 
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::none_of
-    inline constexpr struct none_of_t final
-      : hpx::detail::tag_parallel_algorithm<none_of_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// CPO for hpx::none_of
+inline constexpr struct none_of_t final
+  : hpx::detail::tag_parallel_algorithm<none_of_t>
+{
+private:
+// clang-format off
         template <typename ExPolicy, typename FwdIter, typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
-        // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
-        tag_fallback_invoke(
-            none_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
-        {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-                "Required at least forward iterator.");
+// clang-format on
+friend
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+    tag_fallback_invoke(
+        none_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
+{
+    static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+        "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::none_of().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity{});
-        }
+    return hpx::parallel::v1::detail::none_of().call(
+        HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+        hpx::parallel::util::projection_identity{});
+}
 
-        // clang-format off
+// clang-format off
         template <typename InIter, typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<InIter>::value
             )>
-        // clang-format on
-        friend bool tag_fallback_invoke(
-            none_of_t, InIter first, InIter last, F&& f)
-        {
-            static_assert(hpx::traits::is_input_iterator<InIter>::value,
-                "Required at least input iterator.");
+// clang-format on
+friend bool tag_fallback_invoke(none_of_t, InIter first, InIter last, F&& f)
+{
+    static_assert(hpx::traits::is_input_iterator<InIter>::value,
+        "Required at least input iterator.");
 
-            return hpx::parallel::v1::detail::none_of().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity{});
-        }
-    } none_of{};
+    return hpx::parallel::v1::detail::none_of().call(hpx::execution::seq, first,
+        last, HPX_FORWARD(F, f), hpx::parallel::util::projection_identity{});
+}
+} none_of{};
 
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::any_of
-    inline constexpr struct any_of_t final
-      : hpx::detail::tag_parallel_algorithm<any_of_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// CPO for hpx::any_of
+inline constexpr struct any_of_t final
+  : hpx::detail::tag_parallel_algorithm<any_of_t>
+{
+private:
+// clang-format off
         template <typename ExPolicy, typename FwdIter, typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
-        // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
-        tag_fallback_invoke(
-            any_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
-        {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-                "Required at least forward iterator.");
+// clang-format on
+friend
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+    tag_fallback_invoke(
+        any_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
+{
+    static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+        "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::any_of().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity{});
-        }
+    return hpx::parallel::v1::detail::any_of().call(
+        HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+        hpx::parallel::util::projection_identity{});
+}
 
-        // clang-format off
+// clang-format off
         template <typename InIter, typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<InIter>::value
             )>
-        // clang-format on
-        friend bool tag_fallback_invoke(
-            any_of_t, InIter first, InIter last, F&& f)
-        {
-            static_assert(hpx::traits::is_input_iterator<InIter>::value,
-                "Required at least input iterator.");
+// clang-format on
+friend bool tag_fallback_invoke(any_of_t, InIter first, InIter last, F&& f)
+{
+    static_assert(hpx::traits::is_input_iterator<InIter>::value,
+        "Required at least input iterator.");
 
-            return hpx::parallel::v1::detail::any_of().call(hpx::execution::seq,
-                first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity{});
-        }
-    } any_of{};
+    return hpx::parallel::v1::detail::any_of().call(hpx::execution::seq, first,
+        last, HPX_FORWARD(F, f), hpx::parallel::util::projection_identity{});
+}
+} any_of{};
 
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::all_of
-    inline constexpr struct all_of_t final
-      : hpx::detail::tag_parallel_algorithm<all_of_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// CPO for hpx::all_of
+inline constexpr struct all_of_t final
+  : hpx::detail::tag_parallel_algorithm<all_of_t>
+{
+private:
+// clang-format off
         template <typename ExPolicy, typename FwdIter, typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
-        // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
-        tag_fallback_invoke(
-            all_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
-        {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-                "Required at least forward iterator.");
+// clang-format on
+friend
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+    tag_fallback_invoke(
+        all_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
+{
+    static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+        "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::all_of().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity());
-        }
+    return hpx::parallel::v1::detail::all_of().call(
+        HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+        hpx::parallel::util::projection_identity());
+}
 
-        // clang-format off
+// clang-format off
         template <typename InIter, typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<InIter>::value
             )>
-        // clang-format on
-        friend bool tag_fallback_invoke(
-            all_of_t, InIter first, InIter last, F&& f)
-        {
-            static_assert(hpx::traits::is_input_iterator<InIter>::value,
-                "Required at least input iterator.");
+// clang-format on
+friend bool tag_fallback_invoke(all_of_t, InIter first, InIter last, F&& f)
+{
+    static_assert(hpx::traits::is_input_iterator<InIter>::value,
+        "Required at least input iterator.");
 
-            return hpx::parallel::v1::detail::all_of().call(hpx::execution::seq,
-                first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity{});
-        }
-    } all_of{};
+    return hpx::parallel::v1::detail::all_of().call(hpx::execution::seq, first,
+        last, HPX_FORWARD(F, f), hpx::parallel::util::projection_identity{});
+}
+} all_of{};
 
 }    // namespace hpx
 

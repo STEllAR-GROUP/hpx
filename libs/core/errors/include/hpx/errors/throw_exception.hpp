@@ -14,9 +14,7 @@
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/exception_fwd.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <exception>
 #include <string>
@@ -67,15 +65,15 @@ namespace hpx { namespace detail {
 /// \endcond
 
 namespace hpx {
-    /// \cond NOINTERNAL
+/// \cond NOINTERNAL
 
-    /// \brief throw an hpx::exception initialized from the given arguments
-    [[noreturn]] inline void throw_exception(error e, std::string const& msg,
-        std::string const& func, std::string const& file = "", long line = -1)
-    {
-        detail::throw_exception(e, msg, func, file, line);
-    }
-    /// \endcond
+/// \brief throw an hpx::exception initialized from the given arguments
+[[noreturn]] inline void throw_exception(error e, std::string const& msg,
+    std::string const& func, std::string const& file = "", long line = -1)
+{
+    detail::throw_exception(e, msg, func, file, line);
+}
+/// \endcond
 }    // namespace hpx
 
 /// \cond NOINTERNAL

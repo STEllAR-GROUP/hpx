@@ -19,12 +19,17 @@ set(concepts_compat_headers
 
 set(concepts_sources)
 
+if(HPX_WITH_CXX20_MODULES)
+  set(concepts_modulefiles hpx.core.concepts.cppm)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   core concepts
-  GLOBAL_HEADER_GEN ON
+  GLOBAL_HEADER_GEN MODULE
   SOURCES ${concepts_sources}
   HEADERS ${concepts_headers}
+  MODULES ${concepts_modulefiles}
   COMPAT_HEADERS ${concepts_compat_headers}
   MODULE_DEPENDENCIES hpx_config hpx_preprocessor
   CMAKE_SUBDIRS examples tests

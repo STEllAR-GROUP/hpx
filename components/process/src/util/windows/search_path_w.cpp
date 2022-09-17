@@ -15,11 +15,12 @@
 #include <hpx/components/process/util/windows/search_path.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/string_util.hpp>
 
 #include <boost/tokenizer.hpp>
 
-#include <windows.h>
 #include <shellapi.h>
+#include <windows.h>
 
 #include <array>
 #include <cstdlib>
@@ -27,34 +28,33 @@
 #include <string>
 #include <system_error>
 
-namespace hpx { namespace components { namespace process { namespace windows
-{
+namespace hpx { namespace components { namespace process { namespace windows {
 #if defined(_UNICODE) || defined(UNICODE)
-    std::wstring search_path(const std::wstring &filename, std::wstring path)
+    std::wstring search_path(const std::wstring& filename, std::wstring path)
     {
         if (path.empty())
         {
             path = ::_wgetenv(L"PATH");
             if (path.empty())
             {
-                HPX_THROW_EXCEPTION(invalid_status,
-                    "process::search_path",
+                HPX_THROW_EXCEPTION(invalid_status, "process::search_path",
                     "Environment variable PATH not found");
             }
         }
 
         typedef boost::tokenizer<boost::char_separator<wchar_t>,
-            std::wstring::const_iterator, std::wstring> tokenizer;
+            std::wstring::const_iterator, std::wstring>
+            tokenizer;
         boost::char_separator<wchar_t> sep(L";");
         tokenizer tok(path, sep);
         for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)
         {
             filesystem::path p = *it;
             p /= filename;
-            std::array<std::wstring, 4> extensions =
-                { L"", L".exe", L".com", L".bat" };
+            std::array<std::wstring, 4> extensions = {
+                L"", L".exe", L".com", L".bat"};
             for (std::array<std::wstring, 4>::iterator it2 = extensions.begin();
-                it2 != extensions.end(); ++it2)
+                 it2 != extensions.end(); ++it2)
             {
                 filesystem::path p2 = p;
                 p2 += *it2;
@@ -70,30 +70,29 @@ namespace hpx { namespace components { namespace process { namespace windows
         return L"";
     }
 #else
-    std::string search_path(const std::string &filename, std::string path)
+    std::string search_path(const std::string& filename, std::string path)
     {
         if (path.empty())
         {
-            path = ::getenv("PATH");
+            path = hpx::util::getenv("PATH");
             if (path.empty())
             {
-                HPX_THROW_EXCEPTION(invalid_status,
-                    "process::search_path",
+                HPX_THROW_EXCEPTION(invalid_status, "process::search_path",
                     "Environment variable PATH not found");
             }
         }
 
-        typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+        typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
         boost::char_separator<char> sep(";");
         tokenizer tok(path, sep);
         for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)
         {
             filesystem::path p = *it;
             p /= filename;
-            std::array<std::string, 4> extensions = //-V112
-                {{ "", ".exe", ".com", ".bat" }};
+            std::array<std::string, 4> extensions =    //-V112
+                {{"", ".exe", ".com", ".bat"}};
             for (std::array<std::string, 4>::iterator it2 = extensions.begin();
-                it2 != extensions.end(); ++it2)
+                 it2 != extensions.end(); ++it2)
             {
                 filesystem::path p2 = p;
                 p2 += *it2;
@@ -110,6 +109,6 @@ namespace hpx { namespace components { namespace process { namespace windows
         return "";
     }
 #endif
-}}}}
+}}}}    // namespace hpx::components::process::windows
 
 #endif

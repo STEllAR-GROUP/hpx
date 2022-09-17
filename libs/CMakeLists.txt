@@ -16,6 +16,9 @@ include(HPX_AddPseudoTarget)
 
 set(hpx_HEADERS)
 set(hpx_SOURCES "${PROJECT_SOURCE_DIR}/libs/src/empty.cpp")
+if(HPX_WITH_CXX20_MODULES)
+  set(hpx_MODULE_SOURCES "${PROJECT_SOURCE_DIR}/libs/src/hpx.core.cppm")
+endif()
 set(hpx_external_objects_SOURCES)
 
 if(MSVC)
@@ -55,6 +58,15 @@ add_hpx_source_group(
   ROOT "${PROJECT_SOURCE_DIR}/libs/src"
   TARGETS ${hpx_SOURCES}
 )
+
+if(HPX_WITH_CXX20_MODULES)
+  add_hpx_source_group(
+    NAME hpx
+    CLASS "Module Files"
+    ROOT "${PROJECT_SOURCE_DIR}/libs/src"
+    TARGETS ${hpx_MODULE_SOURCES}
+  )
+endif()
 
 add_hpx_source_group(
   NAME hpx_generated
@@ -309,9 +321,31 @@ foreach(lib ${HPX_LIBS})
   # NOTE: hpx_full (i.e. the target representing libhpx.so) is still created in
   # src/CMakeLists.txt. When all of hpx_full has been modularized the target
   # creation can move here as well.
-  if(NOT ${lib} STREQUAL "full")
+  if(NOT "${lib}" STREQUAL "full")
     string(TOUPPER ${lib} uppercase_lib)
-    add_library(hpx_${lib} ${hpx_library_link_mode} src/empty.cpp)
+    if(HPX_WITH_CXX20_MODULES)
+      add_library(hpx_${lib} ${hpx_library_link_mode} ${hpx_MODULE_SOURCES})
+      target_compile_definitions(hpx_${lib} PRIVATE HPX_HAVE_CXX20_MODULES)
+      target_compile_options(hpx_${lib} PRIVATE "-experimental:module")
+
+      file(TO_NATIVE_PATH "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bmi/"
+           bmi_path
+      )
+      target_compile_options(hpx_${lib} PRIVATE "-ifcSearchDir${bmi_path}")
+      target_compile_options(
+        hpx_${lib} PRIVATE "-ifcOutput${bmi_path}" # "hpx.${lib}.ifc"
+      )
+      target_compile_options(
+        hpx_${lib} PRIVATE "-sourceDependencies:directives${bmi_path}"
+      )
+      foreach(module_name ${hpx_MODULE_SOURCES})
+        set_source_files_properties(
+          ${module_name} PROPERTIES COMPILE_OPTIONS "-interface"
+        )
+      endforeach()
+    else()
+      add_library(hpx_${lib} ${hpx_library_link_mode} ${hpx_SOURCES})
+    endif()
     target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
 
     set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")

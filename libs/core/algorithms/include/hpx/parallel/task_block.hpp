@@ -10,8 +10,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_local/async.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/errors.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
@@ -489,8 +489,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
 /// \cond NOINTERNAL
 namespace std {
-    template <typename ExPolicy>
-    hpx::parallel::v2::task_block<ExPolicy>* addressof(
-        hpx::parallel::v2::task_block<ExPolicy>&) = delete;
+template <typename ExPolicy>
+hpx::parallel::v2::task_block<ExPolicy>* addressof(
+    hpx::parallel::v2::task_block<ExPolicy>&) = delete;
 }
 /// \endcond

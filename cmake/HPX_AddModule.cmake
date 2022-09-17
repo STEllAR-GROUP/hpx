@@ -6,14 +6,20 @@
 
 include(HPX_ExportTargets)
 include(HPX_PrintSummary)
+if(HPX_WITH_CXX20_MODULES)
+  include(HPX_AddModuleLibrary)
+endif()
 
 function(add_hpx_module libname modulename)
   # Retrieve arguments
-  set(options CUDA CONFIG_FILES NO_CONFIG_IN_GENERATED_HEADERS)
+  set(options CUDA CONFIG_FILES GENERATE_EXPORT_DEFINITIONS
+              NO_CONFIG_IN_GENERATED_HEADERS
+  )
   set(one_value_args GLOBAL_HEADER_GEN)
   set(multi_value_args
       SOURCES
       HEADERS
+      MODULES
       COMPAT_HEADERS
       OBJECTS
       DEPENDENCIES
@@ -36,12 +42,22 @@ function(add_hpx_module libname modulename)
   include(HPX_Option)
 
   # Global headers should be always generated except if explicitly disabled
+  set(global_module_header OFF)
   if("${${modulename}_GLOBAL_HEADER_GEN}" STREQUAL "")
     set(${modulename}_GLOBAL_HEADER_GEN ON)
+  elseif(("${${modulename}_GLOBAL_HEADER_GEN}" STREQUAL "MODULE")
+         AND HPX_WITH_CXX20_MODULES
+  )
+    set(global_module_header ON)
   endif()
 
   string(TOUPPER ${libname} libname_upper)
   string(TOUPPER ${modulename} modulename_upper)
+
+  # capitalize string
+  string(SUBSTRING ${libname} 0 1 first_letter)
+  string(TOUPPER ${first_letter} first_letter)
+  string(REGEX REPLACE "^.(.*)" "${first_letter}\\1" libname_cap "${libname}")
 
   # Mark the module as enabled (see hpx/libs/CMakeLists.txt)
   set(modules ${HPX_ENABLED_MODULES})
@@ -86,6 +102,11 @@ function(add_hpx_module libname modulename)
   list(TRANSFORM ${modulename}_SOURCES PREPEND ${SOURCE_ROOT}/ OUTPUT_VARIABLE
                                                                sources
   )
+  if(HPX_WITH_CXX20_MODULES)
+    list(TRANSFORM ${modulename}_MODULES PREPEND ${SOURCE_ROOT}/ OUTPUT_VARIABLE
+                                                                 module_sources
+    )
+  endif()
   list(TRANSFORM ${modulename}_HEADERS PREPEND ${HEADER_ROOT}/ OUTPUT_VARIABLE
                                                                headers
   )
@@ -130,16 +151,27 @@ function(add_hpx_module libname modulename)
       )
       hpx_error(${error_message})
     endif()
+
     # Add a global include file that include all module headers
     set(global_header
         "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/modules/${modulename}.hpp"
     )
-    if(NOT ${modulename}_NO_CONFIG_IN_GENERATED_HEADERS)
-      set(module_headers "#include <hpx/config.hpp>\n\n")
-      set(module_headers
-          "${module_headers}#if defined(HPX_HAVE_MODULE_${modulename_upper})\n"
+
+    if(global_module_header)
+      set(cppm_module_prefix
+          "${cppm_module_prefix}#if !defined(HPX_HAVE_CXX20_MODULES)\n"
       )
     endif()
+
+    if(NOT ${modulename}_NO_CONFIG_IN_GENERATED_HEADERS)
+      set(cppm_module_prefix
+          "${cppm_module_prefix}#include <hpx/config.hpp>\n\n"
+      )
+      set(cppm_module_prefix
+          "${cppm_module_prefix}#if defined(HPX_HAVE_MODULE_${modulename_upper})\n"
+      )
+    endif()
+
     foreach(header_file ${${modulename}_HEADERS})
       # Exclude the files specified
       if((NOT (${header_file} IN_LIST ${modulename}_EXCLUDE_FROM_GLOBAL_HEADER))
@@ -148,9 +180,31 @@ function(add_hpx_module libname modulename)
         set(module_headers "${module_headers}#include <${header_file}>\n")
       endif()
     endforeach(header_file)
+
     if(NOT ${modulename}_NO_CONFIG_IN_GENERATED_HEADERS)
-      set(module_headers "${module_headers}#endif\n")
+      set(cppm_module_postfix
+          "${cppm_module_postfix}#endif // HPX_HAVE_MODULE_${modulename_upper}\n\n"
+      )
     endif()
+
+    if(global_module_header)
+      set(cppm_module_postfix "${cppm_module_postfix}#else\n\n")
+      set(cppm_module_postfix
+          "${cppm_module_postfix}#if defined(HPX_CORE_EXPORTS)\n"
+      )
+      set(cppm_module_postfix
+          "${cppm_module_postfix}import hpx.${libname}.${modulename};\n"
+      )
+      set(cppm_module_postfix "${cppm_module_postfix}#else\n")
+      set(cppm_module_postfix "${cppm_module_postfix}import hpx.core;\n")
+      set(cppm_module_postfix
+          "${cppm_module_postfix}#endif // HPX_CORE_EXPORTS\n\n"
+      )
+      set(cppm_module_postfix
+          "${cppm_module_postfix}#endif // HPX_HAVE_CXX20_MODULES\n"
+      )
+    endif()
+
     configure_file(
       "${PROJECT_SOURCE_DIR}/cmake/templates/global_module_header.hpp.in"
       "${global_header}"
@@ -198,6 +252,18 @@ function(add_hpx_module libname modulename)
     set(generated_headers ${generated_headers} ${global_config_file})
   endif()
 
+  # generate export macro definitions, if needed
+  if(${modulename}_GENERATE_EXPORT_DEFINITIONS)
+    set(export_header
+        "${CMAKE_CURRENT_BINARY_DIR}/include/hpx/${modulename}/export_definitions.hpp"
+    )
+    configure_file(
+      "${PROJECT_SOURCE_DIR}/cmake/templates/export_definitions.hpp.in"
+      "${export_header}"
+    )
+    set(generated_headers ${generated_headers} ${export_header})
+  endif()
+
   # collect zombie generated headers
   file(GLOB_RECURSE zombie_generated_headers
        ${CMAKE_CURRENT_BINARY_DIR}/include/*.hpp
@@ -231,22 +297,39 @@ function(add_hpx_module libname modulename)
   endif()
 
   set(source_group_root ${SOURCE_ROOT})
-  if(NOT sources AND NOT config_entries_source)
+  if(NOT sources
+     AND NOT config_entries_source
+     AND NOT module_sources
+  )
     set(source_group_root "${HPX_SOURCE_DIR}/libs/src/")
     set(sources "${source_group_root}/empty.cpp")
   endif()
 
   # create library modules
-  add_library(
-    hpx_${modulename}
-    ${module_library_type}
-    ${sources}
-    ${config_entries_source}
-    ${${modulename}_OBJECTS}
-    ${headers}
-    ${generated_headers}
-    ${compat_headers}
-  )
+  if(NOT HPX_WITH_CXX20_MODULES)
+    add_library(
+      hpx_${modulename}
+      ${module_library_type}
+      ${sources}
+      ${config_entries_source}
+      ${${modulename}_OBJECTS}
+      ${headers}
+      ${module_sources}
+      ${generated_headers}
+      ${compat_headers}
+    )
+  else()
+    add_hpx_module_library(
+      ${libname} ${modulename}
+      LINKTYPE ${module_library_type}
+      MODULE_SOURCES ${module_sources}
+      MODULE_HEADERS ${headers}
+      SOURCES ${sources} ${config_entries_source}
+      OBJECTS ${${modulename}_OBJECTS}
+      HEADERS ${generated_headers} ${compat_headers}
+      FOLDER "Core/Modules/${libname_cap}/BMI"
+    )
+  endif()
 
   if(HPX_WITH_CHECK_MODULE_DEPENDENCIES)
     # verify that all dependencies are from the same module category
@@ -313,6 +396,19 @@ function(add_hpx_module libname modulename)
     target_include_directories(hpx_${modulename} PRIVATE ${HPX_SOURCE_DIR})
   endif()
 
+  # if(HPX_WITH_CXX20_MODULES) target_compile_definitions(hpx_${modulename}
+  # PRIVATE HPX_HAVE_CXX20_MODULES) target_compile_options(hpx_${modulename}
+  # PRIVATE "-experimental:module")
+  #
+  # file(TO_NATIVE_PATH "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/bmi/"
+  # bmi_path ) target_compile_options(hpx_${modulename} PRIVATE
+  # "-ifcSearchDir${bmi_path}") target_compile_options( hpx_${modulename}
+  # PRIVATE "-ifcOutput${bmi_path}" # "hpx.${libname}.${modulename}.ifc" )
+  # target_compile_options( hpx_${modulename} PRIVATE
+  # "-sourceDependencies:directives${bmi_path}" ) foreach(module_name
+  # ${module_sources}) set_source_files_properties( ${module_name} PROPERTIES
+  # COMPILE_OPTIONS "-interface" ) endforeach() endif()
+
   add_hpx_source_group(
     NAME hpx_${modulename}
     ROOT ${HEADER_ROOT}/hpx
@@ -325,6 +421,14 @@ function(add_hpx_module libname modulename)
     CLASS "Source Files"
     TARGETS ${sources}
   )
+  if(HPX_WITH_CXX20_MODULES)
+    add_hpx_source_group(
+      NAME hpx_${modulename}
+      ROOT ${source_group_root}
+      CLASS "Module Files"
+      TARGETS ${module_sources}
+    )
+  endif()
   if(${modulename}_COMPAT_HEADERS)
     add_hpx_source_group(
       NAME hpx_${modulename}
@@ -334,7 +438,10 @@ function(add_hpx_module libname modulename)
     )
   endif()
 
-  if(${modulename}_GLOBAL_HEADER_GEN OR ${modulename}_CONFIG_FILES)
+  if(${modulename}_GLOBAL_HEADER_GEN
+     OR ${modulename}_CONFIG_FILES
+     OR ${modulename}_GENERATE_EXPORT_DEFINITIONS
+  )
     add_hpx_source_group(
       NAME hpx_${modulename}
       ROOT ${CMAKE_CURRENT_BINARY_DIR}/include/hpx
@@ -348,11 +455,6 @@ function(add_hpx_module libname modulename)
     CLASS "Generated Files"
     TARGETS ${config_header}
   )
-
-  # capitalize string
-  string(SUBSTRING ${libname} 0 1 first_letter)
-  string(TOUPPER ${first_letter} first_letter)
-  string(REGEX REPLACE "^.(.*)" "${first_letter}\\1" libname_cap "${libname}")
 
   set_target_properties(
     hpx_${modulename} PROPERTIES FOLDER "Core/Modules/${libname_cap}"

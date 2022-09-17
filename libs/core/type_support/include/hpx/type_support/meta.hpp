@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/concepts/concepts.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/type_support/detected.hpp>
 #include <hpx/type_support/pack.hpp>
 

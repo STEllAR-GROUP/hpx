@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/config/defines.hpp>
+
 #if defined(HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE)
 #define HPX_FORWARD(T, ...) static_cast<decltype(__VA_ARGS__)&&>(__VA_ARGS__)
 #else

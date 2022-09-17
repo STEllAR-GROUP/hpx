@@ -7,6 +7,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling_local/command_line_handling_local.hpp>
 #include <hpx/coroutines/detail/context_impl.hpp>
@@ -23,6 +25,7 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
@@ -38,8 +41,6 @@
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
 #include <hpx/threading/thread.hpp>
 #include <hpx/threading_base/detail/get_default_timer_service.hpp>
 #include <hpx/type_support/pack.hpp>

@@ -11,8 +11,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/agas/agas_fwd.hpp>
-#include <hpx/cache/lru_cache.hpp>
-#include <hpx/cache/statistics/local_full_statistics.hpp>
+#include <hpx/modules/cache.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/datastructures/detail/dynamic_bitset.hpp>
 #include <hpx/functional/function.hpp>

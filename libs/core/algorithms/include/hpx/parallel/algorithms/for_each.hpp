@@ -242,9 +242,9 @@ namespace hpx {
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/executors.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -583,156 +583,153 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
 
-    // Note: The implementation of the non-segmented algorithms here relies on
-    //       tag_fallback_invoke. For this reason the tag_invoke overloads for
-    //       the segmented algorithms (and other specializations) take
-    //       precedence over the implementations here. This has the advantage
-    //       that the non-segmented algorithms do not need to be explicitly
-    //       disabled for other, possibly external specializations.
-    //
-    inline constexpr struct for_each_t final
-      : hpx::detail::tag_parallel_algorithm<for_each_t>
-    {
-    private:
-        // clang-format off
+// Note: The implementation of the non-segmented algorithms here relies on
+//       tag_fallback_invoke. For this reason the tag_invoke overloads for
+//       the segmented algorithms (and other specializations) take
+//       precedence over the implementations here. This has the advantage
+//       that the non-segmented algorithms do not need to be explicitly
+//       disabled for other, possibly external specializations.
+//
+inline constexpr struct for_each_t final
+  : hpx::detail::tag_parallel_algorithm<for_each_t>
+{
+private:
+// clang-format off
         template <typename InIter,
             typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<InIter>::value
             )>
-        // clang-format on
-        friend F tag_fallback_invoke(
-            hpx::for_each_t, InIter first, InIter last, F&& f)
-        {
-            static_assert((hpx::traits::is_input_iterator<InIter>::value),
-                "Requires at least input iterator.");
+// clang-format on
+friend F tag_fallback_invoke(hpx::for_each_t, InIter first, InIter last, F&& f)
+{
+    static_assert((hpx::traits::is_input_iterator<InIter>::value),
+        "Requires at least input iterator.");
 
-            if (first != last)
-            {
-                hpx::parallel::v1::detail::for_each<InIter>().call(
-                    hpx::execution::seq, first, last, f,
-                    hpx::parallel::util::projection_identity());
-            }
-            return HPX_FORWARD(F, f);
-        }
+    if (first != last)
+    {
+        hpx::parallel::v1::detail::for_each<InIter>().call(hpx::execution::seq,
+            first, last, f, hpx::parallel::util::projection_identity());
+    }
+    return HPX_FORWARD(F, f);
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value
             )>
-        // clang-format on
-        friend decltype(auto) tag_fallback_invoke(hpx::for_each_t,
-            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
-        {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Requires at least forward iterator.");
+// clang-format on
+friend decltype(auto) tag_fallback_invoke(
+    hpx::for_each_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
+{
+    static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+        "Requires at least forward iterator.");
 
-            return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
-                hpx::parallel::v1::detail::for_each<FwdIter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_FORWARD(F, f),
-                    hpx::parallel::util::projection_identity()));
-        }
-    } for_each{};
+    return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
+        hpx::parallel::v1::detail::for_each<FwdIter>().call(
+            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+            hpx::parallel::util::projection_identity()));
+}
+} for_each{};
 
-    ///////////////////////////////////////////////////////////////////////////
-    inline constexpr struct for_each_n_t final
-      : hpx::detail::tag_parallel_algorithm<for_each_n_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+inline constexpr struct for_each_n_t final
+  : hpx::detail::tag_parallel_algorithm<for_each_n_t>
+{
+private:
+// clang-format off
         template <typename InIter, typename Size, typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_input_iterator<InIter>::value
             )>
-        // clang-format on
-        friend InIter tag_fallback_invoke(
-            hpx::for_each_n_t, InIter first, Size count, F&& f)
-        {
-            static_assert((hpx::traits::is_input_iterator<InIter>::value),
-                "Requires at least input iterator.");
+// clang-format on
+friend InIter tag_fallback_invoke(
+    hpx::for_each_n_t, InIter first, Size count, F&& f)
+{
+    static_assert((hpx::traits::is_input_iterator<InIter>::value),
+        "Requires at least input iterator.");
 
-            // if count is representing a negative value, we do nothing
-            if (parallel::v1::detail::is_negative(count))
-            {
-                return first;
-            }
+    // if count is representing a negative value, we do nothing
+    if (parallel::v1::detail::is_negative(count))
+    {
+        return first;
+    }
 
-            return hpx::parallel::v1::detail::for_each_n<InIter>().call(
-                hpx::execution::seq, first, std::size_t(count),
-                HPX_FORWARD(F, f), parallel::util::projection_identity());
-        }
+    return hpx::parallel::v1::detail::for_each_n<InIter>().call(
+        hpx::execution::seq, first, std::size_t(count), HPX_FORWARD(F, f),
+        parallel::util::projection_identity());
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename FwdIter, typename Size, typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
-        // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
-        tag_fallback_invoke(hpx::for_each_n_t, ExPolicy&& policy, FwdIter first,
-            Size count, F&& f)
-        {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-                "Requires at least forward iterator.");
+// clang-format on
+friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
+tag_fallback_invoke(
+    hpx::for_each_n_t, ExPolicy&& policy, FwdIter first, Size count, F&& f)
+{
+    static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+        "Requires at least forward iterator.");
 
-            // if count is representing a negative value, we do nothing
-            if (parallel::v1::detail::is_negative(count))
-            {
-                using result =
-                    parallel::util::detail::algorithm_result<ExPolicy, FwdIter>;
-                return result::get(HPX_MOVE(first));
-            }
+    // if count is representing a negative value, we do nothing
+    if (parallel::v1::detail::is_negative(count))
+    {
+        using result =
+            parallel::util::detail::algorithm_result<ExPolicy, FwdIter>;
+        return result::get(HPX_MOVE(first));
+    }
 
-            return hpx::parallel::v1::detail::for_each_n<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
-                HPX_FORWARD(F, f), parallel::util::projection_identity());
-        }
-    } for_each_n{};
+    return hpx::parallel::v1::detail::for_each_n<FwdIter>().call(
+        HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
+        HPX_FORWARD(F, f), parallel::util::projection_identity());
+}
+} for_each_n{};
 }    // namespace hpx
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 namespace hpx { namespace traits {
-    template <typename ExPolicy, typename F, typename Proj>
-    struct get_function_address<
-        parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj>>
+template <typename ExPolicy, typename F, typename Proj>
+struct get_function_address<
+    parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj>>
+{
+    static constexpr std::size_t call(
+        parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
+            f) noexcept
     {
-        static constexpr std::size_t call(
-            parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
-                f) noexcept
-        {
-            return get_function_address<std::decay_t<F>>::call(f.f_);
-        }
-    };
+        return get_function_address<std::decay_t<F>>::call(f.f_);
+    }
+};
 
-    template <typename ExPolicy, typename F, typename Proj>
-    struct get_function_annotation<
-        parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj>>
+template <typename ExPolicy, typename F, typename Proj>
+struct get_function_annotation<
+    parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj>>
+{
+    static constexpr char const* call(
+        parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
+            f) noexcept
     {
-        static constexpr char const* call(
-            parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
-                f) noexcept
-        {
-            return get_function_annotation<std::decay_t<F>>::call(f.f_);
-        }
-    };
+        return get_function_annotation<std::decay_t<F>>::call(f.f_);
+    }
+};
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-    template <typename ExPolicy, typename F, typename Proj>
-    struct get_function_annotation_itt<
-        parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj>>
+template <typename ExPolicy, typename F, typename Proj>
+struct get_function_annotation_itt<
+    parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj>>
+{
+    static util::itt::string_handle call(
+        parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
+            f) noexcept
     {
-        static util::itt::string_handle call(
-            parallel::v1::detail::for_each_iteration<ExPolicy, F, Proj> const&
-                f) noexcept
-        {
-            return get_function_annotation_itt<std::decay_t<F>>::call(f.f_);
-        }
-    };
+        return get_function_annotation_itt<std::decay_t<F>>::call(f.f_);
+    }
+};
 #endif
 }}    // namespace hpx::traits
 #endif

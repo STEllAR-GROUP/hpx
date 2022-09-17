@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/local/execution.hpp>
 #include <hpx/local/runtime.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/iterator_support.hpp>
 
 #include <atomic>

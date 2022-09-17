@@ -23,9 +23,7 @@
 #include <hpx/components/client_base.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/components_base/server/locking_hook.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <hpx/components/containers/partitioned_vector/partitioned_vector_fwd.hpp>
 
@@ -319,263 +317,260 @@ namespace hpx { namespace server {
     /**/
 
 namespace hpx {
-    template <typename T, typename Data>
-    class partitioned_vector_partition
-      : public components::client_base<partitioned_vector_partition<T, Data>,
-            server::partitioned_vector<T, Data>>
-    {
-    private:
-        typedef hpx::server::partitioned_vector<T, Data> server_type;
-        typedef hpx::components::client_base<
-            partitioned_vector_partition<T, Data>,
-            server::partitioned_vector<T, Data>>
-            base_type;
+template <typename T, typename Data>
+class partitioned_vector_partition
+  : public components::client_base<partitioned_vector_partition<T, Data>,
+        server::partitioned_vector<T, Data>>
+{
+private:
+    typedef hpx::server::partitioned_vector<T, Data> server_type;
+    typedef hpx::components::client_base<partitioned_vector_partition<T, Data>,
+        server::partitioned_vector<T, Data>>
+        base_type;
 
-    public:
-        partitioned_vector_partition() = default;
+public:
+    partitioned_vector_partition() = default;
 
-        explicit partitioned_vector_partition(id_type const& gid);
+    explicit partitioned_vector_partition(id_type const& gid);
 
-        explicit partitioned_vector_partition(
-            hpx::shared_future<id_type> const& gid);
+    explicit partitioned_vector_partition(
+        hpx::shared_future<id_type> const& gid);
 
-        // Return the pinned pointer to the underlying component
-        std::shared_ptr<server::partitioned_vector<T, Data>> get_ptr() const;
+    // Return the pinned pointer to the underlying component
+    std::shared_ptr<server::partitioned_vector<T, Data>> get_ptr() const;
 
-        ///////////////////////////////////////////////////////////////////////
-        //  Capacity related API's in partitioned_vector_partition client class
+    ///////////////////////////////////////////////////////////////////////
+    //  Capacity related API's in partitioned_vector_partition client class
 
-        /// Asynchronously return the size of the partitioned_vector_partition
-        /// component.
-        ///
-        /// \return This returns size as the hpx::future of type size_type
-        ///
-        future<std::size_t> size_async() const;
+    /// Asynchronously return the size of the partitioned_vector_partition
+    /// component.
+    ///
+    /// \return This returns size as the hpx::future of type size_type
+    ///
+    future<std::size_t> size_async() const;
 
-        /// Return the size of the partitioned_vector_partition component.
-        ///
-        /// \return This returns size as the hpx::future of type size_type
-        ///
-        std::size_t size() const;
+    /// Return the size of the partitioned_vector_partition component.
+    ///
+    /// \return This returns size as the hpx::future of type size_type
+    ///
+    std::size_t size() const;
 
-        //         future<std::size_t> max_size_async() const
-        //         {
-        //             HPX_ASSERT(this->get_id());
-        //             return this->base_type::max_size_async(this->get_id());
-        //         }
-        //         std::size_t max_size() const
-        //         {
-        //             return max_size_async().get();
-        //         }
+    //         future<std::size_t> max_size_async() const
+    //         {
+    //             HPX_ASSERT(this->get_id());
+    //             return this->base_type::max_size_async(this->get_id());
+    //         }
+    //         std::size_t max_size() const
+    //         {
+    //             return max_size_async().get();
+    //         }
 
-        /// Resize the partitioned_vector_partition component.
-        /// If the \a val is not specified it use default constructor instead.
-        ///
-        /// \param n    New size of the partitioned_vector_partition
-        /// \param val  Value to be copied if \a n is greater than the current
-        ///             size
-        ///
-        void resize(std::size_t n, T const& val = T());
+    /// Resize the partitioned_vector_partition component.
+    /// If the \a val is not specified it use default constructor instead.
+    ///
+    /// \param n    New size of the partitioned_vector_partition
+    /// \param val  Value to be copied if \a n is greater than the current
+    ///             size
+    ///
+    void resize(std::size_t n, T const& val = T());
 
-        /// Resize the partitioned_vector_partition component.
-        /// If the \a val is not specified it use default constructor instead.
-        ///
-        /// \param n    New size of the partitioned_vector_partition
-        /// \param val  Value to be copied if \a n is greater than the current
-        ///             size
-        ///
-        /// \return This returns the hpx::future of type void which gets ready
-        ///         once the operation is finished.
-        ///
-        future<void> resize_async(std::size_t n, T const& val = T());
+    /// Resize the partitioned_vector_partition component.
+    /// If the \a val is not specified it use default constructor instead.
+    ///
+    /// \param n    New size of the partitioned_vector_partition
+    /// \param val  Value to be copied if \a n is greater than the current
+    ///             size
+    ///
+    /// \return This returns the hpx::future of type void which gets ready
+    ///         once the operation is finished.
+    ///
+    future<void> resize_async(std::size_t n, T const& val = T());
 
-        //         future<std::size_t> capacity_async() const
-        //         {
-        //             HPX_ASSERT(this->get_id());
-        //             return this->base_type::capacity_async(this->get_id());
-        //         }
-        //         std::size_t capacity() const
-        //         {
-        //             return capacity_async().get();
-        //         }
+    //         future<std::size_t> capacity_async() const
+    //         {
+    //             HPX_ASSERT(this->get_id());
+    //             return this->base_type::capacity_async(this->get_id());
+    //         }
+    //         std::size_t capacity() const
+    //         {
+    //             return capacity_async().get();
+    //         }
 
-        //         future<bool> empty_async() const
-        //         {
-        //             HPX_ASSERT(this->get_id());
-        //             return this->base_type::empty_async(this->get_id());
-        //         }
-        //         bool empty() const
-        //         {
-        //             return empty_async().get();
-        //         }
+    //         future<bool> empty_async() const
+    //         {
+    //             HPX_ASSERT(this->get_id());
+    //             return this->base_type::empty_async(this->get_id());
+    //         }
+    //         bool empty() const
+    //         {
+    //             return empty_async().get();
+    //         }
 
-        //         void reserve(std::size_t n)
-        //         {
-        //             HPX_ASSERT(this->get_id());
-        //             this->base_type::reserve_async(this->get_id(), n).get();
-        //         }
+    //         void reserve(std::size_t n)
+    //         {
+    //             HPX_ASSERT(this->get_id());
+    //             this->base_type::reserve_async(this->get_id(), n).get();
+    //         }
 
-        //  Element Access API's in Client class
+    //  Element Access API's in Client class
 
-        /// Returns the value at position \a pos in the partitioned_vector_partition
-        /// component.
-        ///
-        /// \param pos  Position of the element in the partitioned_vector_partition
-        ///
-        /// \return Returns the value of the element at position represented
-        ///         by \a pos
-        ///
-        T get_value(launch::sync_policy, std::size_t pos) const;
+    /// Returns the value at position \a pos in the partitioned_vector_partition
+    /// component.
+    ///
+    /// \param pos  Position of the element in the partitioned_vector_partition
+    ///
+    /// \return Returns the value of the element at position represented
+    ///         by \a pos
+    ///
+    T get_value(launch::sync_policy, std::size_t pos) const;
 
-        /// Return the element at the position \a pos in the
-        /// partitioned_vector_partition container.
-        ///
-        /// \param pos Position of the element in the partitioned_vector_partition
-        ///
-        /// \return This returns the value as the hpx::future
-        ///
-        future<T> get_value(std::size_t pos) const;
+    /// Return the element at the position \a pos in the
+    /// partitioned_vector_partition container.
+    ///
+    /// \param pos Position of the element in the partitioned_vector_partition
+    ///
+    /// \return This returns the value as the hpx::future
+    ///
+    future<T> get_value(std::size_t pos) const;
 
-        /// Returns the value at position \a pos in the partitioned_vector_partition
-        /// component.
-        ///
-        /// \param pos  Position of the element in the partitioned_vector_partition
-        ///
-        /// \return Returns the value of the element at position represented
-        ///         by \a pos
-        ///
-        std::vector<T> get_values(
-            launch::sync_policy, std::vector<std::size_t> const& pos) const;
+    /// Returns the value at position \a pos in the partitioned_vector_partition
+    /// component.
+    ///
+    /// \param pos  Position of the element in the partitioned_vector_partition
+    ///
+    /// \return Returns the value of the element at position represented
+    ///         by \a pos
+    ///
+    std::vector<T> get_values(
+        launch::sync_policy, std::vector<std::size_t> const& pos) const;
 
-        /// Return the element at the position \a pos in the
-        /// partitioned_vector_partition container.
-        ///
-        /// \param pos Position of the element in the partitioned_vector_partition
-        ///
-        /// \return This returns the value as the hpx::future
-        ///
-        future<std::vector<T>> get_values(
-            std::vector<std::size_t> const& pos) const;
+    /// Return the element at the position \a pos in the
+    /// partitioned_vector_partition container.
+    ///
+    /// \param pos Position of the element in the partitioned_vector_partition
+    ///
+    /// \return This returns the value as the hpx::future
+    ///
+    future<std::vector<T>> get_values(
+        std::vector<std::size_t> const& pos) const;
 
-        // future<T> front_async() const
-        // {
-        //     HPX_ASSERT(this->get_id());
-        //     return this->base_type::front_async(this->get_id());
-        // }
-        // T front() const
-        // {
-        //     HPX_ASSERT(this->get_id());
-        //     return front_async().get();
-        // }
+    // future<T> front_async() const
+    // {
+    //     HPX_ASSERT(this->get_id());
+    //     return this->base_type::front_async(this->get_id());
+    // }
+    // T front() const
+    // {
+    //     HPX_ASSERT(this->get_id());
+    //     return front_async().get();
+    // }
 
-        // future<T> back_async() const
-        // {
-        //     HPX_ASSERT(this->get_id());
-        //     return this->base_type::back_async(this->get_id());
-        // }
-        // T back() const
-        // {
-        //     return back_async().get();
-        // }
+    // future<T> back_async() const
+    // {
+    //     HPX_ASSERT(this->get_id());
+    //     return this->base_type::back_async(this->get_id());
+    // }
+    // T back() const
+    // {
+    //     return back_async().get();
+    // }
 
-        //  Modifiers API's in client class
-        // void assign(std::size_t n, T const& val)
-        // {
-        //     HPX_ASSERT(this->get_id());
-        //     this->base_type::assign_async(this->get_id(), n, val).get();
-        // }
+    //  Modifiers API's in client class
+    // void assign(std::size_t n, T const& val)
+    // {
+    //     HPX_ASSERT(this->get_id());
+    //     this->base_type::assign_async(this->get_id(), n, val).get();
+    // }
 
-        // template <typename T_>
-        // void push_back(T_ && val)
-        // {
-        //     HPX_ASSERT(this->get_id());
-        //     this->base_type::push_back_async(
-        //         this->get_id(), HPX_FORWARD(T_, val)).get();
-        // }
+    // template <typename T_>
+    // void push_back(T_ && val)
+    // {
+    //     HPX_ASSERT(this->get_id());
+    //     this->base_type::push_back_async(
+    //         this->get_id(), HPX_FORWARD(T_, val)).get();
+    // }
 
-        // void pop_back()
-        // {
-        //     HPX_ASSERT(this->get_id());
-        //     this->base_type::pop_back_async(this->get_id()).get();
-        // }
+    // void pop_back()
+    // {
+    //     HPX_ASSERT(this->get_id());
+    //     this->base_type::pop_back_async(this->get_id()).get();
+    // }
 
-        /// Copy the value of \a val in the element at position
-        /// \a pos in the partitioned_vector_partition container.
-        ///
-        /// \param pos   Position of the element in the partitioned_vector_partition
-        /// \param val   The value to be copied
-        ///
-        void set_value(launch::sync_policy, std::size_t pos, T&& val);
-        void set_value(launch::sync_policy, std::size_t pos, T const& val);
+    /// Copy the value of \a val in the element at position
+    /// \a pos in the partitioned_vector_partition container.
+    ///
+    /// \param pos   Position of the element in the partitioned_vector_partition
+    /// \param val   The value to be copied
+    ///
+    void set_value(launch::sync_policy, std::size_t pos, T&& val);
+    void set_value(launch::sync_policy, std::size_t pos, T const& val);
 
-        /// Copy the value of \a val in the element at position
-        /// \a pos in the partitioned_vector_partition component.
-        ///
-        /// \param pos  Position of the element in the partitioned_vector_partition
-        /// \param val  Value to be copied
-        ///
-        /// \return This returns the hpx::future of type void
-        ///
-        future<void> set_value(std::size_t pos, T&& val);
-        future<void> set_value(std::size_t pos, T const& val);
+    /// Copy the value of \a val in the element at position
+    /// \a pos in the partitioned_vector_partition component.
+    ///
+    /// \param pos  Position of the element in the partitioned_vector_partition
+    /// \param val  Value to be copied
+    ///
+    /// \return This returns the hpx::future of type void
+    ///
+    future<void> set_value(std::size_t pos, T&& val);
+    future<void> set_value(std::size_t pos, T const& val);
 
-        /// Copy the value of \a val in the element at position
-        /// \a pos in the partitioned_vector_partition container.
-        ///
-        /// \param pos   Position of the element in the partitioned_vector_partition
-        /// \param val   The value to be copied
-        ///
-        void set_values(launch::sync_policy,
-            std::vector<std::size_t> const& pos, std::vector<T> const& val);
+    /// Copy the value of \a val in the element at position
+    /// \a pos in the partitioned_vector_partition container.
+    ///
+    /// \param pos   Position of the element in the partitioned_vector_partition
+    /// \param val   The value to be copied
+    ///
+    void set_values(launch::sync_policy, std::vector<std::size_t> const& pos,
+        std::vector<T> const& val);
 
-        /// Copy the value of \a val in the element at position
-        /// \a pos in the partitioned_vector_partition component.
-        ///
-        /// \param pos  Position of the element in the partitioned_vector_partition
-        /// \param val  Value to be copied
-        ///
-        /// \return This returns the hpx::future of type void
-        ///
-        future<void> set_values(
-            std::vector<std::size_t> const& pos, std::vector<T> const& val);
+    /// Copy the value of \a val in the element at position
+    /// \a pos in the partitioned_vector_partition component.
+    ///
+    /// \param pos  Position of the element in the partitioned_vector_partition
+    /// \param val  Value to be copied
+    ///
+    /// \return This returns the hpx::future of type void
+    ///
+    future<void> set_values(
+        std::vector<std::size_t> const& pos, std::vector<T> const& val);
 
-        //         void clear()
-        //         {
-        //             HPX_ASSERT(this->get_id());
-        //             this->base_type::clear_async(this->get_id()).get();
-        //         }
+    //         void clear()
+    //         {
+    //             HPX_ASSERT(this->get_id());
+    //             this->base_type::clear_async(this->get_id()).get();
+    //         }
 
-        /// Returns a copy of the data owned by the partitioned_vector_partition
-        /// component.
-        ///
-        /// \return This returns the data of the partitioned_vector_partition
-        ///
-        typename server_type::data_type get_copied_data(
-            launch::sync_policy) const;
+    /// Returns a copy of the data owned by the partitioned_vector_partition
+    /// component.
+    ///
+    /// \return This returns the data of the partitioned_vector_partition
+    ///
+    typename server_type::data_type get_copied_data(launch::sync_policy) const;
 
-        /// Returns a copy of the data owned by the partitioned_vector_partition
-        /// component.
-        ///
-        /// \return This returns the data as an hpx::future
-        ///
-        hpx::future<typename server_type::data_type> get_copied_data() const;
+    /// Returns a copy of the data owned by the partitioned_vector_partition
+    /// component.
+    ///
+    /// \return This returns the data as an hpx::future
+    ///
+    hpx::future<typename server_type::data_type> get_copied_data() const;
 
-        /// Updates the data owned by the partition_vector
-        /// component.
-        ///
-        /// \return This returns the data of the partition_vector
-        ///
-        void set_data(
-            launch::sync_policy, typename server_type::data_type&& other) const;
+    /// Updates the data owned by the partition_vector
+    /// component.
+    ///
+    /// \return This returns the data of the partition_vector
+    ///
+    void set_data(
+        launch::sync_policy, typename server_type::data_type&& other) const;
 
-        /// Updates the data owned by the partition_vector
-        /// component.
-        ///
-        /// \return This returns the hpx::future of type void
-        ///
-        hpx::future<void> set_data(
-            typename server_type::data_type&& other) const;
-    };
+    /// Updates the data owned by the partition_vector
+    /// component.
+    ///
+    /// \return This returns the hpx::future of type void
+    ///
+    hpx::future<void> set_data(typename server_type::data_type&& other) const;
+};
 }    // namespace hpx
 
 #include <hpx/config/warnings_suffix.hpp>

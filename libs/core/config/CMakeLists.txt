@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,7 @@ set(config_headers
     hpx/config/branch_hints.hpp
     hpx/config/compiler_fence.hpp
     hpx/config/compiler_specific.hpp
+    hpx/config/config.hpp
     hpx/config/constexpr.hpp
     hpx/config/debug.hpp
     hpx/config/deprecation.hpp
@@ -40,12 +41,17 @@ endif()
 # Default location is $HPX_ROOT/libs/config/src
 set(config_sources version.cpp)
 
+if(HPX_WITH_CXX20_MODULES)
+  set(config_modulefiles hpx.core.config.cppm)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   core config CONFIG_FILES
   GLOBAL_HEADER_GEN OFF
   SOURCES ${config_sources}
   HEADERS ${config_headers}
+  MODULES ${config_modulefiles}
   MODULE_DEPENDENCIES hpx_preprocessor
   DEPENDENCIES hpx_dependencies_boost
   CMAKE_SUBDIRS examples tests

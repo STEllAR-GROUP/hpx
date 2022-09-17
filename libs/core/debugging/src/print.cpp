@@ -256,7 +256,11 @@ namespace hpx { namespace debug {
                 gethostname(hostname_, std::size_t(12));
 #endif
                 std::string temp = "(" + std::to_string(guess_rank()) + ")";
+#if defined(HPX_MSVC)
+                strcat_s(hostname_, sizeof(hostname_), temp.c_str());
+#else
                 std::strcat(hostname_, temp.c_str());
+#endif
             }
             return hostname_;
         }

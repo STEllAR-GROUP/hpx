@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution/algorithms/detail/single_result.hpp>
@@ -21,6 +20,7 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/synchronization/stop_token.hpp>
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>

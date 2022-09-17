@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Hartmut Kaiser
+# Copyright (c) 2013-2022 Hartmut Kaiser
 # Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2016 John Biddiscombe
 #
@@ -119,21 +119,29 @@ function(write_config_defines_file)
 
   set(hpx_config_defines "\n")
   foreach(def ${DEFINITIONS_VAR})
-    # C++20 specific variable
-    string(FIND ${def} "HAVE_CXX20" _pos)
+    # C++23 specific variable
+    string(FIND ${def} "HAVE_CXX23" _pos)
     if(NOT ${_pos} EQUAL -1)
       set(hpx_config_defines
-          "${hpx_config_defines}#if __cplusplus >= 202002\n#define ${def}\n#endif\n"
+          "${hpx_config_defines}#if __cplusplus > 202002\n#define ${def}\n#endif\n"
       )
     else()
-      # C++17 specific variable
-      string(FIND ${def} "HAVE_CXX17" _pos)
+      # C++20 specific variable
+      string(FIND ${def} "HAVE_CXX20" _pos)
       if(NOT ${_pos} EQUAL -1)
         set(hpx_config_defines
-            "${hpx_config_defines}#if __cplusplus >= 201500\n#define ${def}\n#endif\n"
+            "${hpx_config_defines}#if __cplusplus >= 202002\n#define ${def}\n#endif\n"
         )
       else()
-        set(hpx_config_defines "${hpx_config_defines}#define ${def}\n")
+        # C++17 specific variable
+        string(FIND ${def} "HAVE_CXX17" _pos)
+        if(NOT ${_pos} EQUAL -1)
+          set(hpx_config_defines
+              "${hpx_config_defines}#if __cplusplus >= 201500\n#define ${def}\n#endif\n"
+          )
+        else()
+          set(hpx_config_defines "${hpx_config_defines}#define ${def}\n")
+        endif()
       endif()
     endif()
   endforeach()
@@ -152,23 +160,29 @@ function(write_config_defines_file)
       string(STRIP ${defname} defname)
     endif()
 
-    # C++20 specific variable
-    string(FIND ${def} "HAVE_CXX20" _pos)
+    # C++23 specific variable
+    string(FIND ${def} "HAVE_CXX23" _pos)
     if(NOT ${_pos} EQUAL -1)
       set(hpx_config_defines
-          "${hpx_config_defines}#if __cplusplus >= 202002 && !defined(${defname})\n#define ${def}\n#endif\n"
+          "${hpx_config_defines}#if __cplusplus > 202002 && !defined(${defname})\n#define ${def}\n#endif\n"
       )
     else()
-      # C++17 specific variable
-      string(FIND ${def} "HAVE_CXX17" _pos)
       if(NOT ${_pos} EQUAL -1)
         set(hpx_config_defines
-            "${hpx_config_defines}#if __cplusplus >= 201500 && !defined(${defname})\n#define ${def}\n#endif\n"
+            "${hpx_config_defines}#if __cplusplus >= 202002 && !defined(${defname})\n#define ${def}\n#endif\n"
         )
       else()
-        set(hpx_config_defines
-            "${hpx_config_defines}#if !defined(${defname})\n#define ${def}\n#endif\n"
-        )
+        # C++17 specific variable
+        string(FIND ${def} "HAVE_CXX17" _pos)
+        if(NOT ${_pos} EQUAL -1)
+          set(hpx_config_defines
+              "${hpx_config_defines}#if __cplusplus >= 201500 && !defined(${defname})\n#define ${def}\n#endif\n"
+          )
+        else()
+          set(hpx_config_defines
+              "${hpx_config_defines}#if !defined(${defname})\n#define ${def}\n#endif\n"
+          )
+        endif()
       endif()
     endif()
   endforeach()

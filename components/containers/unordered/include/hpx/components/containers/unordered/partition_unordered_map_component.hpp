@@ -31,9 +31,7 @@
 #include <hpx/components_base/server/locking_hook.hpp>
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -463,230 +461,229 @@ namespace hpx { namespace server {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
-    template <typename Key, typename T, typename Hash = std::hash<Key>,
-        typename KeyEqual = std::equal_to<Key>>
-    class partition_unordered_map
-      : public components::client_base<
-            partition_unordered_map<Key, T, Hash, KeyEqual>,
-            server::partition_unordered_map<Key, T, Hash, KeyEqual>>
+template <typename Key, typename T, typename Hash = std::hash<Key>,
+    typename KeyEqual = std::equal_to<Key>>
+class partition_unordered_map
+  : public components::client_base<
+        partition_unordered_map<Key, T, Hash, KeyEqual>,
+        server::partition_unordered_map<Key, T, Hash, KeyEqual>>
+{
+private:
+    typedef hpx::server::partition_unordered_map<Key, T, Hash, KeyEqual>
+        server_type;
+    typedef hpx::components::client_base<
+        partition_unordered_map<Key, T, Hash, KeyEqual>,
+        server::partition_unordered_map<Key, T, Hash, KeyEqual>>
+        base_type;
+
+public:
+    partition_unordered_map() {}
+
+    partition_unordered_map(id_type const& gid)
+      : base_type(gid)
     {
-    private:
-        typedef hpx::server::partition_unordered_map<Key, T, Hash, KeyEqual>
-            server_type;
-        typedef hpx::components::client_base<
-            partition_unordered_map<Key, T, Hash, KeyEqual>,
-            server::partition_unordered_map<Key, T, Hash, KeyEqual>>
-            base_type;
+    }
 
-    public:
-        partition_unordered_map() {}
+    partition_unordered_map(hpx::shared_future<id_type> const& gid)
+      : base_type(gid)
+    {
+    }
 
-        partition_unordered_map(id_type const& gid)
-          : base_type(gid)
-        {
-        }
+    // Return the pinned pointer to the underlying component
+    std::shared_ptr<server::partition_unordered_map<Key, T, Hash, KeyEqual>>
+    get_ptr() const
+    {
+        error_code ec(throwmode::lightweight);
+        return hpx::get_ptr<server_type>(this->get_id()).get(ec);
+    }
 
-        partition_unordered_map(hpx::shared_future<id_type> const& gid)
-          : base_type(gid)
-        {
-        }
+    ///////////////////////////////////////////////////////////////////////
+    //  Capacity related API's in partition_unordered_map client class
 
-        // Return the pinned pointer to the underlying component
-        std::shared_ptr<server::partition_unordered_map<Key, T, Hash, KeyEqual>>
-        get_ptr() const
-        {
-            error_code ec(throwmode::lightweight);
-            return hpx::get_ptr<server_type>(this->get_id()).get(ec);
-        }
+    /// Asynchronously return the size of the partition_unordered_map component.
+    ///
+    /// \return This returns size as the hpx::future of type size_type
+    ///
+    future<std::size_t> size_async() const
+    {
+        HPX_ASSERT(this->get_id());
+        return hpx::async<typename server_type::size_action>(this->get_id());
+    }
 
-        ///////////////////////////////////////////////////////////////////////
-        //  Capacity related API's in partition_unordered_map client class
+    /// Return the size of the partition_unordered_map component.
+    ///
+    /// \return This returns size as the hpx::future of type size_type
+    ///
+    std::size_t size() const
+    {
+        return size_async().get();
+    }
 
-        /// Asynchronously return the size of the partition_unordered_map component.
-        ///
-        /// \return This returns size as the hpx::future of type size_type
-        ///
-        future<std::size_t> size_async() const
-        {
-            HPX_ASSERT(this->get_id());
-            return hpx::async<typename server_type::size_action>(
-                this->get_id());
-        }
+    //  Element Access API's in Client class
 
-        /// Return the size of the partition_unordered_map component.
-        ///
-        /// \return This returns size as the hpx::future of type size_type
-        ///
-        std::size_t size() const
-        {
-            return size_async().get();
-        }
+    /// Returns the value at position \a pos in the partition_unordered_map
+    /// component.
+    ///
+    /// \param pos  Position of the element in the partition_unordered_map
+    ///
+    /// \return Returns the value of the element at position represented
+    ///         by \a pos
+    ///
+    T get_value(launch::sync_policy, Key const& pos, bool erase) const
+    {
+        return get_value(pos, erase).get();
+    }
 
-        //  Element Access API's in Client class
-
-        /// Returns the value at position \a pos in the partition_unordered_map
-        /// component.
-        ///
-        /// \param pos  Position of the element in the partition_unordered_map
-        ///
-        /// \return Returns the value of the element at position represented
-        ///         by \a pos
-        ///
-        T get_value(launch::sync_policy, Key const& pos, bool erase) const
-        {
-            return get_value(pos, erase).get();
-        }
-
-        /// Return the element at the position \a pos in the
-        /// partition_unordered_map container.
-        ///
-        /// \param pos Position of the element in the partition_unordered_map
-        ///
-        /// \return This returns the value as the hpx::future
-        ///
-        future<T> get_value(Key const& pos, bool erase) const
-        {
+    /// Return the element at the position \a pos in the
+    /// partition_unordered_map container.
+    ///
+    /// \param pos Position of the element in the partition_unordered_map
+    ///
+    /// \return This returns the value as the hpx::future
+    ///
+    future<T> get_value(Key const& pos, bool erase) const
+    {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_ASSERT(this->get_id());
-            return hpx::async<typename server_type::get_value_action>(
-                this->get_id(), pos, erase);
+        HPX_ASSERT(this->get_id());
+        return hpx::async<typename server_type::get_value_action>(
+            this->get_id(), pos, erase);
 #else
-            HPX_ASSERT(false);
-            HPX_UNUSED(pos);
-            HPX_UNUSED(erase);
-            return hpx::future<T>{};
+        HPX_ASSERT(false);
+        HPX_UNUSED(pos);
+        HPX_UNUSED(erase);
+        return hpx::future<T>{};
 #endif
-        }
+    }
 
-        /// Returns the value at position \a pos in the partition_unordered_map
-        /// component.
-        ///
-        /// \param pos  Position of the element in the partition_unordered_map
-        ///
-        /// \return Returns the value of the element at position represented
-        ///         by \a pos
-        ///
-        std::vector<T> get_values(
-            launch::sync_policy, std::vector<Key> const& keys) const
-        {
-            return get_values(keys).get();
-        }
+    /// Returns the value at position \a pos in the partition_unordered_map
+    /// component.
+    ///
+    /// \param pos  Position of the element in the partition_unordered_map
+    ///
+    /// \return Returns the value of the element at position represented
+    ///         by \a pos
+    ///
+    std::vector<T> get_values(
+        launch::sync_policy, std::vector<Key> const& keys) const
+    {
+        return get_values(keys).get();
+    }
 
-        /// Return the element at the position \a pos in the
-        /// partition_unordered_map container.
-        ///
-        /// \param pos Position of the element in the partition_unordered_map
-        ///
-        /// \return This returns the value as the hpx::future
-        ///
-        future<std::vector<T>> get_values(std::vector<Key> const& keys) const
-        {
-            HPX_ASSERT(this->get_id());
-            return hpx::async<typename server_type::get_values_action>(
-                this->get_id(), keys);
-        }
+    /// Return the element at the position \a pos in the
+    /// partition_unordered_map container.
+    ///
+    /// \param pos Position of the element in the partition_unordered_map
+    ///
+    /// \return This returns the value as the hpx::future
+    ///
+    future<std::vector<T>> get_values(std::vector<Key> const& keys) const
+    {
+        HPX_ASSERT(this->get_id());
+        return hpx::async<typename server_type::get_values_action>(
+            this->get_id(), keys);
+    }
 
-        /// Copy the value of \a val in the element at position
-        /// \a pos in the partition_unordered_map container.
-        ///
-        /// \param pos   Position of the element in the partition_unordered_map
-        /// \param val   The value to be copied
-        ///
-        template <typename T_>
-        void set_value(launch::sync_policy, Key const& pos, T_&& val)
-        {
-            set_value(pos, HPX_FORWARD(T_, val)).get();
-        }
+    /// Copy the value of \a val in the element at position
+    /// \a pos in the partition_unordered_map container.
+    ///
+    /// \param pos   Position of the element in the partition_unordered_map
+    /// \param val   The value to be copied
+    ///
+    template <typename T_>
+    void set_value(launch::sync_policy, Key const& pos, T_&& val)
+    {
+        set_value(pos, HPX_FORWARD(T_, val)).get();
+    }
 
-        /// Copy the value of \a val in the element at position
-        /// \a pos in the partition_unordered_map component.
-        ///
-        /// \param pos  Position of the element in the partition_unordered_map
-        /// \param val  Value to be copied
-        ///
-        /// \return This returns the hpx::future of type void
-        ///
-        template <typename T_>
-        future<void> set_value(Key const& pos, T_&& val)
-        {
+    /// Copy the value of \a val in the element at position
+    /// \a pos in the partition_unordered_map component.
+    ///
+    /// \param pos  Position of the element in the partition_unordered_map
+    /// \param val  Value to be copied
+    ///
+    /// \return This returns the hpx::future of type void
+    ///
+    template <typename T_>
+    future<void> set_value(Key const& pos, T_&& val)
+    {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_ASSERT(this->get_id());
-            return hpx::async<typename server_type::set_value_action>(
-                this->get_id(), pos, HPX_FORWARD(T_, val));
+        HPX_ASSERT(this->get_id());
+        return hpx::async<typename server_type::set_value_action>(
+            this->get_id(), pos, HPX_FORWARD(T_, val));
 #else
-            HPX_ASSERT(false);
-            HPX_UNUSED(pos);
-            HPX_UNUSED(val);
-            return hpx::make_ready_future();
+        HPX_ASSERT(false);
+        HPX_UNUSED(pos);
+        HPX_UNUSED(val);
+        return hpx::make_ready_future();
 #endif
-        }
+    }
 
-        /// Copy the value of \a val in the element at position
-        /// \a pos in the partition_unordered_map container.
-        ///
-        /// \param pos   Position of the element in the partition_unordered_map
-        /// \param val   The value to be copied
-        ///
-        void set_values(launch::sync_policy, std::vector<Key> const& keys,
-            std::vector<T> const& vals)
-        {
-            set_values(keys, vals).get();
-        }
+    /// Copy the value of \a val in the element at position
+    /// \a pos in the partition_unordered_map container.
+    ///
+    /// \param pos   Position of the element in the partition_unordered_map
+    /// \param val   The value to be copied
+    ///
+    void set_values(launch::sync_policy, std::vector<Key> const& keys,
+        std::vector<T> const& vals)
+    {
+        set_values(keys, vals).get();
+    }
 
-        /// Copy the value of \a val in the element at position
-        /// \a pos in the partition_unordered_map component.
-        ///
-        /// \param pos  Position of the element in the partition_unordered_map
-        /// \param val  Value to be copied
-        ///
-        /// \return This returns the hpx::future of type void
-        ///
-        future<void> set_values(
-            std::vector<Key> const& keys, std::vector<T> const& vals)
-        {
-            HPX_ASSERT(this->get_id());
-            return hpx::async<typename server_type::set_values_action>(
-                this->get_id(), keys, vals);
-        }
+    /// Copy the value of \a val in the element at position
+    /// \a pos in the partition_unordered_map component.
+    ///
+    /// \param pos  Position of the element in the partition_unordered_map
+    /// \param val  Value to be copied
+    ///
+    /// \return This returns the hpx::future of type void
+    ///
+    future<void> set_values(
+        std::vector<Key> const& keys, std::vector<T> const& vals)
+    {
+        HPX_ASSERT(this->get_id());
+        return hpx::async<typename server_type::set_values_action>(
+            this->get_id(), keys, vals);
+    }
 
-        /// Erase all values with the given key from the partition_unordered_map
-        /// container.
-        ///
-        /// \param key   Key of the element in the partition_unordered_map
-        ///
-        /// \return Returns the number of elements erased
-        ///
-        std::size_t erase(launch::sync_policy, Key const& key)
-        {
-            return erase(key).get();
-        }
+    /// Erase all values with the given key from the partition_unordered_map
+    /// container.
+    ///
+    /// \param key   Key of the element in the partition_unordered_map
+    ///
+    /// \return Returns the number of elements erased
+    ///
+    std::size_t erase(launch::sync_policy, Key const& key)
+    {
+        return erase(key).get();
+    }
 
-        /// Erase all values with the given key from the partition_unordered_map
-        /// container.
-        ///
-        /// \param key  Key of the element in the partition_unordered_map
-        ///
-        /// \return This returns the hpx::future containing the number of
-        ///         elements erased
-        ///
-        future<std::size_t> erase(Key const& key)
-        {
-            HPX_ASSERT(this->get_id());
-            return hpx::async<typename server_type::erase_action>(
-                this->get_id(), key);
-        }
+    /// Erase all values with the given key from the partition_unordered_map
+    /// container.
+    ///
+    /// \param key  Key of the element in the partition_unordered_map
+    ///
+    /// \return This returns the hpx::future containing the number of
+    ///         elements erased
+    ///
+    future<std::size_t> erase(Key const& key)
+    {
+        HPX_ASSERT(this->get_id());
+        return hpx::async<typename server_type::erase_action>(
+            this->get_id(), key);
+    }
 
-        /// Get/set all the data of this partition
-        future<typename server_type::data_type> get_data() const
-        {
-            typedef typename server_type::get_copied_data_action action_type;
-            return async<action_type>(this->get_id());
-        }
+    /// Get/set all the data of this partition
+    future<typename server_type::data_type> get_data() const
+    {
+        typedef typename server_type::get_copied_data_action action_type;
+        return async<action_type>(this->get_id());
+    }
 
-        future<void> set_data(typename server_type::data_type&& d)
-        {
-            typedef typename server_type::set_copied_data_action action_type;
-            return async<action_type>(this->get_id(), HPX_MOVE(d));
-        }
-    };
+    future<void> set_data(typename server_type::data_type&& d)
+    {
+        typedef typename server_type::set_copied_data_action action_type;
+        return async<action_type>(this->get_id(), HPX_MOVE(d));
+    }
+};
 }    // namespace hpx

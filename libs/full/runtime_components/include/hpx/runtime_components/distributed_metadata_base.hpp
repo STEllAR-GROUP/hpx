@@ -15,10 +15,8 @@
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
 
 #include <type_traits>
 

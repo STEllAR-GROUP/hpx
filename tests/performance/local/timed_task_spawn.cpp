@@ -15,9 +15,8 @@
 
 #include <hpx/functional/bind.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
 
 #include <boost/integer/common_factor.hpp>
 

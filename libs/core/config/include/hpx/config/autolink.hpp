@@ -8,6 +8,7 @@
 
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/debug.hpp>
+#include <hpx/config/defines.hpp>
 
 // enable auto-linking for supported platforms
 #if defined(HPX_MSVC) || defined(__BORLANDC__) ||                              \

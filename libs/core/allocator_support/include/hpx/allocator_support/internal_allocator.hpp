@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -14,8 +15,6 @@
 #include <new>
 #include <type_traits>
 #include <utility>
-
-#include <hpx/preprocessor/cat.hpp>
 
 #if defined(HPX_HAVE_JEMALLOC_PREFIX)
 // this is currently used only for jemalloc and if a special API prefix is

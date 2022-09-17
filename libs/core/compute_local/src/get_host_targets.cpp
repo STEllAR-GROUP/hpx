@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/config/asio.hpp>
 #include <hpx/compute_local/host/target.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime_local/get_os_thread_count.hpp>

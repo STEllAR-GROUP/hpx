@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/serialization/config/defines.hpp>
-#include <hpx/preprocessor/strip_parens.hpp>
+#include <hpx/modules/preprocessor.hpp>
 
 #include <type_traits>
 

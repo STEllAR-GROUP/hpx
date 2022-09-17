@@ -7,9 +7,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+#if !defined(HPX_HAVE_CXX20_MODULES)
 #include <hpx/config/export_definitions.hpp>
 #include <hpx/config/version.hpp>
-#include <hpx/preprocessor/stringize.hpp>
+#include <hpx/modules/preprocessor.hpp>
+#else
+module hpx.core.config;
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {

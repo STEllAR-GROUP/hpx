@@ -364,9 +364,9 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
@@ -913,143 +913,141 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
 
-    template <typename T>
-    using minmax_element_result = hpx::parallel::util::min_max_result<T>;
+template <typename T>
+using minmax_element_result = hpx::parallel::util::min_max_result<T>;
 
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::min_element
-    inline constexpr struct min_element_t final
-      : hpx::detail::tag_parallel_algorithm<min_element_t>
-    {
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// CPO for hpx::min_element
+inline constexpr struct min_element_t final
+  : hpx::detail::tag_parallel_algorithm<min_element_t>
+{
+// clang-format off
         template <typename FwdIter,
             typename F = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<FwdIter>
             )>
-        // clang-format on
-        friend FwdIter tag_fallback_invoke(
-            hpx::min_element_t, FwdIter first, FwdIter last, F&& f = F())
-        {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
+// clang-format on
+friend FwdIter tag_fallback_invoke(
+    hpx::min_element_t, FwdIter first, FwdIter last, F&& f = F())
+{
+    static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+        "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::min_element<FwdIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity{});
-        }
+    return hpx::parallel::v1::detail::min_element<FwdIter>().call(
+        hpx::execution::seq, first, last, HPX_FORWARD(F, f),
+        hpx::parallel::util::projection_identity{});
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename F = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
             )>
-        // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
-        tag_fallback_invoke(hpx::min_element_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, F&& f = F())
-        {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
+// clang-format on
+friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
+tag_fallback_invoke(hpx::min_element_t, ExPolicy&& policy, FwdIter first,
+    FwdIter last, F&& f = F())
+{
+    static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+        "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::min_element<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity());
-        }
-    } min_element{};
+    return hpx::parallel::v1::detail::min_element<FwdIter>().call(
+        HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+        hpx::parallel::util::projection_identity());
+}
+} min_element{};
 
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::max_element
-    inline constexpr struct max_element_t final
-      : hpx::detail::tag_parallel_algorithm<max_element_t>
-    {
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// CPO for hpx::max_element
+inline constexpr struct max_element_t final
+  : hpx::detail::tag_parallel_algorithm<max_element_t>
+{
+// clang-format off
         template <typename FwdIter,
             typename F = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<FwdIter>
             )>
-        // clang-format on
-        friend FwdIter tag_fallback_invoke(
-            hpx::max_element_t, FwdIter first, FwdIter last, F&& f = F())
-        {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
+// clang-format on
+friend FwdIter tag_fallback_invoke(
+    hpx::max_element_t, FwdIter first, FwdIter last, F&& f = F())
+{
+    static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+        "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::max_element<FwdIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity{});
-        }
+    return hpx::parallel::v1::detail::max_element<FwdIter>().call(
+        hpx::execution::seq, first, last, HPX_FORWARD(F, f),
+        hpx::parallel::util::projection_identity{});
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename F = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
             )>
-        // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
-        tag_fallback_invoke(hpx::max_element_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, F&& f = F())
-        {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
+// clang-format on
+friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
+tag_fallback_invoke(hpx::max_element_t, ExPolicy&& policy, FwdIter first,
+    FwdIter last, F&& f = F())
+{
+    static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+        "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::max_element<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity());
-        }
-    } max_element{};
+    return hpx::parallel::v1::detail::max_element<FwdIter>().call(
+        HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+        hpx::parallel::util::projection_identity());
+}
+} max_element{};
 
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::minmax_element
-    inline constexpr struct minmax_element_t final
-      : hpx::detail::tag_parallel_algorithm<minmax_element_t>
-    {
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// CPO for hpx::minmax_element
+inline constexpr struct minmax_element_t final
+  : hpx::detail::tag_parallel_algorithm<minmax_element_t>
+{
+// clang-format off
         template <typename FwdIter,
             typename F = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<FwdIter>
             )>
-        // clang-format on
-        friend minmax_element_result<FwdIter> tag_fallback_invoke(
-            hpx::minmax_element_t, FwdIter first, FwdIter last, F&& f = F())
-        {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
+// clang-format on
+friend minmax_element_result<FwdIter> tag_fallback_invoke(
+    hpx::minmax_element_t, FwdIter first, FwdIter last, F&& f = F())
+{
+    static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+        "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::minmax_element<FwdIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity{});
-        }
+    return hpx::parallel::v1::detail::minmax_element<FwdIter>().call(
+        hpx::execution::seq, first, last, HPX_FORWARD(F, f),
+        hpx::parallel::util::projection_identity{});
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename F = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter>
             )>
-        // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            minmax_element_result<FwdIter>>
-        tag_fallback_invoke(hpx::minmax_element_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, F&& f = F())
-        {
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Required at least forward iterator.");
+// clang-format on
+friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+    minmax_element_result<FwdIter>>
+tag_fallback_invoke(hpx::minmax_element_t, ExPolicy&& policy, FwdIter first,
+    FwdIter last, F&& f = F())
+{
+    static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+        "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::minmax_element<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity());
-        }
-    } minmax_element{};
+    return hpx::parallel::v1::detail::minmax_element<FwdIter>().call(
+        HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+        hpx::parallel::util::projection_identity());
+}
+} minmax_element{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

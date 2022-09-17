@@ -12,7 +12,6 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/inject_scheduler.hpp>
 #include <hpx/execution/algorithms/detail/partial_algorithm.hpp>
 #include <hpx/execution/algorithms/run_loop.hpp>
@@ -23,6 +22,7 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_priority_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/type_support/meta.hpp>

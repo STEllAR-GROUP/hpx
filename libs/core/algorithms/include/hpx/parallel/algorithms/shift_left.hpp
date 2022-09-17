@@ -106,9 +106,9 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/async_local/dataflow.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 
@@ -224,45 +224,45 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
 
-    ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::shift_left
-    inline constexpr struct shift_left_t final
-      : hpx::functional::detail::tag_fallback<shift_left_t>
-    {
-    private:
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// DPO for hpx::shift_left
+inline constexpr struct shift_left_t final
+  : hpx::functional::detail::tag_fallback<shift_left_t>
+{
+private:
+// clang-format off
         template <typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator<FwdIter>::value)>
-        // clang-format on
-        friend FwdIter tag_fallback_invoke(
-            shift_left_t, FwdIter first, FwdIter last, Size n)
-        {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-                "Requires at least forward iterator.");
+// clang-format on
+friend FwdIter tag_fallback_invoke(
+    shift_left_t, FwdIter first, FwdIter last, Size n)
+{
+    static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+        "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
-                hpx::execution::seq, first, last, n);
-        }
+    return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
+        hpx::execution::seq, first, last, n);
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy<ExPolicy>::value &&
                 hpx::traits::is_iterator<FwdIter>::value)>
-        // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(shift_left_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Size n)
-        {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-                "Requires at least forward iterator.");
+// clang-format on
+friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+    FwdIter>::type
+tag_fallback_invoke(
+    shift_left_t, ExPolicy&& policy, FwdIter first, FwdIter last, Size n)
+{
+    static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+        "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, n);
-        }
-    } shift_left{};
+    return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
+        HPX_FORWARD(ExPolicy, policy), first, last, n);
+}
+} shift_left{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

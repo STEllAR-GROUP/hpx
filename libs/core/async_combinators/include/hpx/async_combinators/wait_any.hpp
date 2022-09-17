@@ -125,7 +125,7 @@ namespace hpx {
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/preprocessor/strip_parens.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/type_support/always_void.hpp>
 
 #include <array>

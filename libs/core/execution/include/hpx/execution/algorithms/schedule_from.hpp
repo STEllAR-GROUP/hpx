@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -20,6 +19,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_fused.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/type_support/detail/with_result_of.hpp>
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>

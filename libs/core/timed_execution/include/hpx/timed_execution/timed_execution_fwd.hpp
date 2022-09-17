@@ -8,11 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/timing.hpp>
 
 #include <type_traits>

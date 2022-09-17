@@ -159,9 +159,9 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
@@ -340,12 +340,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx {
-    ///////////////////////////////////////////////////////////////////////////
-    // CPO for hpx::lexicographical_compare
-    inline constexpr struct lexicographical_compare_t final
-      : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
-    {
-        // clang-format off
+///////////////////////////////////////////////////////////////////////////
+// CPO for hpx::lexicographical_compare
+inline constexpr struct lexicographical_compare_t final
+  : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
+{
+// clang-format off
         template <typename InIter1, typename InIter2,
             typename Pred = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
@@ -356,24 +356,22 @@ namespace hpx {
                     typename std::iterator_traits<InIter2>::value_type
                 >
             )>
-        // clang-format on
-        friend bool tag_fallback_invoke(hpx::lexicographical_compare_t,
-            InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
-            Pred&& pred = Pred())
-        {
-            static_assert(hpx::traits::is_input_iterator<InIter1>::value,
-                "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator<InIter2>::value,
-                "Requires at least input iterator.");
+// clang-format on
+friend bool tag_fallback_invoke(hpx::lexicographical_compare_t, InIter1 first1,
+    InIter1 last1, InIter2 first2, InIter2 last2, Pred&& pred = Pred())
+{
+    static_assert(hpx::traits::is_input_iterator<InIter1>::value,
+        "Requires at least input iterator.");
+    static_assert(hpx::traits::is_input_iterator<InIter2>::value,
+        "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::lexicographical_compare().call(
-                hpx::execution::seq, first1, last1, first2, last2,
-                HPX_FORWARD(Pred, pred),
-                hpx::parallel::util::projection_identity{},
-                hpx::parallel::util::projection_identity{});
-        }
+    return hpx::parallel::v1::detail::lexicographical_compare().call(
+        hpx::execution::seq, first1, last1, first2, last2,
+        HPX_FORWARD(Pred, pred), hpx::parallel::util::projection_identity{},
+        hpx::parallel::util::projection_identity{});
+}
 
-        // clang-format off
+// clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred = hpx::parallel::v1::detail::less,
             HPX_CONCEPT_REQUIRES_(
@@ -385,26 +383,24 @@ namespace hpx {
                     typename std::iterator_traits<FwdIter2>::value_type
                 >
             )>
-        // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
-        tag_fallback_invoke(hpx::lexicographical_compare_t, ExPolicy&& policy,
-            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
-            Pred&& pred = Pred())
-        {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
-                "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
-                "Requires at least forward iterator.");
+// clang-format on
+friend typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+tag_fallback_invoke(hpx::lexicographical_compare_t, ExPolicy&& policy,
+    FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
+    Pred&& pred = Pred())
+{
+    static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+        "Requires at least forward iterator.");
+    static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+        "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::lexicographical_compare().call(
-                HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
-                HPX_FORWARD(Pred, pred),
-                hpx::parallel::util::projection_identity{},
-                hpx::parallel::util::projection_identity{});
-        }
+    return hpx::parallel::v1::detail::lexicographical_compare().call(
+        HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
+        HPX_FORWARD(Pred, pred), hpx::parallel::util::projection_identity{},
+        hpx::parallel::util::projection_identity{});
+}
 
-    } lexicographical_compare{};
+} lexicographical_compare{};
 }    // namespace hpx
 
 #endif    // DOXYGEN

@@ -77,9 +77,6 @@ namespace hpx { namespace util {
         std::uint32_t get_first_used_core() const;
         void set_first_used_core(std::uint32_t);
 
-        // Get the size of the ipc parcelport data buffer cache
-        std::size_t get_ipc_data_buffer_cache_size() const;
-
         // Get AGAS client-side local cache size
         std::size_t get_agas_local_cache_size(
             std::size_t dflt = HPX_AGAS_LOCAL_CACHE_SIZE) const;

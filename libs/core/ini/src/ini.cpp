@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2018 Hartmut Kaiser
+//  Copyright (c) 2005-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -7,6 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/modules/string_util.hpp>
 
 // System Header Files
 #include <cerrno>
@@ -28,10 +29,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/serialization/map.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/string_util/classification.hpp>
-#include <hpx/string_util/split.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
 #ifdef __APPLE__
@@ -896,13 +896,14 @@ namespace hpx { namespace util {
             std::string::size_type colon = find_next(":", to_expand);
             if (colon == std::string::npos)
             {
-                char* env = getenv(to_expand.c_str());
+                char* env = hpx::util::getenv(to_expand.c_str());
                 value = detail::replace_substr(
                     value, begin, end - begin + 1, nullptr != env ? env : "");
             }
             else
             {
-                char* env = getenv(to_expand.substr(0, colon).c_str());
+                char* env =
+                    hpx::util::getenv(to_expand.substr(0, colon).c_str());
                 value = detail::replace_substr(value, begin, end - begin + 1,
                     nullptr != env ? std::string(env) :
                                      to_expand.substr(colon + 1));
@@ -979,13 +980,14 @@ namespace hpx { namespace util {
             std::string::size_type colon = find_next(":", to_expand);
             if (colon == std::string::npos)
             {
-                char* env = getenv(to_expand.c_str());
+                char* env = hpx::util::getenv(to_expand.c_str());
                 value = detail::replace_substr(
                     value, begin, end - begin + 1, nullptr != env ? env : "");
             }
             else
             {
-                char* env = getenv(to_expand.substr(0, colon).c_str());
+                char* env =
+                    hpx::util::getenv(to_expand.substr(0, colon).c_str());
                 value = detail::replace_substr(value, begin, end - begin + 1,
                     nullptr != env ? std::string(env) :
                                      to_expand.substr(colon + 1));

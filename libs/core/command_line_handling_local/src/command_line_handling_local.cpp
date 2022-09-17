@@ -12,11 +12,11 @@
 #include <hpx/modules/asio.hpp>
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>

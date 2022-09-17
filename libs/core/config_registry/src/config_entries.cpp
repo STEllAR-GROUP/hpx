@@ -6,7 +6,11 @@
 
 // This module needs an empty config-registry entry for testing purposes
 
-#include <hpx/modules/config_registry.hpp>
+#if !defined(HPX_HAVE_CXX20_MODULES)
+#include <hpx/config_registry/config_registry.hpp>
+#else
+module hpx.core.config_registry;
+#endif
 
 namespace hpx { namespace config_registry_cfg {
 

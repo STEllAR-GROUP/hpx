@@ -36,12 +36,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/preprocessor.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/preprocessor/cat.hpp>
-#include <hpx/preprocessor/expand.hpp>
-#include <hpx/preprocessor/nargs.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime_local/report_error.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
@@ -557,7 +554,7 @@ namespace hpx { namespace actions {
 #define HPX_MAKE_DIRECT_ACTION(func)                                           \
     hpx::actions::make_direct_action<decltype(&func), &func> /**/ /**/
 
-        /// \endcond
+    /// \endcond
 }}    // namespace hpx::actions
 
 /// \cond NOINTERNAL
@@ -630,8 +627,7 @@ namespace hpx { namespace actions {
             {                                                                  \
                 static constexpr threads::thread_stacksize value = size;       \
             };                                                                 \
-        }                                                                      \
-    }                                                                          \
+    }}                                                                         \
     /**/
 
 #define HPX_ACTION_USES_SMALL_STACK(action)                                    \
