@@ -101,6 +101,7 @@ set(include_headers
     hpx/include/threadmanager.hpp
     hpx/include/threads.hpp
     hpx/include/traits.hpp
+    hpx/include/unseq.hpp
     hpx/include/util.hpp
     hpx/latch.hpp
     hpx/memory.hpp
