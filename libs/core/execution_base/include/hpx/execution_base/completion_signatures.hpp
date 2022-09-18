@@ -10,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
+#include <hpx/execution_base/completion_scheduler.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -799,7 +800,7 @@ namespace hpx::execution::experimental {
                 hpx::is_invocable_v<connect_awaitable_t, Sender, Receiver> ||
                 hpx::functional::is_tag_invocable_v<is_debug_env_t,
                     env_of_t<Receiver>>>>
-        friend constexpr auto tag_invoke(connect_t, Sender&& sndr,
+        friend const auto tag_invoke(connect_t, Sender&& sndr,
             Receiver&& rcvr) noexcept(nothrow_connect<Sender, Receiver>())
         {
             if constexpr (is_connectable_with_tag_invoke_v<Sender, Receiver>)
@@ -831,6 +832,12 @@ namespace hpx::execution::experimental {
             }
         }
 #endif    // HPX_HAVE_CXX20_COROUTINES
+
+        friend constexpr bool tag_invoke(
+            forwarding_sender_query_t, connect_t) noexcept
+        {
+            return false;
+        }
 
     } connect{};
 
@@ -1253,9 +1260,7 @@ namespace hpx::execution::experimental {
     };
 
     template <typename ReceiverId>
-    struct promise
-      : promise_base
-      , hpx::functional::tag<promise<ReceiverId>>
+    struct promise : promise_base
     {
         using Receiver = hpx::meta::hidden<ReceiverId>;
 
@@ -1286,8 +1291,8 @@ namespace hpx::execution::experimental {
         }
 
         template <typename Awaitable,
-            typename = std::enable_if_t<
-                hpx::is_invocable_v<as_awaitable_t, Awaitable, promise&>>>
+            typename = std::enable_if_t<hpx::functional::is_tag_invocable_v<
+                as_awaitable_t, Awaitable, promise&>>>
         auto await_transform(Awaitable&& await) noexcept(
             hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t,
                 Awaitable, promise&>)
