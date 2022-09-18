@@ -178,6 +178,7 @@ set(algorithms_headers
     hpx/parallel/spmd_block.hpp
     hpx/parallel/task_block.hpp
     hpx/parallel/task_group.hpp
+    hpx/parallel/unseq.hpp
     hpx/parallel/util/adapt_placement_mode.hpp
     hpx/parallel/util/adapt_sharing_mode.hpp
     hpx/parallel/util/adapt_thread_priority.hpp
