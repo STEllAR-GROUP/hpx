@@ -713,7 +713,7 @@ namespace hpx::execution::experimental {
 
     template <typename Receiver, typename Sender>
     inline constexpr bool is_receiver_from_v = is_receiver_of_v<Receiver,
-        decltype(get_completion_signatures(Sender{}, env_of_t<Receiver>{}))>;
+        completion_signatures_of_t<Sender, env_of_t<Receiver>>>;
 
     namespace detail {
         template <typename A, typename... As>
@@ -799,8 +799,8 @@ namespace hpx::execution::experimental {
                 hpx::is_invocable_v<connect_awaitable_t, Sender, Receiver> ||
                 hpx::functional::is_tag_invocable_v<is_debug_env_t,
                     env_of_t<Receiver>>>>
-        auto tag_invoke(connect_t, Sender&& sndr, Receiver&& rcvr) const
-            noexcept(nothrow_connect<Sender, Receiver>())
+        friend constexpr auto tag_invoke(connect_t, Sender&& sndr,
+            Receiver&& rcvr) noexcept(nothrow_connect<Sender, Receiver>())
         {
             if constexpr (is_connectable_with_tag_invoke_v<Sender, Receiver>)
             {
@@ -827,10 +827,7 @@ namespace hpx::execution::experimental {
             }
             else
             {
-                // This should generate an instantiate backtrace that contains useful
-                // debugging information.
-                return hpx::functional::tag_invoke(*this,
-                    HPX_FORWARD(Sender, sndr), HPX_FORWARD(Receiver, rcvr));
+                return;
             }
         }
 #endif    // HPX_HAVE_CXX20_COROUTINES
@@ -1219,7 +1216,7 @@ namespace hpx::execution::experimental {
         }
     };
 
-    struct operation_base
+    struct operation_base : hpx::functional::tag<operation_base>
     {
         hpx::coro::coroutine_handle<> coro_handle;
 
