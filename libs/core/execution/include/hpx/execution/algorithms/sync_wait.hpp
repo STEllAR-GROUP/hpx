@@ -35,11 +35,11 @@
 #include <type_traits>
 #include <utility>
 
-enum class Sync_wait_type
-    {
-        single,
-        variant
-    };
+enum class sync_wait_type
+{
+    single,
+    variant
+};
 
 namespace hpx::execution::experimental::detail {
 
@@ -90,7 +90,7 @@ namespace hpx::execution::experimental::detail {
     template <typename Pack>
     using make_decayed_pack_t = typename make_decayed_pack<Pack>::type;
 
-    template <typename Sender, Sync_wait_type Type>
+    template <typename Sender, sync_wait_type Type>
     struct sync_wait_receiver
     {
         // value and error_types of the predecessor sender
@@ -110,15 +110,14 @@ namespace hpx::execution::experimental::detail {
         // value_types for a sender. In particular, split() explicitly adds a
         // const& to all tuple members in a way that prevent simply passing
         // decayed_tuple to predecessor_value_types.
-        using single_result_type = make_decayed_pack_t<
-            single_variant_t<predecessor_value_types<hpx::tuple, meta::pack>>>;
 
         // The template should compute the result type of whatever returned from
-        // sync_wait or sync_wait_with_variant by checking Sync_wait_type is single or variant
-        using result_type =
-            std::conditional<Type == Sync_wait_type::single,
-                hpx::variant<single_result_type>,
-                predecessor_value_types<hpx::tuple, hpx::variant>>;
+        // sync_wait or sync_wait_with_variant by checking sync_wait_type is
+        // single or variant
+        using result_type = std::conditional_t<Type == sync_wait_type::single,
+            hpx::variant<make_decayed_pack_t<single_variant_t<
+                predecessor_value_types<hpx::tuple, meta::pack>>>>,
+            predecessor_value_types<hpx::tuple, hpx::variant>>;
 
         // The type of errors to store in the variant. This in itself is a
         // variant.
@@ -142,12 +141,16 @@ namespace hpx::execution::experimental::detail {
                     // return hpx::optional<single_result_type>(
                     //     hpx::get<0>(hpx::get<result_type>(HPX_MOVE(value))));
 
-                    if constexpr (Type == Sync_wait_type::single)
+                    if constexpr (Type == sync_wait_type::single)
                     {
+                        using single_result_type = make_decayed_pack_t<
+                            single_variant_t<predecessor_value_types<hpx::tuple,
+                                meta::pack>>>;
+
                         return hpx::optional<single_result_type>(hpx::get<0>(
                             hpx::get<result_type>(HPX_MOVE(value))));
                     }
-                    else if constexpr (Type == Sync_wait_type::variant)
+                    else
                     {
                         return hpx::optional(
                             hpx::get<result_type>(HPX_MOVE(value)));
@@ -164,7 +167,17 @@ namespace hpx::execution::experimental::detail {
                 // this means that none of set_value/set_error/set_stopped was
                 // called.
                 HPX_ASSERT(hpx::holds_alternative<stopped_type>(value));
-                return hpx::optional<single_result_type>();
+                if constexpr (Type == sync_wait_type::single)
+                {
+                    using single_result_type =
+                        make_decayed_pack_t<single_variant_t<
+                            predecessor_value_types<hpx::tuple, meta::pack>>>;
+                    return hpx::optional<single_result_type>();
+                }
+                else
+                {
+                    return hpx::optional<result_type>();
+                }
             }
         };
 
@@ -362,7 +375,7 @@ namespace hpx::this_thread::experimental {
         {
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
-                    Sync_wait_type::single>;
+                    sync_wait_type::single>;
             using state_type = typename receiver_type::shared_state;
 
             hpx::execution::experimental::run_loop& loop = sched.get_run_loop();
@@ -389,7 +402,7 @@ namespace hpx::this_thread::experimental {
         {
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
-                    Sync_wait_type::single>;
+                    sync_wait_type::single>;
             using state_type = typename receiver_type::shared_state;
 
             hpx::execution::experimental::run_loop loop{};
@@ -473,7 +486,7 @@ namespace hpx::this_thread::experimental {
         {
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
-                    Sync_wait_type::variant>;
+                    sync_wait_type::variant>;
             using state_type = typename receiver_type::shared_state;
 
             hpx::execution::experimental::run_loop& loop = sched.get_run_loop();
@@ -500,7 +513,7 @@ namespace hpx::this_thread::experimental {
         {
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
-                    Sync_wait_type::variant>;
+                    sync_wait_type::variant>;
             using state_type = typename receiver_type::shared_state;
 
             hpx::execution::experimental::run_loop loop{};
