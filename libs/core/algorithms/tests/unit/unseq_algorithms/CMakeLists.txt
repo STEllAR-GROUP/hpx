@@ -1,4 +1,7 @@
-set(tests "")
+set(tests
+    transform_binary2_unseq
+    transform_binary_unseq
+    transform_unseq)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)
