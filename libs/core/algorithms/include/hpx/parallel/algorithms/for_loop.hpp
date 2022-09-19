@@ -1100,8 +1100,8 @@ namespace hpx::parallel {
                 {
                     return util::detail::algorithm_result<ExPolicy>::get(
                         util::partitioner<ExPolicy>::call(
-                            HPX_FORWARD(ExPolicy, policy), first, size,
-                            part_iterations<ExPolicy, F>{HPX_FORWARD(F, f)},
+                        HPX_FORWARD(ExPolicy, policy), first, size,
+                        part_iterations<ExPolicy, F>{HPX_FORWARD(F, f)},
                             hpx::util::empty_function{}));
                 }
                 else
@@ -1127,14 +1127,14 @@ namespace hpx::parallel {
                         util::partitioner<policy_type>::call_with_index(
                             hinted_policy, first, size, 1,
                             part_iterations<policy_type, F, void, args_type>{
-                                HPX_FORWARD(F, f), args},
+                            HPX_FORWARD(F, f), args},
                             [=](auto&&) mutable {
-                                auto pack =
+                            auto pack =
                                     hpx::util::make_index_pack_t<sizeof...(
                                         Ts)>();
-                                // make sure live-out variables are properly set on
-                                // return
-                                detail::exit_iteration(args, pack, size);
+                            // make sure live-out variables are properly set on
+                            // return
+                            detail::exit_iteration(args, pack, size);
                                 return hpx::util::unused;
                             }));
                 }
@@ -1270,18 +1270,18 @@ namespace hpx::parallel {
                         {
                             return util::detail::algorithm_result<ExPolicy>::
                                 get(util::partitioner<ExPolicy>::call(
-                                    HPX_FORWARD(ExPolicy, policy), first, size,
-                                    part_iterations<ExPolicy, F, S>{
-                                        HPX_FORWARD(F, f)},
+                                HPX_FORWARD(ExPolicy, policy), first, size,
+                                part_iterations<ExPolicy, F, S>{
+                                    HPX_FORWARD(F, f)},
                                     [](auto&&) { return hpx::util::unused; }));
                         }
                     }
 
                     return util::detail::algorithm_result<ExPolicy>::get(
                         util::partitioner<ExPolicy>::call_with_index(
-                            HPX_FORWARD(ExPolicy, policy), first, size, stride,
-                            part_iterations<ExPolicy, F, S>{
-                                HPX_FORWARD(F, f), stride},
+                        HPX_FORWARD(ExPolicy, policy), first, size, stride,
+                        part_iterations<ExPolicy, F, S>{
+                            HPX_FORWARD(F, f), stride},
                             [](auto&&) { return hpx::util::unused; }));
                 }
                 else
@@ -1307,14 +1307,14 @@ namespace hpx::parallel {
                         util::partitioner<policy_type>::call_with_index(
                             hinted_policy, first, size, stride,
                             part_iterations<policy_type, F, S, args_type>{
-                                HPX_FORWARD(F, f), stride, args},
+                            HPX_FORWARD(F, f), stride, args},
                             [=](auto&&) mutable {
-                                auto pack =
+                            auto pack =
                                     hpx::util::make_index_pack_t<sizeof...(
                                         Ts)>();
-                                // make sure live-out variables are properly set on
-                                // return
-                                detail::exit_iteration(args, pack, size);
+                            // make sure live-out variables are properly set on
+                            // return
+                            detail::exit_iteration(args, pack, size);
                                 return hpx::util::unused;
                             }));
                 }
