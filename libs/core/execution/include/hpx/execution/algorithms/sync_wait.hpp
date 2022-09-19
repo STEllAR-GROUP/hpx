@@ -350,7 +350,7 @@ namespace hpx::this_thread::experimental {
         }
 
         // clang-format off
-        template <typename Sender, Sync_wait_type Type,
+        template <typename Sender,
             HPX_CONCEPT_REQUIRES_(
                 hpx::execution::experimental::is_sender_v<Sender,
                     hpx::execution::experimental::detail::sync_wait_receiver_env>
@@ -362,7 +362,7 @@ namespace hpx::this_thread::experimental {
         {
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
-                    Type>;
+                    Sync_wait_type::single>;
             using state_type = typename receiver_type::shared_state;
 
             hpx::execution::experimental::run_loop& loop = sched.get_run_loop();
@@ -378,7 +378,7 @@ namespace hpx::this_thread::experimental {
         }
 
         // clang-format off
-        template <typename Sender, Sync_wait_type Type,
+        template <typename Sender,
             HPX_CONCEPT_REQUIRES_(
                 hpx::execution::experimental::is_sender_v<Sender,
                     hpx::execution::experimental::detail::sync_wait_receiver_env>
@@ -389,7 +389,7 @@ namespace hpx::this_thread::experimental {
         {
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
-                    Type>;
+                    Sync_wait_type::single>;
             using state_type = typename receiver_type::shared_state;
 
             hpx::execution::experimental::run_loop loop{};
@@ -461,7 +461,7 @@ namespace hpx::this_thread::experimental {
         }
 
         // clang-format off
-        template <typename Sender, Sync_wait_type Type,
+        template <typename Sender,
             HPX_CONCEPT_REQUIRES_(
                 hpx::execution::experimental::is_sender_v<Sender,
                     hpx::execution::experimental::detail::sync_wait_receiver_env>
@@ -473,7 +473,7 @@ namespace hpx::this_thread::experimental {
         {
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
-                    Type>;
+                    Sync_wait_type::variant>;
             using state_type = typename receiver_type::shared_state;
 
             hpx::execution::experimental::run_loop& loop = sched.get_run_loop();
@@ -489,7 +489,7 @@ namespace hpx::this_thread::experimental {
         }
 
         // clang-format off
-        template <typename Sender, Sync_wait_type Type,
+        template <typename Sender,
             HPX_CONCEPT_REQUIRES_(
                 hpx::execution::experimental::is_sender_v<Sender,
                     hpx::execution::experimental::detail::sync_wait_receiver_env>
@@ -500,7 +500,7 @@ namespace hpx::this_thread::experimental {
         {
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
-                    Type>;
+                    Sync_wait_type::variant>;
             using state_type = typename receiver_type::shared_state;
 
             hpx::execution::experimental::run_loop loop{};
