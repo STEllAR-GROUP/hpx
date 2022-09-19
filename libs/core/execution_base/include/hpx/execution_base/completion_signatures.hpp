@@ -1214,23 +1214,28 @@ namespace hpx::execution::experimental {
                 hpx::coro::coroutine_handle<promise>::from_promise(*this)};
         }
 
-        template <typename Awaitable>
-        Awaitable&& await_transform(Awaitable&& await) noexcept
-        {
-            return HPX_FORWARD(Awaitable, await);
-        }
+        // template <typename Awaitable>
+        // Awaitable&& await_transform(Awaitable&& await) noexcept
+        // {
+        //     return HPX_FORWARD(Awaitable, await);
+        // }
 
-        template <typename Awaitable,
-            typename = std::enable_if_t<hpx::functional::is_tag_invocable_v<
-                as_awaitable_t, Awaitable, promise&>>>
+        template <typename Awaitable>
         auto await_transform(Awaitable&& await) noexcept(
             hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t,
                 Awaitable, promise&>)
-            -> hpx::functional::tag_invoke_result_t<as_awaitable_t, Awaitable,
-                promise&>
+
         {
-            return tag_invoke(
-                as_awaitable, HPX_FORWARD(Awaitable, await), *this);
+            if constexpr (hpx::functional::is_tag_invocable_v<as_awaitable_t,
+                              Awaitable, promise&>)
+            {
+                return tag_invoke(
+                    as_awaitable, HPX_FORWARD(Awaitable, await), *this);
+            }
+            else
+            {
+                return HPX_FORWARD(Awaitable, await);
+            }
         }
 
         // Pass through the get_env receiver query
@@ -1378,13 +1383,6 @@ namespace hpx::execution::experimental {
             }
         }
 #endif    // HPX_HAVE_CXX20_COROUTINES
-
-        friend constexpr bool tag_invoke(
-            forwarding_sender_query_t, connect_t) noexcept
-        {
-            return false;
-        }
-
     } connect{};
 
     /// End definitions from coroutine_utils and sender
