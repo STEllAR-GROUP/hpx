@@ -2,8 +2,11 @@ set(tests
     foreach_unseq
     foreach_unseq_zipiter
     foreachn_unseq
+    reduce_unseq
     transform_binary2_unseq
     transform_binary_unseq
+    transform_reduce_binary_unseq
+    transform_reduce_unseq
     transform_unseq)
 
 foreach(test ${tests})

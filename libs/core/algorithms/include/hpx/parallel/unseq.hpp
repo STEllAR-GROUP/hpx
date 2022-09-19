@@ -8,4 +8,5 @@
 
 #include <hpx/execution.hpp>
 #include <hpx/parallel/unseq/loop.hpp>
+#include <hpx/parallel/unseq/reduce.hpp>
 #include <hpx/parallel/unseq/transform_loop.hpp>
