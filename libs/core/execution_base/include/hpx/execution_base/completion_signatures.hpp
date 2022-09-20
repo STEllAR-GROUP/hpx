@@ -1152,7 +1152,7 @@ namespace hpx::execution::experimental {
         }
     };
 
-    struct operation_base : hpx::functional::tag<operation_base>
+    struct operation_base
     {
         hpx::coro::coroutine_handle<> coro_handle;
 
