@@ -1379,7 +1379,8 @@ namespace hpx::execution::experimental {
             }
             else
             {
-                return;
+                return tag_invoke(connect_t{}, HPX_FORWARD(Sender, sndr),
+                    HPX_FORWARD(Receiver, rcvr));
             }
         }
 #endif    // HPX_HAVE_CXX20_COROUTINES
