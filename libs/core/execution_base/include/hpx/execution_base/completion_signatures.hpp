@@ -1351,17 +1351,11 @@ namespace hpx::execution::experimental {
                 hpx::is_invocable_v<connect_awaitable_t, Sender, Receiver> ||
                 hpx::functional::is_tag_invocable_v<is_debug_env_t,
                     env_of_t<Receiver>>>>
-        friend const auto tag_invoke(connect_t, Sender&& sndr,
+        friend auto tag_invoke(connect_t, Sender&& sndr,
             Receiver&& rcvr) noexcept(nothrow_connect<Sender, Receiver>())
         {
             if constexpr (is_connectable_with_tag_invoke_v<Sender, Receiver>)
             {
-                // hpx::util::invoke_result_t<connect_t, std::decay_t<Sender>,
-                // std::decay_t<Receiver>> is same as connect_result_t<S,R>
-                std::decay_t<hpx::util::invoke_result_t<connect_t,
-                    std::decay_t<Sender>, std::decay_t<Receiver>>>
-                    operation_state;
-
                 static_assert(
                     is_operation_state_v<hpx::functional::tag_invoke_result_t<
                         connect_t, Sender, Receiver>>,
