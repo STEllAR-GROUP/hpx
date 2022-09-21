@@ -5,6 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file future.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -843,6 +845,7 @@ namespace hpx { namespace lcos { namespace detail {
     };
 }}}    // namespace hpx::lcos::detail
 
+/// Top level HPX namespace
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1111,6 +1114,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // Allow to convert any future<U> into any other future<R> based on an
     // existing conversion path U --> R.
+    /// \brief Converts any future of type U to any other future of type R
+    ///        based on an existing conversion path from U to R.
     template <typename R, typename U>
     hpx::future<R> make_future(hpx::future<U>&& f)
     {
@@ -1132,6 +1137,8 @@ namespace hpx {
 
     // Allow to convert any future<U> into any other future<R> based on a given
     // conversion function: R conv(U).
+    /// \brief Converts any future of type U to any other future of type R
+    ///        based on a given conversion function: R conv(U).
     template <typename R, typename U, typename Conv>
     hpx::future<R> make_future(hpx::future<U>&& f, Conv&& conv)
     {
@@ -1149,6 +1156,7 @@ namespace hpx {
     }
 }    // namespace hpx
 
+/// Top level HPX namespace
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1399,6 +1407,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // Allow to convert any shared_future<U> into any other future<R> based on
     // an existing conversion path U --> R.
+    /// \brief Converts any shared_future of type U to any other future of type R
+    ///        based on an existing conversion path from U to R.
     template <typename R, typename U>
     hpx::future<R> make_future(hpx::shared_future<U> f)
     {
@@ -1422,6 +1432,7 @@ namespace hpx {
 
     // Allow to convert any future<U> into any other future<R> based on a given
     // conversion function: R conv(U).
+    /// \copydoc make_future(hpx::future<U>&& f)
     template <typename R, typename U, typename Conv>
     hpx::future<R> make_future(hpx::shared_future<U> f, Conv&& conv)
     {
@@ -1445,18 +1456,22 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // Convert any type of future<T> or shared_future<T> into a corresponding
     // shared_future<T>.
+    /// \brief Converts any future or shared_future of type T to a corresponding
+    ///        shared_future of type T
     template <typename R>
     hpx::shared_future<R> make_shared_future(hpx::future<R>&& f) noexcept
     {
         return f.share();
     }
 
+    /// \copydoc make_shared_future(hpx::future<R>&& f)
     template <typename R>
     hpx::shared_future<R>& make_shared_future(hpx::shared_future<R>& f) noexcept
     {
         return f;
     }
 
+    /// \copydoc make_shared_future(hpx::future<R>&& f)
     template <typename R>
     hpx::shared_future<R>&& make_shared_future(
         hpx::shared_future<R>&& f) noexcept
@@ -1464,6 +1479,7 @@ namespace hpx {
         return HPX_MOVE(f);
     }
 
+    /// \copydoc make_shared_future(hpx::future<R>&& f)
     template <typename R>
     hpx::shared_future<R> const& make_shared_future(
         hpx::shared_future<R> const& f) noexcept
@@ -1472,10 +1488,12 @@ namespace hpx {
     }
 }    // namespace hpx
 
+/// Top level HPX namespace
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // Extension (see wg21.link/P0319), with allocator
+    /// \brief Creates a pre-initialized future object with allocator (extension)
     template <typename T, typename Allocator, typename... Ts>
     std::enable_if_t<std::is_constructible_v<T, Ts&&...> || std::is_void_v<T>,
         future<T>>
@@ -1508,6 +1526,7 @@ namespace hpx {
     }
 
     // Extension (see wg21.link/P0319)
+    /// \copydoc make_ready_future(T&& init)
     template <typename T, typename... Ts>
     HPX_FORCEINLINE std::enable_if_t<
         std::is_constructible_v<T, Ts&&...> || std::is_void_v<T>, future<T>>
@@ -1518,6 +1537,7 @@ namespace hpx {
     }
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object, with allocator
+    /// \copydoc make_ready_future_alloc(Allocator const& a, Ts&&... ts)
     template <int DeductionGuard = 0, typename Allocator, typename T>
     future<hpx::util::decay_unwrap_t<T>> make_ready_future_alloc(
         Allocator const& a, T&& init)
@@ -1527,6 +1547,7 @@ namespace hpx {
     }
 
     // extension: create a pre-initialized future object
+    /// \brief  Creates a pre-initialized future object (extension)
     template <int DeductionGuard = 0, typename T>
     HPX_FORCEINLINE future<hpx::util::decay_unwrap_t<T>> make_ready_future(
         T&& init)
@@ -1538,6 +1559,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object which holds the
     // given error
+    /// \brief Creates a pre-initialized future object which holds the
+    ///        given error (extension)
     template <typename T>
     future<T> make_exceptional_future(std::exception_ptr const& e)
     {
@@ -1550,6 +1573,7 @@ namespace hpx {
         return hpx::traits::future_access<future<T>>::create(HPX_MOVE(p));
     }
 
+    /// \copydoc make_exceptional_future(std::exception_ptr const& e)
     template <typename T, typename E>
     future<T> make_exceptional_future(E e)
     {
@@ -1568,6 +1592,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
+    /// \brief Creates a pre-initialized future object which gets ready at
+    ///        a given point in time (extension)
     template <int DeductionGuard = 0, typename T>
     future<hpx::util::decay_unwrap_t<T>> make_ready_future_at(
         hpx::chrono::steady_time_point const& abs_time, T&& init)
@@ -1582,6 +1608,8 @@ namespace hpx {
             HPX_MOVE(p));
     }
 
+    /// \brief Creates a pre-initialized future object which gets ready after
+    ///        a given point in time (extension)
     template <int DeductionGuard = 0, typename T>
     future<hpx::util::decay_unwrap_t<T>> make_ready_future_after(
         hpx::chrono::steady_duration const& rel_time, T&& init)
@@ -1592,6 +1620,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object, with allocator
+    /// \copydoc make_ready_future_alloc(Allocator const& a, Ts&&... ts)
     template <typename Allocator>
     inline future<void> make_ready_future_alloc(Allocator const& a)
     {
@@ -1606,6 +1635,7 @@ namespace hpx {
     }
 
     // Extension (see wg21.link/P0319)
+    /// \copydoc make_ready_future(T&& init)
     template <typename T>
     HPX_FORCEINLINE std::enable_if_t<std::is_void_v<T>, future<void>>
     make_ready_future()
@@ -1615,6 +1645,7 @@ namespace hpx {
 
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
+    /// \copydoc make_ready_future_at(hpx::chrono::steady_time_point const& abs_time, T&& init)
     inline future<void> make_ready_future_at(
         hpx::chrono::steady_time_point const& abs_time)
     {
@@ -1626,6 +1657,7 @@ namespace hpx {
         return hpx::traits::future_access<future<void>>::create(HPX_MOVE(p));
     }
 
+    /// \copydoc make_ready_future_at(hpx::chrono::steady_time_point const& abs_time, T&& init)
     template <typename T>
     std::enable_if_t<std::is_void_v<T>, future<void>> make_ready_future_at(
         hpx::chrono::steady_time_point const& abs_time)
@@ -1634,12 +1666,14 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \copydoc make_ready_future_after(hpx::chrono::steady_duration const& rel_time, T&& init)
     inline future<void> make_ready_future_after(
         hpx::chrono::steady_duration const& rel_time)
     {
         return hpx::make_ready_future_at(rel_time.from_now());
     }
 
+    /// \copydoc make_ready_future_after(hpx::chrono::steady_duration const& rel_time, T&& init)
     template <typename T>
     std::enable_if_t<std::is_void_v<T>, future<void>> make_ready_future_after(
         hpx::chrono::steady_duration const& rel_time)
