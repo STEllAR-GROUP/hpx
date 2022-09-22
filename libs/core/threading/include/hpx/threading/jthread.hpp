@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file jthread.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -17,6 +19,34 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 
+    /// \brief The class \a jthread represents a single thread of execution. It
+    ///        has the same general behavior as \a hpx::thread, except that \a
+    ///        jthread automatically rejoins on destruction, and can be
+    ///        cancelled/stopped in certain situations.
+    ///        Threads begin execution immediately upon construction of the
+    ///        associated thread object (pending any OS scheduling delays),
+    ///        starting at the top-level function provided as a constructor
+    ///        argument. The return value of the top-level function is ignored
+    ///        and if it terminates by throwing an exception, \a hpx::terminate is
+    ///        called. The top-level function may communicate its return value
+    ///        or an exception to the caller via \a hpx::promise or by modifying
+    ///        shared variables (which may require synchronization, see \a
+    ///        hpx::mutex and \a hpx::atomic)
+    ///        Unlike \a hpx::thread, the jthread logically holds an internal
+    ///        private member of type \a hpx::stop_source, which maintains a shared
+    ///        stop-state. The \a jthread constructor accepts a function that
+    ///        takes a \a hpx::stop_token as its first argument, which will be
+    ///        passed in by the jthread from its internal \a stop_source. This
+    ///        allows the function to check if stop has been requested during
+    ///        its execution, and return if it has.
+    ///        \a hpx::jthread objects may also be in the state that does not
+    ///        represent any thread (after default construction, move from,
+    ///        detach, or join), and a thread of execution may be not associated
+    ///        with any \a jthread objects (after detach).
+    ///        No two \a hpx::jthread objects may represent the same thread of
+    ///        execution; \a hpx::jthread is not \a CopyConstructible or \a
+    ///        CopyAssignable, although it is \a MoveConstructible and \a
+    ///        MoveAssignable.
     class jthread
     {
     private:
@@ -155,11 +185,13 @@ namespace hpx {
         //      is false.
         //
         // Returns: *this.
+        /// \brief moves the jthread object
         jthread& operator=(jthread&&) noexcept = default;
 
         // 32.4.3.2, members
 
         // Effects: Exchanges the values of *this and x.
+        /// \brief swaps two jthread objects
         void swap(jthread& t) noexcept
         {
             std::swap(ssource_, t.ssource_);
@@ -167,6 +199,8 @@ namespace hpx {
         }
 
         // Returns: get_id() != id().
+        /// \brief checks whether the thread is joinable, i.e. potentially running
+        ///        in parallel context
         [[nodiscard]] bool joinable() const noexcept
         {
             return thread_.joinable();
@@ -189,6 +223,7 @@ namespace hpx {
         //          or get_id() == thisthread_::get_id().
         //      - no_such_process - if the thread is not valid.
         //      - invalid_argument - if the thread is not joinable.
+        /// \brief waits for the thread to finish its execution
         void join()
         {
             thread_.join();
@@ -208,6 +243,7 @@ namespace hpx {
         // Error conditions:
         //      - no_such_process - if the thread is not valid.
         //      - invalid_argument - if the thread is not joinable.
+        /// \brief permits the thread to execute independently from the thread handle
         void detach()
         {
             thread_.detach();
@@ -216,6 +252,7 @@ namespace hpx {
         // Returns: A default constructed id object if *this does not
         //      represent a thread, otherwise thisthread_::get_id() for
         //      the thread of execution represented by *this.
+        /// \brief returns the id of the thread
         [[nodiscard]] id get_id() const noexcept
         {
             return thread_.get_id();
@@ -223,6 +260,7 @@ namespace hpx {
 
         // The presence of native_handle() and its semantic is
         //      implementation-defined.
+        /// \brief returns the underlying implementation-defined thread handle
         [[nodiscard]] native_handle_type native_handle()
         {
             return thread_.native_handle();
@@ -231,18 +269,23 @@ namespace hpx {
         // 32.4.3.2, stop token handling
 
         // Effects: Equivalent to: return ssource_;
+        /// \brief returns a stop_source object associated with the shared stop
+        ///        state of the thread
         [[nodiscard]] stop_source get_stop_source() noexcept
         {
             return ssource_;
         }
 
         // Effects: Equivalent to: return ssource_.get_token();
+        /// \brief returns a stop_token associated with the shared stop state of
+        ///        the thread
         [[nodiscard]] stop_token get_stop_token() const noexcept
         {
             return ssource_.get_token();
         }
 
         // Effects: Equivalent to: return ssource_.request_stop();
+        /// \brief requests execution stop via the shared stop state of the thread
         bool request_stop() noexcept
         {
             return ssource_.request_stop();
@@ -251,6 +294,7 @@ namespace hpx {
         // 32.4.3.5, static members
 
         // Returns: thread::hardware_concurrency().
+        /// \brief returns the number of concurrent threads supported by the implementation
         [[nodiscard]] static unsigned int hardware_concurrency()
         {
             return hpx::threads::hardware_concurrency();

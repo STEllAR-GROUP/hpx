@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file sync.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -18,6 +20,9 @@ namespace hpx { namespace detail {
 }}    // namespace hpx::detail
 
 namespace hpx {
+    /// \brief The function template \a sync runs the function \a f synchronously
+    ///        and returns an \a hpx::future that will eventually hold the result
+    ///        of that function call.
     template <typename F, typename... Ts>
     HPX_FORCEINLINE auto sync(F&& f, Ts&&... ts)
         -> decltype(detail::sync_dispatch<std::decay_t<F>>::call(

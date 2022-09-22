@@ -1056,9 +1056,9 @@ Classes
    ================================  ===================================================
    Class                             C++ standard
    ================================  ===================================================
-   :cpp:struct:`hpx::tuple`          :cppreference-generic:`utility/tuple,tuple`
-   :cpp:struct:`hpx::tuple_size`     :cppreference-generic:`utility/tuple,tuple_size`
-   :cpp:struct:`hpx::tuple_element`  :cppreference-generic:`utility/tuple,tuple_element`
+   :cpp:struct:`hpx::tuple`          :cppreference-generic:`utility,tuple`
+   :cpp:struct:`hpx::tuple_size`     :cppreference-generic:`utility,tuple_size`
+   :cpp:struct:`hpx::tuple_element`  :cppreference-generic:`utility,tuple_element`
    ================================  ===================================================
 
 Functions

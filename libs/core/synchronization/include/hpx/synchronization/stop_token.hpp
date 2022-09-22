@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file stop_token.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -207,6 +209,21 @@ namespace hpx {
     // stop_token can also be passed to a stop_callback (32.3.5) constructor
     // to register a callback to be called when a stop request has been made
     // from an associated stop_source.
+
+    /// The \a stop_token class provides the means to check if a stop request has
+    /// been made or can be made, for its associated \a hpx::stop_source object.
+    /// It is essentially a thread-safe "view" of the associated stop-state.
+    /// The stop_token can also be passed to the constructor of \a
+    /// hpx::stop_callback, such that the callback will be invoked if the \a
+    /// stop_token's associated \a hpx::stop_source is requested to stop. And \a
+    /// stop_token can be passed to the interruptible waiting functions of \a
+    /// hpx::condition_variable_any, to interrupt the condition variable's wait
+    /// if stop is requested.
+    ///
+    /// \note A \a stop_token object is not generally constructed independently,
+    ///       but rather retrieved from a \a hpx::jthread or \a hpx::stop_source.
+    ///       This makes it share the same associated stop-state as the \a
+    ///       hpx::jthread or \a hpx::stop_source.
     class stop_token
     {
     private:
@@ -243,6 +260,7 @@ namespace hpx {
         ~stop_token() = default;
 
         // Effects: Exchanges the values of *this and rhs.
+        /// swaps two stop_token objects
         void swap(stop_token& s) noexcept
         {
             std::swap(state_, s.state_);
@@ -252,6 +270,7 @@ namespace hpx {
 
         // Returns: true if *this has ownership of a stop state that has
         //      received a stop request; otherwise, false.
+        /// checks whether the associated stop-state has been requested to stop
         [[nodiscard]] bool stop_requested() const noexcept
         {
             return !!state_ && state_->stop_requested();
@@ -261,6 +280,7 @@ namespace hpx {
         //      (2.1) *this does not have ownership of a stop state, or
         //      (2.2) a stop request was not made and there are no associated
         //            stop_source objects; otherwise, true.
+        /// checks whether associated stop-state can be requested to stop
         [[nodiscard]] bool stop_possible() const noexcept
         {
             return !!state_ && state_->stop_possible();
@@ -306,13 +326,37 @@ namespace hpx {
     // withdrawn (a subsequent stop request has no effect).
 
     // no-shared-stop-state indicator
+    /// Unit type intended for use as a placeholder in hpx::stop_source
+    /// non-default constructor, that makes the constructed hpx::stop_source
+    /// empty with no associated stop-state.
     struct nostopstate_t
     {
         explicit nostopstate_t() = default;
     };
 
+    /// This is a constant object instance of hpx::nostopstate_t for use in
+    /// constructing an empty hpx::stop_source, as a placeholder value in the
+    /// non-default constructor.
     inline constexpr nostopstate_t nostopstate{};
 
+    /// The \a stop_source class provides the means to issue a stop request, such
+    /// as for \a hpx::jthread cancellation. A stop request made for one
+    /// \a stop_source object is visible to all \a stop_sources and \a
+    /// hpx::stop_tokens of the same associated stop-state; any \a
+    /// hpx::stop_callback(s) registered for associated \a hpx::stop_token(s) will
+    /// be invoked, and any hpx::condition_variable_any objects waiting on associated
+    /// \a hpx::stop_token(s) will be awoken.
+    /// Once a stop is requested, it cannot be withdrawn. Additional stop requests
+    /// have no effect.
+    ///
+    /// \note For the purposes of \a hpx::jthread cancellation the \a stop_source
+    ///       object should be retrieved from the hpx::jthread object using \a
+    ///       get_stop_source(); or stop should be requested directly from the
+    ///       \a hpx::jthread object using \a request_stop(). This will then use the
+    ///       same associated stop-state as that passed into the \a hpx::jthread's
+    ///       invoked function argument (i.e., the function being executed on its thread).
+    ///       For other uses, however, a \a stop_source can be constructed separately
+    ///       using the default constructor, which creates new stop-state.
     class stop_source
     {
     public:
@@ -359,6 +403,7 @@ namespace hpx {
         }
 
         // Effects: Exchanges the values of *this and rhs.
+        /// swaps two stop_source objects
         void swap(stop_source& s) noexcept
         {
             std::swap(state_, s.state_);
@@ -368,6 +413,7 @@ namespace hpx {
 
         // Returns: stop_token() if stop_possible() is false; otherwise a new
         //      associated stop_token object.
+        /// returns a stop_token for the associated stop-state
         [[nodiscard]] stop_token get_token() const noexcept
         {
             if (!stop_possible())
@@ -378,6 +424,7 @@ namespace hpx {
         }
 
         // Returns: true if *this has ownership of a stop state; otherwise, false.
+        /// checks whether associated stop-state can be requested to stop
         [[nodiscard]] bool stop_possible() const noexcept
         {
             return !!state_;
@@ -385,6 +432,7 @@ namespace hpx {
 
         // Returns: true if *this has ownership of a stop state that has
         //      received a stop request; otherwise, false.
+        /// checks whether the associated stop-state has been requested to stop
         [[nodiscard]] bool stop_requested() const noexcept
         {
             return !!state_ && state_->stop_requested();
@@ -406,6 +454,7 @@ namespace hpx {
         // Postconditions: stop_possible() is false or stop_requested() is true.
         //
         // Returns: true if this call made a stop request; otherwise false
+        /// makes a stop request for the associated stop-state, if any
         bool request_stop() noexcept
         {
             return !!state_ && state_->request_stop();
@@ -528,6 +577,26 @@ namespace hpx {
 
     // clang-format produces inconsistent result between different versions
     // clang-format off
+    /// The \a stop_callback class template provides an RAII object type that registers
+    /// a callback function for an associated \a hpx::stop_token object, such that the
+    /// callback function will be invoked when the \a hpx::stop_token's associated
+    /// \a hpx::stop_source is requested to stop.
+    /// Callback functions registered via \a stop_callback's constructor are invoked
+    /// either in the same thread that successfully invokes \a request_stop() for a
+    /// \a hpx::stop_source of the \a stop_callback's associated \a hpx::stop_token;
+    /// or if stop has already been requested prior to the constructor's registration,
+    /// then the callback is invoked in the thread constructing the \a stop_callback.
+    /// More than one \a stop_callback can be created for the same \a hpx::stop_token,
+    /// from the same or different threads concurrently. No guarantee is provided
+    /// for the order in which they will be executed, but they will be invoked
+    /// synchronously; except for \a stop_callback(s) constructed after stop has already
+    /// been requested for the \a hpx::stop_token, as described previously.
+    /// If an invocation of a callback exits via an exception then hpx::terminate is
+    /// called.
+    /// \a hpx::stop_callback is not \a CopyConstructible, \a CopyAssignable, \a
+    /// MoveConstructible, nor \a MoveAssignable.
+    /// The template param Callback type must be both \a invocable and \a destructible.
+    /// Any return value is ignored.
     template <typename Callback>
     stop_callback(stop_token, Callback) -> stop_callback<Callback>;
     // clang-format on

@@ -13,6 +13,8 @@
     It adds support for HPX serialization, move assignment, == operator.
 ==============================================================================*/
 
+/// \file serializable_any.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -420,6 +422,9 @@ namespace hpx { namespace util {
 }}    // namespace hpx::util
 
 namespace hpx {
+    /// Constructs an any object containing an object of type \a T, passing the
+    /// provided arguments to T's constructor. Equivalent to: \code
+    /// return std::any(std::in_place_type<T>, std::forward<Args>(args)...); \endcode
     template <typename T, typename Char>
     util::basic_any<serialization::input_archive, serialization::output_archive,
         Char>
