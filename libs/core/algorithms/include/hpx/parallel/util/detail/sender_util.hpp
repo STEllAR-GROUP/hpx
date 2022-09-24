@@ -67,16 +67,9 @@ namespace hpx::detail {
             // returns senders, we don't need to wrap the algorithm in any
             // specific way as it directly integrates with the given
             // predecessor.
-            //
-            // We also string any asynchrony requirements from the given policy
-            // as the senders returned by the executor naturally provide this.
-            auto non_task_policy = hpx::execution::experimental::to_non_task(
-                HPX_FORWARD(ExPolicy, policy));
-
             return hpx::execution::experimental::let_value(
                 HPX_FORWARD(Predecessor, predecessor),
-                bound_algorithm<Tag, decltype(non_task_policy)>{
-                    HPX_MOVE(non_task_policy)});
+                bound_algorithm<Tag, ExPolicy>{HPX_FORWARD(ExPolicy, policy)});
         }
         else if constexpr (hpx::execution::detail::has_async_execution_policy_v<
                                ExPolicy>)

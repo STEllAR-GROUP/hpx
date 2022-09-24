@@ -138,15 +138,13 @@ void measure_parallel_foreach(
 
             // invoke parallel for_each
             hpx::ranges::for_each(hpx::execution::par.with(cs, dsp).on(exec),
-                data_representation, [](std::size_t) { worker_timed(delay); }) |
-                hpx::this_thread::experimental::sync_wait();
+                data_representation, [](std::size_t) { worker_timed(delay); });
         }
         else
         {
             // invoke parallel for_each
             hpx::ranges::for_each(hpx::execution::par.with(cs).on(exec),
-                data_representation, [](std::size_t) { worker_timed(delay); }) |
-                hpx::this_thread::experimental::sync_wait();
+                data_representation, [](std::size_t) { worker_timed(delay); });
         }
     }
     else
@@ -243,16 +241,14 @@ void measure_parallel_forloop(
             hpx::experimental::for_loop(
                 hpx::execution::par.with(cs, dsp).on(exec),
                 std::begin(data_representation), std::end(data_representation),
-                [](iterator) { worker_timed(delay); }) |
-                hpx::this_thread::experimental::sync_wait();
+                [](iterator) { worker_timed(delay); });
         }
         else
         {
             // invoke parallel for_loop
             hpx::experimental::for_loop(hpx::execution::par.with(cs).on(exec),
                 std::begin(data_representation), std::end(data_representation),
-                [](iterator) { worker_timed(delay); }) |
-                hpx::this_thread::experimental::sync_wait();
+                [](iterator) { worker_timed(delay); });
         }
     }
     else

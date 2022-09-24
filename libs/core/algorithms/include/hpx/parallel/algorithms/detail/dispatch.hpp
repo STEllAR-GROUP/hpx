@@ -150,21 +150,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                     local_result_type>;
 
             auto exec = policy.executor();    // avoid move after use
-            if constexpr (hpx::execution_policy_has_scheduler_executor_v<
-                              std::decay_t<ExPolicy>>)
-            {
-                // specialization for all execution policies that wrap sender
-                // based executors
-
-                // create a sender running the launched task
-                return result_handler::get(
-                    execution::async_execute(HPX_MOVE(exec), derived(),
-                        hpx::execution::experimental::to_non_task(
-                            HPX_FORWARD(ExPolicy, policy)),
-                        HPX_FORWARD(Args, args)...));
-            }
-            else if constexpr (hpx::is_async_execution_policy_v<
-                                   std::decay_t<ExPolicy>>)
+            if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
             {
                 // specialization for all task-based (asynchronous) execution
                 // policies

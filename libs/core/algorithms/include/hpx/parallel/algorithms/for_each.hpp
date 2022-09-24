@@ -630,11 +630,12 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
-                hpx::parallel::v1::detail::for_each<FwdIter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_FORWARD(F, f),
-                    hpx::parallel::util::projection_identity()));
+            return hpx::parallel::util::detail::
+                algorithm_result<ExPolicy, FwdIter>::get(
+                    hpx::parallel::v1::detail::for_each<FwdIter>().call(
+                        HPX_FORWARD(ExPolicy, policy), first, last,
+                        HPX_FORWARD(F, f),
+                        hpx::parallel::util::projection_identity()));
         }
     } for_each{};
 
