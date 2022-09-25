@@ -874,7 +874,7 @@ namespace hpx { namespace resource { namespace detail {
         return affinity_data_.get_used_pus_mask(topo_, pu_num);
     }
 
-    threads::mask_cref_type partitioner::get_pu_mask(
+    threads::mask_type partitioner::get_pu_mask(
         std::size_t global_thread_num) const
     {
         return affinity_data_.get_pu_mask(topo_, global_thread_num);

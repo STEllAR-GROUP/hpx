@@ -232,12 +232,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::size_t cores_left = 1;
             if (size_right > 0)
             {
-                std::size_t partition_size_ratio = std::size_t(size_left) /
-                    std::size_t(size_left + size_right);
+                double partition_size_ratio =
+                    double(size_left) / double(size_left + size_right);
 
                 // avoid cores_left = 0 after integer rounding
-                cores_left =
-                    (std::max)(std::size_t(1), partition_size_ratio * cores);
+                cores_left = (std::max)(
+                    std::size_t(1), std::size_t(partition_size_ratio * cores));
             }
 
             // if size_right == 0 && cores == 1, cores_right = 0, should be at least 1.
