@@ -100,12 +100,10 @@ namespace hpx {
     class condition_variable
     {
     private:
-        /// \cond NOPRIVATE
         using mutex_type =
             lcos::local::detail::condition_variable_data::mutex_type;
         using data_type =
             hpx::intrusive_ptr<lcos::local::detail::condition_variable_data>;
-        /// \endcond NOPRIVATE
 
     public:
         /// \brief Construct an object of type \a hpx::condition_variable.
@@ -498,9 +496,7 @@ namespace hpx {
         }
 
     private:
-        /// \cond NOPRIVATE
         hpx::util::cache_aligned_data_derived<data_type> data_;
-        /// \endcond NOPRIVATE
     };
 
     ///
@@ -518,12 +514,11 @@ namespace hpx {
     class condition_variable_any
     {
     private:
-        /// \cond NOPRIVATE
         using mutex_type =
             lcos::local::detail::condition_variable_data::mutex_type;
         using data_type =
             hpx::intrusive_ptr<lcos::local::detail::condition_variable_data>;
-        /// \endcond NOPRIVATE
+
     public:
         ///
         /// \brief Constructs an object of type \a hpx::condition_variable_any
@@ -1237,9 +1232,7 @@ namespace hpx {
         }
 
     private:
-        /// \cond NOPRIVATE
         hpx::util::cache_aligned_data_derived<data_type> data_;
-        /// \endcond NOPRIVATE
     };
 }    // namespace hpx
 

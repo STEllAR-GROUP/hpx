@@ -206,7 +206,8 @@ breathe_doxygen_config_options = {
     'MACRO_EXPANSION': 'YES',
     'DIRECTORY_GRAPH': 'NO',
     'PREDEFINED': '@doxygen_definitions@',
-    'STRIP_FROM_PATH': hpx_source_dir
+    'STRIP_FROM_PATH': hpx_source_dir,
+    'EXTRACT_PRIVATE': 'NO'
 }
 
 numfig = True
