@@ -46,7 +46,7 @@ namespace hpx { namespace util {
             transform_ = f;
         }
 
-        void force_ipv4(bool const& f)
+        void force_ipv4(bool f)
         {
             ipv4_ = f;
         }
