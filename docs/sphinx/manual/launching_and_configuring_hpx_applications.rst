@@ -1461,6 +1461,13 @@ The predefined command line options for any application using
    Sed-style search and replace (``s/search/replace/``) used to transform host
    names to the proper network interconnect.
 
+.. option:: --hpx:force_ipv4
+
+   Network hostnames will be resolved to ipv4 adresses instead of using the
+   first resolved endpoint. This is especially useful on Windows where the
+   local hostname will resolve to an ipv6 adress while remote network hostnames
+   are commonly resolved to ipv4 adresses.
+
 .. option:: --hpx:localities arg
 
    The number of localities to wait for at application startup (default: ``1``).

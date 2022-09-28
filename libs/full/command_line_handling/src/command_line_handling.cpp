@@ -647,6 +647,7 @@ namespace hpx { namespace util {
             mapnames.use_suffix(vm["hpx:ifsuffix"].as<std::string>());
         if (vm.count("hpx:ifprefix"))
             mapnames.use_prefix(vm["hpx:ifprefix"].as<std::string>());
+        mapnames.force_ipv4(vm.count("hpx:force_ipv4") > 0);
 
         // The AGAS host name and port number are pre-initialized from
         //the command line

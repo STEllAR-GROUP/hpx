@@ -27,7 +27,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT bool get_endpoint(std::string const& addr,
-        std::uint16_t port, asio::ip::tcp::endpoint& ep);
+        std::uint16_t port, asio::ip::tcp::endpoint& ep, bool force_ipv4 = false);
 
     HPX_CORE_EXPORT std::string get_endpoint_name(
         asio::ip::tcp::endpoint const& ep);
@@ -36,7 +36,7 @@ namespace hpx { namespace util {
     // properly resolve a give host name to the corresponding IP address
     HPX_CORE_EXPORT asio::ip::tcp::endpoint resolve_hostname(
         std::string const& hostname, std::uint16_t port,
-        asio::io_context& io_service);
+        asio::io_context& io_service, bool force_ipv4 = false);
 
     ///////////////////////////////////////////////////////////////////////////
     // return the public IP address of the local node
