@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //  Copyright (c) 2022 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -115,7 +115,7 @@ int hpx_main()
 
     {
         auto s1 = ex::just(custom_type_non_default_constructible{42});
-        auto result = tt::sync_wait_with_variant(std::move(s1));
+        auto result = tt::sync_wait_with_variant(s1);
         auto v = *result;
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(
@@ -173,12 +173,12 @@ int hpx_main()
     }
 
     {
-        auto sender = ex::just(3) | ex::let_error([](std::exception_ptr) {
+        auto sd = ex::just(3) | ex::let_error([](std::exception_ptr) {
             HPX_TEST(false);
             return ex::just(std::string{"err"});
         });
 
-        auto result = tt::sync_wait_with_variant(std::move(sender));
+        auto result = tt::sync_wait_with_variant(sd);
 
         // variant
         auto v = *result;

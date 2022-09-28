@@ -1,5 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -99,9 +100,18 @@ namespace hpx::execution::experimental::detail {
         using predecessor_value_types =
             value_types_of_t<Sender, sync_wait_receiver_env, Tuple, Variant>;
 
+        template <template <typename...> class Tuple,
+            template <typename...> class Variant>    
+        using predecessor_value_types_with_variant =
+            value_types_of_t<Sender, empty_env, Tuple, Variant>;    
+
         template <template <typename...> class Variant>
         using predecessor_error_types =
             error_types_of_t<Sender, sync_wait_receiver_env, Variant>;
+
+        template <template <typename...> class Variant>
+        using predecessor_error_types_with_variant =
+            error_types_of_t<Sender, empty_env, Variant>;   
 
         // forcing static_assert ensuring variant has exactly one tuple
         //
@@ -114,10 +124,17 @@ namespace hpx::execution::experimental::detail {
         // The template should compute the result type of whatever returned from
         // sync_wait or sync_wait_with_variant by checking sync_wait_type is
         // single or variant
-        using result_type = std::conditional_t<Type == sync_wait_type::single,
-            hpx::variant<make_decayed_pack_t<single_variant_t<
-                predecessor_value_types<hpx::tuple, meta::pack>>>>,
-            predecessor_value_types<hpx::tuple, hpx::variant>>;
+        template <int Dummy>
+        static auto select_result(std::true_type)
+        -> hpx::variant<make_decayed_pack_t<single_variant_t<
+                predecessor_value_types<hpx::tuple, meta::pack>>>>; 
+        
+        template <int Dummy>
+        static auto select_result(std::false_type)
+        -> predecessor_value_types_with_variant<hpx::tuple, hpx::variant>;
+        
+        using result_type = decltype(select_result<42>(
+            std::integral_constant<bool, Type == sync_wait_type::single>()));
 
         // The type of errors to store in the variant. This in itself is a
         // variant.
@@ -129,8 +146,8 @@ namespace hpx::execution::experimental::detail {
 
         struct shared_state
         {
-            hpx::variant<hpx::monostate, error_type, result_type, stopped_type>
-                value;
+            hpx::variant<hpx::monostate, error_type, result_type, stopped_type> value;
+            //hpx::variant<hpx::monostate, error_type, result_type> value;
 
             auto get_value()
             {
@@ -453,8 +470,7 @@ namespace hpx::this_thread::experimental {
         // clang-format off
         template <typename Sender,
             HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_sender_v<Sender,
-                    hpx::execution::experimental::detail::sync_wait_receiver_env> &&
+                hpx::execution::experimental::is_sender_v<Sender> &&
                 hpx::execution::experimental::detail::
                     is_completion_scheduler_tag_invocable_v<
                         hpx::execution::experimental::set_value_t,
@@ -476,8 +492,7 @@ namespace hpx::this_thread::experimental {
         // clang-format off
         template <typename Sender,
             HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_sender_v<Sender,
-                    hpx::execution::experimental::detail::sync_wait_receiver_env>
+                hpx::execution::experimental::is_sender_v<Sender>
             )>
         // clang-format on
         friend auto tag_invoke(sync_wait_with_variant_t,
@@ -504,8 +519,7 @@ namespace hpx::this_thread::experimental {
         // clang-format off
         template <typename Sender,
             HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_sender_v<Sender,
-                    hpx::execution::experimental::detail::sync_wait_receiver_env>
+                hpx::execution::experimental::is_sender_v<Sender>
             )>
         // clang-format on
         friend HPX_FORCEINLINE auto tag_fallback_invoke(
