@@ -27,7 +27,7 @@ namespace hpx { namespace util {
             transform_function_type;
 
         map_hostnames(bool debug = false)
-          : debug_(debug)
+          : ipv4_(false), debug_(debug)
         {
         }
 
@@ -46,12 +46,18 @@ namespace hpx { namespace util {
             transform_ = f;
         }
 
+        void force_ipv4(bool const& f)
+        {
+            ipv4_ = f;
+        }
+
         std::string map(std::string host_name, std::uint16_t port) const;
 
     private:
         transform_function_type transform_;
         std::string suffix_;
         std::string prefix_;
+        bool ipv4_;
         bool debug_;
     };
 }}    // namespace hpx::util
