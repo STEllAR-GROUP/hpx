@@ -5,6 +5,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# find required packages
 if(HPX_WITH_DOCUMENTATION)
   find_package(Doxygen)
   find_package(Sphinx)
@@ -27,22 +28,3 @@ if(HPX_WITH_DOCUMENTATION)
     set(HPX_WITH_DOCUMENTATION OFF)
   endif()
 endif()
-
-# C++ Source -> Doxygen XML
-function(hpx_source_to_doxygen name)
-  set(options)
-  set(one_value_args)
-  set(multi_value_args DEPENDENCIES DOXYGEN_ARGS)
-  cmake_parse_arguments(
-    ${name} "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN}
-  )
-
-  add_custom_command(
-    OUTPUT "${name}/index.xml"
-    COMMAND "${DOXYGEN_EXECUTABLE}" ${${name}_DOXYGEN_ARGS}
-            "${CMAKE_CURRENT_BINARY_DIR}/${name}.doxy"
-    COMMENT "Generating Doxygen."
-    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/${name}.doxy" ${${name}_DEPENDENCIES}
-    VERBATIM
-  )
-endfunction()
