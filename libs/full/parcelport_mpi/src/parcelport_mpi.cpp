@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c)      2020 Google
 //
@@ -13,6 +13,7 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/mpi_base.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
@@ -275,6 +276,10 @@ namespace hpx::traits {
                 static_cast<std::size_t>(util::mpi_environment::size());
             cfg.node_ = static_cast<std::size_t>(util::mpi_environment::rank());
         }
+
+        // by default no additional initialization using the resource
+        // partitioner is required
+        static constexpr void init(hpx::resource::partitioner&) noexcept {}
 
         static void destroy()
         {
