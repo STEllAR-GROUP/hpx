@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/detail/action_factory.hpp>
+#include <hpx/assert.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
 
@@ -43,9 +44,11 @@ namespace hpx { namespace actions { namespace detail {
     template <typename Action>
     register_action<Action>::register_action()
     {
+        char const* action_name =
+            hpx::actions::detail::get_action_name<Action>();
+        HPX_ASSERT(nullptr != action_name);
         action_registry::instance().register_factory(
-            hpx::actions::detail::get_action_name<Action>(), &create,
-            &create_cont);
+            action_name, &create, &create_cont);
     }
 
     template <typename Action>

@@ -1,4 +1,5 @@
-//  Copyright (c)      2020 ETH Zurich
+//  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -52,19 +53,6 @@ namespace hpx {
     }    // namespace resource
     /// \endcond
 
-    namespace detail {
-        // Default params to initialize the init_params struct
-        HPX_MAYBE_UNUSED static int dummy_argc = 1;
-        HPX_MAYBE_UNUSED static char app_name[] = HPX_APPLICATION_STRING;
-        static char* default_argv[2] = {app_name, nullptr};
-        HPX_MAYBE_UNUSED static char** dummy_argv = default_argv;
-        // HPX_APPLICATION_STRING is specific to an application and therefore
-        // cannot be in the source file
-        HPX_MAYBE_UNUSED static const hpx::program_options::options_description
-            default_desc = hpx::program_options::options_description(
-                "Usage: " HPX_APPLICATION_STRING " [options]");
-    }    // namespace detail
-
 #if !defined(DOXYGEN)
     typedef int (*hpx_main_type)(hpx::program_options::variables_map&);
     typedef int (*hpx_user_main_type)(int argc, char** argv);
@@ -111,7 +99,7 @@ namespace hpx {
     {
         // Parameters
         std::reference_wrapper<hpx::program_options::options_description const>
-            desc_cmdline = detail::default_desc;
+            desc_cmdline = hpx::local::detail::default_desc();
         std::vector<std::string> cfg;
         mutable startup_function_type startup;
         mutable shutdown_function_type shutdown;

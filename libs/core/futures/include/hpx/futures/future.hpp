@@ -1600,9 +1600,12 @@ namespace hpx {
     {
         using result_type = hpx::util::decay_unwrap_t<T>;
         using shared_state = lcos::detail::timed_future_data<result_type>;
+        using init_no_addref = typename shared_state::init_no_addref;
 
         hpx::intrusive_ptr<shared_state> p(
-            new shared_state(abs_time.value(), HPX_FORWARD(T, init)));
+            new shared_state(
+                init_no_addref{}, abs_time.value(), HPX_FORWARD(T, init)),
+            false);
 
         return hpx::traits::future_access<future<result_type>>::create(
             HPX_MOVE(p));
@@ -1650,9 +1653,12 @@ namespace hpx {
         hpx::chrono::steady_time_point const& abs_time)
     {
         using shared_state = lcos::detail::timed_future_data<void>;
+        using init_no_addref = typename shared_state::init_no_addref;
 
         hpx::intrusive_ptr<shared_state> p(
-            new shared_state(abs_time.value(), hpx::util::unused));
+            new shared_state(
+                init_no_addref{}, abs_time.value(), hpx::util::unused),
+            false);
 
         return hpx::traits::future_access<future<void>>::create(HPX_MOVE(p));
     }

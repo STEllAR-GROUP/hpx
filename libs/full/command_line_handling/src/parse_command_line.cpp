@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -349,6 +349,19 @@ namespace hpx { namespace util {
             }
         }
     }    // namespace detail
+
+    void verify_unknown_options(std::vector<std::string> const& opts)
+    {
+        for (auto const& opt : opts)
+        {
+            std::string::size_type p = opt.find("--hpx:");
+            if (p != std::string::npos)
+            {
+                throw hpx::detail::command_line_error(
+                    "Unknown/misspelled HPX command line option found: " + opt);
+            }
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // parse the command line
@@ -724,6 +737,8 @@ namespace hpx { namespace util {
                     using hpx::program_options::exclude_positional;
                     *unregistered_options =
                         collect_unrecognized(opts.options, exclude_positional);
+
+                    verify_unknown_options(*unregistered_options);
                 }
 
                 store(opts, vm);
@@ -747,6 +762,8 @@ namespace hpx { namespace util {
                     using hpx::program_options::include_positional;
                     *unregistered_options =
                         collect_unrecognized(opts.options, include_positional);
+
+                    verify_unknown_options(*unregistered_options);
                 }
 
                 store(opts, vm);
