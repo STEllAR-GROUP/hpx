@@ -28,8 +28,8 @@ namespace hpx {
     /// with arguments \a ts according to a specific launch policy.
     ///     - If the async flag is set (i.e. (policy & hpx::launch::async) != 0), then
     ///       async executes the callable object f on a new thread of execution (with all
-    ///       thread-locals initialized) as if spawned by hpx::thread(hpx::forward<F>(f),
-    ///       hpx::forward<Ts>(ts)...), except that if the function f returns a value
+    ///       thread-locals initialized) as if spawned by hpx::thread(std::forward<F>(f),
+    ///       std::forward<Ts>(ts)...), except that if the function f returns a value
     ///       or throws an exception, it is stored in the shared state accessible through
     ///       the hpx::future that async returns to the caller.
     ///     - If the deferred flag is set (i.e. (policy & hpx::launch::deferred) != 0),
