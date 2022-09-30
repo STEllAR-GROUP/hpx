@@ -27,10 +27,6 @@ void tag_invoke(tt::sync_wait_with_variant_t, custom_sender2 s)
 {
     s.tag_invoke_overload_called = true;
 }
-void tag_invoke(tt::sync_wait_with_variant_t, custom_sender_multiTuple s)
-{
-    s.tag_invoke_overload_called = true;
-}
 
 int hpx_main()
 {
@@ -154,7 +150,7 @@ int hpx_main()
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
-        tt::sync_wait_with_variant(custom_sender_multiTuple{
+        tt::sync_wait_with_variant(custom_sender_multi_tuple{
             start_called, connect_called, tag_invoke_overload_called, true});
         HPX_TEST(start_called);
         HPX_TEST(connect_called);
@@ -165,7 +161,7 @@ int hpx_main()
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
-        tt::sync_wait_with_variant(custom_sender_multiTuple{
+        tt::sync_wait_with_variant(custom_sender_multi_tuple{
             start_called, connect_called, tag_invoke_overload_called, false});
         HPX_TEST(start_called);
         HPX_TEST(connect_called);
@@ -178,7 +174,7 @@ int hpx_main()
             return ex::just(std::string{"err"});
         });
 
-        auto result = tt::sync_wait_with_variant(sd);
+        auto result = tt::sync_wait_with_variant(std::move(sd));
 
         // variant
         auto v = *result;

@@ -410,7 +410,7 @@ struct custom_sender
             hpx::execution::experimental::set_error_t(std::exception_ptr)>;
 };
 
-struct custom_sender_multiTuple
+struct custom_sender_multi_tuple
 {
     std::atomic<bool>& start_called;
     std::atomic<bool>& connect_called;
@@ -450,7 +450,7 @@ struct custom_sender_multiTuple
 
     template <typename R>
     friend auto tag_invoke(hpx::execution::experimental::connect_t,
-        custom_sender_multiTuple&& s, R&& r)
+        custom_sender_multi_tuple&& s, R&& r)
     {
         s.connect_called = true;
         return operation_state<R>{s.start_called, std::forward<R>(r)};
@@ -459,7 +459,7 @@ struct custom_sender_multiTuple
     template <typename Env>
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
-        custom_sender_multiTuple const&, Env)
+        custom_sender_multi_tuple const&, Env)
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_value_t(int),
             hpx::execution::experimental::set_value_t(std::string)>;

@@ -1,6 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2022 Hartmut Kaiser
-//  Copyright (c) Chuanqiu He
+//  Copyright (c) 2022 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -36,13 +36,13 @@
 #include <type_traits>
 #include <utility>
 
-enum class sync_wait_type
-{
-    single,
-    variant
-};
-
 namespace hpx::execution::experimental::detail {
+
+    enum class sync_wait_type
+    {
+        single,
+        variant
+    };
 
     struct sync_wait_error_visitor
     {
@@ -91,6 +91,26 @@ namespace hpx::execution::experimental::detail {
     template <typename Pack>
     using make_decayed_pack_t = typename make_decayed_pack<Pack>::type;
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <sync_wait_type Type, typename T>
+    struct select_result;
+
+    template <typename T>
+    struct select_result<sync_wait_type::single, T>
+    {
+        using type = hpx::variant<make_decayed_pack_t<single_variant_t<T>>>;
+    };
+
+    template <typename T>
+    struct select_result<sync_wait_type::variant, T>
+    {
+        using type = T;
+    };
+
+    template <sync_wait_type Type, typename T>
+    using select_result_t = typename select_result<Type, T>::type;
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Sender, sync_wait_type Type>
     struct sync_wait_receiver
     {
@@ -100,18 +120,9 @@ namespace hpx::execution::experimental::detail {
         using predecessor_value_types =
             value_types_of_t<Sender, sync_wait_receiver_env, Tuple, Variant>;
 
-        template <template <typename...> class Tuple,
-            template <typename...> class Variant>    
-        using predecessor_value_types_with_variant =
-            value_types_of_t<Sender, empty_env, Tuple, Variant>;    
-
         template <template <typename...> class Variant>
         using predecessor_error_types =
             error_types_of_t<Sender, sync_wait_receiver_env, Variant>;
-
-        template <template <typename...> class Variant>
-        using predecessor_error_types_with_variant =
-            error_types_of_t<Sender, empty_env, Variant>;   
 
         // forcing static_assert ensuring variant has exactly one tuple
         //
@@ -124,17 +135,8 @@ namespace hpx::execution::experimental::detail {
         // The template should compute the result type of whatever returned from
         // sync_wait or sync_wait_with_variant by checking sync_wait_type is
         // single or variant
-        template <int Dummy>
-        static auto select_result(std::true_type)
-        -> hpx::variant<make_decayed_pack_t<single_variant_t<
-                predecessor_value_types<hpx::tuple, meta::pack>>>>; 
-        
-        template <int Dummy>
-        static auto select_result(std::false_type)
-        -> predecessor_value_types_with_variant<hpx::tuple, hpx::variant>;
-        
-        using result_type = decltype(select_result<42>(
-            std::integral_constant<bool, Type == sync_wait_type::single>()));
+        using result_type = select_result_t<Type,
+            predecessor_value_types<hpx::tuple, hpx::variant>>;
 
         // The type of errors to store in the variant. This in itself is a
         // variant.
@@ -146,8 +148,8 @@ namespace hpx::execution::experimental::detail {
 
         struct shared_state
         {
-            hpx::variant<hpx::monostate, error_type, result_type, stopped_type> value;
-            //hpx::variant<hpx::monostate, error_type, result_type> value;
+            hpx::variant<hpx::monostate, error_type, result_type, stopped_type>
+                value;
 
             auto get_value()
             {
@@ -155,9 +157,6 @@ namespace hpx::execution::experimental::detail {
                 {
                     // pull the tuple out of the variant and wrap it into an
                     // optional, make sure to remove the references
-                    // return hpx::optional<single_result_type>(
-                    //     hpx::get<0>(hpx::get<result_type>(HPX_MOVE(value))));
-
                     if constexpr (Type == sync_wait_type::single)
                     {
                         using single_result_type = make_decayed_pack_t<
@@ -390,6 +389,7 @@ namespace hpx::this_thread::experimental {
             hpx::execution::experimental::run_loop_scheduler const& sched,
             Sender&& sender)
         {
+            using hpx::execution::experimental::detail::sync_wait_type;
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
                     sync_wait_type::single>;
@@ -417,6 +417,7 @@ namespace hpx::this_thread::experimental {
         friend HPX_FORCEINLINE auto tag_fallback_invoke(
             sync_wait_t, Sender&& sender)
         {
+            using hpx::execution::experimental::detail::sync_wait_type;
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
                     sync_wait_type::single>;
@@ -499,6 +500,7 @@ namespace hpx::this_thread::experimental {
             hpx::execution::experimental::run_loop_scheduler const& sched,
             Sender&& sender)
         {
+            using hpx::execution::experimental::detail::sync_wait_type;
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
                     sync_wait_type::variant>;
@@ -525,6 +527,7 @@ namespace hpx::this_thread::experimental {
         friend HPX_FORCEINLINE auto tag_fallback_invoke(
             sync_wait_with_variant_t, Sender&& sender)
         {
+            using hpx::execution::experimental::detail::sync_wait_type;
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
                     sync_wait_type::variant>;
