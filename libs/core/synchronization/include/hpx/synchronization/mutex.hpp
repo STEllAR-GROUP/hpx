@@ -52,7 +52,7 @@ namespace hpx {
     ///        The behavior of a program is undefined if a \a mutex is
     ///        destroyed while still owned by any threads, or a thread
     ///        terminates while owning a \a mutex. The mutex class satisfies
-    ///        all requirements of \a Mutex and \a StandardLayoutType.
+    ///        all requirements of \namedrequirement{Mutex} and \namedrequirement{StandardLayoutType}.
     ///
     ///        \a hpx::mutex is neither copyable nor movable.
     ///
@@ -242,7 +242,8 @@ namespace hpx {
     ///        \a timed_mutex with a timeout via the member functions
     ///        \a try_lock_for() and \a try_lock_until().
     ///        The \a timed_mutex class satisfies all requirements of
-    ///        \a TimedMutex and \a StandardLayoutType.
+    ///        \namedrequirement{TimedMutex} and
+    ///        \namedrequirement{StandardLayoutType}.
     ///
     ///        \a hpx::timed_mutex is neither copyable nor movable.
     ///
