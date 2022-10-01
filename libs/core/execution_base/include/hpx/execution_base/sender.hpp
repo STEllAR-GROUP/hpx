@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/coroutine_utils.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/operation_state.hpp>

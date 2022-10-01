@@ -773,11 +773,10 @@ namespace hpx::execution::experimental {
     template <typename S, typename R>
     using connect_result_t = hpx::util::invoke_result_t<connect_t, S, R>;
 
-#if defined(HPX_HAVE_CXX20_COROUTINES)
-
     template <typename Sender, typename Receiver>
-    inline constexpr bool has_nothrow_connect = noexcept(
-        connect(std::declval<Sender>(), std::declval<Receiver>()));
+    struct has_nothrow_connect;
+
+#if defined(HPX_HAVE_CXX20_COROUTINES)
 
     // 4.18. Cancellation of a sender can unwind a stack of coroutines
     // As described in the section "All awaitables are senders", the sender
@@ -835,7 +834,7 @@ namespace hpx::execution::experimental {
             std::exception_ptr>;
 
         template <typename Value>
-        struct receiver_base : hpx::functional::tag<receiver_base<Value>>
+        struct receiver_base
         {
             template <typename... Us,
                 HPX_CONCEPT_REQUIRES_(
@@ -874,7 +873,6 @@ namespace hpx::execution::experimental {
 
         template <typename PromiseId, typename Value>
         struct sender_awaitable_base
-          : hpx::functional::tag<sender_awaitable_base<PromiseId, Value>>
         {
             using Promise = hpx::meta::hidden<PromiseId>;
             struct receiver : receiver_base<Value>
@@ -928,44 +926,11 @@ namespace hpx::execution::experimental {
         };
 
         template <typename PromiseId, typename SenderId>
-        struct sender_awaitable
-          : sender_awaitable_base<PromiseId,
-                single_sender_value_t<hpx::meta::hidden<SenderId>,
-                    env_of_t<hpx::meta::hidden<PromiseId>>>>
-        {
-        private:
-            using Promise = hpx::meta::hidden<PromiseId>;
-            using Sender = hpx::meta::hidden<SenderId>;
-            using Env = env_of_t<Promise>;
-            using Value = single_sender_value_t<Sender, Env>;
-            using Base = sender_awaitable_base<PromiseId, Value>;
-            using receiver = typename Base::receiver;
-            connect_result_t<Sender, receiver> op_state_;
+        struct sender_awaitable;
 
-        public:
-            sender_awaitable(Sender&& sender,
-                hpx::coro::coroutine_handle<Promise>
-                    hcoro) noexcept(has_nothrow_connect<Sender, receiver>)
-              : op_state_(connect(HPX_FORWARD(Sender, sender),
-                    receiver{{&this->result, hcoro}}))
-            {
-            }
-
-            void await_suspend(hpx::coro::coroutine_handle<Promise>) noexcept
-            {
-                start(op_state_);
-            }
-        };
         template <typename Promise, typename Sender>
         using sender_awaitable_t = sender_awaitable<hpx::meta::hidden<Promise>,
             hpx::meta::hidden<Sender>>;
-
-        template <typename T, typename Promise>
-        inline constexpr bool is_custom_tag_invoke_awaiter_v =
-            hpx::functional::is_tag_invocable_v<as_awaitable_t, T, Promise&>&&
-                is_awaitable_v<hpx::functional::tag_invoke_result_t<
-                                   as_awaitable_t, T, Promise&>,
-                    Promise>;
 
         template <typename Sender, typename Promise>
         using receiver =
@@ -992,12 +957,7 @@ namespace hpx::execution::experimental {
         template <typename T, typename Promise>
         static constexpr bool is_noexcept() noexcept
         {
-            if constexpr (detail::is_custom_tag_invoke_awaiter_v<T, Promise>)
-            {
-                return hpx::functional::is_nothrow_tag_invocable_v<
-                    as_awaitable_t, T, Promise&>;
-            }
-            else if constexpr (is_awaitable_v<T, Promise>)
+            if constexpr (is_awaitable_v<T>)
             {
                 return true;
             }
@@ -1018,11 +978,7 @@ namespace hpx::execution::experimental {
             as_awaitable_t, T&& t,
             Promise& promise) noexcept(is_noexcept<T, Promise>())
         {
-            if constexpr (detail::is_custom_tag_invoke_awaiter_v<T, Promise>)
-            {
-                return tag_invoke(as_awaitable_t{}, HPX_FORWARD(T, t), promise);
-            }
-            else if constexpr (is_awaitable_v<T, Promise>)
+            if constexpr (is_awaitable_v<T>)
             {
                 return HPX_FORWARD(T, t);
             }
@@ -1097,8 +1053,7 @@ namespace hpx::execution::experimental {
     {
         template <typename Value>
         auto await_transform(Value&& val)
-            -> hpx::functional::tag_invoke_result_t<as_awaitable_t, Value,
-                Promise&>
+            -> hpx::util::invoke_result_t<as_awaitable_t, Value, Promise&>
         {
             static_assert(is_derived_from<Promise, with_awaitable_senders>);
             return as_awaitable(
@@ -1152,7 +1107,7 @@ namespace hpx::execution::experimental {
         }
     };
 
-    struct operation_base
+    struct operation_base : hpx::functional::tag<operation_base>
     {
         hpx::coro::coroutine_handle<> coro_handle;
 
@@ -1191,7 +1146,7 @@ namespace hpx::execution::experimental {
     template <typename ReceiverId>
     struct promise : promise_base
     {
-        using Receiver = hpx::meta::hidden<ReceiverId>;
+        using Receiver = hpx::meta::type<ReceiverId>;
 
         explicit promise(auto&, Receiver& rcvr_) noexcept
           : rcvr(rcvr_)
@@ -1222,7 +1177,9 @@ namespace hpx::execution::experimental {
         template <typename Awaitable>
         auto await_transform(Awaitable&& await) noexcept(
             hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t,
-                Awaitable, promise&>)
+                Awaitable, promise&> ||
+            !hpx::functional::is_tag_invocable_v<as_awaitable_t, Awaitable,
+                promise&>)
 
         {
             if constexpr (hpx::functional::is_tag_invocable_v<as_awaitable_t,
@@ -1322,6 +1279,7 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_fallback<connect_t>
     {
 #if defined(HPX_HAVE_CXX20_COROUTINES)
+
         template <typename Sender, typename Receiver,
             typename = std::enable_if_t<
                 hpx::is_invocable_v<connect_awaitable_t, Sender, Receiver> ||
@@ -1338,12 +1296,54 @@ namespace hpx::execution::experimental {
             }
             else
             {
-                // FIXME: Not sure what should be done
                 return;
             }
         }
 #endif    // HPX_HAVE_CXX20_COROUTINES
     } connect{};
+
+    template <typename Sender, typename Receiver>
+    struct has_nothrow_connect
+      : std::integral_constant<bool,
+            noexcept(connect(std::declval<Sender>(), std::declval<Receiver>()))>
+    {
+    };
+
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+    namespace detail {
+        template <typename PromiseId, typename SenderId>
+        struct sender_awaitable
+          : sender_awaitable_base<PromiseId,
+                single_sender_value_t<hpx::meta::type<SenderId>,
+                    env_of_t<hpx::meta::type<PromiseId>>>>
+        {
+        private:
+            using Promise = hpx::meta::type<PromiseId>;
+            using Sender = hpx::meta::type<SenderId>;
+            using Env = env_of_t<Promise>;
+            using Value = single_sender_value_t<Sender, Env>;
+            using Base = sender_awaitable_base<PromiseId, Value>;
+            using receiver = typename Base::receiver;
+            connect_result_t<Sender, receiver> op_state_;
+
+        public:
+            sender_awaitable(Sender&& sender,
+                hpx::coro::coroutine_handle<Promise>
+                    hcoro) noexcept(has_nothrow_connect<Sender,
+                receiver>::value)
+              : op_state_(connect(HPX_FORWARD(Sender, sender),
+                    receiver{{&this->result, hcoro}}))
+            {
+            }
+
+            void await_suspend(hpx::coro::coroutine_handle<Promise>) noexcept
+            {
+                start(op_state_);
+            }
+        };
+    }    // namespace detail
+
+#endif    // HPX_HAVE_CXX20_COROUTINES
 
     /// End definitions from coroutine_utils and sender
 

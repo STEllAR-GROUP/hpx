@@ -5,9 +5,13 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config/coroutines_support.hpp>
+#include <hpx/execution/algorithms/just.hpp>
+#include <hpx/execution/algorithms/sync_wait.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/coroutine_utils.hpp>
 #include <hpx/modules/testing.hpp>
+
+#include "coroutine_task.hpp"
 
 #include <exception>
 
@@ -45,6 +49,16 @@ struct promise
     void unhandled_exception() {}
 };
 
+template <typename S1, typename S2,
+    typename = std::enable_if_t<hpx::execution::experimental::is_sender_v<S1> &&
+        hpx::execution::experimental::is_sender_v<S2>>>
+task<int> async_answer(S1 s1, S2 s2)
+{
+    // Senders are implicitly awaitable (in this coroutine type):
+    co_await (S2 &&) s2;
+    co_return co_await (S1 &&) s1;
+}
+
 int main()
 {
     using namespace hpx::execution::experimental;
@@ -60,14 +74,18 @@ int main()
                 void>);
     }
 
-    // as_awaitable
+    try
     {
-        // auto p = promise_base{};
-        // constexpr auto awaitable_1 =
-        //     as_awaitable(non_awaitable_sender<decltype(signature_all(
-        //                      std::exception_ptr(), int()))>{},
-        //         p);
-        // static_assert(is_awaitable_v<decltype(awaitable_1), decltype(p)>);
+        // Awaitables are implicitly senders:
+        auto [i] = hpx::this_thread::experimental::sync_wait(
+            async_answer(hpx::execution::experimental::just(42),
+                hpx::execution::experimental::just()))
+                       .value();
+        std::cout << "The answer is " << i << '\n';
+    }
+    catch (std::exception& e)
+    {
+        std::cout << e.what() << '\n';
     }
     return hpx::util::report_errors();
 }
