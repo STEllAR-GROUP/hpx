@@ -27,7 +27,8 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT bool get_endpoint(std::string const& addr,
-        std::uint16_t port, asio::ip::tcp::endpoint& ep, bool force_ipv4 = false);
+        std::uint16_t port, asio::ip::tcp::endpoint& ep,
+        bool force_ipv4 = false);
 
     HPX_CORE_EXPORT std::string get_endpoint_name(
         asio::ip::tcp::endpoint const& ep);
