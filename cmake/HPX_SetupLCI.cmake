@@ -9,10 +9,18 @@
 
 macro(hpx_setup_lci)
   if(NOT TARGET LCI::LCI)
-    include(HPX_SetupMPI)
-    hpx_setup_mpi()
     if(NOT HPX_WITH_FETCH_LCI)
-      find_package(LCI REQUIRED)
+      find_package(
+        LCI
+        CONFIG
+        REQUIRED
+        HINTS
+        ${LCI_ROOT}
+        $ENV{LCI_ROOT}
+        PATH_SUFFIXES
+        lib/cmake
+        lib64/cmake
+      )
     elseif(NOT HPX_FIND_PACKAGE)
       set(HPX_WITH_PARCELPORT_LCI_BACKEND
           ibv

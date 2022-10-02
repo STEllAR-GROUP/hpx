@@ -18,7 +18,7 @@ endif()
 if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   include(HPX_SetupLCI)
   hpx_setup_lci()
-  set(additional_dependencies ${additional_dependencies} Mpi::mpi LCI::LCI)
+  set(additional_dependencies ${additional_dependencies} LCI::LCI)
 endif()
 
 include(HPX_AddModule)

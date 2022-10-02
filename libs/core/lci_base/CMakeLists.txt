@@ -26,6 +26,6 @@ add_hpx_module(
   SOURCES ${lci_base_sources}
   HEADERS ${lci_base_headers}
   MODULE_DEPENDENCIES hpx_logging hpx_runtime_configuration hpx_util
-  DEPENDENCIES Mpi::mpi LCI::LCI
+  DEPENDENCIES LCI::LCI
   CMAKE_SUBDIRS examples tests
 )
