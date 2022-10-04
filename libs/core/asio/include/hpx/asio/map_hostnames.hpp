@@ -27,7 +27,8 @@ namespace hpx { namespace util {
             transform_function_type;
 
         map_hostnames(bool debug = false)
-          : ipv4_(false), debug_(debug)
+          : ipv4_(false)
+          , debug_(debug)
         {
         }
 

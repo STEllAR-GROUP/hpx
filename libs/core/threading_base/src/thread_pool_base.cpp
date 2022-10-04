@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -36,7 +36,8 @@ namespace hpx { namespace threads {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    mask_type thread_pool_base::get_used_processing_units() const
+    mask_type thread_pool_base::get_used_processing_units(
+        std::size_t num_cores, bool full_cores) const
     {
         auto const& topo = create_topology();
         auto const sched = get_scheduler();
@@ -44,17 +45,44 @@ namespace hpx { namespace threads {
         mask_type used_processing_units = mask_type();
         threads::resize(used_processing_units, hardware_concurrency());
 
-        for (std::size_t thread_num = 0; thread_num < get_os_thread_count();
-             ++thread_num)
+        std::size_t max_cores = get_os_thread_count();
+        for (std::size_t thread_num = 0;
+             thread_num != max_cores && num_cores != 0; ++thread_num)
         {
             if (sched->get_state(thread_num).load() <= hpx::state::suspended)
             {
-                used_processing_units |= affinity_data_.get_pu_mask(
-                    topo, thread_num + get_thread_offset());
+                if (!full_cores)
+                {
+                    used_processing_units |= affinity_data_.get_pu_mask(
+                        topo, thread_num + get_thread_offset());
+                }
+                else
+                {
+                    used_processing_units |= topo.get_core_affinity_mask(
+                        thread_num + get_thread_offset());
+                }
+                --num_cores;
             }
         }
 
         return used_processing_units;
+    }
+
+    mask_type thread_pool_base::get_used_processing_units(bool full_cores) const
+    {
+        return get_used_processing_units(get_os_thread_count(), full_cores);
+    }
+
+    mask_type thread_pool_base::get_used_processing_unit(
+        std::size_t thread_num, bool full_cores) const
+    {
+        auto const& topo = create_topology();
+        if (!full_cores)
+        {
+            return affinity_data_.get_pu_mask(
+                topo, thread_num + get_thread_offset());
+        }
+        return topo.get_core_affinity_mask(thread_num + get_thread_offset());
     }
 
     hwloc_bitmap_ptr thread_pool_base::get_numa_domain_bitmap() const

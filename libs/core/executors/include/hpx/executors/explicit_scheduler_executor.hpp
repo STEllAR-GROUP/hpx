@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/algorithms/keep_future.hpp>
@@ -28,6 +27,8 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/topology.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -92,9 +93,14 @@ namespace hpx::execution::experimental {
         }
 
         // support all properties exposed by the wrapped scheduler
+        // clang-format off
         template <typename Tag, typename Property,
-            typename Enable = std::enable_if_t<hpx::functional::
-                    is_tag_invocable_v<Tag, BaseScheduler, Property>>>
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
+                hpx::functional::is_tag_invocable_v<
+                    Tag, BaseScheduler, Property>
+            )>
+        // clang-format on
         friend explicit_scheduler_executor tag_invoke(
             Tag tag, explicit_scheduler_executor const& exec, Property&& prop)
         {
@@ -102,9 +108,13 @@ namespace hpx::execution::experimental {
                 tag, exec.sched_, HPX_FORWARD(Property, prop)));
         }
 
+        // clang-format off
         template <typename Tag,
-            typename Enable = std::enable_if_t<
-                hpx::functional::is_tag_invocable_v<Tag, BaseScheduler>>>
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
+                hpx::functional::is_tag_invocable_v<Tag, BaseScheduler>
+            )>
+        // clang-format on
         friend decltype(auto) tag_invoke(
             Tag tag, explicit_scheduler_executor const& exec)
         {

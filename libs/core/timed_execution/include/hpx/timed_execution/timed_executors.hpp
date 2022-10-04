@@ -16,7 +16,9 @@
 #include <hpx/executors/sequenced_executor.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/modules/threading.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/timed_execution/timed_execution.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
@@ -543,9 +545,14 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         // support all properties exposed by the wrapped executor
+        // clang-format off
         template <typename Tag, typename Property,
-            typename Enable = std::enable_if_t<hpx::functional::
-                    is_tag_invocable_v<Tag, BaseExecutor, Property>>>
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
+                hpx::functional::is_tag_invocable_v<
+                    Tag, BaseExecutor, Property>
+            )>
+        // clang-format on
         friend timed_executor tag_invoke(
             Tag tag, timed_executor const& exec, Property&& prop)
         {
@@ -553,9 +560,13 @@ namespace hpx { namespace parallel { namespace execution {
                 tag, exec.exec_, HPX_FORWARD(Property, prop)));
         }
 
+        // clang-format off
         template <typename Tag,
-            typename Enable = std::enable_if_t<
-                hpx::functional::is_tag_invocable_v<Tag, BaseExecutor>>>
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
+                hpx::functional::is_tag_invocable_v<Tag, BaseExecutor>
+            )>
+        // clang-format on
         friend decltype(auto) tag_invoke(Tag tag, timed_executor const& exec)
         {
             return hpx::functional::tag_invoke(tag, exec.exec_);

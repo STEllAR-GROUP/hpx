@@ -1502,21 +1502,38 @@ namespace hpx { namespace threads {
         hwloc_bitmap_t cpuset = mask_to_bitmap(mask, HWLOC_OBJ_PU);
         std::size_t cache_size = 0;
 
+#if HWLOC_API_VERSION >= 0x00020000
+        hwloc_obj_type_t type = HWLOC_OBJ_L1CACHE;
+        switch (level)
+        {
+        case 2:
+            type = HWLOC_OBJ_L2CACHE;
+            break;
+
+        case 3:
+            type = HWLOC_OBJ_L3CACHE;
+            break;
+
+        case 4:
+            type = HWLOC_OBJ_L4CACHE;
+            break;
+
+        case 5:
+            type = HWLOC_OBJ_L5CACHE;
+            break;
+
+        default:
+            break;
+        }
+#endif
+
         iterate(cpuset, [&](auto num_pu) {
             hwloc_obj_t pu_obj = hwloc_get_obj_by_type(
                 topo, HWLOC_OBJ_PU, static_cast<unsigned>(num_pu));
+
+#if HWLOC_API_VERSION >= 0x00020000
             if (pu_obj == nullptr)
                 return;
-
-            hwloc_obj_type_t type = HWLOC_OBJ_L1CACHE;
-            if (level == 2)
-                type = HWLOC_OBJ_L2CACHE;
-            else if (level == 3)
-                type = HWLOC_OBJ_L3CACHE;
-            else if (level == 4)
-                type = HWLOC_OBJ_L4CACHE;
-            else if (level == 5)
-                type = HWLOC_OBJ_L5CACHE;
 
             hwloc_obj_t cache_obj =
                 hwloc_get_ancestor_obj_by_type(topo, type, pu_obj);
@@ -1525,6 +1542,19 @@ namespace hpx { namespace threads {
 
             cache_size += std::size_t(cache_obj->attr->cache.size) /
                 num_set_bits(cache_obj->cpuset);
+#else
+            // traverse up until found the requested cache level
+            int levels = 0;
+            for (hwloc_obj_t obj = pu_obj; obj != nullptr && levels < level;
+                 obj = obj->parent)
+            {
+                if (obj->type != HWLOC_OBJ_CACHE || ++levels != level)
+                    continue;
+
+                cache_size += std::size_t(obj->attr->cache.size) /
+                    num_set_bits(obj->cpuset);
+            }
+#endif
         });
 
         hwloc_bitmap_free(cpuset);

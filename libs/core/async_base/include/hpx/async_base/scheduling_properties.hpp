@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,8 +11,21 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 
+#include <type_traits>
+
 namespace hpx { namespace execution { namespace experimental {
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Property, typename Enable = void>
+    struct is_scheduling_property : std::false_type
+    {
+    };
+
+    template <typename Property>
+    inline constexpr bool is_scheduling_property_v =
+        is_scheduling_property<Property>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
         template <typename Tag, typename... Args>
@@ -41,6 +55,16 @@ namespace hpx { namespace execution { namespace experimental {
         };
     }    // namespace detail
 
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Property>
+    struct is_scheduling_property<Property,
+        std::enable_if_t<
+            std::is_base_of_v<detail::property_base<Property>, Property>>>
+      : std::true_type
+    {
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     inline constexpr struct with_priority_t final
       : detail::property_base<with_priority_t>
     {
@@ -59,6 +83,12 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } get_priority{};
 
+    template <>
+    struct is_scheduling_property<get_priority_t> : std::true_type
+    {
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     inline constexpr struct with_stacksize_t final
       : detail::property_base<with_stacksize_t>
     {
@@ -77,6 +107,12 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } get_stacksize{};
 
+    template <>
+    struct is_scheduling_property<get_stacksize_t> : std::true_type
+    {
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     inline constexpr struct with_hint_t final
       : detail::property_base<with_hint_t>
     {
@@ -95,6 +131,12 @@ namespace hpx { namespace execution { namespace experimental {
         }
     } get_hint{};
 
+    template <>
+    struct is_scheduling_property<get_hint_t> : std::true_type
+    {
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     inline constexpr struct with_annotation_t final
       : detail::property_base<with_annotation_t>
     {
@@ -112,4 +154,9 @@ namespace hpx { namespace execution { namespace experimental {
             return nullptr;
         }
     } get_annotation{};
+
+    template <>
+    struct is_scheduling_property<get_annotation_t> : std::true_type
+    {
+    };
 }}}    // namespace hpx::execution::experimental

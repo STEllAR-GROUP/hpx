@@ -2160,7 +2160,10 @@ namespace hpx::detail {
         block_width_type const extra_bits = count_extra_bits();
 
         if (extra_bits != 0)
+        {
+            // NOLINTNEXTLINE(stringop-overflow=)
             highest_block() &= (Block(1) << extra_bits) - 1;
+        }
     }
 
     // check class invariants

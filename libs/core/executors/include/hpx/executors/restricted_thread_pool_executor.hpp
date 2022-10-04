@@ -14,6 +14,7 @@
 #include <hpx/execution/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/parallel_executor.hpp>
+#include <hpx/modules/concepts.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -97,6 +98,11 @@ namespace hpx::parallel::execution {
                     hpx::parallel::execution::processing_units_count(exec_)));
         }
 
+        std::int16_t get_current_thread_num() const
+        {
+            return static_cast<std::int16_t>(first_thread_ + os_thread_++);
+        }
+
         embedded_executor generate_executor(std::uint16_t thread_num) const
         {
             return hpx::execution::experimental::with_hint(
@@ -107,25 +113,36 @@ namespace hpx::parallel::execution {
         // property implementations
 
         // support all properties exposed by the embedded executor
+        // clang-format off
         template <typename Tag, typename Property,
-            typename Enable = std::enable_if_t<hpx::functional::
-                    is_tag_invocable_v<Tag, embedded_executor, Property>>>
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
+                hpx::functional::is_tag_invocable_v<
+                    Tag, embedded_executor, Property>
+            )>
+        // clang-format on
         friend restricted_policy_executor tag_invoke(
-            Tag, restricted_policy_executor const& exec, Property&& prop)
+            Tag tag, restricted_policy_executor const& exec, Property&& prop)
         {
             auto exec_with_prop = exec;
-            exec_with_prop.exec_ =
-                Tag{}(exec.exec_, HPX_FORWARD(Property, prop));
+            exec_with_prop.exec_ = hpx::functional::tag_invoke(tag,
+                exec.generate_executor(exec.get_current_thread_num()),
+                HPX_FORWARD(Property, prop));
             return exec_with_prop;
         }
 
+        // clang-format off
         template <typename Tag,
-            typename Enable = std::enable_if_t<
-                hpx::functional::is_tag_invocable_v<Tag, embedded_executor>>>
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
+                hpx::functional::is_tag_invocable_v<Tag, embedded_executor>
+            )>
+        // clang-format on
         friend decltype(auto) tag_invoke(
-            Tag, restricted_policy_executor const& exec)
+            Tag tag, restricted_policy_executor const& exec)
         {
-            return Tag{}(exec.exec_);
+            return hpx::functional::tag_invoke(
+                tag, exec.generate_executor(exec.get_current_thread_num()));
         }
 
         // executor API
