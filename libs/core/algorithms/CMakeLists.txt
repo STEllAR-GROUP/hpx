@@ -35,6 +35,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
     hpx/parallel/algorithms/detail/pivot.hpp
     hpx/parallel/algorithms/detail/reduce.hpp
+    hpx/parallel/algorithms/detail/replace.hpp
     hpx/parallel/algorithms/detail/rotate.hpp
     hpx/parallel/algorithms/detail/sample_sort.hpp
     hpx/parallel/algorithms/detail/search.hpp
