@@ -497,6 +497,10 @@ if(HPX_WITH_ITTNOTIFY)
   target_link_libraries(hpx_core PUBLIC Amplifier::amplifier)
 endif()
 
+if(HPX_WITH_LIKWID)
+  target_link_libraries(hpx_core PUBLIC LIKWID::likwid)
+endif()
+
 if(TARGET STDEXEC::stdexec)
   target_link_libraries(hpx_core INTERFACE STDEXEC::stdexec)
 endif()
