@@ -410,6 +410,61 @@ struct custom_sender
             hpx::execution::experimental::set_error_t(std::exception_ptr)>;
 };
 
+struct custom_sender_multi_tuple
+{
+    std::atomic<bool>& start_called;
+    std::atomic<bool>& connect_called;
+    std::atomic<bool>& tag_invoke_overload_called;
+
+    bool expect_set_value = true;
+
+    template <template <class...> class Tuple,
+        template <class...> class Variant>
+    using value_types = Variant<Tuple<>>;
+
+    template <template <class...> class Variant>
+    using error_types = Variant<std::exception_ptr>;
+
+    static constexpr bool sends_stopped = false;
+
+    template <typename R>
+    struct operation_state
+    {
+        std::atomic<bool>& start_called;
+        std::decay_t<R> r;
+        bool expect_set_value = true;
+        friend void tag_invoke(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
+        {
+            os.start_called = true;
+            if (os.expect_set_value)
+            {
+                hpx::execution::experimental::set_value(std::move(os.r), 3);
+            }
+            else
+            {
+                hpx::execution::experimental::set_value(std::move(os.r), "err");
+            }
+        };
+    };
+
+    template <typename R>
+    friend auto tag_invoke(hpx::execution::experimental::connect_t,
+        custom_sender_multi_tuple&& s, R&& r)
+    {
+        s.connect_called = true;
+        return operation_state<R>{s.start_called, std::forward<R>(r)};
+    }
+
+    template <typename Env>
+    friend auto tag_invoke(
+        hpx::execution::experimental::get_completion_signatures_t,
+        custom_sender_multi_tuple const&, Env)
+        -> hpx::execution::experimental::completion_signatures<
+            hpx::execution::experimental::set_value_t(int),
+            hpx::execution::experimental::set_value_t(std::string)>;
+};
+
 template <typename T>
 struct custom_typed_sender
 {

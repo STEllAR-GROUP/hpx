@@ -18,6 +18,7 @@ set(tests
     algorithm_split
     algorithm_start_detached
     algorithm_sync_wait
+    algorithm_sync_wait_with_variant
     algorithm_then
     algorithm_transfer
     algorithm_transfer_just
