@@ -206,6 +206,12 @@ include(HPX_SetupPapi)
 # CUDA
 include(HPX_SetupCUDA)
 
+# LIKWID
+if(HPX_WITH_LIKWID)
+  set(HPX_LIKWID_ROOT "@LIKWID_ROOT@")
+  include(HPX_SetupLikwid)
+endif()
+
 include(HPX_SetupMPI)
 if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
   hpx_setup_mpi()
