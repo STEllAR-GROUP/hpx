@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file function_ref.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -26,6 +28,26 @@
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \brief \c function_ref class is a vocabulary type with reference
+    ///        semantics for passing entities to call.
+    /// \details An example use case that benefits from higher-order functions
+    ///          is \c retry(n,f) which attempts to call \c f up to \c n times
+    ///          synchronously until success. This example might model the
+    ///          real-world scenario of repeatedly querying a flaky web service.
+    ///          \code
+    ///          using payload = std::optional< /* ... */ >;
+    ///          // Repeatedly invokes `action` up to `times` repetitions.
+    ///          // Immediately returns if `action` returns a valid `payload`.
+    ///          // Returns `std::nullopt` otherwise.
+    ///          payload retry(size_t times, /* ????? */ action);
+    ///          \endcode
+    ///          The passed-in action should be a callable entity that takes no
+    ///          arguments and returns a payload. This can be done with function
+    ///          pointers, \c hpx::function or a template but it is much simpler
+    ///          with \c function_ref as seen below:
+    ///          \code
+    ///          payload retry(size_t times, function_ref<payload()> action);
+    ///          \endcode
     template <typename Sig>
     class function_ref;
 
