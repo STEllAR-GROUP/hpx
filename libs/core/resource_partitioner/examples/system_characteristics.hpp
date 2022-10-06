@@ -50,4 +50,17 @@ void print_system_characteristics()
 
     //! -------------------------------------- topology
     topo.print_hwloc(std::cout);
+
+    //! -------------------------------------- cache sizes
+    hpx::threads::mask_type core0 = topo.get_core_affinity_mask(0);
+    std::cout << "[System Cache sizes (core 0)]\n"
+              << "L1 Cache: " << topo.get_cache_size(core0, 1) << "\n"
+              << "L2 Cache: " << topo.get_cache_size(core0, 2) << "\n"
+              << "L3 Cache: " << topo.get_cache_size(core0, 3) << "\n\n";
+
+    hpx::threads::mask_type machine = topo.get_machine_affinity_mask();
+    std::cout << "[System Cache sizes (all available cores)]\n"
+              << "L1 Cache: " << topo.get_cache_size(machine, 1) << "\n"
+              << "L2 Cache: " << topo.get_cache_size(machine, 2) << "\n"
+              << "L3 Cache: " << topo.get_cache_size(machine, 3) << "\n\n";
 }

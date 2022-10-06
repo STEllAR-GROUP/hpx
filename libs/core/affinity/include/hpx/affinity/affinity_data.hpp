@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -89,21 +89,28 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
             std::size_t num_thread, std::size_t hardware_concurrency) const;
 
     private:
-        std::size_t num_threads_;    ///< number of processing units managed
-        std::size_t
-            pu_offset_;          ///< offset of the first processing unit to use
-        std::size_t pu_step_;    ///< step between used processing units
+        ///< number of processing units managed
+        std::size_t num_threads_;
+
+        ///< offset of the first processing unit to use
+        std::size_t pu_offset_;
+
+        ///< step between used processing units
+        std::size_t pu_step_;
         std::size_t used_cores_;
         std::string affinity_domain_;
         std::vector<mask_type> affinity_masks_;
         std::vector<std::size_t> pu_nums_;
-        mask_type
-            no_affinity_;    ///< mask of processing units which have no affinity
-        bool
-            use_process_mask_;    ///< use the process CPU mask to limit available PUs
+
+        ///< mask of processing units which have no affinity
+        mask_type no_affinity_;
+
+        ///< use the process CPU mask to limit available PUs
+        bool use_process_mask_;
         std::size_t num_pus_needed_;
-        static std::atomic<int>
-            instance_number_counter_;    ///< counter for instance numbers
+
+        ///< counter for instance numbers
+        static std::atomic<int> instance_number_counter_;
     };
 }}}}    // namespace hpx::threads::policies::detail
 

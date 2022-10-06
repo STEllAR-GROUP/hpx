@@ -266,6 +266,9 @@ namespace hpx { namespace threads {
         std::size_t get_pu_number(std::size_t num_core, std::size_t num_pu,
             error_code& ec = throws) const;
 
+        /// Return the size of the cache associated with the given mask.
+        std::size_t get_cache_size(mask_type mask, int level) const;
+
         mask_type get_cpubind_mask(error_code& ec = throws) const;
         mask_type get_cpubind_mask(
             std::thread& handle, error_code& ec = throws) const;
@@ -339,7 +342,11 @@ namespace hpx { namespace threads {
 
         void extract_node_mask(hwloc_obj_t parent, mask_type& mask) const;
 
+        std::size_t get_number_of_core_pus_locked(std::size_t core) const;
+
         std::size_t extract_node_count(
+            hwloc_obj_t parent, hwloc_obj_type_t type, std::size_t count) const;
+        std::size_t extract_node_count_locked(
             hwloc_obj_t parent, hwloc_obj_type_t type, std::size_t count) const;
 
         mask_type init_machine_affinity_mask() const;
@@ -363,6 +370,8 @@ namespace hpx { namespace threads {
         }
 
         void init_num_of_pus();
+
+        hwloc_obj_t get_pu_obj(std::size_t num_core) const;
 
         hwloc_topology_t topo;
 

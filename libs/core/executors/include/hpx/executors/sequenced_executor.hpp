@@ -18,10 +18,13 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/thread_description.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -216,6 +219,21 @@ namespace hpx { namespace execution {
             sequenced_executor const&)
         {
             return 1;
+        }
+
+        friend auto tag_invoke(
+            hpx::execution::experimental::get_processing_units_mask_t,
+            sequenced_executor const&)
+        {
+            return threads::detail::get_self_or_default_pool()
+                ->get_used_processing_unit(hpx::get_worker_thread_num(), false);
+        }
+
+        friend auto tag_invoke(hpx::execution::experimental::get_cores_mask_t,
+            sequenced_executor const&)
+        {
+            return threads::detail::get_self_or_default_pool()
+                ->get_used_processing_unit(hpx::get_worker_thread_num(), true);
         }
 
     private:

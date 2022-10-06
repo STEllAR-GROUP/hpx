@@ -1,4 +1,5 @@
-//  Copyright (c)      2017 Shoshana Jakobovits
+//  Copyright (c) 2017 Shoshana Jakobovits
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -155,6 +156,7 @@ namespace hpx { namespace resource { namespace detail {
         threads::mask_cref_type get_pu_mask(
             std::size_t global_thread_num) const;
         std::size_t get_thread_occupancy(std::size_t pu_num) const;
+        threads::mask_type get_used_pus_mask(std::size_t pu_num) const;
 
         void init(resource::partitioner_mode rpmode, hpx::util::section cfg,
             hpx::threads::policies::detail::affinity_data affinity_data);

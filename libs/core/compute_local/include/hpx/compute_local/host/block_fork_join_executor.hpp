@@ -20,8 +20,9 @@
 #include <hpx/executors/fork_join_executor.hpp>
 #include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/topology/cpu_mask.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -273,6 +274,7 @@ namespace hpx::execution::experimental {
         // clang-format off
         template <typename Tag, typename Property,
             HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
                 hpx::functional::is_tag_invocable_v<
                     Tag, fork_join_executor, Property>
             )>
@@ -281,20 +283,22 @@ namespace hpx::execution::experimental {
             block_fork_join_executor const& exec, Property&& prop) noexcept
         {
             auto exec_with_prop = exec;
-            exec_with_prop.exec_ = tag(exec.exec_, HPX_FORWARD(Property, prop));
+            exec_with_prop.exec_ = hpx::functional::tag_invoke(
+                tag, exec.exec_, HPX_FORWARD(Property, prop));
             return exec_with_prop;
         }
 
         // clang-format off
         template <typename Tag,
             HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
                 hpx::functional::is_tag_invocable_v<Tag, fork_join_executor>
             )>
         // clang-format on
         friend decltype(auto) tag_invoke(
             Tag tag, block_fork_join_executor const& exec) noexcept
         {
-            return tag(exec.exec_);
+            return hpx::functional::tag_invoke(tag, exec.exec_);
         }
 
     private:

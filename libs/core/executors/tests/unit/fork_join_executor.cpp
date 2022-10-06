@@ -1,5 +1,5 @@
 //  Copyright (c)      2020 ETH Zurich
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,6 +26,25 @@
 using hpx::execution::experimental::fork_join_executor;
 
 static std::atomic<std::size_t> count{0};
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename... ExecutorArgs>
+void test_processing_mask(ExecutorArgs&&... args)
+{
+    std::cerr << "test_processing_mask\n";
+
+    auto& rp = hpx::resource::get_partitioner();
+    auto const& expected_mask =
+        rp.get_used_pus_mask(hpx::get_worker_thread_num());
+
+    fork_join_executor exec{expected_mask, std::forward<ExecutorArgs>(args)...};
+    auto pus_mask =
+        hpx::execution::experimental::get_processing_units_mask(exec);
+    HPX_TEST(pus_mask == expected_mask);
+
+    auto cores_mask = hpx::execution::experimental::get_cores_mask(exec);
+    HPX_TEST(cores_mask == expected_mask);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 void bulk_test(int, int passed_through)    //-V813
@@ -173,6 +192,8 @@ void test_executor(hpx::threads::thread_priority priority,
     test_bulk_async(priority, stacksize, schedule);
     test_bulk_sync_exception(priority, stacksize, schedule);
     test_bulk_async_exception(priority, stacksize, schedule);
+
+    test_processing_mask(priority, stacksize, schedule);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
