@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -162,6 +162,28 @@ void static_check_executor()
         "is_bulk_two_way_executor_v<executor>");
 }
 
+void test_processing_mask()
+{
+    hpx::execution::parallel_executor exec;
+
+    {
+        auto pool = hpx::threads::detail::get_self_or_default_pool();
+        auto expected_mask =
+            pool->get_used_processing_units(pool->get_os_thread_count(), false);
+        auto mask =
+            hpx::execution::experimental::get_processing_units_mask(exec);
+        HPX_TEST(mask == expected_mask);
+    }
+
+    {
+        auto pool = hpx::threads::detail::get_self_or_default_pool();
+        auto expected_mask =
+            pool->get_used_processing_units(pool->get_os_thread_count(), true);
+        auto mask = hpx::execution::experimental::get_cores_mask(exec);
+        HPX_TEST(mask == expected_mask);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
@@ -174,6 +196,8 @@ int hpx_main()
     test_bulk_sync();
     test_bulk_async();
     test_bulk_then();
+
+    test_processing_mask();
 
     return hpx::local::finalize();
 }

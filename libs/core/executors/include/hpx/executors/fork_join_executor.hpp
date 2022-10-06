@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,12 +27,11 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/hardware.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading/thread.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/topology/cpu_mask.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -856,6 +856,19 @@ namespace hpx { namespace execution { namespace experimental {
             fork_join_executor const& exec) noexcept
         {
             return exec.shared_data_->annotation_;
+        }
+
+        friend auto tag_invoke(
+            hpx::execution::experimental::get_processing_units_mask_t,
+            fork_join_executor const& exec) noexcept
+        {
+            return exec.shared_data_->pu_mask_;
+        }
+
+        friend auto tag_invoke(hpx::execution::experimental::get_cores_mask_t,
+            fork_join_executor const& exec) noexcept
+        {
+            return exec.shared_data_->pu_mask_;
         }
 
         /// \cond NOINTERNAL

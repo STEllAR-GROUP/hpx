@@ -691,11 +691,9 @@ namespace hpx { namespace threads {
         }
     }    // }}}
 
-    std::size_t topology::extract_node_count(
+    std::size_t topology::extract_node_count_locked(
         hwloc_obj_t parent, hwloc_obj_type_t type, std::size_t count) const
     {    // {{{
-        hwloc_obj_t obj;
-
         if (parent == nullptr)
         {
             return count;
@@ -706,35 +704,27 @@ namespace hpx { namespace threads {
             return count;
         }
 
-        {
-            std::unique_lock<mutex_type> lk(topo_mtx);
-            obj = hwloc_get_next_child(topo, parent, nullptr);
-        }
+        hwloc_obj_t obj = hwloc_get_next_child(topo, parent, nullptr);
 
         while (obj)
         {
             if (hwloc_compare_types(type, obj->type) == 0)
             {
-                /*
-                do {
-                    ++count;
-                    {
-                        std::unique_lock<mutex_type> lk(topo_mtx);
-                        obj = hwloc_get_next_child(topo, parent, obj);
-                    }
-                } while (obj != nullptr && hwloc_compare_types(type, obj->type) == 0);
-                return count;
-                */
                 ++count;
             }
 
-            count = extract_node_count(obj, type, count);
-
-            std::unique_lock<mutex_type> lk(topo_mtx);
+            count = extract_node_count_locked(obj, type, count);
             obj = hwloc_get_next_child(topo, parent, obj);
         }
 
         return count;
+    }    // }}}
+
+    std::size_t topology::extract_node_count(
+        hwloc_obj_t parent, hwloc_obj_type_t type, std::size_t count) const
+    {    // {{{
+        std::unique_lock<mutex_type> lk(topo_mtx);
+        return extract_node_count_locked(parent, type, count);
     }    // }}}
 
     std::size_t topology::get_number_of_sockets() const
@@ -844,24 +834,25 @@ namespace hpx { namespace threads {
         return num_of_pus_;
     }
 
-    std::size_t topology::get_number_of_core_pus(std::size_t core) const
+    std::size_t topology::get_number_of_core_pus_locked(std::size_t core) const
     {
-        hwloc_obj_t core_obj = nullptr;
-
-        {
-            std::unique_lock<mutex_type> lk(topo_mtx);
-            core_obj = hwloc_get_obj_by_type(
-                topo, HWLOC_OBJ_CORE, static_cast<unsigned>(core));
-        }
+        hwloc_obj_t core_obj = hwloc_get_obj_by_type(
+            topo, HWLOC_OBJ_CORE, static_cast<unsigned>(core));
 
         if (!use_pus_as_cores_ && core_obj)
         {
             HPX_ASSERT(core == detail::get_index(core_obj));
             std::size_t pu_count = 0;
-            return extract_node_count(core_obj, HWLOC_OBJ_PU, pu_count);
+            return extract_node_count_locked(core_obj, HWLOC_OBJ_PU, pu_count);
         }
 
         return std::size_t(1);
+    }
+
+    std::size_t topology::get_number_of_core_pus(std::size_t core) const
+    {
+        std::unique_lock<mutex_type> lk(topo_mtx);
+        return get_number_of_core_pus_locked(core);
     }
 
     std::size_t topology::get_number_of_socket_cores(
@@ -1456,10 +1447,118 @@ namespace hpx { namespace threads {
 #endif
     }
 
-    /// Free memory that was previously allocated by allocate
+    // Free memory that was previously allocated by allocate
     void topology::deallocate(void* addr, std::size_t len) const noexcept
     {
         hwloc_free(topo, addr, len);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    hwloc_obj_t topology::get_pu_obj(std::size_t num_pu) const
+    {
+        hwloc_obj_t pu_obj = hwloc_get_obj_by_type(
+            topo, HWLOC_OBJ_CORE, static_cast<unsigned>(num_pu));
+
+        if (pu_obj == nullptr)
+        {
+            HPX_THROW_EXCEPTION(no_success, "topology::get_core_obj",
+                "Couldn't find required object representing the given core in "
+                "topology");
+        }
+
+        return pu_obj;
+    }
+
+    template <typename F>
+    static void iterate(hwloc_bitmap_t cpuset, F&& f)
+    {
+        for (auto id = hwloc_bitmap_first(cpuset);
+             (unsigned) id != (unsigned) -1; id = hwloc_bitmap_next(cpuset, id))
+        {
+            if (hwloc_bitmap_isset(cpuset, id))
+            {
+                f(id);
+            }
+        }
+    }
+
+    static auto num_set_bits(hwloc_bitmap_t cpuset)
+    {
+        std::size_t count = 0;
+        iterate(cpuset, [&](auto) { ++count; });
+        return count;
+    }
+
+    // Return the size of the cache associated with the given cpuset.
+    std::size_t topology::get_cache_size(mask_type mask, int level) const
+    {
+        if (level < 1 || level > 5)
+        {
+            return 0;
+        }
+
+        std::unique_lock<mutex_type> lk(topo_mtx);
+
+        hwloc_bitmap_t cpuset = mask_to_bitmap(mask, HWLOC_OBJ_PU);
+        std::size_t cache_size = 0;
+
+#if HWLOC_API_VERSION >= 0x00020000
+        hwloc_obj_type_t type = HWLOC_OBJ_L1CACHE;
+        switch (level)
+        {
+        case 2:
+            type = HWLOC_OBJ_L2CACHE;
+            break;
+
+        case 3:
+            type = HWLOC_OBJ_L3CACHE;
+            break;
+
+        case 4:
+            type = HWLOC_OBJ_L4CACHE;
+            break;
+
+        case 5:
+            type = HWLOC_OBJ_L5CACHE;
+            break;
+
+        default:
+            break;
+        }
+#endif
+
+        iterate(cpuset, [&](auto num_pu) {
+            hwloc_obj_t pu_obj = hwloc_get_obj_by_type(
+                topo, HWLOC_OBJ_PU, static_cast<unsigned>(num_pu));
+
+#if HWLOC_API_VERSION >= 0x00020000
+            if (pu_obj == nullptr)
+                return;
+
+            hwloc_obj_t cache_obj =
+                hwloc_get_ancestor_obj_by_type(topo, type, pu_obj);
+            if (cache_obj == nullptr)
+                return;
+
+            cache_size += std::size_t(cache_obj->attr->cache.size) /
+                num_set_bits(cache_obj->cpuset);
+#else
+            // traverse up until found the requested cache level
+            int levels = 0;
+            for (hwloc_obj_t obj = pu_obj; obj != nullptr && levels < level;
+                 obj = obj->parent)
+            {
+                if (obj->type != HWLOC_OBJ_CACHE || ++levels != level)
+                    continue;
+
+                cache_size += std::size_t(obj->attr->cache.size) /
+                    num_set_bits(obj->cpuset);
+            }
+#endif
+        });
+
+        hwloc_bitmap_free(cpuset);
+        return cache_size;
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -14,6 +14,8 @@
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/tag_invoke.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/type_support/always_void.hpp>
 
@@ -188,9 +190,13 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         // support all properties exposed by the wrapped executor
+        // clang-format off
         template <typename Tag, typename Property,
-            typename Enable = std::enable_if_t<hpx::functional::
-                    is_tag_invocable_v<Tag, BaseExecutor, Property>>>
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
+                hpx::functional::is_tag_invocable_v<Tag, BaseExecutor, Property>
+            )>
+        // clang-format on
         friend annotating_executor tag_invoke(
             Tag tag, annotating_executor const& exec, Property&& prop)
         {
@@ -198,13 +204,17 @@ namespace hpx { namespace execution { namespace experimental {
                 tag, exec.exec_, HPX_FORWARD(Property, prop)));
         }
 
+        // clang-format off
         template <typename Tag,
-            typename Enable = std::enable_if_t<
-                hpx::functional::is_tag_invocable_v<Tag, BaseExecutor>>>
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
+                hpx::functional::is_tag_invocable_v<Tag, BaseExecutor>
+            )>
+        // clang-format on
         friend decltype(auto) tag_invoke(
             Tag tag, annotating_executor const& exec)
         {
-            return hpx::functional::tag_invoke(tag, exec.policy_);
+            return hpx::functional::tag_invoke(tag, exec.exec_);
         }
 
     private:

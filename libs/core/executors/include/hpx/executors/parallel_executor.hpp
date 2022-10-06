@@ -30,6 +30,8 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/iterator_support/range.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/topology.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
@@ -164,9 +166,13 @@ namespace hpx { namespace execution {
         // property implementations
 
         // support all properties exposed by the embedded policy
+        // clang-format off
         template <typename Tag, typename Property,
-            typename Enable = std::enable_if_t<
-                hpx::functional::is_tag_invocable_v<Tag, Policy, Property>>>
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
+                hpx::functional::is_tag_invocable_v<Tag, Policy, Property>
+            )>
+        // clang-format on
         friend parallel_policy_executor tag_invoke(
             Tag tag, parallel_policy_executor const& exec, Property&& prop)
         {
@@ -176,9 +182,13 @@ namespace hpx { namespace execution {
             return exec_with_prop;
         }
 
+        // clang-format off
         template <typename Tag,
-            typename Enable = std::enable_if_t<
-                hpx::functional::is_tag_invocable_v<Tag, Policy>>>
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
+                hpx::functional::is_tag_invocable_v<Tag, Policy>
+            )>
+        // clang-format on
         friend decltype(auto) tag_invoke(
             Tag tag, parallel_policy_executor const& exec)
         {
@@ -227,6 +237,25 @@ namespace hpx { namespace execution {
             parallel_policy_executor const& exec)
         {
             return exec.get_num_cores();
+        }
+
+        friend auto tag_invoke(
+            hpx::execution::experimental::get_processing_units_mask_t,
+            parallel_policy_executor const& exec)
+        {
+            auto pool = exec.pool_ ?
+                exec.pool_ :
+                threads::detail::get_self_or_default_pool();
+            return pool->get_used_processing_units(exec.get_num_cores(), false);
+        }
+
+        friend auto tag_invoke(hpx::execution::experimental::get_cores_mask_t,
+            parallel_policy_executor const& exec)
+        {
+            auto pool = exec.pool_ ?
+                exec.pool_ :
+                threads::detail::get_self_or_default_pool();
+            return pool->get_used_processing_units(exec.get_num_cores(), true);
         }
 
     public:

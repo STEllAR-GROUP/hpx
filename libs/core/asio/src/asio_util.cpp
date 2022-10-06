@@ -112,8 +112,8 @@ namespace hpx { namespace util {
 
             asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
 
-            while (force_ipv4 &&
-                it != tcp::resolver::iterator() && !it->endpoint().address().is_v4())
+            while (force_ipv4 && it != tcp::resolver::iterator() &&
+                !it->endpoint().address().is_v4())
             {
                 ++it;
             }

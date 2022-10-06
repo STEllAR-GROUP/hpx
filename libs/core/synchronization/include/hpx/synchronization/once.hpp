@@ -79,7 +79,7 @@ namespace hpx {
     ///          active call, with no additional synchronization.
     ///
     /// \param flag    an object, for which exactly one function gets executed
-    /// \param f	   Callable object to invoke
+    /// \param f       Callable object to invoke
     /// \param args... arguments to pass to the function
     ///
     /// \throws std::system_error if any condition prevents calls to \a call_once
