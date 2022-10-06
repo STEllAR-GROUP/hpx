@@ -11,11 +11,14 @@
 #pragma once
 
 #if defined(DOXYGEN)
+/// Top level HPX namespace
 namespace hpx {
-    /// The function \a when_all is an operator allowing to join on the result
-    /// of all given futures. It AND-composes all future objects given and
-    /// returns a new future object representing the same list of futures
-    /// after they finished executing.
+    /// \brief function \a when_all creates a future object that becomes ready
+    ///        when all elements in a set of \a future and \a shared_future
+    ///        objects become ready. It is an operator allowing to join on the
+    ///        result of all given futures. It AND-composes all given future
+    ///        objects and returns a new future object representing the same
+    ///        list of futures after they finished executing.
     ///
     /// \param first    [in] The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
@@ -43,10 +46,7 @@ namespace hpx {
             future<typename std::iterator_traits<InputIter>::value_type>>>
     hpx::future<Container> when_all(InputIter first, InputIter last);
 
-    /// The function \a when_all is an operator allowing to join on the result
-    /// of all given futures. It AND-composes all future objects given and
-    /// returns a new future object representing the same list of futures
-    /// after they finished executing.
+    /// \copybrief when_all(InputIter first, InputIter last)
     ///
     /// \param values   [in] A range holding an arbitrary amount of \a future
     ///                 or \a shared_future objects for which \a when_all
@@ -69,10 +69,7 @@ namespace hpx {
     template <typename Range>
     hpx::future<Range> when_all(Range&& values);
 
-    /// The function \a when_all is an operator allowing to join on the result
-    /// of all given futures. It AND-composes all future objects given and
-    /// returns a new future object representing the same list of futures
-    /// after they finished executing.
+    /// \copybrief when_all(InputIter first, InputIter last)
     ///
     /// \param futures  [in] An arbitrary number of \a future or \a shared_future
     ///                 objects, possibly holding different types for which
@@ -94,10 +91,7 @@ namespace hpx {
     template <typename... T>
     hpx::future<hpx::tuple<hpx::future<T>...>> when_all(T&&... futures);
 
-    /// The function \a when_all_n is an operator allowing to join on the result
-    /// of all given futures. It AND-composes all future objects given and
-    /// returns a new future object representing the same list of futures
-    /// after they finished executing.
+    /// \copybrief when_all(InputIter first, InputIter last)
     ///
     /// \param begin    [in] The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
