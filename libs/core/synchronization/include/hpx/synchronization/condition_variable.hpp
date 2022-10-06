@@ -86,16 +86,19 @@ namespace hpx {
     /// \a hpx::condition_variable works only with \a std::unique_lock<hpx::mutex>.
     /// This restriction allows for maximal efficiency on some platforms.
     /// \a hpx::condition_variable_any provides a condition variable that works
-    /// with any \a BasicLockable object, such as \a std::shared_lock.
+    /// with any \namedrequirement{BasicLockable} object, such as
+    /// \a std::shared_lock.
     ///
     /// Condition variables permit concurrent invocation of the \a wait,
     /// \a wait_for, \a wait_until, \a notify_one and \a notify_all member
     /// functions.
     ///
-    /// The class \a hpx::condition_variable is a \a StandardLayoutType.
-    /// It is not \a CopyConstructible, \a MoveConstructible, \a CopyAssignable,
-    /// or \a MoveAssignable.
-    ///
+    /// The class \a hpx::condition_variable is a
+    /// \namedrequirement{StandardLayoutType}.
+    /// It is not \namedrequirement{CopyConstructible},
+    /// \namedrequirement{MoveConstructible},
+    /// \namedrequirement{CopyAssignable}, or
+    /// \namedrequirement{MoveAssignable}.
     ///
     class condition_variable
     {
@@ -503,13 +506,15 @@ namespace hpx {
     /// \brief The \a condition_variable_any class is a generalization of
     /// \a hpx::condition_variable. Whereas \a hpx::condition_variable works
     /// only on \a std::unique_lock<std::mutex>, \a acondition_variable_any can
-    /// operate on any lock that meets the \a BasicLockable requirements.
+    /// operate on any lock that meets the \namedrequirement{BasicLockable}
+    /// requirements.
     ///
     /// See \a hpx::condition_variable for the description of the semantics of
     /// condition variables.
-    /// The class \a hpx::condition_variable_any is a \a StandardLayoutType. It
-    /// is not \a CopyConstructible, \a MoveConstructible, \a CopyAssignable,
-    /// or \a MoveAssignable.
+    /// It is not \namedrequirement{CopyConstructible},
+    /// \namedrequirement{MoveConstructible},
+    /// \namedrequirement{CopyAssignable}, or
+    /// \namedrequirement{MoveAssignable}.
     ///
     class condition_variable_any
     {
@@ -670,8 +675,9 @@ namespace hpx {
         ///
         /// \tparam Lock Type of \a lock.
         ///
-        /// \param lock An object of type Lock that meets the \a BasicLockable
-        ///             requirements, which must be locked by the current thread
+        /// \param lock An object of type Lock that meets the
+        ///             \namedrequirement{BasicLockable} requirements, which
+        ///             must be locked by the current thread
         /// \param ec   Used to hold error code value originated during the
         ///             operation. Defaults to \a throws -- A special'throw on
         ///             error' \a error_code.
@@ -735,8 +741,9 @@ namespace hpx {
         /// \tparam Lock      Type of \a lock.
         /// \tparam Predicate Type of \a pred.
         ///
-        /// \param lock an object of type Lock that meets the \a BasicLockable
-        ///             requirements, which must be locked by the current thread
+        /// \param lock an object of type Lock that meets the
+        ///             \namedrequirement{BasicLockable} requirements, which
+        ///             must be locked by the current thread
         /// \param pred predicate which returns `false` if the waiting should
         ///             be continued `(bool(pred()) == false)`.
         ///             The signature of the predicate function should be
@@ -780,7 +787,8 @@ namespace hpx {
         /// \tparam Lock Type of \a lock.
         ///
         /// \param lock     an object of type \a Lock that meets the
-        ///                 requirements of \a BasicLockable, which must be
+        ///                 requirements of
+        ///                 \namedrequirement{BasicLockable}, which must be
         ///                 locked by the current thread
         /// \param abs_time represents the time when waiting should be stopped.
         /// \param ec       used to hold error code value originated during the
@@ -855,8 +863,8 @@ namespace hpx {
         /// \tparam Predicate Type of \a pred.
         ///
         /// \param lock     an object of type \a Lock that meets the
-        ///                 requirements of \a BasicLockable, which must be
-        ///                 locked by the current thread
+        ///                 requirements of \namedrequirement{BasicLockable},
+        ///                 which must be locked by the current thread
         /// \param abs_time represents the time when waiting should be stopped.
         /// \param pred     predicate which returns \a false if the waiting
         ///                 should be continued
@@ -911,8 +919,8 @@ namespace hpx {
         /// \tparam Lock Type of \a lock.
         ///
         /// \param lock     an object of type \a Lock that meets the
-        ///                 \a BasicLockable requirements, which must be locked
-        ///                 by the current thread.
+        ///                 \namedrequirement{BasicLockable} requirements,
+        ///                 which must be locked by the current thread.
         /// \param rel_time an object of type \a hpx::chrono::duration
         ///                 representing the maximum time to spend waiting. Note
         ///                 that \a rel_time must be small enough not to
@@ -957,7 +965,8 @@ namespace hpx {
         /// \tparam Predicate Type of \a pred.
         ///
         /// \param lock     an object of type \a Lock that meets the
-        ///                 \a BasicLockable requirements, which must be locked
+        ///                 \namedrequirement{BasicLockable} requirements,which
+        ///                 must be locked
         ///                 by the current thread.
         /// \param rel_time an object of type \a hpx::chrono::duration
         ///                 representing the maximum time to spend waiting. Note
@@ -1016,9 +1025,9 @@ namespace hpx {
         /// \tparam Lock      Type of \a lock.
         /// \tparam Predicate Type of \a pred.
         ///
-        /// \param lock   an object of type Lock that meets the \a BasicLockable
-        ///               requirements, which must be locked by the current
-        ///               thread
+        /// \param lock   an object of type Lock that meets the
+        ///               \namedrequirement{BasicLockable} requirements, which
+        ///               must be locked by the current thread
         /// \param stoken a \a hpx::stop_token to register interruption for
         /// \param pred   predicate which returns `false` if the waiting should
         ///               be continued `(bool(pred()) == false)`.
@@ -1106,8 +1115,8 @@ namespace hpx {
         /// \tparam Predicate Type of \a pred.
         ///
         /// \param lock     an object of type \a Lock that meets the
-        ///                 requirements of \a BasicLockable, which must be
-        ///                 locked by the current thread.
+        ///                 requirements of \namedrequirement{BasicLockable},
+        ///                 which must be locked by the current thread.
         /// \param stoken   a \a hpx::stop_token to register interruption for.
         /// \param abs_time represents the time when waiting should be stopped.
         /// \param pred     predicate which returns \a false if the waiting
@@ -1202,8 +1211,8 @@ namespace hpx {
         /// \tparam Predicate Type of \a pred.
         ///
         /// \param lock     an object of type \a Lock that meets the
-        ///                 \a BasicLockable requirements, which must be locked
-        ///                 by the current thread.
+        ///                 \namedrequirement{BasicLockable} requirements,
+        ///                 which must be locked by the current thread.
         /// \param stoken   a \a hpx::stop_token to register interruption for.
         /// \param rel_time an object of type \a hpx::chrono::duration
         ///                 representing the maximum time to spend waiting. Note

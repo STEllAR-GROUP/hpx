@@ -52,7 +52,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     bool get_endpoint(std::string const& addr, std::uint16_t port,
-        asio::ip::tcp::endpoint& ep)
+        asio::ip::tcp::endpoint& ep, bool force_ipv4)
     {
         using namespace asio::ip;
         std::error_code ec;
@@ -63,11 +63,14 @@ namespace hpx { namespace util {
             return true;
         }
 
-        address_v6 addr6 = address_v6::from_string(addr.c_str(), ec);
-        if (!ec)
-        {    // it's an IPV6 address
-            ep = tcp::endpoint(address(addr6), port);
-            return true;
+        if (!force_ipv4)
+        {
+            address_v6 addr6 = address_v6::from_string(addr.c_str(), ec);
+            if (!ec)
+            {    // it's an IPV6 address
+                ep = tcp::endpoint(address(addr6), port);
+                return true;
+            }
         }
         return false;
     }
@@ -81,7 +84,7 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // properly resolve a give host name to the corresponding IP address
     asio::ip::tcp::endpoint resolve_hostname(std::string const& hostname,
-        std::uint16_t port, asio::io_context& io_service)
+        std::uint16_t port, asio::io_context& io_service, bool force_ipv4)
     {
         using asio::ip::tcp;
 
@@ -108,6 +111,13 @@ namespace hpx { namespace util {
             tcp::resolver::query query(hostname, std::to_string(port));
 
             asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+
+            while (force_ipv4 &&
+                it != tcp::resolver::iterator() && !it->endpoint().address().is_v4())
+            {
+                ++it;
+            }
+
             HPX_ASSERT(it != asio::ip::tcp::resolver::iterator());
             return *it;
         }

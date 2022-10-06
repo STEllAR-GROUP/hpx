@@ -459,7 +459,7 @@ Classes
    Class                                          C++ standard
    =============================================  =============================================================
    :cpp:class:`hpx::function`                     :cppreference-generic:`utility/functional,function`
-   :cpp:class:`hpx::function_ref`
+   :cpp:class:`hpx::function_ref`                 |p0792|_
    :cpp:class:`hpx::move_only_function`           :cppreference-generic:`utility/functional,move_only_function`
    :cpp:struct:`hpx::traits::is_bind_expression`  :cppreference-generic:`utility/functional,is_bind_expression`
    :cpp:struct:`hpx::traits::is_placeholder`      :cppreference-generic:`utility/functional,is_placeholder`
@@ -541,13 +541,13 @@ Functions
    :cpp:func:`hpx::dataflow`
    :cpp:func:`hpx::make_future`
    :cpp:func:`hpx::make_shared_future`
-   :cpp:func:`hpx::make_ready_future`
+   :cpp:func:`hpx::make_ready_future`        |p0159|_
    :cpp:func:`hpx::make_ready_future_alloc`
    :cpp:func:`hpx::make_ready_future_at`
    :cpp:func:`hpx::make_ready_future_after`
-   :cpp:func:`hpx::make_exceptional_future`
-   :cpp:func:`hpx::when_all`
-   :cpp:func:`hpx::when_any`
+   :cpp:func:`hpx::make_exceptional_future`  |p0159|_
+   :cpp:func:`hpx::when_all`                 |p0159|_
+   :cpp:func:`hpx::when_any`                 |p0159|_
    :cpp:func:`hpx::when_some`
    :cpp:func:`hpx::when_each`
    :cpp:func:`hpx::wait_all`

@@ -208,7 +208,12 @@ breathe_doxygen_config_options = {
     'PREDEFINED': '@doxygen_definitions@',
     'STRIP_FROM_PATH': hpx_source_dir,
     'EXTRACT_PRIVATE': 'NO'
+    'ALIASES': r'namedrequirement{1}="<a href=\"https://en.cppreference.com/w/cpp/named_req/\1\">\1</a>"'
 }
+
+# ! this should work but doesn't. check after updating breathe version.
+# breathe_doxygen_aliases = {
+# }
 
 numfig = True
 primary_domain = 'cpp'
@@ -496,6 +501,10 @@ rst_prolog += '''
 .. _cpp20_p0075r1: http://wg21.link/p0075r1
 .. |cpp20_p0443| replace:: P0443
 .. _cpp20_p0443: https://github.com/executors/issaquah_2016
+.. |p0792| replace:: P0792
+.. _p0792: http://wg21.link/p0792
+.. |p0159| replace:: P0159
+.. _p0159: http://wg21.link/p0159
 .. |p1393| replace:: P1393
 .. _p1393: http://wg21.link/p1393
 .. |p2220| replace:: P2220

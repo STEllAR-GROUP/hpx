@@ -82,12 +82,11 @@ namespace hpx {
             HPX_MAYBE_UNUSED static char app_name[] = HPX_APPLICATION_STRING;
             static char* default_argv[2] = {app_name, nullptr};
             HPX_MAYBE_UNUSED static char** dummy_argv = default_argv;
+
             // HPX_APPLICATION_STRING is specific to an application and therefore
             // cannot be in the source file
-            HPX_MAYBE_UNUSED static const hpx::program_options::
-                options_description default_desc =
-                    hpx::program_options::options_description(
-                        "Usage: " HPX_APPLICATION_STRING " [options]");
+            HPX_CORE_EXPORT hpx::program_options::options_description const&
+            default_desc();
 
             // Utilities to init the thread_pools of the resource partitioner
             using rp_callback_type =
@@ -99,7 +98,7 @@ namespace hpx {
         {
             std::reference_wrapper<
                 hpx::program_options::options_description const>
-                desc_cmdline = detail::default_desc;
+                desc_cmdline = detail::default_desc();
             std::vector<std::string> cfg;
             mutable startup_function_type startup;
             mutable shutdown_function_type shutdown;

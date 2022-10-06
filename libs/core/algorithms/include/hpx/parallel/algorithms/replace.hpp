@@ -481,6 +481,7 @@ namespace hpx {
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/detail/replace.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
@@ -497,21 +498,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
         /// \cond NOINTERNAL
 
-        // sequential replace
-        template <typename InIter, typename T1, typename T2, typename Proj>
-        inline InIter sequential_replace(InIter first, InIter last,
-            T1 const& old_value, T2 const& new_value, Proj&& proj)
-        {
-            for (/* */; first != last; ++first)
-            {
-                if (HPX_INVOKE(proj, *first) == old_value)
-                {
-                    *first = new_value;
-                }
-            }
-            return first;
-        }
-
         template <typename Iter>
         struct replace : public detail::algorithm<replace<Iter>, Iter>
         {
@@ -522,11 +508,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter, typename T1,
                 typename T2, typename Proj>
-            static InIter sequential(ExPolicy, InIter first, InIter last,
-                T1 const& old_value, T2 const& new_value, Proj&& proj)
+            static InIter sequential(ExPolicy&& policy, InIter first,
+                InIter last, T1 const& old_value, T2 const& new_value,
+                Proj&& proj)
             {
-                return sequential_replace(
-                    first, last, old_value, new_value, HPX_FORWARD(Proj, proj));
+                return sequential_replace<ExPolicy>(
+                    HPX_FORWARD(ExPolicy, policy), first, last, old_value,
+                    new_value, HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename FwdIter, typename T1,
@@ -536,19 +524,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 parallel(ExPolicy&& policy, FwdIter first, FwdIter last,
                     T1 const& old_value, T2 const& new_value, Proj&& proj)
             {
-                typedef typename std::iterator_traits<FwdIter>::value_type type;
-
-                return for_each_n<FwdIter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first,
-                    std::distance(first, last),
-                    [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
-                        type& t) -> void {
-                        if (HPX_INVOKE(proj, t) == old_value)
-                        {
-                            t = new_value;
-                        }
-                    },
-                    util::projection_identity());
+                return sequential_replace<ExPolicy>(
+                    HPX_FORWARD(ExPolicy, policy), first, last, old_value,
+                    new_value, HPX_FORWARD(Proj, proj));
             }
         };
         /// \endcond
@@ -585,22 +563,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
         /// \cond NOINTERNAL
 
-        // sequential replace_if
-        template <typename InIter, typename Sent, typename F, typename T,
-            typename Proj>
-        inline InIter sequential_replace_if(
-            InIter first, Sent sent, F&& f, T const& new_value, Proj&& proj)
-        {
-            for (/* */; first != sent; ++first)
-            {
-                if (HPX_INVOKE(f, HPX_INVOKE(proj, *first)))
-                {
-                    *first = new_value;
-                }
-            }
-            return first;
-        }
-
         template <typename Iter>
         struct replace_if : public detail::algorithm<replace_if<Iter>, Iter>
         {
@@ -611,11 +573,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename F, typename T, typename Proj>
-            static InIter sequential(ExPolicy, InIter first, Sent last, F&& f,
-                T const& new_value, Proj&& proj)
+            static InIter sequential(ExPolicy&& policy, InIter first, Sent last,
+                F&& f, T const& new_value, Proj&& proj)
             {
-                return sequential_replace_if(first, last, HPX_FORWARD(F, f),
-                    new_value, HPX_FORWARD(Proj, proj));
+                return sequential_replace_if<ExPolicy>(
+                    HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(F, f), new_value, HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
@@ -625,20 +588,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 parallel(ExPolicy&& policy, FwdIter first, Sent last, F&& f,
                     T const& new_value, Proj&& proj)
             {
-                typedef typename std::iterator_traits<FwdIter>::value_type type;
-
-                return for_each_n<FwdIter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first,
-                    detail::distance(first, last),
-                    [new_value, f = HPX_FORWARD(F, f),
-                        proj = HPX_FORWARD(Proj, proj)](
-                        type& t) mutable -> void {
-                        if (HPX_INVOKE(f, HPX_INVOKE(proj, t)))
-                        {
-                            t = new_value;
-                        }
-                    },
-                    util::projection_identity());
+                return sequential_replace_if<ExPolicy>(
+                    HPX_FORWARD(ExPolicy, policy), first, last,
+                    HPX_FORWARD(F, f), new_value, HPX_FORWARD(Proj, proj));
             }
         };
         /// \endcond
@@ -673,23 +625,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
         /// \cond NOINTERNAL
 
-        // sequential replace_copy
-        template <typename InIter, typename Sent, typename OutIter, typename T,
-            typename Proj>
-        inline util::in_out_result<InIter, OutIter> sequential_replace_copy(
-            InIter first, Sent sent, OutIter dest, T const& old_value,
-            T const& new_value, Proj&& proj)
-        {
-            for (/* */; first != sent; ++first)
-            {
-                if (HPX_INVOKE(proj, *first) == old_value)
-                    *dest++ = new_value;
-                else
-                    *dest++ = *first;
-            }
-            return util::in_out_result<InIter, OutIter>(first, dest);
-        }
-
         template <typename IterPair>
         struct replace_copy
           : public detail::algorithm<replace_copy<IterPair>, IterPair>
@@ -701,11 +636,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename OutIter, typename T, typename Proj>
-            static util::in_out_result<InIter, OutIter> sequential(ExPolicy,
-                InIter first, Sent sent, OutIter dest, T const& old_value,
-                T const& new_value, Proj&& proj)
+            static util::in_out_result<InIter, OutIter> sequential(
+                ExPolicy&& policy, InIter first, Sent sent, OutIter dest,
+                T const& old_value, T const& new_value, Proj&& proj)
             {
-                return sequential_replace_copy(first, sent, dest, old_value,
+                return sequential_replace_copy<ExPolicy>(
+                    HPX_FORWARD(ExPolicy, policy), first, sent, dest, old_value,
                     new_value, HPX_FORWARD(Proj, proj));
             }
 
@@ -717,24 +653,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 FwdIter2 dest, T const& old_value, T const& new_value,
                 Proj&& proj)
             {
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
-                typedef typename zip_iterator::reference reference;
-
-                return util::detail::get_in_out_result(
-                    for_each_n<zip_iterator>().call(
-                        HPX_FORWARD(ExPolicy, policy),
-                        hpx::util::make_zip_iterator(first, dest),
-                        detail::distance(first, sent),
-                        [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
-                            reference t) -> void {
-                            using hpx::get;
-                            if (HPX_INVOKE(proj, get<0>(t)) == old_value)
-                                get<1>(t) = new_value;
-                            else
-                                get<1>(t) = get<0>(t);    //-V573
-                        },
-                        util::projection_identity()));
+                return sequential_replace_copy<ExPolicy>(
+                    HPX_FORWARD(ExPolicy, policy), first, sent, dest, old_value,
+                    new_value, HPX_FORWARD(Proj, proj));
             }
         };
         /// \endcond
@@ -777,27 +698,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
         /// \cond NOINTERNAL
 
-        // sequential replace_copy_if
-        template <typename InIter, typename Sent, typename OutIter, typename F,
-            typename T, typename Proj>
-        inline util::in_out_result<InIter, OutIter> sequential_replace_copy_if(
-            InIter first, Sent sent, OutIter dest, F&& f, T const& new_value,
-            Proj&& proj)
-        {
-            for (/* */; first != sent; ++first)
-            {
-                if (HPX_INVOKE(f, HPX_INVOKE(proj, *first)))
-                {
-                    *dest++ = new_value;
-                }
-                else
-                {
-                    *dest++ = *first;
-                }
-            }
-            return util::in_out_result<InIter, OutIter>{first, dest};
-        }
-
         template <typename IterPair>
         struct replace_copy_if
           : public detail::algorithm<replace_copy_if<IterPair>, IterPair>
@@ -809,11 +709,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename OutIter, typename F, typename T, typename Proj>
-            static util::in_out_result<InIter, OutIter> sequential(ExPolicy,
-                InIter first, Sent sent, OutIter dest, F&& f,
+            static util::in_out_result<InIter, OutIter> sequential(
+                ExPolicy&& policy, InIter first, Sent sent, OutIter dest, F&& f,
                 T const& new_value, Proj&& proj)
             {
-                return sequential_replace_copy_if(first, sent, dest,
+                return sequential_replace_copy_if<ExPolicy>(
+                    HPX_FORWARD(ExPolicy, policy), first, sent, dest,
                     HPX_FORWARD(F, f), new_value, HPX_FORWARD(Proj, proj));
             }
 
@@ -824,29 +725,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             parallel(ExPolicy&& policy, FwdIter1 first, Sent sent,
                 FwdIter2 dest, F&& f, T const& new_value, Proj&& proj)
             {
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
-                typedef typename zip_iterator::reference reference;
-
-                return util::detail::get_in_out_result(
-                    for_each_n<zip_iterator>().call(
-                        HPX_FORWARD(ExPolicy, policy),
-                        hpx::util::make_zip_iterator(first, dest),
-                        detail::distance(first, sent),
-                        [new_value, f = HPX_FORWARD(F, f),
-                            proj = HPX_FORWARD(Proj, proj)](
-                            reference t) mutable -> void {
-                            using hpx::get;
-                            if (HPX_INVOKE(f, HPX_INVOKE(proj, get<0>(t))))
-                            {
-                                get<1>(t) = new_value;
-                            }
-                            else
-                            {
-                                get<1>(t) = get<0>(t);    //-V573
-                            }
-                        },
-                        util::projection_identity()));
+                return sequential_replace_copy_if<ExPolicy>(
+                    HPX_FORWARD(ExPolicy, policy), first, sent, dest,
+                    HPX_FORWARD(F, f), new_value, HPX_FORWARD(Proj, proj));
             }
         };
         /// \endcond
@@ -984,11 +865,9 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Required at least forward iterator.");
 
-            typedef typename std::iterator_traits<FwdIter>::value_type Type;
-
             return hpx::replace_if(
                 HPX_FORWARD(ExPolicy, policy), first, last,
-                [old_value](Type const& a) -> bool { return old_value == a; },
+                [old_value](auto const& a) { return old_value == a; },
                 new_value);
         }
     } replace{};
@@ -1114,11 +993,9 @@ namespace hpx {
             static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
                 "Required at least forward iterator.");
 
-            typedef typename std::iterator_traits<FwdIter1>::value_type Type;
-
             return hpx::replace_copy_if(
                 HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                [old_value](Type const& a) -> bool { return old_value == a; },
+                [old_value](auto const& a) { return old_value == a; },
                 new_value);
         }
     } replace_copy{};

@@ -35,6 +35,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/parallel_stable_sort.hpp
     hpx/parallel/algorithms/detail/pivot.hpp
     hpx/parallel/algorithms/detail/reduce.hpp
+    hpx/parallel/algorithms/detail/replace.hpp
     hpx/parallel/algorithms/detail/rotate.hpp
     hpx/parallel/algorithms/detail/sample_sort.hpp
     hpx/parallel/algorithms/detail/search.hpp
@@ -168,6 +169,7 @@ set(algorithms_headers
     hpx/parallel/datapar/loop.hpp
     hpx/parallel/datapar/mismatch.hpp
     hpx/parallel/datapar/reduce.hpp
+    hpx/parallel/datapar/replace.hpp
     hpx/parallel/datapar/transfer.hpp
     hpx/parallel/datapar/transform_loop.hpp
     hpx/parallel/datapar/zip_iterator.hpp

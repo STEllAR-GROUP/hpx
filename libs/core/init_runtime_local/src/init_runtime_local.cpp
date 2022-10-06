@@ -528,6 +528,13 @@ namespace hpx {
                 }
                 return result;
             }
+
+            hpx::program_options::options_description const& default_desc()
+            {
+                static hpx::program_options::options_description default_desc_(
+                    std::string("Usage: ") + app_name + " [options]");
+                return default_desc_;
+            }
         }    // namespace detail
     }        // namespace local
 }    // namespace hpx

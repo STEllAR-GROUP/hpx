@@ -1,5 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -36,6 +37,12 @@
 #include <utility>
 
 namespace hpx::execution::experimental::detail {
+
+    enum class sync_wait_type
+    {
+        single,
+        variant
+    };
 
     struct sync_wait_error_visitor
     {
@@ -84,7 +91,27 @@ namespace hpx::execution::experimental::detail {
     template <typename Pack>
     using make_decayed_pack_t = typename make_decayed_pack<Pack>::type;
 
-    template <typename Sender>
+    ///////////////////////////////////////////////////////////////////////////
+    template <sync_wait_type Type, typename T>
+    struct select_result;
+
+    template <typename T>
+    struct select_result<sync_wait_type::single, T>
+    {
+        using type = hpx::variant<make_decayed_pack_t<single_variant_t<T>>>;
+    };
+
+    template <typename T>
+    struct select_result<sync_wait_type::variant, T>
+    {
+        using type = T;
+    };
+
+    template <sync_wait_type Type, typename T>
+    using select_result_t = typename select_result<Type, T>::type;
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Sender, sync_wait_type Type>
     struct sync_wait_receiver
     {
         // value and error_types of the predecessor sender
@@ -104,13 +131,12 @@ namespace hpx::execution::experimental::detail {
         // value_types for a sender. In particular, split() explicitly adds a
         // const& to all tuple members in a way that prevent simply passing
         // decayed_tuple to predecessor_value_types.
-        using single_result_type = make_decayed_pack_t<
-            single_variant_t<predecessor_value_types<hpx::tuple, meta::pack>>>;
 
         // The template should compute the result type of whatever returned from
-        // sync_wait, which should be optional of the variant of the tuples. The
-        // sync_wait works when the variant has one tuple.
-        using result_type = hpx::variant<single_result_type>;
+        // sync_wait or sync_wait_with_variant by checking sync_wait_type is
+        // single or variant
+        using result_type = select_result_t<Type,
+            predecessor_value_types<hpx::tuple, hpx::variant>>;
 
         // The type of errors to store in the variant. This in itself is a
         // variant.
@@ -131,8 +157,20 @@ namespace hpx::execution::experimental::detail {
                 {
                     // pull the tuple out of the variant and wrap it into an
                     // optional, make sure to remove the references
-                    return hpx::optional<single_result_type>(
-                        hpx::get<0>(hpx::get<result_type>(HPX_MOVE(value))));
+                    if constexpr (Type == sync_wait_type::single)
+                    {
+                        using single_result_type = make_decayed_pack_t<
+                            single_variant_t<predecessor_value_types<hpx::tuple,
+                                meta::pack>>>;
+
+                        return hpx::optional<single_result_type>(hpx::get<0>(
+                            hpx::get<result_type>(HPX_MOVE(value))));
+                    }
+                    else
+                    {
+                        return hpx::optional(
+                            hpx::get<result_type>(HPX_MOVE(value)));
+                    }
                 }
                 else if (hpx::holds_alternative<error_type>(value))
                 {
@@ -145,7 +183,17 @@ namespace hpx::execution::experimental::detail {
                 // this means that none of set_value/set_error/set_stopped was
                 // called.
                 HPX_ASSERT(hpx::holds_alternative<stopped_type>(value));
-                return hpx::optional<single_result_type>();
+                if constexpr (Type == sync_wait_type::single)
+                {
+                    using single_result_type =
+                        make_decayed_pack_t<single_variant_t<
+                            predecessor_value_types<hpx::tuple, meta::pack>>>;
+                    return hpx::optional<single_result_type>();
+                }
+                else
+                {
+                    return hpx::optional<result_type>();
+                }
             }
         };
 
@@ -341,9 +389,10 @@ namespace hpx::this_thread::experimental {
             hpx::execution::experimental::run_loop_scheduler const& sched,
             Sender&& sender)
         {
+            using hpx::execution::experimental::detail::sync_wait_type;
             using receiver_type =
-                hpx::execution::experimental::detail::sync_wait_receiver<
-                    Sender>;
+                hpx::execution::experimental::detail::sync_wait_receiver<Sender,
+                    sync_wait_type::single>;
             using state_type = typename receiver_type::shared_state;
 
             hpx::execution::experimental::run_loop& loop = sched.get_run_loop();
@@ -368,9 +417,10 @@ namespace hpx::this_thread::experimental {
         friend HPX_FORCEINLINE auto tag_fallback_invoke(
             sync_wait_t, Sender&& sender)
         {
+            using hpx::execution::experimental::detail::sync_wait_type;
             using receiver_type =
-                hpx::execution::experimental::detail::sync_wait_receiver<
-                    Sender>;
+                hpx::execution::experimental::detail::sync_wait_receiver<Sender,
+                    sync_wait_type::single>;
             using state_type = typename receiver_type::shared_state;
 
             hpx::execution::experimental::run_loop loop{};
@@ -404,4 +454,116 @@ namespace hpx::this_thread::experimental {
                 sync_wait_t>{};
         }
     } sync_wait{};
+
+    ////////////////////////////////////////////////////////////////////
+    // DPO for sync_wait_with_variant
+
+    // this_thread::sync_wait_with_variant is a sender consumer that submits
+    // the work described by the provided sender for execution, similarly to
+    // ensure_started, except that it blocks the current std::thread or
+    // thread of main until the work is completed, and returns an optional
+    // of variant of tuples that were sent by the provided sender on its
+    // completion of work.
+    inline constexpr struct sync_wait_with_variant_t final
+      : hpx::functional::detail::tag_priority<sync_wait_with_variant_t>
+    {
+    private:
+        // clang-format off
+        template <typename Sender,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_sender_v<Sender> &&
+                hpx::execution::experimental::detail::
+                    is_completion_scheduler_tag_invocable_v<
+                        hpx::execution::experimental::set_value_t,
+                        Sender, sync_wait_with_variant_t
+                    >
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
+            sync_wait_with_variant_t, Sender&& sender)
+        {
+            auto scheduler =
+                hpx::execution::experimental::get_completion_scheduler<
+                    hpx::execution::experimental::set_value_t>(sender);
+
+            return hpx::functional::tag_invoke(sync_wait_with_variant_t{},
+                HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender));
+        }
+
+        // clang-format off
+        template <typename Sender,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_sender_v<Sender>
+            )>
+        // clang-format on
+        friend auto tag_invoke(sync_wait_with_variant_t,
+            hpx::execution::experimental::run_loop_scheduler const& sched,
+            Sender&& sender)
+        {
+            using hpx::execution::experimental::detail::sync_wait_type;
+            using receiver_type =
+                hpx::execution::experimental::detail::sync_wait_receiver<Sender,
+                    sync_wait_type::variant>;
+            using state_type = typename receiver_type::shared_state;
+
+            hpx::execution::experimental::run_loop& loop = sched.get_run_loop();
+            state_type state{};
+            auto op_state = hpx::execution::experimental::connect(
+                HPX_FORWARD(Sender, sender), receiver_type{state, loop});
+            hpx::execution::experimental::start(op_state);
+
+            // Wait for the variant to be filled in.
+            loop.run();
+
+            return state.get_value();
+        }
+
+        // clang-format off
+        template <typename Sender,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_sender_v<Sender>
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE auto tag_fallback_invoke(
+            sync_wait_with_variant_t, Sender&& sender)
+        {
+            using hpx::execution::experimental::detail::sync_wait_type;
+            using receiver_type =
+                hpx::execution::experimental::detail::sync_wait_receiver<Sender,
+                    sync_wait_type::variant>;
+            using state_type = typename receiver_type::shared_state;
+
+            hpx::execution::experimental::run_loop loop{};
+            state_type state{};
+            auto op_state = hpx::execution::experimental::connect(
+                HPX_FORWARD(Sender, sender), receiver_type{state, loop});
+            hpx::execution::experimental::start(op_state);
+
+            // Wait for the variant to be filled in.
+            loop.run();
+
+            return state.get_value();
+        }
+
+        // clang-format off
+        template <typename Scheduler,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_scheduler_v<Scheduler>
+            )>
+        // clang-format on
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+            sync_wait_with_variant_t, Scheduler&& scheduler)
+        {
+            return hpx::execution::experimental::detail::inject_scheduler<
+                sync_wait_with_variant_t, Scheduler>{
+                HPX_FORWARD(Scheduler, scheduler)};
+        }
+
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
+            sync_wait_with_variant_t)
+        {
+            return hpx::execution::experimental::detail::partial_algorithm<
+                sync_wait_with_variant_t>{};
+        }
+    } sync_wait_with_variant{};
 }    // namespace hpx::this_thread::experimental

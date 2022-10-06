@@ -1,5 +1,5 @@
 //  Copyright (c)      2018 Mikael Simberg
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -52,8 +52,8 @@ namespace hpx {
         {
             if (argc == 0 || argv == nullptr)
             {
-                argc = dummy_argc;
-                argv = dummy_argv;
+                argc = hpx::local::detail::dummy_argc;
+                argv = hpx::local::detail::dummy_argv;
             }
 
 #if defined(HPX_WINDOWS)
@@ -139,7 +139,8 @@ namespace hpx {
     {
         hpx::function<int(hpx::program_options::variables_map&)> main_f =
             static_cast<hpx_main_type>(::hpx_main);
-        return detail::init_impl(
-            HPX_MOVE(main_f), detail::dummy_argc, detail::dummy_argv, params);
+        return detail::init_impl(HPX_MOVE(main_f),
+            hpx::local::detail::dummy_argc, hpx::local::detail::dummy_argv,
+            params);
     }
 }    // namespace hpx

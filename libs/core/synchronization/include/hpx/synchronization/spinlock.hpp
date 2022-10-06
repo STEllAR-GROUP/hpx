@@ -11,6 +11,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
+/// \file spinlock.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -162,6 +164,9 @@ namespace hpx {
         };
     }    // namespace detail
 
+    /// \brief \c spinlock is a type of lock that causes a thread attempting to
+    ///        obtain it to check for its availability while waiting in a loop
+    ///        continuously.
     using spinlock = detail::spinlock<true>;
     using spinlock_no_backoff = detail::spinlock<false>;
 }    // namespace hpx

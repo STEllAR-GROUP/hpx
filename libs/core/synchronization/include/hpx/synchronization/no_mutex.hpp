@@ -4,12 +4,17 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file no_mutex.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
 
 namespace hpx {
 
+    /// \brief \c no_mutex class can be used in cases where the shared data between
+    ///        multiple threads can be accessed simultaneously without causing
+    ///        inconsistencies.
     struct no_mutex
     {
         constexpr void lock() noexcept {}
