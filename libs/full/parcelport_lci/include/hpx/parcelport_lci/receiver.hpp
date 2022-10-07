@@ -69,6 +69,39 @@ namespace hpx::parcelset::policies::lci {
         }
     };
 
+    struct request_wrapper_t
+    {
+        LCI_request_t request;
+        request_wrapper_t()
+        {
+            request.flag = LCI_ERR_RETRY;
+        }
+        ~request_wrapper_t()
+        {
+            if (request.flag == LCI_OK)
+            {
+                if (request.type == LCI_IOVEC)
+                {
+                    for (int j = 0; j < request.data.iovec.count; ++j)
+                    {
+                        LCI_lbuffer_free(request.data.iovec.lbuffers[j]);
+                    }
+                    free(request.data.iovec.lbuffers);
+                    free(request.data.iovec.piggy_back.address);
+                }
+                else
+                {
+                    HPX_ASSERT(request.type = LCI_MEDIUM);
+                    LCI_mbuffer_free(request.data.mbuffer);
+                }
+            }
+            else
+            {
+                HPX_ASSERT(request.flag == LCI_ERR_RETRY);
+            }
+        }
+    };
+
     template <typename Parcelport>
     struct receiver
     {
@@ -84,13 +117,13 @@ namespace hpx::parcelset::policies::lci {
         bool background_work() noexcept
         {
             // We first try to accept a new connection
-            LCI_request_t request = accept();
+            request_wrapper_t request;
+            LCI_queue_pop(util::lci_environment::h_queue(), &request.request);
 
-            if (request.flag == LCI_OK)
+            if (request.request.flag == LCI_OK)
             {
-                buffer_type buffer = decode_request(request);
+                buffer_type buffer = decode_request(request.request);
                 decode_parcels(pp_, HPX_MOVE(buffer), -1);
-                free_request(request);
                 return true;
             }
             return false;
@@ -179,31 +212,6 @@ namespace hpx::parcelset::policies::lci {
             data.time_ = timer_.elapsed_nanoseconds() - data.time_;
 #endif
             return buffer_;
-        }
-
-        void free_request(LCI_request_t request)
-        {
-            if (request.type == LCI_IOVEC)
-            {
-                for (int j = 0; j < request.data.iovec.count; ++j)
-                {
-                    LCI_lbuffer_free(request.data.iovec.lbuffers[j]);
-                }
-                free(request.data.iovec.lbuffers);
-                free(request.data.iovec.piggy_back.address);
-            }
-            else
-            {
-                LCI_mbuffer_free(request.data.mbuffer);
-            }
-        }
-
-        LCI_request_t accept() noexcept
-        {
-            LCI_request_t request;
-            request.flag = LCI_ERR_RETRY;
-            LCI_queue_pop(util::lci_environment::h_queue(), &request);
-            return request;
         }
 
         Parcelport& pp_;
