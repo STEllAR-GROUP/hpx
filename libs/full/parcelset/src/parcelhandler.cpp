@@ -340,9 +340,13 @@ namespace hpx::parcelset {
         bool stop_buffering, parcelport_background_mode mode)
     {
         bool did_some_work = false;
+        if (!is_networking_enabled_)
+        {
+            return did_some_work;
+        }
 
         // flush all parcel buffers
-        if (is_networking_enabled_ && 0 == num_thread &&
+        if (0 == num_thread &&
             (mode & parcelport_background_mode_flush_buffers))
         {
             std::unique_lock<mutex_type> l(handlers_mtx_, std::try_to_lock);
@@ -385,12 +389,15 @@ namespace hpx::parcelset {
 
     void parcelhandler::flush_parcels()
     {
-        // now flush all parcel ports to be shut down
-        for (pports_type::value_type& pp : pports_)
+        if (is_networking_enabled_)
         {
-            if (pp.first > 0)
+            // now flush all parcel ports to be shut down
+            for (pports_type::value_type& pp : pports_)
             {
-                pp.second->flush_parcels();
+                if (pp.first > 0)
+                {
+                    pp.second->flush_parcels();
+                }
             }
         }
     }
@@ -487,7 +494,7 @@ namespace hpx::parcelset {
         return locality();
     }
 
-    /// Return the reference to an existing io_service
+    // Return the reference to an existing io_service
     util::io_service_pool* parcelhandler::get_thread_pool(char const* name)
     {
         util::io_service_pool* result = nullptr;
@@ -824,19 +831,12 @@ namespace hpx::parcelset {
             // If we are in a stopped state, ignore some errors
             if (hpx::is_stopped_or_shutting_down())
             {
-                if (ec ==
-                        asio::error::make_error_code(
-                            asio::error::connection_aborted) ||
-                    ec ==
-                        asio::error::make_error_code(
-                            asio::error::connection_reset) ||
-                    ec ==
-                        asio::error::make_error_code(
-                            asio::error::broken_pipe) ||
-                    ec ==
-                        asio::error::make_error_code(
-                            asio::error::not_connected) ||
-                    ec == asio::error::make_error_code(asio::error::eof))
+                using asio::error::make_error_code;
+                if (ec == make_error_code(asio::error::connection_aborted) ||
+                    ec == make_error_code(asio::error::connection_reset) ||
+                    ec == make_error_code(asio::error::broken_pipe) ||
+                    ec == make_error_code(asio::error::not_connected) ||
+                    ec == make_error_code(asio::error::eof))
                 {
                     return;
                 }
@@ -983,6 +983,7 @@ namespace hpx::parcelset {
     {
         return util::get_and_reset_value(count_routed_, reset);
     }
+
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
     // number of parcels sent
     std::int64_t parcelhandler::get_parcel_send_count(
