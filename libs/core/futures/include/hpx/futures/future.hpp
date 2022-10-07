@@ -1547,7 +1547,9 @@ namespace hpx {
     }
 
     // extension: create a pre-initialized future object
-    /// \brief  Creates a pre-initialized future object (extension)
+    /// \brief The function creates a shared state that is immediately ready
+    ///        and returns a future associated with that shared state.
+    ///        For the returned future, valid() == true and is_ready() == true
     template <int DeductionGuard = 0, typename T>
     HPX_FORCEINLINE future<hpx::util::decay_unwrap_t<T>> make_ready_future(
         T&& init)
