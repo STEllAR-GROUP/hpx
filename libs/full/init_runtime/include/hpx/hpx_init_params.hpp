@@ -19,6 +19,7 @@
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/type_support/unused.hpp>
 
+#include <cstring>
 #include <functional>
 #include <string>
 #include <vector>
@@ -97,9 +98,16 @@ namespace hpx {
     ///                     function will be executed.
     struct init_params
     {
+        init_params()
+        {
+            std::strncpy(hpx::local::detail::app_name, HPX_APPLICATION_STRING,
+                sizeof(hpx::local::detail::app_name) - 1);
+        }
+
         // Parameters
         std::reference_wrapper<hpx::program_options::options_description const>
-            desc_cmdline = hpx::local::detail::default_desc();
+            desc_cmdline =
+                hpx::local::detail::default_desc(HPX_APPLICATION_STRING);
         std::vector<std::string> cfg;
         mutable startup_function_type startup;
         mutable shutdown_function_type shutdown;

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -529,10 +529,11 @@ namespace hpx {
                 return result;
             }
 
-            hpx::program_options::options_description const& default_desc()
+            hpx::program_options::options_description const& default_desc(
+                char const* desc)
             {
                 static hpx::program_options::options_description default_desc_(
-                    std::string("Usage: ") + app_name + " [options]");
+                    std::string("Usage: ") + desc + " [options]");
                 return default_desc_;
             }
         }    // namespace detail

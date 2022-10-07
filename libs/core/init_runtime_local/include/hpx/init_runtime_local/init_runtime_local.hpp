@@ -1,6 +1,6 @@
 //  Copyright (c)      2021 ETH Zurich
 //  Copyright (c)      2018 Mikael Simberg
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -23,6 +23,7 @@
 
 #include <csignal>
 #include <cstddef>
+#include <cstring>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -79,14 +80,14 @@ namespace hpx {
 
             // Default params to initialize the init_params struct
             HPX_MAYBE_UNUSED static int dummy_argc = 1;
-            HPX_MAYBE_UNUSED static char app_name[] = HPX_APPLICATION_STRING;
+            HPX_MAYBE_UNUSED static char app_name[256] = HPX_APPLICATION_STRING;
             static char* default_argv[2] = {app_name, nullptr};
             HPX_MAYBE_UNUSED static char** dummy_argv = default_argv;
 
             // HPX_APPLICATION_STRING is specific to an application and therefore
             // cannot be in the source file
             HPX_CORE_EXPORT hpx::program_options::options_description const&
-            default_desc();
+            default_desc(char const*);
 
             // Utilities to init the thread_pools of the resource partitioner
             using rp_callback_type =
@@ -96,9 +97,15 @@ namespace hpx {
 
         struct init_params
         {
+            init_params()
+            {
+                std::strncpy(detail::app_name, HPX_APPLICATION_STRING,
+                    sizeof(detail::app_name) - 1);
+            }
+
             std::reference_wrapper<
                 hpx::program_options::options_description const>
-                desc_cmdline = detail::default_desc();
+                desc_cmdline = detail::default_desc(HPX_APPLICATION_STRING);
             std::vector<std::string> cfg;
             mutable startup_function_type startup;
             mutable shutdown_function_type shutdown;
