@@ -12,6 +12,7 @@
 // util
 #include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threading_base.hpp>
@@ -255,6 +256,10 @@ namespace hpx { namespace traits {
 
             FUNC_END_DEBUG_MSG;
         }
+
+        // by default no additional initialization using the resource
+        // partitioner is required
+        static constexpr void init(hpx::resource::partitioner&) noexcept {}
 
         static void destroy() {}
 

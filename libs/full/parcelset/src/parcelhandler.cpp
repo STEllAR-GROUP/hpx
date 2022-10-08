@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
@@ -19,6 +19,7 @@
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/string_util.hpp>
@@ -1277,6 +1278,17 @@ namespace hpx::parcelset {
             get_parcelport_factories())
         {
             factory->init(argc, argv, cfg);
+        }
+    }
+
+    void parcelhandler::init(hpx::resource::partitioner& rp)
+    {
+        HPX_ASSERT(hpx::is_networking_enabled());
+
+        for (plugins::parcelport_factory_base* factory :
+            get_parcelport_factories())
+        {
+            factory->init(rp);
         }
     }
 

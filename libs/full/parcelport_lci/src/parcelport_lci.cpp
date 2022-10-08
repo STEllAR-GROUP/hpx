@@ -12,6 +12,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
@@ -251,6 +252,7 @@ namespace hpx::traits {
         {
             return "50";
         }
+
         static void init(
             int* argc, char*** argv, util::command_line_handling& cfg)
         {
@@ -259,6 +261,9 @@ namespace hpx::traits {
                 static_cast<std::size_t>(util::lci_environment::size());
             cfg.node_ = static_cast<std::size_t>(util::lci_environment::rank());
         }
+
+        // TODO: implement creation of custom thread pool here
+        static void init(hpx::resource::partitioner&) noexcept {}
 
         static void destroy()
         {
