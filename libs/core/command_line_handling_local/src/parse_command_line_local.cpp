@@ -22,7 +22,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace local { namespace detail {
-    inline std::string trim_whitespace(std::string const& s)
+
+    ///////////////////////////////////////////////////////////////////////
+    std::string trim_whitespace(std::string const& s)
     {
         using size_type = std::string::size_type;
 
@@ -111,54 +113,52 @@ namespace hpx { namespace local { namespace detail {
     // Additional command line parser which interprets '@something' as an
     // option "options-file" with the value "something". Additionally we
     // resolve defined command line option aliases.
-    struct option_parser
+    option_parser::option_parser(util::section const& ini, bool ignore_aliases)
+      : ini_(ini)
+      , ignore_aliases_(ignore_aliases)
     {
-        option_parser(util::section const& ini, bool ignore_aliases)
-          : ini_(ini)
-          , ignore_aliases_(ignore_aliases)
+    }
+
+    std::pair<std::string, std::string> option_parser::operator()(
+        std::string const& s) const
+    {
+        // handle special syntax for configuration files @filename
+        if ('@' == s[0])
         {
+            return std::make_pair(std::string("hpx:options-file"), s.substr(1));
         }
 
-        std::pair<std::string, std::string> operator()(
-            std::string const& s) const
+        // handle aliasing, if enabled
+        if (ini_.get_entry("hpx.commandline.aliasing", "0") == "0" ||
+            ignore_aliases_)
         {
-            // handle special syntax for configuration files @filename
-            if ('@' == s[0])
-                return std::make_pair(
-                    std::string("hpx:options-file"), s.substr(1));
-
-            // handle aliasing, if enabled
-            if (ini_.get_entry("hpx.commandline.aliasing", "0") == "0" ||
-                ignore_aliases_)
-            {
-                return std::make_pair(std::string(), std::string());
-            }
-            return handle_aliasing(ini_, s);
+            return std::make_pair(std::string(), std::string());
         }
 
-        util::section const& ini_;
-        bool ignore_aliases_;
-    };
+        return handle_aliasing(ini_, s);
+    }
 
     ///////////////////////////////////////////////////////////////////////
     hpx::program_options::basic_command_line_parser<char>&
     get_commandline_parser(
         hpx::program_options::basic_command_line_parser<char>& p, int mode)
     {
-        if ((mode & ~util::report_missing_config_file) ==
+        if ((mode &
+                ~(util::report_missing_config_file | util::ignore_aliases)) ==
             util::allow_unregistered)
+        {
             return p.allow_unregistered();
+        }
         return p;
     }
 
     ///////////////////////////////////////////////////////////////////////
-    // Read all options from a given config file, parse and add them to the
-    // given variables_map
-    bool read_config_file_options(std::string const& filename,
-        hpx::program_options::options_description const& desc,
-        hpx::program_options::variables_map& vm, util::section const& rtcfg,
-        int error_mode)
+    // Read all options from a given config file
+    std::vector<std::string> read_config_file_options(
+        std::string const& filename, int error_mode)
     {
+        std::vector<std::string> options;
+
         std::ifstream ifs(filename.c_str());
         if (!ifs.is_open())
         {
@@ -168,13 +168,14 @@ namespace hpx { namespace local { namespace detail {
                              "options file not found ("
                           << filename << ")" << std::endl;
             }
-            return false;
+            return options;
         }
 
-        std::vector<std::string> options;
         std::string line;
         while (std::getline(ifs, line))
         {
+            using hpx::local::detail::trim_whitespace;
+
             // skip empty lines
             std::string::size_type pos = line.find_first_not_of(" \t");
             if (pos == std::string::npos)
@@ -197,32 +198,42 @@ namespace hpx { namespace local { namespace detail {
             }
         }
 
+        return options;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Handle all options from a given config file, parse and add them to the
+    // given variables_map
+    bool handle_config_file_options(std::vector<std::string> const& options,
+        hpx::program_options::options_description const& desc,
+        hpx::program_options::variables_map& vm, util::section const& rtcfg,
+        int error_mode)
+    {
         // add options to parsed settings
         if (!options.empty())
         {
-            using hpx::program_options::basic_command_line_parser;
             using hpx::program_options::command_line_parser;
             using hpx::program_options::store;
-            using hpx::program_options::value;
-            using namespace hpx::program_options::command_line_style;
+            using hpx::program_options::command_line_style::unix_style;
 
-            store(detail::get_commandline_parser(
+            store(hpx::local::detail::get_commandline_parser(
                       command_line_parser(options)
                           .options(desc)
                           .style(unix_style)
-                          .extra_parser(detail::option_parser(
+                          .extra_parser(hpx::local::detail::option_parser(
                               rtcfg, error_mode & util::ignore_aliases)),
                       error_mode & ~util::ignore_aliases)
                       .run(),
                 vm);
             notify(vm);
+            return true;
         }
-        return true;
+        return false;
     }
 
-    // try to find a config file somewhere up the filesystem hierarchy
-    // starting with the input file path. This allows to use a general
-    // <app_name>.cfg file for all executables in a certain project.
+    // try to find a config file somewhere up the filesystem hierarchy starting
+    // with the input file path. This allows to use a general <app_name>.cfg
+    // file for all executables in a certain project.
     void handle_generic_config_options(std::string appname,
         hpx::program_options::variables_map& vm,
         hpx::program_options::options_description const& desc_cfgfile,
@@ -239,16 +250,21 @@ namespace hpx { namespace local { namespace detail {
         while (!dir.empty())
         {
             filesystem::path filename = dir / (appname + ".cfg");
-            bool result =
-                read_config_file_options(filename.string(), desc_cfgfile, vm,
-                    ini, error_mode & ~util::report_missing_config_file);
-            if (result)
-                break;    // break on the first options file found
+            std::vector<std::string> options =
+                hpx::local::detail::read_config_file_options(filename.string(),
+                    error_mode & ~util::report_missing_config_file);
 
-                // Boost filesystem and C++17 filesystem behave differently
-                // here. Boost filesystem returns an empty path for
-                // "/".parent_path() whereas C++17 filesystem will keep
-                // returning "/".
+            bool result = handle_config_file_options(options, desc_cfgfile, vm,
+                ini, error_mode & ~util::report_missing_config_file);
+            if (result)
+            {
+                break;    // break on the first options file found
+            }
+
+            // Boost filesystem and C++17 filesystem behave differently
+            // here. Boost filesystem returns an empty path for
+            // "/".parent_path() whereas C++17 filesystem will keep
+            // returning "/".
 #if !defined(HPX_FILESYSTEM_HAVE_BOOST_FILESYSTEM_COMPATIBILITY)
             auto dir_prev = dir;
             dir = dir.parent_path();    // chop off last directory part
@@ -274,8 +290,11 @@ namespace hpx { namespace local { namespace detail {
             for (std::string const& cfg_file : cfg_files)
             {
                 // parse a single config file and store the results
-                read_config_file_options(
-                    cfg_file, desc_cfgfile, vm, ini, error_mode);
+                std::vector<std::string> options =
+                    read_config_file_options(cfg_file, error_mode);
+
+                handle_config_file_options(
+                    options, desc_cfgfile, vm, ini, error_mode);
             }
         }
     }
@@ -295,14 +314,13 @@ namespace hpx { namespace local { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // parse the command line
-    bool parse_commandline(util::section const& rtcfg,
+    bool parse_commandline(util::section const& rtcfg, options_map& all_options,
         hpx::program_options::options_description const& app_options,
-        std::string const& arg0, std::vector<std::string> const& args,
+        std::vector<std::string> const& args,
         hpx::program_options::variables_map& vm, int error_mode,
         hpx::program_options::options_description* visible,
         std::vector<std::string>* unregistered_options)
     {
-        using hpx::program_options::basic_command_line_parser;
         using hpx::program_options::command_line_parser;
         using hpx::program_options::options_description;
         using hpx::program_options::parsed_options;
@@ -311,242 +329,287 @@ namespace hpx { namespace local { namespace detail {
         using hpx::program_options::value;
         using namespace hpx::program_options::command_line_style;
 
-        try
+        if (rtcfg.get_entry("hpx.commandline.allow_unknown", "0") == "0")
         {
             // clang-format off
-            options_description cmdline_options(
-                "HPX options (allowed on command line only)");
-            cmdline_options.add_options()
-                ("hpx:help", value<std::string>()->implicit_value("minimal"),
-                    "print out program usage (default: this message), possible "
-                    "values: 'full' (additionally prints options from components)")
-                ("hpx:version", "print out HPX version and copyright information")
-                ("hpx:info", "print out HPX configuration information")
-                ("hpx:options-file", value<std::vector<std::string> >()->composing(),
-                    "specify a file containing command line options "
-                    "(alternatively: @filepath)")
-            ;
-
-            options_description hpx_options(
-                "HPX options (additionally allowed in an options file)");
-            options_description hidden_options("Hidden options");
+            options_description positional_options;
+            positional_options.add_options()
+                ("hpx:positional",
+                  value<std::vector<std::string>>(), "positional options")
+                ;
             // clang-format on
 
-            // general options definitions
-            // clang-format off
-            hpx_options.add_options()
-                ("hpx:pu-offset", value<std::size_t>(),
-                  "the first processing unit this instance of HPX should be "
-                  "run on (default: 0), valid for "
-                  "--hpx:queuing=local, --hpx:queuing=abp-priority, "
-                  "--hpx:queuing=static, --hpx:queuing=static-priority, "
-                  "and --hpx:queuing=local-priority only")
-                ("hpx:pu-step", value<std::size_t>(),
-                  "the step between used processing unit numbers for this "
-                  "instance of HPX (default: 1), valid for "
-                  "--hpx:queuing=local, --hpx:queuing=abp-priority, "
-                  "--hpx:queuing=static, --hpx:queuing=static-priority "
-                  "and --hpx:queuing=local-priority only")
-                ("hpx:affinity", value<std::string>(),
-                  "the affinity domain the OS threads will be confined to, "
-                  "possible values: pu, core, numa, machine (default: pu), valid for "
-                  "--hpx:queuing=local, --hpx:queuing=abp-priority, "
-                  "--hpx:queuing=static, --hpx:queuing=static-priority "
-                  " and --hpx:queuing=local-priority only")
-                ("hpx:bind", value<std::vector<std::string> >()->composing(),
-                  "the detailed affinity description for the OS threads, see "
-                  "the documentation for a detailed description of possible "
-                  "values. Do not use with --hpx:pu-step, --hpx:pu-offset, or "
-                  "--hpx:affinity options. Implies --hpx:numa-sensitive=1"
-                  "(--hpx:bind=none disables defining thread affinities).")
-                ("hpx:use-process-mask", "use the process mask to restrict "
-                 "available hardware resources (implies "
-                 "--hpx:ignore-batch-env)")
-                ("hpx:print-bind",
-                  "print to the console the bit masks calculated from the "
-                  "arguments specified to all --hpx:bind options.")
-                ("hpx:threads", value<std::string>(),
-                 "the number of operating system threads to spawn for this HPX "
-                 "locality (default: 1, using 'all' will spawn one thread for "
-                 "each processing unit")
-                ("hpx:cores", value<std::string>(),
-                 "the number of cores to utilize for this HPX "
-                 "locality (default: 'all', i.e. the number of cores is based on "
-                 "the number of total cores in the system)")
-                ("hpx:queuing", value<std::string>(),
-                  "the queue scheduling policy to use, options are "
-                  "'local', 'local-priority-fifo','local-priority-lifo', "
-                  "'abp-priority-fifo', 'abp-priority-lifo', 'static', and "
-                  "'static-priority' (default: 'local-priority'; "
-                  "all option values can be abbreviated)")
-                ("hpx:high-priority-threads", value<std::size_t>(),
-                  "the number of operating system threads maintaining a high "
-                  "priority queue (default: number of OS threads), valid for "
-                  "--hpx:queuing=local-priority,--hpx:queuing=static-priority, "
-                  " and --hpx:queuing=abp-priority only)")
-                ("hpx:numa-sensitive", value<std::size_t>()->implicit_value(0),
-                  "makes the local-priority scheduler NUMA sensitive ("
-                  "allowed values: 0 - no NUMA sensitivity, 1 - allow only for "
-                  "boundary cores to steal across NUMA domains, 2 - "
-                  "no cross boundary stealing is allowed (default value: 0)")
-            ;
+            all_options[options_type::desc_cmdline].add(positional_options);
+            all_options[options_type::desc_cfgfile].add(positional_options);
 
-            options_description config_options("HPX configuration options");
-            config_options.add_options()
-                ("hpx:app-config", value<std::string>(),
-                  "load the specified application configuration (ini) file")
-                ("hpx:config", value<std::string>()->default_value(""),
-                  "load the specified hpx configuration (ini) file")
-                ("hpx:ini", value<std::vector<std::string> >()->composing(),
-                  "add a configuration definition to the default runtime "
-                  "configuration")
-                ("hpx:exit", "exit after configuring the runtime")
-            ;
+            // move all positional options into the hpx:positional option
+            // group
+            positional_options_description pd;
+            pd.add("hpx:positional", -1);
 
-            options_description debugging_options("HPX debugging options");
-            debugging_options.add_options()
-                ("hpx:dump-config-initial", "print the initial runtime configuration")
-                ("hpx:dump-config", "print the final runtime configuration")
-                // enable debug output from command line handling
-                ("hpx:debug-clp", "debug command line processing")
-                ("hpx:debug-hpx-log", value<std::string>()->implicit_value("cout"),
-                  "enable all messages on the HPX log channel and send all "
-                  "HPX logs to the target destination")
-                ("hpx:debug-timing-log", value<std::string>()->implicit_value("cout"),
-                  "enable all messages on the timing log channel and send all "
-                  "timing logs to the target destination")
-                ("hpx:debug-app-log", value<std::string>()->implicit_value("cout"),
-                  "enable all messages on the application log channel and send all "
-                  "application logs to the target destination")
-#if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)
-                ("hpx:attach-debugger",
-                  value<std::string>()->implicit_value("startup"),
-                  "wait for a debugger to be attached, possible values: "
-                  "off, startup, exception or test-failure (default: startup)")
-#endif
-            ;
+            // parse command line, allow for unregistered options this point
+            parsed_options opts(get_commandline_parser(
+                command_line_parser(args)
+                    .options(all_options[options_type::desc_cmdline])
+                    .positional(pd)
+                    .style(unix_style)
+                    .extra_parser(option_parser(
+                        rtcfg, error_mode & util::ignore_aliases)),
+                error_mode & ~util::ignore_aliases)
+                                    .run());
 
-            hidden_options.add_options()
-                ("hpx:ignore", "this option will be silently ignored")
-            ;
-            // clang-format off
-
-            // construct the overall options description and parse the
-            // command line
-            options_description desc_cmdline;
-            options_description positional_options;
-            desc_cmdline
-                .add(app_options).add(cmdline_options)
-                .add(hpx_options)
-                .add(config_options).add(debugging_options)
-                .add(hidden_options)
-            ;
-
-            options_description desc_cfgfile;
-            desc_cfgfile
-                .add(app_options).add(hpx_options)
-                .add(config_options)
-                .add(debugging_options).add(hidden_options)
-            ;
-
-            if (rtcfg.get_entry("hpx.commandline.allow_unknown", "0") == "0")
+            // collect unregistered options, if needed
+            if (unregistered_options)
             {
-                // move all positional options into the hpx:positional option
-                // group
-                positional_options_description pd;
-                pd.add("hpx:positional", -1);
+                using hpx::program_options::collect_unrecognized;
+                using hpx::program_options::exclude_positional;
+                *unregistered_options =
+                    collect_unrecognized(opts.options, exclude_positional);
 
-                positional_options.add_options()
-                    ("hpx:positional", value<std::vector<std::string> >(),
-                      "positional options")
-                ;
-                desc_cmdline.add(positional_options);
-                desc_cfgfile.add(positional_options);
-
-                // parse command line, allow for unregistered options this point
-                parsed_options opts(detail::get_commandline_parser(
-                        command_line_parser(args)
-                            .options(desc_cmdline)
-                            .positional(pd)
-                            .style(unix_style)
-                            .extra_parser(detail::option_parser(rtcfg,
-                                error_mode & util::ignore_aliases)),
-                         error_mode & ~util::ignore_aliases
-                    ).run()
-                );
-
-                // collect unregistered options, if needed
-                if (unregistered_options) {
-                    using hpx::program_options::collect_unrecognized;
-                    using hpx::program_options::exclude_positional;
-                    *unregistered_options =
-                        collect_unrecognized(opts.options, exclude_positional);
-
-                    verify_unknown_options(*unregistered_options);
-                }
-
-                store(opts, vm);
-            }
-            else
-            {
-                // parse command line, allow for unregistered options this point
-                parsed_options opts(detail::get_commandline_parser(
-                        command_line_parser(args)
-                            .options(desc_cmdline)
-                            .style(unix_style)
-                            .extra_parser(detail::option_parser(rtcfg,
-                                error_mode & util::ignore_aliases)),
-                        error_mode & ~util::ignore_aliases
-                    ).run()
-                );
-
-                // collect unregistered options, if needed
-                if (unregistered_options) {
-                    using hpx::program_options::collect_unrecognized;
-                    using hpx::program_options::include_positional;
-                    *unregistered_options =
-                        collect_unrecognized(opts.options, include_positional);
-
-                    verify_unknown_options(*unregistered_options);
-                }
-
-                store(opts, vm);
+                verify_unknown_options(*unregistered_options);
             }
 
-            if (vm.count("hpx:help"))
-            {
-                // collect help information
-                if (visible) {
-                    (*visible)
-                        .add(app_options).add(cmdline_options)
-                        .add(hpx_options)
-                        .add(debugging_options).add(config_options)
-                    ;
-                }
-                return true;
-            }
-
-            notify(vm);
-
-            detail::handle_generic_config_options(
-                arg0, vm, desc_cfgfile, rtcfg, error_mode);
-            detail::handle_config_options(
-                vm, desc_cfgfile, rtcfg, error_mode);
+            store(opts, vm);
         }
-        catch (std::exception const& e) {
-            if (error_mode & util::rethrow_on_error)
-                throw;
+        else
+        {
+            // parse command line, allow for unregistered options this point
+            parsed_options opts(get_commandline_parser(
+                command_line_parser(args)
+                    .options(all_options[options_type::desc_cmdline])
+                    .style(unix_style)
+                    .extra_parser(option_parser(
+                        rtcfg, error_mode & util::ignore_aliases)),
+                error_mode & ~util::ignore_aliases)
+                                    .run());
 
-            std::cerr << "hpx::init: exception caught: "
-                      << e.what() << std::endl;
-            return false;
+            // collect unregistered options, if needed
+            if (unregistered_options)
+            {
+                using hpx::program_options::collect_unrecognized;
+                using hpx::program_options::include_positional;
+                *unregistered_options =
+                    collect_unrecognized(opts.options, include_positional);
+
+                verify_unknown_options(*unregistered_options);
+            }
+
+            store(opts, vm);
         }
+
+        if (vm.count("hpx:help"))
+        {
+            // collect help information
+            if (visible != nullptr)
+            {
+                (*visible)
+                    .add(app_options)
+                    .add(all_options[options_type::commandline_options])
+                    .add(all_options[options_type::hpx_options])
+                    .add(all_options[options_type::debugging_options])
+                    .add(all_options[options_type::config_options]);
+            }
+            return true;
+        }
+
+        notify(vm);
+
         return true;
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail
+    options_map compose_local_options()
     {
+        using hpx::program_options::value;
+
+        options_map all_options;
+
+        // clang-format off
+        all_options.emplace(options_type::commandline_options,
+            "HPX options (allowed on command line only)");
+
+        all_options[options_type::commandline_options].add_options()
+            ("hpx:help", value<std::string>()->implicit_value("minimal"),
+                "print out program usage (default: this message), possible "
+                "values: 'full' (additionally prints options from components)")
+            ("hpx:version", "print out HPX version and copyright information")
+            ("hpx:info", "print out HPX configuration information")
+            ("hpx:options-file", value<std::vector<std::string> >()->composing(),
+                "specify a file containing command line options "
+                "(alternatively: @filepath)")
+        ;
+        // clang-format on
+
+        all_options.emplace(options_type::hpx_options,
+            "HPX options (additionally allowed in an options file)");
+        all_options.emplace(options_type::hidden_options, "Hidden options");
+
+        // general options definitions
+        // clang-format off
+        all_options[options_type::hpx_options].add_options()
+            ("hpx:pu-offset", value<std::size_t>(),
+                "the first processing unit this instance of HPX should be "
+                "run on (default: 0), valid for "
+                "--hpx:queuing=local, --hpx:queuing=abp-priority, "
+                "--hpx:queuing=static, --hpx:queuing=static-priority, "
+                "and --hpx:queuing=local-priority only")
+            ("hpx:pu-step", value<std::size_t>(),
+                "the step between used processing unit numbers for this "
+                "instance of HPX (default: 1), valid for "
+                "--hpx:queuing=local, --hpx:queuing=abp-priority, "
+                "--hpx:queuing=static, --hpx:queuing=static-priority "
+                "and --hpx:queuing=local-priority only")
+            ("hpx:affinity", value<std::string>(),
+                "the affinity domain the OS threads will be confined to, "
+                "possible values: pu, core, numa, machine (default: pu), valid for "
+                "--hpx:queuing=local, --hpx:queuing=abp-priority, "
+                "--hpx:queuing=static, --hpx:queuing=static-priority "
+                " and --hpx:queuing=local-priority only")
+            ("hpx:bind", value<std::vector<std::string> >()->composing(),
+                "the detailed affinity description for the OS threads, see "
+                "the documentation for a detailed description of possible "
+                "values. Do not use with --hpx:pu-step, --hpx:pu-offset, or "
+                "--hpx:affinity options. Implies --hpx:numa-sensitive=1"
+                "(--hpx:bind=none disables defining thread affinities).")
+            ("hpx:use-process-mask", "use the process mask to restrict "
+                "available hardware resources (implies "
+                "--hpx:ignore-batch-env)")
+            ("hpx:print-bind",
+                "print to the console the bit masks calculated from the "
+                "arguments specified to all --hpx:bind options.")
+            ("hpx:threads", value<std::string>(),
+                "the number of operating system threads to spawn for this HPX "
+                "locality (default: 1, using 'all' will spawn one thread for "
+                "each processing unit")
+            ("hpx:cores", value<std::string>(),
+                "the number of cores to utilize for this HPX "
+                "locality (default: 'all', i.e. the number of cores is based on "
+                "the number of total cores in the system)")
+            ("hpx:queuing", value<std::string>(),
+                "the queue scheduling policy to use, options are "
+                "'local', 'local-priority-fifo','local-priority-lifo', "
+                "'abp-priority-fifo', 'abp-priority-lifo', 'static', and "
+                "'static-priority' (default: 'local-priority'; "
+                "all option values can be abbreviated)")
+            ("hpx:high-priority-threads", value<std::size_t>(),
+                "the number of operating system threads maintaining a high "
+                "priority queue (default: number of OS threads), valid for "
+                "--hpx:queuing=local-priority,--hpx:queuing=static-priority, "
+                " and --hpx:queuing=abp-priority only)")
+            ("hpx:numa-sensitive", value<std::size_t>()->implicit_value(0),
+                "makes the local-priority scheduler NUMA sensitive ("
+                "allowed values: 0 - no NUMA sensitivity, 1 - allow only for "
+                "boundary cores to steal across NUMA domains, 2 - "
+                "no cross boundary stealing is allowed (default value: 0)")
+        ;
+
+        all_options.emplace(options_type::config_options,
+            "HPX configuration options");
+        all_options[options_type::config_options].add_options()
+            ("hpx:app-config", value<std::string>(),
+                "load the specified application configuration (ini) file")
+            ("hpx:config", value<std::string>()->default_value(""),
+                "load the specified hpx configuration (ini) file")
+            ("hpx:ini", value<std::vector<std::string> >()->composing(),
+                "add a configuration definition to the default runtime "
+                "configuration")
+            ("hpx:exit", "exit after configuring the runtime")
+        ;
+
+        all_options.emplace(options_type::debugging_options,
+            "HPX debugging options");
+        all_options[options_type::debugging_options].add_options()
+            ("hpx:dump-config-initial", "print the initial runtime configuration")
+            ("hpx:dump-config", "print the final runtime configuration")
+            // enable debug output from command line handling
+            ("hpx:debug-clp", "debug command line processing")
+#if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)
+            ("hpx:attach-debugger",
+                value<std::string>()->implicit_value("startup"),
+                "wait for a debugger to be attached, possible values: "
+                "off, startup, exception or test-failure (default: startup)")
+#endif
+            ("hpx:debug-hpx-log", value<std::string>()->implicit_value("cout"),
+                "enable all messages on the HPX log channel and send all "
+                "HPX logs to the target destination")
+            ("hpx:debug-timing-log", value<std::string>()->implicit_value("cout"),
+                "enable all messages on the timing log channel and send all "
+                "timing logs to the target destination")
+            ("hpx:debug-app-log", value<std::string>()->implicit_value("cout"),
+                "enable all messages on the application log channel and send all "
+                "application logs to the target destination")
+        ;
+
+        all_options[options_type::hidden_options].add_options()
+            ("hpx:ignore", "this option will be silently ignored")
+        ;
+        // clang-format on
+
+        return all_options;
+    }
+
+    void compose_all_options(
+        hpx::program_options::options_description const& app_options,
+        options_map& all_options)
+    {
+        // construct the overall options description and parse the command line
+        all_options.emplace(options_type::desc_cmdline,
+            "All HPX options allowed on the command line");
+
+        all_options[options_type::desc_cmdline]
+            .add(app_options)
+            .add(all_options[options_type::commandline_options])
+            .add(all_options[options_type::hpx_options])
+            .add(all_options[options_type::config_options])
+            .add(all_options[options_type::debugging_options])
+            .add(all_options[options_type::hidden_options]);
+
+        all_options.emplace(options_type::desc_cfgfile,
+            "All HPX options allowed in configuration files");
+
+        all_options[options_type::desc_cfgfile]
+            .add(app_options)
+            .add(all_options[options_type::hpx_options])
+            .add(all_options[options_type::config_options])
+            .add(all_options[options_type::debugging_options])
+            .add(all_options[options_type::hidden_options]);
+    }
+
+    bool parse_commandline(util::section const& rtcfg,
+        hpx::program_options::options_description const& app_options,
+        std::string const& arg0, std::vector<std::string> const& args,
+        hpx::program_options::variables_map& vm, int error_mode,
+        hpx::program_options::options_description* visible,
+        std::vector<std::string>* unregistered_options)
+    {
+        try
+        {
+            options_map all_options = compose_local_options();
+
+            compose_all_options(app_options, all_options);
+
+            bool result = parse_commandline(rtcfg, all_options, app_options,
+                args, vm, error_mode, visible, unregistered_options);
+
+            handle_generic_config_options(arg0, vm,
+                all_options[options_type::desc_cfgfile], rtcfg, error_mode);
+            handle_config_options(
+                vm, all_options[options_type::desc_cfgfile], rtcfg, error_mode);
+
+            return result;
+        }
+        catch (std::exception const& e)
+        {
+            if (error_mode & util::rethrow_on_error)
+                throw;
+
+            std::cerr << "hpx::init: exception caught: " << e.what()
+                      << std::endl;
+        }
+        return false;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
         std::string extract_arg0(std::string const& cmdline)
         {
             std::string::size_type p = cmdline.find_first_of(" \t");
@@ -556,14 +619,12 @@ namespace hpx { namespace local { namespace detail {
             }
             return cmdline;
         }
-    }
+    }    // namespace detail
 
-    bool parse_commandline(
-        util::section const& rtcfg,
+    bool parse_commandline(util::section const& rtcfg,
         hpx::program_options::options_description const& app_options,
         std::string const& cmdline, hpx::program_options::variables_map& vm,
-        int error_mode,
-        hpx::program_options::options_description* visible,
+        int error_mode, hpx::program_options::options_description* visible,
         std::vector<std::string>* unregistered_options)
     {
         using namespace hpx::program_options;
@@ -573,8 +634,8 @@ namespace hpx { namespace local { namespace detail {
         std::vector<std::string> args = split_unix(cmdline);
 #endif
         return parse_commandline(rtcfg, app_options,
-            detail::extract_arg0(cmdline), args, vm, error_mode,
-            visible, unregistered_options);
+            detail::extract_arg0(cmdline), args, vm, error_mode, visible,
+            unregistered_options);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -587,36 +648,39 @@ namespace hpx { namespace local { namespace detail {
         return s;
     }
 
-    void add_as_option(std::string& command_line, std::string const& k,
-        std::string const& v)
+    void add_as_option(
+        std::string& command_line, std::string const& k, std::string const& v)
     {
         command_line += "--" + k;
         if (!v.empty())
             command_line += "=" + v;
     }
 
-    std::string
-    reconstruct_command_line(hpx::program_options::variables_map const &vm)
+    std::string reconstruct_command_line(
+        hpx::program_options::variables_map const& vm)
     {
         std::string command_line;
         for (auto const& v : vm)
         {
             hpx::program_options::any const& value = v.second.value();
-            if (hpx::program_options::any_cast<std::string>(&value)) {
+            if (hpx::program_options::any_cast<std::string>(&value))
+            {
                 add_as_option(command_line, v.first,
                     embed_in_quotes(v.second.as<std::string>()));
                 if (!command_line.empty())
                     command_line += " ";
             }
-            else if (hpx::program_options::any_cast<double>(&value)) {
+            else if (hpx::program_options::any_cast<double>(&value))
+            {
                 add_as_option(command_line, v.first,
                     std::to_string(v.second.as<double>()));
                 if (!command_line.empty())
                     command_line += " ";
             }
-            else if (hpx::program_options::any_cast<int>(&value)) {
-                add_as_option(command_line, v.first,
-                    std::to_string(v.second.as<int>()));
+            else if (hpx::program_options::any_cast<int>(&value))
+            {
+                add_as_option(
+                    command_line, v.first, std::to_string(v.second.as<int>()));
                 if (!command_line.empty())
                     command_line += " ";
             }
@@ -634,4 +698,4 @@ namespace hpx { namespace local { namespace detail {
         }
         return command_line;
     }
-}}}
+}}}    // namespace hpx::local::detail

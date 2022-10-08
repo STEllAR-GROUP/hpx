@@ -15,6 +15,7 @@ set(example_programs
     fibonacci_futures
     fibonacci_local
     file_serialization
+    hello_world_3
     latch_local
     local_channel_docs
     local_channel

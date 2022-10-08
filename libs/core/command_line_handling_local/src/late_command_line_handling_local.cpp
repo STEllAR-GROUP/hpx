@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,6 +33,78 @@ namespace hpx { namespace local { namespace detail {
         return str;
     }
 
+    void set_unknown_commandline_options(util::runtime_configuration& ini,
+        std::vector<std::string> const& still_unregistered_options)
+    {
+        std::string still_unknown_commandline;
+        for (std::size_t i = 1; i < still_unregistered_options.size(); ++i)
+        {
+            if (i != 1)
+            {
+                still_unknown_commandline += " ";
+            }
+            still_unknown_commandline +=
+                util::detail::enquote(still_unregistered_options[i]);
+        }
+
+        if (!still_unknown_commandline.empty())
+        {
+            util::section* s = ini.get_section("hpx");
+            HPX_ASSERT(s != nullptr);
+            s->add_entry("unknown_cmd_line_option", still_unknown_commandline);
+        }
+    }
+
+    bool handle_full_help(util::runtime_configuration& ini,
+        hpx::program_options::options_description const& options)
+    {
+        std::string fullhelp(ini.get_entry("hpx.cmd_line_help", ""));
+        if (!fullhelp.empty())
+        {
+            std::string help_option(
+                ini.get_entry("hpx.cmd_line_help_option", ""));
+            if (0 == std::string("full").find(help_option))
+            {
+                std::cout << decode_string(fullhelp);
+                std::cout << options << std::endl;
+            }
+            else
+            {
+                throw hpx::detail::command_line_error(
+                    "unknown help option: " + help_option);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    std::string get_full_commandline(util::runtime_configuration& ini)
+    {
+        return ini.get_entry("hpx.commandline.command", "") + " " +
+            ini.get_entry("hpx.commandline.prepend_options", "") +
+            ini.get_entry("hpx.commandline.options", "") +
+            ini.get_entry("hpx.commandline.config_options", "");
+    }
+
+    bool handle_late_options(util::runtime_configuration& ini,
+        hpx::program_options::variables_map& vm,
+        void (*handle_print_bind)(std::size_t))
+    {
+        if (vm.count("hpx:print-bind"))
+        {
+            std::size_t num_threads = hpx::util::from_string<std::size_t>(
+                ini.get_entry("hpx.os_threads", 1));
+            handle_print_bind(num_threads);
+        }
+
+        if (vm.count("hpx:exit"))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     int handle_late_commandline_options(util::runtime_configuration& ini,
         hpx::program_options::options_description const& options,
         void (*handle_print_bind)(std::size_t))
@@ -44,84 +116,38 @@ namespace hpx { namespace local { namespace detail {
                 ini.get_entry("hpx.unknown_cmd_line", ""));
             if (!unknown_cmd_line.empty())
             {
-                std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
-                hpx::program_options::variables_map vm;
-
                 util::commandline_error_mode mode = util::rethrow_on_error;
                 std::string allow_unknown(
                     ini.get_entry("hpx.commandline.allow_unknown", "0"));
                 if (allow_unknown != "0")
                     mode = util::allow_unregistered;
 
+                hpx::program_options::variables_map vm;
                 std::vector<std::string> still_unregistered_options;
                 parse_commandline(ini, options, unknown_cmd_line, vm, mode,
                     nullptr, &still_unregistered_options);
 
-                std::string still_unknown_commandline;
-                for (std::size_t i = 1; i < still_unregistered_options.size();
-                     ++i)
-                {
-                    if (i != 1)
-                    {
-                        still_unknown_commandline += " ";
-                    }
-                    still_unknown_commandline +=
-                        util::detail::enquote(still_unregistered_options[i]);
-                }
-
-                if (!still_unknown_commandline.empty())
-                {
-                    util::section* s = ini.get_section("hpx");
-                    HPX_ASSERT(s != nullptr);
-                    s->add_entry(
-                        "unknown_cmd_line_option", still_unknown_commandline);
-                }
+                set_unknown_commandline_options(
+                    ini, still_unregistered_options);
             }
 
-            std::string fullhelp(ini.get_entry("hpx.cmd_line_help", ""));
-            if (!fullhelp.empty())
+            if (handle_full_help(ini, options))
             {
-                std::string help_option(
-                    ini.get_entry("hpx.cmd_line_help_option", ""));
-                if (0 == std::string("full").find(help_option))
-                {
-                    std::cout << decode_string(fullhelp);
-                    std::cout << options << std::endl;
-                }
-                else
-                {
-                    throw hpx::detail::command_line_error(
-                        "unknown help option: " + help_option);
-                }
                 return 1;
             }
 
             // secondary command line handling, looking for --exit and other
             // options
-            std::string cmd_line =
-                ini.get_entry("hpx.commandline.command", "") + " " +
-                ini.get_entry("hpx.commandline.prepend_options", "") +
-                ini.get_entry("hpx.commandline.options", "") +
-                ini.get_entry("hpx.commandline.config_options", "");
-
+            std::string cmd_line(get_full_commandline(ini));
             if (!cmd_line.empty())
             {
-                std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
                 hpx::program_options::variables_map vm;
 
                 parse_commandline(ini, options, cmd_line, vm,
                     util::allow_unregistered |
                         util::report_missing_config_file);
 
-                if (vm.count("hpx:print-bind"))
-                {
-                    std::size_t num_threads =
-                        hpx::util::from_string<std::size_t>(
-                            ini.get_entry("hpx.os_threads", 1));
-                    handle_print_bind(num_threads);
-                }
-
-                if (vm.count("hpx:exit"))
+                if (handle_late_options(ini, vm, handle_print_bind))
                 {
                     return 1;
                 }
@@ -129,8 +155,9 @@ namespace hpx { namespace local { namespace detail {
         }
         catch (std::exception const& e)
         {
-            std::cerr << "handle_late_commandline_options: "
-                      << "command line processing: " << e.what() << std::endl;
+            std::cerr
+                << "handle_late_commandline_options: command line processing: "
+                << e.what() << std::endl;
             return -1;
         }
 
