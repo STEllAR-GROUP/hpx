@@ -103,6 +103,14 @@ macro(hpx_setup_lci)
         PATTERN "*.h"
       )
 
+      install(
+        DIRECTORY ${lci_BINARY_DIR}/include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT core
+        FILES_MATCHING
+        PATTERN "*.h"
+      )
+
       export(
         TARGETS LCI
         NAMESPACE LCI::

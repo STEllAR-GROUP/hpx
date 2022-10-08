@@ -1104,7 +1104,7 @@ if(HPX_WITH_NETWORKING)
     ADVANCED
   )
   hpx_option(
-    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "v1.7.1"
+    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "iovec"
     CATEGORY "Build Targets"
     ADVANCED
   )
