@@ -10,6 +10,27 @@
 
 #pragma once
 
+#if defined(DOXYGEN)
+namespace hpx {
+    // clang-format off
+
+    /// \brief Constructs a tuple that is a concatenation of all tuples in \c tuples.
+    ///        The behavior is undefined if any type in \c std::decay_t<Tuples>...
+    ///        is not a specialization of \c hpx::tuple. However, an implementation
+    ///        may choose to support types (such as \c std::array and \c std::pair)
+    ///        that follow the tuple-like protocol.
+    ///
+    /// \param tuples - zero or more tuples to concatenate
+    ///
+    /// \returns hpx::tuple object composed of all elements of all argument tuples
+    ///          constructed from \c hpx::get<Is>(HPX_FORWARD(UTuple,t) for each
+    ///          individual element.
+    template <typename... Tuples>
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(Tuples&&... tuples);
+    // clang-format on
+}    // namespace hpx
+#else
+
 #include <hpx/config.hpp>
 #include <hpx/datastructures/config/defines.hpp>
 #include <hpx/datastructures/member_pack.hpp>
@@ -1062,3 +1083,5 @@ namespace hpx {
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
+
+#endif //DOXYGEN
