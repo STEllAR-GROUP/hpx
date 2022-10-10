@@ -79,9 +79,9 @@ namespace hpx { namespace ranges {
     ///
     template <typename InIter, typename Sent, typename OutIter,
         typename Op = std::plus<typename
-        std::iterator_traits<InIter>::value_type>
-    inclusive_scan_result<InIter, OutIter> inclusive_scan(
-        InIter first, Sent last, OutIter dest, Op&& op);
+        std::iterator_traits<InIter>::value_type>>
+    inclusive_scan_result<InIter, OutIter>
+    inclusive_scan(InIter first, Sent last, OutIter dest, Op&& op);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
@@ -385,8 +385,8 @@ namespace hpx { namespace ranges {
     template <typename InIter, typename Sent, typename OutIter,
         typename Op,
         typename T = typename std::iterator_traits<InIter>::value_type>
-    inclusive_scan_result<InIter, OutIter> inclusive_scan(
-        InIter first, Sent last, OutIter dest, Op&& op, T init);
+    inclusive_scan_result<InIter, OutIter>
+    inclusive_scan(InIter first, Sent last, OutIter dest, Op&& op, T init);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Assigns through each iterator \a i in [result, result + (last - first))
@@ -545,7 +545,7 @@ namespace hpx { namespace ranges {
     template <typename Rng, typename O,
         typename Op,
         typename T = typename std::iterator_traits<
-            hpx::traits::range_iterator_t<Rng>>::value_type,>
+            hpx::traits::range_iterator_t<Rng>>::value_type>
     inclusive_scan_result<hpx::traits::range_iterator_t<Rng>, O> inclusive_scan(
         Rng&& rng, O dest, Op&& op, T init);
 
