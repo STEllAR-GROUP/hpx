@@ -262,6 +262,11 @@ namespace hpx::execution::experimental {
         template <>
         struct dependent_completion_signatures<no_env>
         {
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+            bool await_ready();
+            void await_suspend(const hpx::coro::coroutine_handle<no_env>&);
+            dependent_completion_signatures<no_env> await_resume();
+#endif
         };
     }    // namespace detail
 

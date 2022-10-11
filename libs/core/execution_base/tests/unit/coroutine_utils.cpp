@@ -49,6 +49,59 @@ struct promise
     void unhandled_exception() {}
 };
 
+template <typename Awaiter>
+struct awaitable_sender_1
+{
+    Awaiter operator co_await();
+};
+
+struct awaiter
+{
+    bool await_ready()
+    {
+        return true;
+    }
+    bool await_suspend(hpx::coro::coroutine_handle<>)
+    {
+        return false;
+    }
+    bool await_resume()
+    {
+        return false;
+    }
+};
+
+using dependent = hpx::execution::experimental::dependent_completion_signatures<
+    hpx::execution::experimental::no_env>;
+
+struct recv_set_value
+{
+    friend void tag_invoke(hpx::execution::experimental::set_value_t,
+        recv_set_value,
+        decltype(std::declval<dependent>().await_ready())) noexcept
+    {
+    }
+    friend void tag_invoke(
+        hpx::execution::experimental::set_stopped_t, recv_set_value) noexcept
+    {
+    }
+    friend void tag_invoke(hpx::execution::experimental::set_error_t,
+        recv_set_value, std::exception_ptr) noexcept
+    {
+    }
+    friend dependent tag_invoke(
+        hpx::execution::experimental::get_env_t, const recv_set_value&) noexcept
+    {
+        return {};
+    }
+};
+
+template <class T>
+T& unmove(T&& t)
+{
+    return t;
+}
+
 template <typename S1, typename S2,
     typename = std::enable_if_t<hpx::execution::experimental::is_sender_v<S1> &&
         hpx::execution::experimental::is_sender_v<S2>>>
@@ -72,6 +125,57 @@ int main()
             std::is_same_v<single_sender_value_t<non_awaitable_sender<
                                decltype(signature_all(std::exception_ptr()))>>,
                 void>);
+    }
+
+    // single sender value
+    {
+        static_assert(
+            std::is_same_v<single_sender_value_t<awaitable_sender_1<awaiter>>,
+                bool>);
+        static_assert(std::is_same_v<
+            single_sender_value_t<awaitable_sender_1<std::suspend_always>>,
+            void>);
+    }
+
+    // connect awaitable
+    {
+        static_assert(std::is_same_v<decltype(connect_awaitable(
+                                         awaitable_sender_1<awaiter>{},
+                                         recv_set_value{})),
+            operation_t<recv_set_value>>);
+
+        static_assert(
+            std::is_same_v<decltype(connect(awaitable_sender_1<awaiter>{},
+                               recv_set_value{})),
+                operation_t<recv_set_value>>);
+    }
+
+    // Promise base
+    {
+        static_assert(is_awaitable_v<awaitable_sender_1<awaiter>,
+            promise_t<recv_set_value>>);
+    }
+
+    // Operation base
+    {
+        static_assert(is_operation_state_v<operation_t<recv_set_value>>);
+    }
+
+    // Connect result type
+    {
+        static_assert(std::is_same_v<
+            connect_result_t<awaitable_sender_1<awaiter>, recv_set_value>,
+            operation_t<recv_set_value>>);
+    }
+
+    // As awaitable
+    {
+        static_assert(is_awaitable_v<decltype(as_awaitable(
+                awaitable_sender_1<awaiter>{}, unmove(::promise{})))>);
+        static_assert(
+            std::is_same_v<decltype(as_awaitable(awaitable_sender_1<awaiter>{},
+                               unmove(::promise{}))),
+                awaitable_sender_1<awaiter>&&>);
     }
 
     try
