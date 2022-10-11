@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/resiliency/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/resiliency/resiliency_cpos.hpp>
 #include <hpx/resiliency/util.hpp>
 
@@ -63,8 +64,9 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                     std::exception_ptr ex;
 
-                    for (auto&& f : HPX_MOVE(results))
+                    for (auto& f : results)
                     {
+                        HPX_ASSERT(f.is_ready());
                         if (f.has_exception())
                         {
                             // rethrow abort_replicate_exception, if caught

@@ -90,12 +90,14 @@ add_hpx_module(
   HEADERS ${executors_headers}
   COMPAT_HEADERS ${executors_compat_headers}
   MODULE_DEPENDENCIES
+    hpx_allocator_support
     hpx_async_base
     hpx_concepts
     hpx_config
     hpx_errors
     hpx_execution
     hpx_format
+    hpx_functional
     hpx_futures
     hpx_hardware
     hpx_io_service
