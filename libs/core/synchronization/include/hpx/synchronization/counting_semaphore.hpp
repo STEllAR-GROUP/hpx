@@ -143,7 +143,7 @@ namespace hpx {
 
         ///
         /// \brief Tries to atomically decrement the internal counter by 1
-        ///        if it is greater than 0​; no blocking occurs regardless.
+        ///        if it is greater than 0; no blocking occurs regardless.
         ///
         /// \return \a true if it decremented the internal counter,
         ///         otherwise \a false
@@ -164,8 +164,8 @@ namespace hpx {
 
         ///
         /// \brief Tries to atomically decrement the internal counter by 1
-        ///        if it is greater than ​0; otherwise blocks until it is
-        ///        greater than ​0 and can successfully decrement the
+        ///        if it is greater than 0; otherwise blocks until it is
+        ///        greater than 0 and can successfully decrement the
         ///        internal counter, or the \a abs_time time point has been
         ///        passed.
         ///
@@ -181,8 +181,8 @@ namespace hpx {
 
         ///
         /// \brief Tries to atomically decrement the internal counter by 1
-        ///        if it is greater than ​0; otherwise blocks until it is
-        ///        greater than ​0 and can successfully decrement the
+        ///        if it is greater than 0; otherwise blocks until it is
+        ///        greater than 0 and can successfully decrement the
         ///        internal counter, or the \a rel_time duration has been
         ///        exceeded.
         ///
