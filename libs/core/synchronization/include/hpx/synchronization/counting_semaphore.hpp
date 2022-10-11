@@ -556,7 +556,7 @@ namespace hpx::lcos::local {
         "hpx::counting_semaphore_var<> instead") =
         hpx::counting_semaphore_var<>;
 }    // namespace hpx::lcos::local
-/// \endcond
+     /// \endcond
 
 #endif
 
