@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config/coroutines_support.hpp>
+#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/queries/get_stop_token.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/coroutine_utils.hpp>
@@ -231,7 +232,7 @@ using awaiter_context_t = typename hpx::execution::experimental::env_of_t<
 ////////////////////////////////////////////////////////////////////////////////
 // In a base class so it can be specialized when T is void:
 template <typename T>
-struct _promise_base
+struct promise_base
 {
     void return_value(T value) noexcept
     {
@@ -241,7 +242,7 @@ struct _promise_base
 };
 
 template <>
-struct _promise_base<void>
+struct promise_base<void>
 {
     struct _void
     {
@@ -252,6 +253,23 @@ struct _promise_base<void>
     }
     std::variant<std::monostate, _void, std::exception_ptr> data_{};
 };
+
+HPX_HAS_MEMBER_XXX_TRAIT_DEF(stop_requested)
+
+template <typename T>
+struct stop_requested_ret_bool
+  : std::integral_constant<bool,
+        std::is_same_v<decltype(std::declval<T>().stop_requested()), bool>>
+{
+};
+
+template <typename T, typename = void>
+inline constexpr bool stop_requested_ret_bool_v = false;
+
+template <typename T>
+inline constexpr bool
+    stop_requested_ret_bool_v<T, std::enable_if_t<has_stop_requested_v<T>>> =
+        stop_requested_ret_bool<T>::value;
 
 ////////////////////////////////////////////////////////////////////////////////
 // basic_task
@@ -275,7 +293,7 @@ public:
     }
 
 private:
-    struct _final_awaitable
+    struct final_awaitable
     {
         static std::false_type await_ready() noexcept
         {
@@ -290,7 +308,7 @@ private:
     };
 
     struct _promise
-      : _promise_base<T>
+      : promise_base<T>
       , hpx::execution::experimental::with_awaitable_senders<_promise>
     {
         basic_task get_return_object() noexcept
@@ -302,7 +320,7 @@ private:
         {
             return {};
         }
-        _final_awaitable final_suspend() noexcept
+        final_awaitable final_suspend() noexcept
         {
             return {};
         }
@@ -310,18 +328,18 @@ private:
         {
             this->data_.template emplace<2>(std::current_exception());
         }
-        using _context_t =
+        using context_t =
             typename Context::template promise_context_t<_promise>;
-        friend _context_t tag_invoke(
+        friend context_t tag_invoke(
             hpx::execution::experimental::get_env_t, const _promise& self)
         {
             return self.context_;
         }
-        _context_t context_;
+        context_t context_;
     };
 
     template <typename ParentPromise = void>
-    struct _task_awaitable
+    struct task_awaitable
     {
         hpx::coro::coroutine_handle<_promise> coro_;
         std::optional<awaiter_context_t<_promise, ParentPromise>> context_{};
@@ -338,9 +356,7 @@ private:
                 hpx::meta::one_of<ParentPromise, ParentPromise2, void>::value);
             coro_.promise().set_continuation(parent);
             context_.emplace(coro_.promise().context_, parent.promise());
-            if constexpr (requires {
-                              coro_.promise().stop_requested() ? 0 : 1;
-                          })
+            if constexpr (stop_requested_ret_bool_v<decltype(coro_.promise())>)
             {
                 if (coro_.promise().stop_requested())
                     return parent.promise().unhandled_stopped();
@@ -362,25 +378,25 @@ private:
 
     // Make this task awaitable within a particular context:
     template <typename ParentPromise>
-    friend _task_awaitable<ParentPromise> tag_invoke(
+    friend task_awaitable<ParentPromise> tag_invoke(
         hpx::execution::experimental::as_awaitable_t, basic_task&& self,
         ParentPromise&) noexcept
     {
-        return _task_awaitable<ParentPromise>{std::exchange(self.coro_, {})};
+        return task_awaitable<ParentPromise>{std::exchange(self.coro_, {})};
     }
 
     // Make this task generally awaitable:
-    friend _task_awaitable<> operator co_await(basic_task&& self) noexcept
+    friend task_awaitable<> operator co_await(basic_task&& self) noexcept
     {
         static_assert(well_formed<awaiter_context_t, _promise>);
-        return _task_awaitable<>{std::exchange(self.coro_, {})};
+        return task_awaitable<>{std::exchange(self.coro_, {})};
     }
 
     // Specify basic_task's completion signatures
     //   This is only necessary when basic_task is not generally awaitable
     //   owing to constraints imposed by its Context parameter.
     template <typename... Ts>
-    using _task_traits_t = hpx::execution::experimental::completion_signatures<
+    using task_traits_t = hpx::execution::experimental::completion_signatures<
         hpx::execution::experimental::set_value_t(Ts...),
         hpx::execution::experimental::set_error_t(std::exception_ptr),
         hpx::execution::experimental::set_stopped_t()>;
@@ -388,7 +404,7 @@ private:
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
         const basic_task&, auto) -> std::conditional_t<std::is_void_v<T>,
-        _task_traits_t<>, _task_traits_t<T>>;
+        task_traits_t<>, task_traits_t<T>>;
 
     explicit basic_task(
         hpx::coro::coroutine_handle<promise_type> __coro) noexcept
