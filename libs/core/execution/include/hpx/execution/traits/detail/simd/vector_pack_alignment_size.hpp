@@ -9,17 +9,18 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DATAPAR_STD_EXPERIMENTAL_SIMD)
+#if defined(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
+
+#include <hpx/execution/traits/detail/simd/vector_pack_simd.hpp>
+
 #include <cstddef>
 #include <type_traits>
-
-#include <experimental/simd>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct is_vector_pack<std::experimental::native_simd<T>> : std::true_type
+    struct is_vector_pack<datapar::experimental::native_simd<T>> : std::true_type
     {
     };
 
@@ -30,7 +31,7 @@ namespace hpx { namespace parallel { namespace traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct is_scalar_vector_pack<std::experimental::native_simd<T>>
+    struct is_scalar_vector_pack<datapar::experimental::native_simd<T>>
       : std::false_type
     {
     };
@@ -48,10 +49,10 @@ namespace hpx { namespace parallel { namespace traits {
     };
 
     template <typename T, typename Abi>
-    struct vector_pack_alignment<std::experimental::simd<T, Abi>>
+    struct vector_pack_alignment<datapar::experimental::simd<T, Abi>>
     {
-        static std::size_t const value = std::experimental::memory_alignment_v<
-            std::experimental::simd<T, Abi>>;
+        static std::size_t const value = datapar::experimental::memory_alignment_v<
+            datapar::experimental::simd<T, Abi>>;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -62,10 +63,10 @@ namespace hpx { namespace parallel { namespace traits {
     };
 
     template <typename T, typename Abi>
-    struct vector_pack_size<std::experimental::simd<T, Abi>>
+    struct vector_pack_size<datapar::experimental::simd<T, Abi>>
     {
         static std::size_t const value =
-            std::experimental::simd<T, Abi>::size();
+            datapar::experimental::simd<T, Abi>::size();
     };
 }}}    // namespace hpx::parallel::traits
 

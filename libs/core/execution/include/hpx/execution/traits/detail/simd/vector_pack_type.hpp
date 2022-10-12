@@ -9,9 +9,9 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DATAPAR_STD_EXPERIMENTAL_SIMD)
+#if defined(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
 
-#include <experimental/simd>
+#include <hpx/execution/traits/detail/simd/vector_pack_simd.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -23,16 +23,16 @@ namespace hpx { namespace parallel { namespace traits {
         template <typename T, std::size_t N, typename Abi>
         struct vector_pack_type
         {
-            typedef std::experimental::fixed_size_simd<T, N> type;
+            typedef datapar::experimental::fixed_size_simd<T, N> type;
         };
 
         template <typename T, typename Abi>
         struct vector_pack_type<T, 0, Abi>
         {
             typedef typename std::conditional<std::is_void<Abi>::value,
-                std::experimental::simd_abi::native<T>, Abi>::type abi_type;
+                datapar::experimental::native<T>, Abi>::type abi_type;
 
-            typedef std::experimental::simd<T, abi_type> type;
+            typedef datapar::experimental::simd<T, abi_type> type;
         };
 
         template <typename T, typename Abi>
@@ -51,7 +51,7 @@ namespace hpx { namespace parallel { namespace traits {
     ////////////////////////////////////////////////////////////////////
     template <typename T>
     struct vector_pack_mask_type<T,
-        typename std::enable_if_t<std::experimental::is_simd_v<T>>>
+        typename std::enable_if_t<datapar::experimental::is_simd_v<T>>>
     {
         using type = T::mask_type;
     };

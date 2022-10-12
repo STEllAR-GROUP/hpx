@@ -9,18 +9,19 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DATAPAR_STD_EXPERIMENTAL_SIMD)
-#include <cstddef>
+#if defined(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
 
-#include <experimental/simd>
+#include <hpx/execution/traits/detail/simd/vector_pack_simd.hpp>
+
+#include <cstddef>
 
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(
-        std::experimental::simd_mask<T, Abi> const& mask)
+        datapar::experimental::simd_mask<T, Abi> const& mask)
     {
-        return std::experimental::popcount(mask);
+        return datapar::experimental::popcount(mask);
     }
 }}}    // namespace hpx::parallel::traits
 
