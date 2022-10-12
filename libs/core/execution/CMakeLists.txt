@@ -73,6 +73,7 @@ set(execution_headers
     hpx/execution/traits/detail/simd/vector_pack_get_set.hpp
     hpx/execution/traits/detail/simd/vector_pack_load_store.hpp
     hpx/execution/traits/detail/simd/vector_pack_reduce.hpp
+    hpx/execution/traits/detail/simd/vector_pack_simd.hpp
     hpx/execution/traits/detail/simd/vector_pack_type.hpp
     hpx/execution/traits/detail/vc/vector_pack_alignment_size.hpp
     hpx/execution/traits/detail/vc/vector_pack_all_any_none.hpp
