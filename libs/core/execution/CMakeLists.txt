@@ -142,6 +142,10 @@ if(TARGET Eve::eve)
   set(execution_optional_dependencies Eve::eve)
 endif()
 
+if(TARGET SVE::sve)
+  set(execution_optional_dependencies SVE::sve)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   core execution
