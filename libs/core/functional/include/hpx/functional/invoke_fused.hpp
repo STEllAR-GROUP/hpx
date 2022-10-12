@@ -55,6 +55,10 @@ namespace hpx::util {
         {
         };
 
+        template <typename F, typename Tuple>
+        using invoke_fused_result_t =
+            typename invoke_fused_result<F, Tuple>::type;
+
         ///////////////////////////////////////////////////////////////////////
         template <std::size_t... Is, typename F, typename Tuple>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE

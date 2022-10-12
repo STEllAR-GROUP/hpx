@@ -20,6 +20,7 @@ function(add_hpx_module libname modulename)
       MODULE_DEPENDENCIES
       CMAKE_SUBDIRS
       EXCLUDE_FROM_GLOBAL_HEADER
+      ADD_TO_GLOBAL_HEADER
   )
   cmake_parse_arguments(
     ${modulename} "${options}" "${one_value_args}" "${multi_value_args}"
@@ -143,7 +144,8 @@ function(add_hpx_module libname modulename)
     foreach(header_file ${${modulename}_HEADERS})
       # Exclude the files specified
       if((NOT (${header_file} IN_LIST ${modulename}_EXCLUDE_FROM_GLOBAL_HEADER))
-         AND (NOT ("${header_file}" MATCHES "detail"))
+         AND (NOT ("${header_file}" MATCHES "detail")
+              OR ${header_file} IN_LIST ${modulename}_ADD_TO_GLOBAL_HEADER)
       )
         set(module_headers "${module_headers}#include <${header_file}>\n")
       endif()
