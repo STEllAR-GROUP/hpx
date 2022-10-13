@@ -8,6 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_base/dataflow.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -540,4 +542,29 @@ namespace hpx::execution::experimental {
     {
     } transfer_when_all_with_variant{};
 
+    // the following enables directly using dataflow() with senders
+
+    template <typename F, typename Sender, typename... Senders>
+    constexpr HPX_FORCEINLINE auto tag_invoke(
+        hpx::detail::dataflow_t, F&& f, Sender&& sender, Senders&&... senders)
+        -> decltype(then(when_all(HPX_FORWARD(Sender, sender),
+                             HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f)))
+    {
+        return then(when_all(HPX_FORWARD(Sender, sender),
+                        HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f));
+    }
+
+    template <typename F, typename Sender, typename... Senders>
+    constexpr HPX_FORCEINLINE auto tag_invoke(hpx::detail::dataflow_t,
+        hpx::launch, F&& f, Sender&& sender, Senders&&... senders)
+        -> decltype(then(when_all(HPX_FORWARD(Sender, sender),
+                             HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f)))
+    {
+        return then(when_all(HPX_FORWARD(Sender, sender),
+                        HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f));
+    }
 }    // namespace hpx::execution::experimental

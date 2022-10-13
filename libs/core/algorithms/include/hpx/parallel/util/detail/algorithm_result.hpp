@@ -11,6 +11,7 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/sync_wait.hpp>
+#include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy_fwd.hpp>
 #include <hpx/functional/detail/invoke.hpp>
@@ -152,7 +153,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             {
                 namespace tt = hpx::this_thread::experimental;
                 auto result = tt::sync_wait(HPX_FORWARD(T_, t));
-                return hpx::get<0>(*result);
+                if constexpr (hpx::tuple_size_v<
+                                  std::decay_t<decltype(*result)>> == 0)
+                {
+                    return;
+                }
+                else
+                {
+                    return hpx::get<0>(*result);
+                }
             }
             else
             {
@@ -206,6 +215,29 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
     };
 
+    template <typename ExPolicy>
+    struct algorithm_result_impl<ExPolicy, void,
+        std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
+            hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
+    {
+        // The return type of the initiating function.
+        using type = void;
+
+        template <typename T_>
+        static constexpr auto get(T_&& t)
+        {
+            namespace ex = hpx::execution::experimental;
+            if constexpr (ex::is_sender_v<T_>)
+            {
+                return HPX_FORWARD(T_, t);
+            }
+            else
+            {
+                return ex::just(HPX_FORWARD(T_, t));
+            }
+        }
+    };
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename T = void>
     struct algorithm_result : algorithm_result_impl<std::decay_t<ExPolicy>, T>
@@ -218,12 +250,31 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     using algorithm_result_t = typename algorithm_result<ExPolicy, T>::type;
 
     ///////////////////////////////////////////////////////////////////////////
+    // clang-format off
     template <typename U, typename Conv,
-        HPX_CONCEPT_REQUIRES_(hpx::is_invocable_v<Conv, U>)>
+        HPX_CONCEPT_REQUIRES_(
+           !hpx::execution::experimental::is_sender_v<U> &&
+            hpx::is_invocable_v<Conv, U>
+        )>
+    // clang-format on
     constexpr hpx::util::invoke_result_t<Conv, U> convert_to_result(
         U&& val, Conv&& conv)
     {
         return HPX_INVOKE(conv, val);
+    }
+
+    // clang-format off
+    template <typename Sender, typename Conv,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_sender_v<Sender>
+        )>
+    // clang-format on
+    constexpr decltype(auto) convert_to_result(Sender&& sender, Conv&& conv)
+    {
+        return hpx::execution::experimental::then(HPX_FORWARD(Sender, sender),
+            [conv = HPX_FORWARD(Conv, conv)](auto&& value) mutable {
+                return HPX_INVOKE(conv, HPX_FORWARD(decltype(value), value));
+            });
     }
 
     template <typename U, typename Conv,

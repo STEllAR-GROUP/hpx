@@ -106,8 +106,10 @@ set(tests
     replace_copy_if
     reverse
     reverse_copy
+    reverse_sender
     rotate
     rotate_copy
+    rotate_sender
     search
     searchn
     set_difference

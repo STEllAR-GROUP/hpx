@@ -16,6 +16,7 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_priority_invoke.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -225,3 +226,23 @@ namespace hpx::execution::experimental {
         }
     } then{};
 }    // namespace hpx::execution::experimental
+
+// the following enables directly using execution::then_t with futures
+namespace hpx {
+
+    template <typename Result, typename F>
+    constexpr HPX_FORCEINLINE auto tag_invoke(
+        hpx::execution::experimental::then_t, hpx::launch l,
+        hpx::future<Result>&& sender, F&& f)
+    {
+        return sender.then(l, HPX_FORWARD(F, f));
+    }
+
+    template <typename Result, typename F>
+    constexpr HPX_FORCEINLINE auto tag_invoke(
+        hpx::execution::experimental::then_t, hpx::launch l,
+        hpx::shared_future<Result> const& sender, F&& f)
+    {
+        return sender.then(l, HPX_FORWARD(F, f));
+    }
+}    // namespace hpx

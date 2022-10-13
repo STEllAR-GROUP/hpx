@@ -109,33 +109,9 @@ namespace hpx::execution::experimental {
             return *this;
         }
 
-        // support all properties exposed by the wrapped scheduler
-        // clang-format off
-        template <typename Tag, typename Property,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<
-                    Tag, BaseScheduler, Property>
-            )>
-        // clang-format on
-        friend scheduler_executor tag_invoke(
-            Tag tag, scheduler_executor const& exec, Property&& prop)
+        constexpr BaseScheduler const& sched() const noexcept
         {
-            return scheduler_executor(hpx::functional::tag_invoke(
-                tag, exec.sched_, HPX_FORWARD(Property, prop)));
-        }
-
-        // clang-format off
-        template <typename Tag,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<Tag, BaseScheduler>
-            )>
-        // clang-format on
-        friend decltype(auto) tag_invoke(
-            Tag tag, scheduler_executor const& exec)
-        {
-            return hpx::functional::tag_invoke(tag, exec.sched_);
+            return sched_;
         }
 
         // Associate the parallel_execution_tag executor tag type as a default
@@ -324,6 +300,34 @@ namespace hpx::execution::experimental {
     template <typename BaseScheduler>
     explicit scheduler_executor(BaseScheduler&& sched)
         -> scheduler_executor<std::decay_t<BaseScheduler>>;
+
+    // support all properties exposed by the wrapped scheduler
+    // clang-format off
+    template <typename Tag, typename BaseScheduler, typename Property,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
+    auto tag_invoke(
+        Tag tag, scheduler_executor<BaseScheduler> const& exec, Property&& prop)
+        -> decltype(scheduler_executor<BaseScheduler>(std::declval<Tag>()(
+            std::declval<BaseScheduler>(), std::declval<Property>())))
+    {
+        return scheduler_executor<BaseScheduler>(
+            tag(exec.sched(), HPX_FORWARD(Property, prop)));
+    }
+
+    // clang-format off
+    template <typename Tag, typename BaseScheduler,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
+    auto tag_invoke(Tag tag, scheduler_executor<BaseScheduler> const& exec)
+        -> decltype(std::declval<Tag>()(std::declval<BaseScheduler>()))
+    {
+        return tag(exec.sched());
+    }
 }    // namespace hpx::execution::experimental
 
 namespace hpx { namespace parallel { namespace execution {

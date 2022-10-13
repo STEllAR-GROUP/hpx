@@ -20,6 +20,7 @@
 
 #include <exception>
 #include <type_traits>
+#include <utility>
 
 namespace hpx::execution::experimental {
 
@@ -465,10 +466,22 @@ namespace hpx::execution::experimental {
         {
         };
 
+        template <typename Sender, typename Env, typename Enable = void>
+        struct completion_signatures_of_is_valid : std::false_type
+        {
+        };
+
+        template <typename Sender, typename Env>
+        struct completion_signatures_of_is_valid<Sender, Env,
+            std::void_t<decltype(get_completion_signatures(
+                std::declval<Sender>(), std::declval<Env>()))>> : std::true_type
+        {
+        };
+
         template <typename Sender, typename Env>
         struct provides_completion_signatures_impl<Sender, Env, true,
-            std::enable_if_t<meta::value<meta::is_valid<
-                                 completion_signatures_of, Sender, Env>> &&
+            std::enable_if_t<
+                meta::value<completion_signatures_of_is_valid<Sender, Env>> &&
                 has_sender_types_v<completion_signatures_of<Sender, Env>>>>
           : std::true_type
         {

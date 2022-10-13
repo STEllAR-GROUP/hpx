@@ -392,25 +392,25 @@ namespace hpx { namespace lcos { namespace detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    //template <typename Policy, typename Func, typename... Ts,
-    //    typename Frame = dataflow_frame<std::decay_t<Policy>,
-    //        std::decay_t<Func>, hpx::tuple<std::decay_t<Ts>...>>>
-    //typename Frame::type create_dataflow(hpx::util::internal_allocator<>,
-    //    Policy&& policy, Func&& func, Ts&&... ts)
-    //{
-    //    // Create the data that is used to construct the dataflow_frame
-    //    auto data = Frame::construct_from(
-    //        HPX_FORWARD(Policy, policy), HPX_FORWARD(Func, func));
+    template <typename Policy, typename Func, typename... Ts,
+        typename Frame = dataflow_frame<std::decay_t<Policy>,
+            std::decay_t<Func>, hpx::tuple<std::decay_t<Ts>...>>>
+    typename Frame::type create_dataflow(hpx::util::internal_allocator<>,
+        Policy&& policy, Func&& func, Ts&&... ts)
+    {
+        // Create the data that is used to construct the dataflow_frame
+        auto data = Frame::construct_from(
+            HPX_FORWARD(Policy, policy), HPX_FORWARD(Func, func));
 
-    //    // Construct the dataflow_frame and traverse the arguments
-    //    // asynchronously
-    //    hpx::intrusive_ptr<Frame> p = util::traverse_pack_async(
-    //        util::async_traverse_in_place_tag<Frame>{}, HPX_MOVE(data),
-    //        HPX_FORWARD(Ts, ts)...);
+        // Construct the dataflow_frame and traverse the arguments
+        // asynchronously
+        hpx::intrusive_ptr<Frame> p = util::traverse_pack_async(
+            util::async_traverse_in_place_tag<Frame>{}, HPX_MOVE(data),
+            HPX_FORWARD(Ts, ts)...);
 
-    //    using traits::future_access;
-    //    return future_access<typename Frame::type>::create(HPX_MOVE(p));
-    //}
+        using traits::future_access;
+        return future_access<typename Frame::type>::create(HPX_MOVE(p));
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Allocator, typename Policy, typename Func,

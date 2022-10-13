@@ -54,7 +54,7 @@ namespace hpx::execution::experimental::detail {
         friend constexpr HPX_FORCEINLINE auto operator|(
             U&& u, inject_scheduler p)
         {
-            return p.invoke(HPX_MOVE(p.scheduler), HPX_FORWARD(U, u));
+            return HPX_MOVE(p).invoke(HPX_MOVE(p.scheduler), HPX_FORWARD(U, u));
         }
     };
 }    // namespace hpx::execution::experimental::detail

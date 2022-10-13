@@ -7,9 +7,10 @@
 #include <hpx/local/execution.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/local/thread.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/container_algorithms/for_each.hpp>
+#include <hpx/parallel/algorithms/for_each.hpp>
 
 #include <algorithm>
 #include <cstddef>

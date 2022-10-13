@@ -61,7 +61,18 @@ add_hpx_module(
   HEADERS ${futures_headers}
   COMPAT_HEADERS ${futures_compat_headers}
   ADD_TO_GLOBAL_HEADER "hpx/futures/detail/future_transforms.hpp"
-  MODULE_DEPENDENCIES hpx_async_base hpx_config hpx_allocator_support hpx_errors
-                      hpx_memory hpx_synchronization
+  MODULE_DEPENDENCIES
+    hpx_allocator_support
+    hpx_assertion
+    hpx_async_base
+    hpx_concepts
+    hpx_config
+    hpx_errors
+    hpx_functional
+    hpx_memory
+    hpx_serialization
+    hpx_synchronization
+    hpx_timing
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

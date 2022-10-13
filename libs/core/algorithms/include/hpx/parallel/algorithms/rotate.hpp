@@ -184,6 +184,7 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/execution/algorithms/when_all.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -210,21 +211,21 @@ namespace hpx {
 #include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1 {
+
     ///////////////////////////////////////////////////////////////////////////
     // rotate
     namespace detail {
+
         /// \cond NOINTERNAL
         template <typename ExPolicy, typename FwdIter, typename Sent>
-        hpx::future<util::in_out_result<FwdIter, Sent>> rotate_helper(
+        decltype(auto) rotate_helper(
             ExPolicy policy, FwdIter first, FwdIter new_first, Sent last)
         {
-            using non_seq = std::false_type;
-
             std::ptrdiff_t size_left = detail::distance(first, new_first);
             std::ptrdiff_t size_right = detail::distance(new_first, last);
 
             // get number of cores currently used
-            std::size_t cores = execution::processing_units_count(
+            std::size_t cores = parallel::execution::processing_units_count(
                 policy.parameters(), policy.executor());
 
             // calculate number of cores to be used for left and right section
@@ -240,17 +241,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::size_t(1), std::size_t(partition_size_ratio * cores));
             }
 
-            // if size_right == 0 && cores == 1, cores_right = 0, should be at least 1.
+            // cores_right should be at least 1.
             std::size_t cores_right =
                 (std::max)(std::size_t(1), cores - cores_left);
 
             // invoke the reverse operations on the left and right sections
             // concurrently
             auto p = policy(hpx::execution::task);
+            auto left_policy =
+                execution::with_processing_units_count(p, cores_left);
+            auto right_policy =
+                execution::with_processing_units_count(p, cores_right);
 
             detail::reverse<FwdIter> r;
 
-            return dataflow(
+            return hpx::dataflow(
                 hpx::launch::sync,
                 [=](auto&& f1, auto&& f2) mutable {
                     // propagate exceptions, if appropriate
@@ -261,16 +266,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         f2.get();
                     }
 
-                    r.call2(
-                        p(hpx::execution::non_task), non_seq(), first, last);
+                    r.call(p(hpx::execution::non_task), first, last);
 
                     std::advance(first, size_right);
                     return util::in_out_result<FwdIter, Sent>{first, last};
                 },
-                r.call2(execution::with_processing_units_count(p, cores_left),
-                    non_seq(), first, new_first),
-                r.call2(execution::with_processing_units_count(p, cores_right),
-                    non_seq(), new_first, last));
+                r.call(left_policy, first, new_first),
+                r.call(right_policy, new_first, last));
         }
 
         template <typename IterPair>
@@ -289,9 +291,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename FwdIter, typename Sent>
-            static typename util::detail::algorithm_result<ExPolicy,
-                IterPair>::type
-            parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, FwdIter first, FwdIter new_first, Sent last)
             {
                 return util::detail::algorithm_result<ExPolicy, IterPair>::get(
@@ -436,8 +436,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 // create new APIs, tag_fallback_invoke overloads.
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::rotate
+    // CPO for hpx::rotate
     inline constexpr struct rotate_t final
       : hpx::detail::tag_parallel_algorithm<rotate_t>
     {
@@ -458,6 +459,7 @@ namespace hpx {
                     hpx::parallel::util::in_out_result<FwdIter, FwdIter>>()
                     .call(hpx::execution::seq, first, new_first, last));
         }
+
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
@@ -465,10 +467,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(hpx::rotate_t, ExPolicy&& policy, FwdIter first,
-            FwdIter new_first, FwdIter last)
+        friend decltype(auto) tag_fallback_invoke(hpx::rotate_t,
+            ExPolicy&& policy, FwdIter first, FwdIter new_first, FwdIter last)
         {
             static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
                 "Requires at least forward iterator.");
@@ -487,7 +487,7 @@ namespace hpx {
     } rotate{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::rotate_copy
+    // CPO for hpx::rotate_copy
     inline constexpr struct rotate_copy_t final
       : hpx::detail::tag_parallel_algorithm<rotate_copy_t>
     {
