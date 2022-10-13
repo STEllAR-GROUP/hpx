@@ -721,33 +721,6 @@ namespace hpx::execution::experimental {
     inline constexpr bool is_receiver_from_v = is_receiver_of_v<Receiver,
         completion_signatures_of_t<Sender, env_of_t<Receiver>>>;
 
-    namespace detail {
-        template <typename A, typename... As>
-        struct front
-        {
-            using type = A;
-        };
-
-        template <template <typename...> typename Fn>
-        struct compose_template_func
-        {
-            template <typename... Args>
-            using apply = Fn<Args...>;
-        };
-
-        template <typename... As>
-        using single_t =
-            std::enable_if_t<sizeof...(As) == 1, meta::type<front<As...>>>;
-
-        template <typename Ty>
-        struct single_or
-        {
-            template <typename... As>
-            using apply = std::enable_if_t<sizeof...(As) <= 1,
-                meta::type<front<As..., Ty>>>;
-        };
-    }    // namespace detail
-
     // Alias template single-sender-value-type is defined as follows:
     //
     // 1. If value_types_of_t<S, E, Tuple, Variant> would have the form
@@ -760,8 +733,7 @@ namespace hpx::execution::experimental {
     template <typename Sender, typename Env = no_env>
     using single_sender_value_t =
         detail::value_types_from<detail::completion_signatures_of<Sender, Env>,
-            detail::single_or<void>,
-            detail::compose_template_func<detail::single_t>>;
+            meta::single_or<void>, meta::compose_template_func<meta::single_t>>;
 
     struct connect_awaitable_t;
 
@@ -903,7 +875,7 @@ namespace hpx::execution::experimental {
                 }
             };
 
-            bool await_ready() const noexcept
+            constexpr bool await_ready() const noexcept
             {
                 return false;
             }
