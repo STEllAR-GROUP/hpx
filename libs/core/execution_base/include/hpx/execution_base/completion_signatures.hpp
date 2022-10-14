@@ -807,8 +807,8 @@ namespace hpx::execution::experimental {
             hpx::meta::if_<std::is_same<Value, void>, void_type, Value>;
 
         template <typename Value>
-        using expected_t = hpx::variant<hpx::monostate, value_or_void_t<Value>,
-            std::exception_ptr>;
+        using coroutine_expected_result_t = hpx::variant<hpx::monostate,
+            value_or_void_t<Value>, std::exception_ptr>;
 
         template <typename Value>
         struct receiver_base
@@ -844,7 +844,7 @@ namespace hpx::execution::experimental {
                 self.continuation.resume();
             }
 
-            expected_t<Value>* result;
+            coroutine_expected_result_t<Value>* result;
             hpx::coro::coroutine_handle<> continuation;
         };
 
@@ -899,7 +899,7 @@ namespace hpx::execution::experimental {
             }
 
         protected:
-            expected_t<Value> result;
+            coroutine_expected_result_t<Value> result;
         };
 
         template <typename PromiseId, typename SenderId>
@@ -989,7 +989,7 @@ namespace hpx::execution::experimental {
                         // This causes the rest of the coroutine
                         // (the part after the co_await of the sender)
                         // to be skipped and invokes the calling
-                        //  coroutine'sstopped handler.
+                        // coroutine's stopped handler.
                         return hpx::coro::coroutine_handle<
                             OtherPromise>::from_address(address)
                             .promise()
@@ -1022,7 +1022,7 @@ namespace hpx::execution::experimental {
     }    // namespace detail
 
     template <typename A, typename B>
-    inline constexpr bool is_derived_from = std::is_base_of_v<B, A>&&
+    inline constexpr bool is_derived_from_v = std::is_base_of_v<B, A>&&
         std::is_convertible_v<const volatile A*, const volatile B*>;
 
     template <typename Promise>
@@ -1032,7 +1032,7 @@ namespace hpx::execution::experimental {
         auto await_transform(Value&& val)
             -> hpx::util::invoke_result_t<as_awaitable_t, Value, Promise&>
         {
-            static_assert(is_derived_from<Promise, with_awaitable_senders>);
+            static_assert(is_derived_from_v<Promise, with_awaitable_senders>);
             return as_awaitable(
                 HPX_FORWARD(Value, val), static_cast<Promise&>(*this));
         }
@@ -1040,7 +1040,7 @@ namespace hpx::execution::experimental {
 
     struct promise_base
     {
-        hpx::coro::suspend_always initial_suspend() noexcept
+        constexpr hpx::coro::suspend_always initial_suspend() noexcept
         {
             return {};
         }
@@ -1145,12 +1145,6 @@ namespace hpx::execution::experimental {
                 hpx::coro::coroutine_handle<promise>::from_promise(*this)};
         }
 
-        // template <typename Awaitable>
-        // Awaitable&& await_transform(Awaitable&& await) noexcept
-        // {
-        //     return HPX_FORWARD(Awaitable, await);
-        // }
-
         template <typename Awaitable>
         auto await_transform(Awaitable&& await) noexcept(
             hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t,
@@ -1162,8 +1156,7 @@ namespace hpx::execution::experimental {
             if constexpr (hpx::functional::is_tag_invocable_v<as_awaitable_t,
                               Awaitable, promise&>)
             {
-                return tag_invoke(
-                    as_awaitable, HPX_FORWARD(Awaitable, await), *this);
+                return as_awaitable(HPX_FORWARD(Awaitable, await), *this);
             }
             else
             {
