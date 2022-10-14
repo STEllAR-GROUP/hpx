@@ -6,6 +6,10 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
@@ -17,8 +21,6 @@
 #include <exception>
 #include <system_error>
 #include <utility>
-
-#if defined(HPX_HAVE_CXX20_COROUTINES)
 
 namespace hpx::execution::experimental {
 
