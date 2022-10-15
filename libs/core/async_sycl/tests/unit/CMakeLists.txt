@@ -21,7 +21,11 @@ foreach (test ${tests})
         )
 
       # make it compile with sycl
-      target_compile_options(${test}_test PUBLIC -fsycl)
+      if(HPX_WITH_HIPSYCL)
+         add_sycl_to_target(TARGET ${test}_test SOURCES ${test}.cpp)
+      else()
+        target_compile_options(${test}_test PUBLIC -fsycl)
+      endif()
       # Add to tests
       add_hpx_unit_test(
            "modules.async_sycl" ${test} ${${test}_PARAMETERS} RUN_SERIAL
