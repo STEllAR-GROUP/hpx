@@ -14,6 +14,8 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
+#include <hpx/errors/exception.hpp>
+#include <hpx/errors/exception_list.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
@@ -237,13 +239,11 @@ namespace hpx::execution::experimental::detail {
         // Store an exception and mark that an exception was thrown in the
         // operation state. This function assumes that there is a current
         // exception.
-        void store_exception() const
+        template <typename Exception>
+        void store_exception(Exception e) const
         {
-            if (!op_state->exception_thrown.exchange(true))
-            {
-                // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
-                op_state->exception = std::current_exception();
-            }
+            // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
+            op_state->exceptions.add(HPX_MOVE(e));
         }
 
         // Finish the work for one worker thread. If this is not the last worker
@@ -254,12 +254,25 @@ namespace hpx::execution::experimental::detail {
         {
             if (--(op_state->tasks_remaining.data_) == 0)
             {
-                if (op_state->exception_thrown)
+                if (op_state->bad_alloc_thrown.load(std::memory_order_relaxed))
                 {
-                    HPX_ASSERT(op_state->exception);
+                    try
+                    {
+                        throw std::bad_alloc();
+                    }
+                    catch (...)
+                    {
+                        hpx::execution::experimental::set_error(
+                            HPX_MOVE(op_state->receiver),
+                            std::current_exception());
+                    }
+                }
+                else if (op_state->exceptions.size() != 0)
+                {
                     hpx::execution::experimental::set_error(
                         HPX_MOVE(op_state->receiver),
-                        HPX_MOVE(op_state->exception));
+                        hpx::detail::construct_lightweight_exception(
+                            HPX_MOVE(op_state->exceptions)));
                 }
                 else
                 {
@@ -279,13 +292,17 @@ namespace hpx::execution::experimental::detail {
             {
                 do_work();
             }
+            catch (std::bad_alloc const& e)
+            {
+                op_state->bad_alloc_thrown = true;
+            }
             catch (...)
             {
-                store_exception();
+                store_exception(std::current_exception());
             }
 
             finish();
-        };
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////
@@ -638,8 +655,8 @@ namespace hpx::execution::experimental::detail {
             using value_types = value_types_of_t<Sender, empty_env,
                 decayed_tuple, hpx::variant>;
             hpx::util::detail::prepend_t<value_types, hpx::monostate> ts;
-            std::atomic<bool> exception_thrown{false};
-            std::exception_ptr exception;
+            std::atomic<bool> bad_alloc_thrown{false};
+            hpx::exception_list exceptions;
 
             template <typename Sender_, typename Shape_, typename F_,
                 typename Receiver_>

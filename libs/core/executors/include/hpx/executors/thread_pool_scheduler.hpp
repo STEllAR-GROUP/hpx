@@ -336,8 +336,9 @@ namespace hpx::execution::experimental {
     // clang-format on
     auto tag_invoke(Tag tag,
         thread_pool_policy_scheduler<Policy> const& scheduler, Property&& prop)
-        -> decltype(std::declval<Tag>()(
-                        std::declval<Policy>(), std::declval<Property>()),
+        -> decltype(std::declval<thread_pool_policy_scheduler<Policy>>().policy(
+                        std::declval<Tag>()(
+                            std::declval<Policy>(), std::declval<Property>())),
             thread_pool_policy_scheduler<Policy>())
     {
         auto scheduler_with_prop = scheduler;

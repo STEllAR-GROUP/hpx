@@ -44,7 +44,7 @@ namespace hpx { namespace execution { namespace experimental {
             // attempt to improve error messages if property is not supported
             template <typename... Ts>
             friend constexpr auto tag_fallback_invoke(Tag, Ts&&...) noexcept
-                -> property_not_supported<Tag, Ts...>;
+                -> decltype(property_not_supported<Tag, Ts...>());
         };
     }    // namespace detail
 

@@ -16,10 +16,6 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/operation_state.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/detail/future_data.hpp>
@@ -461,103 +457,6 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Operation state for sender compatibility
-    template <typename Receiver, typename Future>
-    class operation_state
-    {
-    private:
-        using receiver_type = std::decay_t<Receiver>;
-        using future_type = std::decay_t<Future>;
-        using result_type = typename future_type::result_type;
-
-    public:
-        template <typename Receiver_>
-        operation_state(Receiver_&& r, future_type f)
-          : receiver_(HPX_FORWARD(Receiver_, r))
-          , future_(HPX_MOVE(f))
-        {
-        }
-
-        operation_state(operation_state&&) = delete;
-        operation_state& operator=(operation_state&&) = delete;
-        operation_state(operation_state const&) = delete;
-        operation_state& operator=(operation_state const&) = delete;
-
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
-        {
-            os.start_helper();
-        }
-
-    private:
-        void start_helper() & noexcept
-        {
-            hpx::detail::try_catch_exception_ptr(
-                [&]() {
-                    auto state = traits::detail::get_shared_state(future_);
-
-                    if (!state)
-                    {
-                        HPX_THROW_EXCEPTION(no_state, "operation_state::start",
-                            "the future has no valid shared state");
-                    }
-
-                    auto on_completed = [this]() mutable {
-                        if (future_.has_value())
-                        {
-                            if constexpr (std::is_void_v<result_type>)
-                            {
-                                hpx::execution::experimental::set_value(
-                                    HPX_MOVE(receiver_));
-                            }
-                            else
-                            {
-                                hpx::execution::experimental::set_value(
-                                    HPX_MOVE(receiver_), future_.get());
-                            }
-                        }
-                        else if (future_.has_exception())
-                        {
-                            hpx::execution::experimental::set_error(
-                                HPX_MOVE(receiver_),
-                                future_.get_exception_ptr());
-                        }
-                    };
-
-                    if (!state->is_ready(std::memory_order_relaxed))
-                    {
-                        state->execute_deferred();
-
-                        // execute_deferred might have made the future ready
-                        if (!state->is_ready(std::memory_order_relaxed))
-                        {
-                            // The operation state has to be kept alive until
-                            // set_value is called, which means that we don't
-                            // need to move receiver and future into the
-                            // on_completed callback.
-                            state->set_on_completed(HPX_MOVE(on_completed));
-                        }
-                        else
-                        {
-                            on_completed();
-                        }
-                    }
-                    else
-                    {
-                        on_completed();
-                    }
-                },
-                [&](std::exception_ptr ep) {
-                    hpx::execution::experimental::set_error(
-                        HPX_MOVE(receiver_), HPX_MOVE(ep));
-                });
-        }
-
-        std::decay_t<Receiver> receiver_;
-        future_type future_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Derived, typename R>
     class future_base
     {
@@ -565,31 +464,6 @@ namespace hpx { namespace lcos { namespace detail {
         using result_type = R;
         using shared_state_type =
             future_data_base<traits::detail::shared_state_ptr_result_t<R>>;
-
-        // Sender compatibility
-        template <typename, typename T>
-        struct completion_signatures_base
-        {
-            template <template <typename...> typename Tuple,
-                template <typename...> typename Variant>
-            using value_types = Variant<Tuple<result_type>>;
-        };
-
-        template <typename T>
-        struct completion_signatures_base<T, void>
-        {
-            template <template <typename...> typename Tuple,
-                template <typename...> typename Variant>
-            using value_types = Variant<Tuple<>>;
-        };
-
-        struct completion_signatures : completion_signatures_base<void, R>
-        {
-            template <template <typename...> typename Variant>
-            using error_types = Variant<std::exception_ptr>;
-
-            static constexpr bool sends_stopped = false;
-        };
 
     private:
         template <typename F>
@@ -858,17 +732,6 @@ namespace hpx {
     public:
         using result_type = R;
         using shared_state_type = typename base_type::shared_state_type;
-
-        // Sender compatibility
-        using completion_signatures = typename base_type::completion_signatures;
-
-        template <typename Receiver>
-        friend lcos::detail::operation_state<Receiver, future> tag_invoke(
-            hpx::execution::experimental::connect_t, future&& f,
-            Receiver&& receiver)
-        {
-            return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(f)};
-        }
 
     private:
         struct invalidate
@@ -1168,25 +1031,6 @@ namespace hpx {
     public:
         using result_type = R;
         using shared_state_type = typename base_type::shared_state_type;
-
-        // Sender compatibility
-        using completion_signatures = typename base_type::completion_signatures;
-
-        template <typename Receiver>
-        friend lcos::detail::operation_state<Receiver, shared_future>
-        tag_invoke(hpx::execution::experimental::connect_t, shared_future&& f,
-            Receiver&& receiver)
-        {
-            return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(f)};
-        }
-
-        template <typename Receiver>
-        friend lcos::detail::operation_state<Receiver, shared_future>
-        tag_invoke(hpx::execution::experimental::connect_t, shared_future& f,
-            Receiver&& receiver)
-        {
-            return {HPX_FORWARD(Receiver, receiver), f};
-        }
 
     private:
         template <typename Future>

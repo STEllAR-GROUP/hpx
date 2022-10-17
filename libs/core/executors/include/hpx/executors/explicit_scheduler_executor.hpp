@@ -255,9 +255,9 @@ namespace hpx::execution::experimental {
     // clang-format on
     auto tag_invoke(Tag tag,
         explicit_scheduler_executor<BaseScheduler> const& exec, Property&& prop)
-        -> decltype(std::declval<Tag>()(std::declval<BaseScheduler>(),
-                        std::declval<Property>()),
-            explicit_scheduler_executor<BaseScheduler>())
+        -> decltype(
+            explicit_scheduler_executor<BaseScheduler>(std::declval<Tag>()(
+                std::declval<BaseScheduler>(), std::declval<Property>())))
     {
         return explicit_scheduler_executor<BaseScheduler>(
             tag(exec.sched(), HPX_FORWARD(Property, prop)));

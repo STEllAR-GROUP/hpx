@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    algorithm_as_sender
     algorithm_bulk
     algorithm_ensure_started
     algorithm_execute

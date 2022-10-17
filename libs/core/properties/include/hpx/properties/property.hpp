@@ -20,7 +20,7 @@ namespace hpx { namespace experimental {
     {
         // clang-format off
         template <typename Tag, typename... Tn>
-        friend constexpr HPX_FORCEINLINE auto tag_invoke(
+        friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
                 prefer_t, Tag const& tag, Tn&&... tn)
             noexcept(noexcept(tag(HPX_FORWARD(Tn, tn)...)))
             -> decltype(tag(HPX_FORWARD(Tn, tn)...))

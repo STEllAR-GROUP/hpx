@@ -465,10 +465,12 @@ namespace hpx { namespace execution {
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>
     // clang-format on
-    auto tag_invoke(Tag tag, parallel_policy_executor<Policy> const& exec,
-        Property&& prop) -> decltype(std::declval<Tag>()(std::declval<Policy>(),
-                                         std::declval<Property>()),
-        parallel_policy_executor<Policy>())
+    auto tag_invoke(
+        Tag tag, parallel_policy_executor<Policy> const& exec, Property&& prop)
+        -> decltype(std::declval<parallel_policy_executor<Policy>>().policy(
+                        std::declval<Tag>()(
+                            std::declval<Policy>(), std::declval<Property>())),
+            parallel_policy_executor<Policy>())
     {
         auto exec_with_prop = exec;
         exec_with_prop.policy(tag(exec.policy(), HPX_FORWARD(Property, prop)));
