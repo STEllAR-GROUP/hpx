@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file high_resolution_timer.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -12,12 +14,9 @@
 #include <cstdint>
 
 namespace hpx { namespace chrono {
-    ///////////////////////////////////////////////////////////////////////////
-    //
-    //  high_resolution_timer
-    //      A timer object measures elapsed time.
-    //
-    ///////////////////////////////////////////////////////////////////////////
+
+    /// \brief high_resolution_timer is a timer object which measures
+    ///        the elapsed time
     class high_resolution_timer
     {
     public:
@@ -41,39 +40,43 @@ namespace hpx { namespace chrono {
         {
         }
 
+        /// \brief retuns the current time
         static double now() noexcept
         {
             return take_time_stamp() * 1e-9;
         }
 
+        /// \brief restarts the timer
         void restart() noexcept
         {
             start_time_ = take_time_stamp();
         }
 
-        // return elapsed time in seconds
+        /// \brief returns the elapsed time in seconds
         double elapsed() const noexcept
         {
             return double(take_time_stamp() - start_time_) * 1e-9;
         }
 
+        /// \brief returns the elapsed time in microseconds
         std::int64_t elapsed_microseconds() const noexcept
         {
             return std::int64_t(double(take_time_stamp() - start_time_) * 1e-3);
         }
 
+        /// \brief returns the elapsed time in nanoseconds
         std::int64_t elapsed_nanoseconds() const noexcept
         {
             return std::int64_t(take_time_stamp() - start_time_);
         }
 
-        // return estimated maximum value for elapsed()
+        /// \brief returns the estimated maximum value for \c elapsed()
         static constexpr double elapsed_max() noexcept
         {
             return (hpx::chrono::high_resolution_clock::max)() * 1e-9;
         }
 
-        // return minimum value for elapsed()
+        /// \brief returns the estimated minimum value for \c elapsed()
         static constexpr double elapsed_min() noexcept
         {
             return (hpx::chrono::high_resolution_clock::min)() * 1e-9;
