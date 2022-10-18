@@ -321,7 +321,7 @@ Classes
    ===============================================  ====================================================
    :cpp:class:`hpx::chrono::high_resolution_clock`  :cppreference-generic:`chrono,high_resolution_clock`
    :cpp:class:`hpx::chrono::high_resolution_timer`
-   :cpp:class:`hpx::chrono::steady_time_point`
+   :cpp:class:`hpx::chrono::steady_time_point`      :cppreference-generic:`chrono,time_point`
    ===============================================  ====================================================
 
 .. _public_api_header_hpx_condition_variable:
