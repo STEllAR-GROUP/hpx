@@ -80,6 +80,15 @@ namespace hpx {
     ///          individual element.
     template <typename... Tuples>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(Tuples&&... tuples);
+
+    /// \brief Extracts the Ith element from the tuple. I must be an integer
+    ///        value in [0, sizeof...(Ts)).
+    template <std::size_t I> HPX_HOST_DEVICE
+    typename util::at_index<I, Ts...>::type& get() noexcept;
+
+    /// \copybrief hpx::get()
+    template <std::size_t I> HPX_HOST_DEVICE
+    typename util::at_index<I, Ts...>::type const& get() const noexcept;
     // clang-format on
 }    // namespace hpx
 #else
