@@ -145,7 +145,9 @@ namespace hpx::parcelset {
             /// Return the name of this locality
             std::string get_locality_name() const override
             {
-                return util::lci_environment::get_processor_name();
+                // hostname-rank
+                return util::lci_environment::get_processor_name() + "-" +
+                    std::to_string(util::lci_environment::rank());
             }
 
             std::shared_ptr<sender_connection> create_connection(
