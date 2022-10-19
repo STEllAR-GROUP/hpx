@@ -300,8 +300,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         part_size - 1,
                         [&trail, &tok, &pred_projected](
                             FwdIter it) mutable -> void {
-                            if (hpx::util::invoke(
-                                    pred_projected, *it, *trail++))
+                            if (hpx::invoke(pred_projected, *it, *trail++))
                             {
                                 tok.cancel();
                             }
@@ -313,7 +312,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     if (!tok.was_cancelled() && trail != last)
                     {
-                        return !hpx::util::invoke(pred_projected, *trail, *i);
+                        return !hpx::invoke(pred_projected, *trail, *i);
                     }
                     return !tok.was_cancelled();
                 };
@@ -389,7 +388,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         part_begin, part_size - 1, tok,
                         [&trail, &tok, &pred_projected](
                             reference& v, std::size_t ind) -> void {
-                            if (hpx::util::invoke(pred_projected, v, *trail++))
+                            if (hpx::invoke(pred_projected, v, *trail++))
                             {
                                 tok.cancel(ind);
                             }

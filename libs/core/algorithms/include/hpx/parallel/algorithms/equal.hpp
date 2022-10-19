@@ -538,8 +538,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<> tok;
 
-                // Note: replacing the invoke() with HPX_INVOKE()
-                // below makes gcc generate errors
                 auto f1 = [tok, f = HPX_FORWARD(F, f),
                               proj1 = HPX_FORWARD(Proj1, proj1),
                               proj2 = HPX_FORWARD(Proj2, proj2)](

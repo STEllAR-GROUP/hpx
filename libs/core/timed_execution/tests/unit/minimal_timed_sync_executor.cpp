@@ -156,7 +156,7 @@ struct test_sync_executor1
         test_sync_executor1 const&, F&& f, Ts&&... ts)
     {
         ++count_sync;
-        return hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+        return hpx::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
@@ -172,7 +172,7 @@ struct test_timed_sync_executor1 : test_sync_executor1
     {
         ++count_sync_at;
         hpx::this_thread::sleep_until(abs_time);
-        return hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+        return hpx::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
@@ -197,7 +197,7 @@ struct test_sync_executor2 : test_sync_executor1
         test_sync_executor2 const&, F&& f, Ts&&... ts)
     {
         ++count_apply;
-        hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+        hpx::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
@@ -210,7 +210,7 @@ struct test_timed_sync_executor2 : test_sync_executor2
     {
         ++count_apply_at;
         hpx::this_thread::sleep_until(abs_time);
-        hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+        hpx::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 

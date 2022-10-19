@@ -840,8 +840,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                // Note: replacing the invoke() with HPX_INVOKE()
-                // below makes gcc generate errors
                 auto f1 = [val, proj = HPX_FORWARD(Proj, proj), tok](Iter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
@@ -913,8 +911,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                // Note: replacing the invoke() with HPX_INVOKE()
-                // below makes gcc generate errors
                 auto f1 = [f = HPX_FORWARD(F, f),
                               proj = HPX_FORWARD(Proj, proj),
                               tok](Iter it, std::size_t part_size,
@@ -989,8 +985,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 util::cancellation_token<std::size_t> tok(count);
 
-                // Note: replacing the invoke() with HPX_INVOKE()
-                // below makes gcc generate errors
                 auto f1 = [f = HPX_FORWARD(F, f),
                               proj = HPX_FORWARD(Proj, proj),
                               tok](Iter it, std::size_t part_size,

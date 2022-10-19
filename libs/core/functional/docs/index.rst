@@ -21,7 +21,8 @@ their arguments.
 * :cpp:func:`hpx::bind_back`
 * :cpp:func:`hpx::bind_front`
 * :cpp:func:`hpx::util::deferred_call`
-* :cpp:func:`hpx::util::invoke`
+* :cpp:func:`hpx::invoke`
+* :cpp:func:`hpx::invoke_r`
 * :cpp:func:`hpx::util::invoke_fused`
 * :cpp:func:`hpx::util::mem_fn`
 * :cpp:func:`hpx::util::one_shot`
