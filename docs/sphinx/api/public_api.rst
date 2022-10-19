@@ -944,17 +944,14 @@ Functions
 
 .. table:: Functions of header ``hpx/thread.hpp``
 
-   +-------------------------------------------+
-   | Function                                  |
-   +===========================================+
-   | :cpp:func:`hpx::this_thread::yield`       |
-   +-------------------------------------------+
-   | :cpp:func:`hpx::this_thread::get_id`      |
-   +-------------------------------------------+
-   | :cpp:func:`hpx::this_thread::sleep_for`   |
-   +-------------------------------------------+
-   | :cpp:func:`hpx::this_thread::sleep_until` |
-   +-------------------------------------------+
+   =========================================  ==========================================
+   Function                                     C++ standard
+   =========================================  ==========================================
+   :cpp:func:`hpx::this_thread::yield`        :cppreference-generic:`thread,yield`
+   :cpp:func:`hpx::this_thread::get_id`       :cppreference-generic:`thread,get_id`
+   :cpp:func:`hpx::this_thread::sleep_for`    :cppreference-generic:`thread,sleep_for`
+   :cpp:func:`hpx::this_thread::sleep_until`  :cppreference-generic:`thread,sleep_until`
+   =========================================  ==========================================
 
 .. _public_api_header_hpx_semaphore:
 
