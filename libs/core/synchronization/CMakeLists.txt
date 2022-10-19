@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(synchronization_headers
     hpx/synchronization/async_rw_mutex.hpp
     hpx/synchronization/barrier.hpp
+    hpx/synchronization/binary_semaphore.hpp
     hpx/synchronization/channel_mpmc.hpp
     hpx/synchronization/channel_mpsc.hpp
     hpx/synchronization/channel_spsc.hpp
