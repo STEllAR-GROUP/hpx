@@ -868,6 +868,11 @@ namespace hpx { namespace util { namespace detail {
         }
 
         /// \copybrief try_traverse
+        template <typename Tag>
+        constexpr void init_traverse(Tag) const noexcept
+        {
+        }
+
         template <typename T>
         auto init_traverse(strategy_remap_tag, T&& element)
             -> decltype(spreading::unpack_or_void(
@@ -877,6 +882,7 @@ namespace hpx { namespace util { namespace detail {
             return spreading::unpack_or_void(
                 try_traverse(strategy_remap_tag{}, HPX_FORWARD(T, element)));
         }
+
         template <typename T>
         void init_traverse(strategy_traverse_tag, T&& element)
         {
