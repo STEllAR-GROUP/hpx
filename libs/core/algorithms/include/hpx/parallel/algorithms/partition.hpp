@@ -1586,8 +1586,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_size,
                         [pred, proj, &true_count](
                             zip_iterator it) mutable -> void {
-                            bool f = hpx::util::invoke(
-                                pred, hpx::util::invoke(proj, get<0>(*it)));
+                            bool f = hpx::invoke(
+                                pred, hpx::invoke(proj, get<0>(*it)));
 
                             if ((get<1>(*it) = f))
                                 ++true_count;

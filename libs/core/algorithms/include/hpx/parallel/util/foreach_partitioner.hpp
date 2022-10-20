@@ -153,7 +153,7 @@ namespace hpx { namespace parallel { namespace util {
                 }
 
                 // gcc 9 complains here if HPX_INVOKE is used.
-                return hpx::util::invoke(f, HPX_MOVE(last));
+                return hpx::invoke(f, HPX_MOVE(last));
             }
 
             template <typename F, typename Items, typename FwdIter>

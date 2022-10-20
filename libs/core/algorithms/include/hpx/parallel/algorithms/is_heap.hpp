@@ -289,9 +289,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         part_size, tok,
                         [&tok, first, &comp, &proj](
                             type const& v, std::size_t i) mutable -> void {
-                            if (hpx::util::invoke(comp,
-                                    hpx::util::invoke(proj, *(first + i / 2)),
-                                    hpx::util::invoke(proj, v)))
+                            if (hpx::invoke(comp,
+                                    hpx::invoke(proj, *(first + i / 2)),
+                                    hpx::invoke(proj, v)))
                             {
                                 tok.cancel(0);
                             }
@@ -400,9 +400,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         part_size, tok,
                         [&tok, first, &comp, &proj](
                             type const& v, std::size_t i) -> void {
-                            if (hpx::util::invoke(comp,
-                                    hpx::util::invoke(proj, *(first + i / 2)),
-                                    hpx::util::invoke(proj, v)))
+                            if (hpx::invoke(comp,
+                                    hpx::invoke(proj, *(first + i / 2)),
+                                    hpx::invoke(proj, v)))
                             {
                                 tok.cancel(i);
                             }

@@ -332,8 +332,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 [=, &tok, &op, &proj1, &proj2](auto t, std::size_t i) -> void {
                     // Note: replacing the invoke() with HPX_INVOKE()
                     // below makes gcc generate errors
-                    if (hpx::util::invoke(op, hpx::util::invoke(proj1, t),
-                            hpx::util::invoke(proj2, *first2)))
+                    if (hpx::invoke(op, hpx::invoke(proj1, t),
+                            hpx::invoke(proj2, *first2)))
                     {
                         std::size_t local_count = 1;
                         auto mid = t;
@@ -346,9 +346,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                         {
                             // Note: replacing the invoke() with HPX_INVOKE()
                             // below makes gcc generate errors
-                            if (!hpx::util::invoke(op,
-                                    hpx::util::invoke(proj1, mid),
-                                    hpx::util::invoke(proj2, *mid2)))
+                            if (!hpx::invoke(op, hpx::invoke(proj1, mid),
+                                    hpx::invoke(proj2, *mid2)))
                             {
                                 break;
                             }

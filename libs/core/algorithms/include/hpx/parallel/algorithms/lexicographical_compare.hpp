@@ -255,7 +255,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         [&pred, &tok, &proj1, &proj2](
                             reference t, std::size_t i) mutable -> void {
                             using hpx::get;
-                            using hpx::util::invoke;
+                            using hpx::invoke;
                             // gcc10/cuda11 complains about using HPX_INVOKE here
                             if (invoke(pred, invoke(proj1, get<0>(t)),
                                     invoke(proj2, get<1>(t))) ||
@@ -280,7 +280,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     if (first1 != last1 && first2 != last2)
                     {
-                        using hpx::util::invoke;
+                        using hpx::invoke;
                         return invoke(pred, invoke(proj1, *first1),
                             invoke(proj2, *first2));
                     }

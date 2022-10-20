@@ -113,7 +113,7 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                         if (!valid_results.empty())
                         {
-                            return hpx::util::invoke(HPX_FORWARD(Vote, vote),
+                            return hpx::invoke(HPX_FORWARD(Vote, vote),
                                 HPX_MOVE(valid_results));
                         }
 

@@ -205,8 +205,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         --part_count, tok,
                         [&fst_bool, &pred_projected, &tok](
                             Iter const& a) mutable -> void {
-                            if (fst_bool !=
-                                hpx::util::invoke(pred_projected, *a))
+                            if (fst_bool != hpx::invoke(pred_projected, *a))
                             {
                                 if (fst_bool)
                                     fst_bool = false;
