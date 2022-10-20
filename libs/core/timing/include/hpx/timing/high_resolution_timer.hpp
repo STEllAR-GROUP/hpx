@@ -40,7 +40,7 @@ namespace hpx { namespace chrono {
         {
         }
 
-        /// \brief retuns the current time
+        /// \brief returns the current time
         static double now() noexcept
         {
             return take_time_stamp() * 1e-9;
