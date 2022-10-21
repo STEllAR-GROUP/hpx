@@ -41,10 +41,12 @@ jobs:
     - name: Build
       shell: bash
       run: |
-          cmake --build build --target all
+          cmake --build build --target core
           cmake --build build --target tests.unit.modules.algorithms
     - name: Test
       shell: bash
       run: |
           cd build
-          ctest --output-on-failure
+          ctest \
+            --output-on-failure \
+            --tests-regex tests.unit.modules.algorithms
