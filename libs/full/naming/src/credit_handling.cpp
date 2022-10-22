@@ -16,6 +16,7 @@
 #include <hpx/modules/checkpoint_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/naming/credit_handling.hpp>
@@ -178,12 +179,25 @@ namespace hpx::naming {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::future<gid_type> split_gid_if_needed(gid_type& gid)
+        hpx::future_or_value<gid_type> split_gid_if_needed(gid_type& gid)
         {
             std::unique_lock<gid_type::mutex_type> l(gid.get_mutex());
             return split_gid_if_needed_locked(l, gid);
         }
 
+        gid_type split_gid_if_needed(hpx::launch::sync_policy, gid_type& gid)
+        {
+            auto result = split_gid_if_needed(gid);
+            if (result.has_value())
+            {
+                return result.get_value();
+            }
+
+            HPX_ASSERT(result.has_future());
+            return result.get_future().get();
+        }
+
+        ///////////////////////////////////////////////////////////////////////
         gid_type postprocess_incref(gid_type& gid)
         {
             std::unique_lock<gid_type::mutex_type> l(gid.get_mutex());
@@ -234,7 +248,7 @@ namespace hpx::naming {
             return new_gid;
         }
 
-        hpx::future<gid_type> split_gid_if_needed_locked(
+        hpx::future_or_value<gid_type> split_gid_if_needed_locked(
             std::unique_lock<gid_type::mutex_type>& l, gid_type& gid)
         {
             HPX_ASSERT_OWNS_LOCK(l);
@@ -286,9 +300,26 @@ namespace hpx::naming {
 
                     naming::gid_type const new_gid = gid;    // strips lock-bit
                     HPX_ASSERT(new_gid != invalid_gid);
-                    return agas::incref(new_gid, new_credit)
-                        .then(hpx::launch::sync,
-                            hpx::bind(postprocess_incref, std::ref(gid)));
+
+                    auto result = agas::incref(new_gid, new_credit);
+                    if (result.has_value())
+                    {
+                        try
+                        {
+                            return postprocess_incref(gid);
+                        }
+                        catch (...)
+                        {
+                            return hpx::make_exceptional_future<gid_type>(
+                                std::current_exception());
+                        }
+                    }
+
+                    return result.get_future().then(
+                        hpx::launch::sync, [&gid](auto&& f) {
+                            f.get();
+                            return postprocess_incref(gid);
+                        });
                 }
 
                 HPX_ASSERT(src_log2credits > 1);
@@ -298,11 +329,11 @@ namespace hpx::naming {
                 HPX_ASSERT(detail::has_credits(gid));
                 HPX_ASSERT(detail::has_credits(new_gid));
 
-                return hpx::make_ready_future(new_gid);
+                return new_gid;
             }
 
             naming::gid_type new_gid = gid;    // strips lock-bit
-            return hpx::make_ready_future(new_gid);
+            return new_gid;
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -479,17 +510,26 @@ namespace hpx::naming {
             // preprocessing
             handle_futures.increment_future_count();
 
-            auto f = split_gid_if_needed(gid).then(hpx::launch::sync,
-                [&split_gids, &handle_futures, &gid](
-                    hpx::future<gid_type>&& gid_future) {
-                    HPX_UNUSED(handle_futures);
-                    HPX_ASSERT(handle_futures.has_futures());
-                    split_gids.add_gid(gid, gid_future.get());
-                });
+            auto result = split_gid_if_needed(gid);
+            if (result.has_value())
+            {
+                handle_futures.decrement_future_count();
+                split_gids.add_gid(gid, result.get_value());
+            }
+            else
+            {
+                auto f = result.get_future().then(hpx::launch::sync,
+                    [&split_gids, &handle_futures, &gid](
+                        hpx::future<gid_type>&& gid_future) {
+                        HPX_UNUSED(handle_futures);
+                        HPX_ASSERT(handle_futures.has_futures());
+                        split_gids.add_gid(gid, gid_future.get());
+                    });
 
-            handle_futures.await_future(
-                *traits::future_access<decltype(f)>::get_shared_state(f),
-                false);
+                handle_futures.await_future(
+                    *traits::future_access<decltype(f)>::get_shared_state(f),
+                    false);
+            }
         }
 
         void preprocess_gid(

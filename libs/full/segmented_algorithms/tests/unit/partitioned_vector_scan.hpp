@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Minh-Khanh Do
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -87,7 +88,8 @@ struct verify_ : public hpx::parallel::detail::algorithm<verify_<Value>, Value>
 };
 
 template <typename T>
-void verify_values(hpx::partitioned_vector<T> v1, std::vector<T> v2)
+void verify_values(
+    hpx::partitioned_vector<T> const& v1, std::vector<T> const& v2)
 {
     auto first = v1.begin();
     auto last = v1.end();

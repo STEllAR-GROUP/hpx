@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,8 +12,8 @@
 #include <hpx/config.hpp>
 #include <hpx/agas_base/agas_fwd.hpp>
 #include <hpx/agas_base/gva.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
 
@@ -72,16 +73,16 @@ namespace hpx { namespace agas {
 #endif
 
         resolved_type resolve_gid(naming::gid_type const& id);
-        future<resolved_type> resolve_full(naming::gid_type id);
+        hpx::future_or_value<resolved_type> resolve_full(naming::gid_type id);
 
-        future<id_type> colocate(naming::gid_type id);
+        hpx::future_or_value<id_type> colocate(naming::gid_type id);
 
         naming::address unbind_gid(
             std::uint64_t count, naming::gid_type const& id);
         future<naming::address> unbind_gid_async(
             std::uint64_t count, naming::gid_type const& id);
 
-        future<std::int64_t> increment_credit(std::int64_t credits,
+        future_or_value<std::int64_t> increment_credit(std::int64_t credits,
             naming::gid_type lower, naming::gid_type upper);
 
         std::pair<naming::gid_type, naming::gid_type> allocate(

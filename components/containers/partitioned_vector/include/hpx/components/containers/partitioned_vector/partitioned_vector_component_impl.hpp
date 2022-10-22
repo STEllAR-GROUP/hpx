@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -339,8 +339,8 @@ namespace hpx {
         partitioned_vector_partition<T, Data>::get_ptr() const
     {
         error_code ec(throwmode::lightweight);
-        return hpx::get_ptr<server::partitioned_vector<T, Data>>(this->get_id())
-            .get(ec);
+        return hpx::get_ptr<server::partitioned_vector<T, Data>>(
+            hpx::launch::sync, this->get_id(), ec);
     }
 
     template <typename T, typename Data /*= std::vector<T> */>

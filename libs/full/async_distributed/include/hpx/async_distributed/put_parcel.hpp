@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +11,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/type_support.hpp>
@@ -126,19 +128,32 @@ namespace hpx::parcelset {
             }
             else
             {
-                future<naming::gid_type> split_gid =
+                auto result =
                     naming::detail::split_gid_if_needed(dest.get_gid());
 
-                if (split_gid.is_ready())
+                if (result.has_value())
                 {
                     pp(detail::create_parcel::call_with_action(
-                        split_gid.get(), HPX_MOVE(addr), HPX_MOVE(action)));
+                        HPX_MOVE(result).get_value(), HPX_MOVE(addr),
+                        HPX_MOVE(action)));
                 }
                 else
                 {
-                    split_gid.then(hpx::launch::sync,
-                        put_parcel_cont<PutParcel>{HPX_FORWARD(PutParcel, pp),
-                            HPX_MOVE(dest), HPX_MOVE(addr), HPX_MOVE(action)});
+                    HPX_ASSERT(result.has_future());
+
+                    auto&& split_gid = HPX_MOVE(result).get_future();
+                    if (split_gid.is_ready())
+                    {
+                        pp(detail::create_parcel::call_with_action(
+                            split_gid.get(), HPX_MOVE(addr), HPX_MOVE(action)));
+                    }
+                    else
+                    {
+                        split_gid.then(hpx::launch::sync,
+                            put_parcel_cont<PutParcel>{
+                                HPX_FORWARD(PutParcel, pp), HPX_MOVE(dest),
+                                HPX_MOVE(addr), HPX_MOVE(action)});
+                    }
                 }
             }
         }

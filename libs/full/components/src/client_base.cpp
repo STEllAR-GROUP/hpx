@@ -43,7 +43,7 @@ namespace hpx::util {
 
 namespace hpx::lcos::detail {
 
-    future_data<hpx::id_type>::~future_data() noexcept
+    void future_data<hpx::id_type>::tidy() const noexcept
     {
         auto* registered_name = try_get_extra_data<registered_name_tracker>();
         if (registered_name != nullptr && !registered_name->empty())

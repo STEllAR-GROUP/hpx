@@ -25,6 +25,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/naming/split_gid.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
@@ -291,7 +292,8 @@ namespace hpx::agas {
                 }
             }
 
-            // Search again ... might have been added by a different thread already
+            // Search again ... might have been added by a different thread
+            // already
             it = resolved_localities_.find(gid);
             if (it == resolved_localities_.end())
             {
@@ -315,8 +317,8 @@ namespace hpx::agas {
         return it->second;
     }
 
-    // TODO: We need to ensure that the locality isn't unbound while it still holds
-    // referenced objects.
+    // TODO: We need to ensure that the locality isn't unbound while it still
+    // holds referenced objects.
     bool addressing_service::unregister_locality(
         naming::gid_type const& gid, error_code& ec)
     {
@@ -1058,13 +1060,14 @@ namespace hpx::agas {
         return false;
     }
 
-    hpx::future<naming::address> addressing_service::resolve_async(
+    hpx::future_or_value<naming::address> addressing_service::resolve_async(
         naming::gid_type const& gid)
     {
         if (!gid)
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::resolve_async", "invalid reference id");
+            return naming::address();
         }
 
         // Try the cache.
@@ -1073,7 +1076,9 @@ namespace hpx::agas {
             naming::address addr;
             error_code ec;
             if (resolve_cached(gid, addr, ec))
-                return make_ready_future(addr);
+            {
+                return addr;
+            }
 
             if (ec)
             {
@@ -1086,7 +1091,7 @@ namespace hpx::agas {
         return resolve_full_async(gid);
     }
 
-    hpx::future<hpx::id_type> addressing_service::get_colocation_id_async(
+    hpx::future_or_value<id_type> addressing_service::get_colocation_id_async(
         hpx::id_type const& id)
     {
         if (!id)
@@ -1094,6 +1099,7 @@ namespace hpx::agas {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::get_colocation_id_async",
                 "invalid reference id");
+            return hpx::invalid_id;
         }
 
         return primary_ns_.colocate(id.get_gid());
@@ -1101,15 +1107,12 @@ namespace hpx::agas {
 
     ///////////////////////////////////////////////////////////////////////////
     naming::address addressing_service::resolve_full_postproc(
-        naming::gid_type const& id, future<primary_namespace::resolved_type> f)
+        naming::gid_type const& id, primary_namespace::resolved_type const& rep)
     {
-        using hpx::get;
-
         naming::address addr;
 
-        auto rep = f.get();
-        if (get<0>(rep) == naming::invalid_gid ||
-            get<2>(rep) == naming::invalid_gid)
+        if (hpx::get<0>(rep) == naming::invalid_gid ||
+            hpx::get<2>(rep) == naming::invalid_gid)
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::resolve_full_postproc",
@@ -1118,8 +1121,8 @@ namespace hpx::agas {
 
         // Resolve the gva to the real resolved address (which is just a gva
         // with as fully resolved LVA and and offset of zero).
-        naming::gid_type const base_gid = get<0>(rep);
-        gva const base_gva = get<1>(rep);
+        naming::gid_type const base_gid = hpx::get<0>(rep);
+        gva const base_gva = hpx::get<1>(rep);
 
         gva const g = base_gva.resolve(id, base_gid);
 
@@ -1144,23 +1147,37 @@ namespace hpx::agas {
         return addr;
     }
 
-    hpx::future<naming::address> addressing_service::resolve_full_async(
-        naming::gid_type const& gid)
+    hpx::future_or_value<naming::address>
+    addressing_service::resolve_full_async(naming::gid_type const& gid)
     {
         if (!gid)
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::resolve_full_async",
                 "invalid reference id");
+            return naming::address();
         }
 
         // ask server
-        future<primary_namespace::resolved_type> f =
-            primary_ns_.resolve_full(gid);
+        auto result = primary_ns_.resolve_full(gid);
 
-        return f.then(hpx::launch::sync,
-            util::one_shot(hpx::bind_front(
-                &addressing_service::resolve_full_postproc, this, gid)));
+        if (result.has_value())
+        {
+            try
+            {
+                return resolve_full_postproc(gid, result.get_value());
+            }
+            catch (...)
+            {
+                return hpx::make_exceptional_future<naming::address>(
+                    std::current_exception());
+            }
+        }
+
+        return result.get_future().then(
+            hpx::launch::sync, [this, gid](auto&& f) {
+                return resolve_full_postproc(gid, f.get());
+            });
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1301,26 +1318,38 @@ namespace hpx::agas {
     // incref was sent. The pending decref was subtracted from the amount of
     // credits to incref.
     std::int64_t addressing_service::synchronize_with_async_incref(
-        hpx::future<std::int64_t> fut, hpx::id_type const&,
+        std::int64_t old_credit, hpx::id_type const&,
         std::int64_t compensated_credit)
     {
-        return fut.get() + compensated_credit;
+        return old_credit + compensated_credit;
     }
 
-    hpx::future<std::int64_t> addressing_service::incref_async(
+    std::int64_t addressing_service::incref_async_helper(
         naming::gid_type const& id, std::int64_t credit,
         hpx::id_type const& keep_alive)
     {
+        auto result = incref_async(id, credit, keep_alive);
+        if (result.has_value())
+        {
+            return HPX_MOVE(result).get_value();
+        }
+        return result.get_future().get();
+    }
+
+    hpx::future_or_value<std::int64_t> addressing_service::incref_async(
+        naming::gid_type const& id, std::int64_t credit,
+        hpx::id_type const& keep_alive)
+    {    // {{{ incref implementation
         naming::gid_type raw(naming::detail::get_stripped_gid(id));
 
         if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
         {
             // reschedule this call as an HPX thread
-            hpx::future<std::int64_t> (addressing_service::*incref_async_ptr)(
+            std::int64_t (addressing_service::*incref_async_ptr)(
                 naming::gid_type const&, std::int64_t, hpx::id_type const&) =
-                &addressing_service::incref_async;
+                &addressing_service::incref_async_helper;
 
-            return async(incref_async_ptr, this, raw, credit, keep_alive);
+            return hpx::async(incref_async_ptr, this, raw, credit, keep_alive);
         }
 
         if (HPX_UNLIKELY(0 >= credit))
@@ -1328,6 +1357,7 @@ namespace hpx::agas {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::incref_async",
                 "invalid credit count of {1}", credit);
+            return std::int64_t(-1);
         }
 
         HPX_ASSERT(keep_alive != hpx::invalid_id);
@@ -1390,23 +1420,29 @@ namespace hpx::agas {
             }
         }
 
+        // no need to talk to AGAS, acknowledge the incref immediately
         if (!has_pending_incref)
         {
-            // no need to talk to AGAS, acknowledge the incref immediately
-            return hpx::make_ready_future(pending_decrefs);
+            return pending_decrefs;
         }
 
         naming::gid_type const e_lower = pending_incref.first;
-
-        hpx::future<std::int64_t> f = primary_ns_.increment_credit(
+        auto result = primary_ns_.increment_credit(
             pending_incref.second, e_lower, e_lower);
 
         // pass the amount of compensated decrefs to the callback
-        return f.then(hpx::launch::sync,
-            util::one_shot(
-                hpx::bind(&addressing_service::synchronize_with_async_incref,
-                    hpx::placeholders::_1, keep_alive, pending_decrefs)));
-    }
+        if (result.has_value())
+        {
+            return synchronize_with_async_incref(
+                result.get_value(), keep_alive, pending_decrefs);
+        }
+
+        return result.get_future().then(
+            hpx::launch::sync, [keep_alive, pending_decrefs](auto&& f) {
+                return synchronize_with_async_incref(
+                    f.get(), keep_alive, pending_decrefs);
+            });
+    }    // }}}
 
     ///////////////////////////////////////////////////////////////////////////
     void addressing_service::decref(
@@ -1509,7 +1545,7 @@ namespace hpx::agas {
         // We need to modify the reference count.
         naming::gid_type& mutable_gid = const_cast<hpx::id_type&>(id).get_gid();
         naming::gid_type const new_gid =
-            naming::detail::split_gid_if_needed(mutable_gid).get();
+            naming::detail::split_gid_if_needed(hpx::launch::sync, mutable_gid);
         std::int64_t const new_credit =
             naming::detail::get_credit_from_gid(new_gid);
 
@@ -1534,7 +1570,7 @@ namespace hpx::agas {
         // We need to modify the reference count.
         naming::gid_type& mutable_gid = const_cast<hpx::id_type&>(id).get_gid();
         naming::gid_type const new_gid =
-            naming::detail::split_gid_if_needed(mutable_gid).get();
+            naming::detail::split_gid_if_needed(hpx::launch::sync, mutable_gid);
         std::int64_t new_credit = naming::detail::get_credit_from_gid(new_gid);
 
         future<bool> f = symbol_ns_.bind_async(name, new_gid);

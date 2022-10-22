@@ -1,5 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +16,7 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -238,7 +240,27 @@ namespace hpx { namespace agas {
         return server_->resolve_gid(id);
     }
 
-    future<primary_namespace::resolved_type> primary_namespace::resolve_full(
+    hpx::future_or_value<primary_namespace::resolved_type>
+    primary_namespace::resolve_full(naming::gid_type id)
+    {
+        hpx::id_type dest = hpx::id_type(
+            get_service_instance(id), hpx::id_type::management_type::unmanaged);
+
+        if (naming::get_locality_id_from_id(dest) == agas::get_locality_id())
+        {
+            return server_->resolve_gid(id);
+        }
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        server::primary_namespace::resolve_gid_action action;
+        return hpx::async(action, HPX_MOVE(dest), id);
+#else
+        HPX_ASSERT(false);
+        return primary_namespace::resolved_type{};
+#endif
+    }
+
+    hpx::future_or_value<id_type> primary_namespace::colocate(
         naming::gid_type id)
     {
         hpx::id_type dest = hpx::id_type(
@@ -246,32 +268,15 @@ namespace hpx { namespace agas {
 
         if (naming::get_locality_id_from_id(dest) == agas::get_locality_id())
         {
-            return hpx::make_ready_future(server_->resolve_gid(id));
+            return server_->colocate(id);
         }
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-        server::primary_namespace::resolve_gid_action action;
-        return hpx::async(action, HPX_MOVE(dest), id);
-#else
-        HPX_ASSERT(false);
-        return hpx::make_ready_future(primary_namespace::resolved_type{});
-#endif
-    }
 
-    hpx::future<id_type> primary_namespace::colocate(naming::gid_type id)
-    {
-        hpx::id_type dest = hpx::id_type(
-            get_service_instance(id), hpx::id_type::management_type::unmanaged);
-
-        if (naming::get_locality_id_from_id(dest) == agas::get_locality_id())
-        {
-            return hpx::make_ready_future(server_->colocate(id));
-        }
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::primary_namespace::colocate_action action;
         return hpx::async(action, HPX_MOVE(dest), id);
 #else
         HPX_ASSERT(false);
-        return hpx::make_ready_future(hpx::invalid_id);
+        return hpx::invalid_id;
 #endif
     }
 
@@ -316,7 +321,7 @@ namespace hpx { namespace agas {
 #endif
     }
 
-    future<std::int64_t> primary_namespace::increment_credit(
+    future_or_value<std::int64_t> primary_namespace::increment_credit(
         std::int64_t credits, naming::gid_type lower, naming::gid_type upper)
     {
         hpx::id_type dest = hpx::id_type(get_service_instance(lower),
@@ -324,15 +329,15 @@ namespace hpx { namespace agas {
 
         if (naming::get_locality_id_from_id(dest) == agas::get_locality_id())
         {
-            return hpx::make_ready_future(
-                server_->increment_credit(credits, lower, upper));
+            return server_->increment_credit(credits, lower, upper);
         }
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::primary_namespace::increment_credit_action action;
         return hpx::async(action, HPX_MOVE(dest), credits, lower, upper);
 #else
         HPX_ASSERT(false);
-        return hpx::make_ready_future(std::int64_t{});
+        return std::int64_t(-1);
 #endif
     }
 

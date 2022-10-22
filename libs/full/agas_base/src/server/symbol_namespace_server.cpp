@@ -91,7 +91,7 @@ namespace hpx::agas::server {
 
         naming::gid_type gid = gid_;
 
-        gid_table_type::iterator const it = gids_.find(key);
+        auto const it = gids_.find(key);
         if (auto const end = gids_.end(); it != end)
         {
             std::int64_t const credits =
@@ -155,7 +155,7 @@ namespace hpx::agas::server {
             auto iter = first;
             while (iter != last)
             {
-                lcos.push_back((*iter).second);
+                lcos.push_back(iter->second);
                 ++iter;
             }
 
@@ -187,7 +187,8 @@ namespace hpx::agas::server {
                     // split the credit as the receiving end will expect to keep
                     // the object alive
                     naming::gid_type new_gid =
-                        naming::detail::split_gid_if_needed(*current_gid).get();
+                        naming::detail::split_gid_if_needed(
+                            hpx::launch::sync, *current_gid);
 
                     // trigger the lco
                     set_lco_value(id, new_gid);
@@ -216,7 +217,7 @@ namespace hpx::agas::server {
 
         std::unique_lock<mutex_type> l(mutex_);
 
-        gid_table_type::iterator const it = gids_.find(key);
+        auto const it = gids_.find(key);
         if (auto const end = gids_.end(); it == end)
         {
             l.unlock();
@@ -233,8 +234,8 @@ namespace hpx::agas::server {
 
         l.unlock();
 
-        naming::gid_type gid =
-            naming::detail::split_gid_if_needed(*current_gid).get();
+        naming::gid_type gid = naming::detail::split_gid_if_needed(
+            hpx::launch::sync, *current_gid);
 
         LAGAS_(info).format("symbol_namespace::resolve, key({1}), "
                             "stored_gid({2}), gid({3})",
@@ -292,33 +293,33 @@ namespace hpx::agas::server {
             std::regex const rx(str_rx);
 
             std::unique_lock<mutex_type> l(mutex_);
-            for (auto it = gids_.begin(); it != gids_.end(); ++it)
+            for (auto& gid : gids_)
             {
-                if (!std::regex_match(it->first, rx))
+                if (!std::regex_match(gid.first, rx))
                     continue;
 
                 // hold on to entry while map is unlocked
-                std::shared_ptr<naming::gid_type> current_gid(it->second);
+                std::shared_ptr<naming::gid_type> current_gid(gid.second);
                 unlock_guard<std::unique_lock<mutex_type>> ul(l);
 
-                found[it->first] =
-                    naming::detail::split_gid_if_needed(*current_gid).get();
+                found[gid.first] = naming::detail::split_gid_if_needed(
+                    hpx::launch::sync, *current_gid);
             }
         }
         else
         {
             std::unique_lock<mutex_type> l(mutex_);
-            for (auto it = gids_.begin(); it != gids_.end(); ++it)
+            for (auto& gid : gids_)
             {
-                if (!pattern.empty() && pattern != it->first)
+                if (!pattern.empty() && pattern != gid.first)
                     continue;
 
                 // hold on to entry while map is unlocked
-                std::shared_ptr<naming::gid_type> current_gid(it->second);
+                std::shared_ptr<naming::gid_type> current_gid(gid.second);
                 unlock_guard<std::unique_lock<mutex_type>> ul(l);
 
-                found[it->first] =
-                    naming::detail::split_gid_if_needed(*current_gid).get();
+                found[gid.first] = naming::detail::split_gid_if_needed(
+                    hpx::launch::sync, *current_gid);
             }
         }
 
@@ -351,7 +352,8 @@ namespace hpx::agas::server {
 
                     unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     naming::gid_type new_gid =
-                        naming::detail::split_gid_if_needed(*current_gid).get();
+                        naming::detail::split_gid_if_needed(
+                            hpx::launch::sync, *current_gid);
 
                     // trigger the lco
                     handled = true;
