@@ -10,8 +10,8 @@
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
-#include <hpx/functional/function.hpp>
-#include <hpx/functional/move_only_function.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 
 #include <algorithm>
@@ -154,14 +154,19 @@ namespace hpx::agas::detail::impl {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::address> resolve_async(hpx::id_type const& id)
+    hpx::future_or_value<naming::address> resolve_async(hpx::id_type const& id)
     {
         return naming::get_agas_client().resolve_async(id);
     }
 
     naming::address resolve(hpx::id_type const& id, error_code& ec)
     {
-        return naming::get_agas_client().resolve_async(id).get(ec);
+        auto result = naming::get_agas_client().resolve_async(id);
+        if (result.has_value())
+        {
+            return HPX_MOVE(result).get_value();
+        }
+        return result.get_future().get(ec);
     }
 
     bool resolve_local(
@@ -396,13 +401,12 @@ namespace hpx::agas::detail::impl {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<std::int64_t> incref_async(naming::gid_type const& gid,
+    hpx::future_or_value<std::int64_t> incref_async(naming::gid_type const& gid,
         std::int64_t credits, hpx::id_type const& keep_alive_)
     {
         HPX_ASSERT(!naming::detail::is_locked(gid));
 
         naming::resolver_client& resolver = naming::get_agas_client();
-
         if (keep_alive_)
             return resolver.incref_async(gid, credits, keep_alive_);
 
@@ -411,31 +415,21 @@ namespace hpx::agas::detail::impl {
         return resolver.incref_async(gid, credits, keep_alive);
     }
 
-    std::int64_t incref(naming::gid_type const& gid, std::int64_t credits,
-        hpx::id_type const& keep_alive_, error_code&)
-    {
-        HPX_ASSERT(!naming::detail::is_locked(gid));
-
-        naming::resolver_client& resolver = naming::get_agas_client();
-
-        if (keep_alive_)
-        {
-            return resolver.incref_async(gid, credits, keep_alive_).get();
-        }
-        hpx::id_type const keep_alive =
-            hpx::id_type(gid, hpx::id_type::management_type::unmanaged);
-        return resolver.incref_async(gid, credits, keep_alive).get();
-    }
-
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<hpx::id_type> get_colocation_id_async(hpx::id_type const& id)
+    hpx::future_or_value<id_type> get_colocation_id_async(
+        hpx::id_type const& id)
     {
         return naming::get_agas_client().get_colocation_id_async(id);
     }
 
     hpx::id_type get_colocation_id(hpx::id_type const& id, error_code& ec)
     {
-        return get_colocation_id_async(id).get(ec);
+        auto result = get_colocation_id_async(id);
+        if (result.has_value())
+        {
+            return HPX_MOVE(result).get_value();
+        }
+        return result.get_future().get(ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -616,7 +610,6 @@ namespace hpx::agas {
 
             detail::decref = &detail::impl::decref;
             detail::incref_async = &detail::impl::incref_async;
-            detail::incref = &detail::impl::incref;
 
             detail::get_colocation_id_async =
                 &detail::impl::get_colocation_id_async;

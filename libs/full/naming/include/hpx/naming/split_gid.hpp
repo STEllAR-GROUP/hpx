@@ -9,14 +9,20 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/futures/future.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/datastructures.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 
 #include <mutex>
 
 namespace hpx::naming::detail {
 
-    HPX_EXPORT hpx::future<gid_type> split_gid_if_needed(gid_type& id);
-    HPX_EXPORT hpx::future<gid_type> split_gid_if_needed_locked(
+    HPX_EXPORT hpx::future_or_value<gid_type> split_gid_if_needed(gid_type& id);
+
+    HPX_EXPORT gid_type split_gid_if_needed(
+        hpx::launch::sync_policy, gid_type& id);
+
+    HPX_EXPORT hpx::future_or_value<gid_type> split_gid_if_needed_locked(
         std::unique_lock<gid_type::mutex_type>& l, gid_type& gid);
 }    // namespace hpx::naming::detail

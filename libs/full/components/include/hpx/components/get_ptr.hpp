@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,8 +17,8 @@
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/components_base/traits/component_pin_support.hpp>
 #include <hpx/components_base/traits/component_type_is_compatible.hpp>
-#include <hpx/functional/bind_back.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
@@ -134,6 +134,61 @@ namespace hpx {
             return get_ptr_postproc<Component, get_ptr_for_migration_deleter>(
                 addr, id, false);
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Component>
+        std::shared_ptr<Component> resolve_get_ptr_local(hpx::id_type const& id)
+        {
+            return std::shared_ptr<Component>(
+                get_lva<Component>::call(
+                    reinterpret_cast<hpx::naming::address_type>(id.get_lsb())),
+                detail::get_ptr_no_unpin_deleter(id));
+        }
+
+        template <typename Component>
+        hpx::future_or_value<std::shared_ptr<Component>> get_ptr(
+            hpx::id_type const& id)
+        {
+            hpx::error_code ec(hpx::throwmode::lightweight);
+
+            // shortcut for local, non-migratable objects
+            naming::gid_type gid = id.get_gid();
+            if (naming::refers_to_local_lva(gid) &&
+                naming::get_locality_id_from_gid(gid) ==
+                    agas::get_locality_id(ec) &&
+                !ec)
+            {
+                return resolve_get_ptr_local<Component>(id);
+            }
+
+            if (ec)
+            {
+                return hpx::make_exceptional_future<std::shared_ptr<Component>>(
+                    hpx::detail::access_exception(ec));
+            }
+
+            auto result = agas::resolve_async(id);
+            if (result.has_value())
+            {
+                try
+                {
+                    return get_ptr_postproc<Component, get_ptr_deleter>(
+                        HPX_MOVE(result).get_value(), id);
+                }
+                catch (...)
+                {
+                    return hpx::make_exceptional_future<
+                        std::shared_ptr<Component>>(std::current_exception());
+                }
+            }
+
+            return result.get_future().then(hpx::launch::sync,
+                [=](hpx::future<naming::address>&& f)
+                    -> std::shared_ptr<Component> {
+                    return get_ptr_postproc<Component, get_ptr_deleter>(
+                        f.get(), id);
+                });
+        }
     }    // namespace detail
     /// \endcond
 
@@ -164,12 +219,12 @@ namespace hpx {
     template <typename Component>
     hpx::future<std::shared_ptr<Component>> get_ptr(hpx::id_type const& id)
     {
-        hpx::future<naming::address> f = agas::resolve(id);
-        return f.then(hpx::launch::sync,
-            [=](hpx::future<naming::address> f) -> std::shared_ptr<Component> {
-                return detail::get_ptr_postproc<Component,
-                    detail::get_ptr_deleter>(f.get(), id);
-            });
+        auto result = detail::get_ptr<Component>(id);
+        if (result.has_value())
+        {
+            return hpx::make_ready_future(HPX_MOVE(result).get_value());
+        }
+        return HPX_MOVE(result).get_future();
     }
 
     /// \brief Returns a future referring to the pointer to the
@@ -247,19 +302,12 @@ namespace hpx {
     std::shared_ptr<Component> get_ptr(
         launch::sync_policy, hpx::id_type const& id, error_code& ec = throws)
     {
-        // shortcut for local, non-migratable objects
-        naming::gid_type gid = id.get_gid();
-        if (naming::refers_to_local_lva(gid) &&
-            naming::get_locality_id_from_gid(gid) == agas::get_locality_id(ec))
+        auto result = detail::get_ptr<Component>(id);
+        if (result.has_value())
         {
-            return std::shared_ptr<Component>(
-                get_lva<Component>::call(
-                    reinterpret_cast<hpx::naming::address_type>(gid.get_lsb())),
-                detail::get_ptr_no_unpin_deleter(id));
+            return HPX_MOVE(result).get_value();
         }
-
-        hpx::future<std::shared_ptr<Component>> ptr = get_ptr<Component>(id);
-        return ptr.get(ec);
+        return result.get_future().get(ec);
     }
 #endif
 

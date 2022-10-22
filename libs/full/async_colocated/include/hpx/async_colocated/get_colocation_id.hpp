@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/futures/future_fwd.hpp>
+#include <hpx/modules/async_base.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
 

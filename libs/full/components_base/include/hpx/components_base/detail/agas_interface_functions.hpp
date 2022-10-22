@@ -11,8 +11,8 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/move_only_function.hpp>
-#include <hpx/futures/future_fwd.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
@@ -115,7 +115,7 @@ namespace hpx::agas::detail {
         naming::gid_type const& gid);
 
     ///////////////////////////////////////////////////////////////////////////
-    extern HPX_EXPORT hpx::future<naming::address> (*resolve_async)(
+    extern HPX_EXPORT hpx::future_or_value<naming::address> (*resolve_async)(
         hpx::id_type const& id);
 
     extern HPX_EXPORT naming::address (*resolve)(
@@ -184,18 +184,15 @@ namespace hpx::agas::detail {
         naming::gid_type const& id, std::int64_t credits, error_code& ec);
 
     ///////////////////////////////////////////////////////////////////////////
-    extern HPX_EXPORT hpx::future<std::int64_t> (*incref_async)(
+    extern HPX_EXPORT hpx::future_or_value<std::int64_t> (*incref_async)(
         naming::gid_type const& gid, std::int64_t credits,
         hpx::id_type const& keep_alive);
-
-    extern HPX_EXPORT std::int64_t (*incref)(naming::gid_type const& gid,
-        std::int64_t credits, hpx::id_type const& keep_alive, error_code& ec);
 
     ///////////////////////////////////////////////////////////////////////////
     extern HPX_EXPORT std::int64_t (*replenish_credits)(naming::gid_type& gid);
 
     ///////////////////////////////////////////////////////////////////////////
-    extern HPX_EXPORT hpx::future<hpx::id_type> (*get_colocation_id_async)(
+    extern HPX_EXPORT hpx::future_or_value<id_type> (*get_colocation_id_async)(
         hpx::id_type const& id);
 
     extern HPX_EXPORT hpx::id_type (*get_colocation_id)(

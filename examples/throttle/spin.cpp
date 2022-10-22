@@ -47,7 +47,8 @@ int hpx_main()
 
                 for (id_type const& locality_ : localities)
                 {
-                    address addr = hpx::agas::resolve(locality_).get();
+                    address addr =
+                        hpx::agas::resolve(hpx::launch::sync, locality_);
 
                     hpx::util::format_to(std::cout, "  [{1}] {2}\n",
                         get_locality_id_from_gid(locality_.get_gid()),
