@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Anuj R. Sharma
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/distribution_policies/container_distribution_policy.hpp>
@@ -73,6 +72,7 @@ namespace hpx {
 
         std::uint32_t this_locality = get_locality_id();
         std::vector<future<void>> ptrs;
+        ptrs.reserve(partitions_.size());
 
         typedef typename partitions_vector_type::const_iterator const_iterator;
 
@@ -346,6 +346,7 @@ namespace hpx {
         // now initialize our data structures
         std::uint32_t this_locality = get_locality_id();
         std::vector<future<void>> ptrs;
+        ptrs.reserve(num_parts);
 
         std::size_t num_part = 0;
         std::size_t allocated_size = 0;
@@ -397,7 +398,7 @@ namespace hpx {
         }
         HPX_ASSERT(l == num_parts);
 
-        hpx::when_all(ptrs).get();
+        hpx::wait_all(ptrs);
 
         // cache our partition size
         partition_size_ = get_partition_size();
@@ -440,11 +441,12 @@ namespace hpx {
 
         std::uint32_t this_locality = get_locality_id();
         std::vector<future<void>> ptrs;
+        ptrs.reserve(rhs.partitions_.size());
 
-        partitions_vector_type partitions;
         // Fixing the size of partitions to avoid race conditions between
         // possible reallocations during push back and the continuation
         // to set the local partition data
+        partitions_vector_type partitions;
         partitions.resize(rhs.partitions_.size());
         for (std::size_t i = 0; i != rhs.partitions_.size(); ++i)
         {
@@ -461,7 +463,7 @@ namespace hpx {
             }
         }
 
-        hpx::when_all(ptrs).get();
+        hpx::wait_all(ptrs);
 
         size_ = rhs.size_;
         partition_size_ = rhs.partition_size_;

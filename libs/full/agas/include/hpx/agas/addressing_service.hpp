@@ -18,6 +18,7 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/agas_base.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -177,7 +178,7 @@ namespace hpx { namespace agas {
         void garbage_collect(error_code& ec = throws);
 
         static std::int64_t synchronize_with_async_incref(
-            hpx::future<std::int64_t> fut, hpx::id_type const& id,
+            std::int64_t old_credit, hpx::id_type const& id,
             std::int64_t compensated_credit);
 
         server::primary_namespace& get_local_primary_namespace_service()
@@ -221,7 +222,7 @@ namespace hpx { namespace agas {
             util::runtime_configuration& rtcfg);
 
         naming::address resolve_full_postproc(naming::gid_type const& id,
-            future<primary_namespace::resolved_type> f);
+            primary_namespace::resolved_type const&);
         bool bind_postproc(
             naming::gid_type const& id, gva const& g, future<bool> f);
 
@@ -856,15 +857,17 @@ namespace hpx { namespace agas {
         }
 
         ///////////////////////////////////////////////////////////////////////////
-        hpx::future<naming::address> resolve_async(naming::gid_type const& id);
+        hpx::future_or_value<naming::address> resolve_async(
+            naming::gid_type const& id);
 
-        hpx::future<naming::address> resolve_async(hpx::id_type const& id)
+        hpx::future_or_value<naming::address> resolve_async(
+            hpx::id_type const& id)
         {
             return resolve_async(id.get_gid());
         }
 
         ///////////////////////////////////////////////////////////////////////////
-        hpx::future<hpx::id_type> get_colocation_id_async(
+        hpx::future_or_value<id_type> get_colocation_id_async(
             hpx::id_type const& id);
 
         ///////////////////////////////////////////////////////////////////////////
@@ -893,10 +896,11 @@ namespace hpx { namespace agas {
             return addr;
         }
 
-        hpx::future<naming::address> resolve_full_async(
+        hpx::future_or_value<naming::address> resolve_full_async(
             naming::gid_type const& id);
 
-        hpx::future<naming::address> resolve_full_async(hpx::id_type const& id)
+        hpx::future_or_value<naming::address> resolve_full_async(
+            hpx::id_type const& id)
         {
             return resolve_full_async(id.get_gid());
         }
@@ -978,14 +982,25 @@ namespace hpx { namespace agas {
         ///                   throw but returns the result code using the
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
-        hpx::future<std::int64_t> incref_async(naming::gid_type const& gid,
+        hpx::future_or_value<std::int64_t> incref_async(
+            naming::gid_type const& gid, std::int64_t credits = 1,
+            hpx::id_type const& keep_alive = hpx::invalid_id);
+
+        ///  \cond NOINTERN
+        std::int64_t incref_async_helper(naming::gid_type const& gid,
             std::int64_t credits = 1,
             hpx::id_type const& keep_alive = hpx::invalid_id);
+        /// \endcond
 
         std::int64_t incref(naming::gid_type const& gid,
             std::int64_t credits = 1, error_code& ec = throws)
         {
-            return incref_async(gid, credits).get(ec);
+            auto result = incref_async(gid, credits);
+            if (result.has_value())
+            {
+                return HPX_MOVE(result).get_value();
+            }
+            return result.get_future().get(ec);
         }
 
         /// \brief Decrement the global reference count for the given id

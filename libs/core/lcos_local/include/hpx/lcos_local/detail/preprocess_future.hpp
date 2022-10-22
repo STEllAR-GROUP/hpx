@@ -123,6 +123,16 @@ namespace hpx::serialization::detail {
             ++num_futures_;
         }
 
+        void decrement_future_count()
+        {
+            std::lock_guard<mutex_type> l(mtx_);
+            HPX_ASSERT(num_futures_ > 0);
+            if (--num_futures_ == 0)
+            {
+                done_ = true;
+            }
+        }
+
         void reset()
         {
             std::lock_guard<mutex_type> l(mtx_);

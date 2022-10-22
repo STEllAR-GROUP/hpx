@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Minh-Khanh Do
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -75,7 +76,7 @@ void inclusive_scan_algo_tests_with_policy(std::size_t size,
 template <typename T, typename DistPolicy, typename ExPolicy>
 void inclusive_scan_algo_tests_segmented_out_with_policy(std::size_t size,
     DistPolicy const& in_dist_policy, DistPolicy const& out_dist_policy,
-    hpx::partitioned_vector<T>& in, hpx::partitioned_vector<T> out,
+    hpx::partitioned_vector<T>& in, hpx::partitioned_vector<T>& out,
     std::vector<T> ver, ExPolicy const& policy)
 {
     msg9(typeid(ExPolicy).name(), typeid(DistPolicy).name(), typeid(T).name(),
@@ -168,7 +169,7 @@ void inclusive_scan_algo_tests_with_policy_async(std::size_t size,
 template <typename T, typename DistPolicy, typename ExPolicy>
 void inclusive_scan_algo_tests_segmented_out_with_policy_async(std::size_t size,
     DistPolicy const& in_dist_policy, DistPolicy const& out_dist_policy,
-    hpx::partitioned_vector<T>& in, hpx::partitioned_vector<T> out,
+    hpx::partitioned_vector<T>& in, hpx::partitioned_vector<T>& out,
     std::vector<T> ver, ExPolicy const& policy)
 {
     msg9(typeid(ExPolicy).name(), typeid(DistPolicy).name(), typeid(T).name(),
