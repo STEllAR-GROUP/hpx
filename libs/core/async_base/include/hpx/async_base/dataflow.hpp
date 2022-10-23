@@ -4,7 +4,28 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file dataflow.hpp
+
 #pragma once
+
+#if defined(DOXYGEN)
+
+namespace hpx {
+    // clang-format off
+    /// \brief The function template \a dataflow runs the function f
+    ///        asynchronously (potentially in a separate thread which might be
+    ///        a part of a thread pool) and returns a \c hpx::future that will
+    ///        eventually hold the result of that function call. Its behavior
+    ///        is similar to \c hpx::async with the exception that if one of
+    ///        the arguments is a \a future, then \c hpx::dataflow will wait
+    ///        for the \a future to be ready to launch the thread. Hence, the
+    ///        operation is delayed until all the arguments are ready.
+    template <typename F, typename... Ts>
+    auto dataflow(F&& f, Ts&&... ts);
+    // clang-format on
+}    // namespace hpx
+
+#else
 
 #include <hpx/config.hpp>
 #include <hpx/modules/allocator_support.hpp>
@@ -63,4 +84,4 @@ namespace hpx {
     }
 }    // namespace hpx
 
-// #endif
+#endif

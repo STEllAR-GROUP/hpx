@@ -277,8 +277,20 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace this_thread {
+
+        /// \brief Returns the id of the current thread
         HPX_CORE_EXPORT thread::id get_id() noexcept;
 
+        /// \brief Provides a hint to the implementation to reschedule the
+        ///        execution of threads, allowing other threads to run.
+        /// \note  The exact behavior of this function depends on the
+        ///        implementation, in particular on the mechanics of the OS
+        ///        scheduler in use and the state of the system. For example,
+        ///        a first-in-first-out realtime scheduler (SCHED_FIFO in Linux)
+        ///        would suspend the current thread and put it on the back of
+        ///        the queue of the same-priority threads that are ready to run
+        ///        (and if there are no other threads at the same priority, yield
+        ///        has no effect).
         HPX_CORE_EXPORT void yield() noexcept;
         HPX_CORE_EXPORT void yield_to(thread::id) noexcept;
 
@@ -292,9 +304,27 @@ namespace hpx {
 
         HPX_CORE_EXPORT void interrupt();
 
+        /// \brief Blocks the execution of the current thread until specified
+        ///        \a abs_time has been reached.
+        /// \details It is recommended to use the clock tied to \a abs_time,
+        ///          in which case adjustments of the clock may be taken into
+        ///          account. Thus, the duration of the block might be more or
+        ///          less than \c abs_time-Clock::now() at the time of the call,
+        ///          depending on the direction of the adjustment and whether it
+        ///          is honored by the implementation. The function also may block
+        ///          until after \a abs_time has been reached due to process scheduling
+        ///          or resource contention delays.
+        /// \param abs_time absolute time to block until
         HPX_CORE_EXPORT void sleep_until(
             hpx::chrono::steady_time_point const& abs_time);
 
+        /// \brief Blocks the execution of the current thread for at least the
+        ///        specified \a rel_time. This function may block for longer
+        ///        than \a rel_time due to scheduling or resource contention delays.
+        /// \details It is recommended to use a steady clock to measure the duration.
+        ///          If an implementation uses a system clock instead, the wait time
+        ///          may also be sensitive to clock adjustments.
+        /// \param rel_time time duration to sleep
         inline void sleep_for(hpx::chrono::steady_duration const& rel_time)
         {
             sleep_until(rel_time.from_now());
