@@ -27,11 +27,7 @@ namespace hpx { namespace parallel { namespace traits {
     HPX_HOST_DEVICE HPX_FORCEINLINE auto set(
         Vector& vec, std::size_t index, T val)
     {
-#if defined(HPX_HAVE_DATAPAR_STD_EXPERIMENTAL_SIMD)
-        vec[index] = val;
-#elif defined(HPX_HAVE_DATAPAR_SVE)
-        vec.set(index, val);
-#endif
+        datapar::experimental::set(vec, index, val);
     }
 }}}    // namespace hpx::parallel::traits
 

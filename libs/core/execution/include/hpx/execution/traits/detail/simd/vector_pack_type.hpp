@@ -23,16 +23,16 @@ namespace hpx { namespace parallel { namespace traits {
         template <typename T, std::size_t N, typename Abi>
         struct vector_pack_type
         {
-            typedef datapar::experimental::fixed_size_simd<T, N> type;
+            using type = typename datapar::experimental::fixed_size_simd<T, N>;
         };
 
         template <typename T, typename Abi>
         struct vector_pack_type<T, 0, Abi>
         {
-            typedef typename std::conditional<std::is_void<Abi>::value,
-                datapar::experimental::native<T>, Abi>::type abi_type;
+            using abi_type = std::conditional_t<std::is_void_v<Abi>,
+                datapar::experimental::native<T>, Abi>;
 
-            typedef datapar::experimental::simd<T, abi_type> type;
+            using type = typename datapar::experimental::simd<T, abi_type>;
         };
 
         template <typename T, typename Abi>
@@ -51,7 +51,7 @@ namespace hpx { namespace parallel { namespace traits {
     ////////////////////////////////////////////////////////////////////
     template <typename T>
     struct vector_pack_mask_type<T,
-        typename std::enable_if_t<datapar::experimental::is_simd_v<T>>>
+        std::enable_if_t<datapar::experimental::is_simd_v<T>>>
     {
         using type = T::mask_type;
     };
