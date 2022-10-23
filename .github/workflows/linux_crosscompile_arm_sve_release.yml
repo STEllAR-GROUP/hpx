@@ -1,0 +1,52 @@
+# Copyright (c) 2022 Srinivas Yadav
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+name: Linux CROSSCOMPILE ARM SVE CI (Release)
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: stellargroup/crosscompile_arm_sve_build_env:1
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure
+      shell: bash
+      run: |
+          cmake \
+              . \
+              -Bbuild \
+              -GNinja \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_SYSTEM_NAME=Linux \
+              -DCMAKE_SYSTEM_PROCESSOR=arm \
+              -DCMAKE_CROSSCOMPILING=ON \
+              -DCMAKE_CROSSCOMPILING_EMULATOR=/usr/bin/qemu-aarch64 \
+              -DHPX_WITH_MALLOC=system \
+              -DHPX_WITH_FETCH_ASIO=ON \
+              -DHPX_WITH_EXAMPLES=ON \
+              -DHPX_WITH_TESTS=ON \
+              -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
+              -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On \
+              -DHPX_WITH_CXX_STANDARD=20 \
+              -DCMAKE_CXX_FLAGS=-march=armv8-a+sve \
+              -DBOOST_ROOT=/opt/install/boost/release/boost \
+              -DHWLOC_ROOT=/opt/install/hwloc \
+              -DHPX_WITH_GENERIC_CONTEXT_COROUTINES=On
+    - name: Build
+      shell: bash
+      run: |
+          cmake --build build --target core
+          cmake --build build --target tests.unit.modules.algorithms
+    - name: Test
+      shell: bash
+      run: |
+          cd build
+          ctest \
+            --output-on-failure \
+            --tests-regex tests.unit.modules.algorithms
