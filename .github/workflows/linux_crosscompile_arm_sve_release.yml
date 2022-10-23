@@ -37,16 +37,19 @@ jobs:
               -DCMAKE_CXX_FLAGS=-march=armv8-a+sve \
               -DBOOST_ROOT=/opt/install/boost/release/boost \
               -DHWLOC_ROOT=/opt/install/hwloc \
-              -DHPX_WITH_GENERIC_CONTEXT_COROUTINES=On
+              -DHPX_WITH_GENERIC_CONTEXT_COROUTINES=On \
+              -DHPX_WITH_DATAPAR_BACKEND=SVE \
+              -DSVE_ROOT=/opt/install/sve/release/sve
     - name: Build
       shell: bash
       run: |
           cmake --build build --target core
-          cmake --build build --target tests.unit.modules.algorithms
+          cmake --build build --target tests.unit.modules.algorithms.datapar_algorithms
+          cmake --build build --target ninja tests.regressions.modules.algorithms.for_each_datapar
     - name: Test
       shell: bash
       run: |
           cd build
           ctest \
             --output-on-failure \
-            --tests-regex tests.unit.modules.algorithms
+            --tests-regex datapar
