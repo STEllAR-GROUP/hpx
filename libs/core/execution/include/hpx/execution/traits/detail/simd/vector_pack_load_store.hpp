@@ -28,7 +28,8 @@ namespace hpx { namespace parallel { namespace traits {
         template <typename Iter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static V aligned(Iter const& iter)
         {
-            return V(std::addressof(*iter), datapar::experimental::vector_aligned);
+            return V(
+                std::addressof(*iter), datapar::experimental::vector_aligned);
         }
 
         template <typename Iter>

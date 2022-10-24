@@ -15,11 +15,11 @@
 
 namespace hpx { namespace datapar { namespace experimental {
 
-    using std::experimental::simd;
-    using std::experimental::native_simd;
-    using std::experimental::simd_mask;
     using std::experimental::fixed_size_simd;
     using std::experimental::is_simd_v;
+    using std::experimental::native_simd;
+    using std::experimental::simd;
+    using std::experimental::simd_mask;
 
     using std::experimental::simd_abi::native;
 
@@ -28,8 +28,8 @@ namespace hpx { namespace datapar { namespace experimental {
 
     using std::experimental::all_of;
     using std::experimental::any_of;
-    using std::experimental::none_of;
     using std::experimental::find_first_set;
+    using std::experimental::none_of;
     using std::experimental::popcount;
     using std::experimental::reduce;
 
@@ -60,7 +60,7 @@ namespace hpx { namespace datapar { namespace experimental {
     {
         vec[index] = val;
     }
-}}}
+}}}    // namespace hpx::datapar::experimental
 #endif
 
 #if defined(HPX_HAVE_DATAPAR_SVE)
@@ -76,7 +76,7 @@ namespace hpx { namespace datapar { namespace experimental {
     {
         vec.set(index, val);
     }
-}}}
+}}}    // namespace hpx::datapar::experimental
 #endif
 
 #endif

@@ -92,10 +92,11 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "STD_EXPERIMENTAL_SIMD")
   endif()
 endif()
 
-# # ##############################################################################
-# # HPX SVE configuration
-# # ##############################################################################
-if ("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
+# #
+# ##############################################################################
+# # HPX SVE configuration #
+# ##############################################################################
+if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
   hpx_option(
     HPX_WITH_FETCH_SVE
     BOOL
@@ -118,14 +119,17 @@ if ("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
   include(HPX_SetupSVE)
   hpx_option(
     HPX_WITH_DATAPAR BOOL
-    "Enable data parallel algorithm support using SVE library (default: ON)"
-    ON ADVANCED)
+    "Enable data parallel algorithm support using SVE library (default: ON)" ON
+    ADVANCED
+  )
   hpx_add_config_define(HPX_HAVE_DATAPAR_SVE)
   hpx_add_config_define(HPX_HAVE_DATAPAR)
 endif()
 
-if (("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "STD_EXPERIMENTAL_SIMD") OR ("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE"))
-    hpx_add_config_define(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
+if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "STD_EXPERIMENTAL_SIMD")
+   OR ("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
+)
+  hpx_add_config_define(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
 endif()
 
 if(HPX_WITH_DATAPAR)

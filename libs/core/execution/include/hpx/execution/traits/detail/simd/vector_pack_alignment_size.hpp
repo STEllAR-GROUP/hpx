@@ -20,7 +20,8 @@
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    struct is_vector_pack<datapar::experimental::native_simd<T>> : std::true_type
+    struct is_vector_pack<datapar::experimental::native_simd<T>>
+      : std::true_type
     {
     };
 
@@ -51,8 +52,9 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename T, typename Abi>
     struct vector_pack_alignment<datapar::experimental::simd<T, Abi>>
     {
-        static std::size_t const value = datapar::experimental::memory_alignment_v<
-            datapar::experimental::simd<T, Abi>>;
+        static std::size_t const value =
+            datapar::experimental::memory_alignment_v<
+                datapar::experimental::simd<T, Abi>>;
     };
 
     ///////////////////////////////////////////////////////////////////////////

@@ -16,20 +16,22 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE") AND NOT TARGET SVE::sve)
       )
     endif()
 
-    if ("${HPX_WITH_SVE_LENGTH}" STREQUAL "")
-      hpx_error("When using HPX_WITH_FETCH_SVE, set HPX_WITH_SVE_LENGTH to appropriate length based on the architecture.")
+    if("${HPX_WITH_SVE_LENGTH}" STREQUAL "")
+      hpx_error(
+        "When using HPX_WITH_FETCH_SVE, set HPX_WITH_SVE_LENGTH to appropriate length based on the architecture."
+      )
     endif()
 
     set(SVE_LENGTH "${HPX_WITH_SVE_LENGTH}")
 
     include(FetchContent)
-    FetchContent_Declare(
+    fetchcontent_declare(
       sve
       GIT_REPOSITORY https://github.com/srinivasyadav18/sve.git
       GIT_TAG ${HPX_WITH_SVE_TAG}
     )
-    
-    FetchContent_MakeAvailable(sve)
+
+    fetchcontent_makeavailable(sve)
 
     set(SVE_ROOT ${sve_SOURCE_DIR})
 
@@ -38,7 +40,7 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE") AND NOT TARGET SVE::sve)
       EXPORT HPXSVETarget
       COMPONENT core
     )
-  
+
     install(
       DIRECTORY ${SVE_ROOT}/include/
       DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
@@ -47,22 +49,22 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE") AND NOT TARGET SVE::sve)
       PATTERN "*.hpp"
       PATTERN "*.ipp"
     )
-  
+
     export(
       TARGETS sve
       NAMESPACE SVE::
       FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXSVETarget.cmake"
     )
-  
+
     install(
       EXPORT HPXSVETarget
       NAMESPACE SVE::
       FILE HPXSVETarget.cmake
       DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
     )
-  
+
   else()
-    if (SVE_ROOT)
+    if(SVE_ROOT)
       find_package(SVE REQUIRED PATHS ${SVE_ROOT})
     else()
       hpx_error("SVE_ROOT not set")
