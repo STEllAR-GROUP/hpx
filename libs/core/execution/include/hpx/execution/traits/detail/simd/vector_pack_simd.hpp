@@ -10,6 +10,8 @@
 
 #if defined(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
 
+#include <cstddef>
+
 #if defined(HPX_HAVE_DATAPAR_STD_EXPERIMENTAL_SIMD)
 #include <experimental/simd>
 
