@@ -325,6 +325,7 @@ namespace hpx { namespace execution { namespace experimental {
                 {
                     main_thread_ok = true;
                     main_thread_ = t++;
+                    main_pu_num = rp.get_pu_num(main_thread_);
                     set_state_main_thread(thread_state::idle);
                 }
 
@@ -343,21 +344,22 @@ namespace hpx { namespace execution { namespace experimental {
                             HPX_ASSERT(hpx::threads::test(pu_mask_, pu_num));
                             main_thread_ok = true;
                             main_thread_ = t++;
+                            main_pu_num = rp.get_pu_num(main_thread_);
 
                             set_state_main_thread(thread_state::idle);
                             continue;
                         }
 
-                        if (main_pu_num == pu_num)
+                        // don't double-book core that runs main thread
+                        if (main_thread_ok && main_pu_num == pu_num)
                         {
-                            // don't double-book core that runs main thread
                             continue;
                         }
 
+                        // create an HPX thread only for cores in the given
+                        // PU-mask
                         if (!hpx::threads::test(pu_mask_, pu_num))
                         {
-                            // create an HPX thread only for cores in the given
-                            // PU-mask
                             continue;
                         }
 
@@ -367,7 +369,7 @@ namespace hpx { namespace execution { namespace experimental {
                         auto policy =
                             launch::async_policy(priority_, stacksize_,
                                 threads::thread_schedule_hint{
-                                    static_cast<std::int16_t>(pu)});
+                                    static_cast<std::int16_t>(t)});
 
                         hpx::util::thread_description desc(
                             generate_annotation(pu_num, "fork_join_executor"));

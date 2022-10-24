@@ -153,8 +153,7 @@ namespace hpx { namespace resource { namespace detail {
         std::size_t get_pool_index(std::string const& pool_name) const;
 
         std::size_t get_pu_num(std::size_t global_thread_num) const;
-        threads::mask_cref_type get_pu_mask(
-            std::size_t global_thread_num) const;
+        threads::mask_type get_pu_mask(std::size_t global_thread_num) const;
         std::size_t get_thread_occupancy(std::size_t pu_num) const;
         threads::mask_type get_used_pus_mask(std::size_t pu_num) const;
 

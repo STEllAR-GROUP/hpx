@@ -57,7 +57,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         get_get_pu_mask() = f;
     }
 
-    threads::mask_cref_type get_pu_mask(
+    threads::mask_type get_pu_mask(
         threads::topology& topo, std::size_t thread_num)
     {
         if (get_get_pu_mask())
