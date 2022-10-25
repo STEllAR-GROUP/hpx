@@ -4,9 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests contiguous_index_queue lockfree_fifo)
+set(tests contiguous_index_queue lockfree_fifo non_contiguous_index_queue)
 
 set(contiguous_index_queue_PARAMETERS THREADS_PER_LOCALITY 4)
+set(non_contiguous_index_queue_PARAMETERS THREADS_PER_LOCALITY 4)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

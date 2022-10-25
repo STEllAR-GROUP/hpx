@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,7 @@ set(concurrency_headers
     hpx/concurrency/deque.hpp
     hpx/concurrency/detail/contiguous_index_queue.hpp
     hpx/concurrency/detail/freelist.hpp
+    hpx/concurrency/detail/non_contiguous_index_queue.hpp
     hpx/concurrency/detail/tagged_ptr_pair.hpp
     hpx/concurrency/spinlock.hpp
     hpx/concurrency/spinlock_pool.hpp

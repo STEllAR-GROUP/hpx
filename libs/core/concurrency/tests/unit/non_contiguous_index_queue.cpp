@@ -1,13 +1,11 @@
-////////////////////////////////////////////////////////////////////////////////
 //  Copyright (C) 2020 ETH Zurich
+//  Copyright (C) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
-////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/concurrency/detail/contiguous_index_queue.hpp>
+#include <hpx/concurrency/detail/non_contiguous_index_queue.hpp>
 #include <hpx/local/barrier.hpp>
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
@@ -27,30 +25,35 @@
 
 unsigned int seed = std::random_device{}();
 
-void test_basic()
+void test_basic_default()
 {
-    {
-        // A default constructed queue should be empty.
-        hpx::concurrency::detail::contiguous_index_queue<> q;
+    // A default constructed queue should be empty.
+    hpx::concurrency::detail::non_contiguous_index_queue<> q;
 
-        HPX_TEST(q.empty());
-        HPX_TEST(!q.pop_left());
-        HPX_TEST(!q.pop_right());
-    }
+    HPX_TEST(q.empty());
+    HPX_TEST(!q.pop_left());
+    HPX_TEST(!q.pop_right());
+}
 
+void test_basic(std::uint32_t placement_step)
+{
     {
         // Popping from the left should give us the expected indices.
         std::uint32_t first = 3;
-        std::uint32_t last = 7;
-        hpx::concurrency::detail::contiguous_index_queue<> q{first, last};
+        std::uint32_t last = 11;
+        std::uint32_t step = placement_step;
+        hpx::concurrency::detail::non_contiguous_index_queue<> q{
+            first, last, step};
 
+        std::uint32_t count = 0;
         for (std::uint32_t curr_expected = first; curr_expected < last;
-             ++curr_expected)
+             curr_expected += step, ++count)
         {
             hpx::optional<std::uint32_t> curr = q.pop_left();
             HPX_TEST(curr);
             HPX_TEST_EQ(curr.value(), curr_expected);
         }
+        HPX_TEST_EQ(count, (11u - 3u) / placement_step);
 
         HPX_TEST(q.empty());
         HPX_TEST(!q.pop_left());
@@ -60,16 +63,20 @@ void test_basic()
     {
         // Popping from the right should give us the expected indices.
         std::uint32_t first = 3;
-        std::uint32_t last = 7;
-        hpx::concurrency::detail::contiguous_index_queue<> q{first, last};
+        std::uint32_t last = 11;
+        std::uint32_t step = placement_step;
+        hpx::concurrency::detail::non_contiguous_index_queue<> q{
+            first, last, step};
 
-        for (std::uint32_t curr_expected = last - 1; curr_expected >= first;
-             --curr_expected)
+        std::uint32_t count = 0;
+        for (std::uint32_t curr_expected = last - step; curr_expected >= first;
+             curr_expected -= step, ++count)
         {
             hpx::optional<std::uint32_t> curr = q.pop_right();
             HPX_TEST(curr);
             HPX_TEST_EQ(curr.value(), curr_expected);
         }
+        HPX_TEST_EQ(count, (11u - 3u) / placement_step);
 
         HPX_TEST(q.empty());
         HPX_TEST(!q.pop_left());
@@ -77,15 +84,17 @@ void test_basic()
 
         // Resetting a queue should give us the same behaviour as a fresh
         // queue.
-        q.reset(first, last);
+        q.reset(first, last, step);
 
-        for (std::uint32_t curr_expected = last - 1; curr_expected >= first;
-             --curr_expected)
+        count = 0;
+        for (std::uint32_t curr_expected = last - step; curr_expected >= first;
+             curr_expected -= step, ++count)
         {
             hpx::optional<std::uint32_t> curr = q.pop_right();
             HPX_TEST(curr);
             HPX_TEST_EQ(curr.value(), curr_expected);
         }
+        HPX_TEST_EQ(count, (11u - 3u) / placement_step);
 
         HPX_TEST(q.empty());
         HPX_TEST(!q.pop_left());
@@ -102,7 +111,7 @@ enum class pop_mode
 
 void test_concurrent_worker(pop_mode m, std::size_t thread_index,
     std::shared_ptr<hpx::barrier<>> b,
-    hpx::concurrency::detail::contiguous_index_queue<>& q,
+    hpx::concurrency::detail::non_contiguous_index_queue<>& q,
     std::vector<std::uint32_t>& popped_indices)
 {
     hpx::optional<std::uint32_t> curr;
@@ -140,12 +149,15 @@ void test_concurrent_worker(pop_mode m, std::size_t thread_index,
 void test_concurrent(pop_mode m)
 {
     std::uint32_t first = 33;
-    std::uint32_t last = 73210;
-    hpx::concurrency::detail::contiguous_index_queue<> q{first, last};
+    std::uint32_t last = 73211;
+    std::uint32_t step = 7;
+    hpx::concurrency::detail::non_contiguous_index_queue<> q{first, last, step};
 
     std::size_t const num_threads = hpx::get_num_worker_threads();
+
     // This test should be run on at least two worker threads.
     HPX_TEST_LTE(std::size_t(2), num_threads);
+
     std::vector<hpx::future<void>> fs;
     std::vector<std::vector<std::uint32_t>> popped_indices(num_threads);
     fs.reserve(num_threads);
@@ -165,7 +177,7 @@ void test_concurrent(pop_mode m)
     HPX_TEST(!q.pop_left());
     HPX_TEST(!q.pop_right());
 
-    std::size_t num_indices_expected = last - first;
+    std::size_t num_indices_expected = (last - first) / step;
     std::vector<std::uint32_t> collected_popped_indices;
     collected_popped_indices.reserve(num_indices_expected);
     std::size_t num_nonzero_indices_popped = 0;
@@ -186,7 +198,7 @@ void test_concurrent(pop_mode m)
     for (auto const i : collected_popped_indices)
     {
         HPX_TEST_EQ(i, curr_expected);
-        ++curr_expected;
+        curr_expected += step;
     }
 
     // We expect at least two threads to have popped indices concurrently.
@@ -203,7 +215,13 @@ int hpx_main(hpx::program_options::variables_map& vm)
     }
     std::cout << "Using seed: " << seed << '\n';
 
-    test_basic();
+    test_basic_default();
+
+    for (std::uint32_t step = 1; step != 3; ++step)
+    {
+        test_basic(step);
+    }
+
     test_concurrent(pop_mode::left);
     test_concurrent(pop_mode::right);
     test_concurrent(pop_mode::random);

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -216,6 +216,21 @@ namespace hpx { namespace threads {
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \enum thread_placement_hint
+    ///
+    /// The type of hint given to the scheduler related to thread placement
+    enum class thread_placement_hint : std::uint8_t
+    {
+        /// A hint that tells the scheduler to prefer spreading thread placement
+        /// on a breadth-first basis.
+        breadth_first = 0,
+
+        /// A hint that tells the scheduler to prefer spreading thread placement
+        /// on a depth-first basis.
+        depth_first = 1
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief A hint given to a scheduler to guide where a task should be
     /// scheduled.
     ///
@@ -224,37 +239,41 @@ namespace hpx { namespace threads {
     struct thread_schedule_hint
     {
         /// Construct a default hint with mode thread_schedule_hint_mode::none.
-        constexpr thread_schedule_hint() noexcept
-          : hint(-1)
-          , mode(thread_schedule_hint_mode::none)
-        {
-        }
+        constexpr thread_schedule_hint() noexcept = default;
 
         /// Construct a hint with mode thread_schedule_hint_mode::thread and the
         /// given hint as the local thread number.
-        constexpr explicit thread_schedule_hint(
-            std::int16_t thread_hint) noexcept
+        constexpr explicit thread_schedule_hint(std::int16_t thread_hint,
+            thread_placement_hint placement =
+                thread_placement_hint::breadth_first) noexcept
           : hint(thread_hint)
           , mode(thread_schedule_hint_mode::thread)
+          , placement_mode(placement)
         {
         }
 
         /// Construct a hint with the given mode and hint. The numerical hint is
         /// unused when the mode is thread_schedule_hint_mode::none.
-        constexpr thread_schedule_hint(
-            thread_schedule_hint_mode mode, std::int16_t hint) noexcept
+        constexpr thread_schedule_hint(thread_schedule_hint_mode mode,
+            std::int16_t hint,
+            thread_placement_hint placement =
+                thread_placement_hint::breadth_first) noexcept
           : hint(hint)
           , mode(mode)
+          , placement_mode(placement)
         {
         }
 
         /// \cond NOINTERNAL
-        bool operator==(thread_schedule_hint const& rhs) const noexcept
+        constexpr bool operator==(
+            thread_schedule_hint const& rhs) const noexcept
         {
-            return mode == rhs.mode && hint == rhs.hint;
+            return mode == rhs.mode && hint == rhs.hint &&
+                placement_mode == rhs.placement_mode;
         }
 
-        bool operator!=(thread_schedule_hint const& rhs) const noexcept
+        constexpr bool operator!=(
+            thread_schedule_hint const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
@@ -262,9 +281,13 @@ namespace hpx { namespace threads {
 
         /// The hint associated with the mode. The interepretation of this hint
         /// depends on the given mode.
-        std::int16_t hint;
+        std::int16_t hint = -1;
 
         /// The mode of the scheduling hint.
-        thread_schedule_hint_mode mode;
+        thread_schedule_hint_mode mode = thread_schedule_hint_mode::none;
+
+        /// The mode of the desired thread placement.
+        thread_placement_hint placement_mode =
+            thread_placement_hint::breadth_first;
     };
 }}    // namespace hpx::threads

@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 Mikael Simberg
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/datastructures/optional.hpp>
+#include <hpx/datastructures/tuple.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -17,7 +19,7 @@
 
 namespace hpx { namespace concurrency { namespace detail {
 
-    /// \brief A concurrent queue which can only hold contiguous ranges of
+    /// \brief A concurrent queue which can only hold non-contiguous ranges of
     ///        integers.
     ///
     /// A concurrent queue which can be initialized with a range of integers.
@@ -25,14 +27,17 @@ namespace hpx { namespace concurrency { namespace detail {
     /// decrements the next element that will be popped from the right, if there
     /// are items left. Popping from the left increments the next element that
     /// will be popped from the left, if there are items left.
+    ///
+    /// The range of integers is non-contiguous in the sense that the returned
+    /// integers are apart by a given step.
     template <typename T = std::uint32_t>
-    class contiguous_index_queue
+    class non_contiguous_index_queue
     {
         static_assert(sizeof(T) <= 4,
-            "contiguous_index_queue assumes at most 32 bit indices to fit two "
-            "indices in an at most 64 bit struct");
-        static_assert(std::is_integral<T>::value,
-            "contiguous_index_queue only works with integral indices");
+            "non_contiguous_index_queue assumes at most 32 bit indices to fit "
+            "two indices in an at most 64 bit struct");
+        static_assert(std::is_integral_v<T>,
+            "non_contiguous_index_queue only works with integral indices");
 
         struct range
         {
@@ -41,20 +46,20 @@ namespace hpx { namespace concurrency { namespace detail {
 
             range() = default;
 
-            range(T first, T last) noexcept
+            constexpr range(T first, T last) noexcept
               : first(first)
               , last(last)
             {
             }
 
-            constexpr range increment_first() const noexcept
+            constexpr range increment_first(T step) const noexcept
             {
-                return range{first + 1, last};
+                return range{first + step, last};
             }
 
-            constexpr range decrement_last() const noexcept
+            constexpr range decrement_last(T step) const noexcept
             {
-                return range{first, last - 1};
+                return range{first, last - step};
             }
 
             constexpr bool empty() const noexcept
@@ -73,30 +78,40 @@ namespace hpx { namespace concurrency { namespace detail {
         ///
         /// \param first Beginning of the new range.
         /// \param last  End of the new range.
-        constexpr void reset(T first, T last) noexcept
+        /// \param step  Steps size to use when advancing through the range.
+        constexpr void reset(T first, T last, T newstep = 1) noexcept
         {
             initial_range = range{first, last};
+            step = newstep;
             current_range.data_ = range{first, last};
+
+            // range shouldn't be empty
             HPX_ASSERT(first <= last);
+
+            // range must be cleanly divisible by step
+            HPX_ASSERT((last - first) % step == 0);
         }
 
-        /// \brief Construct a new contiguous_index_queue.
+        /// \brief Construct a new non_contiguous_index_queue.
         ///
         /// Construct a new queue with an empty range.
-        constexpr contiguous_index_queue() noexcept
+        constexpr non_contiguous_index_queue() noexcept
           : initial_range{}
+          , step(1)
           , current_range{}
         {
         }
 
-        /// \brief Construct a new contiguous_index_queue with the given range.
+        /// \brief Construct a new non_contiguous_index_queue with the given
+        ///        range.
         ///
         /// Construct a new queue with the given range as the initial range.
-        constexpr contiguous_index_queue(T first, T last) noexcept
+        constexpr non_contiguous_index_queue(T first, T last, T step) noexcept
           : initial_range{}
+          , step{}
           , current_range{}
         {
-            reset(first, last);
+            reset(first, last, step);
         }
 
         /// \brief Copy-construct a queue.
@@ -104,8 +119,10 @@ namespace hpx { namespace concurrency { namespace detail {
         /// No additional synchronization is done to ensure that other threads
         /// are not accessing elements from the queue being copied. It is the
         /// callees responsibility to ensure that it is safe to copy the queue.
-        constexpr contiguous_index_queue(contiguous_index_queue<T> const& other)
+        constexpr non_contiguous_index_queue(
+            non_contiguous_index_queue<T> const& other) noexcept
           : initial_range{other.initial_range}
+          , step{other.step}
           , current_range{}
         {
             current_range.data_ =
@@ -117,19 +134,20 @@ namespace hpx { namespace concurrency { namespace detail {
         /// No additional synchronization is done to ensure that other threads
         /// are not accessing elements from the queue being copied. It is the
         /// callees responsibility to ensure that it is safe to copy the queue.
-        constexpr contiguous_index_queue& operator=(
-            contiguous_index_queue const& other)
+        constexpr non_contiguous_index_queue& operator=(
+            non_contiguous_index_queue const& other) noexcept
         {
             initial_range = other.initial_range;
-            current_range =
+            step = other.step;
+            current_range.data_ =
                 other.current_range.data_.load(std::memory_order_relaxed);
             return *this;
         }
 
         /// \brief Attempt to pop an item from the left of the queue.
         ///
-        /// Attempt to pop an item from the left (beginning) of the queue. If
-        /// no items are left hpx::nullopt is returned.
+        /// Attempt to pop an item from the left (beginning) of the queue. If no
+        /// items are left hpx::nullopt is returned.
         constexpr hpx::optional<T> pop_left() noexcept
         {
             range desired_range{0, 0};
@@ -146,7 +164,7 @@ namespace hpx { namespace concurrency { namespace detail {
                 }
 
                 index = expected_range.first;
-                desired_range = expected_range.increment_first();
+                desired_range = expected_range.increment_first(step);
             } while (!current_range.data_.compare_exchange_weak(
                 expected_range, desired_range));
 
@@ -172,7 +190,7 @@ namespace hpx { namespace concurrency { namespace detail {
                     return hpx::nullopt;
                 }
 
-                desired_range = expected_range.decrement_last();
+                desired_range = expected_range.decrement_last(step);
                 index = desired_range.last;
             } while (!current_range.data_.compare_exchange_weak(
                 expected_range, desired_range));
@@ -185,14 +203,15 @@ namespace hpx { namespace concurrency { namespace detail {
             return current_range.data_.load(std::memory_order_relaxed).empty();
         }
 
-        std::pair<T, T> get_current_range() const
+        hpx::tuple<T, T, T> get_current_range() const
         {
             auto r = current_range.data_.load(std::memory_order_relaxed);
-            return {r.first, r.last};
+            return {r.first, r.last, step};
         }
 
     private:
         range initial_range;
+        T step = 1;
         hpx::util::cache_line_data<std::atomic<range>> current_range;
     };
 }}}    // namespace hpx::concurrency::detail
