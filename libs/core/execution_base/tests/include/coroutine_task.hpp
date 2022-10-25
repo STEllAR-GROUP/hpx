@@ -17,7 +17,9 @@
 #include <hpx/type_support/meta.hpp>
 
 #include <any>
+#include <exception>
 #include <optional>
+#include <type_traits>
 #include <utility>
 
 template <typename C = void>
