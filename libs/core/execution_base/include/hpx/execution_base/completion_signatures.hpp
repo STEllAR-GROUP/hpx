@@ -889,7 +889,7 @@ namespace hpx::execution::experimental {
                     break;
                 case 1:    // set_value
                     if constexpr (!std::is_void_v<Value>)
-                        return HPX_FORWARD(Value, std::get<1>(result));
+                        return HPX_MOVE(std::get<1>(result));
                     else
                         return;
                 case 2:    // set_error
@@ -976,6 +976,8 @@ namespace hpx::execution::experimental {
     namespace detail {
         struct with_awaitable_senders_base
         {
+            with_awaitable_senders_base() = default;
+
             template <typename OtherPromise>
             void set_continuation(
                 hpx::coro::coroutine_handle<OtherPromise> hcoro) noexcept
