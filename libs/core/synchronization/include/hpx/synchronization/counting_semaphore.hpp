@@ -462,31 +462,7 @@ namespace hpx {
     template <std::ptrdiff_t LeastMaxValue = PTRDIFF_MAX>
     using counting_semaphore = detail::counting_semaphore<LeastMaxValue>;
 
-    // A binary semaphore should be more efficient than the default
-    // implementation of a counting semaphore with a unit resource count.
-    namespace detail {
-
-        template <typename Mutex = hpx::spinlock>
-        class binary_semaphore : public counting_semaphore<1, Mutex>
-        {
-        public:
-            binary_semaphore(binary_semaphore const&) = delete;
-            binary_semaphore& operator=(binary_semaphore const&) = delete;
-            binary_semaphore(binary_semaphore&&) = delete;
-            binary_semaphore& operator=(binary_semaphore&&) = delete;
-
-        public:
-            explicit binary_semaphore(std::ptrdiff_t value = 1)
-              : counting_semaphore<1, Mutex>(value)
-            {
-            }
-
-            ~binary_semaphore() = default;
-        };
-    }    // namespace detail
-
-    using binary_semaphore = detail::binary_semaphore<>;
-
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Mutex = hpx::spinlock, int N = 0>
     class counting_semaphore_var
       : public detail::counting_semaphore<PTRDIFF_MAX, Mutex>
@@ -539,11 +515,6 @@ namespace hpx::lcos::local {
         "hpx::lcos::local::cpp20_counting_semaphore is deprecated, use "
         "hpx::counting_semaphore instead") =
         hpx::detail::counting_semaphore<LeastMaxValue, Mutex>;
-
-    template <typename Mutex = hpx::spinlock>
-    using cpp20_binary_semaphore HPX_DEPRECATED_V(1, 8,
-        "hpx::lcos::local::cpp20_binary_semaphore is deprecated, use "
-        "hpx::binary_semaphore instead") = hpx::detail::binary_semaphore<Mutex>;
 
     template <typename Mutex = hpx::spinlock, int N = 0>
     using counting_semaphore_var HPX_DEPRECATED_V(1, 8,

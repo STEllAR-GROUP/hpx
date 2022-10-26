@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,6 +15,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
@@ -478,6 +479,7 @@ namespace hpx::parcelset {
 
         static void init(
             int* argc, char*** argv, util::command_line_handling& cfg);
+        static void init(hpx::resource::partitioner& rp);
     };
 
     std::vector<std::string> load_runtime_configuration();

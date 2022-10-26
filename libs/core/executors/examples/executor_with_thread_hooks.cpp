@@ -52,7 +52,7 @@ namespace executor_example {
             decltype(auto) operator()(Ts&&... ts)
             {
                 on_exit _{exec_};
-                return hpx::util::invoke(f_, std::forward<Ts>(ts)...);
+                return hpx::invoke(f_, std::forward<Ts>(ts)...);
             }
 
             executor_with_thread_hooks const& exec_;

@@ -248,7 +248,7 @@ struct test_sync_executor1
         test_sync_executor1 const&, F&& f, Ts&&... ts)
     {
         ++count_sync;
-        return hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+        return hpx::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
@@ -277,7 +277,7 @@ struct test_sync_executor2 : test_sync_executor1
         {
             for (auto const& elem : shape)
             {
-                hpx::util::invoke(f, elem, ts...);
+                hpx::invoke(f, elem, ts...);
             }
         }
         else
@@ -285,7 +285,7 @@ struct test_sync_executor2 : test_sync_executor1
             std::vector<result_type> results;
             for (auto const& elem : shape)
             {
-                results.push_back(hpx::util::invoke(f, elem, ts...));
+                results.push_back(hpx::invoke(f, elem, ts...));
             }
             return results;
         }

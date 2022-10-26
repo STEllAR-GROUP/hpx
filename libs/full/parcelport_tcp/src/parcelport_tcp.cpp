@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,9 +7,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_TCP)
-#include <hpx/plugin/traits/plugin_config_data.hpp>
-
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/parcelport_tcp/connection_handler.hpp>
+#include <hpx/plugin/traits/plugin_config_data.hpp>
 #include <hpx/plugin_factories/parcelport_factory.hpp>
 
 namespace hpx::traits {
@@ -34,6 +34,10 @@ namespace hpx::traits {
             util::command_line_handling& /* cfg */) noexcept
         {
         }
+
+        // by default no additional initialization using the resource
+        // partitioner is required
+        static constexpr void init(hpx::resource::partitioner&) noexcept {}
 
         static constexpr void destroy() noexcept {}
 

@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/threading_base.hpp>
 
@@ -32,6 +33,7 @@ namespace hpx::plugins {
 
         virtual void init(
             int* argc, char*** argv, util::command_line_handling& cfg) = 0;
+        virtual void init(hpx::resource::partitioner& rp) = 0;
 
         /// Create a new instance of a parcelport
         ///

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling/late_command_line_handling.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
+#include <hpx/modules/command_line_handling_local.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -19,27 +20,10 @@
 
 namespace hpx { namespace util {
 
-    namespace detail {
-        inline void decode(std::string& str, char const* s, char const* r)
-        {
-            std::string::size_type pos = 0;
-            while ((pos = str.find(s, pos)) != std::string::npos)
-            {
-                str.replace(pos, 2, r);
-            }
-        }
-
-        inline std::string decode_string(std::string str)
-        {
-            decode(str, "\\n", "\n");
-            return str;
-        }
-    }    // namespace detail
-
     int handle_late_commandline_options(util::runtime_configuration& ini,
         hpx::program_options::options_description const& options,
         void (*handle_print_bind)(std::size_t),
-        void (*handle_list_parcelports)())
+        [[maybe_unused]] void (*handle_list_parcelports)())
     {
         // do secondary command line processing, check validity of options only
         try
@@ -49,7 +33,6 @@ namespace hpx { namespace util {
             if (!unknown_cmd_line.empty())
             {
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
-                hpx::program_options::variables_map vm;
 
                 util::commandline_error_mode mode = util::rethrow_on_error;
                 std::string allow_unknown(
@@ -57,59 +40,25 @@ namespace hpx { namespace util {
                 if (allow_unknown != "0")
                     mode = util::allow_unregistered;
 
+                hpx::program_options::variables_map vm;
                 std::vector<std::string> still_unregistered_options;
                 util::parse_commandline(ini, options, unknown_cmd_line, vm,
                     std::size_t(-1), mode,
                     get_runtime_mode_from_name(runtime_mode), nullptr,
                     &still_unregistered_options);
 
-                std::string still_unknown_commandline;
-                for (std::size_t i = 1; i < still_unregistered_options.size();
-                     ++i)
-                {
-                    if (i != 1)
-                    {
-                        still_unknown_commandline += " ";
-                    }
-                    still_unknown_commandline +=
-                        util::detail::enquote(still_unregistered_options[i]);
-                }
-
-                if (!still_unknown_commandline.empty())
-                {
-                    util::section* s = ini.get_section("hpx");
-                    HPX_ASSERT(s != nullptr);
-                    s->add_entry(
-                        "unknown_cmd_line_option", still_unknown_commandline);
-                }
+                hpx::local::detail::set_unknown_commandline_options(
+                    ini, still_unregistered_options);
             }
 
-            std::string fullhelp(ini.get_entry("hpx.cmd_line_help", ""));
-            if (!fullhelp.empty())
+            if (hpx::local::detail::handle_full_help(ini, options))
             {
-                std::string help_option(
-                    ini.get_entry("hpx.cmd_line_help_option", ""));
-                if (0 == std::string("full").find(help_option))
-                {
-                    std::cout << detail::decode_string(fullhelp);
-                    std::cout << options << std::endl;
-                }
-                else
-                {
-                    throw hpx::detail::command_line_error(
-                        "unknown help option: " + help_option);
-                }
                 return 1;
             }
 
             // secondary command line handling, looking for --exit and other
             // options
-            std::string cmd_line =
-                ini.get_entry("hpx.commandline.command", "") + " " +
-                ini.get_entry("hpx.commandline.prepend_options", "") +
-                ini.get_entry("hpx.commandline.options", "") +
-                ini.get_entry("hpx.commandline.config_options", "");
-
+            std::string cmd_line(hpx::local::detail::get_full_commandline(ini));
             if (!cmd_line.empty())
             {
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
@@ -119,14 +68,6 @@ namespace hpx { namespace util {
                     std::size_t(-1),
                     util::allow_unregistered | util::report_missing_config_file,
                     get_runtime_mode_from_name(runtime_mode));
-
-                if (vm.count("hpx:print-bind"))
-                {
-                    std::size_t num_threads =
-                        hpx::util::from_string<std::size_t>(
-                            ini.get_entry("hpx.os_threads", 1));
-                    handle_print_bind(num_threads);
-                }
 
 #if defined(HPX_HAVE_NETWORKING)
                 if (vm.count("hpx:list-parcel-ports"))
@@ -139,10 +80,9 @@ namespace hpx { namespace util {
                     }
                     handle_list_parcelports();
                 }
-#else
-                HPX_UNUSED(handle_list_parcelports);
 #endif
-                if (vm.count("hpx:exit"))
+                if (hpx::local::detail::handle_late_options(
+                        ini, vm, handle_print_bind))
                 {
                     return 1;
                 }
@@ -150,8 +90,9 @@ namespace hpx { namespace util {
         }
         catch (std::exception const& e)
         {
-            std::cerr << "handle_late_commandline_options: "
-                      << "command line processing: " << e.what() << std::endl;
+            std::cerr
+                << "handle_late_commandline_options: command line processing: "
+                << e.what() << std::endl;
             return -1;
         }
 

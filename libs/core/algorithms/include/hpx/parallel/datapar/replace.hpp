@@ -161,20 +161,18 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
-                std::size_t n = detail::distance(first, sent);
-
-                util::loop_n_ind<ExPolicy>(
-                    hpx::util::make_zip_iterator(first, dest), sent,
-                    [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
-                        auto& v) {
-                        using var_type = std::decay_t<decltype(get<0>(v))>;
-                        get<1>(v) = traits::choose(
-                            HPX_INVOKE(proj, get<0>(v)) == var_type(old_value),
-                            var_type(new_value), get<0>(v));
-                    });
-
-                return util::in_out_result<InIter, OutIter>(
-                    first + n, dest + n);
+                return util::detail::get_in_out_result(
+                    util::loop_n_ind<ExPolicy>(
+                        hpx::util::make_zip_iterator(first, dest),
+                        detail::distance(first, sent),
+                        [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
+                            auto& v) {
+                            using var_type = std::decay_t<decltype(get<0>(v))>;
+                            get<1>(v) =
+                                traits::choose(HPX_INVOKE(proj, get<0>(v)) ==
+                                        var_type(old_value),
+                                    var_type(new_value), get<0>(v));
+                        }));
             }
             else
             {
@@ -238,21 +236,19 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
-                std::size_t n = detail::distance(first, last);
-
-                util::loop_n_ind<ExPolicy>(
-                    hpx::util::make_zip_iterator(first, dest), n,
-                    [new_value, f = HPX_FORWARD(F, f),
-                        proj = HPX_FORWARD(Proj, proj)](
-                        auto& v) mutable -> void {
-                        using hpx::get;
-                        using var_type = std::decay_t<decltype(get<0>(v))>;
-                        get<1>(v) = traits::choose(
-                            HPX_INVOKE(f, HPX_INVOKE(proj, get<0>(v))),
-                            var_type(new_value), get<0>(v));
-                    });
-                return util::in_out_result<InIter, OutIter>(
-                    first + n, dest + n);
+                return util::detail::get_in_out_result(
+                    util::loop_n_ind<ExPolicy>(
+                        hpx::util::make_zip_iterator(first, dest),
+                        detail::distance(first, last),
+                        [new_value, f = HPX_FORWARD(F, f),
+                            proj = HPX_FORWARD(Proj, proj)](
+                            auto& v) mutable -> void {
+                            using hpx::get;
+                            using var_type = std::decay_t<decltype(get<0>(v))>;
+                            get<1>(v) = traits::choose(
+                                HPX_INVOKE(f, HPX_INVOKE(proj, get<0>(v))),
+                                var_type(new_value), get<0>(v));
+                        }));
             }
             else
             {

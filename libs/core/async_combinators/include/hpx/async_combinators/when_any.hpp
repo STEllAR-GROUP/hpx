@@ -10,6 +10,7 @@
 #pragma once
 
 #if defined(DOXYGEN)
+/// Top level HPX namespace
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// Result type for \a when_any, contains a sequence of futures and an
@@ -22,10 +23,12 @@ namespace hpx {
                               ///< \a hpx::when_any
     };
 
-    /// The function \a when_any is a non-deterministic choice operator. It
-    /// OR-composes all future objects given and returns a new future object
-    /// representing the same list of futures after one future of that list
-    /// finishes execution.
+    /// \brief function \a when_any creates a future object that becomes
+    ///        when at least one element in a set of \a future and \a shared_future
+    ///        objects becomes ready. It is a non-deterministic choice operator.
+    ///        It OR-composes all given future objects and returns a new future
+    ///        object representing the same list of futures after one future of
+    ///        that list finishes execution.
     ///
     /// \param first    [in] The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for
@@ -48,10 +51,7 @@ namespace hpx {
     future<when_any_result<Container>> when_any(
         InputIter first, InputIter last);
 
-    /// The function \a when_any is a non-deterministic choice operator. It
-    /// OR-composes all future objects given and returns a new future object
-    /// representing the same list of futures after one future of that list
-    /// finishes execution.
+    /// \copybrief when_any(InputIter first, InputIter last)
     ///
     /// \param values   [in] A range holding an arbitrary amount of \a futures
     ///                 or \a shared_future objects for which \a when_any should
@@ -68,10 +68,7 @@ namespace hpx {
     template <typename Range>
     future<when_any_result<Range>> when_any(Range& values);
 
-    /// The function \a when_any is a non-deterministic choice operator. It
-    /// OR-composes all future objects given and returns a new future object
-    /// representing the same list of futures after one future of that list
-    /// finishes execution.
+    /// \copybrief when_any(InputIter first, InputIter last)
     ///
     /// \param futures  [in] An arbitrary number of \a future or \a shared_future
     ///                 objects, possibly holding different types for which
@@ -90,10 +87,12 @@ namespace hpx {
     template <typename... T>
     future<when_any_result<tuple<future<T>...>>> when_any(T&&... futures);
 
-    /// The function \a when_any_n is a non-deterministic choice operator. It
-    /// OR-composes all future objects given and returns a new future object
-    /// representing the same list of futures after one future of that list
-    /// finishes execution.
+    /// \brief function \a when_any_n creates a future object that becomes
+    ///        when at least one element in a set of \a future and \a shared_future
+    ///        objects becomes ready. It is a non-deterministic choice operator.
+    ///        It OR-composes all given future objects and returns a new future
+    ///        object representing the same list of futures after one future of
+    ///        that list finishes execution.
     ///
     /// \param first    [in] The iterator pointing to the first element of a
     ///                 sequence of \a future or \a shared_future objects for

@@ -7,6 +7,116 @@
 /// \file parallel/algorithms/reduce_by_key.hpp
 
 #pragma once
+
+#if defined(DOXYGEN)
+
+namespace hpx { namespace parallel { namespace v1 {
+    // clang-format off
+    /// Reduce by Key performs an inclusive scan reduction operation on elements
+    /// supplied in key/value pairs. The algorithm produces a single output
+    /// value for each set of equal consecutive keys in [key_first, key_last).
+    /// the value being the
+    /// GENERALIZED_NONCOMMUTATIVE_SUM(op, init, *first, ..., *(first + (i - result))).
+    /// for the run of consecutive matching keys.
+    /// The number of keys supplied must match the number of values.
+    ///
+    /// \note   Complexity: O(\a last - \a first) applications of the
+    ///         predicate \a op.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it applies user-provided function objects.
+    /// \tparam RanIter     The type of the key iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
+    /// \tparam RanIter2    The type of the value iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     random access iterator.
+    /// \tparam FwdIter1    The type of the iterator representing the
+    ///                     destination key range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination value range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam Compare     The type of the optional function/function object to use
+    ///                     to compare keys (deduced).
+    ///                     Assumed to be std::equal_to otherwise.
+    /// \tparam Func        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a reduce_by_key requires \a Func to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param key_first    Refers to the beginning of the sequence of key elements
+    ///                     the algorithm will be applied to.
+    /// \param key_last     Refers to the end of the sequence of key elements the
+    ///                     algorithm will be applied to.
+    /// \param values_first Refers to the beginning of the sequence of value elements
+    ///                     the algorithm will be applied to.
+    /// \param keys_output  Refers to the start output location for the keys
+    ///                     produced by the algorithm.
+    /// \param values_output Refers to the start output location for the values
+    ///                     produced by the algorithm.
+    /// \param comp         comp is a callable object. The return value of the
+    ///                     INVOKE operation applied to an object of type Comp,
+    ///                     when contextually converted to bool, yields true if
+    ///                     the first argument of the call is less than the
+    ///                     second, and false otherwise. It is assumed that comp
+    ///                     will not apply any non-constant function through the
+    ///                     dereferenced iterator.
+    /// \param func         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is a
+    ///                     binary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type1 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&.
+    ///                     The types \a Type1 \a Ret must be
+    ///                     such that an object of type \a FwdIter can be
+    ///                     dereferenced and then implicitly converted to any
+    ///                     of those types.
+    ///
+    /// \a comp has to induce a strict weak ordering on the values.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequenced_policy execute in sequential order in the
+    /// calling thread.
+    ///
+    /// The application of function objects in parallel algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_policy or \a parallel_task_policy are
+    /// permitted to execute in an unordered fashion in unspecified
+    /// threads, and indeterminately sequenced within each thread.
+    ///
+    /// \returns  The \a reduce_by_key algorithm returns a
+    ///           \a hpx::future<pair<Iter1,Iter2>> if the execution policy is of
+    ///           type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a pair<Iter1,Iter2>
+    ///           otherwise.
+    ///
+    template <typename ExPolicy, typename RanIter, typename RanIter2,
+        typename FwdIter1, typename FwdIter2,
+        typename Compare =
+            std::equal_to<typename std::iterator_traits<RanIter>::value_type>,
+        typename Func =
+            std::plus<typename std::iterator_traits<RanIter2>::value_type>>
+    typename util::detail::algorithm_result<ExPolicy,
+        util::in_out_result<FwdIter1, FwdIter2>>::type
+    reduce_by_key(ExPolicy&& policy, RanIter key_first, RanIter key_last,
+        RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
+        Compare&& comp = Compare(), Func&& func = Func());
+    // clang-format on
+}}}    // namespace hpx::parallel::v1
+
+#else
 //
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution.hpp>
@@ -417,97 +527,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
     }
 #endif
 
-    //-----------------------------------------------------------------------------
-    /// Reduce by Key performs an inclusive scan reduction operation on elements
-    /// supplied in key/value pairs. The algorithm produces a single output
-    /// value for each set of equal consecutive keys in [key_first, key_last).
-    /// the value being the
-    /// GENERALIZED_NONCOMMUTATIVE_SUM(op, init, *first, ..., *(first + (i - result))).
-    /// for the run of consecutive matching keys.
-    /// The number of keys supplied must match the number of values.
-    ///
-    /// \note   Complexity: O(\a last - \a first) applications of the
-    ///         predicate \a op.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it applies user-provided function objects.
-    /// \tparam RanIter     The type of the key iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     random access iterator.
-    /// \tparam RanIter2    The type of the value iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     random access iterator.
-    /// \tparam FwdIter1    The type of the iterator representing the
-    ///                     destination key range (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
-    /// \tparam FwdIter2    The type of the iterator representing the
-    ///                     destination value range (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
-    /// \tparam Compare     The type of the optional function/function object to use
-    ///                     to compare keys (deduced).
-    ///                     Assumed to be std::equal_to otherwise.
-    /// \tparam Func        The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a reduce_by_key requires \a Func to meet the
-    ///                     requirements of \a CopyConstructible.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param key_first    Refers to the beginning of the sequence of key elements
-    ///                     the algorithm will be applied to.
-    /// \param key_last     Refers to the end of the sequence of key elements the
-    ///                     algorithm will be applied to.
-    /// \param values_first Refers to the beginning of the sequence of value elements
-    ///                     the algorithm will be applied to.
-    /// \param keys_output  Refers to the start output location for the keys
-    ///                     produced by the algorithm.
-    /// \param values_output Refers to the start output location for the values
-    ///                     produced by the algorithm.
-    /// \param comp         comp is a callable object. The return value of the
-    ///                     INVOKE operation applied to an object of type Comp,
-    ///                     when contextually converted to bool, yields true if
-    ///                     the first argument of the call is less than the
-    ///                     second, and false otherwise. It is assumed that comp
-    ///                     will not apply any non-constant function through the
-    ///                     dereferenced iterator.
-    /// \param func         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). This is a
-    ///                     binary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     Ret fun(const Type1 &a, const Type1 &b);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&.
-    ///                     The types \a Type1 \a Ret must be
-    ///                     such that an object of type \a FwdIter can be
-    ///                     dereferenced and then implicitly converted to any
-    ///                     of those types.
-    ///
-    /// \a comp has to induce a strict weak ordering on the values.
-    ///
-    /// The application of function objects in parallel algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
-    ///
-    /// The application of function objects in parallel algorithm
-    /// invoked with an execution policy object of type
-    /// \a parallel_policy or \a parallel_task_policy are
-    /// permitted to execute in an unordered fashion in unspecified
-    /// threads, and indeterminately sequenced within each thread.
-    ///
-    /// \returns  The \a reduce_by_key algorithm returns a
-    ///           \a hpx::future<pair<Iter1,Iter2>> if the execution policy is of
-    ///           type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns \a pair<Iter1,Iter2>
-    ///           otherwise.
-    ///
     template <typename ExPolicy, typename RanIter, typename RanIter2,
         typename FwdIter1, typename FwdIter2,
         typename Compare =
@@ -552,3 +571,5 @@ namespace hpx { namespace parallel { inline namespace v1 {
             HPX_FORWARD(Func, func));
     }
 }}}    // namespace hpx::parallel::v1
+
+#endif

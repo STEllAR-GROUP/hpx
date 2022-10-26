@@ -7,25 +7,17 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/async_base/dataflow.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/invoke_fused.hpp>
-#include <hpx/functional/traits/get_function_annotation.hpp>
-#include <hpx/functional/traits/is_action.hpp>
-#include <hpx/futures/detail/future_transforms.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_future.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/is_future.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
@@ -42,11 +34,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 // forward declare the type we will get function annotations from
 namespace hpx { namespace lcos { namespace detail {
+
     template <typename Frame>
     struct dataflow_finalization;
 }}}    // namespace hpx::lcos::detail
 
 namespace hpx { namespace traits {
+
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
     // traits specialization to get annotation from dataflow_finalization
@@ -54,12 +48,12 @@ namespace hpx { namespace traits {
     struct get_function_annotation<lcos::detail::dataflow_finalization<Frame>>
     {
         using function_type = typename Frame::function_type;
-        //
+
         static constexpr char const* call(
             lcos::detail::dataflow_finalization<Frame> const& f) noexcept
         {
             char const* annotation = hpx::traits::get_function_annotation<
-                typename std::decay<function_type>::type>::call(f.this_->func_);
+                std::decay_t<function_type>>::call(f.this_->func_);
             return annotation;
         }
     };
@@ -68,20 +62,19 @@ namespace hpx { namespace traits {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail {
+
     template <typename Frame>
     struct dataflow_finalization
     {
-        //
-        explicit dataflow_finalization(Frame* df)
+        explicit dataflow_finalization(Frame* df) noexcept
           : this_(df)
         {
         }
-        using is_void = typename Frame::is_void;
-        //
+
         template <typename Futures>
         void operator()(Futures&& futures) const
         {
-            return this_->execute(is_void{}, HPX_FORWARD(Futures, futures));
+            return this_->execute(HPX_FORWARD(Futures, futures));
         }
 
         // keep the dataflow frame alive with this pointer reference
@@ -108,12 +101,10 @@ namespace hpx { namespace lcos { namespace detail {
     };
 
     template <typename Policy, typename F, typename Args>
-    struct dataflow_return_impl<
-        /*IsAction=*/false, Policy, F, Args,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+    struct dataflow_return_impl<false, Policy, F, Args,
+        std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
-        using type = hpx::future<
-            typename util::detail::invoke_fused_result<F, Args>::type>;
+        using type = hpx::future<util::detail::invoke_fused_result_t<F, Args>>;
     };
 
     template <typename Executor, typename F, typename Args>
@@ -130,21 +121,23 @@ namespace hpx { namespace lcos { namespace detail {
     };
 
     template <typename Policy, typename F, typename Args>
-    struct dataflow_return_impl<
-        /*IsAction=*/false, Policy, F, Args,
-        typename std::enable_if<traits::is_one_way_executor<Policy>::value ||
-            traits::is_two_way_executor<Policy>::value>::type>
+    struct dataflow_return_impl<false, Policy, F, Args,
+        std::enable_if_t<traits::is_one_way_executor_v<Policy> ||
+            traits::is_two_way_executor_v<Policy>>>
       : dataflow_return_impl_executor<Policy, F, Args>
     {
     };
 
     template <typename Policy, typename F, typename Args>
     struct dataflow_return
-      : detail::dataflow_return_impl<traits::is_action<F>::value, Policy, F,
-            Args>
+      : detail::dataflow_return_impl<traits::is_action_v<F>, Policy, F, Args>
     {
     };
 
+    template <typename Policy, typename F, typename Args>
+    using dataflow_return_t = typename dataflow_return<Policy, F, Args>::type;
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Executor, typename Frame, typename Func,
         typename Futures, typename Enable = void>
     struct has_dataflow_finalize : std::false_type
@@ -155,24 +148,27 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename Executor, typename Frame, typename Func,
         typename Futures>
     struct has_dataflow_finalize<Executor, Frame, Func, Futures,
-        typename hpx::util::always_void<decltype(
+        std::void_t<decltype(
             std::declval<Executor>().dataflow_finalize(std::declval<Frame>(),
-                std::declval<Func>(), std::declval<Futures>()))>::type>
+                std::declval<Func>(), std::declval<Futures>()))>>
       : std::true_type
     {
     };
     // clang-format on
 
+    template <typename Executor, typename Frame, typename Func,
+        typename Futures>
+    inline constexpr bool has_dataflow_finalize_v =
+        has_dataflow_finalize<Executor, Frame, Func, Futures>::value;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Policy, typename Func, typename Futures>
     struct dataflow_frame    //-V690
-      : hpx::lcos::detail::future_data<typename hpx::traits::future_traits<
-            typename detail::dataflow_return<Policy, Func,
-                Futures>::type>::type>
+      : hpx::lcos::detail::future_data<hpx::traits::future_traits_t<
+            detail::dataflow_return_t<Policy, Func, Futures>>>
     {
-        using type =
-            typename detail::dataflow_return<Policy, Func, Futures>::type;
-        using result_type = typename hpx::traits::future_traits<type>::type;
+        using type = detail::dataflow_return_t<Policy, Func, Futures>;
+        using result_type = hpx::traits::future_traits_t<type>;
         using base_type = hpx::lcos::detail::future_data<result_type>;
 
         using is_void = std::is_void<result_type>;
@@ -192,21 +188,22 @@ namespace hpx { namespace lcos { namespace detail {
     public:
         using init_no_addref = typename base_type::init_no_addref;
 
-        /// A struct to construct the dataflow_frame in-place
+        // A struct to construct the dataflow_frame in-place
         struct construction_data
         {
             Policy policy_;
             Func func_;
         };
 
-        /// Construct the dataflow_frame from the given policy
-        /// and callable object.
-        static construction_data construct_from(Policy policy, Func func)
+        // Construct the dataflow_frame from the given policy and callable
+        // object.
+        static constexpr construction_data construct_from(
+            Policy policy, Func func) noexcept
         {
             return construction_data{HPX_MOVE(policy), HPX_MOVE(func)};
         }
 
-        explicit dataflow_frame(construction_data data)
+        explicit dataflow_frame(construction_data data) noexcept
           : base_type(init_no_addref{})
           , policy_(HPX_MOVE(data.policy_))
           , func_(HPX_MOVE(data.func_))
@@ -218,29 +215,22 @@ namespace hpx { namespace lcos { namespace detail {
         // Passes the futures into the evaluation function and
         // sets the result future.
         template <typename Futures_>
-        HPX_FORCEINLINE void execute(std::false_type, Futures_&& futures)
+        HPX_FORCEINLINE void execute(Futures_&& futures)
         {
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    this->set_data(util::invoke_fused(
-                        HPX_MOVE(func_), HPX_FORWARD(Futures_, futures)));
-                },
-                [&](std::exception_ptr ep) {
-                    this->set_exception(HPX_MOVE(ep));
-                });
-        }
+                    if constexpr (is_void::value)
+                    {
+                        util::invoke_fused(
+                            HPX_MOVE(func_), HPX_FORWARD(Futures_, futures));
 
-        // Passes the futures into the evaluation function and
-        // sets the result future.
-        template <typename Futures_>
-        HPX_FORCEINLINE void execute(std::true_type, Futures_&& futures)
-        {
-            hpx::detail::try_catch_exception_ptr(
-                [&]() {
-                    util::invoke_fused(
-                        HPX_MOVE(func_), HPX_FORWARD(Futures_, futures));
-
-                    this->set_data(util::unused_type());
+                        this->set_data(util::unused_type());
+                    }
+                    else
+                    {
+                        this->set_data(util::invoke_fused(
+                            HPX_MOVE(func_), HPX_FORWARD(Futures_, futures)));
+                    }
                 },
                 [&](std::exception_ptr ep) {
                     this->set_exception(HPX_MOVE(ep));
@@ -303,7 +293,7 @@ namespace hpx { namespace lcos { namespace detail {
             if (!recurse_asynchronously)
             {
                 hpx::scoped_annotation annotate(func_);
-                execute(is_void{}, HPX_FORWARD(Futures_, futures));
+                execute(HPX_FORWARD(Futures_, futures));
             }
             else
             {
@@ -330,13 +320,17 @@ namespace hpx { namespace lcos { namespace detail {
 
         // The overload for hpx::dataflow taking an executor simply forwards
         // to the corresponding executor customization point.
-        template <typename Executor, typename Futures_>
-        HPX_FORCEINLINE typename std::enable_if<
-            (traits::is_one_way_executor<Executor>::value ||
-                traits::is_two_way_executor<Executor>::value) &&
-            !has_dataflow_finalize<Executor, dataflow_frame, Func,
-                Futures_>::value>::type
-        finalize(Executor&& exec, Futures_&& futures)
+        //
+        // clang-format off
+        template <typename Executor, typename Futures_,
+            HPX_CONCEPT_REQUIRES_((
+                traits::is_one_way_executor_v<Executor> ||
+                traits::is_two_way_executor_v<Executor>) &&
+                !has_dataflow_finalize_v<
+                    Executor, dataflow_frame, Func, Futures_>
+            )>
+        // clang-format on
+        HPX_FORCEINLINE void finalize(Executor&& exec, Futures_&& futures)
         {
             detail::dataflow_finalization<dataflow_type> this_f_(this);
 
@@ -344,13 +338,16 @@ namespace hpx { namespace lcos { namespace detail {
                 HPX_MOVE(this_f_), HPX_FORWARD(Futures_, futures));
         }
 
-        template <typename Executor, typename Futures_>
-        HPX_FORCEINLINE typename std::enable_if<
-            (traits::is_one_way_executor<Executor>::value ||
-                traits::is_two_way_executor<Executor>::value) &&
-            has_dataflow_finalize<Executor, dataflow_frame, Func,
-                Futures_>::value>::type
-        finalize(Executor&& exec, Futures_&& futures)
+        // clang-format off
+        template <typename Executor, typename Futures_,
+            HPX_CONCEPT_REQUIRES_((
+                traits::is_one_way_executor_v<Executor> ||
+                traits::is_two_way_executor_v<Executor>) &&
+                has_dataflow_finalize_v<
+                    Executor, dataflow_frame, Func, Futures_>
+            )>
+        // clang-format on
+        HPX_FORCEINLINE void finalize(Executor&& exec, Futures_&& futures)
         {
 #if defined(HPX_CUDA_VERSION)
             std::forward<Executor>(exec)
@@ -362,7 +359,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
     public:
-        /// Check whether the current future is ready
+        // Check whether the current future is ready
         template <typename T>
         auto operator()(util::async_traverse_visit_tag, T&& current)
             -> decltype(async_visit_future(HPX_FORWARD(T, current)))
@@ -370,8 +367,8 @@ namespace hpx { namespace lcos { namespace detail {
             return async_visit_future(HPX_FORWARD(T, current));
         }
 
-        /// Detach the current execution context and continue when the
-        /// current future was set to be ready.
+        // Detach the current execution context and continue when the current
+        // future was set to be ready.
         template <typename T, typename N>
         auto operator()(util::async_traverse_detach_tag, T&& current, N&& next)
             -> decltype(async_detach_future(
@@ -381,7 +378,7 @@ namespace hpx { namespace lcos { namespace detail {
                 HPX_FORWARD(T, current), HPX_FORWARD(N, next));
         }
 
-        /// Finish the dataflow when the traversal has finished
+        // Finish the dataflow when the traversal has finished
         template <typename Futures_>
         HPX_FORCEINLINE void operator()(
             util::async_traverse_complete_tag, Futures_&& futures)
@@ -395,42 +392,40 @@ namespace hpx { namespace lcos { namespace detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Policy, typename Func, typename... Ts,
-        typename Frame = dataflow_frame<typename std::decay<Policy>::type,
-            typename std::decay<Func>::type,
-            hpx::tuple<typename std::decay<Ts>::type...>>>
-    typename Frame::type create_dataflow(
-        Policy&& policy, Func&& func, Ts&&... ts)
-    {
-        // Create the data which is used to construct the dataflow_frame
-        auto data = Frame::construct_from(
-            HPX_FORWARD(Policy, policy), HPX_FORWARD(Func, func));
+    //template <typename Policy, typename Func, typename... Ts,
+    //    typename Frame = dataflow_frame<std::decay_t<Policy>,
+    //        std::decay_t<Func>, hpx::tuple<std::decay_t<Ts>...>>>
+    //typename Frame::type create_dataflow(hpx::util::internal_allocator<>,
+    //    Policy&& policy, Func&& func, Ts&&... ts)
+    //{
+    //    // Create the data that is used to construct the dataflow_frame
+    //    auto data = Frame::construct_from(
+    //        HPX_FORWARD(Policy, policy), HPX_FORWARD(Func, func));
 
-        // Construct the dataflow_frame and traverse
-        // the arguments asynchronously
-        hpx::intrusive_ptr<Frame> p = util::traverse_pack_async(
-            util::async_traverse_in_place_tag<Frame>{}, HPX_MOVE(data),
-            HPX_FORWARD(Ts, ts)...);
+    //    // Construct the dataflow_frame and traverse the arguments
+    //    // asynchronously
+    //    hpx::intrusive_ptr<Frame> p = util::traverse_pack_async(
+    //        util::async_traverse_in_place_tag<Frame>{}, HPX_MOVE(data),
+    //        HPX_FORWARD(Ts, ts)...);
 
-        using traits::future_access;
-        return future_access<typename Frame::type>::create(HPX_MOVE(p));
-    }
+    //    using traits::future_access;
+    //    return future_access<typename Frame::type>::create(HPX_MOVE(p));
+    //}
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Allocator, typename Policy, typename Func,
         typename... Ts,
-        typename Frame = dataflow_frame<typename std::decay<Policy>::type,
-            typename std::decay<Func>::type,
-            hpx::tuple<typename std::decay<Ts>::type...>>>
-    typename Frame::type create_dataflow_alloc(
+        typename Frame = dataflow_frame<std::decay_t<Policy>,
+            std::decay_t<Func>, hpx::tuple<std::decay_t<Ts>...>>>
+    typename Frame::type create_dataflow(
         Allocator const& alloc, Policy&& policy, Func&& func, Ts&&... ts)
     {
-        // Create the data which is used to construct the dataflow_frame
+        // Create the data that is used to construct the dataflow_frame
         auto data = Frame::construct_from(
             HPX_FORWARD(Policy, policy), HPX_FORWARD(Func, func));
 
-        // Construct the dataflow_frame and traverse
-        // the arguments asynchronously
+        // Construct the dataflow_frame and traverse the arguments
+        // asynchronously
         hpx::intrusive_ptr<Frame> p = util::traverse_pack_async_allocator(alloc,
             util::async_traverse_in_place_tag<Frame>{}, HPX_MOVE(data),
             HPX_FORWARD(Ts, ts)...);
@@ -446,65 +441,15 @@ namespace hpx { namespace lcos { namespace detail {
     // launch
     template <typename Policy>
     struct dataflow_dispatch_impl<false, Policy,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+        std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         template <typename Allocator, typename Policy_, typename F,
             typename... Ts>
         HPX_FORCEINLINE static decltype(auto) call(
             Allocator const& alloc, Policy_&& policy, F&& f, Ts&&... ts)
         {
-            return detail::create_dataflow_alloc(alloc,
-                HPX_FORWARD(Policy_, policy), HPX_FORWARD(F, f),
-                traits::acquire_future_disp()(HPX_FORWARD(Ts, ts))...);
-        }
-    };
-
-    template <typename Policy>
-    struct dataflow_dispatch<Policy,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
-    {
-        template <typename Allocator, typename F, typename... Ts>
-        HPX_FORCEINLINE static auto call(
-            Allocator const& alloc, F&& f, Ts&&... ts)
-            -> decltype(dataflow_dispatch_impl<false, Policy>::call(
-                alloc, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
-        {
-            return dataflow_dispatch_impl<false, Policy>::call(
-                alloc, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-        }
-
-        template <typename Allocator, typename P, typename F, typename Id,
-            typename... Ts>
-        HPX_FORCEINLINE static auto call(Allocator const& alloc, P&& p, F&& f,
-            typename std::enable_if<
-                traits::is_action<typename std::decay<F>::type>::value,
-                Id>::type const& id,
-            Ts&&... ts)
-            -> decltype(dataflow_dispatch_impl<
-                traits::is_action<typename std::decay<F>::type>::value,
-                Policy>::call(alloc, HPX_FORWARD(P, p), HPX_FORWARD(F, f), id,
-                HPX_FORWARD(Ts, ts)...))
-        {
-            return dataflow_dispatch_impl<
-                traits::is_action<typename std::decay<F>::type>::value,
-                Policy>::call(alloc, HPX_FORWARD(P, p), HPX_FORWARD(F, f), id,
-                HPX_FORWARD(Ts, ts)...);
-        }
-    };
-
-    // executors
-    template <typename Executor>
-    struct dataflow_dispatch<Executor,
-        typename std::enable_if<traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value>::type>
-    {
-        template <typename Allocator, typename Executor_, typename F,
-            typename... Ts>
-        HPX_FORCEINLINE static decltype(auto) call(
-            Allocator const& alloc, Executor_&& exec, F&& f, Ts&&... ts)
-        {
-            return detail::create_dataflow_alloc(alloc,
-                HPX_FORWARD(Executor_, exec), HPX_FORWARD(F, f),
+            return detail::create_dataflow(alloc, HPX_FORWARD(Policy_, policy),
+                HPX_FORWARD(F, f),
                 traits::acquire_future_disp()(HPX_FORWARD(Ts, ts))...);
         }
     };
@@ -512,40 +457,104 @@ namespace hpx { namespace lcos { namespace detail {
     // any action, plain function, or function object
     template <typename FD>
     struct dataflow_dispatch_impl<false, FD,
-        typename std::enable_if<!traits::is_launch_policy<FD>::value &&
-            !(traits::is_one_way_executor<FD>::value ||
-                traits::is_two_way_executor<FD>::value)>::type>
-    {
-        template <typename Allocator, typename F, typename... Ts,
-            typename Enable = typename std::enable_if<
-                !traits::is_action<typename std::decay<F>::type>::value>::type>
-        HPX_FORCEINLINE static auto call(Allocator const& alloc, F&& f,
-            Ts&&... ts) -> decltype(dataflow_dispatch<launch>::call(alloc,
-            launch::async, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
-        {
-            return dataflow_dispatch<launch>::call(alloc, launch::async,
-                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-        }
-    };
-
-    template <typename FD>
-    struct dataflow_dispatch<FD,
-        typename std::enable_if<!traits::is_launch_policy<FD>::value &&
-            !(traits::is_one_way_executor<FD>::value ||
-                traits::is_two_way_executor<FD>::value)>::type>
+        std::enable_if_t<!traits::is_launch_policy_v<FD> &&
+            !traits::is_one_way_executor_v<FD> &&
+            !traits::is_two_way_executor_v<FD>>>
     {
         template <typename Allocator, typename F, typename... Ts>
-        HPX_FORCEINLINE static auto call(
+        HPX_FORCEINLINE static decltype(auto) call(
             Allocator const& alloc, F&& f, Ts&&... ts)
-            -> decltype(dataflow_dispatch_impl<
-                traits::is_action<typename std::decay<F>::type>::value,
-                launch>::call(alloc, launch::async, HPX_FORWARD(F, f),
-                HPX_FORWARD(Ts, ts)...))
         {
-            return dataflow_dispatch_impl<
-                traits::is_action<typename std::decay<F>::type>::value,
-                launch>::call(alloc, launch::async, HPX_FORWARD(F, f),
-                HPX_FORWARD(Ts, ts)...);
+            return detail::create_dataflow(alloc, launch::async,
+                HPX_FORWARD(F, f),
+                traits::acquire_future_disp()(HPX_FORWARD(Ts, ts))...);
         }
     };
 }}}    // namespace hpx::lcos::detail
+
+namespace hpx::detail {
+
+    // clang-format off
+    template <typename Allocator, typename Policy, typename F, typename... Ts,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_allocator_v<Allocator> &&
+            hpx::traits::is_launch_policy_v<Policy> &&
+           !hpx::traits::is_action_v<std::decay_t<F>>
+        )>
+    auto tag_invoke(dataflow_t, Allocator const& alloc, Policy&& policy, F&& f,
+        Ts&&... ts)
+        -> decltype(
+                hpx::lcos::detail::dataflow_dispatch_impl<
+                    false, std::decay_t<Policy>
+                >::call(alloc, HPX_FORWARD(Policy, policy),
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+    // clang-format on
+    {
+        return hpx::lcos::detail::dataflow_dispatch_impl<false,
+            std::decay_t<Policy>>::call(alloc, HPX_FORWARD(Policy, policy),
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+    }
+
+    // clang-format off
+    template <typename Allocator, typename Policy, typename F, typename... Ts,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_allocator_v<Allocator> &&
+            hpx::traits::is_launch_policy_v<Policy> &&
+            hpx::traits::is_action_v<std::decay_t<F>>
+        )>
+    auto tag_invoke(dataflow_t, Allocator const& alloc, Policy&& policy, F&& f,
+        Ts&&... ts)
+        -> decltype(
+                hpx::lcos::detail::dataflow_dispatch_impl<
+                    true, std::decay_t<Policy>
+                >::call(alloc, HPX_FORWARD(Policy, policy),
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+    // clang-format on
+    {
+        return hpx::lcos::detail::dataflow_dispatch_impl<true,
+            std::decay_t<Policy>>::call(alloc, HPX_FORWARD(Policy, policy),
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+    }
+
+    // executors
+    //
+    // clang-format off
+    template <typename Allocator, typename Executor, typename F, typename... Ts,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::traits::is_allocator_v<Allocator> &&
+           (hpx::traits::is_one_way_executor_v<Executor> ||
+            hpx::traits::is_two_way_executor_v<Executor>)
+        )>
+    // clang-format on
+    HPX_FORCEINLINE decltype(auto) tag_invoke(
+        dataflow_t, Allocator const& alloc, Executor&& exec, F&& f, Ts&&... ts)
+    {
+        return hpx::lcos::detail::create_dataflow(alloc,
+            HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+            traits::acquire_future_disp()(HPX_FORWARD(Ts, ts))...);
+    }
+
+    // any action, plain function, or function object
+    //
+    // clang-format off
+    template <typename Allocator, typename F, typename... Ts,
+        HPX_CONCEPT_REQUIRES_(
+             hpx::traits::is_allocator_v<Allocator> &&
+            !hpx::traits::is_launch_policy_v<F> &&
+            !hpx::traits::is_one_way_executor_v<F> &&
+            !hpx::traits::is_two_way_executor_v<F>
+        )>
+    HPX_FORCEINLINE auto tag_invoke(
+        dataflow_t, Allocator const& alloc, F&& f, Ts&&... ts)
+        -> decltype(
+                hpx::lcos::detail::dataflow_dispatch_impl<
+                    traits::is_action_v<std::decay_t<F>>, launch
+                >::call(alloc, launch::async, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Ts, ts)...))
+    // clang-format on
+    {
+        return hpx::lcos::detail::dataflow_dispatch_impl<
+            traits::is_action_v<std::decay_t<F>>, launch>::call(alloc,
+            launch::async, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+    }
+}    // namespace hpx::detail

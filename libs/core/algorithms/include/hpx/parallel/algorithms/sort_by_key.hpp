@@ -5,41 +5,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#pragma once
+/// \file parallel/algorithms/sort_by_key.hpp
 
-#include <hpx/config.hpp>
-#include <hpx/datastructures/tuple.hpp>
+#if defined(DOXYGEN)
 
-#include <hpx/parallel/algorithms/sort.hpp>
-#include <hpx/parallel/util/zip_iterator.hpp>
-
-#include <algorithm>
-#include <iterator>
-#include <type_traits>
-#include <utility>
-
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    template <typename KeyIter, typename ValueIter>
-    using sort_by_key_result = std::pair<KeyIter, ValueIter>;
-
-    ///////////////////////////////////////////////////////////////////////////
-    // sort
-    namespace detail {
-        /// \cond NOINTERNAL
-        struct extract_key
-        {
-            template <typename Tuple>
-            auto operator()(Tuple&& t) const
-                -> decltype(hpx::get<0>(HPX_FORWARD(Tuple, t)))
-            {
-                return hpx::get<0>(HPX_FORWARD(Tuple, t));
-            }
-        };
-        /// \endcond
-    }    // namespace detail
-
-    //-----------------------------------------------------------------------------
+namespace hpx { namespace parallel { namespace v1 {
+    // clang-format off
     /// Sorts one range of data using keys supplied in another range.
     /// The key elements in the range [key_first, key_last) are sorted in
     /// ascending order with the corresponding elements in the value range
@@ -116,6 +87,51 @@ namespace hpx { namespace parallel { inline namespace v1 {
     util::detail::algorithm_result_t<ExPolicy,
         sort_by_key_result<KeyIter, ValueIter>>
     sort_by_key(ExPolicy&& policy, KeyIter key_first, KeyIter key_last,
+        ValueIter value_first, Compare&& comp = Compare());
+    // clang-format on
+}}}    // namespace hpx::parallel::v1
+
+#else
+
+#pragma once
+
+#include <hpx/config.hpp>
+#include <hpx/datastructures/tuple.hpp>
+
+#include <hpx/parallel/algorithms/sort.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
+
+#include <algorithm>
+#include <iterator>
+#include <type_traits>
+#include <utility>
+
+namespace hpx { namespace parallel { inline namespace v1 {
+
+    template <typename KeyIter, typename ValueIter>
+    using sort_by_key_result = std::pair<KeyIter, ValueIter>;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // sort
+    namespace detail {
+        /// \cond NOINTERNAL
+        struct extract_key
+        {
+            template <typename Tuple>
+            auto operator()(Tuple&& t) const
+                -> decltype(hpx::get<0>(HPX_FORWARD(Tuple, t)))
+            {
+                return hpx::get<0>(HPX_FORWARD(Tuple, t));
+            }
+        };
+        /// \endcond
+    }    // namespace detail
+
+    template <typename ExPolicy, typename KeyIter, typename ValueIter,
+        typename Compare = detail::less>
+    util::detail::algorithm_result_t<ExPolicy,
+        sort_by_key_result<KeyIter, ValueIter>>
+    sort_by_key(ExPolicy&& policy, KeyIter key_first, KeyIter key_last,
         ValueIter value_first, Compare&& comp = Compare())
     {
 #if !defined(HPX_HAVE_TUPLE_RVALUE_SWAP)
@@ -141,3 +157,5 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
     }
 }}}    // namespace hpx::parallel::v1
+
+#endif

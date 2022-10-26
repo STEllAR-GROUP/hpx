@@ -858,6 +858,13 @@ namespace hpx {
                         params.rp_callback(rp, cmdline.vm_);
                     }
 
+#if defined(HPX_HAVE_NETWORKING)
+                    if (cmdline.num_localities_ != 1 || cmdline.node_ != 0 ||
+                        cmdline.rtcfg_.enable_networking())
+                    {
+                        parcelset::parcelhandler::init(rp);
+                    }
+#endif
                     // Setup all internal parameters of the resource_partitioner
                     rp.configure_pools();
                 }

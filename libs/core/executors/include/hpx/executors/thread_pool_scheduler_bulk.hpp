@@ -28,8 +28,12 @@
 #include <hpx/iterator_support/counting_iterator.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/threading/thread.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/register_thread.hpp>
+#include <hpx/topology/cpu_mask.hpp>
+#include <hpx/topology/topology.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <atomic>
@@ -64,6 +68,45 @@ namespace hpx::execution::experimental::detail {
         hpx::util::index_pack<Is...>, F&& f, T&& t, Ts& ts)
     {
         HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t), hpx::get<Is>(ts)...);
+    }
+
+    inline hpx::threads::mask_type full_mask(std::size_t num_threads)
+    {
+        auto& rp = hpx::resource::get_partitioner();
+
+        std::size_t overall_threads = hpx::threads::hardware_concurrency();
+        auto mask = hpx::threads::mask_type();
+        hpx::threads::resize(mask, overall_threads);
+        for (std::size_t i = 0; i != num_threads; ++i)
+        {
+            auto thread_mask = rp.get_pu_mask(i);
+            for (std::size_t j = 0; j != overall_threads; ++j)
+            {
+                if (threads::test(thread_mask, j))
+                {
+                    threads::set(mask, j);
+                }
+            }
+        }
+        return mask;
+    }
+
+    inline hpx::threads::mask_type limit_mask(
+        hpx::threads::mask_cref_type orgmask, std::size_t num_threads)
+    {
+        std::size_t num_cores = hpx::threads::hardware_concurrency();
+
+        auto mask = hpx::threads::mask_type();
+        hpx::threads::resize(mask, num_cores);
+        for (std::size_t i = 0, j = 0; i != num_threads && j != num_cores; ++j)
+        {
+            if (hpx::threads::test(orgmask, j))
+            {
+                hpx::threads::set(mask, j);
+                ++i;
+            }
+        }
+        return mask;
     }
 
     template <typename OperationState>
@@ -209,7 +252,7 @@ namespace hpx::execution::experimental::detail {
         // Otherwise it will call set_value on the connected receiver.
         void finish() const
         {
-            if (--(op_state->tasks_remaining) == 0)
+            if (--(op_state->tasks_remaining.data_) == 0)
             {
                 if (op_state->exception_thrown)
                 {
@@ -267,14 +310,14 @@ namespace hpx::execution::experimental::detail {
         }
 
         // Initialize a queue for a worker thread.
-        void init_queue(
-            std::uint32_t const worker_thread, std::uint32_t const size)
+        void init_queue(std::uint32_t const worker_thread,
+            std::uint32_t const size, std::uint32_t num_threads)
         {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const part_begin = static_cast<std::uint32_t>(
-                (worker_thread * size) / op_state->num_worker_threads);
+                (worker_thread * size) / num_threads);
             auto const part_end = static_cast<std::uint32_t>(
-                ((worker_thread + 1) * size) / op_state->num_worker_threads);
+                ((worker_thread + 1) * size) / num_threads);
             queue.reset(part_begin, part_end);
         }
 
@@ -355,6 +398,19 @@ namespace hpx::execution::experimental::detail {
                 op_state->num_worker_threads, size);
             std::uint32_t num_chunks = (size + chunk_size - 1) / chunk_size;
 
+            // launch only as many tasks as we have chunks
+            std::size_t num_pus = op_state->num_worker_threads;
+            if (num_chunks < std::uint32_t(op_state->num_worker_threads))
+            {
+                op_state->num_worker_threads = num_chunks;
+                op_state->tasks_remaining.data_ = num_chunks;
+                op_state->pu_mask =
+                    detail::limit_mask(op_state->pu_mask, num_chunks);
+            }
+
+            HPX_ASSERT(hpx::threads::count(op_state->pu_mask) ==
+                op_state->num_worker_threads);
+
             // Store sent values in the operation state
             op_state->ts.template emplace<hpx::tuple<Ts...>>(
                 HPX_FORWARD(Ts, ts)...);
@@ -362,27 +418,72 @@ namespace hpx::execution::experimental::detail {
             // Initialize the queues for all worker threads so that worker
             // threads can start stealing immediately when they start.
             for (std::uint32_t worker_thread = 0;
-                 worker_thread < op_state->num_worker_threads; ++worker_thread)
+                 worker_thread != op_state->num_worker_threads; ++worker_thread)
             {
-                init_queue(worker_thread, num_chunks);
+                init_queue(
+                    worker_thread, num_chunks, op_state->num_worker_threads);
             }
 
             // Spawn the worker threads for all except the local queue.
-            auto const local_worker_thread =
+            auto& rp = hpx::resource::get_partitioner();
+
+            auto local_worker_thread =
                 std::uint32_t(hpx::get_local_worker_thread_num());
-            for (std::uint32_t worker_thread = 0;
-                 worker_thread != op_state->num_worker_threads; ++worker_thread)
+
+            std::uint32_t worker_thread = 0;
+            bool main_thread_ok = false;
+            std::size_t main_pu_num = rp.get_pu_num(local_worker_thread);
+            if (!hpx::threads::test(op_state->pu_mask, main_pu_num) ||
+                op_state->num_worker_threads == 1)
             {
+                main_thread_ok = true;
+                local_worker_thread = worker_thread++;
+                main_pu_num = rp.get_pu_num(local_worker_thread);
+            }
+
+            for (std::uint32_t pu = 0;
+                 worker_thread != op_state->num_worker_threads && pu != num_pus;
+                 ++pu)
+            {
+                std::size_t pu_num = rp.get_pu_num(pu);
+
                 // The queue for the local thread is handled later inline.
-                if (worker_thread == local_worker_thread)
+                if (!main_thread_ok && pu == local_worker_thread)
+                {
+                    // the initializing thread is expected to participate in
+                    // evaluating parallel regions
+                    HPX_ASSERT(hpx::threads::test(op_state->pu_mask, pu_num));
+                    main_thread_ok = true;
+                    local_worker_thread = worker_thread++;
+                    main_pu_num = rp.get_pu_num(local_worker_thread);
+                    continue;
+                }
+
+                // don't double-book core that runs main thread
+                if (main_thread_ok && main_pu_num == pu_num)
+                {
+                    continue;
+                }
+
+                // create an HPX thread only for cores in the given PU-mask
+                if (!hpx::threads::test(op_state->pu_mask, pu_num))
                 {
                     continue;
                 }
 
                 // Schedule task for this worker thread
                 do_work_task(task_function<OperationState>{
-                    this->op_state, size, chunk_size, worker_thread});
+                    op_state, size, chunk_size, worker_thread});
+
+                ++worker_thread;
             }
+
+            // the main thread should have been associated with a queue
+            HPX_ASSERT(main_thread_ok);
+
+            // there have to be as many HPX threads as there are set bits in
+            // the PU-mask
+            HPX_ASSERT(worker_thread == op_state->num_worker_threads);
 
             // Handle the queue for the local thread.
             do_work_local(task_function<OperationState>{
@@ -432,16 +533,31 @@ namespace hpx::execution::experimental::detail {
         HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
         HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
         HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
+        hpx::threads::mask_type pu_mask;
 
     public:
         template <typename Sender_, typename Shape_, typename F_>
         thread_pool_bulk_sender(
             thread_pool_policy_scheduler<Policy>&& scheduler, Sender_&& sender,
-            Shape_&& shape, F_&& f)
+            Shape_&& shape, F_&& f, hpx::threads::mask_cref_type pu_mask)
           : scheduler(HPX_MOVE(scheduler))
           , sender(HPX_FORWARD(Sender_, sender))
           , shape(HPX_FORWARD(Shape_, shape))
           , f(HPX_FORWARD(F_, f))
+          , pu_mask(pu_mask)
+        {
+        }
+
+        template <typename Sender_, typename Shape_, typename F_>
+        thread_pool_bulk_sender(
+            thread_pool_policy_scheduler<Policy>&& scheduler, Sender_&& sender,
+            Shape_&& shape, F_&& f)
+          : thread_pool_bulk_sender(HPX_MOVE(scheduler),
+                HPX_FORWARD(Sender_, sender), HPX_FORWARD(Shape_, shape),
+                HPX_FORWARD(F_, f),
+                detail::full_mask(
+                    hpx::parallel::execution::processing_units_count(
+                        scheduler)))
         {
         }
 
@@ -509,13 +625,15 @@ namespace hpx::execution::experimental::detail {
             thread_pool_policy_scheduler<Policy> scheduler;
             operation_state_type op_state;
             std::size_t num_worker_threads;
+            hpx::threads::mask_type pu_mask;
             std::vector<hpx::util::cache_aligned_data<
                 hpx::concurrency::detail::contiguous_index_queue<>>>
                 queues;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
-            std::atomic<std::size_t> tasks_remaining{0};
+            hpx::util::cache_aligned_data<std::atomic<std::size_t>>
+                tasks_remaining;
 
             using value_types = value_types_of_t<Sender, empty_env,
                 decayed_tuple, hpx::variant>;
@@ -526,19 +644,23 @@ namespace hpx::execution::experimental::detail {
             template <typename Sender_, typename Shape_, typename F_,
                 typename Receiver_>
             operation_state(thread_pool_policy_scheduler<Policy>&& scheduler,
-                Sender_&& sender, Shape_&& shape, F_&& f, Receiver_&& receiver)
+                Sender_&& sender, Shape_&& shape, F_&& f,
+                hpx::threads::mask_cref_type pumask, Receiver_&& receiver)
               : scheduler(HPX_MOVE(scheduler))
               , op_state(hpx::execution::experimental::connect(
                     HPX_FORWARD(Sender_, sender),
                     bulk_receiver<operation_state, F, Shape>{this}))
               , num_worker_threads(
                     hpx::parallel::execution::processing_units_count(scheduler))
+              , pu_mask(pumask)
               , queues(num_worker_threads)
               , shape(HPX_FORWARD(Shape_, shape))
               , f(HPX_FORWARD(F_, f))
               , receiver(HPX_FORWARD(Receiver_, receiver))
-              , tasks_remaining(num_worker_threads)
             {
+                tasks_remaining.data_.store(
+                    num_worker_threads, std::memory_order_relaxed);
+                HPX_ASSERT(hpx::threads::count(pu_mask) == num_worker_threads);
             }
 
             friend void tag_invoke(start_t, operation_state& os) noexcept
@@ -554,7 +676,8 @@ namespace hpx::execution::experimental::detail {
         {
             return operation_state<std::decay_t<Receiver>>{
                 HPX_MOVE(s.scheduler), HPX_MOVE(s.sender), HPX_MOVE(s.shape),
-                HPX_MOVE(s.f), HPX_FORWARD(Receiver, receiver)};
+                HPX_MOVE(s.f), HPX_MOVE(s.pu_mask),
+                HPX_FORWARD(Receiver, receiver)};
         }
 
         template <typename Receiver>
@@ -562,7 +685,8 @@ namespace hpx::execution::experimental::detail {
             connect_t, thread_pool_bulk_sender& s, Receiver&& receiver)
         {
             return operation_state<std::decay_t<Receiver>>{s.scheduler,
-                s.sender, s.shape, s.f, HPX_FORWARD(Receiver, receiver)};
+                s.sender, s.shape, s.f, s.pu_mask,
+                HPX_FORWARD(Receiver, receiver)};
         }
     };
 }    // namespace hpx::execution::experimental::detail

@@ -105,9 +105,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             util::loop_n<ExPolicy>(it, part_count, tok,
                 [&f, &proj1, &proj2, &tok](auto const& curr) mutable -> void {
                     auto t = *curr;
-                    if (!hpx::util::invoke(f,
-                            hpx::util::invoke(proj1, hpx::get<0>(t)),
-                            hpx::util::invoke(proj2, hpx::get<1>(t))))
+                    if (!hpx::invoke(f, hpx::invoke(proj1, hpx::get<0>(t)),
+                            hpx::invoke(proj2, hpx::get<1>(t))))
                     {
                         tok.cancel();
                     }

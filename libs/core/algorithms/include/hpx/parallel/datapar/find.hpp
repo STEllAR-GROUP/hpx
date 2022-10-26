@@ -330,10 +330,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                         local_tok,
                         [&op, &proj1, &proj2, &local_tok](auto t) -> void {
                             using hpx::get;
-                            if (!hpx::parallel::traits::all_of(
-                                    hpx::util::invoke(op,
-                                        hpx::util::invoke(proj1, get<0>(*t)),
-                                        hpx::util::invoke(proj2, get<1>(*t)))))
+                            if (!hpx::parallel::traits::all_of(hpx::invoke(op,
+                                    hpx::invoke(proj1, get<0>(*t)),
+                                    hpx::invoke(proj2, get<1>(*t)))))
                             {
                                 local_tok.cancel();
                             }
@@ -440,7 +439,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 part_size, tok,
                 [&it, &proj1, &s_first, &s_last, &proj2, &op, &tok, &idx](
                     auto, std::size_t i) {
-                    auto val = *hpx::util::invoke(proj1, it + idx);
+                    auto val = *hpx::invoke(proj1, it + idx);
 
                     util::cancellation_token<> local_tok;
                     util::loop_n<hpx::execution::simd_policy>(s_first,

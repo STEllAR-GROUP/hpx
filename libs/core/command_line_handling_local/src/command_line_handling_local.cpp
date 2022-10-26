@@ -91,7 +91,7 @@ namespace hpx { namespace local { namespace detail {
     inline std::string encode_and_enquote(std::string str)
     {
         encode(str, '\"', "\\\"", 2);
-        return util::detail::enquote(HPX_MOVE(str));
+        return util::detail::enquote(str);
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -188,10 +188,8 @@ namespace hpx { namespace local { namespace detail {
             if (numa_sensitive > 2)
             {
                 throw hpx::detail::command_line_error(
-                    "Invalid argument "
-                    "value for --hpx:numa-sensitive. Allowed values "
-                    "are "
-                    "0, 1, or 2");
+                    "Invalid argument value for --hpx:numa-sensitive. Allowed "
+                    "values are 0, 1, or 2");
             }
             return numa_sensitive;
         }
@@ -248,9 +246,9 @@ namespace hpx { namespace local { namespace detail {
     {
         // If using the process mask we override "cores" and "all" options but
         // keep explicit numeric values.
-        const std::size_t init_threads =
+        std::size_t const init_threads =
             get_number_of_default_threads(use_process_mask);
-        const std::size_t init_cores =
+        std::size_t const init_cores =
             get_number_of_default_cores(use_process_mask);
 
         std::string threads_str = cfgmap.get_value<std::string>(
@@ -341,13 +339,12 @@ namespace hpx { namespace local { namespace detail {
 
     std::size_t handle_num_cores(util::manage_config& cfgmap,
         hpx::program_options::variables_map& vm, std::size_t num_threads,
-        bool use_process_mask)
+        std::size_t num_default_cores)
     {
         std::string cores_str = cfgmap.get_value<std::string>("hpx.cores", "");
         if ("all" == cores_str)
         {
-            cfgmap.config_["hpx.cores"] =
-                std::to_string(get_number_of_default_cores(use_process_mask));
+            cfgmap.config_["hpx.cores"] = std::to_string(num_default_cores);
         }
 
         std::size_t num_cores =
@@ -357,7 +354,7 @@ namespace hpx { namespace local { namespace detail {
             cores_str = vm["hpx:cores"].as<std::string>();
             if ("all" == cores_str)
             {
-                num_cores = get_number_of_default_cores(use_process_mask);
+                num_cores = num_default_cores;
             }
             else
             {
@@ -366,6 +363,25 @@ namespace hpx { namespace local { namespace detail {
         }
 
         return num_cores;
+    }
+
+    std::size_t handle_num_cores(util::manage_config& cfgmap,
+        hpx::program_options::variables_map& vm, std::size_t num_threads,
+        bool use_process_mask)
+    {
+        return handle_num_cores(cfgmap, vm, num_threads,
+            get_number_of_default_cores(use_process_mask));
+    }
+
+    void print_config(std::vector<std::string> const& ini_config)
+    {
+        std::cerr << "Configuration before runtime start:\n";
+        std::cerr << "-----------------------------------\n";
+        for (std::string const& s : ini_config)
+        {
+            std::cerr << s << std::endl;
+        }
+        std::cerr << "-----------------------------------\n";
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -379,10 +395,8 @@ namespace hpx { namespace local { namespace detail {
                 0 != std::string("machine").find(affinity_domain_))
             {
                 throw hpx::detail::command_line_error(
-                    "Invalid command line option "
-                    "--hpx:affinity, value must be one of: pu, core, "
-                    "numa, "
-                    "or machine.");
+                    "Invalid command line option --hpx:affinity, value must be "
+                    "one of: pu, core, numa, or machine.");
             }
         }
     }
@@ -398,10 +412,8 @@ namespace hpx { namespace local { namespace detail {
             pu_step_ != 1 || affinity_domain_ != "pu")
         {
             throw hpx::detail::command_line_error(
-                "Command line option --hpx:bind "
-                "should not be used with --hpx:pu-step, "
-                "--hpx:pu-offset, "
-                "or --hpx:affinity.");
+                "Command line option --hpx:bind should not be used with "
+                "--hpx:pu-step, --hpx:pu-offset, or --hpx:affinity.");
         }
     }
 
@@ -411,9 +423,8 @@ namespace hpx { namespace local { namespace detail {
             pu_offset_ >= hpx::threads::hardware_concurrency())
         {
             throw hpx::detail::command_line_error(
-                "Invalid command line option "
-                "--hpx:pu-offset, value must be smaller than number of "
-                "available processing units.");
+                "Invalid command line option --hpx:pu-offset, value must be "
+                "smaller than number of available processing units.");
         }
     }
 
@@ -423,10 +434,39 @@ namespace hpx { namespace local { namespace detail {
             (pu_step_ == 0 || pu_step_ >= hpx::threads::hardware_concurrency()))
         {
             throw hpx::detail::command_line_error(
-                "Invalid command line option "
-                "--hpx:pu-step, value must be non-zero and smaller "
-                "than "
-                "number of available processing units.");
+                "Invalid command line option --hpx:pu-step, value must be "
+                "non-zero and smaller than number of available processing "
+                "units.");
+        }
+    }
+
+    void command_line_handling::handle_high_priority_threads(
+        hpx::program_options::variables_map& vm,
+        std::vector<std::string>& ini_config)
+    {
+        if (vm_.count("hpx:high-priority-threads"))
+        {
+            std::size_t num_high_priority_queues =
+                vm["hpx:high-priority-threads"].as<std::size_t>();
+            if (num_high_priority_queues != std::size_t(-1) &&
+                num_high_priority_queues > num_threads_)
+            {
+                throw hpx::detail::command_line_error(
+                    "Invalid command line option: number of high priority "
+                    "threads (--hpx:high-priority-threads), should not be "
+                    "larger than number of threads (--hpx:threads)");
+            }
+
+            if (!(queuing_ == "local-priority" || queuing_ == "abp-priority"))
+            {
+                throw hpx::detail::command_line_error(
+                    "Invalid command line option --hpx:high-priority-threads, "
+                    "valid for --hpx:queuing=local-priority and "
+                    "--hpx:queuing=abp-priority only");
+            }
+
+            ini_config.emplace_back("hpx.thread_queue.high_priority_queues!=" +
+                std::to_string(num_high_priority_queues));
         }
     }
 
@@ -452,11 +492,10 @@ namespace hpx { namespace local { namespace detail {
 #if defined(__APPLE__)
         if (use_process_mask_)
         {
-            std::cerr << "Warning: enabled process mask for thread "
-                         "binding, but "
-                         "thread binding is not supported on macOS. "
-                         "Ignoring option."
-                      << std::endl;
+            std::cerr
+                << "Warning: enabled process mask for thread binding, but "
+                   "thread binding is not supported on macOS. Ignoring option."
+                << std::endl;
             use_process_mask_ = false;
         }
 #endif
@@ -557,45 +596,14 @@ namespace hpx { namespace local { namespace detail {
             "hpx.os_threads=" + std::to_string(num_threads_));
         ini_config.emplace_back("hpx.cores=" + std::to_string(num_cores_));
 
-        if (vm_.count("hpx:high-priority-threads"))
-        {
-            std::size_t num_high_priority_queues =
-                vm_["hpx:high-priority-threads"].as<std::size_t>();
-            if (num_high_priority_queues != std::size_t(-1) &&
-                num_high_priority_queues > num_threads_)
-            {
-                throw hpx::detail::command_line_error(
-                    "Invalid command line option: "
-                    "number of high priority threads ("
-                    "--hpx:high-priority-threads), should not be "
-                    "larger "
-                    "than number of threads (--hpx:threads)");
-            }
-
-            if (!(queuing_ == "local-priority" || queuing_ == "abp-priority"))
-            {
-                throw hpx::detail::command_line_error(
-                    "Invalid command line option "
-                    "--hpx:high-priority-threads, "
-                    "valid for --hpx:queuing=local-priority and "
-                    "--hpx:queuing=abp-priority only");
-            }
-
-            ini_config.emplace_back("hpx.thread_queue.high_priority_queues!=" +
-                std::to_string(num_high_priority_queues));
-        }
+        // handle high-priority threads
+        handle_high_priority_threads(vm, ini_config);
 
         enable_logging_settings(vm, ini_config);
 
         if (debug_clp)
         {
-            std::cerr << "Configuration before runtime start:\n";
-            std::cerr << "-----------------------------------\n";
-            for (std::string const& s : ini_config)
-            {
-                std::cerr << s << std::endl;
-            }
-            std::cerr << "-----------------------------------\n";
+            print_config(ini_config);
         }
 
         return true;
@@ -604,7 +612,7 @@ namespace hpx { namespace local { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     void command_line_handling::enable_logging_settings(
         hpx::program_options::variables_map& vm,
-        std::vector<std::string>& ini_config)
+        [[maybe_unused]] std::vector<std::string>& ini_config)
     {
 #if defined(HPX_HAVE_LOGGING)
         if (vm.count("hpx:debug-hpx-log"))
@@ -617,30 +625,6 @@ namespace hpx { namespace local { namespace detail {
                     vm["hpx:debug-hpx-log"].as<std::string>()));
             ini_config.emplace_back("hpx.logging.console.level=5");
             ini_config.emplace_back("hpx.logging.level=5");
-        }
-
-        if (vm.count("hpx:debug-agas-log"))
-        {
-            ini_config.emplace_back("hpx.logging.console.agas.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-agas-log"].as<std::string>()));
-            ini_config.emplace_back("hpx.logging.agas.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-agas-log"].as<std::string>()));
-            ini_config.emplace_back("hpx.logging.console.agas.level=5");
-            ini_config.emplace_back("hpx.logging.agas.level=5");
-        }
-
-        if (vm.count("hpx:debug-parcel-log"))
-        {
-            ini_config.emplace_back("hpx.logging.console.parcel.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-parcel-log"].as<std::string>()));
-            ini_config.emplace_back("hpx.logging.parcel.destination=" +
-                detail::convert_to_log_file(
-                    vm["hpx:debug-parcel-log"].as<std::string>()));
-            ini_config.emplace_back("hpx.logging.console.parcel.level=5");
-            ini_config.emplace_back("hpx.logging.parcel.level=5");
         }
 
         if (vm.count("hpx:debug-timing-log"))
@@ -668,9 +652,8 @@ namespace hpx { namespace local { namespace detail {
             ini_config.emplace_back("hpx.logging.application.level=5");
         }
 #else
-        if (vm.count("hpx:debug-hpx-log") || vm.count("hpx:debug-agas-log") ||
-            vm.count("hpx:debug-parcel-log") ||
-            vm.count("hpx:debug-timing-log") || vm.count("hpx:debug-app-log"))
+        if (vm.count("hpx:debug-hpx-log") || vm.count("hpx:debug-timing-log") ||
+            vm.count("hpx:debug-app-log"))
         {
             // clang-format off
             throw hpx::detail::command_line_error(
@@ -679,8 +662,6 @@ namespace hpx { namespace local { namespace detail {
                 "HPX using the option -DHPX_WITH_LOGGING=On.");
             // clang-format on
         }
-
-        HPX_UNUSED(ini_config);
 #endif
     }
 
@@ -866,6 +847,38 @@ namespace hpx { namespace local { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    void command_line_handling::reconfigure(
+        util::manage_config& cfgmap, hpx::program_options::variables_map& prevm)
+    {
+        // re-initialize runtime configuration object
+        if (prevm.count("hpx:config"))
+            rtcfg_.reconfigure(prevm["hpx:config"].as<std::string>());
+        else
+            rtcfg_.reconfigure("");
+
+        // Make sure any aliases defined on the command line get used for the
+        // option analysis below.
+        std::vector<std::string> cfg;
+        if (prevm.count("hpx:ini"))
+        {
+            cfg = prevm["hpx:ini"].as<std::vector<std::string>>();
+            cfgmap.add(cfg);
+        }
+
+        // append ini options from command line
+        std::copy(
+            ini_config_.begin(), ini_config_.end(), std::back_inserter(cfg));
+
+        // enable logging if invoked requested from command line
+        std::vector<std::string> ini_config_logging;
+        enable_logging_settings(prevm, ini_config_logging);
+
+        std::copy(ini_config_logging.begin(), ini_config_logging.end(),
+            std::back_inserter(cfg));
+
+        rtcfg_.reconfigure(cfg);
+    }
+
     int command_line_handling::call(
         hpx::program_options::options_description const& desc_cmdline, int argc,
         char** argv)
@@ -896,14 +909,13 @@ namespace hpx { namespace local { namespace detail {
 
         args = prepend_options(HPX_MOVE(args), HPX_MOVE(prepend_command_line));
 
-        // Initial analysis of the command line options. This is
-        // preliminary as it will not take into account any aliases as
-        // defined in any of the runtime configuration files.
+        // Initial analysis of the command line options. This is preliminary as
+        // it will not take into account any aliases as defined in any of the
+        // runtime configuration files.
         {
-            // Boost V1.47 and before do not properly reset a variables_map
-            // when calling vm.clear(). We work around that problems by
-            // creating a separate instance just for the preliminary
-            // command line handling.
+            // Boost V1.47 and before do not properly reset a variables_map when
+            // calling vm.clear(). We work around that problems by creating a
+            // separate instance just for the preliminary command line handling.
             hpx::program_options::variables_map prevm;
             if (!parse_commandline(
                     rtcfg_, desc_cmdline, argv[0], args, prevm, error_mode))
@@ -918,40 +930,11 @@ namespace hpx { namespace local { namespace detail {
                 return -2;
             }
 
-            // re-initialize runtime configuration object
-            if (prevm.count("hpx:config"))
-                rtcfg_.reconfigure(prevm["hpx:config"].as<std::string>());
-            else
-                rtcfg_.reconfigure("");
-
-            // Make sure any aliases defined on the command line get used
-            // for the option analysis below.
-            std::vector<std::string> cfg;
-            if (prevm.count("hpx:ini"))
-            {
-                cfg = prevm["hpx:ini"].as<std::vector<std::string>>();
-                cfgmap.add(cfg);
-            }
-
-            // append ini options from command line
-            std::copy(ini_config_.begin(), ini_config_.end(),
-                std::back_inserter(cfg));
-
-            // enable logging if invoked requested from command line
-            std::vector<std::string> ini_config_logging;
-            enable_logging_settings(prevm, ini_config_logging);
-
-            std::copy(ini_config_logging.begin(), ini_config_logging.end(),
-                std::back_inserter(cfg));
-
-            rtcfg_.reconfigure(cfg);
+            reconfigure(cfgmap, prevm);
         }
 
-        // Re-run program option analysis, ini settings (such as aliases)
-        // will be considered now.
-
-        // Now re-parse the command line using the node number (if given).
-        // This will additionally detect any --hpx:N:foo options.
+        // Re-run program option analysis, ini settings (such as aliases) will
+        // be considered now.
         hpx::program_options::options_description help;
         std::vector<std::string> unregistered_options;
 
@@ -965,12 +948,20 @@ namespace hpx { namespace local { namespace detail {
         // break into debugger, if requested
         handle_attach_debugger();
 
-        // handle all --hpx:foo and --hpx:*:foo options
+        // handle all --hpx:foo options
         if (!handle_arguments(cfgmap, vm_, ini_config_))
         {
             return -2;
         }
 
+        return finalize_commandline_handling(
+            argc, argv, help, unregistered_options);
+    }
+
+    int command_line_handling::finalize_commandline_handling(int argc,
+        char** argv, hpx::program_options::options_description const& help,
+        std::vector<std::string> const& unregistered_options)
+    {
         // store unregistered command line and arguments
         store_command_line(argc, argv);
         store_unregistered_options(argv[0], unregistered_options);

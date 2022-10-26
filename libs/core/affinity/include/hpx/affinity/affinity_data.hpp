@@ -54,7 +54,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
             return num_threads_;
         }
 
-        mask_cref_type get_pu_mask(
+        mask_type get_pu_mask(
             threads::topology const& topo, std::size_t num_thread) const;
 
         mask_type get_used_pus_mask(

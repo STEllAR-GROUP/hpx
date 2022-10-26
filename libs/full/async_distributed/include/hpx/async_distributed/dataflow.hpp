@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,34 +7,22 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions_base/basic_action_fwd.hpp>
-#include <hpx/actions_base/traits/extract_action.hpp>
-#include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/traits/is_action.hpp>
-#include <hpx/futures/detail/future_transforms.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/acquire_future.hpp>
-#include <hpx/futures/traits/future_access.hpp>
-#include <hpx/futures/traits/is_future.hpp>
-#include <hpx/futures/traits/promise_local_result.hpp>
+#include <hpx/modules/actions_base.hpp>
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concepts.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/naming.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/threading_base/thread_description.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/type_support/always_void.hpp>
-
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/executors/parallel_executor.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -47,6 +35,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace lcos { namespace detail {
+
     template <typename Policy, typename Action, typename Args>
     struct dataflow_return_impl</*IsAction=*/true, Policy, Action, Args>
     {
@@ -56,7 +45,7 @@ namespace hpx { namespace lcos { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Policy>
     struct dataflow_dispatch_impl<true, Policy,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+        std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         template <typename Allocator, typename Policy_, typename Component,
             typename Signature, typename Derived, typename... Ts>
@@ -65,17 +54,17 @@ namespace hpx { namespace lcos { namespace detail {
             hpx::actions::basic_action<Component, Signature, Derived> const&,
             hpx::id_type const& id, Ts&&... ts)
         {
-            return detail::create_dataflow_alloc(alloc,
-                HPX_FORWARD(Policy_, policy), Derived{}, id,
+            return detail::create_dataflow(alloc, HPX_FORWARD(Policy_, policy),
+                Derived{}, id,
                 traits::acquire_future_disp()(HPX_FORWARD(Ts, ts))...);
         }
     };
 
     template <typename FD>
     struct dataflow_dispatch_impl<true, FD,
-        typename std::enable_if<!traits::is_launch_policy<FD>::value &&
-            !(traits::is_one_way_executor<FD>::value ||
-                traits::is_two_way_executor<FD>::value)>::type>
+        std::enable_if_t<!traits::is_launch_policy_v<FD> &&
+            !traits::is_one_way_executor_v<FD> &&
+            !traits::is_two_way_executor_v<FD>>>
     {
         template <typename Allocator, typename Component, typename Signature,
             typename Derived, typename... Ts>
@@ -88,68 +77,41 @@ namespace hpx { namespace lcos { namespace detail {
                 alloc, launch::async, act, id, HPX_FORWARD(Ts, ts)...);
         }
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename T0, typename Enable = void>
-    struct dataflow_action_dispatch
-    {
-        template <typename Allocator, typename... Ts>
-        HPX_FORCEINLINE static hpx::future<
-            typename traits::promise_local_result<typename hpx::traits::
-                    extract_action<Action>::remote_result_type>::type>
-        call(Allocator const& alloc, hpx::id_type const& id, Ts&&... ts)
-        {
-            return dataflow_dispatch_impl<true, Action>::call(
-                alloc, Action(), id, HPX_FORWARD(Ts, ts)...);
-        }
-    };
-
-    template <typename Action, typename Policy>
-    struct dataflow_action_dispatch<Action, Policy,
-        typename std::enable_if<traits::is_launch_policy<
-            typename std::decay<Policy>::type>::value>::type>
-    {
-        template <typename Allocator, typename... Ts>
-        HPX_FORCEINLINE static hpx::future<
-            typename traits::promise_local_result<typename hpx::traits::
-                    extract_action<Action>::remote_result_type>::type>
-        call(Allocator const& alloc, Policy&& policy, hpx::id_type const& id,
-            Ts&&... ts)
-        {
-            return dataflow_dispatch_impl<true,
-                typename std::decay<Policy>::type>::call(alloc,
-                HPX_FORWARD(Policy, policy), Action(), id,
-                HPX_FORWARD(Ts, ts)...);
-        }
-    };
 }}}    // namespace hpx::lcos::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
-    template <typename Action, typename T0, typename... Ts,
-        typename Enable =
-            typename std::enable_if<traits::is_action<Action>::value>::type>
-    HPX_FORCEINLINE auto dataflow(T0&& t0, Ts&&... ts)
-        -> decltype(lcos::detail::dataflow_action_dispatch<Action, T0>::call(
-            hpx::util::internal_allocator<>{}, HPX_FORWARD(T0, t0),
-            HPX_FORWARD(Ts, ts)...))
+
+    // clang-format off
+    template <typename Action, typename F, typename... Ts,
+        HPX_CONCEPT_REQUIRES_(
+            traits::is_action_v<Action> &&
+           !traits::is_launch_policy_v<F>
+        )>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::dataflow<Action>(...) is deprecated, use hpx::dataflow(Action{}, "
+        "...) instead")
+    // clang-format on
+    decltype(auto) dataflow(F&& f, Ts&&... ts)
     {
-        return lcos::detail::dataflow_action_dispatch<Action, T0>::call(
-            hpx::util::internal_allocator<>{}, HPX_FORWARD(T0, t0),
+        return hpx::detail::dataflow(hpx::util::internal_allocator<>{},
+            hpx::launch::async, Action{}, HPX_FORWARD(F, f),
             HPX_FORWARD(Ts, ts)...);
     }
 
-    template <typename Action, typename Allocator, typename T0, typename... Ts,
-        typename Enable =
-            typename std::enable_if<traits::is_action<Action>::value>::type>
-    HPX_FORCEINLINE auto dataflow_alloc(
-        Allocator const& alloc, T0&& t0, Ts&&... ts)
-        -> decltype(lcos::detail::dataflow_action_dispatch<Action, T0>::call(
-            alloc, HPX_FORWARD(T0, t0), HPX_FORWARD(Ts, ts)...))
+    // clang-format off
+    template <typename Action, typename F, typename... Ts,
+        HPX_CONCEPT_REQUIRES_(
+            traits::is_action_v<Action> &&
+            traits::is_launch_policy_v<F>
+        )>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::dataflow<Action>(policy, ...) is deprecated, use "
+        "hpx::dataflow(policy, Action{}, ...) instead")
+    // clang-format on
+    decltype(auto) dataflow(F&& f, Ts&&... ts)
     {
-        return lcos::detail::dataflow_action_dispatch<Action, T0>::call(
-            alloc, HPX_FORWARD(T0, t0), HPX_FORWARD(Ts, ts)...);
+        return hpx::detail::dataflow(hpx::util::internal_allocator<>{},
+            HPX_FORWARD(F, f), Action{}, HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx
-
-// #endif

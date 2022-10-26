@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file scoped_annotation.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -182,7 +184,11 @@ namespace hpx {
 #endif
 
 #else
-    ///////////////////////////////////////////////////////////////////////////
+    /// \brief scoped_annotation associates a \c name with a section of code
+    ///        (scope). It can be used to visualize code execution in
+    ///        profiling tools like \a Intel \a VTune, \a Apex \a Profiler, etc.
+    ///        That allows analysing performance to figure out which part(s)
+    ///        of code is (are) responsible for performance degradation, etc.
     struct [[nodiscard]] scoped_annotation
     {
         HPX_NON_COPYABLE(scoped_annotation);
