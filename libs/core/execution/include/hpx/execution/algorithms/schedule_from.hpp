@@ -269,7 +269,7 @@ namespace hpx::execution::experimental {
                             !std::is_same_v<std::decay_t<Ts>, hpx::monostate>>>
                     void operator()(Ts&& ts)
                     {
-                        hpx::util::invoke_fused(
+                        hpx::invoke_fused(
                             hpx::bind_front(
                                 hpx::execution::experimental::set_value,
                                 HPX_MOVE(receiver)),

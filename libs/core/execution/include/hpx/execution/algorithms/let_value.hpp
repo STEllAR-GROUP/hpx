@@ -277,7 +277,7 @@ namespace hpx::execution::experimental {
                         {
                             using operation_state_type =
                                 decltype(hpx::execution::experimental::connect(
-                                    hpx::util::invoke_fused(HPX_MOVE(f), t),
+                                    hpx::invoke_fused(HPX_MOVE(f), t),
                                     std::declval<Receiver>()));
 
 #if defined(HPX_HAVE_CXX17_COPY_ELISION)
@@ -289,7 +289,7 @@ namespace hpx::execution::experimental {
                                 .template emplace<operation_state_type>(
                                     hpx::util::detail::with_result_of([&]() {
                                         return hpx::execution::experimental::
-                                            connect(hpx::util::invoke_fused(
+                                            connect(hpx::invoke_fused(
                                                         HPX_MOVE(f), t),
                                                 HPX_MOVE(receiver));
                                     }));
@@ -299,7 +299,7 @@ namespace hpx::execution::experimental {
                             op_state.successor_op_state
                                 .template emplace_f<operation_state_type>(
                                     hpx::execution::experimental::connect,
-                                    hpx::util::invoke_fused(HPX_MOVE(f), t),
+                                    hpx::invoke_fused(HPX_MOVE(f), t),
                                     HPX_MOVE(receiver));
 #endif
                             hpx::visit(

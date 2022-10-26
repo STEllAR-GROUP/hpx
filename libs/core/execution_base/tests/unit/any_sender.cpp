@@ -75,7 +75,7 @@ struct non_copyable_sender
         friend void tag_invoke(
             hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
-            hpx::util::invoke_fused(
+            hpx::invoke_fused(
                 hpx::bind_front(
                     hpx::execution::experimental::set_value, std::move(os.r)),
                 std::move(os.ts));
@@ -127,7 +127,7 @@ struct sender
         friend void tag_invoke(
             hpx::execution::experimental::start_t, operation_state& os) noexcept
         {
-            hpx::util::invoke_fused(
+            hpx::invoke_fused(
                 hpx::bind_front(
                     hpx::execution::experimental::set_value, std::move(os.r)),
                 std::move(os.ts));

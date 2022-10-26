@@ -442,8 +442,8 @@ namespace hpx {
             /// tuple like type. This function is SFINAEd out if the element
             /// isn't accepted by the visitor.
             template <typename Current,
-                typename = typename always_void<decltype(
-                    std::declval<Frame>()->traverse(
+                typename = typename always_void<
+                    decltype(std::declval<Frame>()->traverse(
                         *std::declval<Current>()))>::type>
             void async_traverse_one_impl(
                 container_category_tag<false, false>, Current&& current)
@@ -630,7 +630,7 @@ namespace hpx {
         void resume_traversal_callable<Frame, State>::operator()()
         {
             auto hierarchy = hpx::tuple_cat(hpx::make_tuple(frame_), state_);
-            util::invoke_fused(resume_state_callable{}, HPX_MOVE(hierarchy));
+            hpx::invoke_fused(resume_state_callable{}, HPX_MOVE(hierarchy));
         }
 
         /// Gives access to types related to the traversal frame

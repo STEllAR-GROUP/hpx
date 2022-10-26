@@ -108,7 +108,7 @@ namespace hpx { namespace actions {
                         "Executing {}.", Action::get_action_name(lva_));
 
                     // invoke the action, ignoring the return value
-                    util::invoke_fused(action_invoke<Action>{lva_, comptype_},
+                    hpx::invoke_fused(action_invoke<Action>{lva_, comptype_},
                         HPX_MOVE(args_));
                 }
                 catch (hpx::thread_interrupted const&)
@@ -179,7 +179,7 @@ namespace hpx { namespace actions {
 
                 traits::action_trigger_continuation<
                     typename Action::continuation_type>::call(HPX_MOVE(cont_),
-                    util::functional::invoke_fused{},
+                    hpx::functional::invoke_fused{},
                     action_invoke<Action>{lva_, comptype_}, HPX_MOVE(args_));
 
                 return threads::thread_result_type(

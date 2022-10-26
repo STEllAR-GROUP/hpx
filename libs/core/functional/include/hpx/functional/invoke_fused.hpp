@@ -17,14 +17,14 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx::util {
+namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
         template <typename Tuple>
         struct fused_index_pack
-          : make_index_pack<hpx::tuple_size<std::decay_t<Tuple>>::value>
+          : util::make_index_pack<hpx::tuple_size<std::decay_t<Tuple>>::value>
         {
         };
 
@@ -36,15 +36,15 @@ namespace hpx::util {
         struct invoke_fused_result_impl;
 
         template <typename F, typename Tuple, std::size_t... Is>
-        struct invoke_fused_result_impl<F, Tuple&, index_pack<Is...>>
-          : util::invoke_result<F,
+        struct invoke_fused_result_impl<F, Tuple&, util::index_pack<Is...>>
+          : hpx::util::invoke_result<F,
                 typename hpx::tuple_element<Is, Tuple>::type&...>
         {
         };
 
         template <typename F, typename Tuple, std::size_t... Is>
-        struct invoke_fused_result_impl<F, Tuple&&, index_pack<Is...>>
-          : util::invoke_result<F,
+        struct invoke_fused_result_impl<F, Tuple&&, util::index_pack<Is...>>
+          : hpx::util::invoke_result<F,
                 typename hpx::tuple_element<Is, Tuple>::type&&...>
         {
         };
@@ -63,9 +63,9 @@ namespace hpx::util {
         template <std::size_t... Is, typename F, typename Tuple>
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
             typename invoke_fused_result<F, Tuple>::type
-            invoke_fused_impl(index_pack<Is...>, F&& f, Tuple&& t) noexcept(
-                noexcept(HPX_INVOKE(
-                    HPX_FORWARD(F, f), hpx::get<Is>(HPX_FORWARD(Tuple, t))...)))
+            invoke_fused_impl(util::index_pack<Is...>, F&& f,
+                Tuple&& t) noexcept(noexcept(HPX_INVOKE(HPX_FORWARD(F, f),
+                hpx::get<Is>(HPX_FORWARD(Tuple, t))...)))
         {
             return HPX_INVOKE(
                 HPX_FORWARD(F, f), hpx::get<Is>(HPX_FORWARD(Tuple, t))...);
@@ -125,14 +125,14 @@ namespace hpx::util {
         {
             template <typename F, typename Tuple>
             constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-                typename util::detail::invoke_fused_result<F, Tuple>::type
+                typename hpx::detail::invoke_fused_result<F, Tuple>::type
                 operator()(F&& f, Tuple&& t) const
-                noexcept(noexcept(util::detail::invoke_fused_impl(
-                    util::detail::fused_index_pack_t<Tuple>{},
-                    HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t))))
+                noexcept(noexcept(hpx::detail::invoke_fused_impl(
+                    hpx::detail::fused_index_pack_t<Tuple>{}, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Tuple, t))))
             {
-                using index_pack = util::detail::fused_index_pack_t<Tuple>;
-                return util::detail::invoke_fused_impl(
+                using index_pack = hpx::detail::fused_index_pack_t<Tuple>;
+                return hpx::detail::invoke_fused_impl(
                     index_pack{}, HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t));
             }
         };
@@ -143,16 +143,67 @@ namespace hpx::util {
             template <typename F, typename Tuple>
             constexpr HPX_HOST_DEVICE HPX_FORCEINLINE R operator()(
                 F&& f, Tuple&& t) const
-                noexcept(noexcept(util::detail::invoke_fused_impl(
-                    util::detail::fused_index_pack_t<Tuple>{},
-                    HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t))))
+                noexcept(noexcept(hpx::detail::invoke_fused_impl(
+                    hpx::detail::fused_index_pack_t<Tuple>{}, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Tuple, t))))
             {
-                using index_pack = util::detail::fused_index_pack_t<Tuple>;
+                using index_pack = hpx::detail::fused_index_pack_t<Tuple>;
                 return util::void_guard<R>(),
-                       util::detail::invoke_fused_impl(index_pack{},
+                       hpx::detail::invoke_fused_impl(index_pack{},
                            HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t));
             }
         };
     }    // namespace functional
     /// \endcond
+}    // namespace hpx
+
+/// \cond NOINTERN
+namespace hpx::util {
+
+    template <typename F, typename Tuple>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::util::invoke_fused is deprecated, use hpx::invoke_fused instead")
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
+        typename hpx::detail::invoke_fused_result<F, Tuple>::type
+        invoke_fused(F&& f, Tuple&& t) noexcept(
+            noexcept(hpx::detail::invoke_fused_impl(
+                hpx::detail::fused_index_pack_t<Tuple>{}, HPX_FORWARD(F, f),
+                HPX_FORWARD(Tuple, t))))
+    {
+        using index_pack = hpx::detail::fused_index_pack_t<Tuple>;
+        return hpx::detail::invoke_fused_impl(
+            index_pack{}, HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t));
+    }
+
+    template <typename R, typename F, typename Tuple>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::util::invoke_fused_r is deprecated, use hpx::invoke_fused_r "
+        "instead")
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE R
+        invoke_fused_r(F&& f, Tuple&& t) noexcept(
+            noexcept(hpx::detail::invoke_fused_impl(
+                hpx::detail::fused_index_pack_t<Tuple>{}, HPX_FORWARD(F, f),
+                HPX_FORWARD(Tuple, t))))
+    {
+        using index_pack = hpx::detail::fused_index_pack_t<Tuple>;
+        return util::void_guard<R>(),
+               hpx::detail::invoke_fused_impl(
+                   index_pack{}, HPX_FORWARD(F, f), HPX_FORWARD(Tuple, t));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \cond NOINTERNAL
+    namespace functional {
+
+        using invoke_fused HPX_DEPRECATED_V(1, 9,
+            "hpx::util::invoke_fused is deprecated, use hpx::invoke_fused "
+            "instead") = hpx::functional::invoke_fused;
+
+        template <typename R>
+        using invoke_fused_r HPX_DEPRECATED_V(1, 9,
+            "hpx::util::invoke_fused_r is deprecated, use hpx::invoke_fused_r "
+            "instead") = hpx::functional::invoke_fused_r<R>;
+    }    // namespace functional
+    /// \endcond
 }    // namespace hpx::util
+/// \endcond

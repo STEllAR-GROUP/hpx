@@ -136,7 +136,7 @@ namespace hpx::execution::experimental::detail {
 
             hpx::util::itt::mark_event e(notify_event);
 #endif
-            using index_pack_type = hpx::util::detail::fused_index_pack_t<Ts>;
+            using index_pack_type = hpx::detail::fused_index_pack_t<Ts>;
 
             auto const i_begin =
                 static_cast<std::size_t>(index) * task_f->chunk_size;
@@ -212,7 +212,7 @@ namespace hpx::execution::experimental::detail {
         // clang-format on
         void operator()(Ts&& ts) const
         {
-            hpx::util::invoke_fused(
+            hpx::invoke_fused(
                 hpx::bind_front(hpx::execution::experimental::set_value,
                     HPX_MOVE(op_state->receiver)),
                 HPX_FORWARD(Ts, ts));

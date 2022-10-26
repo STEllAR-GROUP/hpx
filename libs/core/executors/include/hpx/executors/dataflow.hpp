@@ -86,7 +86,7 @@ namespace hpx { namespace lcos { namespace detail {
     {
         static auto error(F f, Args args)
         {
-            hpx::util::invoke_fused(HPX_MOVE(f), HPX_MOVE(args));
+            hpx::invoke_fused(HPX_MOVE(f), HPX_MOVE(args));
         }
 
         using type = decltype(error(std::declval<F>(), std::declval<Args>()));
@@ -104,7 +104,7 @@ namespace hpx { namespace lcos { namespace detail {
     struct dataflow_return_impl<false, Policy, F, Args,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
-        using type = hpx::future<util::detail::invoke_fused_result_t<F, Args>>;
+        using type = hpx::future<hpx::detail::invoke_fused_result_t<F, Args>>;
     };
 
     template <typename Executor, typename F, typename Args>
@@ -221,14 +221,14 @@ namespace hpx { namespace lcos { namespace detail {
                 [&]() {
                     if constexpr (is_void::value)
                     {
-                        util::invoke_fused(
+                        hpx::invoke_fused(
                             HPX_MOVE(func_), HPX_FORWARD(Futures_, futures));
 
                         this->set_data(util::unused_type());
                     }
                     else
                     {
-                        this->set_data(util::invoke_fused(
+                        this->set_data(hpx::invoke_fused(
                             HPX_MOVE(func_), HPX_FORWARD(Futures_, futures)));
                     }
                 },

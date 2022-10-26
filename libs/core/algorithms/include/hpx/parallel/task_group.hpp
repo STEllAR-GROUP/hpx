@@ -75,7 +75,7 @@ namespace hpx { namespace execution { namespace experimental {
                     std::exception_ptr p;
                     try
                     {
-                        hpx::util::invoke_fused(HPX_MOVE(f), HPX_MOVE(t));
+                        hpx::invoke_fused(HPX_MOVE(f), HPX_MOVE(t));
                         return;
                     }
                     catch (...)

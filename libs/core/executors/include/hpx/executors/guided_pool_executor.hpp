@@ -473,8 +473,7 @@ namespace hpx { namespace parallel { namespace execution {
             auto unwrapped_futures_tuple = hpx::util::map_pack(
                 detail::future_extract_value{}, predecessor);
 
-            int domain =
-                hpx::util::invoke_fused(exec.hint_, unwrapped_futures_tuple);
+            int domain = hpx::invoke_fused(exec.hint_, unwrapped_futures_tuple);
 #endif
 
 #ifndef GUIDED_EXECUTOR_DEBUG
