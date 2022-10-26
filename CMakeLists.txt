@@ -2056,6 +2056,15 @@ include(HPX_SetupAsio)
 include(HPX_SetupAllocator)
 include(HPX_SetupHwloc)
 
+# Setup likwid
+hpx_option(
+  HPX_WITH_LIKWID BOOL "Enable Likwid instrumentation support." OFF
+  CATEGORY "Profiling"
+)
+if (HPX_WITH_LIKWID)
+  include(HPX_SetupLikwid)
+endif()
+
 # reset external source lists
 add_hpx_library_sources_noglob(hpx_external)
 add_hpx_library_headers_noglob(hpx_external)

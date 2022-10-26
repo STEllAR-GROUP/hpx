@@ -365,6 +365,10 @@ if(HPX_WITH_ITTNOTIFY)
   target_link_libraries(hpx_core PUBLIC Amplifier::amplifier)
 endif()
 
+if(HPX_WITH_LIKWID)
+  target_link_libraries(hpx_core PUBLIC LIKWID::likwid)
+endif()
+
 if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES OR HPX_WITH_STATIC_LINKING)
   target_link_libraries(hpx_core PUBLIC hpx_public_flags)
   target_link_libraries(hpx_core PUBLIC hpx_base_libraries)
