@@ -9,12 +9,13 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DATAPAR_STD_EXPERIMENTAL_SIMD)
+#if defined(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
+
+#include <hpx/execution/traits/detail/simd/vector_pack_simd.hpp>
+
 #include <cstddef>
 #include <iterator>
 #include <memory>
-
-#include <experimental/simd>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits {
@@ -27,7 +28,8 @@ namespace hpx { namespace parallel { namespace traits {
         template <typename Iter>
         HPX_HOST_DEVICE HPX_FORCEINLINE static V aligned(Iter const& iter)
         {
-            return V(std::addressof(*iter), std::experimental::vector_aligned);
+            return V(
+                std::addressof(*iter), datapar::experimental::vector_aligned);
         }
 
         template <typename Iter>
@@ -46,7 +48,7 @@ namespace hpx { namespace parallel { namespace traits {
             V& value, Iter const& iter)
         {
             value.copy_to(
-                std::addressof(*iter), std::experimental::vector_aligned);
+                std::addressof(*iter), datapar::experimental::vector_aligned);
         }
 
         template <typename Iter>

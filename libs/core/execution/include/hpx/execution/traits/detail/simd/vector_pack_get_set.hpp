@@ -8,7 +8,10 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DATAPAR_STD_EXPERIMENTAL_SIMD)
+#if defined(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
+
+#include <hpx/execution/traits/detail/simd/vector_pack_simd.hpp>
+
 #include <cstddef>
 
 namespace hpx { namespace parallel { namespace traits {
@@ -24,7 +27,7 @@ namespace hpx { namespace parallel { namespace traits {
     HPX_HOST_DEVICE HPX_FORCEINLINE auto set(
         Vector& vec, std::size_t index, T val)
     {
-        vec[index] = val;
+        datapar::experimental::set(vec, index, val);
     }
 }}}    // namespace hpx::parallel::traits
 

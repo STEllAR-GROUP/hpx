@@ -8,18 +8,19 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_DATAPAR_STD_EXPERIMENTAL_SIMD)
-#include <cstddef>
+#if defined(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
 
-#include <experimental/simd>
+#include <hpx/execution/traits/detail/simd/vector_pack_simd.hpp>
+
+#include <cstddef>
 
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi, typename Reduce>
     HPX_HOST_DEVICE HPX_FORCEINLINE T reduce(
-        Reduce r, std::experimental::simd<T, Abi> const& val)
+        Reduce r, datapar::experimental::simd<T, Abi> const& val)
     {
-        return std::experimental::reduce(val, r);
+        return datapar::experimental::reduce(val, r);
     }
 }}}    // namespace hpx::parallel::traits
 

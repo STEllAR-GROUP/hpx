@@ -11,9 +11,9 @@ set(DATAPAR_BACKEND "NONE")
 hpx_option(
   HPX_WITH_DATAPAR_BACKEND
   STRING
-  "Define which vectorization library should be used. Options are: VC, EVE, STD_EXPERIMENTAL_SIMD, NONE"
+  "Define which vectorization library should be used. Options are: VC, EVE, STD_EXPERIMENTAL_SIMD, SVE; NONE"
   ${DATAPAR_BACKEND}
-  STRINGS "VC;EVE;STD_EXPERIMENTAL_SIMD;NONE"
+  STRINGS "VC;EVE;STD_EXPERIMENTAL_SIMD;SVE;NONE"
 )
 include(HPX_AddDefinitions)
 
@@ -90,6 +90,46 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "STD_EXPERIMENTAL_SIMD")
       "Could not find std experimental/simd. Use CXX COMPILER GCC 11 OR CLANG 12 AND ABOVE "
     )
   endif()
+endif()
+
+# #
+# ##############################################################################
+# # HPX SVE configuration #
+# ##############################################################################
+if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
+  hpx_option(
+    HPX_WITH_FETCH_SVE
+    BOOL
+    "Use FetchContent to fetch SVE. By default an installed SVE will be used. (default: OFF)"
+    OFF
+    CATEGORY "Build Targets"
+    ADVANCED
+  )
+  hpx_option(
+    HPX_WITH_SVE_TAG STRING "SVE repository tag or branch" "master"
+    CATEGORY "Build Targets"
+    ADVANCED
+  )
+  hpx_option(
+    HPX_WITH_SVE_LENGTH STRING "SVE length to be used." ""
+    CATEGORY "Build Targets"
+    ADVANCED
+  )
+
+  include(HPX_SetupSVE)
+  hpx_option(
+    HPX_WITH_DATAPAR BOOL
+    "Enable data parallel algorithm support using SVE library (default: ON)" ON
+    ADVANCED
+  )
+  hpx_add_config_define(HPX_HAVE_DATAPAR_SVE)
+  hpx_add_config_define(HPX_HAVE_DATAPAR)
+endif()
+
+if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "STD_EXPERIMENTAL_SIMD")
+   OR ("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
+)
+  hpx_add_config_define(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
 endif()
 
 if(HPX_WITH_DATAPAR)

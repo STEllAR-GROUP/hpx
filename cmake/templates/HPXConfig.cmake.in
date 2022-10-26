@@ -52,6 +52,15 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE")
   endif()
 endif()
 
+if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
+  if(HPX_WITH_FETCH_SVE)
+    include("${CMAKE_CURRENT_LIST_DIR}/HPXSVETarget.cmake")
+  else()
+    set(SVE_ROOT "@SVE_ROOT@")
+    include(HPX_SetupSVE)
+  endif()
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/HPXInternalTargets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
 
