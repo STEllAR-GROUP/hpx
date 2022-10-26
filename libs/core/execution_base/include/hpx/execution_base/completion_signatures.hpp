@@ -1209,7 +1209,7 @@ namespace hpx::execution::experimental {
                     };
                 };
                 if constexpr (std::is_void_v<result_t>)
-                    co_yield (co_await HPX_FORWARD(Awaitable, await), fun());
+                    co_yield(co_await HPX_FORWARD(Awaitable, await), fun());
                 else
                     co_yield fun(co_await HPX_FORWARD(Awaitable, await));
             }

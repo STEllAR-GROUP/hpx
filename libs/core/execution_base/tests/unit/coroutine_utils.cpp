@@ -110,8 +110,8 @@ template <typename S1, typename S2,
 task<int> async_answer(S1 s1, S2 s2)
 {
     // Senders are implicitly awaitable (in this coroutine type):
-    co_await (S2 &&) s2;
-    co_return co_await (S1 &&) s1;
+    co_await(S2 &&) s2;
+    co_return co_await(S1 &&) s1;
 }
 
 int main()
@@ -119,13 +119,13 @@ int main()
     using namespace hpx::execution::experimental;
 
     {
-        static_assert(std::is_same_v<
-            single_sender_value_t<non_awaitable_sender<decltype(signature_all(
-                std::exception_ptr(), int()))>>,
-            int>);
         static_assert(
-            std::is_same_v<single_sender_value_t<non_awaitable_sender<
-                               decltype(signature_all(std::exception_ptr()))>>,
+            std::is_same_v<single_sender_value_t<non_awaitable_sender<decltype(
+                               signature_all(std::exception_ptr(), int()))>>,
+                int>);
+        static_assert(
+            std::is_same_v<single_sender_value_t<non_awaitable_sender<decltype(
+                               signature_all(std::exception_ptr()))>>,
                 void>);
     }
 
