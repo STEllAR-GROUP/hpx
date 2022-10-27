@@ -312,6 +312,7 @@ namespace hpx {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/transfer.hpp>
@@ -407,20 +408,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #else
                 boost::shared_array<bool> flags(new bool[count]);
 #endif
-                std::size_t init = 0u;
-
                 flags[0] = false;
 
                 using hpx::get;
                 using hpx::util::make_zip_iterator;
-                using scan_partitioner_type =
-                    util::scan_partitioner<ExPolicy, FwdIter, std::size_t, void,
-                        util::scan_partitioner_sequential_f3_tag>;
 
                 auto f1 = [pred = HPX_FORWARD(Pred, pred),
                               proj = HPX_FORWARD(Proj, proj)](
                               zip_iterator part_begin,
-                              std::size_t part_size) -> std::size_t {
+                              std::size_t part_size) -> void {
                     FwdIter base = get<0>(part_begin.get_iterator_tuple());
 
                     // Note: replacing the invoke() with HPX_INVOKE()
@@ -436,26 +432,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             if (!(get<1>(*it) = f))
                                 base = get<0>(it.get_iterator_tuple());
                         });
-
-                    // There is no need to return the partition result.
-                    // But, the scan_partitioner doesn't support 'void' as
-                    // Result1. So, unavoidably return non-meaning value.
-                    return 0u;
                 };
 
-                std::shared_ptr<FwdIter> dest_ptr =
-                    std::make_shared<FwdIter>(first);
-                auto f3 =
-                    [dest_ptr, flags](zip_iterator part_begin,
-                        std::size_t part_size,
-                        hpx::shared_future<std::size_t> curr,
-                        hpx::shared_future<std::size_t> next) mutable -> void {
-                    HPX_UNUSED(flags);
+                auto f2 = [flags, first, count](
+                              auto&& results) mutable -> FwdIter {
+                    // HPX_UNUSED(flags);
+                    HPX_UNUSED(results);
 
-                    curr.get();    // rethrow exceptions
-                    next.get();    // rethrow exceptions
-
-                    FwdIter& dest = *dest_ptr;
+                    auto part_begin = make_zip_iterator(first, flags.get());
+                    auto dest = first;
+                    auto part_size = count;
 
                     using execution_policy_type = std::decay_t<ExPolicy>;
                     if (dest == get<0>(part_begin.get_iterator_tuple()))
@@ -481,50 +467,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                     *dest++ = HPX_MOVE(get<0>(*it));
                             });
                     }
+
+                    return dest;
                 };
 
-                auto f4 =
-                    [dest_ptr = HPX_MOVE(dest_ptr), first, count, flags](
-                        std::vector<hpx::shared_future<std::size_t>>&& items,
-                        std::vector<hpx::future<void>>&& data) mutable
-                    -> FwdIter {
-                    // make sure iterators embedded in function object that is
-                    // attached to futures are invalidated
-                    util::detail::clear_container(items);
-                    util::detail::clear_container(data);
-
-                    if (!flags[count - 1])
-                    {
-                        std::advance(first, count - 1);
-                        if (first != (*dest_ptr))
-                            *(*dest_ptr)++ = HPX_MOVE(*first);
-                        else
-                            ++(*dest_ptr);
-                    }
-                    return *dest_ptr;
-                };
-
-                return scan_partitioner_type::call(
+                return util::partitioner<ExPolicy, FwdIter, void>::call(
                     HPX_FORWARD(ExPolicy, policy),
-                    make_zip_iterator(first, flags.get()), count - 1, init,
-                    // step 1 performs first part of scan algorithm
-                    HPX_MOVE(f1),
-                    // step 2 propagates the partition results from left
-                    // to right
-                    [](hpx::shared_future<std::size_t> fut1,
-                        hpx::shared_future<std::size_t> fut2) -> std::size_t {
-                        fut1.get();
-                        fut2.get();    // propagate exceptions
-                        // There is no need to propagate the partition
-                        // results. But, the scan_partitioner doesn't
-                        // support 'void' as Result1. So, unavoidably
-                        // return non-meaning value.
-                        return 0u;
-                    },
-                    // step 3 runs final accumulation on each partition
-                    HPX_MOVE(f3),
-                    // step 4 use this return value
-                    HPX_MOVE(f4));
+                    make_zip_iterator(first, flags.get()), count - 1,
+                    HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
         /// \endcond
