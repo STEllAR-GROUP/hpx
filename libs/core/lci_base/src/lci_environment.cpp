@@ -18,6 +18,7 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdlib>
+#include <memory>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -103,7 +104,8 @@ namespace hpx { namespace util {
     LCI_comp_t lci_environment::rt_cq_r_;
     LCI_endpoint_t lci_environment::h_ep_;
     LCI_comp_t lci_environment::h_cq_r_;
-    std::thread* lci_environment::prg_thread_p = nullptr;
+    // We need this progress thread to send early parcels
+    std::unique_ptr<std::thread> lci_environment::prg_thread_p = nullptr;
     std::atomic<bool> lci_environment::prg_thread_flag = false;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -142,12 +144,10 @@ namespace hpx { namespace util {
         LCI_endpoint_init(&h_ep_, LCI_UR_DEVICE, h_plist_);
         LCI_plist_free(&h_plist_);
         // DEBUG("Rank %d: Init lci env", LCI_RANK);
-
         HPX_ASSERT(prg_thread_flag == false);
         HPX_ASSERT(prg_thread_p == nullptr);
         prg_thread_flag = true;
-        prg_thread_p = new std::thread(progress_fn);
-
+        prg_thread_p = std::make_unique<std::thread>(progress_fn);
         return LCI_OK;
     }
 
@@ -214,14 +214,19 @@ namespace hpx { namespace util {
             LCI_initialized(&lci_init);
             if (lci_init)
             {
-                HPX_ASSERT(prg_thread_flag.load() == true);
-                HPX_ASSERT(prg_thread_p != nullptr);
-                prg_thread_flag = false;
-                prg_thread_p->join();
-                delete prg_thread_p;
-
+                join_prg_thread_if_running();
                 LCI_finalize();
             }
+        }
+    }
+
+    void lci_environment::join_prg_thread_if_running()
+    {
+        if (prg_thread_flag.load())
+        {
+            HPX_ASSERT(prg_thread_p != nullptr);
+            prg_thread_flag = false;
+            prg_thread_p->join();
         }
     }
 
@@ -231,6 +236,13 @@ namespace hpx { namespace util {
         {
             LCI_progress(LCI_UR_DEVICE);
         }
+    }
+
+    bool lci_environment::do_progress()
+    {
+        LCI_error_t ret = LCI_progress(LCI_UR_DEVICE);
+        HPX_ASSERT(ret == LCI_OK || ret == LCI_ERR_RETRY);
+        return ret == LCI_OK;
     }
 
     bool lci_environment::enabled()
