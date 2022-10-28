@@ -179,8 +179,23 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_FORCEINLINE static constexpr decltype(auto) call2(
             ExPolicy&& policy, std::false_type, Args&&... args)
         {
-            return Derived::parallel(
-                HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Args, args)...);
+            using result_handler =
+                hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                    local_result_type>;
+            using result_type = decltype(Derived::parallel(
+                HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Args, args)...));
+
+            if constexpr (std::is_void_v<result_type>)
+            {
+                Derived::parallel(
+                    HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Args, args)...);
+                return result_handler::get();
+            }
+            else
+            {
+                return result_handler::get(Derived::parallel(
+                    HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Args, args)...));
+            }
         }
 
         template <typename ExPolicy, typename... Args>

@@ -475,9 +475,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIter, typename F,
                 typename Proj = util::projection_identity>
-            static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
-                ExPolicy&& policy, FwdIter first, std::size_t count, F&& f,
-                Proj&& proj /* = Proj()*/)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter first,
+                std::size_t count, F&& f, Proj&& proj /* = Proj()*/)
             {
                 if constexpr (!hpx::execution_policy_has_scheduler_executor_v<
                                   ExPolicy>)

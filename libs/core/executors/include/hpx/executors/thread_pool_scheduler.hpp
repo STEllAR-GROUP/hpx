@@ -98,36 +98,6 @@ namespace hpx::execution::experimental {
             return pool_;
         }
 
-        // support all properties exposed by the embedded policy
-        // clang-format off
-        template <typename Tag, typename Property,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<Tag, Policy, Property>
-            )>
-        // clang-format on
-        friend thread_pool_policy_scheduler tag_invoke(Tag tag,
-            thread_pool_policy_scheduler const& scheduler, Property&& prop)
-        {
-            auto scheduler_with_prop = scheduler;
-            scheduler_with_prop.policy_ = hpx::functional::tag_invoke(
-                tag, scheduler.policy_, HPX_FORWARD(Property, prop));
-            return scheduler_with_prop;
-        }
-
-        // clang-format off
-        template <typename Tag,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<Tag, Policy>
-            )>
-        // clang-format on
-        friend decltype(auto) tag_invoke(
-            Tag tag, thread_pool_policy_scheduler const& scheduler)
-        {
-            return hpx::functional::tag_invoke(tag, scheduler.policy_);
-        }
-
         friend constexpr thread_pool_policy_scheduler tag_invoke(
             hpx::parallel::execution::with_processing_units_count_t,
             thread_pool_policy_scheduler const& scheduler,
@@ -321,7 +291,12 @@ namespace hpx::execution::experimental {
             return {sched};
         }
 
-        Policy policy() const
+        void policy(Policy policy) noexcept
+        {
+            policy_ = HPX_MOVE(policy);
+        }
+
+        constexpr Policy const& policy() const noexcept
         {
             return policy_;
         }
@@ -351,6 +326,39 @@ namespace hpx::execution::experimental {
 #endif
         /// \endcond
     };
+
+    // support all properties exposed by the embedded policy
+    // clang-format off
+    template <typename Tag,  typename Policy,typename Property,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
+    auto tag_invoke(Tag tag,
+        thread_pool_policy_scheduler<Policy> const& scheduler, Property&& prop)
+        -> decltype(std::declval<thread_pool_policy_scheduler<Policy>>().policy(
+                        std::declval<Tag>()(
+                            std::declval<Policy>(), std::declval<Property>())),
+            thread_pool_policy_scheduler<Policy>())
+    {
+        auto scheduler_with_prop = scheduler;
+        scheduler_with_prop.policy(
+            tag(scheduler.policy(), HPX_FORWARD(Property, prop)));
+        return scheduler_with_prop;
+    }
+
+    // clang-format off
+    template <typename Tag, typename Policy,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
+    auto tag_invoke(
+        Tag tag, thread_pool_policy_scheduler<Policy> const& scheduler)
+        -> decltype(std::declval<Tag>()(std::declval<Policy>()))
+    {
+        return tag(scheduler.policy());
+    }
 
     using thread_pool_scheduler = thread_pool_policy_scheduler<hpx::launch>;
 }    // namespace hpx::execution::experimental

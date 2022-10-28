@@ -31,6 +31,8 @@ add_hpx_module(
   SOURCES ${tag_invoke_sources}
   HEADERS ${tag_invoke_headers}
   COMPAT_HEADERS ${tag_invoke_compat_headers}
+  ADD_TO_GLOBAL_HEADER "hpx/functional/detail/tag_fallback_invoke.hpp"
+                       "hpx/functional/detail/tag_priority_invoke.hpp"
   MODULE_DEPENDENCIES hpx_config hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

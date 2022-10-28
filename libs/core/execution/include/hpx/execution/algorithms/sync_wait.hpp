@@ -217,8 +217,15 @@ namespace hpx::execution::experimental::detail {
             }
             else
             {
-                r.state.value.template emplace<error_type>(
-                    std::exception_ptr(HPX_FORWARD(Error, error)));
+                try
+                {
+                    throw error;
+                }
+                catch (...)
+                {
+                    r.state.value.template emplace<error_type>(
+                        std::current_exception());
+                }
             }
 
             r.loop.finish();
@@ -456,7 +463,7 @@ namespace hpx::this_thread::experimental {
     } sync_wait{};
 
     ////////////////////////////////////////////////////////////////////
-    // DPO for sync_wait_with_variant
+    // CPO for sync_wait_with_variant
 
     // this_thread::sync_wait_with_variant is a sender consumer that submits
     // the work described by the provided sender for execution, similarly to

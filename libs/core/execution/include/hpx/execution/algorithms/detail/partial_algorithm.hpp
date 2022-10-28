@@ -31,7 +31,7 @@ namespace hpx::execution::experimental::detail {
 
     public:
         template <typename... Us>
-        constexpr HPX_FORCEINLINE auto invoke(Us&&... us)
+        constexpr HPX_FORCEINLINE auto invoke(Us&&... us) &&
         {
             return Tag{}(
                 HPX_FORWARD(Us, us)..., HPX_MOVE(ts).template get<Is>()...);
@@ -66,7 +66,7 @@ namespace hpx::execution::experimental::detail {
                 hpx::execution::experimental::get_completion_scheduler<
                     hpx::execution::experimental::set_value_t>(u);
 
-            return p.invoke(HPX_MOVE(scheduler), HPX_FORWARD(U, u));
+            return HPX_MOVE(p).invoke(HPX_MOVE(scheduler), HPX_FORWARD(U, u));
         }
 
         // clang-format off
@@ -82,7 +82,7 @@ namespace hpx::execution::experimental::detail {
         friend constexpr HPX_FORCEINLINE auto operator|(
             U&& u, partial_algorithm_base p)
         {
-            return p.invoke(HPX_FORWARD(U, u));
+            return HPX_MOVE(p).invoke(HPX_FORWARD(U, u));
         }
     };
 

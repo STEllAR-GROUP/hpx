@@ -349,6 +349,127 @@ int main()
         HPX_TEST(set_error_called);
     }
 
+    // Dataflow success path
+    {
+        std::atomic<bool> set_value_called{false};
+        std::atomic<bool> then_called{false};
+        auto s = hpx::dataflow(
+            [&](int x) {
+                then_called = true;
+                HPX_TEST_EQ(x, 42);
+                return x;
+            },
+            ex::just(42));
+
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<hpx::variant<hpx::tuple<int>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
+        auto f = [](int x) { HPX_TEST_EQ(x, 42); };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        tag_invoke(ex::start, os);
+        HPX_TEST(then_called);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        std::atomic<bool> then_called{false};
+        auto s = hpx::dataflow(
+            [&](int x, std::string y, double z) {
+                then_called = true;
+                HPX_TEST_EQ(x, 42);
+                HPX_TEST_EQ(y, std::string("hello"));
+                HPX_TEST_EQ(z, 3.14);
+                return hpx::make_tuple(x, y, z);
+            },
+            ex::just(42), ex::just(std::string("hello")), ex::just(3.14));
+
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<
+            hpx::variant<hpx::tuple<hpx::tuple<int, std::string, double>>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
+        auto f = [](hpx::tuple<int, std::string, double> t) {
+            HPX_TEST_EQ(t.get<0>(), 42);
+            HPX_TEST_EQ(t.get<1>(), std::string("hello"));
+            HPX_TEST_EQ(t.get<2>(), 3.14);
+        };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(then_called);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        std::atomic<bool> then_called{false};
+        auto s = hpx::dataflow(
+            [&](std::string y, double z) {
+                then_called = true;
+                HPX_TEST_EQ(y, std::string("hello"));
+                HPX_TEST_EQ(z, 3.14);
+                return hpx::make_tuple(y, z);
+            },
+            ex::just(), ex::just(std::string("hello")), ex::just(3.14));
+
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<
+            hpx::variant<hpx::tuple<hpx::tuple<std::string, double>>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
+        auto f = [](hpx::tuple<std::string, double> t) {
+            HPX_TEST_EQ(t.get<0>(), std::string("hello"));
+            HPX_TEST_EQ(t.get<1>(), 3.14);
+        };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(then_called);
+        HPX_TEST(set_value_called);
+    }
+
+    {
+        std::atomic<bool> set_value_called{false};
+        std::atomic<bool> then_called{false};
+        auto s = hpx::dataflow(
+            [&](int x, double z) {
+                then_called = true;
+                HPX_TEST_EQ(x, 42);
+                HPX_TEST_EQ(z, 3.14);
+                return hpx::make_tuple(x, z);
+            },
+            ex::just(42), ex::just(), ex::just(3.14));
+
+        static_assert(ex::is_sender_v<decltype(s)>);
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+
+        check_value_types<hpx::variant<hpx::tuple<hpx::tuple<int, double>>>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_sends_stopped<false>(s);
+
+        auto f = [](hpx::tuple<int, double> t) {
+            HPX_TEST_EQ(t.get<0>(), 42);
+            HPX_TEST_EQ(t.get<1>(), 3.14);
+        };
+        auto r = callback_receiver<decltype(f)>{f, set_value_called};
+        auto os = ex::connect(std::move(s), std::move(r));
+        ex::start(os);
+        HPX_TEST(then_called);
+        HPX_TEST(set_value_called);
+    }
+
     return hpx::util::report_errors();
 }
 #else

@@ -189,34 +189,6 @@ namespace hpx { namespace execution { namespace experimental {
             return exec.annotation_;
         }
 
-        // support all properties exposed by the wrapped executor
-        // clang-format off
-        template <typename Tag, typename Property,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<Tag, BaseExecutor, Property>
-            )>
-        // clang-format on
-        friend annotating_executor tag_invoke(
-            Tag tag, annotating_executor const& exec, Property&& prop)
-        {
-            return annotating_executor(hpx::functional::tag_invoke(
-                tag, exec.exec_, HPX_FORWARD(Property, prop)));
-        }
-
-        // clang-format off
-        template <typename Tag,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_scheduling_property_v<Tag> &&
-                hpx::functional::is_tag_invocable_v<Tag, BaseExecutor>
-            )>
-        // clang-format on
-        friend decltype(auto) tag_invoke(
-            Tag tag, annotating_executor const& exec)
-        {
-            return hpx::functional::tag_invoke(tag, exec.exec_);
-        }
-
     private:
         friend class hpx::serialization::access;
 
@@ -232,6 +204,34 @@ namespace hpx { namespace execution { namespace experimental {
         char const* const annotation_ = nullptr;
         /// \endcond
     };
+
+    // support all properties exposed by the wrapped executor
+    // clang-format off
+    template <typename Tag, typename BaseExecutor,typename Property,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
+    auto tag_invoke(
+        Tag tag, annotating_executor<BaseExecutor> const& exec, Property&& prop)
+        -> decltype(annotating_executor<BaseExecutor>(std::declval<Tag>()(
+            std::declval<BaseExecutor>(), std::declval<Property>())))
+    {
+        return annotating_executor<BaseExecutor>(
+            tag(exec.exec_, HPX_FORWARD(Property, prop)));
+    }
+
+    // clang-format off
+    template <typename Tag, typename BaseExecutor,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
+    auto tag_invoke(Tag tag, annotating_executor<BaseExecutor> const& exec)
+        -> decltype(std::declval<Tag>()(std::declval<BaseExecutor>()))
+    {
+        return tag(exec.exec_);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
 #if !defined(DOXYGEN)    // doxygen gets confused by the deduction guides

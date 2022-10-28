@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,15 +31,10 @@ void test_for_each()
     test_for_each_async(unseq(task), IteratorTag());
     test_for_each_async(par_unseq(task), IteratorTag());
 
-    test_for_each_sender(seq, IteratorTag());
-    test_for_each_sender(par, IteratorTag());
-    test_for_each_sender(unseq, IteratorTag());
-    test_for_each_sender(par_unseq, IteratorTag());
-
-    test_for_each_sender(seq(task), IteratorTag());
-    test_for_each_sender(par(task), IteratorTag());
-    test_for_each_sender(unseq(task), IteratorTag());
-    test_for_each_sender(par_unseq(task), IteratorTag());
+    test_for_each_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_for_each_sender(hpx::launch::async, par(task), IteratorTag());
+    test_for_each_sender(hpx::launch::sync, unseq(task), IteratorTag());
+    test_for_each_sender(hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 void for_each_test()
@@ -65,10 +60,9 @@ void test_for_each_exception()
     test_for_each_exception_async(seq(task), IteratorTag());
     test_for_each_exception_async(par(task), IteratorTag());
 
-    test_for_each_exception_sender(seq, IteratorTag());
-    test_for_each_exception_sender(par, IteratorTag());
-    test_for_each_exception_sender(seq(task), IteratorTag());
-    test_for_each_exception_sender(par(task), IteratorTag());
+    test_for_each_exception_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_for_each_exception_sender(
+        hpx::launch::async, par(task), IteratorTag());
 }
 
 void for_each_exception_test()
@@ -94,10 +88,9 @@ void test_for_each_bad_alloc()
     test_for_each_bad_alloc_async(seq(task), IteratorTag());
     test_for_each_bad_alloc_async(par(task), IteratorTag());
 
-    test_for_each_bad_alloc_sender(seq, IteratorTag());
-    test_for_each_bad_alloc_sender(par, IteratorTag());
-    test_for_each_bad_alloc_sender(seq(task), IteratorTag());
-    test_for_each_bad_alloc_sender(par(task), IteratorTag());
+    test_for_each_bad_alloc_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_for_each_bad_alloc_sender(
+        hpx::launch::async, par(task), IteratorTag());
 }
 
 void for_each_bad_alloc_test()

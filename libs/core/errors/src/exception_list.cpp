@@ -150,7 +150,7 @@ namespace hpx {
             hpx::exception ex;
             {
                 util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
-                ex = hpx::exception(hpx::get_error(e));
+                ex = hpx::exception(hpx::get_error(e), hpx::get_error_what(e));
             }
 
             // set the error code for our base class
@@ -161,12 +161,6 @@ namespace hpx {
 
     void exception_list::add_no_lock(std::exception_ptr const& e)
     {
-        if (exceptions_.empty())
-        {
-            // set the error code for our base class
-            static_cast<hpx::exception&>(*this) =
-                hpx::exception(hpx::get_error(e));
-        }
         exceptions_.push_back(e);
     }
 }    // namespace hpx

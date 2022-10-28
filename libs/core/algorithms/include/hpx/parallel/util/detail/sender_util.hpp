@@ -97,7 +97,7 @@ namespace hpx::detail {
         }
     }
 
-    // Helper base class for implementing parallel algorithm DPOs. See
+    // Helper base class for implementing parallel algorithm CPOs. See
     // tag_fallback documentation for details. Compared to tag_fallback this
     // adds two tag_fallback_invoke overloads that are generic for all
     // parallel algorithms:

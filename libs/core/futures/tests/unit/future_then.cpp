@@ -214,20 +214,18 @@ void test_complex_then_chain_two()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    {
-        test_return_int();
-        test_return_int_launch();
-        test_return_void();
-        test_return_void_launch();
-        test_implicit_unwrapping();
-        test_simple_then();
-        test_simple_deferred_then();
-        test_complex_then();
-        test_complex_then_launch();
-        test_complex_then_chain_one();
-        test_complex_then_chain_one_launch();
-        test_complex_then_chain_two();
-    }
+    test_return_int();
+    test_return_int_launch();
+    test_return_void();
+    test_return_void_launch();
+    test_implicit_unwrapping();
+    test_simple_then();
+    test_simple_deferred_then();
+    test_complex_then();
+    test_complex_then_launch();
+    test_complex_then_chain_one();
+    test_complex_then_chain_one_launch();
+    test_complex_then_chain_two();
 
     hpx::local::finalize();
     return hpx::util::report_errors();

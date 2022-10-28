@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2021 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_base/scheduling_properties.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/execution.hpp>
@@ -19,7 +20,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     ///////////////////////////////////////////////////////////////////////////
     // Executor information customization points
@@ -291,4 +292,14 @@ namespace hpx { namespace parallel { namespace execution {
                 HPX_FORWARD(Executor, exec));
         }
     } mark_end_execution{};
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
+
+namespace hpx::execution::experimental {
+
+    template <>
+    struct is_scheduling_property<
+        hpx::parallel::execution::with_processing_units_count_t>
+      : std::true_type
+    {
+    };
+}    // namespace hpx::execution::experimental

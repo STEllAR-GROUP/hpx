@@ -28,30 +28,23 @@ namespace hpx { namespace execution { namespace experimental {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        template <typename Tag, typename... Args>
-        struct property_not_supported
-        {
-            static_assert(sizeof(Tag) == 0,
-                "The given property (Tag) is not supported on the given type "
-                "(first type in Args). Ensure that you are including the "
-                "correct headers if the property is supported. Alternatively, "
-                "implement support for the property by overloading "
-                "tag_invoke for the given property and type. If the property "
-                "is not required, you can use prefer to fall back to the "
-                "identity transformation when a property is not supported.");
-        };
+        // The given property (Tag) is not supported on the given type (first
+        // type in Args). Ensure that you are including the correct headers if
+        // the property is supported. Alternatively, implement support for the
+        // property by overloading tag_invoke for the given property and type.
+        // If the property is not required, you can use prefer to fall back to
+        // the identity transformation when a property is not supported.
+        template <typename Tag, typename... Ts>
+        struct property_not_supported;
 
         template <typename Tag>
         struct property_base : hpx::functional::detail::tag_fallback<Tag>
         {
         private:
             // attempt to improve error messages if property is not supported
-            template <typename... Args>
-            friend HPX_FORCEINLINE constexpr decltype(auto) tag_fallback_invoke(
-                Tag, Args&&... /*args*/) noexcept
-            {
-                return property_not_supported<Tag, Args...>{};
-            }
+            template <typename... Ts>
+            friend constexpr auto tag_fallback_invoke(Tag, Ts&&...) noexcept
+                -> decltype(property_not_supported<Tag, Ts...>());
         };
     }    // namespace detail
 

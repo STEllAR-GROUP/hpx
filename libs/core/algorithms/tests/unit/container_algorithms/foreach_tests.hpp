@@ -154,7 +154,7 @@ void test_for_each_exception_seq(IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each_exception(ExPolicy policy, IteratorTag)
+void test_for_each_exception(ExPolicy&& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::is_execution_policy<ExPolicy>::value);
 
@@ -188,7 +188,7 @@ void test_for_each_exception(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each_exception_async(ExPolicy p, IteratorTag)
+void test_for_each_exception_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -268,7 +268,7 @@ void test_for_each_bad_alloc_seq(IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each_bad_alloc(ExPolicy policy, IteratorTag)
+void test_for_each_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
     BOOST_STATIC_ASSERT(hpx::is_execution_policy<ExPolicy>::value);
 
@@ -301,7 +301,7 @@ void test_for_each_bad_alloc(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_for_each_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_for_each_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -335,8 +335,8 @@ void test_for_each_bad_alloc_async(ExPolicy p, IteratorTag)
     HPX_TEST(returned_from_algorithm);
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_for_each_sender(ExPolicy&& p, IteratorTag)
+template <typename Policy, typename ExPolicy, typename IteratorTag>
+void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -350,8 +350,12 @@ void test_for_each_sender(ExPolicy&& p, IteratorTag)
     auto rng = hpx::util::make_iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
     auto f = [](std::size_t& v) { v = 42; };
+
+    using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
     auto result = hpx::get<0>(*(ex::just(rng, f) |
-        hpx::ranges::for_each(std::forward<ExPolicy>(p)) | tt::sync_wait()));
+        hpx::ranges::for_each(p.on(exec)) | tt::sync_wait()));
     HPX_TEST(result == iterator(std::end(c)));
 
     // verify values
@@ -363,8 +367,8 @@ void test_for_each_sender(ExPolicy&& p, IteratorTag)
     HPX_TEST_EQ(count, c.size());
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_for_each_exception_sender(ExPolicy p, IteratorTag)
+template <typename Policy, typename ExPolicy, typename IteratorTag>
+void test_for_each_exception_sender(Policy l, ExPolicy&& p, IteratorTag)
 {
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
@@ -382,8 +386,10 @@ void test_for_each_exception_sender(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     try
     {
-        ex::just(rng, f) | hpx::ranges::for_each(std::forward<ExPolicy>(p)) |
-            tt::sync_wait();
+        using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
+        ex::just(rng, f) | hpx::ranges::for_each(p.on(exec)) | tt::sync_wait();
 
         HPX_TEST(false);
     }
@@ -400,8 +406,8 @@ void test_for_each_exception_sender(ExPolicy p, IteratorTag)
     HPX_TEST(caught_exception);
 }
 
-template <typename ExPolicy, typename IteratorTag>
-void test_for_each_bad_alloc_sender(ExPolicy p, IteratorTag)
+template <typename Policy, typename ExPolicy, typename IteratorTag>
+void test_for_each_bad_alloc_sender(Policy l, ExPolicy&& p, IteratorTag)
 {
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
@@ -419,8 +425,10 @@ void test_for_each_bad_alloc_sender(ExPolicy p, IteratorTag)
     bool caught_exception = false;
     try
     {
-        ex::just(rng, f) | hpx::ranges::for_each(std::forward<ExPolicy>(p)) |
-            tt::sync_wait();
+        using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
+        ex::just(rng, f) | hpx::ranges::for_each(p.on(exec)) | tt::sync_wait();
 
         HPX_TEST(false);
     }

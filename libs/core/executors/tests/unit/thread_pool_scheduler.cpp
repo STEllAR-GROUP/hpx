@@ -672,15 +672,16 @@ void test_future_sender()
     {
         std::atomic<bool> called{false};
         auto f = hpx::async([&]() { called = true; });
+        auto fs = ex::as_sender(std::move(f));
 
-        static_assert(ex::is_sender_v<std::decay_t<decltype(f)>>,
-            "a future should be a sender");
-        static_assert(
-            std::is_same_v<std::decay_t<decltype(*tt::sync_wait(std::move(f)))>,
-                hpx::tuple<>>,
+        static_assert(ex::is_sender_v<std::decay_t<decltype(fs)>>,
+            "a future should be adaptable to a sender");
+        static_assert(std::is_same_v<
+                          std::decay_t<decltype(*tt::sync_wait(std::move(fs)))>,
+                          hpx::tuple<>>,
             "sync_wait should return hpx::tuple<>");
 
-        tt::sync_wait(std::move(f));
+        tt::sync_wait(std::move(fs));
         HPX_TEST(called);
 
         bool exception_thrown = false;
@@ -688,7 +689,36 @@ void test_future_sender()
         {
             // The move is intentional. sync_wait should throw.
             // NOLINTNEXTLINE(bugprone-use-after-move)
-            tt::sync_wait(std::move(f));
+            tt::sync_wait(ex::as_sender(std::move(f)));
+            HPX_TEST(false);
+        }
+        catch (...)
+        {
+            exception_thrown = true;
+        }
+        HPX_TEST(exception_thrown);
+    }
+
+    {
+        std::atomic<bool> called{false};
+        auto f = hpx::async([&]() {
+            called = true;
+            return 42;
+        });
+        auto fs = ex::as_sender(std::move(f));
+
+        static_assert(ex::is_sender_v<std::decay_t<decltype(fs)>>,
+            "a future should be adaptable as a sender");
+
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(std::move(fs))), 42);
+        HPX_TEST(called);
+
+        bool exception_thrown = false;
+        try
+        {
+            // The move is intentional. sync_wait should throw.
+            // NOLINTNEXTLINE(bugprone-use-after-move)
+            tt::sync_wait(ex::as_sender(std::move(f)));
             HPX_TEST(false);
         }
         catch (...)
@@ -705,36 +735,9 @@ void test_future_sender()
             return 42;
         });
 
-        static_assert(ex::is_sender_v<std::decay_t<decltype(f)>>,
-            "a future should be a sender");
-
-        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(std::move(f))), 42);
-        HPX_TEST(called);
-
-        bool exception_thrown = false;
-        try
-        {
-            // The move is intentional. sync_wait should throw.
-            // NOLINTNEXTLINE(bugprone-use-after-move)
-            tt::sync_wait(std::move(f));
-            HPX_TEST(false);
-        }
-        catch (...)
-        {
-            exception_thrown = true;
-        }
-        HPX_TEST(exception_thrown);
-    }
-
-    {
-        std::atomic<bool> called{false};
-        auto f = hpx::async([&]() {
-            called = true;
-            return 42;
-        });
-
-        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(
-                        ex::then(std::move(f), [](int x) { return x / 2; }))),
+        HPX_TEST_EQ(
+            hpx::get<0>(*tt::sync_wait(ex::then(
+                ex::as_sender(std::move(f)), [](int x) { return x / 2; }))),
             21);
         HPX_TEST(called);
     }
@@ -742,23 +745,24 @@ void test_future_sender()
     {
         std::atomic<std::size_t> calls{0};
         auto sf = hpx::async([&]() { ++calls; }).share();
+        auto sfs = ex::as_sender(sf);
 
-        static_assert(ex::is_sender_v<std::decay_t<decltype(sf)>>,
-            "a shared_future should be a sender");
-        static_assert(std::is_same_v<
-                          std::decay_t<decltype(*tt::sync_wait(std::move(sf)))>,
-                          hpx::tuple<>>,
+        static_assert(ex::is_sender_v<std::decay_t<decltype(sfs)>>,
+            "a shared_future should be adaptable as a sender");
+        static_assert(
+            std::is_same_v<std::decay_t<decltype(*tt::sync_wait(sfs))>,
+                hpx::tuple<>>,
             "sync_wait should return hpx::tuple<>");
 
-        tt::sync_wait(sf);
-        tt::sync_wait(sf);
-        tt::sync_wait(std::move(sf));
+        tt::sync_wait(sfs);
+        tt::sync_wait(sfs);
+        tt::sync_wait(std::move(sfs));
         HPX_TEST_EQ(calls, std::size_t(1));
 
         bool exception_thrown = false;
         try
         {
-            tt::sync_wait(sf);
+            tt::sync_wait(sfs);
             HPX_TEST(false);
         }
         catch (...)
@@ -774,19 +778,20 @@ void test_future_sender()
             ++calls;
             return 42;
         }).share();
+        auto sfs = ex::as_sender(sf);
 
-        static_assert(ex::is_sender_v<std::decay_t<decltype(sf)>>,
+        static_assert(ex::is_sender_v<std::decay_t<decltype(sfs)>>,
             "a shared_future should be a sender");
 
-        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(sf)), 42);
-        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(sf)), 42);
-        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(std::move(sf))), 42);
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(sfs)), 42);
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(sfs)), 42);
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(std::move(sfs))), 42);
         HPX_TEST_EQ(calls, std::size_t(1));
 
         bool exception_thrown = false;
         try
         {
-            tt::sync_wait(sf);
+            tt::sync_wait(sfs);
             HPX_TEST(false);
         }
         catch (...)
@@ -843,15 +848,16 @@ void test_future_sender()
 
     // mixing senders and futures
     {
-        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(ex::make_future(
-                        ex::transfer_just(ex::thread_pool_scheduler{}, 42)))),
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(ex::as_sender(ex::make_future(
+                        ex::transfer_just(ex::thread_pool_scheduler{}, 42))))),
             42);
     }
 
     {
         HPX_TEST_EQ(
-            ex::make_future(ex::transfer(hpx::async([]() { return 42; }),
-                                ex::thread_pool_scheduler{}))
+            ex::make_future(
+                ex::transfer(ex::as_sender(hpx::async([]() { return 42; })),
+                    ex::thread_pool_scheduler{}))
                 .get(),
             42);
     }
@@ -868,7 +874,8 @@ void test_future_sender()
         auto sf = f.then([](auto&& f) { return f.get() - 40; }).share();
         auto t1 = sf.then([](auto&& sf) { return sf.get() + 1; });
         auto t2 = sf.then([](auto&& sf) { return sf.get() + 2; });
-        auto t1s = ex::then(std::move(t1), [](std::size_t x) { return x + 1; });
+        auto t1s = ex::then(
+            ex::as_sender(std::move(t1)), [](std::size_t x) { return x + 1; });
         auto t1f = ex::make_future(std::move(t1s));
         auto last = hpx::dataflow(
             hpx::unwrapping([](std::size_t x, std::size_t y) { return x + y; }),
@@ -1383,20 +1390,20 @@ void test_keep_future_sender()
 {
     // the future should be passed to then, not it's contained value
     {
-        hpx::make_ready_future<void>() | ex::keep_future() |
+        ex::keep_future(hpx::make_ready_future<void>()) |
             ex::then([](hpx::future<void>&& f) { HPX_TEST(f.is_ready()); }) |
             tt::sync_wait();
     }
 
     {
-        hpx::make_ready_future<void>().share() | ex::keep_future() |
+        ex::keep_future(hpx::make_ready_future<void>().share()) |
             ex::then(
                 [](hpx::shared_future<void>&& f) { HPX_TEST(f.is_ready()); }) |
             tt::sync_wait();
     }
 
     {
-        hpx::make_ready_future<int>(42) | ex::keep_future() |
+        ex::keep_future(hpx::make_ready_future<int>(42)) |
             ex::then([](hpx::future<int>&& f) {
                 HPX_TEST(f.is_ready());
                 HPX_TEST_EQ(f.get(), 42);
@@ -1405,7 +1412,7 @@ void test_keep_future_sender()
     }
 
     {
-        hpx::make_ready_future<int>(42).share() | ex::keep_future() |
+        ex::keep_future(hpx::make_ready_future<int>(42).share()) |
             ex::then([](hpx::shared_future<int>&& f) {
                 HPX_TEST(f.is_ready());
                 HPX_TEST_EQ(f.get(), 42);
@@ -1417,7 +1424,7 @@ void test_keep_future_sender()
         std::atomic<bool> called{false};
         auto f = hpx::async([&]() { called = true; });
 
-        auto r = hpx::get<0>(*tt::sync_wait(std::move(f) | ex::keep_future()));
+        auto r = hpx::get<0>(*tt::sync_wait(ex::keep_future(std::move(f))));
         static_assert(
             std::is_same<std::decay_t<decltype(r)>, hpx::future<void>>::value,
             "sync_wait should return future<void>");
@@ -1430,7 +1437,7 @@ void test_keep_future_sender()
         {
             // The move is intentional. sync_wait should throw.
             // NOLINTNEXTLINE(bugprone-use-after-move)
-            tt::sync_wait(std::move(f) | ex::keep_future());
+            tt::sync_wait(ex::keep_future(std::move(f)));
             HPX_TEST(false);
         }
         catch (...)
@@ -1447,7 +1454,7 @@ void test_keep_future_sender()
             return 42;
         });
 
-        auto r = hpx::get<0>(*tt::sync_wait(std::move(f) | ex::keep_future()));
+        auto r = hpx::get<0>(*tt::sync_wait(ex::keep_future(std::move(f))));
         static_assert(
             std::is_same<std::decay_t<decltype(r)>, hpx::future<int>>::value,
             "sync_wait should return future<int>");
@@ -1461,7 +1468,7 @@ void test_keep_future_sender()
         {
             // The move is intentional. sync_wait should throw.
             // NOLINTNEXTLINE(bugprone-use-after-move)
-            tt::sync_wait(std::move(f) | ex::keep_future());
+            tt::sync_wait(ex::keep_future(std::move(f)));
             HPX_TEST(false);
         }
         catch (...)
@@ -1478,9 +1485,9 @@ void test_keep_future_sender()
             return 42;
         });
 
-        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(
-                        ex::then(std::move(f) | ex::keep_future(),
-                            [](hpx::future<int>&& f) { return f.get() / 2; }))),
+        HPX_TEST_EQ(
+            hpx::get<0>(*tt::sync_wait(ex::then(ex::keep_future(std::move(f)),
+                [](hpx::future<int>&& f) { return f.get() / 2; }))),
             21);
         HPX_TEST(called);
     }
@@ -1489,15 +1496,15 @@ void test_keep_future_sender()
         std::atomic<std::size_t> calls{0};
         auto sf = hpx::async([&]() { ++calls; }).share();
 
-        tt::sync_wait(sf | ex::keep_future());
-        tt::sync_wait(sf | ex::keep_future());
-        tt::sync_wait(std::move(sf) | ex::keep_future());
+        tt::sync_wait(ex::keep_future(sf));
+        tt::sync_wait(ex::keep_future(sf));
+        tt::sync_wait(ex::keep_future(std::move(sf)));
         HPX_TEST_EQ(calls, std::size_t(1));
 
         bool exception_thrown = false;
         try
         {
-            tt::sync_wait(sf | ex::keep_future());
+            tt::sync_wait(ex::keep_future(sf));
             HPX_TEST(false);
         }
         catch (...)
@@ -1514,20 +1521,17 @@ void test_keep_future_sender()
             return 42;
         }).share();
 
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(ex::keep_future(sf))).get(), 42);
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(ex::keep_future(sf))).get(), 42);
         HPX_TEST_EQ(
-            hpx::get<0>(*tt::sync_wait(sf | ex::keep_future())).get(), 42);
-        HPX_TEST_EQ(
-            hpx::get<0>(*tt::sync_wait(sf | ex::keep_future())).get(), 42);
-        HPX_TEST_EQ(
-            hpx::get<0>(*tt::sync_wait(std::move(sf) | ex::keep_future()))
-                .get(),
+            hpx::get<0>(*tt::sync_wait(ex::keep_future(std::move(sf)))).get(),
             42);
         HPX_TEST_EQ(calls, std::size_t(1));
 
         bool exception_thrown = false;
         try
         {
-            tt::sync_wait(sf | ex::keep_future());
+            tt::sync_wait(ex::keep_future(sf));
             HPX_TEST(false);
         }
         catch (...)
@@ -1541,7 +1545,7 @@ void test_keep_future_sender()
     {
         auto f = hpx::async([&]() { return 42; });
 
-        auto r = hpx::get<0>(*(std::move(f) | ex::keep_future() |
+        auto r = hpx::get<0>(*(ex::keep_future(std::move(f)) |
             ex::transfer(ex::thread_pool_scheduler{}) | tt::sync_wait()));
         HPX_TEST(r.is_ready());
         HPX_TEST_EQ(r.get(), 42);
@@ -1550,7 +1554,7 @@ void test_keep_future_sender()
     {
         auto sf = hpx::async([&]() { return 42; }).share();
 
-        auto r = hpx::get<0>(*(std::move(sf) | ex::keep_future() |
+        auto r = hpx::get<0>(*(ex::keep_future(std::move(sf)) |
             ex::transfer(ex::thread_pool_scheduler{}) | tt::sync_wait()));
         HPX_TEST(r.is_ready());
         HPX_TEST_EQ(r.get(), 42);
@@ -1566,7 +1570,7 @@ void test_keep_future_sender()
         // or storing a const&. The copy is not possible because the type is
         // noncopyable, and storing a reference is not acceptable since the
         // reference may outlive the value.
-        auto r = hpx::get<0>(*(std::move(sf) | ex::keep_future() |
+        auto r = hpx::get<0>(*(ex::keep_future(std::move(sf)) |
             ex::transfer(ex::thread_pool_scheduler{}) | tt::sync_wait()));
         HPX_TEST(r.is_ready());
         HPX_TEST_EQ(r.get().x, 42);
@@ -1579,8 +1583,8 @@ void test_keep_future_sender()
 
         auto fun = hpx::unwrapping(
             [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
-        HPX_TEST_EQ(hpx::get<0>(*(ex::when_all(std::move(f) | ex::keep_future(),
-                                      sf | ex::keep_future()) |
+        HPX_TEST_EQ(hpx::get<0>(*(ex::when_all(ex::keep_future(std::move(f)),
+                                      ex::keep_future(sf)) |
                         ex::then(fun) | tt::sync_wait())),
             85);
     }
@@ -1591,8 +1595,8 @@ void test_keep_future_sender()
 
         auto fun = hpx::unwrapping(
             [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
-        HPX_TEST_EQ(hpx::get<0>(*(ex::when_all(std::move(f) | ex::keep_future(),
-                                      sf | ex::keep_future()) |
+        HPX_TEST_EQ(hpx::get<0>(*(ex::when_all(ex::keep_future(std::move(f)),
+                                      ex::keep_future(sf)) |
                         ex::transfer(ex::thread_pool_scheduler{}) |
                         ex::then(fun) | tt::sync_wait())),
             85);
@@ -1692,7 +1696,7 @@ void test_bulk()
                 HPX_TEST(false);
             }
 
-            HPX_TEST_EQ(std::string(e.what()), std::string("error"));
+            HPX_TEST(std::string(e.what()).find("error") == 0);
         }
 
         if (expect_exception)

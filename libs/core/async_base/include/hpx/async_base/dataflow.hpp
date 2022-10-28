@@ -48,7 +48,7 @@ namespace hpx {
         // dataflow<Action>(...) has been removed, this CPO can be moved to
         // namespace hpx.
         inline constexpr struct dataflow_t final
-          : hpx::functional::tag<dataflow_t>
+          : hpx::functional::detail::tag_fallback<dataflow_t>
         {
         private:
             // clang-format off
@@ -57,7 +57,7 @@ namespace hpx {
                     !hpx::traits::is_allocator_v<std::decay_t<F>>
                 )>
             // clang-format on
-            friend constexpr HPX_FORCEINLINE auto tag_invoke(
+            friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
                 dataflow_t tag, F&& f, Ts&&... ts)
                 -> decltype(tag(hpx::util::internal_allocator<>{},
                     HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
