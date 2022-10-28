@@ -438,17 +438,22 @@ namespace hpx {
                 // Do nothing if the visitor doesn't accept the type
             }
 
-            /// Async traverse a single element which isn't a container or
-            /// tuple like type. This function is SFINAEd out if the element
-            /// isn't accepted by the visitor.
-            template <typename Current,
-                typename = typename always_void<
-                    decltype(std::declval<Frame>()->traverse(
-                        *std::declval<Current>()))>::type>
-            void async_traverse_one_impl(
-                container_category_tag<false, false>, Current&& current)
+            // different versions of clang-format disagree
+            // clang-format off
+
+            /// Async traverse a single element which isn't a container or tuple
+            /// like type. This function is SFINAEd out if the element isn't
+            /// accepted by the visitor.
+            ///
             /// SFINAE this out if the visitor doesn't accept
             /// the given element
+            template <typename Current,
+                typename = typename always_void<decltype(
+                    std::declval<Frame>()->traverse(
+                        *std::declval<Current>()))>::type>
+            // clang-format on
+            void async_traverse_one_impl(
+                container_category_tag<false, false>, Current&& current)
             {
                 if (!frame_->traverse(*current))
                 {
