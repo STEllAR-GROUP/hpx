@@ -16,7 +16,8 @@
 namespace hpx { namespace util {
 
     namespace detail {
-#if defined(HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE)
+#if defined(HPX_HAVE_MSVC_NO_UNIQUE_ADDRESS_ATTRIBUTE) ||                      \
+    defined(HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE)
         template <std::size_t I, typename T>
         struct member_leaf
         {

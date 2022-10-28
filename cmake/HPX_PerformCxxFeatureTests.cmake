@@ -82,6 +82,14 @@ function(hpx_perform_cxx_feature_tests)
   )
 
   # C++20 feature tests
+  if(MSVC_VERSION GREATER_EQUAL 1929)
+    # MSVC supports this attribute for all versions starting VS2019 v16.10 see
+    # https://devblogs.microsoft.com/cppblog/msvc-cpp20-and-the-std-cpp20-switch/
+    hpx_check_for_cxx20_no_unique_address_attribute(
+      DEFINITIONS HPX_HAVE_MSVC_NO_UNIQUE_ADDRESS_ATTRIBUTE
+    )
+  endif()
+
   if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 20)
     hpx_check_for_cxx20_coroutines(DEFINITIONS HPX_HAVE_CXX20_COROUTINES)
 
@@ -101,9 +109,11 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX20_PERFECT_PACK_CAPTURE
     )
 
-    hpx_check_for_cxx20_no_unique_address_attribute(
-      DEFINITIONS HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
-    )
+    if(NOT MSVC) # see above
+      hpx_check_for_cxx20_no_unique_address_attribute(
+        DEFINITIONS HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
+      )
+    endif()
 
     hpx_check_for_cxx20_paren_initialization_of_aggregates(
       DEFINITIONS HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES
