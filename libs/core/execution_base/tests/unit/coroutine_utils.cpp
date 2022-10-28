@@ -134,9 +134,10 @@ int main()
         static_assert(
             std::is_same_v<single_sender_value_t<awaitable_sender_1<awaiter>>,
                 bool>);
-        static_assert(std::is_same_v<
-            single_sender_value_t<awaitable_sender_1<std::suspend_always>>,
-            void>);
+        static_assert(
+            std::is_same_v<single_sender_value_t<
+                               awaitable_sender_1<hpx::coro::suspend_always>>,
+                void>);
     }
 
     // connect awaitable
