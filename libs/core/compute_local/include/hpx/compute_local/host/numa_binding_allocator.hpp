@@ -309,7 +309,7 @@ namespace hpx { namespace compute { namespace host {
                         0));
                 nba_deb.debug(debug::str<>("alloc:user(bind)"),
                     debug::hex<12, void*>(result));
-#if defined(NUMA_ALLOCATOR_LINUX)
+#if defined(NUMA_ALLOCATOR_LINUX) && defined(MADV_NOHUGEPAGE)
                 // if Transparent Huge Pages (THP) are enabled, this prevents
                 // pages from being merged into a single numa bound block
                 int ret = madvise(result, n * sizeof(T), MADV_NOHUGEPAGE);
