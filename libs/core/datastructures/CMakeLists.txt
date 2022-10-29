@@ -4,11 +4,10 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# Compatibility with using Boost.FileSystem, introduced in V1.4.0
+# Compatibility with std::tuple (i.e. using hpx::get() with std::tuple)
 hpx_option(
   HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE BOOL
-  "Enable compatibility of hpx::tuple with std::tuple. (default: ON)" ON
-  ADVANCED
+  "Enable compatibility of hpx::get with std::tuple. (default: ON)" ON ADVANCED
   CATEGORY "Modules"
   MODULE DATASTRUCTURES
 )
@@ -16,6 +15,31 @@ hpx_option(
 if(HPX_DATASTRUCTURES_WITH_ADAPT_STD_TUPLE)
   hpx_add_config_define_namespace(
     DEFINE HPX_DATASTRUCTURES_HAVE_ADAPT_STD_TUPLE NAMESPACE DATASTRUCTURES
+  )
+endif()
+
+# Compatibility with std::variant (i.e. using hpx::get() with std::variant)
+set(HPX_DATASTRUCTURES_WITH_ADAPT_STD_VARIANT_DEFAULT ON)
+if(HPX_WITH_CXX17_COPY_ELISION)
+  # we shouldn't implement hpx::get for variant if hpx::variant is an alias for
+  # std::variant
+  set(HPX_DATASTRUCTURES_WITH_ADAPT_STD_VARIANT_DEFAULT OFF)
+endif()
+
+hpx_option(
+  HPX_DATASTRUCTURES_WITH_ADAPT_STD_VARIANT
+  BOOL
+  "Enable compatibility of hpx::get with std::variant.
+ (default: ${HPX_DATASTRUCTURES_WITH_ADAPT_STD_VARIANT_DEFAULT})"
+  ${HPX_DATASTRUCTURES_WITH_ADAPT_STD_VARIANT_DEFAULT}
+  ADVANCED
+  CATEGORY "Modules"
+  MODULE DATASTRUCTURES
+)
+
+if(HPX_DATASTRUCTURES_WITH_ADAPT_STD_VARIANT)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_DATASTRUCTURESHAVE_ADAPT_STD_VARIANT NAMESPACE DATASTRUCTURES
   )
 endif()
 
