@@ -9,6 +9,9 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/config/defines.hpp>
 
+// we shouldn't implement hpx::get for variant if hpx::variant is an alias for
+// std::variant
+#if defined(HPX_DATASTRUCTURESHAVE_ADAPT_STD_VARIANT)
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>    // for size_t
@@ -56,3 +59,5 @@ namespace hpx {
 
     using namespace hpx::adl_barrier;
 }    // namespace hpx
+
+#endif
