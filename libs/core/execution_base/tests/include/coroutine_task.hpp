@@ -37,8 +37,7 @@ inline constexpr bool well_formed = is_valid<T, As...>::value;
 
 template <typename T>
 inline constexpr bool stop_token_provider = std::integral_constant<bool,
-    !std::is_same_v<decltype(hpx::execution::experimental::get_stop_token(
-                        std::declval<T>())),
+    !std::is_same_v<hpx::execution::experimental::stop_token_of_t<T>,
         void>>::value;
 
 template <typename T>
@@ -166,7 +165,7 @@ struct default_task_context_impl::awaiter_context<ParentPromise,
 };
 
 template <typename Token>
-inline bool unstoppable_token = std::declval<Token>().stop_possible();
+inline bool unstoppable_token = !Token::stop_possible();
 
 // // If the parent coroutine's stop token is unstoppable, there's no point
 // // forwarding stop tokens or stop requests at all.
