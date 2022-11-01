@@ -465,18 +465,21 @@ namespace hpx::threads::coroutines::detail::lx {
             // https://rethinkdb.com/blog/handling-stack-overflow-on-custom-stacks/
             // http://www.evanjones.ca/software/threading.html
             //
-            segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
-            segv_stack.ss_flags = 0;
-            segv_stack.ss_size = SEGV_STACK_SIZE;
+            if (register_signal_handler)
+            {
+                segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
+                segv_stack.ss_flags = 0;
+                segv_stack.ss_size = SEGV_STACK_SIZE;
 
-            std::memset(&action, '\0', sizeof(action));
-            action.sa_flags = SA_SIGINFO | SA_ONSTACK;
-            action.sa_sigaction = &sigsegv_handler;
+                std::memset(&action, '\0', sizeof(action));
+                action.sa_flags = SA_SIGINFO | SA_ONSTACK;
+                action.sa_sigaction = &sigsegv_handler;
 
-            sigaltstack(&segv_stack, nullptr);
-            sigemptyset(&action.sa_mask);
-            sigaddset(&action.sa_mask, SIGSEGV);
-            sigaction(SIGSEGV, &action, nullptr);
+                sigaltstack(&segv_stack, nullptr);
+                sigemptyset(&action.sa_mask);
+                sigaddset(&action.sa_mask, SIGSEGV);
+                sigaction(SIGSEGV, &action, nullptr);
+            }
 #endif
         }
 

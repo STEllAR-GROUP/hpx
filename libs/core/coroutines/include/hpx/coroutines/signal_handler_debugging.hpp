@@ -17,4 +17,7 @@ namespace hpx::threads::coroutines {
     HPX_CORE_EXPORT extern bool diagnostics_on_terminate;
     HPX_CORE_EXPORT extern int exception_verbosity;
     HPX_CORE_EXPORT extern std::size_t trace_depth;
+#if !defined(HPX_WINDOWS)
+    HPX_CORE_EXPORT extern bool register_signal_handler;
+#endif
 }    // namespace hpx::threads::coroutines
