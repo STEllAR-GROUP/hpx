@@ -176,14 +176,9 @@ namespace executor_example {
         thread_hook on_stop_;
     };
 
-    template <typename BaseExecutor, typename OnStart, typename OnStop>
-    auto make_executor_with_thread_hooks(
-        BaseExecutor&& exec, OnStart&& on_start, OnStop&& on_stop)
-    {
-        return executor_with_thread_hooks<std::decay_t<BaseExecutor>>(
-            std::forward<BaseExecutor>(exec), std::forward<OnStart>(on_start),
-            std::forward<OnStop>(on_stop));
-    }
+    template <typename Executor, typename OnStart, typename OnStop>
+    executor_with_thread_hooks(Executor&&, OnStart&&, OnStop&&)
+        -> executor_with_thread_hooks<std::decay_t<Executor>>;
 }    // namespace executor_example
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -193,36 +188,35 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename BaseExecutor>
     struct is_one_way_executor<
         executor_example::executor_with_thread_hooks<BaseExecutor>>
-      : is_one_way_executor<typename std::decay<BaseExecutor>::type>
+      : is_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
     template <typename BaseExecutor>
     struct is_never_blocking_one_way_executor<
         executor_example::executor_with_thread_hooks<BaseExecutor>>
-      : is_never_blocking_one_way_executor<
-            typename std::decay<BaseExecutor>::type>
+      : is_never_blocking_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
     template <typename BaseExecutor>
     struct is_two_way_executor<
         executor_example::executor_with_thread_hooks<BaseExecutor>>
-      : is_two_way_executor<typename std::decay<BaseExecutor>::type>
+      : is_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
     template <typename BaseExecutor>
     struct is_bulk_one_way_executor<
         executor_example::executor_with_thread_hooks<BaseExecutor>>
-      : is_bulk_one_way_executor<typename std::decay<BaseExecutor>::type>
+      : is_bulk_one_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 
     template <typename BaseExecutor>
     struct is_bulk_two_way_executor<
         executor_example::executor_with_thread_hooks<BaseExecutor>>
-      : is_bulk_two_way_executor<typename std::decay<BaseExecutor>::type>
+      : is_bulk_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
 }}}    // namespace hpx::parallel::execution
@@ -238,7 +232,7 @@ int hpx_main()
     auto on_start = [&]() { ++starts; };
     auto on_stop = [&]() { ++stops; };
 
-    auto exec = executor_example::make_executor_with_thread_hooks(
+    auto exec = executor_example::executor_with_thread_hooks(
         hpx::execution::par.executor(), on_start, on_stop);
 
     hpx::experimental::for_loop(
