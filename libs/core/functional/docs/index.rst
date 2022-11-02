@@ -24,6 +24,7 @@ their arguments.
 * :cpp:func:`hpx::invoke`
 * :cpp:func:`hpx::invoke_r`
 * :cpp:func:`hpx::invoke_fused`
+* :cpp:func:`hpx::invoke_fused_r`
 * :cpp:func:`hpx::util::mem_fn`
 * :cpp:func:`hpx::util::one_shot`
 * :cpp:func:`hpx::util::protect`
