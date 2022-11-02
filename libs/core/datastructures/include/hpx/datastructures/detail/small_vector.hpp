@@ -186,7 +186,7 @@ namespace hpx::detail {
         {
             if (strg == nullptr)
                 return;
-            strg->storage::~storage();
+            std::destroy_at(strg);
             ::operator delete(strg);
         }
     };
@@ -652,6 +652,7 @@ namespace hpx::detail {
             {
                 detail::storage<T>::dealloc(indirect());
             }
+            set_direct_and_size(0);
         }
 
         // performs a const_cast so we don't need this implementation twice
