@@ -157,8 +157,8 @@ void test(Incrementable start, Incrementable finish)
 #pragma warning(push)
 #pragma warning(disable : 4146)
 #endif
-    test_aux(hpx::util::make_counting_iterator(start),
-        hpx::util::make_counting_iterator(finish), start);
+    test_aux(hpx::util::counting_iterator(start),
+        hpx::util::counting_iterator(finish), start);
 #if defined(HPX_MSVC)
 #pragma warning(pop)
 #endif
@@ -343,8 +343,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     // Also prove that we can handle raw pointers.
     int array[2000];
-    test(hpx::util::make_counting_iterator(array),
-        hpx::util::make_counting_iterator(array + 2000 - 1));
+    test(hpx::util::counting_iterator(array),
+        hpx::util::counting_iterator(array + 2000 - 1));
 
     return hpx::local::finalize();
 }

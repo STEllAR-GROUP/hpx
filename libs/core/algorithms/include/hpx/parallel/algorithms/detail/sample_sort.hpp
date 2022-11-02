@@ -111,9 +111,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             njob = 0;
 
-            auto shape = hpx::util::make_iterator_range(
-                hpx::util::make_counting_iterator(std::uint32_t(0)),
-                hpx::util::make_counting_iterator(nthreads));
+            auto shape = hpx::util::iterator_range(
+                hpx::util::counting_iterator(std::uint32_t(0)),
+                hpx::util::counting_iterator(nthreads));
 
             hpx::wait_all(execution::bulk_async_execute(
                 exec, [this](std::uint32_t) { this->execute_first(); }, shape));
@@ -130,9 +130,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             njob = 0;
 
-            auto shape = hpx::util::make_iterator_range(
-                hpx::util::make_counting_iterator(std::uint32_t(0)),
-                hpx::util::make_counting_iterator(nthreads));
+            auto shape = hpx::util::iterator_range(
+                hpx::util::counting_iterator(std::uint32_t(0)),
+                hpx::util::counting_iterator(nthreads));
 
             hpx::wait_all(execution::bulk_async_execute(
                 exec, [this](std::uint32_t) { this->execute(); }, shape));
@@ -279,9 +279,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         vbuf_thread.emplace_back(buf_first, global_buf.end());
 
         // Sorting of the ranges
-        auto shape = hpx::util::make_iterator_range(
-            hpx::util::make_counting_iterator(std::uint32_t(0)),
-            hpx::util::make_counting_iterator(nthreads));
+        auto shape = hpx::util::iterator_range(
+            hpx::util::counting_iterator(std::uint32_t(0)),
+            hpx::util::counting_iterator(nthreads));
 
         hpx::wait_all(execution::bulk_async_execute(
             exec,

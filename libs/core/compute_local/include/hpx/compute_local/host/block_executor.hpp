@@ -180,7 +180,7 @@ namespace hpx { namespace compute { namespace host {
                     std::advance(part_end, part_end_offset);
                     auto futures = hpx::parallel::execution::bulk_async_execute(
                         executors_[i], HPX_FORWARD(F, f),
-                        util::make_iterator_range(part_begin, part_end),
+                        util::iterator_range(part_begin, part_end),
                         HPX_FORWARD(Ts, ts)...);
 
                     if constexpr (hpx::traits::is_future_v<decltype(futures)>)
@@ -246,7 +246,7 @@ namespace hpx { namespace compute { namespace host {
                     auto part_results =
                         hpx::parallel::execution::bulk_sync_execute(
                             executors_[i], HPX_FORWARD(F, f),
-                            util::make_iterator_range(begin, part_end),
+                            util::iterator_range(begin, part_end),
                             HPX_FORWARD(Ts, ts)...);
                     results.insert(results.end(),
                         std::make_move_iterator(part_results.begin()),

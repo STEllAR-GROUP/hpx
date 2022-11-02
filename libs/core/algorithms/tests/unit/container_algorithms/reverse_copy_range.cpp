@@ -185,7 +185,7 @@ void test_reverse_copy_exception(IteratorTag)
     try
     {
         hpx::ranges::reverse_copy(
-            hpx::util::make_iterator_range(decorated_iterator(std::begin(c)),
+            hpx::util::iterator_range(decorated_iterator(std::begin(c)),
                 decorated_iterator(
                     std::end(c), []() { throw std::runtime_error("test"); })),
             std::begin(d));
@@ -223,7 +223,7 @@ void test_reverse_copy_exception(ExPolicy policy, IteratorTag)
     try
     {
         hpx::ranges::reverse_copy(policy,
-            hpx::util::make_iterator_range(decorated_iterator(std::begin(c)),
+            hpx::util::iterator_range(decorated_iterator(std::begin(c)),
                 decorated_iterator(
                     std::end(c), []() { throw std::runtime_error("test"); })),
             std::begin(d));
@@ -258,7 +258,7 @@ void test_reverse_copy_exception_async(ExPolicy p, IteratorTag)
     try
     {
         auto f = hpx::ranges::reverse_copy(p,
-            hpx::util::make_iterator_range(decorated_iterator(std::begin(c)),
+            hpx::util::iterator_range(decorated_iterator(std::begin(c)),
                 decorated_iterator(
                     std::end(c), []() { throw std::runtime_error("test"); })),
             std::begin(d));
@@ -319,7 +319,7 @@ void test_reverse_copy_bad_alloc(IteratorTag)
     try
     {
         hpx::ranges::reverse_copy(
-            hpx::util::make_iterator_range(decorated_iterator(std::begin(c)),
+            hpx::util::iterator_range(decorated_iterator(std::begin(c)),
                 decorated_iterator(
                     std::end(c), []() { throw std::bad_alloc(); })),
             std::begin(d));
@@ -355,7 +355,7 @@ void test_reverse_copy_bad_alloc(ExPolicy policy, IteratorTag)
     try
     {
         hpx::ranges::reverse_copy(policy,
-            hpx::util::make_iterator_range(decorated_iterator(std::begin(c)),
+            hpx::util::iterator_range(decorated_iterator(std::begin(c)),
                 decorated_iterator(
                     std::end(c), []() { throw std::bad_alloc(); })),
             std::begin(d));
@@ -389,7 +389,7 @@ void test_reverse_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     try
     {
         auto f = hpx::parallel::reverse_copy(p,
-            hpx::util::make_iterator_range(decorated_iterator(std::begin(c)),
+            hpx::util::iterator_range(decorated_iterator(std::begin(c)),
                 decorated_iterator(
                     std::end(c), []() { throw std::bad_alloc(); })),
             std::begin(d));

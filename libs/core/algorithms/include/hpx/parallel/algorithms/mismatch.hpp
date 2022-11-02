@@ -661,8 +661,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::partitioner<ExPolicy,
                     util::in_in_result<Iter1, Iter2>,
                     void>::call_with_index(HPX_FORWARD(ExPolicy, policy),
-                    hpx::util::make_zip_iterator(first1, first2), count1, 1,
-                    HPX_MOVE(f1), HPX_MOVE(f2));
+                    zip_iterator(first1, first2), count1, 1, HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
 
@@ -751,8 +751,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::partitioner<ExPolicy, IterPair,
                     void>::call_with_index(HPX_FORWARD(ExPolicy, policy),
-                    hpx::util::make_zip_iterator(first1, first2), count, 1,
-                    HPX_MOVE(f1), HPX_MOVE(f2));
+                    zip_iterator(first1, first2), count, 1, HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
     }    // namespace detail

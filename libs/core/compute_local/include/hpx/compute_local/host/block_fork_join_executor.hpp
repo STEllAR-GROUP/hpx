@@ -203,8 +203,8 @@ namespace hpx::execution::experimental {
                         stacksize, schedule, yield_delay);
                 };
 
-                hpx::parallel::execution::bulk_sync_execute(exec_, init_f,
-                    hpx::util::detail::make_counting_shape(targets.size()));
+                hpx::parallel::execution::bulk_sync_execute(
+                    exec_, init_f, hpx::util::counting_shape(targets.size()));
             }
         }
 
@@ -228,7 +228,7 @@ namespace hpx::execution::experimental {
                 auto const part_end = ((index + 1) * size) / num_targets;
 
                 auto begin = std::next(std::begin(shape), part_begin);
-                auto inner_shape = hpx::util::make_iterator_range(
+                auto inner_shape = hpx::util::iterator_range(
                     begin, std::next(begin, part_end - part_begin));
 
                 // invoke bulk_sync_execute on one of the inner executors
@@ -236,8 +236,8 @@ namespace hpx::execution::experimental {
                     HPX_FORWARD(decltype(f), f), inner_shape,
                     HPX_FORWARD(decltype(ts), ts)...);
             };
-            auto outer_shape =
-                hpx::util::detail::make_counting_shape(num_targets);
+
+            auto outer_shape = hpx::util::counting_shape(num_targets);
 
             hpx::parallel::execution::bulk_sync_execute(exec_, outer_func,
                 outer_shape, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);

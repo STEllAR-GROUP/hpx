@@ -51,7 +51,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             auto count = hpx::parallel::v1::detail::distance(first1, last1);
             util::cancellation_token<> tok;
-            call(hpx::util::make_zip_iterator(first1, first2), count, tok,
+            call(hpx::util::zip_iterator(first1, first2), count, tok,
                 HPX_FORWARD(F, f));
             return !tok.was_cancelled();
         }
@@ -135,7 +135,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             auto count = hpx::parallel::v1::detail::distance(first1, last1);
             util::cancellation_token<> tok;
-            call(hpx::util::make_zip_iterator(first1, first2), count, tok,
+            call(hpx::util::zip_iterator(first1, first2), count, tok,
                 HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
                 HPX_FORWARD(Proj2, proj2));
             return !tok.was_cancelled();

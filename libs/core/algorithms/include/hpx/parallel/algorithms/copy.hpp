@@ -419,13 +419,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     nullptr;
                 return HPX_MOVE(*dummy);
 #else
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
+                using zip_iterator =
+                    hpx::util::zip_iterator<FwdIter1, FwdIter2>;
 
                 return util::detail::get_in_out_result(
                     util::foreach_partitioner<ExPolicy>::call(
                         HPX_FORWARD(ExPolicy, policy),
-                        hpx::util::make_zip_iterator(first, dest),
+                        zip_iterator(first, dest),
                         detail::distance(first, last),
                         copy_iteration<ExPolicy>(),
                         [](zip_iterator&& last) -> zip_iterator {
@@ -500,26 +500,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
             parallel(ExPolicy&& policy, FwdIter1 first, std::size_t count,
                 FwdIter2 dest)
             {
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
+                using zip_iterator =
+                    hpx::util::zip_iterator<FwdIter1, FwdIter2>;
 
                 return util::detail::get_in_out_result(
                     util::foreach_partitioner<ExPolicy>::call(
                         HPX_FORWARD(ExPolicy, policy),
-                        hpx::util::make_zip_iterator(first, dest), count,
+                        zip_iterator(first, dest), count,
                         [](zip_iterator part_begin, std::size_t part_size,
                             std::size_t) {
-                            using hpx::get;
-
                             auto iters = part_begin.get_iterator_tuple();
-                            util::copy_n<ExPolicy>(
-                                get<0>(iters), part_size, get<1>(iters));
+                            util::copy_n<ExPolicy>(hpx::get<0>(iters),
+                                part_size, hpx::get<1>(iters));
                         },
                         [](zip_iterator&& last) -> zip_iterator {
-                            using hpx::get;
                             auto iters = last.get_iterator_tuple();
                             util::copy_synchronize(
-                                get<0>(iters), get<1>(iters));
+                                hpx::get<0>(iters), hpx::get<1>(iters));
                             return HPX_MOVE(last);
                         }));
             }
@@ -596,7 +593,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::size_t init = 0;
 
                 using hpx::get;
-                using hpx::util::make_zip_iterator;
                 typedef util::scan_partitioner<ExPolicy,
                     util::in_out_result<FwdIter1, FwdIter3>, std::size_t>
                     scan_partitioner_type;
@@ -652,7 +648,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return scan_partitioner_type::call(
                     HPX_FORWARD(ExPolicy, policy),
-                    make_zip_iterator(first, flags.get()), count, init,
+                    zip_iterator(first, flags.get()), count, init,
                     // step 1 performs first part of scan algorithm
                     HPX_MOVE(f1),
                     // step 2 propagates the partition results from left

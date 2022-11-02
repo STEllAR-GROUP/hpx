@@ -134,7 +134,7 @@ namespace hpx { namespace compute { namespace host {
                     return;
                 }
 
-                auto irange = hpx::util::detail::make_counting_shape(count);
+                auto irange = hpx::util::counting_shape(count);
 
                 using iterator_type = hpx::util::counting_iterator<std::size_t>;
                 using partition_result_type =
@@ -205,7 +205,7 @@ namespace hpx { namespace compute { namespace host {
                 }
 
                 // keep memory locality, use executor...
-                auto irange = hpx::util::detail::make_counting_shape(count);
+                auto irange = hpx::util::counting_shape(count);
                 hpx::ranges::for_each(
                     policy_, irange, [p](std::size_t i) { (p + i)->~U(); });
             }

@@ -373,9 +373,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         keystate_iter_type, Compare>
                         kernel;
                     hpx::for_each(policy(hpx::execution::non_task),
-                        make_zip_iterator(
-                            reduce_begin + 1, key_state.begin() + 1),
-                        make_zip_iterator(reduce_end - 1, key_state.end() - 1),
+                        zip_iterator(reduce_begin + 1, key_state.begin() + 1),
+                        zip_iterator(reduce_end - 1, key_state.end() - 1),
                         [&kernel, &comp](zip_ref ref) {
                             kernel(hpx::get<0>(ref), hpx::get<1>(ref), comp);
                         });
@@ -397,12 +396,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using value_type =
                     typename std::iterator_traits<RanIter2>::value_type;
 
-                zip_iterator_in states_begin = make_zip_iterator(
-                    values_first, hpx::util::begin(key_state));
-                zip_iterator_in states_end = make_zip_iterator(
+                zip_iterator_in states_begin =
+                    zip_iterator(values_first, hpx::util::begin(key_state));
+                zip_iterator_in states_end = zip_iterator(
                     values_first + number_of_keys, hpx::util::end(key_state));
-                zip_iterator_vout states_out_begin = make_zip_iterator(
-                    values_output, hpx::util::begin(key_state));
+                zip_iterator_vout states_out_begin =
+                    zip_iterator(values_output, hpx::util::begin(key_state));
                 //
 
                 zip_type_in initial;
@@ -456,12 +455,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return make_pair_result(
                     hpx::ranges::copy_if(policy(hpx::execution::non_task),
-                        make_zip_iterator(key_first, temp.begin(),
+                        zip_iterator(key_first, temp.begin(),
                             hpx::util::begin(key_state)),
-                        make_zip_iterator(key_last,
-                            temp.begin() + number_of_keys,
+                        zip_iterator(key_last, temp.begin() + number_of_keys,
                             hpx::util::end(key_state)),
-                        make_zip_iterator(keys_output, values_output,
+                        zip_iterator(keys_output, values_output,
                             hpx::util::begin(key_state)),
                         // copies to dest only when 'end' state is true
                         [](zip2_ref it) { return hpx::get<2>(it).end; }),

@@ -308,7 +308,7 @@ void test_stable_sort_exception(ExPolicy&& policy, T)
                 decorated_iterator;
 
             hpx::ranges::stable_sort(std::forward<ExPolicy>(policy),
-                hpx::util::make_iterator_range(
+                hpx::util::iterator_range(
                     decorated_iterator(
                         c.begin(), []() { throw std::runtime_error("test"); }),
                     decorated_iterator(c.end())));
@@ -342,9 +342,8 @@ void test_stable_sort_exception(ExPolicy&& policy, T)
                 decorated_iterator;
 
             hpx::ranges::stable_sort(std::forward<ExPolicy>(policy),
-                hpx::util::make_iterator_range(
-                    decorated_iterator(
-                        c.begin(), []() { throw std::bad_alloc(); }),
+                hpx::util::iterator_range(decorated_iterator(c.begin(),
+                                              []() { throw std::bad_alloc(); }),
                     decorated_iterator(c.end())));
 
             HPX_TEST(false);
@@ -390,7 +389,7 @@ void test_stable_sort_exception(ExPolicy&& policy, T, Compare comp)
                 decorated_iterator;
 
             hpx::ranges::stable_sort(std::forward<ExPolicy>(policy),
-                hpx::util::make_iterator_range(
+                hpx::util::iterator_range(
                     decorated_iterator(
                         c.begin(), []() { throw std::runtime_error("test"); }),
                     decorated_iterator(c.end())),
@@ -425,9 +424,8 @@ void test_stable_sort_exception(ExPolicy&& policy, T, Compare comp)
                 decorated_iterator;
 
             hpx::ranges::stable_sort(std::forward<ExPolicy>(policy),
-                hpx::util::make_iterator_range(
-                    decorated_iterator(
-                        c.begin(), []() { throw std::bad_alloc(); }),
+                hpx::util::iterator_range(decorated_iterator(c.begin(),
+                                              []() { throw std::bad_alloc(); }),
                     decorated_iterator(c.end())),
                 comp);
 
@@ -476,7 +474,7 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T)
 
             hpx::future<void> f =
                 hpx::ranges::stable_sort(std::forward<ExPolicy>(policy),
-                    hpx::util::make_iterator_range(
+                    hpx::util::iterator_range(
                         decorated_iterator(c.begin(),
                             []() { throw std::runtime_error("test"); }),
                         decorated_iterator(c.end())));
@@ -514,12 +512,11 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::future<void> f =
-                hpx::ranges::stable_sort(std::forward<ExPolicy>(policy),
-                    hpx::util::make_iterator_range(
-                        decorated_iterator(
-                            c.begin(), []() { throw std::bad_alloc(); }),
-                        decorated_iterator(c.end())));
+            hpx::future<void> f = hpx::ranges::stable_sort(
+                std::forward<ExPolicy>(policy),
+                hpx::util::iterator_range(decorated_iterator(c.begin(),
+                                              []() { throw std::bad_alloc(); }),
+                    decorated_iterator(c.end())));
 
             returned_from_algorithm = true;
             f.get();
@@ -570,7 +567,7 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T, Compare comp)
 
             hpx::future<void> f =
                 hpx::ranges::stable_sort(std::forward<ExPolicy>(policy),
-                    hpx::util::make_iterator_range(
+                    hpx::util::iterator_range(
                         decorated_iterator(c.begin(),
                             []() { throw std::runtime_error("test"); }),
                         decorated_iterator(c.end())),
@@ -609,13 +606,12 @@ void test_stable_sort_exception_async(ExPolicy&& policy, T, Compare comp)
                 std::random_access_iterator_tag>
                 decorated_iterator;
 
-            hpx::future<void> f =
-                hpx::ranges::stable_sort(std::forward<ExPolicy>(policy),
-                    hpx::util::make_iterator_range(
-                        decorated_iterator(
-                            c.begin(), []() { throw std::bad_alloc(); }),
-                        decorated_iterator(c.end())),
-                    comp);
+            hpx::future<void> f = hpx::ranges::stable_sort(
+                std::forward<ExPolicy>(policy),
+                hpx::util::iterator_range(decorated_iterator(c.begin(),
+                                              []() { throw std::bad_alloc(); }),
+                    decorated_iterator(c.end())),
+                comp);
 
             returned_from_algorithm = true;
             f.get();

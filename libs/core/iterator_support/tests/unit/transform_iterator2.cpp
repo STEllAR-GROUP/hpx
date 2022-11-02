@@ -196,10 +196,10 @@ int main()
         x[k2] = x[k2] * 2;
 
     tests::input_iterator_test(
-        hpx::util::make_transform_iterator(&y[0], &mult_2), x[0], x[1]);
+        hpx::util::transform_iterator(&y[0], &mult_2), x[0], x[1]);
 
     tests::random_access_readable_iterator_test(
-        hpx::util::make_transform_iterator(&y[0], &mult_2), N, x);
+        hpx::util::transform_iterator(&y[0], &mult_2), N, x);
 }
 
 // Test transform_iterator as projection iterator
@@ -217,34 +217,30 @@ int main()
     }
 
     std::copy(x, x + N,
-        hpx::util::make_transform_iterator((pair_t*) values, select_first()));
+        hpx::util::transform_iterator((pair_t*) values, select_first()));
 
     std::copy(y, y + N,
-        hpx::util::make_transform_iterator((pair_t*) values, select_second()));
+        hpx::util::transform_iterator((pair_t*) values, select_second()));
 
     tests::random_access_readable_iterator_test(
-        hpx::util::make_transform_iterator(
-            (pair_t*) values, value_select_first()),
+        hpx::util::transform_iterator((pair_t*) values, value_select_first()),
         N, x);
 
     tests::random_access_readable_iterator_test(
-        hpx::util::make_transform_iterator(
-            (pair_t*) values, const_select_first()),
+        hpx::util::transform_iterator((pair_t*) values, const_select_first()),
         N, x);
 
     tests::constant_lvalue_iterator_test(
-        hpx::util::make_transform_iterator(
-            (pair_t*) values, const_select_first()),
+        hpx::util::transform_iterator((pair_t*) values, const_select_first()),
         x[0]);
 
     tests::non_const_lvalue_iterator_test(
-        hpx::util::make_transform_iterator((pair_t*) values, select_first()),
-        x[0], 17);
+        hpx::util::transform_iterator((pair_t*) values, select_first()), x[0],
+        17);
 
     tests::const_nonconst_iterator_test(
-        ++hpx::util::make_transform_iterator((pair_t*) values, select_first()),
-        hpx::util::make_transform_iterator(
-            (pair_t*) values, const_select_first()));
+        ++hpx::util::transform_iterator((pair_t*) values, select_first()),
+        hpx::util::transform_iterator((pair_t*) values, const_select_first()));
 }
 
 // Test transform_iterator with polymorphic object function
@@ -258,12 +254,11 @@ int main()
         x[k2] = x[k2] * 2;
 
     tests::input_iterator_test(
-        hpx::util::make_transform_iterator(&y[0], polymorphic_mult_functor()),
-        x[0], x[1]);
+        hpx::util::transform_iterator(&y[0], polymorphic_mult_functor()), x[0],
+        x[1]);
 
     tests::random_access_readable_iterator_test(
-        hpx::util::make_transform_iterator(&y[0], polymorphic_mult_functor()),
-        N, x);
+        hpx::util::transform_iterator(&y[0], polymorphic_mult_functor()), N, x);
 }
 
 return hpx::util::report_errors();

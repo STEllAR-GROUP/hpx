@@ -24,8 +24,10 @@
 #include <utility>
 
 namespace hpx { namespace util {
+
     // Default template argument handling for iterator_adaptor
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Iterator>
         struct value_type_iterator_traits_helper
@@ -62,29 +64,27 @@ namespace hpx { namespace util {
         {
             // the following type calculations use lazy_conditional to avoid
             // premature instantiations
-            using value_type = typename std::conditional<
-                std::is_void<Value>::value,
-                typename util::lazy_conditional<std::is_void<Reference>::value,
+            using value_type = std::conditional_t<std::is_void_v<Value>,
+                util::lazy_conditional_t<std::is_void_v<Reference>,
                     value_type_iterator_traits_helper<Base>,
-                    std::remove_reference<Reference>>::type,
-                Value>::type;
+                    std::remove_reference<Reference>>,
+                Value>;
 
-            using reference_type =
-                typename std::conditional<std::is_void<Reference>::value,
-                    typename util::lazy_conditional<std::is_void<Value>::value,
-                        reference_iterator_traits_helper<Base>,
-                        std::add_lvalue_reference<Value>>::type,
-                    Reference>::type;
+            using reference_type = std::conditional_t<std::is_void_v<Reference>,
+                util::lazy_conditional_t<std::is_void_v<Value>,
+                    reference_iterator_traits_helper<Base>,
+                    std::add_lvalue_reference<Value>>,
+                Reference>;
 
             using iterator_category =
-                typename util::lazy_conditional<std::is_void<Category>::value,
+                util::lazy_conditional_t<std::is_void_v<Category>,
                     category_iterator_traits_helper<Base>,
-                    util::identity<Category>>::type;
+                    util::identity<Category>>;
 
             using difference_type =
-                typename util::lazy_conditional<std::is_void<Difference>::value,
+                util::lazy_conditional_t<std::is_void_v<Difference>,
                     difference_type_iterator_traits_helper<Base>,
-                    util::identity<Difference>>::type;
+                    util::identity<Difference>>;
 
             using type = iterator_facade<Derived, value_type, iterator_category,
                 reference_type, difference_type, Pointer>;

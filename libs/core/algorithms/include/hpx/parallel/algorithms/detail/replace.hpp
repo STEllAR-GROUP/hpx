@@ -164,7 +164,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 return util::detail::get_in_out_result(
                     for_each_n<zip_iterator>().call(
                         HPX_FORWARD(ExPolicy, policy),
-                        hpx::util::make_zip_iterator(first, dest),
+                        zip_iterator(first, dest),
                         detail::distance(first, sent),
                         [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
                             reference t) -> void {
@@ -228,7 +228,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 return util::detail::get_in_out_result(
                     for_each_n<zip_iterator>().call(
                         HPX_FORWARD(ExPolicy, policy),
-                        hpx::util::make_zip_iterator(first, dest),
+                        zip_iterator(first, dest),
                         detail::distance(first, sent),
                         [new_value, f = HPX_FORWARD(F, f),
                             proj = HPX_FORWARD(Proj, proj)](

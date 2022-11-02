@@ -360,8 +360,7 @@ namespace hpx { namespace parallel { namespace util {
     hpx::util::iterator_range<Iterator, Sentinel> make_subrange(
         Iterator iterator, Sentinel sentinel)
     {
-        return hpx::util::make_iterator_range<Iterator, Sentinel>(
-            iterator, sentinel);
+        return hpx::util::iterator_range(iterator, sentinel);
     }
 
     template <typename Iterator, typename Sentinel = Iterator>
@@ -370,8 +369,7 @@ namespace hpx { namespace parallel { namespace util {
     {
         return hpx::make_future<hpx::util::iterator_range<Iterator, Sentinel>>(
             HPX_MOVE(iterator), [sentinel](Iterator&& it) {
-                return hpx::util::iterator_range<Iterator, Sentinel>(
-                    it, sentinel);
+                return hpx::util::iterator_range(it, sentinel);
             });
     }
 

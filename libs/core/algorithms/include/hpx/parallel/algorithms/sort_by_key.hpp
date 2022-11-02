@@ -151,8 +151,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         return detail::get_iter_pair<iterator_type>(
             detail::sort<iterator_type>().call(HPX_FORWARD(ExPolicy, policy),
-                hpx::util::make_zip_iterator(key_first, value_first),
-                hpx::util::make_zip_iterator(key_last, value_last),
+                hpx::util::zip_iterator(key_first, value_first),
+                hpx::util::zip_iterator(key_last, value_last),
                 HPX_FORWARD(Compare, comp), detail::extract_key()));
 #endif
     }

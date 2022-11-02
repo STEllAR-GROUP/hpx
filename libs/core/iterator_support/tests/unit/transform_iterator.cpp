@@ -114,8 +114,8 @@ void test_left_element_full()
     std::ostringstream str;
 
     std::for_each(
-        hpx::util::make_transform_iterator(std::begin(values), transformer),
-        hpx::util::make_transform_iterator(std::end(values), transformer),
+        hpx::util::transform_iterator(std::begin(values), transformer),
+        hpx::util::transform_iterator(std::end(values), transformer),
         [&str](int d) { str << d << " "; });
 
     HPX_TEST_EQ(str.str(), std::string("9 0 1 2 3 4 5 6 7 8 "));
@@ -134,8 +134,8 @@ void test_right_element_full()
     std::ostringstream str;
 
     std::for_each(
-        hpx::util::make_transform_iterator(std::begin(values), transformer),
-        hpx::util::make_transform_iterator(std::end(values), transformer),
+        hpx::util::transform_iterator(std::begin(values), transformer),
+        hpx::util::transform_iterator(std::end(values), transformer),
         [&str](int d) { str << d << " "; });
 
     HPX_TEST_EQ(str.str(), std::string("1 2 3 4 5 6 7 8 9 0 "));

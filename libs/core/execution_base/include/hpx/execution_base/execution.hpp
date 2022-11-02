@@ -315,8 +315,7 @@ namespace hpx { namespace parallel { namespace execution {
             Ts&&... ts)
         {
             return bulk_sync_execute_t{}(HPX_FORWARD(Executor, exec),
-                HPX_FORWARD(F, f),
-                hpx::util::detail::make_counting_shape(shape),
+                HPX_FORWARD(F, f), hpx::util::counting_shape(shape),
                 HPX_FORWARD(Ts, ts)...);
         }
     } bulk_sync_execute{};
@@ -386,8 +385,7 @@ namespace hpx { namespace parallel { namespace execution {
             Ts&&... ts)
         {
             return bulk_async_execute_t{}(HPX_FORWARD(Executor, exec),
-                HPX_FORWARD(F, f),
-                hpx::util::detail::make_counting_shape(shape),
+                HPX_FORWARD(F, f), hpx::util::counting_shape(shape),
                 HPX_FORWARD(Ts, ts)...);
         }
     } bulk_async_execute{};
@@ -464,8 +462,7 @@ namespace hpx { namespace parallel { namespace execution {
             Future&& predecessor, Ts&&... ts)
         {
             return bulk_then_execute_t{}(HPX_FORWARD(Executor, exec),
-                HPX_FORWARD(F, f),
-                hpx::util::detail::make_counting_shape(shape),
+                HPX_FORWARD(F, f), hpx::util::counting_shape(shape),
                 HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
     } bulk_then_execute{};

@@ -534,7 +534,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         false);
                 }
 
-                typedef hpx::util::zip_iterator<Iter1, Iter2> zip_iterator;
+                using zip_iterator = hpx::util::zip_iterator<Iter1, Iter2>;
 
                 util::cancellation_token<> tok;
 
@@ -550,9 +550,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 return util::partitioner<ExPolicy, bool>::call(
-                    HPX_FORWARD(ExPolicy, policy),
-                    hpx::util::make_zip_iterator(first1, first2), count1,
-                    HPX_MOVE(f1), [](auto&& results) -> bool {
+                    HPX_FORWARD(ExPolicy, policy), zip_iterator(first1, first2),
+                    count1, HPX_MOVE(f1), [](auto&& results) -> bool {
                         return std::all_of(hpx::util::begin(results),
                             hpx::util::end(results),
                             [](hpx::future<bool>& val) { return val.get(); });
@@ -598,8 +597,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     difference_type;
                 difference_type count = std::distance(first1, last1);
 
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
+                using zip_iterator =
+                    hpx::util::zip_iterator<FwdIter1, FwdIter2>;
 
                 util::cancellation_token<> tok;
                 auto f1 = [f, tok](zip_iterator it,
@@ -610,9 +609,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 };
 
                 return util::partitioner<ExPolicy, bool>::call(
-                    HPX_FORWARD(ExPolicy, policy),
-                    hpx::util::make_zip_iterator(first1, first2), count,
-                    HPX_MOVE(f1), [](auto&& results) {
+                    HPX_FORWARD(ExPolicy, policy), zip_iterator(first1, first2),
+                    count, HPX_MOVE(f1), [](auto&& results) {
                         return std::all_of(hpx::util::begin(results),
                             hpx::util::end(results),
                             [](hpx::future<bool>& val) { return val.get(); });

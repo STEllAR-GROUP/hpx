@@ -161,21 +161,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
             parallel(
                 ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
             {
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
+                using zip_iterator =
+                    hpx::util::zip_iterator<FwdIter1, FwdIter2>;
 
                 return util::detail::get_in_out_result(
                     util::foreach_partitioner<ExPolicy>::call(
                         HPX_FORWARD(ExPolicy, policy),
-                        hpx::util::make_zip_iterator(first, dest),
+                        zip_iterator(first, dest),
                         detail::distance(first, last),
                         [](zip_iterator part_begin, std::size_t part_size,
                             std::size_t) {
-                            using hpx::get;
-
                             auto iters = part_begin.get_iterator_tuple();
-                            util::move_n(
-                                get<0>(iters), part_size, get<1>(iters));
+                            util::move_n(hpx::get<0>(iters), part_size,
+                                hpx::get<1>(iters));
                         },
                         [](zip_iterator&& last) -> zip_iterator {
                             return HPX_MOVE(last);

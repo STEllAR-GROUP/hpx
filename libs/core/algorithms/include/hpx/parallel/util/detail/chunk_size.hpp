@@ -150,7 +150,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         iterator shape_begin(begin, chunk_size, count);
         iterator shape_end(last, chunk_size, count, count);
 
-        return hpx::util::make_iterator_range(shape_begin, shape_end);
+        return hpx::util::iterator_range(shape_begin, shape_end);
     }
 
     template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
@@ -213,7 +213,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         iterator shape_begin(begin, chunk_size, count);
         iterator shape_end(last, chunk_size, count, count);
 
-        return hpx::util::make_iterator_range(shape_begin, shape_end);
+        return hpx::util::iterator_range(shape_begin, shape_end);
     }
 
     template <typename ExPolicy, typename FwdIter,
@@ -359,7 +359,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         iterator shape_begin(begin, chunk_size, count, 0, 0);
         iterator shape_end(last, chunk_size, count, count, 0);
 
-        return hpx::util::make_iterator_range(shape_begin, shape_end);
+        return hpx::util::iterator_range(shape_begin, shape_end);
     }
 
     template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
@@ -427,7 +427,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         iterator shape_begin(begin, chunk_size, count, 0, base_idx);
         iterator shape_end(last, chunk_size, count, count, base_idx);
 
-        return hpx::util::make_iterator_range(shape_begin, shape_end);
+        return hpx::util::iterator_range(shape_begin, shape_end);
     }
 
     template <typename ExPolicy, typename FwdIter,

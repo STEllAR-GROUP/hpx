@@ -88,7 +88,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         comm.set(communicator_type::right, U[0][Nx - 1], 0);
     }
 
-    auto range = hpx::util::detail::make_counting_shape(nlp);
+    auto range = hpx::util::counting_shape(nlp);
 
     executor_type executor(numa_domains);
     auto policy = hpx::execution::par.on(executor);

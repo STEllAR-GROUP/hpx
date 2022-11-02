@@ -215,7 +215,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::partitioner<ExPolicy, FwdIter,
                     void>::call_with_index(HPX_FORWARD(ExPolicy, policy),
-                    hpx::util::make_zip_iterator(first, next), count - 1, 1,
+                    hpx::util::zip_iterator(first, next), count - 1, 1,
                     HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
