@@ -479,7 +479,7 @@ Functions
    :cpp:func:`hpx::experimental::bind_back`
    :cpp:func:`hpx::bind_front`               :cppreference-generic:`utility/functional,bind_front`
    :cpp:func:`hpx::invoke`                   :cppreference-generic:`utility/functional,invoke`
-   :cpp:func:`hpx::invoke_fused`
+   :cpp:func:`hpx::invoke_fused`             :cppreference-generic:`utility,apply`
    :cpp:func:`hpx::invoke_fused_r`
    :cpp:func:`hpx::mem_fn`                   :cppreference-generic:`utility/functional,mem_fn`
    ========================================  =====================================================

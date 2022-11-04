@@ -73,7 +73,7 @@ namespace hpx {
     }    // namespace detail
 
     /// Invokes the given callable object f with the content of
-    /// the sequenced type t (tuples, pairs)
+    /// the sequenced type t (tuples, pairs).
     ///
     /// \param f Must be a callable object. If f is a member function pointer,
     ///          the first argument in the sequenced type will be treated as
@@ -88,7 +88,11 @@ namespace hpx {
     /// \throws std::exception like objects thrown by call to object f
     ///         with the arguments contained in the sequenceable type t.
     ///
-    /// \note This function is similar to `std::apply` (C++17)
+    /// \note This function is similar to `std::apply` (C++17). The difference
+    ///       between \c hpx::invoke and \c hpx::invoke_fused is that the later
+    ///       unpacks the tuples while the former cannot. Turning a tuple into a
+    ///       parameter pack is not a trivial operation which makes
+    ///       \c hpx::invoke_fused rather useful.
     template <typename F, typename Tuple>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
         typename detail::invoke_fused_result<F, Tuple>::type
@@ -105,6 +109,9 @@ namespace hpx {
     ///
     /// \tparam R The result type of the function when it's called
     ///           with the content of the given sequenced type.
+    /// \note The difference between \c hpx::invoke_fused and
+    ///       \c hpx::invoke_fused_r is that the later allows to
+    ///       specify the return type as well.
     template <typename R, typename F, typename Tuple>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE R
     invoke_fused_r(F&& f, Tuple&& t) noexcept(
