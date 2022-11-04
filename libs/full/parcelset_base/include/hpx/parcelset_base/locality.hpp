@@ -15,6 +15,8 @@
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/serialization.hpp>
 
+#include <hpx/parcelset_base/parcelset_base_fwd.hpp>
+
 #include <map>
 #include <memory>
 #include <string>
@@ -27,7 +29,7 @@
 namespace hpx { namespace parcelset {
 
     //////////////////////////////////////////////////////////////////////////
-    class HPX_EXPORT locality
+    class locality
     {
         template <typename Impl>
         class impl;
