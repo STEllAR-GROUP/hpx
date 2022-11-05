@@ -440,7 +440,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_value_construct
+    // CPO for hpx::uninitialized_value_construct
     inline constexpr struct uninitialized_value_construct_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_t>
     {
@@ -487,7 +487,7 @@ namespace hpx {
     } uninitialized_value_construct{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_value_construct_n
+    // CPO for hpx::uninitialized_value_construct_n
     inline constexpr struct uninitialized_value_construct_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_n_t>
     {

@@ -347,7 +347,7 @@ namespace hpx { namespace ranges {
     using partial_sort_copy_result = parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::partial_sort_copy
+    // CPO for hpx::ranges::partial_sort_copy
     inline constexpr struct partial_sort_copy_t final
       : hpx::detail::tag_parallel_algorithm<partial_sort_copy_t>
     {

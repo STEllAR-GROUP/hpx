@@ -231,7 +231,7 @@ namespace hpx { namespace ranges {
     using swap_ranges_result = hpx::parallel::util::in_in_result<Iter1, Iter2>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::swap_ranges
+    // CPO for hpx::ranges::swap_ranges
     inline constexpr struct swap_ranges_t final
       : hpx::detail::tag_parallel_algorithm<swap_ranges_t>
     {

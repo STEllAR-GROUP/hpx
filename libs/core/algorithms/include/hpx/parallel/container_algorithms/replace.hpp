@@ -1222,7 +1222,7 @@ namespace hpx { namespace ranges {
     using replace_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::replace_if
+    // CPO for hpx::ranges::replace_if
     inline constexpr struct replace_if_t final
       : hpx::detail::tag_parallel_algorithm<replace_if_t>
     {
@@ -1343,7 +1343,7 @@ namespace hpx { namespace ranges {
     } replace_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::replace
+    // CPO for hpx::ranges::replace
     inline constexpr struct replace_t final
       : hpx::detail::tag_parallel_algorithm<replace_t>
     {
@@ -1470,7 +1470,7 @@ namespace hpx { namespace ranges {
     } replace{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::replace_copy_if
+    // CPO for hpx::ranges::replace_copy_if
     inline constexpr struct replace_copy_if_t final
       : hpx::detail::tag_parallel_algorithm<replace_copy_if_t>
     {
@@ -1615,7 +1615,7 @@ namespace hpx { namespace ranges {
     } replace_copy_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::replace_copy
+    // CPO for hpx::ranges::replace_copy
     inline constexpr struct replace_copy_t final
       : hpx::detail::tag_parallel_algorithm<replace_copy_t>
     {

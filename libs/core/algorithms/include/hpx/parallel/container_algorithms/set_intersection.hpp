@@ -443,7 +443,7 @@ namespace hpx { namespace ranges {
     using set_intersection_result = parallel::util::in_in_out_result<I1, I2, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::set_intersection
+    // CPO for hpx::ranges::set_intersection
     inline constexpr struct set_intersection_t final
       : hpx::detail::tag_parallel_algorithm<set_intersection_t>
     {

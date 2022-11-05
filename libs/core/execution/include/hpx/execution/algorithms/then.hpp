@@ -97,8 +97,14 @@ namespace hpx::execution::experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
+            template <typename Func, typename Pack>
+            struct undefined_set_value_signature;
+
             template <typename Pack, typename Enable = void>
-            struct generate_set_value_signature;
+            struct generate_set_value_signature
+              : undefined_set_value_signature<F, Pack>
+            {
+            };
 
             template <template <typename...> typename Pack, typename... Ts>
             struct generate_set_value_signature<Pack<Ts...>,

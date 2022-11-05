@@ -443,7 +443,7 @@ namespace hpx { namespace ranges {
     using set_union_result = parallel::util::in_in_out_result<I1, I2, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::set_union
+    // CPO for hpx::ranges::set_union
     inline constexpr struct set_union_t final
       : hpx::detail::tag_parallel_algorithm<set_union_t>
     {

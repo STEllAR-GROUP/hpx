@@ -761,7 +761,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::mismatch
+    // CPO for hpx::mismatch
     inline constexpr struct mismatch_t final
       : hpx::detail::tag_parallel_algorithm<mismatch_t>
     {

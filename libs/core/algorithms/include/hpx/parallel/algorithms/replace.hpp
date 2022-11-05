@@ -766,7 +766,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::replace_if
+    // CPO for hpx::replace_if
     inline constexpr struct replace_if_t final
       : hpx::detail::tag_parallel_algorithm<replace_if_t>
     {
@@ -823,7 +823,7 @@ namespace hpx {
     } replace_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::replace
+    // CPO for hpx::replace
     inline constexpr struct replace_t final
       : hpx::detail::tag_parallel_algorithm<replace_t>
     {
@@ -873,7 +873,7 @@ namespace hpx {
     } replace{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::replace_copy_if
+    // CPO for hpx::replace_copy_if
     inline constexpr struct replace_copy_if_t final
       : hpx::detail::tag_parallel_algorithm<replace_copy_if_t>
     {
@@ -942,7 +942,7 @@ namespace hpx {
     } replace_copy_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::replace_copy
+    // CPO for hpx::replace_copy
     inline constexpr struct replace_copy_t final
       : hpx::detail::tag_parallel_algorithm<replace_copy_t>
     {

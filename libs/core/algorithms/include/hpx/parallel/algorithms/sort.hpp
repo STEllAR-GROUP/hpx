@@ -420,7 +420,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::sort
+    // CPO for hpx::sort
     inline constexpr struct sort_t final
       : hpx::detail::tag_parallel_algorithm<sort_t>
     {

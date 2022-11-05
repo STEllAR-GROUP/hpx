@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,6 +7,8 @@
 
 #pragma once
 
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/adjacent_difference.hpp>
 
@@ -20,10 +23,10 @@
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy>
-void test_adjacent_difference(ExPolicy policy)
+void test_adjacent_difference(ExPolicy&& policy)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
 
     std::vector<int> c = test::random_iota<int>(10007);
     std::vector<int> d(10007);
@@ -39,11 +42,64 @@ void test_adjacent_difference(ExPolicy policy)
     HPX_TEST(std::end(d) == it);
 }
 
-template <typename ExPolicy>
-void test_adjacent_difference_async(ExPolicy p)
+template <typename Policy, typename ExPolicy>
+void test_adjacent_difference_direct(Policy l, ExPolicy policy)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
+
+    std::vector<int> c = test::random_iota<int>(10007);
+    std::vector<int> d(10007);
+    std::vector<int> d_ans(10007);
+
+    namespace ex = hpx::execution::experimental;
+
+    using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
+    auto it = hpx::adjacent_difference(
+        policy.on(exec), std::begin(c), std::end(c), std::begin(d));
+
+    std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
+        [](auto lhs, auto rhs) { return lhs == rhs; }));
+
+    HPX_TEST(std::end(d) == it);
+}
+
+template <typename Policy, typename ExPolicy>
+void test_adjacent_difference_sender(Policy l, ExPolicy&& policy)
+{
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
+
+    std::vector<int> c = test::random_iota<int>(10007);
+    std::vector<int> d(10007);
+    std::vector<int> d_ans(10007);
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+
+    using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
+    auto result = ex::just(std::begin(c), std::end(c), std::begin(d)) |
+        hpx::adjacent_difference(policy.on(exec)) | tt::sync_wait();
+
+    std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
+        [](auto lhs, auto rhs) { return lhs == rhs; }));
+
+    HPX_TEST(std::end(d) == hpx::get<0>(*result));
+}
+
+template <typename ExPolicy>
+void test_adjacent_difference_async(ExPolicy&& p)
+{
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
 
     std::vector<int> c = test::random_iota<int>(10007);
     std::vector<int> d(10007);
@@ -60,12 +116,39 @@ void test_adjacent_difference_async(ExPolicy p)
     HPX_TEST(std::end(d) == f_it.get());
 }
 
+template <typename Policy, typename ExPolicy>
+void test_adjacent_difference_async_direct(Policy l, ExPolicy&& p)
+{
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
+
+    std::vector<int> c = test::random_iota<int>(10007);
+    std::vector<int> d(10007);
+    std::vector<int> d_ans(10007);
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+
+    using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
+    auto result = hpx::adjacent_difference(
+                      p.on(exec), std::begin(c), std::end(c), std::begin(d)) |
+        tt::sync_wait();
+    std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
+        [](auto lhs, auto rhs) { return lhs == rhs; }));
+
+    HPX_TEST(std::end(d) == hpx::get<0>(*result));
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_difference_exception(ExPolicy policy, IteratorTag)
+void test_adjacent_difference_exception(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -98,7 +181,7 @@ void test_adjacent_difference_exception(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_difference_exception_async(ExPolicy p, IteratorTag)
+void test_adjacent_difference_exception_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -141,10 +224,10 @@ void test_adjacent_difference_exception_async(ExPolicy p, IteratorTag)
 
 //////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_difference_bad_alloc(ExPolicy policy, IteratorTag)
+void test_adjacent_difference_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -176,7 +259,7 @@ void test_adjacent_difference_bad_alloc(ExPolicy policy, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag>
-void test_adjacent_difference_bad_alloc_async(ExPolicy p, IteratorTag)
+void test_adjacent_difference_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
     typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>

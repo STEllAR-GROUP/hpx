@@ -427,7 +427,7 @@ namespace hpx { namespace ranges {
     using reverse_copy_result = hpx::parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::reverse
+    // CPO for hpx::ranges::reverse
     inline constexpr struct reverse_t final
       : hpx::detail::tag_parallel_algorithm<reverse_t>
     {
@@ -514,7 +514,7 @@ namespace hpx { namespace ranges {
     } reverse{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::reverse_copy
+    // CPO for hpx::ranges::reverse_copy
     inline constexpr struct reverse_copy_t final
       : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
     {

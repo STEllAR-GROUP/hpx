@@ -229,7 +229,7 @@ namespace hpx { namespace ranges {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::destroy
+    // CPO for hpx::ranges::destroy
     inline constexpr struct destroy_t final
       : hpx::detail::tag_parallel_algorithm<destroy_t>
     {
@@ -313,7 +313,7 @@ namespace hpx { namespace ranges {
     } destroy{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::destroy_n
+    // CPO for hpx::ranges::destroy_n
     inline constexpr struct destroy_n_t final
       : hpx::detail::tag_parallel_algorithm<destroy_n_t>
     {

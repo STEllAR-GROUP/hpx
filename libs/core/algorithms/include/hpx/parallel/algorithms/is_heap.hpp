@@ -462,7 +462,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::is_heap
+    // CPO for hpx::is_heap
     inline constexpr struct is_heap_t final
       : hpx::detail::tag_parallel_algorithm<is_heap_t>
     {
@@ -519,7 +519,7 @@ namespace hpx {
     } is_heap{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::is_heap_until
+    // CPO for hpx::is_heap_until
     inline constexpr struct is_heap_until_t final
       : hpx::detail::tag_parallel_algorithm<is_heap_until_t>
     {

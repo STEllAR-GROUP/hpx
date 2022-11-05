@@ -29,7 +29,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
     private:
         template <typename InIter, typename Sent, typename OutIter, typename Op>
-        friend inline OutIter tag_fallback_invoke(
+        friend constexpr inline OutIter tag_fallback_invoke(
             sequential_adjacent_difference_t<ExPolicy>, InIter first, Sent last,
             OutIter dest, Op&& op)
         {
@@ -42,7 +42,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             while (++first != last)
             {
                 value_t val = *first;
-                *++dest = op(val, HPX_MOVE(acc));
+                *++dest = HPX_INVOKE(op, val, HPX_MOVE(acc));
                 acc = HPX_MOVE(val);
             }
             return ++dest;
@@ -57,7 +57,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 #else
     template <typename ExPolicy, typename InIter, typename Sent,
         typename OutIter, typename Op>
-    HPX_HOST_DEVICE HPX_FORCEINLINE OutIter sequential_adjacent_difference(
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr OutIter
+    sequential_adjacent_difference(
         InIter first, Sent last, OutIter dest, Op&& op)
     {
         return sequential_adjacent_difference_t<ExPolicy>{}(

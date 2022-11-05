@@ -222,9 +222,9 @@ namespace hpx {
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
+#include <hpx/modules/executors.hpp>
 
 #include <hpx/algorithms/traits/is_value_proxy.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_difference.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
@@ -252,14 +252,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
         struct adjacent_difference
           : public detail::algorithm<adjacent_difference<Iter>, Iter>
         {
-            adjacent_difference()
+            constexpr adjacent_difference() noexcept
               : adjacent_difference::algorithm("adjacent_difference")
             {
             }
 
             template <typename ExPolicy, typename InIter, typename Sent,
                 typename OutIter, typename Op>
-            static OutIter sequential(
+            static constexpr OutIter sequential(
                 ExPolicy, InIter first, Sent last, OutIter dest, Op&& op)
             {
                 return sequential_adjacent_difference<ExPolicy>(
@@ -268,10 +268,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
                 typename FwdIter2, typename Op>
-            static typename util::detail::algorithm_result<ExPolicy,
-                FwdIter2>::type
-            parallel(ExPolicy&& policy, FwdIter1 first, Sent last,
-                FwdIter2 dest, Op&& op)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter1 first,
+                Sent last, FwdIter2 dest, Op&& op)
             {
                 using zip_iterator =
                     hpx::util::zip_iterator<FwdIter1, FwdIter1, FwdIter2>;
@@ -280,9 +278,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using difference_type =
                     typename std::iterator_traits<FwdIter1>::difference_type;
 
-                if (first == last)
+                constexpr bool scheduler_policy =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+                if constexpr (!scheduler_policy)
                 {
-                    return result::get(HPX_MOVE(dest));
+                    if (first == last)
+                    {
+                        return result::get(HPX_MOVE(dest));
+                    }
                 }
 
                 difference_type count = detail::distance(first, last) - 1;
@@ -293,9 +297,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     tmp = *first++;
                 *dest++ = HPX_MOVE(tmp);
 
-                if (count == 0)
+                if constexpr (!scheduler_policy)
                 {
-                    return result::get(HPX_MOVE(dest));
+                    if (count == 0)
+                    {
+                        return result::get(HPX_MOVE(dest));
+                    }
                 }
 
                 auto f1 = [op = HPX_FORWARD(Op, op)](zip_iterator part_begin,
@@ -309,10 +316,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         });
                 };
 
-                auto f2 = [dest, count](auto&& data) mutable -> FwdIter2 {
-                    // make sure iterators embedded in function object that is
-                    // attached to futures are invalidated
-                    util::detail::clear_container(data);
+                auto f2 = [dest, count](auto&&... data) mutable -> FwdIter2 {
+                    static_assert(sizeof...(data) < 2);
+                    if constexpr (sizeof...(data) == 1)
+                    {
+                        // make sure iterators embedded in function object that
+                        // is attached to futures are invalidated
+                        util::detail::clear_container(data...);
+                    }
                     std::advance(dest, count);
                     return dest;
                 };
@@ -365,6 +376,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::adjacent_difference
     inline constexpr struct adjacent_difference_t final
@@ -399,10 +411,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter2>
-        tag_fallback_invoke(hpx::adjacent_difference_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest)
+        friend decltype(auto) tag_fallback_invoke(hpx::adjacent_difference_t,
+            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Required at least forward iterator.");
@@ -442,10 +452,9 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter2>
-        tag_fallback_invoke(hpx::adjacent_difference_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op)
+        friend decltype(auto) tag_fallback_invoke(hpx::adjacent_difference_t,
+            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
+            Op&& op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Required at least forward iterator.");
@@ -456,7 +465,6 @@ namespace hpx {
                 .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
                     HPX_FORWARD(Op, op));
         }
-
     } adjacent_difference{};
 }    // namespace hpx
 #endif

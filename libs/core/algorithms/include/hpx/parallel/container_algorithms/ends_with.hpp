@@ -297,7 +297,7 @@ namespace hpx { namespace ranges {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::copy
+    // CPO for hpx::ranges::copy
     inline constexpr struct ends_with_t final
       : hpx::functional::detail::tag_fallback<ends_with_t>
     {

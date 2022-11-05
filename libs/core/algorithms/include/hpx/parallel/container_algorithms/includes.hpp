@@ -368,7 +368,7 @@ namespace hpx { namespace ranges {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::includes
+    // CPO for hpx::ranges::includes
     inline constexpr struct includes_t final
       : hpx::detail::tag_parallel_algorithm<includes_t>
     {

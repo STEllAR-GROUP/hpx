@@ -371,7 +371,7 @@ namespace hpx { namespace ranges {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::equal
+    // CPO for hpx::equal
     inline constexpr struct equal_t final
       : hpx::detail::tag_parallel_algorithm<equal_t>
     {

@@ -258,7 +258,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::starts_with
+    // CPO for hpx::starts_with
     inline constexpr struct starts_with_t final
       : hpx::functional::detail::tag_fallback<starts_with_t>
     {

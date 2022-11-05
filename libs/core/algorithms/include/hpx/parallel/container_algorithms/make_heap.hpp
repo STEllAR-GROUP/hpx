@@ -409,7 +409,7 @@ namespace hpx { namespace ranges {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::make_heap
+    // CPO for hpx::ranges::make_heap
     inline constexpr struct make_heap_t final
       : hpx::detail::tag_parallel_algorithm<make_heap_t>
     {
