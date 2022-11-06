@@ -32,7 +32,7 @@ void test_for_each_explicit_sender_direct(
 
     namespace ex = hpx::execution::experimental;
 
-    auto rng = hpx::util::make_iterator_range(
+    auto rng = hpx::util::iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
 
     auto f = [](std::size_t& v) { v = 42; };
@@ -69,7 +69,7 @@ void test_for_each_explicit_sender_direct_async(
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
 
-    auto rng = hpx::util::make_iterator_range(
+    auto rng = hpx::util::iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
 
     auto f = [](std::size_t& v) { v = 42; };
@@ -106,7 +106,7 @@ void test_for_each_explicit_sender(Policy l, ExPolicy&& policy, IteratorTag)
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
 
-    auto rng = hpx::util::make_iterator_range(
+    auto rng = hpx::util::iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
 
     auto f = [](std::size_t& v) { v = 42; };

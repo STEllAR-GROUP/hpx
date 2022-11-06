@@ -146,7 +146,7 @@ namespace hpx { namespace util {
                     }
 
                     // returns a range of pairs
-                    return util::make_iterator_range(this->histogram_);
+                    return util::iterator_range(this->histogram_);
                 }
 
             private:

@@ -411,7 +411,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 flags[0] = false;
 
                 using hpx::get;
-                using hpx::util::make_zip_iterator;
 
                 auto f1 = [pred = HPX_FORWARD(Pred, pred),
                               proj = HPX_FORWARD(Proj, proj)](
@@ -439,7 +438,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     // HPX_UNUSED(flags);
                     HPX_UNUSED(results);
 
-                    auto part_begin = make_zip_iterator(first, flags.get());
+                    auto part_begin = zip_iterator(first, flags.get());
                     auto dest = first;
                     auto part_size = count;
 
@@ -473,8 +472,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::partitioner<ExPolicy, FwdIter, void>::call(
                     HPX_FORWARD(ExPolicy, policy),
-                    make_zip_iterator(first, flags.get()), count - 1,
-                    HPX_MOVE(f1), HPX_MOVE(f2));
+                    zip_iterator(first, flags.get()), count - 1, HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -643,7 +642,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::size_t init = 0;
 
                 using hpx::get;
-                using hpx::util::make_zip_iterator;
                 using scan_partitioner_type = util::scan_partitioner<ExPolicy,
                     unique_copy_result<FwdIter1, FwdIter2>, std::size_t>;
 
@@ -699,8 +697,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return scan_partitioner_type::call(
                     HPX_FORWARD(ExPolicy, policy),
-                    //make_zip_iterator(first, flags.get() - 1),
-                    make_zip_iterator(first, flags.get() - 1), count - 1, init,
+                    zip_iterator(first, flags.get() - 1), count - 1, init,
                     // step 1 performs first part of scan algorithm
                     HPX_MOVE(f1),
                     // step 2 propagates the partition results from left

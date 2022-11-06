@@ -13,7 +13,9 @@
 #include <utility>
 
 namespace hpx { namespace util {
+
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T, std::size_t N>
         HPX_HOST_DEVICE constexpr HPX_FORCEINLINE T* begin_impl(
@@ -76,6 +78,7 @@ namespace hpx { namespace util {
 
         ///////////////////////////////////////////////////////////////////////
         namespace range_impl {
+
             struct fallback
             {
                 template <typename T>
@@ -161,6 +164,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace range_adl {
+
         template <typename C,
             typename Iterator = typename detail::iterator<C>::type>
         HPX_HOST_DEVICE constexpr HPX_FORCEINLINE Iterator begin(C& c) noexcept(

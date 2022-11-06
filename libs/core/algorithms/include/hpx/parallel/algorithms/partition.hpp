@@ -1569,7 +1569,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 output_iterator_offset init = {0, 0};
 
                 using hpx::get;
-                using hpx::util::make_zip_iterator;
                 using scan_partitioner_type = util::scan_partitioner<ExPolicy,
                     hpx::tuple<FwdIter1, FwdIter2, FwdIter3>,
                     output_iterator_offset>;
@@ -1640,7 +1639,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return scan_partitioner_type::call(
                     HPX_FORWARD(ExPolicy, policy),
-                    make_zip_iterator(first, flags.get()), count, init,
+                    zip_iterator(first, flags.get()), count, init,
                     // step 1 performs first part of scan algorithm
                     HPX_MOVE(f1),
                     // step 2 propagates the partition results from left

@@ -133,7 +133,7 @@ std::vector<hpx::util::iterator_range<iter>> split(
     {
         iter prev = first;
         std::advance(first, (std::min)(increment, std::distance(first, last)));
-        results.push_back(hpx::util::make_iterator_range(prev, first));
+        results.push_back(hpx::util::iterator_range(prev, first));
     }
     return results;
 }

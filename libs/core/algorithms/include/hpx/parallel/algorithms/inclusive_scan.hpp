@@ -561,7 +561,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // same partitions the first step operated on.
 
                 using hpx::get;
-                using hpx::util::make_zip_iterator;
 
                 auto f3 = [op](zip_iterator part_begin, std::size_t part_size,
                               T val) mutable -> void {
@@ -578,7 +577,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::in_out_result<FwdIter1, FwdIter2>, T>::
                     call(
                         HPX_FORWARD(ExPolicy, policy),
-                        make_zip_iterator(first, dest), count, init,
+                        zip_iterator(first, dest), count, init,
                         // step 1 performs first part of scan algorithm
                         [op, last](zip_iterator part_begin,
                             std::size_t part_size) -> T {

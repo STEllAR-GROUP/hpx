@@ -18,8 +18,8 @@ int hpx_main()
 {
     std::vector<double> large(64);
 
-    auto zip_it_begin = hpx::util::make_zip_iterator(large.begin());
-    auto zip_it_end = hpx::util::make_zip_iterator(large.end());
+    auto zip_it_begin = hpx::util::zip_iterator(large.begin());
+    auto zip_it_end = hpx::util::zip_iterator(large.end());
 
     hpx::for_each(
         hpx::execution::par_simd, zip_it_begin, zip_it_end, [](auto t) {

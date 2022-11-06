@@ -296,8 +296,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return util::partitioner_with_cleanup<ExPolicy,
                 util::in_out_result<Iter, FwdIter2>, partition_result_type>::
                 call(
-                    HPX_FORWARD(ExPolicy, policy),
-                    hpx::util::make_zip_iterator(first, dest), count,
+                    HPX_FORWARD(ExPolicy, policy), zip_iterator(first, dest),
+                    count,
                     [tok](zip_iterator t, std::size_t part_size) mutable
                     -> partition_result_type {
                         using hpx::get;

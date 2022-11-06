@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,7 +30,7 @@ namespace hpx { namespace util {
     public:
         generator_iterator() = default;
 
-        generator_iterator(Generator* g)
+        explicit generator_iterator(Generator* g)
           : m_g(g)
           , m_value((*m_g)())
         {
@@ -41,12 +41,12 @@ namespace hpx { namespace util {
             m_value = (*m_g)();
         }
 
-        typename Generator::result_type const& dereference() const
+        constexpr typename Generator::result_type const& dereference() const
         {
             return m_value;
         }
 
-        bool equal(generator_iterator const& y) const
+        constexpr bool equal(generator_iterator const& y) const
         {
             return m_g == y.m_g && m_value == y.m_value;
         }
@@ -57,7 +57,10 @@ namespace hpx { namespace util {
     };
 
     template <typename Generator>
-    inline generator_iterator<Generator> make_generator_iterator(Generator& gen)
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::util::make_generator_iterator is deprecated, use "
+        "hpx::util::generator_iterator instead")
+    generator_iterator<Generator> make_generator_iterator(Generator& gen)
     {
         using result_type = generator_iterator<Generator>;
         return result_type(&gen);

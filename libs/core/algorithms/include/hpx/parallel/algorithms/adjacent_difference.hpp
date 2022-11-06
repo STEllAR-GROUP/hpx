@@ -317,11 +317,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return dest;
                 };
 
-                using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, FwdIter2, void>::call(
                     HPX_FORWARD(ExPolicy, policy),
-                    make_zip_iterator(first, prev, dest), count, HPX_MOVE(f1),
-                    HPX_MOVE(f2));
+                    hpx::util::zip_iterator(first, prev, dest), count,
+                    HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
 

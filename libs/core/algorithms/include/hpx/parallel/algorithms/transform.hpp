@@ -499,7 +499,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return util::detail::get_in_out_result(
                         util::foreach_partitioner<ExPolicy>::call(
                             HPX_FORWARD(ExPolicy, policy),
-                            hpx::util::make_zip_iterator(first, dest),
+                            hpx::util::zip_iterator(first, dest),
                             detail::distance(first, last), HPX_MOVE(f1),
                             util::projection_identity()));
                 }
@@ -710,7 +710,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return util::detail::get_in_in_out_result(
                         util::foreach_partitioner<ExPolicy>::call(
                             HPX_FORWARD(ExPolicy, policy),
-                            hpx::util::make_zip_iterator(first1, first2, dest),
+                            hpx::util::zip_iterator(first1, first2, dest),
                             detail::distance(first1, last1), HPX_MOVE(f1),
                             util::projection_identity()));
                 }
@@ -787,7 +787,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return util::detail::get_in_in_out_result(
                         util::foreach_partitioner<ExPolicy>::call(
                             HPX_FORWARD(ExPolicy, policy),
-                            hpx::util::make_zip_iterator(first1, first2, dest),
+                            hpx::util::zip_iterator(first1, first2, dest),
                             (std::min) (detail::distance(first1, last1),
                                 detail::distance(first2, last2)),
                             HPX_MOVE(f1), util::projection_identity()));

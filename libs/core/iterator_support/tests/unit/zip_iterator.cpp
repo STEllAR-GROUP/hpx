@@ -30,11 +30,12 @@ void category_test()
     std::list<int> rng1;
     std::string rng2;
 
-    hpx::util::make_zip_iterator(hpx::make_tuple(
+    auto zipiter = hpx::util::zip_iterator(hpx::make_tuple(
         // BidirectionalInput
-        hpx::util::make_transform_iterator(rng1.begin(), &to_value),
-        rng2.begin()    // RandomAccess
-        ));
+        hpx::util::transform_iterator(rng1.begin(), &to_value),
+        // RandomAccess
+        rng2.begin()));
+    (void) zipiter;
 }
 //
 
@@ -352,9 +353,9 @@ int main(void)
 
     std::vector<hpx::tuple<double, double>> vect_of_tuples(3);
 
-    std::copy(hpx::util::make_zip_iterator(
-                  hpx::make_tuple(vect1.begin(), vect2.begin())),
-        hpx::util::make_zip_iterator(hpx::make_tuple(vect1.end(), vect2.end())),
+    std::copy(
+        hpx::util::zip_iterator(hpx::make_tuple(vect1.begin(), vect2.begin())),
+        hpx::util::zip_iterator(hpx::make_tuple(vect1.end(), vect2.end())),
         vect_of_tuples.begin());
 
     HPX_TEST(42. == hpx::get<0>(*vect_of_tuples.begin()) &&

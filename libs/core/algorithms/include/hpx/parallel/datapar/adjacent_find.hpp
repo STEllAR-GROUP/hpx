@@ -42,7 +42,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             InIter next = first;
             ++next;
 
-            auto zip_iter = hpx::util::make_zip_iterator(first, next);
+            auto zip_iter = hpx::util::zip_iterator(first, next);
             std::size_t count = std::distance(first, last);
             util::cancellation_token<std::size_t> tok(count);
 

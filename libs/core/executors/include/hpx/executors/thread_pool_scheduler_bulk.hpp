@@ -747,18 +747,15 @@ namespace hpx::execution::experimental {
         if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
             // fall back to non-bulk scheduling if sync execution was requested
-            return detail::bulk_sender<Sender,
-                hpx::util::detail::counting_shape_type<Count>, F>{
-                HPX_FORWARD(Sender, sender),
-                hpx::util::detail::make_counting_shape(count),
-                HPX_FORWARD(F, f)};
+            return detail::bulk_sender<Sender, hpx::util::counting_shape<Count>,
+                F>{HPX_FORWARD(Sender, sender),
+                hpx::util::counting_shape(count), HPX_FORWARD(F, f)};
         }
         else
         {
             return detail::thread_pool_bulk_sender<Policy, Sender,
-                hpx::util::detail::counting_shape_type<Count>, F>{
-                HPX_MOVE(scheduler), HPX_FORWARD(Sender, sender),
-                hpx::util::detail::make_counting_shape(count),
+                hpx::util::counting_shape<Count>, F>{HPX_MOVE(scheduler),
+                HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
                 HPX_FORWARD(F, f)};
         }
     }

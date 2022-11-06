@@ -288,11 +288,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return first2 != last2;
                 };
 
-                using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, bool, void>::call_with_index(
-                    HPX_FORWARD(ExPolicy, policy),
-                    make_zip_iterator(first1, first2), count, 1, HPX_MOVE(f1),
-                    HPX_MOVE(f2));
+                    HPX_FORWARD(ExPolicy, policy), zip_iterator(first1, first2),
+                    count, 1, HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
         /// \endcond

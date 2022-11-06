@@ -246,7 +246,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::detail::convert_to_result(
                     for_each_n<zip_iterator>().call(
                         HPX_FORWARD(ExPolicy, policy),
-                        hpx::util::make_zip_iterator(
+                        hpx::util::zip_iterator(
                             first, destination_iterator(last2)),
                         size / 2,
                         [](reference t) -> void {

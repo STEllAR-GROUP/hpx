@@ -323,7 +323,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 part_size, tok,
                 [=, &tok, &op, &proj1, &proj2, &idx](
                     auto, std::size_t i) -> void {
-                    auto begin = hpx::util::make_zip_iterator(it + idx, first2);
+                    auto begin = hpx::util::zip_iterator(it + idx, first2);
                     ++idx;
                     util::cancellation_token<> local_tok;
                     util::loop_n<hpx::execution::simd_policy>(begin, diff,

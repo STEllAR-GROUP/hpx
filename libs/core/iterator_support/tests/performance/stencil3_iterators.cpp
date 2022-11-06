@@ -174,16 +174,15 @@ namespace hpx { namespace experimental {
                 auto prev = make_previous_transformer(begin, begin_val);
                 auto next = make_next_transformer(end, end_val);
 
-                return type(
-                    hpx::make_tuple(util::make_transform_iterator(it, prev), it,
-                        util::make_transform_iterator(it, next)));
+                return type(hpx::make_tuple(util::transform_iterator(it, prev),
+                    it, util::transform_iterator(it, next)));
             }
 
             static type create(Iterator const& it)
             {
                 return type(hpx::make_tuple(
-                    util::make_transform_iterator(it, left_transformer()), it,
-                    util::make_transform_iterator(it, right_transformer())));
+                    util::transform_iterator(it, left_transformer()), it,
+                    util::transform_iterator(it, right_transformer())));
             }
         };
     }    // namespace detail

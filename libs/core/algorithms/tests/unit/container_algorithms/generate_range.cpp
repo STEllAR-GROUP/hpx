@@ -179,7 +179,7 @@ void test_generate_exception(IteratorTag)
     try
     {
         hpx::ranges::generate(
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c))),
@@ -217,7 +217,7 @@ void test_generate_exception(ExPolicy&& policy, IteratorTag)
     try
     {
         hpx::ranges::generate(policy,
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c))),
@@ -253,7 +253,7 @@ void test_generate_exception_async(ExPolicy&& p, IteratorTag)
     try
     {
         hpx::future<void> f = hpx::ranges::generate(p,
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c))),
@@ -319,9 +319,8 @@ void test_generate_bad_alloc(ExPolicy&& policy, IteratorTag)
     try
     {
         hpx::ranges::generate(policy,
-            hpx::util::make_iterator_range(
-                decorated_iterator(
-                    std::begin(c), []() { throw std::bad_alloc(); }),
+            hpx::util::iterator_range(decorated_iterator(std::begin(c),
+                                          []() { throw std::bad_alloc(); }),
                 decorated_iterator(std::end(c))),
             gen);
         HPX_TEST(false);
@@ -354,9 +353,8 @@ void test_generate_bad_alloc_async(ExPolicy&& p, IteratorTag)
     try
     {
         hpx::future<void> f = hpx::ranges::generate(p,
-            hpx::util::make_iterator_range(
-                decorated_iterator(
-                    std::begin(c), []() { throw std::bad_alloc(); }),
+            hpx::util::iterator_range(decorated_iterator(std::begin(c),
+                                          []() { throw std::bad_alloc(); }),
                 decorated_iterator(std::end(c))),
             gen);
         returned_from_algorithm = true;

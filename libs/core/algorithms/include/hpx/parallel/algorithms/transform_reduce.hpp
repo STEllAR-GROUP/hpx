@@ -565,11 +565,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         HPX_FORWARD(Op2, op2));
                 };
 
-                using hpx::util::make_zip_iterator;
-
                 return util::partitioner<ExPolicy, T>::call(
-                    HPX_FORWARD(ExPolicy, policy),
-                    make_zip_iterator(first1, first2), count, HPX_MOVE(f1),
+                    HPX_FORWARD(ExPolicy, policy), zip_iterator(first1, first2),
+                    count, HPX_MOVE(f1),
                     [init = HPX_FORWARD(T_, init), op1 = HPX_FORWARD(Op1, op1)](
                         auto&& results) mutable -> T {
                         T ret = HPX_MOVE(init);

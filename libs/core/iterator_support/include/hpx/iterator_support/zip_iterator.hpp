@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -446,6 +446,25 @@ namespace hpx { namespace util {
     };
 
     template <typename... Ts>
+    zip_iterator(Ts const&... vs) -> zip_iterator<Ts...>;
+
+    template <typename... Ts>
+    zip_iterator(hpx::tuple<Ts...>&& vs) -> zip_iterator<Ts...>;
+
+    template <typename... Ts>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::util::make_zip_iterator is deprecated, use "
+        "hpx::util::zip_iterator instead")
+    HPX_HOST_DEVICE
+        constexpr zip_iterator<std::decay_t<Ts>...> make_zip_iterator(
+            Ts&&... vs)
+    {
+        using result_type = zip_iterator<std::decay_t<Ts>...>;
+        return result_type(HPX_FORWARD(Ts, vs)...);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename... Ts>
     class zip_iterator<hpx::tuple<Ts...>>
       : public detail::zip_iterator_base<hpx::tuple<Ts...>,
             zip_iterator<hpx::tuple<Ts...>>>
@@ -519,15 +538,6 @@ namespace hpx { namespace util {
             return *this;
         }
     };
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename... Ts>
-    HPX_HOST_DEVICE constexpr zip_iterator<std::decay_t<Ts>...>
-    make_zip_iterator(Ts&&... vs)
-    {
-        using result_type = zip_iterator<std::decay_t<Ts>...>;
-        return result_type(HPX_FORWARD(Ts, vs)...);
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ZipIter>

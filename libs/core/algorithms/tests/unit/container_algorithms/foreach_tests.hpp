@@ -42,10 +42,10 @@ void test_for_each_seq(IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
 
     counter f;
-    auto res = hpx::ranges::for_each(
-        hpx::util::make_iterator_range(
-            iterator(std::begin(c)), iterator(std::end(c))),
-        f);
+    auto res =
+        hpx::ranges::for_each(hpx::util::iterator_range(iterator(std::begin(c)),
+                                  iterator(std::end(c))),
+            f);
 
     // verify values
     std::size_t count = 0;
@@ -71,7 +71,7 @@ void test_for_each(ExPolicy&& policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
 
     iterator result = hpx::ranges::for_each(std::forward<ExPolicy>(policy),
-        hpx::util::make_iterator_range(
+        hpx::util::iterator_range(
             iterator(std::begin(c)), iterator(std::end(c))),
         [](std::size_t& v) { v = 42; });
     HPX_TEST(result == iterator(std::end(c)));
@@ -95,7 +95,7 @@ void test_for_each_async(ExPolicy&& p, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
 
     hpx::future<iterator> f = hpx::ranges::for_each(std::forward<ExPolicy>(p),
-        hpx::util::make_iterator_range(
+        hpx::util::iterator_range(
             iterator(std::begin(c)), iterator(std::end(c))),
         [](std::size_t& v) { v = 42; });
     HPX_TEST(f.get() == iterator(std::end(c)));
@@ -133,9 +133,8 @@ void test_for_each_exception_seq(IteratorTag)
     counter_exception f;
     try
     {
-        hpx::ranges::for_each(
-            hpx::util::make_iterator_range(
-                iterator(std::begin(c)), iterator(std::end(c))),
+        hpx::ranges::for_each(hpx::util::iterator_range(iterator(std::begin(c)),
+                                  iterator(std::end(c))),
             f);
 
         HPX_TEST(false);
@@ -168,7 +167,7 @@ void test_for_each_exception(ExPolicy&& policy, IteratorTag)
     try
     {
         hpx::ranges::for_each(policy,
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
             [](std::size_t&) { throw std::runtime_error("test"); });
 
@@ -201,7 +200,7 @@ void test_for_each_exception_async(ExPolicy&& p, IteratorTag)
     try
     {
         hpx::future<iterator> f = hpx::ranges::for_each(p,
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
             [](std::size_t&) { throw std::runtime_error("test"); });
         returned_from_algorithm = true;
@@ -247,9 +246,8 @@ void test_for_each_bad_alloc_seq(IteratorTag)
     counter_bad_alloc f;
     try
     {
-        hpx::ranges::for_each(
-            hpx::util::make_iterator_range(
-                iterator(std::begin(c)), iterator(std::end(c))),
+        hpx::ranges::for_each(hpx::util::iterator_range(iterator(std::begin(c)),
+                                  iterator(std::end(c))),
             f);
 
         HPX_TEST(false);
@@ -282,7 +280,7 @@ void test_for_each_bad_alloc(ExPolicy&& policy, IteratorTag)
     try
     {
         hpx::ranges::for_each(policy,
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
             [](std::size_t&) { throw std::bad_alloc(); });
 
@@ -314,7 +312,7 @@ void test_for_each_bad_alloc_async(ExPolicy&& p, IteratorTag)
     try
     {
         hpx::future<iterator> f = hpx::ranges::for_each(p,
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
             [](std::size_t&) { throw std::bad_alloc(); });
         returned_from_algorithm = true;
@@ -347,7 +345,7 @@ void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
 
-    auto rng = hpx::util::make_iterator_range(
+    auto rng = hpx::util::iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
     auto f = [](std::size_t& v) { v = 42; };
 
@@ -379,7 +377,7 @@ void test_for_each_exception_sender(Policy l, ExPolicy&& p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto rng = hpx::util::make_iterator_range(
+    auto rng = hpx::util::iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
     auto f = [](std::size_t&) { throw std::runtime_error("test"); };
 
@@ -418,7 +416,7 @@ void test_for_each_bad_alloc_sender(Policy l, ExPolicy&& p, IteratorTag)
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    auto rng = hpx::util::make_iterator_range(
+    auto rng = hpx::util::iterator_range(
         iterator(std::begin(c)), iterator(std::end(c)));
     auto f = [](std::size_t&) { throw std::bad_alloc(); };
 

@@ -138,7 +138,7 @@ void test_transform_exception(IteratorTag)
     try
     {
         hpx::ranges::transform(
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
             std::begin(d),
             [](std::size_t v) { return throw std::runtime_error("test"), v; });
@@ -176,7 +176,7 @@ void test_transform_exception(ExPolicy policy, IteratorTag)
     try
     {
         hpx::ranges::transform(policy,
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
             std::begin(d),
             [](std::size_t v) { return throw std::runtime_error("test"), v; });
@@ -211,7 +211,7 @@ void test_transform_exception_async(ExPolicy p, IteratorTag)
     try
     {
         auto f = hpx::ranges::transform(p,
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
             std::begin(d),
             [](std::size_t v) { return throw std::runtime_error("test"), v; });
@@ -274,7 +274,7 @@ void test_transform_bad_alloc(ExPolicy policy, IteratorTag)
     try
     {
         hpx::ranges::transform(policy,
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
             std::begin(d),
             [](std::size_t v) { return throw std::bad_alloc(), v; });
@@ -308,7 +308,7 @@ void test_transform_bad_alloc_async(ExPolicy p, IteratorTag)
     try
     {
         auto f = hpx::ranges::transform(p,
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 iterator(std::begin(c)), iterator(std::end(c))),
             std::begin(d),
             [](std::size_t v) { return throw std::bad_alloc(), v; });

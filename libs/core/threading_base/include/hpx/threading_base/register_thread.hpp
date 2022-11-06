@@ -38,6 +38,7 @@ namespace hpx { namespace threads {
     ///       \a threads#register_thread_plain
     ///
     namespace detail {
+
         template <typename F>
         struct thread_function
         {
@@ -98,14 +99,13 @@ namespace hpx { namespace threads {
     template <typename F>
     thread_function_type make_thread_function(F&& f)
     {
-        return {detail::thread_function<typename std::decay<F>::type>{
-            HPX_FORWARD(F, f)}};
+        return {detail::thread_function<std::decay_t<F>>{HPX_FORWARD(F, f)}};
     }
 
     template <typename F>
     thread_function_type make_thread_function_nullary(F&& f)
     {
-        return {detail::thread_function_nullary<typename std::decay<F>::type>{
+        return {detail::thread_function_nullary<std::decay_t<F>>{
             HPX_FORWARD(F, f)}};
     }
 

@@ -143,8 +143,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             using reference = typename zip_iterator::reference;
 
             return get_iter_in_in_result(for_each_n<zip_iterator>().call(
-                HPX_FORWARD(ExPolicy, policy),
-                hpx::util::make_zip_iterator(first1, first2), n,
+                HPX_FORWARD(ExPolicy, policy), zip_iterator(first1, first2), n,
                 [](reference t) -> void {
                     using hpx::get;
                     std::swap(get<0>(t), get<1>(t));

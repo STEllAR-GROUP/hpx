@@ -53,7 +53,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             auto count = hpx::parallel::v1::detail::distance(first1, last1);
             util::cancellation_token<std::size_t> tok(count);
-            call(0, hpx::util::make_zip_iterator(first1, first2), count, tok,
+            call(0, hpx::util::zip_iterator(first1, first2), count, tok,
                 HPX_FORWARD(F, f));
             std::size_t mismatched = tok.get_data();
 
@@ -150,7 +150,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             auto count = hpx::parallel::v1::detail::distance(first1, last1);
 
             util::cancellation_token<std::size_t> tok(count);
-            call1(0, hpx::util::make_zip_iterator(first1, first2), count, tok,
+            call1(0, hpx::util::zip_iterator(first1, first2), count, tok,
                 HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
                 HPX_FORWARD(Proj2, proj2));
             std::size_t mismatched = tok.get_data();

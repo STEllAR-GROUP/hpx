@@ -310,7 +310,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
 
                 using hpx::get;
-                using hpx::util::make_zip_iterator;
 
                 // Note: replacing the invoke() with HPX_INVOKE()
                 // below makes gcc generate errors
@@ -332,7 +331,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               auto&& results) mutable -> Iter {
                     HPX_UNUSED(results);
 
-                    auto part_begin = make_zip_iterator(first, flags.get());
+                    auto part_begin = zip_iterator(first, flags.get());
                     auto dest = first;
                     auto part_size = count;
 
@@ -365,7 +364,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::partitioner<ExPolicy, Iter, void>::call(
                     HPX_FORWARD(ExPolicy, policy),
-                    make_zip_iterator(first, flags.get()), count, HPX_MOVE(f1),
+                    zip_iterator(first, flags.get()), count, HPX_MOVE(f1),
                     HPX_MOVE(f2));
             }
         };
