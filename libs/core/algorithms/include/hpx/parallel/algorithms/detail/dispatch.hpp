@@ -149,7 +149,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     local_result_type>;
 
-            auto exec = policy.executor();    // avoid move after use
+            decltype(auto) exec = policy.executor();    // avoid use after move
             if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
             {
                 // specialization for all task-based (asynchronous) execution
@@ -157,20 +157,18 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
                 // run the launched task on the requested executor
                 return result_handler::get(execution::async_execute(
-                    HPX_MOVE(exec), derived(), HPX_FORWARD(ExPolicy, policy),
-                    HPX_FORWARD(Args, args)...));
+                    exec, derived(), policy, HPX_FORWARD(Args, args)...));
             }
             else if constexpr (std::is_void_v<local_result_type>)
             {
-                execution::sync_execute(HPX_MOVE(exec), derived(),
-                    HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Args, args)...);
+                execution::sync_execute(
+                    exec, derived(), policy, HPX_FORWARD(Args, args)...);
                 return result_handler::get();
             }
             else
             {
                 return result_handler::get(execution::sync_execute(
-                    HPX_MOVE(exec), derived(), HPX_FORWARD(ExPolicy, policy),
-                    HPX_FORWARD(Args, args)...));
+                    exec, derived(), policy, HPX_FORWARD(Args, args)...));
             }
         }
 

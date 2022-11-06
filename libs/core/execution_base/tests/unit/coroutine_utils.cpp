@@ -54,7 +54,10 @@ struct promise
 template <typename Awaiter>
 struct awaitable_sender_1
 {
-    Awaiter operator co_await();
+    Awaiter operator co_await()
+    {
+        return Awaiter{};
+    }
 };
 
 struct awaiter
@@ -184,11 +187,11 @@ int main()
     try
     {
         // Awaitables are implicitly senders:
-        auto [i] = hpx::this_thread::experimental::sync_wait(
+        auto i = hpx::this_thread::experimental::sync_wait(
             async_answer(hpx::execution::experimental::just(42),
                 hpx::execution::experimental::just()))
-                       .value();
-        std::cout << "The answer is " << i << '\n';
+                     .value();
+        std::cout << "The answer is " << hpx::get<0>(i) << '\n';
     }
     catch (std::exception& e)
     {
