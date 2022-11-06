@@ -48,8 +48,10 @@ namespace hpx { namespace threads { namespace policies {
       , background_thread_count_(0)
       , polling_function_mpi_(&null_polling_function)
       , polling_function_cuda_(&null_polling_function)
+      , polling_function_sycl_(&null_polling_function)
       , polling_work_count_function_mpi_(&null_polling_work_count_function)
       , polling_work_count_function_cuda_(&null_polling_work_count_function)
+      , polling_work_count_function_sycl_(&null_polling_work_count_function)
     {
         set_scheduler_mode(mode);
 

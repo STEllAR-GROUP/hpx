@@ -10,13 +10,13 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(async_sycl_headers)
+set(async_sycl_headers hpx/async_sycl/detail/sycl_event_callback.hpp)
 
 # cmake-format: off
 set(async_sycl_compat_headers)
 # cmake-format: on
 
-set(async_sycl_sources)
+set(async_sycl_sources sycl_event_callback.cpp)
 
 hpx_info("Building HPX SYCL Module")
 
@@ -41,3 +41,9 @@ add_hpx_module(
     hpx_threading_base
   CMAKE_SUBDIRS examples tests
 )
+# make it compile with sycl
+if(HPX_WITH_HIPSYCL)
+add_sycl_to_target(TARGET hpx_async_sycl SOURCES ${async_sycl_sources})
+else()
+target_compile_options(hpx_async_sycl PUBLIC -fsycl)
+endif()

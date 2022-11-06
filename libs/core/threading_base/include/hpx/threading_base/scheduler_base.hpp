@@ -335,6 +335,22 @@ namespace hpx { namespace threads { namespace policies {
                 &null_polling_work_count_function, std::memory_order_relaxed);
         }
 
+        void set_sycl_polling_functions(polling_function_ptr sycl_func,
+            polling_work_count_function_ptr sycl_work_count_func)
+        {
+            polling_function_sycl_.store(sycl_func, std::memory_order_relaxed);
+            polling_work_count_function_sycl_.store(
+                sycl_work_count_func, std::memory_order_relaxed);
+        }
+
+        void clear_sycl_polling_function()
+        {
+            polling_function_sycl_.store(
+                &null_polling_function, std::memory_order_relaxed);
+            polling_work_count_function_sycl_.store(
+                &null_polling_work_count_function, std::memory_order_relaxed);
+        }
+
         detail::polling_status custom_polling_function() const
         {
             detail::polling_status status = detail::polling_status::idle;
@@ -352,6 +368,13 @@ namespace hpx { namespace threads { namespace policies {
                 status = detail::polling_status::busy;
             }
 #endif
+#if defined(HPX_HAVE_MODULE_ASYNC_SYCL)
+            if ((*polling_function_sycl_.load(std::memory_order_relaxed))() ==
+                detail::polling_status::busy)
+            {
+                status = detail::polling_status::busy;
+            }
+#endif
             return status;
         }
 
@@ -364,6 +387,10 @@ namespace hpx { namespace threads { namespace policies {
 #endif
 #if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
             work_count += polling_work_count_function_cuda_.load(
+                std::memory_order_relaxed)();
+#endif
+#if defined(HPX_HAVE_MODULE_ASYNC_SYCL)
+            work_count += polling_work_count_function_sycl_.load(
                 std::memory_order_relaxed)();
 #endif
             return work_count;
@@ -403,10 +430,13 @@ namespace hpx { namespace threads { namespace policies {
 
         std::atomic<polling_function_ptr> polling_function_mpi_;
         std::atomic<polling_function_ptr> polling_function_cuda_;
+        std::atomic<polling_function_ptr> polling_function_sycl_;
         std::atomic<polling_work_count_function_ptr>
             polling_work_count_function_mpi_;
         std::atomic<polling_work_count_function_ptr>
             polling_work_count_function_cuda_;
+        std::atomic<polling_work_count_function_ptr>
+            polling_work_count_function_sycl_;
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:

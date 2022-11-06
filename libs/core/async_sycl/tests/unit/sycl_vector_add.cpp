@@ -5,24 +5,25 @@
 #include <hpx/hpx_init.hpp> 
 #if defined(HPX_HAVE_SYCL)
 
+
+#include <hpx/async_sycl/sycl_event_pool.hpp> 
+#include <CL/sycl.hpp> 
+
 // Check compiler compatability
+// Needs to be done AFTER sycl include for HipSYCL
+// (intel dpcpp would be fine without the include)
 #if defined(SYCL_LANGUAGE_VERSION)
 #pragma message("OKAY: Sycl compiler detected...")
 #if defined(__INTEL_LLVM_COMPILER)
 #pragma message("OKAY: Intel dpcpp detected!")
 #elif defined(__HIPSYCL__)
-#warning("HIPSycl syclcc compiler detected!")
-// TODO Fix compilation with hipsycl
-// Technically it should be possible to substitute -fno-sycl flag with --hipsycl-platform=cpu
-// and keep the rest the same
-// See: syclcc --help
-// and https://github.com/illuhad/hipSYCL/blob/develop/doc/macros.md
-#error("Support for hipsycl not yet implemented!")
+#pragma message("OKAY: HIPSycl compiler detected!")
 #else
-#warning("Non-Intel compiler have not yet been tested with the HPX Sycl integration...")
+#warning("HPX-SYCL integration only tested with Intel oneapi and HipSYCL. \
+Utilized compiler appears to be neither of those!")
 #endif
 #else
-//#error("Compiler does not seem to support SYCL! SYCL_LANGUAGE_VERSION is undefined!")
+#error("Compiler does not seem to support SYCL! SYCL_LANGUAGE_VERSION is undefined!")
 #endif
 
 // Check for separate compiler host and device passes
@@ -32,14 +33,16 @@
 #pragma message("OKAY: Sycl compiler with two or more compile passes detected")
 #endif
 
-
 #if defined(__SYCL_DEVICE_ONLY__)
 #pragma message("Sycl device pass...")
 #else
 #pragma message("Sycl host pass...")
 #endif
 
+
 #if defined(__HIPSYCL__) 
+// Lots of warning within the hipsycl headers
+// To compiler with Werror we need to disable those
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-copy"
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -53,9 +56,6 @@
 #pragma clang diagnostic ignored "-Wreorder-ctor"
 #endif
 
-#include <hpx/async_sycl/sycl_event_pool.hpp> 
-#include <CL/sycl.hpp> 
-
 
 
 
@@ -65,7 +65,7 @@ using namespace cl::sycl;
 using namespace sycl;
 #endif
 
-constexpr size_t vector_size = 1000000;
+constexpr size_t vector_size = 2000000;
 
 void VectorAdd(queue& q, const std::vector<int>& a_vector,
     const std::vector<int>& b_vector, std::vector<int>& add_parallel)
@@ -85,7 +85,7 @@ void VectorAdd(queue& q, const std::vector<int>& a_vector,
       buffer b_buf(b_vector.data(), num_items);
       buffer add_buf(add_parallel.data(), num_items);
 
-      my_kernel_event = q.submit([&](handler& h) {
+      event tmp_event = q.submit([&](handler& h) {
           // Tell sycl we'd like to access our buffers here
           accessor a(a_buf, h, read_only);
           accessor b(b_buf, h, read_only);
@@ -95,9 +95,12 @@ void VectorAdd(queue& q, const std::vector<int>& a_vector,
           // Note: destruction of the accessors should not cause a device->host
           // memcpy (I think...)
       });
+      my_kernel_event = tmp_event;
       // simulate get_future
+      // As far as I'm aware there's no functionality to use "my own" SYCL events so I have to rely
+      // on whatever the runtime API returns to me OR submit dummy kernels..
       my_kernel_event2 = q.submit([&](handler& h) {
-          h.parallel_for(range<1>{1}, [=](auto i) { });
+          h.parallel_for(range<1>{1}, [=](auto i) {volatile int do_not_optimize = 1; });
           });
       // should be running
       const auto event_status =
@@ -128,6 +131,15 @@ int hpx_main(int, char**)
 {
     std::cout << "Starting HPX main" << std::endl;
 
+    // Stupid check, but without that macro defined event polling won't work
+    // Might as well make sure...
+#if defined(HPX_HAVE_MODULE_ASYNC_SYCL)
+    std::cerr << "Okay: HPX_HAVE_MODULE_ASYNC_SYCL is defined!" << std::endl;
+#else
+    std::cerr << "Error: HPX_HAVE_MODULE_ASYNC_SYCL is defined!" << std::endl;
+    return -1;
+#endif
+
     // Select default sycl device
     default_selector d_selector;
 
@@ -136,8 +148,8 @@ int hpx_main(int, char**)
         add_sequential(vector_size), add_parallel(vector_size);
     for (size_t i = 0; i < a.size(); i++)
     {
-        a.at(i) = i;
-        b.at(i) = i;
+        a.at(i) = static_cast<int>(i);
+        b.at(i) = static_cast<int>(i);
     }
 
     try
@@ -167,7 +179,7 @@ int hpx_main(int, char**)
     {
         if (add_parallel.at(i) != add_sequential.at(i))
         {
-            std::cout << "Vector add failed on device.\n ";
+            std::cerr << "Vector add failed on device.\n ";
             return -1;
         }
     }
