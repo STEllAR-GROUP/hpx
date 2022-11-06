@@ -57,7 +57,7 @@ namespace hpx::execution::experimental {
             return [f = HPX_FORWARD(F, f),
                        t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
                        auto i, auto&& predecessor, auto& v) mutable {
-                v[i] = hpx::util::invoke_fused(
+                v[i] = hpx::invoke_fused(
                     hpx::bind_front(HPX_FORWARD(F, f), i,
                         HPX_FORWARD(decltype(predecessor), predecessor)),
                     HPX_MOVE(t));

@@ -77,7 +77,7 @@ namespace hpx::execution::experimental {
             void operator()(Ts const& ts) noexcept
             {
                 // FIXME: check whether it is ok to move the receiver
-                hpx::util::invoke_fused(
+                hpx::invoke_fused(
                     hpx::bind_front(hpx::execution::experimental::set_value,
                         HPX_MOVE(receiver)),
                     ts);

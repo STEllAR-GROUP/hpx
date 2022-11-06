@@ -68,7 +68,7 @@ struct external_future_executor
             [&]() {
                 if constexpr (is_void)
                 {
-                    hpx::util::invoke_fused(
+                    hpx::invoke_fused(
                         std::forward<F>(f), std::forward<Futures>(futures));
 
                     // Signal completion from another thread/task.
@@ -82,7 +82,7 @@ struct external_future_executor
                 }
                 else
                 {
-                    auto&& r = hpx::util::invoke_fused(
+                    auto&& r = hpx::invoke_fused(
                         std::forward<F>(f), std::forward<Futures>(futures));
 
                     // Signal completion from another thread/task.
@@ -147,7 +147,7 @@ struct external_future_additional_argument_executor
                 additional_argument a{};
                 if constexpr (is_void)
                 {
-                    hpx::util::invoke_fused(std::forward<F>(f),
+                    hpx::invoke_fused(std::forward<F>(f),
                         hpx::tuple_cat(
                             hpx::tie(a), std::forward<Futures>(futures)));
 
@@ -162,7 +162,7 @@ struct external_future_additional_argument_executor
                 }
                 else
                 {
-                    auto&& r = hpx::util::invoke_fused(std::forward<F>(f),
+                    auto&& r = hpx::invoke_fused(std::forward<F>(f),
                         hpx::tuple_cat(
                             hpx::tie(a), std::forward<Futures>(futures)));
 

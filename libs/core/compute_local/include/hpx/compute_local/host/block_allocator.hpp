@@ -161,7 +161,7 @@ namespace hpx { namespace compute { namespace host {
                                 [&arguments, p](iterator_type it) {
                                     using hpx::util::functional::
                                         placement_new_one;
-                                    hpx::util::invoke_fused(
+                                    hpx::invoke_fused(
                                         placement_new_one<U>(p + *it),
                                         arguments);
                                 },

@@ -175,7 +175,7 @@ private:
         // invoke a function with the unwrapped tuple future types to demonstrate
         // that we can access them
         std::cout << "when_all(fut) : tuple       : ";
-        util::invoke_fused(
+        hpx::invoke_fused(
             [](const auto&... ts) {
                 std::cout << print_type<decltype(ts)...>(" | ") << "\n";
             },
@@ -220,7 +220,7 @@ private:
         // invoke a function with the unwrapped tuple future types to demonstrate
         // that we can access them
         std::cout << "dataflow      : tuple       : ";
-        util::invoke_fused(
+        hpx::invoke_fused(
             [](const auto&... ts) {
                 std::cout << print_type<decltype(ts)...>(" | ") << "\n";
             },

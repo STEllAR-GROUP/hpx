@@ -500,8 +500,7 @@ namespace hpx { namespace execution { namespace experimental {
             struct thread_function_helper
             {
                 using argument_pack_type = std::decay_t<Tuple>;
-                using index_pack_type =
-                    hpx::util::detail::fused_index_pack_t<Tuple>;
+                using index_pack_type = hpx::detail::fused_index_pack_t<Tuple>;
 
                 template <std::size_t... Is_, typename F_, typename A_,
                     typename Tuple_>
