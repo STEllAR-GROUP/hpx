@@ -1,12 +1,20 @@
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <cstdlib>
 #include <iostream> 
 #include <string> 
 #include <vector>
+#include "hpx/futures/future.hpp"
 
 #include <hpx/hpx_init.hpp> 
+#include <hpx/local/future.hpp>
 #if defined(HPX_HAVE_SYCL)
 
 
 #include <hpx/async_sycl/sycl_event_pool.hpp> 
+#include <hpx/async_sycl/sycl_future.hpp> 
 #include <CL/sycl.hpp> 
 
 // Check compiler compatability
@@ -88,6 +96,24 @@ void VectorAdd(cl::sycl::queue& q, const std::vector<int>& a_vector,
           // memcpy (I think...)
       });
       my_kernel_event = tmp_event;
+      hpx::future<void> my_kernel_future =
+          hpx::sycl::experimental::detail::get_future(q, my_kernel_event);
+      if (my_kernel_future.is_ready())
+      {
+        std::cerr << "ERROR: Async Kernel Launch is immediately ready " 
+          << "(thus probably not asynchronous at at all!" << std::endl;
+        exit(1); // exit failure
+      } else {
+        std::cout<< "OKAY: Kernel started asynchronousely" << std::endl;
+      }
+      auto continuation_future = my_kernel_future.then([](auto && fut) {
+          fut.get();
+          std::cout << "OKAY: Continuation working!" << std::endl;
+          return;
+          });
+      continuation_future.get();
+
+      /* my_kernel_future.get(); */
       // simulate get_future
       // As far as I'm aware there's no functionality to use "my own" SYCL events so I have to rely
       // on whatever the runtime API returns to me OR submit dummy kernels..
@@ -124,14 +150,18 @@ int hpx_main(int, char**)
 {
     std::cout << "Starting HPX main" << std::endl;
 
-    // Stupid check, but without that macro defined event polling won't work
+    // Kind of superfluous check, but without that macro defined event polling won't work
     // Might as well make sure...
 #if defined(HPX_HAVE_MODULE_ASYNC_SYCL)
-    std::cerr << "Okay: HPX_HAVE_MODULE_ASYNC_SYCL is defined!" << std::endl;
+    std::cerr << "OKAY: HPX_HAVE_MODULE_ASYNC_SYCL is defined!" << std::endl;
 #else
     std::cerr << "Error: HPX_HAVE_MODULE_ASYNC_SYCL is defined!" << std::endl;
     return -1;
 #endif
+
+    // Enable polling for the future
+    hpx::sycl::experimental::detail::register_polling(hpx::resource::get_thread_pool(0));
+    std::cout << "SYCL Future polling enabled!\n";
 
     // Select default sycl device
     cl::sycl::default_selector d_selector;
@@ -197,6 +227,10 @@ int hpx_main(int, char**)
     add_parallel.clear();
 
     std::cout << "Vector add successful.\n";
+    // Disable polling
+    std::cout << "Disabling SYCL future polling.\n";
+    hpx::sycl::experimental::detail::unregister_polling(hpx::resource::get_thread_pool(0));
+
     std::cout << "Finalizing HPX main" << std::endl;
     return hpx::finalize();
 }

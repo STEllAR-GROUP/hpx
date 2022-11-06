@@ -19,7 +19,6 @@
 #include <utility>
 #include <vector>
 
-#include <CL/sycl.hpp> 
 #include <hpx/async_sycl/detail/sycl_event_callback.hpp>
 #if defined(__HIPSYCL__) 
 // Lots of warning within the hipsycl headers
@@ -36,6 +35,7 @@
 #pragma clang diagnostic ignored "-Wmismatched-tags"
 #pragma clang diagnostic ignored "-Wreorder-ctor"
 #endif
+#ifndef __SYCL_DEVICE_ONLY__
 
 namespace hpx { namespace sycl { namespace experimental { namespace detail {
 
@@ -122,21 +122,39 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     // Adds an event to the queue by submitting a SYCL dummy kernel and using
     // its return event
     void add_event_callback(
-        event_callback_function_type&& f, cl::sycl::queue queue)
+        event_callback_function_type&& f, cl::sycl::queue command_queue)
     {
         // The SYCL standard does not include a eventRecord method 
         // Instead we have to submit some dummy function and use the event the launch returns
-        cl::sycl::event event = queue.submit([&](cl::sycl::handler& h) {
+        cl::sycl::event event = command_queue.submit([&](cl::sycl::handler& h) {
             h.parallel_for(cl::sycl::range<1>{1}, [=](auto i) {});
             });
         detail::add_to_event_callback_queue(event_callback{event, HPX_MOVE(f)});
+
+#if defined(__HIPSYCL__) 
+        // See https://github.com/illuhad/hipSYCL/issues/599 for why we need to flush
+        // See https://github.com/illuhad/hipSYCL/pull/749 for API change: 
+        //
+        // The latter PR also dictates our minimal required hipsycl version.
+        //
+        // We COULD support older hipsycl version by using an API switch depending on the
+        // hipsycl version but since we do not need to support any old SYCL code I do not
+        // see a reason for doing so.
+        command_queue.get_context().hipSYCL_runtime()->dag().flush_async();
+#endif
     }
 
-    // Adds an event directly to the queue without submitting a SYCL dummy kernel
+    // Adds an event callback directly for a given event 
+    // (event needs to be from the queue in question when using hipsycl)
     void add_event_callback(
-        event_callback_function_type&& f, cl::sycl::event event)
+        event_callback_function_type&& f, cl::sycl::queue command_queue,
+        cl::sycl::event event)
     {
         detail::add_to_event_callback_queue(event_callback{event, HPX_MOVE(f)});
+
+#if defined(__HIPSYCL__) 
+        command_queue.get_context().hipSYCL_runtime()->dag().flush_async();
+#endif
     }
 
     // -------------------------------------------------------------
@@ -268,3 +286,4 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
         sched->clear_sycl_polling_function();
     }
 }}}}    // namespace hpx::sycl::experimental::detail
+#endif

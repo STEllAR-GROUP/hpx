@@ -12,6 +12,9 @@
 
 #include <string>
 
+// TODO(daissgr) Really include this here? This will spill into user code (but is sort of required?)
+#include <CL/sycl.hpp> 
+
 namespace hpx { namespace sycl { namespace experimental { namespace detail {
 
     /// Type of the event_callback function used. Unlike the CUDA counterpart we are
@@ -30,7 +33,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
      * hpx::future representing the completion of an asynchronous SYCL kernel call.
     */
     HPX_CORE_EXPORT void add_event_callback(
-        event_callback_function_type&& f, cl::sycl::queue stream);
+        event_callback_function_type&& f, cl::sycl::queue command_queue);
 
     /// Add callback to be called when all commands up to and including
     /// the passed event are done
@@ -40,9 +43,11 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
      * When done, the callback function f will be called.
      * Intended to be used with a callback function that sets the future data of an
      * hpx::future representing the completion of an asynchronous SYCL kernel call.
+     * NOTE: For hipsycl it is required to flush the internal DAG of the queue, the event
+     * thus should be assiociated with the passed queue
     */
-    HPX_CORE_EXPORT void add_event_callback(
-        event_callback_function_type&& f, cl::sycl::event event);
+    HPX_CORE_EXPORT void add_event_callback(event_callback_function_type&& f,
+        cl::sycl::queue command_queue, cl::sycl::event event);
 
     /// Register SYCL event polling function with the scheduler (see scheduler_base.hpp)
     HPX_CORE_EXPORT void register_polling(hpx::threads::thread_pool_base& pool);

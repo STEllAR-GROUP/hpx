@@ -16,7 +16,7 @@ set(async_sycl_headers hpx/async_sycl/detail/sycl_event_callback.hpp)
 set(async_sycl_compat_headers)
 # cmake-format: on
 
-set(async_sycl_sources sycl_event_callback.cpp)
+set(async_sycl_sources sycl_event_callback.cpp sycl_future.cpp)
 
 hpx_info("Building HPX SYCL Module")
 
