@@ -57,8 +57,8 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
 #endif
 
     // -------------------------------------------------------------
-    // Holds a SYCL event and a callback. The callback is intended to be called when
-    // the event is ready.
+    /// Holds a SYCL event and a callback. The callback is intended to be called when
+    /// the event is ready.
     struct event_callback
     {
         cl::sycl::event event;
@@ -66,42 +66,42 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     };
 
     // -------------------------------------------------------------
-    // Event_callbacks are added using a concurrent queue
-    // and stored in a callback vector for later checking
+    /// Event_callbacks are added using a concurrent queue
     using event_callback_queue_type =
         concurrency::ConcurrentQueue<event_callback>;
+    /// Event_callbacks stored in a callback vector for later checking 
     using event_callback_vector_type = std::vector<event_callback>;
-    // Access to (static) event callback vector containing unfinished events
+    /// Access to (static) event callback vector containing unfinished events
     event_callback_vector_type& get_event_callback_vector()
     {
         static event_callback_vector_type event_callback_vector;
         return event_callback_vector;
     }
 
-    // Access to (static) event callback queue containing unfinished events
+    /// Access to (static) event callback queue containing unfinished events
     event_callback_queue_type& get_event_callback_queue()
     {
         static event_callback_queue_type event_callback_queue;
         return event_callback_queue;
     }
 
-    // Get the rough number of events (required by get_work_count() functionality)
+    /// Get the rough number of events (required by get_work_count() functionality)
     std::size_t get_number_of_enqueued_events()
     {
         return get_event_callback_queue().size_approx();
     }
 
-    // Get the number of events (required by get_work_count() functionality)
+    /// Get the number of events (required by get_work_count() functionality)
     std::size_t get_number_of_active_events()
     {
         return get_event_callback_vector().size();
     }
-    // Add event_callback into queue for checking
+    /// Add event_callback into queue for checking
     void add_to_event_callback_queue(event_callback&& continuation)
     {
         HPX_ASSERT_MSG(get_register_polling_count() != 0,
-            "CUDA event polling has not been enabled on any pool. Make sure "
-            "that CUDA event polling is enabled on at least one thread pool.");
+            "SYCL event polling has not been enabled on any pool. Make sure "
+            "that SYCL event polling is enabled on at least one thread pool.");
 
         get_event_callback_queue().enqueue(HPX_MOVE(continuation));
 
@@ -144,6 +144,20 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     // poll (checks if any event in the vector/queue is done and calls its callback
     // get_work_count (how many unfinished events are left (approx)
     
+    /// Check for completed SYCL events and call their associated callbacks.
+    /** This methods trys to get the lock for the callback vector. 
+     * If unsuccessful it will exit as another thread is already polling.
+     * If successful it will first check the event_callback_vector for
+     * any events that are completed/finished and call their respective callbacks.
+     * Afterwards the queue is checked: If an event here is done, the callback
+     * will also be invoked. Otherwise the assiocated event_callback is added to
+     * the callback vector to be checked a later time.
+     *
+     * Unlike the CUDA counterpart, no event pool is used here since we have to work
+     * with the SYCL events directly returned form the SYCL runtime
+     * (as there is no syclEventRecord). We have to trust in the respective SYCL 
+     * implementation to use an event pool internally.
+     */
     hpx::threads::policies::detail::polling_status poll()
     {
         using hpx::threads::policies::detail::polling_status;
@@ -198,6 +212,8 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
                                                      polling_status::busy;
     }
 
+    /// Gets the number of events left in the vector (if not locked by another thread) in
+    /// addition the the approximated number of events in the queue
     std::size_t get_work_count()
     {
         std::size_t work_count = 0;
@@ -215,6 +231,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     }
 
     // -------------------------------------------------------------
+    /// Register SYCL event polling function with the scheduler (see scheduler_base.hpp)
     void register_polling(hpx::threads::thread_pool_base& pool)
     {
 #if defined(HPX_DEBUG)
@@ -226,6 +243,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     }
 
     // -------------------------------------------------------------
+    /// Unregister SYCL event polling function -- only use when all kernels are done
     void unregister_polling(hpx::threads::thread_pool_base& pool)
     {
 #if defined(HPX_DEBUG)
