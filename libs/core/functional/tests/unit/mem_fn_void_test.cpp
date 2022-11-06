@@ -143,95 +143,95 @@ int main()
 
     std::shared_ptr<X> sp(new X);
 
-    hpx::util::mem_fn (&X::f0)(x);
-    hpx::util::mem_fn (&X::f0)(&x);
-    hpx::util::mem_fn (&X::f0)(sp);
+    hpx::mem_fn (&X::f0)(x);
+    hpx::mem_fn (&X::f0)(&x);
+    hpx::mem_fn (&X::f0)(sp);
 
-    hpx::util::mem_fn (&X::g0)(x);
-    hpx::util::mem_fn (&X::g0)(rcx);
-    hpx::util::mem_fn (&X::g0)(&x);
-    hpx::util::mem_fn (&X::g0)(pcx);
-    hpx::util::mem_fn (&X::g0)(sp);
+    hpx::mem_fn (&X::g0)(x);
+    hpx::mem_fn (&X::g0)(rcx);
+    hpx::mem_fn (&X::g0)(&x);
+    hpx::mem_fn (&X::g0)(pcx);
+    hpx::mem_fn (&X::g0)(sp);
 
-    hpx::util::mem_fn (&X::f1)(x, 1);
-    hpx::util::mem_fn (&X::f1)(&x, 1);
-    hpx::util::mem_fn (&X::f1)(sp, 1);
+    hpx::mem_fn (&X::f1)(x, 1);
+    hpx::mem_fn (&X::f1)(&x, 1);
+    hpx::mem_fn (&X::f1)(sp, 1);
 
-    hpx::util::mem_fn (&X::g1)(x, 1);
-    hpx::util::mem_fn (&X::g1)(rcx, 1);
-    hpx::util::mem_fn (&X::g1)(&x, 1);
-    hpx::util::mem_fn (&X::g1)(pcx, 1);
-    hpx::util::mem_fn (&X::g1)(sp, 1);
+    hpx::mem_fn (&X::g1)(x, 1);
+    hpx::mem_fn (&X::g1)(rcx, 1);
+    hpx::mem_fn (&X::g1)(&x, 1);
+    hpx::mem_fn (&X::g1)(pcx, 1);
+    hpx::mem_fn (&X::g1)(sp, 1);
 
-    hpx::util::mem_fn (&X::f2)(x, 1, 2);
-    hpx::util::mem_fn (&X::f2)(&x, 1, 2);
-    hpx::util::mem_fn (&X::f2)(sp, 1, 2);
+    hpx::mem_fn (&X::f2)(x, 1, 2);
+    hpx::mem_fn (&X::f2)(&x, 1, 2);
+    hpx::mem_fn (&X::f2)(sp, 1, 2);
 
-    hpx::util::mem_fn (&X::g2)(x, 1, 2);
-    hpx::util::mem_fn (&X::g2)(rcx, 1, 2);
-    hpx::util::mem_fn (&X::g2)(&x, 1, 2);
-    hpx::util::mem_fn (&X::g2)(pcx, 1, 2);
-    hpx::util::mem_fn (&X::g2)(sp, 1, 2);
+    hpx::mem_fn (&X::g2)(x, 1, 2);
+    hpx::mem_fn (&X::g2)(rcx, 1, 2);
+    hpx::mem_fn (&X::g2)(&x, 1, 2);
+    hpx::mem_fn (&X::g2)(pcx, 1, 2);
+    hpx::mem_fn (&X::g2)(sp, 1, 2);
 
-    hpx::util::mem_fn (&X::f3)(x, 1, 2, 3);
-    hpx::util::mem_fn (&X::f3)(&x, 1, 2, 3);
-    hpx::util::mem_fn (&X::f3)(sp, 1, 2, 3);
+    hpx::mem_fn (&X::f3)(x, 1, 2, 3);
+    hpx::mem_fn (&X::f3)(&x, 1, 2, 3);
+    hpx::mem_fn (&X::f3)(sp, 1, 2, 3);
 
-    hpx::util::mem_fn (&X::g3)(x, 1, 2, 3);
-    hpx::util::mem_fn (&X::g3)(rcx, 1, 2, 3);
-    hpx::util::mem_fn (&X::g3)(&x, 1, 2, 3);
-    hpx::util::mem_fn (&X::g3)(pcx, 1, 2, 3);
-    hpx::util::mem_fn (&X::g3)(sp, 1, 2, 3);
+    hpx::mem_fn (&X::g3)(x, 1, 2, 3);
+    hpx::mem_fn (&X::g3)(rcx, 1, 2, 3);
+    hpx::mem_fn (&X::g3)(&x, 1, 2, 3);
+    hpx::mem_fn (&X::g3)(pcx, 1, 2, 3);
+    hpx::mem_fn (&X::g3)(sp, 1, 2, 3);
 
-    hpx::util::mem_fn (&X::f4)(x, 1, 2, 3, 4);
-    hpx::util::mem_fn (&X::f4)(&x, 1, 2, 3, 4);
-    hpx::util::mem_fn (&X::f4)(sp, 1, 2, 3, 4);
+    hpx::mem_fn (&X::f4)(x, 1, 2, 3, 4);
+    hpx::mem_fn (&X::f4)(&x, 1, 2, 3, 4);
+    hpx::mem_fn (&X::f4)(sp, 1, 2, 3, 4);
 
-    hpx::util::mem_fn (&X::g4)(x, 1, 2, 3, 4);
-    hpx::util::mem_fn (&X::g4)(rcx, 1, 2, 3, 4);
-    hpx::util::mem_fn (&X::g4)(&x, 1, 2, 3, 4);
-    hpx::util::mem_fn (&X::g4)(pcx, 1, 2, 3, 4);
-    hpx::util::mem_fn (&X::g4)(sp, 1, 2, 3, 4);
+    hpx::mem_fn (&X::g4)(x, 1, 2, 3, 4);
+    hpx::mem_fn (&X::g4)(rcx, 1, 2, 3, 4);
+    hpx::mem_fn (&X::g4)(&x, 1, 2, 3, 4);
+    hpx::mem_fn (&X::g4)(pcx, 1, 2, 3, 4);
+    hpx::mem_fn (&X::g4)(sp, 1, 2, 3, 4);
 
-    hpx::util::mem_fn (&X::f5)(x, 1, 2, 3, 4, 5);
-    hpx::util::mem_fn (&X::f5)(&x, 1, 2, 3, 4, 5);
-    hpx::util::mem_fn (&X::f5)(sp, 1, 2, 3, 4, 5);
+    hpx::mem_fn (&X::f5)(x, 1, 2, 3, 4, 5);
+    hpx::mem_fn (&X::f5)(&x, 1, 2, 3, 4, 5);
+    hpx::mem_fn (&X::f5)(sp, 1, 2, 3, 4, 5);
 
-    hpx::util::mem_fn (&X::g5)(x, 1, 2, 3, 4, 5);
-    hpx::util::mem_fn (&X::g5)(rcx, 1, 2, 3, 4, 5);
-    hpx::util::mem_fn (&X::g5)(&x, 1, 2, 3, 4, 5);
-    hpx::util::mem_fn (&X::g5)(pcx, 1, 2, 3, 4, 5);
-    hpx::util::mem_fn (&X::g5)(sp, 1, 2, 3, 4, 5);
+    hpx::mem_fn (&X::g5)(x, 1, 2, 3, 4, 5);
+    hpx::mem_fn (&X::g5)(rcx, 1, 2, 3, 4, 5);
+    hpx::mem_fn (&X::g5)(&x, 1, 2, 3, 4, 5);
+    hpx::mem_fn (&X::g5)(pcx, 1, 2, 3, 4, 5);
+    hpx::mem_fn (&X::g5)(sp, 1, 2, 3, 4, 5);
 
-    hpx::util::mem_fn (&X::f6)(x, 1, 2, 3, 4, 5, 6);
-    hpx::util::mem_fn (&X::f6)(&x, 1, 2, 3, 4, 5, 6);
-    hpx::util::mem_fn (&X::f6)(sp, 1, 2, 3, 4, 5, 6);
+    hpx::mem_fn (&X::f6)(x, 1, 2, 3, 4, 5, 6);
+    hpx::mem_fn (&X::f6)(&x, 1, 2, 3, 4, 5, 6);
+    hpx::mem_fn (&X::f6)(sp, 1, 2, 3, 4, 5, 6);
 
-    hpx::util::mem_fn (&X::g6)(x, 1, 2, 3, 4, 5, 6);
-    hpx::util::mem_fn (&X::g6)(rcx, 1, 2, 3, 4, 5, 6);
-    hpx::util::mem_fn (&X::g6)(&x, 1, 2, 3, 4, 5, 6);
-    hpx::util::mem_fn (&X::g6)(pcx, 1, 2, 3, 4, 5, 6);
-    hpx::util::mem_fn (&X::g6)(sp, 1, 2, 3, 4, 5, 6);
+    hpx::mem_fn (&X::g6)(x, 1, 2, 3, 4, 5, 6);
+    hpx::mem_fn (&X::g6)(rcx, 1, 2, 3, 4, 5, 6);
+    hpx::mem_fn (&X::g6)(&x, 1, 2, 3, 4, 5, 6);
+    hpx::mem_fn (&X::g6)(pcx, 1, 2, 3, 4, 5, 6);
+    hpx::mem_fn (&X::g6)(sp, 1, 2, 3, 4, 5, 6);
 
-    hpx::util::mem_fn (&X::f7)(x, 1, 2, 3, 4, 5, 6, 7);
-    hpx::util::mem_fn (&X::f7)(&x, 1, 2, 3, 4, 5, 6, 7);
-    hpx::util::mem_fn (&X::f7)(sp, 1, 2, 3, 4, 5, 6, 7);
+    hpx::mem_fn (&X::f7)(x, 1, 2, 3, 4, 5, 6, 7);
+    hpx::mem_fn (&X::f7)(&x, 1, 2, 3, 4, 5, 6, 7);
+    hpx::mem_fn (&X::f7)(sp, 1, 2, 3, 4, 5, 6, 7);
 
-    hpx::util::mem_fn (&X::g7)(x, 1, 2, 3, 4, 5, 6, 7);
-    hpx::util::mem_fn (&X::g7)(rcx, 1, 2, 3, 4, 5, 6, 7);
-    hpx::util::mem_fn (&X::g7)(&x, 1, 2, 3, 4, 5, 6, 7);
-    hpx::util::mem_fn (&X::g7)(pcx, 1, 2, 3, 4, 5, 6, 7);
-    hpx::util::mem_fn (&X::g7)(sp, 1, 2, 3, 4, 5, 6, 7);
+    hpx::mem_fn (&X::g7)(x, 1, 2, 3, 4, 5, 6, 7);
+    hpx::mem_fn (&X::g7)(rcx, 1, 2, 3, 4, 5, 6, 7);
+    hpx::mem_fn (&X::g7)(&x, 1, 2, 3, 4, 5, 6, 7);
+    hpx::mem_fn (&X::g7)(pcx, 1, 2, 3, 4, 5, 6, 7);
+    hpx::mem_fn (&X::g7)(sp, 1, 2, 3, 4, 5, 6, 7);
 
-    hpx::util::mem_fn (&X::f8)(x, 1, 2, 3, 4, 5, 6, 7, 8);
-    hpx::util::mem_fn (&X::f8)(&x, 1, 2, 3, 4, 5, 6, 7, 8);
-    hpx::util::mem_fn (&X::f8)(sp, 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::mem_fn (&X::f8)(x, 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::mem_fn (&X::f8)(&x, 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::mem_fn (&X::f8)(sp, 1, 2, 3, 4, 5, 6, 7, 8);
 
-    hpx::util::mem_fn (&X::g8)(x, 1, 2, 3, 4, 5, 6, 7, 8);
-    hpx::util::mem_fn (&X::g8)(rcx, 1, 2, 3, 4, 5, 6, 7, 8);
-    hpx::util::mem_fn (&X::g8)(&x, 1, 2, 3, 4, 5, 6, 7, 8);
-    hpx::util::mem_fn (&X::g8)(pcx, 1, 2, 3, 4, 5, 6, 7, 8);
-    hpx::util::mem_fn (&X::g8)(sp, 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::mem_fn (&X::g8)(x, 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::mem_fn (&X::g8)(rcx, 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::mem_fn (&X::g8)(&x, 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::mem_fn (&X::g8)(pcx, 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::mem_fn (&X::g8)(sp, 1, 2, 3, 4, 5, 6, 7, 8);
 
     HPX_TEST_EQ(x.hash, 17610u);
     HPX_TEST_EQ(sp->hash, 2155u);

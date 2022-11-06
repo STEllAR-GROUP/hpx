@@ -23,5 +23,5 @@
 namespace hpx {
 
     using hpx::invoke_fused;
-    using hpx::util::mem_fn;
+    using hpx::mem_fn;
 }    // namespace hpx

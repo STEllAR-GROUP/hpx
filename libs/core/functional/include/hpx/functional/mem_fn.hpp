@@ -12,7 +12,7 @@
 
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename MemberPointer>
@@ -39,6 +39,15 @@ namespace hpx { namespace util {
         };
     }    // namespace detail
 
+    /// \brief Function template hpx::mem_fn generates wrapper objects for pointers
+    ///        to members, which can store, copy, and invoke a pointer to member.
+    ///        Both references and pointers (including smart pointers) to an object
+    ///        can be used when invoking a hpx::mem_fn.
+    ///
+    /// \param pm 	pointer to member that will be wrapped
+    ///
+    /// \return a call wrapper of unspecified type that has the following members:
+    ///         -
     template <typename M, typename C>
     constexpr detail::mem_fn<M C::*> mem_fn(M C::*pm)
     {
@@ -57,4 +66,34 @@ namespace hpx { namespace util {
     {
         return detail::mem_fn<R (C::*)(Ps...) const>(pm);
     }
-}}    // namespace hpx::util
+}    // namespace hpx
+
+/// \cond NOINTERN
+namespace hpx::util {
+
+    template <typename M, typename C>
+    HPX_DEPRECATED_V(
+        1, 9, "hpx::util::mem_fn is deprecated, use hpx::mem_fn instead")
+    constexpr hpx::detail::mem_fn<M C::*> mem_fn(M C::*pm)
+    {
+        return hpx::detail::mem_fn<M C::*>(pm);
+    }
+
+    template <typename R, typename C, typename... Ps>
+    HPX_DEPRECATED_V(
+        1, 9, "hpx::util::mem_fn is deprecated, use hpx::mem_fn instead")
+    constexpr hpx::detail::mem_fn<R (C::*)(Ps...)> mem_fn(R (C::*pm)(Ps...))
+    {
+        return hpx::detail::mem_fn<R (C::*)(Ps...)>(pm);
+    }
+
+    template <typename R, typename C, typename... Ps>
+    HPX_DEPRECATED_V(
+        1, 9, "hpx::util::mem_fn is deprecated, use hpx::mem_fn instead")
+    constexpr hpx::detail::mem_fn<R (C::*)(Ps...) const> mem_fn(
+        R (C::*pm)(Ps...) const)
+    {
+        return hpx::detail::mem_fn<R (C::*)(Ps...) const>(pm);
+    }
+
+}    // namespace hpx::util

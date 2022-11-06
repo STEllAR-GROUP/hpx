@@ -154,32 +154,32 @@ std::shared_ptr<X> make()
 
 int main()
 {
-    hpx::util::mem_fn (&X::f0)(make());
-    hpx::util::mem_fn (&X::g0)(make());
+    hpx::mem_fn (&X::f0)(make());
+    hpx::mem_fn (&X::g0)(make());
 
-    hpx::util::mem_fn (&X::f1)(make(), 1);
-    hpx::util::mem_fn (&X::g1)(make(), 1);
+    hpx::mem_fn (&X::f1)(make(), 1);
+    hpx::mem_fn (&X::g1)(make(), 1);
 
-    hpx::util::mem_fn (&X::f2)(make(), 1, 2);
-    hpx::util::mem_fn (&X::g2)(make(), 1, 2);
+    hpx::mem_fn (&X::f2)(make(), 1, 2);
+    hpx::mem_fn (&X::g2)(make(), 1, 2);
 
-    hpx::util::mem_fn (&X::f3)(make(), 1, 2, 3);
-    hpx::util::mem_fn (&X::g3)(make(), 1, 2, 3);
+    hpx::mem_fn (&X::f3)(make(), 1, 2, 3);
+    hpx::mem_fn (&X::g3)(make(), 1, 2, 3);
 
-    hpx::util::mem_fn (&X::f4)(make(), 1, 2, 3, 4);
-    hpx::util::mem_fn (&X::g4)(make(), 1, 2, 3, 4);
+    hpx::mem_fn (&X::f4)(make(), 1, 2, 3, 4);
+    hpx::mem_fn (&X::g4)(make(), 1, 2, 3, 4);
 
-    hpx::util::mem_fn (&X::f5)(make(), 1, 2, 3, 4, 5);
-    hpx::util::mem_fn (&X::g5)(make(), 1, 2, 3, 4, 5);
+    hpx::mem_fn (&X::f5)(make(), 1, 2, 3, 4, 5);
+    hpx::mem_fn (&X::g5)(make(), 1, 2, 3, 4, 5);
 
-    hpx::util::mem_fn (&X::f6)(make(), 1, 2, 3, 4, 5, 6);
-    hpx::util::mem_fn (&X::g6)(make(), 1, 2, 3, 4, 5, 6);
+    hpx::mem_fn (&X::f6)(make(), 1, 2, 3, 4, 5, 6);
+    hpx::mem_fn (&X::g6)(make(), 1, 2, 3, 4, 5, 6);
 
-    hpx::util::mem_fn (&X::f7)(make(), 1, 2, 3, 4, 5, 6, 7);
-    hpx::util::mem_fn (&X::g7)(make(), 1, 2, 3, 4, 5, 6, 7);
+    hpx::mem_fn (&X::f7)(make(), 1, 2, 3, 4, 5, 6, 7);
+    hpx::mem_fn (&X::g7)(make(), 1, 2, 3, 4, 5, 6, 7);
 
-    hpx::util::mem_fn (&X::f8)(make(), 1, 2, 3, 4, 5, 6, 7, 8);
-    hpx::util::mem_fn (&X::g8)(make(), 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::mem_fn (&X::f8)(make(), 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::mem_fn (&X::g8)(make(), 1, 2, 3, 4, 5, 6, 7, 8);
 
     HPX_TEST_EQ(hash, 2155u);
 

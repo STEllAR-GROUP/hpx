@@ -173,32 +173,32 @@ int main()
     Y<X> px(&x);
     Y<X const> pcx(&x);
 
-    hpx::util::mem_fn (&X::f0)(px);
-    hpx::util::mem_fn (&X::g0)(pcx);
+    hpx::mem_fn (&X::f0)(px);
+    hpx::mem_fn (&X::g0)(pcx);
 
-    hpx::util::mem_fn (&X::f1)(px, 1);
-    hpx::util::mem_fn (&X::g1)(pcx, 1);
+    hpx::mem_fn (&X::f1)(px, 1);
+    hpx::mem_fn (&X::g1)(pcx, 1);
 
-    hpx::util::mem_fn (&X::f2)(px, 1, 2);
-    hpx::util::mem_fn (&X::g2)(pcx, 1, 2);
+    hpx::mem_fn (&X::f2)(px, 1, 2);
+    hpx::mem_fn (&X::g2)(pcx, 1, 2);
 
-    hpx::util::mem_fn (&X::f3)(px, 1, 2, 3);
-    hpx::util::mem_fn (&X::g3)(pcx, 1, 2, 3);
+    hpx::mem_fn (&X::f3)(px, 1, 2, 3);
+    hpx::mem_fn (&X::g3)(pcx, 1, 2, 3);
 
-    hpx::util::mem_fn (&X::f4)(px, 1, 2, 3, 4);
-    hpx::util::mem_fn (&X::g4)(pcx, 1, 2, 3, 4);
+    hpx::mem_fn (&X::f4)(px, 1, 2, 3, 4);
+    hpx::mem_fn (&X::g4)(pcx, 1, 2, 3, 4);
 
-    hpx::util::mem_fn (&X::f5)(px, 1, 2, 3, 4, 5);
-    hpx::util::mem_fn (&X::g5)(pcx, 1, 2, 3, 4, 5);
+    hpx::mem_fn (&X::f5)(px, 1, 2, 3, 4, 5);
+    hpx::mem_fn (&X::g5)(pcx, 1, 2, 3, 4, 5);
 
-    hpx::util::mem_fn (&X::f6)(px, 1, 2, 3, 4, 5, 6);
-    hpx::util::mem_fn (&X::g6)(pcx, 1, 2, 3, 4, 5, 6);
+    hpx::mem_fn (&X::f6)(px, 1, 2, 3, 4, 5, 6);
+    hpx::mem_fn (&X::g6)(pcx, 1, 2, 3, 4, 5, 6);
 
-    hpx::util::mem_fn (&X::f7)(px, 1, 2, 3, 4, 5, 6, 7);
-    hpx::util::mem_fn (&X::g7)(pcx, 1, 2, 3, 4, 5, 6, 7);
+    hpx::mem_fn (&X::f7)(px, 1, 2, 3, 4, 5, 6, 7);
+    hpx::mem_fn (&X::g7)(pcx, 1, 2, 3, 4, 5, 6, 7);
 
-    hpx::util::mem_fn (&X::f8)(px, 1, 2, 3, 4, 5, 6, 7, 8);
-    hpx::util::mem_fn (&X::g8)(pcx, 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::mem_fn (&X::f8)(px, 1, 2, 3, 4, 5, 6, 7, 8);
+    hpx::mem_fn (&X::g8)(pcx, 1, 2, 3, 4, 5, 6, 7, 8);
 
     HPX_TEST_EQ(hash, 2155u);
 
