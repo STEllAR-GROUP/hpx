@@ -2,7 +2,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <cstdlib>
 #include <iostream> 
 #include <string> 
 #include <vector>
@@ -13,7 +12,6 @@
 #if defined(HPX_HAVE_SYCL)
 
 
-#include <hpx/async_sycl/sycl_event_pool.hpp> 
 #include <hpx/async_sycl/sycl_future.hpp> 
 #include <CL/sycl.hpp> 
 
@@ -21,7 +19,7 @@
 // Needs to be done AFTER sycl include for HipSYCL
 // (intel dpcpp would be fine without the include)
 #if defined(SYCL_LANGUAGE_VERSION)
-#pragma message("OKAY: Sycl compiler detected...")
+#pragma message("OKAY: Sycl compiler detected!")
 #if defined(__INTEL_LLVM_COMPILER)
 #pragma message("OKAY: Intel dpcpp detected!")
 #elif defined(__HIPSYCL__)
@@ -38,7 +36,7 @@ Utilized compiler appears to be neither of those!")
 #if defined(__SYCL_SINGLE_SOURCE__)
 #error("Sycl single source compiler not supported! Use one with multiple passes")
 #else
-#pragma message("OKAY: Sycl compiler with two or more compile passes detected")
+#pragma message("OKAY: Sycl compiler with two or more compile passes detected!")
 #endif
 
 #if defined(__SYCL_DEVICE_ONLY__)
@@ -70,13 +68,16 @@ constexpr size_t vector_size = 2000000;
 void VectorAdd(cl::sycl::queue& q, const std::vector<int>& a_vector,
     const std::vector<int>& b_vector, std::vector<int>& add_parallel)
 {
+    // Kind of superfluous check, but without that macro defined event polling won't work
+    // Might as well make sure...
+#if defined(HPX_HAVE_MODULE_ASYNC_SYCL)
+    std::cerr << "OKAY: HPX_HAVE_MODULE_ASYNC_SYCL is defined!" << std::endl;
+#else
+    std::cerr << "Error: HPX_HAVE_MODULE_ASYNC_SYCL is not defined!" << std::endl;
+    std::terminate();
+#endif
+
     cl::sycl::event my_kernel_event;
-    cl::sycl::event my_kernel_event2;
-    if (!hpx::sycl::experimental::sycl_event_pool::get_event_pool().pop(my_kernel_event))
-    {
-        HPX_THROW_EXCEPTION(
-            hpx::invalid_status, "add_event_callback", "could not get an event");
-    }
     // input range
     cl::sycl::range<1> num_items{a_vector.size()};
     {
@@ -85,7 +86,7 @@ void VectorAdd(cl::sycl::queue& q, const std::vector<int>& a_vector,
       cl::sycl::buffer b_buf(b_vector.data(), num_items);
       cl::sycl::buffer add_buf(add_parallel.data(), num_items);
 
-      cl::sycl::event tmp_event = q.submit([&](cl::sycl::handler& h) {
+      my_kernel_event = q.submit([&](cl::sycl::handler& h) {
           // Tell sycl we'd like to access our buffers here
           cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
           cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
@@ -95,16 +96,27 @@ void VectorAdd(cl::sycl::queue& q, const std::vector<int>& a_vector,
           // Note: destruction of the accessors should not cause a device->host
           // memcpy (I think...)
       });
-      my_kernel_event = tmp_event;
       hpx::future<void> my_kernel_future =
           hpx::sycl::experimental::detail::get_future(q, my_kernel_event);
+      const auto event_status_before =
+          my_kernel_event.get_info<cl::sycl::info::event::command_execution_status>();
+      if (event_status_before != cl::sycl::info::event_command_status::complete)
+      {
+          std::cerr << "OKAY: Kernel event not complete immediately after launch!" 
+              << std::endl;
+      } else {
+          std::cerr << "ERROR: Kernel event is immediately complete " 
+              << "(thus the launch probably is not asynchronous at at all)!" << std::endl;
+          std::terminate();
+      }
       if (my_kernel_future.is_ready())
       {
-        std::cerr << "ERROR: Async Kernel Launch is immediately ready " 
-          << "(thus probably not asynchronous at at all!" << std::endl;
-        exit(1); // exit failure
+          std::cerr << "ERROR: Async kernel launch future is immediately ready " 
+              << "(thus probably not asynchronous at at all)!" << std::endl;
+          std::terminate();
       } else {
-        std::cout<< "OKAY: Kernel started asynchronousely" << std::endl;
+          std::cout<< "OKAY: Kernel hpx::future is NOT ready immediately after launch!" 
+              << std::endl;
       }
       auto continuation_future = my_kernel_future.then([](auto && fut) {
           fut.get();
@@ -113,55 +125,37 @@ void VectorAdd(cl::sycl::queue& q, const std::vector<int>& a_vector,
           });
       continuation_future.get();
 
-      /* my_kernel_future.get(); */
-      // simulate get_future
-      // As far as I'm aware there's no functionality to use "my own" SYCL events so I have to rely
-      // on whatever the runtime API returns to me OR submit dummy kernels..
-      my_kernel_event2 = q.submit([&](cl::sycl::handler& h) {
-          h.parallel_for(cl::sycl::range<1>{1}, [=](auto i) 
-              {volatile int do_not_optimize = 1; });
-          });
-      // should be running
-      const auto event_status =
+      const auto event_status_after =
           my_kernel_event.get_info<cl::sycl::info::event::command_execution_status>();
-      const auto event_status2 =
-          my_kernel_event2.get_info<cl::sycl::info::event::command_execution_status>();
-      if (event_status != cl::sycl::info::event_command_status::complete &&
-          event_status2 != cl::sycl::info::event_command_status::complete)
-          std::cerr << "OKAY: Kernel not yet done" << std::endl;
-      else
-        std::cerr << "ERROR: Kernel already done" << std::endl;
+      if (event_status_after == cl::sycl::info::event_command_status::complete)
+      {
+          std::cerr << "OKAY: Kernel is done!" << std::endl;
+      } else {
+          std::cerr << "ERROR: Kernel still running after continuation.get()!" << std::endl;
+          std::terminate();
+      }
+
+      // NOTE about usage:
       // according to the sycl specification (2020) section 3.9.8, the entire
-      // thing will synchronize here, due to the buffers being destroyed
+      // thing will synchronize here, due to the buffers being destroyed!
+      //
+      // Hence this implictly syncs everything, so we should use get on any
+      // futures/continuations beforehand
+      // (or simply make sure that the sycl buffers (a_buf, b_buf_ add_buf)
+      // have a longer lifetime by moving them to another scope. 
     }
-    // should be done
-    const auto event_status =
-        my_kernel_event.get_info<cl::sycl::info::event::command_execution_status>();
-    const auto event_status2 =
-        my_kernel_event2.get_info<cl::sycl::info::event::command_execution_status>();
-    if (event_status != cl::sycl::info::event_command_status::complete ||
-        event_status2 != cl::sycl::info::event_command_status::complete)
-        std::cerr << "ERROR: Kernel still not done" << std::endl;
-    else
-      std::cerr << "OKAY: Kernel done after end of scope" << std::endl;
 }
 
 int hpx_main(int, char**)
 {
     std::cout << "Starting HPX main" << std::endl;
 
-    // Kind of superfluous check, but without that macro defined event polling won't work
-    // Might as well make sure...
-#if defined(HPX_HAVE_MODULE_ASYNC_SYCL)
-    std::cerr << "OKAY: HPX_HAVE_MODULE_ASYNC_SYCL is defined!" << std::endl;
-#else
-    std::cerr << "Error: HPX_HAVE_MODULE_ASYNC_SYCL is defined!" << std::endl;
-    return -1;
-#endif
-
     // Enable polling for the future
     hpx::sycl::experimental::detail::register_polling(hpx::resource::get_thread_pool(0));
     std::cout << "SYCL Future polling enabled!\n";
+
+    std::cout << "SYCL language version: " << SYCL_LANGUAGE_VERSION << "\n";
+
 
     // Select default sycl device
     cl::sycl::default_selector d_selector;
@@ -180,7 +174,6 @@ int hpx_main(int, char**)
         // TODO Insert executor once finished
       cl::sycl::queue q(d_selector, cl::sycl::property::queue::in_order{});
         /* queue q(d_selector); */
-        std::cout << "SYCL language version: " << SYCL_LANGUAGE_VERSION << "\n";
         std::cout << "Running on device: "
                   << q.get_device().get_info<cl::sycl::info::device::name>() << "\n";
         std::cout << "Vector size: " << a.size() << "\n";
@@ -203,9 +196,10 @@ int hpx_main(int, char**)
         if (add_parallel.at(i) != add_sequential.at(i))
         {
             std::cerr << "Vector add failed on device.\n ";
-            return -1;
+            std::terminate();
         }
     }
+    std::cout << "OKAY: Vector add results correct!\n";
 
     static_assert(vector_size >= 6, "vector_size unreasonably small");
     for (size_t i = 0; i < 3; i++)
@@ -226,7 +220,6 @@ int hpx_main(int, char**)
     add_sequential.clear();
     add_parallel.clear();
 
-    std::cout << "Vector add successful.\n";
     // Disable polling
     std::cout << "Disabling SYCL future polling.\n";
     hpx::sycl::experimental::detail::unregister_polling(hpx::resource::get_thread_pool(0));
