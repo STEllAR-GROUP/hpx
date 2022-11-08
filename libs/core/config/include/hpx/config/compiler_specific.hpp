@@ -158,7 +158,7 @@
 
 #if defined(HPX_HAVE_SANITIZERS)
 #  if defined(__has_feature)
-#  if __has_feature(address_sanitizer)
+#    if __has_feature(address_sanitizer)
 #      define HPX_HAVE_ADDRESS_SANITIZER
 #    endif
 #  elif defined(__SANITIZE_ADDRESS__)   // MSVC defines this

@@ -29,8 +29,8 @@ struct p
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
+    using hpx::invoke;
     using hpx::is_invocable_v;
-    using hpx::util::invoke;
 
     typedef int (s::*mem_fun_ptr)();
     HPX_TEST_MSG((is_invocable_v<mem_fun_ptr, p> == false), "mem-fun-ptr");

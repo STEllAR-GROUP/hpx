@@ -46,10 +46,11 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////
         // There is no need to protect these global from thread concurrent
         // access as they are access during early startup only.
-        extern std::list<startup_function_type> global_pre_startup_functions;
-        extern std::list<startup_function_type> global_startup_functions;
-        extern std::list<shutdown_function_type> global_pre_shutdown_functions;
-        extern std::list<shutdown_function_type> global_shutdown_functions;
+        extern std::list<startup_function_type>& global_pre_startup_functions();
+        extern std::list<startup_function_type>& global_startup_functions();
+        extern std::list<shutdown_function_type>&
+        global_pre_shutdown_functions();
+        extern std::list<shutdown_function_type>& global_shutdown_functions();
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////

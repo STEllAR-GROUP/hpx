@@ -31,10 +31,6 @@
 #include <utility>
 
 namespace hpx {
-    namespace detail {
-        HPX_CORE_EXPORT char const* store_function_annotation(std::string name);
-    }    // namespace detail
-
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {

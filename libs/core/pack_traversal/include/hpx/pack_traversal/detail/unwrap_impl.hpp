@@ -172,10 +172,10 @@ namespace hpx { namespace util { namespace detail {
         template <typename C, typename T>
         static auto apply(C&& callable, T&& unwrapped)
             // There is no trait for the invoke_fused result
-            -> decltype(invoke_fused(
+            -> decltype(hpx::invoke_fused(
                 HPX_FORWARD(C, callable), HPX_FORWARD(T, unwrapped)))
         {
-            return invoke_fused(
+            return hpx::invoke_fused(
                 HPX_FORWARD(C, callable), HPX_FORWARD(T, unwrapped));
         }
     };

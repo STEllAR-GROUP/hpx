@@ -9,12 +9,13 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX20_EXPERIMENTAL_SIMD)
+#if defined(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
+
+#include <hpx/execution/traits/detail/simd/vector_pack_simd.hpp>
+
 #include <cstddef>
 #include <iterator>
 #include <memory>
-
-#include <experimental/simd>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace traits {
@@ -25,15 +26,16 @@ namespace hpx { namespace parallel { namespace traits {
     struct vector_pack_load
     {
         template <typename Iter>
-        static V aligned(Iter const& iter)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static V aligned(Iter const& iter)
         {
-            return V(std::addressof(*iter), std::experimental::vector_aligned);
+            return V(
+                std::addressof(*iter), datapar::experimental::vector_aligned);
         }
 
         template <typename Iter>
-        static V unaligned(Iter const& iter)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static V unaligned(Iter const& iter)
         {
-            return V(std::addressof(*iter), std::experimental::element_aligned);
+            return *iter;
         }
     };
 
@@ -42,17 +44,18 @@ namespace hpx { namespace parallel { namespace traits {
     struct vector_pack_store
     {
         template <typename Iter>
-        static void aligned(V& value, Iter const& iter)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void aligned(
+            V& value, Iter const& iter)
         {
             value.copy_to(
-                std::addressof(*iter), std::experimental::vector_aligned);
+                std::addressof(*iter), datapar::experimental::vector_aligned);
         }
 
         template <typename Iter>
-        static void unaligned(V& value, Iter const& iter)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static void unaligned(
+            V& value, Iter const& iter)
         {
-            value.copy_to(
-                std::addressof(*iter), std::experimental::element_aligned);
+            *iter = value;
         }
     };
 }}}    // namespace hpx::parallel::traits

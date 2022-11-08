@@ -1,5 +1,5 @@
 //  Copyright (c)      2020 ETH Zurich
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,6 +26,25 @@
 using hpx::execution::experimental::fork_join_executor;
 
 static std::atomic<std::size_t> count{0};
+
+///////////////////////////////////////////////////////////////////////////////
+template <typename... ExecutorArgs>
+void test_processing_mask(ExecutorArgs&&... args)
+{
+    std::cerr << "test_processing_mask\n";
+
+    auto& rp = hpx::resource::get_partitioner();
+    auto const& expected_mask =
+        rp.get_used_pus_mask(hpx::get_worker_thread_num());
+
+    fork_join_executor exec{expected_mask, std::forward<ExecutorArgs>(args)...};
+    auto pus_mask =
+        hpx::execution::experimental::get_processing_units_mask(exec);
+    HPX_TEST(pus_mask == expected_mask);
+
+    auto cores_mask = hpx::execution::experimental::get_cores_mask(exec);
+    HPX_TEST(cores_mask == expected_mask);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 void bulk_test(int, int passed_through)    //-V813
@@ -155,20 +174,10 @@ void static_check_executor()
 {
     using namespace hpx::traits;
 
-    static_assert(!has_sync_execute_member<fork_join_executor>::value,
-        "!has_sync_execute_member<fork_join_executor>::value");
-    static_assert(!has_async_execute_member<fork_join_executor>::value,
-        "!has_async_execute_member<fork_join_executor>::value");
-    static_assert(!has_then_execute_member<fork_join_executor>::value,
-        "!has_then_execute_member<fork_join_executor>::value");
-    static_assert(has_bulk_sync_execute_member<fork_join_executor>::value,
-        "has_bulk_sync_execute_member<fork_join_executor>::value");
-    static_assert(has_bulk_async_execute_member<fork_join_executor>::value,
-        "has_bulk_async_execute_member<fork_join_executor>::value");
-    static_assert(!has_bulk_then_execute_member<fork_join_executor>::value,
-        "!has_bulk_then_execute_member<fork_join_executor>::value");
-    static_assert(!has_post_member<fork_join_executor>::value,
-        "!has_post_member<fork_join_executor>::value");
+    static_assert(is_bulk_one_way_executor_v<fork_join_executor>,
+        "is_bulk_one_way_executor_v<fork_join_executor>");
+    static_assert(is_bulk_two_way_executor_v<fork_join_executor>,
+        "is_bulk_two_way_executor_v<fork_join_executor>");
 }
 
 template <typename... ExecutorArgs>
@@ -183,6 +192,8 @@ void test_executor(hpx::threads::thread_priority priority,
     test_bulk_async(priority, stacksize, schedule);
     test_bulk_sync_exception(priority, stacksize, schedule);
     test_bulk_async_exception(priority, stacksize, schedule);
+
+    test_processing_mask(priority, stacksize, schedule);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -197,6 +208,7 @@ int hpx_main()
              // hpx::threads::thread_priority::low,
              hpx::threads::thread_priority::normal,
              hpx::threads::thread_priority::high,
+             hpx::threads::thread_priority::bound,
          })
     {
         for (auto const stacksize : {

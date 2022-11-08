@@ -23,7 +23,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // The vector types to be used are defined in partitioned_vector module.
-// HPX_REGISTER_PARTITIONED_VECTOR(double)
+#if defined(HPX_HAVE_STATIC_LINKING)
+HPX_REGISTER_PARTITIONED_VECTOR(double)
+#endif
 
 void bulk_test(hpx::lcos::spmd_block block,
     std::size_t N,

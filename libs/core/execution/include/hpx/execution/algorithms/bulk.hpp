@@ -69,11 +69,11 @@ namespace hpx::execution::experimental {
                 )>
             // clang-format on
             friend constexpr auto tag_invoke(
-                hpx::execution::experimental::get_completion_scheduler_t<CPO>,
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>
+                    tag,
                 bulk_sender const& sender)
             {
-                return hpx::execution::experimental::get_completion_scheduler<
-                    CPO>(sender.sender);
+                return tag(sender.sender);
             }
 
             template <typename Receiver>
@@ -221,11 +221,9 @@ namespace hpx::execution::experimental {
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
             bulk_t, Sender&& sender, Shape const& shape, F&& f)
         {
-            return detail::bulk_sender<Sender,
-                hpx::util::detail::counting_shape_type<Shape>, F>{
-                HPX_FORWARD(Sender, sender),
-                hpx::util::detail::make_counting_shape(shape),
-                HPX_FORWARD(F, f)};
+            return detail::bulk_sender<Sender, hpx::util::counting_shape<Shape>,
+                F>{HPX_FORWARD(Sender, sender),
+                hpx::util::counting_shape(shape), HPX_FORWARD(F, f)};
         }
 
         // clang-format off

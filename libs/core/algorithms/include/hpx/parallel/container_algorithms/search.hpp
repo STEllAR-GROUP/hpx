@@ -207,8 +207,9 @@ namespace hpx { namespace ranges {
         typename Pred = hpx::ranges::equal_to,
         typename Proj1 = parallel::util::projection_identity,
         typename Proj2 = parallel::util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type search(
-        ExPolicy&& policy, FwdIter first, Sent last, FwdIter2 s_first,
+    typename typename parallel::util::detail::algorithm_result<ExPolicy,
+        FwdIter>::type
+    search(ExPolicy&& policy, FwdIter first, Sent last, FwdIter2 s_first,
         Sent2 s_last, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
 
@@ -392,7 +393,12 @@ namespace hpx { namespace ranges {
     ///                     overload of \a adjacent_find requires \a Pred to meet the
     ///                     requirements of \a CopyConstructible. This defaults
     ///                     to std::equal_to<>
-    ///
+    /// \tparam Proj1       The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity and is applied
+    ///                     to the elements of type dereferenced \a FwdIter.
+    /// \tparam Proj2       The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity and is applied
+    ///                     to the elements of type dereferenced \a FwdIter2.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of the first range the algorithm will be applied to.
@@ -432,16 +438,16 @@ namespace hpx { namespace ranges {
     ///           If the length of the subsequence [s_first, s_last) is greater
     ///           than the length of the range [first, first+count),
     ///           \a first is returned.
-    ///           Additionally if the size of the subsequence is empty or no subsequence
+    ///           Additionally, if the size of the subsequence is empty or no subsequence
     ///           is found, \a first is also returned.
     ///
     template <typename FwdIter, typename FwdIter2, typename Sent2,
         typename Pred = hpx::ranges::equal_to,
         typename Proj1 = parallel::util::projection_identity,
         typename Proj2 = parallel::util::projection_identity>
-    FwdIter search_n(ExPolicy&& policy, FwdIter first, std::size_t count,
-        FwdIter2 s_first, Sent s_last, Pred&& op = Pred(),
-        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+    FwdIter search_n(FwdIter first, std::size_t count, FwdIter2 s_first,
+        Sent s_last, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
+        Proj2&& proj2 = Proj2());
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
     /// Uses a provided predicate to compare elements.
@@ -471,7 +477,12 @@ namespace hpx { namespace ranges {
     ///                     overload of \a adjacent_find requires \a Pred to meet the
     ///                     requirements of \a CopyConstructible. This defaults
     ///                     to std::equal_to<>
-    ///
+    /// \tparam Proj1       The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity and is applied
+    ///                     to the elements of type dereferenced \a FwdIter.
+    /// \tparam Proj2       The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity and is applied
+    ///                     to the elements of type dereferenced \a FwdIter2.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -529,10 +540,11 @@ namespace hpx { namespace ranges {
         typename Sent2, typename Pred = hpx::ranges::equal_to,
         typename Proj1 = parallel::util::projection_identity,
         typename Proj2 = parallel::util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type search_n(
-        ExPolicy&& policy, FwdIter first, std::size_t count, FwdIter2 s_first,
-        Sent2 s_last, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-        Proj2&& proj2 = Proj2());
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        FwdIter>::type
+    search_n(ExPolicy&& policy, FwdIter first, std::size_t count,
+        FwdIter2 s_first, Sent2 s_last, Pred&& op = Pred(),
+        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Searches the range [first, last) for any elements in the range [s_first, s_last).
     /// Uses a provided predicate to compare elements.

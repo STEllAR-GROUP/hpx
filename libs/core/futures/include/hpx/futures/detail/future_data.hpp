@@ -133,7 +133,7 @@ namespace hpx { namespace lcos { namespace detail {
         util::atomic_count count_;
     };
 
-    /// support functions for hpx::intrusive_ptr
+    // support functions for hpx::intrusive_ptr
     inline void intrusive_ptr_add_ref(future_data_refcnt_base* p) noexcept
     {
         ++p->count_;
@@ -251,8 +251,7 @@ namespace hpx { namespace lcos { namespace detail {
             exception = 4 | ready
         };
 
-        /// Return whether or not the data is available for this
-        /// \a future.
+        // Return whether or not the data is available for this \a future.
         bool is_ready(
             std::memory_order order = std::memory_order_acquire) const noexcept
         {
@@ -302,9 +301,9 @@ namespace hpx { namespace lcos { namespace detail {
         template <typename Callback>
         static void handle_on_completed(Callback&& on_completed);
 
-        /// Set the callback which needs to be invoked when the future becomes
-        /// ready. If the future is ready the function will be invoked
-        /// immediately.
+        // Set the callback which needs to be invoked when the future becomes
+        // ready. If the future is ready the function will be invoked
+        // immediately.
         void set_on_completed(completed_callback_type data_sink) override;
 
         virtual state wait(error_code& ec = throws);
@@ -494,6 +493,7 @@ namespace hpx { namespace lcos { namespace detail {
 
             // Note: cv.notify_one() above 'consumes' the lock 'l' and leaves
             //       it unlocked when returning.
+            HPX_ASSERT_DOESNT_OWN_LOCK(l);
 
             // invoke the callback (continuation) function
             if (!on_completed.empty())
@@ -553,6 +553,7 @@ namespace hpx { namespace lcos { namespace detail {
 
             // Note: cv.notify_one() above 'consumes' the lock 'l' and leaves
             //       it unlocked when returning.
+            HPX_ASSERT_DOESNT_OWN_LOCK(l);
 
             // invoke the callback (continuation) function
             if (!on_completed.empty())
@@ -598,8 +599,8 @@ namespace hpx { namespace lcos { namespace detail {
                 [&](std::exception_ptr ep) { set_exception(HPX_MOVE(ep)); });
         }
 
-        /// Reset the promise to allow to restart an asynchronous
-        /// operation. Allows any subsequent set_data operation to succeed.
+        // Reset the promise to allow to restart an asynchronous operation.
+        // Allows any subsequent set_data operation to succeed.
         void reset(error_code& /*ec*/ = throws)
         {
             // no locking is required as semantics guarantee a single writer
@@ -748,21 +749,24 @@ namespace hpx { namespace lcos { namespace detail {
     public:
         using base_type = future_data<Result>;
         using result_type = typename base_type::result_type;
+        using init_no_addref = typename base_type::init_no_addref;
 
     public:
         timed_future_data() = default;
 
         template <typename Result_>
-        timed_future_data(std::chrono::steady_clock::time_point const& abs_time,
+        timed_future_data(init_no_addref no_addref,
+            std::chrono::steady_clock::time_point const& abs_time,
             Result_&& init)
+          : base_type(no_addref)
         {
             hpx::intrusive_ptr<timed_future_data> this_(this);
 
             error_code ec;
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(
-                    [this_, init = HPX_FORWARD(Result_, init)]() {
-                        this_->set_value(init);
+                    [this_, init = HPX_FORWARD(Result_, init)]() mutable {
+                        this_->set_value(HPX_MOVE(init));
                     }),
                 "timed_future_data<Result>::timed_future_data",
                 threads::thread_priority::boost,

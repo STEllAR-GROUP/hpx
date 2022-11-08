@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -152,20 +152,36 @@ void static_check_executor()
     using namespace hpx::traits;
     using executor = hpx::execution::parallel_executor;
 
-    static_assert(has_sync_execute_member<executor>::value,
-        "has_sync_execute_member<executor>::value");
-    static_assert(has_async_execute_member<executor>::value,
-        "has_async_execute_member<executor>::value");
-    static_assert(has_then_execute_member<executor>::value,
-        "has_then_execute_member<executor>::value");
-    static_assert(!has_bulk_sync_execute_member<executor>::value,
-        "!has_bulk_sync_execute_member<executor>::value");
-    static_assert(has_bulk_async_execute_member<executor>::value,
-        "has_bulk_async_execute_member<executor>::value");
-    static_assert(has_bulk_then_execute_member<executor>::value,
-        "has_bulk_then_execute_member<executor>::value");
-    static_assert(has_post_member<executor>::value,
-        "check has_post_member<executor>::value");
+    static_assert(
+        is_one_way_executor_v<executor>, "is_one_way_executor_v<executor>");
+    static_assert(is_never_blocking_one_way_executor_v<executor>,
+        "is_never_blocking_one_way_executor_v<executor>");
+    static_assert(
+        is_two_way_executor_v<executor>, "is_two_way_executor_v<executor>");
+    static_assert(is_bulk_two_way_executor_v<executor>,
+        "is_bulk_two_way_executor_v<executor>");
+}
+
+void test_processing_mask()
+{
+    hpx::execution::parallel_executor exec;
+
+    {
+        auto pool = hpx::threads::detail::get_self_or_default_pool();
+        auto expected_mask =
+            pool->get_used_processing_units(pool->get_os_thread_count(), false);
+        auto mask =
+            hpx::execution::experimental::get_processing_units_mask(exec);
+        HPX_TEST(mask == expected_mask);
+    }
+
+    {
+        auto pool = hpx::threads::detail::get_self_or_default_pool();
+        auto expected_mask =
+            pool->get_used_processing_units(pool->get_os_thread_count(), true);
+        auto mask = hpx::execution::experimental::get_cores_mask(exec);
+        HPX_TEST(mask == expected_mask);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -180,6 +196,8 @@ int hpx_main()
     test_bulk_sync();
     test_bulk_async();
     test_bulk_then();
+
+    test_processing_mask();
 
     return hpx::local::finalize();
 }

@@ -4,20 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-# Add all files here which should be passed to doxygen
-set(doxygen_dependencies
-    "${PROJECT_SOURCE_DIR}/components/component_storage/include/hpx/components/component_storage/migrate_from_storage.hpp"
-    "${PROJECT_SOURCE_DIR}/components/component_storage/include/hpx/components/component_storage/migrate_to_storage.hpp"
-)
-
-# Definitions for autodoc.doxy.in
-foreach(doxygen_input ${doxygen_dependencies})
-  set(doxygen_inputs "${doxygen_inputs} ${doxygen_input}")
-endforeach()
-
-set(doxygen_output_file "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc")
-set(doxygen_output_dir "${CMAKE_CURRENT_BINARY_DIR}/doxygen")
-
+# used while generating sphinx config file
 set(doxygen_definition_list
     "DOXYGEN:=1"
     "BOOST_SYSTEM_NOEXCEPT="
@@ -35,12 +22,6 @@ set(doxygen_definition_list
 foreach(doxygen_predef ${doxygen_definition_list})
   set(doxygen_definitions "${doxygen_definitions} \"${doxygen_predef}\"")
 endforeach()
-
-hpx_info("Creating Doxyfile: ${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.doxy")
-configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/autodoc.doxy.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc.doxy" @ONLY
-)
 
 # Generate rst files with CMake variables and toolchains
 set(HPX_CMAKE_OPTIONS_RST "")
@@ -121,6 +102,7 @@ configure_file(
 )
 
 # Configure Sphinx conf.py
+set(HPX_CONF_DOCUMENTATION_SHORT_VERSION "${HPX_VERSION}")
 if(HPX_WITH_GIT_TAG)
   set(HPX_CONF_DOCUMENTATION_VERSION "${HPX_WITH_GIT_TAG}")
 elseif(HPX_WITH_GIT_BRANCH)
@@ -214,8 +196,6 @@ create_symbolic_link(
   "${PROJECT_SOURCE_DIR}/libs" "${CMAKE_CURRENT_BINARY_DIR}/libs"
 )
 
-hpx_source_to_doxygen(hpx_autodoc DEPENDENCIES ${doxygen_dependencies})
-
 add_custom_target(docs)
 add_custom_target(docs-html)
 add_custom_target(docs-singlehtml)
@@ -257,7 +237,6 @@ foreach(output_format ${HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS})
   add_custom_command(
     OUTPUT "${SPHINX_DOCS_OUTPUT_FILE}"
     DEPENDS "${sphinx_source_files_build}"
-            "${CMAKE_CURRENT_BINARY_DIR}/hpx_autodoc/index.xml"
     COMMAND ${SPHINX_DOCS_BUILD_COMMAND}
   )
 

@@ -37,7 +37,7 @@ namespace hpx { namespace ranges {
     /// \tparam Proj1       The type of an optional projection function for
     ///                     the source range. This defaults to
     ///                     \a util::projection_identity
-    /// \tparam Proj1       The type of an optional projection function for
+    /// \tparam Proj2       The type of an optional projection function for
     ///                     the destination range. This defaults to
     ///                     \a util::projection_identity
     ///
@@ -68,10 +68,13 @@ namespace hpx { namespace ranges {
     ///           The \a starts_with algorithm returns a boolean with the
     ///           value true if the second range matches the prefix of the
     ///           first range, false otherwise.
-    template <typename FwdIter1, typename Sent1, typename FwdIter2,
-        typename Sent2, typename Pred, typename Proj1, typename Proj2>
-    bool starts_with(FwdIter1 first1, Sent1 last1, FwdIter2 first2,
-        Sent2 last2, Pred&& pred, Proj1&& proj1, Proj2&& proj2);
+    template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
+        typename Pred = ranges::equal_to,
+        typename Proj1 = parallel::util::projection_identity,
+        typename Proj2 = parallel::util::projection_identity>
+    bool starts_with(Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
+        Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
+        Proj2&& proj2 = Proj2());
 
     /// Checks whether the second range defined by [first1, last1) matches the
     /// prefix of the first range defined by [first2, last2)
@@ -100,7 +103,7 @@ namespace hpx { namespace ranges {
     /// \tparam Proj1       The type of an optional projection function for
     ///                     the source range. This defaults to
     ///                     \a util::projection_identity
-    /// \tparam Proj1       The type of an optional projection function for
+    /// \tparam Proj2       The type of an optional projection function for
     ///                     the destination range. This defaults to
     ///                     \a util::projection_identity
     ///
@@ -142,14 +145,14 @@ namespace hpx { namespace ranges {
     ///           The \a starts_with algorithm returns a boolean with the
     ///           value true if the second range matches the prefix of the
     ///           first range, false otherwise.
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter2, typename Sent2, typename Pred, typename Proj1,
-        typename Proj2>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        bool>::type
+    template <typename ExPolicy, typename FwdIter1, typename Sent1, typename FwdIter2,
+        typename Sent2, typename Pred = ranges::equal_to,
+        typename Proj1 = parallel::util::projection_identity,
+        typename Proj2 = parallel::util::projection_identity>
+    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
     starts_with(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
-        FwdIter2 first2, Sent2 last2, Pred&& pred, Proj1&& proj1,
-        Proj2&& proj2);
+        FwdIter2 first2, Sent2 last2, Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
+        Proj2&& proj2 = Proj2());
 
     /// Checks whether the second range \a rng2 matches the
     /// prefix of the first range \a rng1.
@@ -168,7 +171,7 @@ namespace hpx { namespace ranges {
     /// \tparam Proj1       The type of an optional projection function for
     ///                     the source range. This defaults to
     ///                     \a util::projection_identity
-    /// \tparam Proj1       The type of an optional projection function for
+    /// \tparam Proj2       The type of an optional projection function for
     ///                     the destination range. This defaults to
     ///                     \a util::projection_identity
     ///
@@ -195,10 +198,12 @@ namespace hpx { namespace ranges {
     ///           The \a starts_with algorithm returns a boolean with the
     ///           value true if the second range matches the prefix of the
     ///           first range, false otherwise.
-    template <typename Rng1, typename Rng2, typename Pred,
-        typename Proj1, typename Proj2>
-    bool starts_with(Rng1&& rng1, Rng2&& rng2, Pred&& pred,
-        Proj1&& proj1, Proj2&& proj2);
+    template <typename Rng1, typename Rng2,
+        typename Pred = ranges::equal_to,
+        typename Proj1 = parallel::util::projection_identity,
+        typename Proj2 = parallel::util::projection_identity>
+    bool starts_with(Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(),
+        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Checks whether the second range \a rng2 matches the
     /// prefix of the first range \a rng1.
@@ -221,7 +226,7 @@ namespace hpx { namespace ranges {
     /// \tparam Proj1       The type of an optional projection function for
     ///                     the source range. This defaults to
     ///                     \a util::projection_identity
-    /// \tparam Proj1       The type of an optional projection function for
+    /// \tparam Proj2       The type of an optional projection function for
     ///                     the destination range. This defaults to
     ///                     \a util::projection_identity
     ///
@@ -260,11 +265,14 @@ namespace hpx { namespace ranges {
     ///           value true if the second range matches the prefix of the
     ///           first range, false otherwise.
     template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename Pred, typename Proj1, typename Proj2>
+        typename Pred = ranges::equal_to,
+        typename Proj1 = parallel::util::projection_identity,
+        typename Proj2 = parallel::util::projection_identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         bool>::type
     starts_with(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
-        Pred&& pred, Proj1&& proj1, Proj2&& proj2);
+        Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
+        Proj2&& proj2 = Proj2());
 
     // clang-format on
 }}    // namespace hpx::ranges
@@ -290,7 +298,7 @@ namespace hpx { namespace ranges {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::copy
+    // CPO for hpx::ranges::copy
     inline constexpr struct starts_with_t final
       : hpx::functional::detail::tag_fallback<starts_with_t>
     {

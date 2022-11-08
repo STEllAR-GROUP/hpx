@@ -1,4 +1,5 @@
-//  Copyright (c)      2017 Shoshana Jakobovits
+//  Copyright (c) 2017 Shoshana Jakobovits
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -858,12 +859,22 @@ namespace hpx { namespace resource { namespace detail {
         return initial_thread_pools_[index].pool_name_;
     }
 
-    size_t partitioner::get_pu_num(std::size_t global_thread_num)
+    std::size_t partitioner::get_pu_num(std::size_t global_thread_num) const
     {
         return affinity_data_.get_pu_num(global_thread_num);
     }
 
-    threads::mask_cref_type partitioner::get_pu_mask(
+    std::size_t partitioner::get_thread_occupancy(std::size_t pu_num) const
+    {
+        return affinity_data_.get_thread_occupancy(topo_, pu_num);
+    }
+
+    threads::mask_type partitioner::get_used_pus_mask(std::size_t pu_num) const
+    {
+        return affinity_data_.get_used_pus_mask(topo_, pu_num);
+    }
+
+    threads::mask_type partitioner::get_pu_mask(
         std::size_t global_thread_num) const
     {
         return affinity_data_.get_pu_mask(topo_, global_thread_num);

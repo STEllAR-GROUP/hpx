@@ -15,6 +15,7 @@
 #include <hpx/executors/datapar/execution_policy.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/find.hpp>
+#include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
 #include <hpx/parallel/datapar/zip_iterator.hpp>
@@ -322,17 +323,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 part_size, tok,
                 [=, &tok, &op, &proj1, &proj2, &idx](
                     auto, std::size_t i) -> void {
-                    auto begin = hpx::util::make_zip_iterator(it + idx, first2);
+                    auto begin = hpx::util::zip_iterator(it + idx, first2);
                     ++idx;
                     util::cancellation_token<> local_tok;
                     util::loop_n<hpx::execution::simd_policy>(begin, diff,
                         local_tok,
                         [&op, &proj1, &proj2, &local_tok](auto t) -> void {
                             using hpx::get;
-                            if (!hpx::parallel::traits::all_of(
-                                    hpx::util::invoke(op,
-                                        hpx::util::invoke(proj1, get<0>(*t)),
-                                        hpx::util::invoke(proj2, get<1>(*t)))))
+                            if (!hpx::parallel::traits::all_of(hpx::invoke(op,
+                                    hpx::invoke(proj1, get<0>(*t)),
+                                    hpx::invoke(proj2, get<1>(*t)))))
                             {
                                 local_tok.cancel();
                             }
@@ -362,9 +362,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
         else
         {
-            return sequential_find_end<typename ExPolicy::base_policy_type>(
-                first1, last1, first2, last2, HPX_FORWARD(Pred, op),
-                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+            using base_policy_type =
+                decltype((hpx::execution::experimental::to_non_simd(
+                    std::declval<ExPolicy>())));
+            return sequential_find_end<base_policy_type>(first1, last1, first2,
+                last2, HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
     }
 
@@ -388,8 +391,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
         else
         {
-            return sequential_find_end<typename ExPolicy::base_policy_type>(it,
-                first2, base_idx, part_size, diff, tok, HPX_FORWARD(Pred, op),
+            using base_policy_type =
+                decltype((hpx::execution::experimental::to_non_simd(
+                    std::declval<ExPolicy>())));
+            return sequential_find_end<base_policy_type>(it, first2, base_idx,
+                part_size, diff, tok, HPX_FORWARD(Pred, op),
                 HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
     }
@@ -433,7 +439,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 part_size, tok,
                 [&it, &proj1, &s_first, &s_last, &proj2, &op, &tok, &idx](
                     auto, std::size_t i) {
-                    auto val = *hpx::util::invoke(proj1, it + idx);
+                    auto val = *hpx::invoke(proj1, it + idx);
 
                     util::cancellation_token<> local_tok;
                     util::loop_n<hpx::execution::simd_policy>(s_first,
@@ -474,10 +480,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
         else
         {
-            return sequential_find_first_of<
-                typename ExPolicy::base_policy_type>(first, last, s_first,
-                s_last, HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
-                HPX_FORWARD(Proj2, proj2));
+            using base_policy_type =
+                decltype((hpx::execution::experimental::to_non_simd(
+                    std::declval<ExPolicy>())));
+            return sequential_find_first_of<base_policy_type>(first, last,
+                s_first, s_last, HPX_FORWARD(Pred, op),
+                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
     }
 
@@ -501,9 +509,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
         else
         {
-            return sequential_find_first_of<
-                typename ExPolicy::base_policy_type>(it, s_first, s_last,
-                base_idx, part_size, tok, HPX_FORWARD(Pred, op),
+            using base_policy_type =
+                decltype((hpx::execution::experimental::to_non_simd(
+                    std::declval<ExPolicy>())));
+            return sequential_find_first_of<base_policy_type>(it, s_first,
+                s_last, base_idx, part_size, tok, HPX_FORWARD(Pred, op),
                 HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
     }

@@ -8,20 +8,21 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX20_EXPERIMENTAL_SIMD)
-#include <cstddef>
+#if defined(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
 
-#include <experimental/simd>
+#include <hpx/execution/traits/detail/simd/vector_pack_simd.hpp>
+
+#include <cstddef>
 
 namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE int find_first_of(
-        std::experimental::simd_mask<T, Abi> const& msk)
+        datapar::experimental::simd_mask<T, Abi> const& msk)
     {
-        if (std::experimental::any_of(msk))
+        if (datapar::experimental::any_of(msk))
         {
-            return std::experimental::find_first_set(msk);
+            return datapar::experimental::find_first_set(msk);
         }
         return -1;
     }

@@ -16,6 +16,7 @@
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_priority_invoke.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -96,8 +97,14 @@ namespace hpx::execution::experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
+            template <typename Func, typename Pack>
+            struct undefined_set_value_signature;
+
             template <typename Pack, typename Enable = void>
-            struct generate_set_value_signature;
+            struct generate_set_value_signature
+              : undefined_set_value_signature<F, Pack>
+            {
+            };
 
             template <template <typename...> typename Pack, typename... Ts>
             struct generate_set_value_signature<Pack<Ts...>,
@@ -133,14 +140,6 @@ namespace hpx::execution::experimental {
             friend auto tag_invoke(get_completion_signatures_t,
                 then_sender const&, Env) -> generate_completion_signatures<Env>;
 
-            //using signatures = hpx::util::detail::concat_inner_packs_t<
-            //    hpx::util::detail::concat_t<hpx::tuple<
-            //        std::size_t, double, std::string>>>;
-
-            //using signatures = typename completion_signatures_of_t<Sender,
-            //    empty_env>::template value_types<gen_value_signature,
-            //    hpx::variant>;
-
             // clang-format off
             template <typename CPO,
                 HPX_CONCEPT_REQUIRES_(
@@ -150,12 +149,14 @@ namespace hpx::execution::experimental {
                 )>
             // clang-format on
             friend constexpr auto tag_invoke(
-                hpx::execution::experimental::get_completion_scheduler_t<CPO>,
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>
+                    tag,
                 then_sender const& sender)
             {
-                return hpx::execution::experimental::get_completion_scheduler<
-                    CPO>(sender.sender);
+                return tag(sender.sender);
             }
+
+            // TODO: add forwarding_sender_query
 
             template <typename Receiver>
             friend auto tag_invoke(

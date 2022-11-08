@@ -19,7 +19,7 @@ namespace hpx::parallel::util::detail {
     // make sure iterators embedded in function object that is attached to
     // futures are invalidated
     template <typename Cont>
-    inline constexpr void clear_container(Cont&) noexcept
+    inline constexpr void clear_container(Cont&&) noexcept
     {
     }
 
@@ -53,7 +53,7 @@ namespace hpx::parallel::util::detail {
     {
         for (auto& f : arr)
         {
-            f = hpx::future<T>();
+            f = hpx::shared_future<T>();
         }
     }
 }    // namespace hpx::parallel::util::detail

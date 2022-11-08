@@ -199,7 +199,7 @@ void test_replace_copy_exception(IteratorTag)
     try
     {
         hpx::ranges::replace_copy(
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c))),
@@ -238,7 +238,7 @@ void test_replace_copy_exception(ExPolicy policy, IteratorTag)
     try
     {
         hpx::ranges::replace_copy(policy,
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c))),
@@ -274,7 +274,7 @@ void test_replace_copy_exception_async(ExPolicy p, IteratorTag)
     try
     {
         auto f = hpx::ranges::replace_copy(p,
-            hpx::util::make_iterator_range(
+            hpx::util::iterator_range(
                 decorated_iterator(
                     std::begin(c), []() { throw std::runtime_error("test"); }),
                 decorated_iterator(std::end(c))),
@@ -335,10 +335,10 @@ void test_replace_copy_bad_alloc(IteratorTag)
     bool caught_bad_alloc = false;
     try
     {
-        hpx::ranges::replace_copy(hpx::util::make_iterator_range(
-                                      decorated_iterator(std::begin(c),
+        hpx::ranges::replace_copy(
+            hpx::util::iterator_range(decorated_iterator(std::begin(c),
                                           []() { throw std::bad_alloc(); }),
-                                      decorated_iterator(std::end(c))),
+                decorated_iterator(std::end(c))),
             std::begin(d), std::size_t(42), std::size_t(43));
         HPX_TEST(false);
     }
@@ -372,9 +372,8 @@ void test_replace_copy_bad_alloc(ExPolicy policy, IteratorTag)
     try
     {
         hpx::ranges::replace_copy(policy,
-            hpx::util::make_iterator_range(
-                decorated_iterator(
-                    std::begin(c), []() { throw std::bad_alloc(); }),
+            hpx::util::iterator_range(decorated_iterator(std::begin(c),
+                                          []() { throw std::bad_alloc(); }),
                 decorated_iterator(std::end(c))),
             std::begin(d), std::size_t(42), std::size_t(43));
         HPX_TEST(false);
@@ -407,9 +406,8 @@ void test_replace_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     try
     {
         auto f = hpx::ranges::replace_copy(p,
-            hpx::util::make_iterator_range(
-                decorated_iterator(
-                    std::begin(c), []() { throw std::bad_alloc(); }),
+            hpx::util::iterator_range(decorated_iterator(std::begin(c),
+                                          []() { throw std::bad_alloc(); }),
                 decorated_iterator(std::end(c))),
             std::begin(d), std::size_t(42), std::size_t(43));
         returned_from_algorithm = true;

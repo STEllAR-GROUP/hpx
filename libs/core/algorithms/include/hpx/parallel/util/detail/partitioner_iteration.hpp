@@ -16,7 +16,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util { namespace detail {
     // Hand-crafted function object allowing to replace a more complex
-    // bind(functional::invoke_fused(), f1, _1)
+    // bind(hpx::functional::invoke_fused(), f1, _1)
     template <typename Result, typename F>
     struct partitioner_iteration
     {
@@ -25,7 +25,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         template <typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE Result operator()(T&& t)
         {
-            return hpx::util::invoke_fused_r<Result>(f_, HPX_FORWARD(T, t));
+            return hpx::invoke_fused_r<Result>(f_, HPX_FORWARD(T, t));
         }
     };
 }}}}    // namespace hpx::parallel::util::detail

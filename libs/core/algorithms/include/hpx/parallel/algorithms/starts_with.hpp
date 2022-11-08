@@ -1,3 +1,4 @@
+//  Copyright (c) 2022 Bhumit Attarde
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2014 Grant Mercer
 //
@@ -8,6 +9,141 @@
 /// \file parallel/algorithms/starts_with.hpp
 
 #pragma once
+
+#if defined(DOXYGEN)
+
+namespace hpx {
+    // clang-format off
+
+    /// Checks whether the second range defined by [first1, last1) matches the
+    /// prefix of the first range defined by [first2, last2)
+    ///
+    /// \note   Complexity: Linear: at most min(N1, N2) applications of the
+    ///                     predicate and both projections.
+    ///
+    /// \tparam InIter1     The type of the source iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an input iterator.
+    /// \tparam InIter2     The type of the destination iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an input iterator.
+    /// \tparam Pred        The binary predicate that compares the projected
+    ///                     elements. This defaults to
+    ///                     \a hpx::parallel::v1::detail::equal_to.
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the source range. This defaults to
+    ///                     \a hpx::parallel::util::projection_identity.
+    /// \tparam Proj2       The type of an optional projection function for
+    ///                     the destination range. This defaults to
+    ///                     \a hpx::parallel::util::projection_identity.
+    ///
+    /// \param first1       Refers to the beginning of the source range.
+    /// \param last1        Sentinel value referring to the end of the source
+    ///                     range.
+    /// \param first2       Refers to the beginning of the destination range.
+    /// \param last2        Sentinel value referring to the end of the
+    ///                     destination range.
+    /// \param pred         Specifies the binary predicate function
+    ///                     (or function object) which will be invoked for
+    ///                     comparison of the elements in the in two ranges
+    ///                     projected by \a proj1 and \a proj2 respectively.
+    /// \param proj1        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     source range as a projection operation before the
+    ///                     actual predicate \a pred is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     destination range as a projection operation before
+    ///                     the actual predicate \a pred is invoked.
+    ///
+    /// The assignments in the parallel \a starts_with algorithm invoked
+    /// without an execution policy object execute in sequential order
+    /// in the calling thread.
+    ///
+    /// \returns  The \a starts_with algorithm returns \a bool.
+    ///           The \a starts_with algorithm returns a boolean with the
+    ///           value true if the second range matches the prefix of the
+    ///           first range, false otherwise.
+    template <typename InIter1, typename InIter2,
+        typename Pred = hpx::parallel::v1::detail::equal_to,
+        typename Proj1 = parallel::util::projection_identity,
+        typename Proj2 = parallel::util::projection_identity>
+    bool starts_with( InIter1 first1, InIter1 last1, InIter2 first2,
+        InIter2 last2, Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
+        Proj2&& proj2 = Proj2());
+
+    /// Checks whether the second range defined by [first1, last1) matches the
+    /// prefix of the first range defined by [first2, last2).
+    /// Executed according to the policy.
+    ///
+    /// \note   Complexity: Linear: at most min(N1, N2) applications of the
+    ///                     predicate and both projections.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam InIter1     The type of the source iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an input iterator.
+    /// \tparam InIter2     The type of the destination iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an input iterator.
+    /// \tparam Pred        The binary predicate that compares the projected
+    ///                     elements. This defaults to
+    ///                     \a hpx::parallel::v1::detail::equal_to.
+    /// \tparam Proj1       The type of an optional projection function for
+    ///                     the source range. This defaults to
+    ///                     \a hpx::parallel::util::projection_identity.
+    /// \tparam Proj2       The type of an optional projection function for
+    ///                     the destination range. This defaults to
+    ///                     \a hpx::parallel::util::projection_identity.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first1       Refers to the beginning of the source range.
+    /// \param last1        Sentinel value referring to the end of the source
+    ///                     range.
+    /// \param first2       Refers to the beginning of the destination range.
+    /// \param last2        Sentinel value referring to the end of the
+    ///                     destination range.
+    /// \param pred         Specifies the binary predicate function
+    ///                     (or function object) which will be invoked for
+    ///                     comparison of the elements in the in two ranges
+    ///                     projected by \a proj1 and \a proj2 respectively.
+    /// \param proj1        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     source range as a projection operation before the
+    ///                     actual predicate \a pred is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     destination range as a projection operation before
+    ///                     the actual predicate \a pred is invoked.
+    ///
+    /// The assignments in the parallel \a starts_with algorithm invoked
+    /// without an execution policy object execute in sequential order
+    /// in the calling thread.
+    ///
+    /// \returns  The \a starts_with algorithm returns a
+    ///           \a hpx::future<bool> if the execution policy is of type
+    ///           \a sequenced_task_policy or \a parallel_task_policy and
+    ///           returns \a bool otherwise.
+    ///           The \a starts_with algorithm returns a boolean with the
+    ///           value true if the second range matches the prefix of the
+    ///           first range, false otherwise.
+    template <typename ExPolicy, typename InIter1, typename InIter2,
+        typename Pred = hpx::parallel::v1::detail::equal_to,
+        typename Proj1 = parallel::util::projection_identity,
+        typename Proj2 = parallel::util::projection_identity>
+    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+    starts_with(ExPolicy&& policy, InIter1 first1, InIter1 last1,
+        InIter2 first2,InIter2 last2, Pred&& pred = Pred(),
+        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+
+    // clang-format on
+}    // namespace hpx
+
+#else    // DOXYGEN
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
@@ -122,7 +258,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::starts_with
+    // CPO for hpx::starts_with
     inline constexpr struct starts_with_t final
       : hpx::functional::detail::tag_fallback<starts_with_t>
     {
@@ -195,3 +331,4 @@ namespace hpx {
     } starts_with{};
 
 }    // namespace hpx
+#endif

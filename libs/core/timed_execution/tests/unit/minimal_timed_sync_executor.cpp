@@ -152,11 +152,11 @@ struct test_sync_executor1
     typedef hpx::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename... Ts>
-    typename hpx::util::detail::invoke_deferred_result<F,
-        Ts...>::type static sync_execute(F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::sync_execute_t,
+        test_sync_executor1 const&, F&& f, Ts&&... ts)
     {
         ++count_sync;
-        return hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+        return hpx::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
@@ -165,13 +165,14 @@ struct test_timed_sync_executor1 : test_sync_executor1
     typedef hpx::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename... Ts>
-    typename hpx::util::detail::invoke_deferred_result<F, Ts...>::
-        type static sync_execute_at(
-            hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(
+        hpx::parallel::execution::sync_execute_at_t,
+        test_timed_sync_executor1 const&,
+        hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         ++count_sync_at;
         hpx::this_thread::sleep_until(abs_time);
-        return hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+        return hpx::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
@@ -192,22 +193,24 @@ struct test_sync_executor2 : test_sync_executor1
     typedef hpx::execution::sequenced_execution_tag execution_category;
 
     template <typename F, typename... Ts>
-    static void post(F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
+        test_sync_executor2 const&, F&& f, Ts&&... ts)
     {
         ++count_apply;
-        hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+        hpx::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
 struct test_timed_sync_executor2 : test_sync_executor2
 {
     template <typename F, typename... Ts>
-    static void post_at(
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::post_at_t,
+        test_timed_sync_executor2 const&,
         hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         ++count_apply_at;
         hpx::this_thread::sleep_until(abs_time);
-        hpx::util::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+        hpx::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
@@ -229,7 +232,7 @@ int hpx_main()
     test_timed_executor<test_sync_executor1>({{6, 0, 0, 0}});
     test_timed_executor<test_sync_executor2>({{4, 2, 0, 0}});
 
-    test_timed_executor<test_timed_sync_executor1>({{2, 0, 4, 0}});
+    test_timed_executor<test_timed_sync_executor1>({{4, 0, 2, 0}});
     test_timed_executor<test_timed_sync_executor2>({{4, 0, 0, 2}});
 
     return hpx::local::finalize();

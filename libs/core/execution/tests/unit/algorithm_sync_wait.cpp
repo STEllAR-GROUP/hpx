@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/local/execution.hpp>
 #include <hpx/local/init.hpp>
-#include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include "algorithm_test_utils.hpp"
@@ -42,21 +42,44 @@ int hpx_main()
     }
 
     {
-        HPX_TEST_EQ(tt::sync_wait(ex::just(3)), 3);
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(ex::just(3))), 3);
     }
 
     {
-        HPX_TEST_EQ(
-            tt::sync_wait(ex::just(custom_type_non_default_constructible{42}))
-                .x,
+        // rvalue arguments
+        auto result = *tt::sync_wait(ex::just(3, 4.0));
+        HPX_TEST_EQ(hpx::get<0>(result), 3);
+        HPX_TEST_EQ(hpx::get<1>(result), 4.0);
+    }
+
+    {
+        // lvalue arguments
+        int i = 3;
+        double d = 4.0;
+        auto result = *tt::sync_wait(ex::just(i, d));
+        HPX_TEST_EQ(hpx::get<0>(result), 3);
+        HPX_TEST_EQ(hpx::get<1>(result), 4.0);
+    }
+
+    {
+        auto result = *tt::sync_wait(ex::just(3, 4.0, std::string("42")));
+        HPX_TEST_EQ(hpx::get<0>(result), 3);
+        HPX_TEST_EQ(hpx::get<1>(result), 4.0);
+        HPX_TEST_EQ(hpx::get<2>(result), std::string("42"));
+    }
+
+    {
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(ex::just(
+                                    custom_type_non_default_constructible{42})))
+                        .x,
             42);
     }
 
     {
         HPX_TEST_EQ(
-            tt::sync_wait(
-                ex::just(
-                    custom_type_non_default_constructible_non_copyable{42}))
+            hpx::get<0>(
+                *tt::sync_wait(ex::just(
+                    custom_type_non_default_constructible_non_copyable{42})))
                 .x,
             42);
     }
@@ -75,7 +98,7 @@ int hpx_main()
     }
 
     {
-        HPX_TEST_EQ(ex::just(3) | tt::sync_wait(), 3);
+        HPX_TEST_EQ(hpx::get<0>(*(ex::just(3) | tt::sync_wait())), 3);
     }
 
     // tag_invoke overload
@@ -104,6 +127,12 @@ int hpx_main()
             exception_thrown = true;
         }
         HPX_TEST(exception_thrown);
+    }
+
+    // cancellation path
+    {
+        auto result = stopped_sender_with_value_type{} | tt::sync_wait();
+        HPX_TEST(!result);    // returned optional should be empty
     }
 
     return hpx::local::finalize();

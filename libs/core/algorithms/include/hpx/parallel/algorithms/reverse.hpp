@@ -14,13 +14,13 @@
 namespace hpx {
 
     /// Reverses the order of the elements in the range [first, last).
-    /// Behaves as if applying std::iter_swap to every pair of iterators
-    /// first+i, (last-i) - 1 for each non-negative i < (last-first)/2.
+    /// Behaves as if applying \a std::iter_swap to every pair of iterators
+    /// first+i, (\a last-i) - 1 for each non-negative i < (last-first)/2.
     ///
     /// \note   Complexity: Linear in the distance between \a first and \a last.
     ///
-    /// \tparam BidirIter  The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    /// \tparam BidirIter   The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
     ///                     bidirectional iterator.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
@@ -31,14 +31,15 @@ namespace hpx {
     /// The assignments in the parallel \a reverse algorithm
     /// execute in sequential order in the calling thread.
     ///
-    /// \returns  The \a reverse algorithm returns a \a void.
+    /// \returns  The \a reverse algorithm returns \a void.
     ///
     template <typename BidirIter>
     void reverse(BidirIter first, BidirIter last);
 
     /// Reverses the order of the elements in the range [first, last).
-    /// Behaves as if applying std::iter_swap to every pair of iterators
+    /// Behaves as if applying \a std::iter_swap to every pair of iterators
     /// first+i, (last-i) - 1 for each non-negative i < (last-first)/2.
+    /// Executed according to the policy.
     ///
     /// \note   Complexity: Linear in the distance between \a first and \a last.
     ///
@@ -46,8 +47,8 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam BidirIter  The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    /// \tparam BidirIter   The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
     ///                     bidirectional iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -79,19 +80,19 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Copies the elements from the range [first, last) to another range
-    /// beginning at dest_first in such a way that the elements in the new
+    /// beginning at dest in such a way that the elements in the new
     /// range are in reverse order.
     /// Behaves as if by executing the assignment
-    /// *(dest_first + (last - first) - 1 - i) = *(first + i) once for each
+    /// *(dest + (last - first) - 1 - i) = *(first + i) once for each
     /// non-negative i < (last - first)
     /// If the source and destination ranges (that is, [first, last) and
-    /// [dest_first, dest_first+(last-first)) respectively) overlap, the
+    /// [dest, dest+(last-first)) respectively) overlap, the
     /// behavior is undefined.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam BidirIter   The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     bidirectional iterator.
     /// \tparam OutIter     The type of the iterator representing the
     ///                     destination range (deduced).
@@ -114,17 +115,17 @@ namespace hpx {
     ///           copied.
     ///
     template <typename BidirIter, typename OutIter>
-    OutIter reverse_copy(BidirIter first, BidirIter last, Outiter dest);
+    OutIter reverse_copy(BidirIter first, BidirIter last, OutIter dest);
 
     /// Copies the elements from the range [first, last) to another range
-    /// beginning at dest_first in such a way that the elements in the new
+    /// beginning at dest in such a way that the elements in the new
     /// range are in reverse order.
     /// Behaves as if by executing the assignment
-    /// *(dest_first + (last - first) - 1 - i) = *(first + i) once for each
+    /// *(dest + (last - first) - 1 - i) = *(first + i) once for each
     /// non-negative i < (last - first)
     /// If the source and destination ranges (that is, [first, last) and
-    /// [dest_first, dest_first+(last-first)) respectively) overlap, the
-    /// behavior is undefined.
+    /// [dest, dest+(last-first)) respectively) overlap, the
+    /// behavior is undefined. Executed according to the policy.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
@@ -133,11 +134,11 @@ namespace hpx {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam BidirIter   The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     bidirectional iterator.
     /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -170,9 +171,9 @@ namespace hpx {
     ///           copied.
     ///
     template <typename ExPolicy, typename BidirIter, typename FwdIter>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
     reverse_copy(
-        ExPolicy&& policy, BidirIter first, BidirIter last, FwdIter dest_first);
+        ExPolicy&& policy, BidirIter first, BidirIter last, FwdIter dest);
 
 }    // namespace hpx
 
@@ -231,9 +232,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename BidirIter, typename Sent>
-            static typename util::detail::algorithm_result<ExPolicy,
-                BidirIter>::type
-            parallel(ExPolicy&& policy, BidirIter first, Sent last)
+            static decltype(auto) parallel(
+                ExPolicy&& policy, BidirIter first, Sent last)
             {
                 using destination_iterator = std::reverse_iterator<BidirIter>;
                 using zip_iterator =
@@ -246,7 +246,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return util::detail::convert_to_result(
                     for_each_n<zip_iterator>().call(
                         HPX_FORWARD(ExPolicy, policy),
-                        hpx::util::make_zip_iterator(
+                        hpx::util::zip_iterator(
                             first, destination_iterator(last2)),
                         size / 2,
                         [](reference t) -> void {
@@ -254,8 +254,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             std::swap(get<0>(t), get<1>(t));
                         },
                         util::projection_identity()),
-                    [last2](
-                        zip_iterator const&) -> BidirIter { return last2; });
+                    [last2](auto) -> BidirIter { return last2; });
             }
         };
         /// \endcond
@@ -264,18 +263,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format off
     template <typename ExPolicy, typename BidirIter,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<BidirIter>::value
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<BidirIter>
         )>
     // clang-format on
     HPX_DEPRECATED_V(1, 7,
         "hpx::parallel::reverse is deprecated, use hpx::reverse "
         "instead")
-        typename util::detail::algorithm_result<ExPolicy, BidirIter>::type
-        reverse(ExPolicy&& policy, BidirIter first, BidirIter last)
+        util::detail::algorithm_result_t<ExPolicy, BidirIter> reverse(
+            ExPolicy&& policy, BidirIter first, BidirIter last)
     {
-        static_assert(
-            (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
+        static_assert((hpx::traits::is_bidirectional_iterator_v<BidirIter>),
             "Requires at least bidirectional iterator.");
 
         return detail::reverse<BidirIter>().call(
@@ -319,8 +317,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename BidirIter, typename Sent,
                 typename FwdIter>
-            static typename util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<BidirIter, FwdIter>>::type
+            static util::detail::algorithm_result_t<ExPolicy,
+                util::in_out_result<BidirIter, FwdIter>>
             parallel(ExPolicy&& policy, BidirIter first, Sent last,
                 FwdIter dest_first)
             {
@@ -344,22 +342,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // clang-format off
     template <typename ExPolicy, typename BidirIter, typename FwdIter,
         HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator<BidirIter>::value &&
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value
+            hpx::traits::is_iterator_v<BidirIter> &&
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_iterator_v<FwdIter>
         )>
     // clang-format on
     HPX_DEPRECATED_V(1, 7,
         "hpx::parallel::reverse_copy is deprecated, use hpx::reverse_copy "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        util::in_out_result<BidirIter, FwdIter>>::type
-        reverse_copy(ExPolicy&& policy, BidirIter first, BidirIter last,
-            FwdIter dest_first)
+        "instead") util::detail::algorithm_result_t<ExPolicy,
+        util::in_out_result<BidirIter, FwdIter>> reverse_copy(ExPolicy&& policy,
+        BidirIter first, BidirIter last, FwdIter dest_first)
     {
-        static_assert(
-            (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
+        static_assert((hpx::traits::is_bidirectional_iterator_v<BidirIter>),
             "Requires at least bidirectional iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+        static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
             "Requires at least forward iterator.");
 
         return detail::reverse_copy<util::in_out_result<BidirIter, FwdIter>>()
@@ -368,8 +364,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 }}}    // namespace hpx::parallel::v1
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::reverse
+    // CPO for hpx::reverse
     inline constexpr struct reverse_t final
       : hpx::detail::tag_parallel_algorithm<reverse_t>
     {
@@ -377,14 +374,13 @@ namespace hpx {
         // clang-format off
         template <typename BidirIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<BidirIter>::value
+                hpx::traits::is_iterator_v<BidirIter>
             )>
         // clang-format on
         friend void tag_fallback_invoke(
             hpx::reverse_t, BidirIter first, BidirIter last)
         {
-            static_assert(
-                (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
+            static_assert((hpx::traits::is_bidirectional_iterator_v<BidirIter>),
                 "Requires at least bidirectional iterator.");
 
             hpx::parallel::v1::detail::reverse<BidirIter>().call(
@@ -394,17 +390,14 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename BidirIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<BidirIter>::value &&
-                hpx::is_execution_policy<ExPolicy>::value
+                hpx::traits::is_iterator_v<BidirIter> &&
+                hpx::is_execution_policy_v<ExPolicy>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            void>::type
-        tag_fallback_invoke(
+        friend decltype(auto) tag_fallback_invoke(
             hpx::reverse_t, ExPolicy&& policy, BidirIter first, BidirIter last)
         {
-            static_assert(
-                (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
+            static_assert((hpx::traits::is_bidirectional_iterator_v<BidirIter>),
                 "Requires at least bidirectional iterator.");
 
             return parallel::util::detail::algorithm_result<ExPolicy>::get(
@@ -414,7 +407,7 @@ namespace hpx {
     } reverse{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::reverse_copy
+    // CPO for hpx::reverse_copy
     inline constexpr struct reverse_copy_t final
       : hpx::detail::tag_parallel_algorithm<reverse_copy_t>
     {
@@ -422,18 +415,17 @@ namespace hpx {
         // clang-format off
         template <typename BidirIter, typename OutIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<BidirIter>::value &&
-                hpx::traits::is_iterator<OutIter>::value
+                hpx::traits::is_iterator_v<BidirIter> &&
+                hpx::traits::is_iterator_v<OutIter>
             )>
         // clang-format on
         friend OutIter tag_fallback_invoke(
             hpx::reverse_copy_t, BidirIter first, BidirIter last, OutIter dest)
         {
-            static_assert(
-                (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
+            static_assert((hpx::traits::is_bidirectional_iterator_v<BidirIter>),
                 "Requires at least bidirectional iterator.");
 
-            static_assert((hpx::traits::is_output_iterator<OutIter>::value),
+            static_assert((hpx::traits::is_output_iterator_v<OutIter>),
                 "Requires at least output iterator.");
 
             return parallel::util::get_second_element(
@@ -446,21 +438,19 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename BidirIter, typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<BidirIter>::value &&
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::traits::is_iterator_v<BidirIter> &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::reverse_copy_t, ExPolicy&& policy,
             BidirIter first, BidirIter last, FwdIter dest)
         {
-            static_assert(
-                (hpx::traits::is_bidirectional_iterator<BidirIter>::value),
+            static_assert((hpx::traits::is_bidirectional_iterator_v<BidirIter>),
                 "Requires at least bidirectional iterator.");
 
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
                 "Requires at least forward iterator.");
 
             return parallel::util::get_second_element(

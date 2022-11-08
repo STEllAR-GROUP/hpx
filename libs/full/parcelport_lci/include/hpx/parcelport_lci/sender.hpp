@@ -93,7 +93,7 @@ namespace hpx::parcelset::policies::lci {
                 send_messages(HPX_MOVE(connection));
                 has_work = true;
             }
-            next_free_tag();
+            //            next_free_tag();
             return has_work;
         }
 

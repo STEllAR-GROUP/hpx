@@ -17,7 +17,7 @@
 
 // clang-format off
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
-#if !defined(HPX_MODULE_STATIC_LINKING)
+#if !defined(HPX_MODULE_STATIC_LINKING) && !defined(HPX_HAVE_STATIC_LINKING)
 # define HPX_SYMBOL_EXPORT      __declspec(dllexport)
 # define HPX_SYMBOL_IMPORT      __declspec(dllimport)
 # define HPX_SYMBOL_INTERNAL    /* empty */

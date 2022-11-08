@@ -12,7 +12,7 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/util.hpp>
-
+#include <asio/ip/host_name.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <atomic>
@@ -110,24 +110,6 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     LCI_error_t lci_environment::init_lci()
     {
-        // Check if MPI_Init has been called previously
-        int is_mpi_initialized = 0;
-        int retval = MPI_Initialized(&is_mpi_initialized);
-        if (MPI_SUCCESS != retval)
-        {
-            return LCI_ERR_FATAL;
-        }
-        if (!is_mpi_initialized)
-        {
-            int provided;
-            retval =
-                MPI_Init_thread(nullptr, nullptr, MPI_THREAD_SINGLE, &provided);
-            if (MPI_SUCCESS != retval)
-            {
-                return LCI_ERR_FATAL;
-            }
-        }
-
         int lci_initialized = 0;
         LCI_initialized(&lci_initialized);
         if (!lci_initialized)
@@ -154,9 +136,9 @@ namespace hpx { namespace util {
         LCI_plist_create(&h_plist_);
         LCI_queue_create(LCI_UR_DEVICE, &h_cq_r_);
         LCI_plist_set_comp_type(
-            h_plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_QUEUE);
+            h_plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_SYNC);
         LCI_plist_set_comp_type(
-            h_plist_, LCI_PORT_COMMAND, LCI_COMPLETION_QUEUE);
+            h_plist_, LCI_PORT_COMMAND, LCI_COMPLETION_SYNC);
         LCI_plist_set_default_comp(h_plist_, h_cq_r_);
         LCI_endpoint_init(&h_ep_, LCI_UR_DEVICE, h_plist_);
         LCI_plist_free(&h_plist_);
@@ -221,11 +203,7 @@ namespace hpx { namespace util {
 
     std::string lci_environment::get_processor_name()
     {
-        char name[MPI_MAX_PROCESSOR_NAME + 1] = {'\0'};
-        int len = 0;
-        MPI_Get_processor_name(name, &len);
-
-        return name;
+        return asio::ip::host_name();
     }
 
     void lci_environment::finalize()
@@ -244,12 +222,6 @@ namespace hpx { namespace util {
                 delete prg_thread_p;
 
                 LCI_finalize();
-            }
-            int is_finalized = 0;
-            MPI_Finalized(&is_finalized);
-            if (!is_finalized)
-            {
-                MPI_Finalize();
             }
         }
     }

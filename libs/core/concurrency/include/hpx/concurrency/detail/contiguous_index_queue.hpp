@@ -13,6 +13,7 @@
 #include <atomic>
 #include <cstdint>
 #include <type_traits>
+#include <utility>
 
 namespace hpx { namespace concurrency { namespace detail {
 
@@ -180,6 +181,12 @@ namespace hpx { namespace concurrency { namespace detail {
         constexpr bool empty() const noexcept
         {
             return current_range.data_.load(std::memory_order_relaxed).empty();
+        }
+
+        std::pair<T, T> get_current_range() const
+        {
+            auto r = current_range.data_.load(std::memory_order_relaxed);
+            return {r.first, r.last};
         }
 
     private:

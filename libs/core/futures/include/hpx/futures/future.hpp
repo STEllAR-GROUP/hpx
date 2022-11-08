@@ -5,6 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file future.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -14,10 +16,6 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/operation_state.hpp>
-#include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/detail/future_data.hpp>
@@ -373,31 +371,31 @@ namespace hpx { namespace lcos { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename ContResult, typename Future, typename Policy, typename F>
     inline traits::detail::shared_state_ptr_t<continuation_result_t<ContResult>>
-    make_continuation(Future const& future, Policy&& policy, F&& f);
+    make_continuation(Future&& future, Policy&& policy, F&& f);
 
     // create non-unwrapping continuations
     template <typename ContResult, typename Future, typename Executor,
         typename F>
     inline traits::detail::shared_state_ptr_t<ContResult>
-    make_continuation_exec(Future const& future, Executor&& exec, F&& f);
+    make_continuation_exec(Future&& future, Executor&& exec, F&& f);
 
     template <typename ContResult, typename Future, typename Executor,
         typename Policy, typename F>
     inline traits::detail::shared_state_ptr_t<ContResult>
     make_continuation_exec_policy(
-        Future const& future, Executor&& exec, Policy&& policy, F&& f);
+        Future&& future, Executor&& exec, Policy&& policy, F&& f);
 
     template <typename ContResult, typename Allocator, typename Future,
         typename Policy, typename F>
     inline traits::detail::shared_state_ptr_t<continuation_result_t<ContResult>>
     make_continuation_alloc(
-        Allocator const& a, Future const& future, Policy&& policy, F&& f);
+        Allocator const& a, Future&& future, Policy&& policy, F&& f);
 
     template <typename ContResult, typename Allocator, typename Future,
         typename Policy, typename F>
     inline traits::detail::shared_state_ptr_t<ContResult>
     make_continuation_alloc_nounwrap(
-        Allocator const& a, Future const& future, Policy&& policy, F&& f);
+        Allocator const& a, Future&& future, Policy&& policy, F&& f);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename FD, typename Enable = void>
@@ -459,83 +457,6 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Operation state for sender compatibility
-    template <typename Receiver, typename Future>
-    class operation_state
-    {
-    private:
-        using receiver_type = std::decay_t<Receiver>;
-        using future_type = std::decay_t<Future>;
-        using result_type = typename future_type::result_type;
-
-    public:
-        template <typename Receiver_>
-        operation_state(Receiver_&& r, future_type f)
-          : receiver_(HPX_FORWARD(Receiver_, r))
-          , future_(HPX_MOVE(f))
-        {
-        }
-
-        operation_state(operation_state&&) = delete;
-        operation_state& operator=(operation_state&&) = delete;
-        operation_state(operation_state const&) = delete;
-        operation_state& operator=(operation_state const&) = delete;
-
-        friend void tag_invoke(
-            hpx::execution::experimental::start_t, operation_state& os) noexcept
-        {
-            os.start_helper();
-        }
-
-    private:
-        void start_helper() & noexcept
-        {
-            hpx::detail::try_catch_exception_ptr(
-                [&]() {
-                    auto state = traits::detail::get_shared_state(future_);
-
-                    if (!state)
-                    {
-                        HPX_THROW_EXCEPTION(no_state, "operation_state::start",
-                            "the future has no valid shared state");
-                    }
-
-                    // The operation state has to be kept alive until set_value is
-                    // called, which means that we don't need to move receiver and
-                    // future into the on_completed callback.
-                    state->set_on_completed([this]() mutable {
-                        if (future_.has_value())
-                        {
-                            if constexpr (std::is_void_v<result_type>)
-                            {
-                                hpx::execution::experimental::set_value(
-                                    HPX_MOVE(receiver_));
-                            }
-                            else
-                            {
-                                hpx::execution::experimental::set_value(
-                                    HPX_MOVE(receiver_), future_.get());
-                            }
-                        }
-                        else if (future_.has_exception())
-                        {
-                            hpx::execution::experimental::set_error(
-                                HPX_MOVE(receiver_),
-                                future_.get_exception_ptr());
-                        }
-                    });
-                },
-                [&](std::exception_ptr ep) {
-                    hpx::execution::experimental::set_error(
-                        HPX_MOVE(receiver_), HPX_MOVE(ep));
-                });
-        }
-
-        std::decay_t<Receiver> receiver_;
-        future_type future_;
-    };
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Derived, typename R>
     class future_base
     {
@@ -543,31 +464,6 @@ namespace hpx { namespace lcos { namespace detail {
         using result_type = R;
         using shared_state_type =
             future_data_base<traits::detail::shared_state_ptr_result_t<R>>;
-
-        // Sender compatibility
-        template <typename, typename T>
-        struct completion_signatures_base
-        {
-            template <template <typename...> typename Tuple,
-                template <typename...> typename Variant>
-            using value_types = Variant<Tuple<result_type>>;
-        };
-
-        template <typename T>
-        struct completion_signatures_base<T, void>
-        {
-            template <template <typename...> typename Tuple,
-                template <typename...> typename Variant>
-            using value_types = Variant<Tuple<>>;
-        };
-
-        struct completion_signatures : completion_signatures_base<void, R>
-        {
-            template <template <typename...> typename Variant>
-            using error_types = Variant<std::exception_ptr>;
-
-            static constexpr bool sends_stopped = false;
-        };
 
     private:
         template <typename F>
@@ -823,6 +719,7 @@ namespace hpx { namespace lcos { namespace detail {
     };
 }}}    // namespace hpx::lcos::detail
 
+/// Top level HPX namespace
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -835,17 +732,6 @@ namespace hpx {
     public:
         using result_type = R;
         using shared_state_type = typename base_type::shared_state_type;
-
-        // Sender compatibility
-        using completion_signatures = typename base_type::completion_signatures;
-
-        template <typename Receiver>
-        friend lcos::detail::operation_state<Receiver, future> tag_invoke(
-            hpx::execution::experimental::connect_t, future&& f,
-            Receiver&& receiver)
-        {
-            return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(f)};
-        }
 
     private:
         struct invalidate
@@ -1091,6 +977,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // Allow to convert any future<U> into any other future<R> based on an
     // existing conversion path U --> R.
+    /// \brief Converts any future of type U to any other future of type R
+    ///        based on an existing conversion path from U to R.
     template <typename R, typename U>
     hpx::future<R> make_future(hpx::future<U>&& f)
     {
@@ -1112,6 +1000,8 @@ namespace hpx {
 
     // Allow to convert any future<U> into any other future<R> based on a given
     // conversion function: R conv(U).
+    /// \brief Converts any future of type U to any other future of type R
+    ///        based on a given conversion function: R conv(U).
     template <typename R, typename U, typename Conv>
     hpx::future<R> make_future(hpx::future<U>&& f, Conv&& conv)
     {
@@ -1129,6 +1019,7 @@ namespace hpx {
     }
 }    // namespace hpx
 
+/// Top level HPX namespace
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1140,25 +1031,6 @@ namespace hpx {
     public:
         using result_type = R;
         using shared_state_type = typename base_type::shared_state_type;
-
-        // Sender compatibility
-        using completion_signatures = typename base_type::completion_signatures;
-
-        template <typename Receiver>
-        friend lcos::detail::operation_state<Receiver, shared_future>
-        tag_invoke(hpx::execution::experimental::connect_t, shared_future&& f,
-            Receiver&& receiver)
-        {
-            return {HPX_FORWARD(Receiver, receiver), HPX_MOVE(f)};
-        }
-
-        template <typename Receiver>
-        friend lcos::detail::operation_state<Receiver, shared_future>
-        tag_invoke(hpx::execution::experimental::connect_t, shared_future& f,
-            Receiver&& receiver)
-        {
-            return {HPX_FORWARD(Receiver, receiver), f};
-        }
 
     private:
         template <typename Future>
@@ -1379,6 +1251,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // Allow to convert any shared_future<U> into any other future<R> based on
     // an existing conversion path U --> R.
+    /// \brief Converts any shared_future of type U to any other future of type R
+    ///        based on an existing conversion path from U to R.
     template <typename R, typename U>
     hpx::future<R> make_future(hpx::shared_future<U> f)
     {
@@ -1402,6 +1276,7 @@ namespace hpx {
 
     // Allow to convert any future<U> into any other future<R> based on a given
     // conversion function: R conv(U).
+    /// \copydoc make_future(hpx::future<U>&& f)
     template <typename R, typename U, typename Conv>
     hpx::future<R> make_future(hpx::shared_future<U> f, Conv&& conv)
     {
@@ -1425,18 +1300,22 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // Convert any type of future<T> or shared_future<T> into a corresponding
     // shared_future<T>.
+    /// \brief Converts any future or shared_future of type T to a corresponding
+    ///        shared_future of type T
     template <typename R>
     hpx::shared_future<R> make_shared_future(hpx::future<R>&& f) noexcept
     {
         return f.share();
     }
 
+    /// \copydoc make_shared_future(hpx::future<R>&& f)
     template <typename R>
     hpx::shared_future<R>& make_shared_future(hpx::shared_future<R>& f) noexcept
     {
         return f;
     }
 
+    /// \copydoc make_shared_future(hpx::future<R>&& f)
     template <typename R>
     hpx::shared_future<R>&& make_shared_future(
         hpx::shared_future<R>&& f) noexcept
@@ -1444,6 +1323,7 @@ namespace hpx {
         return HPX_MOVE(f);
     }
 
+    /// \copydoc make_shared_future(hpx::future<R>&& f)
     template <typename R>
     hpx::shared_future<R> const& make_shared_future(
         hpx::shared_future<R> const& f) noexcept
@@ -1452,10 +1332,12 @@ namespace hpx {
     }
 }    // namespace hpx
 
+/// Top level HPX namespace
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // Extension (see wg21.link/P0319), with allocator
+    /// \brief Creates a pre-initialized future object with allocator (extension)
     template <typename T, typename Allocator, typename... Ts>
     std::enable_if_t<std::is_constructible_v<T, Ts&&...> || std::is_void_v<T>,
         future<T>>
@@ -1488,6 +1370,7 @@ namespace hpx {
     }
 
     // Extension (see wg21.link/P0319)
+    /// \copydoc make_ready_future(T&& init)
     template <typename T, typename... Ts>
     HPX_FORCEINLINE std::enable_if_t<
         std::is_constructible_v<T, Ts&&...> || std::is_void_v<T>, future<T>>
@@ -1498,6 +1381,7 @@ namespace hpx {
     }
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object, with allocator
+    /// \copydoc make_ready_future_alloc(Allocator const& a, Ts&&... ts)
     template <int DeductionGuard = 0, typename Allocator, typename T>
     future<hpx::util::decay_unwrap_t<T>> make_ready_future_alloc(
         Allocator const& a, T&& init)
@@ -1507,6 +1391,9 @@ namespace hpx {
     }
 
     // extension: create a pre-initialized future object
+    /// \brief The function creates a shared state that is immediately ready
+    ///        and returns a future associated with that shared state.
+    ///        For the returned future, valid() == true and is_ready() == true
     template <int DeductionGuard = 0, typename T>
     HPX_FORCEINLINE future<hpx::util::decay_unwrap_t<T>> make_ready_future(
         T&& init)
@@ -1518,6 +1405,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object which holds the
     // given error
+    /// \brief Creates a pre-initialized future object which holds the
+    ///        given error (extension)
     template <typename T>
     future<T> make_exceptional_future(std::exception_ptr const& e)
     {
@@ -1530,6 +1419,7 @@ namespace hpx {
         return hpx::traits::future_access<future<T>>::create(HPX_MOVE(p));
     }
 
+    /// \copydoc make_exceptional_future(std::exception_ptr const& e)
     template <typename T, typename E>
     future<T> make_exceptional_future(E e)
     {
@@ -1548,20 +1438,27 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
+    /// \brief Creates a pre-initialized future object which gets ready at
+    ///        a given point in time (extension)
     template <int DeductionGuard = 0, typename T>
     future<hpx::util::decay_unwrap_t<T>> make_ready_future_at(
         hpx::chrono::steady_time_point const& abs_time, T&& init)
     {
         using result_type = hpx::util::decay_unwrap_t<T>;
         using shared_state = lcos::detail::timed_future_data<result_type>;
+        using init_no_addref = typename shared_state::init_no_addref;
 
         hpx::intrusive_ptr<shared_state> p(
-            new shared_state(abs_time.value(), HPX_FORWARD(T, init)));
+            new shared_state(
+                init_no_addref{}, abs_time.value(), HPX_FORWARD(T, init)),
+            false);
 
         return hpx::traits::future_access<future<result_type>>::create(
             HPX_MOVE(p));
     }
 
+    /// \brief Creates a pre-initialized future object which gets ready after
+    ///        a given point in time (extension)
     template <int DeductionGuard = 0, typename T>
     future<hpx::util::decay_unwrap_t<T>> make_ready_future_after(
         hpx::chrono::steady_duration const& rel_time, T&& init)
@@ -1572,6 +1469,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // extension: create a pre-initialized future object, with allocator
+    /// \copydoc make_ready_future_alloc(Allocator const& a, Ts&&... ts)
     template <typename Allocator>
     inline future<void> make_ready_future_alloc(Allocator const& a)
     {
@@ -1586,6 +1484,7 @@ namespace hpx {
     }
 
     // Extension (see wg21.link/P0319)
+    /// \copydoc make_ready_future(T&& init)
     template <typename T>
     HPX_FORCEINLINE std::enable_if_t<std::is_void_v<T>, future<void>>
     make_ready_future()
@@ -1595,15 +1494,22 @@ namespace hpx {
 
     // extension: create a pre-initialized future object which gets ready at
     // a given point in time
+    /// \copydoc make_ready_future_at(hpx::chrono::steady_time_point const& abs_time, T&& init)
     inline future<void> make_ready_future_at(
         hpx::chrono::steady_time_point const& abs_time)
     {
         using shared_state = lcos::detail::timed_future_data<void>;
+        using init_no_addref = typename shared_state::init_no_addref;
 
-        return hpx::traits::future_access<future<void>>::create(
-            new shared_state(abs_time.value(), hpx::util::unused));
+        hpx::intrusive_ptr<shared_state> p(
+            new shared_state(
+                init_no_addref{}, abs_time.value(), hpx::util::unused),
+            false);
+
+        return hpx::traits::future_access<future<void>>::create(HPX_MOVE(p));
     }
 
+    /// \copydoc make_ready_future_at(hpx::chrono::steady_time_point const& abs_time, T&& init)
     template <typename T>
     std::enable_if_t<std::is_void_v<T>, future<void>> make_ready_future_at(
         hpx::chrono::steady_time_point const& abs_time)
@@ -1612,12 +1518,14 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \copydoc make_ready_future_after(hpx::chrono::steady_duration const& rel_time, T&& init)
     inline future<void> make_ready_future_after(
         hpx::chrono::steady_duration const& rel_time)
     {
         return hpx::make_ready_future_at(rel_time.from_now());
     }
 
+    /// \copydoc make_ready_future_after(hpx::chrono::steady_duration const& rel_time, T&& init)
     template <typename T>
     std::enable_if_t<std::is_void_v<T>, future<void>> make_ready_future_after(
         hpx::chrono::steady_duration const& rel_time)

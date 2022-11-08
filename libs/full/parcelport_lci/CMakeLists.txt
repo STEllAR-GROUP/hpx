@@ -14,7 +14,6 @@ set(parcelport_lci_headers
     hpx/parcelport_lci/header.hpp
     hpx/parcelport_lci/locality.hpp
     hpx/parcelport_lci/receiver.hpp
-    hpx/parcelport_lci/receiver_connection.hpp
     hpx/parcelport_lci/sender.hpp
     hpx/parcelport_lci/sender_connection.hpp
     hpx/parcelport_lci/tag_provider.hpp
@@ -36,7 +35,7 @@ add_hpx_module(
   SOURCES ${parcelport_lci_sources}
   HEADERS ${parcelport_lci_headers}
   COMPAT_HEADERS ${parcelport_lci_compat_headers}
-  DEPENDENCIES hpx_core hpx_dependencies_boost Mpi::mpi LCI::LCI
+  DEPENDENCIES hpx_core hpx_dependencies_boost LCI::LCI
   MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_parcelset
   CMAKE_SUBDIRS examples tests
 )

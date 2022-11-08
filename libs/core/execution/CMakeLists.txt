@@ -7,8 +7,10 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(execution_headers
+    hpx/execution/algorithms/as_sender.hpp
     hpx/execution/algorithms/bulk.hpp
     hpx/execution/algorithms/detail/is_negative.hpp
+    hpx/execution/algorithms/detail/inject_scheduler.hpp
     hpx/execution/algorithms/detail/partial_algorithm.hpp
     hpx/execution/algorithms/detail/predicates.hpp
     hpx/execution/algorithms/detail/single_result.hpp
@@ -20,6 +22,7 @@ set(execution_headers
     hpx/execution/algorithms/let_stopped.hpp
     hpx/execution/algorithms/let_value.hpp
     hpx/execution/algorithms/make_future.hpp
+    hpx/execution/algorithms/run_loop.hpp
     hpx/execution/algorithms/schedule_from.hpp
     hpx/execution/algorithms/split.hpp
     hpx/execution/algorithms/start_detached.hpp
@@ -35,6 +38,7 @@ set(execution_headers
     hpx/execution/detail/sync_launch_policy_dispatch.hpp
     hpx/execution/execution.hpp
     hpx/execution/executor_parameters.hpp
+    hpx/execution/executors/adaptive_static_chunk_size.hpp
     hpx/execution/executors/auto_chunk_size.hpp
     hpx/execution/executors/dynamic_chunk_size.hpp
     hpx/execution/executors/execution.hpp
@@ -53,17 +57,31 @@ set(execution_headers
     hpx/execution/queries/get_delegatee_scheduler.hpp
     hpx/execution/queries/get_stop_token.hpp
     hpx/execution/queries/read.hpp
+    hpx/execution/traits/detail/eve/vector_pack_alignment_size.hpp
+    hpx/execution/traits/detail/eve/vector_pack_all_any_none.hpp
+    hpx/execution/traits/detail/eve/vector_pack_conditionals.hpp
+    hpx/execution/traits/detail/eve/vector_pack_count_bits.hpp
+    hpx/execution/traits/detail/eve/vector_pack_find.hpp
+    hpx/execution/traits/detail/eve/vector_pack_get_set.hpp
+    hpx/execution/traits/detail/eve/vector_pack_load_store.hpp
+    hpx/execution/traits/detail/eve/vector_pack_reduce.hpp
+    hpx/execution/traits/detail/eve/vector_pack_type.hpp
     hpx/execution/traits/detail/simd/vector_pack_alignment_size.hpp
     hpx/execution/traits/detail/simd/vector_pack_all_any_none.hpp
+    hpx/execution/traits/detail/simd/vector_pack_conditionals.hpp
     hpx/execution/traits/detail/simd/vector_pack_count_bits.hpp
     hpx/execution/traits/detail/simd/vector_pack_find.hpp
+    hpx/execution/traits/detail/simd/vector_pack_get_set.hpp
     hpx/execution/traits/detail/simd/vector_pack_load_store.hpp
     hpx/execution/traits/detail/simd/vector_pack_reduce.hpp
+    hpx/execution/traits/detail/simd/vector_pack_simd.hpp
     hpx/execution/traits/detail/simd/vector_pack_type.hpp
     hpx/execution/traits/detail/vc/vector_pack_alignment_size.hpp
     hpx/execution/traits/detail/vc/vector_pack_all_any_none.hpp
+    hpx/execution/traits/detail/vc/vector_pack_conditionals.hpp
     hpx/execution/traits/detail/vc/vector_pack_count_bits.hpp
     hpx/execution/traits/detail/vc/vector_pack_find.hpp
+    hpx/execution/traits/detail/vc/vector_pack_get_set.hpp
     hpx/execution/traits/detail/vc/vector_pack_load_store.hpp
     hpx/execution/traits/detail/vc/vector_pack_reduce.hpp
     hpx/execution/traits/detail/vc/vector_pack_type.hpp
@@ -72,8 +90,10 @@ set(execution_headers
     hpx/execution/traits/is_execution_policy.hpp
     hpx/execution/traits/vector_pack_alignment_size.hpp
     hpx/execution/traits/vector_pack_all_any_none.hpp
+    hpx/execution/traits/vector_pack_conditionals.hpp
     hpx/execution/traits/vector_pack_count_bits.hpp
     hpx/execution/traits/vector_pack_find.hpp
+    hpx/execution/traits/vector_pack_get_set.hpp
     hpx/execution/traits/vector_pack_load_store.hpp
     hpx/execution/traits/vector_pack_reduce.hpp
     hpx/execution/traits/vector_pack_type.hpp
@@ -103,8 +123,10 @@ set(execution_compat_headers
     hpx/parallel/executors/static_chunk_size.hpp => hpx/execution.hpp
     hpx/parallel/traits/vector_pack_alignment_size.hpp => hpx/execution.hpp
     hpx/parallel/traits/vector_pack_all_any_none.hpp => hpx/execution.hpp
-    hpx/parallel/traits/vector_pack_find.hpp => hpx/execution.hpp
+    hpx/parallel/traits/vector_pack_conditionals.hpp => hpx/execution.hpp
     hpx/parallel/traits/vector_pack_count_bits.hpp => hpx/execution.hpp
+    hpx/parallel/traits/vector_pack_find.hpp => hpx/execution.hpp
+    hpx/parallel/traits/vector_pack_get_set.hpp => hpx/execution.hpp
     hpx/parallel/traits/vector_pack_load_store.hpp => hpx/execution.hpp
     hpx/parallel/traits/vector_pack_load_reduce.hpp => hpx/execution.hpp
     hpx/parallel/traits/vector_pack_type.hpp => hpx/execution.hpp
@@ -116,6 +138,14 @@ set(execution_compat_headers
 
 if(TARGET Vc::vc)
   set(execution_optional_dependencies Vc::vc)
+endif()
+
+if(TARGET Eve::eve)
+  set(execution_optional_dependencies Eve::eve)
+endif()
+
+if(TARGET SVE::sve)
+  set(execution_optional_dependencies SVE::sve)
 endif()
 
 include(HPX_AddModule)
@@ -132,6 +162,7 @@ add_hpx_module(
     hpx_threading
     hpx_pack_traversal
     hpx_errors
+    hpx_lock_registration
     hpx_memory
     hpx_synchronization
     hpx_thread_support

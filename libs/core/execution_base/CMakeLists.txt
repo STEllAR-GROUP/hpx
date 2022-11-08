@@ -11,6 +11,7 @@ set(execution_base_headers
     hpx/execution_base/completion_scheduler.hpp
     hpx/execution_base/completion_signatures.hpp
     hpx/execution_base/context_base.hpp
+    hpx/execution_base/coroutine_utils.hpp
     hpx/execution_base/detail/spinlock_deadlock_detection.hpp
     hpx/execution_base/execution.hpp
     hpx/execution_base/get_env.hpp
@@ -21,6 +22,7 @@ set(execution_base_headers
     hpx/execution_base/this_thread.hpp
     hpx/execution_base/traits/is_executor.hpp
     hpx/execution_base/traits/is_executor_parameters.hpp
+    hpx/execution_base/traits/coroutine_traits.hpp
 )
 
 # cmake-format: off

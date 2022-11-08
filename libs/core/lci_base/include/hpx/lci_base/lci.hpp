@@ -17,7 +17,6 @@
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #endif
 
-#include <mpi.h>
 #include "lci.h"
 
 #if defined(__clang__)

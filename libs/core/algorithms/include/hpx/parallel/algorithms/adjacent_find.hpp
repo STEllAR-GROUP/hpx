@@ -15,14 +15,14 @@
 namespace hpx {
     /// Searches the range [first, last) for two consecutive identical elements.
     ///
-    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
-    ///                     (last - first) - 1 application of the predicate
+    /// \note   Complexity: Exactly the smaller of (\a result - \a first) + 1 and
+    ///                     (\a last - \a first) - 1 application of the predicate
     ///                     where \a result is the value returned
     ///
-    /// \tparam FwdIter     The type of the source iterators used for the
+    /// \tparam InIter      The type of the source iterators used for the
     ///                     range (deduced).
     ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
+    ///                     input iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
@@ -38,21 +38,22 @@ namespace hpx {
     ///                     The signature does not need to have const &, but
     ///                     the function must not modify the objects passed to
     ///                     it. The types \a Type1 must be such
-    ///                     that objects of type \a FwdIter
+    ///                     that objects of type \a InIter
     ///                     can be dereferenced and then implicitly converted
     ///                     to \a Type1 .
     ///
     /// \returns  The \a adjacent_find algorithm returns an iterator to the
     ///           first of the identical elements. If no such elements are
     ///           found, \a last is returned.
-    template <typename FwdIter, typename Pred = detail::equal_to>
-    FwdIter adjacent_find(FwdIter first, FwdIter last, Pred&& pred = Pred());
+    template <typename InIter,
+        typename Pred = hpx::parallel::v1::detail::equal_to>
+    InIter adjacent_find(InIter first, InIter last, Pred&& pred = Pred());
 
     /// Searches the range [first, last) for two consecutive identical elements.
     /// This version uses the given binary predicate pred
     ///
-    /// \note   Complexity: Exactly the smaller of (result - first) + 1 and
-    ///                     (last - first) - 1 application of the predicate
+    /// \note   Complexity: Exactly the smaller of (\a result - \a first) + 1 and
+    ///                     (\a last - \a first) - 1 application of the predicate
     ///                     where \a result is the value returned
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
@@ -61,7 +62,7 @@ namespace hpx {
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used for the
     ///                     range (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
@@ -98,11 +99,11 @@ namespace hpx {
     /// unordered fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<InIter>
+    /// \returns  The \a adjacent_find algorithm returns a \a hpx::future<FwdIter>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a InIter otherwise.
+    ///           returns \a FwdIter otherwise.
     ///           The \a adjacent_find algorithm returns an iterator to the
     ///           first of the identical elements. If no such elements are
     ///           found, \a last is returned.
@@ -112,9 +113,8 @@ namespace hpx {
     ///           predicate \a pred.
     ///
     template <typename ExPolicy, typename FwdIter,
-        typename Pred = detail::equal_to>
-    typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type>::type
+        typename Pred = hpx::parallel::v1::detail::equal_to>
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
     adjacent_find(
         ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred = Pred());
 }    // namespace hpx
@@ -215,7 +215,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return util::partitioner<ExPolicy, FwdIter,
                     void>::call_with_index(HPX_FORWARD(ExPolicy, policy),
-                    hpx::util::make_zip_iterator(first, next), count - 1, 1,
+                    hpx::util::zip_iterator(first, next), count - 1, 1,
                     HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };

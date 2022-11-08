@@ -105,14 +105,13 @@ namespace hpx { namespace ranges {
     ///           If the length of the range [first1, last1) does not equal
     ///           the length of the range [first2, last2), it returns false.
     ///
-    template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
-        typename Sent2, typename Pred = ranges::equal_to,
-        typename Proj1 = util::projection_identity,
-        typename Proj2 = util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
-    equal(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
-        Sent2 last2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-        Proj2&& proj2 = Proj2());
+    template <typename ExPolicy, typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2, typename Pred = equal_to,
+        typename Proj1 = hpx::parallel::util::projection_identity,
+        typename Proj2 = hpx::parallel::util::projection_identity>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+    equal(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
+        Pred&& op = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     /// Returns true if the range [first1, last1) is equal to the range
     /// starting at first2, and false otherwise.
@@ -196,11 +195,156 @@ namespace hpx { namespace ranges {
     ///           two ranges are equal, otherwise it returns false.
     ///
     template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename Pred = ranges::equal_to,
-        typename Proj1 = util::projection_identity,
-        typename Proj2 = util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Pred = equal_to,
+        typename Proj1 = hpx::parallel::util::projection_identity,
+        typename Proj2 = hpx::parallel::util::projection_identity>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
     equal(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
+        Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+
+    /// Returns true if the range [first1, last1) is equal to the range
+    /// [first2, last2), and false otherwise.
+    ///
+    /// \note   Complexity: At most min(last1 - first1, last2 - first2)
+    ///         applications of the predicate \a f.
+    ///
+    /// \tparam Iter1       The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent1       The type of the source iterators used for the end of
+    ///                     the first range (deduced).
+    /// \tparam Iter2       The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent2       The type of the source iterators used for the end of
+    ///                     the second range (deduced).
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
+    /// \tparam Proj1       The type of an optional projection function applied
+    ///                     to the first range. This
+    ///                     defaults to \a util::projection_identity
+    /// \tparam Proj2       The type of an optional projection function applied
+    ///                     to the second range. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    /// \param last2        Refers to the end of the sequence of elements of
+    ///                     the second range the algorithm will be applied to.
+    /// \param op           The binary predicate which returns true if the
+    ///                     elements should be treated as equal. The signature
+    ///                     of the predicate function should be equivalent to
+    ///                     the following:
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type1 and \a Type2 respectively
+    /// \param proj1        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements of the
+    ///                     first range as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements of the
+    ///                     second range as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// \note     The two ranges are considered equal if, for every iterator
+    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
+    ///           This overload of equal uses operator== to determine if two
+    ///           elements are equal.
+    ///
+    /// \returns  The \a equal algorithm returns true if the elements in the
+    ///           two ranges are equal, otherwise it returns false.
+    ///           If the length of the range [first1, last1) does not equal
+    ///           the length of the range [first2, last2), it returns false.
+    ///
+    template <typename Iter1, typename Sent1,
+        typename Iter2, typename Sent2, typename Pred = equal_to,
+        typename Proj1 = hpx::parallel::util::projection_identity,
+        typename Proj2 = hpx::parallel::util::projection_identity>
+    bool equal(Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
+        Pred&& op = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
+
+    /// Returns true if the range [first1, last1) is equal to the range
+    /// starting at first2, and false otherwise.
+    ///
+    /// \note   Complexity: At most \a last1 - \a first1 applications of the
+    ///         predicate \a f.
+    ///
+    /// \tparam Rng1        The type of the first source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Rng2        The type of the second source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a equal requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::equal_to<>
+    /// \tparam Proj1       The type of an optional projection function applied
+    ///                     to the first range. This
+    ///                     defaults to \a util::projection_identity
+    /// \tparam Proj2       The type of an optional projection function applied
+    ///                     to the second range. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param rng1         Refers to the first sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param rng2         Refers to the second sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param op           The binary predicate which returns true if the
+    ///                     elements should be treated as equal. The signature
+    ///                     of the predicate function should be equivalent to
+    ///                     the following:
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type1 and \a Type2 respectively
+    /// \param proj1        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements of the
+    ///                     first range as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    /// \param proj2        Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements of the
+    ///                     second range as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// \note     The two ranges are considered equal if, for every iterator
+    ///           i in the range [first1,last1), *i equals *(first2 + (i - first1)).
+    ///           This overload of equal uses operator== to determine if two
+    ///           elements are equal.
+    ///
+    /// \returns  The \a equal algorithm returns true if the elements in the
+    ///           two ranges are equal, otherwise it returns false.
+    ///
+    template <typename Rng1, typename Rng2, typename Pred = equal_to,
+        typename Proj1 = hpx::parallel::util::projection_identity,
+        typename Proj2 = hpx::parallel::util::projection_identity>
+    bool equal(Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     // clang-format on
@@ -227,7 +371,7 @@ namespace hpx { namespace ranges {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::equal
+    // CPO for hpx::equal
     inline constexpr struct equal_t final
       : hpx::detail::tag_parallel_algorithm<equal_t>
     {

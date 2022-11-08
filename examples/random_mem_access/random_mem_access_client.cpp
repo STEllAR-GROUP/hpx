@@ -50,7 +50,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         std::vector<hpx::future<void>> barrier;
         for (std::size_t i = 0; i < iterations; i++)
         {
-            std::uniform_int_distribution<> dis(0, array_size - 1);
+            std::uniform_int_distribution<> dis(
+                0, static_cast<int>(array_size - 1));
             std::size_t rn = dis(gen);
             //std::cout << " Random element access: " << rn << std::endl;
             barrier.push_back(accu[rn].add_async());

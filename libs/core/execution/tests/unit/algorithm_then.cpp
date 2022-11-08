@@ -5,12 +5,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/local/init.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/threading.hpp>
 
 #include "algorithm_test_utils.hpp"
 
 #include <atomic>
+#include <chrono>
 #include <exception>
 #include <stdexcept>
 #include <string>
@@ -42,7 +46,112 @@ auto tag_invoke(ex::then_t, S&& s, custom_transformer t)
     return ex::then(std::forward<S>(s), [t = std::move(t)]() { t(); });
 }
 
-int main()
+///////////////////////////////////////////////////////////////////////////////
+void test_execution_then_return_int()
+{
+    hpx::future<int> f1 =
+        hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
+    HPX_TEST(f1.valid());
+    hpx::future<int> f2 = hpx::execution::experimental::make_future(
+        hpx::execution::experimental::then(
+            hpx::execution::experimental::as_sender(std::move(f1)),
+            [](int value) {
+                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+                return 2 * value;
+            }));
+    HPX_TEST(f2.valid());
+    try
+    {
+        HPX_TEST_EQ(f2.get(), 2);
+    }
+    catch (hpx::exception const& /*ex*/)
+    {
+        HPX_TEST(false);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+}
+
+void test_execution_then_return_void()
+{
+    hpx::future<int> f1 =
+        hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
+    HPX_TEST(f1.valid());
+    hpx::future<void> f2 = hpx::execution::experimental::make_future(
+        hpx::execution::experimental::then(
+            hpx::execution::experimental::as_sender(std::move(f1)), [](auto) {
+                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }));
+    HPX_TEST(f2.valid());
+    try
+    {
+        f2.wait();
+    }
+    catch (hpx::exception const& /*ex*/)
+    {
+        HPX_TEST(false);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+}
+
+void test_execution_then_return_int_shared()
+{
+    hpx::shared_future<int> f1 =
+        hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
+    HPX_TEST(f1.valid());
+    hpx::future<int> f2 = hpx::execution::experimental::make_future(
+        hpx::execution::experimental::then(
+            hpx::execution::experimental::as_sender(std::move(f1)),
+            [](int value) {
+                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+                return 2 * value;
+            }));
+    HPX_TEST(f2.valid());
+    try
+    {
+        HPX_TEST_EQ(f2.get(), 2);
+    }
+    catch (hpx::exception const& /*ex*/)
+    {
+        HPX_TEST(false);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+}
+
+void test_execution_then_return_void_shared()
+{
+    hpx::shared_future<int> f1 =
+        hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
+    HPX_TEST(f1.valid());
+    hpx::future<void> f2 = hpx::execution::experimental::make_future(
+        hpx::execution::experimental::then(
+            hpx::execution::experimental::as_sender(std::move(f1)), [](auto) {
+                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }));
+    HPX_TEST(f2.valid());
+    try
+    {
+        f2.wait();
+    }
+    catch (hpx::exception const& /*ex*/)
+    {
+        HPX_TEST(false);
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+}
+
+int hpx_main()
 {
     // Success path
     {
@@ -332,6 +441,19 @@ int main()
         HPX_TEST(tag_invoke_overload_called);
         HPX_TEST(custom_transformer_call_operator_called);
     }
+
+    test_execution_then_return_int();
+    test_execution_then_return_void();
+    test_execution_then_return_int_shared();
+    test_execution_then_return_void_shared();
+
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    HPX_TEST_EQ_MSG(hpx::local::init(hpx_main, argc, argv), 0,
+        "HPX main exited with non-zero status");
 
     return hpx::util::report_errors();
 }

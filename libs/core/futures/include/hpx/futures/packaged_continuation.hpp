@@ -185,16 +185,19 @@ namespace hpx { namespace lcos { namespace detail {
     protected:
         void run_impl(traits::detail::shared_state_ptr_for_t<Future>&& f)
         {
-            Future future = traits::future_access<Future>::create(HPX_MOVE(f));
+            auto future = traits::future_access<std::decay_t<Future>>::create(
+                HPX_MOVE(f));
             invoke_continuation(f_, HPX_MOVE(future), *this);
         }
 
         void run_impl_nounwrap(
             traits::detail::shared_state_ptr_for_t<Future>&& f)
         {
-            using is_void = std::is_void<util::invoke_result_t<F, Future>>;
+            using is_void =
+                std::is_void<util::invoke_result_t<F, std::decay_t<Future>&&>>;
 
-            Future future = traits::future_access<Future>::create(HPX_MOVE(f));
+            auto future = traits::future_access<std::decay_t<Future>>::create(
+                HPX_MOVE(f));
             invoke_continuation_nounwrap(
                 f_, HPX_MOVE(future), *this, is_void{});
         }
@@ -246,18 +249,21 @@ namespace hpx { namespace lcos { namespace detail {
         {
             reset_id r(*this);
 
-            Future future = traits::future_access<Future>::create(HPX_MOVE(f));
+            auto future = traits::future_access<std::decay_t<Future>>::create(
+                HPX_MOVE(f));
             invoke_continuation(f_, HPX_MOVE(future), *this);
         }
 
         void async_impl_nounwrap(
             traits::detail::shared_state_ptr_for_t<Future>&& f)
         {
-            using is_void = std::is_void<util::invoke_result_t<F, Future>>;
+            using is_void =
+                std::is_void<util::invoke_result_t<F, std::decay_t<Future>&&>>;
 
             reset_id r(*this);
 
-            Future future = traits::future_access<Future>::create(HPX_MOVE(f));
+            auto future = traits::future_access<std::decay_t<Future>>::create(
+                HPX_MOVE(f));
             invoke_continuation_nounwrap(
                 f_, HPX_MOVE(future), *this, is_void{});
         }
@@ -371,18 +377,18 @@ namespace hpx { namespace lcos { namespace detail {
     public:
         ///////////////////////////////////////////////////////////////////////
         // TODO: Reduce duplication!
-        template <typename Spawner, typename Policy>
-        void attach(Future const& future,
-            std::remove_reference_t<Spawner>& spawner, Policy&& policy,
-            error_code& /*ec*/ = throws)
+        template <typename Spawner, typename Future_, typename Policy>
+        void attach(Future_&& future, std::remove_reference_t<Spawner>& spawner,
+            Policy&& policy, error_code& /*ec*/ = throws)
         {
             using shared_state_ptr =
-                traits::detail::shared_state_ptr_for_t<Future>;
+                traits::detail::shared_state_ptr_for_t<Future_>;
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
             hpx::intrusive_ptr<continuation> this_(this);
-            shared_state_ptr state = traits::detail::get_shared_state(future);
+            shared_state_ptr state =
+                traits::detail::get_shared_state(HPX_FORWARD(Future_, future));
             typename shared_state_ptr::element_type* ptr = state.get();
 
             if (ptr == nullptr)
@@ -407,18 +413,19 @@ namespace hpx { namespace lcos { namespace detail {
                 });
         }
 
-        template <typename Spawner, typename Policy>
-        void attach(Future const& future,
+        template <typename Spawner, typename Future_, typename Policy>
+        void attach(Future_&& future,
             std::remove_reference_t<Spawner>&& spawner, Policy&& policy,
             error_code& /*ec*/ = throws)
         {
             using shared_state_ptr =
-                traits::detail::shared_state_ptr_for_t<Future>;
+                traits::detail::shared_state_ptr_for_t<Future_>;
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
             hpx::intrusive_ptr<continuation> this_(this);
-            shared_state_ptr state = traits::detail::get_shared_state(future);
+            shared_state_ptr state =
+                traits::detail::get_shared_state(HPX_FORWARD(Future_, future));
             typename shared_state_ptr::element_type* ptr = state.get();
 
             if (ptr == nullptr)
@@ -444,18 +451,19 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename Spawner, typename Policy>
-        void attach_nounwrap(Future const& future,
+        template <typename Spawner, typename Future_, typename Policy>
+        void attach_nounwrap(Future_&& future,
             std::remove_reference_t<Spawner>& spawner, Policy&& policy,
             error_code& /*ec*/ = throws)
         {
             using shared_state_ptr =
-                traits::detail::shared_state_ptr_for_t<Future>;
+                traits::detail::shared_state_ptr_for_t<Future_>;
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
             hpx::intrusive_ptr<continuation> this_(this);
-            shared_state_ptr state = traits::detail::get_shared_state(future);
+            shared_state_ptr state =
+                traits::detail::get_shared_state(HPX_FORWARD(Future_, future));
             typename shared_state_ptr::element_type* ptr = state.get();
 
             if (ptr == nullptr)
@@ -480,18 +488,19 @@ namespace hpx { namespace lcos { namespace detail {
                 });
         }
 
-        template <typename Spawner, typename Policy>
-        void attach_nounwrap(Future const& future,
+        template <typename Spawner, typename Future_, typename Policy>
+        void attach_nounwrap(Future_&& future,
             std::remove_reference_t<Spawner>&& spawner, Policy&& policy,
             error_code& /*ec*/ = throws)
         {
             using shared_state_ptr =
-                traits::detail::shared_state_ptr_for_t<Future>;
+                traits::detail::shared_state_ptr_for_t<Future_>;
 
             // bind an on_completed handler to this future which will invoke
             // the continuation
             hpx::intrusive_ptr<continuation> this_(this);
-            shared_state_ptr state = traits::detail::get_shared_state(future);
+            shared_state_ptr state =
+                traits::detail::get_shared_state(HPX_FORWARD(Future_, future));
             typename shared_state_ptr::element_type* ptr = state.get();
 
             if (ptr == nullptr)

@@ -84,6 +84,7 @@ function(add_hpx_test category name)
   set(cmd
       "${PYTHON_EXECUTABLE}"
       "${_script_location}/bin/hpxrun.py"
+      ${CMAKE_CROSSCOMPILING_EMULATOR}
       ${_exe}
         "-e" "${expected}"
         "-t" "${${name}_THREADS_PER_LOCALITY}"

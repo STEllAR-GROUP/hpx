@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,10 +6,14 @@
 
 #pragma once
 
-#include <hpx/executors/thread_pool_executor.hpp>
+#include <hpx/config.hpp>
+#include <hpx/executors/parallel_executor.hpp>
 
 namespace hpx { namespace parallel { namespace execution {
-    using current_executor = parallel::execution::thread_pool_executor;
+    using current_executor HPX_DEPRECATED_V(1, 9,
+        "hpx::parallel::execution::current_executor is deprecated, use "
+        "hpx::execution::parallel_executor instead") =
+        hpx::execution::parallel_executor;
 }}}    // namespace hpx::parallel::execution
 
 namespace hpx { namespace threads {
@@ -26,7 +30,7 @@ namespace hpx { namespace threads {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_CORE_EXPORT parallel::execution::current_executor get_executor(
+    HPX_CORE_EXPORT hpx::execution::parallel_executor get_executor(
         thread_id_type const& id, error_code& ec = throws);
 }}    // namespace hpx::threads
 
@@ -44,6 +48,6 @@ namespace hpx { namespace this_thread {
     ///         running, it will throw an \a hpx#exception with an error code of
     ///         \a hpx#invalid_status.
     ///
-    HPX_CORE_EXPORT parallel::execution::current_executor get_executor(
+    HPX_CORE_EXPORT hpx::execution::parallel_executor get_executor(
         error_code& ec = throws);
 }}    // namespace hpx::this_thread

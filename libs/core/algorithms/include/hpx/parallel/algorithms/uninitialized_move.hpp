@@ -31,10 +31,6 @@ namespace hpx {
     ///                     algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
-    /// The assignments in the parallel \a uninitialized_move algorithm invoked
-    /// without an execution policy object will execute in sequential order in
-    /// the calling thread.
-    ///
     /// \returns  The \a uninitialized_move algorithm returns \a FwdIter.
     ///           The \a uninitialized_move algorithm returns the output
     ///           iterator to the element in the destination range, one past
@@ -46,7 +42,8 @@ namespace hpx {
     /// Moves the elements in the range, defined by [first, last), to an
     /// uninitialized memory area beginning at \a dest. If an exception is
     /// thrown during the initialization, some objects in [first, last) are
-    /// left in a valid but unspecified state.
+    /// left in a valid but unspecified state. Executed according to the
+    /// policy.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
@@ -55,7 +52,7 @@ namespace hpx {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter1    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam FwdIter2    The type of the iterator representing the
     ///                     destination range (deduced).
@@ -103,12 +100,12 @@ namespace hpx {
     /// \note   Complexity: Performs exactly \a count movements, if
     ///         count > 0, no move operations otherwise.
     ///
-    /// \tparam FwdIter1      The type of the source iterators used (deduced).
+    /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
-    /// \tparam FwdIter2     The type of the iterator representing the
+    /// \tparam FwdIter     The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
@@ -119,25 +116,24 @@ namespace hpx {
     ///                     \a first the algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
-    /// The assignments in the parallel \a uninitialized_move_n algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
-    ///
     /// \returns  The \a uninitialized_move_n algorithm returns a
-    ///           returns \a FwdIter2.
-    ///           The \a uninitialized_move_n algorithm returns the output
-    ///           iterator to the element in the destination range, one past
-    ///           the last element moved.
+    ///           returns \a std::pair<InIter,FwdIter>.
+    ///           The \a uninitialized_move_n algorithm returns A pair whose
+    ///           first element is an iterator to the element past the last
+    ///           element moved in the source range, and whose second element
+    ///           is an iterator to the element past the last element moved
+    ///           in the destination range.
     ///
     template <typename InIter, typename Size, typename FwdIter>
-    FwdIter uninitialized_move_n(InIter first, Size count, FwdIter dest);
+    std::pair<InIter, FwdIter> uninitialized_move_n(
+        InIter first, Size count, FwdIter dest);
 
     /// Moves the elements in the range [first, first + count), starting from
     /// first and proceeding to first + count - 1., to another range beginning
     /// at dest. If an exception is
     /// thrown during the initialization, some objects in [first, first + count)
-    /// are left in a valid but unspecified state.
+    /// are left in a valid but unspecified state. Executed according to the
+    /// policy.
     ///
     /// \note   Complexity: Performs exactly \a count movements, if
     ///         count > 0, no move operations otherwise.
@@ -146,12 +142,12 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1      The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
-    /// \tparam FwdIter2     The type of the iterator representing the
+    /// \tparam FwdIter2    The type of the iterator representing the
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
@@ -177,17 +173,21 @@ namespace hpx {
     /// within each thread.
     ///
     /// \returns  The \a uninitialized_move_n algorithm returns a
-    ///           \a hpx::future<FwdIter2> if the execution policy is of type
+    ///           \a hpx::future<std::pair<FwdIter1,FwdIter2>>
+    ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
-    ///           returns \a FwdIter2 otherwise.
-    ///           The \a uninitialized_move_n algorithm returns the output
-    ///           iterator to the element in the destination range, one past
-    ///           the last element moved.
+    ///           returns \a std::pair<FwdIter1,FwdIter2> otherwise.
+    ///           The \a uninitialized_move_n algorithm returns A pair whose
+    ///           first element is an iterator to the element past the last
+    ///           element moved in the source range, and whose second element
+    ///           is an iterator to the element past the last element moved
+    ///           in the destination range.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Size,
         typename FwdIter2>
-    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        std::pair<FwdIter1, FwdIter2>>::type
     uninitialized_move_n(
         ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
 }    // namespace hpx
@@ -296,8 +296,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             return util::partitioner_with_cleanup<ExPolicy,
                 util::in_out_result<Iter, FwdIter2>, partition_result_type>::
                 call(
-                    HPX_FORWARD(ExPolicy, policy),
-                    hpx::util::make_zip_iterator(first, dest), count,
+                    HPX_FORWARD(ExPolicy, policy), zip_iterator(first, dest),
+                    count,
                     [tok](zip_iterator t, std::size_t part_size) mutable
                     -> partition_result_type {
                         using hpx::get;
@@ -591,7 +591,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_move
+    // CPO for hpx::uninitialized_move
     inline constexpr struct uninitialized_move_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_move_t>
     {
@@ -643,7 +643,7 @@ namespace hpx {
     } uninitialized_move{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_move_n
+    // CPO for hpx::uninitialized_move_n
     inline constexpr struct uninitialized_move_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_move_n_t>
     {

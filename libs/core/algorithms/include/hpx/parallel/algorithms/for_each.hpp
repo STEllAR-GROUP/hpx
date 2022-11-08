@@ -41,15 +41,16 @@ namespace hpx {
     ///                     \endcode \n
     ///                     The signature does not need to have const&. The
     ///                     type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a InIter can be dereferenced and then
     ///                     implicitly converted to Type.
     ///
     /// \returns            \a f.
+    ///
     template <typename InIter, typename F>
     F for_each(InIter first, InIter last, F&& f);
 
     /// Applies \a f to the result of dereferencing every iterator in the
-    /// range [first, last).
+    /// range [first, last). Executed according to the policy.
     ///
     /// \note   Complexity: Applies \a f exactly \a last - \a first times.
     ///
@@ -68,9 +69,9 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it applies user-provided function objects.
-    /// \tparam FwdIte      The type of the source begin and end iterator used
+    /// \tparam FwdIter     The type of the source begin and end iterator used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an forward iterator.
+    ///                     requirements of a forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a for_each requires \a F to meet the
@@ -111,6 +112,7 @@ namespace hpx {
     ///           type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns void otherwise.
+    ///
     template <typename ExPolicy, typename FwdIter, typename F>
     typename util::detail::algorithm_result<ExPolicy, void>::type for_each(
         ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
@@ -149,17 +151,18 @@ namespace hpx {
     ///                     \endcode \n
     ///                     The signature does not need to have const&. The
     ///                     type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
+    ///                     type \a InIter can be dereferenced and then
     ///                     implicitly converted to Type.
     ///
     /// \returns            \a first + \a count for non-negative values of
     ///                     \a count and \a first for negative values.
+    ///
     template <typename InIter, typename Size, typename F>
     InIter for_each_n(InIter first, Size count, F&& f);
 
     /// Applies \a f to the result of dereferencing every iterator in the range
     /// [first, first + count), starting from first and proceeding to
-    /// first + count - 1.
+    /// first + count - 1. Executed according to the policy.
     ///
     /// \note   Complexity: Applies \a f exactly \a count times.
     ///
@@ -170,7 +173,7 @@ namespace hpx {
     /// dereferenced iterator.
     ///
     /// Unlike its sequential form, the parallel overload of
-    /// \a for_each does not return a copy of its \a Function parameter,
+    /// \a for_each_n does not return a copy of its \a Function parameter,
     /// since parallelization may not permit efficient state
     /// accumulation.
     ///
@@ -185,7 +188,7 @@ namespace hpx {
     ///                     elements to apply \a f to.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a for_each requires \a F to meet the
+    ///                     overload of \a for_each_n requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -226,6 +229,7 @@ namespace hpx {
     ///           otherwise.
     ///           It returns \a first + \a count for non-negative values of
     ///           \a count and \a first for negative values.
+    ///
     template <typename ExPolicy, typename FwdIter, typename Size, typename F>
     typename util::detail::algorithm_result<ExPolicy, FwdIter>::type for_each_n(
         ExPolicy&& policy, FwdIter first, Size count, F&& f);
@@ -249,6 +253,7 @@ namespace hpx {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
@@ -361,6 +366,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                Iter part_begin, std::size_t part_size)
+            {
+                util::loop_n<execution_policy_type>(part_begin, part_size,
+                    invoke_projected<fun_type, proj_type>{f_, proj_});
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
                 Iter part_begin, std::size_t part_size, std::size_t)
             {
                 util::loop_n<execution_policy_type>(part_begin, part_size,
@@ -409,7 +422,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
-                Iter part_begin, std::size_t part_size, std::size_t)
+                Iter part_begin, std::size_t part_size)
             {
                 using value_type = std::decay_t<
                     typename std::iterator_traits<Iter>::reference>;
@@ -423,6 +436,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::loop_n_ind<execution_policy_type>(
                         part_begin, part_size, f_);
                 }
+            }
+
+            template <typename Iter>
+            HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
+                Iter part_begin, std::size_t part_size, std::size_t)
+            {
+                return (*this)(part_begin, part_size);
             }
         };
 
@@ -455,23 +475,25 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIter, typename F,
                 typename Proj = util::projection_identity>
-            static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
-                ExPolicy&& policy, FwdIter first, std::size_t count, F&& f,
-                Proj&& proj /* = Proj()*/)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter first,
+                std::size_t count, F&& f, Proj&& proj /* = Proj()*/)
             {
-                if (count != 0)
+                if constexpr (!hpx::execution_policy_has_scheduler_executor_v<
+                                  ExPolicy>)
                 {
-                    auto f1 =
-                        for_each_iteration<ExPolicy, F, std::decay_t<Proj>>(
-                            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
-
-                    return util::foreach_partitioner<ExPolicy>::call(
-                        HPX_FORWARD(ExPolicy, policy), first, count,
-                        HPX_MOVE(f1), util::projection_identity());
+                    if (count == 0)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            FwdIter>::get(HPX_MOVE(first));
+                    }
                 }
 
-                return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                    HPX_MOVE(first));
+                auto f1 = for_each_iteration<ExPolicy, F, std::decay_t<Proj>>(
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+
+                return util::foreach_partitioner<ExPolicy>::call(
+                    HPX_FORWARD(ExPolicy, policy), first, count, HPX_MOVE(f1),
+                    hpx::identity());
             }
         };
         /// \endcond
@@ -529,25 +551,29 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
                 typename F, typename Proj>
-            static constexpr typename util::detail::algorithm_result<ExPolicy,
-                FwdIterB>::type
-            parallel(ExPolicy&& policy, FwdIterB first, FwdIterE last, F&& f,
-                Proj&& proj)
+            static constexpr decltype(auto) parallel(ExPolicy&& policy,
+                FwdIterB first, FwdIterE last, F&& f, Proj&& proj)
             {
-                if (first != last)
-                {
-                    auto f1 =
-                        for_each_iteration<ExPolicy, F, std::decay_t<Proj>>(
-                            HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+                using result_t =
+                    hpx::parallel::util::detail::algorithm_result<ExPolicy,
+                        FwdIterB>;
 
-                    return util::foreach_partitioner<ExPolicy>::call(
-                        HPX_FORWARD(ExPolicy, policy), first,
-                        detail::distance(first, last), HPX_MOVE(f1),
-                        util::projection_identity());
+                if constexpr (!hpx::execution_policy_has_scheduler_executor_v<
+                                  ExPolicy>)
+                {
+                    if (first == last)
+                    {
+                        return result_t::get(HPX_MOVE(first));
+                    }
                 }
 
-                return util::detail::algorithm_result<ExPolicy, FwdIterB>::get(
-                    HPX_MOVE(first));
+                auto f1 = for_each_iteration<ExPolicy, F, std::decay_t<Proj>>(
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+
+                return result_t::get(util::foreach_partitioner<ExPolicy>::call(
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1),
+                    hpx::identity()));
             }
         };
         /// \endcond
@@ -597,26 +623,18 @@ namespace hpx {
                 hpx::traits::is_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<
-            ExPolicy>::type
-        tag_fallback_invoke(hpx::for_each_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, F&& f)
+        friend decltype(auto) tag_fallback_invoke(hpx::for_each_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
         {
             static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
                 "Requires at least forward iterator.");
 
-            if (first == last)
-            {
-                using result =
-                    hpx::parallel::util::detail::algorithm_result<ExPolicy>;
-                return result::get();
-            }
-
-            return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
-                hpx::parallel::v1::detail::for_each<FwdIter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_FORWARD(F, f),
-                    hpx::parallel::util::projection_identity()));
+            return hpx::parallel::util::detail::
+                algorithm_result<ExPolicy, FwdIter>::get(
+                    hpx::parallel::v1::detail::for_each<FwdIter>().call(
+                        HPX_FORWARD(ExPolicy, policy), first, last,
+                        HPX_FORWARD(F, f),
+                        hpx::parallel::util::projection_identity()));
         }
     } for_each{};
 
@@ -655,8 +673,7 @@ namespace hpx {
                 hpx::traits::is_forward_iterator<FwdIter>::value
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::for_each_n_t, ExPolicy&& policy, FwdIter first,
             Size count, F&& f)
         {

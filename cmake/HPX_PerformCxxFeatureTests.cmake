@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2021 Hartmut Kaiser
+# Copyright (c) 2007-2022 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2013-2016 Agustin Berge
 # Copyright (c)      2017 Taeguk Kwon
@@ -77,16 +77,24 @@ function(hpx_perform_cxx_feature_tests)
 
   hpx_check_for_cxx17_copy_elision(DEFINITIONS HPX_HAVE_CXX17_COPY_ELISION)
 
-  hpx_check_for_cxx17_memory_resource(
-    DEFINITIONS HPX_HAVE_CXX17_MEMORY_RESOURCE
+  hpx_check_for_cxx17_optional_copy_elision(
+    DEFINITIONS HPX_HAVE_CXX17_OPTIONAL_COPY_ELISION
   )
 
   # C++20 feature tests
+  if(MSVC_VERSION GREATER_EQUAL 1929)
+    # MSVC supports this attribute for all versions starting VS2019 v16.10 see
+    # https://devblogs.microsoft.com/cppblog/msvc-cpp20-and-the-std-cpp20-switch/
+    hpx_check_for_cxx20_no_unique_address_attribute(
+      DEFINITIONS HPX_HAVE_MSVC_NO_UNIQUE_ADDRESS_ATTRIBUTE
+    )
+  endif()
+
   if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 20)
     hpx_check_for_cxx20_coroutines(DEFINITIONS HPX_HAVE_CXX20_COROUTINES)
 
     hpx_check_for_cxx20_experimental_simd(
-      DEFINITIONS HPX_HAVE_CXX20_EXPERIMENTAL_SIMD HPX_HAVE_DATAPAR
+      DEFINITIONS HPX_HAVE_CXX20_EXPERIMENTAL_SIMD
     )
 
     hpx_check_for_cxx20_lambda_capture(
@@ -101,9 +109,11 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX20_PERFECT_PACK_CAPTURE
     )
 
-    hpx_check_for_cxx20_no_unique_address_attribute(
-      DEFINITIONS HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
-    )
+    if(NOT MSVC) # see above
+      hpx_check_for_cxx20_no_unique_address_attribute(
+        DEFINITIONS HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
+      )
+    endif()
 
     hpx_check_for_cxx20_paren_initialization_of_aggregates(
       DEFINITIONS HPX_HAVE_CXX20_PAREN_INITIALIZATION_OF_AGGREGATES

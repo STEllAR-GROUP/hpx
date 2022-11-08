@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_GPU_SUPPORT) && defined(HPX_HAVE_GPUBLAS)
 #include <hpx/async_cuda/cuda_exception.hpp>
 #include <hpx/async_cuda/cuda_executor.hpp>
@@ -117,7 +118,7 @@ namespace hpx { namespace cuda { namespace experimental {
         struct dispatch_helper<cublasStatus_t, Args...>
         {
             inline cublasStatus_t operator()(
-                cublasStatus_t (*f)(Args...), Args... args)
+                cublasStatus_t (*f)(Args...), Args... args) const
             {
                 cublasStatus_t err = f(args...);
                 return check_cublas_error(err);
@@ -156,7 +157,7 @@ namespace hpx { namespace cuda { namespace experimental {
 #endif
 
         // construct a cublas stream
-        cublas_executor(std::size_t device,
+        explicit cublas_executor(std::size_t device,
             cublasPointerMode_t pointer_mode = CUBLAS_POINTER_MODE_HOST,
             bool event_mode = false)
           : hpx::cuda::experimental::cuda_executor(device, event_mode)
@@ -175,20 +176,21 @@ namespace hpx { namespace cuda { namespace experimental {
         // OneWay Execution
         // -------------------------------------------------------------------------
         template <typename F, typename... Ts>
-        decltype(auto) post(F&& f, Ts&&... ts)
+        friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
+            cublas_executor const& exec, F&& f, Ts&&... ts)
         {
-            return cublas_executor::apply(
-                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            return exec.apply(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // -------------------------------------------------------------------------
         // TwoWay Execution
         // -------------------------------------------------------------------------
         template <typename F, typename... Ts>
-        decltype(auto) async_execute(F&& f, Ts&&... ts)
+        friend decltype(auto) tag_invoke(
+            hpx::parallel::execution::async_execute_t,
+            cublas_executor const& exec, F&& f, Ts&&... ts)
         {
-            return cublas_executor::async(
-                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            return exec.async(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
     protected:
@@ -196,15 +198,17 @@ namespace hpx { namespace cuda { namespace experimental {
         // that you would use for a cublas call except the cublas handle which is omitted
         // as the wrapper will supply that for you
         template <typename R, typename... Params, typename... Args>
-        typename std::enable_if<std::is_same<cublasStatus_t, R>::value, R>::type
-        apply(R (*cublas_function)(Params...), Args&&... args)
+        std::enable_if_t<std::is_same_v<cublasStatus_t, R>, R> apply(
+            R (*cublas_function)(Params...), Args&&... args) const
         {
             // make sure we run on the correct device
             check_cuda_error(cudaSetDevice(device_));
+
             // make sure this operation takes place on our stream
             check_cublas_error(cublasSetStream(handle_.get(), stream_));
             check_cublas_error(
                 cublasSetPointerMode(handle_.get(), pointer_mode_));
+
             // insert the cublas handle in the arg list and call the cublas function
             detail::dispatch_helper<R, Params...> helper{};
             return helper(
@@ -215,9 +219,8 @@ namespace hpx { namespace cuda { namespace experimental {
         // forward a cuda function through to the cuda executor base class
         // (we permit the use of a cublas executor for cuda calls)
         template <typename R, typename... Params, typename... Args>
-        inline typename std::enable_if<std::is_same<cudaError_t, R>::value,
-            void>::type
-        apply(R (*cuda_function)(Params...), Args&&... args)
+        inline std::enable_if_t<std::is_same_v<cudaError_t, R>> apply(
+            R (*cuda_function)(Params...), Args&&... args) const
         {
             return cuda_executor::apply(
                 cuda_function, HPX_FORWARD(Args, args)...);
@@ -228,16 +231,17 @@ namespace hpx { namespace cuda { namespace experimental {
         // when the task completes, this allows integration of GPU kernels with
         // hpx::futures and the tasking DAG.
         template <typename R, typename... Params, typename... Args>
-        hpx::future<typename std::enable_if<
-            std::is_same<cublasStatus_t, R>::value, void>::type>
-        async(R (*cublas_function)(Params...), Args&&... args)
+        hpx::future<std::enable_if_t<std::is_same_v<cublasStatus_t, R>>> async(
+            R (*cublas_function)(Params...), Args&&... args) const
         {
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
                     // make sure we run on the correct device
                     check_cuda_error(cudaSetDevice(device_));
+
                     // make sure this operation takes place on our stream
                     check_cublas_error(cublasSetStream(handle_.get(), stream_));
+
                     // insert the cublas handle in the arg list and call the
                     // cublas function
                     detail::dispatch_helper<R, Params...> helper;
@@ -253,16 +257,15 @@ namespace hpx { namespace cuda { namespace experimental {
         // -------------------------------------------------------------------------
         // forward a cuda function through to the cuda executor base class
         template <typename R, typename... Params, typename... Args>
-        inline hpx::future<typename std::enable_if<
-            std::is_same<cudaError_t, R>::value, void>::type>
-        async(R (*cuda_function)(Params...), Args&&... args)
+        inline hpx::future<std::enable_if_t<std::is_same_v<cudaError_t, R>>>
+        async(R (*cuda_function)(Params...), Args&&... args) const
         {
             return cuda_executor::async(
                 cuda_function, HPX_FORWARD(Args, args)...);
         }
 
         // return a copy of the cublas handle
-        cublasHandle_t get_handle()
+        cublasHandle_t get_handle() const
         {
             return handle_.get();
         }

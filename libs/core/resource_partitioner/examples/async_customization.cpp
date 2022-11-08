@@ -42,25 +42,18 @@ struct test_async_executor
 
     template <typename... Futures>
     struct is_tuple_of_futures<hpx::tuple<Futures...>>
-      : util::all_of<
-            traits::is_future<typename std::remove_reference<Futures>::type>...>
+      : util::all_of<traits::is_future<std::remove_reference_t<Futures>>...>
     {
     };
 
     template <typename Future>
     struct is_future_of_tuple_of_futures
       : std::integral_constant<bool,
-            traits::is_future<Future>::value &&
+            traits::is_future_v<Future> &&
                 is_tuple_of_futures<typename traits::future_traits<
-                    typename std::remove_reference<Future>::type>::
-                        result_type>::value>
+                    std::remove_reference_t<Future>>::result_type>::value>
     {
     };
-
-    // --------------------------------------------------------------------
-    // For C++11 compatibility
-    template <bool B, typename T = void>
-    using enable_if_t = typename std::enable_if<B, T>::type;
 
     // --------------------------------------------------------------------
     // function that returns a const ref to the contents of a future
@@ -72,25 +65,25 @@ struct test_async_executor
         template <typename T, template <typename> class Future>
         const T& operator()(const Future<T>& el) const
         {
-            typedef
-                typename traits::detail::shared_state_ptr_for<Future<T>>::type
-                    shared_state_ptr;
+            using shared_state_ptr =
+                traits::detail::shared_state_ptr_for_t<Future<T>>;
             shared_state_ptr const& state =
                 traits::detail::get_shared_state(el);
             return *state->get_result();
         }
     };
 
+private:
     // --------------------------------------------------------------------
     // async execute specialized for simple arguments typical
     // of a normal async call with arbitrary arguments
     // --------------------------------------------------------------------
     template <typename F, typename... Ts>
-    future<typename util::invoke_result<F, Ts...>::type> async_execute(
-        F&& f, Ts&&... ts)
+    friend future<util::invoke_result_t<F, Ts...>> tag_invoke(
+        hpx::parallel::execution::async_execute_t,
+        test_async_executor const& exec, F&& f, Ts&&... ts)
     {
-        typedef typename util::detail::invoke_deferred_result<F, Ts...>::type
-            result_type;
+        using result_type = util::detail::invoke_deferred_result_t<F, Ts...>;
 
         using namespace hpx::util::debug;
         std::cout << "async_execute : Function    : " << print_type<F>()
@@ -101,7 +94,7 @@ struct test_async_executor
                   << print_type<result_type>() << "\n";
 
         // forward the task execution on to the real internal executor
-        return hpx::parallel::execution::async_execute(executor_,
+        return hpx::parallel::execution::async_execute(exec.executor_,
             hpx::annotated_function(std::forward<F>(f), "custom"),
             std::forward<Ts>(ts)...);
     }
@@ -111,13 +104,15 @@ struct test_async_executor
     // note that future<> and shared_future<> are both supported
     // --------------------------------------------------------------------
     template <typename F, typename Future, typename... Ts,
-        typename = enable_if_t<traits::is_future<
-            typename std::remove_reference<Future>::type>::value>>
-    auto then_execute(F&& f, Future&& predecessor, Ts&&... ts) -> future<
-        typename util::detail::invoke_deferred_result<F, Future, Ts...>::type>
+        typename = std::enable_if_t<
+            traits::is_future_v<std::remove_reference_t<Future>>>>
+    friend auto tag_invoke(hpx::parallel::execution::then_execute_t,
+        test_async_executor const& exec, F&& f, Future&& predecessor,
+        Ts&&... ts)
+        -> future<util::detail::invoke_deferred_result_t<F, Future, Ts...>>
     {
-        typedef typename util::detail::invoke_deferred_result<F, Future,
-            Ts...>::type result_type;
+        using result_type =
+            util::detail::invoke_deferred_result_t<F, Future, Ts...>;
 
         using namespace hpx::util::debug;
         std::cout << "then_execute : Function     : " << print_type<F>()
@@ -133,7 +128,7 @@ struct test_async_executor
         std::cout << "then_execute : Result       : "
                   << print_type<result_type>() << "\n";
 
-        return hpx::parallel::execution::then_execute(executor_,
+        return hpx::parallel::execution::then_execute(exec.executor_,
             std::forward<F>(f), std::forward<Future>(predecessor),
             std::forward<Ts>(ts)...);
     }
@@ -144,17 +139,18 @@ struct test_async_executor
     // --------------------------------------------------------------------
     template <typename F, template <typename> class OuterFuture,
         typename... InnerFutures, typename... Ts,
-        typename = enable_if_t<is_future_of_tuple_of_futures<
+        typename = std::enable_if_t<is_future_of_tuple_of_futures<
             OuterFuture<hpx::tuple<InnerFutures...>>>::value>,
-        typename = enable_if_t<
+        typename = std::enable_if_t<
             is_tuple_of_futures<hpx::tuple<InnerFutures...>>::value>>
-    auto then_execute(F&& f,
+    friend auto tag_invoke(hpx::parallel::execution::then_execute_t,
+        test_async_executor const& exec, F&& f,
         OuterFuture<hpx::tuple<InnerFutures...>>&& predecessor, Ts&&... ts)
-        -> future<typename util::detail::invoke_deferred_result<F,
-            OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>::type>
+        -> future<util::detail::invoke_deferred_result_t<F,
+            OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>>
     {
-        typedef typename util::detail::invoke_deferred_result<F,
-            OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>::type result_type;
+        using result_type = util::detail::invoke_deferred_result_t<F,
+            OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>;
 
         // get the tuple of futures from the predecessor future <tuple of futures>
         const auto& predecessor_value =
@@ -179,14 +175,14 @@ struct test_async_executor
         // invoke a function with the unwrapped tuple future types to demonstrate
         // that we can access them
         std::cout << "when_all(fut) : tuple       : ";
-        util::invoke_fused(
+        hpx::invoke_fused(
             [](const auto&... ts) {
                 std::cout << print_type<decltype(ts)...>(" | ") << "\n";
             },
             unwrapped_futures_tuple);
 
         // forward the task execution on to the real internal executor
-        return hpx::parallel::execution::then_execute(executor_,
+        return hpx::parallel::execution::then_execute(exec.executor_,
             hpx::annotated_function(std::forward<F>(f), "custom then"),
             std::forward<OuterFuture<hpx::tuple<InnerFutures...>>>(predecessor),
             std::forward<Ts>(ts)...);
@@ -198,14 +194,16 @@ struct test_async_executor
     // function type, result type and tuple of futures as arguments
     // --------------------------------------------------------------------
     template <typename F, typename... InnerFutures,
-        typename = enable_if_t<
-            traits::is_future_tuple<hpx::tuple<InnerFutures...>>::value>>
-    auto async_execute(F&& f, hpx::tuple<InnerFutures...>&& predecessor)
-        -> future<typename util::detail::invoke_deferred_result<F,
-            hpx::tuple<InnerFutures...>>::type>
+        typename = std::enable_if_t<
+            traits::is_future_tuple_v<hpx::tuple<InnerFutures...>>>>
+    friend auto tag_invoke(hpx::parallel::execution::async_execute_t,
+        test_async_executor const& exec, F&& f,
+        hpx::tuple<InnerFutures...>&& predecessor)
+        -> future<util::detail::invoke_deferred_result_t<F,
+            hpx::tuple<InnerFutures...>>>
     {
-        typedef typename util::detail::invoke_deferred_result<F,
-            hpx::tuple<InnerFutures...>>::type result_type;
+        using result_type = util::detail::invoke_deferred_result_t<F,
+            hpx::tuple<InnerFutures...>>;
 
         auto unwrapped_futures_tuple =
             util::map_pack(future_extract_value{}, predecessor);
@@ -222,14 +220,14 @@ struct test_async_executor
         // invoke a function with the unwrapped tuple future types to demonstrate
         // that we can access them
         std::cout << "dataflow      : tuple       : ";
-        util::invoke_fused(
+        hpx::invoke_fused(
             [](const auto&... ts) {
                 std::cout << print_type<decltype(ts)...>(" | ") << "\n";
             },
             unwrapped_futures_tuple);
 
         // forward the task execution on to the real internal executor
-        return hpx::parallel::execution::async_execute(executor_,
+        return hpx::parallel::execution::async_execute(exec.executor_,
             hpx::annotated_function(std::forward<F>(f), "custom async"),
             std::forward<hpx::tuple<InnerFutures...>>(predecessor));
     }
@@ -266,7 +264,7 @@ int test(const std::string& message, Executor& exec)
     std::cout << message << std::endl;
     std::cout << "============================" << std::endl;
     std::cout << "Test 1 : async()" << std::endl;
-    auto fa = async(
+    hpx::future<char const*> fa = async(
         exec,
         [](int a, double b, const char* c) {
             std::cout << "Inside async " << c << std::endl;
@@ -274,7 +272,7 @@ int test(const std::string& message, Executor& exec)
             return "async";
         },
         1, 2.2, "Hello");
-    HPX_TEST_EQ(fa.get(), "async");
+    HPX_TEST_EQ(std::string(fa.get()), std::string("async"));
     std::cout << std::endl;
 
     // test 2a
@@ -293,7 +291,7 @@ int test(const std::string& message, Executor& exec)
         HPX_TEST_EQ(r, testval);
         return std::string("then");
     });
-    HPX_TEST_EQ(ft.get(), "then");
+    HPX_TEST_EQ(ft.get(), std::string("then"));
     std::cout << std::endl;
 
     // test 2b
@@ -310,7 +308,7 @@ int test(const std::string& message, Executor& exec)
         HPX_TEST_EQ(r, testval);
         return std::string("then(shared)");
     });
-    HPX_TEST_EQ(fts.get(), "then(shared)");
+    HPX_TEST_EQ(fts.get(), std::string("then(shared)"));
     std::cout << std::endl;
 
 #if !defined(HPX_MSVC)
@@ -378,7 +376,7 @@ int test(const std::string& message, Executor& exec)
     auto f1 = hpx::async(&dummy_task<decltype(testval6)>, testval6);
     auto f2 = hpx::async(&dummy_task<decltype(testval7)>, testval7);
     //
-    auto fd = dataflow(
+    hpx::future<std::string> fd = dataflow(
         exec,
         [testval6, testval7](future<std::uint16_t>&& f1, future<double>&& f2) {
             std::cout << "Inside dataflow : " << std::endl;
@@ -393,7 +391,7 @@ int test(const std::string& message, Executor& exec)
             return std::string("dataflow");
         },
         f1, f2);
-    HPX_TEST_EQ(fd.get(), "dataflow");
+    HPX_TEST_EQ(fd.get(), std::string("dataflow"));
     std::cout << std::endl;
 
     // test 4b
@@ -404,7 +402,7 @@ int test(const std::string& message, Executor& exec)
     auto fs1 = hpx::async(&dummy_task<decltype(testval8)>, testval8);
     auto fs2 = hpx::async(&dummy_task<decltype(testval9)>, testval9);
     //
-    auto fds = dataflow(
+    hpx::future<std::string> fds = dataflow(
         exec,
         [testval8, testval9](
             future<std::uint32_t>&& f1, shared_future<double>&& f2) {
@@ -420,7 +418,7 @@ int test(const std::string& message, Executor& exec)
             return std::string("dataflow(shared)");
         },
         fs1, fs2);
-    HPX_TEST_EQ(fds.get(), "dataflow(shared)");
+    HPX_TEST_EQ(fds.get(), std::string("dataflow(shared)"));
 
     std::cout << "============================" << std::endl;
     std::cout << "Complete" << std::endl;

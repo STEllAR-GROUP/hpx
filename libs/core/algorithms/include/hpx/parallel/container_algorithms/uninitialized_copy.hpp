@@ -135,10 +135,9 @@ namespace hpx { namespace ranges {
     /// without an execution policy object will execute in sequential order in
     /// the calling thread.
     ///
-    /// \returns  The \a uninitialized_copy algorithm returns an
-    ///           \a in_out_result<typename hpx::traits::range_traits<Rng1>
-    ///           ::iterator_type, typename hpx::traits::range_traits<Rng2>
-    ///           ::iterator_type>.
+    /// \returns  The \a uninitialized_copy algorithm returns an \a
+    ///           in_out_result<typename hpx::traits::range_traits<Rng1>::iterator_type,
+    ///           typename hpx::traits::range_traits<Rng2>::iterator_type>.
     ///           The \a uninitialized_copy algorithm returns an input iterator
     ///           to one past the last element copied from and the output
     ///           iterator to the element in the destination range, one past
@@ -275,7 +274,7 @@ namespace hpx { namespace ranges {
     /// \param count        Refers to the number of elements starting at
     ///                     \a first the algorithm will be applied to.
     /// \param first2       Refers to the beginning of the destination range.
-    /// \param last1        Refers to sentinel value denoting the end of the
+    /// \param last2        Refers to sentinel value denoting the end of the
     ///                     second range the algorithm will be applied to.
     ///
     /// The assignments in the parallel \a uninitialized_copy_n algorithm

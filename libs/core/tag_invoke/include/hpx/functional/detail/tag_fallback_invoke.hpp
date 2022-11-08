@@ -12,7 +12,7 @@ namespace hpx::functional::detail {
     inline namespace unspecified {
         /// The `hpx::functional::detail::tag_fallback_invoke` name defines a constexpr object
         /// that is invocable with one or more arguments. The first argument
-        /// is a 'tag' (typically a DPO). It is only invocable if an overload
+        /// is a 'tag' (typically a CPO). It is only invocable if an overload
         /// of tag_fallback_invoke() that accepts the same arguments could be
         /// found via ADL.
         ///

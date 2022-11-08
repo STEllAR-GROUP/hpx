@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -84,11 +84,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
         HPX_CORE_EXPORT ~condition_variable();
 
-        HPX_CORE_EXPORT bool empty(
-            std::unique_lock<mutex_type> const& lock) const;
+        HPX_CORE_EXPORT bool empty(std::unique_lock<mutex_type>& lock) const;
 
         HPX_CORE_EXPORT std::size_t size(
-            std::unique_lock<mutex_type> const& lock) const;
+            std::unique_lock<mutex_type>& lock) const;
 
         // Return false if no more threads are waiting (returns true if queue
         // is non-empty).

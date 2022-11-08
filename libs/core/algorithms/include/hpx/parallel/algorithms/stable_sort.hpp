@@ -31,95 +31,11 @@ namespace hpx {
     /// \tparam RandomIt    The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of a
     ///                     random access iterator.
-    ///
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    ///
-    /// The assignments in the parallel \a stable_sort algorithm invoked without
-    /// an execution policy object execute in sequential order in the
-    /// calling thread.
-    ///
-    /// \returns  The \a stable_sort algorithm does not return anything.
-    ///
-    template <typename RandomIt>
-    void stable_sort(RandomIt first, RandomIt last);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Sorts the elements in the range [first, last) in ascending order. The
-    /// relative order of equal elements is preserved. The function
-    /// uses the given comparison function object comp (defaults to using
-    /// operator<()).
-    ///
-    /// \note   Complexity: O(Nlog(N)), where N = std::distance(first, last)
-    ///                     comparisons.
-    ///
-    /// A sequence is sorted with respect to a comparator \a comp and a
-    /// projection \a proj if for every iterator i pointing to the sequence and
-    /// every non-negative integer n such that i + n is a valid iterator
-    /// pointing to an element of the sequence, and
-    /// INVOKE(comp, INVOKE(proj, *(i + n)), INVOKE(proj, *i)) == false.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it applies user-provided function objects.
-    /// \tparam RandomIt    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     random access iterator.
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    ///
-    /// The application of function objects in parallel algorithm
-    /// invoked with an execution policy object of type
-    /// \a sequenced_policy execute in sequential order in the
-    /// calling thread.
-    ///
-    /// The application of function objects in parallel algorithm
-    /// invoked with an execution policy object of type
-    /// \a parallel_policy or \a parallel_task_policy are
-    /// permitted to execute in an unordered fashion in unspecified
-    /// threads, and indeterminately sequenced within each thread.
-    ///
-    /// \returns  The \a stable_sort algorithm returns a
-    ///           \a hpx::future<void> if the execution policy is of
-    ///           type
-    ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns nothing
-    ///           otherwise.
-    ///
-    template <typename ExPolicy, typename RandomIt>
-    typename util::detail::algorithm_result<ExPolicy>::type
-    stable_sort(ExPolicy&& policy, RandomIt first, RandomIt last);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// Sorts the elements in the range [first, last) in ascending order. The
-    /// relative order of equal elements is preserved. The function
-    /// uses the given comparison function object comp (defaults to using
-    /// operator<()).
-    ///
-    /// \note   Complexity: O(Nlog(N)), where N = std::distance(first, last)
-    ///                     comparisons.
-    ///
-    /// A sequence is sorted with respect to a comparator \a comp and a
-    /// projection \a proj if for every iterator i pointing to the sequence and
-    /// every non-negative integer n such that i + n is a valid iterator
-    /// pointing to an element of the sequence, and
-    /// INVOKE(comp, INVOKE(proj, *(i + n)), INVOKE(proj, *i)) == false.
-    ///
-    /// \tparam RandomIt    The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of a
-    ///                     random access iterator.
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to
+    ///                     \a parallel::util::projection_identity.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -143,16 +59,19 @@ namespace hpx {
     /// an execution policy object execute in sequential order in the
     /// calling thread.
     ///
-    /// \returns  The \a stable_sort algorithm returns nothing.
+    /// \returns  The \a stable_sort algorithm returns \a void.
     ///
-    template <typename RandomIt, typename Comp, typename Proj>
-    void stable_sort(RandomIt first, RandomIt last, Comp&& comp, Proj&& proj);
+    template <typename RandomIt,
+            typename Comp = hpx::parallel::v1::detail::less,
+            typename Proj = parallel::util::projection_identity>
+    void stable_sort(RandomIt first, RandomIt last, Comp&& comp = Comp(),
+        Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Sorts the elements in the range [first, last) in ascending order. The
     /// relative order of equal elements is preserved. The function
     /// uses the given comparison function object comp (defaults to using
-    /// operator<()).
+    /// operator<()). Executed according to the policy.
     ///
     /// \note   Complexity: O(Nlog(N)), where N = std::distance(first, last)
     ///                     comparisons.
@@ -173,7 +92,8 @@ namespace hpx {
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity.
+    ///                     defaults to
+    ///                     \a parallel::util::projection_identity.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -210,14 +130,15 @@ namespace hpx {
     ///           \a hpx::future<void> if the execution policy is of
     ///           type
     ///           \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns nothing
+    ///           \a parallel_task_policy and returns \a void
     ///           otherwise.
     ///
-    template <typename ExPolicy, typename RandomIt, typename Comp,
-        typename Proj>
+    template <typename ExPolicy, typename RandomIt,
+        typename Comp = hpx::parallel::v1::detail::less,
+        typename Proj = parallel::util::projection_identity>
     typename parallel::util::detail::algorithm_result<ExPolicy>::type
-    stable_sort(ExPolicy&& policy, RandomIt first, RandomIt last, Comp&& comp,
-        Proj&& proj);
+    stable_sort(ExPolicy&& policy, RandomIt first, RandomIt last,
+        Comp&& comp = Comp(), Proj&& proj = Proj());
 
     // clang-format on
 }    // namespace hpx
@@ -383,7 +304,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::stable_sort
+    // CPO for hpx::stable_sort
     inline constexpr struct stable_sort_t final
       : hpx::detail::tag_parallel_algorithm<stable_sort_t>
     {

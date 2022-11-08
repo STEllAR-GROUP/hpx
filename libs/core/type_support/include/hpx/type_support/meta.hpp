@@ -235,9 +235,13 @@ namespace hpx { namespace meta {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
+        template <typename... Ts>
+        struct compose_args_helper_not_valid;
+
         template <typename F, typename Pack, typename Enable = void>
         struct compose_args_helper
         {
+            using type = compose_args_helper_not_valid<F, Pack>;
         };
 
         template <typename F, template <class...> typename A, typename... As>
@@ -448,5 +452,30 @@ namespace hpx { namespace meta {
         template <typename... Ts>
         using apply = invoke<compose_args<Continuation>,
             if_<std::is_same<Ts, Old>, pack<>, pack<Ts>>...>;
+    };
+
+    template <typename A, typename... As>
+    struct front
+    {
+        using type = A;
+    };
+
+    template <template <typename...> typename Fn>
+    struct compose_template_func
+    {
+        template <typename... Args>
+        using apply = Fn<Args...>;
+    };
+
+    template <typename... As>
+    using single_t =
+        std::enable_if_t<sizeof...(As) == 1, meta::type<front<As...>>>;
+
+    template <typename Ty>
+    struct single_or
+    {
+        template <typename... As>
+        using apply =
+            std::enable_if_t<sizeof...(As) <= 1, meta::type<front<As..., Ty>>>;
     };
 }}    // namespace hpx::meta

@@ -8,11 +8,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/datastructures/variant.hpp>
 #include <hpx/type_support/meta.hpp>
+#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>
-#include <variant>
 
 namespace hpx::execution::experimental::detail {
 
@@ -86,6 +87,18 @@ namespace hpx::execution::experimental::detail {
 
     template <typename T>
     struct single_variant<util::pack<T>>
+    {
+        using type = T;
+    };
+
+    template <typename T>
+    struct single_variant<meta::pack<T>>
+    {
+        using type = T;
+    };
+
+    template <typename T>
+    struct single_variant<hpx::variant<T>>
     {
         using type = T;
     };

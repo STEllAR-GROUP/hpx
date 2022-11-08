@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    algorithm_as_sender
     algorithm_bulk
     algorithm_ensure_started
     algorithm_execute
@@ -14,9 +15,11 @@ set(tests
     algorithm_let_error
     algorithm_let_stopped
     algorithm_let_value
+    algorithm_run_loop
     algorithm_split
     algorithm_start_detached
     algorithm_sync_wait
+    algorithm_sync_wait_with_variant
     algorithm_then
     algorithm_transfer
     algorithm_transfer_just
@@ -29,6 +32,7 @@ set(tests
     executor_parameters_timer_hooks
     forwarding_env_query
     forwarding_scheduler_query
+    forwarding_sender_query
     future_then_executor
     minimal_async_executor
     minimal_sync_executor

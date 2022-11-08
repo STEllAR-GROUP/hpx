@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2020 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,6 +12,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/modules/prefix.hpp>
 #include <hpx/modules/preprocessor.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/plugin/traits/plugin_config_data.hpp>
@@ -143,6 +144,12 @@ namespace hpx::plugins {
         {
             // initialize the parcelport with the parameters we got passed in at start
             traits::plugin_config_data<Parcelport>::init(argc, argv, cfg);
+        }
+
+        void init(hpx::resource::partitioner& rp) override
+        {
+            // initialize the parcelport with the parameters we got passed in at start
+            traits::plugin_config_data<Parcelport>::init(rp);
         }
 
         /// Create a new instance of a message handler

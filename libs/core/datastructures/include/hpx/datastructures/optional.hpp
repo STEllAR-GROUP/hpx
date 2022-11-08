@@ -8,7 +8,9 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_CXX17_COPY_ELISION)
+#if defined(HPX_HAVE_CXX17_COPY_ELISION) &&                                    \
+    defined(HPX_HAVE_CXX17_OPTIONAL_COPY_ELISION)
+
 #include <functional>    // for std::hash<optional<T>>
 #include <optional>
 

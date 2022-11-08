@@ -13,7 +13,7 @@
 
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx {
 
 #define HPX_INVOKE_R(R, F, ...)                                                \
     (::hpx::util::void_guard<R>(), HPX_INVOKE(F, __VA_ARGS__))
@@ -56,6 +56,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace functional {
+
         struct invoke
         {
             template <typename F, typename... Ts>
@@ -81,4 +82,40 @@ namespace hpx { namespace util {
             }
         };
     }    // namespace functional
-}}       // namespace hpx::util
+}    // namespace hpx
+
+/// \cond NOINTERN
+namespace hpx::util {
+
+    template <typename F, typename... Ts>
+    HPX_DEPRECATED_V(
+        1, 9, "hpx::util::invoke is deprecated, use hpx::invoke instead")
+    constexpr HPX_HOST_DEVICE decltype(auto) invoke(F&& f, Ts&&... vs) noexcept(
+        noexcept(HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...)))
+    {
+        return hpx::invoke(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
+    }
+
+    template <typename R, typename F, typename... Ts>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::util::invoke_r<R> is deprecated, use hpx::invoke_r<R> instead")
+    constexpr HPX_HOST_DEVICE R invoke_r(F&& f, Ts&&... vs) noexcept(
+        noexcept(HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...)))
+    {
+        return hpx::invoke_r<R>(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
+    }
+
+    namespace functional {
+
+        using invoke HPX_DEPRECATED_V(1, 9,
+            "hpx::util::functional::invoke is deprecated, use "
+            "hpx::functional::invoke instead") = hpx::functional::invoke;
+
+        template <typename R>
+        using invoke_r HPX_DEPRECATED_V(1, 9,
+            "hpx::util::functional::invoke_r<R> is deprecated, use "
+            "hpx::functional::invoke_r<R> instead") =
+            hpx::functional::invoke_r<R>;
+    }    // namespace functional
+}    // namespace hpx::util
+/// \endcond

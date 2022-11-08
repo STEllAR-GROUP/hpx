@@ -8,6 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_base/dataflow.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -50,8 +52,7 @@ namespace hpx::execution::experimental {
         // passed to when_all. When set_value is called, it will emplace the
         // values sent into the appropriate position in the pack used to store
         // values from all predecessor senders.
-        template <typename OperationState,
-            std::size_t I = OperationState::sender_pack_size>
+        template <typename OperationState>
         struct when_all_receiver
         {
             std::decay_t<OperationState>& op_state;
@@ -95,6 +96,9 @@ namespace hpx::execution::experimental {
 
             template <typename... Ts, std::size_t... Is>
             auto set_value_helper(hpx::util::index_pack<Is...>, Ts&&... ts)
+            // MSVC sometimes invalidly rejects valid invocations
+            // clang-format off
+#if !defined(HPX_MSVC)
                 -> decltype(
                     (std::declval<
                          typename OperationState::value_types_storage_type>()
@@ -103,6 +107,8 @@ namespace hpx::execution::experimental {
                             .emplace(HPX_FORWARD(Ts, ts)),
                         ...),
                     void())
+#endif
+            // clang-format on
             {
                 // op_state.ts holds values from all predecessor senders. We
                 // emplace the values using the offset calculated while
@@ -113,7 +119,8 @@ namespace hpx::execution::experimental {
                     ...);
             }
 
-            static constexpr std::size_t sender_pack_size = I;
+            static constexpr std::size_t sender_pack_size =
+                OperationState::sender_pack_size;
             using index_pack_type =
                 hpx::util::make_index_pack_t<sender_pack_size>;
 
@@ -535,4 +542,29 @@ namespace hpx::execution::experimental {
     {
     } transfer_when_all_with_variant{};
 
+    // the following enables directly using dataflow() with senders
+
+    template <typename F, typename Sender, typename... Senders>
+    constexpr HPX_FORCEINLINE auto tag_invoke(
+        hpx::detail::dataflow_t, F&& f, Sender&& sender, Senders&&... senders)
+        -> decltype(then(when_all(HPX_FORWARD(Sender, sender),
+                             HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f)))
+    {
+        return then(when_all(HPX_FORWARD(Sender, sender),
+                        HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f));
+    }
+
+    template <typename F, typename Sender, typename... Senders>
+    constexpr HPX_FORCEINLINE auto tag_invoke(hpx::detail::dataflow_t,
+        hpx::launch, F&& f, Sender&& sender, Senders&&... senders)
+        -> decltype(then(when_all(HPX_FORWARD(Sender, sender),
+                             HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f)))
+    {
+        return then(when_all(HPX_FORWARD(Sender, sender),
+                        HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f));
+    }
 }    // namespace hpx::execution::experimental

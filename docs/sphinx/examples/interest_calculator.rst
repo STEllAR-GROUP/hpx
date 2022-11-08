@@ -59,7 +59,7 @@ The source code for this example can be found here:
 <../../examples/quickstart/interest_calculator.cpp>`.
 
 To compile this program, go to your |hpx| build directory (see
-:ref:`hpx_build_system` for information on configuring and building |hpx|) and
+:ref:`building_hpx` for information on configuring and building |hpx|) and
 enter:
 
 .. code-block:: shell-session

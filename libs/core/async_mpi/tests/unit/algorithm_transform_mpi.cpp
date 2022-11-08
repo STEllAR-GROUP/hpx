@@ -4,10 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/datastructures/variant.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/modules/async_mpi.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
+#include <hpx/modules/executors.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include "algorithm_test_utils.hpp"
@@ -57,7 +60,8 @@ int hpx_main()
                 }
                 auto s = mpi::transform_mpi(
                     ex::just(&data, count, datatype, 0, comm), MPI_Ibcast);
-                auto result = tt::sync_wait(HPX_MOVE(s));
+                auto mpi_result = tt::sync_wait(HPX_MOVE(s));
+                auto result = hpx::get<0>(*mpi_result);
                 if (rank != 0)
                 {
                     HPX_TEST_EQ(data, 42);
@@ -82,7 +86,8 @@ int hpx_main()
                         return MPI_Ibcast(
                             data, count, datatype, i, comm, request);
                     });
-                auto result = tt::sync_wait(HPX_MOVE(s));
+                auto mpi_result = tt::sync_wait(HPX_MOVE(s));
+                auto result = hpx::get<0>(*mpi_result);
                 if (rank != 0)
                 {
                     HPX_TEST_EQ(data, 42);
@@ -138,8 +143,9 @@ int hpx_main()
                 {
                     data = 42;
                 }
-                auto result = ex::just(&data, count, datatype, 0, comm) |
-                    mpi::transform_mpi(MPI_Ibcast) | tt::sync_wait();
+                auto result =
+                    hpx::get<0>(*(ex::just(&data, count, datatype, 0, comm) |
+                        mpi::transform_mpi(MPI_Ibcast) | tt::sync_wait()));
                 if (rank != 0)
                 {
                     HPX_TEST_EQ(data, 42);

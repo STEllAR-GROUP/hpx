@@ -18,7 +18,7 @@ namespace hpx {
     /// \note   Complexity: Linear in the distance between \a first and \a last
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam T           The type of the value to be assigned (deduced).
     ///
@@ -28,18 +28,15 @@ namespace hpx {
     ///                     algorithm will be applied to.
     /// \param value        The value to be assigned.
     ///
-    /// The assignments in the parallel \a uninitialized_fill algorithm invoked
-    /// without an execution policy object will execute in sequential order in
-    /// the calling thread.
-    ///
-    /// \returns  The \a uninitialized_fill algorithm  returns nothing
+    /// \returns  The \a uninitialized_fill algorithm returns nothing
     ///
     template <typename FwdIter, typename T>
     void uninitialized_fill(FwdIter first, FwdIter last, T const& value);
 
     /// Copies the given \a value to an uninitialized memory area, defined by
     /// the range [first, last). If an exception is thrown during the
-    /// initialization, the function has no effects.
+    /// initialization, the function has no effects. Executed according to the
+    /// policy.
     ///
     /// \note   Complexity: Linear in the distance between \a first and \a last
     ///
@@ -48,7 +45,7 @@ namespace hpx {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam T           The type of the value to be assigned (deduced).
     ///
@@ -102,10 +99,6 @@ namespace hpx {
     ///                     \a first the algorithm will be applied to.
     /// \param value        The value to be assigned.
     ///
-    /// The assignments in the parallel \a uninitialized_fill_n algorithm
-    /// invoked without an execution policy object execute in sequential order
-    /// in the calling thread.
-    ///
     /// \returns  The \a uninitialized_fill_n algorithm returns a
     ///           returns \a FwdIter.
     ///           The \a uninitialized_fill_n algorithm returns the output
@@ -117,7 +110,8 @@ namespace hpx {
 
     /// Copies the given \a value value to the first count elements in an
     /// uninitialized memory area beginning at first. If an exception is thrown
-    /// during the initialization, the function has no effects.
+    /// during the initialization, the function has no effects. Executed
+    /// according to the policy.
     ///
     /// \note   Complexity: Performs exactly \a count assignments, if
     ///         count > 0, no assignments otherwise.
@@ -445,7 +439,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_fill
+    // CPO for hpx::uninitialized_fill
     inline constexpr struct uninitialized_fill_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_fill_t>
     {
@@ -491,7 +485,7 @@ namespace hpx {
     } uninitialized_fill{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_fill_n
+    // CPO for hpx::uninitialized_fill_n
     inline constexpr struct uninitialized_fill_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_fill_n_t>
     {

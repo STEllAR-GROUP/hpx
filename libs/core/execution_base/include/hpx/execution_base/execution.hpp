@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -43,18 +43,6 @@ namespace hpx { namespace execution {
     ///       \a parallel_execution_tag.
     struct unsequenced_execution_tag
     {
-    };
-
-    /// \cond NOINTERNAL
-    struct task_policy_tag
-    {
-        constexpr task_policy_tag() = default;
-    };
-
-    /// \cond NOINTERNAL
-    struct non_task_policy_tag
-    {
-        constexpr non_task_policy_tag() = default;
     };
 }}    // namespace hpx::execution
 
@@ -106,8 +94,9 @@ namespace hpx { namespace parallel { namespace execution {
     ///
     /// \returns f(ts...)'s result
     ///
-    /// \note This is valid for one way executors only, it will call
-    ///       exec.sync_execute(f, ts...) if it exists.
+    /// \note It will call tag_invoke(sync_execute_t, exec, f, ts...) if it
+    ///       exists. For two-way executors it will invoke asynch_execute_t
+    ///       and wait for the task's completion before returning.
     ///
     inline constexpr struct sync_execute_t final
       : hpx::functional::detail::tag_fallback<sync_execute_t>
@@ -116,7 +105,7 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -163,7 +152,7 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -202,7 +191,7 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename Future, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -243,7 +232,7 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -301,8 +290,8 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename Shape, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value&&
-                !std::is_integral<Shape>::value
+                hpx::traits::is_executor_any_v<Executor> &&
+               !std::is_integral_v<Shape>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -317,18 +306,16 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename Shape, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value&&
-                std::is_integral<Shape>::value
+                hpx::traits::is_executor_any_v<Executor> &&
+                std::is_integral_v<Shape>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_sync_execute_t, Executor&& exec, F&& f, Shape const& shape,
             Ts&&... ts)
         {
-            return detail::bulk_sync_execute_fn_helper<
-                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
-                HPX_FORWARD(F, f),
-                hpx::util::detail::make_counting_shape(shape),
+            return bulk_sync_execute_t{}(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), hpx::util::counting_shape(shape),
                 HPX_FORWARD(Ts, ts)...);
         }
     } bulk_sync_execute{};
@@ -373,8 +360,8 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename Shape, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value &&
-                !std::is_integral<Shape>::value
+                hpx::traits::is_executor_any_v<Executor> &&
+               !std::is_integral_v<Shape>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -389,18 +376,16 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename F, typename Shape, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value &&
-                std::is_integral<Shape>::value
+                hpx::traits::is_executor_any_v<Executor> &&
+                std::is_integral_v<Shape>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_async_execute_t, Executor&& exec, F&& f, Shape const& shape,
             Ts&&... ts)
         {
-            return detail::bulk_async_execute_fn_helper<
-                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
-                HPX_FORWARD(F, f),
-                hpx::util::detail::make_counting_shape(shape),
+            return bulk_async_execute_t{}(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), hpx::util::counting_shape(shape),
                 HPX_FORWARD(Ts, ts)...);
         }
     } bulk_async_execute{};
@@ -450,8 +435,8 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Executor, typename F, typename Shape,
             typename Future, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value&&
-                !std::is_integral<Shape>::value
+                hpx::traits::is_executor_any_v<Executor> &&
+               !std::is_integral_v<Shape>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -468,18 +453,16 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Executor, typename F, typename Shape,
             typename Future, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value&&
-                std::is_integral<Shape>::value
+                hpx::traits::is_executor_any_v<Executor> &&
+                std::is_integral_v<Shape>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             bulk_then_execute_t, Executor&& exec, F&& f, Shape const& shape,
             Future&& predecessor, Ts&&... ts)
         {
-            return detail::bulk_then_execute_fn_helper<
-                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
-                HPX_FORWARD(F, f),
-                hpx::util::detail::make_counting_shape(shape),
+            return bulk_then_execute_t{}(HPX_FORWARD(Executor, exec),
+                HPX_FORWARD(F, f), hpx::util::counting_shape(shape),
                 HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
     } bulk_then_execute{};

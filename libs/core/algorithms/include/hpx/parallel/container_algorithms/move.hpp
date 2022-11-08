@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Bruno Pitrus
 //  Copyright (c) 2017-2020 Hartmut Kaiser
+//  Copyright (c) 2022 Dimitra Karatza
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,14 +26,14 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter1    The type of the begin source iterators used (deduced).
+    /// \tparam Iter1       The type of the source iterators used for the
+    ///                     first range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam Sent1       The type of the end source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     sentinel for FwdIter1.
-    /// \tparam FwdIter     The type of the iterator representing the
-    ///                     destination range (deduced).
+    /// \tparam Sent1       The type of the source iterators used for the end of
+    ///                     the first range (deduced).
+    /// \tparam Iter2       The type of the source iterators used for the
+    ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     ///
@@ -64,11 +65,11 @@ namespace hpx { namespace ranges {
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element moved.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Sent1,
-        typename FwdIter>
-    typename util::detail::algorithm_result<
-        ExPolicy, ranges::move_result<FwdIter1, FwdIter>>::type
-    move(ExPolicy&& policy, FwdIter1 iter, Sent1 sent, FwdIter dest);
+    template <typename ExPolicy, typename Iter1, typename Sent1,
+        typename Iter2>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        move_result<Iter1, Iter2>>::type
+    move(ExPolicy&& policy, Iter1 first, Sent1 last, Iter2 dest);
 
     /// Moves the elements in the range \a rng to another range beginning
     /// at \a dest. After this operation the elements in the moved-from
@@ -85,8 +86,8 @@ namespace hpx { namespace ranges {
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
-    /// \tparam FwdIter     The type of the iterator representing the
-    ///                     destination range (deduced).
+    /// \tparam Iter2       The type of the source iterators used for the
+    ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     ///
@@ -116,13 +117,75 @@ namespace hpx { namespace ranges {
     ///           \a last and the output iterator to the element in the
     ///           destination range, one past the last element moved.
     ///
-    template <typename ExPolicy, typename Rng, typename FwdIter>
-    typename util::detail::algorithm_result<
-        ExPolicy, ranges::move_result<
-            typename hpx::traits::range_traits<Rng>::iterator_type, FwdIter>
-    >::type
-    move(ExPolicy&& policy, Rng&& rng, FwdIter dest);
+    template <typename ExPolicy, typename Rng, typename Iter2>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        move_result<typename hpx::traits::range_iterator<Rng>::type,
+            Iter2>>::type
+    move(ExPolicy&& policy, Rng&& rng, Iter2 dest);
 
+    /// Moves the elements in the range \a rng to another range beginning
+    /// at \a dest. After this operation the elements in the moved-from
+    /// range will still contain valid values of the appropriate type,
+    /// but not necessarily the same values as before the move.
+    ///
+    /// \note   Complexity: Performs exactly
+    ///         std::distance(begin(rng), end(rng)) assignments.
+    ///
+    /// \tparam Iter1       The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent1       The type of the source iterators used for the end of
+    ///                     the first range (deduced).
+    /// \tparam Iter2       The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// \returns  The \a move algorithm returns \a
+    ///           ranges::move_result<iterator_t<Rng>, FwdIter2>.
+    ///           The \a move algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the element in the
+    ///           destination range, one past the last element moved.
+    ///
+    template <typename Iter1, typename Sent1, typename Iter2>
+    move_result<Iter1, Iter2> move(Iter1 first, Sent1 last, Iter2 dest);
+
+    /// Moves the elements in the range \a rng to another range beginning
+    /// at \a dest. After this operation the elements in the moved-from
+    /// range will still contain valid values of the appropriate type,
+    /// but not necessarily the same values as before the move.
+    ///
+    /// \note   Complexity: Performs exactly
+    ///         std::distance(begin(rng), end(rng)) assignments.
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam Iter2       The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// \returns  The \a move algorithm returns a
+    ///           \a ranges::move_result<iterator_t<Rng>, FwdIter2>.
+    ///           The \a move algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the element in the
+    ///           destination range, one past the last element moved.
+    ///
+    template <typename Rng, typename Iter2>
+    move_result<typename hpx::traits::range_iterator<Rng>::type, Iter2>
+    move(Rng&& rng, Iter2 dest);
     // clang-format on
 }}    // namespace hpx::ranges
 

@@ -6,11 +6,12 @@
 
 #include <hpx/config.hpp>
 
+#if !defined(HPX_HAVE_STATIC_LINKING)
 #include <hpx/distribution_policies/container_distribution_policy.hpp>
 
 #include <hpx/components/containers/partitioned_vector/export_definitions.hpp>
-#include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 #include <hpx/components/containers/partitioned_vector/partitioned_vector.hpp>
+#include <hpx/components/containers/partitioned_vector/partitioned_vector_component.hpp>
 
 #include <vector>
 
@@ -22,7 +23,7 @@ HPX_REGISTER_PARTITIONED_VECTOR(long_long)
 // arguments
 #if defined(HPX_MSVC)
 #pragma warning(push)
-#pragma warning(disable: 5037)
+#pragma warning(disable : 5037)
 #endif
 
 template class HPX_PARTITIONED_VECTOR_EXPORT
@@ -32,12 +33,11 @@ template class HPX_PARTITIONED_VECTOR_EXPORT
 template class HPX_PARTITIONED_VECTOR_EXPORT
     hpx::partitioned_vector<int, std::vector<int>>;
 template HPX_PARTITIONED_VECTOR_EXPORT
-    hpx::partitioned_vector<int, std::vector<int>>::partitioned_vector(
-        size_type, hpx::container_distribution_policy const&, void*);
+hpx::partitioned_vector<int, std::vector<int>>::partitioned_vector(
+    size_type, hpx::container_distribution_policy const&, void*);
 template HPX_PARTITIONED_VECTOR_EXPORT
-    hpx::partitioned_vector<int, std::vector<int>>::partitioned_vector(
-        size_type, int const&, hpx::container_distribution_policy const&,
-        void*);
+hpx::partitioned_vector<int, std::vector<int>>::partitioned_vector(
+    size_type, int const&, hpx::container_distribution_policy const&, void*);
 
 template class HPX_PARTITIONED_VECTOR_EXPORT
     hpx::server::partitioned_vector<long long, std::vector<long long>>;
@@ -46,14 +46,14 @@ template class HPX_PARTITIONED_VECTOR_EXPORT
 template class HPX_PARTITIONED_VECTOR_EXPORT
     hpx::partitioned_vector<long long, std::vector<long long>>;
 template HPX_PARTITIONED_VECTOR_EXPORT
-    hpx::partitioned_vector<long long, std::vector<long long>>::partitioned_vector(
-        size_type, hpx::container_distribution_policy const&, void*);
-template HPX_PARTITIONED_VECTOR_EXPORT
-    hpx::partitioned_vector<long long, std::vector<long long>>::partitioned_vector(
-        size_type, long long const&, hpx::container_distribution_policy const&,
-        void*);
+hpx::partitioned_vector<long long, std::vector<long long>>::partitioned_vector(
+    size_type, hpx::container_distribution_policy const&, void*);
+template HPX_PARTITIONED_VECTOR_EXPORT hpx::partitioned_vector<long long,
+    std::vector<long long>>::partitioned_vector(size_type, long long const&,
+    hpx::container_distribution_policy const&, void*);
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)
 #endif
 
+#endif

@@ -15,6 +15,7 @@
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_difference.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
 #include <hpx/parallel/datapar/zip_iterator.hpp>
@@ -48,9 +49,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             }
 
             using hpx::get;
-            using hpx::util::make_zip_iterator;
             util::loop_n<std::decay_t<ExPolicy>>(
-                make_zip_iterator(first, prev, dest), count,
+                hpx::util::zip_iterator(first, prev, dest), count,
                 [op](auto&& it) mutable {
                     get<2>(*it) = HPX_INVOKE(op, get<0>(*it), get<1>(*it));
                 });

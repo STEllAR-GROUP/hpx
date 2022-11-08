@@ -19,11 +19,13 @@
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution/traits/future_then_result_exec.hpp>
+#include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
@@ -62,9 +64,28 @@ namespace hpx { namespace parallel { namespace execution {
             return sync_execute_not_callable<Executor, F, Ts...>{};
         }
 
-        template <typename OneWayExecutor, typename F, typename... Ts>
-        HPX_FORCEINLINE auto sync_execute_dispatch(int, OneWayExecutor&& exec,
-            F&& f, Ts&&... ts) -> decltype(exec.sync_execute(HPX_FORWARD(F, f),
+        template <typename OneWayExecutor, typename F, typename... Ts,
+            typename Enable = std::enable_if_t<hpx::functional::
+                    is_tag_invocable_v<hpx::parallel::execution::sync_execute_t,
+                        OneWayExecutor&&, F&&, Ts&&...>>>
+        HPX_FORCEINLINE decltype(auto) sync_execute_dispatch(
+            int, OneWayExecutor&& exec, F&& f, Ts&&... ts)
+        {
+            return hpx::parallel::execution::sync_execute(
+                exec, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename OneWayExecutor, typename F, typename... Ts,
+            typename Enable =
+                std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                    hpx::parallel::execution::sync_execute_t, OneWayExecutor&&,
+                    F&&, Ts&&...>>>
+        HPX_DEPRECATED_V(1, 9,
+            "Exposing sync_execute() from an executor is deprecated, please "
+            "expose this functionality through a corresponding overload of "
+            "tag_invoke")
+        auto sync_execute_dispatch(int, OneWayExecutor&& exec, F&& f,
+            Ts&&... ts) -> decltype(exec.sync_execute(HPX_FORWARD(F, f),
             HPX_FORWARD(Ts, ts)...))
         {
             return exec.sync_execute(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -77,29 +98,6 @@ namespace hpx { namespace parallel { namespace execution {
             std::enable_if_t<hpx::traits::is_one_way_executor_v<Executor> &&
                 !hpx::traits::is_two_way_executor_v<Executor>>>
         {
-            // clang-format off
-            template <typename OneWayExecutor, typename F, typename... Ts>
-            HPX_FORCEINLINE static auto call_impl(
-                std::false_type, OneWayExecutor&& exec, F&& f, Ts&&... ts)
-                -> hpx::future<decltype(sync_execute_dispatch(0,
-                    HPX_FORWARD(OneWayExecutor, exec), HPX_FORWARD(F, f),
-                    HPX_FORWARD(Ts, ts)...))>
-            // clang-format on
-            {
-                return hpx::make_ready_future(
-                    sync_execute_dispatch(0, HPX_FORWARD(OneWayExecutor, exec),
-                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
-            }
-
-            template <typename OneWayExecutor, typename F, typename... Ts>
-            HPX_FORCEINLINE static hpx::future<void> call_impl(
-                std::true_type, OneWayExecutor&& exec, F&& f, Ts&&... ts)
-            {
-                sync_execute_dispatch(0, HPX_FORWARD(OneWayExecutor, exec),
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-                return hpx::make_ready_future();
-            }
-
             template <typename OneWayExecutor, typename F, typename... Ts>
             HPX_FORCEINLINE static auto call(OneWayExecutor&& exec, F&& f,
                 Ts&&... ts) -> hpx::future<decltype(sync_execute_dispatch(0,
@@ -107,13 +105,24 @@ namespace hpx { namespace parallel { namespace execution {
                 HPX_FORWARD(Ts, ts)...))>
             {
                 // clang-format off
-                using is_void = std::is_void<decltype(sync_execute_dispatch(0,
-                    HPX_FORWARD(OneWayExecutor, exec), HPX_FORWARD(F, f),
-                    HPX_FORWARD(Ts, ts)...))>;
+                static constexpr bool is_void =
+                    std::is_void_v<decltype(sync_execute_dispatch(0,
+                        HPX_FORWARD(OneWayExecutor, exec), HPX_FORWARD(F, f),
+                        HPX_FORWARD(Ts, ts)...))>;
                 // clang-format on
 
-                return call_impl(
-                    is_void(), exec, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+                if constexpr (is_void)
+                {
+                    sync_execute_dispatch(0, HPX_FORWARD(OneWayExecutor, exec),
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+                    return hpx::make_ready_future();
+                }
+                else
+                {
+                    return hpx::make_ready_future(sync_execute_dispatch(0,
+                        HPX_FORWARD(OneWayExecutor, exec), HPX_FORWARD(F, f),
+                        HPX_FORWARD(Ts, ts)...));
+                }
             }
 
             template <typename OneWayExecutor, typename F, typename... Ts>
@@ -207,7 +216,27 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             // dispatch to V1 executors
-            template <typename OneWayExecutor, typename F, typename... Ts>
+            template <typename OneWayExecutor, typename F, typename... Ts,
+                typename Enable = std::enable_if_t<hpx::functional::
+                        is_tag_invocable_v<hpx::parallel::execution::post_t,
+                            OneWayExecutor&&, F&&, Ts&&...>>>
+            HPX_FORCEINLINE static decltype(auto) call_impl(
+                int, OneWayExecutor&& exec, F&& f, Ts&&... ts)
+            {
+                // use post, if exposed
+                return hpx::parallel::execution::post(
+                    exec, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
+
+            template <typename OneWayExecutor, typename F, typename... Ts,
+                typename Enable =
+                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::post_t, OneWayExecutor&&, F&&,
+                        Ts&&...>>>
+            HPX_DEPRECATED_V(1, 9,
+                "Exposing post() from an executor is deprecated, please "
+                "expose this functionality through a corresponding overload of "
+                "tag_invoke")
             HPX_FORCEINLINE static auto call_impl(int, OneWayExecutor&& exec,
                 F&& f, Ts&&... ts) -> decltype(exec.post(HPX_FORWARD(F, f),
                 HPX_FORWARD(Ts, ts)...))
@@ -253,7 +282,27 @@ namespace hpx { namespace parallel { namespace execution {
             return async_execute_not_callable<Executor, F, Ts...>{};
         }
 
-        template <typename TwoWayExecutor, typename F, typename... Ts>
+        template <typename TwoWayExecutor, typename F, typename... Ts,
+            typename Enable =
+                std::enable_if_t<hpx::functional::is_tag_invocable_v<
+                    hpx::parallel::execution::async_execute_t, TwoWayExecutor&&,
+                    F&&, Ts&&...>>>
+        HPX_FORCEINLINE decltype(auto) async_execute_dispatch(
+            int, TwoWayExecutor&& exec, F&& f, Ts&&... ts)
+        {
+            return hpx::parallel::execution::async_execute(
+                exec, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename TwoWayExecutor, typename F, typename... Ts,
+            typename Enable =
+                std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                    hpx::parallel::execution::async_execute_t, TwoWayExecutor&&,
+                    F&&, Ts&&...>>>
+        HPX_DEPRECATED_V(1, 9,
+            "Exposing async_execute() from an executor is deprecated, please "
+            "expose this functionality through a corresponding overload of "
+            "tag_invoke")
         HPX_FORCEINLINE auto async_execute_dispatch(int, TwoWayExecutor&& exec,
             F&& f, Ts&&... ts) -> decltype(exec.async_execute(HPX_FORWARD(F, f),
             HPX_FORWARD(Ts, ts)...))
@@ -293,56 +342,69 @@ namespace hpx { namespace parallel { namespace execution {
         {
             // fall-back: emulate sync_execute using async_execute
             template <typename TwoWayExecutor, typename F, typename... Ts>
-            static auto call_impl(std::false_type, TwoWayExecutor&& exec, F&& f,
-                Ts&&... ts) -> hpx::util::invoke_result_t<F, Ts...>
-            {
-                try
-                {
-                    using result_type =
-                        hpx::util::detail::invoke_deferred_result_t<F, Ts...>;
-
-                    // use async execution, wait for result, propagate exceptions
-                    return async_execute_dispatch(0,
-                        HPX_FORWARD(TwoWayExecutor, exec),
-                        [&]() -> result_type {
-                            return HPX_INVOKE(
-                                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
-                        })
-                        .get();
-                }
-                catch (std::bad_alloc const& ba)
-                {
-                    throw ba;
-                }
-                catch (...)
-                {
-                    // note: constructor doesn't lock/suspend
-                    throw hpx::exception_list(std::current_exception());
-                }
-            }
-
-            template <typename TwoWayExecutor, typename F, typename... Ts>
-            HPX_FORCEINLINE static void call_impl(
-                std::true_type, TwoWayExecutor&& exec, F&& f, Ts&&... ts)
-            {
-                async_execute_dispatch(0, HPX_FORWARD(TwoWayExecutor, exec),
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)
-                    .get();
-            }
-
-            template <typename TwoWayExecutor, typename F, typename... Ts>
             HPX_FORCEINLINE static auto call_impl(hpx::traits::detail::wrap_int,
                 TwoWayExecutor&& exec, F&& f, Ts&&... ts)
                 -> hpx::util::invoke_result_t<F, Ts...>
             {
-                using is_void = typename std::is_void<hpx::util::detail::
-                        invoke_deferred_result_t<F, Ts...>>::type;
+                static constexpr bool is_void = std::is_void_v<
+                    hpx::util::detail::invoke_deferred_result_t<F, Ts...>>;
 
-                return call_impl(is_void(), HPX_FORWARD(TwoWayExecutor, exec),
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+                if constexpr (is_void)
+                {
+                    async_execute_dispatch(0, HPX_FORWARD(TwoWayExecutor, exec),
+                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)
+                        .get();
+                }
+                else
+                {
+                    try
+                    {
+                        using result_type =
+                            hpx::util::detail::invoke_deferred_result_t<F,
+                                Ts...>;
+
+                        // use async execution, wait for result, propagate exceptions
+                        return async_execute_dispatch(0,
+                            HPX_FORWARD(TwoWayExecutor, exec),
+                            [&]() -> result_type {
+                                return HPX_INVOKE(
+                                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+                            })
+                            .get();
+                    }
+                    catch (std::bad_alloc const& ba)
+                    {
+                        throw ba;
+                    }
+                    catch (...)
+                    {
+                        // note: constructor doesn't lock/suspend
+                        throw hpx::exception_list(std::current_exception());
+                    }
+                }
             }
 
-            template <typename TwoWayExecutor, typename F, typename... Ts>
+            template <typename TwoWayExecutor, typename F, typename... Ts,
+                typename Enable =
+                    std::enable_if_t<hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::sync_execute_t,
+                        TwoWayExecutor&&, F&&, Ts&&...>>>
+            HPX_FORCEINLINE static decltype(auto) call_impl(
+                int, TwoWayExecutor&& exec, F&& f, Ts&&... ts)
+            {
+                return hpx::parallel::execution::sync_execute(
+                    exec, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
+
+            template <typename TwoWayExecutor, typename F, typename... Ts,
+                typename Enable =
+                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::sync_execute_t,
+                        TwoWayExecutor&&, F&&, Ts&&...>>>
+            HPX_DEPRECATED_V(1, 9,
+                "Exposing sync_execute() from an executor is deprecated, "
+                "please expose this functionality through a corresponding "
+                "overload of tag_invoke")
             HPX_FORCEINLINE static auto call_impl(
                 int, TwoWayExecutor&& exec, F&& f, Ts&&... ts)
                 -> decltype(exec.sync_execute(
@@ -401,7 +463,29 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             template <typename TwoWayExecutor, typename F, typename Future,
-                typename... Ts>
+                typename... Ts,
+                typename Enable =
+                    std::enable_if_t<hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::then_execute_t,
+                        TwoWayExecutor&&, F&&, Future&&, Ts&&...>>>
+            HPX_FORCEINLINE static decltype(auto) call_impl(int,
+                TwoWayExecutor&& exec, F&& f, Future&& predecessor, Ts&&... ts)
+            {
+                return hpx::parallel::execution::then_execute(exec,
+                    HPX_FORWARD(F, f), HPX_FORWARD(Future, predecessor),
+                    HPX_FORWARD(Ts, ts)...);
+            }
+
+            template <typename TwoWayExecutor, typename F, typename Future,
+                typename... Ts,
+                typename Enable =
+                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::then_execute_t,
+                        TwoWayExecutor&&, F&&, Future&&, Ts&&...>>>
+            HPX_DEPRECATED_V(1, 9,
+                "Exposing then_execute() from an executor is deprecated, "
+                "please expose this functionality through a corresponding "
+                "overload of tag_invoke")
             HPX_FORCEINLINE static auto call_impl(int, TwoWayExecutor&& exec,
                 F&& f, Future&& predecessor, Ts&&... ts)
                 -> decltype(exec.then_execute(HPX_FORWARD(F, f),
@@ -447,11 +531,32 @@ namespace hpx { namespace parallel { namespace execution {
                 TwoWayExecutor&& exec, F&& f, Ts&&... ts)
             {
                 // simply discard the returned future
-                exec.async_execute(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+                hpx::parallel::execution::async_execute(
+                    exec, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
 
             // dispatch to V1 executors
-            template <typename TwoWayExecutor, typename F, typename... Ts>
+            template <typename TwoWayExecutor, typename F, typename... Ts,
+                typename Enable = std::enable_if_t<hpx::functional::
+                        is_tag_invocable_v<hpx::parallel::execution::post_t,
+                            TwoWayExecutor&&, F&&, Ts&&...>>>
+            HPX_FORCEINLINE static decltype(auto) call_impl(
+                int, TwoWayExecutor&& exec, F&& f, Ts&&... ts)
+            {
+                // use post, if exposed
+                return hpx::parallel::execution::post(
+                    exec, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            }
+
+            template <typename TwoWayExecutor, typename F, typename... Ts,
+                typename Enable =
+                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::post_t, TwoWayExecutor&&, F&&,
+                        Ts&&...>>>
+            HPX_DEPRECATED_V(1, 9,
+                "Exposing post() from an executor is deprecated, please "
+                "expose this functionality through a corresponding overload of "
+                "tag_invoke")
             HPX_FORCEINLINE static auto call_impl(int, TwoWayExecutor&& exec,
                 F&& f, Ts&&... ts) -> decltype(exec.post(HPX_FORWARD(F, f),
                 HPX_FORWARD(Ts, ts)...))
@@ -498,7 +603,27 @@ namespace hpx { namespace parallel { namespace execution {
 
         // default implementation of the post() customization point
         template <typename NonBlockingOneWayExecutor, typename F,
-            typename... Ts>
+            typename... Ts,
+            typename Enable = std::enable_if_t<hpx::functional::
+                    is_tag_invocable_v<hpx::parallel::execution::post_t,
+                        NonBlockingOneWayExecutor&&, F&&, Ts&&...>>>
+        HPX_FORCEINLINE decltype(auto) post_dispatch(
+            int, NonBlockingOneWayExecutor&& exec, F&& f, Ts&&... ts)
+        {
+            return hpx::parallel::execution::post(
+                exec, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename NonBlockingOneWayExecutor, typename F,
+            typename... Ts,
+            typename Enable =
+                std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                    hpx::parallel::execution::post_t,
+                    NonBlockingOneWayExecutor&&, F&&, Ts&&...>>>
+        HPX_DEPRECATED_V(1, 9,
+            "Exposing post() from an executor is deprecated, please "
+            "expose this functionality through a corresponding overload of "
+            "tag_invoke")
         HPX_FORCEINLINE auto post_dispatch(
             int, NonBlockingOneWayExecutor&& exec, F&& f, Ts&&... ts)
             -> decltype(exec.post(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
@@ -560,7 +685,28 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         template <typename BulkTwoWayExecutor, typename F, typename Shape,
-            typename... Ts>
+            typename... Ts,
+            typename Enable =
+                std::enable_if_t<hpx::functional::is_tag_invocable_v<
+                    hpx::parallel::execution::bulk_async_execute_t,
+                    BulkTwoWayExecutor&&, F&&, Shape, Ts&&...>>>
+        HPX_FORCEINLINE decltype(auto) bulk_async_execute_dispatch(int,
+            BulkTwoWayExecutor&& exec, F&& f, Shape const& shape, Ts&&... ts)
+        {
+            return hpx::parallel::execution::bulk_async_execute(
+                exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename BulkTwoWayExecutor, typename F, typename Shape,
+            typename... Ts,
+            typename Enable =
+                std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                    hpx::parallel::execution::bulk_async_execute_t,
+                    BulkTwoWayExecutor&&, F&&, Shape, Ts&&...>>>
+        HPX_DEPRECATED_V(1, 9,
+            "Exposing bulk_async_execute() from an executor is deprecated, "
+            "please expose this functionality through a corresponding overload "
+            "of tag_invoke")
         HPX_FORCEINLINE auto bulk_async_execute_dispatch(int,
             BulkTwoWayExecutor&& exec, F&& f, Shape const& shape, Ts&&... ts)
             -> decltype(exec.bulk_async_execute(
@@ -611,7 +757,28 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             template <typename BulkExecutor, typename F, typename Shape,
-                typename... Ts>
+                typename... Ts,
+                typename Enable =
+                    std::enable_if_t<hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::bulk_async_execute_t,
+                        BulkExecutor&&, F&&, Shape, Ts&&...>>>
+            HPX_FORCEINLINE static decltype(auto) call_impl(
+                int, BulkExecutor&& exec, F&& f, Shape const& shape, Ts&&... ts)
+            {
+                return hpx::parallel::execution::bulk_async_execute(
+                    exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+            }
+
+            template <typename BulkExecutor, typename F, typename Shape,
+                typename... Ts,
+                typename Enable =
+                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::bulk_async_execute_t,
+                        BulkExecutor&&, F&&, Shape, Ts&&...>>>
+            HPX_DEPRECATED_V(1, 9,
+                "Exposing bulk_async_execute() from an executor is deprecated, "
+                "please expose this functionality through a corresponding "
+                "overload of tag_invoke")
             HPX_FORCEINLINE static auto call_impl(
                 int, BulkExecutor&& exec, F&& f, Shape const& shape, Ts&&... ts)
                 -> decltype(exec.bulk_async_execute(
@@ -690,7 +857,28 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         template <typename BulkTwoWayExecutor, typename F, typename Shape,
-            typename... Ts>
+            typename... Ts,
+            typename Enable =
+                std::enable_if_t<hpx::functional::is_tag_invocable_v<
+                    hpx::parallel::execution::bulk_sync_execute_t,
+                    BulkTwoWayExecutor&&, F&&, Shape, Ts&&...>>>
+        HPX_FORCEINLINE decltype(auto) bulk_sync_execute_dispatch(int,
+            BulkTwoWayExecutor&& exec, F&& f, Shape const& shape, Ts&&... ts)
+        {
+            return hpx::parallel::execution::bulk_sync_execute(
+                exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+        }
+
+        template <typename BulkTwoWayExecutor, typename F, typename Shape,
+            typename... Ts,
+            typename Enable =
+                std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                    hpx::parallel::execution::bulk_sync_execute_t,
+                    BulkTwoWayExecutor&&, F&&, Shape, Ts&&...>>>
+        HPX_DEPRECATED_V(1, 9,
+            "Exposing bulk_sync_execute() from an executor is deprecated, "
+            "please expose this functionality through a corresponding overload "
+            "of tag_invoke")
         HPX_FORCEINLINE auto bulk_sync_execute_dispatch(int,
             BulkTwoWayExecutor&& exec, F&& f, Shape const& shape, Ts&&... ts)
             -> decltype(exec.bulk_sync_execute(
@@ -723,8 +911,7 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename F, typename Shape, typename... Ts>
         struct bulk_execute_result
           : bulk_execute_result_impl<F, Shape,
-                std::is_void<bulk_function_result_t<F, Shape, Ts...>>::value,
-                Ts...>
+                std::is_void_v<bulk_function_result_t<F, Shape, Ts...>>, Ts...>
         {
         };
 
@@ -739,74 +926,72 @@ namespace hpx { namespace parallel { namespace execution {
                 !hpx::traits::is_two_way_executor_v<Executor> &&
                 !hpx::traits::is_bulk_one_way_executor_v<Executor>>>
         {
-            // returns void if F returns void
-            template <typename BulkExecutor, typename F, typename Shape,
-                typename... Ts>
-            static auto call_impl(std::false_type, BulkExecutor&& exec, F&& f,
-                Shape const& shape, Ts&&... ts)
-                -> bulk_execute_result_impl_t<F, Shape, false, Ts...>
-            {
-                try
-                {
-                    bulk_execute_result_impl_t<F, Shape, false, Ts...> results;
-                    results.reserve(hpx::util::size(shape));
-
-                    for (auto const& elem : shape)
-                    {
-                        results.push_back(
-                            execution::sync_execute(exec, f, elem, ts...));
-                    }
-                    return results;
-                }
-                catch (std::bad_alloc const& ba)
-                {
-                    throw ba;
-                }
-                catch (...)
-                {
-                    // note: constructor doesn't lock/suspend
-                    throw hpx::exception_list(std::current_exception());
-                }
-            }
-
-            template <typename BulkExecutor, typename F, typename Shape,
-                typename... Ts>
-            static void call_impl(std::true_type, BulkExecutor&& exec, F&& f,
-                Shape const& shape, Ts&&... ts)
-            {
-                try
-                {
-                    for (auto const& elem : shape)
-                    {
-                        execution::sync_execute(exec, f, elem, ts...);
-                    }
-                }
-                catch (std::bad_alloc const& ba)
-                {
-                    throw ba;
-                }
-                catch (...)
-                {
-                    // note: constructor doesn't lock/suspend
-                    throw hpx::exception_list(std::current_exception());
-                }
-            }
-
             template <typename BulkExecutor, typename F, typename Shape,
                 typename... Ts>
             HPX_FORCEINLINE static auto call_impl(hpx::traits::detail::wrap_int,
                 BulkExecutor&& exec, F&& f, Shape const& shape, Ts&&... ts)
                 -> bulk_execute_result_t<F, Shape, Ts...>
             {
-                using is_void = typename std::is_void<
-                    bulk_function_result_t<F, Shape, Ts...>>::type;
+                static constexpr bool is_void =
+                    std::is_void_v<bulk_function_result_t<F, Shape, Ts...>>;
 
-                return call_impl(is_void(), HPX_FORWARD(BulkExecutor, exec),
-                    HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+                try
+                {
+                    if constexpr (is_void)
+                    {
+                        for (auto const& elem : shape)
+                        {
+                            execution::sync_execute(exec, f, elem, ts...);
+                        }
+                    }
+                    else
+                    {
+                        bulk_execute_result_impl_t<F, Shape, false, Ts...>
+                            results;
+                        results.reserve(hpx::util::size(shape));
+
+                        for (auto const& elem : shape)
+                        {
+                            results.push_back(
+                                execution::sync_execute(exec, f, elem, ts...));
+                        }
+                        return results;
+                    }
+                }
+                catch (std::bad_alloc const& ba)
+                {
+                    throw ba;
+                }
+                catch (...)
+                {
+                    // note: constructor doesn't lock/suspend
+                    throw hpx::exception_list(std::current_exception());
+                }
             }
 
             template <typename BulkExecutor, typename F, typename Shape,
-                typename... Ts>
+                typename... Ts,
+                typename Enable =
+                    std::enable_if_t<hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::bulk_sync_execute_t,
+                        BulkExecutor&&, F&&, Shape, Ts&&...>>>
+            static decltype(auto) call_impl(
+                int, BulkExecutor&& exec, F&& f, Shape const& shape, Ts&&... ts)
+            {
+                return hpx::parallel::execution::bulk_sync_execute(
+                    exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+            }
+
+            template <typename BulkExecutor, typename F, typename Shape,
+                typename... Ts,
+                typename Enable =
+                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::bulk_sync_execute_t,
+                        BulkExecutor&&, F&&, Shape, Ts&&...>>>
+            HPX_DEPRECATED_V(1, 9,
+                "Exposing bulk_sync_execute() from an executor is deprecated, "
+                "please expose this functionality through a corresponding "
+                "overload of tag_invoke")
             static auto call_impl(
                 int, BulkExecutor&& exec, F&& f, Shape const& shape, Ts&&... ts)
                 -> decltype(exec.bulk_sync_execute(
@@ -846,41 +1031,13 @@ namespace hpx { namespace parallel { namespace execution {
         {
             template <typename BulkExecutor, typename F, typename Shape,
                 typename... Ts>
-            static auto call_impl(std::false_type, BulkExecutor&& exec, F&& f,
-                Shape const& shape, Ts&&... ts)
+            HPX_FORCEINLINE static auto call_impl(hpx::traits::detail::wrap_int,
+                BulkExecutor&& exec, F&& f, Shape const& shape, Ts&&... ts)
                 -> bulk_execute_result_t<F, Shape, Ts...>
             {
-                using result_type =
-                    std::vector<hpx::traits::executor_future_t<Executor,
-                        bulk_function_result_t<F, Shape, Ts...>>>;
+                static constexpr bool is_void =
+                    std::is_void_v<bulk_function_result_t<F, Shape, Ts...>>;
 
-                try
-                {
-                    result_type results;
-                    results.reserve(hpx::util::size(shape));
-                    for (auto const& elem : shape)
-                    {
-                        results.push_back(
-                            execution::async_execute(exec, f, elem, ts...));
-                    }
-                    return hpx::unwrap(results);
-                }
-                catch (std::bad_alloc const& ba)
-                {
-                    throw ba;
-                }
-                catch (...)
-                {
-                    // note: constructor doesn't lock/suspend
-                    throw hpx::exception_list(std::current_exception());
-                }
-            }
-
-            template <typename BulkExecutor, typename F, typename Shape,
-                typename... Ts>
-            static void call_impl(std::true_type, BulkExecutor&& exec, F&& f,
-                Shape const& shape, Ts&&... ts)
-            {
                 using result_type =
                     std::vector<hpx::traits::executor_future_t<Executor,
                         bulk_function_result_t<F, Shape, Ts...>>>;
@@ -888,15 +1045,26 @@ namespace hpx { namespace parallel { namespace execution {
                 result_type results;
                 try
                 {
-                    results.reserve(hpx::util::size(shape));
-
-                    for (auto const& elem : shape)
+                    if constexpr (is_void)
                     {
-                        results.push_back(
-                            execution::async_execute(exec, f, elem, ts...));
+                        results.reserve(hpx::util::size(shape));
+                        for (auto const& elem : shape)
+                        {
+                            results.push_back(
+                                execution::async_execute(exec, f, elem, ts...));
+                        }
+                        hpx::wait_all_nothrow(results);
                     }
-
-                    hpx::wait_all_nothrow(results);
+                    else
+                    {
+                        results.reserve(hpx::util::size(shape));
+                        for (auto const& elem : shape)
+                        {
+                            results.push_back(
+                                execution::async_execute(exec, f, elem, ts...));
+                        }
+                        return hpx::unwrap(results);
+                    }
                 }
                 catch (std::bad_alloc const& ba)
                 {
@@ -908,37 +1076,48 @@ namespace hpx { namespace parallel { namespace execution {
                     throw hpx::exception_list(std::current_exception());
                 }
 
-                // handle exceptions
-                hpx::exception_list exceptions;
-                for (auto& f : results)
+                if constexpr (is_void)
                 {
-                    if (f.has_exception())
+                    // handle exceptions
+                    hpx::exception_list exceptions;
+                    for (auto& f : results)
                     {
-                        exceptions.add(f.get_exception_ptr());
+                        if (f.has_exception())
+                        {
+                            exceptions.add(f.get_exception_ptr());
+                        }
+                    }
+
+                    if (exceptions.size() != 0)
+                    {
+                        throw exceptions;
                     }
                 }
-
-                if (exceptions.size() != 0)
-                {
-                    throw exceptions;
-                }
             }
 
             template <typename BulkExecutor, typename F, typename Shape,
-                typename... Ts>
-            HPX_FORCEINLINE static auto call_impl(hpx::traits::detail::wrap_int,
-                BulkExecutor&& exec, F&& f, Shape const& shape, Ts&&... ts)
-                -> bulk_execute_result_t<F, Shape, Ts...>
+                typename... Ts,
+                typename Enable =
+                    std::enable_if_t<hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::bulk_sync_execute_t,
+                        BulkExecutor&&, F&&, Shape, Ts&&...>>>
+            HPX_FORCEINLINE static decltype(auto) call_impl(
+                int, BulkExecutor&& exec, F&& f, Shape const& shape, Ts&&... ts)
             {
-                using is_void = typename std::is_void<
-                    bulk_function_result_t<F, Shape, Ts...>>::type;
-
-                return call_impl(is_void(), HPX_FORWARD(BulkExecutor, exec),
-                    HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+                return hpx::parallel::execution::bulk_sync_execute(
+                    exec, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename BulkExecutor, typename F, typename Shape,
-                typename... Ts>
+                typename... Ts,
+                typename Enable =
+                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::bulk_sync_execute_t,
+                        BulkExecutor&&, F&&, Shape, Ts&&...>>>
+            HPX_DEPRECATED_V(1, 9,
+                "Exposing bulk_sync_execute() from an executor is deprecated, "
+                "please expose this functionality through a corresponding "
+                "overload of tag_invoke")
             HPX_FORCEINLINE static auto call_impl(
                 int, BulkExecutor&& exec, F&& f, Shape const& shape, Ts&&... ts)
                 -> decltype(exec.bulk_sync_execute(
@@ -1014,67 +1193,76 @@ namespace hpx { namespace parallel { namespace execution {
         {
             template <typename BulkExecutor, typename F, typename Shape,
                 typename Future, typename... Ts>
-            static auto call_impl(std::false_type, BulkExecutor&& exec, F&& f,
-                Shape const& shape, Future&& predecessor, Ts&&... ts)
-                -> hpx::future<
-                    bulk_then_execute_result_t<F, Shape, Future, Ts...>>
-            {
-                using result_type =
-                    bulk_then_execute_result_t<F, Shape, Future, Ts...>;
-
-                using shared_state_type =
-                    hpx::traits::detail::shared_state_ptr_t<result_type>;
-
-                auto func =
-                    make_fused_bulk_sync_execute_helper(exec, HPX_FORWARD(F, f),
-                        shape, hpx::make_tuple(HPX_FORWARD(Ts, ts)...));
-
-                shared_state_type p =
-                    lcos::detail::make_continuation_exec<result_type>(
-                        HPX_FORWARD(Future, predecessor),
-                        HPX_FORWARD(BulkExecutor, exec), HPX_MOVE(func));
-
-                return hpx::traits::future_access<
-                    hpx::future<result_type>>::create(HPX_MOVE(p));
-            }
-
-            template <typename BulkExecutor, typename F, typename Shape,
-                typename Future, typename... Ts>
-            static hpx::future<void> call_impl(std::true_type,
-                BulkExecutor&& exec, F&& f, Shape const& shape,
-                Future&& predecessor, Ts&&... ts)
-            {
-                auto func =
-                    make_fused_bulk_sync_execute_helper(exec, HPX_FORWARD(F, f),
-                        shape, hpx::make_tuple(HPX_FORWARD(Ts, ts)...));
-
-                hpx::traits::detail::shared_state_ptr_t<void> p =
-                    lcos::detail::make_continuation_exec<void>(
-                        HPX_FORWARD(Future, predecessor),
-                        HPX_FORWARD(BulkExecutor, exec), HPX_MOVE(func));
-
-                return hpx::traits::future_access<hpx::future<void>>::create(
-                    HPX_MOVE(p));
-            }
-
-            template <typename BulkExecutor, typename F, typename Shape,
-                typename Future, typename... Ts>
             HPX_FORCEINLINE static auto call_impl(hpx::traits::detail::wrap_int,
                 BulkExecutor&& exec, F&& f, Shape const& shape,
                 Future&& predecessor, Ts&&... ts)
                 -> hpx::future<
                     bulk_then_execute_result_t<F, Shape, Future, Ts...>>
             {
-                using is_void = typename std::is_void<
-                    then_bulk_function_result_t<F, Shape, Future, Ts...>>::type;
+                static constexpr bool is_void = std::is_void_v<
+                    then_bulk_function_result_t<F, Shape, Future, Ts...>>;
 
-                return bulk_then_execute_fn_helper::call_impl(is_void(),
-                    HPX_FORWARD(BulkExecutor, exec), HPX_FORWARD(F, f), shape,
-                    HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
+                if constexpr (is_void)
+                {
+                    auto func = make_fused_bulk_sync_execute_helper(exec,
+                        HPX_FORWARD(F, f), shape,
+                        hpx::make_tuple(HPX_FORWARD(Ts, ts)...));
+
+                    hpx::traits::detail::shared_state_ptr_t<void> p =
+                        lcos::detail::make_continuation_exec<void>(
+                            HPX_FORWARD(Future, predecessor),
+                            HPX_FORWARD(BulkExecutor, exec), HPX_MOVE(func));
+
+                    return hpx::traits::future_access<
+                        hpx::future<void>>::create(HPX_MOVE(p));
+                }
+                else
+                {
+                    using result_type =
+                        bulk_then_execute_result_t<F, Shape, Future, Ts...>;
+
+                    using shared_state_type =
+                        hpx::traits::detail::shared_state_ptr_t<result_type>;
+
+                    auto func = make_fused_bulk_sync_execute_helper(exec,
+                        HPX_FORWARD(F, f), shape,
+                        hpx::make_tuple(HPX_FORWARD(Ts, ts)...));
+
+                    shared_state_type p =
+                        lcos::detail::make_continuation_exec<result_type>(
+                            HPX_FORWARD(Future, predecessor),
+                            HPX_FORWARD(BulkExecutor, exec), HPX_MOVE(func));
+
+                    return hpx::traits::future_access<
+                        hpx::future<result_type>>::create(HPX_MOVE(p));
+                }
             }
 
             template <typename BulkExecutor, typename F, typename Shape,
-                typename Future, typename... Ts>
+                typename Future, typename... Ts,
+                typename Enable =
+                    std::enable_if_t<hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::bulk_then_execute_t,
+                        BulkExecutor&&, F&&, Shape, Future&&, Ts&&...>>>
+            HPX_FORCEINLINE static decltype(auto) call_impl(int,
+                BulkExecutor&& exec, F&& f, Shape const& shape,
+                Future&& predecessor, Ts&&... ts)
+            {
+                return hpx::parallel::execution::bulk_then_execute(exec,
+                    HPX_FORWARD(F, f), shape, HPX_FORWARD(Future, predecessor),
+                    HPX_FORWARD(Ts, ts)...);
+            }
+
+            template <typename BulkExecutor, typename F, typename Shape,
+                typename Future, typename... Ts,
+                typename Enable =
+                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::bulk_then_execute_t,
+                        BulkExecutor&&, F&&, Shape, Future&&, Ts&&...>>>
+            HPX_DEPRECATED_V(1, 9,
+                "Exposing bulk_then_execute() from an executor is deprecated, "
+                "please expose this functionality through a corresponding "
+                "overload of tag_invoke")
             HPX_FORCEINLINE static auto call_impl(int, BulkExecutor&& exec,
                 F&& f, Shape const& shape, Future&& predecessor, Ts&&... ts)
                 -> decltype(exec.bulk_then_execute(HPX_FORWARD(F, f), shape,
@@ -1171,7 +1359,30 @@ namespace hpx { namespace parallel { namespace execution {
             }
 
             template <typename BulkExecutor, typename F, typename Shape,
-                typename Future, typename... Ts>
+                typename Future, typename... Ts,
+                typename Enable =
+                    std::enable_if_t<hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::bulk_then_execute_t,
+                        BulkExecutor&&, F&&, Shape, Future&&, Ts&&...>>>
+            HPX_FORCEINLINE static decltype(auto) call_impl(int,
+                BulkExecutor&& exec, F&& f, Shape const& shape,
+                Future&& predecessor, Ts&&... ts)
+            {
+                return hpx::parallel::execution::bulk_then_execute(exec,
+                    HPX_FORWARD(F, f), shape, HPX_FORWARD(Future, predecessor),
+                    HPX_FORWARD(Ts, ts)...);
+            }
+
+            template <typename BulkExecutor, typename F, typename Shape,
+                typename Future, typename... Ts,
+                typename Enable =
+                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                        hpx::parallel::execution::bulk_then_execute_t,
+                        BulkExecutor&&, F&&, Shape, Future&&, Ts&&...>>>
+            HPX_DEPRECATED_V(1, 9,
+                "Exposing bulk_then_execute() from an executor is deprecated, "
+                "please expose this functionality through a corresponding "
+                "overload of tag_invoke")
             HPX_FORCEINLINE static auto call_impl(int, BulkExecutor&& exec,
                 F&& f, Shape const& shape, Future&& predecessor, Ts&&... ts)
                 -> decltype(exec.bulk_then_execute(HPX_FORWARD(F, f), shape,

@@ -4,7 +4,7 @@
 # Copyright (c) 2017 Google
 # Copyright (c) 2017 Taeguk Kwon
 # Copyright (c) 2020 Giannis Gonidelis
-# Copyright (c) 2021 Hartmut Kaiser
+# Copyright (c) 2021-2022 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -440,10 +440,10 @@ function(hpx_check_for_cxx17_copy_elision)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_cxx17_memory_resource)
+function(hpx_check_for_cxx17_optional_copy_elision)
   add_hpx_config_test(
-    HPX_WITH_CXX17_MEMORY_RESOURCE
-    SOURCE cmake/tests/cxx17_memory_resource.cpp
+    HPX_WITH_CXX17_OPTIONAL_COPY_ELISION
+    SOURCE cmake/tests/cxx17_optional_copy_elision.cpp
     FILE ${ARGN}
   )
 endfunction()

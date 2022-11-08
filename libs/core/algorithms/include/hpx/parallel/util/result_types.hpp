@@ -1,12 +1,10 @@
-//  Copyright (c) 2020-2021 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
 //  Copyright (c) 2021 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-/// \file parallel/container_algorithms/copy.hpp
 
 // make sure inspect doesn't get upset about the unproteced min()/max() below
 // hpxinspect:nominmax
@@ -15,6 +13,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
+#include <hpx/execution/algorithms/then.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/modules/futures.hpp>
 
 #include <type_traits>
@@ -109,12 +109,6 @@ namespace hpx { namespace parallel { namespace util {
     }
 
     template <typename I, typename O>
-    O get_second_element(util::in_out_result<I, O>&& p)
-    {
-        return p.out;
-    }
-
-    template <typename I, typename O>
     hpx::future<std::pair<I, O>> get_pair(
         hpx::future<util::in_out_result<I, O>>&& f)
     {
@@ -124,12 +118,46 @@ namespace hpx { namespace parallel { namespace util {
             });
     }
 
+    ///////////////////////////////////////////////////////////////////////
+    template <typename I, typename O>
+    O get_second_element(util::in_out_result<I, O>&& p)
+    {
+        return p.out;
+    }
+
     template <typename I, typename O>
     hpx::future<O> get_second_element(
         hpx::future<util::in_out_result<I, O>>&& f)
     {
         return hpx::make_future<O>(
             HPX_MOVE(f), [](util::in_out_result<I, O>&& p) { return p.out; });
+    }
+
+    namespace functional {
+        struct get_second_element
+        {
+            template <typename T>
+            auto operator()(T&& val) const -> decltype(
+                hpx::parallel::util::get_second_element(HPX_FORWARD(T, val)))
+            {
+                return hpx::parallel::util::get_second_element(
+                    HPX_FORWARD(T, val));
+            }
+        };
+    }    // namespace functional
+
+    // clang-format off
+    template <typename Sender,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_sender_v<Sender>
+        )>
+    // clang-format on
+    auto get_second_element(Sender&& sender)
+        -> decltype(hpx::execution::experimental::then(
+            HPX_FORWARD(Sender, sender), functional::get_second_element{}))
+    {
+        return hpx::execution::experimental::then(
+            HPX_FORWARD(Sender, sender), functional::get_second_element{});
     }
 
     // converst a in_out_result into a iterator_range
@@ -332,8 +360,7 @@ namespace hpx { namespace parallel { namespace util {
     hpx::util::iterator_range<Iterator, Sentinel> make_subrange(
         Iterator iterator, Sentinel sentinel)
     {
-        return hpx::util::make_iterator_range<Iterator, Sentinel>(
-            iterator, sentinel);
+        return hpx::util::iterator_range(iterator, sentinel);
     }
 
     template <typename Iterator, typename Sentinel = Iterator>
@@ -342,8 +369,7 @@ namespace hpx { namespace parallel { namespace util {
     {
         return hpx::make_future<hpx::util::iterator_range<Iterator, Sentinel>>(
             HPX_MOVE(iterator), [sentinel](Iterator&& it) {
-                return hpx::util::iterator_range<Iterator, Sentinel>(
-                    it, sentinel);
+                return hpx::util::iterator_range(it, sentinel);
             });
     }
 

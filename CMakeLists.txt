@@ -60,7 +60,7 @@ endif()
 set(HPX_VERSION_MAJOR 1)
 set(HPX_VERSION_MINOR 9)
 set(HPX_VERSION_SUBMINOR 0)
-set(HPX_VERSION_DATE 20220518)
+set(HPX_VERSION_DATE 20220805)
 set(HPX_VERSION_TAG "-trunk")
 
 set(HPX_VERSION
@@ -575,38 +575,6 @@ hpx_option(
   ${HPX_WITH_PKGCONFIG_DEFAULT}
   ADVANCED
 )
-
-# ##############################################################################
-# HPX datapar configuration
-# ##############################################################################
-hpx_option(
-  HPX_WITH_DATAPAR_VC
-  BOOL
-  "Enable data parallel algorithm support using the external Vc library (default: OFF)"
-  OFF
-  ADVANCED
-)
-if(HPX_WITH_DATAPAR_VC)
-  hpx_option(
-    HPX_WITH_DATAPAR_VC_NO_LIBRARY BOOL
-    "Don't link with the Vc static library (default: OFF)" OFF ADVANCED
-  )
-endif()
-
-if(HPX_WITH_DATAPAR_VC)
-  hpx_warn(
-    "Vc support is deprecated. This option will be removed in a future release. It will be replaced with SIMD support from the C++ standard library"
-  )
-  include(HPX_SetupVc)
-endif()
-if(NOT HPX_WITH_DATAPAR_VC)
-  hpx_info("No vectorization library configured")
-else()
-  hpx_option(
-    HPX_WITH_DATAPAR BOOL
-    "Enable data parallel algorithm support (default: ON)" ON ADVANCED
-  )
-endif()
 
 # ##############################################################################
 # Threadlevel Nice option
@@ -1146,7 +1114,7 @@ if(HPX_WITH_NETWORKING)
     ADVANCED
   )
   hpx_option(
-    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "v1.7.1"
+    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "iovec"
     CATEGORY "Build Targets"
     ADVANCED
   )
@@ -1599,6 +1567,8 @@ hpx_option(
 include(HPX_SetupCUDA)
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
+include(TargetArch)
+target_architecture(__target_arch)
 
 # ##############################################################################
 # Set configuration option to use Boost.Context or not. This depends on the
@@ -1610,6 +1580,11 @@ endif()
 if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   set(__use_generic_coroutine_context ON)
 endif()
+# If compiling for riscv64, automatically bake in Boost.Context
+if(${__target_arch} STREQUAL "riscv64")
+  set(__use_generic_coroutine_context ON)
+endif()
+
 hpx_option(
   HPX_WITH_GENERIC_CONTEXT_COROUTINES
   BOOL
@@ -1631,6 +1606,11 @@ if(NOT HPX_WITH_STABLE_INPLACE_MERGE)
     "The standard library you are using (libc++ version < 6) does not have a stable inplace_merge implementation."
   )
 endif()
+
+# ##############################################################################
+# HPX datapar configuration
+# ##############################################################################
+include(HPX_SetupDatapar)
 
 # ##############################################################################
 # Check for misc system headers
@@ -1695,7 +1675,7 @@ if(WIN32)
       -Gw PUBLIC CONFIGURATIONS Release RelWithDebInfo MinSizeRel
     )
     hpx_add_target_compile_option(-Zo PUBLIC CONFIGURATIONS RelWithDebInfo)
-    if(HPX_WITH_DATAPAR_VC)
+    if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
       hpx_add_target_compile_option(-std:c++latest PUBLIC)
       hpx_add_config_cond_define(_HAS_AUTO_PTR_ETC 1)
     endif()
@@ -1703,8 +1683,12 @@ if(WIN32)
     # Exceptions
     hpx_add_target_compile_option(-EHsc)
     if(MSVC_VERSION GREATER_EQUAL 1900)
-      # assume conforming (throwing) operator new implementations
-      hpx_add_target_compile_option(-Zc:throwingNew PUBLIC)
+      if(NOT (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"
+              AND "x${CMAKE_CXX_SIMULATE_ID}" STREQUAL "xMSVC")
+      )
+        # assume conforming (throwing) operator new implementations
+        hpx_add_target_compile_option(-Zc:throwingNew PUBLIC)
+      endif()
 
       # enable faster linking (requires VS2015 Update1) disabled for now as this
       # flag crashes debugger hpx_remove_link_flag(/debug CONFIGURATIONS Debug)
@@ -1806,7 +1790,13 @@ if(HPX_WITH_COMPILER_WARNINGS)
     # is illegal in the current source character set
     hpx_add_compile_flag(-wd4828)
 
-    if(HPX_WITH_DATAPAR_VC)
+    if(HPX_WITH_CXX_STANDARD LESS 20)
+      # support for attribute 'msvc::no_unique_address' in C++17 and earlier is
+      # a vendor extension
+      hpx_add_compile_flag(-wd4848)
+    endif()
+
+    if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
       # unary minus operator applied to unsigned type, result still unsigned
       hpx_add_compile_flag(-wd4146)
 
@@ -1856,8 +1846,8 @@ if(HPX_WITH_COMPILER_WARNINGS)
     endif()
 
     # False positive when build with Vc and Clang
-    if(NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-           )
+    if(NOT (("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
+            AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     )
       hpx_add_compile_flag_if_available(-Werror=trampolines)
     endif()
@@ -1913,7 +1903,9 @@ else()
   endif()
 
   # False positive when building with Vc and Clang
-  if(NOT (HPX_WITH_DATAPAR_VC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+  if(NOT (("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
+          AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  )
     # Silence warning about __sync_fetch_and_nand changing semantics
     hpx_add_compile_flag_if_available(-Wno-sync-nand)
   endif()
@@ -1974,9 +1966,7 @@ else()
   endif()
 
   set(__has_timestamp_support OFF)
-  include(TargetArch)
 
-  target_architecture(__target_arch)
   if("${__target_arch}" STREQUAL "i386"
      OR "${__target_arch}" STREQUAL "ix86"
      OR "${__target_arch}" STREQUAL "x86_64"
@@ -2013,6 +2003,8 @@ else()
   elseif("${__target_arch}" STREQUAL "ppc" OR "${__target_arch}" STREQUAL
                                               "ppc64"
   )
+    set(__has_timestamp_support ON)
+  elseif("${__target_arch}" STREQUAL "riscv64")
     set(__has_timestamp_support ON)
   elseif("${__target_arch}" STREQUAL "bgq")
     set(__has_timestamp_support ON)
@@ -2510,6 +2502,7 @@ if(HPX_WITH_DOCUMENTATION)
       FILES "${PROJECT_BINARY_DIR}/share/hpx/docs/latexpdf/latex/HPX.pdf"
       DESTINATION ${CMAKE_INSTALL_DATADIR}/hpx/docs/pdf/
       COMPONENT docs
+      OPTIONAL
     )
   endif()
 

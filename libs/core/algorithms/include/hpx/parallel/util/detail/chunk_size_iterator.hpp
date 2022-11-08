@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -77,7 +77,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE chunk_size_iterator() = default;
 
         HPX_HOST_DEVICE chunk_size_iterator(Iterator it, std::size_t chunk_size,
-            std::size_t count = 0, std::size_t current = 0)
+            std::size_t count = 0, std::size_t current = 0) noexcept
           : data_(it, (hpx::detail::min)(chunk_size, count))
           , chunk_size_(chunk_size)
           , last_chunk_size_(get_last_chunk_size(count, chunk_size))
@@ -108,19 +108,20 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     protected:
         friend class hpx::util::iterator_core_access;
 
-        HPX_HOST_DEVICE bool equal(chunk_size_iterator const& other) const
+        HPX_HOST_DEVICE constexpr bool equal(
+            chunk_size_iterator const& other) const noexcept
         {
             return iterator() == other.iterator() &&
                 chunk_size_ == other.chunk_size_ && current_ == other.current_;
         }
 
-        HPX_HOST_DEVICE typename base_type::reference dereference()
+        HPX_HOST_DEVICE constexpr typename base_type::reference dereference()
             const noexcept
         {
             return data_;
         }
 
-        HPX_HOST_DEVICE void increment(std::size_t offset)
+        HPX_HOST_DEVICE void increment(std::size_t offset) noexcept
         {
             current_ += offset + chunk_size_;
             if (current_ >= count_)
@@ -147,12 +148,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             }
         }
 
-        HPX_HOST_DEVICE void increment()
+        HPX_HOST_DEVICE void increment() noexcept
         {
             increment(0);
         }
 
-        HPX_HOST_DEVICE void decrement(std::size_t offset)
+        HPX_HOST_DEVICE void decrement(std::size_t offset) noexcept
         {
             current_ -= offset + chunk_size_;
             if (current_ == 0)
@@ -181,7 +182,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             typename Enable = std::enable_if_t<
                 hpx::traits::is_bidirectional_iterator_v<Iter> ||
                 std::is_integral_v<Iter>>>
-        HPX_HOST_DEVICE void decrement()
+        HPX_HOST_DEVICE void decrement() noexcept
         {
             decrement(0);
         }
@@ -190,7 +191,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             typename Enable = std::enable_if_t<
                 hpx::traits::is_random_access_iterator_v<Iter> ||
                 std::is_integral_v<Iter>>>
-        HPX_HOST_DEVICE void advance(std::ptrdiff_t n)
+        HPX_HOST_DEVICE void advance(std::ptrdiff_t n) noexcept
         {
             // prepare next value
             if (n > 0)
@@ -207,8 +208,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             typename Enable = std::enable_if_t<
                 hpx::traits::is_random_access_iterator_v<Iter> ||
                 std::is_integral_v<Iter>>>
-        HPX_HOST_DEVICE std::ptrdiff_t distance_to(
-            chunk_size_iterator const& rhs) const
+        HPX_HOST_DEVICE constexpr std::ptrdiff_t distance_to(
+            chunk_size_iterator const& rhs) const noexcept
         {
             return static_cast<std::ptrdiff_t>(
                 ((rhs.iterator() - iterator()) + chunk_size_ - 1) /
@@ -299,19 +300,20 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     protected:
         friend class hpx::util::iterator_core_access;
 
-        HPX_HOST_DEVICE bool equal(chunk_size_idx_iterator const& other) const
+        HPX_HOST_DEVICE constexpr bool equal(
+            chunk_size_idx_iterator const& other) const noexcept
         {
             return iterator() == other.iterator() &&
                 chunk_size_ == other.chunk_size_ && current_ == other.current_;
         }
 
-        HPX_HOST_DEVICE typename base_type::reference dereference()
+        HPX_HOST_DEVICE constexpr typename base_type::reference dereference()
             const noexcept
         {
             return data_;
         }
 
-        HPX_HOST_DEVICE void increment(std::size_t offset)
+        HPX_HOST_DEVICE void increment(std::size_t offset) noexcept
         {
             base_index() += offset + chunk_size_;
             current_ += offset + chunk_size_;
@@ -339,12 +341,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             }
         }
 
-        HPX_HOST_DEVICE void increment()
+        HPX_HOST_DEVICE void increment() noexcept
         {
             increment(0);
         }
 
-        HPX_HOST_DEVICE void decrement(std::size_t offset)
+        HPX_HOST_DEVICE void decrement(std::size_t offset) noexcept
         {
             base_index() -= offset + chunk_size_;
             current_ -= offset + chunk_size_;
@@ -375,7 +377,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             typename Enable = std::enable_if_t<
                 hpx::traits::is_bidirectional_iterator_v<Iter> ||
                 std::is_integral_v<Iter>>>
-        HPX_HOST_DEVICE void decrement()
+        HPX_HOST_DEVICE void decrement() noexcept
         {
             decrement(0);
         }
@@ -384,7 +386,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             typename Enable = std::enable_if_t<
                 hpx::traits::is_random_access_iterator_v<Iter> ||
                 std::is_integral_v<Iter>>>
-        HPX_HOST_DEVICE void advance(std::ptrdiff_t n)
+        HPX_HOST_DEVICE void advance(std::ptrdiff_t n) noexcept
         {
             // prepare next value
             if (n > 0)
@@ -401,8 +403,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             typename Enable = std::enable_if_t<
                 hpx::traits::is_random_access_iterator_v<Iter> ||
                 std::is_integral_v<Iter>>>
-        HPX_HOST_DEVICE std::ptrdiff_t distance_to(
-            chunk_size_idx_iterator const& rhs) const
+        HPX_HOST_DEVICE constexpr std::ptrdiff_t distance_to(
+            chunk_size_idx_iterator const& rhs) const noexcept
         {
             return static_cast<std::ptrdiff_t>(
                 ((rhs.iterator() - iterator()) + chunk_size_ - 1) /

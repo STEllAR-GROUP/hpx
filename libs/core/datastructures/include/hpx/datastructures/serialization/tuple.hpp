@@ -90,8 +90,14 @@ namespace hpx::util::detail {
             {
                 if constexpr (!std::is_default_constructible_v<T>)
                 {
+                    // non-default constructible types are handled by the user
                     using serialization::detail::load_construct_data;
                     load_construct_data(ar, &t, 0);
+                }
+                else
+                {
+                    // default constructible types still need to be constructed
+                    ::new (&t) T;
                 }
                 ar >> t;
             }

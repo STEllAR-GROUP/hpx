@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //  Copyright (c) 2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -37,87 +37,68 @@ struct external_future_executor
     // type calculation of it. dataflow_finalize has to set the same type to
     // the future state.
     template <typename F, typename... Ts>
-    decltype(auto) async_execute_helper(std::true_type, F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::async_execute_t,
+        external_future_executor const&, F&& f, Ts&&... ts)
     {
-        // The completion of f is signalled out-of-band.
-        hpx::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
-        return hpx::async(
-            []() { hpx::util::yield_while([]() { return !done; }); });
-    }
-
-    template <typename F, typename... Ts>
-    decltype(auto) async_execute_helper(std::false_type, F&& f, Ts&&... ts)
-    {
-        // The completion of f is signalled out-of-band.
-        auto&& r = hpx::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
-        return hpx::async([r = std::move(r)]() {
-            hpx::util::yield_while([]() { return !done; });
-            return r;
-        });
-    }
-
-    template <typename F, typename... Ts>
-    decltype(auto) async_execute(F&& f, Ts&&... ts)
-    {
-        using is_void = typename std::is_void<
-            typename hpx::util::invoke_result<F, Ts...>::type>;
-        return async_execute_helper(
-            is_void{}, std::forward<F>(f), std::forward<Ts>(ts)...);
-    }
-
-    template <typename Frame, typename F, typename Futures>
-    void dataflow_finalize_helper(
-        std::true_type, Frame frame, F&& f, Futures&& futures)
-    {
-        hpx::detail::try_catch_exception_ptr(
-            [&]() {
-                hpx::util::invoke_fused(
-                    std::forward<F>(f), std::forward<Futures>(futures));
-
-                // Signal completion from another thread/task.
-                hpx::intrusive_ptr<typename std::remove_pointer<
-                    typename std::decay<Frame>::type>::type>
-                    frame_p(frame);
-                hpx::apply([frame_p = std::move(frame_p)]() {
-                    hpx::util::yield_while([]() { return !done; });
-                    frame_p->set_data(hpx::util::unused_type{});
-                });
-            },
-            [&](std::exception_ptr ep) {
-                frame->set_exception(std::move(ep));
+        if constexpr (std::is_void_v<hpx::util::invoke_result_t<F, Ts...>>)
+        {
+            // The completion of f is signalled out-of-band.
+            hpx::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+            return hpx::async(
+                []() { hpx::util::yield_while([]() { return !done; }); });
+        }
+        else
+        {
+            // The completion of f is signalled out-of-band.
+            auto&& r = hpx::invoke(std::forward<F>(f), std::forward<Ts>(ts)...);
+            return hpx::async([r = std::move(r)]() {
+                hpx::util::yield_while([]() { return !done; });
+                return r;
             });
-    }
-
-    template <typename Frame, typename F, typename Futures>
-    void dataflow_finalize_helper(
-        std::false_type, Frame frame, F&& f, Futures&& futures)
-    {
-        hpx::detail::try_catch_exception_ptr(
-            [&]() {
-                auto&& r = hpx::util::invoke_fused(
-                    std::forward<F>(f), std::forward<Futures>(futures));
-
-                // Signal completion from another thread/task.
-                hpx::intrusive_ptr<typename std::remove_pointer<
-                    typename std::decay<Frame>::type>::type>
-                    frame_p(frame);
-                hpx::apply([frame_p = std::move(frame_p), r = std::move(r)]() {
-                    hpx::util::yield_while([]() { return !done; });
-                    frame_p->set_data(std::move(r));
-                });
-            },
-            [&](std::exception_ptr ep) {
-                frame->set_exception(std::move(ep));
-            });
+        }
     }
 
     template <typename Frame, typename F, typename Futures>
     void dataflow_finalize(Frame&& frame, F&& f, Futures&& futures)
     {
-        using is_void = typename std::remove_pointer<
-            typename std::decay<Frame>::type>::type::is_void;
-        dataflow_finalize_helper(is_void{}, std::forward<Frame>(frame),
-            std::forward<F>(f), std::forward<Futures>(futures));
+        static constexpr bool is_void =
+            std::remove_pointer_t<std::decay_t<Frame>>::is_void::value;
+
+        hpx::detail::try_catch_exception_ptr(
+            [&]() {
+                if constexpr (is_void)
+                {
+                    hpx::invoke_fused(
+                        std::forward<F>(f), std::forward<Futures>(futures));
+
+                    // Signal completion from another thread/task.
+                    hpx::intrusive_ptr<
+                        std::remove_pointer_t<std::decay_t<Frame>>>
+                        frame_p(frame);
+                    hpx::apply([frame_p = std::move(frame_p)]() {
+                        hpx::util::yield_while([]() { return !done; });
+                        frame_p->set_data(hpx::util::unused_type{});
+                    });
+                }
+                else
+                {
+                    auto&& r = hpx::invoke_fused(
+                        std::forward<F>(f), std::forward<Futures>(futures));
+
+                    // Signal completion from another thread/task.
+                    hpx::intrusive_ptr<
+                        std::remove_pointer_t<std::decay_t<Frame>>>
+                        frame_p(frame);
+                    hpx::apply(
+                        [frame_p = std::move(frame_p), r = std::move(r)]() {
+                            hpx::util::yield_while([]() { return !done; });
+                            frame_p->set_data(std::move(r));
+                        });
+                }
+            },
+            [&](std::exception_ptr ep) {
+                frame->set_exception(std::move(ep));
+            });
     }
 };
 
@@ -128,97 +109,77 @@ struct additional_argument
 struct external_future_additional_argument_executor
 {
     // This is not actually called by dataflow, but it is used for the return
-    // type calculation of it. dataflow_finalize has to set the same type to
-    // the future state.
+    // type calculation of it. dataflow_finalize has to set the same type to the
+    // future state.
     template <typename F, typename... Ts>
-    decltype(auto) async_execute_helper(std::true_type, F&& f, Ts&&... ts)
+    friend decltype(auto) tag_invoke(hpx::parallel::execution::async_execute_t,
+        external_future_additional_argument_executor const&, F&& f, Ts&&... ts)
     {
-        // The completion of f is signalled out-of-band.
-        hpx::invoke(
-            std::forward<F>(f), additional_argument{}, std::forward<Ts>(ts)...);
-        return hpx::async(
-            []() { hpx::util::yield_while([]() { return !done; }); });
-    }
-
-    template <typename F, typename... Ts>
-    decltype(auto) async_execute_helper(std::false_type, F&& f, Ts&&... ts)
-    {
-        // The completion of f is signalled out-of-band.
-        auto&& r = hpx::invoke(
-            std::forward<F>(f), additional_argument{}, std::forward<Ts>(ts)...);
-        return hpx::async([r = std::move(r)]() {
-            hpx::util::yield_while([]() { return !done; });
-            return r;
-        });
-    }
-
-    template <typename F, typename... Ts>
-    decltype(auto) async_execute(F&& f, Ts&&... ts)
-    {
-        using is_void =
-            typename std::is_void<typename hpx::util::invoke_result<F,
-                additional_argument, Ts...>::type>;
-        return async_execute_helper(
-            is_void{}, std::forward<F>(f), std::forward<Ts>(ts)...);
-    }
-
-    template <typename Frame, typename F, typename Futures>
-    void dataflow_finalize_helper(
-        std::true_type, Frame frame, F&& f, Futures&& futures)
-    {
-        hpx::detail::try_catch_exception_ptr(
-            [&]() {
-                additional_argument a{};
-                hpx::util::invoke_fused(std::forward<F>(f),
-                    hpx::tuple_cat(
-                        hpx::tie(a), std::forward<Futures>(futures)));
-
-                // Signal completion from another thread/task.
-                hpx::intrusive_ptr<typename std::remove_pointer<
-                    typename std::decay<Frame>::type>::type>
-                    frame_p(frame);
-                hpx::apply([frame_p = std::move(frame_p)]() {
-                    hpx::util::yield_while([]() { return !done; });
-                    frame_p->set_data(hpx::util::unused_type{});
-                });
-            },
-            [&](std::exception_ptr ep) {
-                frame->set_exception(std::move(ep));
+        if constexpr (std::is_void_v<hpx::util::invoke_result_t<F,
+                          additional_argument, Ts...>>)
+        {
+            // The completion of f is signalled out-of-band.
+            hpx::invoke(std::forward<F>(f), additional_argument{},
+                std::forward<Ts>(ts)...);
+            return hpx::async(
+                []() { hpx::util::yield_while([]() { return !done; }); });
+        }
+        else
+        {
+            // The completion of f is signalled out-of-band.
+            auto&& r = hpx::invoke(std::forward<F>(f), additional_argument{},
+                std::forward<Ts>(ts)...);
+            return hpx::async([r = std::move(r)]() {
+                hpx::util::yield_while([]() { return !done; });
+                return r;
             });
-    }
-
-    template <typename Frame, typename F, typename Futures>
-    void dataflow_finalize_helper(
-        std::false_type, Frame frame, F&& f, Futures&& futures)
-    {
-        hpx::detail::try_catch_exception_ptr(
-            [&]() {
-                additional_argument a{};
-                auto&& r = hpx::util::invoke_fused(std::forward<F>(f),
-                    hpx::tuple_cat(
-                        hpx::tie(a), std::forward<Futures>(futures)));
-
-                // Signal completion from another thread/task.
-                hpx::intrusive_ptr<typename std::remove_pointer<
-                    typename std::decay<Frame>::type>::type>
-                    frame_p(frame);
-                hpx::apply([frame_p = std::move(frame_p), r = std::move(r)]() {
-                    hpx::util::yield_while([]() { return !done; });
-                    frame_p->set_data(std::move(r));
-                });
-            },
-            [&](std::exception_ptr ep) {
-                frame->set_exception(std::move(ep));
-            });
+        }
     }
 
     template <typename Frame, typename F, typename Futures>
     void dataflow_finalize(Frame&& frame, F&& f, Futures&& futures)
     {
-        using is_void = typename std::remove_pointer<
-            typename std::decay<Frame>::type>::type::is_void;
-        dataflow_finalize_helper(is_void{}, std::forward<Frame>(frame),
-            std::forward<F>(f), std::forward<Futures>(futures));
+        static constexpr bool is_void =
+            std::remove_pointer_t<std::decay_t<Frame>>::is_void::value;
+
+        hpx::detail::try_catch_exception_ptr(
+            [&]() {
+                additional_argument a{};
+                if constexpr (is_void)
+                {
+                    hpx::invoke_fused(std::forward<F>(f),
+                        hpx::tuple_cat(
+                            hpx::tie(a), std::forward<Futures>(futures)));
+
+                    // Signal completion from another thread/task.
+                    hpx::intrusive_ptr<
+                        std::remove_pointer_t<std::decay_t<Frame>>>
+                        frame_p(frame);
+                    hpx::apply([frame_p = std::move(frame_p)]() {
+                        hpx::util::yield_while([]() { return !done; });
+                        frame_p->set_data(hpx::util::unused_type{});
+                    });
+                }
+                else
+                {
+                    auto&& r = hpx::invoke_fused(std::forward<F>(f),
+                        hpx::tuple_cat(
+                            hpx::tie(a), std::forward<Futures>(futures)));
+
+                    // Signal completion from another thread/task.
+                    hpx::intrusive_ptr<
+                        std::remove_pointer_t<std::decay_t<Frame>>>
+                        frame_p(frame);
+                    hpx::apply(
+                        [frame_p = std::move(frame_p), r = std::move(r)]() {
+                            hpx::util::yield_while([]() { return !done; });
+                            frame_p->set_data(std::move(r));
+                        });
+                }
+            },
+            [&](std::exception_ptr ep) {
+                frame->set_exception(std::move(ep));
+            });
     }
 };
 

@@ -91,46 +91,7 @@ void test_find_end4()
 void find_end_test4()
 {
     test_find_end4<std::random_access_iterator_tag>();
-    // test_find_end4<std::forward_iterator_tag>();
-}
-
-template <typename IteratorTag>
-void test_find_end_exception()
-{
-    using namespace hpx::execution;
-
-    test_find_end_exception(simd, IteratorTag());
-    test_find_end_exception(par_simd, IteratorTag());
-
-    test_find_end_exception_async(simd(task), IteratorTag());
-    test_find_end_exception_async(par_simd(task), IteratorTag());
-}
-
-void find_end_exception_test()
-{
-    test_find_end_exception<std::random_access_iterator_tag>();
-    // test_find_end_exception<std::forward_iterator_tag>();
-}
-
-template <typename IteratorTag>
-void test_find_end_bad_alloc()
-{
-    using namespace hpx::execution;
-
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_find_end_bad_alloc(simd, IteratorTag());
-    test_find_end_bad_alloc(par_simd, IteratorTag());
-
-    test_find_end_bad_alloc_async(simd(task), IteratorTag());
-    test_find_end_bad_alloc_async(par_simd(task), IteratorTag());
-}
-
-void find_end_bad_alloc_test()
-{
-    test_find_end_bad_alloc<std::random_access_iterator_tag>();
-    // test_find_end_bad_alloc<std::forward_iterator_tag>();
+    test_find_end4<std::forward_iterator_tag>();
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -145,8 +106,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     find_end_test2();
     find_end_test3();
     find_end_test4();
-    find_end_exception_test();
-    find_end_bad_alloc_test();
     return hpx::local::finalize();
 }
 

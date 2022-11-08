@@ -54,7 +54,7 @@ namespace hpx {
     bool is_sorted(FwdIter first, FwdIter last, Pred&& pred = Pred());
 
     /// Determines if the range [first, last) is sorted. Uses pred to
-    /// compare elements.
+    /// compare elements. Executed according to the policy.
     ///
     /// \note   Complexity: at most (N+S-1) comparisons where
     ///         \a N = distance(first, last).
@@ -158,6 +158,7 @@ namespace hpx {
 
     /// Returns the first element in the range [first, last) that is not sorted.
     /// Uses a predicate to compare elements or the less than operator.
+    /// Executed according to the policy.
     ///
     /// \note   Complexity: at most (N+S-1) comparisons where
     ///         \a N = distance(first, last).
@@ -299,8 +300,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         part_size - 1,
                         [&trail, &tok, &pred_projected](
                             FwdIter it) mutable -> void {
-                            if (hpx::util::invoke(
-                                    pred_projected, *it, *trail++))
+                            if (hpx::invoke(pred_projected, *it, *trail++))
                             {
                                 tok.cancel();
                             }
@@ -312,7 +312,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     if (!tok.was_cancelled() && trail != last)
                     {
-                        return !hpx::util::invoke(pred_projected, *trail, *i);
+                        return !hpx::invoke(pred_projected, *trail, *i);
                     }
                     return !tok.was_cancelled();
                 };
@@ -388,7 +388,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         part_begin, part_size - 1, tok,
                         [&trail, &tok, &pred_projected](
                             reference& v, std::size_t ind) -> void {
-                            if (hpx::util::invoke(pred_projected, v, *trail++))
+                            if (hpx::invoke(pred_projected, v, *trail++))
                             {
                                 tok.cancel(ind);
                             }

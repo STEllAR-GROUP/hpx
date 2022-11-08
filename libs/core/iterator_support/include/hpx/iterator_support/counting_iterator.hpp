@@ -42,26 +42,27 @@ namespace hpx { namespace util {
             };
 
             using base_traversal =
-                util::lazy_conditional<std::is_integral<Incrementable>::value,
+                util::lazy_conditional<std::is_integral_v<Incrementable>,
                     util::identity<std::random_access_iterator_tag>,
                     iterator_category<Incrementable>>;
 
-            using traversal = typename util::lazy_conditional<
-                std::is_void<CategoryOrTraversal>::value, base_traversal,
-                util::identity<CategoryOrTraversal>>::type;
+            using traversal =
+                util::lazy_conditional_t<std::is_void_v<CategoryOrTraversal>,
+                    base_traversal, util::identity<CategoryOrTraversal>>;
 
             // calculate difference_type of the resulting iterator
             template <typename Integer>
             struct integer_difference_type
             {
-                using type = typename std::conditional<
-                    (sizeof(Integer) >= sizeof(std::intmax_t)),
+                using type = std::conditional_t<(sizeof(Integer) >=
+                                                    sizeof(std::intmax_t)),
 
-                    std::conditional<(std::is_signed<Integer>::value), Integer,
+                    std::conditional_t<std::is_signed_v<Integer>, Integer,
                         std::intmax_t>,
 
-                    std::conditional<(sizeof(Integer) < sizeof(std::ptrdiff_t)),
-                        std::ptrdiff_t, std::intmax_t>>::type::type;
+                    std::conditional_t<(sizeof(Integer) <
+                                           sizeof(std::ptrdiff_t)),
+                        std::ptrdiff_t, std::intmax_t>>;
             };
 
             template <typename Iterator>
@@ -72,13 +73,13 @@ namespace hpx { namespace util {
             };
 
             using base_difference =
-                util::lazy_conditional<std::is_integral<Incrementable>::value,
+                util::lazy_conditional<std::is_integral_v<Incrementable>,
                     integer_difference_type<Incrementable>,
                     iterator_difference_type<Incrementable>>;
 
             using difference =
-                typename util::lazy_conditional<std::is_void<Difference>::value,
-                    base_difference, util::identity<Difference>>::type;
+                util::lazy_conditional_t<std::is_void_v<Difference>,
+                    base_difference, util::identity<Difference>>;
 
             using type = iterator_adaptor<counting_iterator<Incrementable,
                                               CategoryOrTraversal, Difference>,
@@ -190,9 +191,15 @@ namespace hpx { namespace util {
 
     // Manufacture a counting iterator for an arbitrary incrementable type
     template <typename Incrementable>
-    HPX_HOST_DEVICE inline constexpr counting_iterator<Incrementable>
-    make_counting_iterator(Incrementable x)
+    counting_iterator(Incrementable x) -> counting_iterator<Incrementable>;
+
+    template <typename Incrementable>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::util::make_counting_iterator is deprecated, use "
+        "hpx::util::counting_iterator instead")
+    HPX_HOST_DEVICE inline constexpr counting_iterator<
+        Incrementable> make_counting_iterator(Incrementable x) noexcept
     {
-        return counting_iterator<Incrementable>(x);
+        return counting_iterator<Incrementable>(HPX_MOVE(x));
     }
 }}    // namespace hpx::util

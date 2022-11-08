@@ -8,15 +8,14 @@
 set(example_programs
     composable_guard
     customize_async
-    disable_thread_stealing_executor
     enumerate_threads
     event_synchronization
-    executor_with_thread_hooks
     fibonacci_await
     fibonacci_dataflow
     fibonacci_futures
     fibonacci_local
     file_serialization
+    hello_world_3
     latch_local
     local_channel_docs
     local_channel
@@ -33,7 +32,7 @@ set(example_programs
     wait_composition
 )
 
-if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" AND NOT HPX_WITH_STATIC_LINKING)
   set(example_programs ${example_programs} init_globally)
 endif()
 

@@ -55,6 +55,10 @@
 #include <sys/param.h>
 
 #include <stdexcept>
+// Fix for musl. Use linux/param.h for EXEC_PAGESIZE
+#ifdef __linux__
+#include <linux/param.h>
+#endif
 #endif
 
 #if defined(__FreeBSD__)

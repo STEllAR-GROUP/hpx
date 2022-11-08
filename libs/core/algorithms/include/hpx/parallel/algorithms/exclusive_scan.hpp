@@ -215,10 +215,10 @@ namespace hpx {
     ///                     destination range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
-    /// \tparam T           The type of the value to be used as initial (and
-    ///                     intermediate) values (deduced).
     /// \tparam Op          The type of the binary function object used for
     ///                     the reduction operation.
+    /// \tparam T           The type of the value to be used as initial (and
+    ///                     intermediate) values (deduced).
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -276,7 +276,7 @@ namespace hpx {
     /// \a inclusive_scan may be non-deterministic.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename T, typename Op>
+    typename Op, typename T>
     typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     exclusive_scan(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 dest, T init, Op&& op);
@@ -406,7 +406,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // same partitions the first step operated on.
 
                 using hpx::get;
-                using hpx::util::make_zip_iterator;
 
                 auto f3 = [op](zip_iterator part_begin, std::size_t part_size,
                               T val) mutable -> void {
@@ -424,7 +423,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::in_out_result<FwdIter1, FwdIter2>, T>::
                     call(
                         HPX_FORWARD(ExPolicy, policy),
-                        make_zip_iterator(first, dest), count, init,
+                        zip_iterator(first, dest), count, init,
                         // step 1 performs first part of scan algorithm
                         [op, last](zip_iterator part_begin,
                             std::size_t part_size) -> T {
@@ -537,7 +536,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::exclusive_scan
+    // CPO for hpx::exclusive_scan
     inline constexpr struct exclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<exclusive_scan_t>
     {

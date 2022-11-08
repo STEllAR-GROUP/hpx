@@ -18,10 +18,12 @@
 #include <hpx/parallel/datapar/fill.hpp>
 #include <hpx/parallel/datapar/find.hpp>
 #include <hpx/parallel/datapar/generate.hpp>
+#include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
 #include <hpx/parallel/datapar/mismatch.hpp>
 #include <hpx/parallel/datapar/reduce.hpp>
+#include <hpx/parallel/datapar/replace.hpp>
 #include <hpx/parallel/datapar/transfer.hpp>
 #include <hpx/parallel/datapar/transform_loop.hpp>
 #include <hpx/parallel/datapar/zip_iterator.hpp>

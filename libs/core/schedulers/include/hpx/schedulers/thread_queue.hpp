@@ -134,6 +134,7 @@ namespace hpx { namespace threads { namespace policies {
             std::ptrdiff_t const stacksize =
                 data.scheduler_base->get_stack_size(data.stacksize);
 
+#if !defined(HPX_HAVE_ADDRESS_SANITIZER)
             thread_heap_type* heap = nullptr;
 
             if (stacksize == parameters_.small_stacksize_)
@@ -157,6 +158,7 @@ namespace hpx { namespace threads { namespace policies {
                 heap = &thread_heap_nostack_;
             }
             HPX_ASSERT(heap);
+#endif
 
             if (data.initial_state ==
                     thread_schedule_state::pending_do_not_schedule ||
@@ -167,7 +169,6 @@ namespace hpx { namespace threads { namespace policies {
 
             // ASAN gets confused by reusing threads/stacks
 #if !defined(HPX_HAVE_ADDRESS_SANITIZER)
-
             // Check for an unused thread object.
             if (!heap->empty())
             {

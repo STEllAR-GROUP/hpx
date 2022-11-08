@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config/constexpr.hpp>
+#include <hpx/execution_base/coroutine_utils.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
@@ -89,10 +90,7 @@ namespace hpx { namespace execution { namespace experimental {
     //      // operation states are not movable, and therefore this operation
     //      // state object must be kept alive until the operation finishes
     //
-    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
-    struct connect_t : hpx::functional::tag<connect_t>
-    {
-    } connect{};
+    struct connect_t;
 
     namespace detail {
         template <typename S, typename R, typename Enable = void>
@@ -182,6 +180,10 @@ namespace hpx { namespace execution { namespace experimental {
     template <typename S>
     using schedule_result_t = hpx::util::invoke_result_t<schedule_t, S>;
 
-    template <typename S, typename R>
-    using connect_result_t = hpx::util::invoke_result_t<connect_t, S, R>;
-}}}    // namespace hpx::execution::experimental
+    namespace detail {
+        // Dummy type used in place of a scheduler if none is given
+        struct no_scheduler
+        {
+        };
+    }    // namespace detail
+}}}      // namespace hpx::execution::experimental

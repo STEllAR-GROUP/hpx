@@ -173,15 +173,22 @@ for lib in hpx_libs.keys():
         module_api_ref = open(basedir + '/full_api.rst', 'w')
         module_api_ref.write(api_ref_header.format(module))
         header_refs = ''
+        header_names = set()
         for source in module_sources[1]:
             header = source[len('include/'):]
             header_splitted = re.split('[/ .]',header)
+
             header_name = header_splitted[-2]
+            # create a new, longer header name if current one already exists
+            if header_name in header_names:
+                header_name = '{0}_{1}'.format(header_splitted[-3], header_name)
+            header_names.add(header_name)
+
             header_ref = open(basedir + '/' + header_name + '.rst', 'w')
             header_ref.write(api_header_file.format(header, module))
             header_ref.close()
             header_refs += '   /libs/' + lib + '/' + module + '/api/' + header_name + '.rst\n'
-        module_api_ref.write(api_file) 
+        module_api_ref.write(api_file)
         module_api_ref.write(header_refs)
         module_api_ref.close()
         api_refs += '   /libs/' + lib + '/' + module + '/api/full_api.rst\n'
@@ -199,8 +206,14 @@ breathe_doxygen_config_options = {
     'MACRO_EXPANSION': 'YES',
     'DIRECTORY_GRAPH': 'NO',
     'PREDEFINED': '@doxygen_definitions@',
-    'STRIP_FROM_PATH': hpx_source_dir
+    'STRIP_FROM_PATH': hpx_source_dir,
+    'EXTRACT_PRIVATE': 'NO',
+    'ALIASES': r'namedrequirement{1}="<a href=\"https://en.cppreference.com/w/cpp/named_req/\1\">\1</a>"'
 }
+
+# ! this should work but doesn't. check after updating breathe version.
+# breathe_doxygen_aliases = {
+# }
 
 numfig = True
 primary_domain = 'cpp'
@@ -262,6 +275,10 @@ rst_prolog += '''
     :alt: JOSS Paper about HPX
 .. |hpx_dependency_report| replace:: |hpx| Dependency report
 .. _hpx_dependency_report: ../../report/index.html
+.. |hpx_single_html| replace:: |hpx| Single HTML documentation
+.. _hpx_single_html: ../../singlehtml/index.h
+.. |hpx_pdf| replace:: |hpx| PDF documentation
+.. _hpx_pdf: ../../pdf/HPX.pdf
 
 .. |hpxpi| replace:: HPXPI
 .. _hpxpi: https://github.com/STEllAR-GROUP/hpxpi/
@@ -274,18 +291,12 @@ rst_prolog += '''
 .. _lsu: https://www.lsu.edu
 .. |cct| replace:: Center for Computation and Technology (CCT)
 .. _cct: https://www.cct.lsu.edu
-.. |iu| replace:: Indiana University (IU)
-.. _iu: https://www.iu.edu
-.. |crest| replace:: Center for Research in Extreme Scale Technologies (CREST)
-.. _crest: https://pti.iu.edu
 .. |fau| replace:: Friedrich-Alexander University Erlangen-Nuremberg (FAU)
 .. _fau: https://www.fau.de
 .. |inf3| replace:: Department of Computer Science 3 - Computer Architecture
 .. _inf3: https://www3.cs.fau.de
 .. |sandia| replace:: Sandia National Labs (Albuquerque)
 .. _sandia: https://www.sandia.gov
-.. |tue| replace:: Technische Universiteit Eindhoven
-.. _tue: https://www.tui.nl
 .. |nmsu| replace:: New Mexico State University
 .. _nmsu: https://www.nmsu.edu
 .. |unlv| replace:: University of Nevada, Las Vegas
@@ -302,6 +313,10 @@ rst_prolog += '''
 .. _tud: https://www.tudelft.nl/en/
 .. |tud_eemcs| replace:: Faculty of Electrical Engineering, Mathematics & Computer Science
 .. _tud_eemcs: https://www.tudelft.nl/en/eemcs
+.. |amd| replace:: AMD
+.. _amd: https://www.amd.com/en
+.. |psu| replace:: Paris-Saclay University
+.. _psu: https://www.universite-paris-saclay.fr/en
 
 .. |gsoc| replace:: Google Summer of Code
 .. _gsoc: https://developers.google.com/open-source/soc/
@@ -377,6 +392,8 @@ rst_prolog += '''
 .. _docker_docs_bind_mounts: https://docs.docker.com/storage/bind-mounts/
 .. |docker_build_env| replace:: Docker Hub
 .. _docker_build_env: https://hub.docker.com/r/stellargroup/build_env/
+.. |eve| replace:: EVE - the Expressive Vector Engine
+.. _eve: https://github.com/jfalcou/eve
 .. |gcc| replace:: GNU Compiler Collection (g++)
 .. _gcc: https://gcc.gnu.org
 .. |clang| replace:: clang: a C language family frontend for LLVM
@@ -484,6 +501,10 @@ rst_prolog += '''
 .. _cpp20_p0075r1: http://wg21.link/p0075r1
 .. |cpp20_p0443| replace:: P0443
 .. _cpp20_p0443: https://github.com/executors/issaquah_2016
+.. |p0792| replace:: P0792
+.. _p0792: http://wg21.link/p0792
+.. |p0159| replace:: P0159
+.. _p0159: http://wg21.link/p0159
 .. |p1393| replace:: P1393
 .. _p1393: http://wg21.link/p1393
 .. |p2220| replace:: P2220
@@ -541,15 +562,16 @@ rst_prolog += '''
 .. |email_mstumpf| image:: /_static/images/emails/martinhstumpf.png
 .. |email_blelbach| image:: /_static/images/emails/blelbach.png
 .. |email_syang| image:: /_static/images/emails/syang16.png
-.. |email_jhabraken| image:: /_static/images/emails/vexocide.png
+.. |email_jhabraken| image:: /_static/images/emails/jhabraken.png
 .. |email_sbrandt| image:: /_static/images/emails/sbrandt.png
 .. |email_atrantan| image:: /_static/images/emails/atrantan.png
-.. |email_aserio| image:: /_static/images/emails/aserio.png
+.. |email_alemoine| image:: /_static/images/emails/alemoine.png
 .. |email_mbrodowicz| image:: /_static/images/emails/mbrodowicz.png
 .. |email_vamatya| image:: /_static/images/emails/vamatya.png
 .. |email_dkaratza| image:: /_static/images/emails/dkaratza.png
 .. |email_ggonidelis| image:: /_static/images/emails/ggonidelis.png
 .. |email_rstobaugh| image:: /_static/images/emails/rstobaugh.png
+.. |email_bhumitattarde| image:: /_static/images/emails/bhumitattarde.png
 '''
 
 # Add any paths that contain templates here, relative to this directory.
@@ -574,8 +596,8 @@ author = 'The STE||AR Group'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-# The short X.Y version.
-version = '@HPX_CONF_DOCUMENTATION_VERSION@'
+# The short X.Y.Z version.
+version = '@HPX_CONF_DOCUMENTATION_SHORT_VERSION@'
 # The full version, including alpha/beta/rc tags.
 release = '@HPX_CONF_DOCUMENTATION_VERSION@'
 
@@ -623,7 +645,6 @@ html_theme = 'sphinx_book_theme'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'logo_only': True,
     "home_page_in_toc": True,
     "repository_url": "https://github.com/STEllAR-GROUP/hpx",
     "use_repository_button": True,

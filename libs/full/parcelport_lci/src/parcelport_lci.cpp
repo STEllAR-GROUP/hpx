@@ -12,6 +12,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/synchronization.hpp>
@@ -144,7 +145,9 @@ namespace hpx::parcelset {
             /// Return the name of this locality
             std::string get_locality_name() const override
             {
-                return util::lci_environment::get_processor_name();
+                // hostname-rank
+                return util::lci_environment::get_processor_name() + "-" +
+                    std::to_string(util::lci_environment::rank());
             }
 
             std::shared_ptr<sender_connection> create_connection(
@@ -251,6 +254,7 @@ namespace hpx::traits {
         {
             return "50";
         }
+
         static void init(
             int* argc, char*** argv, util::command_line_handling& cfg)
         {
@@ -259,6 +263,9 @@ namespace hpx::traits {
                 static_cast<std::size_t>(util::lci_environment::size());
             cfg.node_ = static_cast<std::size_t>(util::lci_environment::rank());
         }
+
+        // TODO: implement creation of custom thread pool here
+        static void init(hpx::resource::partitioner&) noexcept {}
 
         static void destroy()
         {

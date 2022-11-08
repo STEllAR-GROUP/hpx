@@ -49,7 +49,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                                 t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
                                 std::size_t) mutable -> result_type {
                     // ignore argument (invocation count of bulk_execute)
-                    return hpx::util::invoke_fused(f, t);
+                    return hpx::invoke_fused(f, t);
                 };
 
                 auto&& results = hpx::parallel::execution::bulk_async_execute(
@@ -113,7 +113,7 @@ namespace hpx { namespace resiliency { namespace experimental {
 
                         if (!valid_results.empty())
                         {
-                            return hpx::util::invoke(HPX_FORWARD(Vote, vote),
+                            return hpx::invoke(HPX_FORWARD(Vote, vote),
                                 HPX_MOVE(valid_results));
                         }
 
@@ -144,7 +144,7 @@ namespace hpx { namespace resiliency { namespace experimental {
                                 t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)](
                                 std::size_t) mutable {
                     // ignore argument (invocation count of bulk_execute)
-                    hpx::util::invoke_fused(f, t);
+                    hpx::invoke_fused(f, t);
 
                     // return non-void result to force executor into providing a
                     // future for each invocation (returning void might optimize

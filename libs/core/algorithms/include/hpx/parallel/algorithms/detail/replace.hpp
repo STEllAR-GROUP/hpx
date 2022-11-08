@@ -1,0 +1,265 @@
+//  Copyright (c) 2022 Srinivas Yadav
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#pragma once
+
+#include <hpx/config.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
+#include <hpx/parallel/algorithms/for_each.hpp>
+#include <hpx/parallel/util/compare_projected.hpp>
+#include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/zip_iterator.hpp>
+
+#include <algorithm>
+#include <cstddef>
+#include <iostream>
+#include <type_traits>
+#include <utility>
+
+namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ExPolicy>
+    struct sequential_replace_t final
+      : hpx::functional::detail::tag_fallback<sequential_replace_t<ExPolicy>>
+    {
+    private:
+        template <typename InIter, typename T1, typename T2, typename Proj>
+        friend inline constexpr auto tag_fallback_invoke(sequential_replace_t,
+            ExPolicy&& policy, InIter first, InIter last, T1 const& old_value,
+            T2 const& new_value, Proj&& proj)
+        {
+            if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
+            {
+                return util::loop(HPX_FORWARD(ExPolicy, policy), first, last,
+                    [old_value, new_value, &proj](auto& v) {
+                        if (HPX_INVOKE(proj, *v) == old_value)
+                        {
+                            *v = new_value;
+                        }
+                    });
+            }
+            else
+            {
+                typedef typename std::iterator_traits<InIter>::value_type type;
+
+                return for_each_n<InIter>().call(
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    std::distance(first, last),
+                    [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
+                        type& t) -> void {
+                        if (HPX_INVOKE(proj, t) == old_value)
+                        {
+                            t = new_value;
+                        }
+                    },
+                    util::projection_identity());
+            }
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    inline constexpr sequential_replace_t<ExPolicy> sequential_replace =
+        sequential_replace_t<ExPolicy>{};
+#else
+    template <typename ExPolicy, typename... Args>
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_replace(Args&&... args)
+    {
+        return sequential_replace_t<ExPolicy>{}(std::forward<Args>(args)...);
+    }
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ExPolicy>
+    struct sequential_replace_if_t final
+      : hpx::functional::detail::tag_fallback<sequential_replace_if_t<ExPolicy>>
+    {
+    private:
+        template <typename InIter, typename Sent, typename F, typename T,
+            typename Proj>
+        friend inline constexpr auto tag_fallback_invoke(
+            sequential_replace_if_t, ExPolicy&& policy, InIter first, Sent last,
+            F&& f, T const& new_value, Proj&& proj)
+        {
+            if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
+            {
+                return util::loop(HPX_FORWARD(ExPolicy, policy), first, last,
+                    [&f, new_value, &proj](auto& v) {
+                        if (HPX_INVOKE(f, HPX_INVOKE(proj, *v)))
+                        {
+                            *v = new_value;
+                        }
+                    });
+            }
+            else
+            {
+                typedef typename std::iterator_traits<InIter>::value_type type;
+
+                return for_each_n<InIter>().call(
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    detail::distance(first, last),
+                    [new_value, f = HPX_FORWARD(F, f),
+                        proj = HPX_FORWARD(Proj, proj)](
+                        type& t) mutable -> void {
+                        if (HPX_INVOKE(f, HPX_INVOKE(proj, t)))
+                        {
+                            t = new_value;
+                        }
+                    },
+                    util::projection_identity());
+            }
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    inline constexpr sequential_replace_if_t<ExPolicy> sequential_replace_if =
+        sequential_replace_if_t<ExPolicy>{};
+#else
+    template <typename ExPolicy, typename... Args>
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_replace_if(Args&&... args)
+    {
+        return sequential_replace_if_t<ExPolicy>{}(std::forward<Args>(args)...);
+    }
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ExPolicy>
+    struct sequential_replace_copy_t final
+      : hpx::functional::detail::tag_fallback<
+            sequential_replace_copy_t<ExPolicy>>
+    {
+    private:
+        template <typename InIter, typename Sent, typename OutIter, typename T,
+            typename Proj>
+        friend inline constexpr auto tag_fallback_invoke(
+            sequential_replace_copy_t, ExPolicy&& policy, InIter first,
+            Sent sent, OutIter dest, T const& old_value, T const& new_value,
+            Proj&& proj)
+        {
+            if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
+            {
+                for (/* */; first != sent; ++first)
+                {
+                    if (HPX_INVOKE(proj, *first) == old_value)
+                        *dest++ = new_value;
+                    else
+                        *dest++ = *first;
+                }
+                return util::in_out_result<InIter, OutIter>(first, dest);
+            }
+            else
+            {
+                typedef hpx::util::zip_iterator<InIter, OutIter> zip_iterator;
+                typedef typename zip_iterator::reference reference;
+
+                return util::detail::get_in_out_result(
+                    for_each_n<zip_iterator>().call(
+                        HPX_FORWARD(ExPolicy, policy),
+                        zip_iterator(first, dest),
+                        detail::distance(first, sent),
+                        [old_value, new_value, proj = HPX_FORWARD(Proj, proj)](
+                            reference t) -> void {
+                            using hpx::get;
+                            if (HPX_INVOKE(proj, get<0>(t)) == old_value)
+                                get<1>(t) = new_value;
+                            else
+                                get<1>(t) = get<0>(t);    //-V573
+                        },
+                        util::projection_identity()));
+            }
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    inline constexpr sequential_replace_copy_t<ExPolicy>
+        sequential_replace_copy = sequential_replace_copy_t<ExPolicy>{};
+#else
+    template <typename ExPolicy, typename... Args>
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_replace_copy(Args&&... args)
+    {
+        return sequential_replace_copy_t<ExPolicy>{}(
+            std::forward<Args>(args)...);
+    }
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename ExPolicy>
+    struct sequential_replace_copy_if_t final
+      : hpx::functional::detail::tag_fallback<
+            sequential_replace_copy_if_t<ExPolicy>>
+    {
+    private:
+        template <typename InIter, typename Sent, typename OutIter, typename F,
+            typename T, typename Proj>
+        friend inline constexpr auto tag_fallback_invoke(
+            sequential_replace_copy_if_t, ExPolicy&& policy, InIter first,
+            Sent sent, OutIter dest, F&& f, T const& new_value, Proj&& proj)
+        {
+            if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
+            {
+                for (/* */; first != sent; ++first)
+                {
+                    if (HPX_INVOKE(f, HPX_INVOKE(proj, *first)))
+                    {
+                        *dest++ = new_value;
+                    }
+                    else
+                    {
+                        *dest++ = *first;
+                    }
+                }
+                return util::in_out_result<InIter, OutIter>{first, dest};
+            }
+            else
+            {
+                typedef hpx::util::zip_iterator<InIter, OutIter> zip_iterator;
+                typedef typename zip_iterator::reference reference;
+
+                return util::detail::get_in_out_result(
+                    for_each_n<zip_iterator>().call(
+                        HPX_FORWARD(ExPolicy, policy),
+                        zip_iterator(first, dest),
+                        detail::distance(first, sent),
+                        [new_value, f = HPX_FORWARD(F, f),
+                            proj = HPX_FORWARD(Proj, proj)](
+                            reference t) mutable -> void {
+                            using hpx::get;
+                            if (HPX_INVOKE(f, HPX_INVOKE(proj, get<0>(t))))
+                            {
+                                get<1>(t) = new_value;
+                            }
+                            else
+                            {
+                                get<1>(t) = get<0>(t);    //-V573
+                            }
+                        },
+                        util::projection_identity()));
+            }
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    inline constexpr sequential_replace_copy_if_t<ExPolicy>
+        sequential_replace_copy_if = sequential_replace_copy_if_t<ExPolicy>{};
+#else
+    template <typename ExPolicy, typename... Args>
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto sequential_replace_copy_if(
+        Args&&... args)
+    {
+        return sequential_replace_copy_if_t<ExPolicy>{}(
+            std::forward<Args>(args)...);
+    }
+#endif
+
+}}}}    // namespace hpx::parallel::v1::detail

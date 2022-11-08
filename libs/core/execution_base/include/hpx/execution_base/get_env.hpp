@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/unwrap_ref.hpp>
 
@@ -15,6 +16,24 @@
 #include <utility>
 
 namespace hpx::execution::experimental {
+
+    namespace detail {
+
+        // checks whether tag_invoke(CPO, Args...) is
+        // contextually convertible to bool, assumes that the expression is
+        // valid
+        template <typename CPO>
+        struct contextually_convertible_to_bool
+        {
+            template <typename... Args>
+            struct apply
+              : std::is_invocable_r<bool,
+                    hpx::functional::tag_t<hpx::functional::tag_invoke>, CPO,
+                    Args...>
+            {
+            };
+        };
+    }    // namespace detail
 
     // 1. An execution environment contains state associated with the
     //    completion of an asynchronous operation. Every receiver has an
@@ -157,19 +176,23 @@ namespace hpx::execution::experimental {
     // through environment adaptors.
     //
     // The name execution::forwarding_env_query denotes a customization point
-    // object. For some subexpression t, execution::forwarding_env_query(t)
-    // is expression equivalent to:
+    // object. For some subexpression t, execution::forwarding_env_query(t) is
+    // expression equivalent to:
     //
-    // 1. tag_invoke(execution::forwarding_env_query, t), contextually
-    //    converted to bool, if the tag_invoke expression is well formed.
-    //      Mandates: The tag_invoke expression is indeed contextually
-    //      convertible to bool, that expression and the contextual conversion
-    //      are not potentially-throwing and are core constant expressions if t
-    //      is a core constant expression.
+    // 1. tag_invoke(execution::forwarding_env_query, t), contextually converted
+    //    to bool, if the tag_invoke expression is well formed.
+    //
+    //      - Mandates: The tag_invoke expression is indeed contextually
+    //        convertible to bool, that expression and the contextual conversion
+    //        are not potentially-throwing and are core constant expressions if
+    //        t is a core constant expression.
+    //
     // 2. Otherwise, false.
     //
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct forwarding_env_query_t
-        final : hpx::functional::detail::tag_fallback<forwarding_env_query_t>
+        final
+      : hpx::functional::detail::tag_fallback_noexcept<forwarding_env_query_t,
+            detail::contextually_convertible_to_bool<forwarding_env_query_t>>
     {
     private:
         template <typename T>
@@ -178,7 +201,6 @@ namespace hpx::execution::experimental {
         {
             return false;
         }
-
     } forwarding_env_query{};
 
 }    // namespace hpx::execution::experimental

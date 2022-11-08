@@ -241,11 +241,10 @@ void test_reset_thread_distribution()
 ///////////////////////////////////////////////////////////////////////////////
 // processing_units_count
 
-struct test_executor_processing_units_count
-  : hpx::parallel::execution::parallel_executor_aggregated
+struct test_executor_processing_units_count : hpx::execution::parallel_executor
 {
     test_executor_processing_units_count()
-      : hpx::parallel::execution::parallel_executor_aggregated()
+      : hpx::execution::parallel_executor()
     {
     }
 
@@ -287,14 +286,11 @@ void test_processing_units_count()
 {
     {
         params_count = 0;
-        exec_count = 0;
 
         hpx::parallel::execution::processing_units_count(
-            test_processing_units{},
-            hpx::parallel::execution::parallel_executor_aggregated());
+            test_processing_units{}, hpx::execution::parallel_executor());
 
-        HPX_TEST_EQ(params_count, std::size_t(1));
-        HPX_TEST_EQ(exec_count, std::size_t(0));
+        HPX_TEST_EQ(params_count, std::size_t(0));
     }
 
     {
@@ -335,6 +331,16 @@ void test_processing_units_count()
 
         HPX_TEST_EQ(num_cores, std::size_t(2));
         HPX_TEST_EQ(params_count, std::size_t(0));
+    }
+
+    {
+        auto p = hpx::parallel::execution::with_processing_units_count(
+            hpx::execution::par, 2);
+
+        std::size_t num_cores =
+            hpx::parallel::execution::processing_units_count(p);
+
+        HPX_TEST_EQ(num_cores, std::size_t(2));
     }
 }
 

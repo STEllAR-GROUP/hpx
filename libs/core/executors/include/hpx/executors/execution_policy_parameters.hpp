@@ -30,7 +30,7 @@ namespace hpx::parallel::execution {
     template <typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::functional::is_tag_invocable_v<
+            hpx::is_invocable_v<
                 with_processing_units_count_t,
                 typename std::decay_t<ExPolicy>::executor_type, std::size_t>
         )>
@@ -49,7 +49,7 @@ namespace hpx::parallel::execution {
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_executor_parameters_v<Params> &&
-            hpx::functional::is_tag_invocable_v<
+            hpx::is_invocable_v<
                 with_processing_units_count_t,
                 typename std::decay_t<ExPolicy>::executor_type, std::size_t> &&
             detail::has_processing_units_count_v<std::decay_t<Params>>
@@ -79,5 +79,20 @@ namespace hpx::parallel::execution {
         ParametersProperty, ExPolicy&& policy, Params&& params)
     {
         return policy.with(HPX_FORWARD(Params, params));
+    }
+
+    // clang-format off
+    template <typename ParametersProperty, typename ExPolicy, typename...Ts,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_execution_policy_v<ExPolicy>
+        )>
+    // clang-format on
+    constexpr auto tag_fallback_invoke(
+        ParametersProperty prop, ExPolicy&& policy, Ts&&... ts)
+        -> decltype(std::declval<ParametersProperty>()(
+            std::declval<typename std::decay_t<ExPolicy>::executor_type>(),
+            std::declval<Ts>()...))
+    {
+        return prop(policy.executor(), HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx::parallel::execution

@@ -16,14 +16,14 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Sorts some of the elements in the range [first, last) in ascending
-    /// order, storing the result in the range [d_first, d_last). At most
-    /// d_last - d_first of the elements are placed sorted to the range
-    /// [d_first, d_first + n) where n is the number of elements to sort
-    /// (n = min(last - first, d_last - d_first)).
+    /// order, storing the result in the range [r_first, r_last). At most
+    /// r_last - r_first of the elements are placed sorted to the range
+    /// [r_first, r_first + n) where n is the number of elements to sort
+    /// (n = min(last - first, r_last - r_first)).
     ///
     /// \note   Complexity: O(Nlog(min(D,N))), where N =
-    ///         std::distance(first, last) and D = std::distance(d_first,
-    ///         d_last) comparisons.
+    ///         std::distance(first, last) and D = std::distance(r_first,
+    ///         r_last) comparisons.
     ///
     /// \tparam InIter      The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
@@ -49,8 +49,8 @@ namespace hpx { namespace ranges {
     /// \param last         Refers to the sentinel value denoting the end of
     ///                     the sequence of elements the algorithm will be
     ///                     applied to.
-    /// \param d_first      Refers to the beginning of the destination range.
-    /// \param d_last       Refers to the sentinel denoting the end of the
+    /// \param r_first      Refers to the beginning of the destination range.
+    /// \param r_last       Refers to the sentinel denoting the end of the
     ///                     destination range.
     /// \param comp         comp is a callable object. The return value of the
     ///                     INVOKE operation applied to an object of type Comp,
@@ -78,21 +78,23 @@ namespace hpx { namespace ranges {
     ///           The algorithm returns {last, result_first + N}.
     ///
     template <typename InIter, typename Sent1, typename RandIter,
-        typename Sent2, typename Comp, typename Proj1, typename Proj2>
+        typename Sent2, typename Comp = ranges::less,
+        typename Proj1 = parallel::util::projection_identity,
+        typename Proj2 = parallel::util::projection_identity>
     partial_sort_copy_result<InIter, RandIter> partial_sort_copy(InIter first,
-        Sent1 last, RandIter d_first, Sent2 d_last, Comp&& comp = Comp(),
+        Sent1 last, RandIter r_first, Sent2 r_last, Comp&& comp = Comp(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Sorts some of the elements in the range [first, last) in ascending
-    /// order, storing the result in the range [d_first, d_last). At most
-    /// d_last - d_first of the elements are placed sorted to the range
-    /// [d_first, d_first + n) where n is the number of elements to sort
-    /// (n = min(last - first, d_last - d_first)).
+    /// order, storing the result in the range [r_first, r_last). At most
+    /// r_last - r_first of the elements are placed sorted to the range
+    /// [r_first, r_first + n) where n is the number of elements to sort
+    /// (n = min(last - first, r_last - r_first)).
     ///
     /// \note   Complexity: O(Nlog(min(D,N))), where N =
-    ///         std::distance(first, last) and D = std::distance(d_first,
-    ///         d_last) comparisons.
+    ///         std::distance(first, last) and D = std::distance(r_first,
+    ///         r_last) comparisons.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -124,8 +126,8 @@ namespace hpx { namespace ranges {
     /// \param last         Refers to the sentinel value denoting the end of
     ///                     the sequence of elements the algorithm will be
     ///                     applied to.
-    /// \param d_first      Refers to the beginning of the destination range.
-    /// \param d_last       Refers to the sentinel denoting the end of the
+    /// \param r_first      Refers to the beginning of the destination range.
+    /// \param r_last       Refers to the sentinel denoting the end of the
     ///                     destination range.
     /// \param comp         comp is a callable object. The return value of the
     ///                     INVOKE operation applied to an object of type Comp,
@@ -164,25 +166,27 @@ namespace hpx { namespace ranges {
     ///           The algorithm returns {last, result_first + N}.
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent1,
-        typename RandIter, typename Sent2, typename Comp, typename Proj1,
-        typename Proj2>
-    parallel::util::detail::algorithm_result_t<ExPolicy,
+        typename RandIter, typename Sent2,
+        typename Comp = ranges::less,
+        typename Proj1 = parallel::util::projection_identity,
+        typename Proj2 = parallel::util::projection_identity>
+    typename parallel::util::detail::algorithm_result_t<ExPolicy,
         partial_sort_copy_result<FwdIter, RandIter>>
     partial_sort_copy(
-        ExPolicy&& policy, FwdIter first, Sent1 last, RandIter d_first,
-        Sent2 d_last, Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
+        ExPolicy&& policy, FwdIter first, Sent1 last, RandIter r_first,
+        Sent2 r_last, Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Sorts some of the elements in the range [first, last) in ascending
-    /// order, storing the result in the range [d_first, d_last). At most
-    /// d_last - d_first of the elements are placed sorted to the range
-    /// [d_first, d_first + n) where n is the number of elements to sort
-    /// (n = min(last - first, d_last - d_first)).
+    /// order, storing the result in the range [r_first, r_last). At most
+    /// r_last - r_first of the elements are placed sorted to the range
+    /// [r_first, r_first + n) where n is the number of elements to sort
+    /// (n = min(last - first, r_last - r_first)).
     ///
     /// \note   Complexity: O(Nlog(min(D,N))), where N =
-    ///         std::distance(first, last) and D = std::distance(d_first,
-    ///         d_last) comparisons.
+    ///         std::distance(first, last) and D = std::distance(r_first,
+    ///         r_last) comparisons.
     ///
     /// \tparam Rng1        The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
@@ -195,12 +199,12 @@ namespace hpx { namespace ranges {
     /// \tparam Proj1       The type of an optional projection function for the
     ///                     input range. This defaults to
     ///                     \a util::projection_identity.
-    /// \tparam Proj1       The type of an optional projection function for the
+    /// \tparam Proj2       The type of an optional projection function for the
     ///                     output range. This defaults to
     ///                     \a util::projection_identity.
     ///
     /// \param rng1         Refers to the source range.
-    /// \param rng1         Refers to the destination range.
+    /// \param rng2         Refers to the destination range.
     /// \param comp         comp is a callable object. The return value of the
     ///                     INVOKE operation applied to an object of type Comp,
     ///                     when contextually converted to bool, yields true if
@@ -227,9 +231,10 @@ namespace hpx { namespace ranges {
     ///           range_iterator_t<Rng2>>.
     ///           The algorithm returns {last, result_first + N}.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent1,
-        typename RandIter, typename Sent2, typename Comp, typename Proj1,
-        typename Proj2>
+    template <typename Rng1, typename Rng2,
+        typename Comp = ranges::less,
+        typename Proj1 = parallel::util::projection_identity,
+        typename Proj2 = parallel::util::projection_identity>
     partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,
         hpx::traits::range_iterator_t<Rng2>>
     partial_sort_copy(Rng1&& rng1, Rng2&& rng2, Comp&& comp = Comp(),
@@ -237,14 +242,14 @@ namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Sorts some of the elements in the range [first, last) in ascending
-    /// order, storing the result in the range [d_first, d_last). At most
-    /// d_last - d_first of the elements are placed sorted to the range
-    /// [d_first, d_first + n) where n is the number of elements to sort
-    /// (n = min(last - first, d_last - d_first)).
+    /// order, storing the result in the range [r_first, r_last). At most
+    /// r_last - r_first of the elements are placed sorted to the range
+    /// [r_first, r_first + n) where n is the number of elements to sort
+    /// (n = min(last - first, r_last - r_first)).
     ///
     /// \note   Complexity: O(Nlog(min(D,N))), where N =
-    ///         std::distance(first, last) and D = std::distance(d_first,
-    ///         d_last) comparisons.
+    ///         std::distance(first, last) and D = std::distance(r_first,
+    ///         r_last) comparisons.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -261,14 +266,14 @@ namespace hpx { namespace ranges {
     /// \tparam Proj1       The type of an optional projection function for the
     ///                     input range. This defaults to
     ///                     \a util::projection_identity.
-    /// \tparam Proj1       The type of an optional projection function for the
+    /// \tparam Proj2       The type of an optional projection function for the
     ///                     output range. This defaults to
     ///                     \a util::projection_identity.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param rng1         Refers to the source range.
-    /// \param rng1         Refers to the destination range.
+    /// \param rng2         Refers to the destination range.
     /// \param comp         comp is a callable object. The return value of the
     ///                     INVOKE operation applied to an object of type Comp,
     ///                     when contextually converted to bool, yields true if
@@ -307,9 +312,10 @@ namespace hpx { namespace ranges {
     ///           range_iterator_t<Rng2>> otherwise.
     ///           The algorithm returns {last, result_first + N}.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent1,
-        typename RandIter, typename Sent2, typename Comp, typename Proj1,
-        typename Proj2>
+    template <typename ExPolicy, typename Rng1, typename Rng2,
+        typename Comp = ranges::less,
+        typename Proj1 = parallel::util::projection_identity,
+        typename Proj2 = parallel::util::projection_identity>
     parallel::util::detail::algorithm_result_t<ExPolicy,
         partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,
         hpx::traits::range_iterator_t<Rng2>>>
@@ -341,7 +347,7 @@ namespace hpx { namespace ranges {
     using partial_sort_copy_result = parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::partial_sort_copy
+    // CPO for hpx::ranges::partial_sort_copy
     inline constexpr struct partial_sort_copy_t final
       : hpx::detail::tag_parallel_algorithm<partial_sort_copy_t>
     {
@@ -428,7 +434,7 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename Rng1, typename Rng2,
-            typename Compare = ranges::less,
+            typename Comp = ranges::less,
             typename Proj1 = parallel::util::projection_identity,
             typename Proj2 = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
@@ -437,7 +443,7 @@ namespace hpx { namespace ranges {
                 parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 parallel::traits::is_indirect_callable_v<
-                    hpx::execution::sequenced_policy, Compare,
+                    hpx::execution::sequenced_policy, Comp,
                     parallel::traits::projected_range<Proj1, Rng1>,
                     parallel::traits::projected_range<Proj1, Rng1>
                 >
@@ -446,7 +452,7 @@ namespace hpx { namespace ranges {
         friend partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,
             hpx::traits::range_iterator_t<Rng2>>
         tag_fallback_invoke(hpx::ranges::partial_sort_copy_t, Rng1&& rng1,
-            Rng2&& rng2, Compare&& comp = Compare(), Proj1&& proj1 = Proj1(),
+            Rng2&& rng2, Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
             using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
@@ -464,13 +470,13 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::partial_sort_copy<result_type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), HPX_FORWARD(Compare, comp),
+                    hpx::util::end(rng2), HPX_FORWARD(Comp, comp),
                     HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
 
         // clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2,
-            typename Compare = ranges::less,
+            typename Comp = ranges::less,
             typename Proj1 = parallel::util::projection_identity,
             typename Proj2 = parallel::util::projection_identity,
             HPX_CONCEPT_REQUIRES_(
@@ -480,7 +486,7 @@ namespace hpx { namespace ranges {
                 parallel::traits::is_projected_range_v<Proj1, Rng1> &&
                 parallel::traits::is_projected_range_v<Proj2, Rng2> &&
                 parallel::traits::is_indirect_callable_v<
-                    ExPolicy, Compare,
+                    ExPolicy, Comp,
                     parallel::traits::projected_range<Proj1, Rng1>,
                     parallel::traits::projected_range<Proj1, Rng1>
                 >
@@ -490,7 +496,7 @@ namespace hpx { namespace ranges {
             partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,
                 hpx::traits::range_iterator_t<Rng2>>>
         tag_fallback_invoke(hpx::ranges::partial_sort_copy_t, ExPolicy&& policy,
-            Rng1&& rng1, Rng2&& rng2, Compare&& comp = Compare(),
+            Rng1&& rng1, Rng2&& rng2, Comp&& comp = Comp(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
             using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
@@ -508,7 +514,7 @@ namespace hpx { namespace ranges {
             return hpx::parallel::v1::detail::partial_sort_copy<result_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                     hpx::util::end(rng1), hpx::util::begin(rng2),
-                    hpx::util::end(rng2), HPX_FORWARD(Compare, comp),
+                    hpx::util::end(rng2), HPX_FORWARD(Comp, comp),
                     HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
     } partial_sort_copy{};

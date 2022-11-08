@@ -90,6 +90,7 @@ namespace hpx { namespace threads { namespace detail {
 
         data.run_now = (thread_priority::high == data.priority ||
             thread_priority::high_recursive == data.priority ||
+            thread_priority::bound == data.priority ||
             thread_priority::boost == data.priority);
 
         thread_id_ref_type id = invalid_thread_id;

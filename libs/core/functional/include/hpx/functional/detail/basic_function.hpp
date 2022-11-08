@@ -224,8 +224,8 @@ namespace hpx { namespace util { namespace detail {
 
         HPX_FORCEINLINE R operator()(Ts... vs) const
         {
-            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
-            return vptr->invoke(object, HPX_FORWARD(Ts, vs)...);
+            vtable const* f_vptr = static_cast<vtable const*>(base_type::vptr);
+            return f_vptr->invoke(object, HPX_FORWARD(Ts, vs)...);
         }
 
         using base_type::get_function_address;

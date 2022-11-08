@@ -58,8 +58,8 @@ namespace hpx::execution::experimental {
         return hpx::execution::experimental::read(get_stop_token);
     }
 
-    // Helper template allowing to exptract the type of a stop_token
-    // extracted from a receiver environment.
+    // Helper template allowing to extract the type of a stop_token extracted
+    // from a receiver environment.
     template <typename T>
     using stop_token_of_t = std::remove_cv_t<
         std::remove_reference_t<decltype(get_stop_token(std::declval<T>()))>>;

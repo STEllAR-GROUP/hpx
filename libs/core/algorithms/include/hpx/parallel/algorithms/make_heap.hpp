@@ -1,3 +1,4 @@
+//  Copyright (c) 2022 Bhumit Attarde
 //  Copyright (c) 2015 Grant Mercer
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,6 +14,7 @@ namespace hpx {
     // clang-format off
 
     /// Constructs a \a max \a heap in the range [first, last).
+    /// Executed according to the policy.
     ///
     /// \note Complexity: at most (3*N) comparisons where
     ///       \a N = distance(first, last).
@@ -24,6 +26,26 @@ namespace hpx {
     /// \tparam RndIter     The type of the source iterators used for algorithm.
     ///                     This iterator must meet the requirements for a
     ///                     random access iterator.
+    /// \tparam Comp        Comparison function object (i.e. an object that
+    ///                     satisfies the requirements of Compare) which returns
+    ///                     true if the first argument is less than the second.
+    ///                     The signature of the comparison function should be
+    ///                     equivalent to the following:
+    ///                     \code
+    ///                     bool cmp(const Type1 &a, const Type2 &b);
+    ///                     \endcode
+    ///                     While the signature does not need to have const &,
+    ///                     the function must not modify the objects passed to
+    ///                     it and must be able to accept all values of type
+    ///                     (possibly \a const) \a Type1 and \a Type2 regardless
+    ///                     of value category (thus, \a Type1 & is not allowed,
+    ///                     nor is \a Type1 unless for \a Type1 a move is
+    ///                     equivalent to a copy. The types \a Type1 and \a Type2
+    ///                     must be such that an object of type \a RandomIt can
+    ///                     be dereferenced and then implicitly converted to both
+    ///                     of them.
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of that the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements of
@@ -56,11 +78,11 @@ namespace hpx {
     ///           and returns \a void otherwise.
     ///
     template <typename ExPolicy, typename RndIter, typename Comp>
-    typename util::detail::algorithm_result<ExPolicy>::type make_heap(
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy>::type make_heap(
         ExPolicy&& policy, RndIter first, RndIter last, Comp&& comp);
 
     /// Constructs a \a max \a heap in the range [first, last). Uses the
-    /// operator \a < for comparisons.
+    /// operator \a < for comparisons. Executed according to the policy.
     ///
     /// \note Complexity: at most (3*N) comparisons where
     ///       \a N = distance(first, last).
@@ -72,6 +94,8 @@ namespace hpx {
     /// \tparam RndIter     The type of the source iterators used for algorithm.
     ///                     This iterator must meet the requirements for a
     ///                     random access iterator.
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of that the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements of
@@ -95,6 +119,71 @@ namespace hpx {
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy>::type
     make_heap(ExPolicy&& policy, RndIter first, RndIter last);
 
+    /// Constructs a \a max \a heap in the range [first, last).
+    ///
+    /// \note Complexity: at most (3*N) comparisons where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam RndIter     The type of the source iterators used for algorithm.
+    ///                     This iterator must meet the requirements for a
+    ///                     random access iterator.
+    /// \tparam Comp        Comparison function object (i.e. an object that
+    ///                     satisfies the requirements of Compare) which returns
+    ///                     true if the first argument is less than the second.
+    ///                     The signature of the comparison function should be
+    ///                     equivalent to the following:
+    ///                     \code
+    ///                     bool cmp(const Type1 &a, const Type2 &b);
+    ///                     \endcode
+    ///                     While the signature does not need to have const &,
+    ///                     the function must not modify the objects passed to
+    ///                     it and must be able to accept all values of type
+    ///                     (possibly \a const) \a Type1 and \a Type2 regardless
+    ///                     of value category (thus, \a Type1 & is not allowed,
+    ///                     nor is \a Type1 unless for \a Type1 a move is
+    ///                     equivalent to a copy. The types \a Type1 and \a Type2
+    ///                     must be such that an object of type \a RandomIt can
+    ///                     be dereferenced and then implicitly converted to both
+    ///                     of them.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of that the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     that the algorithm will be applied to.
+    /// \param comp         Refers to the binary predicate which returns true
+    ///                     if the first argument should be treated as less than
+    ///                     the second. The signature of the function should be
+    ///                     equivalent to
+    ///                     \code
+    ///                     bool comp(const Type &a, const Type &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a RndIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// \returns  The \a make_heap algorithm returns a \a void.
+    ///
+    template <typename RndIter, typename Comp>
+    void make_heap(RndIter first, RndIter last, Comp&& comp);
+
+    /// Constructs a \a max \a heap in the range [first, last).
+    ///
+    /// \note Complexity: at most (3*N) comparisons where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam RndIter     The type of the source iterators used for algorithm.
+    ///                     This iterator must meet the requirements for a
+    ///                     random access iterator.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of that the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     that the algorithm will be applied to.
+    ///
+    /// \returns  The \a make_heap algorithm returns a \a void.
+    ///
+    template <typename RndIter>
+    void make_heap(RndIter first, RndIter last);
     // clang-format on
 }    // namespace hpx
 
@@ -114,6 +203,7 @@ namespace hpx {
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -121,6 +211,7 @@ namespace hpx {
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -358,11 +449,26 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         start = end_exclusive;
                     }
 
-                    scoped_params.mark_end_of_scheduling();
+                    if (errors.empty())
+                    {
+                        scoped_params.mark_end_of_scheduling();
 
-                    // Perform sift down for the head node
-                    sift_down(first, comp = HPX_FORWARD(Comp, comp),
-                        proj = HPX_FORWARD(Proj, proj), n, first);
+                        // Perform sift down for the head node
+                        sift_down(first, comp = HPX_FORWARD(Comp, comp),
+                            proj = HPX_FORWARD(Proj, proj), n, first);
+                    }
+                }
+                catch (std::bad_alloc const& e)
+                {
+                    if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
+                    {
+                        return hpx::make_exceptional_future<RndIter>(e);
+                    }
+                    else
+                    {
+                        HPX_UNUSED(e);
+                        throw;
+                    }
                 }
                 catch (...)
                 {
@@ -371,7 +477,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 // rethrow exceptions, if any
-                util::detail::handle_local_exceptions<ExPolicy>::call(errors);
+                if (!errors.empty())
+                {
+                    if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
+                    {
+                        return hpx::make_exceptional_future<RndIter>(
+                            hpx::exception_list(HPX_MOVE(errors)));
+                    }
+                    else
+                    {
+                        util::detail::handle_local_exceptions<ExPolicy>::call(
+                            errors);
+                    }
+                }
 
                 std::advance(first, n);
                 return util::detail::algorithm_result<ExPolicy, RndIter>::get(
@@ -410,7 +528,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::make_heap
+    // CPO for hpx::make_heap
     inline constexpr struct make_heap_t final
       : hpx::detail::tag_parallel_algorithm<make_heap_t>
     {

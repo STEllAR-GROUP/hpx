@@ -35,46 +35,6 @@ void n_copy_test()
     test_copy_n<std::forward_iterator_tag>();
 }
 
-////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_copy_n_exception()
-{
-    test_copy_n_exception(IteratorTag());
-
-    test_copy_n_exception(hpx::execution::simd, IteratorTag());
-    test_copy_n_exception(hpx::execution::par_simd, IteratorTag());
-
-    test_copy_n_exception_async(
-        hpx::execution::simd(hpx::execution::task), IteratorTag());
-    test_copy_n_exception_async(
-        hpx::execution::par_simd(hpx::execution::task), IteratorTag());
-}
-
-void copy_n_exception_test()
-{
-    test_copy_n_exception<std::random_access_iterator_tag>();
-    test_copy_n_exception<std::forward_iterator_tag>();
-}
-
-////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_copy_n_bad_alloc()
-{
-    test_copy_n_bad_alloc(hpx::execution::simd, IteratorTag());
-    test_copy_n_bad_alloc(hpx::execution::par_simd, IteratorTag());
-
-    test_copy_n_bad_alloc_async(
-        hpx::execution::simd(hpx::execution::task), IteratorTag());
-    test_copy_n_bad_alloc_async(
-        hpx::execution::par_simd(hpx::execution::task), IteratorTag());
-}
-
-void copy_n_bad_alloc_test()
-{
-    test_copy_n_bad_alloc<std::random_access_iterator_tag>();
-    test_copy_n_bad_alloc<std::forward_iterator_tag>();
-}
-
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (vm.count("seed"))
@@ -84,8 +44,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     gen.seed(seed);
 
     n_copy_test();
-    copy_n_exception_test();
-    copy_n_bad_alloc_test();
     return hpx::local::finalize();
 }
 

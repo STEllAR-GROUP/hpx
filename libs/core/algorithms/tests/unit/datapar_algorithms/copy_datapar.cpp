@@ -35,46 +35,6 @@ void copy_test()
     test_copy<std::forward_iterator_tag>();
 }
 
-////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_copy_exception()
-{
-    using namespace hpx::execution;
-
-    test_copy_exception(IteratorTag());
-
-    test_copy_exception(simd, IteratorTag());
-    test_copy_exception(par_simd, IteratorTag());
-
-    test_copy_exception_async(simd(task), IteratorTag());
-    test_copy_exception_async(par_simd(task), IteratorTag());
-}
-
-void copy_exception_test()
-{
-    test_copy_exception<std::random_access_iterator_tag>();
-    test_copy_exception<std::forward_iterator_tag>();
-}
-
-////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_copy_bad_alloc()
-{
-    test_copy_bad_alloc(hpx::execution::simd, IteratorTag());
-    test_copy_bad_alloc(hpx::execution::par_simd, IteratorTag());
-
-    test_copy_bad_alloc_async(
-        hpx::execution::simd(hpx::execution::task), IteratorTag());
-    test_copy_bad_alloc_async(
-        hpx::execution::par_simd(hpx::execution::task), IteratorTag());
-}
-
-void copy_bad_alloc_test()
-{
-    test_copy_bad_alloc<std::random_access_iterator_tag>();
-    test_copy_bad_alloc<std::forward_iterator_tag>();
-}
-
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (vm.count("seed"))
@@ -84,8 +44,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     gen.seed(seed);
 
     copy_test();
-    copy_exception_test();
-    copy_bad_alloc_test();
     return hpx::local::finalize();
 }
 

@@ -14,15 +14,15 @@
 namespace hpx { namespace ranges {
     // clang-format off
 
-    /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
+    /// in the uninitialized storage designated by the range
     /// by value-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter.
@@ -43,11 +43,10 @@ namespace hpx { namespace ranges {
     ///           the last element constructed.
     ///
     template <typename FwdIter, typename Sent>
-    FwdIter uninitialized_value_construct(
-        FwdIter first, Sent last);
+    FwdIter uninitialized_value_construct(FwdIter first, Sent last);
 
-    /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
+    /// in the uninitialized storage designated by the range
     /// by value-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
@@ -58,7 +57,7 @@ namespace hpx { namespace ranges {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for FwdIter.
@@ -91,11 +90,10 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent>
     typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    uninitialized_value_construct(
-        ExPolicy&& policy, FwdIter first, Sent last);
+    uninitialized_value_construct(ExPolicy&& policy, FwdIter first, Sent last);
 
-    /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
+    /// in the uninitialized storage designated by the range
     /// by value-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
@@ -113,8 +111,7 @@ namespace hpx { namespace ranges {
     /// sequential order in the calling thread.
     ///
     /// \returns  The \a uninitialized_value_construct algorithm returns a
-    ///           returns \a hpx::traits::range_traits<Rng>
-    ///           ::iterator_type.
+    ///           returns \a hpx::traits::range_traits<Rng>::iterator_type.
     ///           The \a uninitialized_value_construct algorithm returns
     ///           the output iterator to the element in the range, one past
     ///           the last element constructed.
@@ -123,8 +120,8 @@ namespace hpx { namespace ranges {
     typename hpx::traits::range_traits<Rng>::iterator_type
     uninitialized_value_construct(Rng&& rng);
 
-    /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
+    /// in the uninitialized storage designated by the range
     /// by value-initialization. If an exception is thrown during the
     /// initialization, the function has no effects.
     ///
@@ -153,10 +150,9 @@ namespace hpx { namespace ranges {
     /// in an unordered fashion in unspecified threads, and indeterminately
     /// sequenced within each thread.
     ///
-    /// \returns  The \a uninitialized_value_construct algorithm returns a
-    ///           \a hpx::future<typename hpx::traits::range_traits<Rng>
-    ///           ::iterator_type>, if the
-    ///           execution policy is of type \a sequenced_task_policy
+    /// \returns  The \a uninitialized_value_construct algorithm returns a \a
+    ///           hpx::future<typename hpx::traits::range_traits<Rng>::iterator_type>,
+    ///           if the execution policy is of type \a sequenced_task_policy
     ///           or \a parallel_task_policy and returns \a typename
     ///           hpx::traits::range_traits<Rng>::iterator_type otherwise.
     ///           The \a uninitialized_value_construct algorithm returns
@@ -168,8 +164,8 @@ namespace hpx { namespace ranges {
         typename hpx::traits::range_traits<Rng>::iterator_type>::type
     uninitialized_value_construct(ExPolicy&& policy, Rng&& rng);
 
-    /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
+    /// in the uninitialized storage designated by the range
     /// [first, first + count) by value-initialization. If an exception
     /// is thrown during the initialization, the function has no effects.
     ///
@@ -177,7 +173,7 @@ namespace hpx { namespace ranges {
     ///         count > 0, no assignments otherwise.
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
@@ -200,8 +196,8 @@ namespace hpx { namespace ranges {
     template <typename FwdIter, typename Size>
     FwdIter uninitialized_value_construct_n(FwdIter first, Size count);
 
-    /// Constructs objects of type typename iterator_traits<ForwardIt>
-    /// ::value_type in the uninitialized storage designated by the range
+    /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
+    /// in the uninitialized storage designated by the range
     /// [first, first + count) by value-initialization. If an exception
     /// is thrown during the initialization, the function has no effects.
     ///
@@ -213,7 +209,7 @@ namespace hpx { namespace ranges {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
@@ -247,10 +243,8 @@ namespace hpx { namespace ranges {
     ///           the last element constructed.
     ///
     template <typename ExPolicy, typename FwdIter, typename Size>
-    typename typename parallel::util::detail::algorithm_result<ExPolicy,
-        FwdIter>::type
-    uninitialized_value_construct_n(
-        ExPolicy&& policy, FwdIter first, Size count);
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    uninitialized_value_construct_n(ExPolicy&& policy, FwdIter first, Size count);
 
     // clang-format on
 }}    // namespace hpx::ranges

@@ -145,6 +145,7 @@ namespace hpx {
 #include <hpx/async_combinators/detail/throw_if_exceptional.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/deferred_call.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/acquire_shared_state.hpp>
 #include <hpx/futures/traits/detail/future_traits.hpp>
@@ -195,14 +196,15 @@ namespace hpx {
 
                     if (counter < wait_.needed_count_ && shared_state)
                     {
-                        if (!shared_state->is_ready())
+                        if (!shared_state->is_ready(std::memory_order_relaxed))
                         {
                             // handle future only if not enough futures are ready yet
                             // also, do not touch any futures which are already ready
                             shared_state->execute_deferred();
 
                             // execute_deferred might have made the future ready
-                            if (!shared_state->is_ready())
+                            if (!shared_state->is_ready(
+                                    std::memory_order_relaxed))
                             {
                                 shared_state->set_on_completed(
                                     util::deferred_call(
@@ -335,293 +337,332 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future>
-    bool wait_some_nothrow(std::size_t n, std::vector<Future> const& values)
+    inline constexpr struct wait_some_nothrow_t final
+      : hpx::functional::tag<wait_some_nothrow_t>
     {
-        static_assert(
-            hpx::traits::is_future_v<Future>, "invalid use of hpx::wait_some");
-
-        if (n == 0)
+    private:
+        template <typename Future>
+        friend bool tag_invoke(wait_some_nothrow_t, std::size_t n,
+            std::vector<Future> const& values)
         {
+            static_assert(hpx::traits::is_future_v<Future>,
+                "invalid use of hpx::wait_some");
+
+            if (n == 0)
+            {
+                return false;
+            }
+
+            if (n > values.size())
+            {
+                HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
+                    "number of results to wait for is out of bounds");
+                return false;
+            }
+
+            auto lazy_values = traits::acquire_shared_state_disp()(values);
+            auto f = detail::get_wait_some_frame(lazy_values, n);
+
+            return (*f)();
+        }
+
+        template <typename Future>
+        friend HPX_FORCEINLINE bool tag_invoke(
+            wait_some_nothrow_t, std::size_t n, std::vector<Future>& values)
+        {
+            return tag_invoke(wait_some_nothrow_t{}, n,
+                const_cast<std::vector<Future> const&>(values));
+        }
+
+        template <typename Future>
+        friend HPX_FORCEINLINE bool tag_invoke(
+            wait_some_nothrow_t, std::size_t n, std::vector<Future>&& values)
+        {
+            return tag_invoke(wait_some_nothrow_t{}, n,
+                const_cast<std::vector<Future> const&>(values));
+        }
+
+        template <typename Future, std::size_t N>
+        friend bool tag_invoke(wait_some_nothrow_t, std::size_t n,
+            std::array<Future, N> const& values)
+        {
+            static_assert(
+                hpx::traits::is_future_v<Future>, "invalid use of wait_some");
+
+            if (n == 0)
+            {
+                return false;
+            }
+
+            if (n > values.size())
+            {
+                HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
+                    "number of results to wait for is out of bounds");
+                return false;
+            }
+
+            auto lazy_values = traits::acquire_shared_state_disp()(values);
+            auto f = detail::get_wait_some_frame(lazy_values, n);
+
+            return (*f)();
+        }
+
+        template <typename Future, std::size_t N>
+        friend HPX_FORCEINLINE bool tag_invoke(wait_some_nothrow_t,
+            std::size_t n, std::array<Future, N>& lazy_values)
+        {
+            return tag_invoke(wait_some_nothrow_t{}, n,
+                const_cast<std::array<Future, N> const&>(lazy_values));
+        }
+
+        template <typename Future, std::size_t N>
+        friend HPX_FORCEINLINE bool tag_invoke(wait_some_nothrow_t,
+            std::size_t n, std::array<Future, N>&& lazy_values)
+        {
+            return tag_invoke(wait_some_nothrow_t{}, n,
+                const_cast<std::array<Future, N> const&>(lazy_values));
+        }
+
+        template <typename Iterator,
+            typename Enable =
+                std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+        friend bool tag_invoke(
+            wait_some_nothrow_t, std::size_t n, Iterator begin, Iterator end)
+        {
+            auto values = traits::acquire_shared_state<Iterator>()(begin, end);
+            auto f = detail::get_wait_some_frame(values, n);
+
+            return (*f)();
+        }
+
+        friend bool tag_invoke(wait_some_nothrow_t, std::size_t n)
+        {
+            if (n != 0)
+            {
+                HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                    "hpx::wait_some_nothrow",
+                    "number of results to wait for is out of bounds");
+            }
             return false;
         }
 
-        if (n > values.size())
+        template <typename T>
+        friend bool tag_invoke(
+            wait_some_nothrow_t, std::size_t n, hpx::future<T>&& f)
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
-                "number of results to wait for is out of bounds");
-            return false;
+            if (n != 1)
+            {
+                HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
+                    "number of results to wait for is out of bounds");
+                return false;
+            }
+
+            f.wait();
+            return f.has_exception();
         }
 
-        auto lazy_values = traits::acquire_shared_state_disp()(values);
-        auto f = detail::get_wait_some_frame(lazy_values, n);
-
-        return (*f)();
-    }
-
-    template <typename Future>
-    void wait_some(std::size_t n, std::vector<Future> const& values)
-    {
-        if (hpx::wait_some_nothrow(n, values))
+        template <typename T>
+        friend bool tag_invoke(
+            wait_some_nothrow_t, std::size_t n, hpx::shared_future<T>&& f)
         {
-            hpx::detail::throw_if_exceptional(values);
+            if (n != 1)
+            {
+                HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
+                    "number of results to wait for is out of bounds");
+                return false;
+            }
+
+            f.wait();
+            return f.has_exception();
         }
-    }
 
-    template <typename Future>
-    bool wait_some_nothrow(std::size_t n, std::vector<Future>& values)
-    {
-        return hpx::wait_some_nothrow(
-            n, const_cast<std::vector<Future> const&>(values));
-    }
-
-    template <typename Future>
-    void wait_some(std::size_t n, std::vector<Future>& values)
-    {
-        if (hpx::wait_some_nothrow(
-                n, const_cast<std::vector<Future> const&>(values)))
+        template <typename... Ts>
+        friend bool tag_invoke(wait_some_nothrow_t, std::size_t n, Ts&&... ts)
         {
-            hpx::detail::throw_if_exceptional(values);
-        }
-    }
+            if (n == 0)
+            {
+                return false;
+            }
 
-    template <typename Future>
-    bool wait_some_nothrow(std::size_t n, std::vector<Future>&& values)
-    {
-        return hpx::wait_some_nothrow(
-            n, const_cast<std::vector<Future> const&>(values));
-    }
+            if (n > sizeof...(Ts))
+            {
+                HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::lcos::wait_some",
+                    "number of results to wait for is out of bounds");
+                return false;
+            }
 
-    template <typename Future>
-    void wait_some(std::size_t n, std::vector<Future>&& values)
-    {
-        if (hpx::wait_some_nothrow(
-                n, const_cast<std::vector<Future> const&>(values)))
-        {
-            hpx::detail::throw_if_exceptional(values);
+            using result_type =
+                hpx::tuple<traits::detail::shared_state_ptr_for_t<Ts>...>;
+
+            result_type values(traits::detail::get_shared_state(ts)...);
+            auto f = detail::get_wait_some_frame(values, n);
+
+            return (*f)();
         }
-    }
+    } wait_some_nothrow{};
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Future, std::size_t N>
-    bool wait_some_nothrow(std::size_t n, std::array<Future, N> const& values)
+    inline constexpr struct wait_some_t final
+      : hpx::functional::tag<wait_some_t>
     {
-        static_assert(
-            hpx::traits::is_future_v<Future>, "invalid use of wait_some");
-
-        if (n == 0)
+    private:
+        template <typename Future>
+        friend void tag_invoke(
+            wait_some_t, std::size_t n, std::vector<Future> const& values)
         {
-            return false;
+            if (hpx::wait_some_nothrow(n, values))
+            {
+                hpx::detail::throw_if_exceptional(values);
+            }
         }
 
-        if (n > values.size())
+        template <typename Future>
+        friend void tag_invoke(
+            wait_some_t, std::size_t n, std::vector<Future>& values)
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
-                "number of results to wait for is out of bounds");
-            return false;
+            if (hpx::wait_some_nothrow(
+                    n, const_cast<std::vector<Future> const&>(values)))
+            {
+                hpx::detail::throw_if_exceptional(values);
+            }
         }
 
-        auto lazy_values = traits::acquire_shared_state_disp()(values);
-        auto f = detail::get_wait_some_frame(lazy_values, n);
-
-        return (*f)();
-    }
-
-    template <typename Future, std::size_t N>
-    void wait_some(std::size_t n, std::array<Future, N> const& lazy_values)
-    {
-        if (hpx::wait_some_nothrow(n, lazy_values))
+        template <typename Future>
+        friend void tag_invoke(
+            wait_some_t, std::size_t n, std::vector<Future>&& values)
         {
-            hpx::detail::throw_if_exceptional(lazy_values);
+            if (hpx::wait_some_nothrow(
+                    n, const_cast<std::vector<Future> const&>(values)))
+            {
+                hpx::detail::throw_if_exceptional(values);
+            }
         }
-    }
 
-    template <typename Future, std::size_t N>
-    bool wait_some_nothrow(std::size_t n, std::array<Future, N>& lazy_values)
-    {
-        return hpx::wait_some_nothrow(
-            n, const_cast<std::array<Future, N> const&>(lazy_values));
-    }
-
-    template <typename Future, std::size_t N>
-    void wait_some(std::size_t n, std::array<Future, N>& lazy_values)
-    {
-        if (hpx::wait_some_nothrow(
-                n, const_cast<std::array<Future, N> const&>(lazy_values)))
+        template <typename Future, std::size_t N>
+        friend void tag_invoke(wait_some_t, std::size_t n,
+            std::array<Future, N> const& lazy_values)
         {
-            hpx::detail::throw_if_exceptional(lazy_values);
+            if (hpx::wait_some_nothrow(n, lazy_values))
+            {
+                hpx::detail::throw_if_exceptional(lazy_values);
+            }
         }
-    }
 
-    template <typename Future, std::size_t N>
-    bool wait_some_nothrow(std::size_t n, std::array<Future, N>&& lazy_values)
-    {
-        return hpx::wait_some_nothrow(
-            n, const_cast<std::array<Future, N> const&>(lazy_values));
-    }
-
-    template <typename Future, std::size_t N>
-    void wait_some(std::size_t n, std::array<Future, N>&& lazy_values)
-    {
-        if (hpx::wait_some_nothrow(
-                n, const_cast<std::array<Future, N> const&>(lazy_values)))
+        template <typename Future, std::size_t N>
+        friend void tag_invoke(
+            wait_some_t, std::size_t n, std::array<Future, N>& lazy_values)
         {
-            hpx::detail::throw_if_exceptional(lazy_values);
+            if (hpx::wait_some_nothrow(
+                    n, const_cast<std::array<Future, N> const&>(lazy_values)))
+            {
+                hpx::detail::throw_if_exceptional(lazy_values);
+            }
         }
-    }
+
+        template <typename Future, std::size_t N>
+        friend void tag_invoke(
+            wait_some_t, std::size_t n, std::array<Future, N>&& lazy_values)
+        {
+            if (hpx::wait_some_nothrow(
+                    n, const_cast<std::array<Future, N> const&>(lazy_values)))
+            {
+                hpx::detail::throw_if_exceptional(lazy_values);
+            }
+        }
+
+        template <typename Iterator,
+            typename Enable =
+                std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+        friend void tag_invoke(
+            wait_some_t, std::size_t n, Iterator begin, Iterator end)
+        {
+            auto values = traits::acquire_shared_state<Iterator>()(begin, end);
+            auto f = detail::get_wait_some_frame(values, n);
+
+            if ((*f)())
+            {
+                hpx::detail::throw_if_exceptional(values);
+            }
+        }
+
+        friend void tag_invoke(wait_some_t, std::size_t n)
+        {
+            if (n != 0)
+            {
+                HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
+                    "number of results to wait for is out of bounds");
+            }
+        }
+
+        template <typename T>
+        friend void tag_invoke(wait_some_t, std::size_t n, hpx::future<T>&& f)
+        {
+            if (hpx::wait_some_nothrow(n, HPX_MOVE(f)))
+            {
+                hpx::detail::throw_if_exceptional(f);
+            }
+        }
+
+        template <typename T>
+        friend void tag_invoke(
+            wait_some_t, std::size_t n, hpx::shared_future<T>&& f)
+        {
+            if (hpx::wait_some_nothrow(n, HPX_MOVE(f)))
+            {
+                hpx::detail::throw_if_exceptional(f);
+            }
+        }
+
+        template <typename... Ts>
+        friend void tag_invoke(wait_some_t, std::size_t n, Ts&&... ts)
+        {
+            if (hpx::wait_some_nothrow(n, ts...))
+            {
+                hpx::detail::throw_if_exceptional(HPX_FORWARD(Ts, ts)...);
+            }
+        }
+    } wait_some{};
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    bool wait_some_nothrow(std::size_t n, Iterator begin, Iterator end)
+    inline constexpr struct wait_some_n_nothrow_t final
+      : hpx::functional::tag<wait_some_n_nothrow_t>
     {
-        auto values = traits::acquire_shared_state<Iterator>()(begin, end);
-        auto f = detail::get_wait_some_frame(values, n);
-
-        return (*f)();
-    }
-
-    template <typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    void wait_some(std::size_t n, Iterator begin, Iterator end)
-    {
-        auto values = traits::acquire_shared_state<Iterator>()(begin, end);
-        auto f = detail::get_wait_some_frame(values, n);
-
-        if ((*f)())
+    private:
+        template <typename Iterator,
+            typename Enable =
+                std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+        friend bool tag_invoke(wait_some_n_nothrow_t, std::size_t n,
+            Iterator begin, std::size_t count)
         {
-            hpx::detail::throw_if_exceptional(values);
+            auto values =
+                traits::acquire_shared_state<Iterator>()(begin, count);
+            auto f = detail::get_wait_some_frame(values, n);
+
+            return (*f)();
         }
-    }
-
-    template <typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    bool wait_some_n_nothrow(std::size_t n, Iterator begin, std::size_t count)
-    {
-        auto values = traits::acquire_shared_state<Iterator>()(begin, count);
-        auto f = detail::get_wait_some_frame(values, n);
-
-        return (*f)();
-    }
-
-    template <typename Iterator,
-        typename Enable =
-            std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
-    void wait_some_n(std::size_t n, Iterator begin, std::size_t count)
-    {
-        auto values = traits::acquire_shared_state<Iterator>()(begin, count);
-        auto f = detail::get_wait_some_frame(values, n);
-
-        if ((*f)())
-        {
-            hpx::detail::throw_if_exceptional(values);
-        }
-    }
-
-    inline bool wait_some_nothrow(std::size_t n)
-    {
-        if (n != 0)
-        {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some_nothrow",
-                "number of results to wait for is out of bounds");
-        }
-        return false;
-    }
-
-    inline void wait_some(std::size_t n)
-    {
-        if (n != 0)
-        {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
-                "number of results to wait for is out of bounds");
-        }
-    }
+    } wait_some_n_nothrow{};
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    bool wait_some_nothrow(std::size_t n, hpx::future<T>&& f)
+    inline constexpr struct wait_some_n_t final
+      : hpx::functional::tag<wait_some_n_t>
     {
-        if (n != 1)
+    private:
+        template <typename Iterator,
+            typename Enable =
+                std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+        friend void tag_invoke(
+            wait_some_n_t, std::size_t n, Iterator begin, std::size_t count)
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
-                "number of results to wait for is out of bounds");
-            return false;
+            auto values =
+                traits::acquire_shared_state<Iterator>()(begin, count);
+            auto f = detail::get_wait_some_frame(values, n);
+
+            if ((*f)())
+            {
+                hpx::detail::throw_if_exceptional(values);
+            }
         }
-
-        f.wait();
-
-        return f.has_exception();
-    }
-
-    template <typename T>
-    void wait_some(std::size_t n, hpx::future<T>&& f)
-    {
-        if (hpx::wait_some_nothrow(n, HPX_MOVE(f)))
-        {
-            hpx::detail::throw_if_exceptional(f);
-        }
-    }
-
-    template <typename T>
-    bool wait_some_nothrow(std::size_t n, hpx::shared_future<T>&& f)
-    {
-        if (n != 1)
-        {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
-                "number of results to wait for is out of bounds");
-            return false;
-        }
-
-        f.wait();
-
-        return f.has_exception();
-    }
-
-    template <typename T>
-    void wait_some(std::size_t n, hpx::shared_future<T>&& f)
-    {
-        if (hpx::wait_some_nothrow(n, HPX_MOVE(f)))
-        {
-            hpx::detail::throw_if_exceptional(f);
-        }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename... Ts>
-    bool wait_some_nothrow(std::size_t n, Ts&&... ts)
-    {
-        if (n == 0)
-        {
-            return false;
-        }
-
-        if (n > sizeof...(Ts))
-        {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::lcos::wait_some",
-                "number of results to wait for is out of bounds");
-            return false;
-        }
-
-        using result_type =
-            hpx::tuple<traits::detail::shared_state_ptr_for_t<Ts>...>;
-
-        result_type values(traits::detail::get_shared_state(ts)...);
-        auto f = detail::get_wait_some_frame(values, n);
-
-        return (*f)();
-    }
-
-    template <typename... Ts>
-    void wait_some(std::size_t n, Ts&&... ts)
-    {
-        if (hpx::wait_some_nothrow(n, ts...))
-        {
-            hpx::detail::throw_if_exceptional(HPX_FORWARD(Ts, ts)...);
-        }
-    }
+    } wait_some_n{};
 }    // namespace hpx
 
 namespace hpx::lcos {

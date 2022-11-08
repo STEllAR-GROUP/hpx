@@ -23,8 +23,8 @@ sub-namespaces will eventually be removed.
 ``hpx/algorithm.hpp``
 =====================
 
-The header :hpx-header:`libs/full/include/include,hpx/algorithm.hpp` corresponds to the 
-C++ standard library header :cppreference-header:`algorithm`. See :ref:`parallel_algorithms` for 
+The header :hpx-header:`libs/full/include/include,hpx/algorithm.hpp` corresponds to the
+C++ standard library header :cppreference-header:`algorithm`. See :ref:`parallel_algorithms` for
 more information about the parallel algorithms.
 
 Classes
@@ -47,6 +47,7 @@ Functions
    =================================================  ==========================================================
    `hpx` function                                     C++ standard
    =================================================  ==========================================================
+   :cpp:func:`hpx::adjacent_difference`               :cppreference-generic:`algorithm,adjacent_difference`
    :cpp:func:`hpx::adjacent_find`                     :cppreference-generic:`algorithm,adjacent_find`
    :cpp:func:`hpx::all_of`                            :cppreference-generic:`algorithm,all_any_none_of,all_of`
    :cpp:func:`hpx::any_of`                            :cppreference-generic:`algorithm,all_any_none_of,any_of`
@@ -89,6 +90,7 @@ Functions
    :cpp:func:`hpx::partial_sort_copy`                 :cppreference-generic:`algorithm,partial_sort_copy`
    :cpp:func:`hpx::partition`                         :cppreference-generic:`algorithm,partition`
    :cpp:func:`hpx::partition_copy`                    :cppreference-generic:`algorithm,partition_copy`
+   :cpp:func:`hpx::parallel::v1::reduce_by_key`       `reduce_by_key <https://thrust.github.io/doc/group__reductions_gad5623f203f9b3fdcab72481c3913f0e0.html>`_
    :cpp:func:`hpx::remove`                            :cppreference-generic:`algorithm,remove`
    :cpp:func:`hpx::remove_copy`                       :cppreference-generic:`algorithm,remove_copy`
    :cpp:func:`hpx::remove_copy_if`                    :cppreference-generic:`algorithm,remove_copy,remove_copy_if`
@@ -110,6 +112,7 @@ Functions
    :cpp:func:`hpx::shift_left`                        :cppreference-generic:`algorithm,shift,shift_left`
    :cpp:func:`hpx::shift_right`                       :cppreference-generic:`algorithm,shift,shift_right`
    :cpp:func:`hpx::sort`                              :cppreference-generic:`algorithm,sort`
+   :cpp:func:`hpx::parallel::v1::sort_by_key`         `sort_by_key <https://thrust.github.io/doc/group__sorting_gabe038d6107f7c824cf74120500ef45ea.html>`_
    :cpp:func:`hpx::stable_partition`                  :cppreference-generic:`algorithm,stable_partition`
    :cpp:func:`hpx::stable_sort`                       :cppreference-generic:`algorithm,stable_sort`
    :cpp:func:`hpx::starts_with`                       :cppreference-generic:`algorithm/ranges,starts_with`
@@ -187,7 +190,7 @@ Functions
 ``hpx/any.hpp``
 ===============
 
-The header :hpx-header:`libs/full/include/include,hpx/any.hpp` corresponds to the C++ 
+The header :hpx-header:`libs/full/include/include,hpx/any.hpp` corresponds to the C++
 standard library header :cppreference-header:`any`.
 
 :cpp:type:`hpx::any` is compatible with ``std::any``.
@@ -223,7 +226,7 @@ Functions
 ``hpx/assert.hpp``
 ==================
 
-The header :hpx-header:`libs/core/assertion/include,hpx/assert.hpp` corresponds to the C++ standard 
+The header :hpx-header:`libs/core/assertion/include,hpx/assert.hpp` corresponds to the C++ standard
 library header :cppreference-header:`cassert`.
 
 :c:macro:`HPX_ASSERT` is the |hpx| equivalent to ``assert`` in ``cassert``.
@@ -247,9 +250,9 @@ Macros
 ``hpx/barrier.hpp``
 ===================
 
-The header :hpx-header:`libs/full/include/include,hpx/barrier.hpp` corresponds to the 
-C++ standard library header :cppreference-header:`barrier` and contains a distributed barrier implementation. This 
-functionality is also exposed through the ``hpx::distributed`` namespace. The name in 
+The header :hpx-header:`libs/full/include/include,hpx/barrier.hpp` corresponds to the
+C++ standard library header :cppreference-header:`barrier` and contains a distributed barrier implementation. This
+functionality is also exposed through the ``hpx::distributed`` namespace. The name in
 ``hpx::distributed`` should be preferred.
 
 Classes
@@ -265,19 +268,19 @@ Classes
 
 .. table:: Distributed implementation of classes of header ``hpx/barrier.hpp``
 
-   +----------------------------------------+  
+   +----------------------------------------+
    | Class                                  |
-   +========================================+  
+   +========================================+
    | :cpp:class:`hpx::distributed::barrier` |
-   +----------------------------------------+ 
+   +----------------------------------------+
 
 .. _public_api_header_hpx_channel:
 
 ``hpx/channel.hpp``
 ===================
 
-The header :hpx-header:`libs/full/include/include,hpx/channel.hpp` contains a local and a 
-distributed channel implementation. This  functionality is also exposed through the ``hpx::distributed`` 
+The header :hpx-header:`libs/full/include/include,hpx/channel.hpp` contains a local and a
+distributed channel implementation. This  functionality is also exposed through the ``hpx::distributed``
 namespace. The name in ``hpx::distributed`` should be preferred.
 
 Classes
@@ -289,24 +292,24 @@ Classes
    | Class                    |
    +==========================+
    | :cpp:class:`hpx::channel`|
-   +--------------------------+  
+   +--------------------------+
 
 .. table:: Distributed implementation of classes of header ``hpx/channel.hpp``
 
-   +----------------------------------------+  
+   +----------------------------------------+
    | Class                                  |
-   +========================================+  
+   +========================================+
    | :cpp:class:`hpx::distributed::channel` |
-   +----------------------------------------+ 
+   +----------------------------------------+
 
 .. _public_api_header_hpx_chrono:
 
 ``hpx/chrono.hpp``
 ==================
 
-The header :hpx-header:`libs/full/include/include,hpx/chrono.hpp` corresponds to the 
-C++ standard library header :cppreference-header:`chrono`. The following replacements and 
-extensions are provided compared to :cppreference-header:`chrono`. 
+The header :hpx-header:`libs/full/include/include,hpx/chrono.hpp` corresponds to the
+C++ standard library header :cppreference-header:`chrono`. The following replacements and
+extensions are provided compared to :cppreference-header:`chrono`.
 
 Classes
 -------
@@ -318,7 +321,7 @@ Classes
    ===============================================  ====================================================
    :cpp:class:`hpx::chrono::high_resolution_clock`  :cppreference-generic:`chrono,high_resolution_clock`
    :cpp:class:`hpx::chrono::high_resolution_timer`
-   :cpp:class:`hpx::chrono::steady_time_point`
+   :cpp:class:`hpx::chrono::steady_time_point`      :cppreference-generic:`chrono,time_point`
    ===============================================  ====================================================
 
 .. _public_api_header_hpx_condition_variable:
@@ -326,7 +329,7 @@ Classes
 ``hpx/condition_variable.hpp``
 ==============================
 
-The header :hpx-header:`libs/full/include/include,hpx/condition_variable.hpp` corresponds to the C++ 
+The header :hpx-header:`libs/full/include/include,hpx/condition_variable.hpp` corresponds to the C++
 standard library header :cppreference-header:`condition_variable`.
 
 Classes
@@ -347,10 +350,10 @@ Classes
 ``hpx/exception.hpp``
 =====================
 
-The header :hpx-header:`libs/full/include/include,hpx/exception.hpp` corresponds to 
-the C++ standard library header :cppreference-header:`exception`. :cpp:class:`hpx::exception` 
-extends ``std::exception`` and is the base class for all exceptions thrown in |hpx|. 
-:c:macro:`HPX_THROW_EXCEPTION` can be used to throw |hpx| exceptions with file and line information 
+The header :hpx-header:`libs/full/include/include,hpx/exception.hpp` corresponds to
+the C++ standard library header :cppreference-header:`exception`. :cpp:class:`hpx::exception`
+extends ``std::exception`` and is the base class for all exceptions thrown in |hpx|.
+:c:macro:`HPX_THROW_EXCEPTION` can be used to throw |hpx| exceptions with file and line information
 attached to the exception.
 
 Macros
@@ -374,9 +377,9 @@ Classes
 ``hpx/execution.hpp``
 =====================
 
-The header :hpx-header:`libs/full/include/include,hpx/execution.hpp` corresponds to the 
-C++ standard library header :cppreference-header:`execution`. See :ref:`parallel`, 
-:ref:`parallel_algorithms` and :ref:`executor_parameters` for more information about execution 
+The header :hpx-header:`libs/full/include/include,hpx/execution.hpp` corresponds to the
+C++ standard library header :cppreference-header:`execution`. See :ref:`parallel`,
+:ref:`parallel_algorithms` and :ref:`executor_parameters` for more information about execution
 policies and executor parameters.
 
 .. note::
@@ -423,8 +426,8 @@ Classes
 ``hpx/functional.hpp``
 ======================
 
-The header :hpx-header:`libs/full/include/include,hpx/functional.hpp` corresponds to the 
-C++ standard library header :cppreference-header:`functional`. :cpp:class:`hpx::function` is a more 
+The header :hpx-header:`libs/full/include/include,hpx/functional.hpp` corresponds to the
+C++ standard library header :cppreference-header:`functional`. :cpp:class:`hpx::function` is a more
 efficient and serializable replacement for ``std::function``.
 
 Constants
@@ -435,10 +438,10 @@ The following constants correspond to the C++ standard :cppreference-generic:`ut
 .. table:: Constants of header ``hpx/functional.hpp``
 
    +---------------------------------+
-   | Constant                        |        
+   | Constant                        |
    +=================================+
    | :cpp:var:`hpx::placeholders::_1`|
-   +---------------------------------+ 
+   +---------------------------------+
    | :cpp:var:`hpx::placeholders::_2`|
    +---------------------------------+
    | ...                             |
@@ -456,7 +459,7 @@ Classes
    Class                                          C++ standard
    =============================================  =============================================================
    :cpp:class:`hpx::function`                     :cppreference-generic:`utility/functional,function`
-   :cpp:class:`hpx::function_ref`
+   :cpp:class:`hpx::function_ref`                 |p0792|_
    :cpp:class:`hpx::move_only_function`           :cppreference-generic:`utility/functional,move_only_function`
    :cpp:struct:`hpx::traits::is_bind_expression`  :cppreference-generic:`utility/functional,is_bind_expression`
    :cpp:struct:`hpx::traits::is_placeholder`      :cppreference-generic:`utility/functional,is_placeholder`
@@ -476,7 +479,8 @@ Functions
    :cpp:func:`hpx::experimental::bind_back`
    :cpp:func:`hpx::bind_front`               :cppreference-generic:`utility/functional,bind_front`
    :cpp:func:`hpx::invoke`                   :cppreference-generic:`utility/functional,invoke`
-   :cpp:func:`hpx::util::invoke_fused`
+   :cpp:func:`hpx::invoke_fused`             :cppreference-generic:`utility,apply`
+   :cpp:func:`hpx::invoke_fused_r`
    :cpp:func:`hpx::mem_fn`                   :cppreference-generic:`utility/functional,mem_fn`
    ========================================  =====================================================
 
@@ -485,12 +489,12 @@ Functions
 ``hpx/future.hpp``
 ==================
 
-The header :hpx-header:`libs/full/include/include,hpx/future.hpp` corresponds to the 
-C++ standard library header :cppreference-header:`future`. See :ref:`extend_futures` for more 
-information about extensions to futures compared to the C++ standard library. 
+The header :hpx-header:`libs/full/include/include,hpx/future.hpp` corresponds to the
+C++ standard library header :cppreference-header:`future`. See :ref:`extend_futures` for more
+information about extensions to futures compared to the C++ standard library.
 
-This header file also contains overloads of :cpp:func:`hpx::async`, 
-:cpp:func:`hpx::apply`, :cpp:func:`hpx::sync`, and :cpp:func:`hpx::dataflow` that can be used with 
+This header file also contains overloads of :cpp:func:`hpx::async`,
+:cpp:func:`hpx::apply`, :cpp:func:`hpx::sync`, and :cpp:func:`hpx::dataflow` that can be used with
 actions. See :ref:`action_invocation` for more information about invoking actions.
 
 Classes
@@ -519,9 +523,9 @@ Classes
 .. table:: Distributed implementation of classes of header ``hpx/latch.hpp``
 
    +---------------------------------------+
-   | Class                                 |        
+   | Class                                 |
    +=======================================+
-   | :cpp:class:`hpx::distributed::promise`| 
+   | :cpp:class:`hpx::distributed::promise`|
    +---------------------------------------+
 
 Functions
@@ -533,22 +537,18 @@ Functions
    Function                                  C++ standard
    ========================================  =====================================
    :cpp:func:`hpx::async`                    :cppreference-generic:`thread,async`
-   :cpp:func:`hpx::apply`     
+   :cpp:func:`hpx::apply`
    :cpp:func:`hpx::sync`
    :cpp:func:`hpx::dataflow`
    :cpp:func:`hpx::make_future`
    :cpp:func:`hpx::make_shared_future`
-   :cpp:func:`hpx::make_ready_future`
+   :cpp:func:`hpx::make_ready_future`        |p0159|_
    :cpp:func:`hpx::make_ready_future_alloc`
    :cpp:func:`hpx::make_ready_future_at`
    :cpp:func:`hpx::make_ready_future_after`
-   :cpp:func:`hpx::make_exceptional_future`
-   :cpp:func:`hpx::async`
-   :cpp:func:`hpx::apply`
-   :cpp:func:`hpx::sync`
-   :cpp:func:`hpx::dataflow`
-   :cpp:func:`hpx::when_all`
-   :cpp:func:`hpx::when_any`
+   :cpp:func:`hpx::make_exceptional_future`  |p0159|_
+   :cpp:func:`hpx::when_all`                 |p0159|_
+   :cpp:func:`hpx::when_any`                 |p0159|_
    :cpp:func:`hpx::when_some`
    :cpp:func:`hpx::when_each`
    :cpp:func:`hpx::wait_all`
@@ -567,8 +567,8 @@ Examples
 ``hpx/init.hpp``
 ================
 
-The header :hpx-header:`libs/full/init_runtime/include,hpx/init.hpp` contains functionality for 
-starting, stopping, suspending, and resuming the |hpx| runtime. This is the main way to explicitly 
+The header :hpx-header:`libs/full/init_runtime/include,hpx/init.hpp` contains functionality for
+starting, stopping, suspending, and resuming the |hpx| runtime. This is the main way to explicitly
 start the |hpx| runtime. See :ref:`starting_hpx` for more details on starting the |hpx| runtime.
 
 Classes
@@ -591,7 +591,7 @@ Functions
 .. table:: Functions of header ``hpx/init.hpp``
 
    +------------------------------+
-   | Function                     |  
+   | Function                     |
    +==============================+
    | :cpp:func:`hpx::init`        |
    +------------------------------+
@@ -611,9 +611,9 @@ Functions
 ``hpx/latch.hpp``
 =================
 
-The header :hpx-header:`libs/full/include/include,hpx/latch.hpp` corresponds to the C++ 
-standard library header :cppreference-header:`latch`. It contains a local and a distributed latch 
-implementation. This functionality is also exposed through the ``hpx::distributed`` namespace. 
+The header :hpx-header:`libs/full/include/include,hpx/latch.hpp` corresponds to the C++
+standard library header :cppreference-header:`latch`. It contains a local and a distributed latch
+implementation. This functionality is also exposed through the ``hpx::distributed`` namespace.
 The name in ``hpx::distributed`` should be preferred.
 
 Classes
@@ -629,7 +629,7 @@ Classes
 
 .. table:: Distributed implementation of classes of header ``hpx/latch.hpp``
 
-   +--------------------------------------+ 
+   +--------------------------------------+
    | Class                                |
    +======================================+
    | :cpp:class:`hpx::distributed::latch` |
@@ -640,7 +640,7 @@ Classes
 ``hpx/mutex.hpp``
 =================
 
-The header :hpx-header:`libs/full/include/include,hpx/mutex.hpp` corresponds to the 
+The header :hpx-header:`libs/full/include/include,hpx/mutex.hpp` corresponds to the
 C++ standard library header :cppreference-header:`mutex`.
 
 Classes
@@ -676,9 +676,9 @@ Functions
 ``hpx/memory.hpp``
 ==================
 
-The header :hpx-header:`libs/full/include/include,hpx/memory.hpp` corresponds to the 
-C++ standard library header :cppreference-header:`memory`. It contains parallel versions of the 
-copy, fill, move, and construct helper functions in :cppreference-header:`memory`. See 
+The header :hpx-header:`libs/full/include/include,hpx/memory.hpp` corresponds to the
+C++ standard library header :cppreference-header:`memory`. It contains parallel versions of the
+copy, fill, move, and construct helper functions in :cppreference-header:`memory`. See
 :ref:`parallel_algorithms` for more information about the parallel algorithms.
 
 Functions
@@ -723,8 +723,8 @@ Functions
 ``hpx/numeric.hpp``
 ===================
 
-The header :hpx-header:`libs/full/include/include,hpx/numeric.hpp` corresponds to the 
-C++ standard library header :cppreference-header:`numeric`. See :ref:`parallel_algorithms` for more 
+The header :hpx-header:`libs/full/include/include,hpx/numeric.hpp` corresponds to the
+C++ standard library header :cppreference-header:`numeric`. See :ref:`parallel_algorithms` for more
 information about the parallel algorithms.
 
 Functions
@@ -746,7 +746,7 @@ Functions
 
 .. table:: `hpx::ranges` functions of header ``hpx/numeric.hpp``
 
-   +--------------------------------------------------+ 
+   +--------------------------------------------------+
    | `hpx::ranges` function                           |
    +==================================================+
    | :cpp:func:`hpx::ranges::exclusive_scan`          |
@@ -756,15 +756,15 @@ Functions
    | :cpp:func:`hpx::ranges::transform_exclusive_scan`|
    +--------------------------------------------------+
    | :cpp:func:`hpx::ranges::transform_inclusive_scan`|
-   +--------------------------------------------------+ 
+   +--------------------------------------------------+
 
 .. _public_api_header_hpx_optional:
 
 ``hpx/optional.hpp``
 ====================
 
-The header :hpx-header:`libs/full/include/include,hpx/optional.hpp` corresponds to the 
-C++ standard library header :cppreference-header:`optional`. :cpp:type:`hpx::optional` is compatible 
+The header :hpx-header:`libs/full/include/include,hpx/optional.hpp` corresponds to the
+C++ standard library header :cppreference-header:`optional`. :cpp:type:`hpx::optional` is compatible
 with ``std::optional``.
 
 Constants
@@ -790,7 +790,7 @@ Classes
 ``hpx/runtime.hpp``
 ===================
 
-The header :hpx-header:`libs/full/include/include,hpx/runtime.hpp` contains functions for accessing 
+The header :hpx-header:`libs/full/include/include,hpx/runtime.hpp` contains functions for accessing
 local and distributed runtime information.
 
 Typedefs
@@ -798,7 +798,7 @@ Typedefs
 
 .. table:: Typedefs of header ``hpx/runtime.hpp``
 
-   +-----------------------------------------+ 
+   +-----------------------------------------+
    | Typedef                                 |
    +=========================================+
    | :cpp:type:`hpx::startup_function_type`  |
@@ -811,7 +811,7 @@ Functions
 
 .. table:: Functions of header ``hpx/runtime.hpp``
 
-   +--------------------------------------------------+ 
+   +--------------------------------------------------+
    | Function                                         |
    +==================================================+
    | :cpp:func:`hpx::find_root_locality`              |
@@ -850,7 +850,7 @@ Functions
 ``hpx/source_location.hpp``
 ===========================
 
-The header :hpx-header:`libs/full/include/include,hpx/source_location.hpp` corresponds to the 
+The header :hpx-header:`libs/full/include/include,hpx/source_location.hpp` corresponds to the
 C++ standard library header :cppreference-header:`source_location`.
 
 Classes
@@ -869,7 +869,7 @@ Classes
 ``hpx/system_error.hpp``
 ========================
 
-The header :hpx-header:`libs/full/include/include,hpx/system_error.hpp` corresponds to the 
+The header :hpx-header:`libs/full/include/include,hpx/system_error.hpp` corresponds to the
 C++ standard library header :cppreference-header:`system_error`.
 
 Classes
@@ -888,8 +888,8 @@ Classes
 ``hpx/task_block.hpp``
 ======================
 
-The header :hpx-header:`libs/full/include/include,hpx/task_block.hpp` corresponds to the 
-``task_block`` feature in |cpp11_n4088|_. See :ref:`using_task_block` for more details on using task 
+The header :hpx-header:`libs/full/include/include,hpx/task_block.hpp` corresponds to the
+``task_block`` feature in |cpp11_n4088|_. See :ref:`using_task_block` for more details on using task
 blocks.
 
 Classes
@@ -897,9 +897,9 @@ Classes
 
 .. table:: Classes of header ``hpx/task_black.hpp``
 
-   +---------------------------------------------------------+ 
+   +---------------------------------------------------------+
    | Class                                                   |
-   +=========================================================+               
+   +=========================================================+
    | :cpp:class:`hpx::parallel::v2::task_canceled_exception` |
    +---------------------------------------------------------+
    | :cpp:class:`hpx::parallel::v2::task_block`              |
@@ -910,9 +910,9 @@ Functions
 
 .. table:: Functions of header ``hpx/task_black.hpp``
 
-   +-----------------------------------------------------------------+ 
+   +-----------------------------------------------------------------+
    | Function                                                        |
-   +=================================================================+   
+   +=================================================================+
    | :cpp:func:`hpx::parallel::v2::define_task_block`                |
    +-----------------------------------------------------------------+
    | :cpp:func:`hpx::parallel::v2::define_task_block_restore_thread` |
@@ -923,9 +923,9 @@ Functions
 ``hpx/thread.hpp``
 ==================
 
-The header :hpx-header:`libs/full/include/include,hpx/thread.hpp` corresponds to the 
-C++ standard library header :cppreference-header:`thread`. The functionality in this header is 
-equivalent to the standard library thread functionality, with the exception that the |hpx| 
+The header :hpx-header:`libs/full/include/include,hpx/thread.hpp` corresponds to the
+C++ standard library header :cppreference-header:`thread`. The functionality in this header is
+equivalent to the standard library thread functionality, with the exception that the |hpx|
 equivalents are implemented on top of lightweight threads and the |hpx| runtime.
 
 Classes
@@ -945,24 +945,21 @@ Functions
 
 .. table:: Functions of header ``hpx/thread.hpp``
 
-   +-------------------------------------------+ 
-   | Function                                  |
-   +===========================================+
-   | :cpp:func:`hpx::this_thread::yield`       |
-   +-------------------------------------------+
-   | :cpp:func:`hpx::this_thread::get_id`      |
-   +-------------------------------------------+
-   | :cpp:func:`hpx::this_thread::sleep_for`   |
-   +-------------------------------------------+
-   | :cpp:func:`hpx::this_thread::sleep_until` |
-   +-------------------------------------------+
+   =========================================  ==========================================
+   Function                                     C++ standard
+   =========================================  ==========================================
+   :cpp:func:`hpx::this_thread::yield`        :cppreference-generic:`thread,yield`
+   :cpp:func:`hpx::this_thread::get_id`       :cppreference-generic:`thread,get_id`
+   :cpp:func:`hpx::this_thread::sleep_for`    :cppreference-generic:`thread,sleep_for`
+   :cpp:func:`hpx::this_thread::sleep_until`  :cppreference-generic:`thread,sleep_until`
+   =========================================  ==========================================
 
 .. _public_api_header_hpx_semaphore:
 
 ``hpx/semaphore.hpp``
 =====================
 
-The header :hpx-header:`libs/full/include/include,hpx/semaphore.hpp` corresponds to the 
+The header :hpx-header:`libs/full/include/include,hpx/semaphore.hpp` corresponds to the
 C++ standard library header :cppreference-header:`semaphore`.
 
 Classes
@@ -982,7 +979,7 @@ Classes
 ``hpx/shared_mutex.hpp``
 ========================
 
-The header :hpx-header:`libs/full/include/include,hpx/shared_mutex.hpp` corresponds to the 
+The header :hpx-header:`libs/full/include/include,hpx/shared_mutex.hpp` corresponds to the
 C++ standard library header :cppreference-header:`shared_mutex`.
 
 Classes
@@ -1001,7 +998,7 @@ Classes
 ``hpx/stop_token.hpp``
 ======================
 
-The header :hpx-header:`libs/full/include/include,hpx/stop_token.hpp` corresponds to the 
+The header :hpx-header:`libs/full/include/include,hpx/stop_token.hpp` corresponds to the
 C++ standard library header :cppreference-header:`stop_token`.
 
 Constants
@@ -1034,8 +1031,8 @@ Classes
 ``hpx/tuple.hpp``
 =================
 
-The header :hpx-header:`libs/full/include/include,hpx/tuple.hpp` corresponds to the 
-C++ standard library header :cppreference-header:`tuple`. :cpp:class:`hpx::tuple` can be used in 
+The header :hpx-header:`libs/full/include/include,hpx/tuple.hpp` corresponds to the
+C++ standard library header :cppreference-header:`tuple`. :cpp:class:`hpx::tuple` can be used in
 CUDA device code, unlike ``std::tuple``.
 
 Constants
@@ -1057,9 +1054,9 @@ Classes
    ================================  ===================================================
    Class                             C++ standard
    ================================  ===================================================
-   :cpp:struct:`hpx::tuple`          :cppreference-generic:`utility/tuple,tuple`
-   :cpp:struct:`hpx::tuple_size`     :cppreference-generic:`utility/tuple,tuple_size`
-   :cpp:struct:`hpx::tuple_element`  :cppreference-generic:`utility/tuple,tuple_element`
+   :cpp:struct:`hpx::tuple`          :cppreference-generic:`utility,tuple`
+   :cpp:struct:`hpx::tuple_size`     :cppreference-generic:`utility,tuple_size`
+   :cpp:struct:`hpx::tuple_element`  :cppreference-generic:`utility,tuple_element`
    ================================  ===================================================
 
 Functions
@@ -1082,7 +1079,7 @@ Functions
 ``hpx/type_traits.hpp``
 =======================
 
-The header :hpx-header:`libs/full/include/include,hpx/type_traits.hpp` corresponds to the 
+The header :hpx-header:`libs/full/include/include,hpx/type_traits.hpp` corresponds to the
 C++ standard library header :cppreference-header:`type_traits`.
 
 Classes
@@ -1102,15 +1099,15 @@ Classes
 ``hpx/unwrap.hpp``
 ==================
 
-The header :hpx-header:`libs/full/include/include,hpx/unwrap.hpp` contains utilities for 
+The header :hpx-header:`libs/full/include/include,hpx/unwrap.hpp` contains utilities for
 unwrapping futures.
 
 Classes
 -------
 
 .. table:: Classes of header ``hpx/unwrap.hpp``
-          
-   +-------------------------------------------+ 
+
+   +-------------------------------------------+
    | Class                                     |
    +===========================================+
    | :cpp:struct:`hpx::functional::unwrap`     |
@@ -1125,7 +1122,7 @@ Functions
 
 .. table:: Functions of header ``hpx/unwrap.hpp``
 
-   +----------------------------------+ 
+   +----------------------------------+
    | Function                         |
    +==================================+
    | :cpp:func:`hpx::unwrap`          |
@@ -1144,7 +1141,7 @@ Functions
 ``hpx/version.hpp``
 ===================
 
-The header :hpx-header:`libs/core/version/include,hpx/version.hpp` provides version information 
+The header :hpx-header:`libs/core/version/include,hpx/version.hpp` provides version information
 about |hpx|.
 
 Macros
@@ -1152,7 +1149,7 @@ Macros
 
 .. table:: Macros of header ``hpx/version.hpp``
 
-   +----------------------------------+ 
+   +----------------------------------+
    | Macro                            |
    +==================================+
    | :c:macro:`HPX_VERSION_MAJOR`     |
@@ -1175,7 +1172,7 @@ Functions
 
 .. table:: Functions of header ``hpx/version.hpp``
 
-   +-----------------------------------------+ 
+   +-----------------------------------------+
    | Function                                |
    +=========================================+
    | :cpp:func:`hpx::major_version`          |
@@ -1200,6 +1197,6 @@ Functions
 ``hpx/wrap_main.hpp``
 =====================
 
-The header :hpx-header:`wrap/include,hpx/wrap_main.hpp` does not provide any direct functionality 
-but is used for implicitly using ``main`` as the runtime entry point. See :ref:`minimal` for more 
+The header :hpx-header:`wrap/include,hpx/wrap_main.hpp` does not provide any direct functionality
+but is used for implicitly using ``main`` as the runtime entry point. See :ref:`minimal` for more
 details on implicitly starting the |hpx| runtime.

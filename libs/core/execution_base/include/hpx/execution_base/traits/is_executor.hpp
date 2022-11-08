@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -35,6 +35,11 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T>
         struct is_bulk_two_way_executor : std::false_type
+        {
+        };
+
+        template <typename T>
+        struct is_scheduler_executor : std::false_type
         {
         };
     }    // namespace detail
@@ -76,6 +81,15 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename T, typename Enable = void>
     struct is_bulk_two_way_executor
       : detail::is_bulk_two_way_executor<std::decay_t<T>>
+    {
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // is_scheduler_executor evaluates to true for executors that return senders
+    // from their scheduling functions
+    template <typename T, typename Enable = void>
+    struct is_scheduler_executor
+      : detail::is_scheduler_executor<std::decay_t<T>>
     {
     };
 }}}    // namespace hpx::parallel::execution
@@ -162,4 +176,20 @@ namespace hpx { namespace traits {
 
     template <typename T>
     inline constexpr bool is_executor_any_v = is_executor_any<T>::value;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // is_scheduler_executor evaluates to true for executors that return senders
+    // from their scheduling functions
+    template <typename T, typename Enable = void>
+    struct is_scheduler_executor
+      : parallel::execution::is_scheduler_executor<std::decay_t<T>>
+    {
+    };
+
+    template <typename T>
+    using is_scheduler_executor_t = typename is_scheduler_executor<T>::type;
+
+    template <typename T>
+    inline constexpr bool is_scheduler_executor_v =
+        is_scheduler_executor<T>::value;
 }}    // namespace hpx::traits

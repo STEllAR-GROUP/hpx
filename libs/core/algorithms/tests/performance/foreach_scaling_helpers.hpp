@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/executors/parallel_executor_aggregated.hpp>
 #include <hpx/local/algorithm.hpp>
 #include <hpx/local/chrono.hpp>
 #include <hpx/local/execution.hpp>
@@ -129,20 +129,41 @@ void measure_parallel_foreach(
     // create executor parameters object
     hpx::execution::static_chunk_size cs(chunk_size);
 
-    if (disable_stealing)
+    if constexpr (hpx::traits::is_scheduler_executor_v<Executor>)
     {
-        // disable stealing from inside the algorithm
-        disable_stealing_parameter dsp;
+        if (disable_stealing)
+        {
+            // disable stealing from inside the algorithm
+            disable_stealing_parameter dsp;
 
-        // invoke parallel for_each
-        hpx::ranges::for_each(hpx::execution::par.with(cs, dsp).on(exec),
-            data_representation, [](std::size_t) { worker_timed(delay); });
+            // invoke parallel for_each
+            hpx::ranges::for_each(hpx::execution::par.with(cs, dsp).on(exec),
+                data_representation, [](std::size_t) { worker_timed(delay); });
+        }
+        else
+        {
+            // invoke parallel for_each
+            hpx::ranges::for_each(hpx::execution::par.with(cs).on(exec),
+                data_representation, [](std::size_t) { worker_timed(delay); });
+        }
     }
     else
     {
-        // invoke parallel for_each
-        hpx::ranges::for_each(hpx::execution::par.with(cs).on(exec),
-            data_representation, [](std::size_t) { worker_timed(delay); });
+        if (disable_stealing)
+        {
+            // disable stealing from inside the algorithm
+            disable_stealing_parameter dsp;
+
+            // invoke parallel for_each
+            hpx::ranges::for_each(hpx::execution::par.with(cs, dsp).on(exec),
+                data_representation, [](std::size_t) { worker_timed(delay); });
+        }
+        else
+        {
+            // invoke parallel for_each
+            hpx::ranges::for_each(hpx::execution::par.with(cs).on(exec),
+                data_representation, [](std::size_t) { worker_timed(delay); });
+        }
     }
 }
 
@@ -209,22 +230,47 @@ void measure_parallel_forloop(
     // create executor parameters object
     hpx::execution::static_chunk_size cs(chunk_size);
 
-    if (disable_stealing)
+    if constexpr (hpx::traits::is_scheduler_executor_v<Executor>)
     {
-        // disable stealing from inside the algorithm
-        disable_stealing_parameter dsp;
+        if (disable_stealing)
+        {
+            // disable stealing from inside the algorithm
+            disable_stealing_parameter dsp;
 
-        // invoke parallel for_loop
-        hpx::experimental::for_loop(hpx::execution::par.with(cs, dsp).on(exec),
-            std::begin(data_representation), std::end(data_representation),
-            [](iterator) { worker_timed(delay); });
+            // invoke parallel for_loop
+            hpx::experimental::for_loop(
+                hpx::execution::par.with(cs, dsp).on(exec),
+                std::begin(data_representation), std::end(data_representation),
+                [](iterator) { worker_timed(delay); });
+        }
+        else
+        {
+            // invoke parallel for_loop
+            hpx::experimental::for_loop(hpx::execution::par.with(cs).on(exec),
+                std::begin(data_representation), std::end(data_representation),
+                [](iterator) { worker_timed(delay); });
+        }
     }
     else
     {
-        // invoke parallel for_loop
-        hpx::experimental::for_loop(hpx::execution::par.with(cs).on(exec),
-            std::begin(data_representation), std::end(data_representation),
-            [](iterator) { worker_timed(delay); });
+        if (disable_stealing)
+        {
+            // disable stealing from inside the algorithm
+            disable_stealing_parameter dsp;
+
+            // invoke parallel for_loop
+            hpx::experimental::for_loop(
+                hpx::execution::par.with(cs, dsp).on(exec),
+                std::begin(data_representation), std::end(data_representation),
+                [](iterator) { worker_timed(delay); });
+        }
+        else
+        {
+            // invoke parallel for_loop
+            hpx::experimental::for_loop(hpx::execution::par.with(cs).on(exec),
+                std::begin(data_representation), std::end(data_representation),
+                [](iterator) { worker_timed(delay); });
+        }
     }
 }
 

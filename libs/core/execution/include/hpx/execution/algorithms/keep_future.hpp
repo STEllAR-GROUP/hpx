@@ -159,10 +159,5 @@ namespace hpx { namespace execution { namespace experimental {
             return detail::keep_future_sender<std::decay_t<Future>>(
                 HPX_FORWARD(Future, future));
         }
-
-        constexpr HPX_FORCEINLINE auto operator()() const
-        {
-            return detail::partial_algorithm<keep_future_t>{};
-        }
     } keep_future{};
 }}}    // namespace hpx::execution::experimental

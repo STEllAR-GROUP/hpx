@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 # Copyright (c) 2007-2012 Hartmut Kaiser
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
@@ -6,9 +6,12 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests tuple_serialization_803 function_argument wait_all_hang_1946)
+set(tests non_default_constructible_argument_5998 tuple_serialization_803
+          function_argument wait_all_hang_1946
+)
 
 set(function_argument_FLAGS DEPENDENCIES iostreams_component)
+set(non_default_constructible_argument_5998_PARAMETERS LOCALITIES 2)
 set(wait_all_hang_1946_PARAMETERS THREADS_PER_LOCALITY 8)
 set(wait_all_hang_1946_FLAGS DEPENDENCIES iostreams_component)
 

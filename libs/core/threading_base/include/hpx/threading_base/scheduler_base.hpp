@@ -228,12 +228,12 @@ namespace hpx { namespace threads { namespace policies {
         virtual void schedule_thread(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
-            thread_priority priority = thread_priority::normal) = 0;
+            thread_priority priority = thread_priority::default_) = 0;
 
         virtual void schedule_thread_last(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
-            thread_priority priority = thread_priority::normal) = 0;
+            thread_priority priority = thread_priority::default_) = 0;
 
         virtual void destroy_thread(threads::thread_data* thrd) = 0;
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2021 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,9 +20,9 @@
 #include <hpx/lcos_local/and_gate.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
-#include <memory>
 #include <mutex>
 #include <type_traits>
 #include <utility>
@@ -44,7 +44,7 @@ namespace hpx { namespace collectives { namespace detail {
         using mutex_type = hpx::spinlock;
 
     public:
-        communicator_server()    //-V730
+        communicator_server() noexcept    //-V730
           : num_sites_(0)
           , needs_initialization_(false)
           , data_available_(false)
@@ -52,7 +52,7 @@ namespace hpx { namespace collectives { namespace detail {
             HPX_ASSERT(false);    // shouldn't ever be called
         }
 
-        explicit communicator_server(std::size_t num_sites)
+        explicit communicator_server(std::size_t num_sites) noexcept
           : data_()
           , gate_(num_sites)
           , num_sites_(num_sites)
@@ -65,17 +65,20 @@ namespace hpx { namespace collectives { namespace detail {
         ///////////////////////////////////////////////////////////////////////
         // generic get action, dispatches to proper operation
         template <typename Operation, typename Result, typename... Args>
-        Result get_result(std::size_t which, Args... args)
+        Result get_result(
+            std::size_t which, std::size_t generation, Args... args)
         {
-            return std::make_shared<traits::communication_operation<
-                communicator_server, Operation>>(*this)
-                ->template get<Result>(which, HPX_MOVE(args)...);
+            using collective_operation =
+                traits::communication_operation<communicator_server, Operation>;
+
+            return collective_operation::template get<Result>(
+                *this, which, generation, HPX_MOVE(args)...);
         }
 
         template <typename Operation, typename Result, typename... Args>
         struct communication_get_action
           : hpx::actions::make_action<Result (communicator_server::*)(
-                                          std::size_t, Args...),
+                                          std::size_t, std::size_t, Args...),
                 &communicator_server::template get_result<Operation, Result,
                     Args...>,
                 communication_get_action<Operation, Result, Args...>>::type
@@ -83,17 +86,20 @@ namespace hpx { namespace collectives { namespace detail {
         };
 
         template <typename Operation, typename Result, typename... Args>
-        Result set_result(std::size_t which, Args... args)
+        Result set_result(
+            std::size_t which, std::size_t generation, Args... args)
         {
-            return std::make_shared<traits::communication_operation<
-                communicator_server, Operation>>(*this)
-                ->template set<Result>(which, HPX_MOVE(args)...);
+            using collective_operation =
+                traits::communication_operation<communicator_server, Operation>;
+
+            return collective_operation::template set<Result>(
+                *this, which, generation, HPX_MOVE(args)...);
         }
 
         template <typename Operation, typename Result, typename... Args>
         struct communication_set_action
           : hpx::actions::make_action<Result (communicator_server::*)(
-                                          std::size_t, Args...),
+                                          std::size_t, std::size_t, Args...),
                 &communicator_server::template set_result<Operation, Result,
                     Args...>,
                 communication_set_action<Operation, Result, Args...>>::type
@@ -125,7 +131,7 @@ namespace hpx { namespace collectives { namespace detail {
         }
 
         template <typename Lock>
-        void invalidate_data(Lock& l)
+        void invalidate_data(Lock& l) noexcept
         {
             HPX_ASSERT_OWNS_LOCK(l);
             if (!needs_initialization_)
@@ -133,6 +139,107 @@ namespace hpx { namespace collectives { namespace detail {
                 needs_initialization_ = true;
                 data_available_ = false;
                 data_.reset();
+            }
+        }
+
+        template <typename Lock>
+        void set_and_invalidate_data(
+            std::size_t which, std::size_t generation, Lock l) noexcept
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+
+            // set() consumes lock
+            if (gate_.set(which, HPX_MOVE(l)))
+            {
+                l = Lock(mtx_);
+                if (generation != std::size_t(-1))
+                {
+                    gate_.next_generation(l, generation);
+                }
+                invalidate_data(l);
+            }
+        }
+
+        template <typename F, typename Lock>
+        auto get_future_and_synchronize(std::size_t generation, F&& f, Lock& l)
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+            auto fut = gate_.get_shared_future(l).then(
+                hpx::launch::sync, HPX_FORWARD(F, f));
+
+            gate_.synchronize(generation == std::size_t(-1) ?
+                    gate_.generation(l) :
+                    generation,
+                l);
+
+            return fut;
+        }
+
+        // Step will be invoked under lock for each site that checks in (either
+        // set or get).
+        //
+        // Finalizer will be invoked under lock after all sites have checked in.
+        template <typename Data, typename Step, typename Finalizer>
+        auto handle_data(std::size_t which, std::size_t generation, Step&& step,
+            Finalizer&& finalizer, std::size_t num_values = std::size_t(-1))
+        {
+            auto on_ready = [this, num_values,
+                                finalizer = HPX_FORWARD(Finalizer, finalizer)](
+                                shared_future<void>&& f) mutable {
+                f.get();    // propagate any exceptions
+
+                if constexpr (!std::is_same_v<std::nullptr_t,
+                                  std::decay_t<Finalizer>>)
+                {
+                    std::unique_lock l(mtx_);
+                    util::ignore_while_checking il(&l);
+                    HPX_UNUSED(il);
+
+                    // call provided finalizer
+                    return HPX_FORWARD(Finalizer, finalizer)(
+                        access_data<Data>(l, num_values), data_available_);
+                }
+                else
+                {
+                    HPX_UNUSED(this);
+                    HPX_UNUSED(num_values);
+                    HPX_UNUSED(finalizer);
+                }
+            };
+
+            std::unique_lock l(mtx_);
+            util::ignore_while_checking il(&l);
+            HPX_UNUSED(il);
+
+            auto f =
+                get_future_and_synchronize(generation, HPX_MOVE(on_ready), l);
+
+            if constexpr (!std::is_same_v<std::nullptr_t, std::decay_t<Step>>)
+            {
+                // call provided step function for each invocation site
+                HPX_FORWARD(Step, step)(access_data<Data>(l, num_values));
+            }
+            else
+            {
+                HPX_UNUSED(step);
+            }
+
+            set_and_invalidate_data(which, generation, HPX_MOVE(l));
+
+            return f;
+        }
+
+        // protect against vector<bool> idiosyncrasies
+        template <typename ValueType, typename Data>
+        static decltype(auto) handle_bool(Data&& data)
+        {
+            if constexpr (std::is_same_v<ValueType, bool>)
+            {
+                return bool(data);
+            }
+            else
+            {
+                return HPX_FORWARD(Data, data);
             }
         }
 

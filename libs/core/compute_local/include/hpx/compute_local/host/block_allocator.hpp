@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -38,8 +38,8 @@ namespace hpx { namespace compute { namespace host {
         /// The policy_allocator allocates blocks of memory touched according to
         /// the distribution policy of the given executor.
         template <typename T, typename Policy,
-            typename Enable = typename std::enable_if<
-                hpx::is_execution_policy<Policy>::value>::type>
+            typename Enable =
+                std::enable_if_t<hpx::is_execution_policy_v<Policy>>>
         struct policy_allocator
         {
             using policy_type = Policy;
@@ -134,7 +134,7 @@ namespace hpx { namespace compute { namespace host {
                     return;
                 }
 
-                auto irange = hpx::util::detail::make_counting_shape(count);
+                auto irange = hpx::util::counting_shape(count);
 
                 using iterator_type = hpx::util::counting_iterator<std::size_t>;
                 using partition_result_type =
@@ -161,7 +161,7 @@ namespace hpx { namespace compute { namespace host {
                                 [&arguments, p](iterator_type it) {
                                     using hpx::util::functional::
                                         placement_new_one;
-                                    hpx::util::invoke_fused(
+                                    hpx::invoke_fused(
                                         placement_new_one<U>(p + *it),
                                         arguments);
                                 },
@@ -205,7 +205,7 @@ namespace hpx { namespace compute { namespace host {
                 }
 
                 // keep memory locality, use executor...
-                auto irange = hpx::util::detail::make_counting_shape(count);
+                auto irange = hpx::util::counting_shape(count);
                 hpx::ranges::for_each(
                     policy_, irange, [p](std::size_t i) { (p + i)->~U(); });
             }
@@ -248,14 +248,16 @@ namespace hpx { namespace compute { namespace host {
             hpx::parallel::execution::restricted_thread_pool_executor>
     struct block_allocator
       : public detail::policy_allocator<T,
-            hpx::execution::parallel_policy_shim<block_executor<Executor>,
+            hpx::execution::detail::parallel_policy_shim<
+                block_executor<Executor>,
                 typename block_executor<Executor>::executor_parameters_type>>
     {
         using executor_type = block_executor<Executor>;
         using executor_parameters_type =
             typename executor_type::executor_parameters_type;
-        using policy_type = hpx::execution::parallel_policy_shim<executor_type,
-            executor_parameters_type>;
+        using policy_type =
+            hpx::execution::detail::parallel_policy_shim<executor_type,
+                executor_parameters_type>;
         using base_type = detail::policy_allocator<T, policy_type>;
         using target_type = std::vector<host::target>;
 

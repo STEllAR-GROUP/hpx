@@ -232,6 +232,7 @@ namespace hpx::experimental {
 }    // namespace hpx::experimental
 
 namespace hpx::parallel { inline namespace v2 {
+    /// \cond IGNORE_DEPRECATED
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
@@ -250,4 +251,5 @@ namespace hpx::parallel { inline namespace v2 {
     {
         return hpx::experimental::induction(HPX_FORWARD(T, value));
     }
+    /// \endcond
 }}    // namespace hpx::parallel::v2

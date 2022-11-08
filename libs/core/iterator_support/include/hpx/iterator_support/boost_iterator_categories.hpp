@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -55,24 +55,20 @@ namespace hpx { namespace iterators {
         template <typename Cat>
         struct std_category_to_traversal
           : hpx::util::lazy_conditional<
-                std::is_convertible<Cat,
-                    std::random_access_iterator_tag>::value,
+                std::is_convertible_v<Cat, std::random_access_iterator_tag>,
                 hpx::util::identity<random_access_traversal_tag>,
                 hpx::util::lazy_conditional<
-                    std::is_convertible<Cat,
-                        std::bidirectional_iterator_tag>::value,
+                    std::is_convertible_v<Cat, std::bidirectional_iterator_tag>,
                     hpx::util::identity<bidirectional_traversal_tag>,
                     hpx::util::lazy_conditional<
-                        std::is_convertible<Cat,
-                            std::forward_iterator_tag>::value,
+                        std::is_convertible_v<Cat, std::forward_iterator_tag>,
                         hpx::util::identity<forward_traversal_tag>,
                         hpx::util::lazy_conditional<
-                            std::is_convertible<Cat,
-                                std::input_iterator_tag>::value,
+                            std::is_convertible_v<Cat, std::input_iterator_tag>,
                             hpx::util::identity<single_pass_traversal_tag>,
                             hpx::util::lazy_conditional<
-                                std::is_convertible<Cat,
-                                    std::output_iterator_tag>::value,
+                                std::is_convertible_v<Cat,
+                                    std::output_iterator_tag>,
                                 hpx::util::identity<
                                     incrementable_traversal_tag>,
                                 hpx::util::identity<no_traversal_tag>>>>>>
@@ -84,7 +80,7 @@ namespace hpx { namespace iterators {
     template <typename Cat>
     struct iterator_category_to_traversal
       : hpx::util::lazy_conditional<
-            std::is_convertible<Cat, incrementable_traversal_tag>::value,
+            std::is_convertible_v<Cat, incrementable_traversal_tag>,
             hpx::util::identity<Cat>, detail::std_category_to_traversal<Cat>>
     {
     };
@@ -101,21 +97,20 @@ namespace hpx { namespace iterators {
     template <typename Traversal>
     struct pure_traversal_tag
       : hpx::util::lazy_conditional<
-            std::is_convertible<Traversal, random_access_traversal_tag>::value,
+            std::is_convertible_v<Traversal, random_access_traversal_tag>,
             hpx::util::identity<random_access_traversal_tag>,
-            hpx::util::lazy_conditional<std::is_convertible<Traversal,
-                                            bidirectional_traversal_tag>::value,
+            hpx::util::lazy_conditional<
+                std::is_convertible_v<Traversal, bidirectional_traversal_tag>,
                 hpx::util::identity<bidirectional_traversal_tag>,
-                hpx::util::lazy_conditional<std::is_convertible<Traversal,
-                                                forward_traversal_tag>::value,
+                hpx::util::lazy_conditional<
+                    std::is_convertible_v<Traversal, forward_traversal_tag>,
                     hpx::util::identity<forward_traversal_tag>,
-                    hpx::util::lazy_conditional<
-                        std::is_convertible<Traversal,
-                            single_pass_traversal_tag>::value,
+                    hpx::util::lazy_conditional<std::is_convertible_v<Traversal,
+                                                    single_pass_traversal_tag>,
                         hpx::util::identity<single_pass_traversal_tag>,
                         hpx::util::lazy_conditional<
-                            std::is_convertible<Traversal,
-                                incrementable_traversal_tag>::value,
+                            std::is_convertible_v<Traversal,
+                                incrementable_traversal_tag>,
                             hpx::util::identity<incrementable_traversal_tag>,
                             hpx::util::identity<no_traversal_tag>>>>>>
     {

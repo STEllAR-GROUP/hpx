@@ -27,15 +27,17 @@
 #define PAPI_EXTENDED_EVENT_CODES 1
 #endif
 
-namespace hpx { namespace performance_counters { namespace papi { namespace util
-{
+namespace hpx {
+    namespace performance_counters {
+        namespace papi {
+            namespace util {
     using hpx::program_options::options_description;
     using hpx::program_options::variables_map;
 
     ///////////////////////////////////////////////////////////////////////////
     // PAPI call wrapper
-    inline void papi_call(int rc, char const *info, char const *fname,
-                          int ok = PAPI_OK)
+    inline void papi_call(
+        int rc, char const* info, char const* fname, int ok = PAPI_OK)
     {
         if (rc != ok)
         {
@@ -43,8 +45,8 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
                 hpx::util::format("{} ({})", info, PAPI_strerror(rc)));
         }
     }
-    inline void papi_call(int rc, std::string const& info, char const *fname,
-                          int ok = PAPI_OK)
+    inline void papi_call(
+        int rc, std::string const& info, char const* fname, int ok = PAPI_OK)
     {
         papi_call(rc, info.c_str(), fname, ok);
     }
@@ -54,11 +56,11 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
     class event_info_generator
     {
     protected:
-        int const mask_;          // event type mask
-        int const cid_;           // component ID
-        int event_;               // next event to get info about
-        bool active_;             // false when generation terminated
-        PAPI_event_info_t info_;  // event info to be returned
+        int const mask_;            // event type mask
+        int const cid_;             // component ID
+        int event_;                 // next event to get info about
+        bool active_;               // false when generation terminated
+        PAPI_event_info_t info_;    // event info to be returned
 
         // set event info
         virtual bool get_info()
@@ -71,10 +73,16 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             return PAPI_enum_event(&event_, mask_) == PAPI_OK;
         }
 
-        event_info_generator():
-            mask_(0), cid_(0), event_(PAPI_NULL), active_(false) { }
-        event_info_generator(int mask, int first, int cid = 0):
-            mask_(mask), cid_(cid)
+        event_info_generator()
+          : mask_(0)
+          , cid_(0)
+          , event_(PAPI_NULL)
+          , active_(false)
+        {
+        }
+        event_info_generator(int mask, int first, int cid = 0)
+          : mask_(mask)
+          , cid_(cid)
         {
 #if defined(PAPI_EXTENDED_EVENT_CODES)
             reset(first);
@@ -85,13 +93,15 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
 
     public:
         // required generator interface
-        typedef PAPI_event_info_t const *result_type;
+        typedef PAPI_event_info_t const* result_type;
 
-        PAPI_event_info_t const *operator()()
+        PAPI_event_info_t const* operator()()
         {
-            if (!active_) return nullptr;
+            if (!active_)
+                return nullptr;
             while (!get_info())
-                if (!(active_ = get_next_event())) return nullptr;
+                if (!(active_ = get_next_event()))
+                    return nullptr;
             active_ = get_next_event();
             return &info_;
         }
@@ -100,56 +110,65 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
         void reset(int init, bool force = false)
         {
             if (force)
-            { // init must be a valid event code
-                event_ = init; active_ = true;
+            {    // init must be a valid event code
+                event_ = init;
+                active_ = true;
                 return;
             }
             // init is the event type flag; obtain the first valid event code
 #if defined(PAPI_EXTENDED_EVENT_CODES)
-            active_ = (PAPI_enum_cmp_event(&init, PAPI_ENUM_FIRST, cid_) == PAPI_OK);
+            active_ =
+                (PAPI_enum_cmp_event(&init, PAPI_ENUM_FIRST, cid_) == PAPI_OK);
 #else
             active_ = (PAPI_enum_event(&init, PAPI_ENUM_FIRST) == PAPI_OK);
 #endif
-            if (active_) event_ = init;
+            if (active_)
+                event_ = init;
         }
     };
 
     // PAPI preset-only enumerator
-    template<bool all>
-    class preset_enumerator: public event_info_generator
+    template <bool all>
+    class preset_enumerator : public event_info_generator
     {
     protected:
         bool get_info()
-        { // locally available presets must not have null info_.count
+        {    // locally available presets must not have null info_.count
             return event_info_generator::get_info() &&
-                   (!all || info_.count > 0);
+                (!all || info_.count > 0);
         }
 
     public:
-        preset_enumerator(): event_info_generator(
-            (all)? PAPI_ENUM_ALL: PAPI_PRESET_ENUM_AVAIL, PAPI_PRESET_MASK) { }
+        preset_enumerator()
+          : event_info_generator((all) ? PAPI_ENUM_ALL : PAPI_PRESET_ENUM_AVAIL,
+                PAPI_PRESET_MASK)
+        {
+        }
     };
 
     // nested enumerator on umasks available for some native events;
     // initiated with a tracepoint event without any unit masks applied
-    class native_umask_enumerator: public event_info_generator
+    class native_umask_enumerator : public event_info_generator
     {
     public:
         //native_umask_enumerator():
         //    event_info_generator(PAPI_NTV_ENUM_UMASKS, PAPI_NULL) { }
-        native_umask_enumerator(int first = PAPI_NULL):
-            event_info_generator(PAPI_NTV_ENUM_UMASKS, first) {reset(first);}
+        explicit native_umask_enumerator(int first = PAPI_NULL)
+          : event_info_generator(PAPI_NTV_ENUM_UMASKS, first)
+        {
+            reset(first);
+        }
 
         void reset(int first)
         {
             event_info_generator::reset(first, true);
-            active_ = get_next_event(); // advance to the first umask event
+            active_ = get_next_event();    // advance to the first umask event
         }
     };
 
     // PAPI native event enumerator
-    template<bool with_umasks>
-    class native_enumerator: public event_info_generator
+    template <bool with_umasks>
+    class native_enumerator : public event_info_generator
     {
         native_umask_enumerator umask_gen_;
         hpx::util::generator_iterator<native_umask_enumerator> umask_iter_;
@@ -161,7 +180,7 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             if (with_umasks && umasks_present_ && umask_seq_)
             {
                 if (*umask_iter_)
-                { // nested iteration in progress
+                {    // nested iteration in progress
                     info_ = **umask_iter_;
                     return true;
                 }
@@ -175,30 +194,34 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
             {
                 if (umask_seq_)
                 {
-                    if (*++umask_iter_) return true;
+                    if (*++umask_iter_)
+                        return true;
                     umask_seq_ = false;
                 }
                 else
                 {
                     umask_gen_.reset(event_);
                     umask_iter_ =
-                        hpx::util::make_generator_iterator(umask_gen_);
+                        hpx::util::generator_iterator<native_umask_enumerator>(
+                            umask_gen_);
                     if (*umask_iter_)
-                        return umask_seq_ = true; // not ==
+                        return umask_seq_ = true;    // not ==
                 }
             }
             return event_info_generator::get_next_event();
         }
 
     public:
-        native_enumerator(unsigned comp, int mask = PAPI_ENUM_EVENTS):
-            event_info_generator(mask, PAPI_NATIVE_MASK, comp),
-            component_index_(comp), umask_seq_(false)
+        explicit native_enumerator(unsigned comp, int mask = PAPI_ENUM_EVENTS)
+          : event_info_generator(mask, PAPI_NATIVE_MASK, comp)
+          , component_index_(comp)
+          , umask_seq_(false)
         {
-            PAPI_component_info_t const *ci = PAPI_get_component_info(comp);
+            PAPI_component_info_t const* ci = PAPI_get_component_info(comp);
             if (!ci)
                 HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::performance_counters::papi::util::native_enumerator()",
+                    "hpx::performance_counters::papi::util::native_enumerator("
+                    ")",
                     "invalid PAPI component index");
             umasks_present_ = ci->cntr_umasks;
         }
@@ -230,16 +253,16 @@ namespace hpx { namespace performance_counters { namespace papi { namespace util
 
     // create list of event strings from command line options that are
     // relevant to this locality
-    bool get_local_events(std::vector<std::string>& ev,
-                          std::vector<std::string> const& opt);
+    bool get_local_events(
+        std::vector<std::string>& ev, std::vector<std::string> const& opt);
 
     // list locally available events with detailed information
     void list_events(std::string const& scope);
 
     // get relevant thread label and index from counter description
-    std::uint32_t get_counter_thread(counter_path_elements const&, std::string&);
+    std::uint32_t get_counter_thread(
+        counter_path_elements const&, std::string&);
 
-}}}}
+}}}}    // namespace hpx::performance_counters::papi::util
 
 #endif
-

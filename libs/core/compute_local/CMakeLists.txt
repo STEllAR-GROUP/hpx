@@ -12,6 +12,7 @@ set(compute_local_headers
     hpx/compute_local/host.hpp
     hpx/compute_local/host/block_allocator.hpp
     hpx/compute_local/host/block_executor.hpp
+    hpx/compute_local/host/block_fork_join_executor.hpp
     hpx/compute_local/host/get_targets.hpp
     hpx/compute_local/host/numa_allocator.hpp
     hpx/compute_local/host/numa_binding_allocator.hpp
@@ -47,6 +48,7 @@ add_hpx_module(
     hpx_algorithms
     hpx_allocator_support
     hpx_async_combinators
+    hpx_concepts
     hpx_config
     hpx_datastructures
     hpx_execution

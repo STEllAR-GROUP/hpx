@@ -12,10 +12,11 @@
 namespace hpx {
     // clang-format off
 
-    /// Returns true if every element from the sorted range [first2, last2) is
-    /// found within the sorted range [first1, last1). Also returns true if
-    /// [first2, last2) is empty. The version expects both ranges to be sorted
-    /// with the user supplied binary predicate \a f.
+    /// Returns true if every element from the sorted range [\a first2, \a last2) is
+    /// found within the sorted range [\a first1, \a last1). Also returns true if
+    /// [\a first2, \a last2) is empty. The version expects both ranges to be sorted
+    /// with the user supplied binary predicate \a f. Executed according to the
+    /// policy.
     ///
     /// \note   At most 2*(N1+N2-1) comparisons, where
     ///         N1 = std::distance(first1, last1) and
@@ -79,13 +80,70 @@ namespace hpx {
     ///           \a parallel_task_policy and
     ///           returns \a bool otherwise.
     ///           The \a includes algorithm returns true every element from the
-    ///           sorted range [first2, last2) is found within the sorted range
-    ///           [first1, last1). Also returns true if [first2, last2) is empty.
+    ///           sorted range [\a first2, \a last2) is found within the sorted range
+    ///           [\a first1, \a last1).
+    ///           Also returns true if [\a first2, \a last2) is empty.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::less>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type>::type
+        typename Pred = hpx::parallel::v1::detail::less>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type>::type
     includes(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred());
+
+    /// Returns true if every element from the sorted range [\a first2, \a last2) is
+    /// found within the sorted range [\a first1, \a last1). Also returns true if
+    /// [\a first2, \a last2) is empty. The version expects both ranges to be sorted
+    /// with the user supplied binary predicate \a f.
+    ///
+    /// \note   At most 2*(N1+N2-1) comparisons, where
+    ///         N1 = std::distance(first1, last1) and
+    ///         N2 = std::distance(first2, last2).
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used for the
+    ///                     first range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the source iterators used for the
+    ///                     second range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of an optional function/function object to use.
+    ///                     Unlike its sequential form, the parallel
+    ///                     overload of \a includes requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible. This defaults
+    ///                     to std::less<>
+    ///
+    /// \param first1       Refers to the beginning of the sequence of elements
+    ///                     of the first range the algorithm will be applied to.
+    /// \param last1        Refers to the end of the sequence of elements of
+    ///                     the first range the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the sequence of elements
+    ///                     of the second range the algorithm will be applied to.
+    /// \param last2        Refers to the end of the sequence of elements of
+    ///                     the second range the algorithm will be applied to.
+    /// \param op           The binary predicate which returns true if the
+    ///                     elements should be treated as includes. The signature
+    ///                     of the predicate function should be equivalent to
+    ///                     the following:
+    ///                     \code
+    ///                     bool pred(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The types \a Type1 and \a Type2 must be such
+    ///                     that objects of types \a FwdIter1 and \a FwdIter2 can
+    ///                     be dereferenced and then implicitly converted to
+    ///                     \a Type1 and \a Type2 respectively
+    ///
+    /// \returns  The \a includes algorithm returns a \a bool.
+    ///           The \a includes algorithm returns true every element from the
+    ///           sorted range [\a first2, \a last2) is found within the sorted range
+    ///           [\a first1, \a last1).
+    ///           Also returns true if [\a first2, \a last2) is empty.
+    ///
+    template <typename FwdIter1, typename FwdIter2,
+        typename Pred = hpx::parallel::v1::detail::less>
+    bool includes(FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred());
 
     // clang-format on

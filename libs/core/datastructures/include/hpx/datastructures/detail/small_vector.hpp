@@ -1,549 +1,1270 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+//  The code below was taken and adapted from:
+//  https://github.com/martinus/svector.
+//
+// The original file was licensed under the MIT license:
+//
+// Copyright (c) 2022 Martin Leitner-Ankerl
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 
+#include <algorithm>
+#include <array>
 #include <cstddef>
-#include <memory>
-
-#if !defined(HPX_HAVE_CXX17_MEMORY_RESOURCE)
-
-// fall back to Boost if memory_resource is not supported
-#include <boost/container/small_vector.hpp>
-
-namespace hpx::detail {
-
-    template <typename T, std::size_t Size,
-        typename Allocator = std::allocator<T>>
-    using small_vector = boost::container::small_vector<T, Size, Allocator>;
-}
-
-#else
-
+#include <cstdint>
+#include <cstring>
 #include <initializer_list>
-#include <memory_resource>
+#include <iterator>
+#include <limits>
+#include <memory>
+#include <new>
+#include <stdexcept>
+#include <type_traits>
 #include <utility>
-#include <vector>
 
 namespace hpx::detail {
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Allocator>
-    class allocator_memory_resource final : public std::pmr::memory_resource
+    // Note we implement is_iterator here instead of pulling the trait from
+    // the iterator_support module to avoid circular dependencies between
+    // the modules.
+    //
+    // This implementation of is_iterator seems to work fine even for VS2013
+    // which has an implementation of std::iterator_traits that is
+    // SFINAE-unfriendly.
+    template <typename T>
+    struct is_argument_iterator
     {
-    public:
-        explicit allocator_memory_resource(Allocator const& alloc) noexcept
-          : allocator_(alloc)
+#if defined(HPX_MSVC) && defined(__CUDACC__)
+        template <typename U>
+        static typename U::iterator_category* test(U);    // iterator
+
+        template <typename U>
+        static void* test(U*);    // pointer
+#else
+        template <typename U,
+            typename = typename std::iterator_traits<U>::pointer>
+        static void* test(U&&);
+#endif
+
+        static char test(...);
+
+        enum
         {
-        }
-
-    private:
-        bool do_is_equal(memory_resource const& rhs) const noexcept override
-        {
-            return this == &rhs;
-        }
-
-        // Note: the PMR infrastructure calls this with the number of bytes to
-        // allocate but the underlying allocator expects the number of elements
-        void* do_allocate(std::size_t count, std::size_t) override
-        {
-            return allocator_.allocate((count + sizeof(T) - 1) / sizeof(T));
-        }
-
-        void do_deallocate(
-            void* ptr, std::size_t count, std::size_t) noexcept override
-        {
-            using value_type =
-                typename std::allocator_traits<Allocator>::value_type;
-
-            return allocator_.deallocate(static_cast<value_type*>(ptr),
-                (count + sizeof(T) - 1) / sizeof(T));
-        }
-
-    public:
-        HPX_NO_UNIQUE_ADDRESS Allocator allocator_;
+            value = sizeof(test(std::declval<T>())) == sizeof(void*)
+        };
     };
 
-    template <typename T, std::size_t Size, typename Allocator>
-    struct memory_storage final
+    template <typename Iter>
+    inline constexpr bool is_argument_iterator_v =
+        is_argument_iterator<Iter>::value;
+
+    constexpr auto round_up(std::size_t n, std::size_t multiple) noexcept
+        -> std::size_t
     {
-        static_assert(Size > 0, "memory_storage::Size must be non-zero");
+        return ((n + (multiple - 1)) / multiple) * multiple;
+    }
 
-        static constexpr std::size_t preallocated_size = Size * sizeof(T);
+    template <typename T>
+    constexpr auto cx_min(T a, T b) noexcept -> T
+    {
+        return a < b ? a : b;
+    }
 
-        using buffer_resource_type = std::pmr::monotonic_buffer_resource;
-        using allocator_type = std::pmr::polymorphic_allocator<T>;
+    template <typename T>
+    constexpr auto cx_max(T a, T b) noexcept -> T
+    {
+        return a > b ? a : b;
+    }
 
-        explicit memory_storage(Allocator const& alloc = Allocator()) noexcept(
-            noexcept(Allocator()))
-          : resource_(alloc)
-          , pool_(std::data(memory_), preallocated_size, &resource_)
-          , allocator_(&pool_)
+    class header
+    {
+        std::size_t m_size{};
+        std::size_t const m_capacity;
+
+    public:
+        inline explicit constexpr header(std::size_t capacity) noexcept
+          : m_capacity{capacity}
         {
         }
 
-        memory_storage(memory_storage const& rhs)
-          : resource_(rhs.resource_)
-          , pool_(std::data(memory_), preallocated_size, &resource_)
-          , allocator_(&pool_)
+        [[nodiscard]] inline constexpr auto size() const noexcept -> std::size_t
         {
-        }
-        memory_storage(memory_storage&& rhs) noexcept
-          : resource_(HPX_MOVE(rhs.resource_))
-          , pool_(std::data(memory_), preallocated_size, &resource_)
-          , allocator_(&pool_)
-        {
+            return m_size;
         }
 
-        // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
-        memory_storage& operator=(memory_storage const& rhs)
+        [[nodiscard]] inline constexpr auto capacity() const noexcept
+            -> std::size_t
         {
-            // release all memory owned by the old instance
-            allocator_.allocator_type::~allocator_type();
-            pool_.buffer_resource_type::~buffer_resource_type();
-
-            // no need to invoke: memory_ = rhs.memory_; as the data will
-            // be provided by the small_vector::operator= below
-
-            // copy allocator
-            resource_ = rhs.resource_;
-
-            // reconstruct the memory management infrastructure
-            new (&pool_) buffer_resource_type(
-                std::data(memory_), preallocated_size, &resource_);
-            new (&allocator_) allocator_type(&pool_);
-
-            return *this;
+            return m_capacity;
         }
 
-        // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
-        memory_storage& operator=(memory_storage&& rhs) noexcept
+        inline void size(std::size_t s) noexcept
         {
-            // release all memory owned by the old instance
-            allocator_.allocator_type::~allocator_type();
-            pool_.buffer_resource_type::~buffer_resource_type();
-
-            // no need to invoke: memory_ = rhs.memory_; as the data will
-            // be provided by the small_vector::operator= below
-
-            // move allocator
-            resource_ = HPX_MOVE(rhs.resource_);
-
-            // reconstruct the memory management infrastructure
-            new (&pool_) buffer_resource_type(
-                std::data(memory_), preallocated_size, &resource_);
-            new (&allocator_) allocator_type(&pool_);
-
-            return *this;
+            m_size = s;
         }
-
-        std::aligned_storage_t<sizeof(T), alignof(T)> memory_[Size];
-        HPX_NO_UNIQUE_ADDRESS allocator_memory_resource<T, Allocator> resource_;
-        buffer_resource_type pool_;
-        allocator_type allocator_;
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T, std::size_t Size,
+    template <typename T>
+    struct storage : public header
+    {
+        static constexpr auto alignment_of_t = std::alignment_of_v<T>;
+        static constexpr auto max_Alignment =
+            (std::max)(std::alignment_of_v<header>, std::alignment_of_v<T>);
+        static constexpr auto offset_to_data =
+            round_up(sizeof(header), alignment_of_t);
+        static_assert(max_Alignment <= __STDCPP_DEFAULT_NEW_ALIGNMENT__);
+
+        explicit constexpr storage(std::size_t capacity) noexcept
+          : header(capacity)
+        {
+        }
+
+        auto data() noexcept -> T*
+        {
+            auto ptr_to_data =
+                reinterpret_cast<std::byte*>(this) + offset_to_data;
+            return std::launder(reinterpret_cast<T*>(ptr_to_data));
+        }
+
+        static auto alloc(std::size_t capacity) -> storage<T>*
+        {
+            // make sure we don't overflow!
+            auto mem = sizeof(T) * capacity;
+            if (mem < capacity)
+            {
+                throw std::bad_alloc();
+            }
+
+            if (offset_to_data + mem < mem)
+            {
+                throw std::bad_alloc();
+            }
+
+            mem += offset_to_data;
+            if (static_cast<std::ptrdiff_t>(mem) >
+                (std::numeric_limits<std::ptrdiff_t>::max)())
+            {
+                throw std::bad_alloc();
+            }
+
+            // only void* is allowed to be converted to uintptr_t
+            void* ptr = ::operator new(offset_to_data + sizeof(T) * capacity);
+            if (nullptr == ptr)
+            {
+                throw std::bad_alloc();
+            }
+            return new (ptr) storage<T>(capacity);
+        }
+
+        static void dealloc(storage* strg)
+        {
+            if (strg == nullptr)
+                return;
+            std::destroy_at(strg);
+            ::operator delete(strg);
+        }
+    };
+
+    template <typename T>
+    constexpr auto alignment_of_small_vector() noexcept -> std::size_t
+    {
+        return cx_max(sizeof(void*), std::alignment_of_v<T>);
+    }
+
+    template <typename T>
+    constexpr auto size_of_small_vector(
+        std::size_t min_inline_capacity) noexcept -> std::size_t
+    {
+        // + 1 for one byte size in direct mode
+        return round_up(sizeof(T) * min_inline_capacity + 1,
+            alignment_of_small_vector<T>());
+    }
+
+    template <typename T>
+    constexpr auto automatic_capacity(std::size_t min_inline_capacity) noexcept
+        -> std::size_t
+    {
+        return cx_min(
+            (size_of_small_vector<T>(min_inline_capacity) - 1U) / sizeof(T),
+            std::size_t(127));
+    }
+
+    // note: Allocator is currently unused
+    template <typename T, std::size_t MinInlineCapacity,
         typename Allocator = std::allocator<T>>
     class small_vector
     {
-    private:
-        using other_allocator =
-            typename std::allocator_traits<Allocator>::template rebind_alloc<T>;
+        static_assert(MinInlineCapacity <= 127,
+            "sorry, can't have more than 127 direct elements");
+        static constexpr auto N = automatic_capacity<T>(MinInlineCapacity);
 
-        using storage_type = memory_storage<T, Size, other_allocator>;
-        using data_type = std::pmr::vector<T>;
+        enum class direction
+        {
+            direct,
+            indirect
+        };
+
+        // A buffer to hold the data of the small_vector Depending on
+        // direct/indirect mode, the content it holds is like so:
+        //
+        // direct:
+        //  m_data[0] & 1:  lowest bit is 1 for direct mode.
+        //  m_data[0] >> 1: size for direct mode
+        //  Then 0-X bytes unused (padding), and then the actual inline T data.
+        //
+        // indirect:
+        //  m_data[0] & 1: lowest bit is 0 for indirect mode
+        //  m_data[0..7]:  stores an uintptr_t, which points to the indirect
+        //                 data.
+
+        alignas(alignment_of_small_vector<T>()) std::array<std::uint8_t,
+            size_of_small_vector<T>(MinInlineCapacity)> m_data;
+
+        [[nodiscard]] constexpr auto is_direct() const noexcept -> bool
+        {
+            return (m_data[0] & 1U) != 0U;
+        }
+
+        [[nodiscard]] auto indirect() noexcept -> storage<T>*
+        {
+            // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
+            storage<T>* ptr;
+
+            // NOLINTNEXTLINE(bugprone-sizeof-expression)
+            std::memcpy(&ptr, m_data.data(), sizeof(ptr));
+            return ptr;
+        }
+
+        [[nodiscard]] auto indirect() const noexcept -> storage<T> const*
+        {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+            return const_cast<small_vector*>(this)->indirect();
+        }
+
+        void set_indirect(storage<T>* ptr) noexcept
+        {
+            // NOLINTNEXTLINE(bugprone-sizeof-expression)
+            std::memcpy(m_data.data(), &ptr, sizeof(ptr));
+
+            // safety check to guarantee the lowest bit is 0
+            HPX_ASSERT(!is_direct());
+        }
+
+        [[nodiscard]] constexpr auto direct_size() const noexcept -> std::size_t
+        {
+            return m_data[0] >> 1U;
+        }
+
+        // sets size of direct mode and mode to direct too.
+        constexpr void set_direct_and_size(std::size_t s) noexcept
+        {
+            m_data[0] = static_cast<std::uint8_t>((s << 1U) | 1U);
+        }
+
+        [[nodiscard]] auto direct_data() noexcept -> T*
+        {
+            return std::launder(
+                reinterpret_cast<T*>(m_data.data() + std::alignment_of_v<T>));
+        }
+
+        static void uninitialized_move_and_destroy(
+            T* source_ptr, T* target_ptr, std::size_t size) noexcept
+        {
+            if constexpr (std::is_trivially_copyable_v<T>)
+            {
+                std::memcpy(target_ptr, source_ptr, size * sizeof(T));
+            }
+            else
+            {
+                std::uninitialized_move_n(source_ptr, size, target_ptr);
+                std::destroy_n(source_ptr, size);
+            }
+        }
+
+        void realloc(std::size_t new_capacity)
+        {
+            if (new_capacity <= N)
+            {
+                // put everything into direct storage
+
+                // direct -> direct: nothing to do!
+                if (!is_direct())
+                {
+                    // indirect -> direct
+                    auto* storage = indirect();
+                    uninitialized_move_and_destroy(
+                        storage->data(), direct_data(), storage->size());
+                    set_direct_and_size(storage->size());
+                    detail::storage<T>::dealloc(storage);
+                }
+            }
+            else
+            {
+                // put everything into indirect storage
+                auto* storage = detail::storage<T>::alloc(new_capacity);
+                if (is_direct())
+                {
+                    // direct -> indirect
+                    uninitialized_move_and_destroy(data<direction::direct>(),
+                        storage->data(), size<direction::direct>());
+                    storage->size(size<direction::direct>());
+                }
+                else
+                {
+                    // indirect -> indirect
+                    uninitialized_move_and_destroy(data<direction::indirect>(),
+                        storage->data(), size<direction::indirect>());
+                    storage->size(size<direction::indirect>());
+                    detail::storage<T>::dealloc(indirect());
+                }
+                set_indirect(storage);
+            }
+        }
+
+        [[nodiscard]] static constexpr auto calculate_new_capacity(
+            std::size_t size_to_fit, std::size_t starting_capacity) noexcept
+            -> std::size_t
+        {
+            if (size_to_fit == 0)
+            {
+                // special handling for 0 so N==0 works
+                return starting_capacity;
+            }
+
+            // start with at least 1, so N==0 works
+            auto new_capacity = std::max<std::size_t>(1, starting_capacity);
+
+            // double capacity until its large enough, but make sure we don't
+            // overflow
+            while (
+                new_capacity < size_to_fit && new_capacity * 2 > new_capacity)
+            {
+                new_capacity *= 2;
+            }
+
+            if (new_capacity < size_to_fit)
+            {
+                // got an overflow, set capacity to max
+                new_capacity = max_size();
+            }
+            return (std::min)(new_capacity, max_size());
+        }
+
+        template <direction D>
+        [[nodiscard]] constexpr auto capacity() const noexcept -> std::size_t
+        {
+            if constexpr (D == direction::direct)
+            {
+                return N;
+            }
+            else
+            {
+                return indirect()->capacity();
+            }
+        }
+
+        template <direction D>
+        [[nodiscard]] constexpr auto size() const noexcept -> std::size_t
+        {
+            if constexpr (D == direction::direct)
+            {
+                return direct_size();
+            }
+            else
+            {
+                return indirect()->size();
+            }
+        }
+
+        void set_size(std::size_t s) noexcept
+        {
+            if (is_direct())
+            {
+                set_size<direction::direct>(s);
+            }
+            else
+            {
+                set_size<direction::indirect>(s);
+            }
+        }
+
+        template <direction D>
+        void set_size(std::size_t s) noexcept
+        {
+            if constexpr (D == direction::direct)
+            {
+                set_direct_and_size(s);
+            }
+            else
+            {
+                indirect()->size(s);
+            }
+        }
+
+        template <direction D>
+        [[nodiscard]] auto data() noexcept -> T*
+        {
+            if constexpr (D == direction::direct)
+            {
+                return direct_data();
+            }
+            else
+            {
+                return indirect()->data();
+            }
+        }
+
+        template <direction D>
+        [[nodiscard]] auto data() const noexcept -> T const*
+        {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+            return const_cast<small_vector*>(this)->data<D>();
+        }
+
+        template <direction D>
+        void pop_back() noexcept
+        {
+            if constexpr (std::is_trivially_destructible_v<T>)
+            {
+                set_size<D>(size<D>() - 1);
+            }
+            else
+            {
+                auto s = size<D>() - 1;
+                (data<D>() + s)->~T();
+                set_size<D>(s);
+            }
+        }
+
+        // \brief We need variadic arguments so we can either use copy ctor or
+        // default ctor
+        template <direction D, typename... Args>
+        void resize_after_reserve(std::size_t count, Args&&... args)
+        {
+            auto current_size = size<D>();
+            if (current_size > count)
+            {
+                if constexpr (!std::is_trivially_destructible_v<T>)
+                {
+                    auto* d = data<D>();
+                    std::destroy(d + count, d + current_size);
+                }
+            }
+            else
+            {
+                auto* d = data<D>();
+                for (auto ptr = d + current_size, end = d + count; ptr != end;
+                     ++ptr)
+                {
+                    new (static_cast<void*>(ptr)) T(HPX_FORWARD(Args, args)...);
+                }
+            }
+            set_size<D>(count);
+        }
+
+        // Makes sure that to is not past the end iterator
+        template <direction D>
+        auto erase_checked_end(T const* cfrom, T const* to) -> T*
+        {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+            auto* const erase_begin = const_cast<T*>(cfrom);
+            auto* const container_end = data<D>() + size<D>();
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+            auto* const erase_end =
+                (std::min)(const_cast<T*>(to), container_end);
+
+            std::move(erase_end, container_end, erase_begin);
+            auto const num_erased = std::distance(erase_begin, erase_end);
+            std::destroy(container_end - num_erased, container_end);
+            set_size<D>(size<D>() - num_erased);
+            return erase_begin;
+        }
+
+        template <typename It>
+        void assign(It first, It last, std::input_iterator_tag /*unused*/)
+        {
+            clear();
+
+            // TODO this can be made faster, e.g. by setting size only when
+            // finished.
+            while (first != last)
+            {
+                push_back(*first);
+                ++first;
+            }
+        }
+
+        template <typename It>
+        void assign(It first, It last, std::forward_iterator_tag /*unused*/)
+        {
+            clear();
+
+            auto s = std::distance(first, last);
+            reserve(s);
+            std::uninitialized_copy(first, last, data());
+            set_size(s);
+        }
+
+        // precondition: all uninitialized
+        void do_move_assign(small_vector&& other) noexcept
+        {
+            if (!other.is_direct())
+            {
+                // take other's memory, even when empty
+                set_indirect(other.indirect());
+            }
+            else
+            {
+                auto* other_ptr = other.data<direction::direct>();
+                auto s = other.size<direction::direct>();
+                auto* other_end = other_ptr + s;
+
+                std::uninitialized_move(
+                    other_ptr, other_end, data<direction::direct>());
+                std::destroy(other_ptr, other_end);
+                set_size(s);
+            }
+            other.set_direct_and_size(0);
+        }
+
+        // \brief Shifts data [source_begin, source_end) to the right, starting
+        // on target_begin.
+        //
+        // Preconditions:
+        // * contiguous memory
+        // * source_begin <= target_begin
+        // * source_end onwards is uninitialized memory
+        //
+        // Destroys then empty elements in [source_begin, source_end)
+        auto shift_right(
+            T* source_begin, T* source_end, T* target_begin) noexcept
+        {
+            // 1. uninitialized moves
+            auto const num_moves = std::distance(source_begin, source_end);
+            auto const target_end = target_begin + num_moves;
+            auto const num_uninitialized_move =
+                (std::min)(num_moves, std::distance(source_end, target_end));
+            std::uninitialized_move(source_end - num_uninitialized_move,
+                source_end, target_end - num_uninitialized_move);
+            std::move_backward(source_begin,
+                source_end - num_uninitialized_move,
+                target_end - num_uninitialized_move);
+            std::destroy(source_begin, (std::min)(source_end, target_begin));
+        }
+
+        // makes space for uninitialized data of cout elements. Also updates
+        // size.
+        template <direction D>
+        [[nodiscard]] auto make_uninitialized_space_new(
+            std::size_t s, T* p, std::size_t count) -> T*
+        {
+            auto target = small_vector();
+
+            // we know target is indirect because we're increasing capacity
+            target.reserve(s + count);
+
+            // move everything [begin, pos[
+            auto* target_pos = std::uninitialized_move(
+                data<D>(), p, target.template data<direction::indirect>());
+
+            // move everything [pos, end]
+            std::uninitialized_move(p, data<D>() + s, target_pos + count);
+
+            target.template set_size<direction::indirect>(s + count);
+            *this = HPX_MOVE(target);
+            return target_pos;
+        }
+
+        template <direction D>
+        [[nodiscard]] auto make_uninitialized_space(
+            T const* pos, std::size_t count) -> T*
+        {
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+            auto* const p = const_cast<T*>(pos);
+            auto s = size<D>();
+            if (s + count > capacity<D>())
+            {
+                return make_uninitialized_space_new<D>(s, p, count);
+            }
+
+            shift_right(p, data<D>() + s, p + count);
+            set_size<D>(s + count);
+            return p;
+        }
+
+        // makes space for uninitialized data of cout elements. Also updates size.
+        [[nodiscard]] auto make_uninitialized_space(
+            T const* pos, std::size_t count) -> T*
+        {
+            if (is_direct())
+            {
+                return make_uninitialized_space<direction::direct>(pos, count);
+            }
+            return make_uninitialized_space<direction::indirect>(pos, count);
+        }
+
+        void destroy() noexcept
+        {
+            auto const is_dir = is_direct();
+            if constexpr (!std::is_trivially_destructible_v<T>)
+            {
+                T* ptr = nullptr;
+                std::size_t s = 0;
+                if (is_dir)
+                {
+                    ptr = data<direction::direct>();
+                    s = size<direction::direct>();
+                }
+                else
+                {
+                    ptr = data<direction::indirect>();
+                    s = size<direction::indirect>();
+                }
+                std::destroy_n(ptr, s);
+            }
+            if (!is_dir)
+            {
+                detail::storage<T>::dealloc(indirect());
+            }
+            set_direct_and_size(0);
+        }
+
+        // performs a const_cast so we don't need this implementation twice
+        template <direction D>
+        auto at(std::size_t idx) const -> T&
+        {
+            if (idx >= size<D>())
+            {
+                throw std::out_of_range{"small_vector: idx out of range"};
+            }
+
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+            auto* ptr = const_cast<T*>(data<D>() + idx);
+            return *ptr;
+        }    // LCOV_EXCL_LINE why is this single } marked as not covered? gcov bug?
 
     public:
-        using value_type = typename data_type::value_type;
-        using allocator_type = other_allocator;
-        using size_type = typename data_type::size_type;
-        using difference_type = typename data_type::difference_type;
-        using reference = typename data_type::reference;
-        using const_reference = typename data_type::const_reference;
-        using pointer = typename data_type::pointer;
-        using const_pointer = typename data_type::const_pointer;
-        using iterator = typename data_type::iterator;
-        using const_iterator = typename data_type::const_iterator;
-        using reverse_iterator = typename data_type::reverse_iterator;
-        using const_reverse_iterator =
-            typename data_type::const_reverse_iterator;
+        using value_type = T;
+        using size_type = std::size_t;
+        using difference_type = std::ptrdiff_t;
+        using reference = value_type&;
+        using const_reference = value_type const&;
+        using pointer = T*;
+        using const_pointer = T const*;
+        using iterator = T*;
+        using const_iterator = T const*;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+        using allocator_type = Allocator;
 
-        static constexpr std::size_t static_capacity = Size;
+        static constexpr std::size_t static_capacity = N;
 
-        small_vector() noexcept(noexcept(allocator_type()))
-          : storage_()
-          , data_(storage_.allocator_)
+        constexpr small_vector(Allocator const& = Allocator()) noexcept
         {
-            data_.reserve(Size);
+            set_direct_and_size(0);
         }
 
-        explicit small_vector(allocator_type const& alloc) noexcept
-          : storage_(alloc)
-          , data_(storage_.allocator_)
+        small_vector(
+            std::size_t count, T const& value, Allocator const& = Allocator())
+          : small_vector()
         {
-            data_.reserve(Size);
+            resize(count, value);
         }
 
-        explicit small_vector(
-            size_type count, allocator_type const& alloc = allocator_type())
-          : storage_(alloc)
-          , data_(count, storage_.allocator_)
+        explicit small_vector(std::size_t count, Allocator const& = Allocator())
+          : small_vector()
         {
-        }
-
-        small_vector(size_type count, value_type const& value,
-            allocator_type const& alloc = allocator_type())
-          : storage_(alloc)
-          , data_(count, value, storage_.allocator_)
-        {
-        }
-
-        small_vector(std::initializer_list<T> init_list,
-            allocator_type const& alloc = allocator_type())
-          : storage_(alloc)
-          , data_(std::cbegin(init_list), std::cend(init_list),
-                storage_.allocator_)
-        {
-        }
-
-        template <typename Iterator>
-        small_vector(Iterator first, Iterator last,
-            allocator_type const& alloc = allocator_type())
-          : storage_(alloc)
-          , data_(first, last, storage_.allocator_)
-        {
-        }
-
-        small_vector(small_vector const& rhs)
-          : storage_(rhs.storage_)
-          , data_(rhs.data_, storage_.allocator_)
-        {
-        }
-
-        small_vector(small_vector&& rhs) noexcept
-          : storage_(rhs.storage_)
-          , data_(HPX_MOVE(rhs.data_), storage_.allocator_)
-        {
-        }
-
-        small_vector& operator=(small_vector const& rhs)
-        {
-            if (this != &rhs)
+            reserve(count);
+            if (is_direct())
             {
-                // free all data owned by the old instance
-                data_.data_type::~data_type();
-
-                // reconstruct the memory management infrastructure for
-                // the new instance
-                storage_ = rhs.storage_;
-
-                // fill the new instance with a copy of the rhs data
-                new (&data_) data_type(rhs.data_, storage_.allocator_);
+                resize_after_reserve<direction::direct>(count);
             }
-            return *this;
-        }
-        small_vector& operator=(small_vector&& rhs) noexcept
-        {
-            if (this != &rhs)
+            else
             {
-                // free all data owned by the old instance
-                data_.data_type::~data_type();
-
-                // reconstruct the memory management infrastructure for
-                // the new instance
-                storage_ = HPX_MOVE(rhs.storage_);
-
-                // fill the new instance with the moved rhs data
-                new (&data_)
-                    data_type(HPX_MOVE(rhs.data_), storage_.allocator_);
+                resize_after_reserve<direction::indirect>(count);
             }
+        }
+
+        template <typename InputIt,
+            typename =
+                std::enable_if_t<detail::is_argument_iterator_v<InputIt>>>
+        small_vector(
+            InputIt first, InputIt last, Allocator const& = Allocator())
+          : small_vector()
+        {
+            assign(first, last);
+        }
+
+        small_vector(small_vector const& other)
+          : small_vector()
+        {
+            auto s = other.size();
+            reserve(s);
+            std::uninitialized_copy(other.begin(), other.end(), begin());
+            set_size(s);
+        }
+
+        small_vector(small_vector&& other) noexcept
+          : small_vector()
+        {
+            do_move_assign(HPX_MOVE(other));
+        }
+
+        small_vector(
+            std::initializer_list<T> init, Allocator const& = Allocator())
+          : small_vector(init.begin(), init.end())
+        {
+        }
+
+        ~small_vector()
+        {
+            destroy();
+        }
+
+        void assign(std::size_t count, T const& value)
+        {
+            clear();
+            resize(count, value);
+        }
+
+        template <typename InputIt,
+            typename =
+                std::enable_if_t<detail::is_argument_iterator_v<InputIt>>>
+        void assign(InputIt first, InputIt last)
+        {
+            assign(first, last,
+                typename std::iterator_traits<InputIt>::iterator_category());
+        }
+
+        void assign(std::initializer_list<T> l)
+        {
+            assign(l.begin(), l.end());
+        }
+
+        auto operator=(small_vector const& other) -> small_vector&
+        {
+            if (&other == this)
+            {
+                return *this;
+            }
+
+            assign(other.begin(), other.end());
             return *this;
         }
-        small_vector& operator=(std::initializer_list<T> init_list)
+
+        auto operator=(small_vector&& other) noexcept -> small_vector&
         {
-            data_ = init_list;
+            if (&other == this)
+            {
+                // It doesn't seem to be required to do self-check, but let's do
+                // it anyways to be safe
+                return *this;
+            }
+
+            destroy();
+            do_move_assign(HPX_MOVE(other));
             return *this;
         }
 
-        allocator_type get_allocator() const noexcept
+        auto operator=(std::initializer_list<T> l) -> small_vector&
         {
-            return storage_.resource_.allocator_;
+            assign(l.begin(), l.end());
+            return *this;
         }
 
-        void assign(size_type count, value_type const& value)
+        void resize(std::size_t count)
         {
-            data_.assign(count, value);
-        }
-        template <typename Iterator>
-        void assign(Iterator first, Iterator last)
-        {
-            data_.assign(first, last);
-        }
-        void assign(std::initializer_list<T> init_list)
-        {
-            data_.assign(init_list);
+            if (count > capacity())
+            {
+                reserve(count);
+            }
+
+            if (is_direct())
+            {
+                resize_after_reserve<direction::direct>(count);
+            }
+            else
+            {
+                resize_after_reserve<direction::indirect>(count);
+            }
         }
 
-        reference operator[](size_type pos)
+        void resize(std::size_t count, value_type const& value)
         {
-            return data_[pos];
-        }
-        const_reference operator[](size_type pos) const
-        {
-            return data_[pos];
+            if (count > capacity())
+            {
+                reserve(count);
+            }
+
+            if (is_direct())
+            {
+                resize_after_reserve<direction::direct>(count, value);
+            }
+            else
+            {
+                resize_after_reserve<direction::indirect>(count, value);
+            }
         }
 
-        reference at(size_type pos)
+        auto reserve(std::size_t s)
         {
-            return data_.at(pos);
-        }
-        const_reference at(size_type pos) const
-        {
-            return data_.at(pos);
-        }
-
-        reference front()
-        {
-            return data_.front();
-        }
-        const_reference front() const
-        {
-            return data_.front();
+            auto old_capacity = capacity();
+            auto new_capacity = calculate_new_capacity(s, old_capacity);
+            if (new_capacity > old_capacity)
+            {
+                realloc(new_capacity);
+            }
         }
 
-        reference back()
+        [[nodiscard]] constexpr auto capacity() const noexcept -> std::size_t
         {
-            return data_.back();
-        }
-        const_reference back() const
-        {
-            return data_.back();
-        }
-
-        T* data() noexcept
-        {
-            return data_.data();
-        }
-        T const* data() const noexcept
-        {
-            return data_.data();
+            if (is_direct())
+            {
+                return capacity<direction::direct>();
+            }
+            return capacity<direction::indirect>();
         }
 
-        iterator begin()
+        [[nodiscard]] constexpr auto size() const noexcept -> std::size_t
         {
-            return data_.begin();
-        }
-        const_iterator begin() const
-        {
-            return data_.begin();
-        }
-
-        const_iterator cbegin() const
-        {
-            return data_.cbegin();
+            if (is_direct())
+            {
+                return size<direction::direct>();
+            }
+            return size<direction::indirect>();
         }
 
-        reverse_iterator rbegin()
+        [[nodiscard]] auto data() noexcept -> T*
         {
-            return data_.rbegin();
-        }
-        const_reverse_iterator rbegin() const
-        {
-            return data_.rbegin();
-        }
-
-        const_reverse_iterator crbegin() const
-        {
-            return data_.crbegin();
+            if (is_direct())
+            {
+                return direct_data();
+            }
+            return indirect()->data();
         }
 
-        iterator end()
+        [[nodiscard]] auto data() const noexcept -> T const*
         {
-            return data_.end();
-        }
-        const_iterator end() const
-        {
-            return data_.end();
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+            return const_cast<small_vector*>(this)->data();
         }
 
-        const_iterator cend() const
+        template <typename... Args>
+        auto emplace_back(Args&&... args) -> T&
         {
-            return data_.cend();
+            std::size_t s;    // NOLINT(cppcoreguidelines-init-variables)
+            if (is_direct())
+            {
+                s = direct_size();
+                if (s < N)
+                {
+                    set_direct_and_size(s + 1);
+                    return *new (static_cast<void*>(direct_data() + s))
+                        T(HPX_FORWARD(Args, args)...);
+                }
+                realloc(calculate_new_capacity(N + 1, N));
+            }
+            else
+            {
+                s = size<direction::indirect>();
+                if (s == capacity<direction::indirect>())
+                {
+                    realloc(calculate_new_capacity(s + 1, s));
+                }
+            }
+
+            set_size<direction::indirect>(s + 1);
+            return *new (static_cast<void*>(data<direction::indirect>() + s))
+                T(HPX_FORWARD(Args, args)...);
         }
 
-        reverse_iterator rend()
+        void push_back(T const& value)
         {
-            return data_.rend();
-        }
-        const_reverse_iterator rend() const
-        {
-            return data_.rend();
+            emplace_back(value);
         }
 
-        const_reverse_iterator crend() const
+        void push_back(T&& value)
         {
-            return data_.crend();
+            emplace_back(HPX_MOVE(value));
         }
 
-        bool empty() const
+        [[nodiscard]] auto operator[](std::size_t idx) const noexcept
+            -> T const&
         {
-            return data_.empty();
+            return *(data() + idx);
         }
 
-        size_type size() const
+        [[nodiscard]] auto operator[](std::size_t idx) noexcept -> T&
         {
-            return data_.size();
+            return *(data() + idx);
         }
 
-        size_type max_size() const
+        auto at(std::size_t idx) const -> T const&
         {
-            return data_.max_size();
+            if (is_direct())
+            {
+                return at<direction::direct>(idx);
+            }
+            return at<direction::indirect>(idx);
         }
 
-        void reserve(std::size_t count)
+        auto at(std::size_t idx) -> T&
         {
-            data_.reserve(count);
+            if (is_direct())
+            {
+                return at<direction::direct>(idx);
+            }
+            return at<direction::indirect>(idx);
         }
 
-        size_type capacity() const
+        [[nodiscard]] auto begin() const noexcept -> T const*
         {
-            return data_.capacity();
+            return data();
         }
 
-        void shrink_to_fit()
+        [[nodiscard]] auto cbegin() const noexcept -> T const*
         {
-            data_.shrink_to_fit();
+            return begin();
+        }
+
+        [[nodiscard]] auto begin() noexcept -> T*
+        {
+            return data();
+        }
+
+        [[nodiscard]] auto end() const noexcept -> T const*
+        {
+            if (is_direct())
+            {
+                return data<direction::direct>() + size<direction::direct>();
+            }
+            return data<direction::indirect>() + size<direction::indirect>();
+        }
+
+        [[nodiscard]] auto cend() const noexcept -> T const*
+        {
+            return end();
+        }
+
+        [[nodiscard]] auto end() noexcept -> T*
+        {
+            if (is_direct())
+            {
+                return data<direction::direct>() + size<direction::direct>();
+            }
+            return data<direction::indirect>() + size<direction::indirect>();
+        }
+
+        [[nodiscard]] auto rbegin() noexcept -> reverse_iterator
+        {
+            return reverse_iterator{end()};
+        }
+
+        [[nodiscard]] auto rbegin() const noexcept -> const_reverse_iterator
+        {
+            return crbegin();
+        }
+
+        [[nodiscard]] auto crbegin() const noexcept -> const_reverse_iterator
+        {
+            return const_reverse_iterator{end()};
+        }
+
+        [[nodiscard]] auto rend() noexcept -> reverse_iterator
+        {
+            return reverse_iterator{begin()};
+        }
+
+        [[nodiscard]] auto rend() const noexcept -> const_reverse_iterator
+        {
+            return crend();
+        }
+
+        [[nodiscard]] auto crend() const noexcept -> const_reverse_iterator
+        {
+            return const_reverse_iterator{begin()};
+        }
+
+        [[nodiscard]] auto front() const noexcept -> T const&
+        {
+            return *data();
+        }
+
+        [[nodiscard]] auto front() noexcept -> T&
+        {
+            return *data();
+        }
+
+        [[nodiscard]] auto back() const noexcept -> T const&
+        {
+            if (is_direct())
+            {
+                return *(
+                    data<direction::direct>() + size<direction::direct>() - 1);
+            }
+            return *(
+                data<direction::indirect>() + size<direction::indirect>() - 1);
+        }
+
+        [[nodiscard]] auto back() noexcept -> T&
+        {
+            if (is_direct())
+            {
+                return *(
+                    data<direction::direct>() + size<direction::direct>() - 1);
+            }
+            return *(
+                data<direction::indirect>() + size<direction::indirect>() - 1);
         }
 
         void clear() noexcept
         {
-            data_.clear();
+            if constexpr (!std::is_trivially_destructible_v<T>)
+            {
+                std::destroy(begin(), end());
+            }
+
+            if (is_direct())
+            {
+                set_size<direction::direct>(0);
+            }
+            else
+            {
+                set_size<direction::indirect>(0);
+            }
         }
 
-        iterator insert(const_iterator pos, value_type const& value)
+        [[nodiscard]] constexpr auto empty() const noexcept -> bool
         {
-            return data_.insert(pos, value);
-        }
-        iterator insert(const_iterator pos, value_type&& value)
-        {
-            return data_.insert(pos, HPX_MOVE(value));
-        }
-        iterator insert(
-            const_iterator pos, size_type count, value_type const& value)
-        {
-            return data_.insert(pos, count, value);
-        }
-        template <typename Iterator>
-        iterator insert(Iterator first, Iterator last)
-        {
-            return data_.insert(first, last);
-        }
-        template <typename Iterator>
-        iterator insert(const_iterator pos, Iterator first, Iterator last)
-        {
-            return data_.insert(pos, first, last);
-        }
-        iterator insert(const_iterator pos, std::initializer_list<T> init_list)
-        {
-            return data_.insert(pos, init_list);
-        }
-
-        template <typename... Ts>
-        iterator emplace(const_iterator pos, Ts&&... ts)
-        {
-            return data_.emplace(pos, HPX_FORWARD(Ts, ts)...);
-        }
-
-        iterator erase(const_iterator pos)
-        {
-            return data_.erase(pos);
-        }
-
-        void push_back(value_type const& value)
-        {
-            data_.push_back(value);
-        }
-        void push_back(value_type&& value)
-        {
-            data_.push_back(HPX_MOVE(value));
-        }
-
-        template <typename... Ts>
-        reference emplace_back(Ts&&... ts)
-        {
-            return data_.emplace_back(HPX_FORWARD(Ts, ts)...);
+            return 0U == size();
         }
 
         void pop_back()
         {
-            data_.pop_back();
+            if (is_direct())
+            {
+                pop_back<direction::direct>();
+            }
+            else
+            {
+                pop_back<direction::indirect>();
+            }
         }
 
-        void resize(size_type count)
+        [[nodiscard]] static constexpr auto max_size() -> std::size_t
         {
-            data_.resize(count);
-        }
-        void resize(size_type count, value_type const& value)
-        {
-            data_.resize(count, value);
+            return (std::numeric_limits<std::size_t>::max)();
         }
 
         void swap(small_vector& other) noexcept
         {
-            // data.swap(other.data_);
-            // explicitly move the objects as the MSVC standard library has a
-            // bug preventing to swap two std::pmr::vectors
-            small_vector tmp = HPX_MOVE(*this);
-            *this = HPX_MOVE(other);
-            other = HPX_MOVE(tmp);
+            // TODO we could try to do the minimum number of moves
+            std::swap(*this, other);
         }
 
-        friend bool operator==(small_vector const& lhs, small_vector const& rhs)
+        void shrink_to_fit()
         {
-            return lhs.data_ == rhs.data_;
-        }
-        friend bool operator<(small_vector const& lhs, small_vector const& rhs)
-        {
-            return lhs.data_ < rhs.data_;
-        }
-        friend bool operator>(small_vector const& lhs, small_vector const& rhs)
-        {
-            return lhs.data_ > rhs.data_;
-        }
-        friend bool operator<=(small_vector const& lhs, small_vector const& rhs)
-        {
-            return lhs.data_ <= rhs.data_;
-        }
-        friend bool operator>=(small_vector const& lhs, small_vector const& rhs)
-        {
-            return lhs.data_ >= rhs.data_;
-        }
-        friend bool operator!=(small_vector const& lhs, small_vector const& rhs)
-        {
-            return lhs.data_ != rhs.data_;
+            // per the standard we wouldn't need to do anything here. But since
+            // we are so nice, let's do the shrink.
+            auto const c = capacity();
+            auto const s = size();
+            if (s >= c)
+            {
+                return;
+            }
+
+            auto new_capacity = calculate_new_capacity(s, N);
+            if (new_capacity == c)
+            {
+                // nothing change!
+                return;
+            }
+
+            realloc(new_capacity);
         }
 
-    private:
-        storage_type storage_;
-        data_type data_;
+        template <typename... Args>
+        auto emplace(const_iterator pos, Args&&... args) -> iterator
+        {
+            auto* p = make_uninitialized_space(pos, 1);
+            return new (static_cast<void*>(p)) T(HPX_FORWARD(Args, args)...);
+        }
+
+        auto insert(const_iterator pos, T const& value) -> iterator
+        {
+            return emplace(pos, value);
+        }
+
+        auto insert(const_iterator pos, T&& value) -> iterator
+        {
+            return emplace(pos, HPX_MOVE(value));
+        }
+
+        auto insert(const_iterator pos, std::size_t count, T const& value)
+            -> iterator
+        {
+            auto* p = make_uninitialized_space(pos, count);
+            std::uninitialized_fill_n(p, count, value);
+            return p;
+        }
+
+        template <typename It>
+        auto insert(const_iterator pos, It first, It last,
+            std::input_iterator_tag /*unused*/)
+        {
+            if (!(first != last))
+            {
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+                return const_cast<T*>(pos);
+            }
+
+            // just input_iterator_tag makes this very slow. Let's do the same
+            // as the STL.
+            if (pos == end())
+            {
+                auto s = size();
+                while (first != last)
+                {
+                    emplace_back(*first);
+                    ++first;
+                }
+                return begin() + s;
+            }
+
+            auto tmp = small_vector(first, last);
+            return insert(pos, std::make_move_iterator(tmp.begin()),
+                std::make_move_iterator(tmp.end()));
+        }
+
+        template <typename It>
+        auto insert(const_iterator pos, It first, It last,
+            std::forward_iterator_tag /*unused*/)
+        {
+            auto* p = make_uninitialized_space(pos, std::distance(first, last));
+            std::uninitialized_copy(first, last, p);
+            return p;
+        }
+
+        template <typename InputIt,
+            typename =
+                std::enable_if_t<detail::is_argument_iterator_v<InputIt>>>
+        auto insert(const_iterator pos, InputIt first, InputIt last) -> iterator
+        {
+            return insert(pos, first, last,
+                typename std::iterator_traits<InputIt>::iterator_category());
+        }
+
+        auto insert(const_iterator pos, std::initializer_list<T> l) -> iterator
+        {
+            return insert(pos, l.begin(), l.end());
+        }
+
+        auto erase(const_iterator pos) -> iterator
+        {
+            return erase(pos, pos + 1);
+        }
+
+        auto erase(const_iterator first, const_iterator last) -> iterator
+        {
+            if (is_direct())
+            {
+                return erase_checked_end<direction::direct>(first, last);
+            }
+            return erase_checked_end<direction::indirect>(first, last);
+        }
     };
+
+    template <typename T, std::size_t NA, std::size_t NB>
+    [[nodiscard]] constexpr auto operator==(small_vector<T, NA> const& a,
+        small_vector<T, NB> const& b) noexcept -> bool
+    {
+        return std::equal(a.begin(), a.end(), b.begin(), b.end());
+    }
+
+    template <typename T, std::size_t NA, std::size_t NB>
+    [[nodiscard]] constexpr auto operator!=(small_vector<T, NA> const& a,
+        small_vector<T, NB> const& b) noexcept -> bool
+    {
+        return !(a == b);
+    }
+
+    template <typename T, std::size_t NA, std::size_t NB>
+    [[nodiscard]] constexpr auto operator<(small_vector<T, NA> const& a,
+        small_vector<T, NB> const& b) noexcept -> bool
+    {
+        return std::lexicographical_compare(
+            a.begin(), a.end(), b.begin(), b.end());
+    }
+
+    template <typename T, std::size_t NA, std::size_t NB>
+    [[nodiscard]] constexpr auto operator>=(small_vector<T, NA> const& a,
+        small_vector<T, NB> const& b) noexcept -> bool
+    {
+        return !(a < b);
+    }
+
+    template <typename T, std::size_t NA, std::size_t NB>
+    [[nodiscard]] constexpr auto operator>(small_vector<T, NA> const& a,
+        small_vector<T, NB> const& b) noexcept -> bool
+    {
+        return std::lexicographical_compare(
+            b.begin(), b.end(), a.begin(), a.end());
+    }
+
+    template <typename T, std::size_t NA, std::size_t NB>
+    [[nodiscard]] constexpr auto operator<=(small_vector<T, NA> const& a,
+        small_vector<T, NB> const& b) noexcept -> bool
+    {
+        return !(a > b);
+    }
 }    // namespace hpx::detail
 
+// NOLINTNEXTLINE(cert-dcl58-cpp)
 namespace std {
 
-    template <typename T, std::size_t Size, typename Allocator>
-    void swap(hpx::detail::small_vector<T, Size, Allocator>& lhs,
-        hpx::detail::small_vector<T, Size, Allocator>& rhs)
+    template <typename T, std::size_t N, typename U>
+    constexpr auto erase(hpx::detail::small_vector<T, N>& sv, U const& value) ->
+        typename hpx::detail::small_vector<T, N>::size_type
     {
-        lhs.swap(rhs);
+        auto* removed_begin = std::remove(sv.begin(), sv.end(), value);
+        auto num_removed = std::distance(removed_begin, sv.end());
+        sv.erase(removed_begin, sv.end());
+        return num_removed;
+    }
+
+    template <typename T, std::size_t N, typename Pred>
+    constexpr auto erase_if(hpx::detail::small_vector<T, N>& sv, Pred pred) ->
+        typename hpx::detail::small_vector<T, N>::size_type
+    {
+        auto* removed_begin = std::remove_if(sv.begin(), sv.end(), pred);
+        auto num_removed = std::distance(removed_begin, sv.end());
+        sv.erase(removed_begin, sv.end());
+        return num_removed;
     }
 }    // namespace std
-
-#endif

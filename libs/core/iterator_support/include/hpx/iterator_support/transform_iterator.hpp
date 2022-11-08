@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,24 +32,22 @@ namespace hpx { namespace util {
             // the following type calculations use lazy_conditional to avoid
             // premature instantiations
             using reference_type =
-                typename util::lazy_conditional<std::is_void<Reference>::value,
+                util::lazy_conditional_t<std::is_void_v<Reference>,
                     util::invoke_result<Transformer, Iterator>,
-                    util::identity<Reference>>::type;
+                    util::identity<Reference>>;
 
-            using value_type =
-                typename util::lazy_conditional<std::is_void<Value>::value,
-                    std::remove_reference<reference_type>,
-                    util::identity<Value>>::type;
+            using value_type = util::lazy_conditional_t<std::is_void_v<Value>,
+                std::remove_reference<reference_type>, util::identity<Value>>;
 
             using iterator_category =
-                typename util::lazy_conditional<std::is_void<Category>::value,
+                util::lazy_conditional_t<std::is_void_v<Category>,
                     category_iterator_traits_helper<Iterator>,
-                    util::identity<Category>>::type;
+                    util::identity<Category>>;
 
             using difference_type =
-                typename util::lazy_conditional<std::is_void<Difference>::value,
+                util::lazy_conditional_t<std::is_void_v<Difference>,
                     difference_type_iterator_traits_helper<Iterator>,
-                    util::identity<Difference>>::type;
+                    util::identity<Difference>>;
 
             using type = hpx::util::iterator_adaptor<
                 transform_iterator<Iterator, Transformer, Reference, Value,
@@ -74,12 +72,13 @@ namespace hpx { namespace util {
             Reference, Value, Category, Difference>::type base_type;
 
     public:
-        transform_iterator() {}
+        transform_iterator() = default;
 
         explicit transform_iterator(Iterator const& it)
           : base_type(it)
         {
         }
+
         transform_iterator(Iterator const& it, Transformer const& f)
           : base_type(it)
           , transformer_(f)
@@ -92,18 +91,16 @@ namespace hpx { namespace util {
         transform_iterator(
             transform_iterator<OtherIterator, OtherTransformer, OtherReference,
                 OtherValue, OtherCategory, OtherDifference> const& t,
-            typename std::enable_if<
-                std::is_convertible<OtherIterator, Iterator>::value &&
-                std::is_convertible<OtherTransformer, Transformer>::value &&
-                std::is_convertible<OtherCategory, Category>::value &&
-                std::is_convertible<OtherDifference,
-                    Difference>::value>::type* = nullptr)
+            std::enable_if_t<std::is_convertible_v<OtherIterator, Iterator> &&
+                std::is_convertible_v<OtherTransformer, Transformer> &&
+                std::is_convertible_v<OtherCategory, Category> &&
+                std::is_convertible_v<OtherDifference, Difference>>* = nullptr)
           : base_type(t.base())
           , transformer_(t.transformer())
         {
         }
 
-        Transformer const& transformer() const
+        constexpr Transformer const& transformer() const noexcept
         {
             return transformer_;
         }
@@ -119,16 +116,23 @@ namespace hpx { namespace util {
         Transformer transformer_;
     };
 
+    template <typename Iterator, typename Transformer>
+    transform_iterator(Iterator const&, Transformer const&)
+        -> transform_iterator<Iterator, Transformer>;
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Transformer, typename Iterator>
-    inline transform_iterator<Iterator, Transformer> make_transform_iterator(
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::util::make_transform_iterator is deprecated, use "
+        "hpx::util::transform_iterator instead")
+    transform_iterator<Iterator, Transformer> make_transform_iterator(
         Iterator const& it, Transformer const& f)
     {
         return transform_iterator<Iterator, Transformer>(it, f);
     }
 
     template <typename Transformer, typename Iterator>
-    inline transform_iterator<Iterator, Transformer> make_transform_iterator(
+    transform_iterator<Iterator, Transformer> make_transform_iterator(
         Iterator const& it)
     {
         return transform_iterator<Iterator, Transformer>(it, Transformer());

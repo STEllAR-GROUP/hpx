@@ -79,11 +79,11 @@ if(HPX_WITH_GIT_BRANCH)
     )
   endif()
   if("latexpdf" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
-    file(
-      COPY "${DOCS_SOURCE}/latexpdf/latex/HPX.pdf"
-      DESTINATION "${DOCS_BRANCH_DEST}/pdf/"
-      PATTERN "*.buildinfo" EXCLUDE
-    )
+    if(EXISTS "${DOCS_SOURCE}/latexpdf/latex/HPX.pdf")
+      file(COPY "${DOCS_SOURCE}/latexpdf/latex/HPX.pdf"
+           DESTINATION "${DOCS_BRANCH_DEST}/pdf/"
+      )
+    endif()
   endif()
   # special handling of dependency report files
   if(EXISTS "${DOCS_SOURCE}/report")

@@ -19,7 +19,9 @@
 
 #if (defined(__linux) || defined(__APPLE__) || defined(__sun)) &&              \
     (!defined(__ANDROID__) || !defined(ANDROID))
+#if defined(__GLIBC__)
 #define HPX_HAVE_EXECINFO
+#endif
 #define HPX_HAVE_DLFCN
 #if defined(__GNUC__) && !defined(__clang__)
 #define HPX_HAVE_UNWIND

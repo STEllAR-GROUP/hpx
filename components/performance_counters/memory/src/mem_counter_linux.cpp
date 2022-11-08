@@ -14,6 +14,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+// Fix for musl. Use linux/param.h for EXEC_PAGESIZE
+#ifdef __linux__
+#include <linux/param.h>
+#endif
+
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 

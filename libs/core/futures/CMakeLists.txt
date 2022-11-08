@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -60,9 +60,19 @@ add_hpx_module(
   SOURCES ${futures_sources}
   HEADERS ${futures_headers}
   COMPAT_HEADERS ${futures_compat_headers}
-  EXCLUDE_FROM_GLOBAL_HEADER "hpx/futures/detail/future_data.hpp"
-                             "hpx/futures/detail/future_transforms.hpp"
-  MODULE_DEPENDENCIES hpx_async_base hpx_config hpx_allocator_support hpx_errors
-                      hpx_memory hpx_synchronization
+  ADD_TO_GLOBAL_HEADER "hpx/futures/detail/future_transforms.hpp"
+  MODULE_DEPENDENCIES
+    hpx_allocator_support
+    hpx_assertion
+    hpx_async_base
+    hpx_concepts
+    hpx_config
+    hpx_errors
+    hpx_functional
+    hpx_memory
+    hpx_serialization
+    hpx_synchronization
+    hpx_timing
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

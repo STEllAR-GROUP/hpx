@@ -16,6 +16,7 @@
 #include <hpx/type_support/unused.hpp>
 
 #include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
@@ -37,7 +38,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util {
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Result, typename ExPolicy, typename FwdIter,
             typename F>
         auto foreach_partition(
@@ -106,7 +110,7 @@ namespace hpx { namespace parallel { namespace util {
 
             template <typename ExPolicy_, typename FwdIter, typename F1,
                 typename F2>
-            static FwdIter call(ExPolicy_&& policy, FwdIter first,
+            static decltype(auto) call(ExPolicy_&& policy, FwdIter first,
                 std::size_t count, F1&& f1, F2&& f2)
             {
                 // inform parameter traits
@@ -134,7 +138,8 @@ namespace hpx { namespace parallel { namespace util {
         private:
             template <typename F, typename Items1, typename Items2,
                 typename FwdIter>
-            static FwdIter reduce(
+
+            static auto reduce(
                 std::pair<Items1, Items2>&& items, F&& f, FwdIter last)
             {
                 // wait for all tasks to finish
@@ -146,20 +151,37 @@ namespace hpx { namespace parallel { namespace util {
                     handle_local_exceptions::call(hpx::get<0>(items));
                     handle_local_exceptions::call(hpx::get<1>(items));
                 }
-                return f(HPX_MOVE(last));
+
+                // gcc 9 complains here if HPX_INVOKE is used.
+                return hpx::invoke(f, HPX_MOVE(last));
             }
 
             template <typename F, typename Items, typename FwdIter>
-            static FwdIter reduce(Items&& items, F&& f, FwdIter last)
+            static auto reduce(Items&& items, F&& f, FwdIter last)
             {
-                // wait for all tasks to finish
-                if (hpx::wait_all_nothrow(items))
+                namespace ex = hpx::execution::experimental;
+                if constexpr (ex::is_sender_v<std::decay_t<Items>> &&
+                    !hpx::traits::is_future_v<std::decay_t<Items>>)
                 {
-                    // always rethrow if items has at least one exceptional
-                    // future
-                    handle_local_exceptions::call(items);
+                    // the predecessor sender could be exposing zero or more
+                    // value types
+                    return ex::then(HPX_FORWARD(Items, items),
+                        [f = HPX_FORWARD(F, f),
+                            last = HPX_MOVE(last)]() mutable {
+                            return HPX_INVOKE(f, HPX_MOVE(last));
+                        });
                 }
-                return f(HPX_MOVE(last));
+                else
+                {
+                    // wait for all tasks to finish
+                    if (hpx::wait_all_nothrow(items))
+                    {
+                        // always rethrow if items has at least one exceptional
+                        // future
+                        handle_local_exceptions::call(items);
+                    }
+                    return HPX_INVOKE(f, HPX_MOVE(last));
+                }
             }
         };
 
@@ -258,12 +280,6 @@ namespace hpx { namespace parallel { namespace util {
                 return hpx::future<FwdIter>();
 #else
                 // wait for all tasks to finish
-                // Note: the lambda takes the vectors by value (dataflow
-                //       moves those into the lambda) to ensure that they
-                //       will be destroyed before the lambda exists.
-                //       Otherwise the vectors stay alive in the dataflow's
-                //       shared state and may reference data that has gone
-                //       out of scope.
                 return hpx::dataflow(
                     hpx::launch::sync,
                     [last, scoped_params = HPX_MOVE(scoped_params),
@@ -275,6 +291,33 @@ namespace hpx { namespace parallel { namespace util {
                         return f(HPX_MOVE(last));
                     },
                     HPX_MOVE(items));
+#endif
+            }
+
+            template <typename F, typename FwdIter>
+            static hpx::future<FwdIter> reduce(
+                std::shared_ptr<scoped_executor_parameters>&& scoped_params,
+                hpx::future<void>&& item, F&& f, FwdIter last)
+            {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+                HPX_UNUSED(scoped_params);
+                HPX_UNUSED(item);
+                HPX_UNUSED(f);
+                HPX_UNUSED(last);
+                HPX_ASSERT(false);
+                return hpx::future<FwdIter>();
+#else
+                // wait for the task to finish, invoke the given function before
+                // returning
+                return item.then(hpx::launch::sync,
+                    [last, scoped_params = HPX_MOVE(scoped_params),
+                        f = HPX_FORWARD(F, f)](auto&& r) mutable -> FwdIter {
+                        HPX_UNUSED(scoped_params);
+
+                        handle_local_exceptions::call(HPX_MOVE(r));
+
+                        return f(HPX_MOVE(last));
+                    });
 #endif
             }
         };

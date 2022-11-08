@@ -60,14 +60,13 @@ namespace hpx {
     /// permitted to execute in an unordered fashion in unspecified
     /// threads, and indeterminately sequenced within each thread.
     ///
-    /// \returns  The \a partial_sort_copy algorithm returns a
-    ///           returns \a RandomIt.
+    /// \returns  The \a partial_sort_copy algorithm returns a \a RandomIt.
     ///           The algorithm returns an iterator to the element defining
     ///           the upper boundary of the sorted range i.e.
     ///           d_first + min(last - first, d_last - d_first)
     ///
     template <typename InIter, typename RandIter,
-        typename Comp>
+        typename Comp = hpx::parallel::v1::detail::less>
     RandIter partial_sort_copy(InIter first, InIter last, RandIter d_first,
         RandIter d_last, Comp&& comp = Comp());
 
@@ -76,7 +75,8 @@ namespace hpx {
     /// order, storing the result in the range [d_first, d_last). At most
     /// d_last - d_first of the elements are placed sorted to the range
     /// [d_first, d_first + n) where n is the number of elements to sort
-    /// (n = min(last - first, d_last - d_first)).
+    /// (n = min(last - first, d_last - d_first)). Executed according to
+    /// the policy.
     ///
     /// \note   Complexity: O(Nlog(min(D,N))), where N =
     ///         std::distance(first, last) and D = std::distance(d_first,
@@ -134,7 +134,7 @@ namespace hpx {
     ///           d_first + min(last - first, d_last - d_first)
     ///
     template <typename ExPolicy, typename FwdIter, typename RandIter,
-        typename Comp>
+        typename Comp = hpx::parallel::v1::detail::less>
     parallel::util::detail::algorithm_result_t<ExPolicy, RandIter>
     partial_sort_copy(
         ExPolicy&& policy, FwdIter first, FwdIter last, RandIter d_first,
@@ -345,7 +345,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::partial_sort_copy
+    // CPO for hpx::partial_sort_copy
     inline constexpr struct partial_sort_copy_t final
       : hpx::detail::tag_parallel_algorithm<partial_sort_copy_t>
     {

@@ -17,7 +17,9 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/type_support/empty_function.hpp>
 #include <hpx/type_support/unused.hpp>
+#include <hpx/type_support/void_guard.hpp>
 
+#include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
@@ -31,7 +33,6 @@
 #include <cstddef>
 #include <exception>
 #include <iterator>
-#include <list>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -39,8 +40,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace parallel { namespace util {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Result, typename ExPolicy, typename FwdIter,
             typename F>
         auto partition(
@@ -200,14 +203,13 @@ namespace hpx { namespace parallel { namespace util {
 
             template <typename ExPolicy_, typename FwdIter, typename F1,
                 typename F2>
-            static R call(ExPolicy_&& policy, FwdIter first, std::size_t count,
-                F1&& f1, F2&& f2)
+            static auto call(ExPolicy_&& policy, FwdIter first,
+                std::size_t count, F1&& f1, F2&& f2)
             {
                 // inform parameter traits
                 scoped_executor_parameters scoped_params(
                     policy.parameters(), policy.executor());
 
-                std::list<std::exception_ptr> errors;
                 try
                 {
                     auto&& items = detail::partition<Result>(
@@ -226,14 +228,13 @@ namespace hpx { namespace parallel { namespace util {
 
             template <typename ExPolicy_, typename FwdIter, typename Stride,
                 typename F1, typename F2>
-            static R call_with_index(ExPolicy_&& policy, FwdIter first,
+            static auto call_with_index(ExPolicy_&& policy, FwdIter first,
                 std::size_t count, Stride stride, F1&& f1, F2&& f2)
             {
                 // inform parameter traits
                 scoped_executor_parameters scoped_params(
                     policy.parameters(), policy.executor());
 
-                std::list<std::exception_ptr> errors;
                 try
                 {
                     auto&& items = detail::partition_with_index<Result>(
@@ -253,7 +254,7 @@ namespace hpx { namespace parallel { namespace util {
             template <typename ExPolicy_, typename FwdIter, typename F1,
                 typename F2, typename Data>
             // requires is_container<Data>
-            static R call_with_data(ExPolicy_&& policy, FwdIter first,
+            static auto call_with_data(ExPolicy_&& policy, FwdIter first,
                 std::size_t count, F1&& f1, F2&& f2,
                 std::vector<std::size_t> const& chunk_sizes, Data&& data)
             {
@@ -280,27 +281,52 @@ namespace hpx { namespace parallel { namespace util {
 
         private:
             template <typename Items, typename F>
-            static R reduce(Items&& workitems, F&& f)
+            static auto reduce(Items&& items, F&& f)
             {
-                // wait for all tasks to finish
-                if (hpx::wait_all_nothrow(workitems))
+                namespace ex = hpx::execution::experimental;
+                if constexpr (ex::is_sender_v<std::decay_t<Items>> &&
+                    !hpx::traits::is_future_v<std::decay_t<Items>>)
                 {
-                    // always rethrow workitems has at least one exceptional
-                    // future
-                    handle_local_exceptions::call(workitems);
+                    // the predecessor sender could be exposing zero or more
+                    // value types
+                    return ex::then(HPX_FORWARD(Items, items),
+                        [f = HPX_FORWARD(F, f)](auto&&... results) mutable {
+                            return HPX_INVOKE(
+                                f, HPX_FORWARD(decltype(results), results)...);
+                        });
                 }
-                return f(HPX_MOVE(workitems));
+                else
+                {
+                    // wait for all tasks to finish
+                    if (hpx::wait_all_nothrow(items))
+                    {
+                        // always rethrow workitems has at least one exceptional
+                        // future
+                        handle_local_exceptions::call(items);
+                    }
+                    return HPX_INVOKE(f, HPX_FORWARD(Items, items));
+                }
             }
 
             template <typename Items>
-            static void reduce(Items&& workitems, hpx::util::empty_function)
+            static auto reduce(Items&& items, hpx::util::empty_function)
             {
-                // wait for all tasks to finish
-                if (hpx::wait_all_nothrow(workitems))
+                namespace ex = hpx::execution::experimental;
+                if constexpr (ex::is_sender_v<std::decay_t<Items>> &&
+                    !hpx::traits::is_future_v<std::decay_t<Items>>)
                 {
-                    // always rethrow workitems has at least one exceptional
-                    // future
-                    handle_local_exceptions::call(workitems);
+                    return HPX_FORWARD(Items, items);
+                }
+                else
+                {
+                    // wait for all tasks to finish
+                    if (hpx::wait_all_nothrow(items))
+                    {
+                        // always rethrow workitems has at least one exceptional
+                        // future
+                        handle_local_exceptions::call(items);
+                    }
+                    return hpx::util::unused;
                 }
             }
 
@@ -461,7 +487,7 @@ namespace hpx { namespace parallel { namespace util {
 
                         handle_local_exceptions::call(r);
 
-                        return f(HPX_MOVE(r));
+                        return hpx::util::void_guard<R>(), f(HPX_MOVE(r));
                     },
                     HPX_MOVE(workitems));
 #endif

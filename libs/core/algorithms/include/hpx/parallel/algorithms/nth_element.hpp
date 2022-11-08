@@ -21,6 +21,7 @@ namespace hpx {
     /// whatever element would occur in that position if [first, last) were
     /// sorted and all of the elements before this new nth element are less
     /// than or equal to the elements after the new nth element.
+    /// Executed according to the policy.
     ///
     /// \note   Complexity: Linear in std::distance(first, last) on average.
     ///         O(N) applications of the predicate, and O(N log N) swaps,
@@ -60,8 +61,8 @@ namespace hpx {
     ///
     /// \returns  The \a nth_element algorithms returns nothing.
     ///
-    template <typename RandomIt, typename Pred>
-    void nth_element(RandomIt first, RandomIt nth, RandomIt last, Pred&& pred);
+    template <typename RandomIt, typename Pred = hpx::parallel::v1::detail::less>
+    void nth_element(RandomIt first, RandomIt nth, RandomIt last, Pred&& pred = Pred());
 
     /// nth_element is a partial sorting algorithm that rearranges elements in
     /// [first, last) such that the element pointed at by nth is changed to
@@ -119,9 +120,10 @@ namespace hpx {
     ///
     /// \returns  The \a nth_element algorithms returns nothing.
     ///
-    template <typename ExPolicy, typename RandomIt, typename Pred>
+    template <typename ExPolicy, typename RandomIt,
+        typename Pred = hpx::parallel::v1::detail::less>
     void nth_element(ExPolicy&& policy, RandomIt first, RandomIt nth,
-        RandomIt last, Pred&& pred);
+        RandomIt last, Pred&& pred = Pred());
 
     // clang-format on
 }    // namespace hpx

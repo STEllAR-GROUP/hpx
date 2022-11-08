@@ -10,6 +10,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/debugging.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/preprocessor/expand.hpp>
+#include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
@@ -76,7 +79,9 @@ namespace hpx { namespace serialization { namespace detail {
 
 }}}    // namespace hpx::serialization::detail
 
-#define HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_WITH_NAME(Class, Name)         \
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_SERIALIZATION_ADD_GET_NAME_MEMBERS_WITH_NAME(                      \
+    Class, Name, Override)                                                     \
     template <typename, typename>                                              \
     friend struct ::hpx::serialization::detail::register_class_name;           \
                                                                                \
@@ -86,83 +91,164 @@ namespace hpx { namespace serialization { namespace detail {
             .instantiate();                                                    \
         return Name;                                                           \
     }                                                                          \
-    virtual std::string hpx_serialization_get_name() const                     \
+    virtual std::string hpx_serialization_get_name() const Override            \
     {                                                                          \
         return Class::hpx_serialization_get_name_impl();                       \
     }                                                                          \
     /**/
 
-#define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(Class, Name)                   \
-    HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_WITH_NAME(Class, Name);            \
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS(Class, Override)               \
     virtual void load(hpx::serialization::input_archive& ar, unsigned n)       \
+        Override                                                               \
     {                                                                          \
         serialize<hpx::serialization::input_archive>(ar, n);                   \
     }                                                                          \
     virtual void save(hpx::serialization::output_archive& ar, unsigned n)      \
-        const                                                                  \
+        const Override                                                         \
     {                                                                          \
         const_cast<Class*>(this)                                               \
             ->serialize<hpx::serialization::output_archive>(ar, n);            \
-    }                                                                          \
-    HPX_SERIALIZATION_SPLIT_MEMBER()                                           \
-    /**/
+    }
 
-#define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(Class, Name)          \
-    HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_WITH_NAME(Class, Name);            \
+#define HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_SPLITTED(Override)             \
     virtual void load(hpx::serialization::input_archive& ar, unsigned n)       \
+        Override                                                               \
     {                                                                          \
         load<hpx::serialization::input_archive>(ar, n);                        \
     }                                                                          \
     virtual void save(hpx::serialization::output_archive& ar, unsigned n)      \
-        const                                                                  \
+        const Override                                                         \
     {                                                                          \
         save<hpx::serialization::output_archive>(ar, n);                       \
     }                                                                          \
     /**/
 
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(...)                  \
+    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED_(__VA_ARGS__)             \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED_(...)                 \
+    HPX_PP_EXPAND(                                                             \
+        HPX_PP_CAT(HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED_,          \
+            HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                           \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED_3(                    \
+    Class, Name, Override)                                                     \
+    HPX_SERIALIZATION_ADD_GET_NAME_MEMBERS_WITH_NAME(Class, Name, Override);   \
+    HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_SPLITTED(Override)                 \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED_2(Class, Name)        \
+    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED_3(Class, Name, /**/)      \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(...)                           \
+    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_(__VA_ARGS__)                      \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_(...)                          \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_,         \
+        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_3(Class, Name, Override)       \
+    HPX_SERIALIZATION_ADD_GET_NAME_MEMBERS_WITH_NAME(Class, Name, Override);   \
+    HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS(Class, Override)                   \
+    HPX_SERIALIZATION_SPLIT_MEMBER()                                           \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_2(Class, Name)                 \
+    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_3(Class, Name, /**/)               \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
 #define HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(Class)                          \
     virtual std::string hpx_serialization_get_name() const = 0;                \
-    virtual void load(hpx::serialization::input_archive& ar, unsigned n)       \
-    {                                                                          \
-        serialize<hpx::serialization::input_archive>(ar, n);                   \
-    }                                                                          \
-    virtual void save(hpx::serialization::output_archive& ar, unsigned n)      \
-        const                                                                  \
-    {                                                                          \
-        const_cast<Class*>(this)                                               \
-            ->serialize<hpx::serialization::output_archive>(ar, n);            \
-    }                                                                          \
+    HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS(Class, /**/)                       \
     HPX_SERIALIZATION_SPLIT_MEMBER()                                           \
     /**/
 
 #define HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT_SPLITTED(Class)                 \
     virtual std::string hpx_serialization_get_name() const = 0;                \
-    virtual void load(hpx::serialization::input_archive& ar, unsigned n)       \
-    {                                                                          \
-        load<hpx::serialization::input_archive>(ar, n);                        \
-    }                                                                          \
-    virtual void save(hpx::serialization::output_archive& ar, unsigned n)      \
-        const                                                                  \
-    {                                                                          \
-        save<hpx::serialization::output_archive>(ar, n);                       \
-    }                                                                          \
+    HPX_SERIALIZATION_ADD_INTRUSIVE_MEMBERS_SPLITTED(/**/)                     \
     /**/
 
-#define HPX_SERIALIZATION_POLYMORPHIC(Class)                                   \
-    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(Class, HPX_PP_STRINGIZE(Class))    \
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_SERIALIZATION_POLYMORPHIC(...)                                     \
+    HPX_SERIALIZATION_POLYMORPHIC_(__VA_ARGS__)                                \
     /**/
 
-#define HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(Class)                          \
-    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(                          \
-        Class, HPX_PP_STRINGIZE(Class))                                        \
+#define HPX_SERIALIZATION_POLYMORPHIC_(...)                                    \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_SERIALIZATION_POLYMORPHIC_,                   \
+        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
     /**/
 
-#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(Class)                          \
-    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME(                                   \
-        Class, hpx::util::debug::type_id<Class>::typeid_.type_id();)           \
+#define HPX_SERIALIZATION_POLYMORPHIC_2(Class, Override)                       \
+    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_3(                                 \
+        Class, HPX_PP_STRINGIZE(Class), Override)                              \
     /**/
 
-#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED(Class)                 \
-    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED(                          \
-        Class, hpx::util::debug::type_id<T>::typeid_.type_id();)               \
+#define HPX_SERIALIZATION_POLYMORPHIC_1(Class)                                 \
+    HPX_SERIALIZATION_POLYMORPHIC_2(Class, /**/)                               \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(...)                            \
+    HPX_SERIALIZATION_POLYMORPHIC_SPLITTED_(__VA_ARGS__)                       \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_SPLITTED_(...)                           \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_SERIALIZATION_POLYMORPHIC_SPLITTED_,          \
+        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_SPLITTED_2(Class, Override)              \
+    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED_3(                        \
+        Class, HPX_PP_STRINGIZE(Class), Override)                              \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_SPLITTED_1(Class)                        \
+    HPX_SERIALIZATION_POLYMORPHIC_SPLITTED_2(Class, /**/)                      \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(...)                            \
+    HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_(__VA_ARGS__)                       \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_(...)                           \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_,          \
+        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_2(Class, Override)              \
+    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_3(                                 \
+        Class, hpx::util::debug::type_id<Class>::typeid_.type_id(), Override)  \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_1(Class)                        \
+    HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_2(Class, /**/)                      \
+    /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED(...)                   \
+    HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED_(__VA_ARGS__)              \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED_(...)                  \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED_, \
+        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED_2(Class, Override)     \
+    HPX_SERIALIZATION_POLYMORPHIC_WITH_NAME_SPLITTED_3(                        \
+        Class, hpx::util::debug::type_id<T>::typeid_.type_id(), Override)      \
+    /**/
+
+#define HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED_1(Class)               \
+    HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE_SPLITTED_2(Class, /**/)             \
     /**/

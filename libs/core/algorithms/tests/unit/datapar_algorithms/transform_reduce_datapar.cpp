@@ -99,7 +99,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::srand(seed);
 
     transform_reduce_test();
-
     return hpx::local::finalize();
 }
 

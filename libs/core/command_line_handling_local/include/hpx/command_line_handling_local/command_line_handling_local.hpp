@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,8 +18,12 @@
 #include <utility>
 #include <vector>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx { namespace local { namespace detail {
-    struct command_line_handling
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct HPX_CORE_EXPORT command_line_handling
     {
         command_line_handling(hpx::util::runtime_configuration rtcfg,
             std::vector<std::string> ini_config,
@@ -86,5 +90,40 @@ namespace hpx { namespace local { namespace detail {
 
         std::vector<std::string> preprocess_config_settings(
             int argc, char** argv);
+
+        int finalize_commandline_handling(int argc, char** argv,
+            hpx::program_options::options_description const& help,
+            std::vector<std::string> const& unregistered_options);
+
+        void reconfigure(util::manage_config& cfgmap,
+            hpx::program_options::variables_map& prevm);
+
+        void handle_high_priority_threads(
+            hpx::program_options::variables_map& vm,
+            std::vector<std::string>& ini_config);
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    HPX_CORE_EXPORT std::string runtime_configuration_string(
+        command_line_handling const& cfg);
+
+    HPX_CORE_EXPORT std::vector<std::string> prepend_options(
+        std::vector<std::string>&& args, std::string&& options);
+
+    HPX_CORE_EXPORT std::string convert_to_log_file(std::string const& dest);
+
+    HPX_CORE_EXPORT std::size_t handle_num_cores(util::manage_config& cfgmap,
+        hpx::program_options::variables_map& vm, std::size_t num_threads,
+        std::size_t num_default_cores);
+
+    HPX_CORE_EXPORT std::size_t get_number_of_default_threads(
+        bool use_process_mask);
+    HPX_CORE_EXPORT std::size_t get_number_of_default_cores(
+        bool use_process_mask);
+
+    HPX_CORE_EXPORT void print_config(
+        std::vector<std::string> const& ini_config);
+
 }}}    // namespace hpx::local::detail
+
+#include <hpx/config/warnings_suffix.hpp>

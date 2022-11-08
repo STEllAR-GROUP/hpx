@@ -16,8 +16,12 @@
 
 /// Indicates that this data member need not have an address distinct from all
 /// other non-static data members of its class.
+///
 /// For more details see
 /// `https://en.cppreference.com/w/cpp/language/attributes/no_unique_address`__.
+///
+/// For details about the support on MSVC, see
+/// `https://devblogs.microsoft.com/cppblog/msvc-cpp20-and-the-std-cpp20-switch/`__.
 #define HPX_NO_UNIQUE_ADDRESS
 #else
 
@@ -26,20 +30,25 @@
 #if defined(HPX_MSVC)
 #   define HPX_NOINLINE __declspec(noinline)
 #elif defined(__GNUC__)
-#   if defined(__NVCC__) || defined(__CUDACC__) || defined(__HIPCC__)
-        // nvcc doesn't always parse __noinline
-#       define HPX_NOINLINE __attribute__ ((noinline))
-#   else
-#       define HPX_NOINLINE __attribute__ ((__noinline__))
-#   endif
+#  if defined(__NVCC__) || defined(__CUDACC__) || defined(__HIPCC__)
+     // nvcc doesn't always parse __noinline
+#    define HPX_NOINLINE __attribute__ ((noinline))
+#  else
+#    define HPX_NOINLINE __attribute__ ((__noinline__))
+#  endif
 #else
-#   define HPX_NOINLINE
+#  define HPX_NOINLINE
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // handle [[no_unique_address]]
-#if defined(HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE)
-#   define HPX_NO_UNIQUE_ADDRESS [[no_unique_address]]
+#if defined(HPX_HAVE_MSVC_NO_UNIQUE_ADDRESS_ATTRIBUTE) ||                      \
+    defined(HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE)
+#  if defined(HPX_MSVC)
+#    define HPX_NO_UNIQUE_ADDRESS [[msvc::no_unique_address]]
+#  else
+#    define HPX_NO_UNIQUE_ADDRESS [[no_unique_address]]
+#  endif
 #else
 #   define HPX_NO_UNIQUE_ADDRESS
 #endif

@@ -1,5 +1,6 @@
 //  Copyright (c) 2015 Daniel Bourgeois
 //  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2022 Bhumit Attarde
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +15,8 @@ namespace hpx {
     // clang-format off
 
     /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ...,
-    /// conv_op(*(first + (last - first) - 1))).
+    /// conv_op(*(first + (last - first) - 1))). Executed according to the
+    /// policy.
     ///
     /// \note   Complexity: O(\a last - \a first) applications of the
     ///         predicates \a red_op and \a conv_op.
@@ -23,13 +25,9 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam FwdIter      The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     input iterator.
-    /// \tparam F           The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a copy_if requires \a F to meet the
-    ///                     requirements of \a CopyConstructible.
+    /// \tparam FwdIter     The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
     /// \tparam T           The type of the value to be used as initial (and
     ///                     intermediate) values (deduced).
     /// \tparam Reduce      The type of the binary function object used for
@@ -44,21 +42,6 @@ namespace hpx {
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
-    /// \param conv_op      Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last). This is a
-    ///                     unary predicate. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     R fun(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
-    ///                     implicitly converted to Type.
-    ///                     The type \a R must be such that an object of this
-    ///                     type can be implicitly converted to \a T.
     /// \param init         The initial value for the generalized sum.
     /// \param red_op       Specifies the function (or function object) which
     ///                     will be invoked for each of the values returned
@@ -75,6 +58,21 @@ namespace hpx {
     ///                     such that an object of a type as returned from
     ///                     \a conv_op can be implicitly converted to any
     ///                     of those types.
+    /// \param conv_op      Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is a
+    ///                     unary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     R fun(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///                     The type \a R must be such that an object of this
+    ///                     type can be implicitly converted to \a T.
     ///
     /// The reduce operations in the parallel \a transform_reduce algorithm invoked
     /// with an execution policy object of type \a sequenced_policy
@@ -107,27 +105,101 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter, typename T, typename Reduce,
         typename Convert>
-    typename util::detail::algorithm_result<ExPolicy, T>::type
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, T>::type
     transform_reduce(ExPolicy&& policy, FwdIter first, FwdIter last, T init,
         Reduce&& red_op, Convert&& conv_op);
+
+    /// Returns GENERALIZED_SUM(red_op, init, conv_op(*first), ...,
+    /// conv_op(*(first + (last - first) - 1))).
+    ///
+    /// \note   Complexity: O(\a last - \a first) applications of the
+    ///         predicates \a red_op and \a conv_op.
+    ///
+    /// \tparam InIter      The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam T           The type of the value to be used as initial (and
+    ///                     intermediate) values (deduced).
+    /// \tparam Reduce      The type of the binary function object used for
+    ///                     the reduction operation.
+    /// \tparam Convert     The type of the unary function object used to
+    ///                     transform the elements of the input sequence before
+    ///                     invoking the reduce function.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param init         The initial value for the generalized sum.
+    /// \param red_op       Specifies the function (or function object) which
+    ///                     will be invoked for each of the values returned
+    ///                     from the invocation of \a conv_op. This is a
+    ///                     binary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///                     The types \a Type1, \a Type2, and \a Ret must be
+    ///                     such that an object of a type as returned from
+    ///                     \a conv_op can be implicitly converted to any
+    ///                     of those types.
+    /// \param conv_op      Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last). This is a
+    ///                     unary predicate. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     R fun(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a InIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///                     The type \a R must be such that an object of this
+    ///                     type can be implicitly converted to \a T.
+    ///
+    /// \returns  The \a transform_reduce algorithm returns a \a T.
+    ///           The \a transform_reduce algorithm returns the result of the
+    ///           generalized sum over the values returned from \a conv_op when
+    ///           applied to the elements given by the input range
+    ///           [first, last).
+    ///
+    /// \note   GENERALIZED_SUM(op, a1, ..., aN) is defined as follows:
+    ///         * a1 when N is 1
+    ///         * op(GENERALIZED_SUM(op, b1, ..., bK), GENERALIZED_SUM(op, bM, ..., bN)),
+    ///           where:
+    ///           * b1, ..., bN may be any permutation of a1, ..., aN and
+    ///           * 1 < K+1 = M <= N.
+    ///
+    /// The difference between \a transform_reduce and \a accumulate is
+    /// that the behavior of \a transform_reduce may be non-deterministic for
+    /// non-associative or non-commutative binary predicate.
+    ///
+    template <typename InIter, typename T, typename Reduce, typename Convert>
+    T transform_reduce(InIter first, InIter last, T init, Reduce&& red_op,
+        Convert&& conv_op);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Returns the result of accumulating init with the inner products of the
     /// pairs formed by the elements of two ranges starting at first1 and
-    /// first2.
+    /// first2. Executed according to the policy.
     ///
-    /// \note   Complexity: O(\a last - \a first) applications of the
-    ///         predicate \a op2.
+    /// \note   Complexity: O(\a last - \a first) applications each of
+    ///                     \a reduce and \a transform.
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter1    The type of the first source iterators used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an forward iterator.
+    ///                     requirements of a forward iterator.
     /// \tparam FwdIter2    The type of the second source iterators used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an forward iterator.
+    ///                     requirements of a forward iterator.
     /// \tparam T           The type of the value to be used as return)
     ///                     values (deduced).
     /// \param policy       The execution policy to use for the scheduling of
@@ -157,27 +229,56 @@ namespace hpx {
     ///           returns \a T otherwise.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename T>
-    typename util::detail::algorithm_result<ExPolicy, T>::type
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, T>::type
     transform_reduce(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, T init);
 
-    ///////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
     /// Returns the result of accumulating init with the inner products of the
     /// pairs formed by the elements of two ranges starting at first1 and
     /// first2.
     ///
-    /// \note   Complexity: O(\a last - \a first) applications of the
-    ///         predicate \a op2.
+    /// \note   Complexity: O(\a last - \a first) applications each of
+    ///                     \a reduce and \a transform.
+    ///
+    /// \tparam InIter1     The type of the first source iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an input iterator.
+    /// \tparam InIter2     The type of the second source iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an input iterator.
+    /// \tparam T           The type of the value to be used as return)
+    ///                     values (deduced).
+    /// \param first1       Refers to the beginning of the first sequence of
+    ///                     elements the result will be calculated with.
+    /// \param last1        Refers to the end of the first sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the second sequence of
+    ///                     elements the result will be calculated with.
+    /// \param init         The initial value for the sum.
+    ///
+    /// \returns  The \a transform_reduce algorithm returns a \a T.
+    ///
+    template <typename InIter1, typename InIter2, typename T>
+    T transform_reduce(InIter1 first1, InIter1 last1, InIter2 first2, T init);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Returns the result of accumulating init with the inner products of the
+    /// pairs formed by the elements of two ranges starting at first1 and
+    /// first2. Executed according to the policy.
+    ///
+    /// \note   Complexity: O(\a last - \a first) applications each of
+    ///                     \a reduce and \a transform.
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter1    The type of the first source iterators used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an forward iterator.
+    ///                     requirements of a forward iterator.
     /// \tparam FwdIter2    The type of the second source iterators used
     ///                     (deduced). This iterator type must meet the
-    ///                     requirements of an forward iterator.
+    ///                     requirements of a forward iterator.
     /// \tparam T           The type of the value to be used as return)
     ///                     values (deduced).
     /// \tparam Reduce      The type of the binary function object used for
@@ -197,7 +298,7 @@ namespace hpx {
     /// \param init         The initial value for the sum.
     /// \param red_op       Specifies the function (or function object) which
     ///                     will be invoked for the initial value and each
-    ///                     of the return values of \a op2.
+    ///                     of the return values of \a conv_op.
     ///                     This is a binary predicate. The
     ///                     signature of this predicate should be equivalent to
     ///                     should be equivalent to:
@@ -222,7 +323,7 @@ namespace hpx {
     ///                     it.
     ///                     The type \a Ret must be such that it can be
     ///                     implicitly converted to an object for the second
-    ///                     argument type of \a op1.
+    ///                     argument type of \a red_op.
     ///
     /// The operations in the parallel \a transform_reduce algorithm invoked
     /// with an execution policy object of type \a sequenced_policy
@@ -242,9 +343,73 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename T, typename Reduce, typename Convert>
-    typename util::detail::algorithm_result<ExPolicy, T>::type
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, T>::type
     transform_reduce(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, T init, Reduce&& red_op, Convert&& conv_op);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// Returns the result of accumulating init with the inner products of the
+    /// pairs formed by the elements of two ranges starting at first1 and
+    /// first2.
+    ///
+    /// \note   Complexity: O(\a last - \a first) applications each of
+    ///                     \a reduce and \a transform.
+    /// \tparam InIter1     The type of the first source iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an input iterator.
+    /// \tparam InIter2     The type of the second source iterators used
+    ///                     (deduced). This iterator type must meet the
+    ///                     requirements of an input iterator.
+    /// \tparam T           The type of the value to be used as return)
+    ///                     values (deduced).
+    /// \tparam Reduce      The type of the binary function object used for
+    ///                     the multiplication operation.
+    /// \tparam Convert     The type of the unary function object used to
+    ///                     transform the elements of the input sequence before
+    ///                     invoking the reduce function.
+    ///
+    /// \param first1       Refers to the beginning of the first sequence of
+    ///                     elements the result will be calculated with.
+    /// \param last1        Refers to the end of the first sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param first2       Refers to the beginning of the second sequence of
+    ///                     elements the result will be calculated with.
+    /// \param init         The initial value for the sum.
+    /// \param red_op       Specifies the function (or function object) which
+    ///                     will be invoked for the initial value and each
+    ///                     of the return values of \a conv_op.
+    ///                     This is a binary predicate. The
+    ///                     signature of this predicate should be equivalent to
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type1 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///                     The type \a Ret must be
+    ///                     such that it can be implicitly converted to a type
+    ///                     of \a T.
+    /// \param conv_op      Specifies the function (or function object) which
+    ///                     will be invoked for each of the input values
+    ///                     of the sequence. This is a binary predicate. The
+    ///                     signature of this predicate should be equivalent to
+    ///                     \code
+    ///                     Ret fun(const Type1 &a, const Type2 &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it.
+    ///                     The type \a Ret must be such that it can be
+    ///                     implicitly converted to an object for the second
+    ///                     argument type of \a red_op.
+    ///
+    /// \returns  The \a transform_reduce algorithm returns a \a T.
+    ///
+    template <typename InIter1, typename InIter2,
+        typename T, typename Reduce, typename Convert>
+    T transform_reduce(ExPolicy&& policy, InIter1 first1, InIter1 last1,
+        InIter2 first2, T init, Reduce&& red_op, Convert&& conv_op);
 
     // clang-format on
 }    // namespace hpx
@@ -400,11 +565,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         HPX_FORWARD(Op2, op2));
                 };
 
-                using hpx::util::make_zip_iterator;
-
                 return util::partitioner<ExPolicy, T>::call(
-                    HPX_FORWARD(ExPolicy, policy),
-                    make_zip_iterator(first1, first2), count, HPX_MOVE(f1),
+                    HPX_FORWARD(ExPolicy, policy), zip_iterator(first1, first2),
+                    count, HPX_MOVE(f1),
                     [init = HPX_FORWARD(T_, init), op1 = HPX_FORWARD(Op1, op1)](
                         auto&& results) mutable -> T {
                         T ret = HPX_MOVE(init);

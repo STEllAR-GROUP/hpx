@@ -31,7 +31,7 @@
 #include <exception>
 #include <system_error>
 
-#if defined(HPX_WINDOWS)
+#if defined(HPX_WINDOWS) && !defined(HPX_HAVE_STATIC_LINKING)
 // Prevent asio from initializing Winsock, the object must be constructed
 // before any Asio's own global objects. With MSVC, this may be accomplished
 // by adding the following code to the DLL:
@@ -52,7 +52,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     bool get_endpoint(std::string const& addr, std::uint16_t port,
-        asio::ip::tcp::endpoint& ep)
+        asio::ip::tcp::endpoint& ep, bool force_ipv4)
     {
         using namespace asio::ip;
         std::error_code ec;
@@ -63,11 +63,14 @@ namespace hpx { namespace util {
             return true;
         }
 
-        address_v6 addr6 = address_v6::from_string(addr.c_str(), ec);
-        if (!ec)
-        {    // it's an IPV6 address
-            ep = tcp::endpoint(address(addr6), port);
-            return true;
+        if (!force_ipv4)
+        {
+            address_v6 addr6 = address_v6::from_string(addr.c_str(), ec);
+            if (!ec)
+            {    // it's an IPV6 address
+                ep = tcp::endpoint(address(addr6), port);
+                return true;
+            }
         }
         return false;
     }
@@ -81,7 +84,7 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // properly resolve a give host name to the corresponding IP address
     asio::ip::tcp::endpoint resolve_hostname(std::string const& hostname,
-        std::uint16_t port, asio::io_context& io_service)
+        std::uint16_t port, asio::io_context& io_service, bool force_ipv4)
     {
         using asio::ip::tcp;
 
@@ -108,6 +111,13 @@ namespace hpx { namespace util {
             tcp::resolver::query query(hostname, std::to_string(port));
 
             asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+
+            while (force_ipv4 && it != tcp::resolver::iterator() &&
+                !it->endpoint().address().is_v4())
+            {
+                ++it;
+            }
+
             HPX_ASSERT(it != asio::ip::tcp::resolver::iterator());
             return *it;
         }
@@ -320,7 +330,7 @@ namespace hpx { namespace util {
     bool split_ip_address(
         std::string const& v, std::string& host, std::uint16_t& port)
     {
-        std::string::size_type p = v.find_first_of(':');
+        std::string::size_type p = v.find_last_of(':');
 
         std::string tmp_host;
         std::uint16_t tmp_port = 0;
@@ -329,9 +339,40 @@ namespace hpx { namespace util {
         {
             if (p != std::string::npos)
             {
-                tmp_host = v.substr(0, p);
-                tmp_port =
-                    hpx::util::from_string<std::uint16_t>(v.substr(p + 1));
+                if (v.find_first_of(':') != p)
+                {
+                    // IPv6
+                    std::string::size_type begin_of_address =
+                        v.find_first_of('[');
+                    if (begin_of_address != std::string::npos)
+                    {
+                        // IPv6 with a port has to be written as: [address]:port
+                        std::string::size_type end_of_address =
+                            v.find_last_of(']');
+                        if (end_of_address == std::string::npos)
+                            return false;
+
+                        tmp_host =
+                            v.substr(begin_of_address + 1, end_of_address - 1);
+                        if (end_of_address < p)
+                        {
+                            tmp_port = hpx::util::from_string<std::uint16_t>(
+                                v.substr(p + 1));
+                        }
+                    }
+                    else
+                    {
+                        // IPv6 without a port
+                        tmp_host = v;
+                    }
+                }
+                else
+                {
+                    // IPv4
+                    tmp_host = v.substr(0, p);
+                    tmp_port =
+                        hpx::util::from_string<std::uint16_t>(v.substr(p + 1));
+                }
             }
             else
             {

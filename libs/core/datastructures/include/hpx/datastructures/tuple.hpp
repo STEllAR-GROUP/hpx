@@ -6,7 +6,92 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file tuple.hpp
+
 #pragma once
+
+#if defined(DOXYGEN)
+namespace hpx {
+    // clang-format off
+
+    /// \brief Class template hpx::tuple is a fixed-size collection of
+    ///        heterogeneous values. It is a generalization of \a hpx::pair.
+    ///        If \a std::is_trivially_destructible<Ti>::value is true for
+    ///        every \a Ti in \a Ts, the destructor of tuple is trivial.
+    /// \param Ts... the types of the elements that the tuple stores.
+    ////       Empty list is supported.
+    template <typename... Ts>
+    class tuple;
+
+    /// \brief Provides access to the number of elements in a tuple-like type
+    ///        as a compile-time constant expression.
+    /// \details  The primary template is not defined. An explicit (full) or
+    ///           partial specialization is required to make a type tuple-like.
+    template <typename T>
+    struct tuple_size;
+
+    /// \brief Provides compile-time indexed access to the types of the elements
+    ///        of a tuple-like type.
+    /// \details  The primary template is not defined. An explicit (full) or
+    ///           partial specialization is required to make a type tuple-like.
+    template <std::size_t I, typename T, typename Enable = void>
+    struct tuple_element;
+
+    /// \brief An object of unspecified type such that any value can be assigned to
+    ///        it with no effect. Intended for use with hpx::tie when unpacking a
+    ///        hpx::tuple, as a placeholder for the arguments that are not used.
+    ///        While the behavior of hpx::ignore outside of hpx::tie is not formally
+    ///        specified, some code guides recommend using hpx::ignore to avoid warnings
+    ///        from unused return values of [[nodiscard]] functions.
+    constexpr hpx::detail::ignore_type ignore = {};
+
+    /// \brief Provides compile-time indexed access to the types of the elements of the tuple.
+    template <typename... Ts>
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE tuple<util::decay_unwrap_t<Ts>...>
+    make_tuple(Ts&&... ts);
+
+    /// \brief Constructs a tuple of references to the arguments in args suitable
+    ///        for forwarding as an argument to a function. The tuple has rvalue
+    ///        reference data members when rvalues are used as arguments, and
+    ///        otherwise has lvalue reference data members.
+    /// \param ts zero or more arguments to construct the tuple from
+    /// \returns hpx::tuple object created as if by
+    ///          \code hpx::tuple<Ts&&...>(HPX_FORWARD(Ts, ts)...) \endcode
+    template <typename... Ts>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr tuple<Ts&&...> forward_as_tuple(Ts&&... ts);
+
+    /// \brief Creates a tuple of lvalue references to its arguments or instances
+    ///        of hpx::ignore.
+    /// \param ts zero or more lvalue arguments to construct the tuple from.
+    /// \returns hpx::tuple object containing lvalue references.
+    template <typename... Ts>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr tuple<Ts&...> tie(Ts&... ts);
+
+    /// \brief Constructs a tuple that is a concatenation of all tuples in \c tuples.
+    ///        The behavior is undefined if any type in \c std::decay_t<Tuples>...
+    ///        is not a specialization of \c hpx::tuple. However, an implementation
+    ///        may choose to support types (such as \c std::array and \c std::pair)
+    ///        that follow the tuple-like protocol.
+    ///
+    /// \param tuples - zero or more tuples to concatenate
+    ///
+    /// \returns hpx::tuple object composed of all elements of all argument tuples
+    ///          constructed from \c hpx::get<Is>(HPX_FORWARD(UTuple,t) for each
+    ///          individual element.
+    template <typename... Tuples>
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE auto tuple_cat(Tuples&&... tuples);
+
+    /// \brief Extracts the Ith element from the tuple. I must be an integer
+    ///        value in [0, sizeof...(Ts)).
+    template <std::size_t I> HPX_HOST_DEVICE
+    typename util::at_index<I, Ts...>::type& get() noexcept;
+
+    /// \copybrief hpx::get()
+    template <std::size_t I> HPX_HOST_DEVICE
+    typename util::at_index<I, Ts...>::type const& get() const noexcept;
+    // clang-format on
+}    // namespace hpx
+#else
 
 #include <hpx/config.hpp>
 #include <hpx/datastructures/config/defines.hpp>
@@ -497,6 +582,9 @@ namespace hpx {
     {
     };
 #endif
+
+    template <class T>
+    inline constexpr std::size_t tuple_size_v = tuple_size<T>::value;
 
     // template <size_t I, class Tuple>
     // class tuple_element
@@ -1028,3 +1116,5 @@ namespace hpx {
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
+
+#endif    //DOXYGEN

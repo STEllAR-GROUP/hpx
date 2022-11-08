@@ -21,16 +21,17 @@
 #include <utility>
 
 namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+
     template <typename InputIterator, typename Distance>
     HPX_HOST_DEVICE constexpr void advance_impl(
-        InputIterator& i, Distance n, std::random_access_iterator_tag)
+        InputIterator& i, Distance n, std::random_access_iterator_tag) noexcept
     {
         i += n;
     }
 
     template <typename InputIterator, typename Distance>
     HPX_HOST_DEVICE constexpr void advance_impl(
-        InputIterator& i, Distance n, std::bidirectional_iterator_tag)
+        InputIterator& i, Distance n, std::bidirectional_iterator_tag) noexcept
     {
         if (n < 0)
         {
@@ -46,7 +47,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename InputIterator, typename Distance>
     HPX_HOST_DEVICE constexpr void advance_impl(
-        InputIterator& i, Distance n, std::input_iterator_tag)
+        InputIterator& i, Distance n, std::input_iterator_tag) noexcept
     {
 #if defined(HPX_INTEL_VERSION)
 #pragma warning(push)
@@ -61,7 +62,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 
     template <typename InputIterator, typename Distance>
-    HPX_HOST_DEVICE constexpr void advance(InputIterator& i, Distance n)
+    HPX_HOST_DEVICE constexpr void advance(
+        InputIterator& i, Distance n) noexcept
     {
         advance_impl(i, n,
             typename std::iterator_traits<InputIterator>::iterator_category());
@@ -72,7 +74,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct calculate_distance
     {
         template <typename T1, typename T2>
-        HPX_FORCEINLINE constexpr static std::size_t call(T1 t1, T2 t2)
+        HPX_FORCEINLINE constexpr static std::size_t call(T1 t1,
+            T2 t2) noexcept(noexcept(std::declval<T1>() - std::declval<T2>()))
         {
             return std::size_t(t2 - t1);
         }
@@ -80,8 +83,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename Iterable>
     struct calculate_distance<Iterable,
-        typename std::enable_if<
-            hpx::traits::is_iterator<Iterable>::value>::type>
+        std::enable_if_t<hpx::traits::is_iterator_v<Iterable>>>
     {
         template <typename Iter1, typename Iter2>
         HPX_FORCEINLINE constexpr static std::size_t call(
@@ -149,8 +151,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename Iterable>
     struct calculate_next<Iterable,
-        typename std::enable_if<hpx::traits::is_iterator<Iterable>::value &&
-            !hpx::traits::is_bidirectional_iterator<Iterable>::value>::type>
+        std::enable_if_t<hpx::traits::is_iterator_v<Iterable> &&
+            !hpx::traits::is_bidirectional_iterator_v<Iterable>>>
     {
         template <typename Iter, typename Stride>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr static Iter call(
@@ -170,7 +172,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             // anything less than a bidirectional iterator does not support
             // negative offsets
-            HPX_ASSERT(!std::is_signed<Stride>::value || !is_negative(offset));
+            HPX_ASSERT(!std::is_signed_v<Stride> || !is_negative(offset));
 
             // NVCC seems to have a bug with std::min...
             offset =
@@ -186,8 +188,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename Iterable>
     struct calculate_next<Iterable,
-        typename std::enable_if<
-            hpx::traits::is_bidirectional_iterator<Iterable>::value>::type>
+        std::enable_if_t<hpx::traits::is_bidirectional_iterator_v<Iterable>>>
     {
         template <typename Iter, typename Stride>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr static Iter call(
@@ -276,10 +277,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct equal_to
     {
         template <typename T1, typename T2,
-            typename Enable = typename std::enable_if<
-                hpx::traits::is_equality_comparable_with<T1, T2>::value>::type>
+            typename Enable = std::enable_if_t<
+                hpx::traits::is_equality_comparable_with_v<T1, T2>>>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
+            noexcept(noexcept(std::declval<T1>() == std::declval<T2>()))
         {
             return t1 == t2;
         }
@@ -288,10 +290,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct not_equal_to
     {
         template <typename T1, typename T2,
-            typename Enable = typename std::enable_if<
-                hpx::traits::is_equality_comparable_with<T1, T2>::value>::type>
+            typename Enable = std::enable_if_t<
+                hpx::traits::is_equality_comparable_with_v<T1, T2>>>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
+            noexcept(noexcept(std::declval<T1>() != std::declval<T2>()))
         {
             return t1 != t2;
         }
@@ -300,18 +303,21 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename Value>
     struct compare_to
     {
-        HPX_HOST_DEVICE HPX_FORCEINLINE compare_to(Value&& val)
+        HPX_HOST_DEVICE HPX_FORCEINLINE explicit compare_to(
+            Value&& val) noexcept
           : value_(HPX_MOVE(val))
         {
         }
-        HPX_HOST_DEVICE HPX_FORCEINLINE compare_to(Value const& val)
+        HPX_HOST_DEVICE HPX_FORCEINLINE explicit compare_to(Value const& val)
           : value_(val)
         {
         }
 
         template <typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
-            T const& t) const -> decltype(std::declval<Value>() == t)
+            T const& t) const
+            noexcept(noexcept(std::declval<Value>() == std::declval<T>()))
+                -> decltype(std::declval<Value>() == t)
         {
             return value_ == t;
         }
@@ -325,6 +331,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename T1, typename T2>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
+            noexcept(noexcept(std::declval<T1>() < std::declval<T2>()))
         {
             return HPX_FORWARD(T1, t1) < HPX_FORWARD(T2, t2);
         }
@@ -335,6 +342,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename T1, typename T2>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
+            noexcept(noexcept(std::declval<T1>() > std::declval<T2>()))
         {
             return HPX_FORWARD(T1, t1) > HPX_FORWARD(T2, t2);
         }
@@ -345,6 +353,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename T1, typename T2>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
+            noexcept(noexcept(std::declval<T1>() >= std::declval<T2>()))
         {
             return HPX_FORWARD(T1, t1) >= HPX_FORWARD(T2, t2);
         }
@@ -355,6 +364,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename T1, typename T2>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
             T1&& t1, T2&& t2) const
+            noexcept(noexcept(std::declval<T1>() <= std::declval<T2>()))
         {
             return HPX_FORWARD(T1, t1) <= HPX_FORWARD(T2, t2);
         }
@@ -365,6 +375,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct min_of
     {
         constexpr T operator()(T const& t1, T const& t2) const
+            noexcept(noexcept(std::declval<T>() < std::declval<T>()))
         {
             // NVCC seems to have a bug with std::min...
             return t1 < t2 ? t1 : t2;
@@ -375,6 +386,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct max_of
     {
         constexpr T operator()(T const& t1, T const& t2) const
+            noexcept(noexcept(std::declval<T>() > std::declval<T>()))
         {
             return (std::max)(t1, t2);
         }
@@ -385,7 +397,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         template <typename T1, typename T2>
         constexpr auto operator()(T1 const& t1, T2 const& t2) const
-            -> decltype(t1 + t2)
+            noexcept(noexcept(std::declval<T1>() + std::declval<T2>()))
+                -> decltype(t1 + t2)
         {
             return t1 + t2;
         }
@@ -395,7 +408,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         template <typename T1, typename T2>
         constexpr auto operator()(T1 const& t1, T2 const& t2) const
-            -> decltype(t1 - t2)
+            noexcept(noexcept(std::declval<T1>() - std::declval<T2>()))
+                -> decltype(t1 - t2)
         {
             return t1 - t2;
         }
@@ -405,7 +419,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         template <typename T1, typename T2>
         constexpr auto operator()(T1 const& t1, T2 const& t2) const
-            -> decltype(t1 * t2)
+            noexcept(noexcept(std::declval<T1>() * std::declval<T2>()))
+                -> decltype(t1 * t2)
         {
             return t1 * t2;
         }
@@ -415,7 +430,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         template <typename T1, typename T2>
         constexpr auto operator()(T1 const& t1, T2 const& t2) const
-            -> decltype(t1 / t2)
+            noexcept(noexcept(std::declval<T1>() / std::declval<T2>()))
+                -> decltype(t1 / t2)
         {
             return t1 / t2;
         }

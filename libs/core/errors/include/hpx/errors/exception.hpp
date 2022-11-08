@@ -344,6 +344,8 @@ namespace hpx {
     HPX_CORE_EXPORT std::string get_error_what(exception_info const& xi);
 
     /// \cond NOINTERNAL
+    HPX_CORE_EXPORT std::string get_error_what(std::exception_ptr const& e);
+
     template <typename E>
     std::string get_error_what(E const& e)
     {

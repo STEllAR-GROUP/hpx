@@ -23,10 +23,6 @@ namespace hpx {
     ///         assignments, exactly \a last - \a first applications of
     ///         the operator==().
     ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -34,8 +30,6 @@ namespace hpx {
     ///                     This value type must meet the requirements of
     ///                     \a CopyConstructible.
     ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
@@ -49,19 +43,24 @@ namespace hpx {
     ///           The \a remove algorithm returns the iterator to the new end
     ///           of the range.
     ///
-    template <typename FwdIter, typename T>
+    template <typename FwdIter,
+        typename T = typename std::iterator_traits<FwdIter>::value_type>
     FwdIter remove(FwdIter first, FwdIter last, T const& value);
 
     /////////////////////////////////////////////////////////////////////////////
     /// Removes all elements satisfying specific criteria from the range
     /// [first, last) and returns a past-the-end iterator for the new
     /// end of the range. This version removes all elements that are
-    /// equal to \a value.
+    /// equal to \a value. Executed according to the policy.
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first applications of
     ///         the operator==().
     ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
@@ -69,6 +68,8 @@ namespace hpx {
     ///                     This value type must meet the requirements of
     ///                     \a CopyConstructible.
     ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
@@ -92,9 +93,10 @@ namespace hpx {
     ///           The \a remove algorithm returns the iterator to the new end
     ///           of the range.
     ///
-    template <typename ExPolicy, typename FwdIter, typename T>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type remove(
-        ExPolicy&& policy, FwdIter first, FwdIter last, T const& value);
+    template <typename ExPolicy, typename FwdIter,
+        typename T = typename std::iterator_traits<FwdIter>::value_type>
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    remove(ExPolicy&& policy, FwdIter first, FwdIter last, T const& value);
 
     /// Removes all elements satisfying specific criteria from the range
     /// [first, last) and returns a past-the-end iterator for the new
@@ -145,7 +147,7 @@ namespace hpx {
     /// Removes all elements satisfying specific criteria from the range
     /// [first, last) and returns a past-the-end iterator for the new
     /// end of the range. This version removes all elements for which predicate
-    /// \a pred returns true.
+    /// \a pred returns true. Executed according to the policy.
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first applications of
@@ -202,8 +204,8 @@ namespace hpx {
     ///           of the range.
     ///
     template <typename ExPolicy, typename FwdIter, typename Pred>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type remove_if(
-        ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred);
+    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    remove_if(ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred);
 
 }    // namespace hpx
 
@@ -228,8 +230,8 @@ namespace hpx {
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
-#include <hpx/parallel/util/scan_partitioner.hpp>
 #include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
@@ -306,56 +308,32 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #else
                 boost::shared_array<bool> flags(new bool[count]);
 #endif
-                std::size_t init = 0u;
 
                 using hpx::get;
-                using hpx::util::make_zip_iterator;
-                typedef util::scan_partitioner<ExPolicy, Iter, std::size_t,
-                    void, util::scan_partitioner_sequential_f3_tag>
-                    scan_partitioner_type;
 
                 // Note: replacing the invoke() with HPX_INVOKE()
                 // below makes gcc generate errors
                 auto f1 = [pred = HPX_FORWARD(Pred, pred),
                               proj = HPX_FORWARD(Proj, proj)](
                               zip_iterator part_begin,
-                              std::size_t part_size) -> std::size_t {
+                              std::size_t part_size) -> void {
                     // MSVC complains if pred or proj is captured by ref below
                     util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_size,
                         [pred, proj](zip_iterator it) mutable {
-                            bool f = hpx::util::invoke(
-                                pred, hpx::util::invoke(proj, get<0>(*it)));
+                            bool f = hpx::invoke(
+                                pred, hpx::invoke(proj, get<0>(*it)));
 
                             get<1>(*it) = f;
                         });
-
-                    // There is no need to return the partition result.
-                    // But, the scan_partitioner doesn't support 'void' as
-                    // Result1. So, unavoidably return non-meaning value.
-                    return 0u;
                 };
 
-                auto f2 = hpx::unwrapping(
-                    [](std::size_t, std::size_t) -> std::size_t {
-                        // There is no need to propagate the partition
-                        // results. But, the scan_partitioner doesn't
-                        // support 'void' as Result1. So, unavoidably
-                        // return non-meaning value.
-                        return 0u;
-                    });
+                auto f2 = [flags, first, count](
+                              auto&& results) mutable -> Iter {
+                    HPX_UNUSED(results);
 
-                std::shared_ptr<Iter> dest_ptr = std::make_shared<Iter>(first);
-                auto f3 =
-                    [dest_ptr, flags](zip_iterator part_begin,
-                        std::size_t part_size,
-                        hpx::shared_future<std::size_t> curr,
-                        hpx::shared_future<std::size_t> next) mutable -> void {
-                    HPX_UNUSED(flags);
-
-                    curr.get();    // rethrow exceptions
-                    next.get();    // rethrow exceptions
-
-                    Iter& dest = *dest_ptr;
+                    auto part_begin = zip_iterator(first, flags.get());
+                    auto dest = first;
+                    auto part_size = count;
 
                     using execution_policy_type = std::decay_t<ExPolicy>;
                     if (dest == get<0>(part_begin.get_iterator_tuple()))
@@ -381,34 +359,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                     *dest++ = HPX_MOVE(get<0>(*it));
                             });
                     }
+                    return dest;
                 };
 
-                auto f4 =
-                    [dest_ptr, flags](
-                        std::vector<hpx::shared_future<std::size_t>>&& items,
-                        std::vector<hpx::future<void>>&& data) mutable -> Iter {
-                    HPX_UNUSED(flags);
-
-                    // make sure iterators embedded in function object that is
-                    // attached to futures are invalidated
-                    util::detail::clear_container(items);
-                    util::detail::clear_container(data);
-
-                    return *dest_ptr;
-                };
-
-                return scan_partitioner_type::call(
+                return util::partitioner<ExPolicy, Iter, void>::call(
                     HPX_FORWARD(ExPolicy, policy),
-                    make_zip_iterator(first, flags.get()), count, init,
-                    // step 1 performs first part of scan algorithm
-                    HPX_MOVE(f1),
-                    // step 2 propagates the partition results from left
-                    // to right
-                    HPX_MOVE(f2),
-                    // step 3 runs final accumulation on each partition
-                    HPX_MOVE(f3),
-                    // step 4 use this return value
-                    HPX_MOVE(f4));
+                    zip_iterator(first, flags.get()), count, HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
         /// \endcond

@@ -1,5 +1,5 @@
 ..
-    Copyright (C) 2018-2021 STE||AR Group
+    Copyright (C) 2018-2022 STE||AR Group
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,8 @@ Releases
 .. toctree::
    :maxdepth: 1
 
+   releases/whats_new_1_9_0
+   releases/whats_new_1_8_1
    releases/whats_new_1_8_0
    releases/whats_new_1_7_1
    releases/whats_new_1_7_0

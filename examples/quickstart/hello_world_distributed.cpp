@@ -91,15 +91,24 @@ void hello_world_foreman()
         for (std::size_t worker : attendance)
         {
             // Asynchronously start a new task. The task is encapsulated in a
-            // future, which we can query to determine if the task has
-            // completed. We give the task a hint to run on a particular worker
-            // thread, but no guarantees are given by the scheduler that the
-            // task will actually run on that worker thread.
+            // future that we can query to determine if the task has completed.
+            //
+            // We give the task a hint to run on a particular worker thread
+            // (core) and suggest binding the scheduled thread to the given
+            // core, but no guarantees are given by the scheduler that the task
+            // will actually run on that worker thread. It will however try as
+            // hard as possible to place the new task on the given worker
+            // thread.
             hpx::execution::parallel_executor exec(
-                hpx::threads::thread_schedule_hint(
-                    hpx::threads::thread_schedule_hint_mode::thread,
-                    static_cast<std::int16_t>(worker)));
-            futures.push_back(hpx::async(exec, hello_world_worker, worker));
+                hpx::threads::thread_priority::bound);
+
+            hpx::threads::thread_schedule_hint hint(
+                hpx::threads::thread_schedule_hint_mode::thread,
+                static_cast<std::int16_t>(worker));
+
+            futures.push_back(
+                hpx::async(hpx::execution::experimental::with_hint(exec, hint),
+                    hello_world_worker, worker));
         }
 
         // Wait for all of the futures to finish. The callback version of the

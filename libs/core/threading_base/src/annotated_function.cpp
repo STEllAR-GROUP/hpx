@@ -24,6 +24,8 @@ namespace hpx::detail {
 
 #else
 
+#include <hpx/threading_base/thread_description.hpp>
+
 #include <string>
 
 namespace hpx::detail {

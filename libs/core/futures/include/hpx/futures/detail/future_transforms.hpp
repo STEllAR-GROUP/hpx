@@ -30,15 +30,10 @@ namespace hpx { namespace lcos { namespace detail {
     {
         // Check for state right away as the element might not be able to
         // produce a shared state (even if it's ready).
-        if (current.is_ready())
-        {
-            return true;
-        }
-
         auto const& state =
             traits::detail::get_shared_state(HPX_FORWARD(T, current));
 
-        if (state.get() == nullptr)
+        if (!state || state->is_ready(std::memory_order_relaxed))
         {
             return true;
         }

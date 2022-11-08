@@ -11,203 +11,6 @@
 
 #if defined(DOXYGEN)
 namespace hpx { namespace ranges {
-    /// Removes all elements that are equal to \a value from the range
-    /// [first, last) and and returns a subrange [ret, last), where ret
-    /// is a past-the-end iterator for the new end of the range.
-    ///
-    /// \note   Complexity: Performs not more than \a last - \a first
-    ///         assignments, exactly \a last - \a first applications of
-    ///         the operator==() and the projection \a proj.
-    ///
-    /// \tparam FwdIter     The type of the source iterators used for the
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
-    /// \tparam Sent        The type of the end iterators used (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
-    /// \tparam T           The type of the value to remove (deduced).
-    ///                     This value type must meet the requirements of
-    ///                     \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param value        Specifies the value of elements to remove.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a remove algorithm
-    /// execute in sequential order in the calling thread.
-    ///
-    /// \returns  The \a remove algorithm returns a \a
-    ///           subrange_t<FwdIter, Sent>.
-    ///           The \a remove algorithm returns an object {ret, last},
-    ///           where ret is a past-the-end iterator for a new
-    ///           subrange of the values all in valid but unspecified state.
-    ///
-    template <typename FwdIter, typename Sent, typename T,
-        typename Proj = util::projection_identity>
-    subrange_t<FwdIter, Sent> remove(
-        FwdIter first, Sent last, T const& value, Proj&& proj = Proj());
-
-    /// Removes all elements that are equal to \a value from the range
-    /// [first, last) and and returns a subrange [ret, last), where ret
-    /// is a past-the-end iterator for the new end of the range.
-    ///
-    /// \note   Complexity: Performs not more than \a last - \a first
-    ///         assignments, exactly \a last - \a first applications of
-    ///         the operator==() and the projection \a proj.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam FwdIter     The type of the source iterators used for the
-    ///                     This iterator type must meet the requirements of a
-    ///                     forward iterator.
-    /// \tparam Sent        The type of the end iterators used (deduced). This
-    ///                     sentinel type must be a sentinel for FwdIter.
-    /// \tparam T           The type of the value to remove (deduced).
-    ///                     This value type must meet the requirements of
-    ///                     \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param first        Refers to the beginning of the sequence of elements
-    ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
-    ///                     algorithm will be applied to.
-    /// \param value        Specifies the value of elements to remove.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a remove algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a remove algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a remove algorithm returns a \a
-    ///           hpx::future<subrange_t<FwdIter, Sent>>.
-    ///           The \a remove algorithm returns an object {ret, last},
-    ///           where ret is a past-the-end iterator for a new
-    ///           subrange of the values all in valid but unspecified state.
-    ///
-    template <typename ExPolicy, typename FwdIter, typename Sent, typename T,
-        typename Proj = util::projection_identity>
-    typename parallel::util::detail::algorithm_result<ExPolicy,
-        subrange_t<FwdIter, Sent>>::type
-    remove(ExPolicy&& policy, FwdIter first, Sent last, T const& value,
-        Proj&& proj = Proj());
-
-    /// Removes all elements that are equal to \a value from the range
-    /// \a rng and and returns a subrange [ret, util::end(rng)), where ret
-    /// is a past-the-end iterator for the new end of the range.
-    ///
-    /// \note   Complexity: Performs not more than \a util::end(rng)
-    ///         - \a util::begin(rng) assignments, exactly
-    ///         \a util::end(rng) - \a util::begin(rng) applications of
-    ///         the operator==() and the projection \a proj.
-    ///
-    /// \tparam Rng         The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam T           The type of the value to remove (deduced).
-    ///                     This value type must meet the requirements of
-    ///                     \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param value        Specifies the value of elements to remove.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a remove algorithm
-    /// execute in sequential order in the calling thread.
-    ///
-    /// \returns  The \a remove algorithm returns a \a
-    ///           subrange_t<typename hpx::traits::range_iterator<Rng>::type>.
-    ///           The \a remove algorithm returns an object {ret, last},
-    ///           where ret is a past-the-end iterator for a new
-    ///           subrange of the values all in valid but unspecified state.
-    ///
-    template <typename Rng, typename T,
-        typename Proj = util::projection_identity>
-    subrange_t<typename hpx::traits::range_iterator<Rng>::type> remove(
-        Rng&& rng, T const& value, Proj&& proj = Proj());
-
-    /// Removes all elements that are equal to \a value from the range
-    /// \a rng and and returns a subrange [ret, util::end(rng)), where ret
-    /// is a past-the-end iterator for the new end of the range.
-    ///
-    /// \note   Complexity: Performs not more than \a util::end(rng)
-    ///         - \a util::begin(rng) assignments, exactly
-    ///         \a util::end(rng) - \a util::begin(rng) applications of
-    ///         the operator==() and the projection \a proj.
-    ///
-    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
-    ///                     It describes the manner in which the execution
-    ///                     of the algorithm may be parallelized and the manner
-    ///                     in which it executes the assignments.
-    /// \tparam Rng         The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam T           The type of the value to remove (deduced).
-    ///                     This value type must meet the requirements of
-    ///                     \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param policy       The execution policy to use for the scheduling of
-    ///                     the iterations.
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param value        Specifies the value of elements to remove.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a remove algorithm invoked with
-    /// an execution policy object of type \a sequenced_policy
-    /// execute in sequential order in the calling thread.
-    ///
-    /// The assignments in the parallel \a remove algorithm invoked with
-    /// an execution policy object of type \a parallel_policy or
-    /// \a parallel_task_policy are permitted to execute in an unordered
-    /// fashion in unspecified threads, and indeterminately sequenced
-    /// within each thread.
-    ///
-    /// \returns  The \a remove algorithm returns a \a hpx::future<
-    ///           subrange_t<typename hpx::traits::range_iterator<Rng>::type>>
-    ///           if the execution policy is of type
-    ///           \a sequenced_task_policy or \a parallel_task_policy and
-    ///           returns \a FwdIter otherwise.
-    ///           The \a remove algorithm returns the iterator to the new end
-    ///           of the range.
-    ///
-    template <typename ExPolicy, typename Rng, typename T,
-        typename Proj = util::projection_identity>
-    typename parallel::util::detail::algorithm_result<ExPolicy,
-        subrange_t<typename hpx::traits::range_iterator<Rng>::type>>::type
-    remove(ExPolicy&& policy, Rng&& rng, T const& value, Proj&& proj = Proj());
-
     /// Removes all elements for which predicate \a pred returns true
     /// from the range [first, last) and returns a subrange [ret, last),
     /// where ret is a past-the-end iterator for the new end of the range.
@@ -216,7 +19,7 @@ namespace hpx { namespace ranges {
     ///         assignments, exactly \a last - \a first applications of
     ///         the predicate \a pred and the projection \a proj.
     ///
-    /// \tparam FwdIter     The type of the source iterators used for the
+    /// \tparam Iter        The type of the source iterators used for the
     ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Sent        The type of the end iterators used (deduced). This
@@ -230,7 +33,7 @@ namespace hpx { namespace ranges {
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param pred         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
@@ -260,10 +63,64 @@ namespace hpx { namespace ranges {
     ///           where ret is a past-the-end iterator for a new
     ///           subrange of the values all in valid but unspecified state.
     ///
-    template <typename FwdIter, typename Sent, typename Pred,
+    template <typename Iter, typename Sent, typename Pred,
         typename Proj = hpx::parallel::util::projection_identity>
-    subrange_t<FwdIter, Sent> remove_if(
-        FwdIter first, Sent sent, Pred&& pred, Proj&& proj = Proj());
+    subrange_t<Iter, Sent> remove_if(
+        Iter first, Sent sent, Pred&& pred, Proj&& proj = Proj());
+
+    /// Removes all elements that are equal to \a value from the range
+    /// \a rng and and returns a subrange [ret, util::end(rng)), where ret
+    /// is a past-the-end iterator for the new end of the range.
+    ///
+    /// \note   Complexity: Performs not more than \a util::end(rng)
+    ///         - \a util::begin(rng) assignments, exactly
+    ///         \a util::end(rng) - \a util::begin(rng) applications of
+    ///         the operator==() and the projection \a proj.
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a remove_if requires \a Pred to meet the
+    ///                     requirements of \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).This is an
+    ///                     unary predicate which returns \a true for the
+    ///                     required elements. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a remove_if algorithm
+    /// execute in sequential order in the calling thread.
+    ///
+    /// \returns  The \a remove_if algorithm returns a \a
+    ///           subrange_t<typename hpx::traits::range_iterator<Rng>::type>.
+    ///           The \a remove_if algorithm returns an object {ret, last},
+    ///           where ret is a past-the-end iterator for a new
+    ///           subrange of the values all in valid but unspecified state.
+    ///
+    template <typename Rng, typename Pred,
+        typename Proj = hpx::parallel::util::projection_identity>
+    subrange_t<typename hpx::traits::range_iterator<Rng>::type> remove_if(
+        Rng&& rng, Pred&& pred, Proj&& proj = Proj());
 
     /// Removes all elements for which predicate \a pred returns true
     /// from the range [first, last) and returns a subrange [ret, last),
@@ -293,7 +150,7 @@ namespace hpx { namespace ranges {
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param last         Refers to the end of the sequence of elements the
+    /// \param sent         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param pred         Specifies the function (or function object) which
     ///                     will be invoked for each of the elements in the
@@ -336,60 +193,6 @@ namespace hpx { namespace ranges {
         subrange_t<FwdIter, Sent>>::type
     remove_if(ExPolicy&& policy, FwdIter first, Sent sent, Pred&& pred,
         Proj&& proj = Proj());
-
-    /// Removes all elements that are equal to \a value from the range
-    /// \a rng and and returns a subrange [ret, util::end(rng)), where ret
-    /// is a past-the-end iterator for the new end of the range.
-    ///
-    /// \note   Complexity: Performs not more than \a util::end(rng)
-    ///         - \a util::begin(rng) assignments, exactly
-    ///         \a util::end(rng) - \a util::begin(rng) applications of
-    ///         the operator==() and the projection \a proj.
-    ///
-    /// \tparam Rng         The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
-    /// \tparam Pred        The type of the function/function object to use
-    ///                     (deduced). Unlike its sequential form, the parallel
-    ///                     overload of \a remove_if requires \a Pred to meet the
-    ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
-    ///
-    /// \param rng          Refers to the sequence of elements the algorithm
-    ///                     will be applied to.
-    /// \param pred         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements in the
-    ///                     sequence specified by [first, last).This is an
-    ///                     unary predicate which returns \a true for the
-    ///                     required elements. The signature of this predicate
-    ///                     should be equivalent to:
-    ///                     \code
-    ///                     bool pred(const Type &a);
-    ///                     \endcode \n
-    ///                     The signature does not need to have const&, but
-    ///                     the function must not modify the objects passed to
-    ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIter can be dereferenced and then
-    ///                     implicitly converted to Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
-    ///
-    /// The assignments in the parallel \a remove_if algorithm
-    /// execute in sequential order in the calling thread.
-    ///
-    /// \returns  The \a remove_if algorithm returns a \a
-    ///           subrange_t<typename hpx::traits::range_iterator<Rng>::type>.
-    ///           The \a remove_if algorithm returns an object {ret, last},
-    ///           where ret is a past-the-end iterator for a new
-    ///           subrange of the values all in valid but unspecified state.
-    ///
-    template <typename Rng, typename T,
-        typename Proj = util::projection_identity>
-    subrange_t<typename hpx::traits::range_iterator<Rng>::type> remove_if(
-        Rng&& rng, Pred&& pred, Proj&& proj = Proj());
 
     /// Removes all elements that are equal to \a value from the range
     /// \a rng and and returns a subrange [ret, util::end(rng)), where ret
@@ -458,10 +261,215 @@ namespace hpx { namespace ranges {
     ///           subrange of the values all in valid but unspecified state.
     ///
     template <typename ExPolicy, typename Rng, typename Pred,
-        typename Proj = util::projection_identity>
+        typename Proj = hpx::parallel::util::projection_identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         subrange_t<typename hpx::traits::range_iterator<Rng>::type>>::type
     remove_if(ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj());
+
+    /// Removes all elements that are equal to \a value from the range
+    /// [first, last) and and returns a subrange [ret, last), where ret
+    /// is a past-the-end iterator for the new end of the range.
+    ///
+    /// \note   Complexity: Performs not more than \a last - \a first
+    ///         assignments, exactly \a last - \a first applications of
+    ///         the operator==() and the projection \a proj.
+    ///
+    /// \tparam Iter        The type of the source iterators used for the
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the end iterators used (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
+    /// \tparam T           The type of the value to remove (deduced).
+    ///                     This value type must meet the requirements of
+    ///                     \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param value        Specifies the value of elements to remove.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a remove algorithm
+    /// execute in sequential order in the calling thread.
+    ///
+    /// \returns  The \a remove algorithm returns a \a
+    ///           subrange_t<FwdIter, Sent>.
+    ///           The \a remove algorithm returns an object {ret, last},
+    ///           where ret is a past-the-end iterator for a new
+    ///           subrange of the values all in valid but unspecified state.
+    ///
+    template <typename Iter, typename Sent,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T =
+            typename hpx::parallel::traits::projected<Iter, Proj>::value_type>
+    subrange_t<Iter, Sent> remove(
+        Iter first, Sent last, T const& value, Proj&& proj = Proj());
+
+    /// Removes all elements that are equal to \a value from the range
+    /// \a rng and and returns a subrange [ret, util::end(rng)), where ret
+    /// is a past-the-end iterator for the new end of the range.
+    ///
+    /// \note   Complexity: Performs not more than \a util::end(rng)
+    ///         - \a util::begin(rng) assignments, exactly
+    ///         \a util::end(rng) - \a util::begin(rng) applications of
+    ///         the operator==() and the projection \a proj.
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam T           The type of the value to remove (deduced).
+    ///                     This value type must meet the requirements of
+    ///                     \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param value        Specifies the value of elements to remove.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a remove algorithm
+    /// execute in sequential order in the calling thread.
+    ///
+    /// \returns  The \a remove algorithm returns a \a
+    ///           subrange_t<typename hpx::traits::range_iterator<Rng>::type>.
+    ///           The \a remove algorithm returns an object {ret, last},
+    ///           where ret is a past-the-end iterator for a new
+    ///           subrange of the values all in valid but unspecified state.
+    ///
+    template <typename Rng,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T = typename hpx::parallel::traits::projected<
+            hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
+    subrange_t<typename hpx::traits::range_iterator<Rng>::type> remove(
+        Rng&& rng, T const& value, Proj&& proj = Proj());
+
+    /// Removes all elements that are equal to \a value from the range
+    /// [first, last) and and returns a subrange [ret, last), where ret
+    /// is a past-the-end iterator for the new end of the range.
+    ///
+    /// \note   Complexity: Performs not more than \a last - \a first
+    ///         assignments, exactly \a last - \a first applications of
+    ///         the operator==() and the projection \a proj.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam FwdIter     The type of the source iterators used for the
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the end iterators used (deduced). This
+    ///                     sentinel type must be a sentinel for FwdIter.
+    /// \tparam T           The type of the value to remove (deduced).
+    ///                     This value type must meet the requirements of
+    ///                     \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param value        Specifies the value of elements to remove.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a remove algorithm invoked with
+    /// an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a remove algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a remove algorithm returns a \a
+    ///           hpx::future<subrange_t<FwdIter, Sent>>.
+    ///           The \a remove algorithm returns an object {ret, last},
+    ///           where ret is a past-the-end iterator for a new
+    ///           subrange of the values all in valid but unspecified state.
+    ///
+    template <typename ExPolicy, typename FwdIter, typename Sent,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T = typename hpx::parallel::traits::projected<FwdIter,
+            Proj>::value_type>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        subrange_t<FwdIter, Sent>>::type
+    remove(ExPolicy&& policy, FwdIter first, Sent last, T const& value,
+        Proj&& proj = Proj());
+
+    /// Removes all elements that are equal to \a value from the range
+    /// \a rng and and returns a subrange [ret, util::end(rng)), where ret
+    /// is a past-the-end iterator for the new end of the range.
+    ///
+    /// \note   Complexity: Performs not more than \a util::end(rng)
+    ///         - \a util::begin(rng) assignments, exactly
+    ///         \a util::end(rng) - \a util::begin(rng) applications of
+    ///         the operator==() and the projection \a proj.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam T           The type of the value to remove (deduced).
+    ///                     This value type must meet the requirements of
+    ///                     \a CopyConstructible.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param value        Specifies the value of elements to remove.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a is invoked.
+    ///
+    /// The assignments in the parallel \a remove algorithm invoked with
+    /// an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The assignments in the parallel \a remove algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a remove algorithm returns a \a hpx::future<
+    ///           subrange_t<typename hpx::traits::range_iterator<Rng>::type>>
+    ///           if the execution policy is of type
+    ///           \a sequenced_task_policy or \a parallel_task_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a remove algorithm returns the iterator to the new end
+    ///           of the range.
+    ///
+    template <typename ExPolicy, typename Rng,
+        typename Proj = hpx::parallel::util::projection_identity,
+        typename T = typename hpx::parallel::traits::projected<
+            hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
+    typename parallel::util::detail::algorithm_result<ExPolicy,
+        subrange_t<typename hpx::traits::range_iterator<Rng>::type>>::type
+    remove(ExPolicy&& policy, Rng&& rng, T const& value, Proj&& proj = Proj());
 
 }}    // namespace hpx::ranges
 

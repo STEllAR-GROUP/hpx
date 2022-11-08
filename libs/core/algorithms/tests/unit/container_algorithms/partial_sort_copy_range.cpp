@@ -26,7 +26,11 @@
 unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
+#if defined(HPX_DEBUG)
+#define SIZE 111
+#else
 #define SIZE 1007
+#endif
 
 template <typename IteratorTag>
 void test_partial_sort_range_sent(IteratorTag)
@@ -119,13 +123,13 @@ void test_partial_sort_range_async_sent(ExPolicy p, IteratorTag)
         auto result = hpx::ranges::partial_sort_copy(p, lst.begin(),
             sentinel<std::uint64_t>{SIZE}, A.begin(),
             sentinel<std::uint64_t>{*(A.begin() + i)}, compare_t());
-        result.wait();
+        result.get();
 
         for (std::uint64_t j = 0; j < i; ++j)
         {
             HPX_ASSERT(A[j] == j);
-        };
-    };
+        }
+    }
 }
 
 template <typename IteratorTag>
@@ -213,13 +217,13 @@ void test_partial_sort_range_async(ExPolicy p, IteratorTag)
         A = B;
 
         auto result = hpx::ranges::partial_sort_copy(p, lst, A, compare_t());
-        result.wait();
+        result.get();
 
         for (std::uint64_t j = 0; j < i; ++j)
         {
             HPX_ASSERT(A[j] == j);
-        };
-    };
+        }
+    }
 }
 
 template <typename IteratorTag>

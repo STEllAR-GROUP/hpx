@@ -20,17 +20,13 @@ namespace hpx {
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
-    ///
-    /// The assignments in the parallel \a uninitialized_value_construct
-    /// algorithm invoked without an execution policy object will execute in
-    /// sequential order in the calling thread.
     ///
     /// \returns  The \a uninitialized_value_construct algorithm
     ///           returns nothing
@@ -41,7 +37,8 @@ namespace hpx {
     /// Constructs objects of type typename iterator_traits<ForwardIt>
     /// ::value_type in the uninitialized storage designated by the range
     /// by value-initialization. If an exception is thrown during the
-    /// initialization, the function has no effects.
+    /// initialization, the function has no effects. Executed according
+    /// to the policy.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
@@ -50,7 +47,7 @@ namespace hpx {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -90,7 +87,7 @@ namespace hpx {
     ///         count > 0, no assignments otherwise.
     ///
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
@@ -99,10 +96,6 @@ namespace hpx {
     ///                     the algorithm will be applied to.
     /// \param count        Refers to the number of elements starting at
     ///                     \a first the algorithm will be applied to.
-    ///
-    /// The assignments in the parallel \a uninitialized_value_construct_n
-    /// algorithm invoked without an execution policy object execute in
-    /// sequential order in the calling thread.
     ///
     /// \returns  The \a uninitialized_value_construct_n algorithm returns a
     ///           returns \a FwdIter.
@@ -126,7 +119,7 @@ namespace hpx {
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
     /// \tparam FwdIter     The type of the source iterators used (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
@@ -447,7 +440,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_value_construct
+    // CPO for hpx::uninitialized_value_construct
     inline constexpr struct uninitialized_value_construct_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_t>
     {
@@ -494,7 +487,7 @@ namespace hpx {
     } uninitialized_value_construct{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_value_construct_n
+    // CPO for hpx::uninitialized_value_construct_n
     inline constexpr struct uninitialized_value_construct_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_n_t>
     {

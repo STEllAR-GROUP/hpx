@@ -12,6 +12,7 @@ set(include_local_headers
     hpx/local/chrono.hpp
     hpx/local/compute.hpp
     hpx/local/condition_variable.hpp
+    hpx/local/datapar.hpp
     hpx/local/exception.hpp
     hpx/local/execution.hpp
     hpx/local/functional.hpp

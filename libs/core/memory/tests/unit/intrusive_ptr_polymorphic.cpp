@@ -68,7 +68,7 @@ struct E : D
     {
     }
 
-    const char* foo()
+    const char* foo() override
     {
         return "E::foo";
     }
@@ -86,7 +86,7 @@ struct E : D
         ar& b;
     }
     HPX_SERIALIZATION_SPLIT_MEMBER();
-    HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(E);
+    HPX_SERIALIZATION_POLYMORPHIC_SPLITTED(E, override);
 };
 
 class F : public E
@@ -100,7 +100,7 @@ class F : public E
         ar& hpx::serialization::base_object<E>(*this);
         ar& c;
     }
-    HPX_SERIALIZATION_POLYMORPHIC(F)
+    HPX_SERIALIZATION_POLYMORPHIC(F, override)
 
 public:
     explicit F(int c = 3)
@@ -108,7 +108,7 @@ public:
     {
     }
 
-    const char* foo()
+    const char* foo() override
     {
         return "F::foo";
     }

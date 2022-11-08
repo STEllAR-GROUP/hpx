@@ -1,5 +1,6 @@
 //  Copyright (c) 2018 Christopher Ogle
 //  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2022 Dimitra Karatza
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -49,9 +50,140 @@ namespace hpx { namespace ranges {
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
-    template <typename ExPolicy, typename Rng, typename T>
-    typename util::detail::algorithm_result<ExPolicy>::type
+    template <typename ExPolicy, typename Rng,
+        typename T = typename std::iterator_traits<
+            hpx::traits::range_iterator_t<Rng>>::value_type>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        typename hpx::traits::range_traits<Rng>::iterator_type>::type
     fill(ExPolicy&& policy, Rng&& rng, T const& value);
+
+    /// Assigns the given value to the elements in the range [first, last).
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Iter        The type of the source iterators used for the
+    ///                     range (deduced).
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for InIter.
+    /// \tparam T           The type of the value to be assigned (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    /// \param value        The value to be assigned.
+    ///
+    /// The comparisons in the parallel \a fill algorithm invoked with
+    /// an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparisons in the parallel \a fill algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a fill algorithm returns a \a hpx::future<void> if the
+    ///           execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a difference_type otherwise (where \a difference_type
+    ///           is defined by \a void.
+    ///
+    template <typename ExPolicy, typename Iter, typename Sent,
+        typename T = typename std::iterator_traits<Iter>::value_type>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        Iter>::type
+    fill(ExPolicy&& policy, Iter first, Sent last, T const& value);
+
+    /// Assigns the given value to the elements in the range [first, last).
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam T           The type of the value to be assigned (deduced).
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param value        The value to be assigned.
+    ///
+    /// \returns  The \a fill algorithm returns \a void.
+    ///
+    template <typename Rng, typename T = typename std::iterator_traits<
+        hpx::traits::range_iterator_t<Rng>>::value_type>
+    hpx::traits::range_iterator_t<Rng> fill(Rng&& rng, T const& value);
+
+    /// Assigns the given value to the elements in the range [first, last).
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam Iter        The type of the source iterators used for the
+    ///                     range (deduced).
+    /// \tparam Sent        The type of the source sentinel (deduced). This
+    ///                     sentinel type must be a sentinel for InIter.
+    /// \tparam T           The type of the value to be assigned (deduced).
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     of the range the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements of
+    ///                     the range the algorithm will be applied to.
+    /// \param value        The value to be assigned.
+    ///
+    /// \returns  The \a fill algorithm returns \a void.
+    ///
+    template <typename Iter, typename Sent,
+        typename T = typename std::iterator_traits<Iter>::value_type>
+    Iter fill(Iter first, Sent last, T const& value);
+
+    /// Assigns the given value value to the first count elements in the range
+    /// beginning at first if count > 0. Does nothing otherwise.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam T           The type of the value to be assigned (deduced).
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param value        The value to be assigned.
+    ///
+    /// The comparisons in the parallel \a fill_n algorithm invoked with
+    /// an execution policy object of type \a sequenced_policy
+    /// execute in sequential order in the calling thread.
+    ///
+    /// The comparisons in the parallel \a fill_n algorithm invoked with
+    /// an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a fill_n algorithm returns a \a hpx::future<void> if the
+    ///           execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a difference_type otherwise (where \a difference_type
+    ///           is defined by \a void.
+    ///
+    template <typename ExPolicy, typename Rng,
+        typename T = typename std::iterator_traits<
+            hpx::traits::range_iterator_t<Rng>>::value_type>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+        hpx::traits::range_iterator_t<Rng>>
+    fill_n(ExPolicy&& policy, Rng&& rng, T const& value);
 
     /// Assigns the given value value to the first count elements in the range
     /// beginning at first if count > 0. Does nothing otherwise.
@@ -63,9 +195,10 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
-    /// \tparam Iterator    The type of the source range used (deduced).
-    ///                     The iterators extracted from this range type must
-    ///                     meet the requirements of an forward iterator.
+    /// \tparam FwdIter     The type of the source iterators used for the
+    ///                     range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
     /// \tparam Size        The type of the argument specifying the number of
     ///                     elements to apply \a f to.
     /// \tparam T           The type of the value to be assigned (deduced).
@@ -95,9 +228,58 @@ namespace hpx { namespace ranges {
     ///           returns \a difference_type otherwise (where \a difference_type
     ///           is defined by \a void.
     ///
-    template <typename ExPolicy, typename Iterator, typename Size, typename T>
-    typename util::detail::algorithm_result<ExPolicy, Iterator>::type
-    fill_n(ExPolicy&& policy, Iterator first, Size count, T const& value);
+    template <typename ExPolicy, typename FwdIter, typename Size,
+        typename T = typename std::iterator_traits<FwdIter>::value_type>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        FwdIter>::type
+    fill_n(ExPolicy&& policy, FwdIter first, Size count, T const& value);
+
+    /// Assigns the given value value to the first count elements in the range
+    /// beginning at first if count > 0. Does nothing otherwise.
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam T           The type of the value to be assigned (deduced).
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param value        The value to be assigned.
+    ///
+    /// \returns  The \a fill_n algorithm returns an output iterator that
+    ///           compares equal to last.
+    ///
+    template <typename Rng,
+        typename T = typename std::iterator_traits<
+            hpx::traits::range_iterator_t<Rng>>::value_type>
+    typename hpx::traits::range_traits<Rng>::iterator_type
+    fill_n(Rng&& rng, T const& value);
+
+    /// Assigns the given value value to the first count elements in the range
+    /// beginning at first if count > 0. Does nothing otherwise.
+    ///
+    /// \note   Complexity: Performs exactly \a count assignments, for
+    ///         count > 0.
+    ///
+    /// \tparam Iterator    The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an forward iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply \a f to.
+    /// \tparam T           The type of the value to be assigned (deduced).
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.
+    /// \param value        The value to be assigned.
+    ///
+    /// \returns  The \a fill_n algorithm returns an output iterator that
+    ///           compares equal to last.
+    ///
+    template <typename FwdIter, typename Size,
+        typename T = typename std::iterator_traits<FwdIter>::value_type>
+    FwdIter fill_n(Iterator first, Size count, T const& value);
 
     // clang-format on
 }}    // namespace hpx::ranges

@@ -23,14 +23,14 @@ set(example_programs simplest_resource_partitioner_1
                      simplest_resource_partitioner_2
 )
 
-set(example_programs
-    ${example_programs} async_customization
-    oversubscribing_resource_partitioner simple_resource_partitioner
+set(example_programs ${example_programs} oversubscribing_resource_partitioner
+                     simple_resource_partitioner
 )
 
-# Intel compilers have trouble compiling this example
-if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-  set(example_programs ${example_programs} guided_pool_test)
+# Intel compilers have trouble compiling these examples, older versions of MSVC
+# fail too
+if(NOT ${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel" AND NOT MSVC)
+  set(example_programs ${example_programs} guided_pool_test async_customization)
 endif()
 
 set(oversubscribing_resource_partitioner_PARAMETERS

@@ -62,8 +62,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
 
     // Define range of values
-    std::size_t lower = vm["l"].as<std::size_t>();
-    std::size_t upper = vm["u"].as<std::size_t>();
+    int lower = vm["l"].as<int>();
+    int upper = vm["u"].as<int>();
 
     // Matrices have random values in the range [lower, upper]
     std::uniform_int_distribution<element_type> dis(lower, upper);
@@ -112,10 +112,10 @@ int main(int argc, char* argv[])
         hpx::program_options::value<unsigned int>(),
         "The random number generator seed to use for this run")
         ("l",
-        hpx::program_options::value<std::size_t>()->default_value(0),
+        hpx::program_options::value<int>()->default_value(0),
         "Lower limit of range of values")
         ("u",
-        hpx::program_options::value<std::size_t>()->default_value(10),
+        hpx::program_options::value<int>()->default_value(10),
         "Upper limit of range of values");
     // clang-format on
     hpx::local::init_params init_args;

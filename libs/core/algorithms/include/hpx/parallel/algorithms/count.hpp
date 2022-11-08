@@ -1,3 +1,4 @@
+//  Copyright (c) 2022 Bhumit Attarde
 //  Copyright (c) 2014 Grant Mercer
 //  Copyright (c) 2020-2022 Hartmut Kaiser
 //
@@ -15,7 +16,7 @@ namespace hpx {
 
     /// Returns the number of elements in the range [first, last) satisfying
     /// a specific criteria. This version counts the elements that are equal to
-    /// the given \a value.
+    /// the given \a value. Executed according to the policy.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first comparisons.
     ///
@@ -23,15 +24,10 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam FwdIterB    The type of the source begin iterator used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam FwdIterE    The type of the source end iterator used (deduced).
+    /// \tparam FwdIter    The type of the source iterator used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam T           The type of the value to search for (deduced).
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -40,10 +36,6 @@ namespace hpx {
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param value        The value to search for.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
     ///
     /// The comparisons in the parallel \a count algorithm invoked with
     /// an execution policy object of type \a sequenced_policy
@@ -64,17 +56,40 @@ namespace hpx {
     ///           is defined by \a std::iterator_traits<FwdIterB>::difference_type.
     ///           The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
-    ///
-    template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
-        typename T, typename Proj = util::projection_identity>
+    template <typename ExPolicy, typename FwdIter, typename T>
     typename util::detail::algorithm_result<ExPolicy,
-        typename std::iterator_traits<FwdIterB>::difference_type>::type
-    count(ExPolicy&& policy, FwdIterB first, FwdIterE last, T const& value,
-            Proj&& proj = Proj());
+        typename std::iterator_traits<FwdIter>::difference_type>::type
+    count(ExPolicy&& policy, FwdIter first, FwdIter last, T const& value);
+
+    /// Returns the number of elements in the range [first, last) satisfying
+    /// a specific criteria. This version counts the elements that are equal to
+    /// the given \a value.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first comparisons.
+    /// \tparam InIter      The type of the source iterator used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam T           The type of the value to search for (deduced).
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param value        The value to search for.
+    ///
+    ///
+    /// \returns  The \a count algorithm returns a \a difference_type (where \a difference_type
+    ///           is defined by \a std::iterator_traits<InIter>::difference_type.
+    ///           The \a count algorithm returns the number of elements
+    ///           satisfying the given criteria.
+    ///
+    template <typename InIter, typename T>
+    typename std::iterator_traits<InIter>::difference_type
+    count(InIter first, InIter last, T const& value);
 
     /// Returns the number of elements in the range [first, last) satisfying
     /// a specific criteria. This version counts elements for which predicate
-    /// \a f returns true.
+    /// \a f returns true. Executed according to the policy.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first applications of
     ///         the predicate.
@@ -83,18 +98,13 @@ namespace hpx {
     ///                     It describes the manner in which the execution
     ///                     of the algorithm may be parallelized and the manner
     ///                     in which it executes the comparisons.
-    /// \tparam Iter        The type of the source begin iterator used (deduced).
-    ///                     This iterator type must meet the requirements of an
-    ///                     forward iterator.
-    /// \tparam Sent        The type of the source end iterator used (deduced).
+    /// \tparam FwdIter     The type of the source begin iterator used (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     forward iterator.
     /// \tparam F           The type of the function/function object to use
     ///                     (deduced). Unlike its sequential form, the parallel
     ///                     overload of \a count_if requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
-    /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -114,12 +124,8 @@ namespace hpx {
     ///                     The signature does not need to have const&, but
     ///                     the function must not modify the objects passed to
     ///                     it. The type \a Type must be such that an object of
-    ///                     type \a FwdIterB can be dereferenced and then
+    ///                     type \a FwdIter can be dereferenced and then
     ///                     implicitly converted to Type.
-    /// \param proj         Specifies the function (or function object) which
-    ///                     will be invoked for each of the elements as a
-    ///                     projection operation before the actual predicate
-    ///                     \a is invoked.
     ///
     /// \note The assignments in the parallel \a count_if algorithm invoked with
     ///       an execution policy object of type \a sequenced_policy
@@ -136,16 +142,58 @@ namespace hpx {
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a difference_type otherwise (where \a difference_type
-    ///           is defined by \a std::iterator_traits<FwdIterB>::difference_type.
+    ///           is defined by \a std::iterator_traits<FwdIter>::difference_type.
     ///           The \a count algorithm returns the number of elements
     ///           satisfying the given criteria.
     ///
-    template <typename ExPolicy, typename Iter, typename Sent,
-        typename F, typename Proj = util::projection_identity>
+    template <typename ExPolicy, typename FwdIter, typename F>
     typename util::detail::algorithm_result<ExPolicy,
-        typename std::iterator_traits<Iter>::difference_type>::type
-    count_if(ExPolicy&& policy, Iter first, Sent last, F&& f,
-        Proj&& proj = Proj());
+        typename std::iterator_traits<FwdIter>::difference_type>::type
+    count_if(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
+
+    /// Returns the number of elements in the range [first, last) satisfying
+    /// a specific criteria. This version counts elements for which predicate
+    /// \a f returns true.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first applications of
+    ///         the predicate.
+    ///
+    /// \tparam InIter      The type of the source begin iterator used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam F           The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a count_if requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param f            Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).This is an
+    ///                     unary predicate which returns \a true for the
+    ///                     required elements. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a InIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// \returns  The \a count_if algorithm returns \a difference_type (where
+    ///           a difference_type is defined by
+    ///           \a std::iterator_traits<InIter>::difference_type.
+    ///           The \a count algorithm returns the number of elements
+    ///           satisfying the given criteria.
+    ///
+    template <typename InIter, typename F>
+        typename std::iterator_traits<InIter>::difference_type
+    count_if(InIter first, InIter last, F&& f);
 
     // clang-format on
 }    // namespace hpx

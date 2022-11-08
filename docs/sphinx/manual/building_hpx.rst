@@ -253,14 +253,14 @@ To build |hpx| under Windows 10 x64 with Visual Studio 2015:
 
   .. code-block:: bash
 
-     bootstrap.bat
+     .\bootstrap.bat
 
   This batch file will set up everything needed to create a successful build.
   Now execute:
 
   .. code-block:: bash
 
-     b2.exe link=shared variant=release,debug architecture=x86 address-model=64 threading=multi --build-type=complete install
+     .\b2.exe link=shared variant=release,debug architecture=x86 address-model=64 threading=multi --build-type=complete install
 
   This command will start a (very long) build of all available Boost libraries.
   Please, be patient.
@@ -285,12 +285,14 @@ To build |hpx| under Windows 10 x64 with Visual Studio 2015:
   will build |hpx| packages out of the |hpx| source tree.
 
 * Set three new environment variables (in CMake, not in Windows environment):
-  ``BOOST_ROOT``, ``HWLOC_ROOT``, ``CMAKE_INSTALL_PREFIX``. The meaning of
+  ``BOOST_ROOT``, ``HWLOC_ROOT``, ``ASIO_ROOT``, ``CMAKE_INSTALL_PREFIX``. The meaning of
   these variables is as follows:
 
   * ``BOOST_ROOT`` the |hpx| root directory of the unpacked Boost headers/cpp files.
   * ``HWLOC_ROOT`` the |hpx| root directory of the unpacked Portable Hardware Locality
     files.
+  * ``ASIO_ROOT`` the |hpx| root directory of the unpacked ASIO files. Alternatively use
+    ``HPX_WITH_FETCH_ASIO`` with value ``True``.
   * ``CMAKE_INSTALL_PREFIX`` the |hpx| root directory where the future builds of |hpx|
     should be installed.
 

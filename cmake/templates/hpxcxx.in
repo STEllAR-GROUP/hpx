@@ -126,12 +126,14 @@ if pkg in os.environ:
 else:
     os.environ[pkg] = pkgconf
 
+args += ["-Wl,--start-group"]
 if application:
     args += ["`pkg-config --cflags --libs hpx_application" + pkgconf_suffix + "`"]
 elif component:
     args += ["`pkg-config --cflags --libs hpx_component" + pkgconf_suffix + "`"]
 else:
     args += ["`pkg-config --cflags hpx_application" + pkgconf_suffix + "`"]
+args += ["-Wl,--end-group"]
 
 if not component and not application and not minusc:
     usage()

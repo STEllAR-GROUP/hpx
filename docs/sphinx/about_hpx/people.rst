@@ -1,5 +1,5 @@
 ..
-    Copyright (C) 2007-2015 Hartmut Kaiser
+    Copyright (C) 2007-2022 Hartmut Kaiser
     Copyright (C) 2016-2018 Adrian Serio
 
     SPDX-License-Identifier: BSL-1.0
@@ -71,18 +71,18 @@ tables below.
    ======================= ================ =====
    Hartmut Kaiser          |cct|_, |lsu|_   |email_hkaiser|
    Thomas Heller           |inf3|_, |fau|_  |email_theller|
-   Agustin Berge           |cct|_, |lsu|_   |email_aberge|
+   Agustin Berge                            |email_aberge|
    Mikael Simberg          |cscs|_          |email_msimberg|
    John Biddiscombe        |cscs|_          |email_jbiddiscombe|
    Anton Bikineev          |cct|_, |lsu|_   |email_abikineev|
    Martin Stumpf           |inf3|_, |fau|_  |email_mstumpf|
-   Bryce Adelstein Lelbach |nvidia|_        |email_blelbach|
+   Bryce Adelstein Lelbach                  |email_blelbach|
    Shuangyang Yang         |cct|_, |lsu|_   |email_syang|
-   Jeroen Habraken         |tue|_           |email_jhabraken|
+   Jeroen Habraken                          |email_jhabraken|
    Steven Brandt           |cct|_, |lsu|_   |email_sbrandt|
-   Antoine Tran Tan        |cct|_, |lsu|_   |email_atrantan|
-   Adrian Serio            |cct|_, |lsu|_   |email_aserio|
-   Maciej Brodowicz        |crest|_, |iu|_  |email_mbrodowicz|
+   Antoine Tran Tan        |psu|_,          |email_atrantan|
+   Adrian S. Lemoine       |amd|_           |email_alemoine|
+   Maciej Brodowicz                         |email_mbrodowicz|
    Giannis Gonidelis       |cct|_, |lsu|_   |email_ggonidelis|
    ======================= ================ =====
 
@@ -96,13 +96,14 @@ Contributors to this document
   ======================= ===================== =====
   Hartmut Kaiser          |cct|_, |lsu|_        |email_hkaiser|
   Thomas Heller           |inf3|_, |fau|_       |email_theller|
-  Bryce Adelstein Lelbach |nvidia|_             |email_blelbach|
+  Bryce Adelstein Lelbach                       |email_blelbach|
   Vinay C Amatya          |cct|_, |lsu|_        |email_vamatya|
   Steven Brandt           |cct|_, |lsu|_        |email_sbrandt|
-  Maciej Brodowicz        |crest|_, |iu|_       |email_mbrodowicz|
-  Adrian Serio            |cct|_, |lsu|_        |email_aserio|
+  Maciej Brodowicz                              |email_mbrodowicz|
+  Adrian S. Lemoine       |amd|_                |email_alemoine|
   Rebecca Stobaugh                              |email_rstobaugh|
   Dimitra Karatza         |tud_eemcs|_, |tud|_  |email_dkaratza|
+  Bhumit Attarde                                |email_bhumitattarde|
   ======================= ===================== =====
 
 Acknowledgements
@@ -111,7 +112,10 @@ Acknowledgements
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
-* Dimitra Karatza, for her work on refactoring the documentation and providing 
+* Shreyas Atre, for contributing fixes to our implementation of
+  senders/receivers.
+* Alexander Neumann, for contributing fixes to the cmake build system.
+* Dimitra Karatza, for her work on refactoring the documentation and providing
   a new user-friendly environment during and after Google Season of Docs 2021.
 * Srinivas Yadav, for his work on SIMD support in algorithms before and during
   Google Summer of Code 2021.
@@ -152,7 +156,8 @@ the project through discussions, pull requests, documentation patches, etc.
 * Bruno Pitrus, for his work with parallel algorithms.
 * Nikunj Gupta, for rewriting the implementation of ``hpx_main.hpp`` and for his
   fixes for tests.
-* Christopher Taylor, for his interest in |hpx| and the fixes he provided.
+* Christopher Taylor, for his interest in |hpx| and the fixes he provided. Chris
+  also contributed support for RISC-V architectures.
 * Shoshana Jakobovits, for her work on the resource partitioner.
 * Denis Blank, who re-wrote our unwrapped function to accept plain values
   arbitrary containers, and properly deal with nested futures.
@@ -270,6 +275,6 @@ the project through discussions, pull requests, documentation patches, etc.
   Jeff Trull, Yuri Victorovich, and Gregor Daiß who contributed to the general
   improvement of |hpx|.
 
-|stellar_hpx_funding|_ lists current and past funding sources for |hpx|. Special thanks to 
-|gsoc|_ and |gsod|_ for the continuous support they provide which helps us enhance both our 
+|stellar_hpx_funding|_ lists current and past funding sources for |hpx|. Special thanks to
+|gsoc|_ and |gsod|_ for the continuous support they provide which helps us enhance both our
 code and our documentation.

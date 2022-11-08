@@ -13,6 +13,7 @@
 #if defined(DOXYGEN)
 
 namespace hpx {
+    // clang-format off
 
     ///////////////////////////////////////////////////////////////////////////
     /// Finds the smallest element in the range [first, last) using the given
@@ -63,7 +64,8 @@ namespace hpx {
     ///           returns the iterator to the first such element. Returns last
     ///           if the range is empty.
     ///
-    template <typename FwdIter, typename Sent, typename F,
+    template <typename FwdIter, typename Sent,
+        typename F = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
     FwdIter min_element(
         FwdIter first, Sent last, F&& f = F(), Proj&& proj = Proj());
@@ -113,7 +115,8 @@ namespace hpx {
     ///           returns the iterator to the first such element. Returns last
     ///           if the range is empty.
     ///
-    template <typename Rng, typename F,
+    template <typename Rng,
+        typename F = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
     hpx::traits::range_iterator_t<Rng> min_element(
         Rng&& rng, F&& f = F(), Proj&& proj = Proj());
@@ -186,10 +189,11 @@ namespace hpx {
     ///           returns the iterator to the first such element. Returns last
     ///           if the range is empty.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent, typename F,
+    template <typename ExPolicy, typename FwdIter, typename Sent,
+        typename F = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
-    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    min_element(ExPolicy&& policy, FwdIter first, Sent sent, F&& f = F(),
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
+    min_element(ExPolicy&& policy, FwdIter first, Sent last, F&& f = F(),
         Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -256,10 +260,11 @@ namespace hpx {
     ///           returns the iterator to the first such element. Returns last
     ///           if the range is empty.
     ///
-    template <typename ExPolicy, typename Rng, typename F,
+    template <typename ExPolicy, typename Rng,
+        typename F = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::traits::range_iterator_t<Rng>>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+        hpx::traits::range_iterator_t<Rng>>
     min_element(
         ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj());
 
@@ -313,10 +318,11 @@ namespace hpx {
     ///           returns the iterator to the first such element. Returns last
     ///           if the range is empty.
     ///
-    template <typename FwdIter, typename Sent, typename F,
+    template <typename FwdIter, typename Sent,
+        typename F = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
     FwdIter max_element(
-        FwdIter first, Sent sent, F&& f = F(), Proj&& proj = Proj());
+        FwdIter first, Sent last, F&& f = F(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Finds the greatest element in the range [first, last) using the given
@@ -364,7 +370,8 @@ namespace hpx {
     ///           returns the iterator to the first such element. Returns last
     ///           if the range is empty.
     ///
-    template <typename Rng, typename F,
+    template <typename Rng,
+        typename F = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
     hpx::traits::range_iterator_t<Rng> max_element(
         Rng&& rng, F&& f = F(), Proj&& proj = Proj());
@@ -438,10 +445,11 @@ namespace hpx {
     ///           returns the iterator to the first such element. Returns last
     ///           if the range is empty.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent, typename F,
+    template <typename ExPolicy, typename FwdIter, typename Sent,
+        typename F = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
-    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
-    max_element(ExPolicy&& policy, FwdIter first, Sent sent, F&& f = F(),
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
+    max_element(ExPolicy&& policy, FwdIter first, Sent last, F&& f = F(),
         Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -509,12 +517,12 @@ namespace hpx {
     ///           returns the iterator to the first such element. Returns last
     ///           if the range is empty.
     ///
-    template <typename ExPolicy, typename Rng, typename F,
+    template <typename ExPolicy, typename Rng,
+        typename F = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy,
-        hpx::traits::range_iterator_t<Rng>>::type
-    max_element(
-        ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj());
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+        hpx::traits::range_iterator_t<Rng>>
+    max_element(ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
     /// Finds the greatest element in the range [first, last) using the given
@@ -570,9 +578,10 @@ namespace hpx {
     ///           elements are equivalent to the largest element, the iterator
     ///           to the last such element is returned.
     ///
-    template <typename FwdIter, typename Sent, typename F,
+    template <typename FwdIter, typename Sent,
+        typename F = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
-    minmax_element_result<FwdIter, FwdIter> minmax_element(
+    minmax_element_result<FwdIter> minmax_element(
         FwdIter first, Sent last, F&& f = F(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -625,10 +634,10 @@ namespace hpx {
     ///           elements are equivalent to the largest element, the iterator
     ///           to the last such element is returned.
     ///
-    template <typename Rng, typename F,
+    template <typename Rng,
+        typename F = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
-    minmax_element_result<hpx::traits::range_iterator_t<Rng>,
-        hpx::traits::range_iterator_t<Rng>>
+    minmax_element_result<hpx::traits::range_iterator_t<Rng>>
     minmax_element(Rng&& rng, F&& f = F(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -699,10 +708,11 @@ namespace hpx {
     ///           elements are equivalent to the largest element, the iterator
     ///           to the last such element is returned.
     ///
-    template <typename ExPolicy, typename FwdIter, typename Sent, typename F,
+    template <typename ExPolicy, typename FwdIter, typename Sent,
+        typename F = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
-    typename parallel::util::detail::algorithm_result<ExPolicy,
-        minmax_element_result<FwdIter, FwdIter>>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+        minmax_element_result<FwdIter>>
     minmax_element(ExPolicy&& policy, FwdIter first, Sent last, F&& f = F(),
         Proj&& proj = Proj());
 
@@ -771,14 +781,13 @@ namespace hpx {
     ///           elements are equivalent to the largest element, the iterator
     ///           to the last such element is returned.
     ///
-    template <typename ExPolicy, typename Rng, typename F,
+    template <typename ExPolicy, typename Rng,
+        typename F = hpx::parallel::v1::detail::less,
         typename Proj = hpx::parallel::util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy,
-        minmax_element_result<hpx::traits::range_iterator_t<Rng>,
-            hpx::traits::range_iterator_t<Rng>>>::type
-    minmax_element(
-        ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj());
-
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+        minmax_element_result<hpx::traits::range_iterator_t<Rng>>>
+    minmax_element(ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj());
+    // clang-format on
 }    // namespace hpx
 
 #else    // DOXYGEN

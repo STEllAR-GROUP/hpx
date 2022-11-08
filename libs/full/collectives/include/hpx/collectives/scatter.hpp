@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2021 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,14 +18,16 @@ namespace hpx { namespace collectives {
     /// the given base name.
     ///
     /// \param  basename    The base name identifying the scatter operation
-    /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the scatter operation performed on the
-    ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the scatter operation on the given
-    ///                     base name has to be performed more than once.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_gather operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
     /// \param root_site    The sequence number of the central scatter point
     ///                     (usually the locality id). This value is optional
     ///                     and defaults to 0.
@@ -49,13 +51,55 @@ namespace hpx { namespace collectives {
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_gather operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \note       The generation values from corresponding \a scatter_to and
+    ///             \a scatter_from have to match.
     ///
     /// \returns    This function returns a future holding a the
     ///             scattered value. It will become ready once the scatter
     ///             operation has been completed.
     ///
     template <typename T>
-    hpx::future<T> scatter_from(communicator comm,
+    hpx::future<T> scatter_from(
+        communicator comm,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Scatter (receive) a set of values to different call sites
+    ///
+    /// This function receives an element of a set of values operating on
+    /// the given base name.
+    ///
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_gather operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \note       The generation values from corresponding \a scatter_to and
+    ///             \a scatter_from have to match.
+    ///
+    /// \returns    This function returns a future holding a the
+    ///             scattered value. It will become ready once the scatter
+    ///             operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<T> scatter_from(
+        communicator comm,
+        generation_arg generation,
         this_site_arg this_site = this_site_arg());
 
     /// Scatter (send) a part of the value set at the given call site
@@ -69,10 +113,12 @@ namespace hpx { namespace collectives {
     /// \param  num_sites   The number of participating sites (default: all
     ///                     localities).
     /// \param  generation  The generational counter identifying the sequence
-    ///                     number of the scatter operation performed on the
+    ///                     number of the all_gather operation performed on the
     ///                     given base name. This is optional and needs to be
-    ///                     supplied only if the scatter operation on the given
-    ///                     base name has to be performed more than once.
+    ///                     supplied only if the all_gather operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
@@ -99,14 +145,58 @@ namespace hpx { namespace collectives {
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_gather operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    ///
+    /// \note       The generation values from corresponding \a scatter_to and
+    ///             \a scatter_from have to match.
     ///
     /// \returns    This function returns a future holding a the
     ///             scattered value. It will become ready once the scatter
     ///             operation has been completed.
     ///
     template <typename T>
-    hpx::future<T> scatter_to(communicator comm,
-        std::vector<T>&& result, this_site_arg this_site = this_site_arg());
+    hpx::future<T> scatter_to(
+        communicator comm, std::vector<T>&& result,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg());
+
+    /// Scatter (send) a part of the value set at the given call site
+    ///
+    /// This function transmits the value given by \a result to a central scatter
+    /// site (where the corresponding \a scatter_from is executed)
+    ///
+    /// \param  comm        A communicator object returned from \a create_communicator
+    /// \param  num_sites   The number of participating sites (default: all
+    ///                     localities).
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the all_gather operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the all_gather operation on the
+    ///                     given base name has to be performed more than once.
+    ///                     The generation number (if given) must be a positive
+    ///                     number greater than zero.
+    /// \param this_site    The sequence number of this invocation (usually
+    ///                     the locality id). This value is optional and
+    ///                     defaults to whatever hpx::get_locality_id() returns.
+    ///
+    /// \note       The generation values from corresponding \a scatter_to and
+    ///             \a scatter_from have to match.
+    ///
+    /// \returns    This function returns a future holding a the
+    ///             scattered value. It will become ready once the scatter
+    ///             operation has been completed.
+    ///
+    template <typename T>
+    hpx::future<T> scatter_to(
+        communicator comm, std::vector<T>&& result,
+        generation_arg generation,
+        this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
 
 // clang-format on
@@ -126,8 +216,6 @@ namespace hpx { namespace collectives {
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
-#include <memory>
-#include <mutex>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -142,96 +230,38 @@ namespace hpx { namespace traits {
 
     template <typename Communicator>
     struct communication_operation<Communicator, communication::scatter_tag>
-      : std::enable_shared_from_this<
-            communication_operation<Communicator, communication::scatter_tag>>
     {
-        explicit communication_operation(Communicator& comm)
-          : communicator_(comm)
-        {
-        }
-
         template <typename Result>
-        Result get(std::size_t which)
+        static Result get(Communicator& communicator, std::size_t which,
+            std::size_t generation)
         {
-            using arg_type = typename Result::result_type;
-            using mutex_type = typename Communicator::mutex_type;
-            using lock_type = std::unique_lock<mutex_type>;
+            using data_type = typename Result::result_type;
 
-            auto this_ = this->shared_from_this();
-            auto on_ready = [this_ = HPX_MOVE(this_), which](
-                                shared_future<void>&& f) -> arg_type {
-                HPX_UNUSED(this_);
-                f.get();    // propagate any exceptions
-
-                auto& communicator = this_->communicator_;
-
-                lock_type l(communicator.mtx_);
-
-                auto& data = communicator.template access_data<arg_type>(l);
-                return HPX_MOVE(data[which]);
-            };
-
-            lock_type l(communicator_.mtx_);
-            util::ignore_while_checking il(&l);
-            HPX_UNUSED(il);
-
-            hpx::future<arg_type> f =
-                communicator_.gate_.get_shared_future(l).then(
-                    hpx::launch::sync, HPX_MOVE(on_ready));
-
-            communicator_.gate_.synchronize(1, l);
-
-            if (communicator_.gate_.set(which, HPX_MOVE(l)))
-            {
-                l = lock_type(communicator_.mtx_);
-                communicator_.invalidate_data(l);
-            }
-
-            return f;
+            return communicator.template handle_data<data_type>(which,
+                generation,
+                // step function (invoked once for get)
+                nullptr,
+                // finalizer (invoked after all sites have checked in)
+                [which](auto& data, bool&) {
+                    return Communicator::template handle_bool<data_type>(
+                        HPX_MOVE(data[which]));
+                });
         }
 
         template <typename Result, typename T>
-        Result set(std::size_t which, std::vector<T>&& t)
+        static Result set(Communicator& communicator, std::size_t which,
+            std::size_t generation, std::vector<T>&& t)
         {
-            using mutex_type = typename Communicator::mutex_type;
-            using lock_type = std::unique_lock<mutex_type>;
-
-            auto this_ = this->shared_from_this();
-            auto on_ready = [this_ = HPX_MOVE(this_), which](
-                                shared_future<void>&& f) -> T {
-                HPX_UNUSED(this_);
-                f.get();    // propagate any exceptions
-
-                auto& communicator = this_->communicator_;
-
-                lock_type l(communicator.mtx_);
-
-                auto& data = communicator.template access_data<T>(l);
-                return HPX_MOVE(data[which]);
-            };
-
-            lock_type l(communicator_.mtx_);
-            util::ignore_while_checking il(&l);
-            HPX_UNUSED(il);
-
-            hpx::future<T> f = communicator_.gate_.get_shared_future(l).then(
-                hpx::launch::sync, HPX_MOVE(on_ready));
-
-            communicator_.gate_.synchronize(1, l);
-
-            auto& data = communicator_.template access_data<T>(l);
-            data = HPX_MOVE(t);
-
-            if (communicator_.gate_.set(which, HPX_MOVE(l)))
-            {
-                l = lock_type(communicator_.mtx_);
-                communicator_.invalidate_data(l);
-            }
-
-            return f;
+            return communicator.template handle_data<T>(
+                which, generation,
+                // step function (invoked once for set)
+                [&](auto& data) { data = HPX_MOVE(t); },
+                // finalizer (invoked after all sites have checked in)
+                [which](auto& data, bool&) {
+                    return Communicator::template handle_bool<T>(
+                        HPX_MOVE(data[which]));
+                });
         }
-
-        Communicator& communicator_;
     };
 }}    // namespace hpx::traits
 
@@ -240,30 +270,49 @@ namespace hpx { namespace collectives {
     ///////////////////////////////////////////////////////////////////////////
     // destination site needs to be handled differently
     template <typename T>
-    hpx::future<T> scatter_from(
-        communicator fid, this_site_arg this_site = this_site_arg())
+    hpx::future<T> scatter_from(communicator fid,
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
     {
         if (this_site == std::size_t(-1))
         {
             this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
+        if (generation == 0)
+        {
+            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
+                hpx::bad_parameter, "hpx::collectives::scatter_from",
+                "the generation number shouldn't be zero"));
+        }
 
-        auto scatter_data = [this_site](communicator&& c) -> hpx::future<T> {
+        auto scatter_from_data = [this_site, generation](
+                                     communicator&& c) -> hpx::future<T> {
             using action_type = typename detail::communicator_server::
                 template communication_get_action<
                     traits::communication::scatter_tag, hpx::future<T>>;
 
-            // make sure id is kept alive as long as the returned future,
             // explicitly unwrap returned future
-            hpx::future<T> result = async(action_type(), c, this_site);
+            hpx::future<T> result =
+                async(action_type(), c, this_site, generation);
 
-            traits::detail::get_shared_state(result)->set_on_completed(
-                [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+            if (!result.is_ready())
+            {
+                // make sure id is kept alive as long as the returned future
+                traits::detail::get_shared_state(result)->set_on_completed(
+                    [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+            }
 
             return result;
         };
 
-        return fid.then(hpx::launch::sync, HPX_MOVE(scatter_data));
+        return fid.then(hpx::launch::sync, HPX_MOVE(scatter_from_data));
+    }
+
+    template <typename T>
+    hpx::future<T> scatter_from(communicator fid, generation_arg generation,
+        this_site_arg this_site = this_site_arg())
+    {
+        return scatter_from<T>(HPX_MOVE(fid), this_site, generation);
     }
 
     template <typename T>
@@ -282,34 +331,51 @@ namespace hpx { namespace collectives {
     // scatter plain values
     template <typename T>
     hpx::future<T> scatter_to(communicator fid, std::vector<T>&& local_result,
-        this_site_arg this_site = this_site_arg())
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg())
     {
         if (this_site == std::size_t(-1))
         {
             this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
+        if (generation == 0)
+        {
+            return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
+                hpx::bad_parameter, "hpx::collectives::scatter_to",
+                "the generation number shouldn't be zero"));
+        }
 
-        auto scatter_to_data_direct =
-            [this_site](communicator&& c,
-                std::vector<T>&& local_result) -> hpx::future<T> {
+        auto scatter_to_data = [local_result = HPX_MOVE(local_result),
+                                   this_site, generation](
+                                   communicator&& c) mutable -> hpx::future<T> {
             using action_type = typename detail::communicator_server::
                 template communication_set_action<
                     traits::communication::scatter_tag, hpx::future<T>,
                     std::vector<T>>;
 
-            // make sure id is kept alive as long as the returned future,
             // explicitly unwrap returned future
-            hpx::future<T> result =
-                async(action_type(), c, this_site, HPX_MOVE(local_result));
+            hpx::future<T> result = async(action_type(), c, this_site,
+                generation, HPX_MOVE(local_result));
 
-            traits::detail::get_shared_state(result)->set_on_completed(
-                [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+            if (!result.is_ready())
+            {
+                // make sure id is kept alive as long as the returned future
+                traits::detail::get_shared_state(result)->set_on_completed(
+                    [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+            }
 
             return result;
         };
 
-        return dataflow(HPX_MOVE(scatter_to_data_direct), HPX_MOVE(fid),
-            HPX_MOVE(local_result));
+        return fid.then(hpx::launch::sync, HPX_MOVE(scatter_to_data));
+    }
+
+    template <typename T>
+    hpx::future<T> scatter_to(communicator fid, std::vector<T>&& local_result,
+        generation_arg generation, this_site_arg this_site = this_site_arg())
+    {
+        return scatter_to(
+            HPX_MOVE(fid), HPX_MOVE(local_result), this_site, generation);
     }
 
     template <typename T>

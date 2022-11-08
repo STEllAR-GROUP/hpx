@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2013 Shuangyang Yang
-    Copyright (c) 2007-2019 Hartmut Kaiser
+    Copyright (c) 2007-2022 Hartmut Kaiser
     Copyright (c) Christopher Diggins 2005
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
@@ -12,6 +12,8 @@
     The class hpx::any is built based on boost::spirit::hold_any class.
     It adds support for HPX serialization, move assignment, == operator.
 ==============================================================================*/
+
+/// \file serializable_any.hpp
 
 #pragma once
 
@@ -89,18 +91,18 @@ namespace hpx { namespace util { namespace detail { namespace any {
             base_type::stream_out = Vtable::stream_out;
         }
 
-        virtual base_type* get_ptr()
+        virtual base_type* get_ptr() override
         {
             return Vtable::get_ptr();
         }
 
-        void save_object(void* const* object, OArch& ar, unsigned)
+        void save_object(void* const* object, OArch& ar, unsigned) override
         {
             // clang-format off
             ar & Vtable::get(object);
             // clang-format on
         }
-        void load_object(void** object, IArch& ar, unsigned)
+        void load_object(void** object, IArch& ar, unsigned) override
         {
             // clang-format off
             ar & Vtable::construct(object);
@@ -114,7 +116,7 @@ namespace hpx { namespace util { namespace detail { namespace any {
             ar & hpx::serialization::base_object<base_type>(*this);
             // clang-format on
         }
-        HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(fxn_ptr);
+        HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(fxn_ptr, override);
     };
 }}}}    // namespace hpx::util::detail::any
 
@@ -340,7 +342,9 @@ namespace hpx { namespace util {
         void load(IArch& ar, const unsigned version)
         {
             bool is_empty;
-            ar& is_empty;
+            // clang-format off
+            ar & is_empty;
+            // clang-format on
 
             if (is_empty)
             {
@@ -360,7 +364,10 @@ namespace hpx { namespace util {
         void save(OArch& ar, const unsigned version) const
         {
             bool is_empty = !has_value();
-            ar& is_empty;
+            // clang-format off
+            ar & is_empty;
+            // clang-format on
+
             if (!is_empty)
             {
                 ar << hpx::serialization::detail::raw_ptr(table);
@@ -415,6 +422,9 @@ namespace hpx { namespace util {
 }}    // namespace hpx::util
 
 namespace hpx {
+    /// Constructs an any object containing an object of type \a T, passing the
+    /// provided arguments to T's constructor. Equivalent to: \code
+    /// return std::any(std::in_place_type<T>, std::forward<Args>(args)...); \endcode
     template <typename T, typename Char>
     util::basic_any<serialization::input_archive, serialization::output_archive,
         Char>

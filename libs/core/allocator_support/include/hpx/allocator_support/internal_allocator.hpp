@@ -51,7 +51,7 @@ namespace hpx { namespace util {
         internal_allocator() = default;
 
         template <typename U>
-        explicit internal_allocator(internal_allocator<U> const&)
+        internal_allocator(internal_allocator<U> const&)
         {
         }
 

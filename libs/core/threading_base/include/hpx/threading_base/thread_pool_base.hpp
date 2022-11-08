@@ -1,5 +1,5 @@
 //  Copyright (c)      2018 Mikael Simberg
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -217,7 +217,12 @@ namespace hpx { namespace threads {
             return nullptr;
         }
 
-        mask_type get_used_processing_units() const;
+        mask_type get_used_processing_units(bool full_cores = false) const;
+        mask_type get_used_processing_units(
+            std::size_t num_cores, bool full_cores = false) const;
+        mask_type get_used_processing_unit(
+            std::size_t thread_num, bool full_cores = false) const;
+
         hwloc_bitmap_ptr get_numa_domain_bitmap() const;
 
         // performance counters

@@ -321,10 +321,27 @@ namespace hpx { namespace lcos { namespace local {
         }
 
     public:
-        std::size_t next_generation()
+        template <typename Lock>
+        std::size_t next_generation(Lock& l, std::size_t new_generation)
         {
-            std::lock_guard<mutex_type> l(mtx_);
+            HPX_ASSERT_OWNS_LOCK(l);
+
             HPX_ASSERT(generation_ != std::size_t(-1));
+
+            if (new_generation != std::size_t(-1))
+            {
+                if (new_generation < generation_)
+                {
+                    l.unlock();
+                    HPX_THROW_EXCEPTION(hpx::invalid_status,
+                        "and_gate::next_generation",
+                        "sequencing error, new generational counter value too "
+                        "small");
+                    return std::size_t(-1);
+                }
+                generation_ = new_generation;
+            }
+
             std::size_t retval = ++generation_;
 
             trigger_conditions();    // re-check/trigger condition, if needed
@@ -332,10 +349,24 @@ namespace hpx { namespace lcos { namespace local {
             return retval;
         }
 
+        std::size_t next_generation(
+            std::size_t new_generation = std::size_t(-1))
+        {
+            std::unique_lock<mutex_type> l(mtx_);
+            return next_generation(l, new_generation);
+        }
+
+        template <typename Lock>
+        std::size_t generation(Lock& l) const
+        {
+            HPX_ASSERT_OWNS_LOCK(l);
+            return generation_;
+        }
+
         std::size_t generation() const
         {
             std::lock_guard<mutex_type> l(mtx_);
-            return generation_;
+            return generation(l);
         }
 
     protected:

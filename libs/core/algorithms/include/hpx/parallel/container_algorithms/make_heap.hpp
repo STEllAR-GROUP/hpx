@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2022 Dimitra Karatza
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,6 +22,74 @@ namespace hpx { namespace ranges {
     ///                     It describes the manner in which the execution of
     ///                     the algorithm may be parallelized and the manner
     ///                     in which it executes the assignments.
+    /// \tparam Iter        The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the end source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     sentinel for Iter1.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced).
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param comp         Refers to the binary predicate which returns true
+    ///                     if the first argument should be treated as less than
+    ///                     the second. The signature of the function should be
+    ///                     equivalent to
+    ///                     \code
+    ///                     bool comp(const Type &a, const Type &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a RndIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each pair of elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a comp is invoked.
+    ///
+    /// The predicate operations in the parallel \a make_heap algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// executes in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a make_heap algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a make_heap algorithm returns a
+    ///           \a hpx::future<Iter> if the execution policy is of
+    ///           type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a Iter
+    ///           otherwise.
+    ///           It returns \a last.
+    ///
+    template <typename ExPolicy, typename Iter, typename Sent,
+        typename Comp,
+        typename Proj = hpx::parallel::util::projection_identity>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
+    make_heap(ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
+        Proj&& proj = Proj{});
+
+    /// Constructs a \a max \a heap in the range [first, last).
+    ///
+    /// \note Complexity: at most (3*N) comparisons where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution of
+    ///                     the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
     /// \tparam Rng         The type of the source range used (deduced).
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
@@ -29,6 +98,8 @@ namespace hpx { namespace ranges {
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
     /// \param comp         Refers to the binary predicate which returns true
@@ -67,13 +138,64 @@ namespace hpx { namespace ranges {
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename Rng, typename Comp,
-        typename Proj = util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy,
+        typename Proj = hpx::parallel::util::projection_identity>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type
     make_heap(ExPolicy&& policy, Rng&& rng, Comp&& comp, Proj&& proj = Proj{});
 
-    /// Constructs a \a max \a heap in the range [first, last). Uses the
-    /// operator \a < for comparisons.
+    /// Constructs a \a max \a heap in the range [first, last).
+    ///
+    /// \note Complexity: at most (3*N) comparisons where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution of
+    ///                     the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam Iter        The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the end source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     sentinel for Iter1.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each pair of elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a comp is invoked.
+    ///
+    /// The predicate operations in the parallel \a make_heap algorithm invoked
+    /// with an execution policy object of type \a sequential_execution_policy
+    /// executes in sequential order in the calling thread.
+    ///
+    /// The comparison operations in the parallel \a make_heap algorithm invoked
+    /// with an execution policy object of type \a parallel_execution_policy
+    /// or \a parallel_task_execution_policy are permitted to execute in an unordered
+    /// fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a make_heap algorithm returns a
+    ///           \a hpx::future<Iter> if the execution policy is of
+    ///           type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a Iter
+    ///           otherwise.
+    ///           It returns \a last.
+    ///
+    template <typename ExPolicy, typename Iter, typename Sent,
+        typename Proj = hpx::parallel::util::projection_identity>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
+    make_heap(ExPolicy&& policy, Iter first, Sent last, Proj&& proj = Proj{});
+
+    /// Constructs a \a max \a heap in the range [first, last).
     ///
     /// \note Complexity: at most (3*N) comparisons where
     ///       \a N = distance(first, last).
@@ -88,6 +210,8 @@ namespace hpx { namespace ranges {
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to \a util::projection_identity
     ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
     /// \param proj         Specifies the function (or function object) which
@@ -105,16 +229,160 @@ namespace hpx { namespace ranges {
     /// fashion in unspecified threads, and indeterminately sequenced
     /// within each thread.
     ///
-    /// \returns  The \a make_heap algorithm returns a \a hpx::future<void>
-    ///           if the execution policy is of type \a task_execution_policy
-    ///           and returns \a void otherwise.
+    /// \returns  The \a make_heap algorithm returns a
+    ///           \a hpx::future<Iter> if the execution policy is of
+    ///           type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and returns \a Iter
+    ///           otherwise.
+    ///           It returns \a last.
     ///
     template <typename ExPolicy, typename Rng,
-        typename Proj = util::projection_identity>
-    typename util::detail::algorithm_result<ExPolicy,
+        typename Proj = hpx::parallel::util::projection_identity>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type
     make_heap(ExPolicy&& policy, Rng&& rng, Proj&& proj = Proj{});
 
+    /// Constructs a \a max \a heap in the range [first, last).
+    ///
+    /// \note Complexity: at most (3*N) comparisons where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam Iter        The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the end source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     sentinel for Iter1.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced).
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param comp         Refers to the binary predicate which returns true
+    ///                     if the first argument should be treated as less than
+    ///                     the second. The signature of the function should be
+    ///                     equivalent to
+    ///                     \code
+    ///                     bool comp(const Type &a, const Type &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a RndIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each pair of elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a comp is invoked.
+    ///
+    ///
+    /// \returns  The \a make_heap algorithm returns \a Iter.
+    ///           It returns \a last.
+    ///
+    template <typename Iter, typename Sent, typename Comp,
+        typename Proj = hpx::parallel::util::projection_identity>
+    Iter make_heap(Iter first, Sent last, Comp&& comp, Proj&& proj = Proj{});
+
+    /// Constructs a \a max \a heap in the range [first, last).
+    ///
+    /// \note Complexity: at most (3*N) comparisons where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam Comp        The type of the function/function object to use
+    ///                     (deduced).
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param comp         Refers to the binary predicate which returns true
+    ///                     if the first argument should be treated as less than
+    ///                     the second. The signature of the function should be
+    ///                     equivalent to
+    ///                     \code
+    ///                     bool comp(const Type &a, const Type &b);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const &, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that objects of
+    ///                     types \a RndIter can be dereferenced and then
+    ///                     implicitly converted to Type.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each pair of elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a comp is invoked.
+    ///
+    /// \returns  The \a make_heap algorithm returns \a Iter.
+    ///           It returns \a last.
+    ///
+    template <typename Rng, typename Comp,
+        typename Proj = hpx::parallel::util::projection_identity>
+    typename hpx::traits::range_iterator<Rng>::type
+    make_heap(Rng&& rng, Comp&& comp, Proj&& proj = Proj{});
+
+    /// Constructs a \a max \a heap in the range [first, last).
+    ///
+    /// \note Complexity: at most (3*N) comparisons where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam Iter        The type of the begin source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Sent        The type of the end source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     sentinel for Iter1.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each pair of elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a comp is invoked.
+    ///
+    /// \returns  The \a make_heap algorithm returns \a Iter.
+    ///           It returns \a last.
+    ///
+    template <typename Iter, typename Sent,
+        typename Proj = hpx::parallel::util::projection_identity>
+    Iter make_heap(Iter first, Sent last, Proj&& proj = Proj{});
+
+    /// Constructs a \a max \a heap in the range [first, last).
+    ///
+    /// \note Complexity: at most (3*N) comparisons where
+    ///       \a N = distance(first, last).
+    ///
+    /// \tparam Rng         The type of the source range used (deduced).
+    ///                     The iterators extracted from this range type must
+    ///                     meet the requirements of an input iterator.
+    /// \tparam Proj        The type of an optional projection function. This
+    ///                     defaults to \a util::projection_identity
+    ///
+    /// \param rng          Refers to the sequence of elements the algorithm
+    ///                     will be applied to.
+    /// \param proj         Specifies the function (or function object) which
+    ///                     will be invoked for each pair of elements as a
+    ///                     projection operation before the actual predicate
+    ///                     \a comp is invoked.
+    ///
+    /// \returns  The \a make_heap algorithm returns \a Iter.
+    ///           It returns \a last.
+    ///
+    template <typename Rng,
+        typename Proj = hpx::parallel::util::projection_identity>
+    typename hpx::traits::range_iterator<Rng>::type
+    make_heap(Rng&& rng, Proj&& proj = Proj{});
     // clang-format on
 }}    // namespace hpx::ranges
 
@@ -141,7 +409,7 @@ namespace hpx { namespace ranges {
 namespace hpx { namespace ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::make_heap
+    // CPO for hpx::ranges::make_heap
     inline constexpr struct make_heap_t final
       : hpx::detail::tag_parallel_algorithm<make_heap_t>
     {

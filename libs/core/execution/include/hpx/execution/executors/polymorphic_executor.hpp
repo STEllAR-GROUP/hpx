@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/function.hpp>
@@ -30,12 +31,6 @@ namespace hpx { namespace parallel { namespace execution {
 
     namespace detail {
 
-        struct shape_iter_impl_base;
-        HPX_CORE_EXPORT void intrusive_ptr_add_ref(
-            shape_iter_impl_base* p) noexcept;
-        HPX_CORE_EXPORT void intrusive_ptr_release(
-            shape_iter_impl_base* p) noexcept;
-
         struct shape_iter_impl_base
         {
             virtual ~shape_iter_impl_base() = default;
@@ -49,7 +44,7 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Iterator>
         struct shape_iter_impl : shape_iter_impl_base
         {
-            shape_iter_impl(Iterator it)
+            explicit shape_iter_impl(Iterator it)
               : iterator_(it)
             {
             }
@@ -93,7 +88,7 @@ namespace hpx { namespace parallel { namespace execution {
             using reference = std::size_t&;
 
             template <typename Iterator>
-            shape_iter(Iterator it)
+            explicit shape_iter(Iterator it)
               : impl_(new shape_iter_impl<Iterator>(it))
             {
             }
@@ -109,6 +104,9 @@ namespace hpx { namespace parallel { namespace execution {
                 impl_->copy(*rhs.impl_);
                 return *this;
             }
+
+            shape_iter(shape_iter&& rhs) = default;
+            shape_iter& operator=(shape_iter&& rhs) = default;
 
             std::size_t operator*() const
             {
@@ -147,7 +145,7 @@ namespace hpx { namespace parallel { namespace execution {
             using value_type = std::size_t;
 
             template <typename Shape>
-            range_proxy(Shape const& s)
+            explicit range_proxy(Shape const& s)
               : begin_(s.begin())
               , end_(s.end())
               , size_(std::distance(s.begin(), s.end()))
@@ -185,17 +183,19 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename VTable, typename T>
         struct polymorphic_executor_vtables
         {
-            static constexpr VTable instance = detail::construct_vtable<T>();
+            static constexpr VTable instance =
+                VTable(detail::construct_vtable<T>());
         };
 
         template <typename VTable, typename T>
-        constexpr VTable polymorphic_executor_vtables<VTable, T>::instance;
+        inline constexpr VTable
+            polymorphic_executor_vtables<VTable, T>::instance;
 
         template <typename VTable, typename T>
         constexpr VTable const* get_polymorphic_executor_vtable() noexcept
         {
             static_assert(
-                !std::is_reference<T>::value, "T shall have no ref-qualifiers");
+                !std::is_reference_v<T>, "T shall have no ref-qualifiers");
 
             return &polymorphic_executor_vtables<VTable, T>::instance;
         }
@@ -234,8 +234,7 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename T>
             static void* allocate(void* storage, std::size_t storage_size)
             {
-                using storage_t =
-                    typename std::aligned_storage<sizeof(T), alignof(T)>::type;
+                using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
 
                 if (sizeof(T) > storage_size)
                 {
@@ -248,8 +247,7 @@ namespace hpx { namespace parallel { namespace execution {
             static void _deallocate(
                 void* obj, std::size_t storage_size, bool destroy) noexcept
             {
-                using storage_t =
-                    typename std::aligned_storage<sizeof(T), alignof(T)>::type;
+                using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
 
                 if (destroy)
                 {
@@ -276,7 +274,7 @@ namespace hpx { namespace parallel { namespace execution {
             void* (*copy)(void*, std::size_t, void const*, bool);
 
             template <typename T>
-            constexpr vtable_base(construct_vtable<T>) noexcept
+            constexpr explicit vtable_base(construct_vtable<T>) noexcept
               : deallocate(&vtable_base::template _deallocate<T>)
               , copy(&vtable_base::template _copy<T>)
             {
@@ -303,7 +301,8 @@ namespace hpx { namespace parallel { namespace execution {
             void (*post)(void*, post_function_type&&, Ts&&...);
 
             template <typename T>
-            constexpr never_blocking_oneway_vtable(construct_vtable<T>) noexcept
+            constexpr explicit never_blocking_oneway_vtable(
+                construct_vtable<T>) noexcept
               : post(&never_blocking_oneway_vtable::template _post<T>)
             {
             }
@@ -313,7 +312,7 @@ namespace hpx { namespace parallel { namespace execution {
                 throw_bad_polymorphic_executor();
             }
 
-            constexpr never_blocking_oneway_vtable(
+            constexpr explicit never_blocking_oneway_vtable(
                 construct_vtable<empty_polymorphic_executor>) noexcept
               : post(&never_blocking_oneway_vtable::_empty_post)
             {
@@ -342,7 +341,7 @@ namespace hpx { namespace parallel { namespace execution {
             R (*sync_execute)(void*, sync_execute_function_type&&, Ts&&...);
 
             template <typename T>
-            constexpr oneway_vtable(construct_vtable<T>) noexcept
+            constexpr explicit oneway_vtable(construct_vtable<T>) noexcept
               : sync_execute(&oneway_vtable::template _sync_execute<T>)
             {
             }
@@ -354,7 +353,7 @@ namespace hpx { namespace parallel { namespace execution {
                 return {};
             }
 
-            constexpr oneway_vtable(
+            constexpr explicit oneway_vtable(
                 construct_vtable<empty_polymorphic_executor>) noexcept
               : sync_execute(&oneway_vtable::_empty_sync_execute)
             {
@@ -399,7 +398,7 @@ namespace hpx { namespace parallel { namespace execution {
                 Ts&&...);
 
             template <typename T>
-            constexpr twoway_vtable(construct_vtable<T>) noexcept
+            constexpr explicit twoway_vtable(construct_vtable<T>) noexcept
               : async_execute(&twoway_vtable::template _async_execute<T>)
               , then_execute(&twoway_vtable::template _then_execute<T>)
             {
@@ -419,7 +418,7 @@ namespace hpx { namespace parallel { namespace execution {
                 return {};
             }
 
-            constexpr twoway_vtable(
+            constexpr explicit twoway_vtable(
                 construct_vtable<empty_polymorphic_executor>) noexcept
               : async_execute(&twoway_vtable::_empty_async_execute)
               , then_execute(&twoway_vtable::_empty_then_execute)
@@ -452,7 +451,7 @@ namespace hpx { namespace parallel { namespace execution {
                 Ts&&...);
 
             template <typename T>
-            constexpr bulk_oneway_vtable(construct_vtable<T>) noexcept
+            constexpr explicit bulk_oneway_vtable(construct_vtable<T>) noexcept
               : bulk_sync_execute(
                     &bulk_oneway_vtable::template _bulk_sync_execute<T>)
             {
@@ -465,7 +464,7 @@ namespace hpx { namespace parallel { namespace execution {
                 return {};
             }
 
-            constexpr bulk_oneway_vtable(
+            constexpr explicit bulk_oneway_vtable(
                 construct_vtable<empty_polymorphic_executor>) noexcept
               : bulk_sync_execute(&bulk_oneway_vtable::_empty_bulk_sync_execute)
             {
@@ -512,7 +511,7 @@ namespace hpx { namespace parallel { namespace execution {
                 hpx::shared_future<void> const&, Ts&&...);
 
             template <typename T>
-            constexpr bulk_twoway_vtable(construct_vtable<T>) noexcept
+            constexpr explicit bulk_twoway_vtable(construct_vtable<T>) noexcept
               : bulk_async_execute(
                     &bulk_twoway_vtable::template _bulk_async_execute<T>)
               , bulk_then_execute(
@@ -535,7 +534,7 @@ namespace hpx { namespace parallel { namespace execution {
                 return {};
             }
 
-            constexpr bulk_twoway_vtable(
+            constexpr explicit bulk_twoway_vtable(
                 construct_vtable<empty_polymorphic_executor>) noexcept
               : bulk_async_execute(
                     &bulk_twoway_vtable::_empty_bulk_async_execute)
@@ -555,7 +554,8 @@ namespace hpx { namespace parallel { namespace execution {
           , bulk_twoway_vtable<Sig>
         {
             template <typename T>
-            constexpr polymorphic_executor_vtable(construct_vtable<T>) noexcept
+            constexpr explicit polymorphic_executor_vtable(
+                construct_vtable<T>) noexcept
               : vtable_base(construct_vtable<T>())
               , never_blocking_oneway_vtable<Sig>(construct_vtable<T>())
               , oneway_vtable<Sig>(construct_vtable<T>())
@@ -590,13 +590,14 @@ namespace hpx { namespace parallel { namespace execution {
         get_empty_polymorphic_executor_vtable() noexcept
         {
             static polymorphic_executor_vtable<Sig> const empty_vtable =
-                detail::construct_vtable<empty_polymorphic_executor>();
+                polymorphic_executor_vtable<Sig>(
+                    detail::construct_vtable<empty_polymorphic_executor>());
             return &empty_vtable;
         }
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        static constexpr std::size_t polymorphic_executor_storage_size =
+        inline constexpr std::size_t polymorphic_executor_storage_size =
             3 * sizeof(void*);
 
         class HPX_CORE_EXPORT polymorphic_executor_base
@@ -705,18 +706,18 @@ namespace hpx { namespace parallel { namespace execution {
             return *this;
         }
 
-        template <typename Exec, typename PE = typename std::decay<Exec>::type,
-            typename Enable = typename std::enable_if<
-                !std::is_same<PE, polymorphic_executor>::value>::type>
+        template <typename Exec, typename PE = std::decay_t<Exec>,
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<PE, polymorphic_executor>>>
         polymorphic_executor(Exec&& exec)
           : base_type(get_empty_vtable())
         {
             assign(HPX_FORWARD(Exec, exec));
         }
 
-        template <typename Exec, typename PE = typename std::decay<Exec>::type,
-            typename Enable = typename std::enable_if<
-                !std::is_same<PE, polymorphic_executor>::value>::type>
+        template <typename Exec, typename PE = std::decay_t<Exec>,
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<PE, polymorphic_executor>>>
         polymorphic_executor& operator=(Exec&& exec)
         {
             assign(HPX_FORWARD(Exec, exec));
@@ -732,8 +733,8 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Exec>
         void assign(Exec&& exec)
         {
-            using T = typename std::decay<Exec>::type;
-            static_assert(std::is_constructible<T, T const&>::value,
+            using T = std::decay_t<Exec>;
+            static_assert(std::is_constructible_v<T, T const&>,
                 "Exec shall be CopyConstructible");
 
             if (!detail::is_empty_polymorphic_executor(exec))
@@ -776,95 +777,129 @@ namespace hpx { namespace parallel { namespace execution {
         // actual executor interface
 
         // This executor always exposes future<R>
-        template <typename T>
+        template <typename>
         using future_type = hpx::future<R>;
 
+    private:
         // NonBlockingOneWayExecutor interface
         template <typename F>
-        HPX_FORCEINLINE void post(F&& f, Ts... ts) const
+        HPX_FORCEINLINE friend void tag_invoke(hpx::parallel::execution::post_t,
+            polymorphic_executor const& exec, F&& f, Ts... ts)
         {
             using function_type = typename vtable::post_function_type;
 
-            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
-            vptr->post(object, function_type(HPX_FORWARD(F, f)),
+            vtable const* vptr =
+                static_cast<vtable const*>(exec.base_type::vptr);
+            vptr->post(exec.object, function_type(HPX_FORWARD(F, f)),
                 HPX_FORWARD(Ts, ts)...);
         }
 
         // OneWayExecutor interface
         template <typename F>
-        HPX_FORCEINLINE R sync_execute(F&& f, Ts... ts) const
+        HPX_FORCEINLINE friend R tag_invoke(
+            hpx::parallel::execution::sync_execute_t,
+            polymorphic_executor const& exec, F&& f, Ts... ts)
         {
             using function_type = typename vtable::sync_execute_function_type;
 
-            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
-            return vptr->sync_execute(object, function_type(HPX_FORWARD(F, f)),
-                HPX_FORWARD(Ts, ts)...);
+            vtable const* vptr =
+                static_cast<vtable const*>(exec.base_type::vptr);
+            return vptr->sync_execute(exec.object,
+                function_type(HPX_FORWARD(F, f)), HPX_FORWARD(Ts, ts)...);
         }
 
         // TwoWayExecutor interface
         template <typename F>
-        HPX_FORCEINLINE hpx::future<R> async_execute(F&& f, Ts... ts) const
+        HPX_FORCEINLINE friend hpx::future<R> tag_invoke(
+            hpx::parallel::execution::async_execute_t,
+            polymorphic_executor const& exec, F&& f, Ts... ts)
         {
             using function_type = typename vtable::async_execute_function_type;
 
-            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
-            return vptr->async_execute(object, function_type(HPX_FORWARD(F, f)),
-                HPX_FORWARD(Ts, ts)...);
+            vtable const* vptr =
+                static_cast<vtable const*>(exec.base_type::vptr);
+            return vptr->async_execute(exec.object,
+                function_type(HPX_FORWARD(F, f)), HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename F, typename Future>
-        HPX_FORCEINLINE hpx::future<R> then_execute(
-            F&& f, Future&& predecessor, Ts&&... ts) const
+        HPX_FORCEINLINE friend hpx::future<R> tag_invoke(
+            hpx::parallel::execution::then_execute_t,
+            polymorphic_executor const& exec, F&& f, Future&& predecessor,
+            Ts&&... ts)
         {
             using function_type = typename vtable::then_execute_function_type;
 
-            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
-            return vptr->then_execute(object, function_type(HPX_FORWARD(F, f)),
+            vtable const* vptr =
+                static_cast<vtable const*>(exec.base_type::vptr);
+            return vptr->then_execute(exec.object,
+                function_type(HPX_FORWARD(F, f)),
                 hpx::make_shared_future(HPX_FORWARD(Future, predecessor)),
                 HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkOneWayExecutor interface
-        template <typename F, typename Shape>
-        HPX_FORCEINLINE std::vector<R> bulk_sync_execute(
-            F&& f, Shape const& s, Ts&&... ts) const
+        // clang-format off
+        template <typename F, typename Shape,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<Shape>
+            )>
+        // clang-format on
+        HPX_FORCEINLINE friend std::vector<R> tag_invoke(
+            hpx::parallel::execution::bulk_sync_execute_t,
+            polymorphic_executor const& exec, F&& f, Shape const& s, Ts&&... ts)
         {
             using function_type =
                 typename vtable::bulk_sync_execute_function_type;
 
             detail::range_proxy shape(s);
-            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
-            return vptr->bulk_sync_execute(object,
+            vtable const* vptr =
+                static_cast<vtable const*>(exec.base_type::vptr);
+            return vptr->bulk_sync_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)), shape,
                 HPX_FORWARD(Ts, ts)...);
         }
 
         // BulkTwoWayExecutor interface
-        template <typename F, typename Shape>
-        HPX_FORCEINLINE std::vector<hpx::future<R>> bulk_async_execute(
-            F&& f, Shape const& s, Ts&&... ts) const
+        // clang-format off
+        template <typename F, typename Shape,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<Shape>
+            )>
+        // clang-format on
+        HPX_FORCEINLINE friend std::vector<hpx::future<R>> tag_invoke(
+            hpx::parallel::execution::bulk_async_execute_t,
+            polymorphic_executor const& exec, F&& f, Shape const& s, Ts&&... ts)
         {
             using function_type =
                 typename vtable::bulk_async_execute_function_type;
 
             detail::range_proxy shape(s);
-            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
-            return vptr->bulk_async_execute(object,
+            vtable const* vptr =
+                static_cast<vtable const*>(exec.base_type::vptr);
+            return vptr->bulk_async_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)), shape,
                 HPX_FORWARD(Ts, ts)...);
         }
 
-        template <typename F, typename Shape>
-        HPX_FORCEINLINE hpx::future<std::vector<R>> bulk_then_execute(F&& f,
-            Shape const& s, hpx::shared_future<void> const& predecessor,
-            Ts&&... ts) const
+        // clang-format off
+        template <typename F, typename Shape,
+            HPX_CONCEPT_REQUIRES_(
+                !std::is_integral_v<Shape>
+            )>
+        // clang-format on
+        HPX_FORCEINLINE friend hpx::future<std::vector<R>> tag_invoke(
+            hpx::parallel::execution::bulk_then_execute_t,
+            polymorphic_executor const& exec, F&& f, Shape const& s,
+            hpx::shared_future<void> const& predecessor, Ts&&... ts)
         {
             using function_type =
                 typename vtable::bulk_then_execute_function_type;
 
             detail::range_proxy shape(s);
-            vtable const* vptr = static_cast<vtable const*>(base_type::vptr);
-            return vptr->bulk_then_execute(object,
+            vtable const* vptr =
+                static_cast<vtable const*>(exec.base_type::vptr);
+            return vptr->bulk_then_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)), shape, predecessor,
                 HPX_FORWARD(Ts, ts)...);
         }

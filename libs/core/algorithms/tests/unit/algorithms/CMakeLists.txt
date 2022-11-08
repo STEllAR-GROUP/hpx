@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2020 Hartmut Kaiser
+# Copyright (c) 2014-2022 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +18,7 @@ endforeach()
 # add tests
 set(tests
     adjacentdifference
+    adjacentdifference_sender
     adjacentfind
     adjacentfind_binary
     all_of
@@ -51,6 +52,7 @@ set(tests
     foreach
     foreach_executors
     foreach_prefetching
+    foreach_sender
     foreachn
     foreachn_exception
     foreachn_bad_alloc
@@ -62,6 +64,7 @@ set(tests
     for_loop_n_strided
     for_loop_reduction
     for_loop_reduction_async
+    for_loop_sender
     for_loop_strided
     generate
     generaten
@@ -104,8 +107,10 @@ set(tests
     replace_copy_if
     reverse
     reverse_copy
+    reverse_sender
     rotate
     rotate_copy
+    rotate_sender
     search
     searchn
     set_difference

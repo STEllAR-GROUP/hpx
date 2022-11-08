@@ -6,6 +6,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file shared_mutex.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -237,6 +239,25 @@ namespace hpx {
         };
     }    // namespace detail
 
+    /// \brief   The \a shared_mutex class is a synchronization primitive that can be used to protect
+    ///          shared data from being simultaneously accessed by multiple threads. In contrast to
+    ///          other mutex types which facilitate exclusive access, a \a shared_mutex has two levels
+    ///          of access:
+    ///          - \a shared - several threads can share ownership of the same mutex.
+    ///          - \a exclusive - only one thread can own the mutex.
+    /// \details If one thread has acquired the exclusive lock (through \a lock, \a try_lock), no other
+    ///          threads can acquire the lock (including the shared).
+    ///          If one thread has acquired the shared lock (through \a lock_shared, \a try_lock_shared),
+    ///          no other thread can acquire the exclusive lock, but can acquire the shared lock.
+    ///          Only when the exclusive lock has not been acquired by any thread, the shared lock
+    ///          can be acquired by multiple threads.
+    ///          Within one thread, only one lock (shared or exclusive) can be acquired at the same
+    ///          time.
+    ///          Shared mutexes are especially useful when shared data can be safely read by any
+    ///          number of threads simultaneously, but a thread may only write the same data when no
+    ///          other thread is reading or writing at the same time.
+    ///          The \a shared_mutex class satisfies all requirements of \a SharedMutex and \a
+    ///          StandardLayoutType.
     using shared_mutex = detail::shared_mutex<>;
 }    // namespace hpx
 

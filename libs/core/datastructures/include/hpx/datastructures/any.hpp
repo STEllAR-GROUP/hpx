@@ -13,6 +13,8 @@
     It adds support for HPX serialization, move assignment, == operator.
 ==============================================================================*/
 
+/// \file any.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -40,14 +42,26 @@
 namespace hpx {
 
     ////////////////////////////////////////////////////////////////////////////
+    /// Defines a type of object to be thrown by the value-returning forms of
+    /// hpx::any_cast on failure.
     struct bad_any_cast : std::bad_cast
     {
+        /// Constructs a new bad_any_cast object with an implementation-defined
+        /// null-terminated byte string which is accessible through what().
         bad_any_cast(std::type_info const& src, std::type_info const& dest)
           : from(src.name())
           , to(dest.name())
         {
         }
 
+        /// Returns the explanatory string.
+        /// \returns Pointer to a null-terminated string with explanatory information.
+        ///          The string is suitable for conversion and display as a std::wstring.
+        ///          The pointer is guaranteed to be valid at least until the exception
+        ///          object from which it is obtained is destroyed, or until a non-const
+        ///          member function (e.g. copy assignment operator) on the exception
+        ///          object is called.
+        /// \note Implementations are allowed but not required to override what().
         const char* what() const noexcept override
         {
             return "bad any cast";
@@ -1471,6 +1485,7 @@ namespace hpx { namespace util {
     }
 }}    // namespace hpx::util
 
+/// Top level HPX namespace
 namespace hpx {
     template <typename T, typename... Ts>
     util::basic_any<void, void, void, std::true_type> make_any_nonser(
@@ -1523,6 +1538,12 @@ namespace hpx {
     using unique_any_nonser =
         util::basic_any<void, void, void, std::false_type>;
 
+    /// \brief Performs type-safe access to the contained object.
+    ///
+    /// \param operand target any object
+    /// \returns  If operand is not a null pointer, and the \a typeid of the requested
+    ///           \a T matches that of the contents of \a operand, a pointer to the value
+    ///           contained by \a operand, otherwise a null pointer.
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
     inline T* any_cast(
@@ -1536,6 +1557,7 @@ namespace hpx {
         return nullptr;
     }
 
+    /// \copydoc any_cast(util::basic_any<IArch, OArch, Char, Copyable>* operand)
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
     inline T const* any_cast(
@@ -1546,6 +1568,12 @@ namespace hpx {
                 operand));
     }
 
+    /// \brief \copybrief hpx::any_cast(util::basic_any<IArch,OArch,Char,Copyable>* operand)
+    /// Let \a U be \a std::remove_cv_t<std::remove_reference_t<T>>
+    /// The program is ill-formed if \a std::is_constructible_v<T, U&> is false.
+    ///
+    /// \param operand target any object
+    /// \returns static_cast<T>(*std::any_cast<U>(&operand))
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
     T any_cast(util::basic_any<IArch, OArch, Char, Copyable>& operand)
@@ -1558,6 +1586,12 @@ namespace hpx {
         return static_cast<T>(*result);
     }
 
+    /// \brief \copybrief hpx::any_cast(util::basic_any<IArch,OArch,Char,Copyable>* operand)
+    /// Let \a U be \a std::remove_cv_t<std::remove_reference_t<T>>
+    /// The program is ill-formed if \a std::is_constructible_v<T, const U&> is false.
+    ///
+    /// \param operand target any object
+    /// \returns static_cast<T>(*std::any_cast<U>(&operand))
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
     T const& any_cast(

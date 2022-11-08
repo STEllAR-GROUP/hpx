@@ -20,11 +20,11 @@ namespace hpx {
     ///         operation, where N1 = std::distance(first1, last)
     ///         and N2 = std::distance(first2, last2).
     ///
-    /// \tparam InIter1    The type of the source iterators used for the
+    /// \tparam InIter1     The type of the source iterators used for the
     ///                     first range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
-    /// \tparam InIter2    The type of the source iterators used for the
+    /// \tparam InIter2     The type of the source iterators used for the
     ///                     second range (deduced).
     ///                     This iterator type must meet the requirements of an
     ///                     input iterator.
@@ -69,7 +69,8 @@ namespace hpx {
     ///           if the first range is lexicographically less, otherwise
     ///           it returns false.
     ///           range [first2, last2), it returns false.
-    template <typename InIter1, typename InIter2, typename Pred>
+    template <typename InIter1, typename InIter2,
+        typename Pred = hpx::parallel::v1::detail::less>
     bool lexicographical_compare(InIter1 first1, InIter1 last1, InIter2 first2,
         InIter2 last2, Pred&& pred);
 
@@ -147,8 +148,9 @@ namespace hpx {
     ///           if the first range is lexicographically less, otherwise
     ///           it returns false.
     ///           range [first2, last2), it returns false.
-    template <typename FwdIter1, typename FwdIter2, typename Pred>
-    typename util::detail::algorithm_result<ExPolicy, bool>::type
+    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+        typename Pred = hpx::parallel::v1::detail::less>
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
     lexicographical_compare(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, FwdIter2 last2, Pred&& pred);
 
@@ -253,7 +255,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         [&pred, &tok, &proj1, &proj2](
                             reference t, std::size_t i) mutable -> void {
                             using hpx::get;
-                            using hpx::util::invoke;
+                            using hpx::invoke;
                             // gcc10/cuda11 complains about using HPX_INVOKE here
                             if (invoke(pred, invoke(proj1, get<0>(t)),
                                     invoke(proj2, get<1>(t))) ||
@@ -278,7 +280,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     if (first1 != last1 && first2 != last2)
                     {
-                        using hpx::util::invoke;
+                        using hpx::invoke;
                         return invoke(pred, invoke(proj1, *first1),
                             invoke(proj2, *first2));
                     }
@@ -286,11 +288,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return first2 != last2;
                 };
 
-                using hpx::util::make_zip_iterator;
                 return util::partitioner<ExPolicy, bool, void>::call_with_index(
-                    HPX_FORWARD(ExPolicy, policy),
-                    make_zip_iterator(first1, first2), count, 1, HPX_MOVE(f1),
-                    HPX_MOVE(f2));
+                    HPX_FORWARD(ExPolicy, policy), zip_iterator(first1, first2),
+                    count, 1, HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
         /// \endcond

@@ -43,10 +43,11 @@ namespace hpx {
     ///                     through the dereferenced iterator. It defaults to
     ///                     detail::less.
     ///
-    /// \returns  The \a partial_sort algorithm returns nothing.
+    /// \returns  The \a partial_sort algorithm returns a \a RandIter
+    ///           that refers to \a last.
     ///
-    template <typename RandIter, typename Comp>
-    void partial_sort(RandIter first, RandIter middle, RandIter last,
+    template <typename RandIter, typename Comp = hpx::parallel::v1::detail::less>
+    RandIter partial_sort(RandIter first, RandIter middle, RandIter last,
         Comp&& comp = Comp());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -86,12 +87,14 @@ namespace hpx {
     ///                     detail::less.
     ///
     /// \returns  The \a partial_sort algorithm returns a
-    ///           \a hpx::future<void> if the execution policy is of
+    ///           \a hpx::future<RandIter> if the execution policy is of
     ///           type \a sequenced_task_policy or
-    ///           \a parallel_task_policy and returns void otherwise.
+    ///           \a parallel_task_policy and returns \a RandIter otherwise.
+    ///           The iterator returned refers to \a last.
     ///
-    template <typename ExPolicy, typename RandIter, typename Comp>
-    util::detail::algorithm_result_t<ExPolicy> partial_sort(
+    template <typename ExPolicy, typename RandIter,
+        typename Comp = hpx::parallel::v1::detail::less>
+    parallel::util::detail::algorithm_result_t<ExPolicy, RandIter> partial_sort(
         ExPolicy&& policy, RandIter first, RandIter middle, RandIter last,
         Comp&& comp = Comp());
 

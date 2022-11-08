@@ -89,12 +89,6 @@ const char* exec_name(hpx::execution::parallel_executor const& exec)
     return "parallel_executor";
 }
 
-const char* exec_name(
-    hpx::parallel::execution::parallel_executor_aggregated const& exec)
-{
-    return "parallel_executor_aggregated";
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
 double global_scratch = 0;
@@ -261,9 +255,6 @@ int hpx_main(variables_map& vm)
             throw std::logic_error("error: count of 0 futures specified\n");
 
         cds::gc::HP hpGC;
-
-        hpx::execution::parallel_executor par;
-        hpx::parallel::execution::parallel_executor_aggregated par_agg;
 
         for (int i = 0; i < repetitions; i++)
         {

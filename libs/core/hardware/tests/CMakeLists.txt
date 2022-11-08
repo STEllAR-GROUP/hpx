@@ -36,11 +36,12 @@ if(HPX_WITH_TESTS)
       HEADERS ${hardware_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
       EXCLUDE_FROM_ALL
-        "hpx/hardware/timestamp/msvc.hpp"
+        "hpx/hardware/timestamp/bgq.hpp"
+        "hpx/hardware/timestamp/linux_generic.hpp"
+        "hpx/hardware/timestamp/linux_riscv_64.hpp"
         "hpx/hardware/timestamp/linux_x86_32.hpp"
         "hpx/hardware/timestamp/linux_x86_64.hpp"
-        "hpx/hardware/timestamp/linux_generic.hpp"
-        "hpx/hardware/timestamp/bgq.hpp"
+        "hpx/hardware/timestamp/msvc.hpp"
       NOLIBS
       DEPENDENCIES hpx_hardware
     )

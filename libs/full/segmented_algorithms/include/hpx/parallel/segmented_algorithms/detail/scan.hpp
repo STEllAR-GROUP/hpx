@@ -51,8 +51,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 for (++first; first != last; ++first)
                 {
-                    ret = hpx::util::invoke(
-                        op, ret, hpx::util::invoke(conv, *first));
+                    ret = hpx::invoke(op, ret, hpx::invoke(conv, *first));
                 }
             }
             return ret;
@@ -91,7 +90,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::distance(first, last),
                     [op, conv](FwdIter part_begin,
                         std::size_t part_size) mutable -> T {
-                        T ret = hpx::util::invoke(conv, *part_begin);
+                        T ret = hpx::invoke(conv, *part_begin);
                         if (part_size > 1)
                         {
                             // MSVC complains if 'op' is captured by reference
@@ -99,8 +98,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 part_size - 1,
                                 [&ret, op, conv](
                                     FwdIter const& curr) mutable -> void {
-                                    ret = hpx::util::invoke(op, ret,
-                                        hpx::util::invoke(conv, *curr));
+                                    ret = hpx::invoke(
+                                        op, ret, hpx::invoke(conv, *curr));
                                 });
                         }
                         return ret;
@@ -115,7 +114,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                                 [&ret, op](
                                     typename std::vector<T>::iterator const&
                                         curr) mutable {
-                                    ret = hpx::util::invoke(op, ret, *curr);
+                                    ret = hpx::invoke(op, ret, *curr);
                                 });
                         }
                         return ret;

@@ -114,8 +114,10 @@ namespace hpx::experimental {
     /// \param combiner [in] The binary function (object) used to perform a
     ///                 pairwise reduction on the elements.
     ///
-    /// T shall meet the requirements of CopyConstructible and MoveAssignable.
-    /// The expression var = combiner(var, var) shall be well formed.
+    /// T shall meet the requirements of \a CopyConstructible and
+    /// \a MoveAssignable.
+    /// The expression \code var = combiner(var, var) \endcode
+    /// shall be well formed.
     ///
     /// \note In order to produce useful results, modifications to the view
     ///       should be limited to commutative operations closely related to
@@ -256,6 +258,7 @@ namespace hpx::experimental {
 }    // namespace hpx::experimental
 
 namespace hpx::parallel { inline namespace v2 {
+    /// \cond IGNORE_DEPRECATED
 
     template <typename T, typename Op>
     HPX_DEPRECATED_V(1, 8,
@@ -392,4 +395,5 @@ namespace hpx::parallel { inline namespace v2 {
     {
         return hpx::experimental::reduction_max(var, identity);
     }
+    /// \endcond
 }}    // namespace hpx::parallel::v2

@@ -15,6 +15,7 @@
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/equal.hpp>
+#include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
@@ -50,7 +51,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             auto count = hpx::parallel::v1::detail::distance(first1, last1);
             util::cancellation_token<> tok;
-            call(hpx::util::make_zip_iterator(first1, first2), count, tok,
+            call(hpx::util::zip_iterator(first1, first2), count, tok,
                 HPX_FORWARD(F, f));
             return !tok.was_cancelled();
         }
@@ -72,7 +73,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
         else
         {
-            return sequential_equal<typename ExPolicy::base_policy_type>(
+            using base_policy_type =
+                decltype((hpx::execution::experimental::to_non_simd(
+                    std::declval<ExPolicy>())));
+            return sequential_equal<base_policy_type>(
                 it, part_count, tok, HPX_FORWARD(F, f));
         }
     }
@@ -94,7 +98,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
         else
         {
-            return sequential_equal<typename ExPolicy::base_policy_type>(
+            using base_policy_type =
+                decltype((hpx::execution::experimental::to_non_simd(
+                    std::declval<ExPolicy>())));
+            return sequential_equal<base_policy_type>(
                 first1, last1, first2, HPX_FORWARD(F, f));
         }
     }
@@ -112,9 +119,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             util::loop_n<ExPolicy>(it, part_count, tok,
                 [&f, &proj1, &proj2, &tok](auto const& curr) mutable -> void {
                     auto t = *curr;
-                    if (!hpx::parallel::traits::all_of(hpx::util::invoke(f,
-                            hpx::util::invoke(proj1, hpx::get<0>(t)),
-                            hpx::util::invoke(proj2, hpx::get<1>(t)))))
+                    if (!hpx::parallel::traits::all_of(
+                            hpx::invoke(f, hpx::invoke(proj1, hpx::get<0>(t)),
+                                hpx::invoke(proj2, hpx::get<1>(t)))))
                     {
                         tok.cancel();
                     }
@@ -128,7 +135,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         {
             auto count = hpx::parallel::v1::detail::distance(first1, last1);
             util::cancellation_token<> tok;
-            call(hpx::util::make_zip_iterator(first1, first2), count, tok,
+            call(hpx::util::zip_iterator(first1, first2), count, tok,
                 HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
                 HPX_FORWARD(Proj2, proj2));
             return !tok.was_cancelled();
@@ -152,9 +159,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
         else
         {
-            return sequential_equal_binary<typename ExPolicy::base_policy_type>(
-                it, part_count, tok, HPX_FORWARD(F, f),
-                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+            using base_policy_type =
+                decltype((hpx::execution::experimental::to_non_simd(
+                    std::declval<ExPolicy>())));
+            return sequential_equal_binary<base_policy_type>(it, part_count,
+                tok, HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
     }
 
@@ -178,9 +188,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
         else
         {
-            return sequential_equal_binary<typename ExPolicy::base_policy_type>(
-                first1, last1, first2, last2, HPX_FORWARD(F, f),
-                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+            using base_policy_type =
+                decltype((hpx::execution::experimental::to_non_simd(
+                    std::declval<ExPolicy>())));
+            return sequential_equal_binary<base_policy_type>(first1, last1,
+                first2, last2, HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                HPX_FORWARD(Proj2, proj2));
         }
     }
 }}}}    // namespace hpx::parallel::v1::detail

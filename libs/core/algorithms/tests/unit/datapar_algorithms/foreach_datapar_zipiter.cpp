@@ -45,10 +45,10 @@ void for_each_zipiter_test(ExPolicy&& policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
     std::iota(std::begin(d), std::end(d), std::rand());
 
-    auto begin = hpx::util::make_zip_iterator(
+    auto begin = hpx::util::zip_iterator(
         iterator(std::begin(c)), iterator(std::begin(d)));
-    auto end = hpx::util::make_zip_iterator(
-        iterator(std::end(c)), iterator(std::end(d)));
+    auto end =
+        hpx::util::zip_iterator(iterator(std::end(c)), iterator(std::end(d)));
 
     // auto result =
     hpx::for_each(std::forward<ExPolicy>(policy), begin, end, set_42());

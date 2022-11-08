@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,6 +11,7 @@
 #include <hpx/errors/error_code.hpp>
 #include <hpx/errors/exception.hpp>
 #include <hpx/errors/exception_info.hpp>
+#include <hpx/errors/exception_list.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 
@@ -198,6 +199,8 @@ namespace hpx { namespace detail {
 
     template HPX_CORE_EXPORT std::exception_ptr construct_lightweight_exception(
         hpx::thread_interrupted const&);
+    template HPX_CORE_EXPORT std::exception_ptr construct_lightweight_exception(
+        hpx::exception_list const&);
 
     template <typename Exception>
     HPX_CORE_EXPORT std::exception_ptr construct_custom_exception(
@@ -372,6 +375,26 @@ namespace hpx {
         // error codes in addition to the standard library exceptions.
         std::exception const* se = dynamic_cast<std::exception const*>(&xi);
         return se ? se->what() : std::string("<unknown>");
+    }
+
+    std::string get_error_what(std::exception_ptr const& e)
+    {
+        try
+        {
+            std::rethrow_exception(e);
+        }
+        catch (hpx::thread_interrupted const&)
+        {
+            return "thread_interrupted";
+        }
+        catch (std::exception const& e)
+        {
+            return get_error_what(e);
+        }
+        catch (...)
+        {
+            return "<unknown>";
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////

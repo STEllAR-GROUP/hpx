@@ -70,13 +70,7 @@ add_hpx_source_group(
 )
 
 if(NOT HPX_WITH_STATIC_LINKING)
-  if(MSVC)
-    # The MSVC linker can't handle a static library as large as we get when
-    # statically linking the main HPX library
-    set(hpx_library_link_mode_core SHARED)
-  else()
-    set(hpx_library_link_mode_core ${hpx_library_link_mode})
-  endif()
+  set(hpx_library_link_mode_core ${hpx_library_link_mode})
 endif()
 
 # ##############################################################################
@@ -245,7 +239,7 @@ install(
 )
 
 # install PDB if needed
-if(MSVC)
+if(MSVC AND NOT HPX_WITH_STATIC_LINKING)
   install(
     FILES $<TARGET_PDB_FILE:hpx_full>
     DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -317,7 +311,7 @@ foreach(lib ${HPX_LIBS})
   # creation can move here as well.
   if(NOT ${lib} STREQUAL "full")
     string(TOUPPER ${lib} uppercase_lib)
-    add_library(hpx_${lib} SHARED src/empty.cpp)
+    add_library(hpx_${lib} ${hpx_library_link_mode} src/empty.cpp)
     target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
 
     set_target_properties(hpx_${lib} PROPERTIES FOLDER "Core")
@@ -355,15 +349,23 @@ if(MSVC AND HPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION)
   target_link_options(hpx_core PRIVATE "/EXPORT:switch_to_fiber")
 endif()
 
-if(HPX_WITH_DATAPAR_VC)
+if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
   target_link_libraries(hpx_core PUBLIC Vc::vc)
+endif()
+
+if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE")
+  target_link_libraries(hpx_core PUBLIC Eve::eve)
+endif()
+
+if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
+  target_link_libraries(hpx_core PUBLIC SVE::sve)
 endif()
 
 if(HPX_WITH_ITTNOTIFY)
   target_link_libraries(hpx_core PUBLIC Amplifier::amplifier)
 endif()
 
-if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES)
+if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES OR HPX_WITH_STATIC_LINKING)
   target_link_libraries(hpx_core PUBLIC hpx_public_flags)
   target_link_libraries(hpx_core PUBLIC hpx_base_libraries)
   target_link_libraries(hpx_core PUBLIC hpx_dependencies_boost)

@@ -10,7 +10,7 @@ working_dir_default: &working_dir_default
 
 docker_default: &docker_default
     docker:
-      - image: stellargroup/build_env:12
+      - image: stellargroup/build_env:13
 
 defaults: &defaults
     <<: *working_dir_default
@@ -226,6 +226,7 @@ jobs:
                 -DCMAKE_BUILD_TYPE=Debug \
                 -DHPX_WITH_MALLOC=system \
                 -DHPX_WITH_FETCH_ASIO=Off \
+                -DHPX_WITH_DATAPAR_BACKEND=VC \
                 -DHPX_WITH_GIT_COMMIT=${CIRCLE_SHA1} \
                 -DHPX_WITH_GIT_BRANCH="${CIRCLE_BRANCH}" \
                 -DHPX_WITH_GIT_TAG="${CIRCLE_TAG}" \
@@ -600,7 +601,7 @@ jobs:
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
-                --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.targets | sed ':b;N;$!bb;s/\n/|/g'` \
+                --tests-regex `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.targets | sed ':b;N;$!bb;s/\n/|/g'`
       - run:
           <<: *convert_xml
       - run:
@@ -700,7 +701,7 @@ jobs:
           name: Building Header Tests (part 2)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.[a-g].*"
+                -R "tests.headers.modules.[a-c].*"
       - run:
           <<: *convert_xml
       - store_test_results:
@@ -717,13 +718,30 @@ jobs:
           name: Building Header Tests (part 3)
           command: |
               ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
-                -R "tests.headers.modules.[h-n].*"
+                -R "tests.headers.modules.[d-g].*"
       - run:
           <<: *convert_xml
       - store_test_results:
           path: tests.headers3
       - store_artifacts:
           path: tests.headers3
+
+  tests.headers4:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Header Tests (part 4)
+          command: |
+              ctest --timeout 60 -j1 -T test --no-compress-output --output-on-failure \
+                -R "tests.headers.modules.[h-n].*"
+      - run:
+          <<: *convert_xml
+      - store_test_results:
+          path: tests.headers4
+      - store_artifacts:
+          path: tests.headers4
 
   tests.performance:
     <<: *defaults
@@ -904,6 +922,8 @@ workflows:
           <<: *core_dependency
       - tests.headers3:
           <<: *core_dependency
+      - tests.headers4:
+          <<: *core_dependency
       - docs-html:
           requires:
             - configure
@@ -952,6 +972,7 @@ workflows:
             - tests.headers1
             - tests.headers2
             - tests.headers3
+            - tests.headers4
             # prevent docs from being rebuilt
             - docs-html
             - docs-singlehtml

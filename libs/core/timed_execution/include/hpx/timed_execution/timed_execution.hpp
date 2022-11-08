@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,16 +8,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/timed_execution/timed_execution_fwd.hpp>
-
+#include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/timed_execution/timed_execution_fwd.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
-
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/timed_execution/timed_executors.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -32,8 +29,7 @@ namespace hpx { namespace parallel { namespace execution {
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor>
         struct timed_async_execute_fn_helper<Executor,
-            typename std::enable_if<
-                hpx::traits::is_two_way_executor<Executor>::value>::type>
+            std::enable_if_t<hpx::traits::is_two_way_executor_v<Executor>>>
         {
             template <typename TwoWayExecutor, typename F, typename... Ts>
             HPX_FORCEINLINE static auto call(TwoWayExecutor&& exec,
@@ -72,11 +68,9 @@ namespace hpx { namespace parallel { namespace execution {
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor>
         struct timed_post_fn_helper<Executor,
-            typename std::enable_if<
-                hpx::traits::is_one_way_executor<Executor>::value ||
-                hpx::traits::is_two_way_executor<Executor>::value ||
-                hpx::traits::is_never_blocking_one_way_executor<
-                    Executor>::value>::type>
+            std::enable_if_t<hpx::traits::is_one_way_executor_v<Executor> ||
+                hpx::traits::is_two_way_executor_v<Executor> ||
+                hpx::traits::is_never_blocking_one_way_executor_v<Executor>>>
         {
             template <typename NonBlockingOneWayExecutor, typename F,
                 typename... Ts>
@@ -127,9 +121,8 @@ namespace hpx { namespace parallel { namespace execution {
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor>
         struct timed_sync_execute_fn_helper<Executor,
-            typename std::enable_if<
-                hpx::traits::is_one_way_executor<Executor>::value ||
-                hpx::traits::is_two_way_executor<Executor>::value>::type>
+            std::enable_if_t<hpx::traits::is_one_way_executor_v<Executor> ||
+                hpx::traits::is_two_way_executor_v<Executor>>>
         {
             template <typename OneWayExecutor, typename F, typename... Ts>
             HPX_FORCEINLINE static auto call(OneWayExecutor&& exec,

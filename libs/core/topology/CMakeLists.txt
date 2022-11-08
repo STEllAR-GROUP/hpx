@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2021 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,7 +29,10 @@ if(HPX_TOPOLOGY_WITH_ADDITIONAL_HWLOC_TESTING)
 endif()
 
 # Default location is $HPX_ROOT/libs/topology/include
-set(topology_headers hpx/topology/cpu_mask.hpp hpx/topology/topology.hpp)
+set(topology_headers
+    hpx/topology/cpu_mask.hpp hpx/topology/scheduling_properties.hpp
+    hpx/topology/topology.hpp
+)
 
 # Default location is $HPX_ROOT/libs/topology/include_compatibility
 # cmake-format: off
@@ -53,6 +56,7 @@ add_hpx_module(
   COMPAT_HEADERS ${topology_compat_headers}
   MODULE_DEPENDENCIES
     hpx_assertion
+    hpx_async_base
     hpx_config
     hpx_concurrency
     hpx_errors

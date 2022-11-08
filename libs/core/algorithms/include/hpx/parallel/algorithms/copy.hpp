@@ -1,3 +1,4 @@
+//  Copyright (c) 2022 Bhumit Attarde
 //  Copyright (c) 2014 Grant Mercer
 //  Copyright (c) 2015 Daniel Bourgeois
 //  Copyright (c) 2016-2022 Hartmut Kaiser
@@ -15,7 +16,7 @@ namespace hpx {
     // clang-format off
 
     /// Copies the elements in the range, defined by [first, last), to another
-    /// range beginning at \a dest.
+    /// range beginning at \a dest. Executed according to the policy.
     ///
     /// \note   Complexity: Performs exactly \a last - \a first assignments.
     ///
@@ -64,9 +65,38 @@ namespace hpx {
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest);
 
+    /// Copies the elements in the range, defined by [first, last), to another
+    /// range beginning at \a dest.
+    ///
+    /// \note   Complexity: Performs exactly \a last - \a first assignments.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// \returns  The \a copy algorithm returns a \a FwdIter2 .
+    ///           The \a copy algorithm returns the pair of the input iterator
+    ///           \a last and the output iterator to the
+    ///           element in the destination range, one past the last element
+    ///           copied.
+    ///
+    template <typename FwdIter1, typename FwdIter2>
+    FwdIter2 copy(FwdIter1 first, FwdIter1 last, FwdIter2 dest);
+
+
     /// Copies the elements in the range [first, first + count), starting from
     /// first and proceeding to first + count - 1., to another range beginning
-    /// at dest.
+    /// at dest. Executed according to the policy.
     ///
     /// \note   Complexity: Performs exactly \a count assignments, if
     ///         count > 0, no assignments otherwise.
@@ -110,20 +140,50 @@ namespace hpx {
     ///           \a parallel_task_policy and
     ///           returns \a FwdIter2
     ///           otherwise.
-    ///           The \a copy algorithm returns the pair of the input iterator
-    ///           forwarded to the first element after the last in the input
-    ///           sequence and the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
+    ///           The \a copy_n algorithm returns Iterator in the destination range,
+    ///           pointing past the last element copied if count>0 or result
+    ///           otherwise.
     ///
     template <typename ExPolicy, typename FwdIter1, typename Size, typename FwdIter2>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
     copy_n(ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
 
+    /// Copies the elements in the range [first, first + count), starting from
+    /// first and proceeding to first + count - 1., to another range beginning
+    /// at dest.
+    ///
+    /// \note   Complexity: Performs exactly \a count assignments, if
+    ///         count > 0, no assignments otherwise.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to apply \a f to.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// \returns  The \a copy_n algorithm returns a \a FwdIter2 .
+    ///           The \a copy_n algorithm returns Iterator in the destination range,
+    ///           pointing past the last element copied if count>0 or result
+    ///           otherwise.
+    ///
+    template <typename FwdIter1, typename Size, typename FwdIter2>
+    FwdIter2 copy_n(FwdIter1 first, Size count, FwdIter2 dest);
+
+
     /// Copies the elements in the range, defined by [first, last), to another
     /// range beginning at \a dest. Copies only the elements for which the
     /// predicate \a f returns true. The order of the elements that are not
-    /// removed is preserved.
+    /// removed is preserved. Executed according to the policy.
     ///
     /// \note   Complexity: Performs not more than \a last - \a first
     ///         assignments, exactly \a last - \a first applications of the
@@ -183,16 +243,62 @@ namespace hpx {
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a FwdIter2 otherwise.
-    ///           The \a copy algorithm returns the pair of the input iterator
-    ///           forwarded to the first element after the last in the input
-    ///           sequence and the output iterator to the
-    ///           element in the destination range, one past the last element
-    ///           copied.
+    ///           The \a copy_if algorithm returns output iterator to the element in
+    ///           the destination range, one past the last element copied.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename F>
+        typename Pred>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter2> >::type
     copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
+        Pred&& pred);
+
+    /// Copies the elements in the range, defined by [first, last), to another
+    /// range beginning at \a dest. Copies only the elements for which the
+    /// predicate \a f returns true. The order of the elements that are not
+    /// removed is preserved.
+    ///
+    /// \note   Complexity: Performs not more than \a last - \a first
+    ///         assignments, exactly \a last - \a first applications of the
+    ///         predicate \a f.
+    ///
+    /// \tparam FwdIter1    The type of the source iterators used (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam FwdIter2    The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     forward iterator.
+    /// \tparam Pred        The type of the function/function object to use
+    ///                     (deduced). Unlike its sequential form, the parallel
+    ///                     overload of \a copy_if requires \a F to meet the
+    ///                     requirements of \a CopyConstructible.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    /// \param pred         Specifies the function (or function object) which
+    ///                     will be invoked for each of the elements in the
+    ///                     sequence specified by [first, last).This is an
+    ///                     unary predicate which returns \a true for the
+    ///                     required elements. The signature of this predicate
+    ///                     should be equivalent to:
+    ///                     \code
+    ///                     bool pred(const Type &a);
+    ///                     \endcode \n
+    ///                     The signature does not need to have const&, but
+    ///                     the function must not modify the objects passed to
+    ///                     it. The type \a Type must be such that an object of
+    ///                     type \a FwdIter1 can be dereferenced and then
+    ///                     implicitly converted to Type.
+    ///
+    /// \returns  The \a copy_if algorithm returns a \a FwdIter2 .
+    ///           The \a copy_if algorithm returns output iterator to the element in
+    ///           the destination range, one past the last element copied.
+    ///
+    template <typename FwdIter1, typename FwdIter2, typename Pred>
+    FwdIter2 copy_if(FwdIter1 first, FwdIter1 last, FwdIter2 dest,
         Pred&& pred);
 
     // clang-format on
@@ -313,13 +419,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     nullptr;
                 return HPX_MOVE(*dummy);
 #else
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
+                using zip_iterator =
+                    hpx::util::zip_iterator<FwdIter1, FwdIter2>;
 
                 return util::detail::get_in_out_result(
                     util::foreach_partitioner<ExPolicy>::call(
                         HPX_FORWARD(ExPolicy, policy),
-                        hpx::util::make_zip_iterator(first, dest),
+                        zip_iterator(first, dest),
                         detail::distance(first, last),
                         copy_iteration<ExPolicy>(),
                         [](zip_iterator&& last) -> zip_iterator {
@@ -394,26 +500,23 @@ namespace hpx { namespace parallel { inline namespace v1 {
             parallel(ExPolicy&& policy, FwdIter1 first, std::size_t count,
                 FwdIter2 dest)
             {
-                typedef hpx::util::zip_iterator<FwdIter1, FwdIter2>
-                    zip_iterator;
+                using zip_iterator =
+                    hpx::util::zip_iterator<FwdIter1, FwdIter2>;
 
                 return util::detail::get_in_out_result(
                     util::foreach_partitioner<ExPolicy>::call(
                         HPX_FORWARD(ExPolicy, policy),
-                        hpx::util::make_zip_iterator(first, dest), count,
+                        zip_iterator(first, dest), count,
                         [](zip_iterator part_begin, std::size_t part_size,
                             std::size_t) {
-                            using hpx::get;
-
                             auto iters = part_begin.get_iterator_tuple();
-                            util::copy_n<ExPolicy>(
-                                get<0>(iters), part_size, get<1>(iters));
+                            util::copy_n<ExPolicy>(hpx::get<0>(iters),
+                                part_size, hpx::get<1>(iters));
                         },
                         [](zip_iterator&& last) -> zip_iterator {
-                            using hpx::get;
                             auto iters = last.get_iterator_tuple();
                             util::copy_synchronize(
-                                get<0>(iters), get<1>(iters));
+                                hpx::get<0>(iters), hpx::get<1>(iters));
                             return HPX_MOVE(last);
                         }));
             }
@@ -490,7 +593,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::size_t init = 0;
 
                 using hpx::get;
-                using hpx::util::make_zip_iterator;
                 typedef util::scan_partitioner<ExPolicy,
                     util::in_out_result<FwdIter1, FwdIter3>, std::size_t>
                     scan_partitioner_type;
@@ -507,8 +609,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     // MSVC complains if proj is captured by ref below
                     util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_size,
                         [&pred, proj, &curr](zip_iterator it) mutable -> void {
-                            bool f = hpx::util::invoke(
-                                pred, hpx::util::invoke(proj, get<0>(*it)));
+                            bool f = hpx::invoke(
+                                pred, hpx::invoke(proj, get<0>(*it)));
 
                             if ((get<1>(*it) = f))
                                 ++curr;
@@ -546,7 +648,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 return scan_partitioner_type::call(
                     HPX_FORWARD(ExPolicy, policy),
-                    make_zip_iterator(first, flags.get()), count, init,
+                    zip_iterator(first, flags.get()), count, init,
                     // step 1 performs first part of scan algorithm
                     HPX_MOVE(f1),
                     // step 2 propagates the partition results from left

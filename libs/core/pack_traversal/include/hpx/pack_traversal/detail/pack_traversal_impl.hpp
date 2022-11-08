@@ -199,10 +199,10 @@ namespace hpx { namespace util { namespace detail {
         /// may contain spread types
         template <typename C, typename... T>
         constexpr auto apply_spread_impl(std::true_type, C&& callable,
-            T&&... args) -> decltype(invoke_fused(HPX_FORWARD(C, callable),
+            T&&... args) -> decltype(hpx::invoke_fused(HPX_FORWARD(C, callable),
             hpx::tuple_cat(undecorate(HPX_FORWARD(T, args))...)))
         {
-            return invoke_fused(HPX_FORWARD(C, callable),
+            return hpx::invoke_fused(HPX_FORWARD(C, callable),
                 hpx::tuple_cat(undecorate(HPX_FORWARD(T, args))...));
         }
 
@@ -650,13 +650,14 @@ namespace hpx { namespace util { namespace detail {
         /// to a container of the same type which may contain
         /// different types.
         template <typename Strategy, typename T, typename M>
-        auto
-        remap(Strategy, T&& container, M&& mapper) -> decltype(invoke_fused(
-            std::declval<tuple_like_remapper<Strategy,
-                typename std::decay<M>::type, typename std::decay<T>::type>>(),
-            HPX_FORWARD(T, container)))
+        auto remap(Strategy, T&& container, M&& mapper)
+            -> decltype(hpx::invoke_fused(
+                std::declval<
+                    tuple_like_remapper<Strategy, typename std::decay<M>::type,
+                        typename std::decay<T>::type>>(),
+                HPX_FORWARD(T, container)))
         {
-            return invoke_fused(
+            return hpx::invoke_fused(
                 tuple_like_remapper<Strategy, typename std::decay<M>::type,
                     typename std::decay<T>::type>{HPX_FORWARD(M, mapper)},
                 HPX_FORWARD(T, container));
@@ -868,6 +869,11 @@ namespace hpx { namespace util { namespace detail {
         }
 
         /// \copybrief try_traverse
+        template <typename Tag>
+        constexpr void init_traverse(Tag) const noexcept
+        {
+        }
+
         template <typename T>
         auto init_traverse(strategy_remap_tag, T&& element)
             -> decltype(spreading::unpack_or_void(
@@ -877,6 +883,7 @@ namespace hpx { namespace util { namespace detail {
             return spreading::unpack_or_void(
                 try_traverse(strategy_remap_tag{}, HPX_FORWARD(T, element)));
         }
+
         template <typename T>
         void init_traverse(strategy_traverse_tag, T&& element)
         {

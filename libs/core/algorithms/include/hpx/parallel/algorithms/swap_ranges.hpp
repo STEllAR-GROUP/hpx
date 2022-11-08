@@ -16,23 +16,23 @@ namespace hpx {
     /// Exchanges elements between range [first1, last1) and another range
     /// starting at \a first2.
     ///
-    /// \note   Complexity: Linear in the distance between \a first1 and \a
-    ///  last1
+    /// \note   Complexity: Linear in the distance between \a first1 and
+    ///                     \a last1.
     ///
     /// \tparam FwdIter1    The type of the first range of iterators to swap
     ///                     (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam FwdIter2    The type of the second range of iterators to swap
     ///                     (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     ///
     /// \param first1       Refers to the beginning of the first sequence of
     ///                     elements the algorithm will be applied to.
     /// \param last1        Refers to the end of the first sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the second  sequence of
+    /// \param first2       Refers to the beginning of the second sequence of
     ///                     elements the algorithm will be applied to.
     ///
     /// The swap operations in the parallel \a swap_ranges algorithm
@@ -49,9 +49,10 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Exchanges elements between range [first1, last1) and another range
-    /// starting at \a first2.
+    /// starting at \a first2. Executed according to the policy.
     ///
-    /// \note   Complexity: Linear in the distance between \a first1 and \a last1
+    /// \note   Complexity: Linear in the distance between \a first1 and
+    ///                     \a last1.
     ///
     /// \tparam ExPolicy    The type of the execution policy to use (deduced).
     ///                     It describes the manner in which the execution
@@ -59,11 +60,11 @@ namespace hpx {
     ///                     in which it executes the swap operations.
     /// \tparam FwdIter1    The type of the first range of iterators to swap
     ///                     (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     /// \tparam FwdIter2    The type of the second range of iterators to swap
     ///                     (deduced).
-    ///                     This iterator type must meet the requirements of an
+    ///                     This iterator type must meet the requirements of a
     ///                     forward iterator.
     ///
     /// \param policy       The execution policy to use for the scheduling of
@@ -72,7 +73,7 @@ namespace hpx {
     ///                     elements the algorithm will be applied to.
     /// \param last1        Refers to the end of the first sequence of elements
     ///                     the algorithm will be applied to.
-    /// \param first2       Refers to the beginning of the second  sequence of
+    /// \param first2       Refers to the beginning of the second sequence of
     ///                     elements the algorithm will be applied to.
     ///
     /// The swap operations in the parallel \a swap_ranges algorithm
@@ -87,7 +88,7 @@ namespace hpx {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a swap_ranges algorithm returns a
-    ///           \a hpx::future<FwdIter2>  if the execution policy is of
+    ///           \a hpx::future<FwdIter2> if the execution policy is of
     ///           type \a parallel_task_policy and returns \a FwdIter2
     ///           otherwise.
     ///           The \a swap_ranges algorithm returns iterator to the element
@@ -142,8 +143,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             using reference = typename zip_iterator::reference;
 
             return get_iter_in_in_result(for_each_n<zip_iterator>().call(
-                HPX_FORWARD(ExPolicy, policy),
-                hpx::util::make_zip_iterator(first1, first2), n,
+                HPX_FORWARD(ExPolicy, policy), zip_iterator(first1, first2), n,
                 [](reference t) -> void {
                     using hpx::get;
                     std::swap(get<0>(t), get<1>(t));
@@ -249,7 +249,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::swap_ranges
+    // CPO for hpx::swap_ranges
     inline constexpr struct swap_ranges_t final
       : hpx::detail::tag_parallel_algorithm<swap_ranges_t>
     {

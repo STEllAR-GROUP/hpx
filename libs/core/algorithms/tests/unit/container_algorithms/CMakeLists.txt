@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2020 Hartmut Kaiser
+# Copyright (c) 2014-2022 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,6 +6,7 @@
 
 set(tests
     adjacentdifference_range
+    adjacentdifference_range_sender
     adjacentfind_bad_alloc_range
     adjacentfind_binary_bad_alloc_range
     adjacentfind_binary_range
@@ -47,6 +48,7 @@ set(tests
     foreach_adapt
     foreach_range
     foreach_range_projection
+    foreach_range_sender
     generate_range
     includes_range
     inclusive_scan_range

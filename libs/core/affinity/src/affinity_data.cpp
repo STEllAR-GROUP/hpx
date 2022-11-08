@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -149,14 +149,15 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
         num_pus_needed_ = (std::max)(num_unique_cores, max_cores);
     }
 
-    mask_cref_type affinity_data::get_pu_mask(
+    mask_type affinity_data::get_pu_mask(
         threads::topology const& topo, std::size_t global_thread_num) const
     {
         // --hpx:bind=none disables all affinity
         if (threads::test(no_affinity_, global_thread_num))
         {
-            static mask_type m = mask_type();
+            mask_type m = mask_type();
             threads::resize(m, hardware_concurrency());
+            threads::set(m, get_pu_num(global_thread_num));
             return m;
         }
 
@@ -196,8 +197,10 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
     mask_type affinity_data::get_used_pus_mask(
         threads::topology const& topo, std::size_t pu_num) const
     {
+        auto overall_threads = hardware_concurrency();
+
         mask_type ret = mask_type();
-        threads::resize(ret, hardware_concurrency());
+        threads::resize(ret, overall_threads);
 
         // --hpx:bind=none disables all affinity
         if (threads::test(no_affinity_, pu_num))
@@ -206,10 +209,17 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
             return ret;
         }
 
-        for (std::size_t thread_num = 0; thread_num < num_threads_;
+        for (std::size_t thread_num = 0; thread_num != num_threads_;
              ++thread_num)
         {
-            ret |= get_pu_mask(topo, thread_num);
+            auto thread_mask = get_pu_mask(topo, thread_num);
+            for (std::size_t i = 0; i != overall_threads; ++i)
+            {
+                if (threads::test(thread_mask, i))
+                {
+                    threads::set(ret, i);
+                }
+            }
         }
 
         return ret;
@@ -230,7 +240,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
             threads::resize(pu_mask, hardware_concurrency());
             threads::set(pu_mask, pu_num);
 
-            for (std::size_t num_thread = 0; num_thread < num_threads_;
+            for (std::size_t num_thread = 0; num_thread != num_threads_;
                  ++num_thread)
             {
                 mask_cref_type affinity_mask = get_pu_mask(topo, num_thread);
