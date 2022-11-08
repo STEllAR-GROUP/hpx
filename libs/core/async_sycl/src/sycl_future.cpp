@@ -10,11 +10,6 @@
 
 namespace hpx { namespace sycl { namespace experimental { namespace detail {
 
-    hpx::future<void> get_future(cl::sycl::queue command_queue)
-    {
-        return get_future(hpx::util::internal_allocator<>{}, command_queue);
-    }
-
     hpx::future<void> get_future(cl::sycl::queue command_queue,
         cl::sycl::event command_event)
     {

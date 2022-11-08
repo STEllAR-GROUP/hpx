@@ -119,16 +119,12 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     // Either using a dummy kernel within the SYCL command queue (to get a sycl event)
     // or by supplying a SYCL event directly
 
-    // Adds an event to the queue by submitting a SYCL dummy kernel and using
-    // its return event
+    // Adds an event callback directly for a given event 
+    // (event needs to be from the queue in question when using hipsycl)
     void add_event_callback(
-        event_callback_function_type&& f, cl::sycl::queue command_queue)
+        event_callback_function_type&& f, cl::sycl::queue command_queue,
+        cl::sycl::event event)
     {
-        // The SYCL standard does not include a eventRecord method 
-        // Instead we have to submit some dummy function and use the event the launch returns
-        cl::sycl::event event = command_queue.submit([&](cl::sycl::handler& h) {
-            h.parallel_for(cl::sycl::range<1>{1}, [=](auto i) {});
-            });
         detail::add_to_event_callback_queue(event_callback{event, HPX_MOVE(f)});
 
 #if defined(__HIPSYCL__) 
@@ -140,19 +136,6 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
         // We COULD support older hipsycl version by using an API switch depending on the
         // hipsycl version but since we do not need to support any old SYCL code I do not
         // see a reason for doing so.
-        command_queue.get_context().hipSYCL_runtime()->dag().flush_async();
-#endif
-    }
-
-    // Adds an event callback directly for a given event 
-    // (event needs to be from the queue in question when using hipsycl)
-    void add_event_callback(
-        event_callback_function_type&& f, cl::sycl::queue command_queue,
-        cl::sycl::event event)
-    {
-        detail::add_to_event_callback_queue(event_callback{event, HPX_MOVE(f)});
-
-#if defined(__HIPSYCL__) 
         command_queue.get_context().hipSYCL_runtime()->dag().flush_async();
 #endif
     }

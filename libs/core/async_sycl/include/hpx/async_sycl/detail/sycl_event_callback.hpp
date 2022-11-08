@@ -22,19 +22,6 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     using event_callback_function_type =
         hpx::move_only_function<void(void)>;
 
-    /// Add callback to be called when all commands currently in the queue are done
-    /** Adds an event to the queue by submitting a SYCL dummy kernel and using
-     * its return value event. This event will be completely once the dummy kernel
-     * and thus all earlier commands/kernels in the queue have fnished.
-     * This event is added to the sycl event_callback queue/vector.
-     * Thus, the event is polled periodically by the scheduler.
-     * When done, the callback function f will be called.
-     * Intended to be used with a callback function that sets the future data of an
-     * hpx::future representing the completion of an asynchronous SYCL kernel call.
-    */
-    HPX_CORE_EXPORT void add_event_callback(
-        event_callback_function_type&& f, cl::sycl::queue command_queue);
-
     /// Add callback to be called when all commands up to and including
     /// the passed event are done
     /** Adds an SYCL event directly to the sycl event_callback queue/vector

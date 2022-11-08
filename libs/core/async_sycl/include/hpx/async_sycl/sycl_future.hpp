@@ -44,19 +44,6 @@ namespace hpx { namespace sycl { namespace experimental {
             future_data() {}
 
             future_data(init_no_addref no_addref, other_allocator const& alloc,
-                cl::sycl::queue command_queue)
-              : lcos::detail::future_data_allocator<void, Allocator>(
-                    no_addref, alloc)
-            {
-                add_event_callback(
-                    [fdp = hpx::intrusive_ptr<future_data>(this)]() {
-                        fdp->set_data(hpx::util::unused);
-                        // TODO(daissgr) exception handling in here?
-                    },
-                    command_queue);
-            }
-
-            future_data(init_no_addref no_addref, other_allocator const& alloc,
                 cl::sycl::queue command_queue, cl::sycl::event command_event)
               : lcos::detail::future_data_allocator<void, Allocator>(
                     no_addref, alloc)
@@ -71,34 +58,6 @@ namespace hpx { namespace sycl { namespace experimental {
         };
 
         // -------------------------------------------------------------
-        // main API call to get a future from a stream using allocator, and the
-        // specified mode
-        template <typename Allocator>
-        hpx::future<void> get_future(Allocator const& a, cl::sycl::queue command_queue)
-        {
-            using shared_state = future_data<Allocator>;
-
-            using other_allocator = typename std::allocator_traits<
-                Allocator>::template rebind_alloc<shared_state>;
-            using traits = std::allocator_traits<other_allocator>;
-
-            using init_no_addref = typename shared_state::init_no_addref;
-
-            using unique_ptr = std::unique_ptr<shared_state,
-                util::allocator_deleter<other_allocator>>;
-
-            other_allocator alloc(a);
-            unique_ptr p(traits::allocate(alloc, 1),
-                hpx::util::allocator_deleter<other_allocator>{alloc});
-
-            traits::construct(alloc, p.get(), init_no_addref{}, alloc, command_queue);
-
-            return hpx::traits::future_access<future<void>>::create(
-                p.release(), false);
-        }
-        // -------------------------------------------------------------
-        // main API call to get a future from a stream using allocator, and the
-        // specified mode
         template <typename Allocator>
         hpx::future<void> get_future(Allocator const& a, cl::sycl::queue command_queue,
             cl::sycl::event command_event)
@@ -124,20 +83,8 @@ namespace hpx { namespace sycl { namespace experimental {
             return hpx::traits::future_access<future<void>>::create(
                 p.release(), false);
         }
-
-        /* // ------------------------------------------------------------- */
-        /* // main API call to get a future from a stream using allocator */
-        /* template <typename Allocator> */
-        /* hpx::future<void> get_future_with_event( */
-        /*     Allocator const& a, cl::sycl::queue command_queue ) */
-        /* { */
-        /*     return get_future<Allocator>(a, command_queue); */
-        /* } */
-
         // -------------------------------------------------------------
         // non allocator version of : get future with an event set
-        HPX_CORE_EXPORT hpx::future<void> get_future(cl::sycl::queue command_queue);
-
         HPX_CORE_EXPORT hpx::future<void> get_future(cl::sycl::queue command_queue,
             cl::sycl::event command_event);
     }    // namespace detail

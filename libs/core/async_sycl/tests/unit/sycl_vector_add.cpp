@@ -12,8 +12,10 @@
 #if defined(HPX_HAVE_SYCL)
 
 
-#include <hpx/async_sycl/sycl_future.hpp> 
 #include <CL/sycl.hpp> 
+#include <hpx/async_sycl/sycl_future.hpp> 
+#include <hpx/async_sycl/sycl_executor.hpp> 
+#include <boost/core/demangle.hpp>
 
 // Check compiler compatability
 // Needs to be done AFTER sycl include for HipSYCL
@@ -63,7 +65,7 @@ Utilized compiler appears to be neither of those!")
 #endif
 
 
-constexpr size_t vector_size = 2000000;
+constexpr size_t vector_size = 200000000;
 
 void VectorAdd(cl::sycl::queue& q, const std::vector<int>& a_vector,
     const std::vector<int>& b_vector, std::vector<int>& add_parallel)
@@ -85,16 +87,71 @@ void VectorAdd(cl::sycl::queue& q, const std::vector<int>& a_vector,
       cl::sycl::buffer a_buf(a_vector.data(), num_items);
       cl::sycl::buffer b_buf(b_vector.data(), num_items);
       cl::sycl::buffer add_buf(add_parallel.data(), num_items);
+      cl::sycl::buffer add_buf2(add_parallel.data(), num_items);
 
+      hpx::sycl::experimental::sycl_executor exec(cl::sycl::default_selector{});
+
+      /* // Check executor with a lambda that does not return an event */
+      /* auto async_with_dummy_fut = exec.async_execute([&](auto &command_queue) { */
+      /*     command_queue.submit([&](cl::sycl::handler& h) { */
+      /*         cl::sycl::accessor a(a_buf, h, cl::sycl::read_only); */
+      /*         cl::sycl::accessor b(b_buf, h, cl::sycl::read_only); */
+      /*         cl::sycl::accessor add(add_buf, h, cl::sycl::write_only, cl::sycl::no_init); */
+      /*         h.parallel_for(num_items, [=](auto i) { add[i] = a[i] + b[i]; }); */
+      /*     }); */
+      /* }); */
+      /* async_with_dummy_fut.get(); */
+      /* if (async_with_dummy_fut.is_ready()) */
+      /* { */
+      /*     std::cerr << "ERROR: Async kernel launch future is immediately ready " */
+      /*                  "[dummy mode] " */
+      /*               << "(thus probably not asynchronous at at all)!" */
+      /*               << std::endl; */
+      /*     std::terminate(); */
+      /* } else { */
+      /*     std::cout << "OKAY: Kernel hpx::future is NOT ready immediately " */
+      /*                  "after launch [dummy mode]!" */
+      /*               << std::endl; */
+      /* } */
+
+      exec.post([&](auto &command_queue) -> cl::sycl::event {
+          return command_queue.submit([&](cl::sycl::handler& h) {
+              cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
+              cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
+              cl::sycl::accessor add(add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
+              h.parallel_for(num_items, [=](auto i) { add[i] = a[i] + b[i]; });
+          });
+      });
+      
+      // Check executor with a lambda that does not return an event
+      auto async_normal_fut = exec.async_execute([&](auto &command_queue) -> cl::sycl::event {
+          return command_queue.submit([&](cl::sycl::handler& h) {
+              cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
+              cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
+              cl::sycl::accessor add(add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
+              h.parallel_for(num_items, [=](auto i) { add[i] = a[i] + b[i]; });
+          });
+      });
+      async_normal_fut.get();
+      if (async_normal_fut.is_ready())
+      {
+          std::cerr << "ERROR: Async kernel launch future is immediately ready "
+                       "[normal mode] "
+                    << "(thus probably not asynchronous at at all)!"
+                    << std::endl;
+          std::terminate();
+      } else {
+          std::cout << "OKAY: Kernel hpx::future is NOT ready immediately "
+                       "after launch [normal mode]!"
+                    << std::endl;
+      }
+
+      // Non executor test
       my_kernel_event = q.submit([&](cl::sycl::handler& h) {
-          // Tell sycl we'd like to access our buffers here
           cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
           cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
           cl::sycl::accessor add(add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
-          // run Add kernel
           h.parallel_for(num_items, [=](auto i) { add[i] = a[i] + b[i]; });
-          // Note: destruction of the accessors should not cause a device->host
-          // memcpy (I think...)
       });
       hpx::future<void> my_kernel_future =
           hpx::sycl::experimental::detail::get_future(q, my_kernel_event);
