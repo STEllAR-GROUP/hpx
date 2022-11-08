@@ -386,7 +386,7 @@ namespace hpx { namespace ranges {
     using mismatch_result = hpx::parallel::util::in_in_result<Iter1, Iter2>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::mismatch
+    // CPO for hpx::ranges::mismatch
     inline constexpr struct mismatch_t final
       : hpx::detail::tag_parallel_algorithm<mismatch_t>
     {

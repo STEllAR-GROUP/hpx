@@ -458,7 +458,7 @@ namespace hpx { namespace ranges {
         parallel::util::in_in_out_result<I1, I2, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::set_symmetric_difference
+    // CPO for hpx::ranges::set_symmetric_difference
     inline constexpr struct set_symmetric_difference_t final
       : hpx::detail::tag_parallel_algorithm<set_symmetric_difference_t>
     {

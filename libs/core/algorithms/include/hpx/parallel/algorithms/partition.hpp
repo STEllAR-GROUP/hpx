@@ -1698,7 +1698,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::stable_partition
+    // CPO for hpx::stable_partition
     inline constexpr struct stable_partition_t final
       : hpx::detail::tag_parallel_algorithm<stable_partition_t>
     {
@@ -1754,7 +1754,7 @@ namespace hpx {
     } stable_partition{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::partition
+    // CPO for hpx::partition
     inline constexpr struct partition_t final
       : hpx::detail::tag_parallel_algorithm<partition_t>
     {
@@ -1806,7 +1806,7 @@ namespace hpx {
     } partition{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::partition_copy
+    // CPO for hpx::partition_copy
     inline constexpr struct partition_copy_t final
       : hpx::detail::tag_parallel_algorithm<partition_copy_t>
     {

@@ -604,7 +604,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::transform_inclusive_scan
+    // CPO for hpx::transform_inclusive_scan
     inline constexpr struct transform_inclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<transform_inclusive_scan_t>
     {

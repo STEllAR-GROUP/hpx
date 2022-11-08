@@ -192,7 +192,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ends_with
+    // CPO for hpx::ends_with
     inline constexpr struct ends_with_t final
       : hpx::functional::detail::tag_fallback<ends_with_t>
     {

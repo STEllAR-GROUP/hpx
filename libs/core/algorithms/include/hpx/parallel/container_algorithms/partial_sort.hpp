@@ -281,7 +281,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx { namespace ranges {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::partial_sort
+    // CPO for hpx::ranges::partial_sort
     inline constexpr struct partial_sort_t final
       : hpx::detail::tag_parallel_algorithm<partial_sort_t>
     {

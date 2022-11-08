@@ -591,7 +591,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_move
+    // CPO for hpx::uninitialized_move
     inline constexpr struct uninitialized_move_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_move_t>
     {
@@ -643,7 +643,7 @@ namespace hpx {
     } uninitialized_move{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_move_n
+    // CPO for hpx::uninitialized_move_n
     inline constexpr struct uninitialized_move_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_move_n_t>
     {

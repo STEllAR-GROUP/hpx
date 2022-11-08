@@ -523,7 +523,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_copy
+    // CPO for hpx::uninitialized_copy
     inline constexpr struct uninitialized_copy_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_t>
     {
@@ -575,7 +575,7 @@ namespace hpx {
     } uninitialized_copy{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::uninitialized_copy_n
+    // CPO for hpx::uninitialized_copy_n
     inline constexpr struct uninitialized_copy_n_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_copy_n_t>
     {

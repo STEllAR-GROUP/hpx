@@ -266,7 +266,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::shift_right
+    // CPO for hpx::shift_right
     inline constexpr struct shift_right_t final
       : hpx::functional::detail::tag_fallback<shift_right_t>
     {

@@ -386,7 +386,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::transform_exclusive_scan
+    // CPO for hpx::transform_exclusive_scan
     inline constexpr struct transform_exclusive_scan_t final
       : hpx::detail::tag_parallel_algorithm<transform_exclusive_scan_t>
     {

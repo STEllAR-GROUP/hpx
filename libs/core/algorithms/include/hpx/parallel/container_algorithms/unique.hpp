@@ -683,7 +683,7 @@ namespace hpx { namespace ranges {
     using subrange_t = hpx::util::iterator_range<I, S>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::unique
+    // CPO for hpx::ranges::unique
     inline constexpr struct unique_t final
       : hpx::detail::tag_parallel_algorithm<unique_t>
     {
@@ -822,7 +822,7 @@ namespace hpx { namespace ranges {
     using unique_copy_result = parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::unique_copy
+    // CPO for hpx::ranges::unique_copy
     inline constexpr struct unique_copy_t final
       : hpx::detail::tag_parallel_algorithm<unique_copy_t>
     {

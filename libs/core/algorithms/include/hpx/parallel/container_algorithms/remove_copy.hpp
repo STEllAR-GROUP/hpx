@@ -666,7 +666,7 @@ namespace hpx { namespace ranges {
     using remove_copy_if_result = hpx::parallel::util::in_out_result<I, O>;
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::remove_copy_if
+    // CPO for hpx::ranges::remove_copy_if
     inline constexpr struct remove_copy_if_t final
       : hpx::detail::tag_parallel_algorithm<remove_copy_if_t>
     {
@@ -796,7 +796,7 @@ namespace hpx { namespace ranges {
     } remove_copy_if{};
 
     ///////////////////////////////////////////////////////////////////////////
-    // DPO for hpx::ranges::remove_copy
+    // CPO for hpx::ranges::remove_copy
     inline constexpr struct remove_copy_t final
       : hpx::detail::tag_parallel_algorithm<remove_copy_t>
     {
