@@ -51,13 +51,11 @@ namespace hpx { namespace parallel { namespace util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin it, End end, CancelToken& tok, F&& f)
             {
-                for (/**/; it != end; ++it)
-                {
-                    if (tok.was_cancelled())
-                        break;
-                    HPX_INVOKE(f, it);
-                }
-                return it;
+                // check at the start of a partition only
+                if (tok.was_cancelled())
+                    return it;
+
+                return call(it, end, HPX_FORWARD(F, f));
             }
         };
     }    // namespace detail
@@ -130,13 +128,11 @@ namespace hpx { namespace parallel { namespace util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin it, End end, CancelToken& tok, F&& f)
             {
-                for (/**/; it != end; ++it)
-                {
-                    if (tok.was_cancelled())
-                        break;
-                    HPX_INVOKE(f, *it);
-                }
-                return it;
+                // check at the start of a partition only
+                if (tok.was_cancelled())
+                    return it;
+
+                return call(it, end, HPX_FORWARD(F, f));
             }
         };
     }    // namespace detail
@@ -307,70 +303,16 @@ namespace hpx { namespace parallel { namespace util {
                 return it + num;
             }
 
-            template <typename Iter, typename CancelToken, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(Iter it,
-                std::size_t num, CancelToken& tok, F&& f, std::false_type)
+            template <typename Iter, typename CancelToken, typename F,
+                typename Tag>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
+                Iter it, std::size_t num, CancelToken& tok, F&& f, Tag tag)
             {
-                std::size_t count(num & std::size_t(-4));    // -V112
-                for (std::size_t i = 0; i < count;
-                     (void) ++it, i += 4)    // -V112
-                {
-                    if (tok.was_cancelled())
-                        break;
-                    HPX_INVOKE(f, it);
-                    HPX_INVOKE(f, ++it);
-                    HPX_INVOKE(f, ++it);
-                    HPX_INVOKE(f, ++it);
-                }
-                for (/**/; count < num; (void) ++count, ++it)
-                {
-                    if (tok.was_cancelled())
-                        break;
-                    HPX_INVOKE(f, it);
-                }
-                return it;
-            }
+                // check at the start of a partition only
+                if (tok.was_cancelled())
+                    return it;
 
-            template <typename Iter, typename CancelToken, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(Iter it,
-                std::size_t num, CancelToken& tok, F&& f, std::true_type)
-            {
-                while (num >= 4)
-                {
-                    if (tok.was_cancelled())
-                        return it;
-
-                    HPX_INVOKE(f, it);
-                    HPX_INVOKE(f, it + 1);
-                    HPX_INVOKE(f, it + 2);
-                    HPX_INVOKE(f, it + 3);
-
-                    it += 4;
-                    num -= 4;
-                }
-
-                switch (num)
-                {
-                case 3:
-                    HPX_INVOKE(f, it);
-                    HPX_INVOKE(f, it + 1);
-                    HPX_INVOKE(f, it + 2);
-                    break;
-
-                case 2:
-                    HPX_INVOKE(f, it);
-                    HPX_INVOKE(f, it + 1);
-                    break;
-
-                case 1:
-                    HPX_INVOKE(f, it);
-                    break;
-
-                default:
-                    break;
-                }
-
-                return it + num;
+                return call(it, num, HPX_FORWARD(F, f), tag);
             }
         };
     }    // namespace detail
@@ -498,70 +440,16 @@ namespace hpx { namespace parallel { namespace util {
                 return it + num;
             }
 
-            template <typename Iter, typename CancelToken, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(Iter it,
-                std::size_t num, CancelToken& tok, F&& f, std::false_type)
+            template <typename Iter, typename CancelToken, typename F,
+                typename Tag>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
+                Iter it, std::size_t num, CancelToken& tok, F&& f, Tag tag)
             {
-                std::size_t count(num & std::size_t(-4));    // -V112
-                for (std::size_t i = 0; i < count;
-                     (void) ++it, i += 4)    // -V112
-                {
-                    if (tok.was_cancelled())
-                        break;
-                    HPX_INVOKE(f, *it);
-                    HPX_INVOKE(f, *(++it));
-                    HPX_INVOKE(f, *(++it));
-                    HPX_INVOKE(f, *(++it));
-                }
-                for (/**/; count < num; (void) ++count, ++it)
-                {
-                    if (tok.was_cancelled())
-                        break;
-                    HPX_INVOKE(f, *it);
-                }
-                return it;
-            }
+                // check at the start of a partition only
+                if (tok.was_cancelled())
+                    return it;
 
-            template <typename Iter, typename CancelToken, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(Iter it,
-                std::size_t num, CancelToken& tok, F&& f, std::true_type)
-            {
-                while (num >= 4)
-                {
-                    if (tok.was_cancelled())
-                        return it;
-
-                    HPX_INVOKE(f, *it);
-                    HPX_INVOKE(f, *(it + 1));
-                    HPX_INVOKE(f, *(it + 2));
-                    HPX_INVOKE(f, *(it + 3));
-
-                    it += 4;
-                    num -= 4;
-                }
-
-                switch (num)
-                {
-                case 3:
-                    HPX_INVOKE(f, *it);
-                    HPX_INVOKE(f, *(it + 1));
-                    HPX_INVOKE(f, *(it + 2));
-                    break;
-
-                case 2:
-                    HPX_INVOKE(f, *it);
-                    HPX_INVOKE(f, *(it + 1));
-                    break;
-
-                case 1:
-                    HPX_INVOKE(f, *it);
-                    break;
-
-                default:
-                    break;
-                }
-
-                return it + num;
+                return call(it, num, HPX_FORWARD(F, f), tag);
             }
         };
     }    // namespace detail
@@ -769,45 +657,18 @@ namespace hpx { namespace parallel { namespace util {
                 }
             }
 
-            ///////////////////////////////////////////////////////////////////
             template <typename FwdIter, typename CancelToken, typename F,
                 typename Cleanup>
-            static FwdIter call_with_token(FwdIter it, std::size_t num,
-                CancelToken& tok, F&& f, Cleanup&& cleanup)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr FwdIter
+            call_with_token(FwdIter it, std::size_t num, CancelToken& tok,
+                F&& f, Cleanup&& cleanup)
             {
-                FwdIter base = it;
-                try
-                {
-                    std::size_t count(num & std::size_t(-4));    // -V112
-                    for (std::size_t i = 0; i < count;
-                         (void) ++it, i += 4)    // -V112
-                    {
-                        if (tok.was_cancelled())
-                            break;
-
-                        HPX_INVOKE(f, it);
-                        HPX_INVOKE(f, ++it);
-                        HPX_INVOKE(f, ++it);
-                        HPX_INVOKE(f, ++it);
-                    }
-                    for (/**/; count < num; (void) ++count, ++it)
-                    {
-                        if (tok.was_cancelled())
-                            break;
-
-                        HPX_INVOKE(f, it);
-                    }
+                // check at the start of a partition only
+                if (tok.was_cancelled())
                     return it;
-                }
-                catch (...)
-                {
-                    tok.cancel();
-                    for (/**/; base != it; ++base)
-                    {
-                        HPX_INVOKE(cleanup, base);
-                    }
-                    throw;
-                }
+
+                return call(
+                    it, num, HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
             }
 
             template <typename Iter, typename FwdIter, typename CancelToken,
@@ -815,39 +676,12 @@ namespace hpx { namespace parallel { namespace util {
             static FwdIter call_with_token(Iter it, std::size_t num,
                 FwdIter dest, CancelToken& tok, F&& f, Cleanup&& cleanup)
             {
-                FwdIter base = dest;
-                try
-                {
-                    std::size_t count(num & std::size_t(-4));    // -V112
-                    for (std::size_t i = 0; i < count;
-                         (void) ++it, ++dest, i += 4)    // -V112
-                    {
-                        if (tok.was_cancelled())
-                            break;
-
-                        HPX_INVOKE(f, it, dest);
-                        HPX_INVOKE(f, ++it, ++dest);
-                        HPX_INVOKE(f, ++it, ++dest);
-                        HPX_INVOKE(f, ++it, ++dest);
-                    }
-                    for (/**/; count < num; (void) ++count, ++it, ++dest)
-                    {
-                        if (tok.was_cancelled())
-                            break;
-
-                        HPX_INVOKE(f, it, dest);
-                    }
+                // check at the start of a partition only
+                if (tok.was_cancelled())
                     return dest;
-                }
-                catch (...)
-                {
-                    tok.cancel();
-                    for (/**/; base != dest; ++base)
-                    {
-                        HPX_INVOKE(cleanup, base);
-                    }
-                    throw;
-                }
+
+                return call(it, num, dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Cleanup, cleanup));
             }
         };
     }    // namespace detail
@@ -927,15 +761,10 @@ namespace hpx { namespace parallel { namespace util {
                 std::size_t base_idx, Iter it, std::size_t count,
                 CancelToken& tok, F&& f)
             {
-                for (/**/; count != 0; (void) --count, ++it, ++base_idx)
-                {
-                    if (tok.was_cancelled(base_idx))
-                    {
-                        break;
-                    }
-                    HPX_INVOKE(f, *it, base_idx);
-                }
-                return it;
+                if (tok.was_cancelled(base_idx))
+                    return it;
+
+                return call(base_idx, it, count, HPX_FORWARD(F, f));
             }
         };
 
@@ -988,42 +817,10 @@ namespace hpx { namespace parallel { namespace util {
                 std::size_t base_idx, Iter it, std::size_t num,
                 CancelToken& tok, F&& f)
             {
-                while (num >= 4)
-                {
-                    if (tok.was_cancelled(base_idx))
-                        return it;
+                if (tok.was_cancelled(base_idx))
+                    return it;
 
-                    HPX_INVOKE(f, *it, base_idx++);
-                    HPX_INVOKE(f, *(it + 1), base_idx++);
-                    HPX_INVOKE(f, *(it + 2), base_idx++);
-                    HPX_INVOKE(f, *(it + 3), base_idx++);
-
-                    it += 4;
-                    num -= 4;
-                }
-
-                switch (num)
-                {
-                case 3:
-                    HPX_INVOKE(f, *it, base_idx++);
-                    HPX_INVOKE(f, *(it + 1), base_idx++);
-                    HPX_INVOKE(f, *(it + 2), base_idx++);
-                    break;
-
-                case 2:
-                    HPX_INVOKE(f, *it, base_idx++);
-                    HPX_INVOKE(f, *(it + 1), base_idx++);
-                    break;
-
-                case 1:
-                    HPX_INVOKE(f, *it, base_idx);
-                    break;
-
-                default:
-                    break;
-                }
-
-                return it + num;
+                return call(base_idx, it, num, HPX_FORWARD(F, f));
             }
         };
     }    // namespace detail

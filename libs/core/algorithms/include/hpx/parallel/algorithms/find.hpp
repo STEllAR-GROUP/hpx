@@ -810,7 +810,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename FwdIter>
         struct find : public detail::algorithm<find<FwdIter>, FwdIter>
         {
-            find()
+            constexpr find() noexcept
               : find::algorithm("find")
             {
             }
@@ -881,7 +881,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename FwdIter>
         struct find_if : public detail::algorithm<find_if<FwdIter>, FwdIter>
         {
-            find_if()
+            constexpr find_if() noexcept
               : find_if::algorithm("find_if")
             {
             }
@@ -955,7 +955,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         struct find_if_not
           : public detail::algorithm<find_if_not<FwdIter>, FwdIter>
         {
-            find_if_not()
+            constexpr find_if_not() noexcept
               : find_if_not::algorithm("find_if_not")
             {
             }
@@ -1027,7 +1027,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename FwdIter>
         struct find_end : public detail::algorithm<find_end<FwdIter>, FwdIter>
         {
-            find_end()
+            constexpr find_end() noexcept
               : find_end::algorithm("find_end")
             {
             }
@@ -1118,7 +1118,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         struct find_first_of
           : public detail::algorithm<find_first_of<FwdIter>, FwdIter>
         {
-            find_first_of()
+            constexpr find_first_of() noexcept
               : find_first_of::algorithm("find_first_of")
             {
             }
