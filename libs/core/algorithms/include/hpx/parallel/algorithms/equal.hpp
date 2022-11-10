@@ -445,6 +445,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -454,6 +455,8 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/equal.hpp>
+#include <hpx/parallel/util/adapt_placement_mode.hpp>
+#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -478,7 +481,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         ///////////////////////////////////////////////////////////////////////
         struct equal_binary : public detail::algorithm<equal_binary, bool>
         {
-            equal_binary()
+            constexpr equal_binary() noexcept
               : equal_binary::algorithm("equal_binary")
             {
             }
@@ -498,8 +501,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typename Iter2, typename Sent2, typename F, typename Proj1,
                 typename Proj2>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
-                Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
+            parallel(ExPolicy&& orgpolicy, Iter1 first1, Sent1 last1,
+                Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
             {
                 typedef typename std::iterator_traits<Iter1>::difference_type
                     difference_type1;
@@ -534,6 +537,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         false);
                 }
 
+                auto policy = parallel::util::adapt_placement_mode(
+                    HPX_FORWARD(ExPolicy, orgpolicy),
+                    hpx::threads::thread_placement_hint::breadth_first);
+
+                using policy_type = decltype(policy);
                 using zip_iterator = hpx::util::zip_iterator<Iter1, Iter2>;
 
                 util::cancellation_token<> tok;
@@ -543,15 +551,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj2 = HPX_FORWARD(Proj2, proj2)](
                               zip_iterator it,
                               std::size_t part_count) mutable -> bool {
-                    sequential_equal_binary<std::decay_t<ExPolicy>>(it,
-                        part_count, tok, HPX_FORWARD(F, f),
-                        HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+                    sequential_equal_binary<policy_type>(it, part_count, tok,
+                        HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                        HPX_FORWARD(Proj2, proj2));
                     return !tok.was_cancelled();
                 };
 
-                return util::partitioner<ExPolicy, bool>::call(
-                    HPX_FORWARD(ExPolicy, policy), zip_iterator(first1, first2),
-                    count1, HPX_MOVE(f1), [](auto&& results) -> bool {
+                return util::partitioner<policy_type, bool>::call(
+                    HPX_FORWARD(decltype(policy), policy),
+                    zip_iterator(first1, first2), count1, HPX_MOVE(f1),
+                    [](auto&& results) -> bool {
                         return std::all_of(hpx::util::begin(results),
                             hpx::util::end(results),
                             [](hpx::future<bool>& val) { return val.get(); });
@@ -567,7 +576,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \cond NOINTERNAL
         struct equal : public detail::algorithm<equal, bool>
         {
-            equal()
+            constexpr equal() noexcept
               : equal::algorithm("equal")
             {
             }
@@ -584,7 +593,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
+            parallel(ExPolicy&& orgpolicy, FwdIter1 first1, FwdIter1 last1,
                 FwdIter2 first2, F&& f)
             {
                 if (first1 == last1)
@@ -597,20 +606,26 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     difference_type;
                 difference_type count = std::distance(first1, last1);
 
+                decltype(auto) policy = parallel::util::adapt_placement_mode(
+                    HPX_FORWARD(ExPolicy, orgpolicy),
+                    hpx::threads::thread_placement_hint::breadth_first);
+
+                using policy_type = std::decay_t<decltype(policy)>;
                 using zip_iterator =
                     hpx::util::zip_iterator<FwdIter1, FwdIter2>;
 
                 util::cancellation_token<> tok;
                 auto f1 = [f, tok](zip_iterator it,
                               std::size_t part_count) mutable -> bool {
-                    sequential_equal<std::decay_t<ExPolicy>>(
+                    sequential_equal<policy_type>(
                         it, part_count, tok, HPX_FORWARD(F, f));
                     return !tok.was_cancelled();
                 };
 
-                return util::partitioner<ExPolicy, bool>::call(
-                    HPX_FORWARD(ExPolicy, policy), zip_iterator(first1, first2),
-                    count, HPX_MOVE(f1), [](auto&& results) {
+                return util::partitioner<policy_type, bool>::call(
+                    HPX_FORWARD(decltype(policy), policy),
+                    zip_iterator(first1, first2), count, HPX_MOVE(f1),
+                    [](auto&& results) {
                         return std::all_of(hpx::util::begin(results),
                             hpx::util::end(results),
                             [](hpx::future<bool>& val) { return val.get(); });

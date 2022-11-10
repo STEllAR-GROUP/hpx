@@ -203,7 +203,7 @@ namespace hpx { namespace parallel { namespace util {
 
             template <typename ExPolicy_, typename FwdIter, typename F1,
                 typename F2>
-            static auto call(ExPolicy_&& policy, FwdIter first,
+            static decltype(auto) call(ExPolicy_&& policy, FwdIter first,
                 std::size_t count, F1&& f1, F2&& f2)
             {
                 // inform parameter traits
@@ -228,8 +228,9 @@ namespace hpx { namespace parallel { namespace util {
 
             template <typename ExPolicy_, typename FwdIter, typename Stride,
                 typename F1, typename F2>
-            static auto call_with_index(ExPolicy_&& policy, FwdIter first,
-                std::size_t count, Stride stride, F1&& f1, F2&& f2)
+            static decltype(auto) call_with_index(ExPolicy_&& policy,
+                FwdIter first, std::size_t count, Stride stride, F1&& f1,
+                F2&& f2)
             {
                 // inform parameter traits
                 scoped_executor_parameters scoped_params(
@@ -254,8 +255,8 @@ namespace hpx { namespace parallel { namespace util {
             template <typename ExPolicy_, typename FwdIter, typename F1,
                 typename F2, typename Data>
             // requires is_container<Data>
-            static auto call_with_data(ExPolicy_&& policy, FwdIter first,
-                std::size_t count, F1&& f1, F2&& f2,
+            static decltype(auto) call_with_data(ExPolicy_&& policy,
+                FwdIter first, std::size_t count, F1&& f1, F2&& f2,
                 std::vector<std::size_t> const& chunk_sizes, Data&& data)
             {
                 // inform parameter traits

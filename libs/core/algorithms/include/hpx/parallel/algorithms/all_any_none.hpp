@@ -325,6 +325,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -336,6 +337,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/find.hpp>
+#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -357,7 +359,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \cond NOINTERNAL
         struct none_of : public detail::algorithm<none_of, bool>
         {
-            none_of()
+            constexpr none_of() noexcept
               : none_of::algorithm("none_of")
             {
             }
@@ -384,20 +386,22 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         true);
                 }
 
+                using policy_type = std::decay_t<ExPolicy>;
+
                 util::cancellation_token<> tok;
                 auto f1 = [op = HPX_FORWARD(F, op), tok,
                               proj = HPX_FORWARD(Proj, proj)](
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
-                    detail::sequential_find_if<std::decay_t<ExPolicy>>(
-                        part_begin, part_count, tok, HPX_FORWARD(F, op),
+                    detail::sequential_find_if<policy_type>(part_begin,
+                        part_count, tok, HPX_FORWARD(F, op),
                         HPX_FORWARD(Proj, proj));
 
                     return !tok.was_cancelled();
                 };
 
-                return util::partitioner<ExPolicy, bool>::call(
-                    HPX_FORWARD(ExPolicy, policy), first,
+                return util::partitioner<policy_type, bool>::call(
+                    HPX_FORWARD(decltype(policy), policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
                     [](auto&& results) {
                         return detail::sequential_find_if_not<
@@ -419,7 +423,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \cond NOINTERNAL
         struct any_of : public detail::algorithm<any_of, bool>
         {
-            any_of()
+            constexpr any_of() noexcept
               : any_of::algorithm("any_of")
             {
             }
@@ -446,20 +450,22 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         false);
                 }
 
+                using policy_type = std::decay_t<ExPolicy>;
+
                 util::cancellation_token<> tok;
                 auto f1 = [op = HPX_FORWARD(F, op), tok,
                               proj = HPX_FORWARD(Proj, proj)](
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
-                    detail::sequential_find_if<std::decay_t<ExPolicy>>(
-                        part_begin, part_count, tok, HPX_FORWARD(F, op),
+                    detail::sequential_find_if<policy_type>(part_begin,
+                        part_count, tok, HPX_FORWARD(F, op),
                         HPX_FORWARD(Proj, proj));
 
                     return tok.was_cancelled();
                 };
 
-                return util::partitioner<ExPolicy, bool>::call(
-                    HPX_FORWARD(ExPolicy, policy), first,
+                return util::partitioner<policy_type, bool>::call(
+                    HPX_FORWARD(decltype(policy), policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
                     [](auto&& results) {
                         return detail::sequential_find_if<
@@ -481,7 +487,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \cond NOINTERNAL
         struct all_of : public detail::algorithm<all_of, bool>
         {
-            all_of()
+            constexpr all_of() noexcept
               : all_of::algorithm("all_of")
             {
             }
@@ -507,20 +513,22 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         true);
                 }
 
+                using policy_type = std::decay_t<ExPolicy>;
+
                 util::cancellation_token<> tok;
                 auto f1 = [op = HPX_FORWARD(F, op), tok,
                               proj = HPX_FORWARD(Proj, proj)](
                               FwdIter part_begin,
                               std::size_t part_count) mutable -> bool {
-                    detail::sequential_find_if_not<std::decay_t<ExPolicy>>(
-                        part_begin, part_count, tok, HPX_FORWARD(F, op),
+                    detail::sequential_find_if_not<policy_type>(part_begin,
+                        part_count, tok, HPX_FORWARD(F, op),
                         HPX_FORWARD(Proj, proj));
 
                     return !tok.was_cancelled();
                 };
 
-                return util::partitioner<ExPolicy, bool>::call(
-                    HPX_FORWARD(ExPolicy, policy), first,
+                return util::partitioner<policy_type, bool>::call(
+                    HPX_FORWARD(decltype(policy), policy), first,
                     detail::distance(first, last), HPX_MOVE(f1),
                     [](auto&& results) {
                         return detail::sequential_find_if_not<

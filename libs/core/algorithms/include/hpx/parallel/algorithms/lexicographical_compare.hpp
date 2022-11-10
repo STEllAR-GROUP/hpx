@@ -169,6 +169,7 @@ namespace hpx {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/algorithms/mismatch.hpp>
+#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/loop.hpp>
@@ -190,7 +191,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         struct lexicographical_compare
           : public detail::algorithm<lexicographical_compare, bool>
         {
-            lexicographical_compare()
+            constexpr lexicographical_compare() noexcept
               : lexicographical_compare::algorithm("lexicographical_compare")
             {
             }
@@ -219,7 +220,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typename FwdIter2, typename Sent2, typename Pred,
                 typename Proj1, typename Proj2>
             static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
+            parallel(ExPolicy&& orgpolicy, FwdIter1 first1, Sent1 last1,
                 FwdIter2 first2, Sent2 last2, Pred&& pred, Proj1&& proj1,
                 Proj2&& proj2)
             {
@@ -244,14 +245,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         false);
                 }
 
+                decltype(auto) policy = parallel::util::adapt_placement_mode(
+                    HPX_FORWARD(ExPolicy, orgpolicy),
+                    hpx::threads::thread_placement_hint::breadth_first);
+
+                using policy_type = std::decay_t<decltype(policy)>;
+
                 std::size_t count = (std::min)(count1, count2);
-                util::cancellation_token<std::size_t> tok(count);
+                hpx::parallel::util::cancellation_token<std::size_t> tok(count);
 
                 auto f1 = [tok, pred, proj1, proj2](zip_iterator it,
                               std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
-                        part_count, tok,
+                    util::loop_idx_n<policy_type>(base_idx, it, part_count, tok,
                         [&pred, &tok, &proj1, &proj2](
                             reference t, std::size_t i) mutable -> void {
                             using hpx::get;
@@ -288,9 +294,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return first2 != last2;
                 };
 
-                return util::partitioner<ExPolicy, bool, void>::call_with_index(
-                    HPX_FORWARD(ExPolicy, policy), zip_iterator(first1, first2),
-                    count, 1, HPX_MOVE(f1), HPX_MOVE(f2));
+                using partitioner_type =
+                    util::partitioner<policy_type, bool, void>;
+                return partitioner_type::call_with_index(
+                    HPX_FORWARD(decltype(policy), policy),
+                    zip_iterator(first1, first2), count, 1, HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
         /// \endcond

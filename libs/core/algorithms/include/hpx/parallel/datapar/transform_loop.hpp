@@ -17,7 +17,6 @@
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/transform_loop.hpp>
 
 #include <algorithm>

@@ -119,7 +119,7 @@ namespace hpx { namespace concurrency { namespace detail {
         /// No additional synchronization is done to ensure that other threads
         /// are not accessing elements from the queue being copied. It is the
         /// callees responsibility to ensure that it is safe to copy the queue.
-        constexpr non_contiguous_index_queue(
+        non_contiguous_index_queue(
             non_contiguous_index_queue<T> const& other) noexcept
           : initial_range{other.initial_range}
           , step{other.step}
@@ -134,7 +134,7 @@ namespace hpx { namespace concurrency { namespace detail {
         /// No additional synchronization is done to ensure that other threads
         /// are not accessing elements from the queue being copied. It is the
         /// callees responsibility to ensure that it is safe to copy the queue.
-        constexpr non_contiguous_index_queue& operator=(
+        non_contiguous_index_queue& operator=(
             non_contiguous_index_queue const& other) noexcept
         {
             initial_range = other.initial_range;
@@ -148,7 +148,7 @@ namespace hpx { namespace concurrency { namespace detail {
         ///
         /// Attempt to pop an item from the left (beginning) of the queue. If no
         /// items are left hpx::nullopt is returned.
-        constexpr hpx::optional<T> pop_left() noexcept
+        hpx::optional<T> pop_left() noexcept
         {
             range desired_range{0, 0};
             T index = 0;
@@ -162,6 +162,9 @@ namespace hpx { namespace concurrency { namespace detail {
                 {
                     return hpx::nullopt;
                 }
+
+                // reduce pipeline pressure
+                HPX_SMT_PAUSE;
 
                 index = expected_range.first;
                 desired_range = expected_range.increment_first(step);
@@ -175,7 +178,7 @@ namespace hpx { namespace concurrency { namespace detail {
         ///
         /// Attempt to pop an item from the right (end) of the queue. If
         /// no items are left hpx::nullopt is returned.
-        constexpr hpx::optional<T> pop_right() noexcept
+        hpx::optional<T> pop_right() noexcept
         {
             range desired_range{0, 0};
             T index = 0;
@@ -189,6 +192,9 @@ namespace hpx { namespace concurrency { namespace detail {
                 {
                     return hpx::nullopt;
                 }
+
+                // reduce pipeline pressure
+                HPX_SMT_PAUSE;
 
                 desired_range = expected_range.decrement_last(step);
                 index = desired_range.last;
@@ -203,7 +209,7 @@ namespace hpx { namespace concurrency { namespace detail {
             return current_range.data_.load(std::memory_order_relaxed).empty();
         }
 
-        hpx::tuple<T, T, T> get_current_range() const
+        hpx::tuple<T, T, T> get_current_range() const noexcept
         {
             auto r = current_range.data_.load(std::memory_order_relaxed);
             return {r.first, r.last, step};

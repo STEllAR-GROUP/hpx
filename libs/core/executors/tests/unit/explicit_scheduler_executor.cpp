@@ -227,8 +227,10 @@ void tests(hpx::threads::thread_placement_hint placement)
     }
 
     {
-        auto exec = with_hint(explicit_scheduler_executor(
-            thread_pool_policy_scheduler<hpx::launch::sync_policy>{}), hint);
+        auto exec = with_hint(
+            explicit_scheduler_executor(
+                thread_pool_policy_scheduler<hpx::launch::sync_policy>{}),
+            hint);
         test_executor(exec);
     }
 }

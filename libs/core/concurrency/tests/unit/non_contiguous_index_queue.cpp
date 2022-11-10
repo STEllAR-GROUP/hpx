@@ -149,7 +149,7 @@ void test_concurrent_worker(pop_mode m, std::size_t thread_index,
 void test_concurrent(pop_mode m)
 {
     std::uint32_t first = 33;
-    std::uint32_t last = 73211;
+    std::uint32_t last = 731813;
     std::uint32_t step = 7;
     hpx::concurrency::detail::non_contiguous_index_queue<> q{first, last, step};
 

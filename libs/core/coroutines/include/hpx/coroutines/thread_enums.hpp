@@ -221,13 +221,31 @@ namespace hpx { namespace threads {
     /// The type of hint given to the scheduler related to thread placement
     enum class thread_placement_hint : std::uint8_t
     {
-        /// A hint that tells the scheduler to prefer spreading thread placement
-        /// on a breadth-first basis.
-        breadth_first = 0,
+        /// No hint is specified. The implementation is free to chose what
+        /// placement methods to use.
+        none = 0,
 
         /// A hint that tells the scheduler to prefer spreading thread placement
-        /// on a depth-first basis.
-        depth_first = 1
+        /// on a depth-first basis (i.e. consecutively scheduled threads are
+        /// placed on the same core).
+        depth_first = 1,
+
+        /// A hint that tells the scheduler to prefer spreading thread placement
+        /// on a breadth-first basis (i.e. consecutively scheduled threads are
+        /// placed on the neighboring cores).
+        breadth_first = 2,
+
+        /// A hint that tells the scheduler to prefer spreading thread placement
+        /// on a depth-first basis (i.e. consecutively scheduled threads are
+        /// placed on the same core). Threads are being scheduled in reverse
+        /// order.
+        depth_first_reverse = 5,
+
+        /// A hint that tells the scheduler to prefer spreading thread placement
+        /// on a breadth-first basis (i.e. consecutively scheduled threads are
+        /// placed on the neighboring cores). Threads are being scheduled in
+        /// reverse order.
+        breadth_first_reverse = 6
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -245,7 +263,7 @@ namespace hpx { namespace threads {
         /// given hint as the local thread number.
         constexpr explicit thread_schedule_hint(std::int16_t thread_hint,
             thread_placement_hint placement =
-                thread_placement_hint::breadth_first) noexcept
+                thread_placement_hint::none) noexcept
           : hint(thread_hint)
           , mode(thread_schedule_hint_mode::thread)
           , placement_mode(placement)
@@ -257,7 +275,7 @@ namespace hpx { namespace threads {
         constexpr thread_schedule_hint(thread_schedule_hint_mode mode,
             std::int16_t hint,
             thread_placement_hint placement =
-                thread_placement_hint::breadth_first) noexcept
+                thread_placement_hint::none) noexcept
           : hint(hint)
           , mode(mode)
           , placement_mode(placement)
@@ -287,7 +305,6 @@ namespace hpx { namespace threads {
         thread_schedule_hint_mode mode = thread_schedule_hint_mode::none;
 
         /// The mode of the desired thread placement.
-        thread_placement_hint placement_mode =
-            thread_placement_hint::breadth_first;
+        thread_placement_hint placement_mode = thread_placement_hint::none;
     };
 }}    // namespace hpx::threads
