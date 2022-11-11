@@ -30,21 +30,52 @@
 
 namespace hpx { namespace execution {
 
+    namespace detail {
+        // forward declate only
+        template <template <class, class> typename Derived, typename Executor,
+            typename Parameters = void, typename Category = void>
+        struct execution_policy;
+    }    // namespace detail
+
     ///////////////////////////////////////////////////////////////////////////
-    /// Default sequential execution policy object.
-    inline constexpr hpx::execution::experimental::to_task_t task{};
+    struct task_policy_tag final : hpx::execution::experimental::to_task_t
+    {
+    private:
+        // we don't want to allow using 'task' as a CPO from user code
+        using hpx::execution::experimental::to_task_t::operator();
 
-    using task_policy_tag HPX_DEPRECATED_V(1, 9,
-        "hpx::execution::task_policy_tag is deprecated, use "
-        "hpx::execution::experimental::to_task_t instead") =
-        hpx::execution::experimental::to_task_t;
+        template <template <class, class> typename Derived, typename Executor,
+            typename Parameters, typename Category>
+        friend struct detail::execution_policy;
+    };
 
-    inline constexpr hpx::execution::experimental::to_non_task_t non_task{};
+    inline constexpr task_policy_tag task{};
 
-    using non_task_policy_tag HPX_DEPRECATED_V(1, 9,
-        "hpx::execution::non_task_policy_tag is deprecated, use "
-        "hpx::execution::experimental::to_non_task_t instead") =
-        hpx::execution::experimental::to_non_task_t;
+    struct non_task_policy_tag final
+      : hpx::execution::experimental::to_non_task_t
+    {
+    private:
+        // we don't want to allow using 'non_task' as a CPO from user code
+        using hpx::execution::experimental::to_non_task_t::operator();
+
+        template <template <class, class> typename Derived, typename Executor,
+            typename Parameters, typename Category>
+        friend struct detail::execution_policy;
+    };
+
+    inline constexpr non_task_policy_tag non_task{};
+
+    namespace experimental {
+        template <>
+        struct is_execution_policy_mapping<task_policy_tag> : std::true_type
+        {
+        };
+
+        template <>
+        struct is_execution_policy_mapping<non_task_policy_tag> : std::true_type
+        {
+        };
+    }    // namespace experimental
 
     namespace detail {
         template <typename T, typename Enable = void>
@@ -66,7 +97,7 @@ namespace hpx { namespace execution {
         ////////////////////////////////////////////////////////////////////////
         // Base execution policy
         template <template <class, class> typename Derived, typename Executor,
-            typename Parameters = void, typename Category = void>
+            typename Parameters, typename Category>
         struct execution_policy
         {
         private:

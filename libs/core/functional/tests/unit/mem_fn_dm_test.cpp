@@ -36,28 +36,28 @@ int main()
 {
     X x = {0};
 
-    hpx::util::mem_fn (&X::m)(x) = 401;
+    hpx::mem_fn (&X::m)(x) = 401;
 
     HPX_TEST_EQ(x.m, 401);
-    HPX_TEST_EQ(hpx::util::mem_fn(&X::m)(x), 401);
+    HPX_TEST_EQ(hpx::mem_fn(&X::m)(x), 401);
 
-    hpx::util::mem_fn (&X::m)(&x) = 502;
+    hpx::mem_fn (&X::m)(&x) = 502;
 
     HPX_TEST_EQ(x.m, 502);
-    HPX_TEST_EQ(hpx::util::mem_fn(&X::m)(&x), 502);
+    HPX_TEST_EQ(hpx::mem_fn(&X::m)(&x), 502);
 
     X* px = &x;
 
-    hpx::util::mem_fn (&X::m)(px) = 603;
+    hpx::mem_fn (&X::m)(px) = 603;
 
     HPX_TEST_EQ(x.m, 603);
-    HPX_TEST_EQ(hpx::util::mem_fn(&X::m)(px), 603);
+    HPX_TEST_EQ(hpx::mem_fn(&X::m)(px), 603);
 
     X const& cx = x;
     X const* pcx = &x;
 
-    HPX_TEST_EQ(hpx::util::mem_fn(&X::m)(cx), 603);
-    HPX_TEST_EQ(hpx::util::mem_fn(&X::m)(pcx), 603);
+    HPX_TEST_EQ(hpx::mem_fn(&X::m)(cx), 603);
+    HPX_TEST_EQ(hpx::mem_fn(&X::m)(pcx), 603);
 
     return hpx::util::report_errors();
 }
