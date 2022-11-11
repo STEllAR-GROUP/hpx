@@ -220,18 +220,28 @@ namespace hpx {
         // Set console control handler to allow server to be stopped.
         SetConsoleCtrlHandler(hpx::termination_handler, TRUE);
 #else
-        struct sigaction new_action;
-        new_action.sa_handler = hpx::termination_handler;
-        sigemptyset(&new_action.sa_mask);
-        new_action.sa_flags = 0;
+        if (util::from_string<int>(get_config_entry("hpx.handle_signals", 1)))
+        {
+            struct sigaction new_action;
+            new_action.sa_handler = hpx::termination_handler;
+            sigemptyset(&new_action.sa_mask);
+            new_action.sa_flags = 0;
 
-        sigaction(SIGINT, &new_action, nullptr);     // Interrupted
-        sigaction(SIGBUS, &new_action, nullptr);     // Bus error
-        sigaction(SIGFPE, &new_action, nullptr);     // Floating point exception
-        sigaction(SIGILL, &new_action, nullptr);     // Illegal instruction
-        sigaction(SIGPIPE, &new_action, nullptr);    // Bad pipe
-        sigaction(SIGSEGV, &new_action, nullptr);    // Segmentation fault
-        sigaction(SIGSYS, &new_action, nullptr);     // Bad syscall
+            sigaction(SIGINT, &new_action, nullptr);    // Interrupted
+            sigaction(SIGBUS, &new_action, nullptr);    // Bus error
+            sigaction(
+                SIGFPE, &new_action, nullptr);    // Floating point exception
+            sigaction(SIGILL, &new_action, nullptr);     // Illegal instruction
+            sigaction(SIGPIPE, &new_action, nullptr);    // Bad pipe
+            sigaction(SIGSEGV, &new_action, nullptr);    // Segmentation fault
+            sigaction(SIGSYS, &new_action, nullptr);     // Bad syscall
+
+            hpx::threads::coroutines::register_signal_handler = false;
+        }
+        else
+        {
+            hpx::threads::coroutines::register_signal_handler = true;
+        }
 #endif
 
         std::set_new_handler(hpx::new_handler);

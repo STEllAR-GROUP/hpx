@@ -184,7 +184,9 @@ namespace hpx { namespace util {
             "exception_verbosity = ${HPX_EXCEPTION_VERBOSITY:2}",
             "trace_depth = ${HPX_TRACE_DEPTH:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_HAVE_THREAD_BACKTRACE_DEPTH)) "}",
-
+#if !defined(HPX_WINDOWS)
+            "handle_signals = ${HPX_HANDLE_SIGNALS:1}",
+#endif
             // arity for collective operations implemented in a tree fashion
             "[hpx.lcos.collectives]",
             "arity = ${HPX_LCOS_COLLECTIVES_ARITY:32}",

@@ -169,6 +169,7 @@ The `|hpx| configuration section
    master_ini_path = $[hpx.location]/share/hpx-<version>:$[system.executable_prefix]/share/hpx-<version>:$[system.executable_prefix]/../share/hpx-<version>
    ini_path = $[hpx.master_ini_path]/ini
    os_threads = 1
+   cores = all
    localities = 1
    program_name =
    cmd_line =
@@ -182,6 +183,8 @@ The `|hpx| configuration section
    max_busy_loop_count = ${HPX_MAX_BUSY_LOOP_COUNT:<hpx_busy_loop_count_max>}
    max_idle_backoff_time = ${HPX_MAX_IDLE_BACKOFF_TIME:<hpx_idle_backoff_time_max>}
    exception_verbosity = ${HPX_EXCEPTION_VERBOSITY:2}
+   trace_depth = ${HPX_TRACE_DEPTH:20}
+   handle_signals = ${HPX_HANDLE_SIGNALS:1}
 
    [hpx.stacks]
    small_size = ${HPX_SMALL_STACK_SIZE:<hpx_small_stack_size>}
@@ -215,6 +218,9 @@ The `|hpx| configuration section
        (Windows).
    * * ``hpx.os_threads``
      * This setting reflects the number of OS threads used for running
+       |hpx| threads. Defaults to number of detected cores (not hyperthreads/PUs).
+   * * ``hpx.cores``
+     * This setting reflects the number of cores used for running
        |hpx| threads. Defaults to number of detected cores (not hyperthreads/PUs).
    * * ``hpx.localities``
      * This setting reflects the number of localities the application is running
@@ -280,6 +286,17 @@ The `|hpx| configuration section
        thrown exception and the file name, function, and line number where the
        exception was thrown. The default value is ``2`` or the value of the
        environment variable ``HPX_EXCEPTION_VERBOSITY``.
+   * * ``hpx.trace_depth``
+     * This setting defines the number of stack-levels printed in generated
+       stack backtraces. This defaults to ``20``, but can be changed using the
+       cmake ``HPX_WITH_THREAD_BACKTRACE_DEPTH`` configuration setting.
+   * * ``hpx.handle_signals``
+     * This setting defines whether HPX will register signal handlers that will
+       print the configuration information (stack backtrace, system information,
+       etc.) whenever a signal is raised. The default is ``1``. Setting this
+       value to ``0`` can be useful in cases when generating a core-dump on
+       segmentation faults or similar signals is desired. This setting has no
+       effects on non-Linux platforms.
    * * ``hpx.stacks.small_size``
      * This is initialized to the small stack size to be used by |hpx| threads.
        Set by default to the value of the compile time preprocessor constant
@@ -1463,10 +1480,10 @@ The predefined command line options for any application using
 
 .. option:: --hpx:force_ipv4
 
-   Network hostnames will be resolved to ipv4 adresses instead of using the
+   Network hostnames will be resolved to ipv4 addresses instead of using the
    first resolved endpoint. This is especially useful on Windows where the
-   local hostname will resolve to an ipv6 adress while remote network hostnames
-   are commonly resolved to ipv4 adresses.
+   local hostname will resolve to an ipv6 address while remote network hostnames
+   are commonly resolved to ipv4 addresses.
 
 .. option:: --hpx:localities arg
 

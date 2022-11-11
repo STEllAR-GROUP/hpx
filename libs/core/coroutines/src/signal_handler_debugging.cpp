@@ -20,4 +20,7 @@ namespace hpx::threads::coroutines {
 #else
     std::size_t trace_depth = 0;
 #endif
+#if !defined(HPX_WINDOWS)
+    bool register_signal_handler = 1;
+#endif
 }    // namespace hpx::threads::coroutines
