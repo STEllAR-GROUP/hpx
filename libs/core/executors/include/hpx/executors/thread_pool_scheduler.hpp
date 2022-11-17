@@ -268,13 +268,22 @@ namespace hpx::execution::experimental {
             }
         };
 
-        friend hpx::execution::experimental::forward_progress_guarantee
-        tag_invoke(
-            hpx::execution::experimental::get_forward_progress_guarantee_t,
-            thread_pool_policy_scheduler const&) noexcept
+        friend constexpr hpx::execution::experimental::
+            forward_progress_guarantee
+            tag_invoke(
+                hpx::execution::experimental::get_forward_progress_guarantee_t,
+                thread_pool_policy_scheduler const& sched) noexcept
         {
-            return hpx::execution::experimental::forward_progress_guarantee::
-                parallel;
+            if (hpx::detail::has_async_policy(sched.policy()))
+            {
+                return hpx::execution::experimental::
+                    forward_progress_guarantee::parallel;
+            }
+            else
+            {
+                return hpx::execution::experimental::
+                    forward_progress_guarantee::concurrent;
+            }
         }
 
         friend constexpr sender<thread_pool_policy_scheduler> tag_invoke(

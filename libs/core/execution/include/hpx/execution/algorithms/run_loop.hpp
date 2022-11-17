@@ -218,10 +218,11 @@ namespace hpx::execution::experimental {
                 return run_loop_sender(sched.loop);
             }
 
-            friend hpx::execution::experimental::forward_progress_guarantee
-            tag_invoke(
-                hpx::execution::experimental::get_forward_progress_guarantee_t,
-                run_loop_scheduler const&) noexcept
+            friend constexpr hpx::execution::experimental::
+                forward_progress_guarantee
+                tag_invoke(hpx::execution::experimental::
+                               get_forward_progress_guarantee_t,
+                    run_loop_scheduler const&) noexcept
             {
                 return hpx::execution::experimental::
                     forward_progress_guarantee::parallel;
