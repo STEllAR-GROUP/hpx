@@ -212,7 +212,7 @@ namespace hpx {
         // collect available events and print their descriptions
         avail_preset_info_gen gen;
         for (auto it =
-                 hpx::util::generator_iterator<avail_preset_info_gen>(gen);
+                 hpx::util::generator_iterator<avail_preset_info_gen>(&gen);
              *it != nullptr; ++it)
         {
             hpx::util::format_to(std::cout,
@@ -277,7 +277,7 @@ namespace hpx {
         for (int ci = 0; ci < PAPI_num_components(); ++ci)
         {
             native_info_gen gen(ci);
-            for (auto it = hpx::util::generator_iterator<native_info_gen>(gen);
+            for (auto it = hpx::util::generator_iterator<native_info_gen>(&gen);
                  *it != nullptr; ++it)
             {
                 print_native_info(**it);
