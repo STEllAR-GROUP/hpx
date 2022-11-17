@@ -24,12 +24,14 @@
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
+#if HPX_HAVE_ITTNOTIFY != 0
     mutex::mutex(char const* const description)
       : owner_id_(threads::invalid_thread_id)
     {
         HPX_ITT_SYNC_CREATE(this, "hpx::mutex", description);
         HPX_ITT_SYNC_RENAME(this, "hpx::mutex");
     }
+#endif
 
     mutex::~mutex()
     {

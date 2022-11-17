@@ -80,7 +80,14 @@ namespace hpx {
         ///
         /// \param description description of the \a mutex.
         ///
+#if HPX_HAVE_ITTNOTIFY != 0
         HPX_CORE_EXPORT mutex(char const* const description = "");
+#else
+        constexpr mutex(char const* const description = "") noexcept
+          : owner_id_(threads::invalid_thread_id)
+        {
+        }
+#endif
 
         ///
         /// \brief Destroys the \a mutex.
