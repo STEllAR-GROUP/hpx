@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -360,34 +360,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::uninitialized_copy is deprecated, use "
-        "hpx::uninitialized_copy "
-        "instead")
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
-        uninitialized_copy(
-            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
-            "Required at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
-            "Requires at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return parallel::util::get_second_element(
-            detail::uninitialized_copy<
-                util::in_out_result<FwdIter1, FwdIter2>>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     /////////////////////////////////////////////////////////////////////////////
     // uninitialized_copy_sent
     namespace detail {
@@ -483,43 +455,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    template <typename ExPolicy, typename FwdIter1, typename Size,
-        typename FwdIter2>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::uninitialized_copy_n is deprecated, use "
-        "hpx::uninitialized_copy_n "
-        "instead")
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
-        uninitialized_copy_n(
-            ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
-            "Required at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
-            "Requires at least forward iterator.");
-
-        // if count is representing a negative value, we do nothing
-        if (detail::is_negative(count))
-        {
-            return util::detail::algorithm_result<ExPolicy, FwdIter2>::get(
-                HPX_MOVE(dest));
-        }
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return parallel::util::get_second_element(
-            detail::uninitialized_copy_n<
-                util::in_out_result<FwdIter1, FwdIter2>>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, std::size_t(count),
-                    dest));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////

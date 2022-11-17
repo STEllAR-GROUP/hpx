@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -380,47 +380,8 @@ namespace hpx { namespace ranges {
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value)>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::reverse is deprecated, use hpx::ranges::reverse "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_iterator<Rng>::type>::type
-        reverse(ExPolicy&& policy, Rng&& rng)
-    {
-        return detail::reverse<
-            typename hpx::traits::range_iterator<Rng>::type>()
-            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng));
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename OutIter,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            hpx::traits::is_iterator<OutIter>::value
-        )>
-    // clang-format on
-    typename util::detail::algorithm_result<ExPolicy,
-        util::in_out_result<typename hpx::traits::range_iterator<Rng>::type,
-            OutIter>>::type
-    reverse_copy(ExPolicy&& policy, Rng&& rng, OutIter dest_first)
-    {
-        return detail::reverse_copy<util::in_out_result<
-            typename hpx::traits::range_iterator<Rng>::type, OutIter>>()
-            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), dest_first);
-    }
-}}}    // namespace hpx::parallel::v1
-
 namespace hpx { namespace ranges {
+
     /// `reverse_copy_result` is equivalent to
     /// `hpx::parallel::util::in_out_result`
     template <typename I, typename O>

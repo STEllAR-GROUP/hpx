@@ -215,22 +215,3 @@ namespace hpx { namespace segmented {
     //         BaseIter end_;
     //     };
 }}    // namespace hpx::segmented
-
-namespace hpx {
-
-    template <typename Key, typename T, typename Hash, typename KeyEqual,
-        typename BaseIter>
-    using segment_unordered_map_iterator HPX_DEPRECATED_V(1, 7,
-        "hpx::segment_unordered_map_iterator is deprecated. Use "
-        "hpx::segmented::segment_unordered_map_iterator instead.") =
-        segmented::segment_unordered_map_iterator<Key, T, Hash, KeyEqual,
-            BaseIter>;
-
-    template <typename Key, typename T, typename Hash, typename KeyEqual,
-        typename BaseIter>
-    using const_segment_unordered_map_iterator HPX_DEPRECATED_V(1, 7,
-        "hpx::const_segment_unordered_map_iterator is deprecated. Use "
-        "hpx::segmented::const_segment_unordered_map_iterator instead.") =
-        segmented::const_segment_unordered_map_iterator<Key, T, Hash, KeyEqual,
-            BaseIter>;
-}    // namespace hpx

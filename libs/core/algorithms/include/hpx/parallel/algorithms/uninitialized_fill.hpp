@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -314,35 +314,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    template <typename ExPolicy, typename FwdIter, typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::uninitialized_fill is deprecated, use "
-        "hpx::uninitialized_fill "
-        "instead")
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy>::type>::type
-        uninitialized_fill(
-            ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-            "Required at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        using result_type =
-            typename hpx::parallel::util::detail::algorithm_result<
-                ExPolicy>::type;
-
-        return hpx::util::void_guard<result_type>(),
-               hpx::parallel::v1::detail::uninitialized_fill<FwdIter>().call(
-                   HPX_FORWARD(ExPolicy, policy), first, last, value);
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     /////////////////////////////////////////////////////////////////////////////
     // uninitialized_fill_n
     namespace detail {
@@ -404,38 +375,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    template <typename ExPolicy, typename FwdIter, typename Size, typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::uninitialized_fill_n is deprecated, use "
-        "hpx::uninitialized_fill_n "
-        "instead")
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type>::type
-        uninitialized_fill_n(
-            ExPolicy&& policy, FwdIter first, Size count, T const& value)
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
-            "Required at least forward iterator.");
-
-        // if count is representing a negative value, we do nothing
-        if (detail::is_negative(count))
-        {
-            return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                HPX_MOVE(first));
-        }
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::uninitialized_fill_n<FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, std::size_t(count), value);
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////

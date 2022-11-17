@@ -938,65 +938,6 @@ namespace hpx { namespace segmented {
     };
 }}    // namespace hpx::segmented
 
-// Starting V1.7 we have moved the iterators into the segmented namespace such
-// that the tag_invoke overload for the segmented algorithms will be found.
-namespace hpx {
-
-    template <typename T, typename Data, typename BaseIter>
-    using local_raw_vector_iterator HPX_DEPRECATED_V(1, 7,
-        "hpx::local_raw_vector_iterator is deprecated. Use "
-        "hpx::segmented::local_raw_vector_iterator instead.") =
-        segmented::local_raw_vector_iterator<T, Data, BaseIter>;
-
-    template <typename T, typename Data, typename BaseIter>
-    using const_local_raw_vector_iterator HPX_DEPRECATED_V(1, 7,
-        "hpx::const_local_raw_vector_iterator is deprecated. Use "
-        "hpx::segmented::const_local_raw_vector_iterator instead.") =
-        segmented::const_local_raw_vector_iterator<T, Data, BaseIter>;
-
-    template <typename T, typename Data>
-    using local_vector_iterator HPX_DEPRECATED_V(1, 7,
-        "hpx::local_vector_iterator is deprecated. Use "
-        "hpx::segmented::local_vector_iterator instead.") =
-        segmented::local_vector_iterator<T, Data>;
-
-    template <typename T, typename Data>
-    using const_local_vector_iterator HPX_DEPRECATED_V(1, 7,
-        "hpx::const_local_vector_iterator is deprecated. Use "
-        "hpx::segmented::const_local_vector_iterator instead.") =
-        segmented::const_local_vector_iterator<T, Data>;
-
-    template <typename T, typename Data, typename BaseIter>
-    using segment_vector_iterator HPX_DEPRECATED_V(1, 7,
-        "hpx::segment_vector_iterator is deprecated. Use "
-        "hpx::segmented::segment_vector_iterator instead.") =
-        segmented::segment_vector_iterator<T, Data, BaseIter>;
-
-    template <typename T, typename Data, typename BaseIter>
-    using const_segment_vector_iterator HPX_DEPRECATED_V(1, 7,
-        "hpx::const_segment_vector_iterator is deprecated. Use "
-        "hpx::segmented::const_segment_vector_iterator instead.") =
-        segmented::const_segment_vector_iterator<T, Data, BaseIter>;
-
-    template <typename T, typename Data, typename BaseIter>
-    using local_segment_vector_iterator HPX_DEPRECATED_V(1, 7,
-        "hpx::local_segment_vector_iterator is deprecated. Use "
-        "hpx::segmented::local_segment_vector_iterator instead.") =
-        segmented::local_segment_vector_iterator<T, Data, BaseIter>;
-
-    template <typename T, typename Data>
-    using vector_iterator HPX_DEPRECATED_V(1, 7,
-        "hpx::vector_iterator is deprecated. Use "
-        "hpx::segmented::vector_iterator instead.") =
-        segmented::vector_iterator<T, Data>;
-
-    template <typename T, typename Data>
-    using const_vector_iterator HPX_DEPRECATED_V(1, 7,
-        "hpx::const_vector_iterator is deprecated. Use "
-        "hpx::segmented::const_vector_iterator instead.") =
-        segmented::const_vector_iterator<T, Data>;
-}    // namespace hpx
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits {
     template <typename T, typename Data>

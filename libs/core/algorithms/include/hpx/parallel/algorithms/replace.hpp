@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //  Copyright (c)      2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -532,32 +532,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename T1, typename T2,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value &&
-            traits::is_projected<Proj,FwdIter>::value &&
-            traits::is_indirect_callable<ExPolicy,std::equal_to<T1>,
-                traits::projected<Proj, FwdIter>,
-                traits::projected<Proj, T1 const*>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::replace is deprecated, use hpx::replace "
-        "instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        replace(ExPolicy&& policy, FwdIter first, FwdIter last,
-            T1 const& old_value, T2 const& new_value, Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Required at least forward iterator.");
-
-        return detail::replace<FwdIter>().call(HPX_FORWARD(ExPolicy, policy),
-            first, last, old_value, new_value, HPX_FORWARD(Proj, proj));
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // replace_if
     namespace detail {
@@ -595,30 +569,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename F, typename T,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter>::value &&
-            traits::is_projected<Proj,FwdIter>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected<Proj, FwdIter>>::value)>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::replace_if is deprecated, use hpx::replace_if "
-        "instead")
-        typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        replace_if(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-            T const& new_value, Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Required at least forward iterator.");
-
-        return detail::replace_if<FwdIter>().call(HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(F, f), new_value, HPX_FORWARD(Proj, proj));
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     // replace_copy
@@ -661,38 +611,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1,
-        typename FwdIter2, typename T1, typename T2,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            traits::is_projected<Proj, FwdIter1>::value &&
-            traits::is_indirect_callable<ExPolicy, std::equal_to<T1>,
-                traits::projected<Proj, FwdIter1>,
-                traits::projected<Proj, T1 const*>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::replace_copy is deprecated, use "
-        "hpx::replace_copy "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        util::in_out_result<FwdIter1, FwdIter2>>::type
-        replace_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, T1 const& old_value, T2 const& new_value,
-            Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least forward iterator.");
-
-        return detail::replace_copy<util::in_out_result<FwdIter1, FwdIter2>>()
-            .call(HPX_FORWARD(ExPolicy, policy), first, last, dest, old_value,
-                new_value, HPX_FORWARD(Proj, proj));
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // replace_copy_if
     namespace detail {
@@ -732,37 +650,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename F, typename T, typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            traits::is_projected<Proj, FwdIter1>::value &&
-            traits::is_indirect_callable<ExPolicy, F,
-                traits::projected<Proj, FwdIter1>>::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::replace_copy_if is deprecated, use "
-        "hpx::replace_copy_if "
-        "instead") typename util::detail::algorithm_result<ExPolicy,
-        util::in_out_result<FwdIter1, FwdIter2>>::type
-        replace_copy_if(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
-            FwdIter2 dest, F&& f, T const& new_value, Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
-            "Requires at least forward iterator.");
-
-        return detail::replace_copy_if<
-            util::in_out_result<FwdIter1, FwdIter2>>()
-            .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                HPX_FORWARD(F, f), new_value, HPX_FORWARD(Proj, proj));
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
