@@ -58,10 +58,10 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
+    template <typename Scheduler>
     struct sync_wait_receiver_env
     {
-        using scheduler_type =
-            decltype(std::declval<run_loop>().get_scheduler());
+        using scheduler_type = std::decay_t<Scheduler>;
 
         scheduler_type sched;
 
@@ -111,18 +111,21 @@ namespace hpx::execution::experimental::detail {
     using select_result_t = typename select_result<Type, T>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Sender, sync_wait_type Type>
+    template <typename Sender, typename SchedulerHolder, sync_wait_type Type>
     struct sync_wait_receiver
     {
+        using scheduler_type =
+            decltype(std::declval<SchedulerHolder>().get_scheduler());
+
         // value and error_types of the predecessor sender
         template <template <typename...> class Tuple,
             template <typename...> class Variant>
-        using predecessor_value_types =
-            value_types_of_t<Sender, sync_wait_receiver_env, Tuple, Variant>;
+        using predecessor_value_types = value_types_of_t<Sender,
+            sync_wait_receiver_env<scheduler_type>, Tuple, Variant>;
 
         template <template <typename...> class Variant>
-        using predecessor_error_types =
-            error_types_of_t<Sender, sync_wait_receiver_env, Variant>;
+        using predecessor_error_types = error_types_of_t<Sender,
+            sync_wait_receiver_env<scheduler_type>, Variant>;
 
         // forcing static_assert ensuring variant has exactly one tuple
         //
@@ -198,7 +201,7 @@ namespace hpx::execution::experimental::detail {
         };
 
         shared_state& state;
-        run_loop& loop;
+        SchedulerHolder& holder;
 
         template <typename Error>
         friend void tag_invoke(
@@ -228,14 +231,14 @@ namespace hpx::execution::experimental::detail {
                 }
             }
 
-            r.loop.finish();
+            r.holder.finish();
         }
 
         friend void tag_invoke(
             set_stopped_t tag, sync_wait_receiver&& r) noexcept
         {
             r.state.value.template emplace<stopped_type>(tag);
-            r.loop.finish();
+            r.holder.finish();
         }
 
         template <typename... Us>
@@ -244,14 +247,14 @@ namespace hpx::execution::experimental::detail {
         {
             r.state.value.template emplace<result_type>(
                 hpx::forward_as_tuple(HPX_FORWARD(Us, us)...));
-            r.loop.finish();
+            r.holder.finish();
         }
 
-        friend sync_wait_receiver_env tag_invoke(
+        friend sync_wait_receiver_env<scheduler_type> tag_invoke(
             hpx::execution::experimental::get_env_t,
             sync_wait_receiver const& r) noexcept
         {
-            return {r.loop.get_scheduler()};
+            return {r.holder.get_scheduler()};
         }
     };
 }    // namespace hpx::execution::experimental::detail
@@ -365,13 +368,18 @@ namespace hpx::this_thread::experimental {
         // clang-format off
         template <typename Sender,
             HPX_CONCEPT_REQUIRES_(
-                hpx::execution::experimental::is_sender_v<Sender,
-                    hpx::execution::experimental::detail::sync_wait_receiver_env> &&
                 hpx::execution::experimental::detail::
                     is_completion_scheduler_tag_invocable_v<
                         hpx::execution::experimental::set_value_t,
                         Sender, sync_wait_t
-                    >
+                    > &&
+                hpx::execution::experimental::is_sender_v<Sender,
+                    hpx::execution::experimental::detail::sync_wait_receiver_env<
+                        decltype(hpx::execution::experimental::
+                            get_completion_scheduler<hpx::execution::experimental::
+                                set_value_t>(std::declval<Sender>())
+                        )
+                    >>
             )>
         // clang-format on
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(
@@ -389,7 +397,10 @@ namespace hpx::this_thread::experimental {
         template <typename Sender,
             HPX_CONCEPT_REQUIRES_(
                 hpx::execution::experimental::is_sender_v<Sender,
-                    hpx::execution::experimental::detail::sync_wait_receiver_env>
+                    hpx::execution::experimental::detail::sync_wait_receiver_env<
+                        decltype(std::declval<
+                            hpx::execution::experimental::run_loop
+                        >().get_scheduler())>>
             )>
         // clang-format on
         friend auto tag_invoke(sync_wait_t,
@@ -399,6 +410,7 @@ namespace hpx::this_thread::experimental {
             using hpx::execution::experimental::detail::sync_wait_type;
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
+                    hpx::execution::experimental::run_loop,
                     sync_wait_type::single>;
             using state_type = typename receiver_type::shared_state;
 
@@ -418,7 +430,10 @@ namespace hpx::this_thread::experimental {
         template <typename Sender,
             HPX_CONCEPT_REQUIRES_(
                 hpx::execution::experimental::is_sender_v<Sender,
-                    hpx::execution::experimental::detail::sync_wait_receiver_env>
+                    hpx::execution::experimental::detail::sync_wait_receiver_env<
+                        decltype(std::declval<
+                            hpx::execution::experimental::run_loop
+                        >().get_scheduler())>>
             )>
         // clang-format on
         friend HPX_FORCEINLINE auto tag_fallback_invoke(
@@ -427,6 +442,7 @@ namespace hpx::this_thread::experimental {
             using hpx::execution::experimental::detail::sync_wait_type;
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
+                    hpx::execution::experimental::run_loop,
                     sync_wait_type::single>;
             using state_type = typename receiver_type::shared_state;
 
@@ -510,6 +526,7 @@ namespace hpx::this_thread::experimental {
             using hpx::execution::experimental::detail::sync_wait_type;
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
+                    hpx::execution::experimental::run_loop,
                     sync_wait_type::variant>;
             using state_type = typename receiver_type::shared_state;
 
@@ -537,6 +554,7 @@ namespace hpx::this_thread::experimental {
             using hpx::execution::experimental::detail::sync_wait_type;
             using receiver_type =
                 hpx::execution::experimental::detail::sync_wait_receiver<Sender,
+                    hpx::execution::experimental::run_loop,
                     sync_wait_type::variant>;
             using state_type = typename receiver_type::shared_state;
 

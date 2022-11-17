@@ -22,6 +22,7 @@ set(tests
     service_executors
     shared_parallel_executor
     standalone_thread_pool_executor
+    system_scheduler
     thread_pool_scheduler
 )
 
@@ -46,6 +47,8 @@ foreach(test ${tests})
     HPX_PREFIX ${HPX_BUILD_PREFIX}
     FOLDER ${folder_name}
   )
+
+  target_link_libraries(${test}_test PRIVATE hpx_execution_test_utilities)
 
   add_hpx_unit_test("modules.executors" ${test} ${${test}_PARAMETERS})
 

@@ -160,12 +160,13 @@ add_hpx_module(
     hpx_async_base
     hpx_async_combinators
     hpx_config
-    hpx_threading
-    hpx_pack_traversal
     hpx_errors
+    hpx_iterator_support
     hpx_lock_registration
     hpx_memory
+    hpx_pack_traversal
     hpx_synchronization
+    hpx_threading
     hpx_thread_support
     hpx_timing
     hpx_topology

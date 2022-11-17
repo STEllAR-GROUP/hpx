@@ -752,7 +752,7 @@ namespace hpx::execution::experimental::detail {
             }
         };
 
-    public:
+    private:
         template <typename Receiver>
         friend auto tag_invoke(
             connect_t, thread_pool_bulk_sender&& s, Receiver&& receiver)
@@ -764,7 +764,7 @@ namespace hpx::execution::experimental::detail {
         }
 
         template <typename Receiver>
-        auto tag_invoke(
+        friend auto tag_invoke(
             connect_t, thread_pool_bulk_sender& s, Receiver&& receiver)
         {
             return operation_state<std::decay_t<Receiver>>{s.scheduler,
@@ -806,7 +806,7 @@ namespace hpx::execution::experimental {
             std::is_integral_v<Count>
         )>
     // clang-format on
-    constexpr decltype(auto) tag_invoke(bulk_t,
+    constexpr auto tag_invoke(bulk_t,
         thread_pool_policy_scheduler<Policy> scheduler, Sender&& sender,
         Count const& count, F&& f)
     {
