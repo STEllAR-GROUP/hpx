@@ -136,7 +136,7 @@ namespace hpx { namespace performance_counters { namespace papi {
         hpx::performance_counters::discover_counter_func const& f,
         hpx::error_code& ec)
     {
-        for (auto gi = hpx::util::generator_iterator<T>(gen); *gi != nullptr;
+        for (auto gi = hpx::util::generator_iterator<T>(&gen); *gi != nullptr;
              ++gi)
         {
             std::set<std::string>::const_iterator it;

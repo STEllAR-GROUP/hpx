@@ -243,11 +243,8 @@ namespace hpx { namespace threads {
 
     public:
         /// Return the id of the component this thread is running in
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        constexpr
-#endif
-            std::uint64_t    // same as naming::address_type
-            get_component_id() const noexcept
+        constexpr std::uint64_t    // same as naming::address_type
+        get_component_id() const noexcept
         {
             return 0;
         }
@@ -305,32 +302,20 @@ namespace hpx { namespace threads {
 
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         /// Return the locality of the parent thread
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        constexpr
-#endif
-            std::uint32_t
-            get_parent_locality_id() const noexcept
+        constexpr std::uint32_t get_parent_locality_id() const noexcept
         {
             // this is the same as naming::invalid_locality_id
             return ~static_cast<std::uint32_t>(0);
         }
 
         /// Return the thread id of the parent thread
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        constexpr
-#endif
-            thread_id_type
-            get_parent_thread_id() const noexcept
+        constexpr thread_id_type get_parent_thread_id() const noexcept
         {
             return threads::invalid_thread_id;
         }
 
         /// Return the phase of the parent thread
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        constexpr
-#endif
-            std::size_t
-            get_parent_thread_phase() const noexcept
+        constexpr std::size_t get_parent_thread_phase() const noexcept
         {
             return 0;
         }
@@ -368,11 +353,7 @@ namespace hpx { namespace threads {
 #if !defined(HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION)
 
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        constexpr
-#endif
-            char const*
-            get_backtrace() const noexcept
+        constexpr char const* get_backtrace() const noexcept
         {
             return nullptr;
         }
@@ -381,11 +362,7 @@ namespace hpx { namespace threads {
             return nullptr;
         }
 #else
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        constexpr
-#endif
-            util::backtrace const*
-            get_backtrace() const noexcept
+        constexpr util::backtrace const* get_backtrace() const noexcept
         {
             return nullptr;
         }
@@ -451,11 +428,7 @@ namespace hpx { namespace threads {
         }
 #endif
 
-#if !defined(HPX_GCC_VERSION) || (HPX_GCC_VERSION >= 70300)
-        constexpr
-#endif
-            thread_priority
-            get_priority() const noexcept
+        constexpr thread_priority get_priority() const noexcept
         {
             return priority_;
         }
@@ -508,19 +481,19 @@ namespace hpx { namespace threads {
         void run_thread_exit_callbacks();
         void free_thread_exit_callbacks();
 
-        HPX_FORCEINLINE bool is_stackless() const noexcept
+        HPX_FORCEINLINE constexpr bool is_stackless() const noexcept
         {
             return is_stackless_;
         }
 
         void destroy_thread() override;
 
-        policies::scheduler_base* get_scheduler_base() const noexcept
+        constexpr policies::scheduler_base* get_scheduler_base() const noexcept
         {
             return scheduler_base_;
         }
 
-        std::size_t get_last_worker_thread_num() const noexcept
+        constexpr std::size_t get_last_worker_thread_num() const noexcept
         {
             return last_worker_thread_num_;
         }
@@ -531,7 +504,7 @@ namespace hpx { namespace threads {
             last_worker_thread_num_ = last_worker_thread_num;
         }
 
-        std::ptrdiff_t get_stack_size() const noexcept
+        constexpr std::ptrdiff_t get_stack_size() const noexcept
         {
             return stacksize_;
         }
@@ -542,7 +515,7 @@ namespace hpx { namespace threads {
         }
 
         template <typename ThreadQueue>
-        ThreadQueue& get_queue() noexcept
+        constexpr ThreadQueue& get_queue() noexcept
         {
             return *static_cast<ThreadQueue*>(queue_);
         }

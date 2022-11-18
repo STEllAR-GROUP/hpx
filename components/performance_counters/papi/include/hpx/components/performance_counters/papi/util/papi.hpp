@@ -203,7 +203,7 @@ namespace hpx {
                     umask_gen_.reset(event_);
                     umask_iter_ =
                         hpx::util::generator_iterator<native_umask_enumerator>(
-                            umask_gen_);
+                            &umask_gen_);
                     if (*umask_iter_)
                         return umask_seq_ = true;    // not ==
                 }
