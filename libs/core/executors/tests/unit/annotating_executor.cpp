@@ -368,8 +368,10 @@ void test_bulk_then(Executor&& executor)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename ExPolicy>
-void test_post_policy(ExPolicy&& policy)
+void test_post_policy([[maybe_unused]] ExPolicy&& policy)
 {
+// GCC V8 and below don't properly find the policy tag_invoke overloads
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 90000
     std::string desc("test_post_policy");
     auto p = hpx::execution::experimental::with_annotation(policy, desc);
 
@@ -380,6 +382,7 @@ void test_post_policy(ExPolicy&& policy)
     HPX_TEST_EQ(annotation, desc);
     HPX_TEST_EQ(annotation,
         std::string(hpx::execution::experimental::get_annotation(p)));
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

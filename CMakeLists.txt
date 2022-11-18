@@ -1809,7 +1809,9 @@ if(HPX_WITH_COMPILER_WARNINGS)
 
     # gcc V12.1 and above complain about possible ABI incompatibilities caused
     # by the use of std::destructive_interference_size
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
+       AND "${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER_EQUAL "12.1"
+    )
       hpx_add_compile_flag_if_available(-Wno-interference-size)
     endif()
 
