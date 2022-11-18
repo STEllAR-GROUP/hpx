@@ -71,9 +71,10 @@ namespace hpx {
             typename NeedsPadding = typename detail::needs_padding<Data>::type>
         struct cache_aligned_data
         {
-            // We have an explicit (non-default) constructor here to avoid for
-            // the entire cache-line to be initialized by the compiler.
-            cache_aligned_data()
+            // We have an explicit (default) constructor here to avoid for the
+            // entire cache-line to be initialized by the compiler.
+            constexpr cache_aligned_data() noexcept(
+                std::is_nothrow_default_constructible_v<Data>)
               : data_()
             {
             }
@@ -122,9 +123,10 @@ namespace hpx {
             typename NeedsPadding = typename detail::needs_padding<Data>::type>
         struct cache_aligned_data_derived : Data
         {
-            // We have an explicit (non-default) constructor here to avoid for
-            // the entire cache-line to be initialized by the compiler.
-            cache_aligned_data_derived()
+            // We have an explicit (default) constructor here to avoid for the
+            // entire cache-line to be initialized by the compiler.
+            constexpr cache_aligned_data_derived() noexcept(
+                std::is_nothrow_default_constructible_v<Data>)
               : Data()
             {
             }

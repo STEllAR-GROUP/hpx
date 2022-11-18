@@ -13,6 +13,7 @@ set(tests
     dynamic_bitset3
     dynamic_bitset4
     dynamic_bitset5
+    intrusive_list
     is_tuple_like
     serializable_any
     serializable_boost_any

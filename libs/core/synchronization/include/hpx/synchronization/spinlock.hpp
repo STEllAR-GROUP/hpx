@@ -46,6 +46,7 @@ namespace hpx {
             std::atomic<bool> v_;
 
         public:
+#if defined(HPX_HAVE_ITTNOTIFY)
             spinlock() noexcept
               : v_(false)
             {
@@ -58,12 +59,21 @@ namespace hpx {
                 HPX_ITT_SYNC_CREATE(this, "hpx::spinlock", desc);
             }
 
-#if defined(HPX_HAVE_ITTNOTIFY)
             ~spinlock()
             {
                 HPX_ITT_SYNC_DESTROY(this);
             }
 #else
+            constexpr spinlock() noexcept
+              : v_(false)
+            {
+            }
+
+            explicit constexpr spinlock(char const* const) noexcept
+              : v_(false)
+            {
+            }
+
             ~spinlock() = default;
 #endif
 

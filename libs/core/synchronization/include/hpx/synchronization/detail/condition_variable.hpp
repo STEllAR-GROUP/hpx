@@ -10,87 +10,51 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/execution_base/agent_ref.hpp>
+#include <hpx/datastructures/detail/intrusive_list.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/timing/steady_clock.hpp>
-
-#include <boost/intrusive/slist.hpp>
 
 #include <cstddef>
 #include <mutex>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local { namespace detail {
+namespace hpx::lcos::local::detail {
+
     class condition_variable
     {
-    public:
-        HPX_NON_COPYABLE(condition_variable);
-
     private:
         using mutex_type = hpx::spinlock;
 
     private:
         // define data structures needed for intrusive slist container used for
         // the queues
-        struct queue_entry
-        {
-            using hook_type = boost::intrusive::slist_member_hook<
-                boost::intrusive::link_mode<boost::intrusive::normal_link>>;
+        struct queue_entry;
+        struct reset_queue_entry;
 
-            queue_entry(hpx::execution_base::agent_ref ctx, void* q)
-              : ctx_(ctx)
-              , q_(q)
-            {
-            }
-
-            hpx::execution_base::agent_ref ctx_;
-            void* q_;
-            hook_type slist_hook_;
-        };
-
-        using slist_option_type = boost::intrusive::member_hook<queue_entry,
-            queue_entry::hook_type, &queue_entry::slist_hook_>;
-
-        using queue_type = boost::intrusive::slist<queue_entry,
-            slist_option_type, boost::intrusive::cache_last<true>,
-            boost::intrusive::constant_time_size<true>>;
-
-        struct reset_queue_entry
-        {
-            reset_queue_entry(queue_entry& e, queue_type& q)
-              : e_(e)
-              , last_(q.last())
-            {
-            }
-
-            ~reset_queue_entry()
-            {
-                if (e_.ctx_)
-                {
-                    queue_type* q = static_cast<queue_type*>(e_.q_);
-                    q->erase(last_);    // remove entry from queue
-                }
-            }
-
-            queue_entry& e_;
-            queue_type::const_iterator last_;
-        };
+        using queue_type = hpx::detail::intrusive_list<queue_entry>;
 
     public:
-        HPX_CORE_EXPORT condition_variable();
+        constexpr condition_variable() noexcept = default;
+
+        // non-copyable
+        condition_variable(condition_variable const&) = delete;
+        condition_variable(condition_variable&&) = delete;
+        condition_variable& operator=(condition_variable const&) = delete;
+        condition_variable& operator=(condition_variable&&) = delete;
 
         HPX_CORE_EXPORT ~condition_variable();
 
-        HPX_CORE_EXPORT bool empty(std::unique_lock<mutex_type>& lock) const;
+        HPX_CORE_EXPORT bool empty(
+            std::unique_lock<mutex_type>& lock) const noexcept;
 
         HPX_CORE_EXPORT std::size_t size(
-            std::unique_lock<mutex_type>& lock) const;
+            std::unique_lock<mutex_type>& lock) const noexcept;
 
-        // Return false if no more threads are waiting (returns true if queue
-        // is non-empty).
+        // Return false if no more threads are waiting (returns true if queue is
+        // non-empty).
         HPX_CORE_EXPORT bool notify_one(std::unique_lock<mutex_type> lock,
             threads::thread_priority priority, error_code& ec = throws);
 
@@ -160,7 +124,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
         // re-add the remaining items to the original queue
         HPX_CORE_EXPORT void prepend_entries(
-            std::unique_lock<mutex_type>& lock, queue_type& queue);
+            std::unique_lock<mutex_type>& lock, queue_type& queue) noexcept;
 
     private:
         queue_type queue_;
@@ -176,9 +140,9 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
     struct condition_variable_data
     {
-        typedef hpx::spinlock mutex_type;
+        using mutex_type = hpx::spinlock;
 
-        condition_variable_data()
+        HPX_HOST_DEVICE_CONSTEXPR condition_variable_data() noexcept
           : count_(1)
         {
         }
@@ -194,5 +158,4 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
         hpx::util::atomic_count count_;
     };
-
-}}}}    // namespace hpx::lcos::local::detail
+}    // namespace hpx::lcos::local::detail

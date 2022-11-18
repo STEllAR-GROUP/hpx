@@ -46,6 +46,7 @@ endif()
 set(datastructures_headers
     hpx/datastructures/any.hpp
     hpx/datastructures/detail/dynamic_bitset.hpp
+    hpx/datastructures/detail/intrusive_list.hpp
     hpx/datastructures/detail/small_vector.hpp
     hpx/datastructures/detail/optional.hpp
     hpx/datastructures/detail/variant.hpp

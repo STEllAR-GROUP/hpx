@@ -80,10 +80,10 @@ namespace hpx {
         ///
         /// \param description description of the \a mutex.
         ///
-#if HPX_HAVE_ITTNOTIFY != 0
+#if defined(HPX_HAVE_ITTNOTIFY)
         HPX_CORE_EXPORT mutex(char const* const description = "");
 #else
-        constexpr mutex(char const* const description = "") noexcept
+        HPX_HOST_DEVICE_CONSTEXPR mutex(char const* const = "") noexcept
           : owner_id_(threads::invalid_thread_id)
         {
         }

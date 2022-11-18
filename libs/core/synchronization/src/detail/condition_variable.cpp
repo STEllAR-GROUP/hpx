@@ -6,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
+#include <hpx/execution_base/agent_ref.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
@@ -24,11 +25,47 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local { namespace detail {
+namespace hpx::lcos::local::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    condition_variable::condition_variable() = default;
+    struct condition_variable::queue_entry
+    {
+        constexpr queue_entry(
+            hpx::execution_base::agent_ref ctx, void* q) noexcept
+          : ctx_(ctx)
+          , q_(q)
+        {
+        }
 
+        hpx::execution_base::agent_ref ctx_;
+        void* q_;
+
+        queue_entry* next = nullptr;
+        queue_entry* prev = nullptr;
+    };
+
+    struct condition_variable::reset_queue_entry
+    {
+        explicit constexpr reset_queue_entry(
+            condition_variable::queue_entry& e) noexcept
+          : e_(e)
+        {
+        }
+
+        ~reset_queue_entry()
+        {
+            if (e_.ctx_)
+            {
+                condition_variable::queue_type* q =
+                    static_cast<condition_variable::queue_type*>(e_.q_);
+                q->erase(&e_);    // remove entry from queue
+            }
+        }
+
+        condition_variable::queue_entry& e_;
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     condition_variable::~condition_variable()
     {
         if (!queue_.empty())
@@ -42,7 +79,8 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         }
     }
 
-    bool condition_variable::empty(std::unique_lock<mutex_type>& lock) const
+    bool condition_variable::empty(
+        std::unique_lock<mutex_type>& lock) const noexcept
     {
         HPX_ASSERT_OWNS_LOCK(lock);
         HPX_UNUSED(lock);
@@ -51,7 +89,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     }
 
     std::size_t condition_variable::size(
-        std::unique_lock<mutex_type>& lock) const
+        std::unique_lock<mutex_type>& lock) const noexcept
     {
         HPX_ASSERT_OWNS_LOCK(lock);
         HPX_UNUSED(lock);
@@ -68,10 +106,10 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
         if (!queue_.empty())
         {
-            auto ctx = queue_.front().ctx_;
+            auto ctx = queue_.front()->ctx_;
 
             // remove item from queue before error handling
-            queue_.front().ctx_.reset();
+            queue_.front()->ctx_.reset();
             queue_.pop_front();
 
             if (HPX_UNLIKELY(!ctx))
@@ -110,15 +148,17 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         if (!queue.empty())
         {
             // update reference to queue for all queue entries
-            for (queue_entry& qe : queue)
-                qe.q_ = &queue;
+            for (queue_entry* qe = queue_.front(); qe != nullptr; qe = qe->next)
+            {
+                qe->q_ = &queue;
+            }
 
             do
             {
-                auto ctx = queue.front().ctx_;
+                auto ctx = queue.front()->ctx_;
 
                 // remove item from queue before error handling
-                queue.front().ctx_.reset();
+                queue.front()->ctx_.reset();
                 queue.pop_front();
 
                 if (HPX_UNLIKELY(!ctx))
@@ -162,7 +202,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         queue_entry f(this_ctx, &queue_);
         queue_.push_back(f);
 
-        reset_queue_entry r(f, queue_);
+        reset_queue_entry r(f);
         {
             // suspend this thread
             util::unlock_guard<std::unique_lock<mutex_type>> ul(lock);
@@ -185,7 +225,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         queue_entry f(this_ctx, &queue_);
         queue_.push_back(f);
 
-        reset_queue_entry r(f, queue_);
+        reset_queue_entry r(f);
         {
             // suspend this thread
             util::unlock_guard<std::unique_lock<mutex_type>> ul(lock);
@@ -207,15 +247,17 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             queue.swap(queue_);
 
             // update reference to queue for all queue entries
-            for (queue_entry& qe : queue)
-                qe.q_ = &queue;
+            for (queue_entry* qe = queue_.front(); qe != nullptr; qe = qe->next)
+            {
+                qe->q_ = &queue;
+            }
 
             while (!queue.empty())
             {
-                auto ctx = queue.front().ctx_;
+                auto ctx = queue.front()->ctx_;
 
                 // remove item from queue before error handling
-                queue.front().ctx_.reset();
+                queue.front()->ctx_.reset();
                 queue.pop_front();
 
                 if (HPX_UNLIKELY(!ctx))
@@ -239,13 +281,12 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
     // re-add the remaining items to the original queue
     void condition_variable::prepend_entries(
-        std::unique_lock<mutex_type>& lock, queue_type& queue)
+        std::unique_lock<mutex_type>& lock, queue_type& queue) noexcept
     {
         HPX_ASSERT_OWNS_LOCK(lock);
         HPX_UNUSED(lock);
 
-        // splice is constant time only if it == end
-        queue.splice(queue.end(), queue_);
+        queue.splice(queue_);
         queue_.swap(queue);
     }
 
@@ -262,5 +303,4 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
             delete p;
         }
     }
-
-}}}}    // namespace hpx::lcos::local::detail
+}    // namespace hpx::lcos::local::detail
