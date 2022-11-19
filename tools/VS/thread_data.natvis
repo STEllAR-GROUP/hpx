@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Copyright (c) 2014-2022 Hartmut Kaiser                                 -->
+
+<!-- Use, modification and distribution are subject to the Boost Software   -->
+<!-- License, Version 1.0. (See accompanying file LICENSE_1_0.txt           -->
+<!-- or copy at http://www.boost.org/LICENSE_1_0.txt)                       -->
+
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+    <Type Name="hpx::threads::thread_data">
+        <DisplayString>
+            {{ state={current_state_}, priority_={priority_}, desc_={description_} }}
+        </DisplayString>
+        <Expand>
+            <Item Name="[state]">current_state_</Item>
+            <Item Name="[priority]">priority_</Item>
+            <Item Name="[desc]">description_</Item>
+            <Item Name="[lcodesc]">lco_description_</Item>
+            <Item Name="[interrupt_requested]">requested_interrupt_</Item>
+            <Item Name="[interrupt_enabled]">enabled_interrupt_</Item>
+            <Item Name="[scheduler]">scheduler_base_</Item>
+        </Expand>
+    </Type>
+
+</AutoVisualizer>

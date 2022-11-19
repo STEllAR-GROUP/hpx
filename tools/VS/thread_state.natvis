@@ -17,7 +17,7 @@
         </Expand>
     </Type>
 
-    <Type Name="boost::atomics::atomic&lt;hpx::threads::detail::combined_tagged_state&lt;enum hpx::threads::thread_schedule_state, enum hpx::threads::thread_restart_state&gt;&gt;">
+    <Type Name="std::atomic&lt;hpx::threads::detail::combined_tagged_state&lt;enum hpx::threads::thread_schedule_state, enum hpx::threads::thread_restart_state&gt;&gt;">
         <DisplayString>{{ state={(hpx::threads::thread_schedule_state)((m_storage &gt;&gt; 56) &amp; 0xff)}, stateex={(hpx::threads::thread_restart_state)((m_storage &gt;&gt; 48) &amp; 0xff)}, tag={m_storage &amp; 0xffffffffffff,d} }}</DisplayString>
         <Expand>
             <Item Name="[state]">(hpx::threads::thread_schedule_state)((m_storage &gt;&gt; 56) &amp; 0xff)</Item>
