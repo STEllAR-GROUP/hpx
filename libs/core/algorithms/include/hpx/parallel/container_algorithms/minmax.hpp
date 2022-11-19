@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -805,111 +805,6 @@ namespace hpx {
 
 #include <type_traits>
 #include <utility>
-
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    template <typename T>
-    using minmax_element_result = hpx::parallel::util::min_max_result<T>;
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng,
-        typename Proj = util::projection_identity,
-        typename F = detail::less,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_range_v<Rng> &&
-            hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
-            hpx::parallel::traits::is_indirect_callable_v<
-                ExPolicy, F,
-                hpx::parallel::traits::projected_range<Proj, Rng>,
-                hpx::parallel::traits::projected_range<Proj, Rng>
-            >
-        )>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::min_element is deprecated, use "
-        "hpx::ranges::min_element instead")
-        hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            typename hpx::traits::range_traits<Rng>::iterator_type>
-    min_element(ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj())
-    // clang-format on
-    {
-        return hpx::parallel::v1::detail::min_element<
-            hpx::traits::range_iterator_t<Rng>>()
-            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), HPX_FORWARD(F, f),
-                HPX_FORWARD(Proj, proj));
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng,
-        typename Proj = util::projection_identity,
-        typename F = detail::less,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_range_v<Rng> &&
-            hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
-            hpx::parallel::traits::is_indirect_callable_v<
-                ExPolicy, F,
-                hpx::parallel::traits::projected_range<Proj, Rng>,
-                hpx::parallel::traits::projected_range<Proj, Rng>
-            >
-        )>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::max_element is deprecated, use "
-        "hpx::ranges::max_element instead")
-        hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            typename hpx::traits::range_traits<Rng>::iterator_type>
-    max_element(ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj())
-    // clang-format on
-    {
-        return hpx::parallel::v1::detail::max_element<
-            hpx::traits::range_iterator_t<Rng>>()
-            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), HPX_FORWARD(F, f),
-                HPX_FORWARD(Proj, proj));
-    }
-
-#if defined(HPX_MSVC)
-#pragma push_macro("min")
-#pragma push_macro("max")
-#undef min
-#undef max
-#endif
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng,
-        typename Proj = util::projection_identity, typename F = detail::less,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_range_v<Rng> &&
-            hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
-            hpx::parallel::traits::is_indirect_callable_v<
-                ExPolicy, F,
-                hpx::parallel::traits::projected_range<Proj, Rng>,
-                hpx::parallel::traits::projected_range<Proj, Rng>
-            >
-        )>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::minmax_element is deprecated, use "
-        "hpx::ranges::minmax_element instead")
-        hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            minmax_element_result<hpx::traits::range_iterator_t<Rng>>>
-    minmax_element(
-        ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj())
-    // clang-format on
-    {
-        return hpx::parallel::v1::detail::minmax_element<
-            hpx::traits::range_iterator_t<Rng>>()
-            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), HPX_FORWARD(F, f),
-                HPX_FORWARD(Proj, proj));
-    }
-
-#if defined(HPX_MSVC)
-#pragma pop_macro("min")
-#pragma pop_macro("max")
-#endif
-}}}    // namespace hpx::parallel::v1
 
 namespace hpx { namespace ranges {
 

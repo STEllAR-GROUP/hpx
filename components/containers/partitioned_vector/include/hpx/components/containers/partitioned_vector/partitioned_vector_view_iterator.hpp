@@ -258,20 +258,3 @@ namespace hpx { namespace segmented {
         std::array<std::size_t, N + 1> const& hw_basis_;
     };
 }}    // namespace hpx::segmented
-
-// Starting V1.7 we have moved the iterators into the segmented namespace such
-// that the tag_invoke overload for the segmented algorithms will be found.
-namespace hpx {
-
-    template <typename T, std::size_t N, typename Data>
-    using partitioned_vector_view_iterator HPX_DEPRECATED_V(1, 7,
-        "hpx::partitioned_vector_view_iterator is deprecated. Use "
-        "hpx::segmented::partitioned_vector_view_iterator instead.") =
-        segmented::partitioned_vector_view_iterator<T, N, Data>;
-
-    template <typename T, std::size_t N, typename Data>
-    using const_partitioned_vector_view_iterator HPX_DEPRECATED_V(1, 7,
-        "hpx::const_partitioned_vector_view_iterator  is deprecated. Use "
-        "hpx::segmented::const_partitioned_vector_view_iterator  instead.") =
-        segmented::const_partitioned_vector_view_iterator<T, N, Data>;
-}    // namespace hpx

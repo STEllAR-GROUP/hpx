@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Denis Blank
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -206,100 +207,4 @@ namespace hpx {
         return util::detail::functional_unwrap_depth_impl<0U>(
             HPX_FORWARD(T, callable));
     }
-
-    namespace util {
-        template <typename... Args>
-        HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrap instead.")
-        auto unwrap(Args&&... args) -> decltype(
-            detail::unwrap_depth_impl<1U>(HPX_FORWARD(Args, args)...))
-        {
-            return detail::unwrap_depth_impl<1U>(HPX_FORWARD(Args, args)...);
-        }
-
-        namespace functional {
-            struct HPX_DEPRECATED_V(
-                1, 7, "Please use hpx::functional::unwrap instead.") unwrap
-            {
-                template <typename... Args>
-                auto operator()(Args&&... args)
-                    -> decltype(hpx::unwrap(HPX_FORWARD(Args, args)...))
-                {
-                    return hpx::unwrap(HPX_FORWARD(Args, args)...);
-                }
-            };
-        }    // namespace functional
-
-        template <std::size_t Depth, typename... Args>
-        HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrap_n instead.")
-        auto unwrap_n(Args&&... args) -> decltype(
-            detail::unwrap_depth_impl<Depth>(HPX_FORWARD(Args, args)...))
-        {
-            static_assert(Depth > 0U, "The unwrapping depth must be >= 1!");
-            return detail::unwrap_depth_impl<Depth>(HPX_FORWARD(Args, args)...);
-        }
-
-        namespace functional {
-            template <std::size_t Depth>
-            struct HPX_DEPRECATED_V(
-                1, 7, "Please use hpx::functional::unwrap instead.") unwrap_n
-            {
-                template <typename... Args>
-                auto operator()(Args&&... args) -> decltype(
-                    hpx::unwrap_n<Depth>(HPX_FORWARD(Args, args)...))
-                {
-                    return hpx::unwrap_n<Depth>(HPX_FORWARD(Args, args)...);
-                }
-            };
-        }    // namespace functional
-
-        template <typename... Args>
-        HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrap_all instead.")
-        auto unwrap_all(Args&&... args) -> decltype(
-            detail::unwrap_depth_impl<0U>(HPX_FORWARD(Args, args)...))
-        {
-            return detail::unwrap_depth_impl<0U>(HPX_FORWARD(Args, args)...);
-        }
-
-        namespace functional {
-            struct HPX_DEPRECATED_V(
-                1, 7, "Please use hpx::functional::unwrap instead.") unwrap_all
-            {
-                template <typename... Args>
-                auto operator()(Args&&... args)
-                    -> decltype(hpx::unwrap_all(HPX_FORWARD(Args, args)...))
-                {
-                    return hpx::unwrap_all(HPX_FORWARD(Args, args)...);
-                }
-            };
-        }    // namespace functional
-
-        template <typename T>
-        HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrapping instead.")
-        auto unwrapping(T&& callable) -> decltype(
-            detail::functional_unwrap_depth_impl<1U>(HPX_FORWARD(T, callable)))
-        {
-            return detail::functional_unwrap_depth_impl<1U>(
-                HPX_FORWARD(T, callable));
-        }
-
-        template <std::size_t Depth, typename T>
-        HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrapping_n instead.")
-        auto unwrapping_n(T&& callable)
-            -> decltype(detail::functional_unwrap_depth_impl<Depth>(
-                HPX_FORWARD(T, callable)))
-        {
-            static_assert(Depth > 0U, "The unwrapping depth must be >= 1!");
-            return detail::functional_unwrap_depth_impl<Depth>(
-                HPX_FORWARD(T, callable));
-        }
-
-        template <typename T>
-        HPX_DEPRECATED_V(1, 7, "Please use hpx::unwrapping_all instead.")
-        auto unwrapping_all(T&& callable) -> decltype(
-            detail::functional_unwrap_depth_impl<0U>(HPX_FORWARD(T, callable)))
-        {
-            return detail::functional_unwrap_depth_impl<0U>(
-                HPX_FORWARD(T, callable));
-        }
-    }    // namespace util
 }    // namespace hpx

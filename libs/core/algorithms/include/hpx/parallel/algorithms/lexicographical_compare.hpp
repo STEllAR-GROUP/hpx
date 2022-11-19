@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -295,47 +295,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = detail::less,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_iterator<FwdIter1>::value &&
-            hpx::traits::is_iterator<FwdIter2>::value &&
-            hpx::is_invocable_v<Pred,
-                typename std::iterator_traits<FwdIter1>::value_type,
-                typename std::iterator_traits<FwdIter2>::value_type
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::lexicographical_compare is deprecated, use "
-        "hpx::lexicographical_compare "
-        "instead") typename util::detail::algorithm_result<ExPolicy, bool>::type
-        lexicographical_compare(ExPolicy&& policy, FwdIter1 first1,
-            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
-            Pred&& pred = Pred())
-    {
-        static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
-            "Requires at least forward iterator.");
-        static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
-            "Requires at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::lexicographical_compare().call(
-            HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
-            HPX_FORWARD(Pred, pred), hpx::parallel::util::projection_identity{},
-            hpx::parallel::util::projection_identity{});
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
