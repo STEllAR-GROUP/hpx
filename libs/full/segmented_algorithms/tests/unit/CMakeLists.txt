@@ -56,6 +56,21 @@ set(partitioned_vector_exclusive_scan_PARAMETERS RUN_SERIAL)
 set(partitioned_vector_exclusive_scan2_PARAMETERS RUN_SERIAL)
 set(partitioned_vector_target_PARAMETERS RUN_SERIAL)
 
+if(HPX_WITH_PARCELPORT_LCI)
+  set(partitioned_vector_inclusive_scan_PARAMETERS
+      ${partitioned_vector_inclusive_scan_PARAMETERS} NO_PARCELPORT_LCI
+  )
+  set(partitioned_vector_inclusive_scan2_PARAMETERS
+      ${partitioned_vector_inclusive_scan2_PARAMETERS} NO_PARCELPORT_LCI
+  )
+  set(partitioned_vector_exclusive_scan_PARAMETERS
+      ${partitioned_vector_exclusive_scan_PARAMETERS} NO_PARCELPORT_LCI
+  )
+  set(partitioned_vector_exclusive_scan2_PARAMETERS
+      ${partitioned_vector_exclusive_scan2_PARAMETERS} NO_PARCELPORT_LCI
+  )
+endif()
+
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

@@ -40,6 +40,15 @@ set(migrate_polymorphic_component_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY
 )
 set(migrate_polymorphic_component_FLAGS DEPENDENCIES iostreams_component)
 
+if(HPX_WITH_PARCELPORT_LCI)
+  set(migrate_component_PARAMETERS ${migrate_component_PARAMETERS}
+                                   NO_PARCELPORT_LCI
+  )
+  set(migrate_polymorphic_component_PARAMETERS
+      ${migrate_polymorphic_component_PARAMETERS} NO_PARCELPORT_LCI
+  )
+endif()
+
 set(inheritance_2_classes_abstract_FLAGS DEPENDENCIES iostreams_component)
 
 set(inheritance_2_classes_concrete_FLAGS DEPENDENCIES iostreams_component)
