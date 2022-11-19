@@ -9,11 +9,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <iterator>
 
 namespace hpx { namespace lcos { namespace detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>
     struct future_iterator_traits
@@ -22,8 +22,7 @@ namespace hpx { namespace lcos { namespace detail {
 
     template <typename Iterator>
     struct future_iterator_traits<Iterator,
-        hpx::util::always_void_t<
-            typename std::iterator_traits<Iterator>::value_type>>
+        std::void_t<typename std::iterator_traits<Iterator>::value_type>>
     {
         using type = typename std::iterator_traits<Iterator>::value_type;
         using traits_type = hpx::traits::future_traits<type>;

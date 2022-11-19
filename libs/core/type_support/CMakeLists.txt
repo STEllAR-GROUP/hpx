@@ -7,7 +7,6 @@
 set(type_support_headers
     hpx/type_support/detail/with_result_of.hpp
     hpx/type_support/detail/wrap_int.hpp
-    hpx/type_support/always_void.hpp
     hpx/type_support/decay.hpp
     hpx/type_support/detected.hpp
     hpx/type_support/empty_function.hpp

@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <type_traits>
 
@@ -20,15 +19,14 @@ namespace hpx { namespace traits {
         };
 
         template <typename Action>
-        struct is_action_impl<Action,
-            typename util::always_void<typename Action::action_tag>::type>
+        struct is_action_impl<Action, std::void_t<typename Action::action_tag>>
           : std::true_type
         {
         };
     }    // namespace detail
 
     template <typename Action, typename Enable = void>
-    struct is_action : detail::is_action_impl<typename std::decay<Action>::type>
+    struct is_action : detail::is_action_impl<std::decay_t<Action>>
     {
     };
 

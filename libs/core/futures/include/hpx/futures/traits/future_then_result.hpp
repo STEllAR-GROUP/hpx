@@ -11,7 +11,6 @@
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
-#include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
 
@@ -49,8 +48,7 @@ namespace hpx { namespace traits {
 
         template <typename Future, typename F>
         struct future_then_result<Future, F,
-            typename hpx::util::always_void<
-                hpx::util::invoke_result_t<F&, Future>>::type>
+            std::void_t<hpx::util::invoke_result_t<F&, Future>>>
         {
             using cont_result = hpx::util::invoke_result_t<F&, Future>;
 

@@ -16,7 +16,6 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/pack_traversal/detail/container_category.hpp>
-#include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -448,9 +447,9 @@ namespace hpx {
             /// SFINAE this out if the visitor doesn't accept
             /// the given element
             template <typename Current,
-                typename = typename always_void<decltype(
+                typename = std::void_t<decltype(
                     std::declval<Frame>()->traverse(
-                        *std::declval<Current>()))>::type>
+                        *std::declval<Current>()))>>
             // clang-format on
             void async_traverse_one_impl(
                 container_category_tag<false, false>, Current&& current)
