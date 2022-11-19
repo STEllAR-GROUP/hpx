@@ -70,7 +70,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         // launch a new thread executing the given function
         threads::thread_id_ref_type tid =
-            p.apply("run_on_completed_on_new_thread", policy);
+            p.post("run_on_completed_on_new_thread", policy);
 
         // wait for the task to run
         if (is_hpx_thread)

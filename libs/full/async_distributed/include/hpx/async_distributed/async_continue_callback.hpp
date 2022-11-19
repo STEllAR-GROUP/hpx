@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,9 +10,9 @@
 
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
-#include <hpx/async_distributed/applier/apply_callback.hpp>
 #include <hpx/async_distributed/async_callback_fwd.hpp>
 #include <hpx/async_distributed/async_continue.hpp>
+#include <hpx/async_distributed/detail/post_callback.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/futures/traits/promise_remote_result.hpp>
 
@@ -40,9 +40,9 @@ namespace hpx {
             hpx::distributed::promise<result_type, RemoteResult> p;
             auto f = p.get_future();
 
-            apply_cb<Action>(hpx::actions::typed_continuation<result_type,
-                                 continuation_result_type>(
-                                 p.get_id(), HPX_FORWARD(Cont, cont)),
+            hpx::post_cb<Action>(hpx::actions::typed_continuation<result_type,
+                                     continuation_result_type>(
+                                     p.get_id(), HPX_FORWARD(Cont, cont)),
                 target, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
 
             return f;

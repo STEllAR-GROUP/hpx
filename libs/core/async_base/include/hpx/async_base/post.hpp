@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,16 +13,26 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail {
-    // dispatch point used for apply implementations
+
+    // dispatch point used for post implementations
     template <typename Func, typename Enable = void>
-    struct apply_dispatch;
+    struct post_dispatch;
 }}    // namespace hpx::detail
 
 namespace hpx {
+
     template <typename F, typename... Ts>
+    HPX_FORCEINLINE bool post(F&& f, Ts&&... ts)
+    {
+        return detail::post_dispatch<std::decay_t<F>>::call(
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename F, typename... Ts>
+    HPX_DEPRECATED_V(1, 9, "hpx::apply is deprecated, use hpx::post instead")
     HPX_FORCEINLINE bool apply(F&& f, Ts&&... ts)
     {
-        return detail::apply_dispatch<typename std::decay<F>::type>::call(
+        return detail::post_dispatch<std::decay_t<F>>::call(
             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx

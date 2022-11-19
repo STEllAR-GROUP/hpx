@@ -93,6 +93,7 @@ set(include_headers
     hpx/include/parcelset.hpp
     hpx/include/performance_counters.hpp
     hpx/include/plain_actions.hpp
+    hpx/include/post.hpp
     hpx/include/resource_partitioner.hpp
     hpx/include/run_as.hpp
     hpx/include/runtime.hpp

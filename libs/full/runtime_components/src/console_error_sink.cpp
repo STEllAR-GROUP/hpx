@@ -33,7 +33,7 @@ namespace hpx { namespace components {
             else
             {
                 // FIXME: This should use a sync_put_parcel.
-                hpx::apply<server::console_error_sink_action>(dst, e);
+                hpx::post<server::console_error_sink_action>(dst, e);
             }
         }
     }

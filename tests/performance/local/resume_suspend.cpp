@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 
         for (std::size_t thread = 0; thread < threads; ++thread)
         {
-            hpx::apply([]() {});
+            hpx::post([]() {});
         }
 
         auto t_apply = timer.elapsed();
@@ -78,6 +78,6 @@ int main(int argc, char** argv)
     hpx::util::print_cdash_timing("SuspendTime", suspend_time);
 
     hpx::resume();
-    hpx::apply([]() { hpx::finalize(); });
+    hpx::post([]() { hpx::finalize(); });
     hpx::stop();
 }

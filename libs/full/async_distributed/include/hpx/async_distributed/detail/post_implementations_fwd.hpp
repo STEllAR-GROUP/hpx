@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,64 +14,62 @@
 
 #include <type_traits>
 
-namespace hpx { namespace applier { namespace detail {
+namespace hpx { namespace detail {
+
+    ///////////////////////////////////////////////////////////////////////////
     // forward declaration only
     template <typename Action, typename Continuation, typename... Ts>
-    inline bool apply_l_p(Continuation&& c, hpx::id_type const& target,
+    inline bool post_l_p(Continuation&& c, hpx::id_type const& target,
         naming::address&& addr, threads::thread_priority priority, Ts&&... vs);
 
     template <typename Action, typename... Ts>
-    inline bool apply_l_p(hpx::id_type const& target, naming::address&& addr,
+    inline bool post_l_p(hpx::id_type const& target, naming::address&& addr,
         threads::thread_priority priority, Ts&&... vs);
 
     template <typename Action, typename Continuation, typename... Ts>
-    inline bool apply_r_p(naming::address&& addr, Continuation&& c,
+    inline bool post_r_p(naming::address&& addr, Continuation&& c,
         hpx::id_type const& id, threads::thread_priority priority, Ts&&... vs);
 
     template <typename Action, typename... Ts>
-    inline bool apply_r_p(naming::address&& addr, hpx::id_type const& id,
+    inline bool post_r_p(naming::address&& addr, hpx::id_type const& id,
         threads::thread_priority priority, Ts&&... vs);
 
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
-    inline bool apply_r_p_cb(naming::address&& addr, Continuation&& c,
+    inline bool post_r_p_cb(naming::address&& addr, Continuation&& c,
         hpx::id_type const& id, threads::thread_priority priority,
         Callback&& cb, Ts&&... vs);
 
     template <typename Action, typename Callback, typename... Ts>
-    inline bool apply_r_p_cb(naming::address&& addr, hpx::id_type const& id,
+    inline bool post_r_p_cb(naming::address&& addr, hpx::id_type const& id,
         threads::thread_priority priority, Callback&& cb, Ts&&... vs);
-}}}    // namespace hpx::applier::detail
 
-namespace hpx { namespace detail {
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Continuation, typename... Ts>
-    typename std::enable_if<traits::is_continuation<Continuation>::value,
-        bool>::type
-    apply_impl(Continuation&& c, hpx::id_type const& id,
+    std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
+    post_impl(Continuation&& c, hpx::id_type const& id,
         threads::thread_priority priority, Ts&&... vs);
 
     template <typename Action, typename Continuation, typename... Ts>
-    typename std::enable_if<traits::is_continuation<Continuation>::value,
-        bool>::type
-    apply_impl(Continuation&& c, hpx::id_type const& id, naming::address&& addr,
+    std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
+    post_impl(Continuation&& c, hpx::id_type const& id, naming::address&& addr,
         threads::thread_priority priority, Ts&&... vs);
 
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
-    typename std::enable_if<traits::is_continuation<Continuation>::value,
-        bool>::type
-    apply_cb_impl(Continuation&& c, hpx::id_type const& id,
+    std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
+    post_cb_impl(Continuation&& c, hpx::id_type const& id,
         threads::thread_priority priority, Callback&& cb, Ts&&... vs);
 
     template <typename Action, typename... Ts>
-    bool apply_impl(
+    bool post_impl(
         hpx::id_type const& id, threads::thread_priority priority, Ts&&... vs);
 
     template <typename Action, typename... Ts>
-    bool apply_impl(hpx::id_type const& id, naming::address&&,
+    bool post_impl(hpx::id_type const& id, naming::address&&,
         threads::thread_priority priority, Ts&&... vs);
 
     template <typename Action, typename Callback, typename... Ts>
-    bool apply_cb_impl(hpx::id_type const& id,
-        threads::thread_priority priority, Callback&& cb, Ts&&... vs);
+    bool post_cb_impl(hpx::id_type const& id, threads::thread_priority priority,
+        Callback&& cb, Ts&&... vs);
 }}    // namespace hpx::detail

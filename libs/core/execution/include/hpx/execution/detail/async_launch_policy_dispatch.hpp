@@ -159,7 +159,7 @@ namespace hpx { namespace detail {
                 util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
             threads::thread_id_ref_type tid =
-                p.apply(pool, desc.get_description(), policy);
+                p.post(pool, desc.get_description(), policy);
 
             if (tid)
             {
@@ -217,7 +217,7 @@ namespace hpx { namespace detail {
                 util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
             threads::thread_id_ref_type tid =
-                p.apply(pool, desc.get_description(), policy);
+                p.post(pool, desc.get_description(), policy);
 
             // make sure this thread is executed last
             threads::thread_id_type tid_self = threads::get_self_id();

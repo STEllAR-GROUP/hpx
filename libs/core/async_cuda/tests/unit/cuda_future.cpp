@@ -62,9 +62,9 @@ int test_saxpy(hpx::cuda::experimental::cuda_executor& cudaexec)
 
     // copy both arrays from cpu to gpu, putting both copies onto the stream
     // no need to get a future back yet
-    hpx::apply(cudaexec, cudaMemcpyAsync, d_A, h_A, N * sizeof(float),
+    hpx::post(cudaexec, cudaMemcpyAsync, d_A, h_A, N * sizeof(float),
         cudaMemcpyHostToDevice);
-    hpx::apply(cudaexec, cudaMemcpyAsync, d_B, h_B, N * sizeof(float),
+    hpx::post(cudaexec, cudaMemcpyAsync, d_B, h_B, N * sizeof(float),
         cudaMemcpyHostToDevice);
 
     unsigned int threads = 256;
@@ -132,7 +132,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // test kernel launch<float> using apply and async
     float testf = 1.2345;
     std::cout << "apply : cuda kernel <float>  : " << testf << std::endl;
-    hpx::apply(cudaexec, cuda_trivial_kernel<float>, testf);
+    hpx::post(cudaexec, cuda_trivial_kernel<float>, testf);
 
     std::cout << "async : cuda kernel <float>  : " << testf + 1 << std::endl;
     auto f1 = hpx::async(cudaexec, cuda_trivial_kernel<float>, testf + 1);
@@ -142,7 +142,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // test kernel launch<double> using apply and async
     double testd = 2.3456;
     std::cout << "apply : cuda kernel <double> : " << testd << std::endl;
-    hpx::apply(cudaexec, cuda_trivial_kernel<double>, testd);
+    hpx::post(cudaexec, cuda_trivial_kernel<double>, testd);
 
     std::cout << "async : cuda kernel <double> : " << testd + 1 << std::endl;
     auto f2 = hpx::async(cudaexec, cuda_trivial_kernel<double>, testd + 1);

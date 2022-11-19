@@ -129,7 +129,7 @@ namespace hpx { namespace cuda { namespace experimental {
         friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
             cuda_executor const& exec, F&& f, Ts&&... ts)
         {
-            return exec.apply(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            return exec.post(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // -------------------------------------------------------------------------
@@ -149,7 +149,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // (typically this will be cudaError_t).
         // Throws cuda_exception if the async launch fails.
         template <typename R, typename... Params, typename... Args>
-        void apply(R (*cuda_function)(Params...), Args&&... args) const
+        void post(R (*cuda_function)(Params...), Args&&... args) const
         {
             // make sure we run on the correct device
             check_cuda_error(cudaSetDevice(device_));

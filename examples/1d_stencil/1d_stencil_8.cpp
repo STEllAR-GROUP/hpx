@@ -460,11 +460,11 @@ HPX_REGISTER_ACTION(release_dependencies_action)
 
 void stepper_server::send_left(std::size_t t, partition p) const
 {
-    hpx::apply(from_right_action(), left_.get(), t, std::move(p));
+    hpx::post(from_right_action(), left_.get(), t, std::move(p));
 }
 void stepper_server::send_right(std::size_t t, partition p) const
 {
-    hpx::apply(from_left_action(), right_.get(), t, std::move(p));
+    hpx::post(from_left_action(), right_.get(), t, std::move(p));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

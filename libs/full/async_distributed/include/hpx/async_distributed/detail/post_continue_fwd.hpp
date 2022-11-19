@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,22 +12,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
     template <typename Action, typename Cont, typename... Ts>
-    bool apply_continue(Cont&& cont, hpx::id_type const& gid, Ts&&... vs);
+    bool post_continue(Cont&& cont, hpx::id_type const& gid, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename Cont, typename... Ts>
-    bool apply_continue(
+    bool post_continue(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         Cont&& cont, hpx::id_type const& gid, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
-    bool apply_continue(
+    bool post_continue(
         hpx::id_type const& cont, hpx::id_type const& gid, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename... Ts>
-    bool apply_continue(
+    bool post_continue(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         hpx::id_type const& cont, hpx::id_type const& gid, Ts&&... vs);
 }    // namespace hpx

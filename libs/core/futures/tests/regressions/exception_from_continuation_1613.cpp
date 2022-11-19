@@ -60,7 +60,7 @@ void test_exception_from_continuation2()
     }
 
     // make futures ready in backwards sequence
-    hpx::apply([&p]() { p.set_value(); });
+    hpx::post([&p]() { p.set_value(); });
     HPX_TEST(hpx::wait_all_nothrow(results));
 
     HPX_TEST_EQ(recursion_level.load(), NUM_FUTURES);

@@ -21,7 +21,7 @@ int main()
     int val = 0;
 
     test_action act;
-    hpx::apply(act, hpx::find_here(), val);
+    hpx::post(act, hpx::find_here(), val);
 
     return 0;
 }

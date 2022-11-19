@@ -43,7 +43,7 @@ namespace hpx { namespace components {
         void init(std::size_t i)
         {
             typedef server::random_mem_access::init_action init_action;
-            hpx::apply<init_action>(this->get_id(), i);
+            hpx::post<init_action>(this->get_id(), i);
         }
 
         /// Add the given number to the random_mem_access

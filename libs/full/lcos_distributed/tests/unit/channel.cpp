@@ -8,9 +8,9 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/apply.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/post.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -38,9 +38,9 @@ void calculate_sum(hpx::id_type const& loc)
     std::vector<int> s = {7, 2, 8, -9, 4, 0};
     hpx::lcos::channel<int> c(loc);
 
-    hpx::apply(sum_action(), loc,
+    hpx::post(sum_action(), loc,
         std::vector<int>(s.begin(), s.begin() + s.size() / 2), c);
-    hpx::apply(sum_action(), loc,
+    hpx::post(sum_action(), loc,
         std::vector<int>(s.begin() + s.size() / 2, s.end()), c);
 
     int x = c.get(hpx::launch::sync);    // receive from c
@@ -279,7 +279,7 @@ void channel_as_lco(hpx::id_type const& here, hpx::id_type const& there)
 {
     hpx::lcos::channel<int> lco(here);
 
-    hpx::apply_c(return42_action(), lco.get_id(), there);
+    hpx::post_c(return42_action(), lco.get_id(), there);
 
     HPX_TEST_EQ(lco.get(hpx::launch::sync), 42);
 }

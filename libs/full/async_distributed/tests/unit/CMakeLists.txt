@@ -18,8 +18,6 @@ foreach(subdir ${subdirs})
 endforeach()
 
 set(tests
-    apply_remote
-    apply_remote_client
     async_cb_remote
     async_cb_remote_client
     async_continue
@@ -27,12 +25,11 @@ set(tests
     async_remote
     async_remote_client
     async_unwrap_result
+    post_remote
+    post_remote_client
     remote_dataflow
     sync_remote
 )
-
-set(apply_remote_PARAMETERS LOCALITIES 2)
-set(apply_remote_client_PARAMETERS LOCALITIES 2)
 
 set(async_continue_PARAMETERS LOCALITIES 2)
 set(async_continue_cb_PARAMETERS LOCALITIES 2)
@@ -40,6 +37,9 @@ set(async_remote_PARAMETERS LOCALITIES 2)
 set(async_remote_client_PARAMETERS LOCALITIES 2)
 set(async_cb_remote_PARAMETERS LOCALITIES 2)
 set(async_cb_remote_client_PARAMETERS LOCALITIES 2)
+
+set(post_remote_PARAMETERS LOCALITIES 2)
+set(post_remote_client_PARAMETERS LOCALITIES 2)
 
 set(remote_dataflow_PARAMETERS THREADS_PER_LOCALITY 4)
 set(remote_dataflow_PARAMETERS LOCALITIES 2)

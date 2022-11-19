@@ -13,15 +13,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(async_headers
     hpx/async.hpp
     hpx/modules/async_distributed.hpp
-    hpx/async_distributed/applier/apply_callback.hpp
-    hpx/async_distributed/applier/apply_continue_callback.hpp
-    hpx/async_distributed/applier/apply_continue_fwd.hpp
-    hpx/async_distributed/applier/apply_continue.hpp
-    hpx/async_distributed/applier/apply.hpp
-    hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp
-    hpx/async_distributed/applier/detail/apply_implementations.hpp
-    hpx/async_distributed/applier/trigger.hpp
-    hpx/async_distributed/apply.hpp
     hpx/async_distributed/async_callback_fwd.hpp
     hpx/async_distributed/async_callback.hpp
     hpx/async_distributed/async_continue_callback_fwd.hpp
@@ -38,14 +29,23 @@ set(async_headers
     hpx/async_distributed/continuation2_impl.hpp
     hpx/async_distributed/make_continuation.hpp
     hpx/async_distributed/dataflow.hpp
+    hpx/async_distributed/detail/post_callback.hpp
+    hpx/async_distributed/detail/post_continue_callback.hpp
+    hpx/async_distributed/detail/post_continue_fwd.hpp
+    hpx/async_distributed/detail/post_continue.hpp
+    hpx/async_distributed/detail/post_implementations_fwd.hpp
+    hpx/async_distributed/detail/post_implementations.hpp
+    hpx/async_distributed/detail/post.hpp
     hpx/async_distributed/detail/async_implementations_fwd.hpp
     hpx/async_distributed/detail/async_implementations.hpp
     hpx/async_distributed/detail/async_unwrap_result_implementations_fwd.hpp
     hpx/async_distributed/detail/async_unwrap_result_implementations.hpp
     hpx/async_distributed/detail/sync_implementations_fwd.hpp
     hpx/async_distributed/detail/sync_implementations.hpp
+    hpx/async_distributed/detail/trigger.hpp
     hpx/async_distributed/lcos_fwd.hpp
     hpx/async_distributed/packaged_action.hpp
+    hpx/async_distributed/post.hpp
     hpx/async_distributed/promise.hpp
     hpx/async_distributed/put_parcel.hpp
     hpx/async_distributed/put_parcel_fwd.hpp

@@ -11,7 +11,6 @@ set(executors_headers
     hpx/executors/annotating_executor.hpp
     hpx/executors/current_executor.hpp
     hpx/executors/guided_pool_executor.hpp
-    hpx/executors/apply.hpp
     hpx/executors/async.hpp
     hpx/executors/dataflow.hpp
     hpx/executors/detail/hierarchical_spawning.hpp
@@ -28,6 +27,7 @@ set(executors_headers
     hpx/executors/limiting_executor.hpp
     hpx/executors/parallel_executor_aggregated.hpp
     hpx/executors/parallel_executor.hpp
+    hpx/executors/post.hpp
     hpx/executors/restricted_thread_pool_executor.hpp
     hpx/executors/scheduler_executor.hpp
     hpx/executors/sequenced_executor.hpp
@@ -50,6 +50,7 @@ endif()
 # Default location is $HPX_ROOT/libs/executors/include_compatibility
 # cmake-format: off
 set(executors_compat_headers
+    hpx/execution/apply.hpp => hpx/include/parallel_executors.hpp
     hpx/execution/executors.hpp => hpx/include/parallel_executors.hpp
     hpx/execution/execution_policy_fwd.hpp => hpx/execution.hpp
     hpx/execution/execution_policy.hpp => hpx/execution.hpp

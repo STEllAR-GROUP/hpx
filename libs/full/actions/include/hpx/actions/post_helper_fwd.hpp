@@ -12,7 +12,7 @@
 #include <hpx/naming_base/address.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 
-namespace hpx { namespace applier { namespace detail {
+namespace hpx { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
@@ -39,5 +39,5 @@ namespace hpx { namespace applier { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action,
         bool DirectExecute = Action::direct_execution::value>
-    struct apply_helper;
-}}}    // namespace hpx::applier::detail
+    struct post_helper;
+}}    // namespace hpx::detail

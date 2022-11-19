@@ -97,7 +97,7 @@ namespace hpx { namespace detail {
             if (hpx::detail::has_async_policy(policy))
             {
                 threads::thread_id_ref_type tid =
-                    p.apply("sync_launch_policy_dispatch<fork>", policy,
+                    p.post("sync_launch_policy_dispatch<fork>", policy,
                         policy.priority());
                 if (tid && policy == launch::fork)
                 {

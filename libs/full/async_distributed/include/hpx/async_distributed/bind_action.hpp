@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_continuation.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
+#include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/async_local/async_fwd.hpp>
 #include <hpx/datastructures/member_pack.hpp>
 #include <hpx/functional/bind.hpp>
@@ -70,18 +70,18 @@ namespace hpx {
             bound_action& operator=(bound_action const&) = delete;
 
             template <typename... Us>
-            HPX_FORCEINLINE bool apply(Us&&... vs) const
+            HPX_FORCEINLINE bool post(Us&&... vs) const
             {
-                return hpx::apply<Action>(
+                return hpx::post<Action>(
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
                         _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
 
             template <typename... Us>
-            HPX_FORCEINLINE bool apply_c(
+            HPX_FORCEINLINE bool post_c(
                 hpx::id_type const& cont, Us&&... vs) const
             {
-                return hpx::apply_c<Action>(cont,
+                return hpx::post_c<Action>(cont,
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
                         _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
@@ -89,9 +89,9 @@ namespace hpx {
             template <typename Continuation, typename... Us>
             HPX_FORCEINLINE
                 std::enable_if_t<traits::is_continuation_v<Continuation>, bool>
-                apply_c(Continuation&& cont, Us&&... vs) const
+                post_c(Continuation&& cont, Us&&... vs) const
             {
-                return hpx::apply<Action>(HPX_FORWARD(Continuation, cont),
+                return hpx::post<Action>(HPX_FORWARD(Continuation, cont),
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
                         _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }

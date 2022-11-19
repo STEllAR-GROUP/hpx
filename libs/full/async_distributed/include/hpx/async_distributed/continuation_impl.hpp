@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/async_distributed/applier/apply.hpp>
-#include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
+#include <hpx/async_distributed/detail/post.hpp>
+#include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/serialization/access.hpp>
@@ -40,7 +40,7 @@ namespace hpx { namespace actions {
         typename util::invoke_result<cont_type, hpx::id_type, T>::type
         operator()(hpx::id_type const& lco, T&& t) const
         {
-            hpx::apply_c(cont_, lco, target_, HPX_FORWARD(T, t));
+            hpx::post_c(cont_, lco, target_, HPX_FORWARD(T, t));
 
             // Unfortunately we need to default construct the return value,
             // this possibly imposes an additional restriction of return types.

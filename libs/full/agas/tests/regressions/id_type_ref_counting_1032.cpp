@@ -48,7 +48,7 @@ struct test_server1 : ComponentBase<test_server1<ComponentBase>>::type
     {
         HPX_TEST(alive);
         void (*f)(hpx::id_type) = func<ComponentBase>;
-        hpx::apply(f, other);
+        hpx::post(f, other);
         alive = false;
         other = hpx::invalid_id;
     }

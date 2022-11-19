@@ -9,8 +9,8 @@ set(tests
     all_reduce
     all_to_all
     barrier
-    broadcast_apply
     broadcast_component
+    broadcast_post
     channel_communicator
     exclusive_scan_
     fold

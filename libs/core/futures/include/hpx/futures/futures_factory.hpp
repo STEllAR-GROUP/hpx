@@ -92,7 +92,7 @@ namespace hpx { namespace lcos { namespace local {
 
         protected:
             // run in a separate thread
-            threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
+            threads::thread_id_ref_type post(threads::thread_pool_base* pool,
                 const char* annotation, launch policy, error_code& ec) override
             {
                 this->check_started();
@@ -232,7 +232,7 @@ namespace hpx { namespace lcos { namespace local {
 
         protected:
             // run in a separate thread
-            threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
+            threads::thread_id_ref_type post(threads::thread_pool_base* pool,
                 const char* annotation, launch policy, error_code& ec) override
             {
                 if (exec_)
@@ -247,7 +247,7 @@ namespace hpx { namespace lcos { namespace local {
                     return threads::invalid_thread_id;
                 }
 
-                return this->base_type::apply(pool, annotation, policy, ec);
+                return this->base_type::post(pool, annotation, policy, ec);
             }
         };
 
@@ -723,26 +723,26 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         // asynchronous execution
-        threads::thread_id_ref_type apply(
-            const char* annotation = "futures_factory::apply",
+        threads::thread_id_ref_type post(
+            const char* annotation = "futures_factory::post",
             launch policy = launch::async, error_code& ec = throws) const
         {
-            return apply(threads::detail::get_self_or_default_pool(),
-                annotation, policy, ec);
+            return post(threads::detail::get_self_or_default_pool(), annotation,
+                policy, ec);
         }
 
-        threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
-            const char* annotation = "futures_factory::apply",
+        threads::thread_id_ref_type post(threads::thread_pool_base* pool,
+            const char* annotation = "futures_factory::post",
             launch policy = launch::async, error_code& ec = throws) const
         {
             if (!task_)
             {
                 HPX_THROW_EXCEPTION(task_moved,
-                    "futures_factory<Result()>::apply()",
+                    "futures_factory<Result()>::post()",
                     "futures_factory invalid (has it been moved?)");
                 return threads::invalid_thread_id;
             }
-            return task_->apply(pool, annotation, policy, ec);
+            return task_->post(pool, annotation, policy, ec);
         }
 
         // This is the same as get_future, except that it moves the

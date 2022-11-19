@@ -45,7 +45,7 @@ namespace detail {
         hpx::parallel::execution::io_pool_executor executor;
 
         // ... and schedule the handler to run on one of its OS-threads.
-        hpx::apply(executor, &do_async_io, string_to_write, p);
+        hpx::post(executor, &do_async_io, string_to_write, p);
 
         return p->get_future();
     }

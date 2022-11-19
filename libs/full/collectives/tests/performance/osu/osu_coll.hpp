@@ -103,7 +103,7 @@ distribute_component(
             std::vector<hpx::naming::gid_type>>
             p;
         f = p.get_future();
-        p.apply(hpx::launch::async, this_loc, type, num_components);
+        p.post(hpx::launch::async, this_loc, type, num_components);
     }
 
     std::vector<hpx::future<result_type>> components_futures;
@@ -123,7 +123,7 @@ distribute_component(
                 p;
             auto f = p.get_future();
             hpx::id_type id = locs_first[0];
-            p.apply(hpx::launch::async, id, std::move(locs_first), type);
+            p.post(hpx::launch::async, id, std::move(locs_first), type);
             components_futures.push_back(std::move(f));
         }
 
@@ -133,7 +133,7 @@ distribute_component(
                 p;
             auto f = p.get_future();
             hpx::id_type id = locs_second[0];
-            p.apply(hpx::launch::async, id, std::move(locs_second), type);
+            p.post(hpx::launch::async, id, std::move(locs_second), type);
             components_futures.push_back(std::move(f));
         }
     }
@@ -198,7 +198,7 @@ inline std::vector<hpx::id_type> create_components(params const& p)
 
     for (hpx::id_type const& id : hpx::util::locality_results(res))
     {
-        //hpx::apply<typename Component::run_action>(id, p);
+        //hpx::post<typename Component::run_action>(id, p);
         components.push_back(id);
     }
 

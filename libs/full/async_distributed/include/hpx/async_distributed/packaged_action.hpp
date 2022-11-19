@@ -13,8 +13,8 @@
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
-#include <hpx/async_distributed/applier/apply_callback.hpp>
+#include <hpx/async_distributed/detail/post.hpp>
+#include <hpx/async_distributed/detail/post_callback.hpp>
 #include <hpx/async_distributed/promise.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
@@ -138,10 +138,10 @@ namespace hpx { namespace lcos {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts>
-        void do_apply(naming::address&& addr, hpx::id_type const& id,
+        void do_post(naming::address&& addr, hpx::id_type const& id,
             threads::thread_priority priority, Ts&&... vs)
         {
-            LLCO_(info).format("packaged_action::do_apply({}, {}) args({})",
+            LLCO_(info).format("packaged_action::do_post({}, {}) args({})",
                 hpx::actions::detail::get_action_name<action_type>(), id,
                 sizeof...(Ts));
 
@@ -158,7 +158,7 @@ namespace hpx { namespace lcos {
 
             if (addr)
             {
-                hpx::apply_p_cb<action_type>(
+                hpx::post_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
                         HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
                     HPX_MOVE(addr), id, priority, HPX_MOVE(f),
@@ -166,7 +166,7 @@ namespace hpx { namespace lcos {
             }
             else
             {
-                hpx::apply_p_cb<action_type>(
+                hpx::post_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
                         HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
                     id, priority, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
@@ -176,10 +176,10 @@ namespace hpx { namespace lcos {
         }
 
         template <typename... Ts>
-        void do_apply(hpx::id_type const& id, threads::thread_priority priority,
+        void do_post(hpx::id_type const& id, threads::thread_priority priority,
             Ts&&... vs)
         {
-            LLCO_(info).format("packaged_action::do_apply({}, {}) args({})",
+            LLCO_(info).format("packaged_action::do_post({}, {}) args({})",
                 hpx::actions::detail::get_action_name<action_type>(), id,
                 sizeof...(Ts));
 
@@ -195,7 +195,7 @@ namespace hpx { namespace lcos {
             hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
-            hpx::apply_p_cb<action_type>(
+            hpx::post_p_cb<action_type>(
                 actions::typed_continuation<Result, remote_result_type>(
                     HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
                 id, priority, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
@@ -204,10 +204,10 @@ namespace hpx { namespace lcos {
         }
 
         template <typename Callback, typename... Ts>
-        void do_apply_cb(naming::address&& addr, hpx::id_type const& id,
+        void do_post_cb(naming::address&& addr, hpx::id_type const& id,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
-            LLCO_(info).format("packaged_action::do_apply_cb({}, {}) args({})",
+            LLCO_(info).format("packaged_action::do_post_cb({}, {}) args({})",
                 hpx::actions::detail::get_action_name<action_type>(), id,
                 sizeof...(Ts));
 
@@ -227,7 +227,7 @@ namespace hpx { namespace lcos {
 
             if (addr)
             {
-                hpx::apply_p_cb<action_type>(
+                hpx::post_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
                         HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
                     HPX_MOVE(addr), id, priority, HPX_MOVE(f),
@@ -235,7 +235,7 @@ namespace hpx { namespace lcos {
             }
             else
             {
-                hpx::apply_p_cb<action_type>(
+                hpx::post_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
                         HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
                     id, priority, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
@@ -245,10 +245,10 @@ namespace hpx { namespace lcos {
         }
 
         template <typename Callback, typename... Ts>
-        void do_apply_cb(hpx::id_type const& id,
+        void do_post_cb(hpx::id_type const& id,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
-            LLCO_(info).format("packaged_action::do_apply_cb({}, {}) args({})",
+            LLCO_(info).format("packaged_action::do_post_cb({}, {}) args({})",
                 hpx::actions::detail::get_action_name<action_type>(), id,
                 sizeof...(Ts));
 
@@ -266,7 +266,7 @@ namespace hpx { namespace lcos {
             hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
-            hpx::apply_p_cb<action_type>(
+            hpx::post_p_cb<action_type>(
                 actions::typed_continuation<Result, remote_result_type>(
                     HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
                 id, priority, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
@@ -276,7 +276,7 @@ namespace hpx { namespace lcos {
 
     public:
         // Construct a (non-functional) instance of an \a packaged_action. To
-        // use this instance its member function \a apply needs to be directly
+        // use this instance its member function \a post needs to be directly
         // called.
         packaged_action()
           : base_type(std::allocator_arg, hpx::util::internal_allocator<>{})
@@ -290,73 +290,72 @@ namespace hpx { namespace lcos {
         }
 
         template <typename... Ts>
-        void apply(hpx::id_type const& id, Ts&&... vs)
+        void post(hpx::id_type const& id, Ts&&... vs)
         {
-            do_apply(id, actions::action_priority<action_type>(),
+            do_post(id, actions::action_priority<action_type>(),
                 HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
-        void apply(naming::address&& addr, hpx::id_type const& id, Ts&&... vs)
+        void post(naming::address&& addr, hpx::id_type const& id, Ts&&... vs)
         {
-            do_apply(HPX_MOVE(addr), id,
-                actions::action_priority<action_type>(),
+            do_post(HPX_MOVE(addr), id, actions::action_priority<action_type>(),
                 HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
-        void apply_cb(hpx::id_type const& id, Callback&& cb, Ts&&... vs)
+        void post_cb(hpx::id_type const& id, Callback&& cb, Ts&&... vs)
         {
-            do_apply_cb(id, actions::action_priority<action_type>(),
+            do_post_cb(id, actions::action_priority<action_type>(),
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
-        void apply_cb(naming::address&& addr, hpx::id_type const& id,
+        void post_cb(naming::address&& addr, hpx::id_type const& id,
             Callback&& cb, Ts&&... vs)
         {
-            do_apply_cb(HPX_MOVE(addr), id,
+            do_post_cb(HPX_MOVE(addr), id,
                 actions::action_priority<action_type>(),
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
-        void apply_p(hpx::id_type const& id, threads::thread_priority priority,
+        void post_p(hpx::id_type const& id, threads::thread_priority priority,
             Ts&&... vs)
         {
-            do_apply(id, priority, HPX_FORWARD(Ts, vs)...);
+            do_post(id, priority, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
-        void apply_p(naming::address&& addr, hpx::id_type const& id,
+        void post_p(naming::address&& addr, hpx::id_type const& id,
             threads::thread_priority priority, Ts&&... vs)
         {
-            do_apply(HPX_MOVE(addr), id, priority, HPX_FORWARD(Ts, vs)...);
+            do_post(HPX_MOVE(addr), id, priority, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
-        void apply_p_cb(hpx::id_type const& id,
+        void post_p_cb(hpx::id_type const& id,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
-            do_apply_cb(id, priority, HPX_FORWARD(Callback, cb),
+            do_post_cb(id, priority, HPX_FORWARD(Callback, cb),
                 HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
-        void apply_p_cb(naming::address&& addr, hpx::id_type const& id,
+        void post_p_cb(naming::address&& addr, hpx::id_type const& id,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
         {
-            do_apply_cb(HPX_MOVE(addr), id, priority, HPX_FORWARD(Callback, cb),
+            do_post_cb(HPX_MOVE(addr), id, priority, HPX_FORWARD(Callback, cb),
                 HPX_FORWARD(Ts, vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts>
-        void apply_deferred(
+        void post_deferred(
             naming::address&& addr, hpx::id_type const& id, Ts&&... vs)
         {
             LLCO_(info).format(
-                "packaged_action::apply_deferred({}, {}) args({})",
+                "packaged_action::post_deferred({}, {}) args({})",
                 hpx::actions::detail::get_action_name<action_type>(), id,
                 sizeof...(Ts));
 
@@ -371,7 +370,7 @@ namespace hpx { namespace lcos {
             hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
-            auto fut = hpx::functional::apply_c_p_cb<action_type>(cont_id,
+            auto fut = hpx::functional::post_c_p_cb<action_type>(cont_id,
                 HPX_MOVE(addr), id, actions::action_priority<action_type>(),
                 HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
 
@@ -379,11 +378,11 @@ namespace hpx { namespace lcos {
         }
 
         template <typename Callback, typename... Ts>
-        void apply_deferred_cb(naming::address&& addr, hpx::id_type const& id,
+        void post_deferred_cb(naming::address&& addr, hpx::id_type const& id,
             Callback&& cb, Ts&&... vs)
         {
             LLCO_(info).format(
-                "packaged_action::apply_deferred({}, {}) args({})",
+                "packaged_action::post_deferred({}, {}) args({})",
                 hpx::actions::detail::get_action_name<action_type>(), id,
                 sizeof...(Ts));
 
@@ -400,7 +399,7 @@ namespace hpx { namespace lcos {
             hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
-            auto fut = hpx::functional::apply_c_p_cb<action_type>(cont_id,
+            auto fut = hpx::functional::post_c_p_cb<action_type>(cont_id,
                 HPX_MOVE(addr), id, actions::action_priority<action_type>(),
                 HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
 
@@ -418,7 +417,7 @@ namespace hpx { namespace lcos {
 
     public:
         /// Construct a (non-functional) instance of an \a packaged_action. To
-        /// use this instance its member function \a apply needs to be directly
+        /// use this instance its member function \a post needs to be directly
         /// called.
         packaged_action()
           : packaged_action<Action, Result, false>(
@@ -434,7 +433,7 @@ namespace hpx { namespace lcos {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts>
-        void apply(hpx::id_type const& id, Ts&&... vs)
+        void post(hpx::id_type const& id, Ts&&... vs)
         {
             std::pair<bool, components::pinned_ptr> r;
 
@@ -473,12 +472,12 @@ namespace hpx { namespace lcos {
             }
 
             // remote execution
-            this->do_apply(id, actions::action_priority<action_type>(),
+            this->do_post(id, actions::action_priority<action_type>(),
                 HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
-        void apply(naming::address&& addr, hpx::id_type const& id, Ts&&... vs)
+        void post(naming::address&& addr, hpx::id_type const& id, Ts&&... vs)
         {
             std::pair<bool, components::pinned_ptr> r;
 
@@ -517,13 +516,13 @@ namespace hpx { namespace lcos {
             }
 
             // remote execution
-            this->do_apply(HPX_MOVE(addr), id,
+            this->do_post(HPX_MOVE(addr), id,
                 actions::action_priority<action_type>(),
                 HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
-        void apply_cb(hpx::id_type const& id, Callback&& cb, Ts&&... vs)
+        void post_cb(hpx::id_type const& id, Callback&& cb, Ts&&... vs)
         {
             std::pair<bool, components::pinned_ptr> r;
 
@@ -577,12 +576,12 @@ namespace hpx { namespace lcos {
             }
 
             // remote execution
-            this->do_apply_cb(id, actions::action_priority<action_type>(),
+            this->do_post_cb(id, actions::action_priority<action_type>(),
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
-        void apply_cb(naming::address&& addr, hpx::id_type const& id,
+        void post_cb(naming::address&& addr, hpx::id_type const& id,
             Callback&& cb, Ts&&... vs)
         {
             std::pair<bool, components::pinned_ptr> r;
@@ -636,7 +635,7 @@ namespace hpx { namespace lcos {
             }
 
             // remote execution
-            this->do_apply_cb(HPX_MOVE(addr), id,
+            this->do_post_cb(HPX_MOVE(addr), id,
                 actions::action_priority<action_type>(),
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }

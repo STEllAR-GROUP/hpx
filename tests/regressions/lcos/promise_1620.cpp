@@ -53,7 +53,7 @@ void test_leak()
         {
             hpx::distributed::promise<test> p;
             f = p.get_future();
-            hpx::apply_c<call_action>(p.get_id(), hpx::find_here());
+            hpx::post_c<call_action>(p.get_id(), hpx::find_here());
         }
 
         test t = f.get();

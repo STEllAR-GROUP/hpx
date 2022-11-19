@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/apply.hpp>
+#include <hpx/async_base/post.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
@@ -19,16 +19,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
-    // Define apply() overloads for plain local functions and function objects.
-    // dispatching trait for hpx::apply
+    // Define post() overloads for plain local functions and function objects.
+    // dispatching trait for hpx::post
 
     // launch a plain function/function object
     template <typename Func, typename Enable>
-    struct apply_dispatch
+    struct post_dispatch
     {
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            traits::detail::is_deferred_invocable<F, Ts...>::value, bool>::type
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::detail::is_deferred_invocable<F, Ts...>::value, bool>
         call(F&& f, Ts&&... ts)
         {
             execution::parallel_executor exec;
@@ -38,15 +38,15 @@ namespace hpx { namespace detail {
         }
     };
 
-    // The overload for hpx::apply taking an executor simply forwards to the
+    // The overload for hpx::post taking an executor simply forwards to the
     // corresponding executor customization point.
     //
     // parallel::execution::executor
     // threads::executor
     template <typename Executor>
-    struct apply_dispatch<Executor,
-        typename std::enable_if<traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value>::type>
+    struct post_dispatch<Executor,
+        std::enable_if_t<traits::is_one_way_executor<Executor>::value ||
+            traits::is_two_way_executor<Executor>::value>>
     {
         template <typename Executor_, typename F, typename... Ts>
         HPX_FORCEINLINE static decltype(auto) call(

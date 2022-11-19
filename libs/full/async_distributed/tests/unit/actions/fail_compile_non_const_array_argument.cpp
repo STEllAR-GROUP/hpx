@@ -21,7 +21,7 @@ int main()
     int arr[20] = {0};
 
     test_action act;
-    hpx::apply(act, hpx::find_here(), arr);
+    hpx::post(act, hpx::find_here(), arr);
 
     return 0;
 }

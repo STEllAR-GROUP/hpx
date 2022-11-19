@@ -2026,7 +2026,7 @@ namespace hpx { namespace agas {
             for (requests_type::iterator it = requests.begin(); it != end; ++it)
             {
                 server::primary_namespace::decrement_credit_action action;
-                hpx::apply(action, HPX_MOVE(it->first), HPX_MOVE(it->second));
+                hpx::post(action, HPX_MOVE(it->first), HPX_MOVE(it->second));
             }
 
             if (&ec != &throws)

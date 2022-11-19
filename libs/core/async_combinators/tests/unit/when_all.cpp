@@ -34,7 +34,7 @@ void test_when_all_from_list()
     {
         hpx::lcos::local::futures_factory<int()> task(make_int_slowly);
         futures.push_back(task.get_future());
-        task.apply();
+        task.post();
     }
 
     auto r = hpx::when_all(futures);
@@ -56,7 +56,7 @@ void test_when_all_from_list_iterators()
     {
         hpx::lcos::local::futures_factory<int()> task(make_int_slowly);
         futures.push_back(task.get_future());
-        task.apply();
+        task.post();
     }
 
     auto r = hpx::when_all(futures.begin(), futures.end());
@@ -73,7 +73,7 @@ void test_when_all_one_future()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::future<int> f1 = pt1.get_future();
-    pt1.apply();
+    pt1.post();
 
     typedef hpx::tuple<hpx::future<int>> result_type;
     hpx::future<result_type> r = hpx::when_all(f1);
@@ -89,10 +89,10 @@ void test_when_all_two_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::future<int> f1 = pt1.get_future();
-    pt1.apply();
+    pt1.post();
     hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::future<int> f2 = pt2.get_future();
-    pt2.apply();
+    pt2.post();
 
     typedef hpx::tuple<hpx::future<int>, hpx::future<int>> result_type;
     hpx::future<result_type> r = hpx::when_all(f1, f2);
@@ -110,13 +110,13 @@ void test_when_all_three_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::future<int> f1 = pt1.get_future();
-    pt1.apply();
+    pt1.post();
     hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::future<int> f2 = pt2.get_future();
-    pt2.apply();
+    pt2.post();
     hpx::lcos::local::futures_factory<int()> pt3(make_int_slowly);
     hpx::future<int> f3 = pt3.get_future();
-    pt3.apply();
+    pt3.post();
 
     typedef hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>>
         result_type;
@@ -137,16 +137,16 @@ void test_when_all_four_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::future<int> f1 = pt1.get_future();
-    pt1.apply();
+    pt1.post();
     hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::future<int> f2 = pt2.get_future();
-    pt2.apply();
+    pt2.post();
     hpx::lcos::local::futures_factory<int()> pt3(make_int_slowly);
     hpx::future<int> f3 = pt3.get_future();
-    pt3.apply();
+    pt3.post();
     hpx::lcos::local::futures_factory<int()> pt4(make_int_slowly);
     hpx::future<int> f4 = pt4.get_future();
-    pt4.apply();
+    pt4.post();
 
     typedef hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>,
         hpx::future<int>>
@@ -170,19 +170,19 @@ void test_when_all_five_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::future<int> f1 = pt1.get_future();
-    pt1.apply();
+    pt1.post();
     hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::future<int> f2 = pt2.get_future();
-    pt2.apply();
+    pt2.post();
     hpx::lcos::local::futures_factory<int()> pt3(make_int_slowly);
     hpx::future<int> f3 = pt3.get_future();
-    pt3.apply();
+    pt3.post();
     hpx::lcos::local::futures_factory<int()> pt4(make_int_slowly);
     hpx::future<int> f4 = pt4.get_future();
-    pt4.apply();
+    pt4.post();
     hpx::lcos::local::futures_factory<int()> pt5(make_int_slowly);
     hpx::future<int> f5 = pt5.get_future();
-    pt5.apply();
+    pt5.post();
 
     typedef hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>,
         hpx::future<int>, hpx::future<int>>
@@ -208,7 +208,7 @@ void test_when_all_late_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::future<int> f1 = pt1.get_future();
-    pt1.apply();
+    pt1.post();
     hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::future<int> f2 = pt2.get_future();
 
@@ -218,7 +218,7 @@ void test_when_all_late_futures()
     HPX_TEST(!f1.valid());
     HPX_TEST(!f2.valid());
 
-    pt2.apply();
+    pt2.post();
 
     result_type result = r.get();
 

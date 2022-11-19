@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,5 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/apply.hpp>
-#include <hpx/executors/apply.hpp>
+#include <hpx/async_local/post.hpp>
+
+#include <hpx/async_colocated/post_colocated.hpp>
+#include <hpx/async_colocated/post_colocated_callback.hpp>
+#include <hpx/async_distributed/post.hpp>

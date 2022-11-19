@@ -197,7 +197,7 @@ int main()
 
         // We can't wait for futures on the main thread, so we spawn a thread to
         // run the tests for us.
-        hpx::apply(exec, &test_thread_pool_os_executor, exec);
+        hpx::post(exec, &test_thread_pool_os_executor, exec);
 
         // Stop the pool.
         pool.stop(l, true);

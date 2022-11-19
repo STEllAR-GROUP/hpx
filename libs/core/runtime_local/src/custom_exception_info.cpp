@@ -190,7 +190,7 @@ namespace hpx { namespace util {
 
         error_code ec(throwmode::lightweight);
         threads::thread_id_ref_type tid =
-            p.apply("hpx::util::trace_on_new_stack",
+            p.post("hpx::util::trace_on_new_stack",
                 launch::fork_policy(threads::thread_priority::default_,
                     threads::thread_stacksize::medium),
                 ec);

@@ -70,7 +70,7 @@ int hpx_main()
     for (int i = 0; i < 1000; ++i)
     {
         yielder y;
-        hpx::apply([y = std::move(y)]() {});
+        hpx::post([y = std::move(y)]() {});
     }
 
     return hpx::local::finalize();

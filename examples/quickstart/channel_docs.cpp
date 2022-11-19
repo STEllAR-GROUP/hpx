@@ -10,8 +10,8 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/apply.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/post.hpp>
 #include <hpx/iostream.hpp>
 
 #include <numeric>
@@ -37,7 +37,7 @@ void channel()
     hpx::lcos::channel<double> c(hpx::find_here());
 
     // pass the channel to a (possibly remote invoked) action
-    hpx::apply(channel_sender_action(), hpx::find_here(), c);
+    hpx::post(channel_sender_action(), hpx::find_here(), c);
 
     // send some values to the receiver
     std::vector<double> v = {1.2, 3.4, 5.0};

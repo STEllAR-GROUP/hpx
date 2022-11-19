@@ -34,7 +34,7 @@ int main()
     HPX_ASSERT(f5.is_ready());
 
     // Fire-and-forget
-    hpx::apply([]() {
+    hpx::post([]() {
         std::cout << "This will be printed later\n" << std::flush;
     });
 

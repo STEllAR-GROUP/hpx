@@ -224,7 +224,7 @@ There are a few different ways of invoking actions:
   care about the result of an action, we can invoke the action using
   fire-and-forget semantics. This means that once we have asked |hpx| to compute
   the action, we forget about it completely and continue with our computation.
-  We use :cpp:func:`hpx::apply` to invoke an action in a non-blocking fashion.
+  We use :cpp:func:`hpx::post` to invoke an action in a non-blocking fashion.
 
 .. literalinclude:: ../../examples/accumulators/accumulator.hpp
    :language: c++

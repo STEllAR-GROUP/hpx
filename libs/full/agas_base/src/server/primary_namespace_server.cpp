@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/continuation.hpp>
+#include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/format.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>

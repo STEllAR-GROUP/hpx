@@ -33,7 +33,7 @@ void test_wait_for_all_from_array()
     {
         hpx::lcos::local::futures_factory<int()> task(make_int_slowly);
         futures[j] = task.get_future();
-        task.apply();
+        task.post();
     }
 
     hpx::future<std::array<hpx::future<int>, 10>> r = hpx::when_all(futures);

@@ -482,13 +482,13 @@ void test_when_each_late_future()
     hpx::lcos::local::futures_factory<unsigned()> pt3(make_unsigned_slowly<1>);
 
     hpx::future<unsigned> f1 = pt0.get_future();
-    pt0.apply();
+    pt0.post();
     hpx::future<unsigned> f2 = pt1.get_future();
 
     hpx::future<void> r =
         hpx::when_each(callback, std::move(f1), std::move(f2));
 
-    pt1.apply();
+    pt1.post();
 
     r.get();
 
@@ -496,13 +496,13 @@ void test_when_each_late_future()
     HPX_TEST(!f2.valid());    // NOLINT
 
     hpx::future<unsigned> g1 = pt2.get_future();
-    pt2.apply();
+    pt2.post();
     hpx::future<unsigned> g2 = pt3.get_future();
 
     hpx::future<void> rwi =
         hpx::when_each(callback_with_index, std::move(g1), std::move(g2));
 
-    pt3.apply();
+    pt3.post();
 
     rwi.get();
 

@@ -41,9 +41,3 @@ namespace hpx { namespace detail {
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         hpx::id_type const& gid, Callback&& cb, Ts&&... vs);
 }}    // namespace hpx::detail
-
-#if defined(HPX_HAVE_COLOCATED_BACKWARDS_COMPATIBILITY)
-namespace hpx {
-    using hpx::detail::async_colocated_cb;
-}
-#endif

@@ -23,9 +23,9 @@ using hpx::program_options::options_description;
 using hpx::program_options::value;
 using hpx::program_options::variables_map;
 
-using hpx::apply;
 using hpx::async;
 using hpx::future;
+using hpx::post;
 
 using hpx::chrono::high_resolution_timer;
 

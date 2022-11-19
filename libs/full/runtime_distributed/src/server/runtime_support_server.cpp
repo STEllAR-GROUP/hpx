@@ -178,14 +178,13 @@ namespace hpx { namespace components { namespace server {
             {
                 // execute locally, action is executed immediately as it is
                 // a direct_action
-                hpx::applier::detail::apply_l<action_type>(
-                    respond_to, HPX_MOVE(addr));
+                hpx::detail::post_l<action_type>(respond_to, HPX_MOVE(addr));
             }
 #if defined(HPX_HAVE_NETWORKING)
             else
             {
                 // apply remotely, parcel is sent synchronously
-                hpx::applier::detail::apply_r_sync<action_type>(
+                hpx::detail::post_r_sync<action_type>(
                     HPX_MOVE(addr), respond_to);
             }
 #endif
@@ -265,7 +264,7 @@ namespace hpx { namespace components { namespace server {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         hpx::id_type id(naming::get_id_from_locality_id(target_locality_id));
-        apply<dijkstra_termination_action>(
+        hpx::post<dijkstra_termination_action>(
             id, initiating_locality_id, num_localities, dijkstra_token);
 #else
         HPX_ASSERT(false);
@@ -682,7 +681,7 @@ namespace hpx { namespace components { namespace server {
                     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
                         // apply remotely, parcel is sent synchronously
-                        hpx::applier::detail::apply_r_sync<action_type>(
+                        hpx::detail::post_r_sync<action_type>(
                             HPX_MOVE(addr), respond_to);
 #else
                         HPX_ASSERT(false);
@@ -866,7 +865,7 @@ namespace hpx { namespace components { namespace server {
         void operator()(Ts&&... /* vs */)
         {
             // This needs to be run on a HPX thread
-            hpx::apply(HPX_MOVE(*pt));
+            hpx::post(HPX_MOVE(*pt));
             pt.reset();
         }
 
@@ -898,7 +897,7 @@ namespace hpx { namespace components { namespace server {
 
             indirect_packaged_task ipt;
             callbacks.push_back(ipt.get_future());
-            apply_cb(
+            hpx::post_cb(
                 act, id, HPX_MOVE(ipt), agas::get_locality(), rtd->endpoints());
         }
 
@@ -926,7 +925,7 @@ namespace hpx { namespace components { namespace server {
 
         // handle console separately
         id_type id = naming::get_id_from_locality_id(0);
-        apply_cb(
+        hpx::post_cb(
             act, id, HPX_MOVE(ipt), agas::get_locality(), rtd->endpoints());
 
         callback.wait();

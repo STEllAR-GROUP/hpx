@@ -4,8 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/async_local/apply.hpp>
 #include <hpx/async_local/async.hpp>
+#include <hpx/async_local/post.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/thread_pool_util/thread_pool_suspension_helpers.hpp>
@@ -61,7 +61,7 @@ namespace hpx { namespace threads {
 
         if (threads::get_self_ptr())
         {
-            hpx::apply(HPX_MOVE(resume_direct_wrapper));
+            hpx::post(HPX_MOVE(resume_direct_wrapper));
         }
         else
         {
@@ -132,7 +132,7 @@ namespace hpx { namespace threads {
                     "processing units from itself (no thread stealing)");
             }
 
-            hpx::apply(HPX_MOVE(suspend_direct_wrapper));
+            hpx::post(HPX_MOVE(suspend_direct_wrapper));
         }
         else
         {
@@ -165,7 +165,7 @@ namespace hpx { namespace threads {
 
         if (threads::get_self_ptr())
         {
-            hpx::apply(HPX_MOVE(resume_direct_wrapper));
+            hpx::post(HPX_MOVE(resume_direct_wrapper));
         }
         else
         {
@@ -211,7 +211,7 @@ namespace hpx { namespace threads {
 
         if (threads::get_self_ptr())
         {
-            hpx::apply(HPX_MOVE(suspend_direct_wrapper));
+            hpx::post(HPX_MOVE(suspend_direct_wrapper));
         }
         else
         {
