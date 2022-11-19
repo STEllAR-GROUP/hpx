@@ -83,24 +83,19 @@ namespace hpx { namespace lcos {
 
         void set_event() override
         {
-            set_event_nonvirt(std::is_default_constructible<RemoteResult>());
-        }
-
-        void set_event_nonvirt(std::false_type)
-        {
-            // this shouldn't ever be called
-            HPX_THROW_EXCEPTION(invalid_status,
-                "base_lco_with_value::set_event_nonvirt",
-                "attempt to use a non-default-constructible return type "
-                "with "
-                "an action in a context where default-construction would "
-                "be "
-                "required");
-        }
-
-        void set_event_nonvirt(std::true_type)
-        {
-            set_value(RemoteResult());
+            if constexpr (std::is_default_constructible_v<RemoteResult>)
+            {
+                set_value(RemoteResult());
+            }
+            else
+            {
+                // this shouldn't ever be called
+                HPX_THROW_EXCEPTION(invalid_status,
+                    "base_lco_with_value::set_event_nonvirt",
+                    "attempt to use a non-default-constructible return type "
+                    "with an action in a context where default-construction "
+                    "would be required");
+            }
         }
 
         virtual void set_value(RemoteResult&& result) = 0;

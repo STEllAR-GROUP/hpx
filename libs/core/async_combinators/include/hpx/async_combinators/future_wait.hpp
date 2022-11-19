@@ -65,38 +65,6 @@ namespace hpx { namespace lcos {
                 }
             }
 
-            template <typename Index>
-            void on_future_ready(
-                std::false_type, Index i, hpx::execution_base::agent_ref ctx)
-            {
-                if (lazy_values_[i].has_value())
-                {
-                    if (success_counter_)
-                        ++*success_counter_;
-                    // invoke callback function
-                    f_(i, lazy_values_[i].get());
-                }
-
-                // keep track of ready futures
-                on_future_ready_(ctx);
-            }
-
-            template <typename Index>
-            void on_future_ready(
-                std::true_type, Index i, hpx::execution_base::agent_ref ctx)
-            {
-                if (lazy_values_[i].has_value())
-                {
-                    if (success_counter_)
-                        ++*success_counter_;
-                    // invoke callback function
-                    f_(i);
-                }
-
-                // keep track of ready futures
-                on_future_ready_(ctx);
-            }
-
         public:
             using argument_type = std::vector<Future>;
 
@@ -169,9 +137,27 @@ namespace hpx { namespace lcos {
                     current->execute_deferred();
                     current->set_on_completed(
                         [HPX_CXX20_CAPTURE_THIS(=)]() -> void {
-                            using is_void = std::is_void<
-                                typename traits::future_traits<Future>::type>;
-                            return on_future_ready(is_void{}, i, ctx);
+                            constexpr bool is_void =
+                                std::is_void_v<traits::future_traits_t<Future>>;
+
+                            if (lazy_values_[i].has_value())
+                            {
+                                if (success_counter_)
+                                    ++*success_counter_;
+
+                                // invoke callback function
+                                if constexpr (is_void)
+                                {
+                                    f_(i);
+                                }
+                                else
+                                {
+                                    f_(i, lazy_values_[i].get());
+                                }
+                            }
+
+                            // keep track of ready futures
+                            on_future_ready_(ctx);
                         });
                 }
 
