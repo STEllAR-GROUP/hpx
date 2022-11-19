@@ -12,7 +12,7 @@
 #include <hpx/runtime_configuration/component_factory_base.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 
-#include <hpx/components/performance_counters/memory/mem_counter.hpp>
+#include <hpx/components/performance_counters/memory_counters/mem_counter.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality, We register the module dynamically

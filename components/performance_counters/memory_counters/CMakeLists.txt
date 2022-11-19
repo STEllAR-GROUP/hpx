@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2022 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,18 +14,20 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 endif()
 
 set(HPX_COMPONENTS
-    ${HPX_COMPONENTS} memory
+    ${HPX_COMPONENTS} memory_counters
     CACHE INTERNAL "list of HPX components"
 )
 
-set(memory_headers hpx/components/performance_counters/memory/mem_counter.hpp)
+set(memory_headers
+    hpx/components/performance_counters/memory_counters/mem_counter.hpp
+)
 
 set(memory_sources mem_counter_linux.cpp mem_counter_macosx.cpp
                    mem_counter_windows.cpp memory.cpp
 )
 
 add_hpx_component(
-  memory INTERNAL_FLAGS
+  memory_counters INTERNAL_FLAGS
   FOLDER "Core/Components/Counters"
   INSTALL_HEADERS PLUGIN PREPEND_HEADER_ROOT
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -36,7 +38,7 @@ add_hpx_component(
 )
 
 add_hpx_pseudo_dependencies(
-  components.performance_counters.memory memory_component
+  components.performance_counters.memory_counters memory_counters_component
 )
 
 add_subdirectory(tests)

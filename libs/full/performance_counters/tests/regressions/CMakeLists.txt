@@ -9,7 +9,7 @@ set(tests discover_counters_1787 statistics_2666 uptime_1737)
 
 if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
   set(tests ${tests} dynamic_counters_loaded_1508)
-  set(dynamic_counters_loaded_1508_FLAGS DEPENDENCIES memory_component)
+  set(dynamic_counters_loaded_1508_FLAGS DEPENDENCIES memory_counters_component)
 endif()
 
 foreach(test ${tests})
