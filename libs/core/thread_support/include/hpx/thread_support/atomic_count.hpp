@@ -18,7 +18,7 @@ namespace hpx { namespace util {
         HPX_NON_COPYABLE(atomic_count);
 
     public:
-        explicit atomic_count(long value) noexcept
+        constexpr explicit atomic_count(long value) noexcept
           : value_(value)
         {
         }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2015 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,4 +18,12 @@
 #define HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE HPX_DEVICE static const
 #else
 #define HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE inline constexpr
+#endif
+
+/// This macro evaluates to ``constexpr`` for host code and expands nothing for
+/// NVCC
+#if defined(__NVCC__)
+#define HPX_HOST_DEVICE_CONSTEXPR
+#else
+#define HPX_HOST_DEVICE_CONSTEXPR constexpr
 #endif
