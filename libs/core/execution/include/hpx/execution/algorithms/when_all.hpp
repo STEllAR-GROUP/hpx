@@ -207,7 +207,7 @@ namespace hpx::execution::experimental {
                     error_types_of_t<Senders, Env, Variant>...,
                     Variant<std::exception_ptr>>;
 
-                static constexpr bool sends_stopped = false;
+                static constexpr bool sends_stopped = true;
             };
 
             template <typename Env>

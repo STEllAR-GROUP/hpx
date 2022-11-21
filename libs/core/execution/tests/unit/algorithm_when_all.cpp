@@ -46,7 +46,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
@@ -66,7 +66,7 @@ int main()
         check_value_types<hpx::variant<hpx::tuple<int, std::string, double>>>(
             s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](int x, std::string y, double z) {
             HPX_TEST_EQ(x, 42);
@@ -89,7 +89,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<std::string, double>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](std::string y, double z) {
             HPX_TEST_EQ(y, std::string("hello"));
@@ -110,7 +110,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<int, double>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](int x, double z) {
             HPX_TEST_EQ(x, 42);
@@ -131,7 +131,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = []() {};
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
@@ -150,7 +150,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<int, std::string>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](int x, std::string y) {
             HPX_TEST_EQ(x, 42);
@@ -172,7 +172,7 @@ int main()
         check_value_types<hpx::variant<hpx::tuple<int, std::string, double>>>(
             s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](int x, std::string y, double z) {
             HPX_TEST_EQ(x, 42);
@@ -196,7 +196,7 @@ int main()
         check_value_types<hpx::variant<hpx::tuple<int, std::string, double>>>(
             s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](int x, std::string y, double z) {
             HPX_TEST_EQ(x, 42);
@@ -220,7 +220,7 @@ int main()
         check_value_types<hpx::variant<hpx::tuple<int, std::string, double>>>(
             s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](int x, std::string y, double z) {
             HPX_TEST_EQ(x, 42);
@@ -244,7 +244,7 @@ int main()
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
@@ -264,7 +264,7 @@ int main()
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
@@ -284,7 +284,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<decltype(f)>{f, receiver_set_value_called};
@@ -304,7 +304,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<double>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto r = error_callback_receiver<check_exception_ptr>{
             check_exception_ptr{}, set_error_called};
@@ -322,7 +322,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<int, double>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto r = error_callback_receiver<check_exception_ptr>{
             check_exception_ptr{}, set_error_called};
@@ -340,7 +340,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<double, int>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto r = error_callback_receiver<check_exception_ptr>{
             check_exception_ptr{}, set_error_called};
@@ -366,7 +366,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
@@ -395,7 +395,7 @@ int main()
         check_value_types<
             hpx::variant<hpx::tuple<hpx::tuple<int, std::string, double>>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](hpx::tuple<int, std::string, double> t) {
             HPX_TEST_EQ(t.get<0>(), 42);
@@ -427,7 +427,7 @@ int main()
         check_value_types<
             hpx::variant<hpx::tuple<hpx::tuple<std::string, double>>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](hpx::tuple<std::string, double> t) {
             HPX_TEST_EQ(t.get<0>(), std::string("hello"));
@@ -457,7 +457,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<hpx::tuple<int, double>>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-        check_sends_stopped<false>(s);
+        check_sends_stopped<true>(s);
 
         auto f = [](hpx::tuple<int, double> t) {
             HPX_TEST_EQ(t.get<0>(), 42);

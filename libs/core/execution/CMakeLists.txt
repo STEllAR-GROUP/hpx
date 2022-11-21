@@ -31,6 +31,7 @@ set(execution_headers
     hpx/execution/algorithms/transfer.hpp
     hpx/execution/algorithms/transfer_just.hpp
     hpx/execution/algorithms/when_all.hpp
+    hpx/execution/algorithms/when_all_vector.hpp
     hpx/execution/detail/async_launch_policy_dispatch.hpp
     hpx/execution/detail/execution_parameter_callbacks.hpp
     hpx/execution/detail/future_exec.hpp
