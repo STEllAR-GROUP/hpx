@@ -57,8 +57,8 @@ namespace hpx { namespace sycl { namespace experimental {
                 add_event_callback(
                     [fdp = hpx::intrusive_ptr<future_data>(this)]() {
                         fdp->set_data(hpx::util::unused);
-                        // TODO(daissgr) Future work considerations: exception handling in here?
-                        // Technically SYCL has synchronous error handling (exceptions..) in kernel
+                        // TODO Future work considerations: exception handling in here?
+                        // Technically SYCL has asynchronous error handling (exceptions...) in kernel
                         // code but only if it is running on host code (which we are not interested in as of now)
                     },
                     command_event);

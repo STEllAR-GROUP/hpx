@@ -33,7 +33,7 @@ namespace hpx { namespace sycl { namespace experimental {
         {
         }
 
-        // TODO Do we need more constructors?
+        // TODO Future work: Add more constructors as needed (in case we need different queue constructors)
         // -------------------------------------------------------------------------
         // Queue will be cleaned up by its own destructor
         ~sycl_executor() {}
@@ -153,7 +153,7 @@ namespace hpx { namespace sycl { namespace experimental {
         cl::sycl::device get_device() const {
           return command_queue.get_device();
         }
-        // TODO Any other non-event member methods of the sycl::queue that we should map? 
+        // TODO Future work: Check if we want to expose any other (non-event) queue methods
       protected:
         cl::sycl::queue command_queue;
 
