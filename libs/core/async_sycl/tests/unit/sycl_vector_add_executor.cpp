@@ -40,6 +40,9 @@ void VectorAdd_test1(const std::vector<size_t>& a_vector,
         // Create executor
         hpx::sycl::experimental::sycl_executor exec(
             cl::sycl::default_selector{});
+        std::cout << "Running on device: "
+                  << exec.get_device().get_info<cl::sycl::info::device::name>()
+                  << std::endl;
         // use async_execute
         auto async_normal_fut = exec.async_execute(
             &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
@@ -61,14 +64,13 @@ void VectorAdd_test1(const std::vector<size_t>& a_vector,
         {
             std::cerr
                 << "ERROR: Async kernel launch future is immediately ready "
-                   "[normal mode] "
                 << "(thus probably not asynchronous at at all)!" << std::endl;
             std::terminate();
         }
         else
         {
             std::cout << "OKAY: Kernel hpx::future is NOT ready immediately "
-                         "after launch [normal mode]!"
+                         "after launch!"
                       << std::endl;
         }
         continuation_future1.get();
@@ -105,6 +107,10 @@ void VectorAdd_test2(const std::vector<size_t>& a_vector,
     // Test post and get_future methods
     hpx::sycl::experimental::sycl_executor exec(
         cl::sycl::default_selector{});
+    std::cout << "Running on device: "
+              << exec.get_device().get_info<cl::sycl::info::device::name>()
+              << std::endl;
+    // Launch kernel one-way
     exec.post(&cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
         cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
         cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);

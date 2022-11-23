@@ -33,7 +33,7 @@ namespace hpx { namespace sycl { namespace experimental {
         {
         }
 
-        // TODO Do we need more executors?
+        // TODO Do we need more constructors?
         // -------------------------------------------------------------------------
         // Queue will be cleaned up by its own destructor
         ~sycl_executor() {}
@@ -147,26 +147,13 @@ namespace hpx { namespace sycl { namespace experimental {
         }
 #endif
 
-        /// Just runs the given Functor using the queue of this executor
-        void post(std::function<cl::sycl::event(cl::sycl::queue&)> &&f)
-        {
-            // discard event in the one way case...
-            cl::sycl::event e = f(command_queue);
+        // Property interface:
+        
+        /// Return the device used by the underlying SYCL queue
+        cl::sycl::device get_device() const {
+          return command_queue.get_device();
         }
-
-        /// Runs the given Functor, and uses its return event to create a future
-        hpx::future<void> async_execute(std::function<cl::sycl::event(cl::sycl::queue&)> &&f)
-        {
-            return hpx::detail::try_catch_exception_ptr(
-                [&]() {
-                    cl::sycl::event e = f(command_queue);
-                    return get_future(e);
-                },
-                [&](std::exception_ptr&& ep) {
-                    return hpx::make_exceptional_future<void>(HPX_MOVE(ep));
-                });
-        }
-
+        // TODO Any other non-event member methods of the sycl::queue that we should map? 
       protected:
         cl::sycl::queue command_queue;
 
