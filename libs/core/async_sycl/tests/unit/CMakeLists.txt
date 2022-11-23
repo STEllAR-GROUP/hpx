@@ -1,11 +1,9 @@
-# Copyright (c) 2020-2021 The STE||AR-Group
-#
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 
-set(tests sycl_vector_add)
+set(tests sycl_vector_add_get_future sycl_vector_add_executor sycl_vector_add_concurrent_executors)
 
 foreach (test ${tests})
     hpx_info("Building SYCL test ${test}_test")
@@ -26,8 +24,10 @@ foreach (test ${tests})
       else()
         target_compile_options(${test}_test PUBLIC -fsycl)
       endif()
+      # Test with more than one thread (important for conccurent sycl executor test, does not hurt for other tests)
+      set(${test}_PARAMETERS THREADS_PER_LOCALITY 4)
       # Add to tests
       add_hpx_unit_test(
-           "modules.async_sycl" ${test} ${${test}_PARAMETERS} RUN_SERIAL
+           "modules.async_sycl" ${test} ${${test}_PARAMETERS} 
            )
 endforeach()
