@@ -10,7 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/concurrency/detail/contiguous_index_queue.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/concurrency/detail/non_contiguous_index_queue.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -38,6 +39,7 @@
 #include <hpx/topology/topology.hpp>
 #include <hpx/type_support/pack.hpp>
 
+#include <algorithm>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -167,24 +169,53 @@ namespace hpx::execution::experimental::detail {
             auto worker_thread = task_f->worker_thread;
             auto& local_queue = op_state->queues[worker_thread].data_;
 
-            // Handle local queue first
-            hpx::optional<std::uint32_t> index;
-            while ((index = local_queue.pop_left()))
+            // schedule chunks from the end, if needed
+            if (task_f->reverse_placement)
             {
-                do_work_chunk(ts, index.value());
-            }
-
-            // Then steal from neighboring queues
-            for (std::uint32_t offset = 1;
-                 offset != op_state->num_worker_threads; ++offset)
-            {
-                std::size_t neighbor_thread =
-                    (worker_thread + offset) % op_state->num_worker_threads;
-                auto& neighbor_queue = op_state->queues[neighbor_thread].data_;
-
-                while ((index = neighbor_queue.pop_right()))
+                // Handle local queue first
+                hpx::optional<std::uint32_t> index;
+                while ((index = local_queue.pop_right()))
                 {
                     do_work_chunk(ts, index.value());
+                }
+
+                // Then steal from neighboring queues
+                for (std::uint32_t offset = 1;
+                     offset != op_state->num_worker_threads; ++offset)
+                {
+                    std::size_t neighbor_thread =
+                        (worker_thread + offset) % op_state->num_worker_threads;
+                    auto& neighbor_queue =
+                        op_state->queues[neighbor_thread].data_;
+
+                    while ((index = neighbor_queue.pop_left()))
+                    {
+                        do_work_chunk(ts, index.value());
+                    }
+                }
+            }
+            else
+            {
+                // Handle local queue first
+                hpx::optional<std::uint32_t> index;
+                while ((index = local_queue.pop_left()))
+                {
+                    do_work_chunk(ts, index.value());
+                }
+
+                // Then steal from neighboring queues
+                for (std::uint32_t offset = 1;
+                     offset != op_state->num_worker_threads; ++offset)
+                {
+                    std::size_t neighbor_thread =
+                        (worker_thread + offset) % op_state->num_worker_threads;
+                    auto& neighbor_queue =
+                        op_state->queues[neighbor_thread].data_;
+
+                    while ((index = neighbor_queue.pop_right()))
+                    {
+                        do_work_chunk(ts, index.value());
+                    }
                 }
             }
         }
@@ -227,6 +258,7 @@ namespace hpx::execution::experimental::detail {
         std::size_t const size;
         std::uint32_t const chunk_size;
         std::uint32_t const worker_thread;
+        bool reverse_placement;
 
         // Visit the values sent by the predecessor sender.
         void do_work() const
@@ -327,8 +359,8 @@ namespace hpx::execution::experimental::detail {
         }
 
         // Initialize a queue for a worker thread.
-        void init_queue(std::uint32_t const worker_thread,
-            std::uint32_t const size, std::uint32_t num_threads)
+        void init_queue_depth_first(std::uint32_t const worker_thread,
+            std::uint32_t const size, std::uint32_t num_threads) noexcept
         {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const part_begin = static_cast<std::uint32_t>(
@@ -336,6 +368,22 @@ namespace hpx::execution::experimental::detail {
             auto const part_end = static_cast<std::uint32_t>(
                 ((worker_thread + 1) * size) / num_threads);
             queue.reset(part_begin, part_end);
+        }
+
+        void init_queue_breadth_first(std::uint32_t const worker_thread,
+            std::uint32_t const size, std::uint32_t num_threads) noexcept
+        {
+            auto& queue = op_state->queues[worker_thread].data_;
+            auto const num_steps = size / num_threads + 1;
+            auto const part_begin = worker_thread;
+            auto part_end = (std::min)(
+                size + num_threads - 1, part_begin + num_steps * num_threads);
+            auto const remainder = (part_end - part_begin) % num_threads;
+            if (remainder != 0)
+            {
+                part_end -= remainder;
+            }
+            queue.reset(part_begin, part_end, num_threads);
         }
 
         // Spawn a task which will process a number of chunks. If the queue
@@ -432,13 +480,28 @@ namespace hpx::execution::experimental::detail {
             op_state->ts.template emplace<hpx::tuple<Ts...>>(
                 HPX_FORWARD(Ts, ts)...);
 
+            // thread placement
+            hpx::threads::thread_schedule_hint hint =
+                hpx::execution::experimental::get_hint(op_state->scheduler);
+
             // Initialize the queues for all worker threads so that worker
             // threads can start stealing immediately when they start.
+            using placement = hpx::threads::thread_placement_hint;
             for (std::uint32_t worker_thread = 0;
                  worker_thread != op_state->num_worker_threads; ++worker_thread)
             {
-                init_queue(
-                    worker_thread, num_chunks, op_state->num_worker_threads);
+                if (hint.placement_mode == placement::breadth_first ||
+                    hint.placement_mode == placement::breadth_first_reverse)
+                {
+                    init_queue_breadth_first(worker_thread, num_chunks,
+                        op_state->num_worker_threads);
+                }
+                else
+                {
+                    // the default for this scheduler is depth-first placement
+                    init_queue_depth_first(worker_thread, num_chunks,
+                        op_state->num_worker_threads);
+                }
             }
 
             // Spawn the worker threads for all except the local queue.
@@ -458,6 +521,9 @@ namespace hpx::execution::experimental::detail {
                 main_pu_num = rp.get_pu_num(local_worker_thread);
             }
 
+            bool reverse_placement =
+                hint.placement_mode == placement::depth_first_reverse ||
+                hint.placement_mode == placement::breadth_first_reverse;
             for (std::uint32_t pu = 0;
                  worker_thread != op_state->num_worker_threads && pu != num_pus;
                  ++pu)
@@ -489,8 +555,8 @@ namespace hpx::execution::experimental::detail {
                 }
 
                 // Schedule task for this worker thread
-                do_work_task(task_function<OperationState>{
-                    op_state, size, chunk_size, worker_thread});
+                do_work_task(task_function<OperationState>{op_state, size,
+                    chunk_size, worker_thread, reverse_placement});
 
                 ++worker_thread;
             }
@@ -503,8 +569,8 @@ namespace hpx::execution::experimental::detail {
             HPX_ASSERT(worker_thread == op_state->num_worker_threads);
 
             // Handle the queue for the local thread.
-            do_work_local(task_function<OperationState>{
-                this->op_state, size, chunk_size, local_worker_thread});
+            do_work_local(task_function<OperationState>{this->op_state, size,
+                chunk_size, local_worker_thread, reverse_placement});
         }
 
         // clang-format off
@@ -644,7 +710,7 @@ namespace hpx::execution::experimental::detail {
             std::size_t num_worker_threads;
             hpx::threads::mask_type pu_mask;
             std::vector<hpx::util::cache_aligned_data<
-                hpx::concurrency::detail::contiguous_index_queue<>>>
+                hpx::concurrency::detail::non_contiguous_index_queue<>>>
                 queues;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;

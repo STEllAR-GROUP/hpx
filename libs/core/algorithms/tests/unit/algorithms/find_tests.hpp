@@ -1,5 +1,6 @@
 //  Copyright (c) 2021 Srinivas Yadav
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +8,8 @@
 
 #pragma once
 
+#include <hpx/local/execution.hpp>
+#include <hpx/local/future.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/find.hpp>
 
@@ -47,14 +50,14 @@ void test_find(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_find(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
+    // fill vector with random values about 1
     std::vector<int> c(10007);
-    //fill vector with random values about 1
     std::fill(std::begin(c), std::end(c), dis(gen));
     c.at(c.size() / 2) = 1;
 
@@ -66,14 +69,74 @@ void test_find(ExPolicy&& policy, IteratorTag)
     HPX_TEST(index == iterator(test_index));
 }
 
+template <typename Policy, typename ExPolicy, typename IteratorTag>
+void test_find_explicit_sender_direct(Policy l, ExPolicy&& policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
+
+    typedef std::vector<int>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+
+    // fill vector with random values about 1
+    std::vector<int> c(10007);
+    std::fill(std::begin(c), std::end(c), dis(gen));
+    c.at(c.size() / 2) = 1;
+
+    using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
+    iterator index = hpx::find(policy.on(exec), iterator(std::begin(c)),
+        iterator(std::end(c)), int(1));
+
+    base_iterator test_index = std::begin(c) + c.size() / 2;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
+template <typename Policy, typename ExPolicy, typename IteratorTag>
+void test_find_explicit_sender(Policy l, ExPolicy&& policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
+
+    typedef std::vector<int>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+
+    // fill vector with random values about 1
+    std::vector<int> c(10007);
+    std::fill(std::begin(c), std::end(c), dis(gen));
+    c.at(c.size() / 2) = 1;
+
+    using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
+    auto result =
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)), int(1)) |
+        hpx::find(policy.on(exec)) | tt::sync_wait();
+
+    base_iterator test_index = std::begin(c) + c.size() / 2;
+
+    HPX_TEST(hpx::get<0>(*result) == iterator(test_index));
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_find_async(ExPolicy&& p, IteratorTag)
 {
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
+
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    //fill vector with random values above 1
+    // fill vector with random values above 1
     std::fill(std::begin(c), std::end(c), dis(gen));
     c.at(c.size() / 2) = 1;
 
@@ -81,10 +144,40 @@ void test_find_async(ExPolicy&& p, IteratorTag)
         hpx::find(p, iterator(std::begin(c)), iterator(std::end(c)), int(1));
     f.wait();
 
-    //create iterator at position of value to be found
+    // create iterator at position of value to be found
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
     HPX_TEST(f.get() == iterator(test_index));
+}
+
+template <typename Policy, typename ExPolicy, typename IteratorTag>
+void test_find_explicit_sender_direct_async(Policy l, ExPolicy&& p, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
+
+    typedef std::vector<int>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+
+    // fill vector with random values above 1
+    std::vector<int> c(10007);
+    std::fill(std::begin(c), std::end(c), dis(gen));
+    c.at(c.size() / 2) = 1;
+
+    using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
+    auto result = hpx::find(p.on(exec), iterator(std::begin(c)),
+                      iterator(std::end(c)), int(1)) |
+        tt::sync_wait();
+
+    // create iterator at position of value to be found
+    base_iterator test_index = std::begin(c) + c.size() / 2;
+
+    HPX_TEST(hpx::get<0>(*result) == iterator(test_index));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -123,8 +216,8 @@ void test_find_exception(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_find_exception(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>
@@ -197,8 +290,8 @@ void test_find_exception_async(ExPolicy&& p, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_find_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
+    static_assert(hpx::is_execution_policy_v<ExPolicy>,
+        "hpx::is_execution_policy_v<ExPolicy>");
 
     typedef std::vector<int>::iterator base_iterator;
     typedef test::decorated_iterator<base_iterator, IteratorTag>

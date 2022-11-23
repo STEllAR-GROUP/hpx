@@ -11,10 +11,13 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/util/adapt_placement_mode.hpp>
+#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
@@ -35,7 +38,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename FwdIter, typename Sent>
     struct search : public detail::algorithm<search<FwdIter, Sent>, FwdIter>
     {
-        search()
+        constexpr search() noexcept
           : search::algorithm("search")
         {
         }
@@ -49,7 +52,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             for (;; ++first)
             {
                 FwdIter it1 = first;
-                for (FwdIter2 it2 = s_first;; ++it1, ++it2)
+                for (FwdIter2 it2 = s_first;; (void) ++it1, ++it2)
                 {
                     if (it2 == s_last)
                         return first;
@@ -66,8 +69,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             typename Pred, typename Proj1, typename Proj2>
         static typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        parallel(ExPolicy&& policy, FwdIter first, Sent last, FwdIter2 s_first,
-            Sent2 s_last, Pred&& op, Proj1&& proj1, Proj2&& proj2)
+        parallel(ExPolicy&& orgpolicy, FwdIter first, Sent last,
+            FwdIter2 s_first, Sent2 s_last, Pred&& op, Proj1&& proj1,
+            Proj2&& proj2)
         {
             using reference = typename std::iterator_traits<FwdIter>::reference;
 
@@ -97,8 +101,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 return result::get(HPX_MOVE(first));
             }
 
+            decltype(auto) policy = parallel::util::adapt_placement_mode(
+                HPX_FORWARD(ExPolicy, orgpolicy),
+                hpx::threads::thread_placement_hint::breadth_first);
+
+            using policy_type = std::decay_t<decltype(policy)>;
+
             using partitioner =
-                hpx::parallel::util::partitioner<ExPolicy, FwdIter, void>;
+                hpx::parallel::util::partitioner<decltype(policy), FwdIter,
+                    void>;
 
             hpx::parallel::util::cancellation_token<difference_type> tok(count);
 
@@ -109,8 +120,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                           std::size_t base_idx) mutable -> void {
                 FwdIter curr = it;
 
-                hpx::parallel::util::loop_idx_n<std::decay_t<ExPolicy>>(
-                    base_idx, it, part_size, tok,
+                hpx::parallel::util::loop_idx_n<policy_type>(base_idx, it,
+                    part_size, tok,
                     [diff, count, s_first, &tok, &curr,
                         op = HPX_FORWARD(Pred, op),
                         proj1 = HPX_FORWARD(Proj1, proj1),
@@ -145,15 +156,21 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 util::detail::clear_container(data);
                 difference_type search_res = tok.get_data();
                 if (search_res != count)
+                {
                     std::advance(first, search_res);
+                }
                 else
+                {
                     std::advance(first,
                         hpx::parallel::v1::detail::distance(first, last) - 1);
+                }
 
                 return HPX_MOVE(first);
             };
-            return partitioner::call_with_index(HPX_FORWARD(ExPolicy, policy),
-                first, count - (diff - 1), 1, HPX_MOVE(f1), HPX_MOVE(f2));
+
+            return partitioner::call_with_index(
+                HPX_FORWARD(decltype(policy), policy), first,
+                count - (diff - 1), 1, HPX_MOVE(f1), HPX_MOVE(f2));
         }
     };
 
@@ -162,7 +179,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename FwdIter, typename Sent>
     struct search_n : public detail::algorithm<search_n<FwdIter, Sent>, FwdIter>
     {
-        search_n()
+        constexpr search_n() noexcept
           : search_n::algorithm("search_n")
         {
         }
@@ -181,7 +198,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         template <typename ExPolicy, typename FwdIter2, typename Pred,
             typename Proj1, typename Proj2>
         static typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        parallel(ExPolicy&& policy, FwdIter first, std::size_t count,
+        parallel(ExPolicy&& orgpolicy, FwdIter first, std::size_t count,
             FwdIter2 s_first, FwdIter2 s_last, Pred&& op, Proj1&& proj1,
             Proj2&& proj2)
         {
@@ -199,9 +216,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             if (diff > s_difference_type(count))
                 return result::get(HPX_MOVE(first));
 
-            typedef util::partitioner<ExPolicy, FwdIter, void> partitioner;
+            decltype(auto) policy = parallel::util::adapt_placement_mode(
+                HPX_FORWARD(ExPolicy, orgpolicy),
+                hpx::threads::thread_placement_hint::breadth_first);
 
-            util::cancellation_token<difference_type> tok(count);
+            using policy_type = std::decay_t<decltype(policy)>;
+
+            using partitioner =
+                util::partitioner<decltype(policy), FwdIter, void>;
+
+            hpx::parallel::util::cancellation_token<difference_type> tok(count);
 
             auto f1 = [count, diff, tok, s_first, op = HPX_FORWARD(Pred, op),
                           proj1 = HPX_FORWARD(Proj1, proj1),
@@ -210,8 +234,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                           std::size_t base_idx) mutable -> void {
                 FwdIter curr = it;
 
-                util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
-                    part_size, tok,
+                util::loop_idx_n<policy_type>(base_idx, it, part_size, tok,
                     [count, diff, s_first, &tok, &curr,
                         op = HPX_FORWARD(Pred, op),
                         proj1 = HPX_FORWARD(Proj1, proj1),
@@ -250,10 +273,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
                 return HPX_MOVE(first);
             };
-            return partitioner::call_with_index(HPX_FORWARD(ExPolicy, policy),
-                first, count - (diff - 1), 1, HPX_MOVE(f1), HPX_MOVE(f2));
+
+            return partitioner::call_with_index(
+                HPX_FORWARD(decltype(policy), policy), first,
+                count - (diff - 1), 1, HPX_MOVE(f1), HPX_MOVE(f2));
         }
     };
-
     /// \endcond
 }}}}    // namespace hpx::parallel::v1::detail

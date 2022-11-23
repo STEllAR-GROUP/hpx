@@ -17,6 +17,7 @@ set(executors_headers
     hpx/executors/detail/hierarchical_spawning.hpp
     hpx/executors/exception_list.hpp
     hpx/executors/execution_policy_annotation.hpp
+    hpx/executors/execution_policy_hint.hpp
     hpx/executors/execution_policy_fwd.hpp
     hpx/executors/execution_policy_mappings.hpp
     hpx/executors/execution_policy_parameters.hpp

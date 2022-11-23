@@ -213,20 +213,32 @@ void test_executor(Executor&& exec)
     test_bulk_then_void(exec);
 }
 
-int hpx_main()
+void tests(hpx::threads::thread_placement_hint placement)
 {
     using namespace hpx::execution::experimental;
 
+    hpx::threads::thread_schedule_hint hint;
+    hint.placement_mode = placement;
+
     {
-        auto exec = explicit_scheduler_executor(thread_pool_scheduler{});
+        auto exec = with_hint(
+            explicit_scheduler_executor(thread_pool_scheduler{}), hint);
         test_executor(exec);
     }
 
     {
-        auto exec = explicit_scheduler_executor(
-            thread_pool_policy_scheduler<hpx::launch::sync_policy>{});
+        auto exec = with_hint(
+            explicit_scheduler_executor(
+                thread_pool_policy_scheduler<hpx::launch::sync_policy>{}),
+            hint);
         test_executor(exec);
     }
+}
+
+int hpx_main()
+{
+    tests(hpx::threads::thread_placement_hint::breadth_first);
+    tests(hpx::threads::thread_placement_hint::depth_first);
 
     return hpx::local::finalize();
 }

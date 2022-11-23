@@ -206,20 +206,22 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/execution/executors/execution.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
-
-#include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/util/adapt_placement_mode.hpp>
+#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/projection_identity.hpp>
@@ -260,7 +262,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
             typename util::detail::algorithm_result<ExPolicy, bool>::type
-            operator()(ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
+            operator()(ExPolicy&& orgpolicy, Iter first, Sent last, Comp&& comp,
                 Proj&& proj)
             {
                 typedef util::detail::algorithm_result<ExPolicy, bool> result;
@@ -277,7 +279,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Iter second = first + 1;
                 --count;
 
-                util::cancellation_token<std::size_t> tok(count);
+                decltype(auto) policy = parallel::util::adapt_placement_mode(
+                    HPX_FORWARD(ExPolicy, orgpolicy),
+                    hpx::threads::thread_placement_hint::breadth_first);
+
+                using policy_type = std::decay_t<decltype(policy)>;
+
+                hpx::parallel::util::cancellation_token<std::size_t> tok(count);
 
                 // Note: replacing the invoke() with HPX_INVOKE()
                 // below makes gcc generate errors
@@ -285,8 +293,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj = HPX_FORWARD(Proj, proj)](Iter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
-                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
-                        part_size, tok,
+                    util::loop_idx_n<policy_type>(base_idx, it, part_size, tok,
                         [&tok, first, &comp, &proj](
                             type const& v, std::size_t i) mutable -> void {
                             if (hpx::invoke(comp,
@@ -297,6 +304,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             }
                         });
                 };
+
                 auto f2 = [tok](auto&& data) mutable -> bool {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
@@ -308,8 +316,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return find_res != 0;
                 };
 
-                return util::partitioner<ExPolicy, bool, void>::call_with_index(
-                    HPX_FORWARD(ExPolicy, policy), second, count, 1,
+                using partitioner_type =
+                    util::partitioner<policy_type, bool, void>;
+                return partitioner_type::call_with_index(
+                    HPX_FORWARD(decltype(policy), policy), second, count, 1,
                     HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
@@ -317,7 +327,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename RandIter>
         struct is_heap : public detail::algorithm<is_heap<RandIter>, bool>
         {
-            is_heap()
+            constexpr is_heap() noexcept
               : is_heap::algorithm("is_heap")
             {
             }
@@ -371,8 +381,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
             typename util::detail::algorithm_result<ExPolicy, Iter>::type
-            operator()(
-                ExPolicy&& policy, Iter first, Sent last, Comp comp, Proj proj)
+            operator()(ExPolicy&& orgpolicy, Iter first, Sent last, Comp comp,
+                Proj proj)
             {
                 typedef util::detail::algorithm_result<ExPolicy, Iter> result;
                 typedef typename std::iterator_traits<Iter>::value_type type;
@@ -388,7 +398,13 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Iter second = first + 1;
                 --count;
 
-                util::cancellation_token<std::size_t> tok(count);
+                decltype(auto) policy = parallel::util::adapt_placement_mode(
+                    HPX_FORWARD(ExPolicy, orgpolicy),
+                    hpx::threads::thread_placement_hint::breadth_first);
+
+                using policy_type = std::decay_t<decltype(policy)>;
+
+                hpx::parallel::util::cancellation_token<std::size_t> tok(count);
 
                 // Note: replacing the invoke() with HPX_INVOKE()
                 // below makes gcc generate errors
@@ -396,8 +412,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               proj = HPX_FORWARD(Proj, proj)](Iter it,
                               std::size_t part_size,
                               std::size_t base_idx) mutable {
-                    util::loop_idx_n<std::decay_t<ExPolicy>>(base_idx, it,
-                        part_size, tok,
+                    util::loop_idx_n<policy_type>(base_idx, it, part_size, tok,
                         [&tok, first, &comp, &proj](
                             type const& v, std::size_t i) -> void {
                             if (hpx::invoke(comp,
@@ -408,6 +423,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             }
                         });
                 };
+
                 auto f2 = [tok, second](auto&& data) mutable -> Iter {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
@@ -421,8 +437,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return HPX_MOVE(second);
                 };
 
-                return util::partitioner<ExPolicy, Iter, void>::call_with_index(
-                    HPX_FORWARD(ExPolicy, policy), second, count, 1,
+                using partitioner_type =
+                    util::partitioner<policy_type, Iter, void>;
+                return partitioner_type::call_with_index(
+                    HPX_FORWARD(decltype(policy), policy), second, count, 1,
                     HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
@@ -431,7 +449,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         struct is_heap_until
           : public detail::algorithm<is_heap_until<RandIter>, RandIter>
         {
-            is_heap_until()
+            constexpr is_heap_until() noexcept
               : is_heap_until::algorithm("is_heap_until")
             {
             }

@@ -225,12 +225,14 @@ namespace hpx {
 #else
 
 #include <hpx/config.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
+#include <hpx/parallel/util/adapt_placement_mode.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
@@ -249,6 +251,7 @@ namespace hpx {
 #include <vector>
 
 namespace hpx { namespace parallel { inline namespace v1 {
+
     ////////////////////////////////////////////////////////////////////////////
     // is_sorted
     namespace detail {
@@ -257,7 +260,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         struct is_sorted
           : public detail::algorithm<is_sorted<FwdIter, Sent>, bool>
         {
-            is_sorted()
+            constexpr is_sorted() noexcept
               : is_sorted::algorithm("is_sorted")
             {
             }
@@ -287,7 +290,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 util::invoke_projected<Pred, Proj> pred_projected{
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
 
-                util::cancellation_token<> tok;
+                hpx::parallel::util::cancellation_token<> tok;
 
                 // Note: replacing the invoke() with HPX_INVOKE()
                 // below makes gcc generate errors
@@ -341,7 +344,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         struct is_sorted_until
           : public detail::algorithm<is_sorted_until<FwdIter, Sent>, FwdIter>
         {
-            is_sorted_until()
+            constexpr is_sorted_until() noexcept
               : is_sorted_until::algorithm("is_sorted_until")
             {
             }
@@ -357,7 +360,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename Pred, typename Proj>
             static
                 typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-                parallel(ExPolicy&& policy, FwdIter first, Sent last,
+                parallel(ExPolicy&& orgpolicy, FwdIter first, Sent last,
                     Pred&& pred, Proj&& proj)
             {
                 typedef
@@ -375,7 +378,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 util::invoke_projected<Pred, Proj> pred_projected{
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)};
 
-                util::cancellation_token<difference_type> tok(count);
+                decltype(auto) policy = parallel::util::adapt_placement_mode(
+                    HPX_FORWARD(ExPolicy, orgpolicy),
+                    hpx::threads::thread_placement_hint::breadth_first);
+
+                using policy_type = std::decay_t<decltype(policy)>;
+
+                hpx::parallel::util::cancellation_token<difference_type> tok(
+                    count);
 
                 // Note: replacing the invoke() with HPX_INVOKE()
                 // below makes gcc generate errors
@@ -384,8 +394,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                               FwdIter part_begin, std::size_t part_size,
                               std::size_t base_idx) mutable -> void {
                     FwdIter trail = part_begin++;
-                    util::loop_idx_n<std::decay_t<ExPolicy>>(++base_idx,
-                        part_begin, part_size - 1, tok,
+                    util::loop_idx_n<policy_type>(++base_idx, part_begin,
+                        part_size - 1, tok,
                         [&trail, &tok, &pred_projected](
                             reference& v, std::size_t ind) -> void {
                             if (hpx::invoke(pred_projected, v, *trail++))
@@ -396,8 +406,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     FwdIter i = trail++;
 
-                    //trail now points one past the current grouping
-                    //unless canceled
+                    // trail now points one past the current grouping unless
+                    // canceled
                     if (!tok.was_cancelled(base_idx + part_size) &&
                         trail != last)
                     {
@@ -407,6 +417,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         }
                     }
                 };
+
                 auto f2 = [first, tok](auto&& data) mutable -> FwdIter {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
@@ -416,9 +427,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     std::advance(first, loc);
                     return HPX_MOVE(first);
                 };
-                return util::partitioner<ExPolicy, FwdIter,
-                    void>::call_with_index(HPX_FORWARD(ExPolicy, policy), first,
-                    count, 1, HPX_MOVE(f1), HPX_MOVE(f2));
+
+                using partitioner_type =
+                    util::partitioner<policy_type, FwdIter, void>;
+                return partitioner_type::call_with_index(
+                    HPX_FORWARD(decltype(policy), policy), first, count, 1,
+                    HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
         /// \endcond

@@ -10,7 +10,6 @@
 #include <hpx/functional/invoke.hpp>
 
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
 
 #include <functional>
 #include <iterator>

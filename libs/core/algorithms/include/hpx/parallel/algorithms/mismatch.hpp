@@ -537,18 +537,20 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
-
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/mismatch.hpp>
+#include <hpx/parallel/util/adapt_placement_mode.hpp>
+#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/result_types.hpp>
@@ -571,7 +573,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         struct mismatch_binary
           : public detail::algorithm<mismatch_binary<IterPair>, IterPair>
         {
-            mismatch_binary()
+            constexpr mismatch_binary() noexcept
               : mismatch_binary::algorithm("mismatch_binary")
             {
             }
@@ -593,8 +595,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typename Proj2>
             static util::detail::algorithm_result_t<ExPolicy,
                 util::in_in_result<Iter1, Iter2>>
-            parallel(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
-                Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
+            parallel(ExPolicy&& orgpolicy, Iter1 first1, Sent1 last1,
+                Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
             {
                 if (first1 == last1 || first2 == last2)
                 {
@@ -626,15 +628,22 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 using zip_iterator = hpx::util::zip_iterator<Iter1, Iter2>;
 
-                util::cancellation_token<std::size_t> tok(count1);
+                decltype(auto) policy = parallel::util::adapt_placement_mode(
+                    HPX_FORWARD(ExPolicy, orgpolicy),
+                    hpx::threads::thread_placement_hint::breadth_first);
+
+                using policy_type = std::decay_t<decltype(policy)>;
+
+                hpx::parallel::util::cancellation_token<std::size_t> tok(
+                    count1);
 
                 auto f1 = [tok, f = HPX_FORWARD(F, f),
                               proj1 = HPX_FORWARD(Proj1, proj1),
                               proj2 = HPX_FORWARD(Proj2, proj2)](
                               zip_iterator it, std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
-                    sequential_mismatch_binary<std::decay_t<ExPolicy>>(base_idx,
-                        it, part_count, tok, HPX_FORWARD(F, f),
+                    sequential_mismatch_binary<policy_type>(base_idx, it,
+                        part_count, tok, HPX_FORWARD(F, f),
                         HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
                 };
 
@@ -658,9 +667,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return {first1, first2};
                 };
 
-                return util::partitioner<ExPolicy,
-                    util::in_in_result<Iter1, Iter2>,
-                    void>::call_with_index(HPX_FORWARD(ExPolicy, policy),
+                using partitioner_type = util::partitioner<policy_type,
+                    util::in_in_result<Iter1, Iter2>, void>;
+
+                return partitioner_type::call_with_index(
+                    HPX_FORWARD(decltype(policy), policy),
                     zip_iterator(first1, first2), count1, 1, HPX_MOVE(f1),
                     HPX_MOVE(f2));
             }
@@ -691,7 +702,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename IterPair>
         struct mismatch : public detail::algorithm<mismatch<IterPair>, IterPair>
         {
-            mismatch()
+            constexpr mismatch() noexcept
               : mismatch::algorithm("mismatch")
             {
             }
@@ -708,7 +719,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename FwdIter1, typename Sent,
                 typename FwdIter2, typename F>
             static util::detail::algorithm_result_t<ExPolicy, IterPair>
-            parallel(ExPolicy&& policy, FwdIter1 first1, Sent last1,
+            parallel(ExPolicy&& orgpolicy, FwdIter1 first1, Sent last1,
                 FwdIter2 first2, F&& f)
             {
                 if (first1 == last1)
@@ -724,12 +735,18 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using zip_iterator =
                     hpx::util::zip_iterator<FwdIter1, FwdIter2>;
 
-                util::cancellation_token<std::size_t> tok(count);
+                decltype(auto) policy = parallel::util::adapt_placement_mode(
+                    HPX_FORWARD(ExPolicy, orgpolicy),
+                    hpx::threads::thread_placement_hint::breadth_first);
+
+                using policy_type = std::decay_t<decltype(policy)>;
+
+                hpx::parallel::util::cancellation_token<std::size_t> tok(count);
 
                 auto f1 = [tok, f = HPX_FORWARD(F, f)](zip_iterator it,
                               std::size_t part_count,
                               std::size_t base_idx) mutable -> void {
-                    sequential_mismatch<std::decay_t<ExPolicy>>(
+                    sequential_mismatch<policy_type>(
                         base_idx, it, part_count, tok, HPX_FORWARD(F, f));
                 };
 
@@ -749,8 +766,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return std::make_pair(first1, first2);
                 };
 
-                return util::partitioner<ExPolicy, IterPair,
-                    void>::call_with_index(HPX_FORWARD(ExPolicy, policy),
+                using partitioner_type =
+                    util::partitioner<policy_type, IterPair, void>;
+                return partitioner_type::call_with_index(
+                    HPX_FORWARD(decltype(policy), policy),
                     zip_iterator(first1, first2), count, 1, HPX_MOVE(f1),
                     HPX_MOVE(f2));
             }

@@ -44,6 +44,7 @@ set(tests
     fill
     filln
     find
+    find_sender
     findend
     findfirstof
     findfirstof_binary
