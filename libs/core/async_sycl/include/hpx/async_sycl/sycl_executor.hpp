@@ -2,6 +2,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+//  Copyright (c) 2022 Gregor Daiß
 #pragma once
 
 #include <hpx/config.hpp>
@@ -21,128 +22,140 @@
 
 namespace hpx { namespace sycl { namespace experimental {
 
-    namespace detail {
-        // -------------------------------------------------------------------------
-        // A helper object to call a cudafunction returning a cudaError type
-        // or a plain kernel definition (or cublas function in cublas executor)
-        template <typename R, typename... Args>
-        struct dispatch_helper;
-
-        // default implementation - call the function
-        template <typename R, typename... Args>
-        struct dispatch_helper
-        {
-            inline R operator()(R (*f)(Args...), Args... args)
-            {
-                return f(args...);
-            }
-        };
-
-        // specialization for return type void
-        template <typename... Args>
-        struct dispatch_helper<void, Args...>
-        {
-            inline void operator()(void (*f)(Args...), Args... args)
-            {
-                f(args...);
-            }
-        };
-
-        // specialization for return type of cudaError_t
-        template <typename... Args>
-        struct dispatch_helper<cl::sycl::event, Args...>
-        {
-            inline void operator()(cl::sycl::event (*f)(Args...), Args... args)
-            {
-                check_cuda_error(f(args...));
-            }
-        };
-
-    }    // namespace detail
-
-    // -------------------------------------------------------------------------
-    // Allows the launching of cuda functions and kernels on a stream with futures
-    // returned that are set when the async functions/kernels are ready
-    // -------------------------------------------------------------------------
     struct sycl_executor
     {
         using future_type = hpx::future<void>;
 
         // -------------------------------------------------------------------------
-        // constructors - create a cuda stream that all tasks invoked by
-        // this helper will use
-        // assume event mode is the default
+        /// Create a SYCL executor (based on a sycl queue)
         sycl_executor(cl::sycl::default_selector selector)
           : command_queue(selector, cl::sycl::property::queue::in_order{})
         {
         }
 
+        // TODO Do we need more executors?
         // -------------------------------------------------------------------------
         // Queue will be cleaned up by its own destructor
         ~sycl_executor() {}
 
         /// Get future for this command_queue (NOTE will be more efficient if
-        //an event is provided -- otherwise a dummy kernel must be submitted to
-        //get an event)
-        inline future_type get_future()
+        /// an event is provided -- otherwise a dummy kernel must be submitted to
+        /// get an event)
+        future_type get_future()
         {
             // The SYCL standard does not include a eventRecord method Instead
             // we have to submit some dummy function and use the event the
             // launch returns
             cl::sycl::event event = command_queue.submit(
-                [&](cl::sycl::handler& h) { h.single_task([=]() {}); });
-            return detail::get_future(command_queue, event);
+                [&](cl::sycl::handler& h) { h.single_task([]() {}); });
+            return detail::get_future(event);
         }
 
         /// Get future for that becomes ready when the given event completes
         inline future_type get_future(cl::sycl::event event)
         {
-            return detail::get_future(command_queue, event);
+            return detail::get_future(event);
         }
 
-        // -------------------------------------------------------------------------
-        // TODO(daissgr) Seems odd to accept more parameters here than in our async method...
-        // OneWay Execution
-        template <typename F, typename... Ts>
-        inline decltype(auto) post(F&& f, Ts&&... ts)
+#if defined(__INTEL_LLVM_COMPILER)
+        // To find the correct overload (or any at all actually) we need to add the
+        // code_location argument which is the last argument in every queue member
+        // function in the intel oneapi sycl implementation.  As far as I can tell
+        // it is usually invisible from the user-side since it is using a default
+        // agument (code_location::current())
+
+        /// sycl::queue::member_function type with code_location paramter
+        template <typename... Params>
+        using queue_function_ptr_t = cl::sycl::event (cl::sycl::queue::*)(
+            Params..., const cl::sycl::detail::code_location&);
+        /// Invoke member function given queue and parameters. Default
+        /// code_location argument added automatically.
+        template <typename... Params>
+        void post(queue_function_ptr_t<Params...>&& queue_member_function,
+            Params&&... args)
         {
-            return apply(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            // for the intel version we need to actually pass the code location.
+            // Within the intel sycl api this is usually a default argument,
+            // but for invoke we need to pass it manually 
+            cl::sycl::event e =
+                std::invoke(std::forward<queue_function_ptr_t<Params...>>(
+                                queue_member_function),
+                    command_queue, std::forward<Params...>(args...),
+                    cl::sycl::detail::code_location::current());
         }
-
-        // -------------------------------------------------------------------------
-        // TwoWay Execution
-        template <typename F, typename... Ts>
-        inline decltype(auto) async_execute(F&& f, Ts&&... ts)
+        /// Invoke queue member function given queue and parameters. Default
+        /// code_location argument added automatically.  / Returns hpx::future
+        /// tied to the sycl event returned by the asynchronous queue member
+        /// function call (two way)
+        template <typename... Params>
+        hpx::future<void> async_execute(
+            queue_function_ptr_t<Params...>&& queue_member_function,
+            Params&&... args)
         {
-            return async(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            // launching a sycl member function may throw -- if it does put it
+            // into the future
+            return hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    cl::sycl::event e = std::invoke(
+                        std::forward<queue_function_ptr_t<Params...>>(
+                            queue_member_function),
+                        command_queue, std::forward<Params...>(args...),
+                        cl::sycl::detail::code_location::current());
+                    return get_future(e);
+                },
+                [&](std::exception_ptr&& ep) {
+                    return hpx::make_exceptional_future<void>(HPX_MOVE(ep));
+                });
         }
+#else 
+        // Default Implementation without the extra intel code_location parameter
 
-        /// For direct access to the underlying queue
-        cl::sycl::queue& queue(void) {return command_queue;}
-
-      protected:
-        cl::sycl::queue command_queue;
-        // -------------------------------------------------------------------------
-
-        // Original try, did not work with dpcp++ due to different overloads on the device pass?
-        // TODO(daissgr) Try again? 
-        /* template <typename... Params, typename... Args> */
-        /* void apply(cl::sycl::event (cl::sycl::queue::*queue_member_function)(Args...), */
-        /*     Args&&... args) */
-        /* { */
-        /*     cl::sycl::event ret = (command_queue.*queue_member_function)( */
-        /*         HPX_FORWARD(Args, args)...); */
-        /* } */
+        /// sycl::queue::member_function type 
+        template<typename ...Params>
+        using queue_function_ptr_t =  cl::sycl::event (cl::sycl::queue::*)(Params...);
+        /// Invoke queue member function given queue and parameters -- do not
+        /// use event to return a hpx::future (One way)
+        template <typename... Params>
+        void post(queue_function_ptr_t<Params...>&& queue_member_function,
+            Params&&... args)
+        {
+            cl::sycl::event e =
+                std::invoke(std::forward<queue_function_ptr_t<Params...>>(
+                                queue_member_function),
+                    command_queue, std::forward<Params...>(args...));
+        }
+        /// Invoke queue member function given queue and parameters --
+        /// hpx::future tied to the sycl event / (two way)
+        template <typename... Params>
+        hpx::future<void> async_execute(
+            queue_function_ptr_t<Params...>&& queue_member_function,
+            Params&&... args)
+        {
+            // launching a sycl member function may throw -- if it does put it
+            // into the future
+            return hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    cl::sycl::event e = std::invoke(
+                        std::forward<queue_function_ptr_t<Params...>>(
+                            queue_member_function),
+                        command_queue, std::forward<Params...>(args...));
+                    return get_future(e);
+                },
+                [&](std::exception_ptr&& ep) {
+                    return hpx::make_exceptional_future<void>(HPX_MOVE(ep));
+                });
+        }
+#endif
 
         /// Just runs the given Functor using the queue of this executor
-        void apply(std::function<cl::sycl::event(cl::sycl::queue&)> &&f)
+        void post(std::function<cl::sycl::event(cl::sycl::queue&)> &&f)
         {
             // discard event in the one way case...
             cl::sycl::event e = f(command_queue);
         }
 
         /// Runs the given Functor, and uses its return event to create a future
-        hpx::future<void> async(std::function<cl::sycl::event(cl::sycl::queue&)> &&f)
+        hpx::future<void> async_execute(std::function<cl::sycl::event(cl::sycl::queue&)> &&f)
         {
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
@@ -153,6 +166,10 @@ namespace hpx { namespace sycl { namespace experimental {
                     return hpx::make_exceptional_future<void>(HPX_MOVE(ep));
                 });
         }
+
+      protected:
+        cl::sycl::queue command_queue;
+
     };
 
 }}}    // namespace hpx::sycl::experimental

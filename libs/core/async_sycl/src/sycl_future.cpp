@@ -10,10 +10,9 @@
 
 namespace hpx { namespace sycl { namespace experimental { namespace detail {
 
-    hpx::future<void> get_future(cl::sycl::queue command_queue,
-        cl::sycl::event command_event)
+    hpx::future<void> get_future(cl::sycl::event command_event)
     {
-        return get_future(hpx::util::internal_allocator<>{}, command_queue, command_event);
+        return get_future(hpx::util::internal_allocator<>{}, command_event);
     }
 }}}}    // namespace hpx::cuda::experimental::detail
 #endif

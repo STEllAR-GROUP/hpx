@@ -2,7 +2,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// TODO(daissgr) Add file doc 
+//  Copyright (c) 2022 Gregor Daiß
 //
 #pragma once
 
@@ -12,7 +12,6 @@
 
 #include <string>
 
-// TODO(daissgr) Really include this here? This will spill into user code (but is sort of required?)
 #include <CL/sycl.hpp> 
 
 namespace hpx { namespace sycl { namespace experimental { namespace detail {
@@ -30,11 +29,11 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
      * When done, the callback function f will be called.
      * Intended to be used with a callback function that sets the future data of an
      * hpx::future representing the completion of an asynchronous SYCL kernel call.
-     * NOTE: For hipsycl it is required to flush the internal DAG of the queue, the event
-     * thus should be assiociated with the passed queue
+     * NOTE: For hipsycl it is required to flush the internal DAG of the queue which is
+     * done by this method as well
     */
     HPX_CORE_EXPORT void add_event_callback(event_callback_function_type&& f,
-        cl::sycl::queue command_queue, cl::sycl::event event);
+        cl::sycl::event event);
 
     /// Register SYCL event polling function with the scheduler (see scheduler_base.hpp)
     HPX_CORE_EXPORT void register_polling(hpx::threads::thread_pool_base& pool);

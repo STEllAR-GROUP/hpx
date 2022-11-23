@@ -2,6 +2,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+//  Copyright (c) 2022 Gregor Daiß
+//
+// This file is very similar to its CUDA counterpart (cuda_future.hpp) just adapted/simplified) 
+// for sycl (we have to get our events from the sycl runtime, and normal stream callbacks are not 
+// possible with SYCL -- we only have the option to do event polling)
+//
 #pragma once
 
 #include <hpx/config.hpp>
@@ -44,23 +50,25 @@ namespace hpx { namespace sycl { namespace experimental {
             future_data() {}
 
             future_data(init_no_addref no_addref, other_allocator const& alloc,
-                cl::sycl::queue command_queue, cl::sycl::event command_event)
+                cl::sycl::event command_event)
               : lcos::detail::future_data_allocator<void, Allocator>(
                     no_addref, alloc)
             {
                 add_event_callback(
                     [fdp = hpx::intrusive_ptr<future_data>(this)]() {
                         fdp->set_data(hpx::util::unused);
-                        // TODO(daissgr) exception handling in here?
+                        // TODO(daissgr) Future work considerations: exception handling in here?
+                        // Technically SYCL has synchronous error handling (exceptions..) in kernel
+                        // code but only if it is running on host code (which we are not interested in as of now)
                     },
-                    command_queue, command_event);
+                    command_event);
             }
         };
 
         // -------------------------------------------------------------
         template <typename Allocator>
-        hpx::future<void> get_future(Allocator const& a, cl::sycl::queue command_queue,
-            cl::sycl::event command_event)
+        hpx::future<void> get_future(
+            Allocator const& a, cl::sycl::event command_event)
         {
             using shared_state = future_data<Allocator>;
 
@@ -77,15 +85,15 @@ namespace hpx { namespace sycl { namespace experimental {
             unique_ptr p(traits::allocate(alloc, 1),
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
-            traits::construct(alloc, p.get(), init_no_addref{}, alloc, command_queue,
-                command_event);
+            traits::construct(
+                alloc, p.get(), init_no_addref{}, alloc, command_event);
 
             return hpx::traits::future_access<future<void>>::create(
                 p.release(), false);
         }
         // -------------------------------------------------------------
         // non allocator version of : get future with an event set
-        HPX_CORE_EXPORT hpx::future<void> get_future(cl::sycl::queue command_queue,
+        HPX_CORE_EXPORT hpx::future<void> get_future(
             cl::sycl::event command_event);
     }    // namespace detail
 }}}      // namespace hpx::cuda::experimental

@@ -2,7 +2,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// TODO(daissgr) Add file doc 
+//  Copyright (c) 2022 Gregor Daiß
+//
+// This file is very similar to its CUDA counterpart (cuda_event_callback.cpp) as it serves 
+// the same purpose: implementing the polling of events.
+// However, there are some differences due to hipsycl: We need to keep the SYCL runtime alive
+// while we run the polling. Furthermore we need to flush the SYCL dag to avoid deadlocks 
+// (as hipsycl is lazy and may only start kernels once the results are requested)
 //
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
@@ -18,23 +24,10 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <shared_mutex>
+#include <hpx/synchronization/shared_mutex.hpp>
 
 #include <hpx/async_sycl/detail/sycl_event_callback.hpp>
-#if defined(__HIPSYCL__) 
-// Lots of warning within the hipsycl headers
-// To compiler with Werror we need to disable those
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-copy"
-#pragma clang diagnostic ignored "-Wunused-parameter"
-#pragma clang diagnostic ignored "-Wunused-variable"
-#pragma clang diagnostic ignored "-Wdouble-promotion"
-#pragma clang diagnostic ignored "-Wunused-local-typedef"
-#pragma clang diagnostic ignored "-Wsign-compare"
-#pragma clang diagnostic ignored "-Wgcc-compat"
-#pragma clang diagnostic ignored "-Wembedded-directive"
-#pragma clang diagnostic ignored "-Wmismatched-tags"
-#pragma clang diagnostic ignored "-Wreorder-ctor"
-#endif
 #ifndef __SYCL_DEVICE_ONLY__
 
 namespace hpx { namespace sycl { namespace experimental { namespace detail {
@@ -55,6 +48,27 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
         return register_polling_count;
     }
 #endif
+
+    // This default queue serves the purpose of keeping the SYCL runtime alive
+    // while the event polling is activated. Without it, each time we create a
+    // temporary SYCL event might re-initialize the entire SYCL runtime at heavy
+    // cost (as observed with hipsycl)
+    // The optional will be set during the register_polling and will be reset during
+    // unregister_polling
+    // For hipsycl, it further serves the purpose of flushing the DAG,
+    // preventing deadlocks from lazy kernel invocation.
+    std::optional<cl::sycl::queue>& get_default_queue()
+    {
+        static std::optional<cl::sycl::queue> default_queue;
+        return default_queue;
+    }
+    // Default queue is protected by this mutex un/register_polling need a unique_lock,
+    // however, for merely flushing the runtime dag, a shared_lock should suffice
+    using sycl_default_queue_mutex_type =  hpx::shared_mutex;
+    sycl_default_queue_mutex_type& get_default_queue_mtx() {
+        static sycl_default_queue_mutex_type queue_mtx;
+        return queue_mtx;
+    }
 
     // -------------------------------------------------------------
     /// Holds a SYCL event and a callback. The callback is intended to be called when
@@ -122,21 +136,31 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     // Adds an event callback directly for a given event 
     // (event needs to be from the queue in question when using hipsycl)
     void add_event_callback(
-        event_callback_function_type&& f, cl::sycl::queue command_queue,
-        cl::sycl::event event)
+        event_callback_function_type&& f, cl::sycl::event event)
     {
         detail::add_to_event_callback_queue(event_callback{event, HPX_MOVE(f)});
 
-#if defined(__HIPSYCL__) 
+#if defined(__HIPSYCL__)
         // See https://github.com/illuhad/hipSYCL/issues/599 for why we need to flush
-        // See https://github.com/illuhad/hipSYCL/pull/749 for API change: 
+        // See https://github.com/illuhad/hipSYCL/pull/749 for API change:
         //
         // The latter PR also dictates our minimal required hipsycl version.
         //
         // We COULD support older hipsycl version by using an API switch depending on the
         // hipsycl version but since we do not need to support any old SYCL code I do not
         // see a reason for doing so.
-        command_queue.get_context().hipSYCL_runtime()->dag().flush_async();
+        //
+        // Note: we can get the runtime reference from any queue to flush the
+        // dag -- hence, we can use the default queue that we use to keep the runtime
+        // alive during polling anyways. Whilst flush_asnyc uses a mutex internally already,
+        // the shared lock here merely ensures that the polling cannot be disabled while 
+        // we use the default queue here
+        std::shared_lock<detail::sycl_default_queue_mutex_type> queue_shared_lk(
+            detail::get_default_queue_mtx()); // make sure the polling has not yet stoped
+        auto &optional_queue = get_default_queue(); 
+        HPX_ASSERT_MSG(optional_queue.has_value(), 
+            "Error: Internal SYCL default queue is empty - is the SYCL polling disabled?");
+        optional_queue.value().get_context().hipSYCL_runtime()->dag().flush_async();
 #endif
     }
 
@@ -172,6 +196,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
         {
             return polling_status::idle;
         }
+
 
         // Iterate over our list of events and see if any have completed
         event_callback_vector.erase(
@@ -225,9 +250,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
                 work_count += get_number_of_active_events();
             }
         }
-
         work_count += get_number_of_enqueued_events();
-
         return work_count;
     }
 
@@ -238,6 +261,15 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
 #if defined(HPX_DEBUG)
         ++get_register_polling_count();
 #endif
+        std::unique_lock<detail::sycl_default_queue_mutex_type> queue_write_lk(
+            detail::get_default_queue_mtx());
+        auto &optional_queue = get_default_queue();
+        HPX_ASSERT_MSG(!(optional_queue.has_value()), 
+            "Error: Internal SYCL queue was already existing when activating the "
+            "SYCL event polling. This is likely due to improper disabling of previous "
+            "event polling");
+        optional_queue.emplace(cl::sycl::default_selector{},
+            cl::sycl::property::queue::in_order{});
         auto* sched = pool.get_scheduler();
         sched->set_sycl_polling_functions(
             &hpx::sycl::experimental::detail::poll, &get_work_count);
@@ -264,9 +296,19 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
                 "SYCL events. Make sure SYCL event polling is not disabled too "
                 "early.");
         }
+        --get_register_polling_count();
 #endif
         auto* sched = pool.get_scheduler();
         sched->clear_sycl_polling_function();
+
+        std::unique_lock<detail::sycl_default_queue_mutex_type> queue_write_lk(
+            detail::get_default_queue_mtx());
+        auto &optional_queue = get_default_queue();
+        HPX_ASSERT_MSG(optional_queue.has_value(), 
+            "Error: Internal SYCL queue was already deleted when deactivating the "
+            "SYCL event polling. This is likely due to repeated disabling of the "
+            "event polling");
+        optional_queue.reset(); 
     }
 }}}}    // namespace hpx::sycl::experimental::detail
 #endif
