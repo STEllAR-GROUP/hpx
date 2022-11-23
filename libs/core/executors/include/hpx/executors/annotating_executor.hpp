@@ -17,7 +17,6 @@
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <string>
 #include <type_traits>

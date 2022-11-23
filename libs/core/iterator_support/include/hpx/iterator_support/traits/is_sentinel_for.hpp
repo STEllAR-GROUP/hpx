@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -53,12 +52,12 @@ namespace hpx { namespace traits {
 
     template <typename Sent, typename Iter>
     struct is_sized_sentinel_for<Sent, Iter,
-        typename util::always_void<
+        std::void_t<
             std::enable_if_t<hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 !disable_sized_sentinel_for<typename std::remove_cv<Sent>::type,
                     typename std::remove_cv<Iter>::type>>,
             typename detail::subtraction_result<Iter, Sent>::type,
-            typename detail::subtraction_result<Sent, Iter>::type>::type>
+            typename detail::subtraction_result<Sent, Iter>::type>>
       : std::true_type
     {
     };

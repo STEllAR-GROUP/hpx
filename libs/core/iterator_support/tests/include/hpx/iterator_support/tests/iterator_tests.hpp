@@ -14,7 +14,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -120,9 +119,8 @@ namespace tests {
         };
 
         template <typename T>
-        struct is_incrementable<T,
-            typename hpx::util::always_void<decltype(
-                ++std::declval<T&>())>::type> : std::true_type
+        struct is_incrementable<T, std::void_t<decltype(++std::declval<T&>())>>
+          : std::true_type
         {
         };
 
@@ -133,8 +131,7 @@ namespace tests {
 
         template <typename T>
         struct is_postfix_incrementable<T,
-            typename hpx::util::always_void<decltype(
-                std::declval<T&>()++)>::type> : std::true_type
+            std::void_t<decltype(std::declval<T&>()++)>> : std::true_type
         {
         };
     }    // namespace traits

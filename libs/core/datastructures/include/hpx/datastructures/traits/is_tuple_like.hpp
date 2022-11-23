@@ -6,12 +6,12 @@
 
 #pragma once
 
+#include <hpx/datastructures/tuple.hpp>
+
 #include <type_traits>
 
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/type_support/always_void.hpp>
-
 namespace hpx { namespace traits {
+
     namespace detail {
         template <typename T, typename Enable = void>
         struct is_tuple_like_impl : std::false_type
@@ -20,8 +20,7 @@ namespace hpx { namespace traits {
 
         template <typename T>
         struct is_tuple_like_impl<T,
-            typename util::always_void<decltype(
-                hpx::tuple_size<T>::value)>::type> : std::true_type
+            std::void_t<decltype(hpx::tuple_size<T>::value)>> : std::true_type
         {
         };
     }    // namespace detail
@@ -29,8 +28,7 @@ namespace hpx { namespace traits {
     /// Deduces to a true type if the given parameter T
     /// has a specific tuple like size.
     template <typename T>
-    struct is_tuple_like
-      : detail::is_tuple_like_impl<typename std::remove_cv<T>::type>
+    struct is_tuple_like : detail::is_tuple_like_impl<std::remove_cv_t<T>>
     {
     };
 }}    // namespace hpx::traits

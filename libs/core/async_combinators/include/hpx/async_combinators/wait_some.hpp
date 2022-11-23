@@ -154,7 +154,6 @@ namespace hpx {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
-#include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <algorithm>

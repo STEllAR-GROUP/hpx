@@ -27,7 +27,6 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/naming_base/unmanaged.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <exception>
 #include <string>
@@ -49,8 +48,7 @@ namespace hpx { namespace traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
-    struct is_client<Derived,
-        typename util::always_void<typename Derived::is_client_tag>::type>
+    struct is_client<Derived, std::void_t<typename Derived::is_client_tag>>
       : std::true_type
     {
     };
@@ -255,7 +253,7 @@ namespace hpx { namespace components {
         // derived from a) stub_base.
         template <typename Stub>
         struct make_stub<Stub,
-            util::always_void_t<typename Stub::server_component_type>>
+            std::void_t<typename Stub::server_component_type>>
         {
             using type = Stub;
             using server_component_type = typename Stub::server_component_type;

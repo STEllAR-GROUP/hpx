@@ -14,7 +14,6 @@
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/pack_traversal/detail/container_category.hpp>
 #include <hpx/pack_traversal/traits/pack_traversal_rebind_container.hpp>
-#include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/detail/reserve.hpp>
@@ -329,8 +328,8 @@ namespace hpx { namespace util { namespace detail {
         };
         template <typename T, typename E>
         struct has_push_back<T, E,
-            typename always_void<decltype(std::declval<T>().push_back(
-                std::declval<E>()))>::type> : std::true_type
+            std::void_t<decltype(std::declval<T>().push_back(
+                std::declval<E>()))>> : std::true_type
         {
         };
 
@@ -600,8 +599,8 @@ namespace hpx { namespace util { namespace detail {
             M mapper_;
 
             template <typename... Args>
-            auto operator()(Args&&... args) -> typename always_void<
-                typename invoke_result<M, OldArgs>::type...>::type
+            auto operator()(Args&&... args)
+                -> std::void_t<typename invoke_result<M, OldArgs>::type...>
             {
                 int dummy[] = {
                     0, ((void) mapper_(HPX_FORWARD(Args, args)), 0)...};

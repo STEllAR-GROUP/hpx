@@ -14,7 +14,6 @@
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <iterator>
@@ -44,8 +43,7 @@ namespace hpx { namespace traits {
 
     template <typename Iterator>
     struct projected_iterator<Iterator,
-        typename hpx::util::always_void<
-            typename std::decay<Iterator>::type::proxy_type>::type>
+        std::void_t<typename std::decay_t<Iterator>::proxy_type>>
     {
         using type = typename std::decay<Iterator>::type::proxy_type;
     };
@@ -92,8 +90,7 @@ namespace hpx { namespace parallel { namespace traits {
 
         template <typename Projected>
         struct projected_result_of_vector_pack<Projected,
-            typename hpx::util::always_void<
-                typename Projected::iterator_type>::type>
+            std::void_t<typename Projected::iterator_type>>
           : projected_result_of_vector_pack_<typename Projected::projector_type,
                 typename std::iterator_traits<
                     typename Projected::iterator_type>::value_type>
@@ -143,8 +140,7 @@ namespace hpx { namespace parallel { namespace traits {
 
         template <typename Projected>
         struct is_projected_indirect<Projected,
-            typename hpx::util::always_void<
-                typename Projected::projector_type>::type>
+            std::void_t<typename Projected::projector_type>>
           : detail::is_projected<typename Projected::projector_type,
                 typename Projected::iterator_type>
         {
@@ -185,8 +181,7 @@ namespace hpx { namespace parallel { namespace traits {
 
     template <typename Projected>
     struct is_projected_zip_iterator<Projected,
-        typename hpx::util::always_void<
-            typename Projected::iterator_type>::type>
+        std::void_t<typename Projected::iterator_type>>
       : hpx::traits::is_zip_iterator<typename Projected::iterator_type>
     {
     };
