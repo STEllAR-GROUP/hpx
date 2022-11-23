@@ -167,9 +167,11 @@ namespace hpx { namespace execution { namespace experimental {
     // clang-format off
     template <typename Scheduler>
     struct is_scheduler<Scheduler,
-        std::enable_if_t<hpx::is_invocable_v<schedule_t, Scheduler> &&
-            std::is_copy_constructible_v<Scheduler> &&
-            hpx::traits::is_equality_comparable_v<Scheduler>>> : std::true_type
+        std::enable_if_t<
+            hpx::is_invocable_v<schedule_t, std::decay_t<Scheduler>> &&
+            std::is_copy_constructible_v<std::decay_t<Scheduler>> &&
+            hpx::traits::is_equality_comparable_v<std::decay_t<Scheduler>>>>
+      : std::true_type
     {
     };
     // clang-format on
