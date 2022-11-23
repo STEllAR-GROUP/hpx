@@ -1,8 +1,9 @@
+//  Copyright (c) 2022 Gregor Daiß
+//
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-//  Copyright (c) 2022 Gregor Daiß
 //
 // This file is very similar to its CUDA counterpart (cuda_future.hpp) just adapted/simplified) 
 // for sycl (we have to get our events from the sycl runtime, and normal stream callbacks are not 
