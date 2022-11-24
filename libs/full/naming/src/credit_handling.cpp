@@ -364,8 +364,7 @@ namespace hpx::naming {
 
             std::int64_t result = 0;
             {
-                hpx::util::unlock_guard<std::unique_lock<gid_type::mutex_type>>
-                    ul(l);
+                hpx::unlock_guard<std::unique_lock<gid_type::mutex_type>> ul(l);
                 result = agas::incref(launch::sync, unlocked_gid, added_credit);
             }
 

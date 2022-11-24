@@ -13,5 +13,5 @@
 #include <hpx/thread_support/unlock_guard.hpp>
 
 namespace hpx {
-    using hpx::util::unlock_guard;
+    using hpx::unlock_guard;
 }    // namespace hpx

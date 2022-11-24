@@ -311,7 +311,7 @@ namespace hpx { namespace lcos { namespace local {
                     &base_and_gate::test_condition, this, generation_value));
 
                 {
-                    hpx::util::unlock_guard<Lock> ul(l);
+                    hpx::unlock_guard<Lock> ul(l);
                     f.get();
                 }    // make sure lock gets re-acquired
             }

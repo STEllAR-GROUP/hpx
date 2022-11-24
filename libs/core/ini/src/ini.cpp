@@ -354,7 +354,7 @@ namespace hpx { namespace util {
             if (it != sections_.end())
             {
                 std::string sub_sec_name = sec_name.substr(i + 1);
-                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*it).second.has_section(sub_sec_name);
             }
             return false;
@@ -373,7 +373,7 @@ namespace hpx { namespace util {
             if (it != sections_.end())
             {
                 std::string sub_sec_name = sec_name.substr(i + 1);
-                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*it).second.get_section(sub_sec_name);
             }
 
@@ -406,7 +406,7 @@ namespace hpx { namespace util {
             if (it != sections_.end())
             {
                 std::string sub_sec_name = sec_name.substr(i + 1);
-                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*it).second.get_section(sub_sec_name);
             }
 
@@ -469,7 +469,7 @@ namespace hpx { namespace util {
                     std::string value = e.first;
                     entry_changed_func f = e.second;
 
-                    hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     f(fullkey, value);
                 }
             }
@@ -518,7 +518,7 @@ namespace hpx { namespace util {
                     std::string value = it->second.first;
                     entry_changed_func f = it->second.second;
 
-                    hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     f(fullkey, value);
                 }
             }
@@ -535,7 +535,7 @@ namespace hpx { namespace util {
                     std::string value = p.first->second.first;
                     entry_changed_func f = p.first->second.second;
 
-                    hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     f(key, value);
                 }
             }
@@ -635,7 +635,7 @@ namespace hpx { namespace util {
             {
                 section_map::const_iterator cit = sections_.find(sub_sec);
                 HPX_ASSERT(cit != sections_.end());
-                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*cit).second.has_entry(sub_key);
             }
             return false;
@@ -655,7 +655,7 @@ namespace hpx { namespace util {
             {
                 section_map::const_iterator cit = sections_.find(sub_sec);
                 HPX_ASSERT(cit != sections_.end());
-                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*cit).second.get_entry(sub_key);
             }
 

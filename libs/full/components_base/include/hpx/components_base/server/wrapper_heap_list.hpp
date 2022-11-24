@@ -61,7 +61,7 @@ namespace hpx { namespace components { namespace detail {
             {
                 if ((*it)->did_alloc(p))
                 {
-                    util::unlock_guard ul(guard);
+                    unlock_guard ul(guard);
                     return (*it)->get_gid(id_range_, p, type_);
                 }
             }

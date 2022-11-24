@@ -217,7 +217,7 @@ namespace hpx { namespace lcos { namespace local {
                 std::exception_ptr e;
 
                 {
-                    util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     e = HPX_GET_EXCEPTION(hpx::future_cancelled,
                         hpx::throwmode::lightweight, "hpx::lcos::local::close",
                         "canceled waiting on this entry");
@@ -509,7 +509,7 @@ namespace hpx { namespace lcos { namespace local {
                 // canceled at this point
                 std::exception_ptr e;
                 {
-                    util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     e = std::exception_ptr(HPX_GET_EXCEPTION(
                         hpx::future_cancelled, "hpx::lcos::local::close",
                         "canceled waiting on this entry"));

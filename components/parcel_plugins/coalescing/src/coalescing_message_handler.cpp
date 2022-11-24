@@ -259,13 +259,13 @@ namespace hpx::plugins::parcel {
         {
             stopped_ = true;
             {
-                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 timer_.stop();    // interrupt timer
             }
         }
         else if (cancel_timer)
         {
-            hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+            hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
             timer_.stop();    // interrupt timer
         }
 

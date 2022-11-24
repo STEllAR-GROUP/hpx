@@ -65,7 +65,7 @@ namespace hpx { namespace util {
                     bool allocated = false;
 
                     {
-                        util::unlock_guard ul(guard);
+                        hpx::unlock_guard ul(guard);
                         allocated = heap->alloc(&p, count);
                     }
 
@@ -108,7 +108,7 @@ namespace hpx { namespace util {
             bool result = false;
 
             {
-                util::unlock_guard ul(guard);
+                hpx::unlock_guard ul(guard);
                 result = heap->alloc((void**) &p, count);
             }
 
@@ -176,7 +176,7 @@ namespace hpx { namespace util {
             bool did_allocate = false;
 
             {
-                util::unlock_guard ull(ul);
+                hpx::unlock_guard ull(ul);
                 did_allocate = heap->did_alloc(p);
                 if (did_allocate)
                 {
@@ -204,7 +204,7 @@ namespace hpx { namespace util {
         std::unique_lock ul(mtx_);
         for (typename list_type::value_type const& heap : heap_list_)
         {
-            util::unlock_guard ull(ul);
+            hpx::unlock_guard ull(ul);
             if (heap->did_alloc(p))
             {
                 return true;

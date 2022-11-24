@@ -364,7 +364,7 @@ namespace hpx { namespace components { namespace server {
                 dijkstra_color_ = false;    // start off with white
 
                 {
-                    util::unlock_guard<dijkstra_scoped_lock> ul(l);
+                    unlock_guard<dijkstra_scoped_lock> ul(l);
                     send_dijkstra_termination_token(target_id - 1,
                         initiating_locality_id, num_localities,
                         dijkstra_color_);
@@ -612,7 +612,7 @@ namespace hpx { namespace components { namespace server {
             stop_called_ = true;
 
             {
-                util::unlock_guard<std::mutex> ul(mtx_);
+                unlock_guard<std::mutex> ul(mtx_);
 
                 util::runtime_configuration& cfg = get_runtime().get_config();
                 std::size_t shutdown_check_count =

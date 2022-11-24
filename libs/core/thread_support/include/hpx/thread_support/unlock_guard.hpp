@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace util {
+namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // This is a helper structure to make sure a lock gets unlocked and locked
     // again in a scope.
@@ -36,4 +36,13 @@ namespace hpx { namespace util {
     private:
         Mutex& m_;
     };
+}    // namespace hpx
+
+namespace hpx { namespace util {
+
+    template <typename Mutex>
+    using unlock_guard HPX_DEPRECATED_V(1, 9,
+        "hpx::util::unlock_guard is deprecated, use "
+        "hpx::unlock_guard instead") = hpx::unlock_guard<Mutex>;
+
 }}    // namespace hpx::util

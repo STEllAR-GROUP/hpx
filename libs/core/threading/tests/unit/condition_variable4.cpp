@@ -53,7 +53,7 @@ void producer_consumer(double prod_sec, double cons_sec, bool interrupt)
                 int item;
 
                 {
-                    hpx::util::unlock_guard<hpx::mutex> ul(items_mtx);
+                    hpx::unlock_guard<hpx::mutex> ul(items_mtx);
                     item = next_value();
                     if (prod_sec > 0)
                     {
@@ -73,7 +73,7 @@ void producer_consumer(double prod_sec, double cons_sec, bool interrupt)
         for (;;)
         {
             {
-                hpx::util::unlock_guard<hpx::mutex> ul(items_mtx);
+                hpx::unlock_guard<hpx::mutex> ul(items_mtx);
                 if (cons_sec > 0)
                 {
                     hpx::this_thread::sleep_for(cons_sleep);

@@ -258,7 +258,7 @@ namespace hpx { namespace components { namespace detail {
             {
                 // this is the first call to get_gid() for this heap - allocate
                 // a sufficiently large range of global ids
-                util::unlock_guard ul(l);
+                unlock_guard ul(l);
                 base_gid = ids.get_id(parameters_.capacity);
 
                 // register the global ids and the base address of this heap
@@ -284,7 +284,7 @@ namespace hpx { namespace components { namespace detail {
             else
             {
                 // unbind the range which is not needed anymore
-                util::unlock_guard ul(l);
+                unlock_guard ul(l);
                 agas::unbind_range_local(base_gid, parameters_.capacity);
             }
         }
@@ -327,7 +327,7 @@ namespace hpx { namespace components { namespace detail {
             naming::gid_type base_gid = base_gid_;
             base_gid_ = naming::invalid_gid;
 
-            util::unlock_guard ull(lk);
+            unlock_guard ull(lk);
             agas::unbind_range_local(base_gid, parameters_.capacity);
         }
 

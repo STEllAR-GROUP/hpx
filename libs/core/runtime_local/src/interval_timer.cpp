@@ -81,7 +81,7 @@ namespace hpx { namespace util { namespace detail {
             {
                 first_start_ = false;
 
-                util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 if (pre_shutdown_)
                 {
                     register_pre_shutdown_function(util::deferred_call(
@@ -258,7 +258,7 @@ namespace hpx { namespace util { namespace detail {
             bool result = false;
 
             {
-                util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 result = f_();    // invoke the supplied function
             }
 
@@ -301,7 +301,7 @@ namespace hpx { namespace util { namespace detail {
             // FIXME: registering threads might lead to thread suspension since
             // the allocators use hpx::spinlock. Unlocking the lock here would
             // be the right thing but leads to crashes and hangs at shutdown.
-            // util::unlock_guard<std::unique_lock<mutex_type> > ul(l);
+            // unlock_guard<std::unique_lock<mutex_type> > ul(l);
             hpx::threads::thread_init_data data(
                 hpx::threads::make_thread_function(hpx::bind_front(
                     &interval_timer::evaluate, this->shared_from_this())),

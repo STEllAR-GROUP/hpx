@@ -166,7 +166,7 @@ namespace hpx { namespace components {
                 threads::thread_restart_state::unknown;
 
             {
-                util::unlock_guard ul(mtx_);
+                unlock_guard ul(mtx_);
                 result = threads::get_self().yield_impl(state);
             }
 

@@ -205,7 +205,7 @@ namespace hpx::lcos::local::detail {
         reset_queue_entry r(f);
         {
             // suspend this thread
-            util::unlock_guard<std::unique_lock<mutex_type>> ul(lock);
+            unlock_guard<std::unique_lock<mutex_type>> ul(lock);
             this_ctx.suspend();
         }
 
@@ -228,7 +228,7 @@ namespace hpx::lcos::local::detail {
         reset_queue_entry r(f);
         {
             // suspend this thread
-            util::unlock_guard<std::unique_lock<mutex_type>> ul(lock);
+            unlock_guard<std::unique_lock<mutex_type>> ul(lock);
             this_ctx.sleep_until(abs_time.value());
         }
 
@@ -271,7 +271,7 @@ namespace hpx::lcos::local::detail {
                     "condition_variable::abort_all: pending thread: {}", ctx);
 
                 // unlock while notifying thread as this can suspend
-                util::unlock_guard<std::unique_lock<Mutex>> unlock(lock);
+                unlock_guard<std::unique_lock<Mutex>> unlock(lock);
 
                 // forcefully abort thread, do not throw
                 ctx.abort();

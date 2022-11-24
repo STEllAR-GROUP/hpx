@@ -488,7 +488,7 @@ namespace hpx { namespace performance_counters { namespace server {
             hpx::id_type base_counter_id;
             {
                 // We need to unlock the lock here since get_counter might suspend
-                util::unlock_guard<std::unique_lock<mutex_type>> unlock(l);
+                unlock_guard<std::unique_lock<mutex_type>> unlock(l);
                 base_counter_id = get_counter(base_counter_name_, ec);
             }
 

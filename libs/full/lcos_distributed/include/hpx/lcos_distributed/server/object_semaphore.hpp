@@ -114,7 +114,7 @@ namespace hpx { namespace lcos { namespace server {
                 thread_queue_.pop_front();
 
                 {
-                    util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    unlock_guard<std::unique_lock<mutex_type>> ul(l);
 
                     // set the LCO's result
                     applier::trigger(id, HPX_MOVE(value));
