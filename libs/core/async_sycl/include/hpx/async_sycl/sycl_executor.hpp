@@ -29,7 +29,7 @@ namespace hpx { namespace sycl { namespace experimental {
 
         // -------------------------------------------------------------------------
         /// Create a SYCL executor (based on a sycl queue)
-        sycl_executor(cl::sycl::default_selector selector)
+        explicit sycl_executor(cl::sycl::default_selector selector)
           : command_queue(selector, cl::sycl::property::queue::in_order{})
         {
         }

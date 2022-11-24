@@ -154,7 +154,6 @@ int hpx_main(int, char**)
     // Enable polling for the future
     hpx::sycl::experimental::detail::register_polling(hpx::resource::get_thread_pool(0));
     std::cout << "SYCL Future polling enabled!\n";
-    std::cout << "SYCL language version: " << SYCL_LANGUAGE_VERSION << "\n";
 
     // Sanity Test 0: Kind of superfluous check, but without that macro defined
     // event polling won't work. Might as well make sure...
