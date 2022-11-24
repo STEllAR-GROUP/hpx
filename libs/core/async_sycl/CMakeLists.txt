@@ -10,7 +10,10 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(async_sycl_headers hpx/async_sycl/detail/sycl_event_callback.hpp hpx/async_sycl/sycl_future.hpp hpx/async_sycl/sycl_executor.hpp)
+set(async_sycl_headers
+    hpx/async_sycl/detail/sycl_event_callback.hpp
+    hpx/async_sycl/sycl_future.hpp hpx/async_sycl/sycl_executor.hpp
+)
 
 # cmake-format: off
 set(async_sycl_compat_headers)
@@ -43,7 +46,7 @@ add_hpx_module(
 )
 # make it compile with sycl
 if(HPX_WITH_HIPSYCL)
-add_sycl_to_target(TARGET hpx_async_sycl SOURCES ${async_sycl_sources})
+  add_sycl_to_target(TARGET hpx_async_sycl SOURCES ${async_sycl_sources})
 else()
-target_compile_options(hpx_async_sycl PUBLIC -fsycl)
+  target_compile_options(hpx_async_sycl PUBLIC -fsycl)
 endif()
