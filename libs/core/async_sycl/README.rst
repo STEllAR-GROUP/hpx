@@ -34,7 +34,7 @@ To make this module compile, we use the -fno-sycl and -fsycl compiler parameters
 HPX to be compiled with dpcpp). For HipSYCL we use its cmake integration instead (requiring HPX to be compiled with
 clang++ and including HipSYCL as a library).
 
-To build with OneAPI, use the CMake Varaible HPX_WITH_SYCL=ON.
+To build with OneAPI, use the CMake Variable HPX_WITH_SYCL=ON.
 To build with HipSYCL, use HPX_WITH_SYCL=ON and HPX_WITH_HIPSYCL=ON (and make sure find_package will find HipSYCL).
 
 Lastly, the module contains three tests/examples. All three implement a simple vector add example. The first one

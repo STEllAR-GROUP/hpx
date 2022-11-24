@@ -63,9 +63,9 @@ namespace hpx { namespace sycl { namespace experimental {
         // code_location argument which is the last argument in every queue member
         // function in the intel oneapi sycl implementation.  As far as I can tell
         // it is usually invisible from the user-side since it is using a default
-        // agument (code_location::current())
+        // argument (code_location::current())
 
-        /// sycl::queue::member_function type with code_location paramter
+        /// sycl::queue::member_function type with code_location parameter
         template <typename... Params>
         using queue_function_ptr_t = cl::sycl::event (cl::sycl::queue::*)(
             Params..., const cl::sycl::detail::code_location&);

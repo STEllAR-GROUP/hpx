@@ -157,7 +157,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
         // the shared lock here merely ensures that the polling cannot be disabled while 
         // we use the default queue here
         std::shared_lock<detail::sycl_default_queue_mutex_type> queue_shared_lk(
-            detail::get_default_queue_mtx()); // make sure the polling has not yet stoped
+            detail::get_default_queue_mtx()); // make sure the polling has not yet stopped
         auto &optional_queue = get_default_queue(); 
         HPX_ASSERT_MSG(optional_queue.has_value(), 
             "Error: Internal SYCL default queue is empty - is the SYCL polling disabled?");
@@ -171,7 +171,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     // get_work_count (how many unfinished events are left (approx)
     
     /// Check for completed SYCL events and call their associated callbacks.
-    /** This methods trys to get the lock for the callback vector. 
+    /** This methods tries to get the lock for the callback vector. 
      * If unsuccessful it will exit as another thread is already polling.
      * If successful it will first check the event_callback_vector for
      * any events that are completed/finished and call their respective callbacks.

@@ -88,7 +88,7 @@ void VectorAdd_test1(const std::vector<size_t>& a_vector,
         // 3.9.8, the entire thing will synchronize here, due to the buffers
         // being destroyed!
         //
-        // Hence this implictly syncs everything, so we should use get on any
+        // Hence this implicitly syncs everything, so we should use get on any
         // futures/continuations beforehand (or simply make sure that the sycl
         // buffers (a_buf, b_buf_ add_buf)
         // have a longer lifetime by moving them to another scope.
@@ -124,7 +124,7 @@ void VectorAdd_test2(const std::vector<size_t>& a_vector,
     // to get an event to create this future!
     //
     // It is instead recommended to use exec.async_execute to get a future!
-    // exec.get_future is merely a convinience method in case we get a
+    // exec.get_future is merely a convenience method in case we get a
     // command_queue from some third-party library and need a future for
     // the current point the queue
     auto my_manual_fut = exec.get_future();
