@@ -83,7 +83,6 @@ void VectorAdd_test1(const std::vector<size_t>& a_vector,
                       << std::endl;
             std::terminate();
         }
-
         // NOTE about usage: according to the sycl specification (2020) section
         // 3.9.8, the entire thing will synchronize here, due to the buffers
         // being destroyed!
@@ -94,6 +93,7 @@ void VectorAdd_test1(const std::vector<size_t>& a_vector,
         // have a longer lifetime by moving them to another scope.
     }
 }
+
 
 /// Test executor post and get_future member method with a vector_add example
 void VectorAdd_test2(const std::vector<size_t>& a_vector,
@@ -146,6 +146,109 @@ void VectorAdd_test2(const std::vector<size_t>& a_vector,
     my_manual_fut.get();
 }
 
+/// Test executor hpx::async with a vector_add example
+void VectorAdd_test3(const std::vector<size_t>& a_vector,
+    const std::vector<size_t>& b_vector, std::vector<size_t>& add_parallel)
+{
+    cl::sycl::range<1> num_items{a_vector.size()};
+    bool continuation_triggered = false;
+    // buffers from host vectors
+    {
+    cl::sycl::buffer a_buf(a_vector.data(), num_items);
+    cl::sycl::buffer b_buf(b_vector.data(), num_items);
+    cl::sycl::buffer add_buf(add_parallel.data(), num_items);
+
+    // Create executor
+    hpx::sycl::experimental::sycl_executor exec(
+        cl::sycl::default_selector{});
+    std::cout << "Running on device: "
+              << exec.get_device().get_info<cl::sycl::info::device::name>()
+              << std::endl;
+    auto async_normal_fut = hpx::async(exec,
+        &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
+            cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
+            cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
+            cl::sycl::accessor add(
+                add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
+            h.parallel_for(
+                num_items, [=](auto i) { add[i] = a[i] + b[i]; });
+        });
+    // Add contiuation
+    auto continuation_future1 = async_normal_fut.then([&continuation_triggered](auto&& fut) {
+        fut.get();
+        std::cout << "OKAY: Continuation working!" << std::endl;
+        continuation_triggered = true;
+        return;
+    });
+    if (async_normal_fut.is_ready())
+    {
+        std::cerr
+            << "ERROR: hpx::async kernel launch future is immediately ready "
+            << "(thus probably not asynchronous at at all)!" << std::endl;
+        std::terminate();
+    }
+    else
+    {
+        std::cout << "OKAY: hpx::async kernel hpx::future is NOT ready immediately "
+                     "after launch!"
+                  << std::endl;
+    }
+    continuation_future1.get();
+    //  Was the continuation triggered by get as well?
+    if (!continuation_triggered)
+    {
+        std::cerr << "ERROR: Continuation was apparently not triggered, "
+                     "despite calling get!"
+                  << std::endl;
+        std::terminate();
+    }
+    }
+}
+
+/// Test hpx::apply and get_future member method with a vector_add example
+void VectorAdd_test4(const std::vector<size_t>& a_vector,
+    const std::vector<size_t>& b_vector, std::vector<size_t>& add_parallel)
+{
+    cl::sycl::range<1> num_items{a_vector.size()};
+    // buffers from host vectors
+    cl::sycl::buffer a_buf(a_vector.data(), num_items);
+    cl::sycl::buffer b_buf(b_vector.data(), num_items);
+    cl::sycl::buffer add_buf(add_parallel.data(), num_items);
+
+    // Test post and get_future methods
+    hpx::sycl::experimental::sycl_executor exec(
+        cl::sycl::default_selector{});
+    std::cout << "Running on device: "
+              << exec.get_device().get_info<cl::sycl::info::device::name>()
+              << std::endl;
+    // Launch kernel one-way
+    hpx::apply(exec, &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
+        cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
+        cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
+        cl::sycl::accessor add(
+            add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
+        h.parallel_for(num_items, [=](auto i) { add[i] = a[i] + b[i]; });
+    });
+    // For the sake of testing: still get a future
+    auto my_manual_fut = exec.get_future();
+    if (my_manual_fut.is_ready())
+    {
+        std::cerr << "ERROR: Manual get_future after hpx::apply "
+                     "is immediately ready "
+                  << "(thus probably not asynchronous at at all)!"
+                  << std::endl;
+        std::terminate();
+    }
+    else
+    {
+        std::cout << "OKAY: Manual get_future after hpx::apply is NOT ready "
+                     "immediately "
+                     "after launch!"
+                  << std::endl;
+    }
+    my_manual_fut.get();
+}
+
 int hpx_main(int, char**)
 {
     static_assert(vector_size >= 6, "vector_size unreasonably small");
@@ -153,23 +256,42 @@ int hpx_main(int, char**)
     hpx::sycl::experimental::detail::register_polling(hpx::resource::get_thread_pool(0));
     std::cout << "SYCL Future polling enabled!\n";
     std::cout << "SYCL language version: " << SYCL_LANGUAGE_VERSION << "\n";
-    // Input vectors
-    std::vector<size_t> a(vector_size), b(vector_size), add_parallel(vector_size);
 
-    // Run tests
+    std::vector<size_t> a(vector_size), b(vector_size),
+        add_parallel(vector_size);
+
+    std::cout << "\n-------------------" << std::endl;
     std::cout << "Test async execute:" << std::endl;
     fill_vector_add_input(a, b, add_parallel);
-    VectorAdd_test1(a, b, add_parallel);
-    check_vector_add_results(a, b, add_parallel); 
-    print_vector_results(a, b, add_parallel);
-    std::cout << "Test post and get_future() member method:" << std::endl;
-    fill_vector_add_input(a, b, add_parallel); // also resets result buffer
     VectorAdd_test1(a, b, add_parallel);
     check_vector_add_results(a, b, add_parallel);
     print_vector_results(a, b, add_parallel);
 
+    std::cout << "\n-----------------------------------------" << std::endl;
+    std::cout << "Test post and get_future() member method:" << std::endl;
+    fill_vector_add_input(a, b, add_parallel);
+    VectorAdd_test2(a, b, add_parallel);
+    check_vector_add_results(a, b, add_parallel);
+    print_vector_results(a, b, add_parallel);
+
+    std::cout << "\n------------------------------" << std::endl;
+    std::cout << "Test hpx::async with executor:" << std::endl;
+    fill_vector_add_input(a, b, add_parallel);
+    VectorAdd_test3(a, b, add_parallel);
+    check_vector_add_results(a, b, add_parallel);
+    print_vector_results(a, b, add_parallel);
+
+    std::cout << "\n---------------------------------------------------------"
+              << std::endl;
+    std::cout << "Test hpx::apply together with get_future() member method:"
+              << std::endl;
+    fill_vector_add_input(a, b, add_parallel);
+    VectorAdd_test4(a, b, add_parallel);
+    check_vector_add_results(a, b, add_parallel);
+    print_vector_results(a, b, add_parallel);
+
     // Cleanup
-    std::cout << "Disabling SYCL future polling.\n";
+    std::cout << "\nDisabling SYCL future polling.\n";
     hpx::sycl::experimental::detail::unregister_polling(hpx::resource::get_thread_pool(0));
     return hpx::finalize();
 }
