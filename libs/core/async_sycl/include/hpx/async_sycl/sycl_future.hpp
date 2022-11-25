@@ -48,7 +48,7 @@ namespace hpx { namespace sycl { namespace experimental {
             using other_allocator = typename std::allocator_traits<
                 Allocator>::template rebind_alloc<future_data>;
 
-            future_data() {}
+            future_data() = default;
 
             future_data(init_no_addref no_addref, other_allocator const& alloc,
                 cl::sycl::event command_event)

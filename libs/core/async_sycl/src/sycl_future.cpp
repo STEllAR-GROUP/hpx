@@ -4,8 +4,9 @@
 
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/config.hpp>
 #include <hpx/async_sycl/sycl_future.hpp>
-#ifndef __SYCL_DEVICE_ONLY__
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 
 namespace hpx { namespace sycl { namespace experimental { namespace detail {
