@@ -14,6 +14,26 @@
 
 #include <CL/sycl.hpp> 
 
+// Check compiler compatibility:
+// Needs to be done AFTER sycl include for HipSYCL
+// (intel dpcpp would be fine without the include)
+//
+// Will raise compile-time errors/warning in case of a unexpected configuration!
+//
+// This file is a good point to add this check as it will get included by
+// sycl_future.hpp and thus indirectly by sycl_executor.hpp
+#if defined(SYCL_LANGUAGE_VERSION)
+#if !defined(__INTEL_LLVM_COMPILER) && !defined(__HIPSYCL__)
+#warning "HPX-SYCL integration only tested with Intel oneapi and HipSYCL. \
+Utilized compiler appears to be neither of those!"
+#endif
+#else
+#error "Compiler does not seem to support SYCL! SYCL_LANGUAGE_VERSION is undefined!"
+#endif
+#if defined(__SYCL_SINGLE_SOURCE__)
+#warning "SYCL single source compiler not tested! Use one with multiple passes"
+#endif
+
 namespace hpx { namespace sycl { namespace experimental { namespace detail {
 
     /// Type of the event_callback function used. Unlike the CUDA counterpart we are
