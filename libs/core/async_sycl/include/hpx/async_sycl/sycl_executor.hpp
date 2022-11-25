@@ -82,9 +82,9 @@ namespace hpx { namespace sycl { namespace experimental {
             // Within the intel sycl api this is usually a default argument,
             // but for invoke we need to pass it manually 
             cl::sycl::event e =
-                std::invoke(std::forward<queue_function_ptr_t<Params...>>(
+                HPX_INVOKE(HPX_FORWARD(queue_function_ptr_t<Params...>,
                                 queue_member_function),
-                    command_queue, std::forward<Params...>(args...),
+                    command_queue, HPX_FORWARD(Params, args)...,
                     cl::sycl::detail::code_location::current());
         }
         /// Invoke queue member function given queue and parameters. Default
@@ -100,10 +100,10 @@ namespace hpx { namespace sycl { namespace experimental {
             // into the future
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    cl::sycl::event e = std::invoke(
-                        std::forward<queue_function_ptr_t<Params...>>(
+                    cl::sycl::event e = HPX_INVOKE(
+                        HPX_FORWARD(queue_function_ptr_t<Params...>,
                             queue_member_function),
-                        command_queue, std::forward<Params...>(args...),
+                        command_queue, HPX_FORWARD(Params,args)...,
                         cl::sycl::detail::code_location::current());
                     return get_future(e);
                 },
@@ -124,9 +124,9 @@ namespace hpx { namespace sycl { namespace experimental {
             Params&&... args)
         {
             cl::sycl::event e =
-                std::invoke(std::forward<queue_function_ptr_t<Params...>>(
+                HPX_INVOKE(HPX_FORWARD(queue_function_ptr_t<Params...>,
                                 queue_member_function),
-                    command_queue, std::forward<Params...>(args...));
+                    command_queue, HPX_FORWARD(Params, args)...);
         }
         /// Invoke queue member function given queue and parameters --
         /// hpx::future tied to the sycl event / (two way)
@@ -139,10 +139,10 @@ namespace hpx { namespace sycl { namespace experimental {
             // into the future
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    cl::sycl::event e = std::invoke(
-                        std::forward<queue_function_ptr_t<Params...>>(
+                    cl::sycl::event e = HPX_INVOKE(
+                        HPX_FORWARD(queue_function_ptr_t<Params...>,
                             queue_member_function),
-                        command_queue, std::forward<Params...>(args...));
+                        command_queue, HPX_FORWARD(Params, args)...);
 
 #if defined(__HIPSYCL__)
                     // TODO This overload works better for hipsycl -- checkout
