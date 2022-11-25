@@ -204,7 +204,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
             std::remove_if(event_callback_vector.begin(),
                 event_callback_vector.end(),
                 [&](event_callback& continuation) {
-                    const auto event_status = continuation.event.get_info<
+                    auto const event_status = continuation.event.get_info<
                         cl::sycl::info::event::command_execution_status>();
 
                     if (event_status != cl::sycl::info::event_command_status::complete)
@@ -221,7 +221,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
         detail::event_callback continuation;
         while (detail::get_event_callback_queue().try_dequeue(continuation))
         {
-            const auto event_status = continuation.event.get_info<
+            auto const event_status = continuation.event.get_info<
                cl::sycl::info::event::command_execution_status>();
 
             if (event_status != cl::sycl::info::event_command_status::complete)

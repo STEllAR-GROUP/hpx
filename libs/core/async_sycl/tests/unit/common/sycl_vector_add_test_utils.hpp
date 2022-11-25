@@ -10,8 +10,9 @@
 
 /// Fills the input vectors a and b with the predefined pattarn (a[i] = i).
 /// Resets device_results to 0 just in case of reusage.
-void fill_vector_add_input(std::vector<size_t>& a,
-    std::vector<size_t>& b, std::vector<size_t>& device_results) {
+void fill_vector_add_input(std::vector<size_t>& a, std::vector<size_t>& b,
+    std::vector<size_t>& device_results)
+{
     assert(a.size() == b.size());
     assert(device_results.size() == a.size());
     for (size_t i = 0; i < a.size(); i++)
@@ -21,10 +22,10 @@ void fill_vector_add_input(std::vector<size_t>& a,
         device_results.at(i) = 0;
     }
 }
-/// Compare the device_results with a sequential vector_add version.
-/// Calls std::terminate and prints an error message with any differences are detected
-void check_vector_add_results(const std::vector<size_t>& a,
-    const std::vector<size_t>& b, const std::vector<size_t>& device_results)
+/// Compare the device_results with a sequential vector_add version. Calls
+/// std::terminate and prints an error message with any differences are detected
+void check_vector_add_results(std::vector<size_t> const& a,
+    std::vector<size_t> const& b, std::vector<size_t> const& device_results)
 {
     assert(a.size() == b.size());
     assert(device_result.size() == a.size());
@@ -42,8 +43,8 @@ void check_vector_add_results(const std::vector<size_t>& a,
     std::cout << "OKAY: Vector add results correct!\n";
 }
 /// Print the first and last few results of the vector add kernel results.
-void print_vector_results(const std::vector<size_t>& a,
-    const std::vector<size_t>& b, const std::vector<size_t>& device_results)
+void print_vector_results(std::vector<size_t> const& a,
+    std::vector<size_t> const& b, std::vector<size_t> const& device_results)
 {
     assert(a.size() == b.size());
     assert(device_result.size() == a.size());
@@ -56,8 +57,9 @@ void print_vector_results(const std::vector<size_t>& a,
     std::cout << "...\n";
     for (size_t i = 3; i > 0; i--)
     {
-        std::cout << "[" << device_results.size() - i << "]: " << a[device_results.size() - i]
-                  << " + " << b[device_results.size() - i] << " = "
+        std::cout << "[" << device_results.size() - i
+                  << "]: " << a[device_results.size() - i] << " + "
+                  << b[device_results.size() - i] << " = "
                   << device_results[device_results.size() - i] << "\n";
     }
 }

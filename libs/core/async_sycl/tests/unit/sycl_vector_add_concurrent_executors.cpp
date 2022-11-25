@@ -29,14 +29,14 @@ std::atomic<size_t> number_executors_finished = 0;
 // overheads.  To this end, there is nothing outside the executors to keep the
 // SYCL runtime alive (effectively also testing if the default queue in our
 // sycl_event_callback file keeps the runtime alive)
-void VectorAdd(const std::vector<size_t>& a_vector,
-    const std::vector<size_t>& b_vector, std::vector<size_t>& add_parallel)
+void VectorAdd(std::vector<size_t> const& a_vector,
+    std::vector<size_t> const& b_vector, std::vector<size_t>& add_parallel)
 {
     std::vector<hpx::shared_future<void>> futs(number_executors);
     for (size_t exec_id = 0; exec_id < number_executors; exec_id++)
     {
-        const auto a_data = a_vector.data();
-        const auto b_data = b_vector.data();
+        auto const a_data = a_vector.data();
+        auto const b_data = b_vector.data();
         auto c_data = add_parallel.data();
         futs[exec_id] = hpx::async([exec_id, a_data, b_data, c_data]() {
             hpx::sycl::experimental::sycl_executor exec(
@@ -45,7 +45,7 @@ void VectorAdd(const std::vector<size_t>& a_vector,
             for (size_t repetition = 0; repetition < number_repetitions - 1;
                  repetition++)
             {
-                const size_t current_chunk_id = slice_size_per_executor *
+                size_t const current_chunk_id = slice_size_per_executor *
                     (exec_id * number_repetitions + repetition);
                 cl::sycl::buffer a_buf(a_data + current_chunk_id, num_items);
                 cl::sycl::buffer b_buf(b_data + current_chunk_id, num_items);
@@ -61,7 +61,7 @@ void VectorAdd(const std::vector<size_t>& a_vector,
                         num_items, [=](auto i) { add[i] = a[i] + b[i]; });
                 });
             }
-            const size_t last_chunk_id = slice_size_per_executor *
+            size_t const last_chunk_id = slice_size_per_executor *
                 (exec_id * number_repetitions + number_repetitions - 1);
             cl::sycl::buffer a_buf(a_data + last_chunk_id, num_items);
             cl::sycl::buffer b_buf(b_data + last_chunk_id, num_items);

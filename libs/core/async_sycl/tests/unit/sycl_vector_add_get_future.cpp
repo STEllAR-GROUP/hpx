@@ -61,14 +61,15 @@ constexpr size_t vector_size = 80000000;
 
 // Useful intel profiling commands:
 // advisor --collect=survey --profile-gpu -- ./bin/sycl_vector_add_test
-// advisor --collect=survey --collect=tripcounts --stacks --flop --profile-gpu -- ./bin/sycl_vector_add_test
+// advisor --collect=survey --collect=tripcounts --stacks --flop 
+// --profile-gpu -- ./bin/sycl_vector_add_test
 
 
 // This test will launch an simple vector add kernel on the given queue.
 // It will then create a hpx::future from the returned sycl event.
 // Includes various sanity / asynchronousy tests
-void VectorAdd(cl::sycl::queue& q, const std::vector<size_t>& a_vector,
-    const std::vector<size_t>& b_vector, std::vector<size_t>& add_parallel)
+void VectorAdd(cl::sycl::queue& q, std::vector<size_t> const& a_vector,
+    std::vector<size_t> const& b_vector, std::vector<size_t>& add_parallel)
 {
     cl::sycl::event my_kernel_event;
     cl::sycl::range<1> num_items{a_vector.size()};
@@ -114,7 +115,7 @@ void VectorAdd(cl::sycl::queue& q, const std::vector<size_t>& a_vector,
             });
         // Test 3: Is the kernel done after calling get?
         continuation_future.get();
-        const auto event_status_after =
+        auto const event_status_after =
             my_kernel_event
                 .get_info<cl::sycl::info::event::command_execution_status>();
         if (event_status_after ==
@@ -147,7 +148,6 @@ void VectorAdd(cl::sycl::queue& q, const std::vector<size_t>& a_vector,
         // have a longer lifetime by moving them to another scope.
     }
 }
-
 
 int hpx_main(int, char**)
 {

@@ -27,8 +27,8 @@
 constexpr size_t vector_size = 80000000;
 
 /// Test executor async_execute with a vector_add example
-void VectorAdd_test1(const std::vector<size_t>& a_vector,
-    const std::vector<size_t>& b_vector, std::vector<size_t>& add_parallel)
+void VectorAdd_test1(std::vector<size_t> const& a_vector,
+    std::vector<size_t> const& b_vector, std::vector<size_t>& add_parallel)
 {
     cl::sycl::range<1> num_items{a_vector.size()};
     {
@@ -55,12 +55,13 @@ void VectorAdd_test1(const std::vector<size_t>& a_vector,
                     num_items, [=](auto i) { add[i] = a[i] + b[i]; });
             });
         // Add contiuation
-        auto continuation_future1 = async_normal_fut.then([&continuation_triggered](auto&& fut) {
-            fut.get();
-            std::cout << "OKAY: Continuation working!" << std::endl;
-            continuation_triggered = true;
-            return;
-        });
+        auto continuation_future1 =
+            async_normal_fut.then([&continuation_triggered](auto&& fut) {
+                fut.get();
+                std::cout << "OKAY: Continuation working!" << std::endl;
+                continuation_triggered = true;
+                return;
+            });
         if (async_normal_fut.is_ready())
         {
             std::cerr
@@ -96,8 +97,8 @@ void VectorAdd_test1(const std::vector<size_t>& a_vector,
 
 
 /// Test executor post and get_future member method with a vector_add example
-void VectorAdd_test2(const std::vector<size_t>& a_vector,
-    const std::vector<size_t>& b_vector, std::vector<size_t>& add_parallel)
+void VectorAdd_test2(std::vector<size_t> const& a_vector,
+    std::vector<size_t> const& b_vector, std::vector<size_t>& add_parallel)
 {
     cl::sycl::range<1> num_items{a_vector.size()};
     // buffers from host vectors
@@ -147,8 +148,8 @@ void VectorAdd_test2(const std::vector<size_t>& a_vector,
 }
 
 /// Test executor hpx::async with a vector_add example
-void VectorAdd_test3(const std::vector<size_t>& a_vector,
-    const std::vector<size_t>& b_vector, std::vector<size_t>& add_parallel)
+void VectorAdd_test3(std::vector<size_t> const& a_vector,
+    std::vector<size_t> const& b_vector, std::vector<size_t>& add_parallel)
 {
     cl::sycl::range<1> num_items{a_vector.size()};
     bool continuation_triggered = false;
@@ -174,12 +175,13 @@ void VectorAdd_test3(const std::vector<size_t>& a_vector,
                 num_items, [=](auto i) { add[i] = a[i] + b[i]; });
         });
     // Add contiuation
-    auto continuation_future1 = async_normal_fut.then([&continuation_triggered](auto&& fut) {
-        fut.get();
-        std::cout << "OKAY: Continuation working!" << std::endl;
-        continuation_triggered = true;
-        return;
-    });
+    auto continuation_future1 =
+        async_normal_fut.then([&continuation_triggered](auto&& fut) {
+            fut.get();
+            std::cout << "OKAY: Continuation working!" << std::endl;
+            continuation_triggered = true;
+            return;
+        });
     if (async_normal_fut.is_ready())
     {
         std::cerr
@@ -206,8 +208,8 @@ void VectorAdd_test3(const std::vector<size_t>& a_vector,
 }
 
 /// Test hpx::apply and get_future member method with a vector_add example
-void VectorAdd_test4(const std::vector<size_t>& a_vector,
-    const std::vector<size_t>& b_vector, std::vector<size_t>& add_parallel)
+void VectorAdd_test4(std::vector<size_t> const& a_vector,
+    std::vector<size_t> const& b_vector, std::vector<size_t>& add_parallel)
 {
     cl::sycl::range<1> num_items{a_vector.size()};
     // buffers from host vectors

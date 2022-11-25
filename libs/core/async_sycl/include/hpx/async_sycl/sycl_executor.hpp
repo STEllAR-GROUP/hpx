@@ -71,7 +71,7 @@ namespace hpx { namespace sycl { namespace experimental {
         /// sycl::queue::member_function type with code_location parameter
         template <typename... Params>
         using queue_function_ptr_t = cl::sycl::event (cl::sycl::queue::*)(
-            std::decay_t<Params>..., const cl::sycl::detail::code_location&);
+            std::decay_t<Params>..., cl::sycl::detail::code_location const&);
         /// Invoke member function given queue and parameters. Default
         /// code_location argument added automatically.
         template <typename... Params>
