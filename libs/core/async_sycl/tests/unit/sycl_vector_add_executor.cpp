@@ -302,4 +302,13 @@ int main(int argc, char* argv[])
 {
     return hpx::init(argc, argv);
 }
+#else
+// Handle none-sycl builds
+int main()
+{
+    std::cerr << "SYCL Support was not given at compiletime! " << std::endl;
+    std::cerr << "Please check your build configuration!" << std::endl;
+    std::cerr << "Exiting..." << std::endl;
+    return 1; // Fail test, as it was meant to test SYCL
+}
 #endif
