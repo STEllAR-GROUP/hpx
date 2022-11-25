@@ -52,7 +52,7 @@ void VectorAdd(const std::vector<size_t>& a_vector,
                 cl::sycl::buffer add_buf(c_data + current_chunk_id, num_items);
 
                 // Testing post
-                exec.post(&cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
+                hpx::apply(exec, &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
                     cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
                     cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
                     cl::sycl::accessor add(
@@ -68,7 +68,7 @@ void VectorAdd(const std::vector<size_t>& a_vector,
             cl::sycl::buffer add_buf(c_data + last_chunk_id, num_items);
 
             // Testing async_exec
-            auto kernel_fut = exec.async_execute(
+            auto kernel_fut = hpx::async(exec,
                 &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
                     cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
                     cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
