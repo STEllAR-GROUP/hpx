@@ -107,6 +107,57 @@ namespace hpx { namespace parallel { namespace util {
     namespace detail {
 
         // Helper class to repeatedly call a function starting from a given
+        // iterator position till the predicate returns true.
+        template <typename Iterator>
+        struct loop_pred
+        {
+            ///////////////////////////////////////////////////////////////////
+            template <typename Begin, typename End, typename Pred>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
+                Begin it, End end, Pred&& pred)
+            {
+                for (/**/; it != end; ++it)
+                {
+                    if (HPX_INVOKE(pred, it))
+                        return it;
+                }
+                return it;
+            }
+        };
+    }    // namespace detail
+
+    template <typename ExPolicy>
+    struct loop_pred_t final
+      : hpx::functional::detail::tag_fallback<loop_pred_t<ExPolicy>>
+    {
+    private:
+        template <typename Begin, typename End, typename Pred>
+        friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
+        tag_fallback_invoke(hpx::parallel::util::loop_pred_t<ExPolicy>,
+            Begin begin, End end, Pred&& pred)
+        {
+            return detail::loop_pred<Begin>::call(
+                begin, end, HPX_FORWARD(Pred, pred));
+        }
+    };
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    template <typename ExPolicy>
+    inline constexpr loop_pred_t<ExPolicy> loop_pred = loop_pred_t<ExPolicy>{};
+#else
+    template <typename ExPolicy, typename Begin, typename End, typename Pred>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop_pred(
+        Begin begin, End end, Pred&& pred)
+    {
+        return hpx::parallel::util::loop_pred_t<ExPolicy>{}(
+            begin, end, HPX_FORWARD(Pred, pred));
+    }
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
+
+        // Helper class to repeatedly call a function starting from a given
         // iterator position.
         template <typename Iterator>
         struct loop_ind
