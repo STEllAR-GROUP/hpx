@@ -36,14 +36,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             sequential_find_t<ExPolicy>, Iterator first, Sentinel last,
             T const& value, Proj proj = Proj())
         {
-            for (; first != last; ++first)
-            {
-                if (HPX_INVOKE(proj, *first) == value)
-                {
-                    return first;
-                }
-            }
-            return first;
+            return util::loop_pred<
+                std::decay_t<hpx::execution::sequenced_policy>>(
+                first, last, [&value, &proj](auto const& curr) {
+                    return HPX_INVOKE(proj, *curr) == value;
+                });
         }
 
         template <typename FwdIter, typename Token, typename T, typename Proj>
@@ -98,14 +95,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             sequential_find_if_t<ExPolicy>, Iterator first, Sentinel last,
             Pred pred, Proj proj = Proj())
         {
-            for (; first != last; ++first)
-            {
-                if (HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
-                {
-                    return first;
-                }
-            }
-            return first;
+            return util::loop_pred<ExPolicy>(
+                first, last, [&pred, &proj](auto const& curr) {
+                    return HPX_INVOKE(pred, HPX_INVOKE(proj, *curr));
+                });
         }
 
         template <typename FwdIter, typename Token, typename F, typename Proj>
@@ -184,14 +177,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             sequential_find_if_not_t<ExPolicy>, Iterator first, Sentinel last,
             Pred pred, Proj proj = Proj())
         {
-            for (; first != last; ++first)
-            {
-                if (!HPX_INVOKE(pred, HPX_INVOKE(proj, *first)))
-                {
-                    return first;
-                }
-            }
-            return first;
+            return util::loop_pred<ExPolicy>(
+                first, last, [&pred, &proj](auto const& curr) {
+                    return !HPX_INVOKE(pred, HPX_INVOKE(proj, *curr));
+                });
         }
 
         template <typename FwdIter, typename Token, typename F, typename Proj>
