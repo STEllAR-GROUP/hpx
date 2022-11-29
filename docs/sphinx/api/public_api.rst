@@ -462,8 +462,8 @@ Classes
    :cpp:class:`hpx::function`                     :cppreference-generic:`utility/functional,function`
    :cpp:class:`hpx::function_ref`                 |p0792|_
    :cpp:class:`hpx::move_only_function`           :cppreference-generic:`utility/functional,move_only_function`
-   :cpp:struct:`hpx::traits::is_bind_expression`  :cppreference-generic:`utility/functional,is_bind_expression`
-   :cpp:struct:`hpx::traits::is_placeholder`      :cppreference-generic:`utility/functional,is_placeholder`
+   :cpp:struct:`hpx::is_bind_expression`          :cppreference-generic:`utility/functional,is_bind_expression`
+   :cpp:struct:`hpx::is_placeholder`              :cppreference-generic:`utility/functional,is_placeholder`
    :cpp:struct:`hpx::scoped_annotation`
    =============================================  =============================================================
 
@@ -477,7 +477,7 @@ Functions
    ========================================  =====================================================
    :cpp:func:`hpx::annotated_function`
    :cpp:func:`hpx::bind`                     :cppreference-generic:`utility/functional,bind`
-   :cpp:func:`hpx::experimental::bind_back`
+   :cpp:func:`hpx::bind_back`                :cppreference-generic:`utility/functional,bind_front`
    :cpp:func:`hpx::bind_front`               :cppreference-generic:`utility/functional,bind_front`
    :cpp:func:`hpx::invoke`                   :cppreference-generic:`utility/functional,invoke`
    :cpp:func:`hpx::invoke_fused`             :cppreference-generic:`utility,apply`
