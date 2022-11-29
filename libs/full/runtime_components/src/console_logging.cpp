@@ -250,8 +250,7 @@ namespace hpx { namespace components {
             {
                 naming::gid_type raw_prefix;
                 {
-                    util::unlock_guard<std::unique_lock<prefix_mutex_type>> ul(
-                        l);
+                    unlock_guard<std::unique_lock<prefix_mutex_type>> ul(l);
                     naming::get_agas_client().get_console_locality(raw_prefix);
                 }
 

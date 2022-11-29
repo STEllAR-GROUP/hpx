@@ -180,7 +180,7 @@ namespace hpx { namespace threads { namespace policies {
             else
 #endif
             {
-                hpx::util::unlock_guard<Lock> ull(lk);
+                hpx::unlock_guard<Lock> ull(lk);
 
                 // Allocate a new thread object.
                 threads::thread_data* p = nullptr;

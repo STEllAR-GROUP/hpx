@@ -185,7 +185,7 @@ namespace hpx { namespace agas { namespace server {
                 std::shared_ptr<naming::gid_type> current_gid = gid_it->second;
 
                 {
-                    util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    unlock_guard<std::unique_lock<mutex_type>> ul(l);
 
                     // split the credit as the receiving end will expect to keep the
                     // object alive
@@ -304,7 +304,7 @@ namespace hpx { namespace agas { namespace server {
 
                 // hold on to entry while map is unlocked
                 std::shared_ptr<naming::gid_type> current_gid(it->second);
-                util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                unlock_guard<std::unique_lock<mutex_type>> ul(l);
 
                 found[it->first] =
                     naming::detail::split_gid_if_needed(*current_gid).get();
@@ -321,7 +321,7 @@ namespace hpx { namespace agas { namespace server {
 
                 // hold on to entry while map is unlocked
                 std::shared_ptr<naming::gid_type> current_gid(it->second);
-                util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                unlock_guard<std::unique_lock<mutex_type>> ul(l);
 
                 found[it->first] =
                     naming::detail::split_gid_if_needed(*current_gid).get();
@@ -356,7 +356,7 @@ namespace hpx { namespace agas { namespace server {
                 // split the credit as the receiving end will expect to keep the
                 // object alive
                 {
-                    util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     new_gid =
                         naming::detail::split_gid_if_needed(*current_gid).get();
 

@@ -366,7 +366,7 @@ namespace hpx::parcelset {
                     {
                         std::shared_ptr<policies::message_handler> p(
                             (*it).second);
-                        util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                        unlock_guard<std::unique_lock<mutex_type>> ul(l);
                         did_some_work = p->flush(flush_mode, stop_buffering) ||
                             did_some_work;
                     }

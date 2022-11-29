@@ -252,7 +252,7 @@ namespace hpx { namespace threads { namespace detail {
 
                     {
                         // unlock the lock while joining
-                        util::unlock_guard<Lock> ul(l);
+                        unlock_guard<Lock> ul(l);
                         remove_processing_unit_internal(i);
                     }
                 }

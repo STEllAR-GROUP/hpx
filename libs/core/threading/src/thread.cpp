@@ -219,7 +219,7 @@ namespace hpx {
                 hpx::bind_front(&resume_thread, HPX_MOVE(this_id))))
         {
             // wait for thread to be terminated
-            util::unlock_guard ul(l);
+            unlock_guard ul(l);
             this_thread::suspend(
                 threads::thread_schedule_state::suspended, "thread::join");
         }

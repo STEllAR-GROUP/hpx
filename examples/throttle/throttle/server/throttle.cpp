@@ -100,7 +100,7 @@ namespace throttle { namespace server {
 
         {
             // put this shepherd thread to sleep for 100ms
-            hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+            hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }

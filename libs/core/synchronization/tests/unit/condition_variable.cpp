@@ -538,7 +538,7 @@ void test_condition_waits()
         HPX_TEST(lock ? true : false);
 
         {
-            hpx::util::unlock_guard<unique_lock> ul(lock);
+            hpx::unlock_guard<unique_lock> ul(lock);
             hpx::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
 
@@ -550,7 +550,7 @@ void test_condition_waits()
         HPX_TEST_EQ(data.awoken, 1);
 
         {
-            hpx::util::unlock_guard<unique_lock> ul(lock);
+            hpx::unlock_guard<unique_lock> ul(lock);
             hpx::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
 
@@ -562,7 +562,7 @@ void test_condition_waits()
         HPX_TEST_EQ(data.awoken, 2);
 
         {
-            hpx::util::unlock_guard<unique_lock> ul(lock);
+            hpx::unlock_guard<unique_lock> ul(lock);
             hpx::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
 
@@ -574,7 +574,7 @@ void test_condition_waits()
         HPX_TEST_EQ(data.awoken, 3);
 
         {
-            hpx::util::unlock_guard<unique_lock> ul(lock);
+            hpx::unlock_guard<unique_lock> ul(lock);
             hpx::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
 
@@ -586,7 +586,7 @@ void test_condition_waits()
         HPX_TEST_EQ(data.awoken, 4);
 
         {
-            hpx::util::unlock_guard<unique_lock> ul(lock);
+            hpx::unlock_guard<unique_lock> ul(lock);
             hpx::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
 

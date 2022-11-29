@@ -124,8 +124,7 @@ namespace hpx { namespace threads {
         while (!exit_funcs_.empty())
         {
             {
-                hpx::util::unlock_guard<
-                    std::unique_lock<hpx::util::detail::spinlock>>
+                hpx::unlock_guard<std::unique_lock<hpx::util::detail::spinlock>>
                     ul(l);
                 if (!exit_funcs_.front().empty())
                     exit_funcs_.front()();

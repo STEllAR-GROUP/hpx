@@ -256,7 +256,7 @@ namespace allocator {
         alloc_block<T>* new_chain = nullptr;
 
         {
-            hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(lk);
+            hpx::unlock_guard<std::unique_lock<mutex_type>> ul(lk);
 
             // allocate new page
             pg = reinterpret_cast<alloc_page*>(std::malloc(sizeof(alloc_page)));
