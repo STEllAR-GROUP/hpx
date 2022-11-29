@@ -124,11 +124,11 @@ namespace hpx { namespace parallel { namespace util {
                     traits::vector_pack_size<V>::value;
 
                 End const lastV = last - (size + 1);
-                int offset = 0;
 
                 while (first < lastV)
                 {
-                    offset = datapar_loop_pred_step<Begin>::callv(pred, first);
+                    int offset =
+                        datapar_loop_pred_step<Begin>::callv(pred, first);
                     if (offset != -1)
                     {
                         std::advance(first, offset);
