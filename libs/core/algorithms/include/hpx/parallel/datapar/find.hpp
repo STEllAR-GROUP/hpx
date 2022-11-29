@@ -36,23 +36,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         static inline Iterator call(
             Iterator first, Sentinel last, T const& val, Proj proj)
         {
-            int offset = 0;
-            util::cancellation_token<> tok;
-
-            auto ret = util::loop_n<std::decay_t<ExPolicy>>(first,
-                std::distance(first, last), tok,
-                [&offset, &val, &tok, &proj](auto const& curr) {
+            return util::loop_pred<std::decay_t<ExPolicy>>(
+                first, last, [&val, &proj](auto const& curr) {
                     auto msk = HPX_INVOKE(proj, *curr) == val;
-                    offset = hpx::parallel::traits::find_first_of(msk);
-                    if (offset != -1)
-                    {
-                        tok.cancel();
-                    }
+                    return hpx::parallel::traits::find_first_of(msk);
                 });
-
-            if (tok.was_cancelled())
-                std::advance(ret, offset);
-            return ret;
         }
 
         template <typename FwdIter, typename Token, typename T, typename Proj>
@@ -79,7 +67,18 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         sequential_find_t<ExPolicy>, Iterator first, Sentinel last,
         T const& val, Proj proj = Proj())
     {
-        return datapar_find<ExPolicy>::call(first, last, val, proj);
+        if constexpr (hpx::parallel::util::detail::iterator_datapar_compatible<
+                          Iterator>::value)
+        {
+            return datapar_find<ExPolicy>::call(first, last, val, proj);
+        }
+        else
+        {
+            using base_policy_type =
+                decltype((hpx::execution::experimental::to_non_simd(
+                    std::declval<ExPolicy>())));
+            return sequential_find<base_policy_type>(first, last, val, proj);
+        }
     }
 
     template <typename ExPolicy, typename FwdIter, typename Token, typename T,
@@ -103,23 +102,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         static inline Iterator call(
             Iterator first, Sentinel last, Pred pred, Proj proj)
         {
-            int offset = 0;
-            util::cancellation_token<> tok;
-
-            auto ret = util::loop_n<std::decay_t<ExPolicy>>(first,
-                std::distance(first, last), tok,
-                [&offset, &pred, &tok, &proj](auto const& curr) {
+            return util::loop_pred<std::decay_t<ExPolicy>>(
+                first, last, [&pred, &proj](auto const& curr) {
                     auto msk = HPX_INVOKE(pred, HPX_INVOKE(proj, *curr));
-                    offset = hpx::parallel::traits::find_first_of(msk);
-                    if (offset != -1)
-                    {
-                        tok.cancel();
-                    }
+                    return hpx::parallel::traits::find_first_of(msk);
                 });
-
-            if (tok.was_cancelled())
-                std::advance(ret, offset);
-            return ret;
         }
 
         template <typename FwdIter, typename Token, typename F, typename Proj>
@@ -160,7 +147,19 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         sequential_find_if_t<ExPolicy>, Iterator first, Sentinel last,
         Pred pred, Proj proj = Proj())
     {
-        return datapar_find_if<ExPolicy>::call(first, last, pred, proj);
+        if constexpr (hpx::parallel::util::detail::iterator_datapar_compatible<
+                          Iterator>::value)
+        {
+            return datapar_find_if<ExPolicy>::call(first, last, pred, proj);
+        }
+        else
+        {
+            using base_policy_type =
+                decltype((hpx::execution::experimental::to_non_simd(
+                    std::declval<ExPolicy>())));
+            return sequential_find_if<base_policy_type>(
+                first, last, pred, proj);
+        }
     }
 
     template <typename ExPolicy, typename FwdIter, typename Token, typename F,
@@ -197,24 +196,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         static inline Iterator call(
             Iterator first, Sentinel last, Pred pred, Proj proj)
         {
-            int offset = 0;
-            util::cancellation_token<> tok;
-
-            auto ret =
-                util::loop_n<ExPolicy>(first, std::distance(first, last), tok,
-                    [&offset, &pred, &tok, &proj](
-                        auto const& curr) mutable -> void {
-                        auto msk = !HPX_INVOKE(pred, HPX_INVOKE(proj, *curr));
-                        offset = hpx::parallel::traits::find_first_of(msk);
-                        if (offset != -1)
-                        {
-                            tok.cancel();
-                        }
-                    });
-
-            if (tok.was_cancelled())
-                std::advance(ret, offset);
-            return ret;
+            return util::loop_pred<std::decay_t<ExPolicy>>(
+                first, last, [&pred, &proj](auto const& curr) mutable {
+                    auto msk = !HPX_INVOKE(pred, HPX_INVOKE(proj, *curr));
+                    return hpx::parallel::traits::find_first_of(msk);
+                });
         }
 
         template <typename FwdIter, typename Token, typename F, typename Proj>
@@ -255,7 +241,19 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         sequential_find_if_not_t<ExPolicy>, Iterator first, Sentinel last,
         Pred pred, Proj proj = Proj())
     {
-        return datapar_find_if_not<ExPolicy>::call(first, last, pred, proj);
+        if constexpr (hpx::parallel::util::detail::iterator_datapar_compatible<
+                          Iterator>::value)
+        {
+            return datapar_find_if_not<ExPolicy>::call(first, last, pred, proj);
+        }
+        else
+        {
+            using base_policy_type =
+                decltype((hpx::execution::experimental::to_non_simd(
+                    std::declval<ExPolicy>())));
+            return sequential_find_if_not<base_policy_type>(
+                first, last, pred, proj);
+        }
     }
 
     template <typename ExPolicy, typename FwdIter, typename Token, typename F,

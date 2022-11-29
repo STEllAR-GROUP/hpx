@@ -126,6 +126,40 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>
+    struct datapar_loop_pred_step
+    {
+        typedef typename std::iterator_traits<Iter>::value_type value_type;
+
+        typedef typename traits::vector_pack_type<value_type, 1>::type V1;
+        typedef typename traits::vector_pack_type<value_type>::type V;
+
+        // Return -1 if the element does not satisfies predicate.
+        // Return 0 if predicate satisfies.
+        // Note 0 is treated as index since call1() is on scalars,
+        // the first element satisfying the predicate would be 0.
+        template <typename Pred>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static int call1(Pred&& pred, Iter& it)
+        {
+            V1 tmp(traits::vector_pack_load<V1, value_type>::unaligned(it));
+            int idx = HPX_INVOKE(pred, &tmp);
+            traits::vector_pack_store<V1, value_type>::unaligned(tmp, it);
+            return idx;
+        }
+
+        // Return -1 if no element of the vector register satisfies predicate.
+        // Returns index to the first element that satisfies the predicate.
+        template <typename Pred>
+        HPX_HOST_DEVICE HPX_FORCEINLINE static int callv(Pred&& pred, Iter& it)
+        {
+            V tmp(traits::vector_pack_load<V, value_type>::aligned(it));
+            int idx = HPX_INVOKE(pred, &tmp);
+            traits::vector_pack_store<V, value_type>::aligned(tmp, it);
+            return idx;
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iter, typename Enable = void>
     struct datapar_loop_step_ind
     {
         typedef typename std::iterator_traits<Iter>::value_type value_type;
