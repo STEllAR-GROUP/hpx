@@ -404,7 +404,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                 // number of elements to sort
                 std::size_t chunk_size = execution::get_chunk_size(
-                    policy.parameters(), policy.executor(), 0, cores, nelem);
+                    policy.parameters(), policy.executor(),
+                    [](std::size_t) { return 0; }, cores, nelem);
 
                 hpx::future<Iter> left = execution::async_execute(
                     policy.executor(), sort_thread_helper(), policy, first,

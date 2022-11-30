@@ -807,24 +807,24 @@ algorithms of determining those chunk sizes.
 
 The way executor parameters are implemented is aligned with the way executors
 are implemented. All functionalities of concrete executor parameter types are
-exposed and accessible through a corresponding
-:cpp:class:`hpx::parallel::executor_parameter_traits` type.
+exposed and accessible through a corresponding customization point, e.g.
+``get_chunk_size()``.
 
 With ``executor_parameter_traits``, clients access all types of executor
 parameters uniformly::
 
     std::size_t chunk_size =
-        executor_parameter_traits<my_parameter_t>::get_chunk_size(my_parameter,
-            my_executor, [](){ return 0; }, num_tasks);
+        hpx::execution::get_chunk_size(my_parameter,
+            my_executor, [](auto){ return 0; }, num_cores, num_tasks);
 
 This call synchronously retrieves the size of a single chunk of loop iterations
 (or similar) to combine for execution on a single |hpx| thread if the overall
-number of tasks to schedule is given by ``num_tasks``. The lambda function
-exposes a means of test-probing the execution of a single iteration for
-performance measurement purposes. The execution parameter type might dynamically
-determine the execution time of one or more tasks in order to calculate the
-chunk size; see :cpp:class:`hpx::execution::auto_chunk_size` for an example of
-this executor parameter type.
+number of cores ``num_cores`` and tasks to schedule is given by ``num_tasks``.
+The lambda function exposes a means of test-probing the execution of a single
+iteration for performance measurement purposes. The execution parameter type
+might dynamically determine the execution time of one or more tasks in order
+to calculate the chunk size; see :cpp:class:`hpx::execution::auto_chunk_size`
+for an example of this executor parameter type.
 
 Other functions in the interface exist to discover whether an executor parameter
 type should be invoked once (i.e., it returns a static chunk size; see
