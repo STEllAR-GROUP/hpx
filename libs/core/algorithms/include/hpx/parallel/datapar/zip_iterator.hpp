@@ -38,10 +38,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             hpx::util::index_pack<Is...>)
         {
             auto const& t = it.get_iterator_tuple();
-            bool const sequencer[] = {
-                true, is_data_aligned(hpx::get<Is>(t))...};
-            return std::all_of(&sequencer[1], &sequencer[sizeof...(Is) + 1],
-                [](bool val) { return val; });
+            return (true && ... && is_data_aligned(hpx::get<Is>(t)));
         }
 
         static HPX_FORCEINLINE bool call(
@@ -117,12 +114,10 @@ namespace hpx { namespace parallel { namespace traits {
             hpx::util::index_pack<Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
-            int const sequencer[] = {0,
-                (vector_pack_store<typename hpx::tuple_element<Is, Tuple>::type,
-                     typename std::iterator_traits<Iter>::value_type>::
-                        aligned(hpx::get<Is>(value), hpx::get<Is>(t)),
-                    0)...};
-            (void) sequencer;
+            (vector_pack_store<typename hpx::tuple_element<Is, Tuple>::type,
+                 typename std::iterator_traits<Iter>::value_type>::
+                    aligned(hpx::get<Is>(value), hpx::get<Is>(t)),
+                ...);
         }
 
         template <typename Tuple, typename... Iter, std::size_t... Is>
@@ -131,12 +126,10 @@ namespace hpx { namespace parallel { namespace traits {
             hpx::util::index_pack<Is...>)
         {
             auto const& t = iter.get_iterator_tuple();
-            int const sequencer[] = {0,
-                (vector_pack_store<typename hpx::tuple_element<Is, Tuple>::type,
-                     typename std::iterator_traits<Iter>::value_type>::
-                        unaligned(hpx::get<Is>(value), hpx::get<Is>(t)),
-                    0)...};
-            (void) sequencer;
+            (vector_pack_store<typename hpx::tuple_element<Is, Tuple>::type,
+                 typename std::iterator_traits<Iter>::value_type>::
+                    unaligned(hpx::get<Is>(value), hpx::get<Is>(t)),
+                ...);
         }
     }    // namespace detail
 

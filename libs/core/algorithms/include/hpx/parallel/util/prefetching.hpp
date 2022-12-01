@@ -250,12 +250,8 @@ namespace hpx { namespace parallel { namespace util {
         template <typename... T>
         HPX_FORCEINLINE void prefetch_addresses(T const&... ts)
         {
-            int const sequencer[] = {
-                (_mm_prefetch(
-                     const_cast<char*>((char const*) &ts), _MM_HINT_T0),
-                    0)...,
-                0};
-            (void) sequencer;
+            (_mm_prefetch(const_cast<char*>((char const*) &ts), _MM_HINT_T0),
+                ...);
         }
 
         template <typename... Ts, std::size_t... Is>
@@ -269,8 +265,7 @@ namespace hpx { namespace parallel { namespace util {
         HPX_FORCEINLINE void prefetch_containers(hpx::tuple<Ts...> const& t,
             hpx::util::index_pack<Is...>, std::size_t idx)
         {
-            int const sequencer[] = {(hpx::get<Is>(t).get()[idx], 0)..., 0};
-            (void) sequencer;
+            (hpx::get<Is>(t).get()[idx], ...);
         }
 #endif
 

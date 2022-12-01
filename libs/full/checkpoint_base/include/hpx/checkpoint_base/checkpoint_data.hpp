@@ -47,11 +47,7 @@ namespace hpx { namespace util {
         ar.get_extra_data<checkpointing_tag>();
 
         // Serialize data
-
-        // Trick to expand the variable pack, takes advantage of the
-        // comma operator.
-        int const sequencer[] = {0, (ar << ts, 0)...};
-        (void) sequencer;    // Suppress unused param. warnings
+        (hpx::serialization::detail::serialize_one(ar, ts), ...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -78,11 +74,7 @@ namespace hpx { namespace util {
         ar.get_extra_data<checkpointing_tag>();
 
         // Serialize data
-
-        // Trick to expand the variable pack, takes advantage of the
-        // comma operator.
-        int const sequencer[] = {0, (ar << ts, 0)...};
-        (void) sequencer;    // Suppress unused param. warnings
+        (hpx::serialization::detail::serialize_one(ar, ts), ...);
 
         return data.size();
     }
@@ -108,11 +100,7 @@ namespace hpx { namespace util {
         hpx::serialization::input_archive ar(cont, cont.size());
 
         // De-serialize data
-
-        // Trick to expand the variable pack, takes advantage of the comma
-        // operator
-        int const sequencer[] = {0, (ar >> ts, 0)...};
-        (void) sequencer;    // Suppress unused variable warnings
+        (hpx::serialization::detail::serialize_one(ar, ts), ...);
     }
 
     /// \cond NOINTERNAL
@@ -123,11 +111,7 @@ namespace hpx { namespace util {
         hpx::serialization::input_archive ar(cont, cont.size());
 
         // De-serialize data
-
-        // Trick to expand the variable pack, takes advantage of the comma
-        // operator
-        int const sequencer[] = {0, (f(ar, ts), 0)...};
-        (void) sequencer;    // Suppress unused variable warnings
+        (f(ar, ts), ...);
     }
     /// \endcond
 }}    // namespace hpx::util

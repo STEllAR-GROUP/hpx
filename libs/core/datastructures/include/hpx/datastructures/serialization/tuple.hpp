@@ -58,13 +58,13 @@ namespace hpx::util::detail {
         static void call(Archive& ar, T& t, unsigned int)
         {
 #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS)
-            int const _sequencer[] = {((ar & hpx::get<Is>(t)), 0)...};
+            (hpx::serialization::detail::serialize_one(ar, hpx::get<Is>(t)),
+                ...);
 #else
-            int const _sequencer[] = {
-                ((ar & const_cast<std::remove_const_t<Ts>&>(hpx::get<Is>(t))),
-                    0)...};
+            (hpx::serialization::detail::serialize_one(
+                 ar, const_cast<std::remove_const_t<Ts>&>(hpx::get<Is>(t))),
+                ...);
 #endif
-            (void) _sequencer;
         }
     };
 
@@ -106,15 +106,12 @@ namespace hpx::util::detail {
         static void call(Archive& ar, hpx::tuple<Ts...>& t, unsigned int)
         {
 #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS)
-            int const _sequencer[] = {
-                (load_element(ar, hpx::get<Is>(t)), 0)...};
+            (load_element(ar, hpx::get<Is>(t)), ...);
 #else
-            int const _sequencer[] = {
-                (load_element(
-                     ar, const_cast<std::remove_const_t<Ts>&>(hpx::get<Is>(t))),
-                    0)...};
+            (load_element(
+                 ar, const_cast<std::remove_const_t<Ts>&>(hpx::get<Is>(t))),
+                ...);
 #endif
-            (void) _sequencer;
         }
     };
 
@@ -135,9 +132,7 @@ namespace hpx::util::detail {
 
         static void call(Archive& ar, hpx::tuple<Ts...> const& t, unsigned int)
         {
-            int const _sequencer[] = {
-                (save_element(ar, hpx::get<Is>(t)), 0)...};
-            (void) _sequencer;
+            (save_element(ar, hpx::get<Is>(t)), ...);
         }
     };
 }    // namespace hpx::util::detail

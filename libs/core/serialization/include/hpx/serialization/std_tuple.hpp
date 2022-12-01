@@ -49,17 +49,16 @@ namespace hpx { namespace serialization {
             static void call(Archive& ar, std::tuple<Ts...>& t, unsigned int)
             {
 #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS)
-                int const _sequencer[] = {((ar & std::get<Is>(t)), 0)...};
+                (hpx::serialization::detail::serialize_one(ar, std::get<Is>(t)),
+                    ...);
 #else
-                int const _sequencer[] = {
-                    ((ar &
-                         const_cast<std::remove_const_t<Ts>&>(std::get<Is>(t))),
-                        0)...};
+                (hpx::serialization::detail::serialize_one(
+                     ar, const_cast<std::remove_const_t<Ts>&>(std::get<Is>(t))),
+                    ...);
 #endif
-                (void) _sequencer;
             }
-        };
-    }    // namespace detail
+        };    // namespace detail
+    }         // namespace detail
 
     template <typename Archive, typename... Ts>
     void serialize(Archive& ar, std::tuple<Ts...>& t, unsigned int version)
