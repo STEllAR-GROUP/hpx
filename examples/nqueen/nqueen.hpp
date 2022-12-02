@@ -60,8 +60,7 @@ namespace nqueen {
         //------------------------------------------------------
         void update_board(std::size_t level, std::size_t pos)
         {
-            hpx::apply<server::board::update_action>(
-                this->get_id(), level, pos);
+            hpx::post<server::board::update_action>(this->get_id(), level, pos);
         }
 
         //-----------------------------------------------------
@@ -95,7 +94,7 @@ namespace nqueen {
         //---------------------------------------------------------
         void clear_board()
         {
-            hpx::apply<server::board::clear_action>(this->get_id());
+            hpx::post<server::board::clear_action>(this->get_id());
         }
     };
 }    // namespace nqueen

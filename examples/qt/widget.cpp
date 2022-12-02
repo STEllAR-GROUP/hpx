@@ -84,7 +84,7 @@ void widget::run_clicked(bool)
 {
     run_button->setEnabled(false);
     list->clear();
-    hpx::apply(callback_, this, no_threads);
+    hpx::post(callback_, this, no_threads);
 }
 
 void widget::add_label(const QString& text)

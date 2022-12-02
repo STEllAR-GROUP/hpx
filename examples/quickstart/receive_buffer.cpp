@@ -88,7 +88,7 @@ public:
     // Helper function to send our boundary elements to the left neighbor.
     void send_left(std::size_t timestep, int data) const
     {
-        hpx::apply(from_right_action(), left_, timestep, data);
+        hpx::post(from_right_action(), left_, timestep, data);
     }
 
     // Helper function to receive the boundary element from the right neighbor.

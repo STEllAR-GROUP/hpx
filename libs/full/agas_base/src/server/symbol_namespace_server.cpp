@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/agas_base/server/symbol_namespace.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
+#include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>

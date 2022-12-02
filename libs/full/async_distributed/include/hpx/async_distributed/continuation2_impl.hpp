@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/async_distributed/applier/apply_continue_fwd.hpp>
-#include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
+#include <hpx/async_distributed/detail/post_continue_fwd.hpp>
+#include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -46,7 +46,7 @@ namespace hpx { namespace actions {
         operator()(hpx::id_type const& lco, T&& t) const
         {
             using hpx::placeholders::_2;
-            hpx::apply_continue(
+            hpx::post_continue(
                 cont_, hpx::bind(f_, lco, _2), target_, HPX_FORWARD(T, t));
 
             // Unfortunately we need to default construct the return value,

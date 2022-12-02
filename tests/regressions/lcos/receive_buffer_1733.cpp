@@ -64,7 +64,7 @@ protected:
     }
     void send(std::size_t t, std::size_t d)
     {
-        hpx::apply(from_action(), from_.get(), t, d);
+        hpx::post(from_action(), from_.get(), t, d);
     }
 
 private:

@@ -12,8 +12,8 @@
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/continuation.hpp>
+#include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/parcelset/parcel.hpp>
 #include <hpx/parcelset_base/detail/parcel_route_handler.hpp>
@@ -125,7 +125,7 @@ namespace hpx::agas::server {
 
                 HPX_ASSERT(naming::is_locality(source));
 
-                hpx::apply<update_agas_cache_action>(
+                hpx::post<update_agas_cache_action>(
                     source, id, addr, g.count, g.offset);
             }
         }

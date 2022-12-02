@@ -240,7 +240,7 @@ namespace hpx { namespace lcos {
             detail::wait_each<Future, F>(
                 HPX_MOVE(lazy_values_), HPX_FORWARD(F, f), &success_counter));
 
-        p.apply();
+        p.post();
         p.get_future().get();
 
         return success_counter.load();
@@ -279,7 +279,7 @@ namespace hpx { namespace lcos {
             detail::wait_each<Future, F>(
                 HPX_MOVE(lazy_values_), HPX_FORWARD(F, f), &success_counter));
 
-        p.apply();
+        p.post();
         p.get_future().get();
 
         return success_counter.load();

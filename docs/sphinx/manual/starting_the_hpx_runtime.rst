@@ -232,7 +232,7 @@ The header file to include for this method of using |hpx| is
 ``hpx/hpx_start.hpp``.
 
 There are many additional overloads of :cpp:func:`hpx::start` available, such as
-the option for users to provide thier own entry point function instead of ``hpx_main``.
+the option for users to provide their own entry point function instead of ``hpx_main``.
 Please refer to the function documentation for more details (see:
 ``hpx/hpx_start.hpp``).
 
@@ -261,7 +261,7 @@ so that they are ready to accept new work. :cpp:func:`hpx::suspend` and
        hpx::start(nullptr, argc, argv);
 
        // Schedule a function on the HPX runtime
-       hpx::apply(&my_function, ...);
+       hpx::post(&my_function, ...);
 
        // Wait for all tasks to finish, and suspend the HPX runtime
        hpx::suspend();
@@ -274,7 +274,7 @@ so that they are ready to accept new work. :cpp:func:`hpx::suspend` and
        // Schedule more work on the HPX runtime
 
        // hpx::finalize has to be called from the HPX runtime before hpx::stop
-       hpx::apply([]() { hpx::finalize(); });
+       hpx::post([]() { hpx::finalize(); });
        return hpx::stop();
    }
 
@@ -332,7 +332,7 @@ this instead:
        hpx::run_as_hpx_thread(&my_other_function, ...);
 
        // hpx::finalize has to be called from the HPX runtime before hpx::stop
-       hpx::apply([]() { hpx::finalize(); });
+       hpx::post([]() { hpx::finalize(); });
        return hpx::stop();
    }
 

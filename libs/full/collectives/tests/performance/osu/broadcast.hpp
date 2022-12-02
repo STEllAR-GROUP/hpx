@@ -168,7 +168,7 @@ namespace hpx { namespace lcos {
                             hpx::async<broadcast_impl_action>(
                                 dst, std::move(next), fun, fan_out));
                         /*
-                        hpx::apply<broadcast_impl_action>(dst, std::move(next),
+                        hpx::post<broadcast_impl_action>(dst, std::move(next),
                         fun, fan_out);
                         */
                     }

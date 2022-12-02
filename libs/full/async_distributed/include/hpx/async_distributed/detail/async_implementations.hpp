@@ -209,7 +209,7 @@ namespace hpx { namespace detail {
                 lcos::packaged_action<Action, Result> p;
 
                 f = p.get_future();
-                p.apply_cb(HPX_MOVE(addr), hmt.get_id(),
+                p.post_cb(HPX_MOVE(addr), hmt.get_id(),
                     HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
                 f.wait();
             }
@@ -232,7 +232,7 @@ namespace hpx { namespace detail {
             handle_managed_target<result_type> hmt(id, f);
             lcos::packaged_action<action_type, result_type> p;
             f = p.get_future();
-            p.apply(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Ts, vs)...);
+            p.post(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Ts, vs)...);
             f.wait();
         }
         return f;
@@ -252,7 +252,7 @@ namespace hpx { namespace detail {
             handle_managed_target<result_type> hmt(id, f);
             lcos::packaged_action<action_type, result_type> p;
             f = p.get_future();
-            p.apply(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Ts, vs)...);
+            p.post(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Ts, vs)...);
         }
         return f;
     }
@@ -271,7 +271,7 @@ namespace hpx { namespace detail {
             handle_managed_target<result_type> hmt(id, f);
             lcos::packaged_action<action_type, result_type> p;
             f = p.get_future();
-            p.apply_deferred(
+            p.post_deferred(
                 HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Ts, vs)...);
         }
         return f;
@@ -516,7 +516,7 @@ namespace hpx { namespace detail {
                 lcos::packaged_action<action_type, result_type> p;
 
                 f = p.get_future();
-                p.apply_cb(HPX_MOVE(addr), hmt.get_id(),
+                p.post_cb(HPX_MOVE(addr), hmt.get_id(),
                     HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
                 if (policy == launch::sync)
                     f.wait();
@@ -526,7 +526,7 @@ namespace hpx { namespace detail {
                 lcos::packaged_action<action_type, result_type> p;
 
                 f = p.get_future();
-                p.apply_deferred_cb(HPX_MOVE(addr), hmt.get_id(),
+                p.post_deferred_cb(HPX_MOVE(addr), hmt.get_id(),
                     HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
             }
             else
@@ -579,7 +579,7 @@ namespace hpx { namespace detail {
             lcos::packaged_action<action_type, result_type> p;
 
             f = p.get_future();
-            p.apply_cb(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Callback, cb),
+            p.post_cb(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Callback, cb),
                 HPX_FORWARD(Ts, vs)...);
             f.wait();
         }
@@ -636,7 +636,7 @@ namespace hpx { namespace detail {
             lcos::packaged_action<action_type, result_type> p;
 
             f = p.get_future();
-            p.apply_cb(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Callback, cb),
+            p.post_cb(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Callback, cb),
                 HPX_FORWARD(Ts, vs)...);
         }
         return f;
@@ -660,7 +660,7 @@ namespace hpx { namespace detail {
             lcos::packaged_action<action_type, result_type> p;
 
             f = p.get_future();
-            p.apply_deferred_cb(HPX_MOVE(addr), hmt.get_id(),
+            p.post_deferred_cb(HPX_MOVE(addr), hmt.get_id(),
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
         return f;

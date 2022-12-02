@@ -43,7 +43,7 @@ namespace hpx { namespace lcos {
 
     /// \brief Perform an asynchronous (fire&forget) distributed broadcast operation
     ///
-    /// The function hpx::lcos::broadcast_apply performs an asynchronous
+    /// The function hpx::lcos::broadcast_post performs an asynchronous
     /// (fire&forget) distributed broadcast operation resulting in action
     /// invocations on a given set of global identifiers. The action can be
     /// either a plain action (in which case the global identifiers have to
@@ -62,7 +62,7 @@ namespace hpx { namespace lcos {
     ///                  action invocation.
     ///
     template <typename Action, typename ArgN, ...>
-    void broadcast_apply(std::vector<hpx::id_type> const& ids, ArgN argN, ...);
+    void broadcast_post(std::vector<hpx::id_type> const& ids, ArgN argN, ...);
 
     /// \brief Perform a distributed broadcast operation
     ///
@@ -99,7 +99,7 @@ namespace hpx { namespace lcos {
 
     /// \brief Perform an asynchronous (fire&forget) distributed broadcast operation
     ///
-    /// The function hpx::lcos::broadcast_apply_with_index performs an asynchronous
+    /// The function hpx::lcos::broadcast_post_with_index performs an asynchronous
     /// (fire&forget) distributed broadcast operation resulting in action
     /// invocations on a given set of global identifiers. The action can be
     /// either a plain action (in which case the global identifiers have to
@@ -121,7 +121,7 @@ namespace hpx { namespace lcos {
     ///                  action invocation.
     ///
     template <typename Action, typename ArgN, ...>
-    void broadcast_apply_with_index(
+    void broadcast_post_with_index(
         std::vector<hpx::id_type> const& ids, ArgN argN, ...);
 }}    // namespace hpx::lcos
 #else
@@ -132,10 +132,10 @@ namespace hpx { namespace lcos {
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_colocated/apply_colocated.hpp>
 #include <hpx/async_colocated/async_colocated.hpp>
+#include <hpx/async_colocated/post_colocated.hpp>
 #include <hpx/async_combinators/when_all.hpp>
-#include <hpx/async_distributed/apply.hpp>
+#include <hpx/async_distributed/post.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/futures/future.hpp>
@@ -200,7 +200,7 @@ namespace hpx { namespace lcos {
             std::true_type, Ts const&... vs);
 
         template <typename Action, typename... Ts>
-        void broadcast_apply_impl(Action const& act,
+        void broadcast_post_impl(Action const& act,
             std::vector<hpx::id_type> const& ids, std::size_t global_idx,
             Ts const&... vs);
 
@@ -242,14 +242,14 @@ namespace hpx { namespace lcos {
         void broadcast_invoke_apply(
             Action act, hpx::id_type const& id, std::size_t, Ts const&... vs)
         {
-            hpx::apply(act, id, vs...);
+            hpx::post(act, id, vs...);
         }
 
         template <typename Action, typename... Ts>
         void broadcast_invoke_apply(broadcast_with_index<Action>,
             hpx::id_type const& id, std::size_t global_idx, Ts const&... vs)
         {
-            hpx::apply(Action(), id, vs..., global_idx);
+            hpx::post(Action(), id, vs..., global_idx);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -266,13 +266,13 @@ namespace hpx { namespace lcos {
         };
 
         template <typename Action, typename... Ts>
-        struct broadcast_apply_invoker
+        struct broadcast_post_invoker
         {
             static void call(Action const& act,
                 std::vector<hpx::id_type> const& ids, std::size_t global_idx,
                 Ts const&... vs)
             {
-                return broadcast_apply_impl(act, ids, global_idx, vs...);
+                return broadcast_post_impl(act, ids, global_idx, vs...);
             }
         };
 
@@ -311,15 +311,15 @@ namespace hpx { namespace lcos {
         };
 
         template <typename Action, typename Is>
-        struct make_broadcast_apply_action_impl;
+        struct make_broadcast_post_action_impl;
 
         template <typename Action, std::size_t... Is>
-        struct make_broadcast_apply_action_impl<Action, util::index_pack<Is...>>
+        struct make_broadcast_post_action_impl<Action, util::index_pack<Is...>>
         {
             typedef
                 typename broadcast_result<Action>::action_result action_result;
 
-            typedef detail::broadcast_apply_invoker<Action,
+            typedef detail::broadcast_post_invoker<Action,
                 typename hpx::tuple_element<Is,
                     typename Action::arguments_type>::type...>
                 broadcast_invoker_type;
@@ -329,15 +329,15 @@ namespace hpx { namespace lcos {
         };
 
         template <typename Action>
-        struct make_broadcast_apply_action
-          : make_broadcast_apply_action_impl<Action,
+        struct make_broadcast_post_action
+          : make_broadcast_post_action_impl<Action,
                 typename util::make_index_pack<Action::arity>::type>
         {
         };
 
         template <typename Action>
-        struct make_broadcast_apply_action<broadcast_with_index<Action>>
-          : make_broadcast_apply_action_impl<broadcast_with_index<Action>,
+        struct make_broadcast_post_action<broadcast_with_index<Action>>
+          : make_broadcast_post_action_impl<broadcast_with_index<Action>,
                 typename util::make_index_pack<Action::arity - 1>::type>
         {
         };
@@ -492,7 +492,7 @@ namespace hpx { namespace lcos {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Action, typename... Ts>
-        void broadcast_apply_impl(Action const& act,
+        void broadcast_post_impl(Action const& act,
             std::vector<hpx::id_type> const& ids, std::size_t global_idx,
             Ts const&... vs)
         {
@@ -514,7 +514,7 @@ namespace hpx { namespace lcos {
                     ids.begin() + local_fanout;
 
                 typedef
-                    typename detail::make_broadcast_apply_action<Action>::type
+                    typename detail::make_broadcast_post_action<Action>::type
                         broadcast_impl_action;
 
                 std::size_t fanout =
@@ -528,7 +528,7 @@ namespace hpx { namespace lcos {
                     std::vector<hpx::id_type> ids_next(it, it + next_fan);
 
                     hpx::id_type id(ids_next[0]);
-                    hpx::detail::apply_colocated<broadcast_impl_action>(id, act,
+                    hpx::detail::post_colocated<broadcast_impl_action>(id, act,
                         HPX_MOVE(ids_next), global_idx + applied, vs...);
 
                     applied += next_fan;
@@ -574,31 +574,30 @@ namespace hpx { namespace lcos {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
-    void broadcast_apply(std::vector<hpx::id_type> const& ids, Ts const&... vs)
+    void broadcast_post(std::vector<hpx::id_type> const& ids, Ts const&... vs)
     {
-        typedef typename detail::make_broadcast_apply_action<Action>::type
+        typedef typename detail::make_broadcast_post_action<Action>::type
             broadcast_impl_action;
 
         if (ids.empty())
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                "hpx::lcos::broadcast_apply",
+            HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::lcos::broadcast_post",
                 "empty list of targets for broadcast operation");
             return;
         }
 
-        hpx::detail::apply_colocated<broadcast_impl_action>(
+        hpx::detail::post_colocated<broadcast_impl_action>(
             ids[0], Action(), ids, 0, vs...);
     }
 
     template <typename Component, typename Signature, typename Derived,
         typename... Ts>
-    void broadcast_apply(
+    void broadcast_post(
         hpx::actions::basic_action<Component, Signature, Derived> /* act */
         ,
         std::vector<hpx::id_type> const& ids, Ts const&... vs)
     {
-        broadcast_apply<Derived>(ids, vs...);
+        broadcast_post<Derived>(ids, vs...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -622,112 +621,112 @@ namespace hpx { namespace lcos {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
-    void broadcast_apply_with_index(
+    void broadcast_post_with_index(
         std::vector<hpx::id_type> const& ids, Ts const&... vs)
     {
-        broadcast_apply<detail::broadcast_with_index<Action>>(ids, vs...);
+        broadcast_post<detail::broadcast_with_index<Action>>(ids, vs...);
     }
 
     template <typename Component, typename Signature, typename Derived,
         typename... Ts>
-    void broadcast_apply_with_index(
+    void broadcast_post_with_index(
         hpx::actions::basic_action<Component, Signature, Derived> /* act */
         ,
         std::vector<hpx::id_type> const& ids, Ts const&... vs)
     {
-        broadcast_apply<detail::broadcast_with_index<Derived>>(ids, vs...);
+        broadcast_post<detail::broadcast_with_index<Derived>>(ids, vs...);
     }
 }}    // namespace hpx::lcos
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION(...)                   \
-    HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_(__VA_ARGS__)              \
+#define HPX_REGISTER_BROADCAST_POST_ACTION_DECLARATION(...)                    \
+    HPX_REGISTER_BROADCAST_POST_ACTION_DECLARATION_(__VA_ARGS__)               \
 /**/
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_(...)                  \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_, \
+#define HPX_REGISTER_BROADCAST_POST_ACTION_DECLARATION_(...)                   \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_BROADCAST_POST_ACTION_DECLARATION_,  \
         HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
     /**/
 
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_1(Action)              \
-    HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_2(Action, Action)          \
+#define HPX_REGISTER_BROADCAST_POST_ACTION_DECLARATION_1(Action)               \
+    HPX_REGISTER_BROADCAST_POST_ACTION_DECLARATION_2(Action, Action)           \
 /**/
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_2(Action, Name)        \
+#define HPX_REGISTER_BROADCAST_POST_ACTION_DECLARATION_2(Action, Name)         \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
-        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type,        \
-        HPX_PP_CAT(broadcast_apply_, Name))                                    \
+        ::hpx::lcos::detail::make_broadcast_post_action<Action>::type,         \
+        HPX_PP_CAT(broadcast_post_, Name))                                     \
     HPX_REGISTER_APPLY_COLOCATED_DECLARATION(                                  \
-        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type,        \
-        HPX_PP_CAT(apply_colocated_broadcast_, Name))                          \
+        ::hpx::lcos::detail::make_broadcast_post_action<Action>::type,         \
+        HPX_PP_CAT(post_colocated_broadcast_, Name))                           \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION(...)                               \
-    HPX_REGISTER_BROADCAST_APPLY_ACTION_(__VA_ARGS__)                          \
+#define HPX_REGISTER_BROADCAST_POST_ACTION(...)                                \
+    HPX_REGISTER_BROADCAST_POST_ACTION_(__VA_ARGS__)                           \
 /**/
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_(...)                              \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_BROADCAST_APPLY_ACTION_,             \
+#define HPX_REGISTER_BROADCAST_POST_ACTION_(...)                               \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_BROADCAST_POST_ACTION_,              \
         HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
     /**/
 
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_1(Action)                          \
-    HPX_REGISTER_BROADCAST_APPLY_ACTION_2(Action, Action)                      \
+#define HPX_REGISTER_BROADCAST_POST_ACTION_1(Action)                           \
+    HPX_REGISTER_BROADCAST_POST_ACTION_2(Action, Action)                       \
 /**/
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_2(Action, Name)                    \
+#define HPX_REGISTER_BROADCAST_POST_ACTION_2(Action, Name)                     \
     HPX_REGISTER_ACTION(                                                       \
-        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type,        \
-        HPX_PP_CAT(broadcast_apply_, Name))                                    \
+        ::hpx::lcos::detail::make_broadcast_post_action<Action>::type,         \
+        HPX_PP_CAT(broadcast_post_, Name))                                     \
     HPX_REGISTER_APPLY_COLOCATED(                                              \
-        ::hpx::lcos::detail::make_broadcast_apply_action<Action>::type,        \
-        HPX_PP_CAT(apply_colocated_broadcast_, Name))                          \
+        ::hpx::lcos::detail::make_broadcast_post_action<Action>::type,         \
+        HPX_PP_CAT(post_colocated_broadcast_, Name))                           \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION(...)        \
-    HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_(__VA_ARGS__)   \
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_DECLARATION(...)         \
+    HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_DECLARATION_(__VA_ARGS__)    \
 /**/
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_(...)       \
-    HPX_PP_EXPAND(HPX_PP_CAT(                                                  \
-        HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_,           \
-        HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_DECLARATION_(...)        \
+    HPX_PP_EXPAND(                                                             \
+        HPX_PP_CAT(HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_DECLARATION_, \
+            HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                           \
     /**/
 
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_1(Action)   \
-    HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_2(              \
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_DECLARATION_1(Action)    \
+    HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_DECLARATION_2(               \
         Action, Action)                                                        \
 /**/
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_2(          \
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_DECLARATION_2(           \
     Action, Name)                                                              \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
-        ::hpx::lcos::detail::make_broadcast_apply_action<                      \
+        ::hpx::lcos::detail::make_broadcast_post_action<                       \
             ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(broadcast_apply_with_index_, Name))                         \
+        HPX_PP_CAT(broadcast_post_with_index_, Name))                          \
     HPX_REGISTER_APPLY_COLOCATED_DECLARATION(                                  \
-        ::hpx::lcos::detail::make_broadcast_apply_action<                      \
+        ::hpx::lcos::detail::make_broadcast_post_action<                       \
             ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(apply_colocated_broadcast_with_index_, Name))               \
+        HPX_PP_CAT(post_colocated_broadcast_with_index_, Name))                \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION(...)                    \
-    HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_(__VA_ARGS__)               \
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION(...)                     \
+    HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_(__VA_ARGS__)                \
 /**/
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_(...)                   \
-    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_,  \
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_(...)                    \
+    HPX_PP_EXPAND(HPX_PP_CAT(HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_,   \
         HPX_PP_NARGS(__VA_ARGS__))(__VA_ARGS__))                               \
     /**/
 
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_1(Action)               \
-    HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_2(Action, Action)           \
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_1(Action)                \
+    HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_2(Action, Action)            \
 /**/
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_2(Action, Name)         \
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_2(Action, Name)          \
     HPX_REGISTER_ACTION(                                                       \
-        ::hpx::lcos::detail::make_broadcast_apply_action<                      \
+        ::hpx::lcos::detail::make_broadcast_post_action<                       \
             ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(broadcast_apply_with_index_, Name))                         \
+        HPX_PP_CAT(broadcast_post_with_index_, Name))                          \
     HPX_REGISTER_APPLY_COLOCATED(                                              \
-        ::hpx::lcos::detail::make_broadcast_apply_action<                      \
+        ::hpx::lcos::detail::make_broadcast_post_action<                       \
             ::hpx::lcos::detail::broadcast_with_index<Action>>::type,          \
-        HPX_PP_CAT(apply_colocated_broadcast_with_index_, Name))               \
+        HPX_PP_CAT(post_colocated_broadcast_with_index_, Name))                \
 /**/
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -839,38 +838,37 @@ namespace hpx { namespace lcos {
 #else
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION(...)  /**/
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_(...) /**/
+#define HPX_REGISTER_BROADCAST_POST_ACTION_DECLARATION(...)  /**/
+#define HPX_REGISTER_BROADCAST_POST_ACTION_DECLARATION_(...) /**/
 
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_1(Action)       /**/
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_DECLARATION_2(Action, Name) /**/
-
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION(...)                        /**/
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_(...)                       /**/
-
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_1(Action)                    /**/
-#define HPX_REGISTER_BROADCAST_APPLY_ACTION_2(Action, Name)              /**/
+#define HPX_REGISTER_BROADCAST_POST_ACTION_DECLARATION_1(Action)       /**/
+#define HPX_REGISTER_BROADCAST_POST_ACTION_DECLARATION_2(Action, Name) /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION(...)  /**/
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_(...) /**/
+#define HPX_REGISTER_BROADCAST_POST_ACTION(...)                        /**/
+#define HPX_REGISTER_BROADCAST_POST_ACTION_(...)                       /**/
 
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_1(          \
-    Action) /**/
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_DECLARATION_2(          \
-    Action, Name)                                            /**/
+#define HPX_REGISTER_BROADCAST_POST_ACTION_1(Action)                    /**/
+#define HPX_REGISTER_BROADCAST_POST_ACTION_2(Action, Name)              /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION(...)  /**/
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_(...) /**/
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_DECLARATION(...)  /**/
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_DECLARATION_(...) /**/
 
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_1(Action)       /**/
-#define HPX_REGISTER_BROADCAST_APPLY_WITH_INDEX_ACTION_2(Action, Name) /**/
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_DECLARATION_1(Action) /**/
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_DECLARATION_2(           \
+    Action, Name)                                           /**/
 
 ///////////////////////////////////////////////////////////////////////////////
-#define HPX_REGISTER_BROADCAST_ACTION_DECLARATION(...)                 /**/
-#define HPX_REGISTER_BROADCAST_ACTION_DECLARATION_(...)                /**/
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION(...)  /**/
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_(...) /**/
+
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_1(Action)       /**/
+#define HPX_REGISTER_BROADCAST_POST_WITH_INDEX_ACTION_2(Action, Name) /**/
+
+///////////////////////////////////////////////////////////////////////////////
+#define HPX_REGISTER_BROADCAST_ACTION_DECLARATION(...)                /**/
+#define HPX_REGISTER_BROADCAST_ACTION_DECLARATION_(...)               /**/
 
 #define HPX_REGISTER_BROADCAST_ACTION_DECLARATION_1(Action)       /**/
 #define HPX_REGISTER_BROADCAST_ACTION_DECLARATION_2(Action, Name) /**/

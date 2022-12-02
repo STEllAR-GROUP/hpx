@@ -66,7 +66,7 @@ int main(int argc, char** argv)
 
         for (std::size_t thread = 0; thread < threads; ++thread)
         {
-            hpx::apply([]() {});
+            hpx::post([]() {});
         }
 
         auto t_apply = timer.elapsed();

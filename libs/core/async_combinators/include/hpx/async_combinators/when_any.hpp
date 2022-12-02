@@ -397,7 +397,7 @@ namespace hpx {
                 });
 
             auto result = p.get_future();
-            p.apply();
+            p.post();
 
             return result;
         }
@@ -446,7 +446,7 @@ namespace hpx {
                 });
 
             auto result = p.get_future();
-            p.apply();
+            p.post();
 
             return result;
         }

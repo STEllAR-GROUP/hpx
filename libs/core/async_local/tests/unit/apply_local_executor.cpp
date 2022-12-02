@@ -63,9 +63,9 @@ void test_apply_with_executor(Executor& exec)
     {
         using hpx::placeholders::_1;
 
-        hpx::apply(exec, &increment, 1);
-        hpx::apply(exec, hpx::bind(&increment, 1));
-        hpx::apply(exec, hpx::bind(&increment, _1), 1);
+        hpx::post(exec, &increment, 1);
+        hpx::post(exec, hpx::bind(&increment, 1));
+        hpx::post(exec, hpx::bind(&increment, _1), 1);
     }
 
     {
@@ -76,17 +76,17 @@ void test_apply_with_executor(Executor& exec)
 
         using hpx::placeholders::_1;
 
-        hpx::apply(exec, &increment_with_future, f);
-        hpx::apply(exec, hpx::bind(&increment_with_future, f));
-        hpx::apply(exec, hpx::bind(&increment_with_future, _1), f);
+        hpx::post(exec, &increment_with_future, f);
+        hpx::post(exec, hpx::bind(&increment_with_future, f));
+        hpx::post(exec, hpx::bind(&increment_with_future, _1), f);
     }
 
     {
         using hpx::placeholders::_1;
 
-        hpx::apply(exec, increment, 1);
-        hpx::apply(exec, hpx::bind(increment, 1));
-        hpx::apply(exec, hpx::bind(increment, _1), 1);
+        hpx::post(exec, increment, 1);
+        hpx::post(exec, hpx::bind(increment, 1));
+        hpx::post(exec, hpx::bind(increment, _1), 1);
     }
 
     {
@@ -94,9 +94,9 @@ void test_apply_with_executor(Executor& exec)
 
         using hpx::placeholders::_1;
 
-        hpx::apply(exec, &increment_type::call, inc, 1);
-        hpx::apply(exec, hpx::bind(&increment_type::call, inc, 1));
-        hpx::apply(exec, hpx::bind(&increment_type::call, inc, _1), 1);
+        hpx::post(exec, &increment_type::call, inc, 1);
+        hpx::post(exec, hpx::bind(&increment_type::call, inc, 1));
+        hpx::post(exec, hpx::bind(&increment_type::call, inc, _1), 1);
     }
 
     {
@@ -104,17 +104,17 @@ void test_apply_with_executor(Executor& exec)
 
         using hpx::placeholders::_1;
 
-        hpx::apply(exec, obj, 1);
-        hpx::apply(exec, hpx::bind(obj, 1));
-        hpx::apply(exec, hpx::bind(obj, _1), 1);
+        hpx::post(exec, obj, 1);
+        hpx::post(exec, hpx::bind(obj, 1));
+        hpx::post(exec, hpx::bind(obj, _1), 1);
     }
 
     {
         using hpx::placeholders::_1;
 
-        hpx::apply(exec, increment_lambda, 1);
-        hpx::apply(exec, hpx::bind(increment_lambda, 1));
-        hpx::apply(exec, hpx::bind(increment_lambda, _1), 1);
+        hpx::post(exec, increment_lambda, 1);
+        hpx::post(exec, hpx::bind(increment_lambda, 1));
+        hpx::post(exec, hpx::bind(increment_lambda, _1), 1);
     }
 
     hpx::no_mutex result_mutex;

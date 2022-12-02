@@ -7,9 +7,9 @@
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/post.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/testing.hpp>
 

@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/trigger.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
+#include <hpx/async_distributed/detail/trigger.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/managed_component_base.hpp>
 #include <hpx/modules/errors.hpp>
@@ -208,7 +208,7 @@ namespace hpx { namespace lcos { namespace server {
                 LLCO_(info).format(
                     "object_semapohre::wait: waiting for {}", id);
 
-                hpx::apply<action_type>(id);
+                hpx::post<action_type>(id);
             }
         }
 

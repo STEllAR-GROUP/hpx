@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -42,9 +42,9 @@ namespace hpx {
             hpx::distributed::promise<result_type, RemoteResult> p;
             auto f = p.get_future();
 
-            apply<Action>(hpx::actions::typed_continuation<result_type,
-                              continuation_result_type>(
-                              p.get_id(), HPX_FORWARD(Cont, cont)),
+            hpx::post<Action>(hpx::actions::typed_continuation<result_type,
+                                  continuation_result_type>(
+                                  p.get_id(), HPX_FORWARD(Cont, cont)),
                 target, HPX_FORWARD(Ts, vs)...);
 
             return f;
@@ -69,9 +69,7 @@ namespace hpx {
         typename Cont, typename... Ts>
     hpx::future<typename traits::promise_local_result<
         typename detail::result_of_async_continue<Derived, Cont>::type>::type>
-    async_continue(
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-        ,
+    async_continue(hpx::actions::basic_action<Component, Signature, Derived>,
         Cont&& cont, hpx::id_type const& gid, Ts&&... vs)
     {
         return async_continue<Derived>(
@@ -99,9 +97,7 @@ namespace hpx {
     typename std::enable_if<traits::is_distribution_policy<DistPolicy>::value,
         hpx::future<typename traits::promise_local_result<typename detail::
                 result_of_async_continue<Derived, Cont>::type>::type>>::type
-    async_continue(
-        hpx::actions::basic_action<Component, Signature, Derived> /*act*/
-        ,
+    async_continue(hpx::actions::basic_action<Component, Signature, Derived>,
         Cont&& cont, DistPolicy const& policy, Ts&&... vs)
     {
         return async_continue<Derived>(

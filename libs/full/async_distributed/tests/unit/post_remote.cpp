@@ -8,9 +8,9 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/apply.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/post.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -38,7 +38,7 @@ std::atomic<std::int32_t> accumulator;
 void increment(hpx::id_type const& there, std::int32_t i)
 {
     accumulator += i;
-    hpx::apply(receive_result_action(), there, accumulator.load());
+    hpx::post(receive_result_action(), there, accumulator.load());
 }
 HPX_PLAIN_ACTION(increment)
 
@@ -46,7 +46,7 @@ void increment_with_future(
     hpx::id_type const& there, hpx::shared_future<std::int32_t> fi)
 {
     accumulator += fi.get();
-    hpx::apply(receive_result_action(), there, accumulator.load());
+    hpx::post(receive_result_action(), there, accumulator.load());
 }
 HPX_PLAIN_ACTION(increment_with_future)
 
@@ -57,7 +57,7 @@ struct increment_server
     void call(hpx::id_type const& there, std::int32_t i) const
     {
         accumulator += i;
-        hpx::apply(receive_result_action(), there, accumulator.load());
+        hpx::post(receive_result_action(), there, accumulator.load());
     }
 
     HPX_DEFINE_COMPONENT_ACTION(increment_server, call)
@@ -87,9 +87,9 @@ int hpx_main()
 
         using hpx::placeholders::_1;
 
-        hpx::apply(inc, there, here, 1);
-        hpx::apply(hpx::bind(inc, there, here, 1));
-        hpx::apply(hpx::bind(inc, there, here, _1), 1);
+        hpx::post(inc, there, here, 1);
+        hpx::post(hpx::bind(inc, there, here, 1));
+        hpx::post(hpx::bind(inc, there, here, _1), 1);
     }
 
     {
@@ -99,9 +99,9 @@ int hpx_main()
 
         using hpx::placeholders::_1;
 
-        hpx::apply(inc, there, here, f);
-        hpx::apply(hpx::bind(inc, there, here, f));
-        hpx::apply(hpx::bind(inc, there, here, _1), f);
+        hpx::post(inc, there, here, f);
+        hpx::post(hpx::bind(inc, there, here, f));
+        hpx::post(hpx::bind(inc, there, here, _1), f);
 
         p.set_value(1);
     }
@@ -116,12 +116,12 @@ int hpx_main()
         using hpx::placeholders::_3;
 
         call_action call;
-        hpx::apply(call, inc, here, 1);
-        hpx::apply(hpx::bind(call, inc, here, 1));
-        hpx::apply(hpx::bind(call, inc, here, _1), 1);
-        hpx::apply(hpx::bind(call, _1, here, 1), inc);
-        hpx::apply(hpx::bind(call, _1, _2, 1), inc, here);
-        hpx::apply(hpx::bind(call, _1, _2, _3), inc, here, 1);
+        hpx::post(call, inc, here, 1);
+        hpx::post(hpx::bind(call, inc, here, 1));
+        hpx::post(hpx::bind(call, inc, here, _1), 1);
+        hpx::post(hpx::bind(call, _1, here, 1), inc);
+        hpx::post(hpx::bind(call, _1, _2, 1), inc, here);
+        hpx::post(hpx::bind(call, _1, _2, _3), inc, here, 1);
     }
 
     {
@@ -129,7 +129,7 @@ int hpx_main()
             hpx::components::new_<increment_server>(there);
         hpx::id_type inc = inc_f.get();
 
-        hpx::apply<call_action>(inc, here, 1);
+        hpx::post<call_action>(inc, here, 1);
     }
 
     // Let finalize wait for every "apply" to be finished

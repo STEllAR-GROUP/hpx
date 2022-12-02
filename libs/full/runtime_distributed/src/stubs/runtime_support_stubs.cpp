@@ -9,8 +9,8 @@
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_colocated/apply_colocated.hpp>
-#include <hpx/async_distributed/apply.hpp>
+#include <hpx/async_colocated/post_colocated.hpp>
+#include <hpx/async_distributed/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/ini/ini.hpp>
@@ -84,7 +84,7 @@ namespace hpx { namespace components { namespace stubs {
         // We need to make it unmanaged to avoid late refcnt requests
         id_type gid(
             value.get_id().get_gid(), id_type::management_type::unmanaged);
-        hpx::apply<action_type>(targetgid, timeout, gid);
+        hpx::post<action_type>(targetgid, timeout, gid);
 
         return f;
 #else
@@ -108,7 +108,7 @@ namespace hpx { namespace components { namespace stubs {
         hpx::id_type const& targetgid, double timeout)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        hpx::apply<server::runtime_support::shutdown_all_action>(
+        hpx::post<server::runtime_support::shutdown_all_action>(
             targetgid, timeout);
 #else
         HPX_ASSERT(false);
@@ -120,7 +120,7 @@ namespace hpx { namespace components { namespace stubs {
     void runtime_support::shutdown_all(double timeout)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        hpx::apply<server::runtime_support::shutdown_all_action>(
+        hpx::post<server::runtime_support::shutdown_all_action>(
             hpx::id_type(
                 hpx::applier::get_applier().get_runtime_support_raw_gid(),
                 hpx::id_type::management_type::unmanaged),
@@ -146,7 +146,7 @@ namespace hpx { namespace components { namespace stubs {
         hpx::distributed::promise<void> value;
         auto f = value.get_future();
 
-        hpx::apply<action_type>(targetgid, value.get_id());
+        hpx::post<action_type>(targetgid, value.get_id());
         return f;
 #else
         HPX_ASSERT(false);
@@ -166,7 +166,7 @@ namespace hpx { namespace components { namespace stubs {
     void runtime_support::terminate_all(hpx::id_type const& targetgid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        hpx::apply<server::runtime_support::terminate_all_action>(targetgid);
+        hpx::post<server::runtime_support::terminate_all_action>(targetgid);
 #else
         HPX_ASSERT(false);
         HPX_UNUSED(targetgid);
@@ -176,7 +176,7 @@ namespace hpx { namespace components { namespace stubs {
     void runtime_support::terminate_all()
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        hpx::apply<server::runtime_support::terminate_all_action>(hpx::id_type(
+        hpx::post<server::runtime_support::terminate_all_action>(hpx::id_type(
             hpx::applier::get_applier().get_runtime_support_raw_gid(),
             hpx::id_type::management_type::unmanaged));
 #else
@@ -190,7 +190,7 @@ namespace hpx { namespace components { namespace stubs {
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef server::runtime_support::garbage_collect_action action_type;
-        hpx::apply<action_type>(targetgid);
+        hpx::post<action_type>(targetgid);
 #else
         HPX_ASSERT(false);
         HPX_UNUSED(targetgid);
@@ -287,7 +287,7 @@ namespace hpx { namespace components { namespace stubs {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         typedef server::runtime_support::remove_from_connection_cache_action
             action_type;
-        hpx::apply<action_type>(target, gid, endpoints);
+        hpx::post<action_type>(target, gid, endpoints);
 #else
         HPX_ASSERT(false);
         HPX_UNUSED(target);

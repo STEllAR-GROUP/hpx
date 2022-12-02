@@ -905,7 +905,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         // run in a separate thread
-        virtual threads::thread_id_ref_type apply(
+        virtual threads::thread_id_ref_type post(
             threads::thread_pool_base* /*pool*/, const char* /*annotation*/,
             launch /*policy*/, error_code& /*ec*/)
         {

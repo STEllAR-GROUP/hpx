@@ -457,8 +457,8 @@ void test_wait_each_late_future()
     hpx::future<unsigned> f1 = pt0.get_future();
     hpx::future<unsigned> f2 = pt1.get_future();
 
-    hpx::async([pt0 = std::move(pt0)]() { pt0.apply(); });
-    hpx::async([pt1 = std::move(pt1)]() { pt1.apply(); });
+    hpx::async([pt0 = std::move(pt0)]() { pt0.post(); });
+    hpx::async([pt1 = std::move(pt1)]() { pt1.post(); });
 
     hpx::wait_each(callback, std::move(f1), std::move(f2));
 
@@ -468,8 +468,8 @@ void test_wait_each_late_future()
     hpx::future<unsigned> g1 = pt2.get_future();
     hpx::future<unsigned> g2 = pt3.get_future();
 
-    hpx::async([pt2 = std::move(pt2)]() { pt2.apply(); });
-    hpx::async([pt3 = std::move(pt3)]() { pt3.apply(); });
+    hpx::async([pt2 = std::move(pt2)]() { pt2.post(); });
+    hpx::async([pt3 = std::move(pt3)]() { pt3.post(); });
 
     hpx::wait_each(callback_with_index, std::move(g1), std::move(g2));
 

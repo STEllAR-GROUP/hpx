@@ -41,10 +41,10 @@ void test_scheduler(
     {
         hpx::local::resume();
 
-        hpx::apply([]() {
+        hpx::post([]() {
             for (std::size_t i = 0; i < 10000; ++i)
             {
-                hpx::apply([]() {});
+                hpx::post([]() {});
             }
         });
 
@@ -52,7 +52,7 @@ void test_scheduler(
     }
 
     hpx::local::resume();
-    hpx::apply([]() { hpx::local::finalize(); });
+    hpx::post([]() { hpx::local::finalize(); });
     HPX_TEST_EQ(hpx::local::stop(), 0);
 }
 

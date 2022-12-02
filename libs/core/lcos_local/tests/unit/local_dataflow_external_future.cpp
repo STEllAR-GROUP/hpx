@@ -75,7 +75,7 @@ struct external_future_executor
                     hpx::intrusive_ptr<
                         std::remove_pointer_t<std::decay_t<Frame>>>
                         frame_p(frame);
-                    hpx::apply([frame_p = std::move(frame_p)]() {
+                    hpx::post([frame_p = std::move(frame_p)]() {
                         hpx::util::yield_while([]() { return !done; });
                         frame_p->set_data(hpx::util::unused_type{});
                     });
@@ -89,7 +89,7 @@ struct external_future_executor
                     hpx::intrusive_ptr<
                         std::remove_pointer_t<std::decay_t<Frame>>>
                         frame_p(frame);
-                    hpx::apply(
+                    hpx::post(
                         [frame_p = std::move(frame_p), r = std::move(r)]() {
                             hpx::util::yield_while([]() { return !done; });
                             frame_p->set_data(std::move(r));
@@ -155,7 +155,7 @@ struct external_future_additional_argument_executor
                     hpx::intrusive_ptr<
                         std::remove_pointer_t<std::decay_t<Frame>>>
                         frame_p(frame);
-                    hpx::apply([frame_p = std::move(frame_p)]() {
+                    hpx::post([frame_p = std::move(frame_p)]() {
                         hpx::util::yield_while([]() { return !done; });
                         frame_p->set_data(hpx::util::unused_type{});
                     });
@@ -170,7 +170,7 @@ struct external_future_additional_argument_executor
                     hpx::intrusive_ptr<
                         std::remove_pointer_t<std::decay_t<Frame>>>
                         frame_p(frame);
-                    hpx::apply(
+                    hpx::post(
                         [frame_p = std::move(frame_p), r = std::move(r)]() {
                             hpx::util::yield_while([]() { return !done; });
                             frame_p->set_data(std::move(r));
@@ -206,7 +206,7 @@ int hpx_main()
         hpx::future<void> f = hpx::dataflow(exec, []() {
             // This represents an asynchronous operation which has an
             // out-of-band mechanism for signaling completion.
-            hpx::apply([]() {
+            hpx::post([]() {
                 hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
                 done = true;
             });
@@ -227,7 +227,7 @@ int hpx_main()
         hpx::future<int> f = hpx::dataflow(exec, []() {
             // This represents an asynchronous operation which has an
             // out-of-band mechanism for signaling completion.
-            hpx::apply([]() {
+            hpx::post([]() {
                 hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
                 done = true;
             });
@@ -251,7 +251,7 @@ int hpx_main()
         hpx::future<void> f = hpx::dataflow(exec, [](additional_argument) {
             // This represents an asynchronous operation which has an
             // out-of-band mechanism for signaling completion.
-            hpx::apply([]() {
+            hpx::post([]() {
                 hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
                 done = true;
             });
@@ -272,7 +272,7 @@ int hpx_main()
         hpx::future<int> f = hpx::dataflow(exec, [](additional_argument) {
             // This represents an asynchronous operation which has an
             // out-of-band mechanism for signaling completion.
-            hpx::apply([]() {
+            hpx::post([]() {
                 hpx::this_thread::sleep_for(std::chrono::milliseconds(500));
                 done = true;
             });

@@ -8,8 +8,8 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/continuation.hpp>
+#include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/functional/bind_front.hpp>

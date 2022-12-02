@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions/apply_helper_fwd.hpp>
+#include <hpx/actions/post_helper_fwd.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/action_continuation.hpp>
 #include <hpx/actions_base/traits/action_decorate_continuation.hpp>
@@ -32,7 +32,7 @@ namespace hpx {
     bool HPX_EXPORT is_pre_startup();
 }
 
-namespace hpx { namespace applier { namespace detail {
+namespace hpx { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////
     template <typename Action>
@@ -148,7 +148,7 @@ namespace hpx { namespace applier { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
-    struct apply_helper<Action, /*DirectExecute=*/false>
+    struct post_helper<Action, /*DirectExecute=*/false>
     {
         template <typename... Ts>
         static void call(threads::thread_init_data&& data,
@@ -199,7 +199,7 @@ namespace hpx { namespace applier { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
-    struct apply_helper<Action, /*DirectExecute=*/true>
+    struct post_helper<Action, /*DirectExecute=*/true>
     {
         // If local and to be directly executed, just call the function
         template <typename... Ts>
@@ -245,4 +245,4 @@ namespace hpx { namespace applier { namespace detail {
             }
         }
     };
-}}}    // namespace hpx::applier::detail
+}}    // namespace hpx::detail

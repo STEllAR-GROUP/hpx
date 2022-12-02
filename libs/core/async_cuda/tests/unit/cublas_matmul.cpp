@@ -150,7 +150,7 @@ void matrixMultiply(hpx::cuda::experimental::cublas_executor& cublas,
 
     // adding async copy operations into the stream before cublas calls puts
     // the copies in the queue before the matrix operations.
-    hpx::apply(cublas, cudaMemcpyAsync, d_A, h_A.data(), size_A * sizeof(T),
+    hpx::post(cublas, cudaMemcpyAsync, d_A, h_A.data(), size_A * sizeof(T),
         cudaMemcpyHostToDevice);
 
     auto copy_future = hpx::async(cublas, cudaMemcpyAsync, d_B, h_B.data(),
@@ -190,7 +190,7 @@ void matrixMultiply(hpx::cuda::experimental::cublas_executor& cublas,
     hpx::chrono::high_resolution_timer t2;
     for (std::size_t j = 0; j < iterations; j++)
     {
-        hpx::apply(cublas, cublasSgemm, CUBLAS_OP_N, CUBLAS_OP_N,
+        hpx::post(cublas, cublasSgemm, CUBLAS_OP_N, CUBLAS_OP_N,
             matrix_size.uiWB, matrix_size.uiHA, matrix_size.uiWA, &alpha, d_B,
             matrix_size.uiWB, d_A, matrix_size.uiWA, &beta, d_C,
             matrix_size.uiWA);

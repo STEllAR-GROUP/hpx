@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,9 +8,9 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/apply.hpp>
 #include <hpx/include/components.hpp>
 #include <hpx/include/lcos.hpp>
+#include <hpx/include/post.hpp>
 #include <hpx/include/runtime.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -20,10 +20,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-bool on_shutdown_executed = false;
-std::uint32_t locality_id = std::uint32_t(-1);
-
-std::int32_t final_result = 0;
+bool root_locality = false;
+std::int32_t final_result;
 hpx::util::spinlock result_mutex;
 
 void receive_result(std::int32_t i)
@@ -37,15 +35,6 @@ HPX_PLAIN_ACTION(receive_result)
 ///////////////////////////////////////////////////////////////////////////////
 std::atomic<std::int32_t> accumulator;
 
-void increment(hpx::id_type const& there, std::int32_t i)
-{
-    locality_id = hpx::get_locality_id();
-
-    accumulator += i;
-    hpx::apply(receive_result_action(), there, accumulator.load());
-}
-HPX_PLAIN_ACTION(increment)
-
 ///////////////////////////////////////////////////////////////////////////////
 struct increment_server
   : hpx::components::managed_component_base<increment_server>
@@ -53,7 +42,7 @@ struct increment_server
     void call(hpx::id_type const& there, std::int32_t i) const
     {
         accumulator += i;
-        hpx::apply(receive_result_action(), there, accumulator.load());
+        hpx::post(receive_result_action(), there, accumulator.load());
     }
 
     HPX_DEFINE_COMPONENT_ACTION(increment_server, call)
@@ -67,55 +56,44 @@ HPX_REGISTER_ACTION_DECLARATION(call_action)
 HPX_REGISTER_ACTION(call_action)
 
 ///////////////////////////////////////////////////////////////////////////////
-void on_shutdown()
-{
-    std::lock_guard<hpx::util::spinlock> l(result_mutex);
-    HPX_TEST_EQ(final_result, 3);
-
-    on_shutdown_executed = true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    locality_id = hpx::get_locality_id();
-
     hpx::id_type here = hpx::find_here();
     hpx::id_type there = here;
+    root_locality = true;
+
     if (hpx::get_num_localities(hpx::launch::sync) > 1)
     {
         std::vector<hpx::id_type> localities = hpx::find_remote_localities();
         there = localities[0];
     }
 
+    typedef hpx::components::client<increment_server> increment_client;
+
     {
-        increment_action inc;
-        hpx::apply(inc, hpx::colocated(there), here, 1);
+        increment_client inc = hpx::components::new_<increment_client>(there);
+
+        using hpx::placeholders::_1;
+        using hpx::placeholders::_2;
+        using hpx::placeholders::_3;
+
+        call_action call;
+        hpx::post(call, inc, here, 1);
+        hpx::post(hpx::bind(call, inc, here, 1));
+        hpx::post(hpx::bind(call, inc, here, _1), 1);
+        hpx::post(hpx::bind(call, _1, here, 1), inc);
+        hpx::post(hpx::bind(call, _1, _2, 1), inc, here);
+        hpx::post(hpx::bind(call, _1, _2, _3), inc, here, 1);
     }
 
     {
-        hpx::future<hpx::id_type> inc_f =
-            hpx::components::new_<increment_server>(there);
-        hpx::id_type where = inc_f.get();
+        increment_client inc = hpx::components::new_<increment_client>(there);
 
-        increment_action inc;
-        hpx::apply(inc, hpx::colocated(where), here, 1);
+        hpx::post<call_action>(inc, here, 1);
     }
 
-    {
-        hpx::future<hpx::id_type> inc_f =
-            hpx::components::new_<increment_server>(there);
-        hpx::id_type where = inc_f.get();
-
-        hpx::apply<increment_action>(hpx::colocated(where), here, 1);
-    }
-
-    // register function which will verify final result
-    hpx::register_shutdown_function(on_shutdown);
-
-    HPX_TEST_EQ(hpx::finalize(), 0);
-
-    return 0;
+    // Let finalize wait for every "apply" to be finished
+    return hpx::finalize();
 }
 
 int main(int argc, char* argv[])
@@ -126,8 +104,10 @@ int main(int argc, char* argv[])
     HPX_TEST_EQ_MSG(
         hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
-    HPX_TEST_NEQ(std::uint32_t(-1), locality_id);
-    HPX_TEST_NEQ(on_shutdown_executed || 0, locality_id);
+    // After hpx::init returns, all actions should have been executed
+    // The final result is only accumulated on the root locality
+    if (root_locality)
+        HPX_TEST_EQ(final_result, 7);
 
     return hpx::util::report_errors();
 }

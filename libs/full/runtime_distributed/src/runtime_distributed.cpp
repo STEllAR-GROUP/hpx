@@ -10,7 +10,7 @@
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_distributed/apply.hpp>
+#include <hpx/async_distributed/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/server/component_base.hpp>
@@ -655,7 +655,7 @@ namespace hpx {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         //   tell main locality to start application exit, duplicated requests
         // will be ignored
-        apply<components::server::runtime_support::shutdown_all_action>(
+        hpx::post<components::server::runtime_support::shutdown_all_action>(
             hpx::find_root_locality(), shutdown_timeout);
 #else
         HPX_ASSERT(false);

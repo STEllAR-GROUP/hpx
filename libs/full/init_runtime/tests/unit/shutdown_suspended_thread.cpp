@@ -17,7 +17,7 @@
 
 int hpx_main()
 {
-    hpx::apply(
+    hpx::post(
         [] { hpx::this_thread::sleep_for(std::chrono::milliseconds(500)); });
 
     return hpx::local::finalize();

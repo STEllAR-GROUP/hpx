@@ -62,7 +62,7 @@ struct indirect_packaged_task
     void operator()(Ts&&...)
     {
         // This needs to be run on a HPX thread
-        hpx::apply(std::move(*pt));
+        hpx::post(std::move(*pt));
     }
 
     std::shared_ptr<packaged_task_type> pt;
@@ -89,7 +89,7 @@ int main()
             indirect_packaged_task p_local;
             auto f_local = p_local.get_future();
 
-            hpx::apply_cb<test_action>(id, p_local, p_remote.get_id());
+            hpx::post_cb<test_action>(id, p_local, p_remote.get_id());
 
             wait_for.push_back(std::move(f_remote));
             wait_for.push_back(std::move(f_local));
@@ -113,7 +113,7 @@ int main()
             indirect_packaged_task p_local;
             auto f_local = p_local.get_future();
 
-            hpx::apply_cb<test_action>(id, p_local, p_remote.get_id());
+            hpx::post_cb<test_action>(id, p_local, p_remote.get_id());
 
             wait_for.push_back(std::move(f_remote));
             wait_for.push_back(std::move(f_local));

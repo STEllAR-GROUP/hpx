@@ -81,10 +81,10 @@ instances of components using the following |hpx| API function:
    instance goes out of scope, the corresponding component instance is
    automatically deleted.
 
-.. _applying_actions:
+.. _posting_actions:
 
-Applying actions
-================
+Posting actions
+===============
 
 .. _action_type_definition:
 
@@ -214,12 +214,12 @@ Action invocation
 -----------------
 
 The process of invoking a global function (or a member function of an object)
-with the help of the associated action is called 'applying the action'. Actions
+with the help of the associated action is called 'posting the action'. Actions
 can have arguments, which will be supplied while the action is applied. At the
-minimum, one parameter is required to apply any action - the id of the
+minimum, one parameter is required to ``post`` any action - the id of the
 :term:`locality` the associated function should be invoked on (for global
 functions), or the id of the component instance (for member functions).
-Generally, |hpx| provides several ways to apply an action, all of which are
+Generally, |hpx| provides several ways to ``post`` an action, all of which are
 described in the following sections.
 
 Generally, |hpx| actions are very similar to 'normal' C++ functions except that
@@ -243,15 +243,15 @@ extensions added by |hpx| (light gray) where:
 
    Overview of the main API exposed by |hpx|.
 
-This figure shows that |hpx| allows the user to apply actions with a syntax
+This figure shows that |hpx| allows the user to ``post` actions with a syntax
 similar to the C++ standard. In fact, all action types have an overloaded
-function operator allowing to synchronously apply the action. Further, |hpx|
+function operator allowing to synchronously ``post the action. Further, |hpx|
 implements ``hpx::async`` which semantically works similar to the
 way ``std::async`` works for plain C++ function.
 
 .. note::
 
-   The similarity of applying an action to conventional function invocations
+   The similarity of posting an action to conventional function invocations
    extends even further. |hpx| implements ``hpx::bind`` and ``hpx::function``
    two facilities which are semantically equivalent to the ``std::bind`` and
    ``std::function`` types as defined by the C++11 Standard. While
@@ -261,26 +261,26 @@ way ``std::async`` works for plain C++ function.
    The |hpx| facilities not only support conventional functions, but can be used
    for actions as well.
 
-Additionally, |hpx| exposes ``hpx::apply`` and ``hpx::async_continue`` both of
+Additionally, |hpx| exposes ``hpx::post`` and ``hpx::async_continue`` both of
 which refine and extend the standard C++ facilities.
 
 The different ways to invoke a function in |hpx| will be explained in more
 detail in the following sections.
 
-.. _apply:
+.. _post:
 
-Applying an action asynchronously without any synchronization
--------------------------------------------------------------
+Posting an action asynchronously without any synchronization
+------------------------------------------------------------
 
 This method ('fire and forget') will make sure the function associated with the
-action is scheduled to run on the target :term:`locality`. Applying the action
+action is scheduled to run on the target :term:`locality`. Posting the action
 does not wait for the function to start running, instead it is a fully
-asynchronous operation. The following example shows how to apply the action as
+asynchronous operation. The following example shows how to ``post`` the action as
 defined :ref:`in the previous section <action_type_definition>` on the local
 :term:`locality` (the :term:`locality` this code runs on)::
 
     some_global_action act;     // define an instance of some_global_action
-    hpx::apply(act, hpx::find_here(), 2.0);
+    hpx::post(act, hpx::find_here(), 2.0);
 
 (the function ``hpx::find_here()`` returns the id of the local :term:`locality`,
 i.e. the :term:`locality` this code executes on).
@@ -290,7 +290,7 @@ Given that ``id`` is the global address for a component instance created
 earlier, this invocation looks like::
 
     some_component_action act;     // define an instance of some_component_action
-    hpx::apply(act, id, "42");
+    hpx::post(act, id, "42");
 
 In this case any value returned from this action (e.g. in this case the integer
 ``42`` is ignored. Please look at :ref:`action_type_definition` for the code
@@ -298,16 +298,16 @@ defining the component action ``some_component_action`` used.
 
 .. _async:
 
-Applying an action asynchronously with synchronization
-------------------------------------------------------
+Posting an action asynchronously with synchronization
+-----------------------------------------------------
 
 This method will make sure the action is scheduled to run on the target
-:term:`locality`. Applying the action itself does not wait for the function to
+:term:`locality`. Posting the action itself does not wait for the function to
 start running or to complete, instead this is a fully asynchronous operation
-similar to using ``hpx::apply`` as described above. The difference is that this
+similar to using ``hpx::post`` as described above. The difference is that this
 method will return an instance of a ``hpx::future<>`` encapsulating the result
 of the (possibly remote) execution. The future can be used to synchronize with
-the asynchronous operation. The following example shows how to apply the action
+the asynchronous operation. The following example shows how to ``post`` the action
 from above on the local :term:`locality`::
 
     some_global_action act;     // define an instance of some_global_action
@@ -355,8 +355,8 @@ earlier, this invocation looks like::
 
 .. _sync:
 
-Applying an action synchronously
---------------------------------
+Posting an action synchronously
+-------------------------------
 
 This method will schedule the function wrapped in the specified action on the
 target :term:`locality`. While the invocation appears to be synchronous (as we
@@ -397,11 +397,11 @@ communication latencies.
 
 .. note::
 
-   The syntax of applying an action is always the same, regardless whether the
+   The syntax of posting an action is always the same, regardless whether the
    target :term:`locality` is remote to the invocation :term:`locality` or not.
    This is a very important feature of |hpx| as it frees the user from the task
    of keeping track what actions have to be applied locally and which actions
-   are remote. If the target for applying an action is local, a new thread is
+   are remote. If the target for posting an action is local, a new thread is
    automatically created and scheduled. Once this thread is scheduled and run,
    it will execute the function encapsulated by that action. If the target is
    remote, |hpx| will send a parcel to the remote :term:`locality` which
@@ -412,22 +412,22 @@ communication latencies.
 
 .. _async_continue:
 
-Applying an action with a continuation but without any synchronization
-----------------------------------------------------------------------
+Posting an action with a continuation but without any synchronization
+---------------------------------------------------------------------
 
-This method is very similar to the method described in section :ref:`apply`. The
+This method is very similar to the method described in section :ref:`post`. The
 difference is that it allows the user to chain a sequence of asynchronous
 operations, while handing the (intermediate) results from one step to the next
-step in the chain. Where ``hpx::apply`` invokes a single function using 'fire
-and forget' semantics, ``hpx::apply_continue`` asynchronously triggers a chain
+step in the chain. Where ``hpx::post`` invokes a single function using 'fire
+and forget' semantics, ``hpx::post_continue`` asynchronously triggers a chain
 of functions without the need for the execution flow 'to come back' to the
 invocation site. Each of the asynchronous functions can be executed on a
 different :term:`locality`.
 
-.. _apply_continue:
+.. _post_continue:
 
-Applying an action with a continuation and with synchronization
----------------------------------------------------------------
+Posting an action with a continuation and with synchronization
+--------------------------------------------------------------
 
 This method is very similar to the method described in section :ref:`async`. In
 addition to what ``hpx::async`` can do, the functions ``hpx::async_continue``

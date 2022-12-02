@@ -45,7 +45,7 @@ void send_receive_channel()
     hpx::lcos::local::channel<int> c;
     hpx::lcos::local::channel<> done;
 
-    hpx::apply(&do_something, c, done);
+    hpx::post(&do_something, c, done);
 
     // send some value
     c.set(43);

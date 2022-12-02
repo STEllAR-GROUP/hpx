@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/apply.hpp>
+#include <hpx/async_distributed/post.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
@@ -214,7 +214,7 @@ namespace hpx { namespace iostreams {
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
                 typedef server::output_stream::write_async_action action_type;
-                hpx::apply<action_type>(this->get_id(), hpx::get_locality_id(),
+                hpx::post<action_type>(this->get_id(), hpx::get_locality_id(),
                     generational_count_++, next);
             }
 #else
@@ -281,7 +281,7 @@ namespace hpx { namespace iostreams {
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
                 typedef server::output_stream::write_async_action action_type;
-                hpx::apply<action_type>(this->get_id(), hpx::get_locality_id(),
+                hpx::post<action_type>(this->get_id(), hpx::get_locality_id(),
                     generational_count_++, next);
             }
             return true;

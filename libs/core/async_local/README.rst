@@ -11,7 +11,7 @@ async_local
 ===========
 
 This module contains functionality for asynchronously launching local work:
-:cpp:func:`hpx::async`, :cpp:func:`hpx::apply`, and :cpp:func:`hpx::dataflow`.
+:cpp:func:`hpx::async`, :cpp:func:`hpx::post`, and :cpp:func:`hpx::dataflow`.
 The :ref:`modules_async` module extends the functionality in this module to work
 with :term:`action`\ s.
 

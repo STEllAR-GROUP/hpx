@@ -45,7 +45,7 @@ int hpx_main()
     // Schedule some dummy work
     for (std::size_t i = 0; i < 10000; ++i)
     {
-        hpx::apply([]() {});
+        hpx::post([]() {});
     }
 
     // Start shutdown

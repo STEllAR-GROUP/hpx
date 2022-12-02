@@ -6,7 +6,7 @@
 
 // The purpose of this example is to demonstrate how to customize certain
 // parameters (such like thread priority, the stacksize, or the targeted
-// processing unit) for a thread which is created by calling hpx::apply() or
+// processing unit) for a thread which is created by calling hpx::post() or
 // hpx::async().
 
 #include <hpx/local/execution.hpp>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions/apply_helper.hpp>
+#include <hpx/actions/post_helper.hpp>
 #include <hpx/actions_base/action_priority.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
@@ -16,10 +16,10 @@
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/actions_base/traits/is_valid_action.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/async_distributed/continuation.hpp>
+#include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 #include <hpx/async_distributed/put_parcel_fwd.hpp>
-#include <hpx/async_local/apply.hpp>
+#include <hpx/async_local/post.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/traits/component_type_is_compatible.hpp>
@@ -35,12 +35,11 @@
 #include <type_traits>
 #include <utility>
 
-// FIXME: Error codes?
-
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
-    // Invoked by a running HPX-thread to apply an action to any resource
-    namespace applier { namespace detail {
+    // Invoked by a running HPX-thread to post() an action to any resource
+    namespace detail {
 #if defined(HPX_HAVE_NETWORKING)
         ///////////////////////////////////////////////////////////////////////
         template <typename Action>
@@ -151,7 +150,7 @@ namespace hpx {
 
         // We know it is remote.
         template <typename Action, typename... Ts>
-        inline bool apply_r_p(naming::address&& addr, hpx::id_type const& id,
+        inline bool post_r_p(naming::address&& addr, hpx::id_type const& id,
             threads::thread_priority priority, Ts&&... vs)
         {
             // If remote, create a new parcel to be sent to the destination
@@ -161,19 +160,18 @@ namespace hpx {
         }
 
         template <typename Action, typename... Ts>
-        inline bool apply_r(
+        inline bool post_r(
             naming::address&& addr, hpx::id_type const& gid, Ts&&... vs)
         {
-            return apply_r_p<Action>(HPX_MOVE(addr), gid,
+            return post_r_p<Action>(HPX_MOVE(addr), gid,
                 actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
         }
 #endif
 
         // We know it is local and has to be directly executed.
         template <typename Action, typename... Ts>
-        inline bool apply_l_p(hpx::id_type const& target,
-            naming::address&& addr, threads::thread_priority priority,
-            Ts&&... vs)
+        inline bool post_l_p(hpx::id_type const& target, naming::address&& addr,
+            threads::thread_priority priority, Ts&&... vs)
         {
             typedef
                 typename hpx::traits::extract_action<Action>::type action_type;
@@ -193,14 +191,14 @@ namespace hpx {
             data.timer_data = hpx::util::external_timer::new_task(
                 data.description, data.parent_locality_id, data.parent_id);
 #endif
-            apply_helper<action_type>::call(HPX_MOVE(data), target,
+            post_helper<action_type>::call(HPX_MOVE(data), target,
                 addr.address_, addr.type_, priority, HPX_FORWARD(Ts, vs)...);
             return true;    // no parcel has been sent (dest is local)
         }
 
         // same as above, but taking all arguments by value
         template <typename Action, typename... Ts>
-        inline bool apply_l_p_val(hpx::id_type const& target,
+        inline bool post_l_p_val(hpx::id_type const& target,
             naming::address&& addr, threads::thread_priority priority, Ts... vs)
         {
             typedef
@@ -221,31 +219,31 @@ namespace hpx {
             data.timer_data = hpx::util::external_timer::new_task(
                 data.description, data.parent_locality_id, data.parent_id);
 #endif
-            apply_helper<action_type>::call(HPX_MOVE(data), target,
+            post_helper<action_type>::call(HPX_MOVE(data), target,
                 addr.address_, addr.type_, priority, HPX_MOVE(vs)...);
             return true;    // no parcel has been sent (dest is local)
         }
 
         template <typename Action, typename... Ts>
-        inline bool apply_l(
+        inline bool post_l(
             hpx::id_type const& target, naming::address&& addr, Ts&&... vs)
         {
-            return apply_l_p<Action>(target, HPX_MOVE(addr),
+            return post_l_p<Action>(target, HPX_MOVE(addr),
                 actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
         }
-    }}    // namespace applier::detail
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
-    inline bool apply_p(
+    inline bool post_p(
         hpx::id_type const& id, threads::thread_priority priority, Ts&&... vs)
     {
-        return hpx::detail::apply_impl<Action>(
+        return hpx::detail::post_impl<Action>(
             id, priority, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Client, typename Stub, typename... Ts>
-    inline bool apply_p(components::client_base<Client, Stub> const& c,
+    inline bool post_p(components::client_base<Client, Stub> const& c,
         threads::thread_priority priority, Ts&&... vs)
     {
         // make sure the action is compatible with the component type
@@ -256,23 +254,24 @@ namespace hpx {
         static_assert(is_valid::value,
             "The action to invoke is not supported by the target");
 
-        return hpx::detail::apply_impl<Action>(
+        return hpx::detail::post_impl<Action>(
             c.get_id(), priority, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename DistPolicy, typename... Ts>
-    inline typename std::enable_if<
-        traits::is_distribution_policy<DistPolicy>::value, bool>::type
-    apply_p(
+    inline std::enable_if_t<traits::is_distribution_policy<DistPolicy>::value,
+        bool>
+    post_p(
         DistPolicy const& policy, threads::thread_priority priority, Ts&&... vs)
     {
         return policy.template apply<Action>(priority, HPX_FORWARD(Ts, vs)...);
     }
 
     namespace detail {
+
         template <typename Action>
-        struct apply_dispatch<Action,
-            typename std::enable_if<traits::is_action<Action>::value>::type>
+        struct post_dispatch<Action,
+            std::enable_if_t<traits::is_action<Action>::value>>
         {
             template <typename Component, typename Signature, typename Derived,
                 typename... Ts>
@@ -280,7 +279,8 @@ namespace hpx {
                 hpx::actions::basic_action<Component, Signature, Derived>,
                 hpx::id_type const& id, Ts&&... ts)
             {
-                return apply_p<Derived>(id, actions::action_priority<Derived>(),
+                return hpx::post_p<Derived>(id,
+                    actions::action_priority<Derived>(),
                     HPX_FORWARD(Ts, ts)...);
             }
 
@@ -299,19 +299,19 @@ namespace hpx {
                 static_assert(is_valid::value,
                     "The action to invoke is not supported by the target");
 
-                return apply_p<Derived>(c.get_id(),
+                return hpx::post_p<Derived>(c.get_id(),
                     actions::action_priority<Derived>(),
                     HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename Component, typename Signature, typename Derived,
                 typename DistPolicy, typename... Ts>
-            HPX_FORCEINLINE static typename std::enable_if<
-                traits::is_distribution_policy<DistPolicy>::value, bool>::type
+            HPX_FORCEINLINE static std::enable_if_t<
+                traits::is_distribution_policy<DistPolicy>::value, bool>
             call(hpx::actions::basic_action<Component, Signature, Derived>,
                 DistPolicy const& policy, Ts&&... ts)
             {
-                return apply_p<Derived>(policy,
+                return hpx::post_p<Derived>(policy,
                     actions::action_priority<Derived>(),
                     HPX_FORWARD(Ts, ts)...);
             }
@@ -319,15 +319,14 @@ namespace hpx {
     }    // namespace detail
 
     template <typename Action, typename... Ts>
-    inline bool apply(hpx::id_type const& id, Ts&&... vs)
+    inline bool post(hpx::id_type const& id, Ts&&... vs)
     {
-        return apply_p<Action>(
+        return hpx::post_p<Action>(
             id, actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Client, typename Stub, typename... Ts>
-    inline bool apply(
-        components::client_base<Client, Stub> const& c, Ts&&... vs)
+    inline bool post(components::client_base<Client, Stub> const& c, Ts&&... vs)
     {
         // make sure the action is compatible with the component type
         typedef typename components::client_base<Client,
@@ -337,24 +336,24 @@ namespace hpx {
         static_assert(is_valid::value,
             "The action to invoke is not supported by the target");
 
-        return apply_p<Action>(c.get_id(), actions::action_priority<Action>(),
-            HPX_FORWARD(Ts, vs)...);
+        return hpx::post_p<Action>(c.get_id(),
+            actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename DistPolicy, typename... Ts>
-    inline typename std::enable_if<
-        traits::is_distribution_policy<DistPolicy>::value, bool>::type
-    apply(DistPolicy const& policy, Ts&&... vs)
+    inline std::enable_if_t<traits::is_distribution_policy<DistPolicy>::value,
+        bool>
+    post(DistPolicy const& policy, Ts&&... vs)
     {
-        return apply_p<Action>(
+        return hpx::post_p<Action>(
             policy, actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    namespace applier { namespace detail {
+    namespace detail {
 #if defined(HPX_HAVE_NETWORKING)
         template <typename Action, typename Continuation, typename... Ts>
-        inline bool apply_r_p(naming::address&& addr, Continuation&& c,
+        inline bool post_r_p(naming::address&& addr, Continuation&& c,
             hpx::id_type const& id, threads::thread_priority priority,
             Ts&&... vs)
         {
@@ -365,18 +364,18 @@ namespace hpx {
         }
 
         template <typename Action, typename Continuation, typename... Ts>
-        inline typename std::enable_if<
-            traits::is_continuation<Continuation>::value, bool>::type
-        apply_r(naming::address&& addr, Continuation&& c,
+        inline std::enable_if_t<traits::is_continuation<Continuation>::value,
+            bool>
+        post_r(naming::address&& addr, Continuation&& c,
             hpx::id_type const& gid, Ts&&... vs)
         {
-            return apply_r_p<Action>(HPX_MOVE(addr),
+            return post_r_p<Action>(HPX_MOVE(addr),
                 HPX_FORWARD(Continuation, c), gid,
                 actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action>
-        inline bool apply_r_sync_p(naming::address&& addr,
+        inline bool post_r_sync_p(naming::address&& addr,
             hpx::id_type const& id, threads::thread_priority priority)
         {
             typedef
@@ -402,17 +401,16 @@ namespace hpx {
         }
 
         template <typename Action>
-        inline bool apply_r_sync(
-            naming::address&& addr, hpx::id_type const& gid)
+        inline bool post_r_sync(naming::address&& addr, hpx::id_type const& gid)
         {
-            return apply_r_sync_p<Action>(
+            return post_r_sync_p<Action>(
                 HPX_MOVE(addr), gid, actions::action_priority<Action>());
         }
 #endif
 
         // We know it is local and has to be directly executed.
         template <typename Action, typename Continuation, typename... Ts>
-        inline bool apply_l_p(Continuation&& cont, hpx::id_type const& target,
+        inline bool post_l_p(Continuation&& cont, hpx::id_type const& target,
             naming::address&& addr, threads::thread_priority priority,
             Ts&&... vs)
         {
@@ -434,40 +432,38 @@ namespace hpx {
             data.timer_data = hpx::util::external_timer::new_task(
                 data.description, data.parent_locality_id, data.parent_id);
 #endif
-            apply_helper<action_type>::call(HPX_MOVE(data),
+            post_helper<action_type>::call(HPX_MOVE(data),
                 HPX_FORWARD(Continuation, cont), target, addr.address_,
                 addr.type_, priority, HPX_FORWARD(Ts, vs)...);
             return true;    // no parcel has been sent (dest is local)
         }
 
         template <typename Action, typename Continuation, typename... Ts>
-        inline typename std::enable_if<
-            traits::is_continuation<Continuation>::value, bool>::type
-        apply_l(Continuation&& c, hpx::id_type const& target,
+        inline std::enable_if_t<traits::is_continuation<Continuation>::value,
+            bool>
+        post_l(Continuation&& c, hpx::id_type const& target,
             naming::address& addr, Ts&&... vs)
         {
-            return apply_l_p<Action>(HPX_FORWARD(Continuation, c), target,
+            return post_l_p<Action>(HPX_FORWARD(Continuation, c), target,
                 HPX_MOVE(addr), actions::action_priority<Action>(),
                 HPX_FORWARD(Ts, vs)...);
         }
-    }}    // namespace applier::detail
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Continuation, typename... Ts>
-    inline typename std::enable_if<traits::is_continuation<Continuation>::value,
-        bool>::type
-    apply_p(Continuation&& c, hpx::id_type const& gid,
+    inline std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
+    post_p(Continuation&& c, hpx::id_type const& gid,
         threads::thread_priority priority, Ts&&... vs)
     {
-        return hpx::detail::apply_impl<Action>(HPX_FORWARD(Continuation, c),
-            gid, priority, HPX_FORWARD(Ts, vs)...);
+        return hpx::detail::post_impl<Action>(HPX_FORWARD(Continuation, c), gid,
+            priority, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Continuation, typename Client,
         typename Stub, typename... Ts>
-    inline typename std::enable_if<traits::is_continuation<Continuation>::value,
-        bool>::type
-    apply_p(Continuation&& cont, components::client_base<Client, Stub> const& c,
+    inline std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
+    post_p(Continuation&& cont, components::client_base<Client, Stub> const& c,
         threads::thread_priority priority, Ts&&... vs)
     {
         // make sure the action is compatible with the component type
@@ -478,28 +474,27 @@ namespace hpx {
         static_assert(is_valid::value,
             "The action to invoke is not supported by the target");
 
-        return hpx::detail::apply_impl<Action>(HPX_FORWARD(Continuation, cont),
+        return hpx::detail::post_impl<Action>(HPX_FORWARD(Continuation, cont),
             c.get_id(), priority, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Continuation, typename DistPolicy,
         typename... Ts>
-    inline
-        typename std::enable_if<traits::is_continuation<Continuation>::value &&
-                traits::is_distribution_policy<DistPolicy>::value,
-            bool>::type
-        apply_p(Continuation&& c, DistPolicy const& policy,
-            threads::thread_priority priority, Ts&&... vs)
+    inline std::enable_if_t<traits::is_continuation<Continuation>::value &&
+            traits::is_distribution_policy<DistPolicy>::value,
+        bool>
+    post_p(Continuation&& c, DistPolicy const& policy,
+        threads::thread_priority priority, Ts&&... vs)
     {
         return policy.template apply<Action>(
             HPX_FORWARD(Continuation, c), priority, HPX_FORWARD(Ts, vs)...);
     }
 
     namespace detail {
+
         template <typename Continuation>
-        struct apply_dispatch<Continuation,
-            typename std::enable_if<
-                traits::is_continuation<Continuation>::value>::type>
+        struct post_dispatch<Continuation,
+            std::enable_if_t<traits::is_continuation<Continuation>::value>>
         {
             template <typename Component, typename Signature, typename Derived,
                 typename... Ts>
@@ -507,7 +502,7 @@ namespace hpx {
                 hpx::actions::basic_action<Component, Signature, Derived>,
                 hpx::id_type const& id, Ts&&... ts)
             {
-                return apply_p<Derived>(HPX_FORWARD(Continuation, c), id,
+                return hpx::post_p<Derived>(HPX_FORWARD(Continuation, c), id,
                     actions::action_priority<Derived>(),
                     HPX_FORWARD(Ts, ts)...);
             }
@@ -528,40 +523,38 @@ namespace hpx {
                 static_assert(is_valid::value,
                     "The action to invoke is not supported by the target");
 
-                return apply_p<Derived>(HPX_FORWARD(Continuation, cont),
+                return hpx::post_p<Derived>(HPX_FORWARD(Continuation, cont),
                     c.get_id(), actions::action_priority<Derived>(),
                     HPX_FORWARD(Ts, ts)...);
             }
 
             template <typename Component, typename Signature, typename Derived,
                 typename DistPolicy, typename... Ts>
-            HPX_FORCEINLINE static typename std::enable_if<
-                traits::is_distribution_policy<DistPolicy>::value, bool>::type
+            HPX_FORCEINLINE static std::enable_if_t<
+                traits::is_distribution_policy<DistPolicy>::value, bool>
             call(Continuation&& c,
                 hpx::actions::basic_action<Component, Signature, Derived>,
                 DistPolicy const& policy, Ts&&... ts)
             {
-                return apply_p<Derived>(HPX_FORWARD(Continuation, c), policy,
-                    actions::action_priority<Derived>(),
+                return hpx::post_p<Derived>(HPX_FORWARD(Continuation, c),
+                    policy, actions::action_priority<Derived>(),
                     HPX_FORWARD(Ts, ts)...);
             }
         };
     }    // namespace detail
 
     template <typename Action, typename Continuation, typename... Ts>
-    inline typename std::enable_if<traits::is_continuation<Continuation>::value,
-        bool>::type
-    apply(Continuation&& c, hpx::id_type const& gid, Ts&&... vs)
+    inline std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
+    post(Continuation&& c, hpx::id_type const& gid, Ts&&... vs)
     {
-        return apply_p<Action>(HPX_FORWARD(Continuation, c), gid,
+        return hpx::post_p<Action>(HPX_FORWARD(Continuation, c), gid,
             actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Continuation, typename Client,
         typename Stub, typename... Ts>
-    inline typename std::enable_if<traits::is_continuation<Continuation>::value,
-        bool>::type
-    apply(Continuation&& cont, components::client_base<Client, Stub> const& c,
+    inline std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
+    post(Continuation&& cont, components::client_base<Client, Stub> const& c,
         Ts&&... vs)
     {
         // make sure the action is compatible with the component type
@@ -572,27 +565,27 @@ namespace hpx {
         static_assert(is_valid::value,
             "The action to invoke is not supported by the target");
 
-        return apply_p<Action>(HPX_FORWARD(Continuation, cont), c.get_id(),
+        return hpx::post_p<Action>(HPX_FORWARD(Continuation, cont), c.get_id(),
             actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Continuation, typename DistPolicy,
         typename... Ts>
-    inline typename std::enable_if<
-        traits::is_distribution_policy<DistPolicy>::value &&
+    inline std::enable_if_t<traits::is_distribution_policy<DistPolicy>::value &&
             traits::is_continuation<Continuation>::value,
-        bool>::type
-    apply(Continuation&& c, DistPolicy const& policy, Ts&&... vs)
+        bool>
+    post(Continuation&& c, DistPolicy const& policy, Ts&&... vs)
     {
-        return apply_p<Action>(HPX_FORWARD(Continuation, c), policy,
+        return hpx::post_p<Action>(HPX_FORWARD(Continuation, c), policy,
             actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_NETWORKING)
-    namespace applier { namespace detail {
+    namespace detail {
+
         template <typename Action, typename... Ts>
-        inline bool apply_c_p(naming::address&& addr,
+        inline bool post_c_p(naming::address&& addr,
             hpx::id_type const& contgid, hpx::id_type const& gid,
             threads::thread_priority priority, Ts&&... vs)
         {
@@ -603,14 +596,14 @@ namespace hpx {
                 typename hpx::traits::extract_action<Action>::remote_result_type
                     remote_result_type;
 
-            return apply_r_p<Action>(HPX_MOVE(addr),
+            return post_r_p<Action>(HPX_MOVE(addr),
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(contgid),
                 gid, priority, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action, typename... Ts>
-        inline bool apply_c(naming::address&& addr, hpx::id_type const& contgid,
+        inline bool post_c(naming::address&& addr, hpx::id_type const& contgid,
             hpx::id_type const& gid, Ts&&... vs)
         {
             typedef
@@ -620,18 +613,18 @@ namespace hpx {
                 typename hpx::traits::extract_action<Action>::remote_result_type
                     remote_result_type;
 
-            return apply_r_p<Action>(HPX_MOVE(addr),
+            return post_r_p<Action>(HPX_MOVE(addr),
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(contgid),
                 gid, actions::action_priority<Action>(),
                 HPX_FORWARD(Ts, vs)...);
         }
-    }}    // namespace applier::detail
+    }    // namespace detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
-    inline bool apply_c_p(hpx::id_type const& contgid, hpx::id_type const& gid,
+    inline bool post_c_p(hpx::id_type const& contgid, hpx::id_type const& gid,
         threads::thread_priority priority, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::local_result_type
@@ -639,14 +632,14 @@ namespace hpx {
         typedef typename hpx::traits::extract_action<Action>::remote_result_type
             remote_result_type;
 
-        return apply_p<Action>(
+        return hpx::post_p<Action>(
             actions::typed_continuation<local_result_type, remote_result_type>(
                 contgid),
             gid, priority, HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename... Ts>
-    inline bool apply_c(
+    inline bool post_c(
         hpx::id_type const& contgid, hpx::id_type const& gid, Ts&&... vs)
     {
         typedef typename hpx::traits::extract_action<Action>::local_result_type
@@ -654,7 +647,7 @@ namespace hpx {
         typedef typename hpx::traits::extract_action<Action>::remote_result_type
             remote_result_type;
 
-        return apply_p<Action>(
+        return hpx::post_p<Action>(
             actions::typed_continuation<local_result_type, remote_result_type>(
                 contgid),
             gid, actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
@@ -662,7 +655,7 @@ namespace hpx {
 
     template <typename Component, typename Signature, typename Derived,
         typename... Ts>
-    inline bool apply_c(
+    inline bool post_c(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         hpx::id_type const& contgid, hpx::id_type const& gid, Ts&&... vs)
     {
@@ -672,14 +665,77 @@ namespace hpx {
             typename hpx::traits::extract_action<Derived>::remote_result_type
                 remote_result_type;
 
-        return apply_p<Derived>(
+        return hpx::post_p<Derived>(
             actions::typed_continuation<local_result_type, remote_result_type>(
                 contgid),
             gid, actions::action_priority<Derived>(), HPX_FORWARD(Ts, vs)...);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Action, typename... Ts>
+    HPX_DEPRECATED_V(1, 9, "hpx::apply is deprecated, use hpx::post instead")
+    inline bool apply(Ts&&... ts)
+    {
+        return hpx::post<Action>(HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename... Ts>
+    HPX_DEPRECATED_V(1, 9, "hpx::apply is deprecated, use hpx::post instead")
+    inline bool apply(Ts&&... ts)
+    {
+        return hpx::post(HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename Action, typename... Ts>
+    HPX_DEPRECATED_V(
+        1, 9, "hpx::apply_p is deprecated, use hpx::post_p instead")
+    inline bool apply_p(Ts&&... ts)
+    {
+        return hpx::post_p<Action>(HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename... Ts>
+    HPX_DEPRECATED_V(
+        1, 9, "hpx::apply_p is deprecated, use hpx::post_p instead")
+    inline bool apply_p(Ts&&... ts)
+    {
+        return hpx::post_p(HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename Action, typename... Ts>
+    HPX_DEPRECATED_V(
+        1, 9, "hpx::apply_c is deprecated, use hpx::post_c instead")
+    inline bool apply_c(Ts&&... ts)
+    {
+        return hpx::post_c<Action>(HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename... Ts>
+    HPX_DEPRECATED_V(
+        1, 9, "hpx::apply_c is deprecated, use hpx::post_c instead")
+    inline bool apply_c(Ts&&... ts)
+    {
+        return hpx::post_c(HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename Action, typename... Ts>
+    HPX_DEPRECATED_V(
+        1, 9, "hpx::apply_c_p is deprecated, use hpx::post_c_p instead")
+    inline bool apply_c_p(Ts&&... ts)
+    {
+        return hpx::post_c_p<Action>(HPX_FORWARD(Ts, ts)...);
+    }
+
+    template <typename... Ts>
+    HPX_DEPRECATED_V(
+        1, 9, "hpx::apply_c_p is deprecated, use hpx::post_c_p instead")
+    inline bool apply_c_p(Ts&&... ts)
+    {
+        return hpx::post_c_p(HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx
 
 // these files are intentionally #included last as it refers to functions
 // defined here
-#include <hpx/async_distributed/applier/detail/apply_implementations.hpp>
+#include <hpx/async_distributed/detail/post_implementations.hpp>
 #include <hpx/async_distributed/put_parcel.hpp>

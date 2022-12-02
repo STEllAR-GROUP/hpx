@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,9 +6,17 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/async_local/apply.hpp>
+#include <hpx/include/post.hpp>
 
-#include <hpx/async_colocated/apply_colocated.hpp>
-#include <hpx/async_colocated/apply_colocated_callback.hpp>
-#include <hpx/async_distributed/apply.hpp>
+#if HPX_HAVE_DEPRECATION_WARNINGS
+#if defined(HPX_MSVC)
+#pragma message(                                                               \
+    "The header hpx/include/apply.hpp is deprecated, "                         \
+    "please include hpx/include/post.hpp instead."                             \
+    "To disable this warning, please define HPX_HAVE_DEPRECATION_WARNINGS=0.")
+#else
+#warning "The header hpx/include/apply.hpp is deprecated, " \
+    "please include hpx/include/post.hpp instead" \
+    "To disable this warning, please define HPX_HAVE_DEPRECATION_WARNINGS=0."
+#endif
+#endif

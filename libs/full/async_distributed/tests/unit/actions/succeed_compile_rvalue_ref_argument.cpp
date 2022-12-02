@@ -10,7 +10,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/apply.hpp>
+#include <hpx/include/post.hpp>
 #include <hpx/include/runtime.hpp>
 
 #include <utility>
@@ -24,7 +24,7 @@ int main()
     int val = 0;
 
     test_action act;
-    hpx::apply(act, hpx::find_here(), std::move(val));
+    hpx::post(act, hpx::find_here(), std::move(val));
 
     return 0;
 }

@@ -40,9 +40,9 @@ using hpx::program_options::options_description;
 using hpx::program_options::value;
 using hpx::program_options::variables_map;
 
-using hpx::apply;
 using hpx::async;
 using hpx::future;
+using hpx::post;
 
 using hpx::chrono::high_resolution_timer;
 
@@ -235,7 +235,7 @@ void measure_function_futures_limiting_executor(
             exec, tasks, tasks + 1000);
         hpx::experimental::for_loop(
             hpx::execution::par.with(fixed), 0, count, [&](std::uint64_t) {
-                hpx::apply(signal_exec, [&]() {
+                hpx::post(signal_exec, [&]() {
                     null_function();
                     sanity_check--;
                 });
@@ -462,12 +462,12 @@ void measure_function_futures_apply_hierarchical_placement(
 
             for (std::uint64_t i = count_start; i < count_end; ++i)
             {
-                hpx::apply(exec, func);
+                hpx::post(exec, func);
             }
         };
 
         auto exec = hpx::execution::parallel_executor(hint);
-        hpx::apply(exec, spawn_func);
+        hpx::post(exec, spawn_func);
     }
     l.wait();
 

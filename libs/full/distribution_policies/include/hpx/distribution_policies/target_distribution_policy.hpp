@@ -13,9 +13,9 @@
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
+#include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 #include <hpx/async_distributed/packaged_action.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
@@ -148,14 +148,14 @@ namespace hpx { namespace components {
         bool apply(Continuation&& c, threads::thread_priority priority,
             Ts&&... vs) const
         {
-            return hpx::detail::apply_impl<Action>(HPX_FORWARD(Continuation, c),
+            return hpx::detail::post_impl<Action>(HPX_FORWARD(Continuation, c),
                 get_next_target(), priority, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action, typename... Ts>
         bool apply(threads::thread_priority priority, Ts&&... vs) const
         {
-            return hpx::detail::apply_impl<Action>(
+            return hpx::detail::post_impl<Action>(
                 get_next_target(), priority, HPX_FORWARD(Ts, vs)...);
         }
 
@@ -167,7 +167,7 @@ namespace hpx { namespace components {
         bool apply_cb(Continuation&& c, threads::thread_priority priority,
             Callback&& cb, Ts&&... vs) const
         {
-            return hpx::detail::apply_cb_impl<Action>(
+            return hpx::detail::post_cb_impl<Action>(
                 HPX_FORWARD(Continuation, c), get_next_target(), priority,
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
@@ -176,7 +176,7 @@ namespace hpx { namespace components {
         bool apply_cb(
             threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
         {
-            return hpx::detail::apply_cb_impl<Action>(get_next_target(),
+            return hpx::detail::post_cb_impl<Action>(get_next_target(),
                 priority, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 

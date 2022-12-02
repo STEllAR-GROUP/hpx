@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/apply.hpp>
 #include <hpx/async_distributed/base_lco.hpp>
+#include <hpx/async_distributed/post.hpp>
 #include <hpx/async_distributed/trigger_lco.hpp>
 
 #include <hpx/naming_base/address.hpp>
@@ -34,12 +34,12 @@ namespace hpx {
                 id.get_gid(), id_type::management_type::managed_move_credit);
             id.make_unmanaged();
 
-            detail::apply_impl<set_action>(
+            detail::post_impl<set_action>(
                 target, HPX_MOVE(addr), actions::action_priority<set_action>());
         }
         else
         {
-            detail::apply_impl<set_action>(
+            detail::post_impl<set_action>(
                 id, HPX_MOVE(addr), actions::action_priority<set_action>());
         }
 #else
@@ -67,14 +67,14 @@ namespace hpx {
                 id.get_gid(), id_type::management_type::managed_move_credit);
             id.make_unmanaged();
 
-            detail::apply_impl<set_action>(
+            detail::post_impl<set_action>(
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(cont),
                 target, HPX_MOVE(addr), actions::action_priority<set_action>());
         }
         else
         {
-            detail::apply_impl<set_action>(
+            detail::post_impl<set_action>(
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(cont),
                 id, HPX_MOVE(addr), actions::action_priority<set_action>());
@@ -101,12 +101,12 @@ namespace hpx {
                 id.get_gid(), id_type::management_type::managed_move_credit);
             id.make_unmanaged();
 
-            detail::apply_impl<set_action>(target, HPX_MOVE(addr),
+            detail::post_impl<set_action>(target, HPX_MOVE(addr),
                 actions::action_priority<set_action>(), e);
         }
         else
         {
-            detail::apply_impl<set_action>(
+            detail::post_impl<set_action>(
                 id, HPX_MOVE(addr), actions::action_priority<set_action>(), e);
         }
 #else
@@ -132,12 +132,12 @@ namespace hpx {
                 id.get_gid(), id_type::management_type::managed_move_credit);
             id.make_unmanaged();
 
-            detail::apply_impl<set_action>(target, HPX_MOVE(addr),
+            detail::post_impl<set_action>(target, HPX_MOVE(addr),
                 actions::action_priority<set_action>(), HPX_MOVE(e));
         }
         else
         {
-            detail::apply_impl<set_action>(id, HPX_MOVE(addr),
+            detail::post_impl<set_action>(id, HPX_MOVE(addr),
                 actions::action_priority<set_action>(), HPX_MOVE(e));
         }
 #else
@@ -167,7 +167,7 @@ namespace hpx {
                 id.get_gid(), id_type::management_type::managed_move_credit);
             id.make_unmanaged();
 
-            detail::apply_impl<set_action>(
+            detail::post_impl<set_action>(
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(cont),
                 target, HPX_MOVE(addr), actions::action_priority<set_action>(),
@@ -175,7 +175,7 @@ namespace hpx {
         }
         else
         {
-            detail::apply_impl<set_action>(
+            detail::post_impl<set_action>(
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(cont),
                 id, HPX_MOVE(addr), actions::action_priority<set_action>(), e);
@@ -208,7 +208,7 @@ namespace hpx {
                 id.get_gid(), id_type::management_type::managed_move_credit);
             id.make_unmanaged();
 
-            detail::apply_impl<set_action>(
+            detail::post_impl<set_action>(
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(cont),
                 target, HPX_MOVE(addr), actions::action_priority<set_action>(),
@@ -216,7 +216,7 @@ namespace hpx {
         }
         else
         {
-            detail::apply_impl<set_action>(
+            detail::post_impl<set_action>(
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(cont),
                 id, HPX_MOVE(addr), actions::action_priority<set_action>(),
@@ -234,10 +234,10 @@ namespace hpx {
 
 #if defined(HPX_MSVC) && !defined(HPX_DEBUG)
     ///////////////////////////////////////////////////////////////////////////
-    // Explicitly instantiate specific apply needed for set_lco_value for MSVC
+    // Explicitly instantiate specific post needed for set_lco_value for MSVC
     // (in release mode only, leads to missing symbols otherwise).
-    template bool apply<lcos::base_lco_with_value<util::unused_type,
-                            util::unused_type>::set_value_action,
+    template bool post<lcos::base_lco_with_value<util::unused_type,
+                           util::unused_type>::set_value_action,
         util::unused_type>(hpx::id_type const&, util::unused_type&&);
 #endif
 }    // namespace hpx

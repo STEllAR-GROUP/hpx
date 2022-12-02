@@ -52,7 +52,7 @@ void test_component_call_future_void()
     // test apply
     for (std::size_t i = 0; i != 100; ++i)
     {
-        hpx::apply<call_future_void_action>(id);
+        hpx::post<call_future_void_action>(id);
     }
 
     // test async
@@ -71,7 +71,7 @@ void test_component_call_future_int()
     // test apply
     for (std::size_t i = 0; i != 100; ++i)
     {
-        hpx::apply<call_future_int_action>(id);
+        hpx::post<call_future_int_action>(id);
     }
 
     // test async
@@ -104,7 +104,7 @@ void test_plain_call_future_void()
     // test apply
     for (std::size_t i = 0; i != 100; ++i)
     {
-        hpx::apply<plain_future_void_action>(id);
+        hpx::post<plain_future_void_action>(id);
     }
 
     // test async
@@ -123,7 +123,7 @@ void test_plain_call_future_int()
     // test apply
     for (std::size_t i = 0; i != 100; ++i)
     {
-        hpx::apply<plain_future_int_action>(id);
+        hpx::post<plain_future_int_action>(id);
     }
 
     // test async

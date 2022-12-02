@@ -11,8 +11,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/actions/apply_helper.hpp>
 #include <hpx/actions/base_action.hpp>
+#include <hpx/actions/post_helper.hpp>
 #include <hpx/actions/register_action.hpp>
 #include <hpx/actions/transfer_base_action.hpp>
 #include <hpx/actions_base/actions_base_support.hpp>
@@ -181,7 +181,7 @@ namespace hpx { namespace actions {
         data.timer_data = hpx::util::external_timer::new_task(
             data.description, data.parent_locality_id, data.parent_id);
 #endif
-        applier::detail::apply_helper<typename base_type::derived_type>::call(
+        hpx::detail::post_helper<typename base_type::derived_type>::call(
             HPX_MOVE(data), target, lva, comptype, this->priority_,
             HPX_MOVE(hpx::get<Is>(this->arguments_))...);
     }

@@ -25,7 +25,7 @@ hpx::tuple<> make_tuple0_slowly()
 void test_split_future0()
 {
     hpx::lcos::local::futures_factory<hpx::tuple<>()> pt(make_tuple0_slowly);
-    pt.apply();
+    pt.post();
 
     hpx::tuple<hpx::future<void>> result =
         hpx::split_future(hpx::shared_future<hpx::tuple<>>(pt.get_future()));
@@ -43,7 +43,7 @@ hpx::tuple<int> make_tuple1_slowly()
 void test_split_future1()
 {
     hpx::lcos::local::futures_factory<hpx::tuple<int>()> pt(make_tuple1_slowly);
-    pt.apply();
+    pt.post();
 
     hpx::tuple<hpx::future<int>> result =
         hpx::split_future(hpx::shared_future<hpx::tuple<int>>(pt.get_future()));
@@ -62,7 +62,7 @@ void test_split_future2()
 {
     hpx::lcos::local::futures_factory<hpx::tuple<int, int>()> pt(
         make_tuple2_slowly);
-    pt.apply();
+    pt.post();
 
     hpx::tuple<hpx::future<int>, hpx::future<int>> result = hpx::split_future(
         hpx::shared_future<hpx::tuple<int, int>>(pt.get_future()));
@@ -82,7 +82,7 @@ void test_split_future3()
 {
     hpx::lcos::local::futures_factory<hpx::tuple<int, int, int>()> pt(
         make_tuple3_slowly);
-    pt.apply();
+    pt.post();
 
     hpx::tuple<hpx::future<int>, hpx::future<int>, hpx::future<int>> result =
         hpx::split_future(
@@ -104,7 +104,7 @@ void test_split_future_pair()
 {
     hpx::lcos::local::futures_factory<std::pair<int, int>()> pt(
         make_pair_slowly);
-    pt.apply();
+    pt.post();
 
     std::pair<hpx::future<int>, hpx::future<int>> result = hpx::split_future(
         hpx::shared_future<std::pair<int, int>>(pt.get_future()));
@@ -124,7 +124,7 @@ void test_split_future_array0()
 {
     hpx::lcos::local::futures_factory<std::array<int, 0>()> pt(
         make_array0_slowly);
-    pt.apply();
+    pt.post();
 
     std::array<hpx::future<void>, 1> result =
         hpx::split_future(pt.get_future());
@@ -143,7 +143,7 @@ void test_split_future_array()
 {
     hpx::lcos::local::futures_factory<std::array<int, 3>()> pt(
         make_array_slowly);
-    pt.apply();
+    pt.post();
 
     std::array<hpx::future<int>, 3> result = hpx::split_future(pt.get_future());
 

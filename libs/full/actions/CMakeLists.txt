@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,10 +14,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(actions_headers
     hpx/actions/action_support.hpp
     hpx/actions/actions_fwd.hpp
-    hpx/actions/apply_helper_fwd.hpp
-    hpx/actions/apply_helper.hpp
     hpx/actions/base_action.hpp
     hpx/actions/invoke_function.hpp
+    hpx/actions/post_helper_fwd.hpp
+    hpx/actions/post_helper.hpp
     hpx/actions/register_action.hpp
     hpx/actions/transfer_base_action.hpp
     hpx/actions/transfer_action.hpp

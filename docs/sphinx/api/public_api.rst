@@ -494,7 +494,7 @@ C++ standard library header :cppreference-header:`future`. See :ref:`extend_futu
 information about extensions to futures compared to the C++ standard library.
 
 This header file also contains overloads of :cpp:func:`hpx::async`,
-:cpp:func:`hpx::apply`, :cpp:func:`hpx::sync`, and :cpp:func:`hpx::dataflow` that can be used with
+:cpp:func:`hpx::post`, :cpp:func:`hpx::sync`, and :cpp:func:`hpx::dataflow` that can be used with
 actions. See :ref:`action_invocation` for more information about invoking actions.
 
 Classes
@@ -537,7 +537,7 @@ Functions
    Function                                  C++ standard
    ========================================  =====================================
    :cpp:func:`hpx::async`                    :cppreference-generic:`thread,async`
-   :cpp:func:`hpx::apply`
+   :cpp:func:`hpx::post`
    :cpp:func:`hpx::sync`
    :cpp:func:`hpx::dataflow`
    :cpp:func:`hpx::make_future`

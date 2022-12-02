@@ -63,7 +63,7 @@ struct additional_argument_executor
         hpx::lcos::detail::dataflow_finalization<A>&& f, hpx::tuple<Ts...>&& t)
     {
         additional_argument a;
-        hpx::apply(f, hpx::tuple_cat(hpx::tie(a), std::move(t)));
+        hpx::post(f, hpx::tuple_cat(hpx::tie(a), std::move(t)));
     }
 };
 

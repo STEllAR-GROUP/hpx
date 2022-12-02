@@ -10,7 +10,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
-#include <hpx/include/apply.hpp>
+#include <hpx/include/post.hpp>
 #include <hpx/include/runtime.hpp>
 
 void test(int const (&ptr)[20]) {}
@@ -22,7 +22,7 @@ int main()
     int const arr[20] = {0};
 
     test_action act;
-    hpx::apply(act, hpx::find_here(), arr);
+    hpx::post(act, hpx::find_here(), arr);
 
     return 0;
 }

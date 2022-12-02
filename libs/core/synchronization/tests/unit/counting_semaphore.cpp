@@ -33,7 +33,7 @@ int hpx_main()
     hpx::counting_semaphore_var<> sem;
 
     for (std::size_t i = 0; i != 10; ++i)
-        hpx::apply(&worker, std::ref(sem));
+        hpx::post(&worker, std::ref(sem));
 
     // Wait for all threads to finish executing.
     sem.wait(10);

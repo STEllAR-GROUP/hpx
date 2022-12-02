@@ -179,7 +179,7 @@ namespace hpx { namespace cuda { namespace experimental {
         friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
             cublas_executor const& exec, F&& f, Ts&&... ts)
         {
-            return exec.apply(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+            return exec.post(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
 
         // -------------------------------------------------------------------------
@@ -198,7 +198,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // that you would use for a cublas call except the cublas handle which is omitted
         // as the wrapper will supply that for you
         template <typename R, typename... Params, typename... Args>
-        std::enable_if_t<std::is_same_v<cublasStatus_t, R>, R> apply(
+        std::enable_if_t<std::is_same_v<cublasStatus_t, R>, R> post(
             R (*cublas_function)(Params...), Args&&... args) const
         {
             // make sure we run on the correct device
@@ -219,10 +219,10 @@ namespace hpx { namespace cuda { namespace experimental {
         // forward a cuda function through to the cuda executor base class
         // (we permit the use of a cublas executor for cuda calls)
         template <typename R, typename... Params, typename... Args>
-        inline std::enable_if_t<std::is_same_v<cudaError_t, R>> apply(
+        inline std::enable_if_t<std::is_same_v<cudaError_t, R>> post(
             R (*cuda_function)(Params...), Args&&... args) const
         {
-            return cuda_executor::apply(
+            return cuda_executor::post(
                 cuda_function, HPX_FORWARD(Args, args)...);
         }
 

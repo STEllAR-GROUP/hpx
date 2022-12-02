@@ -93,7 +93,7 @@ void matrixMultiply(
         cudaMalloc((void**) &d_C, size_C * sizeof(T)));
 
     // copy A to device, no future
-    hpx::apply(cublas, cudaMemcpyAsync, d_A, h_A.data(), size_A * sizeof(T),
+    hpx::post(cublas, cudaMemcpyAsync, d_A, h_A.data(), size_A * sizeof(T),
         cudaMemcpyHostToDevice);
 
     // copy B to device on same stream as A, get a future back
