@@ -17,15 +17,12 @@ struct pack_c
 template <typename = void>
 void test()
 {
-    static_assert(std::is_same<pack_c<std::size_t, __integer_pack(0)...>,
-                      pack_c<std::size_t>>::value,
-        "");
-    static_assert(std::is_same<pack_c<std::size_t, __integer_pack(1)...>,
-                      pack_c<std::size_t, 0>>::value,
-        "");
-    static_assert(std::is_same<pack_c<std::size_t, __integer_pack(2)...>,
-                      pack_c<std::size_t, 0, 1>>::value,
-        "");
+    static_assert(std::is_same_v<pack_c<std::size_t, __integer_pack(0)...>,
+        pack_c<std::size_t>>);
+    static_assert(std::is_same_v<pack_c<std::size_t, __integer_pack(1)...>,
+        pack_c<std::size_t, 0>>);
+    static_assert(std::is_same_v<pack_c<std::size_t, __integer_pack(2)...>,
+        pack_c<std::size_t, 0, 1>>);
 }
 
 int main()
