@@ -15,6 +15,7 @@
 
 #include <cstddef>    // for std::size_t
 #include <fstream>
+#include <locale>
 #include <sstream>
 #include <stdexcept>    // for std::logic_error
 #include <string>
@@ -30,7 +31,7 @@ std::wstring widen_string(
     {
         typedef std::ctype<wchar_t> ct_type;
         typedef std::wstring::traits_type tr_type;
-        ct_type const& ct = BOOST_USE_FACET(ct_type, loc);
+        ct_type const& ct = std::use_facet<ct_type>(loc);
 
         result.resize(len);
         for (std::size_t i = 0; i < len; ++i)

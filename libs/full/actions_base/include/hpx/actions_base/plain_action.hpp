@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,11 +21,10 @@
 #include <hpx/preprocessor/nargs.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 
-#include <boost/utility/string_ref.hpp>
-
 #include <cstdlib>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #if defined(__NVCC__) || defined(__CUDACC__)
 #include <type_traits>
 #endif
@@ -49,7 +48,7 @@ namespace hpx { namespace actions {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        inline std::string make_plain_action_name(boost::string_ref action_name)
+        inline std::string make_plain_action_name(std::string_view action_name)
         {
             return hpx::util::format("plain action({})", action_name);
         }

@@ -49,13 +49,12 @@
 #include <hpx/modules/itt_notify.hpp>
 #endif
 
-#include <boost/utility/string_ref.hpp>
-
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 
@@ -206,7 +205,7 @@ namespace hpx { namespace actions {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        inline std::string make_action_name(boost::string_ref action_name)
+        inline std::string make_action_name(std::string_view action_name)
         {
             return hpx::util::format("action({})", action_name);
         }

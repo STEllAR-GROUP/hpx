@@ -1,5 +1,5 @@
 //  Copyright (c) 2018 Thomas Heller
-//  Copyright (c) 2019-2021 Hartmut Kaiser
+//  Copyright (c) 2019-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,11 +15,10 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 
-#include <boost/utility/string_ref.hpp>
-
 #include <cstddef>
 #include <functional>
 #include <iosfwd>
+#include <string_view>
 #include <utility>
 
 namespace hpx { namespace threads {
@@ -143,7 +142,7 @@ namespace hpx { namespace threads {
         }
 
         friend void format_value(
-            std::ostream& os, boost::string_ref spec, thread_id const& id)
+            std::ostream& os, std::string_view spec, thread_id const& id)
         {
             // propagate spec
             char format[16];
@@ -390,7 +389,7 @@ namespace hpx { namespace threads {
         }
 
         friend void format_value(
-            std::ostream& os, boost::string_ref spec, thread_id_ref const& id)
+            std::ostream& os, std::string_view spec, thread_id_ref const& id)
         {
             // propagate spec
             char format[16];
