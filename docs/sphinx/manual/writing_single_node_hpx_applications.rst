@@ -33,8 +33,6 @@ different ways adapted to |hpx|. The following synchronization objects are avail
 
 #. ``queue``
 
-#. ``object_semaphore``
-
 #. ``barrier``
 
 Channels
