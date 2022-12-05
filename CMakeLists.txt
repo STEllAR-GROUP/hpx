@@ -2325,6 +2325,7 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
       <stack>
       <stdexcept>
       <string>
+      <string_view>
       <system_error>
       <thread>
       <tuple>
@@ -2341,12 +2342,10 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
       <asio/ip/tcp.hpp>
       <boost/config.hpp>
       <boost/fusion/include/vector.hpp>
-      <boost/intrusive/slist.hpp>
       <boost/lockfree/queue.hpp>
       <boost/optional.hpp>
       <boost/spirit/home/x3.hpp>
       <boost/tokenizer.hpp>
-      <boost/utility/string_ref.hpp>
   )
 
   if(HPX_WITH_CXX17_FILESYSTEM)

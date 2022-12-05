@@ -20,11 +20,10 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <boost/utility/string_ref.hpp>
-
 #include <cstddef>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <utility>
 
 namespace hpx { namespace util { namespace logging {
@@ -90,7 +89,7 @@ namespace hpx { namespace util { namespace logging {
 
         template <typename... Args>
         message& format(
-            boost::string_ref format_str, Args const&... args) noexcept
+            std::string_view format_str, Args const&... args) noexcept
         {
             util::format_to(m_str, format_str, args...);
             m_full_msg_computed = false;

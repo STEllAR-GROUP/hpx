@@ -1,5 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2017-2018 Agustin Berge
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,8 +10,6 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <boost/utility/string_ref.hpp>
-
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
@@ -19,11 +18,12 @@
 #include <ostream>
 #include <sstream>
 #include <string>
+#include <string_view>
 
 namespace hpx { namespace util { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     inline std::size_t format_atoi(
-        boost::string_ref str, std::size_t* pos = nullptr) noexcept
+        std::string_view str, std::size_t* pos = nullptr) noexcept
     {
         // copy input to a null terminated buffer
         static constexpr std::size_t digits10 =
@@ -39,11 +39,11 @@ namespace hpx { namespace util { namespace detail {
         return r;
     }
 
-    inline boost::string_ref format_substr(boost::string_ref str,
-        std::size_t start, std::size_t end = boost::string_ref::npos) noexcept
+    inline std::string_view format_substr(std::string_view str,
+        std::size_t start, std::size_t end = std::string_view::npos) noexcept
     {
         return start < str.size() ? str.substr(start, end - start) :
-                                    boost::string_ref{};
+                                    std::string_view{};
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -51,16 +51,16 @@ namespace hpx { namespace util { namespace detail {
     struct format_field
     {
         std::size_t arg_id;
-        boost::string_ref spec;
+        std::string_view spec;
     };
 
-    inline format_field parse_field(boost::string_ref field) noexcept
+    inline format_field parse_field(std::string_view field) noexcept
     {
         std::size_t const sep = field.find(':');
         if (sep != field.npos)
         {
-            boost::string_ref const arg_id = format_substr(field, 0, sep);
-            boost::string_ref const spec = format_substr(field, sep + 1);
+            std::string_view const arg_id = format_substr(field, 0, sep);
+            std::string_view const spec = format_substr(field, sep + 1);
 
             std::size_t const id = format_atoi(arg_id);
             return format_field{id, spec};
@@ -72,7 +72,7 @@ namespace hpx { namespace util { namespace detail {
         }
     }
 
-    void format_to(std::ostream& os, boost::string_ref format_str,
+    void format_to(std::ostream& os, std::string_view format_str,
         format_arg const* args, std::size_t count)
     {
         std::size_t index = 0;
@@ -89,7 +89,7 @@ namespace hpx { namespace util { namespace detail {
                 {
                     HPX_ASSERT(format_str[0] != '}');
                     std::size_t const end = format_str.find('}');
-                    boost::string_ref field_str =
+                    std::string_view field_str =
                         format_substr(format_str, 1, end);
                     format_field const field = parse_field(field_str);
                     format_str.remove_prefix(end - 1);
@@ -116,7 +116,7 @@ namespace hpx { namespace util { namespace detail {
     }
 
     std::string format(
-        boost::string_ref format_str, format_arg const* args, std::size_t count)
+        std::string_view format_str, format_arg const* args, std::size_t count)
     {
         std::ostringstream os;
         detail::format_to(os, format_str, args, count);
