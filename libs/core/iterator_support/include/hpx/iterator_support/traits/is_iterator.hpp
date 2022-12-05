@@ -16,9 +16,29 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Iter>
+    using iter_value_t = typename std::iterator_traits<Iter>::value_type;
+
+    template <typename Iter>
+    using iter_difference_t =
+        typename std::iterator_traits<Iter>::difference_type;
+
+    template <typename Iter>
+    using iter_pointer_t = typename std::iterator_traits<Iter>::pointer;
+
+    template <typename Iter>
+    using iter_ref_t = typename std::iterator_traits<Iter>::reference;
+
+    template <typename Iter>
+    using iter_category_t =
+        typename std::iterator_traits<Iter>::iterator_category;
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         // This implementation of is_iterator seems to work fine even for
         // VS2013 which has an implementation of std::iterator_traits that is
         // SFINAE-unfriendly.
@@ -32,8 +52,7 @@ namespace hpx { namespace traits {
             template <typename U>
             static void* test(U*);    // pointer
 #else
-            template <typename U,
-                typename = typename std::iterator_traits<U>::pointer>
+            template <typename U, typename = iter_pointer_t<U>>
             static void* test(U&&);
 #endif
 
@@ -58,6 +77,10 @@ namespace hpx { namespace traits {
             using type = decltype(std::declval<T>() + std::declval<U>());
         };
 
+        template <typename T, typename U>
+        using addition_result_t = typename addition_result<T, U>::type;
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable = void>
         struct dereference_result
         {
@@ -70,6 +93,10 @@ namespace hpx { namespace traits {
             using type = decltype(*(std::declval<T&>()));
         };
 
+        template <typename T>
+        using dereference_result_t = typename dereference_result<T>::type;
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename T, typename U, typename Enable = void>
         struct inplace_addition_result
         {
@@ -82,6 +109,11 @@ namespace hpx { namespace traits {
             using type = decltype(std::declval<T>() += std::declval<U>());
         };
 
+        template <typename T, typename U>
+        using inplace_addition_result_t =
+            typename inplace_addition_result<T, U>::type;
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename T, typename U, typename Enable = void>
         struct inplace_subtraction_result
         {
@@ -94,6 +126,11 @@ namespace hpx { namespace traits {
             using type = decltype(std::declval<T>() -= std::declval<U>());
         };
 
+        template <typename T, typename U>
+        using inplace_subtraction_result_t =
+            typename inplace_subtraction_result<T, U>::type;
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable = void>
         struct predecrement_result
         {
@@ -106,6 +143,10 @@ namespace hpx { namespace traits {
             using type = decltype(--std::declval<T&>());
         };
 
+        template <typename T>
+        using predecrement_result_t = typename predecrement_result<T>::type;
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable = void>
         struct preincrement_result
         {
@@ -118,6 +159,10 @@ namespace hpx { namespace traits {
             using type = decltype(++std::declval<T&>());
         };
 
+        template <typename T>
+        using preincrement_result_t = typename preincrement_result<T>::type;
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable = void>
         struct postdecrement_result
         {
@@ -130,6 +175,10 @@ namespace hpx { namespace traits {
             using type = decltype(std::declval<T&>()--);
         };
 
+        template <typename T>
+        using postdecrement_result_t = typename postdecrement_result<T>::type;
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable = void>
         struct postincrement_result
         {
@@ -142,6 +191,10 @@ namespace hpx { namespace traits {
             using type = decltype(std::declval<T&>()++);
         };
 
+        template <typename T>
+        using postincrement_result_t = typename postincrement_result<T>::type;
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename T, typename U, typename Enable = void>
         struct subscript_result
         {
@@ -154,6 +207,10 @@ namespace hpx { namespace traits {
             using type = decltype(std::declval<T&>()[std::declval<U>()]);
         };
 
+        template <typename T, typename U>
+        using subscript_result_t = typename subscript_result<T, U>::type;
+
+        ///////////////////////////////////////////////////////////////////////
         template <typename T, typename U, typename Enable = void>
         struct subtraction_result
         {
@@ -166,6 +223,9 @@ namespace hpx { namespace traits {
             using type = decltype(std::declval<T>() - std::declval<U>());
         };
 
+        template <typename T, typename U>
+        using subtraction_result_t = typename subtraction_result<T, U>::type;
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Iter, typename Enable = void>
         struct bidirectional_concept : std::false_type
@@ -174,26 +234,20 @@ namespace hpx { namespace traits {
 
         template <typename Iter>
         struct bidirectional_concept<Iter,
-            std::void_t<typename dereference_result<Iter>::type,
-                typename equality_result<Iter, Iter>::type,
-                typename inequality_result<Iter, Iter>::type,
-                typename predecrement_result<Iter>::type,
-                typename preincrement_result<Iter>::type,
-                typename postdecrement_result<Iter>::type,
-                typename postincrement_result<Iter>::type>>
+            std::void_t<dereference_result_t<Iter>,
+                equality_result_t<Iter, Iter>, inequality_result_t<Iter, Iter>,
+                predecrement_result_t<Iter>, preincrement_result_t<Iter>,
+                postdecrement_result_t<Iter>, postincrement_result_t<Iter>>>
           : std::integral_constant<bool,
-                std::is_convertible<bool,
-                    typename equality_result<Iter, Iter>::type>::value &&
-                    std::is_convertible<bool,
-                        typename inequality_result<Iter, Iter>::type>::value &&
-                    std::is_same<typename std::add_lvalue_reference<Iter>::type,
-                        typename predecrement_result<Iter>::type>::value &&
-                    std::is_same<typename std::add_lvalue_reference<Iter>::type,
-                        typename preincrement_result<Iter>::type>::value &&
-                    std::is_same<Iter,
-                        typename postdecrement_result<Iter>::type>::value &&
-                    std::is_same<Iter,
-                        typename postincrement_result<Iter>::type>::value>
+                std::is_convertible_v<bool, equality_result_t<Iter, Iter>> &&
+                    std::is_convertible_v<bool,
+                        inequality_result_t<Iter, Iter>> &&
+                    std::is_same_v<std::add_lvalue_reference_t<Iter>,
+                        predecrement_result_t<Iter>> &&
+                    std::is_same_v<std::add_lvalue_reference_t<Iter>,
+                        preincrement_result_t<Iter>> &&
+                    std::is_same_v<Iter, postdecrement_result_t<Iter>> &&
+                    std::is_same_v<Iter, postincrement_result_t<Iter>>>
         {
         };
 
@@ -205,44 +259,29 @@ namespace hpx { namespace traits {
 
         template <typename Iter>
         struct random_access_concept<Iter,
-            std::void_t<typename dereference_result<Iter>::type,
-                typename subscript_result<Iter,
-                    typename std::iterator_traits<Iter>::difference_type>::type,
-                typename addition_result<Iter,
-                    typename std::iterator_traits<Iter>::difference_type>::type,
-                typename inplace_addition_result<Iter,
-                    typename std::iterator_traits<Iter>::difference_type>::type,
-                typename subtraction_result<Iter,
-                    typename std::iterator_traits<Iter>::difference_type>::type,
-                typename subtraction_result<Iter, Iter>::type,
-                typename inplace_subtraction_result<Iter,
-                    typename std::iterator_traits<Iter>::difference_type>::
-                    type>>
+            std::void_t<dereference_result_t<Iter>,
+                subscript_result_t<Iter, iter_difference_t<Iter>>,
+                addition_result_t<Iter, iter_difference_t<Iter>>,
+                inplace_addition_result_t<Iter, iter_difference_t<Iter>>,
+                subtraction_result_t<Iter, iter_difference_t<Iter>>,
+                subtraction_result_t<Iter, Iter>,
+                inplace_subtraction_result_t<Iter, iter_difference_t<Iter>>>>
           : std::integral_constant<bool,
                 bidirectional_concept<Iter>::value &&
-                    std::is_same<typename dereference_result<Iter>::type,
-                        typename subscript_result<Iter,
-                            typename std::iterator_traits<
-                                Iter>::difference_type>::type>::value &&
-                    std::is_same<Iter,
-                        typename addition_result<Iter,
-                            typename std::iterator_traits<
-                                Iter>::difference_type>::type>::value &&
-                    std::is_same<typename std::add_lvalue_reference<Iter>::type,
-                        typename inplace_addition_result<Iter,
-                            typename std::iterator_traits<
-                                Iter>::difference_type>::type>::value &&
-                    std::is_same<Iter,
-                        typename subtraction_result<Iter,
-                            typename std::iterator_traits<
-                                Iter>::difference_type>::type>::value &&
-                    std::is_same<
-                        typename std::iterator_traits<Iter>::difference_type,
-                        typename subtraction_result<Iter, Iter>::type>::value &&
-                    std::is_same<typename std::add_lvalue_reference<Iter>::type,
-                        typename inplace_subtraction_result<Iter,
-                            typename std::iterator_traits<
-                                Iter>::difference_type>::type>::value>
+                    std::is_same_v<dereference_result_t<Iter>,
+                        subscript_result_t<Iter, iter_difference_t<Iter>>> &&
+                    std::is_same_v<Iter,
+                        addition_result_t<Iter, iter_difference_t<Iter>>> &&
+                    std::is_same_v<std::add_lvalue_reference_t<Iter>,
+                        inplace_addition_result_t<Iter,
+                            iter_difference_t<Iter>>> &&
+                    std::is_same_v<Iter,
+                        subtraction_result_t<Iter, iter_difference_t<Iter>>> &&
+                    std::is_same_v<iter_difference_t<Iter>,
+                        subtraction_result_t<Iter, Iter>> &&
+                    std::is_same_v<std::add_lvalue_reference_t<Iter>,
+                        inplace_subtraction_result_t<Iter,
+                            iter_difference_t<Iter>>>>
         {
         };
 
@@ -252,21 +291,18 @@ namespace hpx { namespace traits {
         {
         };
 
-        /**
-         * The interface guarantees of InputIterator and ForwardIterator
-         * concepts are not sufficient to robustly distinguish whether a given
-         * type models a forward iterator or an input iterator through interface
-         * inspection and concept emulation alone, given the type in question
-         * models an iterator category no stronger than forward.
-         *
-         * That said, a type which models the BidirectionalIterator concept
-         * also models a ForwardIterator concept, by definition (and the
-         * interface guarantees on the BidirectionalIterator concept are
-         * sufficient for robust concept checking). Here we provide a
-         * specialization to capture this case, such that, bidirectional and
-         * random access iterators will be properly recognized as satisfying the
-         * ForwardIterator concept.
-         */
+        // The interface guarantees of InputIterator and ForwardIterator
+        // concepts are not sufficient to robustly distinguish whether a given
+        // type models a forward iterator or an input iterator through interface
+        // inspection and concept emulation alone, given the type in question
+        // models an iterator category no stronger than forward.
+        //
+        // That said, a type which models the BidirectionalIterator concept also
+        // models a ForwardIterator concept, by definition (and the interface
+        // guarantees on the BidirectionalIterator concept are sufficient for
+        // robust concept checking). Here we provide a specialization to capture
+        // this case, such that, bidirectional and random access iterators will
+        // be properly recognized as satisfying the ForwardIterator concept.
         template <typename Iter>
         struct satisfy_traversal_concept<Iter, hpx::forward_traversal_tag>
           : bidirectional_concept<Iter>
@@ -284,10 +320,14 @@ namespace hpx { namespace traits {
           : random_access_concept<Iter>
         {
         };
+
+        template <typename Iter, typename TraversalTag>
+        inline constexpr bool satisfy_traversal_concept_v =
+            satisfy_traversal_concept<Iter, TraversalTag>::value;
     }    // namespace detail
 
     template <typename Iter, typename Enable = void>
-    struct is_iterator : detail::is_iterator<typename std::decay<Iter>::type>
+    struct is_iterator : detail::is_iterator<std::decay_t<Iter>>
     {
     };
 
@@ -300,6 +340,7 @@ namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
+        ///////////////////////////////////////////////////////////////////////
         template <typename Iter, typename Cat, typename Enable = void>
         struct belongs_to_iterator_category : std::false_type
         {
@@ -307,11 +348,14 @@ namespace hpx { namespace traits {
 
         template <typename Iter, typename Cat>
         struct belongs_to_iterator_category<Iter, Cat,
-            typename std::enable_if<is_iterator<Iter>::value>::type>
-          : std::is_base_of<Cat,
-                typename std::iterator_traits<Iter>::iterator_category>
+            std::enable_if_t<is_iterator_v<Iter>>>
+          : std::is_base_of<Cat, iter_category_t<Iter>>
         {
         };
+
+        template <typename Iter, typename Cat>
+        inline constexpr bool belongs_to_iterator_category_v =
+            belongs_to_iterator_category<Iter, Cat>::value;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Iter, typename Traversal, typename Enable = void>
@@ -321,13 +365,17 @@ namespace hpx { namespace traits {
 
         template <typename Iter, typename Traversal>
         struct belongs_to_iterator_traversal<Iter, Traversal,
-            typename std::enable_if<is_iterator<Iter>::value>::type>
+            std::enable_if_t<is_iterator_v<Iter>>>
           : std::integral_constant<bool,
-                std::is_base_of<Traversal,
-                    hpx::traits::iterator_traversal_t<Iter>>::value ||
-                    satisfy_traversal_concept<Iter, Traversal>::value>
+                std::is_base_of_v<Traversal,
+                    hpx::traits::iterator_traversal_t<Iter>> ||
+                    satisfy_traversal_concept_v<Iter, Traversal>>
         {
         };
+
+        template <typename Iter, typename Traversal>
+        inline constexpr bool belongs_to_iterator_traversal_v =
+            belongs_to_iterator_traversal<Iter, Traversal>::value;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Iter, typename Cat, typename Enable = void>
@@ -336,10 +384,8 @@ namespace hpx { namespace traits {
         };
 
         template <typename Iter, typename Cat>
-        struct has_category<Iter, Cat,
-            typename std::enable_if<is_iterator<Iter>::value>::type>
-          : std::is_same<Cat,
-                typename std::iterator_traits<Iter>::iterator_category>
+        struct has_category<Iter, Cat, std::enable_if_t<is_iterator_v<Iter>>>
+          : std::is_same<Cat, iter_category_t<Iter>>
         {
         };
 
@@ -351,55 +397,62 @@ namespace hpx { namespace traits {
 
         template <typename Iter, typename Traversal>
         struct has_traversal<Iter, Traversal,
-            typename std::enable_if<is_iterator<Iter>::value>::type>
+            std::enable_if_t<is_iterator_v<Iter>>>
           : std::is_same<Traversal, hpx::traits::iterator_traversal_t<Iter>>
         {
         };
 
         template <typename Iter>
         struct has_traversal<Iter, hpx::bidirectional_traversal_tag,
-            typename std::enable_if<is_iterator<Iter>::value>::type>
+            std::enable_if_t<is_iterator_v<Iter>>>
           : std::integral_constant<bool,
-                std::is_same<hpx::bidirectional_traversal_tag,
-                    hpx::traits::iterator_traversal_t<Iter>>::value ||
-                    (satisfy_traversal_concept<Iter,
-                         hpx::bidirectional_traversal_tag>::value &&
-                        !satisfy_traversal_concept<Iter,
-                            hpx::random_access_traversal_tag>::value)>
+                std::is_same_v<hpx::bidirectional_traversal_tag,
+                    hpx::traits::iterator_traversal_t<Iter>> ||
+                    (satisfy_traversal_concept_v<Iter,
+                         hpx::bidirectional_traversal_tag> &&
+                        !satisfy_traversal_concept_v<Iter,
+                            hpx::random_access_traversal_tag>)>
         {
         };
 
         template <typename Iter>
         struct has_traversal<Iter, hpx::random_access_traversal_tag,
-            typename std::enable_if<is_iterator<Iter>::value>::type>
+            std::enable_if_t<is_iterator_v<Iter>>>
           : std::integral_constant<bool,
-                std::is_same<hpx::random_access_traversal_tag,
-                    hpx::traits::iterator_traversal_t<Iter>>::value ||
-                    satisfy_traversal_concept<Iter,
-                        hpx::random_access_traversal_tag>::value>
+                std::is_same_v<hpx::random_access_traversal_tag,
+                    hpx::traits::iterator_traversal_t<Iter>> ||
+                    satisfy_traversal_concept_v<Iter,
+                        hpx::random_access_traversal_tag>>
         {
         };
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Category>
-    struct has_category : detail::has_category<std::decay_t<Iter>, Category>
-    {
-    };
+    inline constexpr bool has_category_v =
+        detail::has_category<std::decay_t<Iter>, Category>::value;
+
+    template <typename Iter, typename Traversal>
+    inline constexpr bool has_traversal_v =
+        detail::has_traversal<std::decay_t<Iter>, Traversal>::value;
 
     template <typename Iter, typename Category>
-    inline constexpr bool has_category_v = has_category<Iter, Category>::value;
+    inline constexpr bool belongs_to_iterator_category_v =
+        detail::belongs_to_iterator_category<std::decay_t<Iter>,
+            Category>::value;
+
+    template <typename Iter, typename Traversal>
+    inline constexpr bool belongs_to_iterator_traversal_v =
+        detail::belongs_to_iterator_traversal<std::decay_t<Iter>,
+            Traversal>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>
     struct is_output_iterator
       : std::integral_constant<bool,
-            detail::belongs_to_iterator_category<
-                typename std::decay<Iter>::type,
-                std::output_iterator_tag>::value ||
-                detail::belongs_to_iterator_traversal<
-                    typename std::decay<Iter>::type,
-                    hpx::incrementable_traversal_tag>::value>
+            belongs_to_iterator_category_v<Iter, std::output_iterator_tag> ||
+                belongs_to_iterator_traversal_v<Iter,
+                    hpx::incrementable_traversal_tag>>
     {
     };
 
@@ -410,15 +463,13 @@ namespace hpx { namespace traits {
     inline constexpr bool is_output_iterator_v =
         is_output_iterator<Iter>::value;
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>
     struct is_input_iterator
       : std::integral_constant<bool,
-            detail::belongs_to_iterator_category<
-                typename std::decay<Iter>::type,
-                std::input_iterator_tag>::value ||
-                detail::belongs_to_iterator_traversal<
-                    typename std::decay<Iter>::type,
-                    hpx::single_pass_traversal_tag>::value>
+            belongs_to_iterator_category_v<Iter, std::input_iterator_tag> ||
+                belongs_to_iterator_traversal_v<Iter,
+                    hpx::single_pass_traversal_tag>>
     {
     };
 
@@ -428,15 +479,13 @@ namespace hpx { namespace traits {
     template <typename Iter>
     inline constexpr bool is_input_iterator_v = is_input_iterator<Iter>::value;
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>
     struct is_forward_iterator
       : std::integral_constant<bool,
-            detail::belongs_to_iterator_category<
-                typename std::decay<Iter>::type,
-                std::forward_iterator_tag>::value ||
-                detail::belongs_to_iterator_traversal<
-                    typename std::decay<Iter>::type,
-                    hpx::forward_traversal_tag>::value>
+            belongs_to_iterator_category_v<Iter, std::forward_iterator_tag> ||
+                belongs_to_iterator_traversal_v<Iter,
+                    hpx::forward_traversal_tag>>
     {
     };
 
@@ -447,15 +496,14 @@ namespace hpx { namespace traits {
     inline constexpr bool is_forward_iterator_v =
         is_forward_iterator<Iter>::value;
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>
     struct is_bidirectional_iterator
       : std::integral_constant<bool,
-            detail::belongs_to_iterator_category<
-                typename std::decay<Iter>::type,
-                std::bidirectional_iterator_tag>::value ||
-                detail::belongs_to_iterator_traversal<
-                    typename std::decay<Iter>::type,
-                    hpx::bidirectional_traversal_tag>::value>
+            belongs_to_iterator_category_v<Iter,
+                std::bidirectional_iterator_tag> ||
+                belongs_to_iterator_traversal_v<Iter,
+                    hpx::bidirectional_traversal_tag>>
     {
     };
 
@@ -467,13 +515,12 @@ namespace hpx { namespace traits {
     inline constexpr bool is_bidirectional_iterator_v =
         is_bidirectional_iterator<Iter>::value;
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>
     struct is_random_access_iterator
       : std::integral_constant<bool,
-            detail::has_category<typename std::decay<Iter>::type,
-                std::random_access_iterator_tag>::value ||
-                detail::has_traversal<typename std::decay<Iter>::type,
-                    hpx::random_access_traversal_tag>::value>
+            has_category_v<Iter, std::random_access_iterator_tag> ||
+                has_traversal_v<Iter, hpx::random_access_traversal_tag>>
     {
     };
 
@@ -529,8 +576,7 @@ namespace hpx { namespace traits {
 
         // different versions of clang-format disagree
         // clang-format off
-        template <typename Iter,
-            typename T = typename std::iterator_traits<Iter>::value_type>
+        template <typename Iter, typename T = iter_value_t<Iter>>
         struct is_vector_iterator
           : std::integral_constant<bool,
                 std::is_same_v<
@@ -568,12 +614,4 @@ namespace hpx { namespace traits {
     template <typename Iter>
     inline constexpr bool is_contiguous_iterator_v =
         is_contiguous_iterator<Iter>::value;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Iter>
-    using iter_value_t = typename std::iterator_traits<Iter>::value_type;
-
-    template <typename Iter>
-    using iter_ref_t = typename std::iterator_traits<Iter>::reference;
-
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

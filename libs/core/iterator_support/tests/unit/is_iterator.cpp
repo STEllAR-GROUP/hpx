@@ -18,6 +18,7 @@
 #include <vector>
 
 namespace test {
+
     template <typename BaseIterator, typename IteratorTag>
     struct test_iterator
       : hpx::util::iterator_adaptor<test_iterator<BaseIterator, IteratorTag>,
@@ -233,9 +234,9 @@ struct random_access_traversal_iterator
     }
 };
 
-void addition_result()
+void addition_result_test()
 {
-    using hpx::traits::detail::addition_result;
+    using namespace hpx::traits::detail;
 
     struct A
     {
@@ -252,16 +253,15 @@ void addition_result()
         }
     };
 
-    HPX_TEST_MSG((std::is_same<B, typename addition_result<C, A>::type>::value),
-        "deduced type");
+    HPX_TEST_MSG((std::is_same_v<B, addition_result_t<C, A>>), "deduced type");
 
     HPX_TEST_MSG(
         (!has_nested_type<addition_result<B, A>>::value), "invalid operation");
 }
 
-void dereference_result()
+void dereference_result_test()
 {
-    using hpx::traits::detail::dereference_result;
+    using namespace hpx::traits::detail;
 
     struct A
     {
@@ -275,16 +275,15 @@ void dereference_result()
         }
     };
 
-    HPX_TEST_MSG((std::is_same<A, typename dereference_result<B>::type>::value),
-        "deduced type");
+    HPX_TEST_MSG((std::is_same_v<A, dereference_result_t<B>>), "deduced type");
 
     HPX_TEST_MSG(
         (!has_nested_type<dereference_result<A>>::value), "invalid operation");
 }
 
-void equality_result()
+void equality_result_test()
 {
-    using hpx::traits::detail::equality_result;
+    using namespace hpx::traits::detail;
 
     struct A
     {
@@ -301,16 +300,15 @@ void equality_result()
         }
     };
 
-    HPX_TEST_MSG((std::is_same<B, typename equality_result<C, A>::type>::value),
-        "deduced type");
+    HPX_TEST_MSG((std::is_same_v<B, equality_result_t<C, A>>), "deduced type");
 
     HPX_TEST_MSG(
         (!has_nested_type<equality_result<B, A>>::value), "invalid operation");
 }
 
-void inequality_result()
+void inequality_result_test()
 {
-    using hpx::traits::detail::inequality_result;
+    using namespace hpx::traits::detail;
 
     struct A
     {
@@ -328,16 +326,15 @@ void inequality_result()
     };
 
     HPX_TEST_MSG(
-        (std::is_same<B, typename inequality_result<C, A>::type>::value),
-        "deduced type");
+        (std::is_same_v<B, inequality_result_t<C, A>>), "deduced type");
 
     HPX_TEST_MSG((!has_nested_type<inequality_result<B, A>>::value),
         "invalid operation");
 }
 
-void inplace_addition_result()
+void inplace_addition_result_test()
 {
-    using hpx::traits::detail::inplace_addition_result;
+    using namespace hpx::traits::detail;
 
     struct A
     {
@@ -355,16 +352,15 @@ void inplace_addition_result()
     };
 
     HPX_TEST_MSG(
-        (std::is_same<B, typename inplace_addition_result<C, A>::type>::value),
-        "deduced type");
+        (std::is_same_v<B, inplace_addition_result_t<C, A>>), "deduced type");
 
     HPX_TEST_MSG((!has_nested_type<inplace_addition_result<B, A>>::value),
         "invalid operation");
 }
 
-void inplace_subtraction_result()
+void inplace_subtraction_result_test()
 {
-    using hpx::traits::detail::inplace_subtraction_result;
+    using namespace hpx::traits::detail;
 
     struct A
     {
@@ -381,17 +377,16 @@ void inplace_subtraction_result()
         }
     };
 
-    HPX_TEST_MSG((std::is_same<B,
-                     typename inplace_subtraction_result<C, A>::type>::value),
+    HPX_TEST_MSG((std::is_same_v<B, inplace_subtraction_result_t<C, A>>),
         "deduced type");
 
     HPX_TEST_MSG((!has_nested_type<inplace_subtraction_result<B, A>>::value),
         "invalid operation");
 }
 
-void predecrement_result()
+void predecrement_result_test()
 {
-    using hpx::traits::detail::predecrement_result;
+    using namespace hpx::traits::detail;
 
     struct A
     {
@@ -407,16 +402,15 @@ void predecrement_result()
     };
 
     HPX_TEST_MSG(
-        (std::is_same<A&, typename predecrement_result<B>::type>::value),
-        "deduced type");
+        (std::is_same_v<A&, predecrement_result_t<B>>), "deduced type");
 
     HPX_TEST_MSG(
         (!has_nested_type<predecrement_result<A>>::value), "invalid operation");
 }
 
-void preincrement_result()
+void preincrement_result_test()
 {
-    using hpx::traits::detail::preincrement_result;
+    using namespace hpx::traits::detail;
 
     struct A
     {
@@ -432,16 +426,15 @@ void preincrement_result()
     };
 
     HPX_TEST_MSG(
-        (std::is_same<A&, typename preincrement_result<B>::type>::value),
-        "deduced type");
+        (std::is_same_v<A&, preincrement_result_t<B>>), "deduced type");
 
     HPX_TEST_MSG(
         (!has_nested_type<preincrement_result<A>>::value), "invalid operation");
 }
 
-void postdecrement_result()
+void postdecrement_result_test()
 {
-    using hpx::traits::detail::postdecrement_result;
+    using namespace hpx::traits::detail;
 
     struct A
     {
@@ -456,16 +449,15 @@ void postdecrement_result()
     };
 
     HPX_TEST_MSG(
-        (std::is_same<A, typename postdecrement_result<B>::type>::value),
-        "deduced type");
+        (std::is_same_v<A, postdecrement_result_t<B>>), "deduced type");
 
     HPX_TEST_MSG((!has_nested_type<postdecrement_result<A>>::value),
         "invalid operation");
 }
 
-void postincrement_result()
+void postincrement_result_test()
 {
-    using hpx::traits::detail::postincrement_result;
+    using namespace hpx::traits::detail;
 
     struct A
     {
@@ -480,16 +472,15 @@ void postincrement_result()
     };
 
     HPX_TEST_MSG(
-        (std::is_same<A, typename postincrement_result<B>::type>::value),
-        "deduced type");
+        (std::is_same_v<A, postincrement_result_t<B>>), "deduced type");
 
     HPX_TEST_MSG((!has_nested_type<postincrement_result<A>>::value),
         "invalid operation");
 }
 
-void subscript_result()
+void subscript_result_test()
 {
-    using hpx::traits::detail::subscript_result;
+    using namespace hpx::traits::detail;
 
     struct A
     {
@@ -506,17 +497,15 @@ void subscript_result()
         }
     };
 
-    HPX_TEST_MSG(
-        (std::is_same<B, typename subscript_result<C, A>::type>::value),
-        "deduced type");
+    HPX_TEST_MSG((std::is_same_v<B, subscript_result_t<C, A>>), "deduced type");
 
     HPX_TEST_MSG(
         (!has_nested_type<subscript_result<B, A>>::value), "invalid operation");
 }
 
-void subtraction_result()
+void subtraction_result_test()
 {
-    using hpx::traits::detail::subtraction_result;
+    using namespace hpx::traits::detail;
 
     struct A
     {
@@ -534,14 +523,13 @@ void subtraction_result()
     };
 
     HPX_TEST_MSG(
-        (std::is_same<B, typename subtraction_result<C, A>::type>::value),
-        "deduced type");
+        (std::is_same_v<B, subtraction_result_t<C, A>>), "deduced type");
 
     HPX_TEST_MSG((!has_nested_type<subtraction_result<B, A>>::value),
         "invalid operation");
 }
 
-void bidirectional_concept()
+void bidirectional_concept_test()
 {
     using hpx::traits::detail::bidirectional_concept;
 
@@ -582,13 +570,10 @@ void bidirectional_concept()
     }
 }
 
-void random_access_concept()
+void random_access_concept_test()
 {
-    using hpx::traits::detail::addition_result;
-    using hpx::traits::detail::inplace_addition_result;
-    using hpx::traits::detail::inplace_subtraction_result;
-    using hpx::traits::detail::random_access_concept;
-    using hpx::traits::detail::subtraction_result;
+    using namespace hpx::traits;
+    using namespace hpx::traits::detail;
 
     {
         using iterator = std::ostream_iterator<int>;
@@ -624,44 +609,27 @@ void random_access_concept()
         using iterator = random_access_traversal_iterator;
 
         using namespace hpx::traits::detail;
-        static_assert(
-            std::is_same<iterator,
-                typename addition_result<iterator,
-                    typename std::iterator_traits<iterator>::difference_type>::
-                    type>::value,
-            "");
-        static_assert(
-            std::is_same<typename std::add_lvalue_reference<iterator>::type,
-                typename inplace_addition_result<iterator,
-                    typename std::iterator_traits<iterator>::difference_type>::
-                    type>::value,
-            "");
-        static_assert(
-            std::is_same<iterator,
-                typename subtraction_result<iterator,
-                    typename std::iterator_traits<iterator>::difference_type>::
-                    type>::value,
-            "");
-        static_assert(
-            std::is_same<
-                typename std::iterator_traits<iterator>::difference_type,
-                typename subtraction_result<iterator, iterator>::type>::value,
-            "");
-        static_assert(
-            std::is_same<typename std::add_lvalue_reference<iterator>::type,
-                typename inplace_subtraction_result<iterator,
-                    typename std::iterator_traits<iterator>::difference_type>::
-                    type>::value,
-            "");
+        static_assert(std::is_same_v<iterator,
+            addition_result_t<iterator, iter_difference_t<iterator>>>);
+        static_assert(std::is_same_v<
+            typename std::add_lvalue_reference<iterator>::type,
+            inplace_addition_result_t<iterator, iter_difference_t<iterator>>>);
+        static_assert(std::is_same_v<iterator,
+            subtraction_result_t<iterator, iter_difference_t<iterator>>>);
+        static_assert(std::is_same_v<iter_difference_t<iterator>,
+            subtraction_result_t<iterator, iterator>>);
+        static_assert(std::is_same_v<std::add_lvalue_reference_t<iterator>,
+            inplace_subtraction_result_t<iterator,
+                iter_difference_t<iterator>>>);
 
         HPX_TEST_MSG((random_access_concept<iterator>::value),
             "random access traversal input iterator");
     }
 }
 
-void satisfy_traversal_concept_forward()
+void satisfy_traversal_concept_forward_test()
 {
-    using hpx::traits::detail::satisfy_traversal_concept;
+    using namespace hpx::traits::detail;
 
     {
         using iterator = std::ostream_iterator<int>;
@@ -708,9 +676,9 @@ void satisfy_traversal_concept_forward()
     }
 }
 
-void satisfy_traversal_concept_bidirectional()
+void satisfy_traversal_concept_bidirectional_test()
 {
-    using hpx::traits::detail::satisfy_traversal_concept;
+    using namespace hpx::traits::detail;
 
     {
         using iterator = std::ostream_iterator<int>;
@@ -756,9 +724,9 @@ void satisfy_traversal_concept_bidirectional()
     }
 }
 
-void satisfy_traversal_concept_random_access()
+void satisfy_traversal_concept_random_access_test()
 {
-    using hpx::traits::detail::satisfy_traversal_concept;
+    using namespace hpx::traits::detail;
 
     {
         using iterator = std::ostream_iterator<int>;
@@ -804,7 +772,7 @@ void satisfy_traversal_concept_random_access()
     }
 }
 
-void is_iterator()
+void is_iterator_test()
 {
     using hpx::traits::is_iterator;
 
@@ -840,7 +808,7 @@ void is_iterator()
     }
 }
 
-void is_output_iterator()
+void is_output_iterator_test()
 {
     using hpx::traits::is_output_iterator;
 
@@ -878,7 +846,7 @@ void is_output_iterator()
     }
 }
 
-void is_input_iterator()
+void is_input_iterator_test()
 {
     using hpx::traits::is_input_iterator;
 
@@ -944,7 +912,7 @@ void is_input_iterator()
     }
 }
 
-void is_forward_iterator()
+void is_forward_iterator_test()
 {
     using hpx::traits::is_forward_iterator;
 
@@ -1016,7 +984,7 @@ void is_forward_iterator()
     }
 }
 
-void is_bidirectional_iterator()
+void is_bidirectional_iterator_test()
 {
     using hpx::traits::is_bidirectional_iterator;
 
@@ -1089,7 +1057,7 @@ void is_bidirectional_iterator()
     }
 }
 
-void is_random_access_iterator()
+void is_random_access_iterator_test()
 {
     using hpx::traits::is_random_access_iterator;
 
@@ -1166,27 +1134,27 @@ void is_random_access_iterator()
 int main()
 {
     {
-        addition_result();
-        dereference_result();
-        equality_result();
-        inequality_result();
-        inplace_addition_result();
-        inplace_subtraction_result();
-        predecrement_result();
-        preincrement_result();
-        postdecrement_result();
-        postincrement_result();
-        subscript_result();
-        subtraction_result();
-        bidirectional_concept();
-        random_access_concept();
-        satisfy_traversal_concept_forward();
-        satisfy_traversal_concept_bidirectional();
-        satisfy_traversal_concept_random_access();
-        is_iterator();
-        is_forward_iterator();
-        is_bidirectional_iterator();
-        is_random_access_iterator();
+        addition_result_test();
+        dereference_result_test();
+        equality_result_test();
+        inequality_result_test();
+        inplace_addition_result_test();
+        inplace_subtraction_result_test();
+        predecrement_result_test();
+        preincrement_result_test();
+        postdecrement_result_test();
+        postincrement_result_test();
+        subscript_result_test();
+        subtraction_result_test();
+        bidirectional_concept_test();
+        random_access_concept_test();
+        satisfy_traversal_concept_forward_test();
+        satisfy_traversal_concept_bidirectional_test();
+        satisfy_traversal_concept_random_access_test();
+        is_iterator_test();
+        is_forward_iterator_test();
+        is_bidirectional_iterator_test();
+        is_random_access_iterator_test();
     }
 
     return hpx::util::report_errors();
