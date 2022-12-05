@@ -11,12 +11,11 @@
 #include <hpx/functional/first_argument.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/synchronization/barrier.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/type_support/pack.hpp>
-
-#include <boost/range/irange.hpp>
 
 #include <cstddef>
 #include <functional>
@@ -197,8 +196,7 @@ namespace hpx { namespace lcos { namespace local {
         return hpx::parallel::execution::bulk_async_execute(policy.executor(),
             detail::spmd_block_helper<F>{
                 barrier, barriers, mtx, HPX_FORWARD(F, f), num_images},
-            boost::irange(std::size_t(0), num_images),
-            HPX_FORWARD(Args, args)...);
+            hpx::util::counting_shape(num_images), HPX_FORWARD(Args, args)...);
     }
 
     // Synchronous version
@@ -231,8 +229,7 @@ namespace hpx { namespace lcos { namespace local {
         hpx::parallel::execution::bulk_sync_execute(policy.executor(),
             detail::spmd_block_helper<F>{
                 barrier, barriers, mtx, HPX_FORWARD(F, f), num_images},
-            boost::irange(std::size_t(0), num_images),
-            HPX_FORWARD(Args, args)...);
+            hpx::util::counting_shape(num_images), HPX_FORWARD(Args, args)...);
     }
 
     template <typename F, typename... Args>

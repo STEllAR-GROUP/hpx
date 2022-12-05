@@ -13,9 +13,8 @@
 #include <hpx/hpx.hpp>
 #include <hpx/include/serialization.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
-
-#include <boost/range/irange.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -88,9 +87,7 @@ double ireceive(hpx::id_type dest, std::size_t loop, std::size_t size,
         using hpx::execution::par;
         using hpx::ranges::for_each;
 
-        std::size_t const start = 0;
-
-        auto range = boost::irange(start, window_size);
+        auto range = hpx::util::counting_shape(window_size);
         for_each(par, range, [&](std::uint64_t) {
             send(dest,
                 buffer_type(send_buffer.get(), size, buffer_type::reference));

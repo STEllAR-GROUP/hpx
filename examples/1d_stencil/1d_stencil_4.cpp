@@ -20,9 +20,8 @@
 #include <hpx/local/chrono.hpp>
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/synchronization.hpp>
-
-#include <boost/range/irange.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -157,8 +156,7 @@ struct stepper
             s.resize(np);
 
         // Initial conditions: f(0, i) = i
-        std::size_t b = 0;
-        auto range = boost::irange(b, np);
+        auto range = hpx::util::counting_shape(np);
         using hpx::execution::par;
         hpx::ranges::for_each(par, range, [&U, nx](std::size_t i) {
             U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));

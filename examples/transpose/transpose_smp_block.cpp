@@ -7,8 +7,7 @@
 #include <hpx/local/algorithm.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/local/numeric.hpp>
-
-#include <boost/range/irange.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <algorithm>
 #include <cstdint>
@@ -66,7 +65,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     const std::uint64_t start = 0;
 
     // Fill the original matrix, set transpose to known garbage value.
-    auto range = boost::irange(start, num_blocks);
+    auto range = hpx::util::counting_shape(start, num_blocks);
     for_each(par, range, [&](std::uint64_t b) {
         for (std::uint64_t i = 0; i < order; ++i)
         {
@@ -91,7 +90,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     {
         hpx::chrono::high_resolution_timer t;
 
-        auto range = boost::irange(start, num_blocks);
+        auto range = hpx::util::counting_shape(start, num_blocks);
 
         std::vector<hpx::shared_future<void>> transpose_futures;
         transpose_futures.resize(num_blocks);
@@ -222,7 +221,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
     const std::uint64_t end = trans.size();
 
     // Fill the original matrix, set transpose to known garbage value.
-    auto range = boost::irange(start, end);
+    auto range = hpx::util::counting_shape(start, end);
     double errsq = transform_reduce(
         par, std::begin(range), std::end(range), 0.0,
         [](double lhs, double rhs) { return lhs + rhs; },
