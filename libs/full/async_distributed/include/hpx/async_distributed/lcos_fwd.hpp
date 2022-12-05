@@ -35,14 +35,6 @@ namespace hpx {
                 typename Action::remote_result_type>::type,
             bool DirectExecute = Action::direct_execution::value>
         class packaged_action;
-
-        template <typename ValueType>
-        struct object_semaphore;
-
-        namespace server {
-            template <typename ValueType>
-            struct object_semaphore;
-        }
     }    // namespace lcos
 
     namespace distributed {
