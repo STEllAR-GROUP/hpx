@@ -769,9 +769,9 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename Archive>
             void serialize(Archive& ar, const unsigned int /* version */)
             {
-                int const sequencer[] = {
-                    (ar & serialization::base_object<Params>(*this), 0)..., 0};
-                (void) sequencer;
+                (hpx::serialization::detail::serialize_one(
+                     ar, serialization::base_object<Params>(*this)),
+                    ...);
             }
         };
 

@@ -775,9 +775,7 @@ namespace hpx::parallel { inline namespace v2 {
             hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
             std::size_t part_index) noexcept
         {
-            int const _sequencer[] = {
-                0, (hpx::get<Is>(args).init_iteration(part_index), 0)...};
-            (void) _sequencer;
+            (hpx::get<Is>(args).init_iteration(part_index), ...);
         }
 
         template <typename... Ts, std::size_t... Is, typename F, typename B>
@@ -793,9 +791,7 @@ namespace hpx::parallel { inline namespace v2 {
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void next_iteration(
             hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>) noexcept
         {
-            int const _sequencer[] = {
-                0, (hpx::get<Is>(args).next_iteration(), 0)...};
-            (void) _sequencer;
+            (hpx::get<Is>(args).next_iteration(), ...);
         }
 
         template <typename... Ts, std::size_t... Is>
@@ -803,9 +799,7 @@ namespace hpx::parallel { inline namespace v2 {
             hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
             std::size_t size) noexcept
         {
-            int const _sequencer[] = {
-                0, (hpx::get<Is>(args).exit_iteration(size), 0)...};
-            (void) _sequencer;
+            (hpx::get<Is>(args).exit_iteration(size), ...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -1061,9 +1055,8 @@ namespace hpx::parallel { inline namespace v2 {
                 ExPolicy&&, InIter first, Size size, F&& f, Arg&& arg,
                 Args&&... args)
             {
-                int const init_sequencer[] = {
-                    (arg.init_iteration(0), 0), (args.init_iteration(0), 0)...};
-                (void) init_sequencer;
+                arg.init_iteration(0);
+                (args.init_iteration(0), ...);
 
                 std::size_t count = size;
                 while (count != 1)
@@ -1074,18 +1067,16 @@ namespace hpx::parallel { inline namespace v2 {
                     ++first;
                     --count;
 
-                    int const next_sequencer[] = {(arg.next_iteration(), 0),
-                        (args.next_iteration(), 0)...};
-                    (void) next_sequencer;
+                    arg.next_iteration();
+                    (args.next_iteration(), ...);
                 }
 
                 HPX_INVOKE(
                     f, first, arg.iteration_value(), args.iteration_value()...);
 
                 // make sure live-out variables are properly set on return
-                int const exit_sequencer[] = {(arg.exit_iteration(size), 0),
-                    (args.exit_iteration(size), 0)...};
-                (void) exit_sequencer;
+                arg.exit_iteration(size);
+                (args.exit_iteration(size), ...);
 
                 return hpx::util::unused_type();
             }
@@ -1139,7 +1130,7 @@ namespace hpx::parallel { inline namespace v2 {
                             }));
                 }
             }
-        };
+        };    // namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         struct for_loop_strided_algo
@@ -1200,9 +1191,8 @@ namespace hpx::parallel { inline namespace v2 {
                 ExPolicy&&, InIter first, Size size, S stride, F&& f, Arg&& arg,
                 Args&&... args)
             {
-                int const init_sequencer[] = {
-                    (arg.init_iteration(0), 0), (args.init_iteration(0), 0)...};
-                (void) init_sequencer;
+                arg.init_iteration(0);
+                (args.init_iteration(0), ...);
 
                 std::size_t count = size;
                 if (stride > 0)
@@ -1215,9 +1205,8 @@ namespace hpx::parallel { inline namespace v2 {
                         first = parallel::v1::detail::next(first, stride);
                         count -= stride;
 
-                        int const next_sequencer[] = {(arg.next_iteration(), 0),
-                            (args.next_iteration(), 0)...};
-                        (void) next_sequencer;
+                        arg.next_iteration();
+                        (args.next_iteration(), ...);
                     }
                 }
                 else
@@ -1230,9 +1219,8 @@ namespace hpx::parallel { inline namespace v2 {
                         first = parallel::v1::detail::next(first, stride);
                         count += stride;
 
-                        int const next_sequencer[] = {(arg.next_iteration(), 0),
-                            (args.next_iteration(), 0)...};
-                        (void) next_sequencer;
+                        arg.next_iteration();
+                        (args.next_iteration(), ...);
                     }
                 }
 
@@ -1243,9 +1231,8 @@ namespace hpx::parallel { inline namespace v2 {
                 }
 
                 // make sure live-out variables are properly set on return
-                int const exit_sequencer[] = {(arg.exit_iteration(size), 0),
-                    (args.exit_iteration(size), 0)...};
-                (void) exit_sequencer;
+                arg.exit_iteration(size);
+                (args.exit_iteration(size), ...);
 
                 return hpx::util::unused_type();
             }

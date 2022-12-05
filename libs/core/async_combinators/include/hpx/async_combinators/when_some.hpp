@@ -298,8 +298,7 @@ namespace hpx::lcos::detail {
         template <typename Tuple, std::size_t... Is>
         HPX_FORCEINLINE void apply(Tuple& tuple, util::index_pack<Is...>) const
         {
-            int const _sequencer[] = {(((*this)(hpx::get<Is>(tuple))), 0)...};
-            (void) _sequencer;
+            ((*this)(hpx::get<Is>(tuple)), ...);
         }
 
         template <typename... Ts>

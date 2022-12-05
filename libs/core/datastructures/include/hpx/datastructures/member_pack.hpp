@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>    // for size_t
@@ -150,14 +151,15 @@ namespace hpx { namespace util {
 }}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive, std::size_t... Is, typename... Ts>
     HPX_FORCEINLINE void serialize(Archive& ar,
         ::hpx::util::member_pack<util::index_pack<Is...>, Ts...>& mp,
         unsigned int const /*version*/ = 0)
     {
-        int sequencer[] = {((ar & mp.template get<Is>()), 0)...};
-        (void) sequencer;
+        (hpx::serialization::detail::serialize_one(ar, mp.template get<Is>()),
+            ...);
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

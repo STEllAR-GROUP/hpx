@@ -20,13 +20,18 @@
 std::string expected_output;
 hpx::spinlock expected_output_mtx;
 
+template <typename T>
+inline void output(std::stringstream& stream, T&& t)
+{
+    stream << t;
+}
+
 template <typename... Ts>
 void generate_output(Ts&&... ts)
 {
     std::stringstream stream;
-    int const sequencer[] = {0, (stream << ts, 0)...};
-    (void) sequencer;
 
+    (output(stream, ts), ...);
     stream << std::endl;
 
     std::string str = stream.str();
@@ -47,9 +52,8 @@ template <typename... Ts>
 void generate_output_no_endl(Ts&&... ts)
 {
     std::stringstream stream;
-    int const sequencer[] = {0, (stream << ts, 0)...};
-    (void) sequencer;
 
+    (output(stream, ts), ...);
     std::string str = stream.str();
 
     {

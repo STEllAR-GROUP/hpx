@@ -13,7 +13,7 @@
 
 #include <type_traits>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     class access;
 
@@ -34,7 +34,12 @@ namespace hpx { namespace serialization {
     template <typename T>
     input_archive& operator&(input_archive& ar, T& t);
 
-}}    // namespace hpx::serialization
+    namespace detail {
+
+        template <typename Archive, typename T>
+        void serialize_one(Archive& ar, T& t);
+    }
+}    // namespace hpx::serialization
 
 #define HPX_SERIALIZATION_SPLIT_MEMBER()                                       \
     void serialize(hpx::serialization::input_archive& ar, unsigned)            \

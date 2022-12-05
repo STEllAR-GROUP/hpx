@@ -343,9 +343,7 @@ namespace hpx { namespace util {
             template <typename F, std::size_t... Is>
             HPX_HOST_DEVICE void apply(F&& f, util::index_pack<Is...>)
             {
-                int const _sequencer[] = {
-                    ((f(hpx::get<Is>(iterators_))), 0)...};
-                (void) _sequencer;
+                (f(hpx::get<Is>(iterators_)), ...);
             }
 
             template <typename F>
