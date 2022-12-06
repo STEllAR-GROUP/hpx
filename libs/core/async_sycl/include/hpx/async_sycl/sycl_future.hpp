@@ -96,5 +96,17 @@ namespace hpx { namespace sycl { namespace experimental {
         // non allocator version of : get future with an event set
         HPX_CORE_EXPORT hpx::future<void> get_future(
             cl::sycl::event command_event);
+        // -------------------------------------------------------------
+        /// Convenience wrapper to get future from just a queue
+        HPX_FORCEINLINE hpx::future<void> get_future(
+            cl::sycl::queue &command_queue)
+        {
+            // The SYCL standard does not include a eventRecord method Instead
+            // we have to submit some dummy function and use the event the
+            // launch returns
+            cl::sycl::event event = command_queue.submit(
+                [](cl::sycl::handler& h) { h.single_task([]() {}); });
+            return get_future(event);
+        }
     }    // namespace detail
 }}}      // namespace hpx::cuda::experimental

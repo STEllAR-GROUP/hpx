@@ -46,12 +46,7 @@ namespace hpx { namespace sycl { namespace experimental {
         /// get an event)
         HPX_FORCEINLINE future_type get_future()
         {
-            // The SYCL standard does not include a eventRecord method Instead
-            // we have to submit some dummy function and use the event the
-            // launch returns
-            cl::sycl::event event = command_queue.submit(
-                [&](cl::sycl::handler& h) { h.single_task([]() {}); });
-            return detail::get_future(event);
+            return detail::get_future(command_queue);
         }
 
         /// Get future for that becomes ready when the given event completes

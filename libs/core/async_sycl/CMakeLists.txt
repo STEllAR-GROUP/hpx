@@ -13,6 +13,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(async_sycl_headers
     hpx/async_sycl/detail/sycl_event_callback.hpp
     hpx/async_sycl/sycl_future.hpp hpx/async_sycl/sycl_executor.hpp
+    hpx/async_sycl/sycl_polling_helper.hpp
 )
 
 # cmake-format: off
