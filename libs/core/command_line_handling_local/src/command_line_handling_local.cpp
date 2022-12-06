@@ -14,14 +14,13 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/util.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
-
-#include <boost/tokenizer.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -837,9 +836,8 @@ namespace hpx { namespace local { namespace detail {
             return HPX_MOVE(args);
         }
 
-        using tokenizer = boost::tokenizer<boost::escaped_list_separator<char>>;
-        boost::escaped_list_separator<char> sep('\\', ' ', '\"');
-        tokenizer tok(options, sep);
+        hpx::string_util::escaped_list_separator sep('\\', ' ', '\"');
+        hpx::string_util::tokenizer tok(options, sep);
 
         std::vector<std::string> result(tok.begin(), tok.end());
         std::move(args.begin(), args.end(), std::back_inserter(result));

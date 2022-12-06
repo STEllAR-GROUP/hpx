@@ -35,6 +35,7 @@ add_hpx_module(
     hpx_errors
     hpx_filesystem
     hpx_format
+    hpx_string_util
     hpx_topology
     hpx_util
     hpx_version

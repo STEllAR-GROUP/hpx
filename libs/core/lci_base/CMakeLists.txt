@@ -25,7 +25,8 @@ add_hpx_module(
   GLOBAL_HEADER_GEN ON
   SOURCES ${lci_base_sources}
   HEADERS ${lci_base_headers}
-  MODULE_DEPENDENCIES hpx_logging hpx_runtime_configuration hpx_util
+  MODULE_DEPENDENCIES hpx_logging hpx_runtime_configuration hpx_string_util
+                      hpx_util
   DEPENDENCIES LCI::LCI
   CMAKE_SUBDIRS examples tests
 )

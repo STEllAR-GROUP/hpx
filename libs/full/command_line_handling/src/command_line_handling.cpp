@@ -27,8 +27,6 @@
 #include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/tokenizer.hpp>
-
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>

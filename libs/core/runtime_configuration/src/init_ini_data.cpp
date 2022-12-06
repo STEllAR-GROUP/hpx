@@ -12,13 +12,12 @@
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/plugin.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 #include <hpx/runtime_configuration/init_ini_data.hpp>
 #include <hpx/runtime_configuration/plugin_registry_base.hpp>
 #include <hpx/version.hpp>
-
-#include <boost/tokenizer.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -88,20 +87,16 @@ namespace hpx { namespace util {
             ini.get_entry("hpx.master_ini_path_suffixes"));
 
         // split off the separate paths from the given path list
-        typedef boost::tokenizer<boost::char_separator<char>> tokenizer_type;
-
-        boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
-        tokenizer_type tok_paths(ini_paths, sep);
-        tokenizer_type::iterator end_paths = tok_paths.end();
-        tokenizer_type tok_suffixes(ini_paths_suffixes, sep);
-        tokenizer_type::iterator end_suffixes = tok_suffixes.end();
+        hpx::string_util::char_separator sep(HPX_INI_PATH_DELIMITER);
+        hpx::string_util::tokenizer tok_paths(ini_paths, sep);
+        auto end_paths = tok_paths.end();
+        hpx::string_util::tokenizer tok_suffixes(ini_paths_suffixes, sep);
+        auto end_suffixes = tok_suffixes.end();
 
         bool result = false;
-        for (tokenizer_type::iterator it = tok_paths.begin(); it != end_paths;
-             ++it)
+        for (auto it = tok_paths.begin(); it != end_paths; ++it)
         {
-            for (tokenizer_type::iterator jt = tok_suffixes.begin();
-                 jt != end_suffixes; ++jt)
+            for (auto jt = tok_suffixes.begin(); jt != end_suffixes; ++jt)
             {
                 std::string path = *it;
                 path += *jt;
@@ -181,12 +176,10 @@ namespace hpx { namespace util {
         std::vector<std::string> ini_paths;
 
         // split off the separate paths from the given path list
-        typedef boost::tokenizer<boost::char_separator<char>> tokenizer_type;
-
-        boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
-        tokenizer_type tok(ini_path, sep);
-        tokenizer_type::iterator end = tok.end();
-        for (tokenizer_type::iterator it = tok.begin(); it != end; ++it)
+        hpx::string_util::char_separator sep(HPX_INI_PATH_DELIMITER);
+        hpx::string_util::tokenizer tok(ini_path, sep);
+        auto end = tok.end();
+        for (auto it = tok.begin(); it != end; ++it)
             ini_paths.push_back(*it);
 
         // have all path elements, now find ini files in there...

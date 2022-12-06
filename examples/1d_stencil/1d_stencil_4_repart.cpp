@@ -44,8 +44,6 @@
 
 #include "print_time_results.hpp"
 
-#include <boost/shared_array.hpp>
-
 using hpx::id_type;
 using hpx::performance_counters::counter_value;
 using hpx::performance_counters::get_counter;

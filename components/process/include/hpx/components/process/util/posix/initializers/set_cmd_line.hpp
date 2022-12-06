@@ -16,6 +16,7 @@
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/vector.hpp>
+#include <hpx/modules/string_util.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
@@ -23,76 +24,72 @@
 #include <memory>
 #endif
 
-#include <boost/tokenizer.hpp>
-
 #include <cstddef>
 #include <string>
 #include <vector>
 
-namespace hpx { namespace components { namespace process { namespace posix {
+namespace hpx::components::process::posix::initializers {
 
-namespace initializers {
-
-class set_cmd_line : public initializer_base
-{
-public:
-    explicit set_cmd_line(const std::string &s)
+    class set_cmd_line : public initializer_base
     {
-        split_command_line(s);
-        init_command_line_arguments();
-    }
+    public:
+        explicit set_cmd_line(const std::string& s)
+        {
+            split_command_line(s);
+            init_command_line_arguments();
+        }
 
-    template <class PosixExecutor>
-    void on_exec_setup(PosixExecutor &e) const
-    {
-        e.cmd_line = cmd_line_.get();
-    }
+        template <class PosixExecutor>
+        void on_exec_setup(PosixExecutor& e) const
+        {
+            e.cmd_line = cmd_line_.get();
+        }
 
-private:
-    void split_command_line(std::string const& s)
-    {
-        typedef boost::tokenizer<boost::escaped_list_separator<char> > tokenizer;
-        boost::escaped_list_separator<char> sep('\\', ' ', '\"');
-        tokenizer tok(s, sep);
-        args_.assign(tok.begin(), tok.end());
-    }
+    private:
+        void split_command_line(std::string const& s)
+        {
+            typedef hpx::string_util::tokenizer<
+                hpx::string_util::escaped_list_separator<char>>
+                tokenizer;
+            hpx::string_util::escaped_list_separator<char> sep('\\', ' ', '\"');
+            tokenizer tok(s, sep);
+            args_.assign(tok.begin(), tok.end());
+        }
 
-    void init_command_line_arguments()
-    {
-        cmd_line_.reset(new char*[args_.size() + 1]);
-        std::size_t i = 0;
-        for (std::string const& s : args_)
-            cmd_line_[i++] = const_cast<char*>(s.c_str());
-        cmd_line_[i] = nullptr;
-    }
+        void init_command_line_arguments()
+        {
+            cmd_line_.reset(new char*[args_.size() + 1]);
+            std::size_t i = 0;
+            for (std::string const& s : args_)
+                cmd_line_[i++] = const_cast<char*>(s.c_str());
+            cmd_line_[i] = nullptr;
+        }
 
-    friend class hpx::serialization::access;
+        friend class hpx::serialization::access;
 
-    template <typename Archive>
-    void save(Archive& ar, unsigned const) const
-    {
-        ar & args_;
-    }
+        template <typename Archive>
+        void save(Archive& ar, unsigned const) const
+        {
+            ar& args_;
+        }
 
-    template <typename Archive>
-    void load(Archive& ar, const unsigned int)
-    {
-        ar & args_;
-        init_command_line_arguments();
-    }
+        template <typename Archive>
+        void load(Archive& ar, const unsigned int)
+        {
+            ar& args_;
+            init_command_line_arguments();
+        }
 
-    HPX_SERIALIZATION_SPLIT_MEMBER()
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
-    std::vector<std::string> args_;
+        std::vector<std::string> args_;
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
-    std::shared_ptr<char*[]> cmd_line_;
+        std::shared_ptr<char*[]> cmd_line_;
 #else
-    boost::shared_array<char*> cmd_line_;
+        boost::shared_array<char*> cmd_line_;
 #endif
-};
+    };
 
-}
-
-}}}}
+}    // namespace hpx::components::process::posix::initializers
 
 #endif

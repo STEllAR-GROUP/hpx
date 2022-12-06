@@ -11,8 +11,7 @@
 // FIXME: this is only to get multiple_occurrences class
 // should move that to a separate headers.
 #include <hpx/program_options/parsers.hpp>
-
-#include <boost/tokenizer.hpp>
+#include <hpx/string_util/tokenizer.hpp>
 
 #include <climits>
 #include <cstdarg>
@@ -558,17 +557,12 @@ namespace hpx { namespace program_options {
             // conditions!
             HPX_ASSERT(line_length > first_column_width);
 
-            // Note: can't use 'tokenizer' as name of typedef -- borland
-            // will consider uses of 'tokenizer' below as uses of
-            // boost::tokenizer, not typedef.
-            using tok = boost::tokenizer<boost::char_separator<char>>;
+            hpx::string_util::tokenizer paragraphs(desc,
+                hpx::string_util::char_separator(
+                    "\n", "", hpx::string_util::empty_token_policy::keep));
 
-            tok paragraphs(desc,
-                boost::char_separator<char>(
-                    "\n", "", boost::keep_empty_tokens));
-
-            tok::const_iterator par_iter = paragraphs.begin();
-            const tok::const_iterator par_end = paragraphs.end();
+            auto par_iter = paragraphs.begin();
+            auto const par_end = paragraphs.end();
 
             while (par_iter != par_end)    // paragraphs
             {

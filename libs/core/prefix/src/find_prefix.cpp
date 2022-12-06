@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2017 Hartmut Kaiser
+//  Copyright (c) 2012-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,7 @@
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
+#include <hpx/string_util/tokenizer.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #if defined(HPX_WINDOWS)
@@ -33,8 +34,6 @@
 #include <sys/types.h>
 #include <vector>
 #endif
-
-#include <boost/tokenizer.hpp>
 
 #include <cstdint>
 #include <string>
@@ -87,11 +86,11 @@ namespace hpx { namespace util {
         std::string const& suffix, std::string const& library)
     {
         std::string prefixes = find_prefix(library);
-        typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-        boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
-        tokenizer tokens(prefixes, sep);
+
+        hpx::string_util::char_separator sep(HPX_INI_PATH_DELIMITER);
+        hpx::string_util::tokenizer tokens(prefixes, sep);
         std::string result;
-        for (tokenizer::iterator it = tokens.begin(); it != tokens.end(); ++it)
+        for (auto it = tokens.begin(); it != tokens.end(); ++it)
         {
             if (it != tokens.begin())
                 result += HPX_INI_PATH_DELIMITER;
