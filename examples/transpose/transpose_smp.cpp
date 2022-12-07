@@ -7,8 +7,7 @@
 #include <hpx/local/algorithm.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/local/numeric.hpp>
-
-#include <boost/range/irange.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #include <algorithm>
 #include <cstdint>
@@ -50,12 +49,13 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "Number of iterations  = " << iterations << "\n";
 
     using hpx::execution::par;
+    using hpx::experimental::for_loop_strided;
     using hpx::ranges::for_each;
 
     const std::uint64_t start = 0;
 
     // Fill the original matrix, set transpose to known garbage value.
-    auto range = boost::irange(start, order);
+    auto range = hpx::util::counting_shape(order);
     // parallel for
     for_each(par, range, [&](std::uint64_t i) {
         for (std::uint64_t j = 0; j < order; ++j)
@@ -76,28 +76,28 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::chrono::high_resolution_timer t;
         if (tile_size < order)
         {
-            auto range = boost::irange(start, order + tile_size, tile_size);
             // parallel for
-            for_each(par, range, [&](std::uint64_t i) {
-                for (std::uint64_t j = 0; j < order; j += tile_size)
-                {
-                    std::uint64_t i_max = (std::min)(order, i + tile_size);
-                    std::uint64_t j_max = (std::min)(order, j + tile_size);
-
-                    for (std::uint64_t it = i; it < i_max; ++it)
+            for_loop_strided(
+                par, start, order + tile_size, tile_size, [&](std::uint64_t i) {
+                    for (std::uint64_t j = 0; j < order; j += tile_size)
                     {
-                        for (std::uint64_t jt = j; jt < j_max; ++jt)
+                        std::uint64_t i_max = (std::min)(order, i + tile_size);
+                        std::uint64_t j_max = (std::min)(order, j + tile_size);
+
+                        for (std::uint64_t it = i; it < i_max; ++it)
                         {
-                            B[it + order * jt] = A[jt + order * it];
+                            for (std::uint64_t jt = j; jt < j_max; ++jt)
+                            {
+                                B[it + order * jt] = A[jt + order * it];
+                            }
                         }
                     }
-                }
-            });
+                });
         }
         else
         {
-            auto range = boost::irange(start, order);
             // parallel for
+            auto range = hpx::util::counting_shape(order);
             for_each(par, range, [&](std::uint64_t i) {
                 for (std::uint64_t j = 0; j < order; ++j)
                 {
@@ -176,7 +176,7 @@ double test_results(std::uint64_t order, std::vector<double> const& trans)
 
     const std::uint64_t start = 0;
 
-    auto range = boost::irange(start, order);
+    auto range = hpx::util::counting_shape(start, order);
     // parallel reduce
     double errsq = transform_reduce(
         par, std::begin(range), std::end(range), 0.0,

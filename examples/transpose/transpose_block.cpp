@@ -10,9 +10,8 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/algorithm.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/numeric.hpp>
-
-#include <boost/range/irange.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -263,7 +262,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         using hpx::ranges::for_each;
 
         // Fill the original matrix, set transpose to known garbage value.
-        auto range = boost::irange(blocks_start, blocks_end);
+        auto range = hpx::util::counting_shape(blocks_start, blocks_end);
         for_each(par, range, [&](std::uint64_t b) {
             std::shared_ptr<block_component> A_ptr =
                 hpx::get_ptr<block_component>(A[b].get_id()).get();
@@ -308,7 +307,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         {
             hpx::chrono::high_resolution_timer t;
 
-            auto range = boost::irange(blocks_start, blocks_end);
+            auto range = hpx::util::counting_shape(blocks_start, blocks_end);
 
             std::vector<hpx::future<void>> block_futures;
             block_futures.resize(num_local_blocks);
@@ -317,8 +316,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
                 std::vector<hpx::future<void>> phase_futures;
                 phase_futures.reserve(num_blocks);
 
-                auto phase_range =
-                    boost::irange(static_cast<std::uint64_t>(0), num_blocks);
+                auto phase_range = hpx::util::counting_shape(
+                    static_cast<std::uint64_t>(0), num_blocks);
                 for (std::uint64_t phase : phase_range)
                 {
                     const std::uint64_t block_size = block_order * block_order;
@@ -380,7 +379,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         }
         {
             // unregister names...
-            auto range = boost::irange(blocks_start, blocks_end);
+            auto range = hpx::util::counting_shape(blocks_start, blocks_end);
             for (auto b : range)
             {
                 hpx::unregister_with_basename(A_block_basename, b);
@@ -469,7 +468,7 @@ double test_results(std::uint64_t order, std::uint64_t block_order,
     using hpx::execution::par;
 
     // Fill the original matrix, set transpose to known garbage value.
-    auto range = boost::irange(blocks_start, blocks_end);
+    auto range = hpx::util::counting_shape(blocks_start, blocks_end);
     double errsq = transform_reduce(
         par, std::begin(range), std::end(range), 0.0,
         [](double lhs, double rhs) { return lhs + rhs; },

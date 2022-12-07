@@ -11,14 +11,13 @@
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_main.hpp>
 #include <hpx/modules/collectives.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <string>
 #include <vector>
-
-#include <boost/range/irange.hpp>
 
 std::atomic<std::size_t> local_count;
 
@@ -49,7 +48,7 @@ std::size_t bulk_test(
 
     hpx::parallel::execution::bulk_sync_execute(hpx::execution::par.executor(),
         spmd_block_helper{name, num_images},
-        boost::irange(offset, offset + images_per_locality));
+        hpx::util::counting_shape(offset, offset + images_per_locality));
 
     return local_count.load();
 }

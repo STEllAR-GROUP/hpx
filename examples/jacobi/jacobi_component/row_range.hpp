@@ -12,9 +12,6 @@
 #include <hpx/include/util.hpp>
 #include <hpx/modules/memory.hpp>
 
-#include <boost/range/iterator.hpp>
-#include <boost/range/mutable_iterator.hpp>
-
 #include <cstddef>
 #include <vector>
 
@@ -148,19 +145,5 @@ namespace jacobi {
         return r.end();
     }
 }    // namespace jacobi
-
-namespace boost {
-    template <>
-    struct range_mutable_iterator<jacobi::row_range>
-    {
-        typedef std::vector<double>::iterator type;
-    };
-
-    template <>
-    struct range_const_iterator<jacobi::row_range>
-    {
-        typedef std::vector<double>::const_iterator type;
-    };
-}    // namespace boost
 
 #endif

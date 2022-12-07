@@ -19,8 +19,6 @@
 #include <utility>
 #include <vector>
 
-#include <boost/range/irange.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 int test_count = 100;
 int partition_size = 10000;
@@ -478,7 +476,7 @@ std::uint64_t bench_stencil3_iterator_explicit()
     // handle all elements explicitly
     int result = values.back() + values.front() + values[1];
 
-    auto range = boost::irange(1, partition_size - 1);
+    auto range = hpx::util::counting_shape(1, partition_size - 1);
 
     std::for_each(
         std::begin(range), std::end(range), [&result, &values](std::size_t i) {

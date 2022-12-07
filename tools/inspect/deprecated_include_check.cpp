@@ -42,6 +42,7 @@ namespace boost { namespace inspect {
         {"boost/exception_ptr\\.hpp", "exception"},
         {"boost/range/iterator_range\\.hpp",
             "hpx/iterator_support/iterator_range.hpp"},
+        {"boost/range/irange\\.hpp", "hpx/iterator_support/counting_shape.hpp"},
         {"hpx/hpx_fwd\\.hpp", "nothing (remove unconditionally)"},
         {"boost/preprocessor/cat\\.hpp", "hpx/util/detail/pp/cat.hpp"},
         {"boost/preprocessor/stringize\\.hpp",

@@ -15,10 +15,6 @@
 #if !defined(HPX_WINDOWS)
 #include <hpx/components/process/util/posix/initializers/initializer_base.hpp>
 
-#include <boost/range/adaptor/filtered.hpp>
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/counting_range.hpp>
-
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -46,13 +42,13 @@ public:
     template <class PosixExecutor>
     void on_exec_setup(PosixExecutor&) const
     {
-        boost::for_each(
-            boost::adaptors::filter(
-                boost::counting_range(0, upper_bound()),
-                pred_
-            ),
-            close
-        );
+        for (int fd = 0; fd != upper_bound(); ++fd)
+        {
+            if (pred_(fd))
+            {
+                close(fd);
+            }
+        }
     }
 
 private:

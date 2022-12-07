@@ -19,12 +19,11 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/hashing/jenkins_hash.hpp>
+#include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/type_support/pack.hpp>
-
-#include <boost/range/irange.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -286,7 +285,8 @@ namespace hpx { namespace lcos {
                 hpx::parallel::execution::bulk_sync_execute(exec,
                     detail::spmd_block_helper<F>{
                         name, images_per_locality, num_images},
-                    boost::irange(offset, offset + images_per_locality),
+                    hpx::util::counting_shape(
+                        offset, offset + images_per_locality),
                     args...);
             }
         };

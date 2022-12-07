@@ -349,7 +349,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             // different versions of clang-format do different things
             // clang-format off
             chunk_size = (std::max) (std::size_t(stride),
-                ((chunk_size + stride - 1) / stride) * stride);
+                std::size_t(((chunk_size + stride - 1) / stride) * stride));
             // clang-format on
         }
 
