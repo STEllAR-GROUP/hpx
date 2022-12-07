@@ -56,6 +56,7 @@ add_hpx_module(
     hpx_prefix
     hpx_coroutines
     hpx_version
+    hpx_string_util
     hpx_synchronization
   CMAKE_SUBDIRS examples tests
 )

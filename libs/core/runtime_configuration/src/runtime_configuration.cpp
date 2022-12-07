@@ -9,6 +9,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>
@@ -21,8 +22,6 @@
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/version.hpp>
-
-#include <boost/tokenizer.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -597,22 +596,18 @@ namespace hpx { namespace util {
         // installation location, this allows to install simple components
         // without the need to install an ini file
         // split of the separate paths from the given path list
-        typedef boost::tokenizer<boost::char_separator<char>> tokenizer_type;
+        hpx::string_util::char_separator sep(HPX_INI_PATH_DELIMITER);
+        hpx::string_util::tokenizer tok_path(component_base_paths, sep);
+        hpx::string_util::tokenizer tok_suffixes(component_path_suffixes, sep);
+        auto end_path = tok_path.end();
+        auto end_suffixes = tok_suffixes.end();
 
-        boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
-        tokenizer_type tok_path(component_base_paths, sep);
-        tokenizer_type tok_suffixes(component_path_suffixes, sep);
-        tokenizer_type::iterator end_path = tok_path.end();
-        tokenizer_type::iterator end_suffixes = tok_suffixes.end();
-
-        for (tokenizer_type::iterator it = tok_path.begin(); it != end_path;
-             ++it)
+        for (auto it = tok_path.begin(); it != end_path; ++it)
         {
             std::string const& path = *it;
             if (tok_suffixes.begin() != tok_suffixes.end())
             {
-                for (tokenizer_type::iterator jt = tok_suffixes.begin();
-                     jt != end_suffixes; ++jt)
+                for (auto jt = tok_suffixes.begin(); jt != end_suffixes; ++jt)
                 {
                     std::string p = path;
                     p += *jt;

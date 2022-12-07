@@ -6,31 +6,26 @@
 
 #include <hpx/program_options/config.hpp>
 #include <hpx/program_options/parsers.hpp>
-
-#include <boost/tokenizer.hpp>
+#include <hpx/string_util/tokenizer.hpp>
 
 #include <string>
 #include <vector>
 
 namespace hpx { namespace program_options { namespace detail {
 
-    template <class Char>
+    template <typename Char>
     std::vector<std::basic_string<Char>> split_unix(
-        const std::basic_string<Char>& cmdline,
-        const std::basic_string<Char>& separator,
-        const std::basic_string<Char>& quote,
-        const std::basic_string<Char>& escape)
+        std::basic_string<Char> const& cmdline,
+        std::basic_string<Char> const& separator,
+        std::basic_string<Char> const& quote,
+        std::basic_string<Char> const& escape)
     {
-        using tokenizerT = boost::tokenizer<boost::escaped_list_separator<Char>,
-            typename std::basic_string<Char>::const_iterator,
-            std::basic_string<Char>>;
-
-        tokenizerT tok(cmdline.begin(), cmdline.end(),
-            boost::escaped_list_separator<Char>(escape, separator, quote));
+        hpx::string_util::tokenizer tok(cmdline.begin(), cmdline.end(),
+            hpx::string_util::escaped_list_separator<Char>(
+                escape, separator, quote));
 
         std::vector<std::basic_string<Char>> result;
-        for (typename tokenizerT::iterator cur_token(tok.begin()),
-             end_token(tok.end());
+        for (auto cur_token(tok.begin()), end_token(tok.end());
              cur_token != end_token; ++cur_token)
         {
             if (!cur_token->empty())
@@ -38,7 +33,6 @@ namespace hpx { namespace program_options { namespace detail {
         }
         return result;
     }
-
 }}}    // namespace hpx::program_options::detail
 
 namespace hpx { namespace program_options {
@@ -58,5 +52,4 @@ namespace hpx { namespace program_options {
     {
         return detail::split_unix<wchar_t>(cmdline, separator, quote, escape);
     }
-
 }}    // namespace hpx::program_options

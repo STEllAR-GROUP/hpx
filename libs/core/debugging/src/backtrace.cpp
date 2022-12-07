@@ -15,8 +15,6 @@
 
 #include <hpx/debugging/backtrace/backtrace.hpp>
 
-#include <boost/config.hpp>
-
 #if (defined(__linux) || defined(__APPLE__) || defined(__sun)) &&              \
     (!defined(__ANDROID__) || !defined(ANDROID))
 #if defined(__GLIBC__)

@@ -2345,7 +2345,6 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
       <boost/lockfree/queue.hpp>
       <boost/optional.hpp>
       <boost/spirit/home/x3.hpp>
-      <boost/tokenizer.hpp>
   )
 
   if(HPX_WITH_CXX17_FILESYSTEM)

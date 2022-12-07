@@ -58,6 +58,6 @@ add_hpx_module(
   COMPAT_HEADERS ${program_options_compat_headers}
   DEPENDENCIES ${__boost_program_options}
   MODULE_DEPENDENCIES hpx_config hpx_datastructures hpx_format
-                      hpx_iterator_support
+                      hpx_iterator_support hpx_string_util
   CMAKE_SUBDIRS examples tests
 )

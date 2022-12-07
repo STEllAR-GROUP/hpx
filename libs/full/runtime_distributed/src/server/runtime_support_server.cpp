@@ -25,6 +25,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -54,8 +55,6 @@
 #ifdef HPX_HAVE_LIB_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
 #endif
-
-#include <boost/tokenizer.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -1260,12 +1259,10 @@ namespace hpx { namespace components { namespace server {
                 else
                     component_path = HPX_DEFAULT_COMPONENT_PATH;
 
-                typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-                boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
-                tokenizer tokens(component_path, sep);
+                hpx::string_util::char_separator sep(HPX_INI_PATH_DELIMITER);
+                hpx::string_util::tokenizer tokens(component_path, sep);
                 std::error_code fsec;
-                for (tokenizer::iterator it = tokens.begin();
-                     it != tokens.end(); ++it)
+                for (auto it = tokens.begin(); it != tokens.end(); ++it)
                 {
                     lib = fs::path(*it);
                     fs::path lib_path =
@@ -1751,12 +1748,10 @@ namespace hpx { namespace components { namespace server {
                 else
                     component_path = HPX_DEFAULT_COMPONENT_PATH;
 
-                typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-                boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
-                tokenizer tokens(component_path, sep);
+                hpx::string_util::char_separator sep(HPX_INI_PATH_DELIMITER);
+                hpx::string_util::tokenizer tokens(component_path, sep);
                 std::error_code fsec;
-                for (tokenizer::iterator it = tokens.begin();
-                     it != tokens.end(); ++it)
+                for (auto it = tokens.begin(); it != tokens.end(); ++it)
                 {
                     lib = fs::path(*it);
                     fs::path lib_path =

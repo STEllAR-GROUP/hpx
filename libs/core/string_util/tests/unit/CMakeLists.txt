@@ -4,7 +4,17 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests string_to_lower string_split string_trim)
+set(tests
+    string_to_lower
+    string_split
+    string_trim
+    tokenizer
+    tokenizer_1
+    tokenizer_2
+    tokenizer_3
+    tokenizer_4
+    tokenizer_5
+)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

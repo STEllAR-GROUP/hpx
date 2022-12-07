@@ -13,8 +13,6 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 
-#include <boost/version.hpp>
-
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////

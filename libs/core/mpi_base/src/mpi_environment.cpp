@@ -11,9 +11,8 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/mpi_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/util.hpp>
-
-#include <boost/tokenizer.hpp>
 
 #include <cstddef>
 #include <cstdlib>
@@ -35,9 +34,8 @@ namespace hpx { namespace util {
             std::string mpi_environment_strings =
                 cfg.get_entry("hpx.parcel.mpi.env", default_env);
 
-            boost::char_separator<char> sep(";,: ");
-            boost::tokenizer<boost::char_separator<char>> tokens(
-                mpi_environment_strings, sep);
+            hpx::string_util::char_separator sep(";,: ");
+            hpx::string_util::tokenizer tokens(mpi_environment_strings, sep);
             for (auto const& tok : tokens)
             {
                 char* env = std::getenv(tok.c_str());

@@ -17,78 +17,72 @@
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/serialization/string.hpp>
 
-#include <boost/shared_array.hpp>
-
 #include <string>
 
-namespace hpx { namespace components { namespace process { namespace posix {
+namespace hpx::components::process::posix::initializers {
 
-namespace initializers {
-
-class run_exe_ : public initializer_base
-{
-public:
-    run_exe_()
+    class run_exe_ : public initializer_base
     {
-        cmd_line_[0] = cmd_line_[1] = nullptr;
+    public:
+        run_exe_()
+        {
+            cmd_line_[0] = cmd_line_[1] = nullptr;
+        }
+
+        explicit run_exe_(const std::string& s)
+          : s_(s)
+        {
+            cmd_line_[0] = const_cast<char*>(s_.c_str());
+            cmd_line_[1] = nullptr;
+        }
+
+        template <class PosixExecutor>
+        void on_exec_setup(PosixExecutor& e) const
+        {
+            e.exe = s_.c_str();
+            if (!e.cmd_line)
+                e.cmd_line = const_cast<char**>(cmd_line_);
+        }
+
+    private:
+        friend class hpx::serialization::access;
+
+        template <typename Archive>
+        void save(Archive& ar, unsigned const) const
+        {
+            ar& s_;
+        }
+
+        template <typename Archive>
+        void load(Archive& ar, const unsigned int)
+        {
+            ar& s_;
+
+            cmd_line_[0] = const_cast<char*>(s_.c_str());
+            cmd_line_[1] = nullptr;
+        }
+
+        HPX_SERIALIZATION_SPLIT_MEMBER()
+
+        std::string s_;
+        char* cmd_line_[2];
+    };
+
+    inline run_exe_ run_exe(const char* s)
+    {
+        return run_exe_(s);
     }
 
-    explicit run_exe_(const std::string &s)
-      : s_(s)
+    inline run_exe_ run_exe(const std::string& s)
     {
-        cmd_line_[0] = const_cast<char*>(s_.c_str());
-        cmd_line_[1] = nullptr;
+        return run_exe_(s);
     }
 
-    template <class PosixExecutor>
-    void on_exec_setup(PosixExecutor &e) const
+    inline run_exe_ run_exe(const filesystem::path& p)
     {
-        e.exe = s_.c_str();
-        if (!e.cmd_line)
-            e.cmd_line = const_cast<char**>(cmd_line_);
+        return run_exe_(p.string());
     }
 
-private:
-    friend class hpx::serialization::access;
-
-    template <typename Archive>
-    void save(Archive& ar, unsigned const) const
-    {
-        ar & s_;
-    }
-
-    template <typename Archive>
-    void load(Archive& ar, const unsigned int)
-    {
-        ar & s_;
-
-        cmd_line_[0] = const_cast<char*>(s_.c_str());
-        cmd_line_[1] = nullptr;
-    }
-
-    HPX_SERIALIZATION_SPLIT_MEMBER()
-
-    std::string s_;
-    char* cmd_line_[2];
-};
-
-inline run_exe_ run_exe(const char *s)
-{
-    return run_exe_(s);
-}
-
-inline run_exe_ run_exe(const std::string &s)
-{
-    return run_exe_(s);
-}
-
-inline run_exe_ run_exe(const filesystem::path &p)
-{
-    return run_exe_(p.string());
-}
-
-}
-
-}}}}
+}    // namespace hpx::components::process::posix::initializers
 
 #endif

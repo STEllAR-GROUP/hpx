@@ -5,9 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/batch_environments/pjm_environment.hpp>
+#include <hpx/string_util/tokenizer.hpp>
 #include <hpx/util/from_string.hpp>
-
-#include <boost/tokenizer.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -69,9 +68,8 @@ namespace hpx::util::batch_environments {
             }
             else if ((var = std::getenv("FLIB_AFFINITY_ON_PROCESS")) != nullptr)
             {
-                boost::char_separator<char> sep(",");
-                boost::tokenizer<boost::char_separator<char>> tok(
-                    std::string(var), sep);
+                hpx::string_util::char_separator<char> sep(",");
+                hpx::string_util::tokenizer tok(std::string(var), sep);
                 num_threads_ = static_cast<std::size_t>(
                     std::distance(std::begin(tok), std::end(tok)));
             }
