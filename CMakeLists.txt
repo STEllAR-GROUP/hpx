@@ -2342,7 +2342,6 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
       <asio/ip/tcp.hpp>
       <boost/config.hpp>
       <boost/fusion/include/vector.hpp>
-      <boost/lockfree/queue.hpp>
       <boost/optional.hpp>
       <boost/spirit/home/x3.hpp>
       <boost/tokenizer.hpp>

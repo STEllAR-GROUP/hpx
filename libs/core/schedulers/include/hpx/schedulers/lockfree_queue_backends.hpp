@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2019 Hartmut Kaiser
+//  Copyright (c) 2019-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +14,7 @@
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
 #include <hpx/concurrency/deque.hpp>
 #else
-#include <boost/lockfree/queue.hpp>
+#include <hpx/concurrency/queue.hpp>
 #endif
 
 #include <hpx/allocator_support/aligned_allocator.hpp>
@@ -36,12 +36,11 @@ namespace hpx { namespace threads { namespace policies {
     struct lockfree_fifo_backend
     {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-        using container_type =
-            boost::lockfree::deque<T, boost::lockfree::caching_freelist_t,
-                hpx::util::aligned_allocator<T>>;
+        using container_type = hpx::lockfree::deque<T,
+            hpx::lockfree::caching_freelist_t, hpx::util::aligned_allocator<T>>;
 #else
         using container_type =
-            boost::lockfree::queue<T, hpx::util::aligned_allocator<T>>;
+            hpx::lockfree::queue<T, hpx::util::aligned_allocator<T>>;
 #endif
 
         using value_type = T;
@@ -160,9 +159,8 @@ namespace hpx { namespace threads { namespace policies {
     template <typename T>
     struct lockfree_lifo_backend
     {
-        using container_type =
-            boost::lockfree::deque<T, boost::lockfree::caching_freelist_t,
-                hpx::util::aligned_allocator<T>>;
+        using container_type = hpx::lockfree::deque<T,
+            hpx::lockfree::caching_freelist_t, hpx::util::aligned_allocator<T>>;
 
         using value_type = T;
         using reference = T&;
@@ -221,9 +219,8 @@ namespace hpx { namespace threads { namespace policies {
     template <typename T>
     struct lockfree_abp_fifo_backend
     {
-        using container_type =
-            boost::lockfree::deque<T, boost::lockfree::caching_freelist_t,
-                hpx::util::aligned_allocator<T>>;
+        using container_type = hpx::lockfree::deque<T,
+            hpx::lockfree::caching_freelist_t, hpx::util::aligned_allocator<T>>;
 
         using value_type = T;
         using reference = T&;
@@ -279,9 +276,8 @@ namespace hpx { namespace threads { namespace policies {
     template <typename T>
     struct lockfree_abp_lifo_backend
     {
-        using container_type =
-            boost::lockfree::deque<T, boost::lockfree::caching_freelist_t,
-                hpx::util::aligned_allocator<T>>;
+        using container_type = hpx::lockfree::deque<T,
+            hpx::lockfree::caching_freelist_t, hpx::util::aligned_allocator<T>>;
 
         using value_type = T;
         using reference = T&;

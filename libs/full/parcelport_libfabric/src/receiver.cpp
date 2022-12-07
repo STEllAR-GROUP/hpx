@@ -45,7 +45,7 @@ namespace hpx::parcelset::policies::libfabric {
         pre_post_receive();
     }
 
-    // these constructors are provided because boost::lockfree::stack requires them
+    // these constructors are provided because hpx::lockfree::stack requires them
     // they should not be used
     receiver::receiver(receiver&&)
       : active_receivers_(0)

@@ -7,11 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/concurrency/barrier.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/timing.hpp>
-
-#include <boost/lockfree/queue.hpp>
 
 #include <chrono>
 #include <cstdint>
@@ -80,9 +79,9 @@ void print_results(variables_map& vm, std::pair<double, double> elapsed_control,
                "## 4:WTIME_CTL_POP:Total Walltime/Pop for "
                "std::vector [nanoseconds]\n"
                "## 5:WTIME_LF_PUSH:Total Walltime/Push for "
-               "boost::lockfree::queue [nanoseconds]\n"
+               "hpx::lockfree::queue [nanoseconds]\n"
                "## 6:WTIME_LF_POP:Total Walltime/Pop for "
-               "boost::lockfree::queue [nanoseconds]\n";
+               "hpx::lockfree::queue [nanoseconds]\n";
     }
 
     if (iterations != 0)
@@ -183,7 +182,7 @@ void perform_iterations(hpx::util::barrier& b,
     }
 
     {
-        boost::lockfree::queue<std::uint64_t> fifo(blocksize);
+        hpx::lockfree::queue<std::uint64_t> fifo(blocksize);
 
         // Warmup.
         bench_fifo(fifo, blocksize);

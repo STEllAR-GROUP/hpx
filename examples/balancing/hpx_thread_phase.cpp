@@ -10,8 +10,7 @@
 #include <hpx/local/init.hpp>
 #include <hpx/local/mutex.hpp>
 #include <hpx/local/thread.hpp>
-
-#include <boost/lockfree/queue.hpp>
+#include <hpx/modules/concurrency.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -22,7 +21,7 @@
 #include <utility>
 #include <vector>
 
-using boost::lockfree::queue;
+using hpx::lockfree::queue;
 
 using hpx::program_options::options_description;
 using hpx::program_options::value;

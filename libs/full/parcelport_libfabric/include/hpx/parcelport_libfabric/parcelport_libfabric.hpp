@@ -125,9 +125,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
         // when terminating the parcelport, this is used to restrict access
         mutex_type stop_mutex;
 
-        boost::lockfree::stack<sender*,
-            boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS>,
-            boost::lockfree::fixed_sized<true>>
+        hpx::lockfree::stack<sender*, std::allocator<sender*>,
+            HPX_PARCELPORT_LIBFABRIC_THROTTLE_SENDS, true>
             senders_;
 
         // Used to help with shutdown

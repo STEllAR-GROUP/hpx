@@ -41,7 +41,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
             rma_memory_pool<region_provider>& memory_pool);
 
         // --------------------------------------------------------------------
-        // these constructors are provided because boost::lockfree::stack requires them
+        // these constructors are provided because hpx::lockfree::stack requires them
         // they should not be used
         receiver(receiver&& other);
         receiver& operator=(receiver&& other);
@@ -85,9 +85,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace libfabric {
         performance_counter<unsigned int> rma_reads_;
         performance_counter<unsigned int> recv_deletes_;
         //
-        boost::lockfree::stack<rma_receiver*,
-            boost::lockfree::capacity<HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS>,
-            boost::lockfree::fixed_sized<true>>
+        boost::lockfree::stack<rma_receiver*, std::allocator<rma_receiver*>,
+            HPX_PARCELPORT_LIBFABRIC_MAX_PREPOSTS, true>
             rma_receivers_;
 
         typedef hpx::spinlock mutex_type;
