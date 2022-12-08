@@ -7,8 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/async.hpp>
 #include <hpx/async_base/apply.hpp>
+#include <hpx/async_base/async.hpp>
 #include <hpx/async_sycl/sycl_future.hpp>
 #include <hpx/errors/exception.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
@@ -56,7 +56,6 @@ namespace hpx { namespace sycl { namespace experimental {
             return detail::get_future(event);
         }
 
-
 #if defined(__INTEL_LLVM_COMPILER)
         // To find the correct overload (or any at all actually) we need to add
         // the code_location argument which is the last argument in every queue
@@ -96,11 +95,11 @@ namespace hpx { namespace sycl { namespace experimental {
             // into the future
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    cl::sycl::event e = HPX_INVOKE(
-                        HPX_FORWARD(queue_function_ptr_t<Params...>,
-                            queue_member_function),
-                        command_queue, HPX_FORWARD(Params,args)...,
-                        cl::sycl::detail::code_location::current());
+                    cl::sycl::event e =
+                        HPX_INVOKE(HPX_FORWARD(queue_function_ptr_t<Params...>,
+                                       queue_member_function),
+                            command_queue, HPX_FORWARD(Params, args)...,
+                            cl::sycl::detail::code_location::current());
                     return get_future(e);
                 },
                 [&](std::exception_ptr&& ep) {
@@ -123,7 +122,7 @@ namespace hpx { namespace sycl { namespace experimental {
         {
             cl::sycl::event e =
                 HPX_INVOKE(HPX_FORWARD(queue_function_ptr_t<Params...>,
-                                queue_member_function),
+                               queue_member_function),
                     command_queue, HPX_FORWARD(Params, args)...);
         }
         /// Invoke queue member function given queue and parameters --
@@ -137,10 +136,10 @@ namespace hpx { namespace sycl { namespace experimental {
             // into the future
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    cl::sycl::event e = HPX_INVOKE(
-                        HPX_FORWARD(queue_function_ptr_t<Params...>,
-                            queue_member_function),
-                        command_queue, HPX_FORWARD(Params, args)...);
+                    cl::sycl::event e =
+                        HPX_INVOKE(HPX_FORWARD(queue_function_ptr_t<Params...>,
+                                       queue_member_function),
+                            command_queue, HPX_FORWARD(Params, args)...);
 
 #if defined(__HIPSYCL__)
                     // TODO This overload works better for hipsycl -- checkout
@@ -154,13 +153,13 @@ namespace hpx { namespace sycl { namespace experimental {
                     // 5us, so not too bad. Still keeping this as a ToDo, might
                     // be a hipsycl issue...
                     return get_future();
-                    // NOTE 1: Alternative workaround: use environment
-                    // variable: export HIPSYCL_RT_SCHEDULER=direct This
-                    // directly circumvents the problematic scheduler, allowing
-                    // us to also use get_future(e)
-                    //
-                    // NOTE2 : Not a problem with oneapi in either case from
-                    // what I can see
+                // NOTE 1: Alternative workaround: use environment
+                // variable: export HIPSYCL_RT_SCHEDULER=direct This
+                // directly circumvents the problematic scheduler, allowing
+                // us to also use get_future(e)
+                //
+                // NOTE2 : Not a problem with oneapi in either case from
+                // what I can see
 #else
                     return get_future(e);
 #endif
@@ -175,7 +174,7 @@ namespace hpx { namespace sycl { namespace experimental {
         // OneWay Execution
         template <typename F, typename... Ts>
         friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
-            sycl_executor & exec, F&& f, Ts&&... ts)
+            sycl_executor& exec, F&& f, Ts&&... ts)
         {
             return exec.post(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
@@ -184,8 +183,8 @@ namespace hpx { namespace sycl { namespace experimental {
         // TwoWay Execution
         template <typename F, typename... Ts>
         friend decltype(auto) tag_invoke(
-            hpx::parallel::execution::async_execute_t,
-            sycl_executor & exec, F&& f, Ts&&... ts)
+            hpx::parallel::execution::async_execute_t, sycl_executor& exec,
+            F&& f, Ts&&... ts)
         {
             return exec.async_execute(
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -194,11 +193,13 @@ namespace hpx { namespace sycl { namespace experimental {
         // Property interface:
 
         /// Return the device used by the underlying SYCL queue
-        HPX_FORCEINLINE cl::sycl::device get_device() const {
+        HPX_FORCEINLINE cl::sycl::device get_device() const
+        {
             return command_queue.get_device();
         }
         /// Return the context used by the underlying SYCL queue
-        HPX_FORCEINLINE cl::sycl::context get_context() const {
+        HPX_FORCEINLINE cl::sycl::context get_context() const
+        {
             return command_queue.get_context();
         }
 
@@ -206,7 +207,6 @@ namespace hpx { namespace sycl { namespace experimental {
         // queue methods
     protected:
         cl::sycl::queue command_queue;
-
     };
 
 }}}    // namespace hpx::sycl::experimental
@@ -242,8 +242,8 @@ namespace hpx {
     //sycl executor
     template <typename Executor, typename... Ts>
     HPX_FORCEINLINE decltype(auto) async(Executor&& exec,
-        hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>&&
-        f, Ts&&... ts)
+        hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>&& f,
+        Ts&&... ts)
     {
         // Make sure we only use this for sycl executors
         static_assert(std::is_same<std::decay_t<Executor>,
@@ -263,8 +263,8 @@ namespace hpx {
     //sycl executor
     template <typename Executor, typename... Ts>
     HPX_FORCEINLINE bool apply(Executor&& exec,
-        hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>&&
-        f, Ts&&... ts)
+        hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>&& f,
+        Ts&&... ts)
     {
         // Make sure we only use this for sycl executors
         static_assert(std::is_same<std::decay_t<Executor>,

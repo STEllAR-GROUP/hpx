@@ -15,6 +15,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/concurrentqueue.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -23,11 +24,10 @@
 #include <atomic>
 #include <cstddef>
 #include <memory>
+#include <shared_mutex>
 #include <string>
 #include <utility>
 #include <vector>
-#include <shared_mutex>
-#include <hpx/synchronization/shared_mutex.hpp>
 
 #include <hpx/async_sycl/detail/sycl_event_callback.hpp>
 #ifndef __SYCL_DEVICE_ONLY__
@@ -67,7 +67,8 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     // unique_lock, however, for merely flushing the runtime dag, a shared_lock
     // should suffice
     using sycl_default_queue_mutex_type = hpx::shared_mutex;
-    sycl_default_queue_mutex_type& get_default_queue_mtx() {
+    sycl_default_queue_mutex_type& get_default_queue_mtx()
+    {
         static sycl_default_queue_mutex_type queue_mtx;
         return queue_mtx;
     }
@@ -121,14 +122,12 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
             "that SYCL event polling is enabled on at least one thread pool.");
 
         get_event_callback_queue().enqueue(HPX_MOVE(continuation));
-
     }
     // In case event_callback was not done when exiting the queue
     // it will be added to the vector using this method for later checking
     void add_to_event_callback_vector(event_callback&& continuation)
     {
         get_event_callback_vector().push_back(HPX_MOVE(continuation));
-
     }
 
     // -------------------------------------------------------------
@@ -160,8 +159,8 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
         // mutex internally already, the shared lock here merely ensures that
         // the polling cannot be disabled while we use the default queue here
         std::shared_lock<detail::sycl_default_queue_mutex_type> queue_shared_lk(
-            detail:: // make sure the polling has not yet stopped
-                get_default_queue_mtx()); 
+            detail::    // make sure the polling has not yet stopped
+            get_default_queue_mtx());
         auto& optional_queue = get_default_queue();
         HPX_ASSERT_MSG(optional_queue.has_value(),
             "Error: Internal SYCL default queue is empty - is the SYCL polling "
@@ -207,7 +206,6 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
             return polling_status::idle;
         }
 
-
         // Iterate over our list of events and see if any have completed
         event_callback_vector.erase(
             std::remove_if(event_callback_vector.begin(),
@@ -232,7 +230,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
         while (detail::get_event_callback_queue().try_dequeue(continuation))
         {
             auto const event_status = continuation.event.get_info<
-               cl::sycl::info::event::command_execution_status>();
+                cl::sycl::info::event::command_execution_status>();
 
             if (event_status != cl::sycl::info::event_command_status::complete)
             {
@@ -275,7 +273,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
 #endif
         std::unique_lock<detail::sycl_default_queue_mutex_type> queue_write_lk(
             detail::get_default_queue_mtx());
-        auto &optional_queue = get_default_queue();
+        auto& optional_queue = get_default_queue();
         HPX_ASSERT_MSG(!(optional_queue.has_value()),
             "Error: Internal SYCL queue was already existing when activating "
             "the SYCL event polling. This is likely due to improper disabling "
@@ -316,7 +314,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
 
         std::unique_lock<detail::sycl_default_queue_mutex_type> queue_write_lk(
             detail::get_default_queue_mtx());
-        auto &optional_queue = get_default_queue();
+        auto& optional_queue = get_default_queue();
         HPX_ASSERT_MSG(optional_queue.has_value(),
             "Error: Internal SYCL queue was already deleted when deactivating "
             "the SYCL event polling. This is likely due to repeated disabling "

@@ -102,7 +102,7 @@ namespace hpx { namespace sycl { namespace experimental {
         // -------------------------------------------------------------
         /// Convenience wrapper to get future from just a queue
         HPX_FORCEINLINE hpx::future<void> get_future(
-            cl::sycl::queue &command_queue)
+            cl::sycl::queue& command_queue)
         {
             // The SYCL standard does not include a eventRecord method Instead
             // we have to submit some dummy function and use the event the
@@ -112,4 +112,4 @@ namespace hpx { namespace sycl { namespace experimental {
             return get_future(event);
         }
     }    // namespace detail
-}}}      // namespace hpx::cuda::experimental
+}}}      // namespace hpx::sycl::experimental

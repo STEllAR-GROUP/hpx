@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include <vector>
-#include <iostream>
-#include <exception>
 #include <cassert>
+#include <exception>
+#include <iostream>
+#include <vector>
 
 #include <hpx/assert.hpp>
 
@@ -18,8 +18,8 @@
 void fill_vector_add_input(std::vector<size_t>& a, std::vector<size_t>& b,
     std::vector<size_t>& device_results)
 {
-    assert(a.size() == b.size());
-    assert(device_results.size() == a.size());
+    HPX_ASSERT(a.size() == b.size());
+    HPX_ASSERT(device_results.size() == a.size());
     for (size_t i = 0; i < a.size(); i++)
     {
         a.at(i) = i;

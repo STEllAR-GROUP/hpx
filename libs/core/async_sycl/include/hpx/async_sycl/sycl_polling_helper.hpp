@@ -9,7 +9,7 @@
 //  only using the SYCL register/unregister functions
 //
 //  TODO Maybe it's worthwhile to create a common class for this in the future,
-//  however, I feel at this point it's not yet necessary 
+//  however, I feel at this point it's not yet necessary
 
 #pragma once
 

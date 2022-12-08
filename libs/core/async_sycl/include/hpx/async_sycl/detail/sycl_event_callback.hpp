@@ -28,7 +28,8 @@
 Utilized compiler appears to be neither of those!"
 #endif
 #else
-#error "Compiler does not seem to support SYCL! SYCL_LANGUAGE_VERSION is undefined!"
+#error                                                                         \
+    "Compiler does not seem to support SYCL! SYCL_LANGUAGE_VERSION is undefined!"
 #endif
 #if defined(__SYCL_SINGLE_SOURCE__)
 #warning "SYCL single source compiler not tested! Use one with multiple passes"
@@ -38,8 +39,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
 
     /// Type of the event_callback function used. Unlike the CUDA counterpart we are
     /// not using an error code parameter as SYCL does not provide one
-    using event_callback_function_type =
-        hpx::move_only_function<void(void)>;
+    using event_callback_function_type = hpx::move_only_function<void(void)>;
 
     /// Add callback to be called when all commands up to and including
     /// the passed event are done
@@ -52,8 +52,8 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
      * NOTE: For hipsycl it is required to flush the internal DAG of the queue which is
      * done by this method as well
     */
-    HPX_CORE_EXPORT void add_event_callback(event_callback_function_type&& f,
-        cl::sycl::event event);
+    HPX_CORE_EXPORT void add_event_callback(
+        event_callback_function_type&& f, cl::sycl::event event);
 
     /// Register SYCL event polling function with the scheduler (see scheduler_base.hpp)
     HPX_CORE_EXPORT void register_polling(hpx::threads::thread_pool_base& pool);

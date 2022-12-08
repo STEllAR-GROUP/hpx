@@ -4,19 +4,18 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-
 #include <algorithm>
 #include <exception>
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include <hpx/hpx_init.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/hpx_init.hpp>
 #include <hpx/local/future.hpp>
 #if defined(HPX_HAVE_SYCL)
-#include <hpx/async_sycl/sycl_future.hpp>
 #include <hpx/async_sycl/sycl_executor.hpp>
+#include <hpx/async_sycl/sycl_future.hpp>
 
 #include "common/sycl_vector_add_test_utils.hpp"
 
@@ -95,7 +94,6 @@ void VectorAdd_test1(std::vector<size_t> const& a_vector,
     }
 }
 
-
 /// Test executor post and get_future member method with a vector_add example
 void VectorAdd_test2(std::vector<size_t> const& a_vector,
     std::vector<size_t> const& b_vector, std::vector<size_t>& add_parallel)
@@ -107,8 +105,7 @@ void VectorAdd_test2(std::vector<size_t> const& a_vector,
     cl::sycl::buffer add_buf(add_parallel.data(), num_items);
 
     // Test post and get_future methods
-    hpx::sycl::experimental::sycl_executor exec(
-        cl::sycl::default_selector{});
+    hpx::sycl::experimental::sycl_executor exec(cl::sycl::default_selector{});
     std::cout << "Running on device: "
               << exec.get_device().get_info<cl::sycl::info::device::name>()
               << std::endl;
@@ -133,8 +130,7 @@ void VectorAdd_test2(std::vector<size_t> const& a_vector,
     {
         std::cerr << "ERROR: Manual get_future using internal dummy kernel "
                      "is immediately ready "
-                  << "(thus probably not asynchronous at at all)!"
-                  << std::endl;
+                  << "(thus probably not asynchronous at at all)!" << std::endl;
         std::terminate();
     }
     else
@@ -155,56 +151,57 @@ void VectorAdd_test3(std::vector<size_t> const& a_vector,
     bool continuation_triggered = false;
     // buffers from host vectors
     {
-    cl::sycl::buffer a_buf(a_vector.data(), num_items);
-    cl::sycl::buffer b_buf(b_vector.data(), num_items);
-    cl::sycl::buffer add_buf(add_parallel.data(), num_items);
+        cl::sycl::buffer a_buf(a_vector.data(), num_items);
+        cl::sycl::buffer b_buf(b_vector.data(), num_items);
+        cl::sycl::buffer add_buf(add_parallel.data(), num_items);
 
-    // Create executor
-    hpx::sycl::experimental::sycl_executor exec(
-        cl::sycl::default_selector{});
-    std::cout << "Running on device: "
-              << exec.get_device().get_info<cl::sycl::info::device::name>()
-              << std::endl;
-    auto async_normal_fut = hpx::async(exec,
-        &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
-            cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
-            cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
-            cl::sycl::accessor add(
-                add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
-            h.parallel_for(
-                num_items, [=](auto i) { add[i] = a[i] + b[i]; });
-        });
-    // Add contiuation
-    auto continuation_future1 =
-        async_normal_fut.then([&continuation_triggered](auto&& fut) {
-            fut.get();
-            std::cout << "OKAY: Continuation working!" << std::endl;
-            continuation_triggered = true;
-            return;
-        });
-    if (async_normal_fut.is_ready())
-    {
-        std::cerr
-            << "ERROR: hpx::async kernel launch future is immediately ready "
-            << "(thus probably not asynchronous at at all)!" << std::endl;
-        std::terminate();
-    }
-    else
-    {
-        std::cout
-            << "OKAY: hpx::async kernel hpx::future is NOT ready immediately "
-               "after launch!"
-            << std::endl;
-    }
-    continuation_future1.get();
-    //  Was the continuation triggered by get as well?
-    if (!continuation_triggered)
-    {
-        std::cerr << "ERROR: Continuation was apparently not triggered, "
-                     "despite calling get!"
+        // Create executor
+        hpx::sycl::experimental::sycl_executor exec(
+            cl::sycl::default_selector{});
+        std::cout << "Running on device: "
+                  << exec.get_device().get_info<cl::sycl::info::device::name>()
                   << std::endl;
-        std::terminate();
-    }
+        auto async_normal_fut = hpx::async(
+            exec, &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
+                cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
+                cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
+                cl::sycl::accessor add(
+                    add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
+                h.parallel_for(
+                    num_items, [=](auto i) { add[i] = a[i] + b[i]; });
+            });
+        // Add contiuation
+        auto continuation_future1 =
+            async_normal_fut.then([&continuation_triggered](auto&& fut) {
+                fut.get();
+                std::cout << "OKAY: Continuation working!" << std::endl;
+                continuation_triggered = true;
+                return;
+            });
+        if (async_normal_fut.is_ready())
+        {
+            std::cerr << "ERROR: hpx::async kernel launch future is "
+                         "immediately ready "
+                      << "(thus probably not asynchronous at at all)!"
+                      << std::endl;
+            std::terminate();
+        }
+        else
+        {
+            std::cout << "OKAY: hpx::async kernel hpx::future is NOT ready "
+                         "immediately "
+                         "after launch!"
+                      << std::endl;
+        }
+        continuation_future1.get();
+        //  Was the continuation triggered by get as well?
+        if (!continuation_triggered)
+        {
+            std::cerr << "ERROR: Continuation was apparently not triggered, "
+                         "despite calling get!"
+                      << std::endl;
+            std::terminate();
+        }
     }
 }
 
@@ -219,8 +216,7 @@ void VectorAdd_test4(std::vector<size_t> const& a_vector,
     cl::sycl::buffer add_buf(add_parallel.data(), num_items);
 
     // Test post and get_future methods
-    hpx::sycl::experimental::sycl_executor exec(
-        cl::sycl::default_selector{});
+    hpx::sycl::experimental::sycl_executor exec(cl::sycl::default_selector{});
     std::cout << "Running on device: "
               << exec.get_device().get_info<cl::sycl::info::device::name>()
               << std::endl;
@@ -238,8 +234,7 @@ void VectorAdd_test4(std::vector<size_t> const& a_vector,
     {
         std::cerr << "ERROR: Manual get_future after hpx::apply "
                      "is immediately ready "
-                  << "(thus probably not asynchronous at at all)!"
-                  << std::endl;
+                  << "(thus probably not asynchronous at at all)!" << std::endl;
         std::terminate();
     }
     else
@@ -312,6 +307,6 @@ int main()
     std::cerr << "SYCL Support was not given at compile time! " << std::endl;
     std::cerr << "Please check your build configuration!" << std::endl;
     std::cerr << "Exiting..." << std::endl;
-    return 1; // Fail test, as it was meant to test SYCL
+    return 1;    // Fail test, as it was meant to test SYCL
 }
 #endif

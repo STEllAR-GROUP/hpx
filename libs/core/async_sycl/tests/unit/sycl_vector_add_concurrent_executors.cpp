@@ -4,19 +4,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <atomic>
+#include <exception>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <exception>
-#include <atomic>
 
 #include <hpx/futures/future.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/local/future.hpp>
 #if defined(HPX_HAVE_SYCL)
-#include <CL/sycl.hpp>
-#include <hpx/async_sycl/sycl_future.hpp>
 #include <hpx/async_sycl/sycl_executor.hpp>
+#include <hpx/async_sycl/sycl_future.hpp>
+#include <CL/sycl.hpp>
 
 #include "common/sycl_vector_add_test_utils.hpp"
 
@@ -72,8 +72,8 @@ void VectorAdd(std::vector<size_t> const& a_vector,
             cl::sycl::buffer add_buf(c_data + last_chunk_id, num_items);
 
             // Testing async_exec
-            auto kernel_fut = hpx::async(exec,
-                &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
+            auto kernel_fut = hpx::async(
+                exec, &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
                     cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
                     cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
                     cl::sycl::accessor add(
@@ -146,6 +146,6 @@ int main()
     std::cerr << "SYCL Support was not given at compile time! " << std::endl;
     std::cerr << "Please check your build configuration!" << std::endl;
     std::cerr << "Exiting..." << std::endl;
-    return 1; // Fail test, as it was meant to test SYCL
+    return 1;    // Fail test, as it was meant to test SYCL
 }
 #endif

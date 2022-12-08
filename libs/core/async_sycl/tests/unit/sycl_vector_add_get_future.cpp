@@ -64,7 +64,6 @@ constexpr size_t vector_size = 80000000;
 // advisor --collect=survey --collect=tripcounts --stacks --flop
 // --profile-gpu -- ./bin/sycl_vector_add_test
 
-
 // This test will launch an simple vector add kernel on the given queue.
 // It will then create a hpx::future from the returned sycl event.
 // Includes various sanity / asynchronousy tests
@@ -166,7 +165,6 @@ int hpx_main(int, char**)
     std::terminate();
 #endif
 
-
     // Input vectors
     std::vector<size_t> a(vector_size), b(vector_size),
         add_parallel(vector_size);
@@ -213,6 +211,6 @@ int main()
     std::cerr << "SYCL Support was not given at compile time! " << std::endl;
     std::cerr << "Please check your build configuration!" << std::endl;
     std::cerr << "Exiting..." << std::endl;
-    return 1; // Fail test, as it was meant to test SYCL...
+    return 1;    // Fail test, as it was meant to test SYCL...
 }
 #endif
