@@ -90,7 +90,7 @@ Functions
    :cpp:func:`hpx::partial_sort_copy`                 :cppreference-generic:`algorithm,partial_sort_copy`
    :cpp:func:`hpx::partition`                         :cppreference-generic:`algorithm,partition`
    :cpp:func:`hpx::partition_copy`                    :cppreference-generic:`algorithm,partition_copy`
-   :cpp:func:`hpx::parallel::v1::reduce_by_key`       `reduce_by_key <https://thrust.github.io/doc/group__reductions_gad5623f203f9b3fdcab72481c3913f0e0.html>`_
+   :cpp:func:`hpx::experimental::reduce_by_key`       `reduce_by_key <https://thrust.github.io/doc/group__reductions_gad5623f203f9b3fdcab72481c3913f0e0.html>`_
    :cpp:func:`hpx::remove`                            :cppreference-generic:`algorithm,remove`
    :cpp:func:`hpx::remove_copy`                       :cppreference-generic:`algorithm,remove_copy`
    :cpp:func:`hpx::remove_copy_if`                    :cppreference-generic:`algorithm,remove_copy,remove_copy_if`
@@ -112,7 +112,7 @@ Functions
    :cpp:func:`hpx::shift_left`                        :cppreference-generic:`algorithm,shift,shift_left`
    :cpp:func:`hpx::shift_right`                       :cppreference-generic:`algorithm,shift,shift_right`
    :cpp:func:`hpx::sort`                              :cppreference-generic:`algorithm,sort`
-   :cpp:func:`hpx::parallel::v1::sort_by_key`         `sort_by_key <https://thrust.github.io/doc/group__sorting_gabe038d6107f7c824cf74120500ef45ea.html>`_
+   :cpp:func:`hpx::experimental::sort_by_key`         `sort_by_key <https://thrust.github.io/doc/group__sorting_gabe038d6107f7c824cf74120500ef45ea.html>`_
    :cpp:func:`hpx::stable_partition`                  :cppreference-generic:`algorithm,stable_partition`
    :cpp:func:`hpx::stable_sort`                       :cppreference-generic:`algorithm,stable_sort`
    :cpp:func:`hpx::starts_with`                       :cppreference-generic:`algorithm/ranges,starts_with`

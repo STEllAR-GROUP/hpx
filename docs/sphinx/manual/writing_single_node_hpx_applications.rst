@@ -667,7 +667,7 @@ Parallel algorithms
        * Sorts the first elements in a range, storing the result in another range.
        * ``<hpx/algorithm.hpp>``
        * :cppreference-algorithm:`partial_sort_copy`
-   * * :cpp:func:`hpx::parallel::v1::sort_by_key`
+   * * :cpp:func:`hpx::experimental::sort_by_key`
      * Sorts one range of data using keys supplied in another range.
      * ``<hpx/algorithm.hpp>``
      *
@@ -695,7 +695,7 @@ Parallel algorithms
      * Does an inclusive parallel scan over a range of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`inclusive_scan`
-   * * :cpp:func:`hpx::parallel::v1::reduce_by_key`
+   * * :cpp:func:`hpx::experimental::reduce_by_key`
      * Performs an inclusive scan on consecutive elements with matching keys,
        with a reduction to output only the final sum for each key. The key
        sequence ``{1,1,1,2,3,3,3,3,1}`` and value sequence
