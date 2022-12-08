@@ -517,11 +517,9 @@ namespace hpx {
             void async_traverse_static_async_range(
                 index_pack<Sequence...>, Current&& current)
             {
-                int dummy[] = {((void) async_traverse_one_checked(
-                                    current.template relocate<Sequence>()),
-                                   0)...,
-                    0};
-                (void) dummy;
+                (async_traverse_one_checked(
+                     current.template relocate<Sequence>()),
+                    ...);
             }
 
             /// Traverse a static range

@@ -602,9 +602,7 @@ namespace hpx { namespace util { namespace detail {
             auto operator()(Args&&... args)
                 -> std::void_t<typename invoke_result<M, OldArgs>::type...>
             {
-                int dummy[] = {
-                    0, ((void) mapper_(HPX_FORWARD(Args, args)), 0)...};
-                (void) dummy;
+                (mapper_(HPX_FORWARD(Args, args)), ...);
             }
         };
 
@@ -639,9 +637,7 @@ namespace hpx { namespace util { namespace detail {
             auto operator()(Args&&... args) -> typename invoke_result<
                 typename invoke_result<M, OldArg>::type>::type
             {
-                int dummy[] = {
-                    0, ((void) mapper_(HPX_FORWARD(Args, args)), 0)...};
-                (void) dummy;
+                (mapper_(HPX_FORWARD(Args, args)), ...);
             }
         };
 
@@ -916,9 +912,7 @@ namespace hpx { namespace util { namespace detail {
         {
             try_traverse(strategy, HPX_FORWARD(First, first));
             try_traverse(strategy, HPX_FORWARD(Second, second));
-            int dummy[] = {
-                0, ((void) try_traverse(strategy, HPX_FORWARD(T, rest)), 0)...};
-            (void) dummy;
+            (try_traverse(strategy, HPX_FORWARD(T, rest)), ...);
         }
     };
 
