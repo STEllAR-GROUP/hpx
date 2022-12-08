@@ -8,6 +8,11 @@
 // VS2019 v16.10 and later (_MSC_FULL_VER >= 192829913 for VS 2019 v16.9) supports
 // [[msvc::no_unique_address]] with all C++ version starting /std:c++14
 // see: https://devblogs.microsoft.com/cppblog/msvc-cpp20-and-the-std-cpp20-switch/
+//
+// clang-cl does not support neither of the attributes, however
+#  if defined(__clang__)
+#    error "clang does not support the no_unique_address attribute on Windows"
+#  endif
 #else
 #  if !defined(__has_cpp_attribute)
 #    error "__has_cpp_attribute not supported, assume [[no_unique_address]] is not supported"
