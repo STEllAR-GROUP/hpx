@@ -24,16 +24,16 @@
 // Needs to be done AFTER sycl include for HipSYCL
 // (intel dpcpp would be fine without the include)
 //
-// Will raise compile-time errors in case of unexpected behaviour! (Hence part of the unit test)
-// Uncomment the pragma message commands for more information about the compile passes
-// (2 passes for hipsycl, 3 for dpcpp)
+// Will raise compile-time errors in case of unexpected behaviour! (Hence part
+// of the unit test) Uncomment the pragma message commands for more information
+// about the compile passes (2 passes for hipsycl, 3 for dpcpp)
 #if defined(SYCL_LANGUAGE_VERSION)
 #if !defined(__INTEL_LLVM_COMPILER) && !defined(__HIPSYCL__)
 #warning "HPX-SYCL integration only tested with Intel oneapi and HipSYCL. \
 Utilized compiler appears to be neither of those!"
 #endif
 #else
-#error "Compiler does not seem to support SYCL! SYCL_LANGUAGE_VERSION is undefined!"
+#error "Compiler seems to not support SYCL! SYCL_LANGUAGE_VERSION is undefined!"
 #endif
 
 // Check for separate compiler host and device passes
@@ -152,7 +152,8 @@ void VectorAdd(cl::sycl::queue& q, std::vector<size_t> const& a_vector,
 int hpx_main(int, char**)
 {
     // Enable polling for the future
-    hpx::sycl::experimental::detail::register_polling(hpx::resource::get_thread_pool(0));
+    hpx::sycl::experimental::detail::register_polling(
+        hpx::resource::get_thread_pool(0));
     std::cout << "SYCL Future polling enabled!\n";
 
     // Sanity Test 0: Kind of superfluous check, but without that macro defined
@@ -160,13 +161,15 @@ int hpx_main(int, char**)
 #if defined(HPX_HAVE_MODULE_ASYNC_SYCL)
     std::cerr << "OKAY: HPX_HAVE_MODULE_ASYNC_SYCL is defined!" << std::endl;
 #else
-    std::cerr << "Error: HPX_HAVE_MODULE_ASYNC_SYCL is not defined!" << std::endl;
+    std::cerr << "Error: HPX_HAVE_MODULE_ASYNC_SYCL is not defined!"
+              << std::endl;
     std::terminate();
 #endif
 
 
     // Input vectors
-    std::vector<size_t> a(vector_size), b(vector_size), add_parallel(vector_size);
+    std::vector<size_t> a(vector_size), b(vector_size),
+        add_parallel(vector_size);
     fill_vector_add_input(a, b, add_parallel);
 
     // Create queue and run on device
@@ -194,7 +197,8 @@ int hpx_main(int, char**)
 
     // Cleanup
     std::cout << "Disabling SYCL future polling.\n";
-    hpx::sycl::experimental::detail::unregister_polling(hpx::resource::get_thread_pool(0));
+    hpx::sycl::experimental::detail::unregister_polling(
+        hpx::resource::get_thread_pool(0));
     return hpx::finalize();
 }
 

@@ -52,14 +52,15 @@ void VectorAdd(std::vector<size_t> const& a_vector,
                 cl::sycl::buffer add_buf(c_data + current_chunk_id, num_items);
 
                 // Testing post
-                hpx::apply(exec, &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
-                    cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
-                    cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
-                    cl::sycl::accessor add(
-                        add_buf, h, cl::sycl::write_only, cl::sycl::no_init);
-                    h.parallel_for(
-                        num_items, [=](auto i) { add[i] = a[i] + b[i]; });
-                });
+                hpx::apply(
+                    exec, &cl::sycl::queue::submit, [&](cl::sycl::handler& h) {
+                        cl::sycl::accessor a(a_buf, h, cl::sycl::read_only);
+                        cl::sycl::accessor b(b_buf, h, cl::sycl::read_only);
+                        cl::sycl::accessor add(add_buf, h, cl::sycl::write_only,
+                            cl::sycl::no_init);
+                        h.parallel_for(
+                            num_items, [=](auto i) { add[i] = a[i] + b[i]; });
+                    });
             }
             size_t const last_chunk_id = slice_size_per_executor *
                 (exec_id * number_repetitions + number_repetitions - 1);

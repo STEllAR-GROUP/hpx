@@ -191,9 +191,10 @@ void VectorAdd_test3(std::vector<size_t> const& a_vector,
     }
     else
     {
-        std::cout << "OKAY: hpx::async kernel hpx::future is NOT ready immediately "
-                     "after launch!"
-                  << std::endl;
+        std::cout
+            << "OKAY: hpx::async kernel hpx::future is NOT ready immediately "
+               "after launch!"
+            << std::endl;
     }
     continuation_future1.get();
     //  Was the continuation triggered by get as well?
@@ -255,7 +256,8 @@ int hpx_main(int, char**)
 {
     static_assert(vector_size >= 6, "vector_size unreasonably small");
     // Enable polling for the future
-    hpx::sycl::experimental::detail::register_polling(hpx::resource::get_thread_pool(0));
+    hpx::sycl::experimental::detail::register_polling(
+        hpx::resource::get_thread_pool(0));
     std::cout << "SYCL Future polling enabled!\n";
     std::cout << "SYCL language version: " << SYCL_LANGUAGE_VERSION << "\n";
 
@@ -294,7 +296,8 @@ int hpx_main(int, char**)
 
     // Cleanup
     std::cout << "\nDisabling SYCL future polling.\n";
-    hpx::sycl::experimental::detail::unregister_polling(hpx::resource::get_thread_pool(0));
+    hpx::sycl::experimental::detail::unregister_polling(
+        hpx::resource::get_thread_pool(0));
     return hpx::finalize();
 }
 
