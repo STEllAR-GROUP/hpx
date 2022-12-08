@@ -4,9 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#pragma once
+
 #include <vector>
 #include <iostream>
+#include <exception>
 #include <cassert>
+
+#include <hpx/assert.hpp>
 
 /// Fills the input vectors a and b with the predefined pattarn (a[i] = i).
 /// Resets device_results to 0 just in case of reusage.
@@ -27,8 +32,8 @@ void fill_vector_add_input(std::vector<size_t>& a, std::vector<size_t>& b,
 void check_vector_add_results(std::vector<size_t> const& a,
     std::vector<size_t> const& b, std::vector<size_t> const& device_results)
 {
-    assert(a.size() == b.size());
-    assert(device_result.size() == a.size());
+    HPX_ASSERT(a.size() == b.size());
+    HPX_ASSERT(device_result.size() == a.size());
     std::vector<size_t> add_sequential(device_results.size());
     for (size_t i = 0; i < add_sequential.size(); i++)
         add_sequential.at(i) = a.at(i) + b.at(i);
@@ -46,8 +51,8 @@ void check_vector_add_results(std::vector<size_t> const& a,
 void print_vector_results(std::vector<size_t> const& a,
     std::vector<size_t> const& b, std::vector<size_t> const& device_results)
 {
-    assert(a.size() == b.size());
-    assert(device_result.size() == a.size());
+    HPX_ASSERT(a.size() == b.size());
+    HPX_ASSERT(device_result.size() == a.size());
     std::cout << "Results: " << std::endl;
     for (size_t i = 0; i < 3; i++)
     {

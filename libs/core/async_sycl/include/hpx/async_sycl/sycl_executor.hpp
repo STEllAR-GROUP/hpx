@@ -197,6 +197,10 @@ namespace hpx { namespace sycl { namespace experimental {
         HPX_FORCEINLINE cl::sycl::device get_device() const {
             return command_queue.get_device();
         }
+        /// Return the context used by the underlying SYCL queue
+        HPX_FORCEINLINE cl::sycl::context get_context() const {
+            return command_queue.get_context();
+        }
 
         // TODO Future work: Check if we want to expose any other (non-event)
         // queue methods

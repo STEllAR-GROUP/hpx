@@ -7,6 +7,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <exception>
+#include <atomic>
+
 #include <hpx/futures/future.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/local/future.hpp>
@@ -140,7 +143,7 @@ int main(int argc, char* argv[])
 // Handle none-sycl builds
 int main()
 {
-    std::cerr << "SYCL Support was not given at compiletime! " << std::endl;
+    std::cerr << "SYCL Support was not given at compile time! " << std::endl;
     std::cerr << "Please check your build configuration!" << std::endl;
     std::cerr << "Exiting..." << std::endl;
     return 1; // Fail test, as it was meant to test SYCL
