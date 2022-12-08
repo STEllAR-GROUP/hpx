@@ -10,6 +10,8 @@
 // runtime, and normal stream callbacks are not possible with SYCL -- we only
 // have the option to do event polling)
 //
+// hpxinspect:noascii
+
 #pragma once
 
 #include <hpx/config.hpp>

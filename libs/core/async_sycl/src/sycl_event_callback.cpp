@@ -12,6 +12,8 @@
 // avoid deadlocks (as hipsycl is lazy and may only start kernels once the
 // results are requested)
 //
+// hpxinspect:noascii
+//
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/concurrentqueue.hpp>
