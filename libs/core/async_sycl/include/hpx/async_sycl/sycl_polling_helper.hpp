@@ -4,12 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
-//  Note: This file is basically the same as 
+//  Note: This file is basically the same as
 //  libs/core/async_cuda/include/hpx/async_cuda/cuda_polling_helper.hpp
 //  only using the SYCL register/unregister functions
 //
 //  TODO Maybe it's worthwhile to create a common class for this in the future,
-//  however, I feel at this point it's not yet necessary  
+//  however, I feel at this point it's not yet necessary 
 
 #pragma once
 

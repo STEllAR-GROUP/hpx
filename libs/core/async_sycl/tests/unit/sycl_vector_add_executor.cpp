@@ -7,20 +7,20 @@
 
 #include <algorithm>
 #include <exception>
-#include <iostream> 
-#include <string> 
+#include <iostream>
+#include <string>
 #include <vector>
 
-#include <hpx/hpx_init.hpp> 
+#include <hpx/hpx_init.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/local/future.hpp>
 #if defined(HPX_HAVE_SYCL)
-#include <hpx/async_sycl/sycl_future.hpp> 
-#include <hpx/async_sycl/sycl_executor.hpp> 
+#include <hpx/async_sycl/sycl_future.hpp>
+#include <hpx/async_sycl/sycl_executor.hpp>
 
 #include "common/sycl_vector_add_test_utils.hpp"
 
-#include <CL/sycl.hpp> 
+#include <CL/sycl.hpp>
 
 // This vector_size leads to 610MB per buffer (size_t datatypes)
 // Entire scenario thus requires about 1830MB device memory when running

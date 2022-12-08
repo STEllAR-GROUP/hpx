@@ -75,7 +75,7 @@ namespace hpx { namespace sycl { namespace experimental {
         {
             // for the intel version we need to actually pass the code location.
             // Within the intel sycl api this is usually a default argument,
-            // but for invoke we need to pass it manually 
+            // but for invoke we need to pass it manually
             cl::sycl::event e =
                 HPX_INVOKE(HPX_FORWARD(queue_function_ptr_t<Params...>,
                                 queue_member_function),
@@ -106,10 +106,10 @@ namespace hpx { namespace sycl { namespace experimental {
                     return hpx::make_exceptional_future<void>(HPX_MOVE(ep));
                 });
         }
-#else 
+#else
         // Default Implementation without the extra intel code_location parameter
 
-        /// sycl::queue::member_function type 
+        /// sycl::queue::member_function type
         template<typename ...Params>
         using queue_function_ptr_t =  cl::sycl::event (cl::sycl::queue::*)(std::decay_t<Params>...);
         /// Invoke queue member function given queue and parameters -- do not
@@ -145,7 +145,7 @@ namespace hpx { namespace sycl { namespace experimental {
                     // get_future(), causes hipsycl to clean up the previous
                     // kernel once done. Without this buffers seem to leak as
                     // hipsycl does not clean up the device memory without some trigger flush.
-                    // In any case, the problems seems to be avoided by always having a 
+                    // In any case, the problems seems to be avoided by always having a
                     // following dummy kernel within the hipsycl dag. Runtime of this
                     // is about 5us, so not too bad. Still keeping this as a ToDo, might
                     // be a hipsycl issue...
@@ -186,7 +186,7 @@ namespace hpx { namespace sycl { namespace experimental {
         }
 
         // Property interface:
-        
+
         /// Return the device used by the underlying SYCL queue
         HPX_FORCEINLINE cl::sycl::device get_device() const {
             return command_queue.get_device();
@@ -218,14 +218,14 @@ namespace hpx {
             // support for a waitable/future
         };
         /// \endcond
-    }}    // namespace parallel::execution 
+    }}    // namespace parallel::execution
 
-    // Add overloads for apply and async to help the compiler determine the correct 
+    // Add overloads for apply and async to help the compiler determine the correct
     // sycl queue member function/overload by passing it the types for subsequent arguments.
     // Without this, the user would have to specify the exact type for the queue_function_ptr
-    // on his/her own which can be annoying, especially when the type depends on a kernel 
+    // on his/her own which can be annoying, especially when the type depends on a kernel
     // lambda (as it does for example in the submit member function).
-    
+
     /// hpx::async overload for launching sycl queue member functions with an sycl executor
     template <typename Executor, typename... Ts>
     HPX_FORCEINLINE decltype(auto) async(

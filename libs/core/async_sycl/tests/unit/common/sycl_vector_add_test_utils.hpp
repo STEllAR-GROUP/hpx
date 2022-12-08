@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <vector>
-#include <iostream> 
+#include <iostream>
 #include <cassert>
 
 /// Fills the input vectors a and b with the predefined pattarn (a[i] = i).

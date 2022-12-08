@@ -29,6 +29,6 @@ foreach (test ${tests})
   set(${test}_PARAMETERS THREADS_PER_LOCALITY 4)
   # Add to tests
   add_hpx_unit_test(
-       "modules.async_sycl" ${test} ${${test}_PARAMETERS} 
+       "modules.async_sycl" ${test} ${${test}_PARAMETERS}
        )
 endforeach()

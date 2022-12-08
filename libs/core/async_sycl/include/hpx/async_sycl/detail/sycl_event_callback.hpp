@@ -12,7 +12,7 @@
 
 #include <string>
 
-#include <CL/sycl.hpp> 
+#include <CL/sycl.hpp>
 
 // Check compiler compatibility:
 // Needs to be done AFTER sycl include for HipSYCL

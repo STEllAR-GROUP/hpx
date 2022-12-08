@@ -4,16 +4,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <iostream> 
-#include <string> 
+#include <iostream>
+#include <string>
 #include <vector>
 #include <hpx/futures/future.hpp>
-#include <hpx/hpx_init.hpp> 
+#include <hpx/hpx_init.hpp>
 #include <hpx/local/future.hpp>
 #if defined(HPX_HAVE_SYCL)
-#include <CL/sycl.hpp> 
-#include <hpx/async_sycl/sycl_future.hpp> 
-#include <hpx/async_sycl/sycl_executor.hpp> 
+#include <CL/sycl.hpp>
+#include <hpx/async_sycl/sycl_future.hpp>
+#include <hpx/async_sycl/sycl_executor.hpp>
 
 #include "common/sycl_vector_add_test_utils.hpp"
 
@@ -121,7 +121,7 @@ int hpx_main(int, char**)
     // Run vector add using multiple executors and multiple cpu tasks
     VectorAdd(a, b, add_parallel);
     // Compare results to sequentiell version
-    check_vector_add_results(a, b, add_parallel); 
+    check_vector_add_results(a, b, add_parallel);
     print_vector_results(a, b, add_parallel);
 
     // Disable polling

@@ -6,26 +6,26 @@
 
 #include <algorithm>
 #include <exception>
-#include <iostream> 
-#include <string> 
+#include <iostream>
+#include <string>
 #include <vector>
 
 #include <hpx/futures/future.hpp>
-#include <hpx/hpx_init.hpp> 
+#include <hpx/hpx_init.hpp>
 #include <hpx/local/future.hpp>
 #if defined(HPX_HAVE_SYCL)
-#include <hpx/async_sycl/sycl_future.hpp> 
+#include <hpx/async_sycl/sycl_future.hpp>
 
 #include "common/sycl_vector_add_test_utils.hpp"
 
-#include <CL/sycl.hpp> 
+#include <CL/sycl.hpp>
 
 // Check compiler compatibility:
 // Needs to be done AFTER sycl include for HipSYCL
 // (intel dpcpp would be fine without the include)
 //
 // Will raise compile-time errors in case of unexpected behaviour! (Hence part of the unit test)
-// Uncomment the pragma message commands for more information about the compile passes 
+// Uncomment the pragma message commands for more information about the compile passes
 // (2 passes for hipsycl, 3 for dpcpp)
 #if defined(SYCL_LANGUAGE_VERSION)
 #if !defined(__INTEL_LLVM_COMPILER) && !defined(__HIPSYCL__)
@@ -61,7 +61,7 @@ constexpr size_t vector_size = 80000000;
 
 // Useful intel profiling commands:
 // advisor --collect=survey --profile-gpu -- ./bin/sycl_vector_add_test
-// advisor --collect=survey --collect=tripcounts --stacks --flop 
+// advisor --collect=survey --collect=tripcounts --stacks --flop
 // --profile-gpu -- ./bin/sycl_vector_add_test
 
 

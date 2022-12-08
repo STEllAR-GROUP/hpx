@@ -138,7 +138,7 @@
 #elif defined(HPX_HAVE_SYCL)
 #  if __HIPSYCL__
     // within hipsycl the macros are not defined without including the header
-#    include <CL/sycl.hpp> 
+#    include <CL/sycl.hpp>
 #  endif
 #  if defined(__SYCL_DEVICE_ONLY__)
 #    define HPX_COMPUTE_DEVICE_CODE

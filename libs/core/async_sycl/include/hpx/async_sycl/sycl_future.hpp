@@ -5,8 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //
-// This file is very similar to its CUDA counterpart (cuda_future.hpp) just adapted/simplified) 
-// for sycl (we have to get our events from the sycl runtime, and normal stream callbacks are not 
+// This file is very similar to its CUDA counterpart (cuda_future.hpp) just adapted/simplified)
+// for sycl (we have to get our events from the sycl runtime, and normal stream callbacks are not
 // possible with SYCL -- we only have the option to do event polling)
 //
 #pragma once

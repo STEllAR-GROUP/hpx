@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //
-// This file is very similar to its CUDA counterpart (cuda_event_callback.cpp) as it serves 
+// This file is very similar to its CUDA counterpart (cuda_event_callback.cpp) as it serves
 // the same purpose: implementing the polling of events.
 // However, there are some differences due to hipsycl: We need to keep the SYCL runtime alive
-// while we run the polling. Furthermore we need to flush the SYCL dag to avoid deadlocks 
+// while we run the polling. Furthermore we need to flush the SYCL dag to avoid deadlocks
 // (as hipsycl is lazy and may only start kernels once the results are requested)
 //
 #include <hpx/config.hpp>
@@ -84,7 +84,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     /// Event_callbacks are added using a concurrent queue
     using event_callback_queue_type =
         concurrency::ConcurrentQueue<event_callback>;
-    /// Event_callbacks stored in a callback vector for later checking 
+    /// Event_callbacks stored in a callback vector for later checking
     using event_callback_vector_type = std::vector<event_callback>;
     /// Access to (static) event callback vector containing unfinished events
     event_callback_vector_type& get_event_callback_vector()
@@ -134,7 +134,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     // Either using a dummy kernel within the SYCL command queue (to get a sycl event)
     // or by supplying a SYCL event directly
 
-    // Adds an event callback directly for a given event 
+    // Adds an event callback directly for a given event
     // (event needs to be from the queue in question when using hipsycl)
     void add_event_callback(
         event_callback_function_type&& f, cl::sycl::event event)
@@ -154,24 +154,24 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
         // Note: we can get the runtime reference from any queue to flush the
         // dag -- hence, we can use the default queue that we use to keep the runtime
         // alive during polling anyways. Whilst flush_asnyc uses a mutex internally already,
-        // the shared lock here merely ensures that the polling cannot be disabled while 
+        // the shared lock here merely ensures that the polling cannot be disabled while
         // we use the default queue here
         std::shared_lock<detail::sycl_default_queue_mutex_type> queue_shared_lk(
             detail::get_default_queue_mtx()); // make sure the polling has not yet stopped
-        auto &optional_queue = get_default_queue(); 
-        HPX_ASSERT_MSG(optional_queue.has_value(), 
+        auto &optional_queue = get_default_queue();
+        HPX_ASSERT_MSG(optional_queue.has_value(),
             "Error: Internal SYCL default queue is empty - is the SYCL polling disabled?");
         optional_queue.value().get_context().hipSYCL_runtime()->dag().flush_async();
 #endif
     }
 
     // -------------------------------------------------------------
-    // Function to be called from the scheduler: 
+    // Function to be called from the scheduler:
     // poll (checks if any event in the vector/queue is done and calls its callback
     // get_work_count (how many unfinished events are left (approx)
-    
+
     /// Check for completed SYCL events and call their associated callbacks.
-    /** This methods tries to get the lock for the callback vector. 
+    /** This methods tries to get the lock for the callback vector.
      * If unsuccessful it will exit as another thread is already polling.
      * If successful it will first check the event_callback_vector for
      * any events that are completed/finished and call their respective callbacks.
@@ -181,7 +181,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
      *
      * Unlike the CUDA counterpart, no event pool is used here since we have to work
      * with the SYCL events directly returned form the SYCL runtime
-     * (as there is no syclEventRecord). We have to trust in the respective SYCL 
+     * (as there is no syclEventRecord). We have to trust in the respective SYCL
      * implementation to use an event pool internally.
      */
     hpx::threads::policies::detail::polling_status poll()
@@ -265,7 +265,7 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
         std::unique_lock<detail::sycl_default_queue_mutex_type> queue_write_lk(
             detail::get_default_queue_mtx());
         auto &optional_queue = get_default_queue();
-        HPX_ASSERT_MSG(!(optional_queue.has_value()), 
+        HPX_ASSERT_MSG(!(optional_queue.has_value()),
             "Error: Internal SYCL queue was already existing when activating the "
             "SYCL event polling. This is likely due to improper disabling of previous "
             "event polling");
@@ -305,11 +305,11 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
         std::unique_lock<detail::sycl_default_queue_mutex_type> queue_write_lk(
             detail::get_default_queue_mtx());
         auto &optional_queue = get_default_queue();
-        HPX_ASSERT_MSG(optional_queue.has_value(), 
+        HPX_ASSERT_MSG(optional_queue.has_value(),
             "Error: Internal SYCL queue was already deleted when deactivating the "
             "SYCL event polling. This is likely due to repeated disabling of the "
             "event polling");
-        optional_queue.reset(); 
+        optional_queue.reset();
     }
 }}}}    // namespace hpx::sycl::experimental::detail
 #endif
