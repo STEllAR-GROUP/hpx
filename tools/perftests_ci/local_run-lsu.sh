@@ -14,8 +14,9 @@ build_dir=$PWD
 rm -rf ${build_dir}/reports/reference-comparison
 
 # Setup the environment (libs + python)
-source ${src_dir}/.jenkins/.jenkins/lsu/env-gcc-11.sh
-source /home/rauriane/virtual_env/perftests_ci/bin/activate
+envfile=${src_dir}/.jenkins/lsu-perftests/env-perftests.sh
+source ${envfile}
+source /home/pansysk75/virtual_envs/perftests_env/bin/activate
 
 # Variables
 mkdir -p ${build_dir}/tools
@@ -28,4 +29,4 @@ configure_build_errors=0
 test_errors=0
 plot_errors=0
 
-source ${src_dir}/.jenkins/cscs-perftests/launch_perftests.sh
+source ${src_dir}/.jenkins/lsu-perftests/launch_perftests.sh

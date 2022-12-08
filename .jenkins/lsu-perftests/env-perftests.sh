@@ -9,7 +9,7 @@ set -eu
 module purge
 module load cmake
 module load llvm/13
-module load boost/1.78.0-Release
+module load boost/1.78.0-release
 module load hwloc
 module load openmpi
 

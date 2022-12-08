@@ -15,8 +15,8 @@ status_computation_and_artifacts_storage() {
     ctest_status=$(( ctest_exit_code + configure_build_errors + test_errors + plot_errors ))
 
     # Copy the testing directory for saving as an artifact
-    cp -r ${build_dir}/Testing ${orig_src_dir}/${configuration_name}-Testing
-    cp -r ${build_dir}/reports ${orig_src_dir}/${configuration_name}-reports
+    cp -r ${build_dir}/Testing ${src_dir}/${configuration_name}-Testing
+    cp -r ${build_dir}/reports ${src_dir}/${configuration_name}-reports
 
     echo "${ctest_status}" > "jenkins-hpx-${configuration_name}-ctest-status.txt"
     exit $ctest_status
@@ -37,7 +37,7 @@ mkdir -p ${build_dir}/reports
 logfile=${build_dir}/reports/jenkins-hpx-${configuration_name}.log
 
 # Load python packages
-# source /apps/daint/SSL/HPX/virtual_envs/perftests_env/bin/activate
+source /home/pansysk75/virtual_envs/perftests_env/bin/activate
 
 # Things went alright by default
 configure_build_errors=0

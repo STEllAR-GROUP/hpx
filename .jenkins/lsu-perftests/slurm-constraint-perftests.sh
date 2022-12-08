@@ -6,3 +6,4 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 configuration_slurm_partition="jenkins-compute"
+configuration_slurm_nodelist="medusa08"
