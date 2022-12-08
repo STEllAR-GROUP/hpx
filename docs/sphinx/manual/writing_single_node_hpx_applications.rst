@@ -617,9 +617,9 @@ Parallel algorithms
      * In header
      * Algorithm page at cppreference.com
    * * :cpp:func:`hpx::nth_element`
-       * Partially sorts the given range making sure that it is partitioned by the given element
-       * ``<hpx/algorithm.hpp>``
-       * :cppreference-algorithm:`nth_element`
+     * Partially sorts the given range making sure that it is partitioned by the given element
+     * ``<hpx/algorithm.hpp>``
+     * :cppreference-algorithm:`nth_element`
    * * :cpp:func:`hpx::is_partitioned`
      * Returns ``true`` if each true element for a predicate precedes the false elements in a range.
      * ``<hpx/algorithm.hpp>``
@@ -664,9 +664,9 @@ Parallel algorithms
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`partial_sort`
    * * :cpp:func:`hpx::partial_sort_copy`
-       * Sorts the first elements in a range, storing the result in another range.
-       * ``<hpx/algorithm.hpp>``
-       * :cppreference-algorithm:`partial_sort_copy`
+     * Sorts the first elements in a range, storing the result in another range.
+     * ``<hpx/algorithm.hpp>``
+     * :cppreference-algorithm:`partial_sort_copy`
    * * :cpp:func:`hpx::experimental::sort_by_key`
      * Sorts one range of data using keys supplied in another range.
      * ``<hpx/algorithm.hpp>``
