@@ -895,7 +895,7 @@ blocks.
 Classes
 -------
 
-.. table:: Classes of header ``hpx/task_black.hpp``
+.. table:: Classes of header ``hpx/task_block.hpp``
 
    +---------------------------------------------------------+
    | Class                                                   |
@@ -908,7 +908,7 @@ Classes
 Functions
 ---------
 
-.. table:: Functions of header ``hpx/task_black.hpp``
+.. table:: Functions of header ``hpx/task_block.hpp``
 
    +-----------------------------------------------------------------+
    | Function                                                        |
@@ -917,6 +917,25 @@ Functions
    +-----------------------------------------------------------------+
    | :cpp:func:`hpx::parallel::v2::define_task_block_restore_thread` |
    +-----------------------------------------------------------------+
+
+.. _public_api_header_hpx_task_group:
+
+``hpx/task_group.hpp``
+======================
+
+The header :hpx-header:`libs/full/include/include,hpx/task_group.hpp` corresponds to the
+``task_group`` feature in |oneTBB|_.
+
+Classes
+-------
+
+.. table:: Classes of header ``hpx/task_group.hpp``
+
+   +---------------------------------------------------------+
+   | Class                                                   |
+   +=========================================================+
+   | :cpp:class:`hpx::execution::experimental::task_group`   |
+   +---------------------------------------------------------+
 
 .. _public_api_header_hpx_thread:
 
