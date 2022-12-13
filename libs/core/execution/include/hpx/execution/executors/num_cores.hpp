@@ -17,7 +17,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx::execution {
+namespace hpx::execution::experimental {
 
     /// Control number of cores in executors which need a functionality
     /// for setting the number of cores to be used by an algorithm directly
@@ -61,13 +61,23 @@ namespace hpx::execution {
         std::size_t num_cores_;
         /// \endcond
     };
-}    // namespace hpx::execution
+}    // namespace hpx::execution::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     /// \cond NOINTERNAL
     template <>
-    struct is_executor_parameters<hpx::execution::num_cores> : std::true_type
+    struct is_executor_parameters<hpx::execution::experimental::num_cores>
+      : std::true_type
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
+
+namespace hpx::execution {
+
+    using num_cores HPX_DEPRECATED_V(1, 9,
+        "hpx::execution::num_cores is deprecated, use "
+        "hpx::execution::experimental::num_cores instead") =
+        hpx::execution::experimental::num_cores;
+}

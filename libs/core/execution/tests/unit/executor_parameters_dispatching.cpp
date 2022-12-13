@@ -418,7 +418,7 @@ void test_processing_units_count()
     {
         params_count = 0;
 
-        hpx::execution::num_cores nc(2);
+        hpx::execution::experimental::num_cores nc(2);
         auto p = hpx::parallel::execution::with_processing_units_count(
             hpx::execution::par, nc);
 

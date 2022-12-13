@@ -10,8 +10,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <algorithm>
@@ -19,7 +22,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace hpx { namespace execution {
+namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Loop iterations are divided into pieces and then assigned to threads.
@@ -160,14 +163,24 @@ namespace hpx { namespace execution {
         std::uint64_t num_iters_for_timing_;
         /// \endcond
     };
-}}    // namespace hpx::execution
+}    // namespace hpx::execution::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     /// \cond NOINTERNAL
     template <>
-    struct is_executor_parameters<hpx::execution::persistent_auto_chunk_size>
+    struct is_executor_parameters<
+        hpx::execution::experimental::persistent_auto_chunk_size>
       : std::true_type
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
+
+namespace hpx::execution {
+
+    using persistent_auto_chunk_size HPX_DEPRECATED_V(1, 9,
+        "hpx::execution::persistent_auto_chunk_size is deprecated, use "
+        "hpx::execution::experimental::persistent_auto_chunk_size instead") =
+        hpx::execution::experimental::persistent_auto_chunk_size;
+}

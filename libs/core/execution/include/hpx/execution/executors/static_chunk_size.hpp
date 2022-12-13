@@ -17,7 +17,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace execution {
+namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Loop iterations are divided into pieces of size \a chunk_size and then
@@ -102,14 +102,23 @@ namespace hpx { namespace execution {
         std::size_t chunk_size_;
         /// \endcond
     };
-}}    // namespace hpx::execution
+}    // namespace hpx::execution::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     /// \cond NOINTERNAL
     template <>
-    struct is_executor_parameters<hpx::execution::static_chunk_size>
-      : std::true_type
+    struct is_executor_parameters<
+        hpx::execution::experimental::static_chunk_size> : std::true_type
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
+
+namespace hpx::execution {
+
+    using static_chunk_size HPX_DEPRECATED_V(1, 9,
+        "hpx::execution::static_chunk_size is deprecated, use "
+        "hpx::execution::experimental::static_chunk_size instead") =
+        hpx::execution::experimental::static_chunk_size;
+}

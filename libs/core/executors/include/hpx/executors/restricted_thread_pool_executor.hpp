@@ -40,8 +40,6 @@ namespace hpx::parallel::execution {
         using execution_category =
             typename embedded_executor::execution_category;
 
-        /// Associate the static_chunk_size executor parameters type as a default
-        /// with this executor.
         using executor_parameters_type =
             typename embedded_executor::executor_parameters_type;
 

@@ -38,7 +38,7 @@ int hpx_main()
             std::vector<int> v(num_elems, 0);
             // Force there to be as many chunks as elements
             hpx::fill(hpx::execution::par.on(exec).with(
-                          hpx::execution::static_chunk_size(1)),
+                          hpx::execution::experimental::static_chunk_size(1)),
                 v.begin(), v.end(), 1);
 
             std::for_each(v.begin(), v.end(), [](int x) { HPX_TEST_EQ(x, 1); });

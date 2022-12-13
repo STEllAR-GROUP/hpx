@@ -77,7 +77,8 @@ namespace hpx { namespace execution { namespace experimental {
 
         /// \cond NOINTERNAL
         using execution_category = hpx::execution::parallel_execution_tag;
-        using executor_parameters_type = hpx::execution::static_chunk_size;
+        using executor_parameters_type =
+            hpx::execution::experimental::static_chunk_size;
         /// \endcond
 
     private:

@@ -26,7 +26,8 @@ namespace hpx { namespace mpi { namespace experimental {
         using execution_category = hpx::execution::parallel_execution_tag;
 
         // default params type as we don't do anything special
-        using executor_parameters_type = hpx::execution::static_chunk_size;
+        using executor_parameters_type =
+            hpx::execution::experimental::static_chunk_size;
 
         constexpr explicit executor(MPI_Comm communicator = MPI_COMM_WORLD)
           : communicator_(communicator)

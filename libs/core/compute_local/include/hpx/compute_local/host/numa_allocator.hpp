@@ -102,7 +102,8 @@ namespace hpx { namespace parallel { namespace util {
                 first_touch.push_back(hpx::for_each(
                     hpx::execution::par(hpx::execution::task)
                         .on(executors_[i])
-                        .with(hpx::execution::static_chunk_size()),
+                        .with(
+                            hpx::execution::experimental::static_chunk_size()),
                     begin, end,
 #if defined(HPX_DEBUG)
                     [this, i]

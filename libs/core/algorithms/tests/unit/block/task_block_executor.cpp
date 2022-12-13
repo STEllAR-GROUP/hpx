@@ -15,8 +15,8 @@
 #include <vector>
 
 using hpx::execution::par;
-using hpx::execution::static_chunk_size;
 using hpx::execution::task;
+using hpx::execution::experimental::static_chunk_size;
 using hpx::parallel::define_task_block;
 
 ///////////////////////////////////////////////////////////////////////////////

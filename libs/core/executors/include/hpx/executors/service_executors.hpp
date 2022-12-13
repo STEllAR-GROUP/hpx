@@ -44,7 +44,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
         // Associate the static_chunk_size executor parameters type as a
         // default with this executor.
-        using executor_parameters_type = hpx::execution::static_chunk_size;
+        using executor_parameters_type =
+            hpx::execution::experimental::static_chunk_size;
 
         explicit service_executor(hpx::util::io_service_pool* pool)
 #if defined(HPX_COMPUTE_HOST_CODE)

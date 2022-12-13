@@ -24,13 +24,13 @@ void test_persistent_executitor_parameters()
 {
     typedef std::random_access_iterator_tag iterator_tag;
     {
-        hpx::execution::persistent_auto_chunk_size p;
+        hpx::execution::experimental::persistent_auto_chunk_size p;
         auto policy = hpx::execution::par.with(p);
         test_for_each(policy, iterator_tag());
     }
 
     {
-        hpx::execution::persistent_auto_chunk_size p;
+        hpx::execution::experimental::persistent_auto_chunk_size p;
         auto policy = hpx::execution::par(hpx::execution::task).with(p);
         test_for_each_async(policy, iterator_tag());
     }
@@ -38,13 +38,13 @@ void test_persistent_executitor_parameters()
     hpx::execution::parallel_executor par_exec;
 
     {
-        hpx::execution::persistent_auto_chunk_size p;
+        hpx::execution::experimental::persistent_auto_chunk_size p;
         auto policy = hpx::execution::par.on(par_exec).with(p);
         test_for_each(policy, iterator_tag());
     }
 
     {
-        hpx::execution::persistent_auto_chunk_size p;
+        hpx::execution::experimental::persistent_auto_chunk_size p;
         auto policy =
             hpx::execution::par(hpx::execution::task).on(par_exec).with(p);
         test_for_each_async(policy, iterator_tag());
@@ -58,12 +58,12 @@ void test_persistent_executitor_parameters_ref()
     typedef std::random_access_iterator_tag iterator_tag;
 
     {
-        hpx::execution::persistent_auto_chunk_size p;
+        hpx::execution::experimental::persistent_auto_chunk_size p;
         test_for_each(hpx::execution::par.with(std::ref(p)), iterator_tag());
     }
 
     {
-        hpx::execution::persistent_auto_chunk_size p;
+        hpx::execution::experimental::persistent_auto_chunk_size p;
         test_for_each_async(
             hpx::execution::par(hpx::execution::task).with(std::ref(p)),
             iterator_tag());
@@ -72,13 +72,13 @@ void test_persistent_executitor_parameters_ref()
     hpx::execution::parallel_executor par_exec;
 
     {
-        hpx::execution::persistent_auto_chunk_size p;
+        hpx::execution::experimental::persistent_auto_chunk_size p;
         test_for_each(
             hpx::execution::par.on(par_exec).with(std::ref(p)), iterator_tag());
     }
 
     {
-        hpx::execution::persistent_auto_chunk_size p;
+        hpx::execution::experimental::persistent_auto_chunk_size p;
         test_for_each_async(hpx::execution::par(hpx::execution::task)
                                 .on(par_exec)
                                 .with(std::ref(p)),

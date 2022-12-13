@@ -66,12 +66,12 @@ void parameters_test(Parameters&&... params)
 void test_dynamic_chunk_size()
 {
     {
-        hpx::execution::dynamic_chunk_size dcs;
+        hpx::execution::experimental::dynamic_chunk_size dcs;
         parameters_test(dcs);
     }
 
     {
-        hpx::execution::dynamic_chunk_size dcs(100);
+        hpx::execution::experimental::dynamic_chunk_size dcs(100);
         parameters_test(dcs);
     }
 }
@@ -79,31 +79,31 @@ void test_dynamic_chunk_size()
 void test_static_chunk_size()
 {
     {
-        hpx::execution::static_chunk_size scs;
+        hpx::execution::experimental::static_chunk_size scs;
         parameters_test(scs);
     }
 
     {
-        hpx::execution::static_chunk_size scs(100);
+        hpx::execution::experimental::static_chunk_size scs(100);
         parameters_test(scs);
     }
 }
 void test_adaptive_static_chunk_size()
 {
     {
-        hpx::execution::adaptive_static_chunk_size asc;
+        hpx::execution::experimental::adaptive_static_chunk_size asc;
         parameters_test(asc);
     }
 }
 void test_guided_chunk_size()
 {
     {
-        hpx::execution::guided_chunk_size gcs;
+        hpx::execution::experimental::guided_chunk_size gcs;
         parameters_test(gcs);
     }
 
     {
-        hpx::execution::guided_chunk_size gcs(100);
+        hpx::execution::experimental::guided_chunk_size gcs(100);
         parameters_test(gcs);
     }
 }
@@ -111,12 +111,13 @@ void test_guided_chunk_size()
 void test_auto_chunk_size()
 {
     {
-        hpx::execution::auto_chunk_size acs;
+        hpx::execution::experimental::auto_chunk_size acs;
         parameters_test(acs);
     }
 
     {
-        hpx::execution::auto_chunk_size acs(std::chrono::milliseconds(1));
+        hpx::execution::experimental::auto_chunk_size acs(
+            std::chrono::milliseconds(1));
         parameters_test(acs);
     }
 }
@@ -124,18 +125,18 @@ void test_auto_chunk_size()
 void test_persistent_auto_chunk_size()
 {
     {
-        hpx::execution::persistent_auto_chunk_size pacs;
+        hpx::execution::experimental::persistent_auto_chunk_size pacs;
         parameters_test(pacs);
     }
 
     {
-        hpx::execution::persistent_auto_chunk_size pacs(
+        hpx::execution::experimental::persistent_auto_chunk_size pacs(
             std::chrono::milliseconds(0), std::chrono::milliseconds(1));
         parameters_test(pacs);
     }
 
     {
-        hpx::execution::persistent_auto_chunk_size pacs(
+        hpx::execution::experimental::persistent_auto_chunk_size pacs(
             std::chrono::milliseconds(0));
         parameters_test(pacs);
     }
@@ -144,12 +145,12 @@ void test_persistent_auto_chunk_size()
 void test_num_cores()
 {
     {
-        hpx::execution::num_cores nc;
+        hpx::execution::experimental::num_cores nc;
         parameters_test(nc);
     }
 
     {
-        hpx::execution::num_cores nc(2);
+        hpx::execution::experimental::num_cores nc(2);
         parameters_test(nc);
     }
 }
@@ -190,7 +191,7 @@ namespace hpx { namespace parallel { namespace execution {
 void test_combined_hooks()
 {
     timer_hooks_parameters pacs("time_hooks");
-    hpx::execution::auto_chunk_size acs;
+    hpx::execution::experimental::auto_chunk_size acs;
 
     parameters_test(acs, pacs);
     parameters_test(pacs, acs);

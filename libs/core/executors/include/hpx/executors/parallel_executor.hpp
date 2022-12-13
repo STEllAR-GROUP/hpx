@@ -80,6 +80,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 }}}}    // namespace hpx::parallel::execution::detail
 
 namespace hpx { namespace execution {
+
     ///////////////////////////////////////////////////////////////////////////
     /// A \a parallel_executor creates groups of parallel execution agents
     /// which execute in threads implicitly created by the executor. This
@@ -99,7 +100,7 @@ namespace hpx { namespace execution {
 
         /// Associate the static_chunk_size executor parameters type as a default
         /// with this executor.
-        using executor_parameters_type = static_chunk_size;
+        using executor_parameters_type = experimental::static_chunk_size;
 
         /// Create a new parallel executor
         constexpr explicit parallel_policy_executor(

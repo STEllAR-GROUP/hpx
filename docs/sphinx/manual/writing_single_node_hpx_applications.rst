@@ -826,9 +826,10 @@ for an example of this executor parameter type.
 
 Other functions in the interface exist to discover whether an executor parameter
 type should be invoked once (i.e., it returns a static chunk size; see
-:cpp:class:`hpx::execution::static_chunk_size`) or whether it should be invoked
+:cpp:class:`hpx::execution::experimental::static_chunk_size`) or whether it
+should be invoked
 for each scheduled chunk of work (i.e., it returns a variable chunk size; for an
-example, see :cpp:class:`hpx::execution::guided_chunk_size`).
+example, see :cpp:class:`hpx::execution::experimental::guided_chunk_size`).
 
 Although this interface appears to require executor parameter type authors to
 implement all different basic operations, none are required. In
@@ -837,23 +838,27 @@ parameter types will naturally specialize all operations for maximum efficiency.
 
 |hpx|  implements the following executor parameter types:
 
-* :cpp:class:`hpx::execution::auto_chunk_size`: Loop iterations are divided into
-  pieces and then assigned to threads. The number of loop iterations combined is
+* :cpp:class:`hpx::execution::experimental::auto_chunk_size`: Loop iterations
+  are divided into pieces and then assigned to threads. The number of loop
+  iterations combined is
   determined based on measurements of how long the execution of 1% of the
   overall number of iterations takes. This executor parameter type makes sure
   that as many loop iterations are combined as necessary to run for the amount
   of time specified.
-* :cpp:class:`hpx::execution::static_chunk_size`: Loop iterations are divided
+* :cpp:class:`hpx::execution::experimental::static_chunk_size`: Loop iterations
+  are divided
   into pieces of a given size and then assigned to threads. If the size is not
   specified, the iterations are, if possible, evenly divided contiguously among
   the threads. This executor parameters type is equivalent to OpenMP's STATIC
   scheduling directive.
-* :cpp:class:`hpx::execution::dynamic_chunk_size`: Loop iterations are divided
+* :cpp:class:`hpx::execution::experimental::dynamic_chunk_size`: Loop iterations
+  are divided
   into pieces of a given size and then dynamically scheduled among the cores;
   when a core finishes one chunk, it is dynamically assigned another. If the
   size is not specified, the default chunk size is 1. This executor parameter
   type is equivalent to OpenMP's DYNAMIC scheduling directive.
-* :cpp:class:`hpx::execution::guided_chunk_size`: Iterations are dynamically
+* :cpp:class:`hpx::execution::experimental::guided_chunk_size`: Iterations are
+  dynamically
   assigned to cores in blocks as cores request them until no blocks remain to be
   assigned. This is similar to ``dynamic_chunk_size`` except that the block size
   decreases each time a number of loop iterations is given to a thread. The size

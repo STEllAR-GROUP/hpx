@@ -133,7 +133,7 @@ int hpx_main(hpx::program_options::variables_map&)
     std::set<std::thread::id> thread_set;
 
     // test a parallel algorithm on custom pool with high priority
-    hpx::execution::static_chunk_size fixed(1);
+    hpx::execution::experimental::static_chunk_size fixed(1);
     hpx::experimental::for_loop_strided(
         hpx::execution::par.with(fixed).on(high_priority_executor), 0,
         loop_count, 1, [&](std::size_t i) {

@@ -127,7 +127,7 @@ void measure_parallel_foreach(
     std::vector<std::size_t> const& data_representation, Executor&& exec)
 {
     // create executor parameters object
-    hpx::execution::static_chunk_size cs(chunk_size);
+    hpx::execution::experimental::static_chunk_size cs(chunk_size);
 
     if constexpr (hpx::traits::is_scheduler_executor_v<Executor>)
     {
@@ -173,7 +173,7 @@ hpx::future<void> measure_task_foreach(
     Executor&& exec)
 {
     // create executor parameters object
-    hpx::execution::static_chunk_size cs(chunk_size);
+    hpx::execution::experimental::static_chunk_size cs(chunk_size);
 
     if (disable_stealing)
     {
@@ -228,7 +228,7 @@ void measure_parallel_forloop(
     using iterator = typename std::vector<std::size_t>::const_iterator;
 
     // create executor parameters object
-    hpx::execution::static_chunk_size cs(chunk_size);
+    hpx::execution::experimental::static_chunk_size cs(chunk_size);
 
     if constexpr (hpx::traits::is_scheduler_executor_v<Executor>)
     {
@@ -282,7 +282,7 @@ hpx::future<void> measure_task_forloop(
     using iterator = typename std::vector<std::size_t>::const_iterator;
 
     // create executor parameters object
-    hpx::execution::static_chunk_size cs(chunk_size);
+    hpx::execution::experimental::static_chunk_size cs(chunk_size);
 
     if (disable_stealing)
     {

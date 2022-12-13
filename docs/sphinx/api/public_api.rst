@@ -406,20 +406,21 @@ Classes
 
 .. table:: Classes of header ``hpx/execution.hpp``
 
-   ========================================================  ========================================================
-   Class                                                     C++ standard
-   ========================================================  ========================================================
-   :cpp:class:`hpx::execution::sequenced_policy`             :cppreference-generic:`algorithm,execution_policy_tag_t`
-   :cpp:class:`hpx::execution::parallel_policy`              :cppreference-generic:`algorithm,execution_policy_tag_t`
-   :cpp:class:`hpx::execution::parallel_unsequenced_policy`  :cppreference-generic:`algorithm,execution_policy_tag_t`
+   =====================================================================  ========================================================
+   Class                                                                  C++ standard
+   =====================================================================  ========================================================
+   :cpp:class:`hpx::execution::sequenced_policy`                          :cppreference-generic:`algorithm,execution_policy_tag_t`
+   :cpp:class:`hpx::execution::parallel_policy`                           :cppreference-generic:`algorithm,execution_policy_tag_t`
+   :cpp:class:`hpx::execution::parallel_unsequenced_policy`               :cppreference-generic:`algorithm,execution_policy_tag_t`
    :cpp:class:`hpx::execution::sequenced_task_policy`
    :cpp:class:`hpx::execution::parallel_task_policy`
-   :cpp:class:`hpx::execution::auto_chunk_size`
-   :cpp:class:`hpx::execution::dynamic_chunk_size`
-   :cpp:class:`hpx::execution::guided_chunk_size`
-   :cpp:class:`hpx::execution::persistent_auto_chunk_size`
-   :cpp:class:`hpx::execution::static_chunk_size`
-   ========================================================  ========================================================
+   :cpp:class:`hpx::execution::experimental::auto_chunk_size`
+   :cpp:class:`hpx::execution::experimental::dynamic_chunk_size`
+   :cpp:class:`hpx::execution::experimental::guided_chunk_size`
+   :cpp:class:`hpx::execution::experimental::persistent_auto_chunk_size`
+   :cpp:class:`hpx::execution::experimental::static_chunk_size`
+   :cpp:class:`hpx::execution::experimental::num_cores`
+   =====================================================================  ========================================================
 
 .. _public_api_header_hpx_functional:
 
