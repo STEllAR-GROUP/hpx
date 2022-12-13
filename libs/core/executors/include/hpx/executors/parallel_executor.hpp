@@ -38,6 +38,7 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
@@ -204,7 +205,9 @@ namespace hpx { namespace execution {
 
         friend constexpr std::size_t tag_invoke(
             hpx::parallel::execution::processing_units_count_t,
-            parallel_policy_executor const& exec)
+            parallel_policy_executor const& exec,
+            hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
+            std::size_t = 0)
         {
             return exec.get_num_cores();
         }
@@ -231,7 +234,9 @@ namespace hpx { namespace execution {
     public:
         // backwards compatibility support, will be removed in the future
         template <typename Parameters>
-        std::size_t processing_units_count(Parameters&&) const
+        std::size_t processing_units_count(Parameters&&,
+            hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
+            std::size_t = 0) const
         {
             return get_num_cores();
         }

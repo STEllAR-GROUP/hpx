@@ -809,11 +809,11 @@ exposed and accessible through a corresponding customization point, e.g.
 ``get_chunk_size()``.
 
 With ``executor_parameter_traits``, clients access all types of executor
-parameters uniformly::
+parameters uniformly, e.g.::
 
     std::size_t chunk_size =
-        hpx::execution::get_chunk_size(my_parameter,
-            my_executor, [](auto){ return 0; }, num_cores, num_tasks);
+        hpx::execution::get_chunk_size(my_parameter, my_executor,
+            num_cores, num_tasks);
 
 This call synchronously retrieves the size of a single chunk of loop iterations
 (or similar) to combine for execution on a single |hpx| thread if the overall

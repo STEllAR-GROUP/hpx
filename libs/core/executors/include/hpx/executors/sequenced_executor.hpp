@@ -25,6 +25,7 @@
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -216,7 +217,9 @@ namespace hpx { namespace execution {
 
         friend constexpr std::size_t tag_invoke(
             hpx::parallel::execution::processing_units_count_t,
-            sequenced_executor const&)
+            sequenced_executor const&,
+            hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
+            std::size_t = 0)
         {
             return 1;
         }

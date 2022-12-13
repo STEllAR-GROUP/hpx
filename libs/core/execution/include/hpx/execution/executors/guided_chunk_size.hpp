@@ -11,12 +11,14 @@
 #include <hpx/config.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <type_traits>
 
 namespace hpx { namespace execution {
+
     ///////////////////////////////////////////////////////////////////////////
     /// Iterations are dynamically assigned to threads in blocks as threads
     /// request them until no blocks remain to be assigned. Similar to
@@ -59,9 +61,10 @@ namespace hpx { namespace execution {
         //             return ...;
         //         }
 
-        template <typename Executor, typename F>
-        constexpr std::size_t get_chunk_size(Executor&& /* exec */, F&&,
-            std::size_t cores, std::size_t num_tasks) const noexcept
+        template <typename Executor>
+        constexpr std::size_t get_chunk_size(Executor&& /* exec */,
+            hpx::chrono::steady_duration const&, std::size_t cores,
+            std::size_t num_tasks) const noexcept
         {
             return (std::max)(min_chunk_size_, (num_tasks + cores - 1) / cores);
         }

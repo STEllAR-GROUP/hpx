@@ -226,7 +226,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             // get number of cores currently used
             std::size_t cores = parallel::execution::processing_units_count(
-                policy.parameters(), policy.executor());
+                policy.parameters(), policy.executor(),
+                hpx::chrono::null_duration, size_left + size_right);
 
             // calculate number of cores to be used for left and right section
             // proportional to the ratio of their sizes

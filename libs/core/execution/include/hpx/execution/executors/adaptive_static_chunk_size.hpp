@@ -12,9 +12,11 @@
 #include <hpx/config.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <hpx/execution/executors/execution_parameters_fwd.hpp>
 
+#include <chrono>
 #include <cmath>
 #include <cstddef>
 #include <iostream>
@@ -55,9 +57,10 @@ namespace hpx { namespace execution {
         }
 
         /// \cond NOINTERNAL
-        template <typename Executor, typename F>
-        std::size_t get_chunk_size(
-            Executor& exec, F&&, std::size_t cores, std::size_t input_size)
+        template <typename Executor>
+        std::size_t get_chunk_size(Executor& exec,
+            hpx::chrono::steady_duration const&, std::size_t cores,
+            std::size_t input_size)
         {
             // Make sure the internal round robin counter of the executor is
             // reset

@@ -141,6 +141,19 @@ void test_persistent_auto_chunk_size()
     }
 }
 
+void test_num_cores()
+{
+    {
+        hpx::execution::num_cores nc;
+        parameters_test(nc);
+    }
+
+    {
+        hpx::execution::num_cores nc(2);
+        parameters_test(nc);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 struct timer_hooks_parameters
 {
@@ -199,6 +212,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     test_guided_chunk_size();
     test_auto_chunk_size();
     test_persistent_auto_chunk_size();
+    test_num_cores();
 
     test_combined_hooks();
 

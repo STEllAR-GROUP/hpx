@@ -12,6 +12,7 @@
 #include <hpx/execution/executors/execution_parameters_fwd.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -35,7 +36,8 @@ namespace hpx::execution {
         /// \cond NOINTERNAL
         // discover the number of cores to use for parallelization
         template <typename Executor>
-        constexpr std::size_t processing_units_count(Executor&&) const noexcept
+        constexpr std::size_t processing_units_count(Executor&&,
+            hpx::chrono::steady_duration const&, std::size_t) const noexcept
         {
             return num_cores_;
         }

@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <type_traits>
@@ -40,9 +41,10 @@ namespace hpx { namespace execution {
         }
 
         /// \cond NOINTERNAL
-        template <typename Executor, typename F>
-        constexpr std::size_t get_chunk_size(
-            Executor&, F&&, std::size_t, std::size_t) const noexcept
+        template <typename Executor>
+        constexpr std::size_t get_chunk_size(Executor&,
+            hpx::chrono::steady_duration const&, std::size_t,
+            std::size_t) const noexcept
         {
             return chunk_size_;
         }

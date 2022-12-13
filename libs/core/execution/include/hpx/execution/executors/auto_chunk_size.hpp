@@ -9,12 +9,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/modules/timing.hpp>
-#include <hpx/serialization/serialize.hpp>
-
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
+#include <hpx/execution_base/traits/is_executor_parameters.hpp>
+#include <hpx/serialization/serialize.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -65,10 +64,10 @@ namespace hpx { namespace execution {
         // testing function in order to approximate the chunk-size.
         using invokes_testing_function = std::true_type;
 
-        // Estimate a chunk size based on number of cores used.
+        // Estimate execution time for one iteration
         template <typename Executor, typename F>
-        std::size_t get_chunk_size(Executor&& exec, F&& f, std::size_t cores,
-            std::size_t count) noexcept
+        auto measure_iteration(
+            Executor&& exec, F&& f, std::size_t count) noexcept
         {
             // by default use 1% of the iterations
             if (num_iters_for_timing_ == 0)
@@ -92,13 +91,28 @@ namespace hpx { namespace execution {
                     t = (high_resolution_clock::now() - t) / test_chunk_size;
                     if (t != 0 && min_time_ >= t)
                     {
-                        // return chunk size which will create the required
-                        // amount of work
-                        return (std::min)(count, (std::size_t)(min_time_ / t));
+                        // return execution time for one iteration
+                        return std::chrono::nanoseconds(t);
                     }
                 }
             }
 
+            return std::chrono::nanoseconds(0);
+        }
+
+        // Estimate a chunk size based on number of cores used.
+        template <typename Executor>
+        std::size_t get_chunk_size(Executor&& exec,
+            hpx::chrono::steady_duration const& iteration_duration,
+            std::size_t cores, std::size_t count) noexcept
+        {
+            // return chunk size which will create the required amount of work
+            if (iteration_duration.value().count() != 0)
+            {
+                auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    iteration_duration.value());
+                return (std::min)(count, (std::size_t)(min_time_ / ns.count()));
+            }
             return (count + cores - 1) / cores;
         }
         /// \endcond

@@ -109,7 +109,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         using buffer_type = typename set_operations_buffer<Iter3>::type;
 
         std::size_t cores = execution::processing_units_count(
-            policy.parameters(), policy.executor());
+            policy.parameters(), policy.executor(), hpx::chrono::null_duration,
+            (std::min)(len1, len2));
 
         std::size_t step = (len1 + cores - 1) / cores;
 
