@@ -23,16 +23,16 @@ namespace hpx::lockfree {
         std::uint64_t left;
         std::uint64_t right;
 
-        constexpr bool operator==(
-            volatile uint128_type const& rhs) const noexcept
+        friend constexpr bool operator==(
+            uint128_type const& lhs, uint128_type const& rhs) noexcept
         {
-            return (left == rhs.left) && (right == rhs.right);
+            return (lhs.left == rhs.left) && (lhs.right == rhs.right);
         }
 
-        constexpr bool operator!=(
-            volatile uint128_type const& rhs) const noexcept
+        friend constexpr bool operator!=(
+            uint128_type const& lhs, uint128_type const& rhs) noexcept
         {
-            return !(*this == rhs);
+            return !(lhs == rhs);
         }
     };
 
@@ -53,20 +53,17 @@ namespace hpx::lockfree {
         static constexpr std::size_t right_tag_index = 7;
         static constexpr compressed_ptr_t ptr_mask = 0xffffffffffff;
 
-        static Left* extract_left_ptr(
-            volatile compressed_ptr_pair_t const& i) noexcept
+        static Left* extract_left_ptr(compressed_ptr_pair_t const& i) noexcept
         {
             return reinterpret_cast<Left*>(i.left & ptr_mask);
         }
 
-        static Right* extract_right_ptr(
-            volatile compressed_ptr_pair_t const& i) noexcept
+        static Right* extract_right_ptr(compressed_ptr_pair_t const& i) noexcept
         {
             return reinterpret_cast<Right*>(i.right & ptr_mask);
         }
 
-        static tag_t extract_left_tag(
-            volatile compressed_ptr_pair_t const& i) noexcept
+        static tag_t extract_left_tag(compressed_ptr_pair_t const& i) noexcept
         {
             cast_unit cu;
             cu.value.left = i.left;
@@ -74,8 +71,7 @@ namespace hpx::lockfree {
             return cu.tags[left_tag_index];
         }
 
-        static tag_t extract_right_tag(
-            volatile compressed_ptr_pair_t const& i) noexcept
+        static tag_t extract_right_tag(compressed_ptr_pair_t const& i) noexcept
         {
             cast_unit cu;
             cu.value.left = i.left;
@@ -162,32 +158,32 @@ namespace hpx::lockfree {
 
         /** comparing semantics */
         /* @{ */
-        constexpr bool operator==(
-            volatile tagged_ptr_pair const& rhs) const noexcept
+        friend constexpr bool operator==(
+            tagged_ptr_pair const& lhs, tagged_ptr_pair const& rhs) noexcept
         {
-            return (pair_ == rhs.pair_);
+            return (lhs.pair_ == rhs.pair_);
         }
 
-        constexpr bool operator!=(
-            volatile tagged_ptr_pair const& rhs) const noexcept
+        friend constexpr bool operator!=(
+            tagged_ptr_pair const& lhs, tagged_ptr_pair const& rhs) noexcept
         {
-            return !(*this == rhs);
+            return !(lhs == rhs);
         }
         /* @} */
 
         /** pointer access */
         /* @{ */
-        Left* get_left_ptr() const volatile noexcept
+        Left* get_left_ptr() const noexcept
         {
             return extract_left_ptr(pair_);
         }
 
-        Right* get_right_ptr() const volatile noexcept
+        Right* get_right_ptr() const noexcept
         {
             return extract_right_ptr(pair_);
         }
 
-        void set_left_ptr(Left* lptr) volatile noexcept
+        void set_left_ptr(Left* lptr) noexcept
         {
             Right* rptr = get_right_ptr();
             tag_t ltag = get_left_tag();
@@ -195,7 +191,7 @@ namespace hpx::lockfree {
             pack_ptr_pair(pair_, lptr, rptr, ltag, rtag);
         }
 
-        void set_right_ptr(Right* rptr) volatile noexcept
+        void set_right_ptr(Right* rptr) noexcept
         {
             Left* lptr = get_left_ptr();
             tag_t ltag = get_left_tag();
@@ -206,18 +202,18 @@ namespace hpx::lockfree {
 
         /** tag access */
         /* @{ */
-        tag_t get_left_tag() const volatile noexcept
+        tag_t get_left_tag() const noexcept
         {
             return extract_left_tag(pair_);
         }
 
-        tag_t get_right_tag() const volatile noexcept
+        tag_t get_right_tag() const noexcept
         {
             return extract_right_tag(pair_);
         }
 
         template <typename Integral>
-        void set_left_tag(Integral ltag) volatile noexcept
+        void set_left_tag(Integral ltag) noexcept
         {
             Left* lptr = get_left_ptr();
             Right* rptr = get_right_ptr();
@@ -226,7 +222,7 @@ namespace hpx::lockfree {
         }
 
         template <typename Integral>
-        void set_right_tag(Integral rtag) volatile noexcept
+        void set_right_tag(Integral rtag) noexcept
         {
             Left* lptr = get_left_ptr();
             Right* rptr = get_right_ptr();

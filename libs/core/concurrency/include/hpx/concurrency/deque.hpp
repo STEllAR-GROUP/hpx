@@ -124,38 +124,38 @@ namespace hpx::lockfree {
         {
         }
 
-        pair lrs(std::memory_order mo = std::memory_order_acquire) const
-            volatile noexcept
+        pair lrs(
+            std::memory_order mo = std::memory_order_acquire) const noexcept
         {
             return pair_.load(mo);
         }
 
-        node* left(std::memory_order mo = std::memory_order_acquire) const
-            volatile noexcept
+        node* left(
+            std::memory_order mo = std::memory_order_acquire) const noexcept
         {
             return pair_.load(mo).get_left_ptr();
         }
 
-        node* right(std::memory_order mo = std::memory_order_acquire) const
-            volatile noexcept
+        node* right(
+            std::memory_order mo = std::memory_order_acquire) const noexcept
         {
             return pair_.load(mo).get_right_ptr();
         }
 
-        tag_t status(std::memory_order mo = std::memory_order_acquire) const
-            volatile noexcept
+        tag_t status(
+            std::memory_order mo = std::memory_order_acquire) const noexcept
         {
             return pair_.load(mo).get_left_tag();
         }
 
-        tag_t tag(std::memory_order mo = std::memory_order_acquire) const
-            volatile noexcept
+        tag_t tag(
+            std::memory_order mo = std::memory_order_acquire) const noexcept
         {
             return pair_.load(mo).get_right_tag();
         }
 
         bool cas(deque_anchor& expected, deque_anchor const& desired,
-            std::memory_order mo = std::memory_order_acq_rel) volatile noexcept
+            std::memory_order mo = std::memory_order_acq_rel) noexcept
         {
             return pair_.compare_exchange_strong(
                 expected.load(std::memory_order_acquire),
@@ -163,63 +163,57 @@ namespace hpx::lockfree {
         }
 
         bool cas(pair& expected, deque_anchor const& desired,
-            std::memory_order mo = std::memory_order_acq_rel) volatile noexcept
+            std::memory_order mo = std::memory_order_acq_rel) noexcept
         {
             return pair_.compare_exchange_strong(
                 expected, desired.load(std::memory_order_acquire), mo);
         }
 
         bool cas(deque_anchor& expected, pair const& desired,
-            std::memory_order mo = std::memory_order_acq_rel) volatile noexcept
+            std::memory_order mo = std::memory_order_acq_rel) noexcept
         {
             return pair_.compare_exchange_strong(
                 expected.load(std::memory_order_acquire), desired, mo);
         }
 
         bool cas(pair& expected, pair const& desired,
-            std::memory_order mo = std::memory_order_acq_rel) volatile noexcept
+            std::memory_order mo = std::memory_order_acq_rel) noexcept
         {
             return pair_.compare_exchange_strong(expected, desired, mo);
         }
 
-        friend bool operator==(volatile deque_anchor const& lhs,
-            volatile deque_anchor const& rhs) noexcept
+        bool operator==(deque_anchor const& rhs) const
         {
-            return lhs.pair_.load(std::memory_order_acquire) ==
+            return pair_.load(std::memory_order_acquire) ==
                 rhs.pair_.load(std::memory_order_acquire);
         }
 
-        friend bool operator!=(volatile deque_anchor const& lhs,
-            volatile deque_anchor const& rhs) noexcept
+        bool operator!=(deque_anchor const& rhs) const
         {
-            return !(lhs == rhs);
+            return !(*this == rhs);
         }
 
-        friend bool operator==(
-            volatile deque_anchor const& lhs, volatile pair const& rhs) noexcept
+        friend bool operator==(deque_anchor const& lhs, pair const& rhs)
         {
             return lhs.pair_.load(std::memory_order_acquire) == rhs;
         }
 
-        friend bool operator!=(
-            volatile deque_anchor const& lhs, volatile pair const& rhs) noexcept
+        friend bool operator!=(deque_anchor const& lhs, pair const& rhs)
         {
             return !(lhs == rhs);
         }
 
-        friend bool operator==(
-            volatile pair const& lhs, volatile deque_anchor const& rhs) noexcept
+        friend bool operator==(pair const& lhs, deque_anchor const& rhs)
         {
             return lhs == rhs.pair_.load(std::memory_order_acquire);
         }
 
-        friend bool operator!=(
-            volatile pair const& lhs, volatile deque_anchor const& rhs) noexcept
+        friend bool operator!=(pair const& lhs, deque_anchor const& rhs)
         {
             return !(lhs == rhs);
         }
 
-        bool is_lock_free() const noexcept
+        bool is_lock_free() const
         {
             return pair_.is_lock_free();
         }

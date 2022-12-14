@@ -49,14 +49,12 @@ namespace hpx::lockfree::detail {
 
         /** comparing semantics */
         /* @{ */
-        constexpr bool operator==(
-            volatile tagged_ptr const& rhs) const noexcept
+        constexpr bool operator==(tagged_ptr const& rhs) const noexcept
         {
             return (ptr == rhs.ptr) && (tag == rhs.tag);
         }
 
-        constexpr bool operator!=(
-            volatile tagged_ptr const& rhs) const noexcept
+        constexpr bool operator!=(tagged_ptr const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
