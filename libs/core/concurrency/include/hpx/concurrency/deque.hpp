@@ -19,10 +19,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/concurrency/detail/freelist.hpp>
+#include <hpx/concurrency/detail/tagged_ptr.hpp>
 #include <hpx/concurrency/detail/tagged_ptr_pair.hpp>
-
-#include <boost/lockfree/detail/tagged_ptr.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -31,7 +31,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace boost { namespace lockfree {
+namespace hpx::lockfree {
 
     // The "left" and "right" terminology is used instead of top and bottom to stay
     // consistent with the paper that this code is based on..
@@ -45,8 +45,8 @@ namespace boost { namespace lockfree {
     template <typename T>
     struct deque_node    //-V690
     {
-        typedef detail::tagged_ptr<deque_node> pointer;
-        typedef std::atomic<pointer> atomic_pointer;
+        using pointer = hpx::lockfree::detail::tagged_ptr<deque_node>;
+        using atomic_pointer = std::atomic<pointer>;
 
         typedef typename pointer::tag_t tag_t;
 
@@ -54,14 +54,14 @@ namespace boost { namespace lockfree {
         atomic_pointer right;
         T data;
 
-        deque_node()
+        constexpr deque_node() noexcept
           : left(nullptr)
           , right(nullptr)
           , data()
         {
         }
 
-        deque_node(deque_node const& p)
+        deque_node(deque_node const& p) noexcept
           : left(p.left.load(std::memory_order_relaxed))
           , right(p.right.load(std::memory_order_relaxed))
         {
@@ -76,7 +76,7 @@ namespace boost { namespace lockfree {
         }
 
         deque_node(deque_node* lptr, deque_node* rptr, T&& v, tag_t ltag = 0,
-            tag_t rtag = 0)
+            tag_t rtag = 0) noexcept
           : left(pointer(lptr, ltag))
           , right(pointer(rptr, rtag))
           , data(HPX_MOVE(v))
@@ -103,12 +103,12 @@ namespace boost { namespace lockfree {
         atomic_pair pair_;
 
     public:
-        deque_anchor()
+        constexpr deque_anchor() noexcept
           : pair_(pair(nullptr, nullptr, stable, 0))
         {
         }
 
-        deque_anchor(deque_anchor const& p)
+        deque_anchor(deque_anchor const& p) noexcept
           : pair_(p.pair_.load(std::memory_order_relaxed))
         {
         }
@@ -118,44 +118,44 @@ namespace boost { namespace lockfree {
         {
         }
 
-        deque_anchor(
-            node* lptr, node* rptr, tag_t status = stable, tag_t tag = 0)
+        deque_anchor(node* lptr, node* rptr, tag_t status = stable,
+            tag_t tag = 0) noexcept
           : pair_(pair(lptr, rptr, status, tag))
         {
         }
 
-        pair lrs(std::memory_order mo = std::memory_order_acquire) const
-            volatile
+        pair lrs(
+            std::memory_order mo = std::memory_order_acquire) const noexcept
         {
             return pair_.load(mo);
         }
 
-        node* left(std::memory_order mo = std::memory_order_acquire) const
-            volatile
+        node* left(
+            std::memory_order mo = std::memory_order_acquire) const noexcept
         {
             return pair_.load(mo).get_left_ptr();
         }
 
-        node* right(std::memory_order mo = std::memory_order_acquire) const
-            volatile
+        node* right(
+            std::memory_order mo = std::memory_order_acquire) const noexcept
         {
             return pair_.load(mo).get_right_ptr();
         }
 
-        tag_t status(std::memory_order mo = std::memory_order_acquire) const
-            volatile
+        tag_t status(
+            std::memory_order mo = std::memory_order_acquire) const noexcept
         {
             return pair_.load(mo).get_left_tag();
         }
 
-        tag_t tag(std::memory_order mo = std::memory_order_acquire) const
-            volatile
+        tag_t tag(
+            std::memory_order mo = std::memory_order_acquire) const noexcept
         {
             return pair_.load(mo).get_right_tag();
         }
 
         bool cas(deque_anchor& expected, deque_anchor const& desired,
-            std::memory_order mo = std::memory_order_acq_rel) volatile
+            std::memory_order mo = std::memory_order_acq_rel) noexcept
         {
             return pair_.compare_exchange_strong(
                 expected.load(std::memory_order_acquire),
@@ -163,44 +163,54 @@ namespace boost { namespace lockfree {
         }
 
         bool cas(pair& expected, deque_anchor const& desired,
-            std::memory_order mo = std::memory_order_acq_rel) volatile
+            std::memory_order mo = std::memory_order_acq_rel) noexcept
         {
             return pair_.compare_exchange_strong(
                 expected, desired.load(std::memory_order_acquire), mo);
         }
 
         bool cas(deque_anchor& expected, pair const& desired,
-            std::memory_order mo = std::memory_order_acq_rel) volatile
+            std::memory_order mo = std::memory_order_acq_rel) noexcept
         {
             return pair_.compare_exchange_strong(
                 expected.load(std::memory_order_acquire), desired, mo);
         }
 
         bool cas(pair& expected, pair const& desired,
-            std::memory_order mo = std::memory_order_acq_rel) volatile
+            std::memory_order mo = std::memory_order_acq_rel) noexcept
         {
             return pair_.compare_exchange_strong(expected, desired, mo);
         }
 
-        bool operator==(volatile deque_anchor const& rhs) const
+        bool operator==(deque_anchor const& rhs) const
         {
             return pair_.load(std::memory_order_acquire) ==
                 rhs.pair_.load(std::memory_order_acquire);
         }
 
-        bool operator!=(volatile deque_anchor const& rhs) const
+        bool operator!=(deque_anchor const& rhs) const
         {
             return !(*this == rhs);
         }
 
-        bool operator==(volatile pair const& rhs) const
+        friend bool operator==(deque_anchor const& lhs, pair const& rhs)
         {
-            return pair_.load(std::memory_order_acquire) == rhs;
+            return lhs.pair_.load(std::memory_order_acquire) == rhs;
         }
 
-        bool operator!=(volatile pair const& rhs) const
+        friend bool operator!=(deque_anchor const& lhs, pair const& rhs)
         {
-            return !(*this == rhs);
+            return !(lhs == rhs);
+        }
+
+        friend bool operator==(pair const& lhs, deque_anchor const& rhs)
+        {
+            return lhs == rhs.pair_.load(std::memory_order_acquire);
+        }
+
+        friend bool operator!=(pair const& lhs, deque_anchor const& rhs)
+        {
+            return !(lhs == rhs);
         }
 
         bool is_lock_free() const
@@ -233,17 +243,17 @@ namespace boost { namespace lockfree {
         using node_allocator =
             typename std::allocator_traits<Alloc>::template rebind_alloc<node>;
 
-        using pool = typename std::conditional<
-            std::is_same<freelist_t, caching_freelist_t>::value,
-            caching_freelist<node, node_allocator>,
-            static_freelist<node, node_allocator>>::type;
+        using pool =
+            std::conditional_t<std::is_same_v<freelist_t, caching_freelist_t>,
+                caching_freelist<node, node_allocator>,
+                static_freelist<node, node_allocator>>;
 
     private:
         anchor anchor_;
         pool pool_;
 
         static constexpr std::size_t padding_size =
-            BOOST_LOCKFREE_CACHELINE_BYTES - sizeof(anchor);    //-V103
+            hpx::threads::get_cache_line_size() - sizeof(anchor);    //-V103
         char padding[padding_size];
 
         node* alloc_node(
@@ -642,5 +652,4 @@ namespace boost { namespace lockfree {
             return pop_right(*r);
         }
     };
-
-}}    // namespace boost::lockfree
+}    // namespace hpx::lockfree

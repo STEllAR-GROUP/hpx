@@ -22,111 +22,196 @@
 // used for its APIs
 #include <jemalloc/jemalloc.h>
 
-inline void* __aligned_alloc(std::size_t alignment, std::size_t size) noexcept
-{
-    return HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, aligned_alloc)(alignment, size);
-}
+namespace hpx::util::detail {
 
-inline void __aligned_free(void* p) noexcept
-{
-    return HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
-}
+    inline void* __aligned_alloc(
+        std::size_t alignment, std::size_t size) noexcept
+    {
+        return HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, aligned_alloc)(
+            alignment, size);
+    }
+
+    inline void __aligned_free(void* p, std::size_t) noexcept
+    {
+        return HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
+    }
+}    // namespace hpx::util::detail
 
 #elif defined(HPX_HAVE_CXX17_STD_ALIGNED_ALLOC)
 
 #include <cstdlib>
 
-inline void* __aligned_alloc(std::size_t alignment, std::size_t size) noexcept
-{
-    return std::aligned_alloc(alignment, size);
-}
+namespace hpx::util::detail {
 
-inline void __aligned_free(void* p) noexcept
-{
-    std::free(p);
-}
+    inline void* __aligned_alloc(
+        std::size_t alignment, std::size_t size) noexcept
+    {
+        return std::aligned_alloc(alignment, size);
+    }
+
+    inline void __aligned_free(void* p, std::size_t) noexcept
+    {
+        std::free(p);
+    }
+}    // namespace hpx::util::detail
 
 #elif defined(HPX_HAVE_C11_ALIGNED_ALLOC)
 
 #include <stdlib.h>
 
-inline void* __aligned_alloc(std::size_t alignment, std::size_t size) noexcept
-{
-    return aligned_alloc(alignment, size);
-}
+namespace hpx::util::detail {
 
-inline void __aligned_free(void* p) noexcept
-{
-    free(p);
-}
+    inline void* __aligned_alloc(
+        std::size_t alignment, std::size_t size) noexcept
+    {
+        return aligned_alloc(alignment, size);
+    }
+
+    inline void __aligned_free(void* p, std::size_t) noexcept
+    {
+        free(p);
+    }
+}    // namespace hpx::util::detail
 
 #else    // !HPX_HAVE_CXX17_STD_ALIGNED_ALLOC && !HPX_HAVE_C11_ALIGNED_ALLOC
 
 #include <cstdlib>
 
-// provide our own (simple) implementation of aligned_alloc
-inline void* __aligned_alloc(std::size_t alignment, std::size_t size) noexcept
-{
-    if (alignment < alignof(void*))
+namespace hpx::util::detail {
+
+    // provide our own (simple) implementation of aligned_alloc
+    inline void* __aligned_alloc(
+        std::size_t alignment, std::size_t size) noexcept
     {
-        alignment = alignof(void*);
+        if (alignment < alignof(void*))
+        {
+            alignment = alignof(void*);
+        }
+
+        std::size_t space = size + alignment - 1;
+        void* allocated_mem = std::malloc(space + sizeof(void*));
+        if (allocated_mem == nullptr)
+        {
+            return nullptr;
+        }
+
+        void* aligned_mem = static_cast<void*>(
+            static_cast<char*>(allocated_mem) + sizeof(void*));
+
+        std::align(alignment, size, aligned_mem, space);
+        *(static_cast<void**>(aligned_mem) - 1) = allocated_mem;
+
+        return aligned_mem;
     }
 
-    std::size_t space = size + alignment - 1;
-    void* allocated_mem = std::malloc(space + sizeof(void*));
-    if (allocated_mem == nullptr)
+    inline void __aligned_free(void* p, std::size_t) noexcept
     {
-        return nullptr;
+        if (nullptr != p)
+        {
+            std::free(*(static_cast<void**>(p) - 1));
+        }
     }
-
-    void* aligned_mem =
-        static_cast<void*>(static_cast<char*>(allocated_mem) + sizeof(void*));
-
-    std::align(alignment, size, aligned_mem, space);
-    *(static_cast<void**>(aligned_mem) - 1) = allocated_mem;
-
-    return aligned_mem;
-}
-
-inline void __aligned_free(void* p) noexcept
-{
-    if (nullptr != p)
-    {
-        std::free(*(static_cast<void**>(p) - 1));
-    }
-}
+}    // namespace hpx::util::detail
 
 #endif
 
+namespace hpx::util::detail {
+
+    template <typename Allocator>
+    inline void* __aligned_alloc(Allocator const& alloc, std::size_t alignment,
+        std::size_t size) noexcept
+    {
+        using value_type =
+            typename std::allocator_traits<Allocator>::value_type;
+        using char_alloc = typename std::allocator_traits<
+            Allocator>::template rebind_alloc<char>;
+
+        std::size_t s = size * sizeof(value_type);
+        std::size_t space = s + alignment - 1;
+
+        char_alloc a(alloc);
+        void* allocated_mem = a.allocate(space + sizeof(void*));
+        if (allocated_mem == nullptr)
+        {
+            return nullptr;
+        }
+
+        void* aligned_mem = static_cast<void*>(
+            static_cast<char*>(allocated_mem) + sizeof(void*));
+
+        std::align(alignment, size, aligned_mem, space);
+        *(static_cast<void**>(aligned_mem) - 1) = allocated_mem;
+
+        return aligned_mem;
+    }
+
+    template <typename T>
+    inline void* __aligned_alloc(std::allocator<T> const&,
+        std::size_t alignment, std::size_t size) noexcept
+    {
+        return __aligned_alloc(alignment, size);
+    }
+
+    template <typename Allocator>
+    inline void __aligned_free(
+        Allocator const& alloc, void* p, std::size_t size) noexcept
+    {
+        if (nullptr != p)
+        {
+            using char_alloc = typename std::allocator_traits<
+                Allocator>::template rebind_alloc<char>;
+
+            char_alloc a(alloc);
+            a.deallocate(*(static_cast<void**>(p) - 1), size);
+        }
+    }
+
+    template <typename T>
+    inline void __aligned_free(
+        std::allocator<T> const&, void* p, std::size_t size) noexcept
+    {
+        __aligned_free(p, size);
+    }
+}    // namespace hpx::util::detail
+
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T = int>
+    template <typename T = int, typename Allocator = std::allocator<T>>
     struct aligned_allocator
     {
-        typedef T value_type;
-        typedef T* pointer;
-        typedef const T* const_pointer;
-        typedef T& reference;
-        typedef T const& const_reference;
-        typedef std::size_t size_type;
-        typedef std::ptrdiff_t difference_type;
+    private:
+        HPX_NO_UNIQUE_ADDRESS Allocator alloc;
+
+    public:
+        using value_type = T;
+        using pointer = T*;
+        using const_pointer = const T*;
+        using reference = T&;
+        using const_reference = T const&;
+        using size_type = std::size_t;
+        using difference_type = std::ptrdiff_t;
 
         template <typename U>
         struct rebind
         {
-            typedef aligned_allocator<U> other;
+            using other = aligned_allocator<U>;
         };
 
-        typedef std::true_type is_always_equal;
-        typedef std::true_type propagate_on_container_move_assignment;
+        using is_always_equal = std::true_type;
+        using propagate_on_container_move_assignment = std::true_type;
 
-        aligned_allocator() = default;
+        aligned_allocator(Allocator const& alloc = Allocator{})
+          : alloc(alloc)
+        {
+        }
 
         template <typename U>
-        explicit aligned_allocator(aligned_allocator<U> const&)
+        explicit aligned_allocator(aligned_allocator<U> const& rhs) noexcept(
+            noexcept(std::is_nothrow_copy_constructible_v<Allocator>))
+          : alloc(rhs.alloc)
         {
         }
 
@@ -148,7 +233,7 @@ namespace hpx { namespace util {
             }
 
             pointer p = reinterpret_cast<pointer>(
-                __aligned_alloc(alignof(T), n * sizeof(T)));
+                detail::__aligned_alloc(alloc, alignof(T), n * sizeof(T)));
 
             if (p == nullptr)
             {
@@ -158,9 +243,9 @@ namespace hpx { namespace util {
             return p;
         }
 
-        void deallocate(pointer p, size_type) noexcept
+        void deallocate(pointer p, size_type size) noexcept
         {
-            __aligned_free(p);
+            detail::__aligned_free(alloc, p, size);
         }
 
         size_type max_size() const noexcept
@@ -194,6 +279,6 @@ namespace hpx { namespace util {
     {
         return false;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -9,9 +9,8 @@
 #include <hpx/local/runtime.hpp>
 #include <hpx/local/thread.hpp>
 #include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/format.hpp>
-
-#include <boost/lockfree/queue.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -22,7 +21,7 @@
 
 template <typename T>
 using queue =
-    boost::lockfree::queue<T, hpx::util::aligned_allocator<std::size_t>>;
+    hpx::lockfree::queue<T, hpx::util::aligned_allocator<std::size_t>>;
 
 using hpx::program_options::options_description;
 using hpx::program_options::value;

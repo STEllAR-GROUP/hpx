@@ -13,11 +13,18 @@ set(concurrency_headers
     hpx/concurrency/concurrentqueue.hpp
     hpx/concurrency/deque.hpp
     hpx/concurrency/detail/contiguous_index_queue.hpp
+    hpx/concurrency/detail/copy_payload.hpp
     hpx/concurrency/detail/freelist.hpp
+    hpx/concurrency/detail/freelist_stack.hpp
     hpx/concurrency/detail/non_contiguous_index_queue.hpp
+    hpx/concurrency/detail/tagged_ptr.hpp
+    hpx/concurrency/detail/tagged_ptr_dcas.hpp
+    hpx/concurrency/detail/tagged_ptr_ptrcompression.hpp
     hpx/concurrency/detail/tagged_ptr_pair.hpp
+    hpx/concurrency/queue.hpp
     hpx/concurrency/spinlock.hpp
     hpx/concurrency/spinlock_pool.hpp
+    hpx/concurrency/stack.hpp
 )
 
 # Default location is $HPX_ROOT/libs/concurrency/include_compatibility
@@ -44,6 +51,7 @@ add_hpx_module(
   HEADERS ${concurrency_headers}
   COMPAT_HEADERS ${concurrency_compat_headers}
   MODULE_DEPENDENCIES
+    hpx_allocator_support
     hpx_assertion
     hpx_concepts
     hpx_config

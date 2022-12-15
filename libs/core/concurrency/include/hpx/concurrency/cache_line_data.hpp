@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2020 Hartmut Kaiser
+//  Copyright (c) 2019-2022 Hartmut Kaiser
 //  Copyright (c) 2019 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -68,7 +68,7 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////////
         // special struct to ensure cache line alignment of a data type
         template <typename Data,
-            typename NeedsPadding = typename detail::needs_padding<Data>::type>
+            bool NeedsPadding = detail::needs_padding<Data>::value>
         struct cache_aligned_data
         {
             // We have an explicit (default) constructor here to avoid for the
@@ -80,12 +80,13 @@ namespace hpx {
             }
 
             cache_aligned_data(Data&& data) noexcept
-              : data_{HPX_MOVE(data)}
+              : data_(HPX_MOVE(data))
             {
             }
 
-            cache_aligned_data(Data const& data)
-              : data_{data}
+            cache_aligned_data(Data const& data) noexcept(
+                noexcept(std::is_nothrow_copy_constructible_v<Data>))
+              : data_(data)
             {
             }
 
@@ -99,17 +100,18 @@ namespace hpx {
         };
 
         template <typename Data>
-        struct cache_aligned_data<Data, std::false_type>
+        struct cache_aligned_data<Data, false>
         {
             cache_aligned_data() = default;
 
             cache_aligned_data(Data&& data) noexcept
-              : data_{HPX_MOVE(data)}
+              : data_(HPX_MOVE(data))
             {
             }
 
-            cache_aligned_data(Data const& data)
-              : data_{data}
+            cache_aligned_data(Data const& data) noexcept(
+                noexcept(std::is_nothrow_copy_constructible_v<Data>))
+              : data_(data)
             {
             }
 
@@ -120,7 +122,7 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////////
         // special struct to ensure cache line alignment of a data type
         template <typename Data,
-            typename NeedsPadding = typename detail::needs_padding<Data>::type>
+            bool NeedsPadding = detail::needs_padding<Data>::value>
         struct cache_aligned_data_derived : Data
         {
             // We have an explicit (default) constructor here to avoid for the
@@ -131,13 +133,12 @@ namespace hpx {
             {
             }
 
-            cache_aligned_data_derived(Data&& data) noexcept
-              : Data{HPX_MOVE(data)}
-            {
-            }
-
-            cache_aligned_data_derived(Data const& data)
-              : Data{data}
+            template <typename... Ts,
+                typename =
+                    std::enable_if_t<std::is_constructible_v<Data, Ts&&...>>>
+            cache_aligned_data_derived(Ts&&... ts) noexcept(
+                noexcept(std::is_nothrow_constructible_v<Data, Ts&&...>))
+              : Data(HPX_FORWARD(Ts, ts)...)
             {
             }
 
@@ -148,17 +149,16 @@ namespace hpx {
         };
 
         template <typename Data>
-        struct cache_aligned_data_derived<Data, std::false_type> : Data
+        struct cache_aligned_data_derived<Data, false> : Data
         {
             cache_aligned_data_derived() = default;
 
-            cache_aligned_data_derived(Data&& data) noexcept
-              : Data{HPX_MOVE(data)}
-            {
-            }
-
-            cache_aligned_data_derived(Data const& data)
-              : Data{data}
+            template <typename... Ts,
+                typename =
+                    std::enable_if_t<std::is_constructible_v<Data, Ts&&...>>>
+            cache_aligned_data_derived(Ts&&... ts) noexcept(
+                noexcept(std::is_nothrow_constructible_v<Data, Ts&&...>))
+              : Data(HPX_FORWARD(Ts, ts)...)
             {
             }
 
@@ -170,6 +170,13 @@ namespace hpx {
         // cache line
         template <typename Data>
         using cache_line_data = cache_aligned_data<Data>;
+
+        ///////////////////////////////////////////////////////////////////////////
+        template <typename T>
+        constexpr inline auto align_up(T value, std::size_t alignment) noexcept
+        {
+            return T(std::size_t(value + (alignment - 1)) & ~(alignment - 1));
+        }
     }    // namespace util
 
 }    // namespace hpx

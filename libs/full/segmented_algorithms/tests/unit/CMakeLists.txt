@@ -57,18 +57,20 @@ set(partitioned_vector_exclusive_scan2_PARAMETERS RUN_SERIAL)
 set(partitioned_vector_target_PARAMETERS RUN_SERIAL)
 
 if(HPX_WITH_PARCELPORT_LCI)
-  set(partitioned_vector_inclusive_scan_PARAMETERS
-      ${partitioned_vector_inclusive_scan_PARAMETERS} NO_PARCELPORT_LCI
+  set(no_lci_tests
+      partitioned_vector_find
+      partitioned_vector_adjacent_find1
+      partitioned_vector_adjacent_find2
+      partitioned_vector_inclusive_scan
+      partitioned_vector_inclusive_scan2
+      partitioned_vector_exclusive_scan
+      partitioned_vector_exclusive_scan2
   )
-  set(partitioned_vector_inclusive_scan2_PARAMETERS
-      ${partitioned_vector_inclusive_scan2_PARAMETERS} NO_PARCELPORT_LCI
-  )
-  set(partitioned_vector_exclusive_scan_PARAMETERS
-      ${partitioned_vector_exclusive_scan_PARAMETERS} NO_PARCELPORT_LCI
-  )
-  set(partitioned_vector_exclusive_scan2_PARAMETERS
-      ${partitioned_vector_exclusive_scan2_PARAMETERS} NO_PARCELPORT_LCI
-  )
+  foreach(no_lci_test ${no_lci_tests})
+    set(${no_lci_test}_PARAMETERS ${${no_lci_test}_PARAMETERS}
+                                  NO_PARCELPORT_LCI
+    )
+  endforeach()
 endif()
 
 foreach(test ${tests})

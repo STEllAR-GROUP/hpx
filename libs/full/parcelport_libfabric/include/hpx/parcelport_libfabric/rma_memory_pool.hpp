@@ -14,7 +14,7 @@
 #include <hpx/parcelport_libfabric/performance_counter.hpp>
 #include <hpx/parcelport_libfabric/rma_memory_region.hpp>
 //
-#include <boost/lockfree/stack.hpp>
+#include <hpx/concurrency/stack.hpp>
 //
 #include <array>
 #include <atomic>
@@ -81,7 +81,7 @@ static_assert(
 
 namespace hpx { namespace parcelset {
 
-    namespace bl = boost::lockfree;
+    namespace bl = hpx::lockfree;
 
     // A simple tag type we use for logging assistance (identification)
     struct pool_tiny
