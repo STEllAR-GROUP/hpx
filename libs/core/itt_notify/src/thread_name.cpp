@@ -9,10 +9,11 @@
 
 #include <string>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     std::string& thread_name()
     {
         static thread_local std::string thread_name_;
         return thread_name_;
     }
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

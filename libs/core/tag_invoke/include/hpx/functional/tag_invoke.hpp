@@ -133,12 +133,14 @@ namespace hpx::functional {
                 return tag_invoke(tag, HPX_FORWARD(Ts, ts)...);
             }
 
-            friend constexpr bool operator==(tag_invoke_t, tag_invoke_t)
+            friend constexpr bool operator==(
+                tag_invoke_t, tag_invoke_t) noexcept
             {
                 return true;
             }
 
-            friend constexpr bool operator!=(tag_invoke_t, tag_invoke_t)
+            friend constexpr bool operator!=(
+                tag_invoke_t, tag_invoke_t) noexcept
             {
                 return false;
             }
@@ -163,6 +165,7 @@ namespace hpx::functional {
         is_tag_invocable<Tag, Args...>::value;
 
     namespace detail {
+
         template <typename Sig, bool Invocable>
         struct is_nothrow_tag_invocable_impl;
 

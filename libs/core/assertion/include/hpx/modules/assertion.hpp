@@ -25,7 +25,8 @@
 #include <string>
 #include <type_traits>
 
-namespace hpx { namespace assertion {
+namespace hpx::assertion {
+
     /// The signature for an assertion handler
     using assertion_handler = void (*)(hpx::source_location const& loc,
         const char* expr, std::string const& msg);
@@ -34,7 +35,7 @@ namespace hpx { namespace assertion {
     /// set already once, the call to this function will be ignored.
     /// \note This function is not thread safe
     HPX_CORE_EXPORT void set_assertion_handler(assertion_handler handler);
-}}    // namespace hpx::assertion
+}    // namespace hpx::assertion
 
 #if defined(DOXYGEN)
 /// \def HPX_ASSERT(expr, msg)

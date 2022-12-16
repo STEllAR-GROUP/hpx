@@ -165,4 +165,6 @@ function(hpx_perform_cxx_feature_tests)
     )
   endif()
 
+  hpx_check_for_builtin_forward_move(DEFINITIONS HPX_HAVE_BUILTIN_FORWARD_MOVE)
+
 endfunction()

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2016 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,21 +14,23 @@
 
 #include <chrono>
 
-namespace hpx { namespace chrono {
+namespace hpx::chrono {
+
     using std::chrono::steady_clock;
 
     class steady_time_point
     {
-        typedef steady_clock::time_point value_type;
+        using value_type = steady_clock::time_point;
 
     public:
-        constexpr steady_time_point(value_type const& abs_time) noexcept
+        /*implicit*/ constexpr steady_time_point(
+            value_type const& abs_time) noexcept
           : _abs_time(abs_time)
         {
         }
 
         template <typename Clock, typename Duration>
-        constexpr steady_time_point(
+        /*implicit*/ constexpr steady_time_point(
             std::chrono::time_point<Clock, Duration> const& abs_time) noexcept
           : _abs_time(std::chrono::time_point_cast<value_type::duration>(
                 steady_clock::now() + (abs_time - Clock::now())))
@@ -46,7 +48,7 @@ namespace hpx { namespace chrono {
 
     class steady_duration
     {
-        typedef steady_clock::duration value_type;
+        using value_type = steady_clock::duration;
 
     public:
         constexpr steady_duration() noexcept
@@ -54,13 +56,14 @@ namespace hpx { namespace chrono {
         {
         }
 
-        constexpr steady_duration(value_type const& rel_time) noexcept
+        /*implicit*/ constexpr steady_duration(
+            value_type const& rel_time) noexcept
           : _rel_time(rel_time)
         {
         }
 
         template <typename Rep, typename Period>
-        constexpr steady_duration(
+        /*implicit*/ constexpr steady_duration(
             std::chrono::duration<Rep, Period> const& rel_time) noexcept
           : _rel_time(std::chrono::duration_cast<value_type>(rel_time))
         {
@@ -84,4 +87,4 @@ namespace hpx { namespace chrono {
 
     inline constexpr steady_duration null_duration{};
 
-}}    // namespace hpx::chrono
+}    // namespace hpx::chrono

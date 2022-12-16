@@ -25,11 +25,11 @@
 #include <ostream>
 #include <string>
 
-namespace hpx { namespace util { namespace logging { namespace destination {
+namespace hpx::util::logging::destination {
 
     /**
     @brief Writes the string to console
-*/
+    */
     struct cout : manipulator
     {
         HPX_CORE_EXPORT static std::unique_ptr<cout> make();
@@ -42,7 +42,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 
     /**
     @brief Writes the string to cerr
-*/
+    */
     struct cerr : manipulator
     {
         HPX_CORE_EXPORT static std::unique_ptr<cerr> make();
@@ -59,7 +59,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
     @note:
     The stream must outlive this object! Or, clear() the stream,
     before the stream is deleted.
-*/
+    */
     struct stream : manipulator
     {
         HPX_CORE_EXPORT static std::unique_ptr<stream> make(
@@ -68,16 +68,16 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         HPX_CORE_EXPORT ~stream();
 
         /**
-        @brief resets the stream. Further output will be written to this stream
-    */
+         @brief resets the stream. Further output will be written to this stream
+         */
         void set_stream(std::ostream* stream_ptr)
         {
             ptr = stream_ptr;
         }
 
         /**
-        @brief clears the stream. Further output will be ignored
-    */
+         @brief clears the stream. Further output will be ignored
+         */
         void clear()
         {
             ptr = nullptr;
@@ -97,7 +97,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
     @brief Writes the string to output debug window
 
     For non-Windows systems, this is the console.
-*/
+     */
     struct dbg_window : manipulator
     {
         HPX_CORE_EXPORT static std::unique_ptr<dbg_window> make();
@@ -110,13 +110,13 @@ namespace hpx { namespace util { namespace logging { namespace destination {
 
     /**
     @brief Writes the string to a file
-*/
+    */
     struct file : manipulator
     {
         /**
-    @brief settings for when constructing a file class. To see how it's used,
-    see @ref dealing_with_flags.
-*/
+         @brief settings for when constructing a file class. To see how it's used,
+         see @ref dealing_with_flags.
+        */
         struct file_settings
         {
             file_settings()
@@ -143,7 +143,7 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         @param file_name name of the file
         @param set [optional] file settings - see file_settings class,
         and @ref dealing_with_flags
-    */
+        */
         HPX_CORE_EXPORT static std::unique_ptr<file> make(
             std::string const& file_name, file_settings set = {});
 
@@ -159,5 +159,4 @@ namespace hpx { namespace util { namespace logging { namespace destination {
         std::string name;
         file_settings settings;
     };
-
-}}}}    // namespace hpx::util::logging::destination
+}    // namespace hpx::util::logging::destination

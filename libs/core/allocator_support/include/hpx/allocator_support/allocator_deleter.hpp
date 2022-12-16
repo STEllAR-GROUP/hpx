@@ -12,7 +12,8 @@
 
 #include <memory>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Allocator>
     struct allocator_deleter
@@ -26,4 +27,4 @@ namespace hpx { namespace util {
 
         Allocator alloc_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util

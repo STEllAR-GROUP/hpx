@@ -30,7 +30,7 @@ namespace hpx::traits {
     using iter_pointer_t = typename std::iterator_traits<Iter>::pointer;
 
     template <typename Iter>
-    using iter_ref_t = typename std::iterator_traits<Iter>::reference;
+    using iter_reference_t = typename std::iterator_traits<Iter>::reference;
 
     template <typename Iter>
     using iter_category_t =
@@ -58,10 +58,8 @@ namespace hpx::traits {
 
             static char test(...);
 
-            enum
-            {
-                value = sizeof(test(std::declval<T>())) == sizeof(void*)
-            };
+            static constexpr bool value =
+                sizeof(test(std::declval<T>())) == sizeof(void*);
         };
 
         ///////////////////////////////////////////////////////////////////////

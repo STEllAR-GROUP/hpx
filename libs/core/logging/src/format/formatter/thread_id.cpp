@@ -28,7 +28,7 @@
 #include <pthread.h>
 #endif
 
-namespace hpx { namespace util { namespace logging { namespace formatter {
+namespace hpx::util::logging::formatter {
 
     thread_id::~thread_id() = default;
 
@@ -50,5 +50,4 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
     {
         return std::unique_ptr<thread_id>(new thread_id_impl());
     }
-
-}}}}    // namespace hpx::util::logging::formatter
+}    // namespace hpx::util::logging::formatter

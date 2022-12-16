@@ -18,7 +18,7 @@
 #include <hpx/hardware/timestamp/cuda.hpp>
 #endif
 
-namespace hpx { namespace util { namespace hardware {
+namespace hpx::util::hardware {
 
     HPX_HOST_DEVICE inline std::uint64_t timestamp()
     {
@@ -30,5 +30,4 @@ namespace hpx { namespace util { namespace hardware {
         return 1000 * res.tv_sec + res.tv_nsec / 1000000;
 #endif
     }
-
-}}}    // namespace hpx::util::hardware
+}    // namespace hpx::util::hardware

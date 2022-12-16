@@ -134,13 +134,13 @@ namespace hpx::functional::detail {
             }
 
             friend constexpr bool operator==(
-                tag_fallback_invoke_t, tag_fallback_invoke_t)
+                tag_fallback_invoke_t, tag_fallback_invoke_t) noexcept
             {
                 return true;
             }
 
             friend constexpr bool operator!=(
-                tag_fallback_invoke_t, tag_fallback_invoke_t)
+                tag_fallback_invoke_t, tag_fallback_invoke_t) noexcept
             {
                 return false;
             }

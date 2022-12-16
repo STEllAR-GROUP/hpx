@@ -33,7 +33,7 @@ namespace hpx::util::functional {
     template <typename T>
     struct placement_new_one
     {
-        placement_new_one(void* p)
+        explicit constexpr placement_new_one(void* p) noexcept
           : p_(p)
         {
         }

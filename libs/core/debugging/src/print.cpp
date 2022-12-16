@@ -34,7 +34,7 @@ HPX_CORE_EXPORT char** freebsd_environ = nullptr;
 
 // ------------------------------------------------------------
 /// \cond NODETAIL
-namespace hpx { namespace debug {
+namespace hpx::debug {
 
     // ------------------------------------------------------------------
     // format as zero padded int
@@ -66,12 +66,12 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     // format as pointer
     // ------------------------------------------------------------------
-    ptr::ptr(void const* v)
+    ptr::ptr(void const* v) noexcept
       : data_(v)
     {
     }
 
-    ptr::ptr(std::uintptr_t v)
+    ptr::ptr(std::uintptr_t v) noexcept
       : data_(reinterpret_cast<void const*>(v))
     {
     }
@@ -140,6 +140,7 @@ namespace hpx { namespace debug {
     // format as padded string
     // ------------------------------------------------------------------
     namespace detail {
+
         void print_str(std::ostream& os, char const* v, int N)
         {
             os << std::left << std::setfill(' ') << std::setw(N) << v;
@@ -149,13 +150,13 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     // format as ip address
     // ------------------------------------------------------------------
-    ipaddr::ipaddr(void const* a)
+    ipaddr::ipaddr(void const* a) noexcept
       : data_(reinterpret_cast<std::uint8_t const*>(a))
       , ipdata_(0)
     {
     }
 
-    ipaddr::ipaddr(std::uint32_t a)
+    ipaddr::ipaddr(std::uint32_t a) noexcept
       : data_(reinterpret_cast<const uint8_t*>(&ipdata_))
       , ipdata_(a)
     {
@@ -172,6 +173,7 @@ namespace hpx { namespace debug {
     // helper class for printing time since start
     // ------------------------------------------------------------------
     namespace detail {
+
         std::ostream& operator<<(
             std::ostream& os, current_time_print_helper const&)
         {
@@ -214,7 +216,8 @@ namespace hpx { namespace debug {
     // useful for debugging corruptions in buffers during
     // rma or other transfers
     // ------------------------------------------------------------------
-    mem_crc32::mem_crc32(void const* a, std::size_t len, char const* txt)
+    mem_crc32::mem_crc32(
+        void const* a, std::size_t len, char const* txt) noexcept
       : addr_(reinterpret_cast<const uint64_t*>(a))
       , len_(len)
       , txt_(txt)
@@ -255,8 +258,12 @@ namespace hpx { namespace debug {
 #if !defined(__FreeBSD__)
                 gethostname(hostname_, std::size_t(12));
 #endif
-                std::string temp = "(" + std::to_string(guess_rank()) + ")";
-                std::strcat(hostname_, temp.c_str());
+                int rank = guess_rank();
+                if (rank != -1)
+                {
+                    std::string temp = "(" + std::to_string(guess_rank()) + ")";
+                    std::strcat(hostname_, temp.c_str());
+                }
             }
             return hostname_;
         }
@@ -269,7 +276,7 @@ namespace hpx { namespace debug {
             char** env = environ;
 #endif
             std::vector<std::string> env_strings{"_RANK=", "_NODEID="};
-            for (char** current = env; *current; current++)
+            for (char** current = env; *current; ++current)
             {
                 auto e = std::string(*current);
                 for (auto s : env_strings)
@@ -307,5 +314,5 @@ namespace hpx { namespace debug {
         template HPX_CORE_EXPORT void print_array(
             std::string const&, std::uint64_t const*, std::size_t);
     }    // namespace detail
-}}       // namespace hpx::debug
+}    // namespace hpx::debug
 /// \endcond

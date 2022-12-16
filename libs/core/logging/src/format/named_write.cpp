@@ -26,7 +26,7 @@
 #include <sstream>
 #include <string>
 
-namespace hpx { namespace util { namespace logging { namespace detail {
+namespace hpx::util::logging::detail {
 
     static std::string unescape(std::string escaped)
     {
@@ -270,8 +270,7 @@ namespace hpx { namespace util { namespace logging { namespace detail {
             named.string(stripped_str);
         }
     }    // namespace
-
-}}}}    // namespace hpx::util::logging::detail
+}    // namespace hpx::util::logging::detail
 
 namespace hpx { namespace util { namespace logging { namespace writer {
 

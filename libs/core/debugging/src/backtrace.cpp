@@ -1,6 +1,6 @@
 //
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2012 Hartmut Kaiser
+//  Copyright (c) 2011-2022 Hartmut Kaiser
 //  Copyright (c) 2010 Artyom Beilis (Tonkikh)
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -64,11 +64,12 @@
 #include <winbase.h>
 #endif
 
-namespace hpx { namespace util { namespace stack_trace {
+namespace hpx::util::stack_trace {
+
 #if defined(HPX_HAVE_EXECINFO) && defined(HPX_HAVE_UNWIND)
     struct trace_data
     {
-        trace_data(void** array, std::size_t size)
+        constexpr trace_data(void** array, std::size_t size) noexcept
           : array_(array)
           , size_(size)
           , cfa_(0)
@@ -267,6 +268,7 @@ namespace hpx { namespace util { namespace stack_trace {
         }
         return res;
     }
+
     void write_symbols(
         void* const* addresses, std::size_t size, std::ostream& out)
     {
@@ -346,6 +348,7 @@ namespace hpx { namespace util { namespace stack_trace {
 #elif defined(HPX_MSVC)
 
     namespace {
+
         HANDLE hProcess = nullptr;
         bool syms_ready = false;
 
@@ -480,6 +483,6 @@ namespace hpx { namespace util { namespace stack_trace {
     }
 
 #endif
-}}}    // namespace hpx::util::stack_trace
+}    // namespace hpx::util::stack_trace
 
 #endif

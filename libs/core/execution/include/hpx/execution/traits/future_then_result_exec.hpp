@@ -44,7 +44,7 @@ namespace hpx { namespace traits {
             using result_type = util::lazy_conditional_t<
                 hpx::traits::detail::is_unique_future_v<cont_result>,
                 hpx::traits::future_traits<cont_result>,
-                hpx::util::identity<cont_result>>;
+                hpx::type_identity<cont_result>>;
 
             using type = hpx::future<result_type>;
         };

@@ -12,7 +12,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     class HPX_CORE_EXPORT bad_lexical_cast : public std::bad_cast
     {
@@ -61,7 +61,6 @@ namespace hpx { namespace util {
             detail::throw_bad_lexical_cast(typeid(Source), typeid(Target));
         }
     }    // namespace detail
-
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>

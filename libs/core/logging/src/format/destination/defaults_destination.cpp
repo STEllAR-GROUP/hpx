@@ -26,7 +26,7 @@
 #include <windows.h>
 #endif
 
-namespace hpx { namespace util { namespace logging { namespace destination {
+namespace hpx::util::logging::destination {
 
     cout::~cout() = default;
 
@@ -98,5 +98,4 @@ namespace hpx { namespace util { namespace logging { namespace destination {
     {
         return std::unique_ptr<dbg_window>(new dbg_window_impl());
     }
-
-}}}}    // namespace hpx::util::logging::destination
+}    // namespace hpx::util::logging::destination

@@ -12,7 +12,7 @@
 
 #include <cstdint>
 
-namespace hpx { namespace util { namespace hardware {
+namespace hpx::util::hardware {
 
     HPX_DEVICE inline std::uint64_t timestamp_cuda()
     {
@@ -20,5 +20,4 @@ namespace hpx { namespace util { namespace hardware {
         asm volatile("mov.u64 %0, %%globaltimer;" : "=l"(cur));
         return cur;
     }
-
-}}}    // namespace hpx::util::hardware
+}    // namespace hpx::util::hardware

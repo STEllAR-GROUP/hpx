@@ -23,7 +23,7 @@
 #include <memory>
 #include <ostream>
 
-namespace hpx { namespace util { namespace logging { namespace formatter {
+namespace hpx::util::logging::formatter {
 
     idx::~idx() = default;
 
@@ -47,5 +47,4 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
     {
         return std::unique_ptr<idx>(new idx_impl());
     }
-
-}}}}    // namespace hpx::util::logging::formatter
+}    // namespace hpx::util::logging::formatter

@@ -61,27 +61,27 @@ namespace hpx { namespace components { namespace server {
 
             switch (dest)
             {
-            case destination_hpx:
+            case logging_destination::hpx:
                 LHPX_CONSOLE_(level) << s;
                 break;
 
-            case destination_timing:
+            case logging_destination::timing:
                 LTIM_CONSOLE_(level) << s;
                 break;
 
-            case destination_agas:
+            case logging_destination::agas:
                 LAGAS_CONSOLE_(level) << s;
                 break;
 
-            case destination_parcel:
+            case logging_destination::parcel:
                 LPT_CONSOLE_(level) << s;
                 break;
 
-            case destination_app:
+            case logging_destination::app:
                 LAPP_CONSOLE_(level) << s;
                 break;
 
-            case destination_debuglog:
+            case logging_destination::debuglog:
                 LDEB_CONSOLE_ << s;
                 break;
 

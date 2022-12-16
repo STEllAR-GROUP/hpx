@@ -32,7 +32,7 @@
 #include <mutex>
 #endif
 
-namespace hpx { namespace util { namespace logging { namespace formatter {
+namespace hpx::util::logging::formatter {
 
     high_precision_time::~high_precision_time() = default;
 
@@ -129,5 +129,4 @@ namespace hpx { namespace util { namespace logging { namespace formatter {
         return std::unique_ptr<high_precision_time>(
             new high_precision_time_impl(format));
     }
-
-}}}}    // namespace hpx::util::logging::formatter
+}    // namespace hpx::util::logging::formatter

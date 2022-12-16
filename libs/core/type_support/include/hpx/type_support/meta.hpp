@@ -14,7 +14,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace meta {
+namespace hpx::meta {
 
     ///////////////////////////////////////////////////////////////////////////
     // make an alias template that extracts the embedded ::type of T
@@ -478,4 +478,4 @@ namespace hpx { namespace meta {
         using apply =
             std::enable_if_t<sizeof...(As) <= 1, meta::type<front<As..., Ty>>>;
     };
-}}    // namespace hpx::meta
+}    // namespace hpx::meta

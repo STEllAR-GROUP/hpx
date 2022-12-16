@@ -20,7 +20,7 @@
 
 #include <string_view>
 
-namespace hpx { namespace util { namespace logging {
+namespace hpx::util::logging {
 
     /**
     @brief Handling levels - classes that can hold and/or deal with levels
@@ -58,5 +58,4 @@ namespace hpx { namespace util { namespace logging {
     ////////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT void format_value(
         std::ostream& os, std::string_view spec, level value);
-
-}}}    // namespace hpx::util::logging
+}    // namespace hpx::util::logging

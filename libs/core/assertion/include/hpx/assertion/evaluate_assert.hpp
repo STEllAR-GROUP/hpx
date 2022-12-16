@@ -13,9 +13,10 @@
 #include <string>
 #include <utility>
 
-namespace hpx { namespace assertion { namespace detail {
+namespace hpx::assertion::detail {
+
     /// \cond NOINTERNAL
     HPX_CORE_EXPORT void handle_assert(hpx::source_location const& loc,
         const char* expr, std::string const& msg) noexcept;
     /// \endcond
-}}}    // namespace hpx::assertion::detail
+}    // namespace hpx::assertion::detail

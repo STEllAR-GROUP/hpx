@@ -16,13 +16,14 @@
 
 #if defined(HPX_WINDOWS)
 #include <Windows.h>
-#endif    // HPX_WINDOWS
+#endif
 
 #if defined(_POSIX_VERSION)
 #include <asio/ip/host_name.hpp>
 #endif
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     void attach_debugger()
     {
 #if defined(_POSIX_VERSION) && defined(HPX_HAVE_UNISTD_H)
@@ -39,4 +40,4 @@ namespace hpx { namespace util {
         DebugBreak();
 #endif
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

@@ -19,9 +19,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
+
         template <typename T, typename Enable = void>
         struct from_string
         {
@@ -228,5 +229,4 @@ namespace hpx { namespace util {
             return HPX_FORWARD(U, default_value);
         }
     }
-
-}}    // namespace hpx::util
+}    // namespace hpx::util

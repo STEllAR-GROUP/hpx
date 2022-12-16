@@ -135,13 +135,13 @@ namespace hpx::functional::detail {
             }
 
             friend constexpr bool operator==(
-                tag_override_invoke_t, tag_override_invoke_t)
+                tag_override_invoke_t, tag_override_invoke_t) noexcept
             {
                 return true;
             }
 
             friend constexpr bool operator!=(
-                tag_override_invoke_t, tag_override_invoke_t)
+                tag_override_invoke_t, tag_override_invoke_t) noexcept
             {
                 return false;
             }

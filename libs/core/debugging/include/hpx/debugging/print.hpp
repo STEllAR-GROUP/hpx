@@ -59,7 +59,7 @@
 
 // ------------------------------------------------------------
 /// \cond NODETAIL
-namespace hpx { namespace debug {
+namespace hpx::debug {
 
     // ------------------------------------------------------------------
     // format as zero padded int
@@ -72,7 +72,7 @@ namespace hpx { namespace debug {
         template <int N, typename T>
         struct dec
         {
-            constexpr dec(T const& v)
+            explicit constexpr dec(T const& v) noexcept
               : data_(v)
             {
             }
@@ -89,7 +89,7 @@ namespace hpx { namespace debug {
     }    // namespace detail
 
     template <int N = 2, typename T>
-    constexpr detail::dec<N, T> dec(T const& v)
+    constexpr detail::dec<N, T> dec(T const& v) noexcept
     {
         return detail::dec<N, T>(v);
     }
@@ -99,8 +99,8 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     struct ptr
     {
-        HPX_CORE_EXPORT ptr(void const* v);
-        HPX_CORE_EXPORT ptr(std::uintptr_t v);
+        HPX_CORE_EXPORT explicit ptr(void const* v) noexcept;
+        HPX_CORE_EXPORT explicit ptr(std::uintptr_t v) noexcept;
 
         void const* data_;
 
@@ -120,10 +120,9 @@ namespace hpx { namespace debug {
         struct hex;
 
         template <int N, typename T>
-        struct hex<N, T,
-            typename std::enable_if<!std::is_pointer<T>::value>::type>
+        struct hex<N, T, std::enable_if_t<!std::is_pointer_v<T>>>
         {
-            constexpr hex(T const& v)
+            explicit constexpr hex(T const& v) noexcept
               : data_(v)
             {
             }
@@ -141,10 +140,9 @@ namespace hpx { namespace debug {
         HPX_CORE_EXPORT void print_ptr(std::ostream& os, void* v, int n);
 
         template <int N, typename T>
-        struct hex<N, T,
-            typename std::enable_if<std::is_pointer<T>::value>::type>
+        struct hex<N, T, std::enable_if_t<std::is_pointer_v<T>>>
         {
-            constexpr hex(T const& v)
+            explicit constexpr hex(T const& v) noexcept
               : data_(v)
             {
             }
@@ -161,7 +159,7 @@ namespace hpx { namespace debug {
     }    // namespace detail
 
     template <int N = 4, typename T>
-    constexpr detail::hex<N, T> hex(T const& v)
+    constexpr detail::hex<N, T> hex(T const& v) noexcept
     {
         return detail::hex<N, T>(v);
     }
@@ -177,7 +175,7 @@ namespace hpx { namespace debug {
         template <int N = 8, typename T = int>
         struct bin
         {
-            constexpr bin(T const& v)
+            explicit constexpr bin(T const& v) noexcept
               : data_(v)
             {
             }
@@ -194,7 +192,7 @@ namespace hpx { namespace debug {
     }    // namespace detail
 
     template <int N = 8, typename T>
-    constexpr detail::bin<N, T> bin(T const& v)
+    constexpr detail::bin<N, T> bin(T const& v) noexcept
     {
         return detail::bin<N, T>(v);
     }
@@ -210,7 +208,7 @@ namespace hpx { namespace debug {
     template <int N = 20>
     struct str
     {
-        constexpr str(char const* v)
+        explicit constexpr str(char const* v) noexcept
           : data_(v)
         {
         }
@@ -229,8 +227,8 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     struct ipaddr
     {
-        HPX_CORE_EXPORT ipaddr(void const* a);
-        HPX_CORE_EXPORT ipaddr(std::uint32_t a);
+        HPX_CORE_EXPORT explicit ipaddr(void const* a) noexcept;
+        HPX_CORE_EXPORT explicit ipaddr(std::uint32_t a) noexcept;
 
         std::uint8_t const* data_;
         std::uint32_t const ipdata_;
@@ -243,6 +241,7 @@ namespace hpx { namespace debug {
     // helper class for printing time since start
     // ------------------------------------------------------------------
     namespace detail {
+
         struct current_time_print_helper
         {
             HPX_CORE_EXPORT friend std::ostream& operator<<(
@@ -253,7 +252,7 @@ namespace hpx { namespace debug {
     // ------------------------------------------------------------------
     // helper function for printing CRC32
     // ------------------------------------------------------------------
-    constexpr inline std::uint32_t crc32(void const*, std::size_t)
+    constexpr inline std::uint32_t crc32(void const*, std::size_t) noexcept
     {
         return 0;
     }
@@ -266,7 +265,7 @@ namespace hpx { namespace debug {
     struct mem_crc32
     {
         HPX_CORE_EXPORT mem_crc32(
-            void const* a, std::size_t len, char const* txt);
+            void const* a, std::size_t len, char const* txt) noexcept;
 
         std::uint64_t const* addr_;
         std::size_t const len_;
@@ -433,85 +432,89 @@ namespace hpx { namespace debug {
     template <>
     struct enable_print<false>
     {
-        constexpr enable_print(const char*) {}
+        explicit constexpr enable_print(const char*) noexcept {}
 
-        constexpr bool is_enabled() const
+        constexpr bool is_enabled() const noexcept
         {
             return false;
         }
 
         template <typename... Args>
-        constexpr void debug(Args const&...) const
+        constexpr void debug(Args const&...) const noexcept
         {
         }
 
         template <typename... Args>
-        constexpr void warning(Args const&...) const
+        constexpr void warning(Args const&...) const noexcept
         {
         }
 
         template <typename... Args>
-        constexpr void trace(Args const&...) const
+        constexpr void trace(Args const&...) const noexcept
         {
         }
 
         template <typename... Args>
-        constexpr void error(Args const&...) const
+        constexpr void error(Args const&...) const noexcept
         {
         }
 
         template <typename... Args>
-        constexpr void timed(Args const&...) const
+        constexpr void timed(Args const&...) const noexcept
         {
         }
 
         template <typename T>
-        constexpr void array(std::string const&, std::vector<T> const&) const
+        constexpr void array(
+            std::string const&, std::vector<T> const&) const noexcept
         {
         }
 
         template <typename T, std::size_t N>
-        constexpr void array(std::string const&, std::array<T, N> const&) const
+        constexpr void array(
+            std::string const&, std::array<T, N> const&) const noexcept
         {
         }
 
         template <typename T>
-        constexpr void array(std::string const&, T const*, std::size_t) const
+        constexpr void array(
+            std::string const&, T const*, std::size_t) const noexcept
         {
         }
 
         template <typename... Args>
-        constexpr bool scope(Args const&...)
+        constexpr bool scope(Args const&...) noexcept
         {
             return true;
         }
 
         template <typename T, typename... Args>
-        constexpr bool declare_variable(Args const&...) const
+        constexpr bool declare_variable(Args const&...) const noexcept
         {
             return true;
         }
 
         template <typename T, typename V>
-        constexpr void set(T&, V const&)
+        constexpr void set(T&, V const&) noexcept
         {
         }
 
         // @todo, return void so that timers have zero footprint when disabled
         template <typename... Args>
-        constexpr int make_timer(const double, Args const&...) const
+        constexpr int make_timer(const double, Args const&...) const noexcept
         {
             return 0;
         }
 
         template <typename Expr>
-        constexpr bool eval(Expr const&)
+        constexpr bool eval(Expr const&) noexcept
         {
             return true;
         }
     };
 
     namespace detail {
+
         template <typename T>
         HPX_CORE_EXPORT void print_array(
             std::string const& name, T const* data, std::size_t size);
@@ -525,17 +528,17 @@ namespace hpx { namespace debug {
         char const* prefix_;
 
     public:
-        constexpr enable_print()
+        constexpr enable_print() noexcept
           : prefix_("")
         {
         }
 
-        constexpr enable_print(const char* p)
+        explicit constexpr enable_print(const char* p) noexcept
           : prefix_(p)
         {
         }
 
-        constexpr bool is_enabled() const
+        constexpr bool is_enabled() const noexcept
         {
             return true;
         }
@@ -624,6 +627,5 @@ namespace hpx { namespace debug {
             return e();
         }
     };
-
-}}    // namespace hpx::debug
+}    // namespace hpx::debug
 /// \endcond

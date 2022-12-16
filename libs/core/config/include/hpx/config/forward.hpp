@@ -6,8 +6,19 @@
 
 #pragma once
 
-#if defined(HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE)
+#include <hpx/config/defines.hpp>
+
+#if defined(HPX_HAVE_BUILTIN_FORWARD_MOVE)
+#include <utility>
+
+#define HPX_FORWARD(T, ...) std::forward<T>(__VA_ARGS__)
+
+#elif defined(HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE)
+
 #define HPX_FORWARD(T, ...) static_cast<decltype(__VA_ARGS__)&&>(__VA_ARGS__)
+
 #else
+
 #define HPX_FORWARD(T, ...) static_cast<T&&>(__VA_ARGS__)
+
 #endif

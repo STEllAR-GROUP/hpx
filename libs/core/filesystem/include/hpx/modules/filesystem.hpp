@@ -23,7 +23,8 @@
 #include <string>
 #include <system_error>
 
-namespace hpx { namespace filesystem {
+namespace hpx::filesystem {
+
     using namespace std::filesystem;
     using std::filesystem::canonical;
 
@@ -61,8 +62,7 @@ namespace hpx { namespace filesystem {
             return canonical(p, ec);
         }
     }
-
-}}    // namespace hpx::filesystem
+}    // namespace hpx::filesystem
 #else
 #include <hpx/config/detail/compat_error_code.hpp>
 
@@ -74,7 +74,8 @@ static_assert(BOOST_FILESYSTEM_VERSION == 3,
     "HPX requires Boost.Filesystem version 3 (or support for the C++17 "
     "filesystem library)");
 
-namespace hpx { namespace filesystem {
+namespace hpx::filesystem {
+
     using namespace boost::filesystem;
 
     using boost::filesystem::canonical;
@@ -94,6 +95,5 @@ namespace hpx { namespace filesystem {
     {
         return is_regular_file(p, compat_error_code(ec));
     }
-
-}}    // namespace hpx::filesystem
+}    // namespace hpx::filesystem
 #endif

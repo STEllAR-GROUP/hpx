@@ -20,7 +20,7 @@
 #include <hpx/logging/detail/macros.hpp>
 #include <hpx/logging/level.hpp>
 
-namespace hpx { namespace util { namespace logging {
+namespace hpx::util::logging {
 
     /**
 @file hpx/logging/logging.hpp
@@ -35,5 +35,4 @@ then you can include this one instead:
 @endcode
 
 */
-
-}}}    // namespace hpx::util::logging
+}    // namespace hpx::util::logging

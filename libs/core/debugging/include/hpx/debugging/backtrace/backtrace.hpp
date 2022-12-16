@@ -1,6 +1,6 @@
 //
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2012 Hartmut Kaiser
+//  Copyright (c) 2011-2022 Hartmut Kaiser
 //  Copyright (c) 2010 Artyom Beilis (Tonkikh)
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,8 +18,10 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
+
     namespace stack_trace {
+
         HPX_CORE_EXPORT std::size_t trace(void** addresses, std::size_t size);
         HPX_CORE_EXPORT void write_symbols(
             void* const* addresses, std::size_t size, std::ostream&);
@@ -43,14 +45,14 @@ namespace hpx { namespace util {
                 frames_.resize(size);
         }
 
-        virtual ~backtrace() noexcept {}
+        virtual ~backtrace() = default;
 
-        std::size_t stack_size() const
+        std::size_t stack_size() const noexcept
         {
             return frames_.size();
         }
 
-        void* return_address(std::size_t frame_no) const
+        void* return_address(std::size_t frame_no) const noexcept
         {
             if (frame_no < stack_size())
                 return frames_[frame_no];
@@ -89,10 +91,11 @@ namespace hpx { namespace util {
     };
 
     namespace details {
+
         class trace_manip
         {
         public:
-            trace_manip(backtrace const* tr)
+            explicit constexpr trace_manip(backtrace const* tr) noexcept
               : tr_(tr)
             {
             }
@@ -126,4 +129,4 @@ namespace hpx { namespace util {
     {
         return backtrace(frames_no).trace();
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

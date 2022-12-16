@@ -16,7 +16,7 @@
 #include <string_view>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace logging {
+namespace hpx::util::logging {
 
     static std::string levelname(level value)
     {
@@ -51,7 +51,6 @@ namespace hpx { namespace util { namespace logging {
         os << std::right << std::setfill(' ') << std::setw(10)
            << levelname(value);
     }
-
-}}}    // namespace hpx::util::logging
+}    // namespace hpx::util::logging
 
 #endif    // HPX_HAVE_LOGGING
