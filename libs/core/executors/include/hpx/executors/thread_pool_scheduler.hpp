@@ -23,6 +23,7 @@
 #include <hpx/modules/topology.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/register_thread.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -110,7 +111,9 @@ namespace hpx::execution::experimental {
 
         friend constexpr std::size_t tag_invoke(
             hpx::parallel::execution::processing_units_count_t,
-            thread_pool_policy_scheduler const& scheduler)
+            thread_pool_policy_scheduler const& scheduler,
+            hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
+            std::size_t = 0)
         {
             return scheduler.get_num_cores();
         }

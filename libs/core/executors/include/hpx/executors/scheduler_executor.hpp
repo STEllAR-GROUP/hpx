@@ -31,7 +31,9 @@
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/topology.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
+#include <cstddef>
 #include <exception>
 #include <string>
 #include <type_traits>
@@ -128,6 +130,19 @@ namespace hpx::execution::experimental {
         using future_type = hpx::future<T>;
 
     private:
+        friend auto tag_invoke(
+            hpx::parallel::execution::processing_units_count_t tag,
+            scheduler_executor const& exec,
+            hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
+            std::size_t = 0)
+            -> decltype(std::declval<
+                hpx::parallel::execution::processing_units_count_t>()(
+                std::declval<BaseScheduler>(),
+                std::declval<hpx::chrono::steady_duration>(), 0))
+        {
+            return tag(exec.sched_);
+        }
+
         // NonBlockingOneWayExecutor interface
         template <typename F, typename... Ts>
         friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,

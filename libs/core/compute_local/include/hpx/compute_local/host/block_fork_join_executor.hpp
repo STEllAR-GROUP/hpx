@@ -116,7 +116,8 @@ namespace hpx::execution::experimental {
     public:
         /// \cond NOINTERNAL
         using execution_category = hpx::execution::parallel_execution_tag;
-        using executor_parameters_type = hpx::execution::static_chunk_size;
+        using executor_parameters_type =
+            hpx::execution::experimental::static_chunk_size;
 
         bool operator==(block_fork_join_executor const& rhs) const noexcept
         {

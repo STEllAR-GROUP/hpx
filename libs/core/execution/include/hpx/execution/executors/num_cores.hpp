@@ -12,11 +12,12 @@
 #include <hpx/execution/executors/execution_parameters_fwd.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx::execution {
+namespace hpx::execution::experimental {
 
     /// Control number of cores in executors which need a functionality
     /// for setting the number of cores to be used by an algorithm directly
@@ -35,7 +36,8 @@ namespace hpx::execution {
         /// \cond NOINTERNAL
         // discover the number of cores to use for parallelization
         template <typename Executor>
-        constexpr std::size_t processing_units_count(Executor&&) const noexcept
+        constexpr std::size_t processing_units_count(Executor&&,
+            hpx::chrono::steady_duration const&, std::size_t) const noexcept
         {
             return num_cores_;
         }
@@ -59,13 +61,23 @@ namespace hpx::execution {
         std::size_t num_cores_;
         /// \endcond
     };
-}    // namespace hpx::execution
+}    // namespace hpx::execution::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     /// \cond NOINTERNAL
     template <>
-    struct is_executor_parameters<hpx::execution::num_cores> : std::true_type
+    struct is_executor_parameters<hpx::execution::experimental::num_cores>
+      : std::true_type
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
+
+namespace hpx::execution {
+
+    using num_cores HPX_DEPRECATED_V(1, 9,
+        "hpx::execution::num_cores is deprecated, use "
+        "hpx::execution::experimental::num_cores instead") =
+        hpx::execution::experimental::num_cores;
+}

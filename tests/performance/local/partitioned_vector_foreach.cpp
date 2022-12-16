@@ -81,7 +81,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     else
     {
         // create executor parameters object
-        hpx::execution::static_chunk_size cs(chunk_size);
+        hpx::execution::experimental::static_chunk_size cs(chunk_size);
 
         // retrieve reference time
         std::vector<int> ref(vector_size);

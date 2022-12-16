@@ -11,11 +11,13 @@
 #include <hpx/config.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace execution {
+namespace hpx::execution::experimental {
+
     ///////////////////////////////////////////////////////////////////////////
     /// Loop iterations are divided into pieces of size \a chunk_size and then
     /// dynamically scheduled among the threads; when a thread finishes one
@@ -40,9 +42,10 @@ namespace hpx { namespace execution {
         }
 
         /// \cond NOINTERNAL
-        template <typename Executor, typename F>
-        constexpr std::size_t get_chunk_size(
-            Executor&, F&&, std::size_t, std::size_t) const noexcept
+        template <typename Executor>
+        constexpr std::size_t get_chunk_size(Executor&,
+            hpx::chrono::steady_duration const&, std::size_t,
+            std::size_t) const noexcept
         {
             return chunk_size_;
         }
@@ -66,14 +69,23 @@ namespace hpx { namespace execution {
         std::size_t chunk_size_;
         /// \endcond
     };
-}}    // namespace hpx::execution
+}    // namespace hpx::execution::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     /// \cond NOINTERNAL
     template <>
-    struct is_executor_parameters<hpx::execution::dynamic_chunk_size>
-      : std::true_type
+    struct is_executor_parameters<
+        hpx::execution::experimental::dynamic_chunk_size> : std::true_type
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
+
+namespace hpx::execution {
+
+    using dynamic_chunk_size HPX_DEPRECATED_V(1, 9,
+        "hpx::execution::dynamic_chunk_size is deprecated, use "
+        "hpx::execution::experimental::dynamic_chunk_size instead") =
+        hpx::execution::experimental::dynamic_chunk_size;
+}

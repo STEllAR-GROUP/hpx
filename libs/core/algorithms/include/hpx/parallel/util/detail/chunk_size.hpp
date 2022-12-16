@@ -25,7 +25,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace util { namespace detail {
+namespace hpx::parallel::util::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename Future, typename FwdIter>
     // requires traits::is_future<Future>
@@ -120,8 +121,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     get_bulk_iteration_shape(ExPolicy&& policy, FwdIter& begin,
         std::size_t& count, Stride s = Stride(1))
     {
-        std::size_t const cores = execution::processing_units_count(
-            policy.parameters(), policy.executor());
+        std::size_t const cores =
+            execution::processing_units_count(policy.parameters(),
+                policy.executor(), hpx::chrono::null_duration, count);
 
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
@@ -129,9 +131,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         FwdIter last = parallel::v1::detail::next(begin, count);
         Stride stride = parallel::v1::detail::abs(s);
 
-        std::size_t chunk_size = execution::get_chunk_size(
-            policy.parameters(), policy.executor(), [](auto) { return 0; },
-            cores, count);
+        std::size_t chunk_size = execution::get_chunk_size(policy.parameters(),
+            policy.executor(), hpx::chrono::null_duration, cores, count);
 
         // make sure, chunk size and max_chunks are consistent
         adjust_chunk_size_and_max_chunks(cores, count, max_chunks, chunk_size);
@@ -160,13 +161,6 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     get_bulk_iteration_shape(ExPolicy&& policy, std::vector<Future>& workitems,
         F1&& f1, FwdIter& begin, std::size_t& count, Stride s = Stride(1))
     {
-        std::size_t const cores = execution::processing_units_count(
-            policy.parameters(), policy.executor());
-
-        std::size_t max_chunks = execution::maximal_number_of_chunks(
-            policy.parameters(), policy.executor(), cores, count);
-
-        FwdIter last = parallel::v1::detail::next(begin, count);
         Stride stride = parallel::v1::detail::abs(s);
 
         auto test_function = [&](std::size_t test_chunk_size) -> std::size_t {
@@ -193,8 +187,20 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             return test_chunk_size;
         };
 
+        // note: running the test function will modify 'count'
+        auto iteration_duration = execution::measure_iteration(
+            policy.parameters(), policy.executor(), test_function, count);
+
+        std::size_t const cores = execution::processing_units_count(
+            policy.parameters(), policy.executor(), iteration_duration, count);
+
+        std::size_t max_chunks = execution::maximal_number_of_chunks(
+            policy.parameters(), policy.executor(), cores, count);
+
+        FwdIter last = parallel::v1::detail::next(begin, count);
+
         std::size_t chunk_size = execution::get_chunk_size(policy.parameters(),
-            policy.executor(), test_function, cores, count);
+            policy.executor(), iteration_duration, cores, count);
 
         // make sure, chunk size and max_chunks are consistent
         adjust_chunk_size_and_max_chunks(cores, count, max_chunks, chunk_size);
@@ -224,8 +230,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     {
         using tuple_type = hpx::tuple<FwdIter, std::size_t>;
 
-        std::size_t const cores = execution::processing_units_count(
-            policy.parameters(), policy.executor());
+        std::size_t const cores =
+            execution::processing_units_count(policy.parameters(),
+                policy.executor(), hpx::chrono::null_duration, count);
 
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
@@ -243,12 +250,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             max_chunks = (std::min) (max_chunks, count);
         }
 
-        auto dummy_f = [](std::size_t) { return 0; };
         while (count != 0)
         {
             std::size_t chunk_size = execution::get_chunk_size(
                 policy.parameters(), policy.executor(),
-                dummy_f, cores, count);
+                hpx::chrono::null_duration, cores, count);
 
             // make sure, chunk size and max_chunks are consistent
             adjust_chunk_size_and_max_chunks(
@@ -296,7 +302,6 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Future, typename F, typename FwdIter>
-    // requires traits::is_future<Future>
     void add_ready_future_idx(std::vector<Future>& workitems, F&& f,
         FwdIter first, std::size_t base_idx, std::size_t count)
     {
@@ -322,14 +327,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     template <typename ExPolicy, typename FwdIter,
         typename Stride = std::size_t>
-    // requires traits::is_future<Future>
     hpx::util::iterator_range<
         parallel::util::detail::chunk_size_idx_iterator<FwdIter>>
     get_bulk_iteration_shape_idx(ExPolicy&& policy, FwdIter begin,
         std::size_t count, Stride s = Stride(1))
     {
-        std::size_t const cores = execution::processing_units_count(
-            policy.parameters(), policy.executor());
+        std::size_t const cores =
+            execution::processing_units_count(policy.parameters(),
+                policy.executor(), hpx::chrono::null_duration, count);
 
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
@@ -337,9 +342,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         FwdIter last = parallel::v1::detail::next(begin, count);
         Stride stride = parallel::v1::detail::abs(s);
 
-        std::size_t chunk_size = execution::get_chunk_size(
-            policy.parameters(), policy.executor(), [](auto) { return 0; },
-            cores, count);
+        std::size_t chunk_size = execution::get_chunk_size(policy.parameters(),
+            policy.executor(), hpx::chrono::null_duration, cores, count);
 
         // make sure, chunk size and max_chunks are consistent
         adjust_chunk_size_and_max_chunks(cores, count, max_chunks, chunk_size);
@@ -364,22 +368,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
         typename Stride = std::size_t>
-    // requires traits::is_future<Future>
     hpx::util::iterator_range<
         parallel::util::detail::chunk_size_idx_iterator<FwdIter>>
     get_bulk_iteration_shape_idx(ExPolicy&& policy,
         std::vector<Future>& workitems, F1&& f1, FwdIter begin,
         std::size_t count, Stride s = Stride(1))
     {
-        std::size_t const cores = execution::processing_units_count(
-            policy.parameters(), policy.executor());
-
-        std::size_t max_chunks = execution::maximal_number_of_chunks(
-            policy.parameters(), policy.executor(), cores, count);
-
-        FwdIter last = parallel::v1::detail::next(begin, count);
-
         Stride stride = parallel::v1::detail::abs(s);
+
         std::size_t base_idx = 0;
         auto test_function = [&](std::size_t test_chunk_size) -> std::size_t {
             if (test_chunk_size == 0)
@@ -406,8 +402,20 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             return test_chunk_size;
         };
 
+        // note: running the test function will modify 'count'
+        auto iteration_duration = execution::measure_iteration(
+            policy.parameters(), policy.executor(), test_function, count);
+
+        std::size_t const cores = execution::processing_units_count(
+            policy.parameters(), policy.executor(), iteration_duration, count);
+
+        std::size_t max_chunks = execution::maximal_number_of_chunks(
+            policy.parameters(), policy.executor(), cores, count);
+
+        FwdIter last = parallel::v1::detail::next(begin, count);
+
         std::size_t chunk_size = execution::get_chunk_size(policy.parameters(),
-            policy.executor(), test_function, cores, count);
+            policy.executor(), iteration_duration, cores, count);
 
         // make sure, chunk size and max_chunks are consistent
         adjust_chunk_size_and_max_chunks(cores, count, max_chunks, chunk_size);
@@ -432,15 +440,15 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     template <typename ExPolicy, typename FwdIter,
         typename Stride = std::size_t>
-    // requires traits::is_future<Future>
     std::vector<hpx::tuple<FwdIter, std::size_t, std::size_t>>
     get_bulk_iteration_shape_idx_variable(ExPolicy&& policy, FwdIter first,
         std::size_t count, Stride s = Stride(1))
     {
         using tuple_type = hpx::tuple<FwdIter, std::size_t, std::size_t>;
 
-        std::size_t const cores = execution::processing_units_count(
-            policy.parameters(), policy.executor());
+        std::size_t const cores =
+            execution::processing_units_count(policy.parameters(),
+                policy.executor(), hpx::chrono::null_duration, count);
 
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
@@ -462,7 +470,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         {
             std::size_t chunk_size = execution::get_chunk_size(
                 policy.parameters(), policy.executor(),
-                [](std::size_t) { return 0; }, cores, count);
+                hpx::chrono::null_duration,  cores, count);
 
             // make sure, chunk size and max_chunks are consistent
             adjust_chunk_size_and_max_chunks(
@@ -489,4 +497,4 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         return shape;
     }
-}}}}    // namespace hpx::parallel::util::detail
+}    // namespace hpx::parallel::util::detail

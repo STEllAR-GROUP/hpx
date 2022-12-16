@@ -371,8 +371,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         hpx::get<0>(t), hpx::get<1>(t));
                 };
 
-                std::size_t const cores = execution::processing_units_count(
-                    policy.parameters(), policy.executor());
+                std::size_t const cores =
+                    execution::processing_units_count(policy.parameters(),
+                        policy.executor(), hpx::chrono::null_duration, n);
 
                 // Take a standard chunk size (amount of work / cores), and only
                 // take a quarter of that. If our chunk size is too large a LOT
@@ -382,7 +383,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // average number of levels done sequentially
                 std::size_t chunk_size = execution::get_chunk_size(
                     policy.parameters(), policy.executor(),
-                    [](std::size_t) { return 0; }, cores, n);
+                    hpx::chrono::null_duration, cores, n);
                 chunk_size /= 4;
 
                 std::size_t max_chunks = execution::maximal_number_of_chunks(

@@ -40,7 +40,8 @@ namespace hpx { namespace compute { namespace host {
     struct block_executor
     {
     public:
-        using executor_parameters_type = hpx::execution::static_chunk_size;
+        using executor_parameters_type =
+            hpx::execution::experimental::static_chunk_size;
 
         explicit block_executor(std::vector<host::target> const& targets,
             threads::thread_priority priority = threads::thread_priority::high,

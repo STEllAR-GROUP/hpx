@@ -45,7 +45,7 @@ int hpx_main()
     using namespace hpx::util;
 
     // create a fixed chunk size to be used in the algorithm
-    hpx::execution::static_chunk_size fixed(50000);
+    hpx::execution::experimental::static_chunk_size fixed(50000);
 
     // helper-executor to verify the used chunk-size
     test_async_executor exec;

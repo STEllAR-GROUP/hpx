@@ -22,20 +22,20 @@ namespace hpx { namespace chrono {
         typedef steady_clock::time_point value_type;
 
     public:
-        steady_time_point(value_type const& abs_time)
+        constexpr steady_time_point(value_type const& abs_time) noexcept
           : _abs_time(abs_time)
         {
         }
 
         template <typename Clock, typename Duration>
-        steady_time_point(
-            std::chrono::time_point<Clock, Duration> const& abs_time)
+        constexpr steady_time_point(
+            std::chrono::time_point<Clock, Duration> const& abs_time) noexcept
           : _abs_time(std::chrono::time_point_cast<value_type::duration>(
                 steady_clock::now() + (abs_time - Clock::now())))
         {
         }
 
-        value_type const& value() const noexcept
+        constexpr value_type const& value() const noexcept
         {
             return _abs_time;
         }
@@ -49,20 +49,26 @@ namespace hpx { namespace chrono {
         typedef steady_clock::duration value_type;
 
     public:
-        steady_duration(value_type const& rel_time)
+        constexpr steady_duration() noexcept
+          : _rel_time(0)
+        {
+        }
+
+        constexpr steady_duration(value_type const& rel_time) noexcept
           : _rel_time(rel_time)
         {
         }
 
         template <typename Rep, typename Period>
-        steady_duration(std::chrono::duration<Rep, Period> const& rel_time)
+        constexpr steady_duration(
+            std::chrono::duration<Rep, Period> const& rel_time) noexcept
           : _rel_time(std::chrono::duration_cast<value_type>(rel_time))
         {
             if (_rel_time < rel_time)
                 ++_rel_time;
         }
 
-        value_type const& value() const noexcept
+        constexpr value_type const& value() const noexcept
         {
             return _rel_time;
         }
@@ -75,4 +81,7 @@ namespace hpx { namespace chrono {
     private:
         value_type _rel_time;
     };
+
+    inline constexpr steady_duration null_duration{};
+
 }}    // namespace hpx::chrono

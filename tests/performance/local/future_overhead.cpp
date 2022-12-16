@@ -226,7 +226,7 @@ void measure_function_futures_limiting_executor(
 
     // test a parallel algorithm on custom pool with high priority
     auto const chunk_size = count / (num_threads * 2);
-    hpx::execution::static_chunk_size fixed(chunk_size);
+    hpx::execution::experimental::static_chunk_size fixed(chunk_size);
 
     // start the clock
     high_resolution_timer walltime;
@@ -302,7 +302,8 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv,
     high_resolution_timer walltime;
     hpx::experimental::for_loop(
         hpx::execution::par.on(exec).with(
-            hpx::execution::static_chunk_size(1), unlimited_number_of_chunks()),
+            hpx::execution::experimental::static_chunk_size(1),
+            unlimited_number_of_chunks()),
         0, count, [](std::uint64_t) { null_function(); });
 
     // stop the clock
