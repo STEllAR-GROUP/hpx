@@ -54,7 +54,6 @@ namespace hpx::serialization {
             // clang-format on
         }
     }    // namespace detail
-
 }    // namespace hpx::serialization
 
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp>

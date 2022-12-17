@@ -186,9 +186,9 @@ namespace hpx::serialization {
                     return;
                 }
 
-                // unfortunately we can't implement a zero copy policy on
-                // the receiving end
-                // as the memory was already allocated by the serialization code
+                // unfortunately we can't implement a zero copy policy on the
+                // receiving end as the memory was already allocated by the
+                // serialization code
                 std::memcpy(
                     address, get_chunk_data(current_chunk_).pos_, count);
                 ++current_chunk_;

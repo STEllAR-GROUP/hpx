@@ -23,7 +23,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     namespace detail {
 
@@ -130,8 +130,8 @@ namespace hpx { namespace serialization {
         }
 
         // Archives can be used to do 'fake' serialization, in which case no
-        // data is being stored/restored and no side effects should be
-        // performed during serialization/de-serialization.
+        // data is being stored/restored and no side effects should be performed
+        // during serialization/de-serialization.
         constexpr bool is_preprocessing() const noexcept
         {
             return bool(flags_ &
@@ -196,6 +196,6 @@ namespace hpx { namespace serialization {
     {
         return ar.current_pos();
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
 #include <hpx/config/warnings_suffix.hpp>

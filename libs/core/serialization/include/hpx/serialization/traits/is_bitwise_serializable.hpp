@@ -22,7 +22,7 @@ namespace hpx::traits {
     template <typename T>
     struct is_bitwise_serializable
       : std::integral_constant<bool,
-            std::is_arithmetic<T>::value || std::is_pointer<T>::value>
+            std::is_arithmetic_v<T> || std::is_pointer_v<T>>
     {
     };
 #endif

@@ -16,7 +16,7 @@
 
 #include <string>
 
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
 
     template <typename T>
     void polymorphic_nonintrusive_factory::save(output_archive& ar, const T& t)
@@ -50,5 +50,4 @@ namespace hpx { namespace serialization { namespace detail {
 
         return t;
     }
-
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail

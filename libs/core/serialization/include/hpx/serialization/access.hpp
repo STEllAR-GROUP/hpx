@@ -92,11 +92,10 @@ namespace hpx::serialization {
             template <typename T1>
             static std::false_type test(...);
 
-            // the following expression sfinae trick
-            // appears to work on clang-3.4, gcc-4.9,
-            // icc-16, msvc-2017 (at least)
-            // note that this detection would have been much easier
-            // to implement if there hadn't been an issue with gcc:
+            // the following expression sfinae trick appears to work on
+            // clang-3.4, gcc-4.9, icc-16, msvc-2017 (at least) note that this
+            // detection would have been much easier to implement if there
+            // hadn't been an issue with gcc:
             // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82478
             template <typename T1,
                 typename = decltype(
@@ -118,16 +117,16 @@ namespace hpx::serialization {
         {
             if constexpr (hpx::traits::is_intrusive_polymorphic_v<T>)
             {
-                // intrusive_polymorphic
-                // the following template function is viable to call right
-                // overloaded function according to T constness and to prevent
-                // calling templated version of serialize function
+                // intrusive_polymorphic: the following template function is
+                // viable to call the right overloaded function according to T
+                // constness and to prevent calling templated version of
+                // serialize function
                 t.serialize(ar, 0);
             }
             else if constexpr (has_serialize_v<T>)
             {
-                // intrusive_usual
-                // cast it to let it be run for templated member functions
+                // intrusive_usual: cast it to let it be run for templated
+                // member functions
                 const_cast<std::decay_t<T>&>(t).serialize(ar, 0);
             }
             else if constexpr (!std::is_empty_v<T>)
@@ -135,19 +134,17 @@ namespace hpx::serialization {
                 // non_intrusive
                 if constexpr (has_serialize_adl_v<T>)
                 {
-                    // this additional indirection level is needed to
-                    // force ADL on the second phase of template lookup.
-                    // call of serialize function directly from base_object
-                    // finds only serialize-member function and doesn't
-                    // perform ADL
+                    // this additional indirection level is needed to force ADL
+                    // on the second phase of template lookup. call of serialize
+                    // function directly from base_object finds only
+                    // serialize-member function and doesn't perform ADL
                     detail::serialize_force_adl(ar, t, 0);
                 }
                 else if constexpr (has_struct_serialization_v<T>)
                 {
-                    // This is automatic serialization for types
-                    // that are simple (brace-initializable) structs,
-                    // what that means every struct's field
-                    // has to be serializable and public.
+                    // This is automatic serialization for types that are simple
+                    // (brace-initializable) structs, what that means every
+                    // struct's field has to be serializable and public.
                     serialize_struct(ar, t, 0);
                 }
                 else
@@ -163,8 +160,8 @@ namespace hpx::serialization {
         HPX_FORCEINLINE static void save_base_object(
             Archive& ar, T const& t, unsigned)
         {
-            // explicitly specify virtual function
-            // of base class to avoid infinite recursion
+            // explicitly specify virtual function of base class to avoid
+            // infinite recursion
             t.T::save(ar, 0);
         }
 
@@ -172,8 +169,8 @@ namespace hpx::serialization {
         HPX_FORCEINLINE static void load_base_object(
             Archive& ar, T& t, unsigned)
         {
-            // explicitly specify virtual function
-            // of base class to avoid infinite recursion
+            // explicitly specify virtual function of base class to avoid
+            // infinite recursion
             t.T::load(ar, 0);
         }
 

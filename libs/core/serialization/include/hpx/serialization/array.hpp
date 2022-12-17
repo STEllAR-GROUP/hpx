@@ -18,7 +18,7 @@
 #include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <boost/array.hpp>
+#include <hpx/serialization/boost_array.hpp>    // for backwards compatibility
 #endif
 
 #include <array>
@@ -112,18 +112,6 @@ namespace hpx::serialization {
     {
         return array<T>(begin, size);
     }
-
-#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-    // implement serialization for boost::array
-    template <typename Archive, typename T, std::size_t N>
-    void serialize(
-        Archive& ar, boost::array<T, N>& a, const unsigned int /* version */)
-    {
-        // clang-format off
-        ar & hpx::serialization::make_array(a.begin(), a.size());
-        // clang-format on
-    }
-#endif
 
     // implement serialization for std::array
     template <typename Archive, typename T, std::size_t N>

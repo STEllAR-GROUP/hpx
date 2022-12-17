@@ -16,7 +16,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     id_registry& id_registry::instance()
     {
@@ -115,14 +116,16 @@ namespace hpx { namespace serialization { namespace detail {
 
     std::vector<std::string> id_registry::get_unassigned_typenames() const
     {
-        typedef typename_to_ctor_t::value_type value_type;
-
         std::vector<std::string> result;
 
         // O(Nlog(M)) ?
-        for (const value_type& v : typename_to_ctor)
+        for (auto const& v : typename_to_ctor)
+        {
             if (!typename_to_id.count(v.first))
+            {
                 result.push_back(v.first);
+            }
+        }
 
         return result;
     }
@@ -170,4 +173,4 @@ namespace hpx { namespace serialization { namespace detail {
         return std::string();
 #endif
     }
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail
