@@ -13,9 +13,10 @@
 #include <string>
 #include <type_traits>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
+
         template <typename T, typename Enable = void>
         struct to_string
         {
@@ -27,8 +28,8 @@ namespace hpx { namespace util {
 
         template <typename T>
         struct to_string<T,
-            typename std::enable_if<std::is_integral<T>::value ||
-                std::is_floating_point<T>::value>::type>
+            std::enable_if_t<std::is_integral_v<T> ||
+                std::is_floating_point_v<T>>>
         {
             static std::string call(T const& value)
             {
@@ -49,5 +50,4 @@ namespace hpx { namespace util {
             return detail::throw_bad_lexical_cast<T, std::string>();
         }
     }
-
-}}    // namespace hpx::util
+}    // namespace hpx::util

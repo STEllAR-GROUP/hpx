@@ -57,7 +57,7 @@ namespace hpx::util::detail {
         T C::*pm;
 
     public:
-        constexpr invoke_mem_obj(T C::*pm) noexcept
+        explicit constexpr invoke_mem_obj(T C::*pm) noexcept
           : pm(pm)
         {
         }
@@ -88,7 +88,7 @@ namespace hpx::util::detail {
         T C::*pm;
 
     public:
-        constexpr invoke_mem_fun(T C::*pm) noexcept
+        explicit constexpr invoke_mem_fun(T C::*pm) noexcept
           : pm(pm)
         {
         }

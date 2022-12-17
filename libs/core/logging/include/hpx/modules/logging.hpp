@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,15 +9,47 @@
 #include <hpx/config.hpp>
 
 namespace hpx {
-    enum logging_destination
+
+    enum class logging_destination
     {
-        destination_hpx = 0,
-        destination_timing = 1,
-        destination_agas = 2,
-        destination_parcel = 3,
-        destination_app = 4,
-        destination_debuglog = 5
+        hpx = 0,
+        timing = 1,
+        agas = 2,
+        parcel = 3,
+        app = 4,
+        debuglog = 5
     };
+
+#define HPX_LOGGING_DESTINATION_UNSCOPED_ENUM_DEPRECATION_MSG                  \
+    "The unscoped logging_destination names are deprecated. Please use "       \
+    "logging_destination::<value> instead."
+
+    HPX_DEPRECATED_V(
+        1, 9, HPX_LOGGING_DESTINATION_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr logging_destination destination_hpx =
+        logging_destination::hpx;
+    HPX_DEPRECATED_V(
+        1, 9, HPX_LOGGING_DESTINATION_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr logging_destination destination_timing =
+        logging_destination::timing;
+    HPX_DEPRECATED_V(
+        1, 9, HPX_LOGGING_DESTINATION_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr logging_destination destination_agas =
+        logging_destination::agas;
+    HPX_DEPRECATED_V(
+        1, 9, HPX_LOGGING_DESTINATION_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr logging_destination destination_parcel =
+        logging_destination::parcel;
+    HPX_DEPRECATED_V(
+        1, 9, HPX_LOGGING_DESTINATION_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr logging_destination destination_app =
+        logging_destination::app;
+    HPX_DEPRECATED_V(
+        1, 9, HPX_LOGGING_DESTINATION_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr logging_destination destination_debuglog =
+        logging_destination::debuglog;
+
+#undef HPX_LOGGING_DESTINATION_UNSCOPED_ENUM_DEPRECATION_MSG
 }    // namespace hpx
 
 #if defined(HPX_HAVE_LOGGING)
@@ -41,10 +73,13 @@ namespace hpx {
 #define LBT_(lvl) LHPX_(lvl, "  [BT] ")  /* bootstrap */
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
+
+    // clang-format off
 
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         HPX_CORE_EXPORT hpx::util::logging::level get_log_level(
             std::string const& env, bool allow_always = false);
     }
@@ -59,8 +94,8 @@ namespace hpx { namespace util {
 #define LAGAS_ENABLED(lvl)                                                     \
     hpx::util::agas_logger()->is_enabled(::hpx::util::logging::level::lvl) /**/
 
-        ////////////////////////////////////////////////////////////////////////
-        HPX_CORE_EXPORT HPX_DECLARE_LOG(parcel)
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CORE_EXPORT HPX_DECLARE_LOG(parcel)
 
 #define LPT_(lvl)                                                              \
     HPX_LOG_FORMAT(hpx::util::parcel, ::hpx::util::logging::level::lvl, "{} ", \
@@ -70,8 +105,8 @@ namespace hpx { namespace util {
     hpx::util::parcel_logger()->is_enabled(                                    \
         ::hpx::util::logging::level::lvl) /**/
 
-        ////////////////////////////////////////////////////////////////////////
-        HPX_CORE_EXPORT HPX_DECLARE_LOG(timing)
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CORE_EXPORT HPX_DECLARE_LOG(timing)
 
 #define LTIM_(lvl)                                                             \
     HPX_LOG_FORMAT(hpx::util::timing, ::hpx::util::logging::level::lvl, "{} ", \
@@ -84,8 +119,8 @@ namespace hpx { namespace util {
     hpx::util::timing_logger()->is_enabled(                                    \
         ::hpx::util::logging::level::lvl) /**/
 
-        ////////////////////////////////////////////////////////////////////////
-        HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx)
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx)
 
 #define LHPX_(lvl, cat)                                                        \
     HPX_LOG_FORMAT(hpx::util::hpx, ::hpx::util::logging::level::lvl, "{}{}",   \
@@ -94,8 +129,8 @@ namespace hpx { namespace util {
 #define LHPX_ENABLED(lvl)                                                      \
     hpx::util::hpx_logger()->is_enabled(::hpx::util::logging::level::lvl) /**/
 
-        ////////////////////////////////////////////////////////////////////////
-        HPX_CORE_EXPORT HPX_DECLARE_LOG(app)
+    ////////////////////////////////////////////////////////////////////////////
+    HPX_CORE_EXPORT HPX_DECLARE_LOG(app)
 
 #define LAPP_(lvl)                                                             \
     HPX_LOG_FORMAT(hpx::util::app, ::hpx::util::logging::level::lvl, "{} ",    \
@@ -104,9 +139,9 @@ namespace hpx { namespace util {
 #define LAPP_ENABLED(lvl)                                                      \
     hpx::util::app_logger()->is_enabled(::hpx::util::logging::level::lvl) /**/
 
-        ////////////////////////////////////////////////////////////////////////
-        // special debug logging channel
-        HPX_CORE_EXPORT HPX_DECLARE_LOG(debuglog)
+    ////////////////////////////////////////////////////////////////////////////
+    // special debug logging channel
+    HPX_CORE_EXPORT HPX_DECLARE_LOG(debuglog)
 
 #define LDEB_                                                                  \
     HPX_LOG_FORMAT(hpx::util::debuglog, ::hpx::util::logging::level::error,    \
@@ -116,24 +151,26 @@ namespace hpx { namespace util {
     hpx::util::debuglog_logger()->is_enabled(                                  \
         ::hpx::util::logging::level::error) /**/
 
-        ////////////////////////////////////////////////////////////////////////
-        // errors are logged in a special manner (always to cerr and additionally,
-        // if enabled to 'normal' logging destination as well)
-        HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx_error)
+    ////////////////////////////////////////////////////////////////////////////
+    // errors are logged in a special manner (always to cerr and additionally,
+    // if enabled to 'normal' logging destination as well)
+    HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx_error)
 
 #define LFATAL_                                                                \
     HPX_LOG_FORMAT(hpx::util::hpx_error, ::hpx::util::logging::level::fatal,   \
-        "{} [ERR] ", ::hpx::util::logging::level::fatal) /**/
+        "{} [ERR] ", ::hpx::util::logging::level::fatal)
 
-            HPX_CORE_EXPORT HPX_DECLARE_LOG(agas_console) HPX_CORE_EXPORT
-        HPX_DECLARE_LOG(parcel_console) HPX_CORE_EXPORT
-        HPX_DECLARE_LOG(timing_console) HPX_CORE_EXPORT
-        HPX_DECLARE_LOG(hpx_console) HPX_CORE_EXPORT
-        HPX_DECLARE_LOG(app_console)
+    HPX_CORE_EXPORT HPX_DECLARE_LOG(agas_console)
+    HPX_CORE_EXPORT HPX_DECLARE_LOG(parcel_console)
+    HPX_CORE_EXPORT HPX_DECLARE_LOG(timing_console)
+    HPX_CORE_EXPORT HPX_DECLARE_LOG(hpx_console)
+    HPX_CORE_EXPORT HPX_DECLARE_LOG(app_console)
 
-        // special debug logging channel
-        HPX_CORE_EXPORT HPX_DECLARE_LOG(debuglog_console)
-}}    // namespace hpx::util
+    // special debug logging channel
+    HPX_CORE_EXPORT HPX_DECLARE_LOG(debuglog_console)
+
+    // clang-format on
+}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
 #define LAGAS_CONSOLE_(lvl)                                                    \
@@ -169,7 +206,7 @@ namespace hpx { namespace util {
 // helper type to forward logging during bootstrap to two destinations
 struct bootstrap_logging
 {
-    constexpr bootstrap_logging() {}
+    constexpr bootstrap_logging() noexcept {}
 };
 
 template <typename T>
@@ -181,12 +218,13 @@ bootstrap_logging const& operator<<(bootstrap_logging const& l, T const& t)
     return l;
 }
 
-constexpr bootstrap_logging lbt_;
+inline constexpr bootstrap_logging lbt_;
 
 #else
 // logging is disabled all together
 
-namespace hpx { namespace util {
+namespace hpx ::util {
+
     namespace detail {
         struct dummy_log_impl
         {
@@ -205,7 +243,7 @@ namespace hpx { namespace util {
                 return *this;
             }
         };
-        constexpr dummy_log_impl dummy_log;
+        inline constexpr dummy_log_impl dummy_log;
     }    // namespace detail
 
     // clang-format off
@@ -244,17 +282,18 @@ namespace hpx { namespace util {
     #define LDEB_ENABLED          (false)
 
     // clang-format on
-
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 struct bootstrap_logging
 {
-    constexpr bootstrap_logging() {}
+    constexpr bootstrap_logging() noexcept {}
 };
-constexpr bootstrap_logging lbt_;
+
+inline constexpr bootstrap_logging lbt_;
 
 template <typename T>
-bootstrap_logging const& operator<<(bootstrap_logging const& l, T&&)
+constexpr bootstrap_logging const& operator<<(
+    bootstrap_logging const& l, T&&) noexcept
 {
     return l;
 }

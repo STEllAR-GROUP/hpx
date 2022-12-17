@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,7 +6,7 @@
 
 #pragma once
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     struct empty_function
     {
@@ -15,4 +15,4 @@ namespace hpx { namespace util {
         {
         }
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util

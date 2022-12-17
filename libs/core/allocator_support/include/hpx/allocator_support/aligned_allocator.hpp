@@ -203,7 +203,9 @@ namespace hpx::util {
         using is_always_equal = std::true_type;
         using propagate_on_container_move_assignment = std::true_type;
 
-        aligned_allocator(Allocator const& alloc = Allocator{})
+        explicit aligned_allocator(
+            Allocator const& alloc = Allocator{}) noexcept(noexcept(std::
+                is_nothrow_copy_constructible_v<Allocator>))
           : alloc(alloc)
         {
         }
@@ -248,7 +250,7 @@ namespace hpx::util {
             detail::__aligned_free(alloc, p, size);
         }
 
-        size_type max_size() const noexcept
+        constexpr size_type max_size() const noexcept
         {
             return (std::numeric_limits<size_type>::max)() / sizeof(T);
         }
@@ -260,7 +262,7 @@ namespace hpx::util {
         }
 
         template <typename U>
-        void destroy(U* p)
+        void destroy(U* p) noexcept
         {
             p->~U();
         }
@@ -268,14 +270,14 @@ namespace hpx::util {
 
     template <typename T>
     constexpr bool operator==(
-        aligned_allocator<T> const&, aligned_allocator<T> const&)
+        aligned_allocator<T> const&, aligned_allocator<T> const&) noexcept
     {
         return true;
     }
 
     template <typename T>
     constexpr bool operator!=(
-        aligned_allocator<T> const&, aligned_allocator<T> const&)
+        aligned_allocator<T> const&, aligned_allocator<T> const&) noexcept
     {
         return false;
     }

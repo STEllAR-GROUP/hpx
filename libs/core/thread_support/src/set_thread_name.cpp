@@ -13,7 +13,7 @@
 
 #include <hpx/thread_support/set_thread_name.hpp>
 
-namespace hpx { namespace util {
+namespace hpx::util {
     DWORD const MS_VC_EXCEPTION = 0x406D1388;
 
 #pragma pack(push, 8)
@@ -44,6 +44,6 @@ namespace hpx { namespace util {
         {
         }
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #endif

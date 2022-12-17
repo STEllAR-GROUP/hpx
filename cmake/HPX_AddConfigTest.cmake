@@ -242,6 +242,15 @@ function(hpx_check_for_unistd_h)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_builtin_forward_move)
+  add_hpx_config_test(
+    HPX_WITH_BUILTIN_FORWARD_MOVE
+    SOURCE cmake/tests/builtin_forward_move.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_libfun_std_experimental_optional)
   add_hpx_config_test(
     HPX_WITH_LIBFUN_EXPERIMENTAL_OPTIONAL

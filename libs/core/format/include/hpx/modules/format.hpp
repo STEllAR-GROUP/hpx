@@ -21,8 +21,10 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         struct type_specifier
@@ -34,7 +36,7 @@ namespace hpx { namespace util {
     template <>                                                                \
     struct type_specifier<Type>                                                \
     {                                                                          \
-        static char const* value() noexcept                                    \
+        static constexpr char const* value() noexcept                          \
         {                                                                      \
             return #Spec;                                                      \
         }                                                                      \
@@ -222,21 +224,23 @@ namespace hpx { namespace util {
 
         struct format_arg
         {
+            format_arg() = default;
+
             template <typename T>
-            format_arg(T const& arg)
+            explicit constexpr format_arg(T const& arg) noexcept
               : _data(&arg)
               , _formatter(&detail::formatter<T>::call)
             {
             }
 
             template <typename T>
-            format_arg(T* arg)
+            explicit constexpr format_arg(T* arg) noexcept
               : _data(arg)
               , _formatter(&detail::formatter<T const*>::call)
             {
             }
             template <typename T>
-            format_arg(T const* arg)
+            explicit constexpr format_arg(T const* arg) noexcept
               : _data(arg)
               , _formatter(&detail::formatter<T const*>::call)
             {
@@ -247,9 +251,9 @@ namespace hpx { namespace util {
                 _formatter(os, spec, _data);
             }
 
-            void const* _data;
+            void const* _data = nullptr;
             void (*_formatter)(
-                std::ostream&, std::string_view spec, void const*);
+                std::ostream&, std::string_view spec, void const*) = nullptr;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -264,7 +268,8 @@ namespace hpx { namespace util {
     template <typename... Args>
     std::string format(std::string_view format_str, Args const&... args)
     {
-        detail::format_arg const format_args[] = {args..., 0};
+        detail::format_arg const format_args[] = {
+            detail::format_arg(args)..., detail::format_arg()};
         return detail::format(format_str, format_args, sizeof...(Args));
     }
 
@@ -272,13 +277,15 @@ namespace hpx { namespace util {
     std::ostream& format_to(
         std::ostream& os, std::string_view format_str, Args const&... args)
     {
-        detail::format_arg const format_args[] = {args..., 0};
+        detail::format_arg const format_args[] = {
+            detail::format_arg(args)..., detail::format_arg()};
         detail::format_to(os, format_str, format_args, sizeof...(Args));
         return os;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Range>
         struct format_join
         {
@@ -308,4 +315,4 @@ namespace hpx { namespace util {
     {
         return {range, delimiter};
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

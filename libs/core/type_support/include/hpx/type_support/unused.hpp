@@ -16,7 +16,8 @@
 #endif
 // clang-format on
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     // We do not import fusion::unused_type anymore to avoid boost::fusion
     // being turned into an associate namespace, as this interferes with ADL
@@ -37,7 +38,8 @@ namespace hpx { namespace util {
         }
 
         template <typename T>
-        constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type(T const&) noexcept
+        /*implicit*/ constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type(
+            T const&) noexcept
         {
         }
 
@@ -79,9 +81,11 @@ namespace hpx { namespace util {
 
 #if defined(HPX_MSVC_NVCC)
     HPX_CONSTANT
+#else
+    inline constexpr
 #endif
-    constexpr unused_type unused = unused_type();
-}}    // namespace hpx::util
+    unused_type unused = unused_type();
+}    // namespace hpx::util
 
 //////////////////////////////////////////////////////////////////////////////
 // use this to silence compiler warnings related to unused function arguments.

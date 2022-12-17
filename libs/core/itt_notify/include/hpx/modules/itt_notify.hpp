@@ -166,12 +166,12 @@ HPX_CORE_EXPORT void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
     ___itt_string_handle* key, void const* data) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     struct thread_description;
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
-namespace hpx { namespace util { namespace itt {
+namespace hpx::util::itt {
 
     struct stack_context
     {
@@ -503,7 +503,7 @@ namespace hpx { namespace util { namespace itt {
     {
         e.start();
     }
-}}}    // namespace hpx::util::itt
+}    // namespace hpx::util::itt
 
 #else
 
@@ -644,12 +644,12 @@ inline constexpr void itt_metadata_add(
 }
 
 //////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     struct thread_description;
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
-namespace hpx { namespace util { namespace itt {
+namespace hpx::util::itt {
 
     struct stack_context
     {
@@ -780,6 +780,6 @@ namespace hpx { namespace util { namespace itt {
     };
 
     inline constexpr void event_tick(event const&) noexcept {}
-}}}    // namespace hpx::util::itt
+}    // namespace hpx::util::itt
 
 #endif    // HPX_HAVE_ITTNOTIFY

@@ -246,7 +246,7 @@ bool use_ittnotify_api = false;
     HPX_INTERNAL_ITT_SYNC(sync_destroy, obj)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace itt {
+namespace hpx::util::itt {
 
     stack_context::stack_context()
     {
@@ -475,7 +475,7 @@ namespace hpx { namespace util { namespace itt {
             HPX_ITT_COUNTER_DESTROY(id_);
         }
     }
-}}}    // namespace hpx::util::itt
+}    // namespace hpx::util::itt
 
 ///////////////////////////////////////////////////////////////////////////////
 void itt_sync_create(

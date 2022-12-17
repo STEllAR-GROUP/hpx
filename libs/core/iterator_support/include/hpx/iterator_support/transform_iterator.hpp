@@ -34,20 +34,21 @@ namespace hpx { namespace util {
             using reference_type =
                 util::lazy_conditional_t<std::is_void_v<Reference>,
                     util::invoke_result<Transformer, Iterator>,
-                    util::identity<Reference>>;
+                    hpx::type_identity<Reference>>;
 
             using value_type = util::lazy_conditional_t<std::is_void_v<Value>,
-                std::remove_reference<reference_type>, util::identity<Value>>;
+                std::remove_reference<reference_type>,
+                hpx::type_identity<Value>>;
 
             using iterator_category =
                 util::lazy_conditional_t<std::is_void_v<Category>,
                     category_iterator_traits_helper<Iterator>,
-                    util::identity<Category>>;
+                    hpx::type_identity<Category>>;
 
             using difference_type =
                 util::lazy_conditional_t<std::is_void_v<Difference>,
                     difference_type_iterator_traits_helper<Iterator>,
-                    util::identity<Difference>>;
+                    hpx::type_identity<Difference>>;
 
             using type = hpx::util::iterator_adaptor<
                 transform_iterator<Iterator, Transformer, Reference, Value,

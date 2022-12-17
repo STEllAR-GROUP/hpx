@@ -9,8 +9,10 @@
 
 #include <vector>
 
-namespace hpx { namespace config_registry {
+namespace hpx::config_registry {
+
     namespace detail {
+
         std::vector<module_config>& get_module_configs()
         {
             static std::vector<module_config> configs;
@@ -33,4 +35,4 @@ namespace hpx { namespace config_registry {
     {
         add_module_config(config);
     }
-}}    // namespace hpx::config_registry
+}    // namespace hpx::config_registry

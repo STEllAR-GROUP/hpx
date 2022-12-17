@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 
-// Needed to get potentially get _GLIBCXX_HAVE_TLS
+// Needed to potentially get _GLIBCXX_HAVE_TLS
 #include <cstdlib>
 
 // clang-format off
@@ -22,31 +22,32 @@
 #endif
 // clang-format on
 
-#if (!defined(__ANDROID__) && !defined(ANDROID)) && !defined(__bgq__)
+#if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__bgq__)
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     template <typename T, typename Tag>
     struct HPX_CORE_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
     {
-        typedef T element_type;
+        using element_type = T;
 
-        T* get() const
+        T* get() const noexcept
         {
             return ptr_;
         }
 
-        T* operator->() const
+        T* operator->() const noexcept
         {
             return ptr_;
         }
 
-        T& operator*() const
+        T& operator*() const noexcept
         {
             HPX_ASSERT(nullptr != ptr_);
             return *ptr_;
         }
 
-        void reset(T* new_value = nullptr)
+        void reset(T* new_value = nullptr) noexcept
         {
             delete ptr_;
             ptr_ = new_value;
@@ -58,20 +59,22 @@ namespace hpx { namespace util {
 
     template <typename T, typename Tag>
     thread_local T* thread_specific_ptr<T, Tag>::ptr_ = nullptr;
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #else
 
 #include <hpx/type_support/static.hpp>
 #include <pthread.h>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     namespace detail {
+
         struct thread_specific_ptr_key
         {
             thread_specific_ptr_key()
             {
-                //pthread_once(&key_once, &thread_specific_ptr_key::make_key);
+                // pthread_once(&key_once, &thread_specific_ptr_key::make_key);
                 pthread_key_create(&key, nullptr);
             }
 
@@ -82,7 +85,7 @@ namespace hpx { namespace util {
     template <typename T, typename Tag>
     struct HPX_CORE_EXPORT_THREAD_SPECIFIC_PTR thread_specific_ptr
     {
-        typedef T element_type;
+        using element_type = T;
 
         static pthread_key_t get_key()
         {
@@ -128,6 +131,6 @@ namespace hpx { namespace util {
             pthread_setspecific(thread_specific_ptr<T, Tag>::get_key(), ptr);
         }
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #endif

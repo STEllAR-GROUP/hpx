@@ -8,7 +8,8 @@
 
 #include <utility>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     // Based on
     // https://quuxplusone.github.io/blog/2018/05/17/super-elider-round-2/ and
     // https://akrzemi1.wordpress.com/2018/05/16/rvalues-redefined/.
@@ -26,20 +27,20 @@ namespace hpx { namespace util { namespace detail {
     public:
         using type = decltype(std::declval<F&&>()());
 
-        explicit with_result_of_t(F&& f)
+        explicit with_result_of_t(F&& f) noexcept
           : f(HPX_FORWARD(F, f))
         {
         }
 
-        operator type()
+        operator type() noexcept
         {
             return HPX_FORWARD(F, f)();
         }
     };
 
     template <typename F>
-    inline with_result_of_t<F> with_result_of(F&& f)
+    inline with_result_of_t<F> with_result_of(F&& f) noexcept
     {
         return with_result_of_t<F>(HPX_FORWARD(F, f));
     }
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

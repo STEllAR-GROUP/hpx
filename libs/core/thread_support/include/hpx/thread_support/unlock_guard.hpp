@@ -41,7 +41,7 @@ namespace hpx {
     public:
         using mutex_type = Mutex;
 
-        explicit unlock_guard(Mutex& m)
+        explicit constexpr unlock_guard(Mutex& m) noexcept
           : m_(m)
         {
             m_.unlock();
@@ -57,11 +57,10 @@ namespace hpx {
     };
 }    // namespace hpx
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     template <typename Mutex>
     using unlock_guard HPX_DEPRECATED_V(1, 9,
-        "hpx::util::unlock_guard is deprecated, use "
-        "hpx::unlock_guard instead") = hpx::unlock_guard<Mutex>;
-
-}}    // namespace hpx::util
+        "hpx::util::unlock_guard is deprecated, use hpx::unlock_guard "
+        "instead") = hpx::unlock_guard<Mutex>;
+}    // namespace hpx::util

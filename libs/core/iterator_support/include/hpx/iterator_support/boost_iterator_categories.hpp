@@ -56,22 +56,21 @@ namespace hpx { namespace iterators {
         struct std_category_to_traversal
           : hpx::util::lazy_conditional<
                 std::is_convertible_v<Cat, std::random_access_iterator_tag>,
-                hpx::util::identity<random_access_traversal_tag>,
+                hpx::type_identity<random_access_traversal_tag>,
                 hpx::util::lazy_conditional<
                     std::is_convertible_v<Cat, std::bidirectional_iterator_tag>,
-                    hpx::util::identity<bidirectional_traversal_tag>,
+                    hpx::type_identity<bidirectional_traversal_tag>,
                     hpx::util::lazy_conditional<
                         std::is_convertible_v<Cat, std::forward_iterator_tag>,
-                        hpx::util::identity<forward_traversal_tag>,
+                        hpx::type_identity<forward_traversal_tag>,
                         hpx::util::lazy_conditional<
                             std::is_convertible_v<Cat, std::input_iterator_tag>,
-                            hpx::util::identity<single_pass_traversal_tag>,
+                            hpx::type_identity<single_pass_traversal_tag>,
                             hpx::util::lazy_conditional<
                                 std::is_convertible_v<Cat,
                                     std::output_iterator_tag>,
-                                hpx::util::identity<
-                                    incrementable_traversal_tag>,
-                                hpx::util::identity<no_traversal_tag>>>>>>
+                                hpx::type_identity<incrementable_traversal_tag>,
+                                hpx::type_identity<no_traversal_tag>>>>>>
         {
         };
     }    // namespace detail
@@ -81,7 +80,7 @@ namespace hpx { namespace iterators {
     struct iterator_category_to_traversal
       : hpx::util::lazy_conditional<
             std::is_convertible_v<Cat, incrementable_traversal_tag>,
-            hpx::util::identity<Cat>, detail::std_category_to_traversal<Cat>>
+            hpx::type_identity<Cat>, detail::std_category_to_traversal<Cat>>
     {
     };
 
@@ -98,21 +97,21 @@ namespace hpx { namespace iterators {
     struct pure_traversal_tag
       : hpx::util::lazy_conditional<
             std::is_convertible_v<Traversal, random_access_traversal_tag>,
-            hpx::util::identity<random_access_traversal_tag>,
+            hpx::type_identity<random_access_traversal_tag>,
             hpx::util::lazy_conditional<
                 std::is_convertible_v<Traversal, bidirectional_traversal_tag>,
-                hpx::util::identity<bidirectional_traversal_tag>,
+                hpx::type_identity<bidirectional_traversal_tag>,
                 hpx::util::lazy_conditional<
                     std::is_convertible_v<Traversal, forward_traversal_tag>,
-                    hpx::util::identity<forward_traversal_tag>,
+                    hpx::type_identity<forward_traversal_tag>,
                     hpx::util::lazy_conditional<std::is_convertible_v<Traversal,
                                                     single_pass_traversal_tag>,
-                        hpx::util::identity<single_pass_traversal_tag>,
+                        hpx::type_identity<single_pass_traversal_tag>,
                         hpx::util::lazy_conditional<
                             std::is_convertible_v<Traversal,
                                 incrementable_traversal_tag>,
-                            hpx::util::identity<incrementable_traversal_tag>,
-                            hpx::util::identity<no_traversal_tag>>>>>>
+                            hpx::type_identity<incrementable_traversal_tag>,
+                            hpx::type_identity<no_traversal_tag>>>>>>
     {
     };
 

@@ -10,7 +10,7 @@
 
 #include <functional>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     template <typename T>
     struct unwrap_reference
@@ -34,8 +34,9 @@ namespace hpx { namespace util {
     using unwrap_reference_t = typename unwrap_reference<T>::type;
 
     template <typename T>
-    HPX_FORCEINLINE unwrap_reference_t<T>& unwrap_ref(T& t)
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr unwrap_reference_t<T>& unwrap_ref(
+        T& t) noexcept
     {
         return t;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

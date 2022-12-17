@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,8 @@
 #include <cstddef>
 #include <string>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     class backtrace
     {
     };
@@ -25,6 +26,6 @@ namespace hpx { namespace util {
     {
         return "";
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #endif

@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,7 @@
 
 #include <hpx/modules/config_registry.hpp>
 
-namespace hpx { namespace @module_name@_cfg {
+namespace hpx::@module_name@_cfg {
 
     config_registry::add_module_config_helper add_config{
     {
@@ -16,4 +16,4 @@ namespace hpx { namespace @module_name@_cfg {
         {@hpx_config_information@
         }
     }};
-}}
+}

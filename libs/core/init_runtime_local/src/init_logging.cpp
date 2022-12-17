@@ -220,27 +220,27 @@ namespace hpx { namespace util {
         switch (dest_)
         {
         default:
-        case destination_hpx:
+        case logging_destination::hpx:
             LHPX_CONSOLE_(level_) << msg;
             break;
 
-        case destination_timing:
+        case logging_destination::timing:
             LTIM_CONSOLE_(level_) << msg;
             break;
 
-        case destination_agas:
+        case logging_destination::agas:
             LAGAS_CONSOLE_(level_) << msg;
             break;
 
-        case destination_parcel:
+        case logging_destination::parcel:
             LPT_CONSOLE_(level_) << msg;
             break;
 
-        case destination_app:
+        case logging_destination::app:
             LAPP_CONSOLE_(level_) << msg;
             break;
 
-        case destination_debuglog:
+        case logging_destination::debuglog:
             LDEB_CONSOLE_ << msg;
             break;
         }
@@ -360,8 +360,8 @@ namespace hpx { namespace util {
                 if (logformat.empty())
                     logformat = "|\\n";
 
-                set_console_dest(
-                    writer, "console", lvl, destination_agas);    //-V106
+                set_console_dest(writer, "console", lvl,
+                    logging_destination::agas);    //-V106
                 writer.write(logformat, logdest);
                 define_formatters(writer);
 
@@ -410,8 +410,8 @@ namespace hpx { namespace util {
                 if (logformat.empty())
                     logformat = "|\\n";
 
-                set_console_dest(
-                    writer, "console", lvl, destination_parcel);    //-V106
+                set_console_dest(writer, "console", lvl,
+                    logging_destination::parcel);    //-V106
                 writer.write(logformat, logdest);
                 define_formatters(writer);
 
@@ -461,8 +461,8 @@ namespace hpx { namespace util {
                 if (logformat.empty())
                     logformat = "|\\n";
 
-                set_console_dest(
-                    writer, "console", lvl, destination_timing);    //-V106
+                set_console_dest(writer, "console", lvl,
+                    logging_destination::timing);    //-V106
                 writer.write(logformat, logdest);
                 define_formatters(writer);
 
@@ -512,8 +512,8 @@ namespace hpx { namespace util {
 
             if (hpx::util::logging::level::disable_all != lvl)
             {
-                set_console_dest(
-                    writer, "console", lvl, destination_hpx);    //-V106
+                set_console_dest(writer, "console", lvl,
+                    logging_destination::hpx);    //-V106
                 writer.write(logformat, logdest);
                 define_formatters(writer);
 
@@ -521,8 +521,8 @@ namespace hpx { namespace util {
                 hpx_logger()->set_enabled(lvl);
 
                 // errors are logged to the given destination and to cerr
-                set_console_dest(
-                    error_writer, "console", lvl, destination_hpx);    //-V106
+                set_console_dest(error_writer, "console", lvl,
+                    logging_destination::hpx);    //-V106
 #if !defined(ANDROID) && !defined(__ANDROID__)
                 if (logdest != "cerr")
                     error_writer.write(logformat, logdest + " cerr");
@@ -537,8 +537,8 @@ namespace hpx { namespace util {
                 // errors are always logged to cerr
                 if (!isconsole)
                 {
-                    set_console_dest(
-                        writer, "console", lvl, destination_hpx);    //-V106
+                    set_console_dest(writer, "console", lvl,
+                        logging_destination::hpx);    //-V106
                     error_writer.write(logformat, "console");
                 }
                 else
@@ -597,8 +597,8 @@ namespace hpx { namespace util {
                 if (logformat.empty())
                     logformat = "|\\n";
 
-                set_console_dest(
-                    writer, "console", lvl, destination_app);    //-V106
+                set_console_dest(writer, "console", lvl,
+                    logging_destination::app);    //-V106
                 writer.write(logformat, logdest);
                 define_formatters(writer);
 
@@ -648,8 +648,8 @@ namespace hpx { namespace util {
                 if (logformat.empty())
                     logformat = "|\\n";
 
-                set_console_dest(
-                    writer, "console", lvl, destination_debuglog);    //-V106
+                set_console_dest(writer, "console", lvl,
+                    logging_destination::debuglog);    //-V106
                 writer.write(logformat, logdest);
                 define_formatters(writer);
 
@@ -965,32 +965,32 @@ namespace hpx { namespace util {
     {
         switch (dest)
         {
-        case destination_hpx:
+        case logging_destination::hpx:
             hpx_logger()->set_enabled(logging::level::disable_all);
             hpx_console_logger()->set_enabled(logging::level::disable_all);
             break;
 
-        case destination_timing:
+        case logging_destination::timing:
             timing_logger()->set_enabled(logging::level::disable_all);
             timing_console_logger()->set_enabled(logging::level::disable_all);
             break;
 
-        case destination_agas:
+        case logging_destination::agas:
             agas_logger()->set_enabled(logging::level::disable_all);
             agas_console_logger()->set_enabled(logging::level::disable_all);
             break;
 
-        case destination_parcel:
+        case logging_destination::parcel:
             parcel_logger()->set_enabled(logging::level::disable_all);
             parcel_console_logger()->set_enabled(logging::level::disable_all);
             break;
 
-        case destination_app:
+        case logging_destination::app:
             app_logger()->set_enabled(logging::level::disable_all);
             app_console_logger()->set_enabled(logging::level::disable_all);
             break;
 
-        case destination_debuglog:
+        case logging_destination::debuglog:
             debuglog_logger()->set_enabled(logging::level::disable_all);
             debuglog_console_logger()->set_enabled(logging::level::disable_all);
             break;
@@ -1008,7 +1008,7 @@ namespace hpx { namespace util {
 
         switch (dest)
         {
-        case destination_hpx:
+        case logging_destination::hpx:
             detail::init_hpx_log(lvl, logdest, logformat,
                 detail::default_isconsole, detail::default_set_console_dest,
                 detail::default_define_formatters);
@@ -1016,7 +1016,7 @@ namespace hpx { namespace util {
                 lvl, HPX_MOVE(logdest), HPX_MOVE(logformat));
             break;
 
-        case destination_timing:
+        case logging_destination::timing:
             detail::init_debuglog_log(lvl, logdest, logformat,
                 detail::default_isconsole, detail::default_set_console_dest,
                 detail::default_define_formatters);
@@ -1024,7 +1024,7 @@ namespace hpx { namespace util {
                 lvl, HPX_MOVE(logdest), HPX_MOVE(logformat));
             break;
 
-        case destination_agas:
+        case logging_destination::agas:
             detail::init_agas_log(lvl, logdest, logformat,
                 detail::default_isconsole, detail::default_set_console_dest,
                 detail::default_define_formatters);
@@ -1032,7 +1032,7 @@ namespace hpx { namespace util {
                 lvl, HPX_MOVE(logdest), HPX_MOVE(logformat));
             break;
 
-        case destination_parcel:
+        case logging_destination::parcel:
             detail::init_parcel_log(lvl, logdest, logformat,
                 detail::default_isconsole, detail::default_set_console_dest,
                 detail::default_define_formatters);
@@ -1040,7 +1040,7 @@ namespace hpx { namespace util {
                 lvl, HPX_MOVE(logdest), HPX_MOVE(logformat));
             break;
 
-        case destination_app:
+        case logging_destination::app:
             detail::init_app_log(lvl, logdest, logformat,
                 detail::default_isconsole, detail::default_set_console_dest,
                 detail::default_define_formatters);
@@ -1048,7 +1048,7 @@ namespace hpx { namespace util {
                 lvl, HPX_MOVE(logdest), HPX_MOVE(logformat));
             break;
 
-        case destination_debuglog:
+        case logging_destination::debuglog:
             detail::init_debuglog_log(lvl, logdest, logformat,
                 detail::default_isconsole, detail::default_set_console_dest,
                 detail::default_define_formatters);

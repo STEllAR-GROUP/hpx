@@ -43,12 +43,12 @@ namespace hpx { namespace util {
 
             using base_traversal =
                 util::lazy_conditional<std::is_integral_v<Incrementable>,
-                    util::identity<std::random_access_iterator_tag>,
+                    hpx::type_identity<std::random_access_iterator_tag>,
                     iterator_category<Incrementable>>;
 
             using traversal =
                 util::lazy_conditional_t<std::is_void_v<CategoryOrTraversal>,
-                    base_traversal, util::identity<CategoryOrTraversal>>;
+                    base_traversal, hpx::type_identity<CategoryOrTraversal>>;
 
             // calculate difference_type of the resulting iterator
             template <typename Integer>
@@ -79,7 +79,7 @@ namespace hpx { namespace util {
 
             using difference =
                 util::lazy_conditional_t<std::is_void_v<Difference>,
-                    base_difference, util::identity<Difference>>;
+                    base_difference, hpx::type_identity<Difference>>;
 
             using type = iterator_adaptor<counting_iterator<Incrementable,
                                               CategoryOrTraversal, Difference>,

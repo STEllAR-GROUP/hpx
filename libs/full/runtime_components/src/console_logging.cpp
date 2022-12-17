@@ -48,27 +48,27 @@ namespace hpx { namespace components {
             switch (get<0>(msg))
             {
             default:
-            case destination_hpx:
+            case logging_destination::hpx:
                 LHPX_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
-            case destination_timing:
+            case logging_destination::timing:
                 LTIM_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
-            case destination_agas:
+            case logging_destination::agas:
                 LAGAS_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
-            case destination_parcel:
+            case logging_destination::parcel:
                 LPT_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
-            case destination_app:
+            case logging_destination::app:
                 LAPP_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
-            case destination_debuglog:
+            case logging_destination::debuglog:
                 LDEB_CONSOLE_ << fail_msg << get<2>(msg);
                 break;
             }

@@ -26,7 +26,7 @@
 #include <string_view>
 #include <utility>
 
-namespace hpx { namespace util { namespace logging {
+namespace hpx::util::logging {
 
     /**
         @brief Optimizes the formatting for prepending and/or appending strings to
@@ -109,7 +109,7 @@ namespace hpx { namespace util { namespace logging {
             return m_full_msg;
         }
 
-        bool empty() const
+        bool empty() const noexcept
         {
             return full_string().empty();
         }
@@ -126,4 +126,4 @@ namespace hpx { namespace util { namespace logging {
         mutable bool m_full_msg_computed;
         mutable std::string m_full_msg;
     };
-}}}    // namespace hpx::util::logging
+}    // namespace hpx::util::logging

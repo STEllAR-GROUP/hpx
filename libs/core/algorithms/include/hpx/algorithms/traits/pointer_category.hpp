@@ -103,8 +103,8 @@ namespace hpx { namespace traits {
         struct pointer_move_category<Source, Dest, false>
         {
             using type = std::conditional_t<
-                std::is_trivially_assignable<iter_ref_t<Dest>,
-                    std::remove_reference_t<iter_ref_t<Source>>>::value,
+                std::is_trivially_assignable<iter_reference_t<Dest>,
+                    std::remove_reference_t<iter_reference_t<Source>>>::value,
                 typename pointer_category_helper<iter_value_t<Source>,
                     iter_value_t<Dest>>::type,
                 general_pointer_tag>;
@@ -121,8 +121,8 @@ namespace hpx { namespace traits {
         struct pointer_copy_category<Source, Dest, false>
         {
             using type = std::conditional_t<
-                std::is_trivially_assignable<iter_ref_t<Dest>,
-                    iter_ref_t<Source>>::value,
+                std::is_trivially_assignable<iter_reference_t<Dest>,
+                    iter_reference_t<Source>>::value,
                 typename pointer_category_helper<iter_value_t<Source>,
                     iter_value_t<Dest>>::type,
                 general_pointer_tag>;

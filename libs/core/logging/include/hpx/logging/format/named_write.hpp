@@ -27,7 +27,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace util { namespace logging { namespace detail {
+namespace hpx::util::logging::detail {
 
     template <typename T>
     struct named
@@ -266,8 +266,7 @@ In the above example, I know that the available destinations are @c out_file,
         std::vector<destination::manipulator*> write_steps;
         std::string format_string;
     };
-
-}}}}    // namespace hpx::util::logging::detail
+}    // namespace hpx::util::logging::detail
 
 namespace hpx { namespace util { namespace logging { namespace writer {
 

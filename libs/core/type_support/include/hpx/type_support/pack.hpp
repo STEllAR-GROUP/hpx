@@ -11,7 +11,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     template <typename... Ts>
     struct pack
@@ -32,6 +32,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Left, typename Right>
         struct make_index_pack_join;
 
@@ -74,6 +75,7 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     // Workaround for clang bug [https://bugs.llvm.org/show_bug.cgi?id=35077]
     namespace detail {
+
         template <typename T>
         struct is_true : std::integral_constant<bool, (bool) T::value>
         {
@@ -87,6 +89,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename... Ts>
         struct always_true : std::true_type
         {
@@ -98,10 +101,10 @@ namespace hpx { namespace util {
         };
 
         template <typename... Ts>
-        static std::false_type all_of(...);
+        static constexpr std::false_type all_of(...);
 
         template <typename... Ts>
-        static auto all_of(int)
+        static constexpr auto all_of(int)
             -> always_true<std::enable_if_t<is_true<Ts>::value>...>;
     }    // namespace detail
 
@@ -120,11 +123,12 @@ namespace hpx { namespace util {
     inline constexpr bool all_of_v = all_of<Ts...>::value;
 
     namespace detail {
-        template <typename... Ts>
-        static std::true_type any_of(...);
 
         template <typename... Ts>
-        static auto any_of(int)
+        static constexpr std::true_type any_of(...);
+
+        template <typename... Ts>
+        static constexpr auto any_of(int)
             -> always_false<std::enable_if_t<is_false<Ts>::value>...>;
     }    // namespace detail
 
@@ -157,6 +161,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         struct empty
         {
         };
@@ -192,15 +197,15 @@ namespace hpx { namespace util {
         };
 
         template <std::size_t J>
-        static empty at_index_check(...);
+        static constexpr empty at_index_check(...);
 
         template <std::size_t J, typename T>
-        static indexed<J, T> at_index_check(indexed<J, T> const&);
+        static constexpr indexed<J, T> at_index_check(indexed<J, T> const&);
 
         template <std::size_t I, typename Ts>
         struct at_index_impl
           : decltype(detail::at_index_check<I>(
-                indexer<Ts, typename make_index_pack<Ts::size>::type>()))
+                indexer<Ts, make_index_pack_t<Ts::size>>()))
         {
         };
 #endif
@@ -215,6 +220,7 @@ namespace hpx { namespace util {
     using at_index_t = typename at_index<I, Ts...>::type;
 
     namespace detail {
+
         template <typename Pack, template <typename> class Transformer>
         struct transform;
 
@@ -360,4 +366,4 @@ namespace hpx { namespace util {
         template <template <typename...> class NewPack, typename OldPack>
         using change_pack_t = typename change_pack<NewPack, OldPack>::type;
     }    // namespace detail
-}}       // namespace hpx::util
+}    // namespace hpx::util

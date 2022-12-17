@@ -25,7 +25,7 @@
 #include <mutex>
 #include <string>
 
-namespace hpx { namespace util { namespace logging { namespace destination {
+namespace hpx::util::logging::destination {
 
     file::~file() = default;
 
@@ -90,5 +90,4 @@ namespace hpx { namespace util { namespace logging { namespace destination {
     {
         return std::unique_ptr<file>(new file_impl(file_name, set));
     }
-
-}}}}    // namespace hpx::util::logging::destination
+}    // namespace hpx::util::logging::destination

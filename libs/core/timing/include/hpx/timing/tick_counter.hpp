@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2012 Hartmut Kaiser
+//  Copyright (c) 2005-2022 Hartmut Kaiser
 //  Copyright (c) 2014      Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,7 +11,8 @@
 
 #include <cstdint>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     //
     //  tick_counter - a timer
@@ -20,7 +21,7 @@ namespace hpx { namespace util {
     class tick_counter
     {
     public:
-        tick_counter(std::uint64_t& output)
+        explicit tick_counter(std::uint64_t& output)
           : start_time_(take_time_stamp())
           , output_(output)
         {
@@ -41,4 +42,4 @@ namespace hpx { namespace util {
         std::uint64_t const start_time_;
         std::uint64_t& output_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util

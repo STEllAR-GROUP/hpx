@@ -24,7 +24,7 @@
 #include <string>
 #include <string_view>
 
-namespace hpx { namespace util { namespace logging {
+namespace hpx::util::logging {
 
     /// @brief Formatter is a manipulator.
     /// It allows you to format the message before writing it to the destination(s)
@@ -87,5 +87,4 @@ namespace hpx { namespace util { namespace logging {
         };
 
     }    // namespace destination
-
-}}}    // namespace hpx::util::logging
+}    // namespace hpx::util::logging

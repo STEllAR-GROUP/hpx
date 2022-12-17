@@ -20,7 +20,8 @@
 #include <string>
 #include <string_view>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     inline std::size_t format_atoi(
         std::string_view str, std::size_t* pos = nullptr) noexcept
@@ -122,4 +123,4 @@ namespace hpx { namespace util { namespace detail {
         detail::format_to(os, format_str, args, count);
         return os.str();
     }
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

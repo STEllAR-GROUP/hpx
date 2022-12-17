@@ -79,12 +79,12 @@ namespace hpx { namespace util {
             using iterator_category =
                 util::lazy_conditional_t<std::is_void_v<Category>,
                     category_iterator_traits_helper<Base>,
-                    util::identity<Category>>;
+                    hpx::type_identity<Category>>;
 
             using difference_type =
                 util::lazy_conditional_t<std::is_void_v<Difference>,
                     difference_type_iterator_traits_helper<Base>,
-                    util::identity<Difference>>;
+                    hpx::type_identity<Difference>>;
 
             using type = iterator_facade<Derived, value_type, iterator_category,
                 reference_type, difference_type, Pointer>;

@@ -17,7 +17,7 @@
 #include <chrono>
 #include <cstdint>
 
-namespace hpx { namespace chrono {
+namespace hpx::chrono {
 
     /// \brief Class \c hpx::chrono::high_resolution_clock represents the clock
     ///        with the smallest tick period provided by the implementation. It
@@ -46,8 +46,8 @@ namespace hpx { namespace chrono {
         // returned by this clock.
         static constexpr std::uint64_t(min)() noexcept
         {
-            typedef std::chrono::duration_values<std::chrono::nanoseconds>
-                duration_values;
+            using duration_values =
+                std::chrono::duration_values<std::chrono::nanoseconds>;
             return (duration_values::min)().count();
         }
 
@@ -55,9 +55,9 @@ namespace hpx { namespace chrono {
         // returned by this clock.
         static constexpr std::uint64_t(max)() noexcept
         {
-            typedef std::chrono::duration_values<std::chrono::nanoseconds>
-                duration_values;
+            using duration_values =
+                std::chrono::duration_values<std::chrono::nanoseconds>;
             return (duration_values::max)().count();
         }
     };
-}}    // namespace hpx::chrono
+}    // namespace hpx::chrono
