@@ -24,7 +24,8 @@
 #include <typeinfo>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace runtime_local { namespace detail {
+namespace hpx::runtime_local::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     // TODO: This is not scalable, and painful to update.
     void save_custom_exception(hpx::serialization::output_archive& ar,
@@ -32,7 +33,7 @@ namespace hpx { namespace runtime_local { namespace detail {
     {
         hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
-        int err_value = hpx::success;
+        hpx::error err_value = hpx::error::success;
         std::string err_message;
 
         std::uint32_t throw_locality_ = 0;
@@ -132,7 +133,7 @@ namespace hpx { namespace runtime_local { namespace detail {
         {
             type = hpx::util::hpx_thread_interrupted_exception;
             what = "hpx::thread_interrupted";
-            err_value = hpx::thread_cancelled;
+            err_value = hpx::error::thread_cancelled;
         }
         catch (hpx::exception const& e)
         {
@@ -144,7 +145,7 @@ namespace hpx { namespace runtime_local { namespace detail {
         {
             type = hpx::util::std_system_error;
             what = e.what();
-            err_value = e.code().value();
+            err_value = static_cast<hpx::error>(e.code().value());
             err_message = e.code().message();
         }
         catch (std::runtime_error const& e)
@@ -215,13 +216,13 @@ namespace hpx { namespace runtime_local { namespace detail {
         if (hpx::util::hpx_exception == type)
         {
             // clang-format off
-            ar & err_value;
+            ar << static_cast<int>(err_value);
             // clang-format on
         }
         else if (hpx::util::std_system_error == type)
         {
             // clang-format off
-            ar & err_value & err_message;
+            ar << static_cast<int>(err_value) << err_message;
             // clang-format on
         }
     }
@@ -233,7 +234,7 @@ namespace hpx { namespace runtime_local { namespace detail {
     {
         hpx::util::exception_type type(hpx::util::unknown_exception);
         std::string what;
-        int err_value = hpx::success;
+        hpx::error err_value = hpx::error::success;
         std::string err_message;
 
         std::uint32_t throw_locality_ = 0;
@@ -261,13 +262,17 @@ namespace hpx { namespace runtime_local { namespace detail {
         if (hpx::util::hpx_exception == type)
         {
             // clang-format off
-            ar & err_value;
+            int error_code = 0;
+            ar >> error_code;
+            err_value = static_cast<hpx::error>(error_code);
             // clang-format on
         }
         else if (hpx::util::std_system_error == type)
         {
             // clang-format off
-            ar & err_value & err_message;
+            int error_code = 0;
+            ar >> error_code >> err_message;
+            err_value = static_cast<hpx::error>(error_code);
             // clang-format on
         }
 
@@ -372,8 +377,8 @@ namespace hpx { namespace runtime_local { namespace detail {
         // std::system_error
         case hpx::util::std_system_error:
             e = hpx::detail::construct_exception(
-                std::system_error(
-                    err_value, std::system_category(), err_message),
+                std::system_error(static_cast<int>(err_value),
+                    std::system_category(), err_message),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
@@ -384,8 +389,7 @@ namespace hpx { namespace runtime_local { namespace detail {
         // hpx::exception
         case hpx::util::hpx_exception:
             e = hpx::detail::construct_exception(
-                hpx::exception(static_cast<hpx::error>(err_value), what,
-                    hpx::throwmode::rethrow),
+                hpx::exception(err_value, what, hpx::throwmode::rethrow),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
@@ -400,4 +404,4 @@ namespace hpx { namespace runtime_local { namespace detail {
             break;
         }
     }
-}}}    // namespace hpx::runtime_local::detail
+}    // namespace hpx::runtime_local::detail

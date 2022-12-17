@@ -100,7 +100,7 @@ namespace hpx { namespace util {
         template <typename U>
         void destroy(U* p)
         {
-            p->~U();
+            std::destroy_at(p);
         }
     };
 

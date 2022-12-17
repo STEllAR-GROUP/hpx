@@ -478,7 +478,7 @@ namespace hpx::parcelset {
             strm << "\t [" << pp.second->here() << "]\n";
         }
 
-        HPX_THROW_EXCEPTION(network_error,
+        HPX_THROW_EXCEPTION(hpx::error::network_error,
             "parcelhandler::find_appropriate_destination",
             "The locality gid cannot be resolved to a valid endpoint. "
             "No valid parcelport configured. Detailed information:\n{}",
@@ -673,7 +673,8 @@ namespace hpx::parcelset {
 
         if (parcels.size() != handlers.size())
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "parcelhandler::put_parcels",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "parcelhandler::put_parcels",
                 "mismatched number of parcels and handlers");
             return;
         }
@@ -738,7 +739,8 @@ namespace hpx::parcelset {
             // make sure all parcels go to the same locality
             if (parcels[0].destination_locality() != p.destination_locality())
             {
-                HPX_THROW_EXCEPTION(bad_parameter, "parcelhandler::put_parcels",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "parcelhandler::put_parcels",
                     "mismatched destinations, all parcels are expected to "
                     "target the same locality");
                 return;
@@ -902,7 +904,7 @@ namespace hpx::parcelset {
                         ec = make_success_code();
                     else
                         ec = make_error_code(
-                            bad_parameter, throwmode::lightweight);
+                            hpx::error::bad_parameter, throwmode::lightweight);
                 }
                 return (*it).second.get();
             }
@@ -918,7 +920,7 @@ namespace hpx::parcelset {
                 l.unlock();
                 if (!r.second)
                 {
-                    HPX_THROWS_IF(ec, internal_server_error,
+                    HPX_THROWS_IF(ec, hpx::error::internal_server_error,
                         "parcelhandler::get_message_handler",
                         "could not store empty message handler");
                     return nullptr;
@@ -932,7 +934,7 @@ namespace hpx::parcelset {
             l.unlock();
             if (!r.second)
             {
-                HPX_THROWS_IF(ec, internal_server_error,
+                HPX_THROWS_IF(ec, hpx::error::internal_server_error,
                     "parcelhandler::get_message_handler",
                     "could not store newly created message handler");
                 return nullptr;
@@ -944,11 +946,12 @@ namespace hpx::parcelset {
             l.unlock();
             if (&ec != &throws)
             {
-                ec = make_error_code(bad_parameter, throwmode::lightweight);
+                ec = make_error_code(
+                    hpx::error::bad_parameter, throwmode::lightweight);
             }
             else
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "parcelhandler::get_message_handler",
                     "couldn't find an appropriate message handler");
             }

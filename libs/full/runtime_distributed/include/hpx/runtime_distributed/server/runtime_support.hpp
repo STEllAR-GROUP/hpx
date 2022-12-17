@@ -509,7 +509,7 @@ namespace hpx { namespace components { namespace server {
         if (!id || new_instance == nullptr)
         {
             // we should not get here (id should not be invalid)
-            HPX_THROW_EXCEPTION(hpx::invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "runtime_support::migrate_component_to_here",
                 "could not create copy of given component");
             return naming::invalid_gid;
@@ -517,7 +517,7 @@ namespace hpx { namespace components { namespace server {
         if (id != migrated_id)
         {
             // we should not get here either (the ids should be the same)
-            HPX_THROW_EXCEPTION(hpx::invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "runtime_support::migrate_component_to_here",
                 "could not create copy of given component (the new id is "
                 "different from the original id)");

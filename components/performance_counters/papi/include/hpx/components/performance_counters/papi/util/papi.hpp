@@ -41,7 +41,7 @@ namespace hpx {
     {
         if (rc != ok)
         {
-            HPX_THROW_EXCEPTION(hpx::no_success, fname,
+            HPX_THROW_EXCEPTION(hpx::error::no_success, fname,
                 hpx::util::format("{} ({})", info, PAPI_strerror(rc)));
         }
     }
@@ -219,9 +219,8 @@ namespace hpx {
         {
             PAPI_component_info_t const* ci = PAPI_get_component_info(comp);
             if (!ci)
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
-                    "hpx::performance_counters::papi::util::native_enumerator("
-                    ")",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::performance_counters::papi::util::native_enumerator",
                     "invalid PAPI component index");
             umasks_present_ = ci->cntr_umasks;
         }

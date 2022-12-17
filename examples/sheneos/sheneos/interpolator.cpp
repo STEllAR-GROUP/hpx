@@ -302,7 +302,7 @@ namespace sheneos {
             break;
 
         default:
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "sheneos::interpolator::get_dimension",
                 "value of parameter 'what' is not valid");
             break;
@@ -339,7 +339,7 @@ namespace sheneos {
 
             if (result.size() != indices.size())
             {
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "interpolator::on_completed_bulk_one",
                     "inconsistent sizes of result and index arrays");
             }
@@ -446,7 +446,7 @@ namespace sheneos {
 
             if (result.size() != indices.size())
             {
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "interpolator::on_completed_bulk",
                     "inconsistent sizes of result and index arrays");
             }

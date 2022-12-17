@@ -205,7 +205,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
-                hpx::bad_parameter, "hpx::collectives::exclusive_scan",
+                hpx::error::bad_parameter, "hpx::collectives::exclusive_scan",
                 "the generation number shouldn't be zero"));
         }
 

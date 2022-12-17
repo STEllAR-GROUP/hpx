@@ -21,40 +21,41 @@
 
 namespace hpx { namespace components { namespace process { namespace windows {
 
-namespace initializers {
+    namespace initializers {
 
-class throw_on_error : public initializer_base
-{
-public:
-    template <class WindowsExecutor>
-    void on_CreateProcess_error(WindowsExecutor&) const
-    {
-        HRESULT hr = GetLastError();
-        LPVOID buffer = 0;
-        if (!FormatMessage(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
-            nullptr, hr,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-            (LPTSTR) &buffer, 0, nullptr))
+        class throw_on_error : public initializer_base
         {
-            HPX_THROW_EXCEPTION(kernel_error, "process::on_CreateProcess_error",
-                "format message failed with {:x} (while retrieving message for "
-                "{:x})",
-                GetLastError(), hr);
-            return;
-        }
+        public:
+            template <class WindowsExecutor>
+            void on_CreateProcess_error(WindowsExecutor&) const
+            {
+                HRESULT hr = GetLastError();
+                LPVOID buffer = 0;
+                if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                            FORMAT_MESSAGE_FROM_SYSTEM |
+                            FORMAT_MESSAGE_IGNORE_INSERTS,
+                        nullptr, hr,
+                        MAKELANGID(LANG_NEUTRAL,
+                            SUBLANG_DEFAULT),    // Default language
+                        (LPTSTR) &buffer, 0, nullptr))
+                {
+                    HPX_THROW_EXCEPTION(hpx::error::kernel_error,
+                        "process::on_CreateProcess_error",
+                        "format message failed with {:x} (while retrieving "
+                        "message for "
+                        "{:x})",
+                        GetLastError(), hr);
+                    return;
+                }
 
-        std::string msg("CreateProcess() failed: ");
-        msg += static_cast<char*>(buffer);
-        LocalFree(buffer);
-        HPX_THROW_EXCEPTION(kernel_error,
-            "process::on_CreateProcess_error", msg);
-    }
-};
+                std::string msg("CreateProcess() failed: ");
+                msg += static_cast<char*>(buffer);
+                LocalFree(buffer);
+                HPX_THROW_EXCEPTION(hpx::error::kernel_error,
+                    "process::on_CreateProcess_error", msg);
+            }
+        };
 
-}
-
-}}}}
+}}}}}    // namespace hpx::components::process::windows::initializers
 
 #endif

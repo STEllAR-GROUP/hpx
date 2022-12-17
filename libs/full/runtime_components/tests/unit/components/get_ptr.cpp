@@ -74,7 +74,7 @@ bool test_get_ptr1(hpx::id_type id)
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(int(e.get_error()), int(hpx::bad_parameter));
+        HPX_TEST_EQ(int(e.get_error()), int(hpx::error::bad_parameter));
     }
 
     return false;
@@ -122,7 +122,7 @@ bool test_get_ptr3(hpx::id_type id)
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(int(e.get_error()), int(hpx::bad_parameter));
+        HPX_TEST_EQ(int(e.get_error()), int(hpx::error::bad_parameter));
     }
 
     return false;

@@ -102,7 +102,8 @@ namespace hpx::execution::experimental {
             }
             else
             {
-                HPX_THROW_EXCEPTION(invalid_status, "task_group::serialize",
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "task_group::serialize",
                     "task_group must be ready in order for it to be "
                     "serialized");
             }

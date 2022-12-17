@@ -274,7 +274,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
-                hpx::bad_parameter, "hpx::collectives::broadcast_to",
+                hpx::error::bad_parameter, "hpx::collectives::broadcast_to",
                 "the generation number shouldn't be zero"));
         }
 
@@ -337,7 +337,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
-                hpx::bad_parameter, "hpx::collectives::broadcast_from",
+                hpx::error::bad_parameter, "hpx::collectives::broadcast_from",
                 "the generation number shouldn't be zero"));
         }
 

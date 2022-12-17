@@ -50,7 +50,7 @@ namespace hpx { namespace util {
         pool_size_ = pool_size;
         if (pool_size_ == 0)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "io_service_pool::io_service_pool",
                 "io_service_pool size is 0");
             return;

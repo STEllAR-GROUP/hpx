@@ -552,9 +552,9 @@ namespace hpx { namespace lcos {
         {
             typedef typename detail::broadcast_result<Action>::type result_type;
 
-            return hpx::make_exceptional_future<result_type>(
-                HPX_GET_EXCEPTION(bad_parameter, "hpx::lcos::broadcast",
-                    "empty list of targets for broadcast operation"));
+            return hpx::make_exceptional_future<result_type>(HPX_GET_EXCEPTION(
+                hpx::error::bad_parameter, "hpx::lcos::broadcast",
+                "empty list of targets for broadcast operation"));
         }
 
         return hpx::detail::async_colocated<broadcast_impl_action>(ids[0],
@@ -581,7 +581,8 @@ namespace hpx { namespace lcos {
 
         if (ids.empty())
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::lcos::broadcast_post",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::lcos::broadcast_post",
                 "empty list of targets for broadcast operation");
             return;
         }

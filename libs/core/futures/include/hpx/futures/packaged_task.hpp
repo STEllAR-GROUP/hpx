@@ -80,7 +80,7 @@ namespace hpx {
         {
             if (function_.empty())
             {
-                HPX_THROW_EXCEPTION(no_state,
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
                     "packaged_task<Signature>::operator()",
                     "this packaged_task has no valid shared state");
                 return;
@@ -110,7 +110,7 @@ namespace hpx {
         {
             if (function_.empty())
             {
-                HPX_THROWS_IF(ec, no_state,
+                HPX_THROWS_IF(ec, hpx::error::no_state,
                     "packaged_task<Signature>::get_future",
                     "this packaged_task has no valid shared state");
                 return hpx::future<R>();
@@ -127,7 +127,8 @@ namespace hpx {
         {
             if (function_.empty())
             {
-                HPX_THROWS_IF(ec, no_state, "packaged_task<Signature>::reset",
+                HPX_THROWS_IF(ec, hpx::error::no_state,
+                    "packaged_task<Signature>::reset",
                     "this packaged_task has no valid shared state");
                 return;
             }

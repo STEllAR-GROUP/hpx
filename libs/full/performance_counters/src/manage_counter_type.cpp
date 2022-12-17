@@ -43,7 +43,7 @@ namespace hpx { namespace performance_counters {
         {
             if (counter_status::invalid_data != status_)
             {
-                HPX_THROWS_IF(ec, hpx::invalid_status,
+                HPX_THROWS_IF(ec, hpx::error::invalid_status,
                     "manage_counter_type::install",
                     "counter type {} has been already installed.",
                     info_.fullname_);
@@ -59,7 +59,7 @@ namespace hpx { namespace performance_counters {
         {
             if (counter_status::invalid_data != status_)
             {
-                HPX_THROWS_IF(ec, hpx::invalid_status,
+                HPX_THROWS_IF(ec, hpx::error::invalid_status,
                     "manage_counter_type::install",
                     "generic counter type {} has been already installed.",
                     info_.fullname_);

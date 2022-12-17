@@ -225,7 +225,7 @@ namespace hpx { namespace server {
                 partition_unordered_map_.find(key);
             if (it == partition_unordered_map_.end())
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "partition_unordered_map::get_value",
                     "unable to find requested key in this partition of the "
                     "unordered_map");
@@ -257,7 +257,7 @@ namespace hpx { namespace server {
                     partition_unordered_map_.find(keys[i]);
                 if (it == partition_unordered_map_.end())
                 {
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "partition_unordered_map::get_values",
                         "unable to find requested key in this partition of the "
                         "unordered_map");

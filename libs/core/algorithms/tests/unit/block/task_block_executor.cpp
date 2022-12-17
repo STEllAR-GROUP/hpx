@@ -305,7 +305,7 @@ void define_task_block_exceptions_test3(Executor& exec)
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(int(e.get_error()), int(hpx::task_block_not_active));
+        HPX_TEST_EQ(int(e.get_error()), int(hpx::error::task_block_not_active));
     }
     catch (...)
     {
@@ -334,7 +334,7 @@ void define_task_block_exceptions_test4(Executor& exec)
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(int(e.get_error()), int(hpx::task_block_not_active));
+        HPX_TEST_EQ(int(e.get_error()), int(hpx::error::task_block_not_active));
     }
     catch (...)
     {

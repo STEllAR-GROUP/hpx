@@ -42,7 +42,7 @@ int start_func(hpx::spinlock& mtx, hpx::condition_variable_any& cond)
 
 void hpx_thread_func()
 {
-    HPX_THROW_EXCEPTION(hpx::invalid_status, "hpx_thread_func", "test");
+    HPX_THROW_EXCEPTION(hpx::error::invalid_status, "hpx_thread_func", "test");
 }
 
 int main(int argc, char** argv)

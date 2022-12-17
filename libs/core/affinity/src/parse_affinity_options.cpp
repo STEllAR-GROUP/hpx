@@ -170,7 +170,8 @@ namespace hpx { namespace threads { namespace detail {
         std::string::const_iterator begin = spec.begin();
         if (!detail::parse(begin, spec.end(), mappings) || begin != spec.end())
         {
-            HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "parse_affinity_options",
                 "failed to parse affinity specification: " + spec);
             return;
         }
@@ -211,7 +212,8 @@ namespace hpx { namespace threads { namespace detail {
                     if (default_last <= std::size_t(*first))
                     {
                         result.clear();
-                        HPX_THROWS_IF(ec, bad_parameter, "extract_bounds",
+                        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                            "extract_bounds",
                             "the resource id given is larger than the "
                             "number of existing resources");
                         return result;
@@ -224,7 +226,8 @@ namespace hpx { namespace threads { namespace detail {
                     if (default_last <= std::size_t(-*second))
                     {
                         result.clear();
-                        HPX_THROWS_IF(ec, bad_parameter, "extract_bounds",
+                        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                            "extract_bounds",
                             "the upper limit given is larger than the "
                             "number of existing resources");
                         return result;
@@ -238,7 +241,8 @@ namespace hpx { namespace threads { namespace detail {
                     if (default_last <= std::size_t(*second))
                     {
                         result.clear();
-                        HPX_THROWS_IF(ec, bad_parameter, "extract_bounds",
+                        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                            "extract_bounds",
                             "the upper limit given is larger than the "
                             "number of existing resources");
                         return result;
@@ -254,7 +258,8 @@ namespace hpx { namespace threads { namespace detail {
                 if (default_last <= std::size_t(*first))
                 {
                     result.clear();
-                    HPX_THROWS_IF(ec, bad_parameter, "extract_bounds",
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                        "extract_bounds",
                         "the resource id given is larger than the number "
                         "of existing resources");
                     return result;
@@ -345,7 +350,8 @@ namespace hpx { namespace threads { namespace detail {
         }
 
         default:
-            HPX_THROWS_IF(ec, bad_parameter, "extract_socket_or_numanode_mask",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "extract_socket_or_numanode_mask",
                 "unexpected specification type {}",
                 spec_type::type_name(s.type_));
             break;
@@ -415,7 +421,7 @@ namespace hpx { namespace threads { namespace detail {
         break;
 
         default:
-            HPX_THROWS_IF(ec, bad_parameter, "extract_core_mask",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter, "extract_core_mask",
                 "unexpected specification type {}",
                 spec_type::type_name(s.type_));
             break;
@@ -498,7 +504,7 @@ namespace hpx { namespace threads { namespace detail {
         break;
 
         default:
-            HPX_THROWS_IF(ec, bad_parameter, "extract_pu_mask",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter, "extract_pu_mask",
                 "unexpected specification type {}",
                 spec_type::type_name(s.type_));
             break;
@@ -515,14 +521,14 @@ namespace hpx { namespace threads { namespace detail {
         mapping_type& m = fmt.second;
         if (m.size() != 3)
         {
-            HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter, "decode_mapping",
                 "bad size of mappings specification array");
             return;
         }
 
         if (b.begin() == b.end())
         {
-            HPX_THROWS_IF(ec, bad_parameter, "decode_mapping",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter, "decode_mapping",
                 "no {1} mapping bounds are specified",
                 spec_type::type_name(fmt.first.type_));
             return;
@@ -716,7 +722,8 @@ namespace hpx { namespace threads { namespace detail {
 
             if (num_threads > num_pus_proc_mask)
             {
-                HPX_THROWS_IF(ec, bad_parameter, "check_num_threads",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "check_num_threads",
                     "specified number of threads ({1}) is larger than number "
                     "of processing units available in process mask ({2})",
                     num_threads, num_pus_proc_mask);
@@ -728,7 +735,8 @@ namespace hpx { namespace threads { namespace detail {
 
             if (num_threads > num_threads_available)
             {
-                HPX_THROWS_IF(ec, bad_parameter, "check_num_threads",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "check_num_threads",
                     "specified number of threads ({1}) is larger than number "
                     "of available processing units ({2})",
                     num_threads, num_threads_available);
@@ -771,7 +779,7 @@ namespace hpx { namespace threads { namespace detail {
 
                     if (any(affinities[num_thread]))
                     {
-                        HPX_THROWS_IF(ec, bad_parameter,
+                        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                             "decode_compact_distribution",
                             "affinity mask for thread {1} has already been set",
                             num_thread);
@@ -816,7 +824,7 @@ namespace hpx { namespace threads { namespace detail {
             {
                 if (any(affinities[num_thread]))
                 {
-                    HPX_THROWS_IF(ec, bad_parameter,
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "decode_scatter_distribution",
                         "affinity mask for thread {1} has already been set",
                         num_thread);
@@ -930,7 +938,7 @@ namespace hpx { namespace threads { namespace detail {
             {
                 if (any(affinities[num_thread]))
                 {
-                    HPX_THROWS_IF(ec, bad_parameter,
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "decode_balanced_distribution",
                         "affinity mask for thread {1} has already been set",
                         num_thread);
@@ -1077,7 +1085,7 @@ namespace hpx { namespace threads { namespace detail {
                 {
                     if (any(affinities[num_thread]))
                     {
-                        HPX_THROWS_IF(ec, bad_parameter,
+                        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                             "decode_numabalanced_distribution",
                             "affinity mask for thread {1} has already been set",
                             num_thread);
@@ -1165,7 +1173,8 @@ namespace hpx { namespace threads {
         {
             if (use_process_mask)
             {
-                HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "parse_affinity_options",
                     "can't use --hpx:use-process-mask with custom thread "
                     "bindings");
             }
@@ -1177,14 +1186,16 @@ namespace hpx { namespace threads {
             {
                 if (m.first.type_ != detail::spec_type::thread)
                 {
-                    HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                        "parse_affinity_options",
                         "bind specification ({1}) is ill formatted", spec);
                     return;
                 }
 
                 if (m.second.size() != 3)
                 {
-                    HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                        "parse_affinity_options",
                         "bind specification ({1}) is ill formatted", spec);
                     return;
                 }
@@ -1193,7 +1204,8 @@ namespace hpx { namespace threads {
                     m.second[1].type_ == detail::spec_type::unknown &&
                     m.second[2].type_ == detail::spec_type::unknown)
                 {
-                    HPX_THROWS_IF(ec, bad_parameter, "parse_affinity_options",
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                        "parse_affinity_options",
                         "bind specification ({1}) is ill formatted", spec);
                     return;
                 }

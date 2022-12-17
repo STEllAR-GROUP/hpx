@@ -39,7 +39,7 @@ namespace hpx::mpi::experimental {
         explicit mpi_exception(int err_code, const std::string& msg = "")
           : err_code_(err_code)
         {
-            hpx::exception(hpx::bad_function_call,
+            hpx::exception(hpx::error::bad_function_call,
                 msg + std::string(" MPI returned with error: ") +
                     detail::error_message(err_code));
         }

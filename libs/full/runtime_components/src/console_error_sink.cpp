@@ -45,7 +45,7 @@ namespace hpx { namespace components {
     {
         if (HPX_UNLIKELY(!threads::get_self_ptr()))
         {
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "components::console_error_sink",
                 "console_error_sink was not called from a HPX-thread");
         }

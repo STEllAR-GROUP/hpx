@@ -383,7 +383,8 @@ namespace hpx { namespace performance_counters {
         {
             if (!status_is_valid(status_))
             {
-                HPX_THROWS_IF(ec, invalid_status, "counter_value::get_value<T>",
+                HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                    "counter_value::get_value<T>",
                     "counter value is in invalid status");
                 return T();
             }
@@ -394,7 +395,7 @@ namespace hpx { namespace performance_counters {
             {
                 if (scaling_ == 0)
                 {
-                    HPX_THROWS_IF(ec, uninitialized_value,
+                    HPX_THROWS_IF(ec, hpx::error::uninitialized_value,
                         "counter_value::get_value<T>",
                         "scaling should not be zero");
                     return T();
@@ -471,14 +472,14 @@ namespace hpx { namespace performance_counters {
         {
             if (!status_is_valid(status_))
             {
-                HPX_THROWS_IF(ec, invalid_status,
+                HPX_THROWS_IF(ec, hpx::error::invalid_status,
                     "counter_values_array::get_value<T>",
                     "counter value is in invalid status");
                 return T();
             }
             if (index >= values_.size())
             {
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "counter_values_array::get_value<T>",
                     "index out of bounds");
                 return T();
@@ -490,7 +491,7 @@ namespace hpx { namespace performance_counters {
             {
                 if (scaling_ == 0)
                 {
-                    HPX_THROWS_IF(ec, uninitialized_value,
+                    HPX_THROWS_IF(ec, hpx::error::uninitialized_value,
                         "counter_values_array::get_value<T>",
                         "scaling should not be zero");
                     return T();

@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -157,7 +158,7 @@ namespace hpx { namespace threads {
 
         void destroy() noexcept override
         {
-            this->~thread_data_stackful();
+            std::destroy_at(this);
             thread_alloc_.deallocate(this, 1);
         }
 

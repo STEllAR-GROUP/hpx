@@ -69,7 +69,7 @@ namespace hpx::execution::experimental {
 
                         if (!state)
                         {
-                            HPX_THROW_EXCEPTION(no_state,
+                            HPX_THROW_EXCEPTION(hpx::error::no_state,
                                 "as_sender_operation_state::start",
                                 "the future has no valid shared state");
                         }

@@ -51,7 +51,7 @@ namespace hpx { namespace components { namespace detail {
                     naming::gid_type g = gid_;
                     gid_ = naming::invalid_gid;    // invalidate GID
 
-                    HPX_THROW_EXCEPTION(duplicate_component_address,
+                    HPX_THROW_EXCEPTION(hpx::error::duplicate_component_address,
                         "component_base<Component>::get_base_gid",
                         "failed to bind id: {} to locality: {}", g,
                         agas::get_locality_id());
@@ -68,7 +68,7 @@ namespace hpx { namespace components { namespace detail {
                     naming::gid_type g = gid_;
                     gid_ = naming::invalid_gid;    // invalidate GID
 
-                    HPX_THROW_EXCEPTION(duplicate_component_address,
+                    HPX_THROW_EXCEPTION(hpx::error::duplicate_component_address,
                         "component_base<Component>::get_base_gid",
                         "failed to rebind id: {} to locality: {}", g,
                         agas::get_locality_id());

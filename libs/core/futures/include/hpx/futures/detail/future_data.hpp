@@ -277,7 +277,8 @@ namespace hpx { namespace lcos { namespace detail {
         }
         virtual void cancel()
         {
-            HPX_THROW_EXCEPTION(future_does_not_support_cancellation,
+            HPX_THROW_EXCEPTION(
+                hpx::error::future_does_not_support_cancellation,
                 "future_data_base::cancel",
                 "this future does not support cancellation");
         }
@@ -316,19 +317,20 @@ namespace hpx { namespace lcos { namespace detail {
 
         virtual std::string const& get_registered_name() const
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "future_data_base::get_registered_name",
                 "this future does not support name registration");
         }
         virtual void set_registered_name(std::string /*name*/)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "future_data_base::set_registered_name",
                 "this future does not support name registration");
         }
         virtual bool register_as(std::string /*name*/, bool /*manage_lifetime*/)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "future_data_base::register_as",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "future_data_base::register_as",
                 "this future does not support name registration");
         }
 
@@ -417,14 +419,15 @@ namespace hpx { namespace lcos { namespace detail {
         /// manager the function will return.
         ///
         /// \param ec     [in,out] this represents the error status on exit,
-        ///               if this is pre-initialized to \a hpx#throws
-        ///               the function will throw on error instead. If the
-        ///               operation blocks and is aborted because the object
-        ///               went out of scope, the code \a hpx#yield_aborted is
-        ///               set or thrown.
+        ///               if this is pre-initialized to \a hpx#throws the
+        ///               function will throw on error instead. If the operation
+        ///               blocks and is aborted because the object went out of
+        ///               scope, the code \a hpx#error#yield_aborted is set or
+        ///               thrown.
         ///
         /// \note         If there has been an error reported (using the action
-        ///               \a base_lco#set_exception), this function will throw an
+        ///               \a base_lco#set_exception), this function will throw
+        ///                  an
         ///               exception encapsulating the reported error code and
         ///               error description if <code>&ec == &throws</code>.
         virtual result_type* get_result(error_code& ec = throws)
@@ -472,7 +475,7 @@ namespace hpx { namespace lcos { namespace detail {
                 // this future should be 'empty' still (it can't be made ready
                 // more than once).
                 l.unlock();
-                HPX_THROW_EXCEPTION(promise_already_satisfied,
+                HPX_THROW_EXCEPTION(hpx::error::promise_already_satisfied,
                     "future_data_base::set_value",
                     "data has already been set for this future");
                 return;
@@ -532,7 +535,7 @@ namespace hpx { namespace lcos { namespace detail {
                 // this future should be 'empty' still (it can't be made ready
                 // more than once).
                 l.unlock();
-                HPX_THROW_EXCEPTION(promise_already_satisfied,
+                HPX_THROW_EXCEPTION(hpx::error::promise_already_satisfied,
                     "future_data_base::set_exception",
                     "data has already been set for this future");
                 return;
@@ -613,14 +616,14 @@ namespace hpx { namespace lcos { namespace detail {
             {
                 result_type* value_ptr =
                     reinterpret_cast<result_type*>(&storage_);
-                value_ptr->~result_type();
+                std::destroy_at(value_ptr);
                 break;
             }
             case exception:
             {
                 std::exception_ptr* exception_ptr =
                     reinterpret_cast<std::exception_ptr*>(&storage_);
-                exception_ptr->~exception_ptr();
+                std::destroy_at(exception_ptr);
                 break;
             }
             default:
@@ -888,7 +891,7 @@ namespace hpx { namespace lcos { namespace detail {
             if (started_)
             {
                 l.unlock();
-                HPX_THROW_EXCEPTION(task_already_started,
+                HPX_THROW_EXCEPTION(hpx::error::task_already_started,
                     "task_base::check_started",
                     "this task has already been started");
                 return;
@@ -1029,14 +1032,15 @@ namespace hpx { namespace lcos { namespace detail {
                         this->started_ = true;
 
                         l.unlock();
-                        this->set_error(future_cancelled,
+                        this->set_error(hpx::error::future_cancelled,
                             "task_base<Result>::cancel",
                             "future has been canceled");
                     }
                     else
                     {
                         l.unlock();
-                        HPX_THROW_EXCEPTION(future_can_not_be_cancelled,
+                        HPX_THROW_EXCEPTION(
+                            hpx::error::future_can_not_be_cancelled,
                             "task_base<Result>::cancel",
                             "future can't be canceled at this time");
                     }

@@ -29,7 +29,7 @@ namespace hpx::agas {
     {
         if (version > HPX_AGAS_VERSION)
         {
-            HPX_THROW_EXCEPTION(version_too_new, "gva::load",
+            HPX_THROW_EXCEPTION(hpx::error::version_too_new, "gva::load",
                 "trying to load GVA with unknown version");
         }
 

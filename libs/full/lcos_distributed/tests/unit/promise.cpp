@@ -28,7 +28,7 @@ HPX_PLAIN_ACTION(test, test_action)
 int test_error()
 {
     HPX_THROW_EXCEPTION(
-        hpx::not_implemented, "test_error", "throwing test exception");
+        hpx::error::not_implemented, "test_error", "throwing test exception");
     return 42;
 }
 HPX_PLAIN_ACTION(test_error, test_error_action)

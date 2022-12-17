@@ -234,7 +234,7 @@ namespace hpx { namespace threads { namespace policies {
                 threads::thread_id_ref_type thrd;
                 create_thread_object(thrd, data, lk);
 
-                task->~task_description();
+                std::destroy_at(task);
                 task_description_alloc_.deallocate(task, 1);
 
                 // add the new entry to the map of all threads
@@ -245,7 +245,7 @@ namespace hpx { namespace threads { namespace policies {
                 {
                     --addfrom->new_tasks_count_.data_;
                     lk.unlock();
-                    HPX_THROW_EXCEPTION(hpx::out_of_memory,
+                    HPX_THROW_EXCEPTION(hpx::error::out_of_memory,
                         "thread_queue::add_new",
                         "Couldn't add new thread to the thread map");
                     return 0;
@@ -685,7 +685,7 @@ namespace hpx { namespace threads { namespace policies {
                     if (HPX_UNLIKELY(!p.second))
                     {
                         lk.unlock();
-                        HPX_THROWS_IF(ec, hpx::out_of_memory,
+                        HPX_THROWS_IF(ec, hpx::error::out_of_memory,
                             "thread_queue::create_thread",
                             "Couldn't add new thread to the map of threads");
                         return;
@@ -729,7 +729,7 @@ namespace hpx { namespace threads { namespace policies {
             // away (can't be scheduled).
             if (data.initial_state != thread_schedule_state::pending)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "thread_queue::create_thread",
                     "staged tasks must have 'pending' as their initial state");
             }
@@ -947,7 +947,7 @@ namespace hpx { namespace threads { namespace policies {
             }
             else if (state == thread_schedule_state::staged)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "thread_queue::iterate_threads",
                     "can't iterate over thread ids of staged threads");
                 return false;

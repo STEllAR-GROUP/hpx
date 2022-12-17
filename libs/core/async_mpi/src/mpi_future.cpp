@@ -140,7 +140,7 @@ namespace hpx { namespace mpi { namespace experimental {
         void hpx_MPI_Handler(MPI_Comm*, int* errorcode, ...)
         {
             mpi_debug.debug(debug::str<>("hpx_MPI_Handler"));
-            HPX_THROW_EXCEPTION(invalid_status, "hpx_MPI_Handler",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status, "hpx_MPI_Handler",
                 detail::error_message(*errorcode));
         }
 
@@ -336,7 +336,7 @@ namespace hpx { namespace mpi { namespace experimental {
 
                 if (requests_vector.size() != request_callback_vector.size())
                 {
-                    HPX_THROW_EXCEPTION(invalid_status,
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "hpx::mpi::experimental::poll",
                         "Fatal Error: Mismatch in vectors");
                 }
@@ -431,7 +431,7 @@ namespace hpx { namespace mpi { namespace experimental {
             {
                 mpi_debug.error(debug::str<>("hpx::mpi::experimental::init"),
                     "init failed");
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "hpx::mpi::experimental::init",
                     "the MPI installation doesn't allow multiple threads");
             }

@@ -49,7 +49,7 @@ namespace hpx::plugins::compression {
     {
         if (current_ + dst_count > buffer_.size())
         {
-            HPX_THROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                 "snappy_serialization_filter::load",
                 "archive data bstream is too short");
             return;
@@ -89,7 +89,7 @@ namespace hpx::plugins::compression {
 
         if (compressed_length > dst_count)
         {
-            HPX_THROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                 "snappy_serialization_filter::flush",
                 "compression failure, flushing did not reach end of data");
             return false;

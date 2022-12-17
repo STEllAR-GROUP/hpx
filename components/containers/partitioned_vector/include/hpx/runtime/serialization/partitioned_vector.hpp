@@ -31,7 +31,7 @@ namespace hpx { namespace serialization
         if (pvec_registered_name.empty())
         {
             HPX_THROW_EXCEPTION(
-                hpx::invalid_status,
+                hpx::error::invalid_status,
                 "hpx::serialization::serialize",
                 "partitioned_vector is not registered");
         }

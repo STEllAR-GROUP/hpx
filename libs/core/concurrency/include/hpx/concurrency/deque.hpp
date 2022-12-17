@@ -284,7 +284,7 @@ namespace hpx::lockfree {
         {
             if (n != nullptr)
             {
-                n->~node();
+                std::destroy_at(n);
                 pool_.deallocate(n);
             }
         }

@@ -64,7 +64,7 @@ namespace hpx { namespace performance_counters { namespace papi {
 
         if (paths.parentinstance_is_basename_)
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 NS_STR "create_papi_counter()",
                 "unsupported counter instance parent name: " +
                     paths.parentinstancename_);
@@ -76,7 +76,7 @@ namespace hpx { namespace performance_counters { namespace papi {
         std::uint32_t tix = util::get_counter_thread(paths, label);
         if (tix == thread_mapper::invalid_index)
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 NS_STR "create_papi_counter()",
                 "cannot find thread specified in " + info.fullname_);
         }
@@ -317,7 +317,7 @@ namespace hpx { namespace performance_counters { namespace papi {
         {
             if (PAPI_library_init(PAPI_VER_CURRENT) != PAPI_VER_CURRENT)
             {
-                HPX_THROW_EXCEPTION(hpx::no_success,
+                HPX_THROW_EXCEPTION(hpx::error::no_success,
                     "hpx::performance_counters::papi::check_startup()",
                     "PAPI library initialization failed (version mismatch)");
             }

@@ -41,7 +41,7 @@ namespace hpx { namespace parallel { inline namespace v2 {
     {
     public:
         task_canceled_exception() noexcept
-          : hpx::exception(hpx::task_canceled_exception)
+          : hpx::exception(hpx::error::task_canceled_exception)
         {
         }
     };
@@ -181,8 +181,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
             // 'active' to be usable.
             if (id_ != threads::get_self_id())
             {
-                HPX_THROW_EXCEPTION(task_block_not_active, "task_block::run",
-                    "the task_block is not active");
+                HPX_THROW_EXCEPTION(hpx::error::task_block_not_active,
+                    "task_block::run", "the task_block is not active");
             }
 
             tasks_.run(
@@ -230,8 +230,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
             // 'active' to be usable.
             if (id_ != threads::get_self_id())
             {
-                HPX_THROW_EXCEPTION(task_block_not_active, "task_block::run",
-                    "the task_block is not active");
+                HPX_THROW_EXCEPTION(hpx::error::task_block_not_active,
+                    "task_block::run", "the task_block is not active");
             }
 
             tasks_.run(HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
@@ -270,8 +270,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
             // 'active' to be usable.
             if (id_ != threads::get_self_id())
             {
-                HPX_THROW_EXCEPTION(task_block_not_active, "task_block::run",
-                    "the task_block is not active");
+                HPX_THROW_EXCEPTION(hpx::error::task_block_not_active,
+                    "task_block::run", "the task_block is not active");
                 return;
             }
 

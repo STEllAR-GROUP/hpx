@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -26,6 +26,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief A hpx::exception is the main exception type used by HPX to
     ///        report errors.
@@ -42,7 +43,7 @@ namespace hpx {
         ///
         /// \param e    The parameter \p e holds the hpx::error code the new
         ///             exception should encapsulate.
-        explicit exception(error e = success);
+        explicit exception(error e = hpx::error::success);
 
         /// Construct a hpx::exception from a boost#system_error.
         explicit exception(std::system_error const& e);
@@ -83,7 +84,7 @@ namespace hpx {
         /// Destruct a hpx::exception
         ///
         /// \throws nothing
-        ~exception() noexcept;
+        ~exception();
 
         /// The function \a get_error() returns the hpx::error code stored
         /// in the referenced instance of a hpx::exception. It returns
@@ -215,7 +216,7 @@ namespace hpx {
             {
             }
 
-            ~std_exception() noexcept {}
+            ~std_exception() = default;
 
             const char* what() const noexcept override
             {
@@ -234,7 +235,7 @@ namespace hpx {
             {
             }
 
-            ~bad_alloc() noexcept {}
+            ~bad_alloc() = default;
 
             const char* what() const noexcept override
             {
@@ -253,7 +254,7 @@ namespace hpx {
             {
             }
 
-            ~bad_exception() noexcept {}
+            ~bad_exception() = default;
 
             const char* what() const noexcept override
             {
@@ -272,7 +273,7 @@ namespace hpx {
             {
             }
 
-            ~bad_cast() noexcept {}
+            ~bad_cast() = default;
 
             const char* what() const noexcept override
             {
@@ -291,7 +292,7 @@ namespace hpx {
             {
             }
 
-            ~bad_typeid() noexcept {}
+            ~bad_typeid() = default;
 
             const char* what() const noexcept override
             {

@@ -83,7 +83,7 @@ hpx::naming::gid_type test_counter_creator(
 
     if (paths.parentinstance_is_basename_)
     {
-        HPX_THROWS_IF(ec, hpx::bad_parameter, "test_counter_creator",
+        HPX_THROWS_IF(ec, hpx::error::bad_parameter, "test_counter_creator",
             "invalid counter instance parent name: " +
                 paths.parentinstancename_);
         return hpx::naming::invalid_gid;
@@ -118,7 +118,7 @@ hpx::naming::gid_type test_counter_creator(
         return id;
     }
 
-    HPX_THROWS_IF(ec, hpx::bad_parameter, "test_counter_creator",
+    HPX_THROWS_IF(ec, hpx::error::bad_parameter, "test_counter_creator",
         "invalid counter instance name: " + paths.instancename_);
     return hpx::naming::invalid_gid;
 }

@@ -69,7 +69,7 @@ namespace hpx { namespace util {
         static void destruct()
         {
             for (std::size_t i = 0; i < N; ++i)
-                get_address(i)->~value_type();
+                std::destroy_at(get_address(i));
         }
 
         ///////////////////////////////////////////////////////////////////////

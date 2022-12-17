@@ -116,7 +116,7 @@ namespace hpx::lcos::local::detail {
             {
                 lock.unlock();
 
-                HPX_THROWS_IF(ec, null_thread_id,
+                HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                     "condition_variable::notify_one",
                     "null thread id encountered");
                 return false;
@@ -166,7 +166,7 @@ namespace hpx::lcos::local::detail {
                     prepend_entries(lock, queue);
                     lock.unlock();
 
-                    HPX_THROWS_IF(ec, null_thread_id,
+                    HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                         "condition_variable::notify_all",
                         "null thread id encountered");
                     return;

@@ -97,7 +97,7 @@ namespace hpx { namespace performance_counters {
     {
         if (path.objectname_.empty())
         {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_name",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter, "get_counter_name",
                 "empty counter object name");
             return counter_status::invalid_data;
         }
@@ -171,8 +171,8 @@ namespace hpx { namespace performance_counters {
     {
         if (path.objectname_.empty())
         {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_type_name",
-                "empty counter object name");
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "get_counter_type_name", "empty counter object name");
             return counter_status::invalid_data;
         }
 
@@ -198,8 +198,8 @@ namespace hpx { namespace performance_counters {
     {
         if (path.objectname_.empty())
         {
-            HPX_THROWS_IF(ec, bad_parameter, "get_full_counter_type_name",
-                "empty counter object name");
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "get_full_counter_type_name", "empty counter object name");
             return counter_status::invalid_data;
         }
 
@@ -230,8 +230,8 @@ namespace hpx { namespace performance_counters {
     {
         if (path.parentinstancename_.empty())
         {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_instance_name",
-                "empty counter instance name");
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "get_counter_instance_name", "empty counter instance name");
             return counter_status::invalid_data;
         }
 
@@ -303,8 +303,9 @@ namespace hpx { namespace performance_counters {
         path_elements elements;
         if (!parse_counter_name(name, elements))
         {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_path_elements",
-                "invalid counter name format: {}", name);
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "get_counter_path_elements", "invalid counter name format: {}",
+                name);
             return counter_status::invalid_data;
         }
 
@@ -356,7 +357,7 @@ namespace hpx { namespace performance_counters {
                         elements.instance_.child_.index_, std::int64_t(-2));
                     if (path.instanceindex_ == std::int64_t(-2))
                     {
-                        HPX_THROWS_IF(ec, bad_parameter,
+                        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                             "get_counter_path_elements",
                             "invalid counter name format: {}", name);
                         return counter_status::invalid_data;
@@ -394,7 +395,8 @@ namespace hpx { namespace performance_counters {
         path_elements elements;
         if (!parse_counter_name(name, elements))
         {
-            HPX_THROWS_IF(ec, bad_parameter, "get_counter_type_path_elements",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "get_counter_type_path_elements",
                 "invalid counter name format: {}", name);
             return counter_status::invalid_data;
         }
@@ -516,7 +518,7 @@ namespace hpx { namespace performance_counters {
     {
         if (hpx::get_runtime_ptr() == nullptr)
         {
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "performance_counters::add_counter_type",
                 "the runtime is not currently running");
             return counter_status::generic_error;
@@ -533,7 +535,7 @@ namespace hpx { namespace performance_counters {
     {
         if (hpx::get_runtime_ptr() == nullptr)
         {
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "performance_counters::discover_counter_types",
                 "the runtime is not currently running");
             return counter_status::generic_error;
@@ -550,7 +552,7 @@ namespace hpx { namespace performance_counters {
     {
         if (hpx::get_runtime_ptr() == nullptr)
         {
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "performance_counters::discover_counter_types",
                 "the runtime is not currently running");
             return counter_status::generic_error;
@@ -565,7 +567,7 @@ namespace hpx { namespace performance_counters {
     {
         if (hpx::get_runtime_ptr() == nullptr)
         {
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "performance_counters::discover_counter_types",
                 "the runtime is not currently running");
             return counter_status::generic_error;
@@ -631,7 +633,7 @@ namespace hpx { namespace performance_counters {
     {
         if (hpx::get_runtime_ptr() == nullptr)
         {
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "performance_counters::get_counter_type",
                 "the runtime is not currently running");
             return counter_status::generic_error;
@@ -766,7 +768,8 @@ namespace hpx { namespace performance_counters {
             registry::instance().get_counter_create_function(info, f, ec);
             if (ec)
             {
-                HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "create_counter_local",
                     "no create function for performance counter found: {} ({})",
                     remove_counter_prefix(info.fullname_), ec.get_message());
                 return naming::invalid_gid;
@@ -781,7 +784,8 @@ namespace hpx { namespace performance_counters {
                 paths.parentinstanceindex_ !=
                     static_cast<std::int64_t>(hpx::get_locality_id()))
             {
-                HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "create_counter_local",
                     "attempt to create counter on wrong locality ({})",
                     ec.get_message());
                 return hpx::naming::invalid_gid;
@@ -791,7 +795,8 @@ namespace hpx { namespace performance_counters {
             naming::gid_type gid = f(info, ec);
             if (ec)
             {
-                HPX_THROW_EXCEPTION(bad_parameter, "create_counter_local",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "create_counter_local",
                     "couldn't create performance counter: {} ({})",
                     remove_counter_prefix(info.fullname_), ec.get_message());
                 return naming::invalid_gid;
@@ -1153,7 +1158,7 @@ namespace hpx { namespace performance_counters {
                             static_cast<std::int32_t>(
                                 get_num_localities(hpx::launch::sync))))
                 {
-                    HPX_THROWS_IF(ec, bad_parameter, "get_counter",
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter, "get_counter",
                         "attempt to create counter on non-existing locality");
                     return result_type();
                 }

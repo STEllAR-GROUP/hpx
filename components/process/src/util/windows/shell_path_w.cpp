@@ -18,31 +18,28 @@
 
 #include <windows.h>
 
-namespace hpx { namespace components { namespace process { namespace windows
-{
+namespace hpx { namespace components { namespace process { namespace windows {
     filesystem::path shell_path()
     {
         TCHAR sysdir[MAX_PATH];
         UINT size = ::GetSystemDirectory(sysdir, sizeof(sysdir));
         if (!size)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
-                "process::shell_path",
-                "GetSystemDirectory() failed");
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "process::shell_path", "GetSystemDirectory() failed");
         }
         filesystem::path p = sysdir;
         return p / "cmd.exe";
     }
 
-    filesystem::path shell_path(hpx::error_code &ec)
+    filesystem::path shell_path(hpx::error_code& ec)
     {
         TCHAR sysdir[MAX_PATH];
         UINT size = ::GetSystemDirectory(sysdir, sizeof(sysdir));
         filesystem::path p;
         if (!size)
         {
-            HPX_THROWS_IF(ec, invalid_status,
-                "process::shell_path",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "process::shell_path",
                 "GetSystemDirectory() failed");
         }
         else
@@ -53,6 +50,6 @@ namespace hpx { namespace components { namespace process { namespace windows
         }
         return p;
     }
-}}}}
+}}}}    // namespace hpx::components::process::windows
 
 #endif

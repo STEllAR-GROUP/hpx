@@ -118,7 +118,7 @@ namespace hpx { namespace parcelset {
 
         impl_->save(ar);
 #else
-        HPX_THROW_EXCEPTION(invalid_status, "locality::save",
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status, "locality::save",
             "this shouldn't be called if networking is disabled");
         HPX_UNUSED(ar);
 #endif
@@ -138,7 +138,7 @@ namespace hpx { namespace parcelset {
         impl_->load(ar);
         HPX_ASSERT(impl_->valid());
 #else
-        HPX_THROW_EXCEPTION(invalid_status, "locality::load",
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status, "locality::load",
             "this shouldn't be called if networking is disabled");
         HPX_UNUSED(ar);
 #endif

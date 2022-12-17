@@ -146,7 +146,7 @@ namespace hpx {
     {
         if (!traits::action_is_target_valid<Action>::call(gid))
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "post_p_cb",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "post_p_cb",
                 "the target (destination) does not match the action type ({})",
                 hpx::actions::detail::get_action_name<Action>());
             return false;
@@ -176,7 +176,7 @@ namespace hpx {
             HPX_FORWARD(Continuation, c), gid, priority,
             HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
 #else
-        HPX_THROW_EXCEPTION(invalid_status, "hpx::post_cb",
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status, "hpx::post_cb",
             "unexpected attempt to send a parcel with networking disabled");
 #endif
     }

@@ -225,21 +225,21 @@ namespace hpx {
             {
                 if (this->shared_state_ == nullptr)
                 {
-                    HPX_THROWS_IF(ec, no_state,
+                    HPX_THROWS_IF(ec, hpx::error::no_state,
                         "detail::promise_base<Result, RemoteResult>::get_id",
                         "this promise has no valid shared state");
                     return hpx::invalid_id;
                 }
                 if (!addr_ || !id_)
                 {
-                    HPX_THROWS_IF(ec, no_state,
+                    HPX_THROWS_IF(ec, hpx::error::no_state,
                         "detail::promise_base<Result, RemoteResult>::get_id",
                         "this promise has no valid LCO");
                     return hpx::invalid_id;
                 }
                 if (!this->future_retrieved_)
                 {
-                    HPX_THROW_EXCEPTION(invalid_status,
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "promise<Result>::get_id",
                         "future has not been retrieved from this promise yet");
                     return hpx::invalid_id;
@@ -268,7 +268,7 @@ namespace hpx {
             {
                 if (!addr_ || !id_)
                 {
-                    HPX_THROWS_IF(ec, no_state,
+                    HPX_THROWS_IF(ec, hpx::error::no_state,
                         "detail::promise_base<Result, RemoteResult>::get_id",
                         "this promise has no valid LCO");
                     return naming::address();
@@ -292,7 +292,7 @@ namespace hpx {
 
                 static void wrapping_deleter(wrapping_type* ptr)
                 {
-                    ptr->~wrapping_type();
+                    std::destroy_at(ptr);
                     hpx::components::component_heap<wrapping_type>().free(ptr);
                 }
 
@@ -350,8 +350,8 @@ namespace hpx {
                 if (this->shared_state_ != nullptr && this->future_retrieved_ &&
                     !(this->shared_state_->is_ready() || id_retrieved_))
                 {
-                    this->shared_state_->set_error(broken_promise, fun,
-                        "abandoning not ready shared state");
+                    this->shared_state_->set_error(hpx::error::broken_promise,
+                        fun, "abandoning not ready shared state");
                     return;
                 }
             }

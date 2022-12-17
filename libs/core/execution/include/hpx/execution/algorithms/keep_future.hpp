@@ -39,7 +39,7 @@ namespace hpx { namespace execution { namespace experimental {
 
                         if (!state)
                         {
-                            HPX_THROW_EXCEPTION(no_state,
+                            HPX_THROW_EXCEPTION(hpx::error::no_state,
                                 "operation_state::start",
                                 "the future has no valid shared state");
                         }

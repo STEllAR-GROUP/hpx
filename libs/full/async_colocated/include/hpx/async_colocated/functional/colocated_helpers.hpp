@@ -32,7 +32,7 @@ namespace hpx { namespace util { namespace functional {
         {
             if (locality_id == hpx::invalid_id)
             {
-                HPX_THROW_EXCEPTION(hpx::no_success,
+                HPX_THROW_EXCEPTION(hpx::error::no_success,
                     "extract_locality::operator()",
                     "could not resolve colocated locality for id({1})", id);
                 return hpx::invalid_id;

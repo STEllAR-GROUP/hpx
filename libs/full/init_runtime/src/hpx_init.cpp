@@ -899,7 +899,8 @@ namespace hpx {
                         &hpx::detail::pre_main, &hpx::detail::post_main));
                     break;
 #else
-                    HPX_THROW_EXCEPTION(invalid_status, "run_or_start",
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                        "run_or_start",
                         "Attempted to start the runtime in the mode \"{1}\", "
                         "but HPX was compiled with "
                         "HPX_WITH_DISTRIBUTED_RUNTIME=OFF, and \"{1}\" "
@@ -949,14 +950,14 @@ namespace hpx {
     {
         if (!threads::get_self_ptr())
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::finalize",
                 "this function can be called from an HPX thread only");
             return -1;
         }
 
         if (!is_running())
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::finalize",
                 "the runtime system is not active (did you already "
                 "call finalize?)");
             return -1;
@@ -984,7 +985,7 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::finalize",
                 "the runtime system is not active (did you already "
                 "call hpx::stop?)");
             return -1;
@@ -1001,14 +1002,14 @@ namespace hpx {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         if (!threads::get_self_ptr())
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::disconnect",
                 "this function can be called from an HPX thread only");
             return -1;
         }
 
         if (!is_running())
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::disconnect",
                 "the runtime system is not active (did you already "
                 "call finalize?)");
             return -1;
@@ -1039,7 +1040,7 @@ namespace hpx {
 
         if (nullptr == p)
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::disconnect",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::disconnect",
                 "the runtime system is not active (did you already "
                 "call finalize?)");
             return -1;

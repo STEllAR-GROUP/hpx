@@ -25,6 +25,7 @@
 #include <cstddef>
 #include <initializer_list>
 #include <iosfwd>
+#include <memory>
 #include <stdexcept>
 #include <type_traits>
 #include <typeinfo>
@@ -244,11 +245,11 @@ namespace hpx { namespace util { namespace detail { namespace any {
             }
             static void static_delete(void** x)
             {
-                reinterpret_cast<T*>(x)->~T();
+                std::destroy_at(reinterpret_cast<T*>(x));
             }
             static void destruct(void** x)
             {
-                reinterpret_cast<T*>(x)->~T();
+                std::destroy_at(reinterpret_cast<T*>(x));
             }
             static void clone(void* const* src, void** dest)
             {
@@ -302,7 +303,7 @@ namespace hpx { namespace util { namespace detail { namespace any {
             static void destruct(void** x)
             {
                 // destruct only, we'll reuse memory
-                (*reinterpret_cast<T**>(x))->~T();
+                std::destroy_at(*reinterpret_cast<T**>(x));
             }
             static void clone(void* const* src, void** dest)
             {
@@ -355,11 +356,11 @@ namespace hpx { namespace util { namespace detail { namespace any {
             }
             static void static_delete(void** x)
             {
-                reinterpret_cast<T*>(x)->~T();
+                std::destroy_at(reinterpret_cast<T*>(x));
             }
             static void destruct(void** x)
             {
-                reinterpret_cast<T*>(x)->~T();
+                std::destroy_at(reinterpret_cast<T*>(x));
             }
             static bool equal_to(void* const* x, void* const* y)
             {
@@ -405,7 +406,7 @@ namespace hpx { namespace util { namespace detail { namespace any {
             static void destruct(void** x)
             {
                 // destruct only, we'll reuse memory
-                (*reinterpret_cast<T**>(x))->~T();
+                std::destroy_at(*reinterpret_cast<T**>(x));
             }
             static bool equal_to(void* const* x, void* const* y)
             {

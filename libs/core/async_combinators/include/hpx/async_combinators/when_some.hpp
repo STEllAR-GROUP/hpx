@@ -431,9 +431,9 @@ namespace hpx {
             if (n > values.size())
             {
                 return hpx::make_exceptional_future<
-                    when_some_result<result_type>>(
-                    HPX_GET_EXCEPTION(hpx::bad_parameter, "hpx::when_some",
-                        "number of results to wait for is out of bounds"));
+                    when_some_result<result_type>>(HPX_GET_EXCEPTION(
+                    hpx::error::bad_parameter, "hpx::when_some",
+                    "number of results to wait for is out of bounds"));
             }
 
             auto f = std::make_shared<lcos::detail::when_some<result_type>>(
@@ -479,7 +479,7 @@ namespace hpx {
             }
 
             return hpx::make_exceptional_future<when_some_result<result_type>>(
-                HPX_GET_EXCEPTION(hpx::bad_parameter, "hpx::when_some",
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter, "hpx::when_some",
                     "number of results to wait for is out of bounds"));
         }
 
@@ -500,9 +500,9 @@ namespace hpx {
             if (n > 1 + sizeof...(Ts))
             {
                 return hpx::make_exceptional_future<
-                    when_some_result<result_type>>(
-                    HPX_GET_EXCEPTION(hpx::bad_parameter, "hpx::when_some",
-                        "number of results to wait for is out of bounds"));
+                    when_some_result<result_type>>(HPX_GET_EXCEPTION(
+                    hpx::error::bad_parameter, "hpx::when_some",
+                    "number of results to wait for is out of bounds"));
             }
 
             traits::acquire_future_disp func;

@@ -188,7 +188,7 @@ namespace hpx { namespace threads { namespace policies {
         // Return the number of existing threads with the given state.
         std::int64_t get_thread_count() const
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "get_thread_count",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "get_thread_count",
                 "use get_queue_length_staged/get_queue_length_pending");
             return 0;
         }
@@ -244,7 +244,7 @@ namespace hpx { namespace threads { namespace policies {
             // away (can't be scheduled).
             if (data.initial_state != thread_schedule_state::pending)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "thread_queue_mc::create_thread",
                     "staged tasks must have 'pending' as their initial state");
             }

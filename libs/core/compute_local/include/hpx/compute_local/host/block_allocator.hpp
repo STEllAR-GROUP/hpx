@@ -29,6 +29,7 @@
 
 #include <cstddef>
 #include <limits>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -167,7 +168,9 @@ namespace hpx { namespace compute { namespace host {
                                 },
                                 // cleanup function, called for all elements of
                                 // current partition which succeeded before exception
-                                [p](iterator_type it) { (p + *it)->~U(); });
+                                [p](iterator_type it) {
+                                    std::destroy_at(p + *it);
+                                });
                         return std::make_pair(it, last);
                     },
                     // finalize, called once if no error occurred
@@ -179,7 +182,7 @@ namespace hpx { namespace compute { namespace host {
                     [p](partition_result_type&& r) -> void {
                         while (r.first != r.second)
                         {
-                            (p + *r.first)->~U();
+                            std::destroy_at(p + *r.first);
                             ++r.first;
                         }
                     });
@@ -206,15 +209,15 @@ namespace hpx { namespace compute { namespace host {
 
                 // keep memory locality, use executor...
                 auto irange = hpx::util::counting_shape(count);
-                hpx::ranges::for_each(
-                    policy_, irange, [p](std::size_t i) { (p + i)->~U(); });
+                hpx::ranges::for_each(policy_, irange,
+                    [p](std::size_t i) { std::destroy_at(p + i); });
             }
 
             // Calls the destructor of the object pointed to by p
             template <typename U>
             void destroy(U* p)
             {
-                p->~U();
+                std::destroy_at(p);
             }
 
             // Required by hpx::compute::traits::allocator_traits. Return

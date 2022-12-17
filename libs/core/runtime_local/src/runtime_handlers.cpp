@@ -68,7 +68,7 @@ namespace hpx { namespace detail {
             strm << " (" << msg << ")";
         }
 
-        hpx::exception e(hpx::assertion_failure, strm.str());
+        hpx::exception e(hpx::error::assertion_failure, strm.str());
         std::cerr << hpx::diagnostic_information(hpx::detail::get_exception(
                          e, loc.function_name(), loc.file_name(), loc.line()))
                   << std::endl;
@@ -112,14 +112,16 @@ namespace hpx { namespace detail {
         {
             if (back_trace.empty())
             {
-                HPX_THROW_EXCEPTION(invalid_status, "verify_no_locks",
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "verify_no_locks",
                     "suspending thread while at least one lock is "
                     "being held (stack backtrace was disabled at "
                     "compile time)");
             }
             else
             {
-                HPX_THROW_EXCEPTION(invalid_status, "verify_no_locks",
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "verify_no_locks",
                     "suspending thread while at least one lock is "
                     "being held, stack backtrace: {}",
                     back_trace);
@@ -138,7 +140,8 @@ namespace hpx { namespace detail {
         hpx::runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::get_default_pool",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::detail::get_default_pool",
                 "The runtime system is not active");
         }
 
@@ -150,7 +153,7 @@ namespace hpx { namespace detail {
         hpx::runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::detail::get_default_timer_service",
                 "The runtime system is not active");
         }

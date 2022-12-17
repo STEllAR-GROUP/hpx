@@ -82,7 +82,7 @@ namespace hpx { namespace components { namespace server {
             {
                 agas::unmark_as_migrated(to_migrate.get_gid());
 
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "hpx::components::server::migrate_to_storage_here",
                     "attempting to migrate an instance of a component which "
                     "was "
@@ -94,7 +94,7 @@ namespace hpx { namespace components { namespace server {
             {
                 agas::unmark_as_migrated(to_migrate.get_gid());
 
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "hpx::components::server::migrate_to_storage_here",
                     "attempting to migrate an instance of a component which is "
                     "currently pinned");
@@ -138,7 +138,7 @@ namespace hpx { namespace components { namespace server {
     {
         if (!traits::component_supports_migration<Component>::call())
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::components::server::migrate_to_storage_here",
                 "attempting to migrate an instance of a component which "
                 "does not support migration");
@@ -173,7 +173,7 @@ namespace hpx { namespace components { namespace server {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         if (!traits::component_supports_migration<Component>::call())
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::components::server::trigger_migrate_to_storage_here",
                 "attempting to migrate an instance of a component which "
                 "does not support migration");
@@ -182,7 +182,7 @@ namespace hpx { namespace components { namespace server {
 
         if (naming::get_locality_id_from_id(to_migrate) != get_locality_id())
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::components::server::trigger_migrate_to_storage_here",
                 "this function has to be executed on the locality responsible "
                 "for managing the address of the given object");
@@ -197,11 +197,10 @@ namespace hpx { namespace components { namespace server {
         future<id_type> f =
             async<action_type>(r.first, to_migrate, r.second, target_storage);
 
-        return f.then(
-            [to_migrate](future<hpx::id_type>&& f) -> hpx::id_type {
-                agas::end_migration(to_migrate);
-                return f.get();
-            });
+        return f.then([to_migrate](future<hpx::id_type>&& f) -> hpx::id_type {
+            agas::end_migration(to_migrate);
+            return f.get();
+        });
 #else
         HPX_ASSERT(false);
         HPX_UNUSED(to_migrate);

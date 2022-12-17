@@ -770,7 +770,7 @@ struct bitset_test
             catch (hpx::exception& ex)
             {
                 // Good!
-                HPX_TEST(ex.get_error() == hpx::out_of_range);
+                HPX_TEST(ex.get_error() == hpx::error::out_of_range);
             }
             catch (...)
             {

@@ -70,7 +70,8 @@ namespace hpx::agas::server {
             {
                 l.unlock();
 
-                HPX_THROWS_IF(ec, no_success, "primary_namespace::route",
+                HPX_THROWS_IF(ec, hpx::error::no_success,
+                    "primary_namespace::route",
                     "can't route parcel to unknown gid: {}", gid);
 
                 return;

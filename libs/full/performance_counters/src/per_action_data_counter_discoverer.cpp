@@ -99,7 +99,7 @@ namespace hpx { namespace performance_counters {
                     types += "  " + e + "\n";
                 }
 
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "per_action_data_counter_registry::counter_discoverer",
                     "action type {} does not match any known type, "
                     "known action types: \n{}",
@@ -124,7 +124,7 @@ namespace hpx { namespace performance_counters {
                 types += "  " + e + "\n";
             }
 
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "per_action_data_counter_registry::counter_discoverer",
                 "action type {} does not match any known type, "
                 "known action types: \n{}",

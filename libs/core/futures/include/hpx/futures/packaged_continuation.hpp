@@ -99,7 +99,8 @@ namespace hpx { namespace lcos { namespace detail {
 
                 if (ptr == nullptr)
                 {
-                    HPX_THROW_EXCEPTION(no_state, "invoke_continuation",
+                    HPX_THROW_EXCEPTION(hpx::error::no_state,
+                        "invoke_continuation",
                         "the inner future has no valid shared state");
                 }
 
@@ -203,7 +204,8 @@ namespace hpx { namespace lcos { namespace detail {
                 std::lock_guard<mutex_type> l(mtx_);
                 if (started_)
                 {
-                    HPX_THROWS_IF(ec, task_already_started, "continuation::run",
+                    HPX_THROWS_IF(ec, hpx::error::task_already_started,
+                        "continuation::run",
                         "this task has already been started");
                     return;
                 }
@@ -223,7 +225,7 @@ namespace hpx { namespace lcos { namespace detail {
                 std::lock_guard<mutex_type> l(mtx_);
                 if (started_)
                 {
-                    HPX_THROWS_IF(ec, task_already_started,
+                    HPX_THROWS_IF(ec, hpx::error::task_already_started,
                         "continuation::run_nounwrap",
                         "this task has already been started");
                     return;
@@ -268,7 +270,7 @@ namespace hpx { namespace lcos { namespace detail {
                 if (started_)
                 {
                     l.unlock();
-                    HPX_THROWS_IF(ec, task_already_started,
+                    HPX_THROWS_IF(ec, hpx::error::task_already_started,
                         "continuation::async",
                         "this task has already been started");
                     return;
@@ -298,7 +300,7 @@ namespace hpx { namespace lcos { namespace detail {
                 if (started_)
                 {
                     l.unlock();
-                    HPX_THROWS_IF(ec, task_already_started,
+                    HPX_THROWS_IF(ec, hpx::error::task_already_started,
                         "continuation::async_nounwrap",
                         "this task has already been started");
                     return;
@@ -344,14 +346,15 @@ namespace hpx { namespace lcos { namespace detail {
                         this->started_ = true;
 
                         l.unlock();
-                        this->set_error(future_cancelled,
+                        this->set_error(hpx::error::future_cancelled,
                             "continuation<Future, ContResult>::cancel",
                             "future has been canceled");
                     }
                     else
                     {
                         l.unlock();
-                        HPX_THROW_EXCEPTION(future_can_not_be_cancelled,
+                        HPX_THROW_EXCEPTION(
+                            hpx::error::future_can_not_be_cancelled,
                             "continuation<Future, ContResult>::cancel",
                             "future can't be canceled at this time");
                     }
@@ -382,7 +385,8 @@ namespace hpx { namespace lcos { namespace detail {
 
             if (ptr == nullptr)
             {
-                HPX_THROW_EXCEPTION(no_state, "continuation::attach",
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
+                    "continuation::attach",
                     "the future to attach has no valid shared state");
             }
 
@@ -419,7 +423,8 @@ namespace hpx { namespace lcos { namespace detail {
 
             if (ptr == nullptr)
             {
-                HPX_THROW_EXCEPTION(no_state, "continuation::attach",
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
+                    "continuation::attach",
                     "the future to attach has no valid shared state");
             }
 
@@ -457,7 +462,8 @@ namespace hpx { namespace lcos { namespace detail {
 
             if (ptr == nullptr)
             {
-                HPX_THROW_EXCEPTION(no_state, "continuation::attach_nounwrap",
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
+                    "continuation::attach_nounwrap",
                     "the future to attach has no valid shared state");
             }
 
@@ -494,7 +500,8 @@ namespace hpx { namespace lcos { namespace detail {
 
             if (ptr == nullptr)
             {
-                HPX_THROW_EXCEPTION(no_state, "continuation::attach_nounwrap",
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
+                    "continuation::attach_nounwrap",
                     "the future to attach has no valid shared state");
             }
 
@@ -613,7 +620,7 @@ namespace hpx { namespace lcos { namespace detail {
 
                     if (ptr == nullptr)
                     {
-                        HPX_THROW_EXCEPTION(no_state,
+                        HPX_THROW_EXCEPTION(hpx::error::no_state,
                             "unwrap_continuation<ContResult>::on_outer_ready",
                             "the inner future has no valid shared state");
                     }
@@ -659,7 +666,7 @@ namespace hpx { namespace lcos { namespace detail {
 
             if (ptr == nullptr)
             {
-                HPX_THROW_EXCEPTION(no_state,
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
                     "unwrap_continuation<ContResult>::attach",
                     "the future has no valid shared state");
             }

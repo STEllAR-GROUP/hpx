@@ -25,7 +25,7 @@ void test_exception_from_continuation1()
     hpx::future<void> f2 = f1.then([](hpx::future<void>&& f1) {
         HPX_TEST(f1.has_value());
         HPX_THROW_EXCEPTION(
-            hpx::invalid_status, "lambda", "testing exceptions");
+            hpx::error::invalid_status, "lambda", "testing exceptions");
     });
 
     p.set_value();
@@ -55,7 +55,7 @@ void test_exception_from_continuation2()
 
                 ++exceptions_thrown;
                 HPX_THROW_EXCEPTION(
-                    hpx::invalid_status, "lambda", "testing exceptions");
+                    hpx::error::invalid_status, "lambda", "testing exceptions");
             }));
     }
 

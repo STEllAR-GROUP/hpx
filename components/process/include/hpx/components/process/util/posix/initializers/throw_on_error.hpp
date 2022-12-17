@@ -19,100 +19,101 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <cstddef>
 #include <string>
 
 namespace hpx { namespace components { namespace process { namespace posix {
 
-namespace initializers {
+    namespace initializers {
 
-class throw_on_error : public initializer_base
-{
-    static std::string extract_error_string(int code)
-    {
-        constexpr std::size_t const buffer_len = 256;
-        char buffer[buffer_len+1];
-        strerror_r(code, buffer, buffer_len);
-        return buffer;
-    }
-
-public:
-    template <class PosixExecutor>
-    void on_fork_setup(PosixExecutor&) const
-    {
-        if (::pipe(fds_) == -1)
+        class throw_on_error : public initializer_base
         {
-            HPX_THROW_EXCEPTION(kernel_error,
-                "throw_on_error::on_fork_setup",
-                "pipe(2) failed: {}", extract_error_string(errno));
-        }
-        if (::fcntl(fds_[1], F_SETFD, FD_CLOEXEC) == -1)
-        {
-            ::close(fds_[0]);
-            ::close(fds_[1]);
+            static std::string extract_error_string(int code)
+            {
+                constexpr std::size_t const buffer_len = 256;
+                char buffer[buffer_len + 1];
+                strerror_r(code, buffer, buffer_len);
+                return buffer;
+            }
 
-            HPX_THROW_EXCEPTION(kernel_error,
-                "throw_on_error::on_fork_setup",
-                "fcntl(2) failed: {}", extract_error_string(errno));
-        }
-    }
+        public:
+            template <class PosixExecutor>
+            void on_fork_setup(PosixExecutor&) const
+            {
+                if (::pipe(fds_) == -1)
+                {
+                    HPX_THROW_EXCEPTION(hpx::error::kernel_error,
+                        "throw_on_error::on_fork_setup", "pipe(2) failed: {}",
+                        extract_error_string(errno));
+                }
+                if (::fcntl(fds_[1], F_SETFD, FD_CLOEXEC) == -1)
+                {
+                    ::close(fds_[0]);
+                    ::close(fds_[1]);
 
-    template <class PosixExecutor>
-    void on_fork_error(PosixExecutor&) const
-    {
-        ::close(fds_[0]);
-        ::close(fds_[1]);
+                    HPX_THROW_EXCEPTION(hpx::error::kernel_error,
+                        "throw_on_error::on_fork_setup", "fcntl(2) failed: {}",
+                        extract_error_string(errno));
+                }
+            }
 
-        HPX_THROW_EXCEPTION(kernel_error,
-            "throw_on_error::on_fork_error",
-            "fork(2) failed: {}", extract_error_string(errno));
-    }
+            template <class PosixExecutor>
+            void on_fork_error(PosixExecutor&) const
+            {
+                ::close(fds_[0]);
+                ::close(fds_[1]);
 
-    template <class PosixExecutor>
-    void on_fork_success(PosixExecutor&) const
-    {
-        ::close(fds_[1]);
-        int code;
-        if (::read(fds_[0], &code, sizeof(int)) > 0)
-        {
-            ::close(fds_[0]);
+                HPX_THROW_EXCEPTION(hpx::error::kernel_error,
+                    "throw_on_error::on_fork_error", "fork(2) failed: {}",
+                    extract_error_string(errno));
+            }
 
-            HPX_THROW_EXCEPTION(kernel_error,
-                "throw_on_error::on_fork_success",
-                "execve(2) failed: {}", extract_error_string(code));
-        }
-        ::close(fds_[0]);
-    }
+            template <class PosixExecutor>
+            void on_fork_success(PosixExecutor&) const
+            {
+                ::close(fds_[1]);
+                int code;
+                if (::read(fds_[0], &code, sizeof(int)) > 0)
+                {
+                    ::close(fds_[0]);
 
-    template <class PosixExecutor>
-    void on_exec_setup(PosixExecutor&) const
-    {
-        ::close(fds_[0]);
-    }
+                    HPX_THROW_EXCEPTION(hpx::error::kernel_error,
+                        "throw_on_error::on_fork_success",
+                        "execve(2) failed: {}", extract_error_string(code));
+                }
+                ::close(fds_[0]);
+            }
 
-    template <class PosixExecutor>
-    void on_exec_error(PosixExecutor&) const
-    {
-        int e = errno;
-        while (::write(fds_[1], &e, sizeof(int)) == -1 && errno == EINTR)
-            ;
-        ::close(fds_[1]);
-    }
+            template <class PosixExecutor>
+            void on_exec_setup(PosixExecutor&) const
+            {
+                ::close(fds_[0]);
+            }
 
-private:
-    friend class hpx::serialization::access;
+            template <class PosixExecutor>
+            void on_exec_error(PosixExecutor&) const
+            {
+                int e = errno;
+                while (
+                    ::write(fds_[1], &e, sizeof(int)) == -1 && errno == EINTR)
+                    ;
+                ::close(fds_[1]);
+            }
 
-    template <typename Archive>
-    void serialize(Archive&, unsigned const) {}
+        private:
+            friend class hpx::serialization::access;
 
-    mutable int fds_[2];
-};
+            template <typename Archive>
+            void serialize(Archive&, unsigned const)
+            {
+            }
 
-}
+            mutable int fds_[2];
+        };
 
-}}}}
+}}}}}    // namespace hpx::components::process::posix::initializers
 
 #endif

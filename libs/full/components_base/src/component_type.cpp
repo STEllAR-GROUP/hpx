@@ -199,7 +199,7 @@ namespace hpx { namespace components {
                 type = agas::register_factory(agas::get_locality_id(), name);
                 if (component_invalid == type)
                 {
-                    HPX_THROW_EXCEPTION(duplicate_component_id,
+                    HPX_THROW_EXCEPTION(hpx::error::duplicate_component_id,
                         "get_agas_component_type",
                         "the component name {} is already in use", name);
                 }

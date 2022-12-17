@@ -16,7 +16,8 @@
 
 void throw_always()
 {
-    HPX_THROW_EXCEPTION(hpx::no_success, "throw_always", "simulated error");
+    HPX_THROW_EXCEPTION(
+        hpx::error::no_success, "throw_always", "simulated error");
 }
 
 std::exception_ptr test_transport()

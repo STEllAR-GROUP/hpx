@@ -38,7 +38,7 @@ namespace hpx { namespace parallel { namespace util {
     template <typename Value>
     inline void destroy_object(Value* ptr)
     {
-        ptr->~Value();
+        std::destroy_at(ptr);
     }
 
     /// Initialize a range of objects with the object val moving across them
@@ -124,10 +124,9 @@ namespace hpx { namespace parallel { namespace util {
     template <typename Iter, typename Sent>
     inline void destroy(Iter first, Sent last)
     {
-        using value_type = typename std::iterator_traits<Iter>::value_type;
         while (first != last)
         {
-            (&(*(first++)))->~value_type();
+            std::destroy_at(&(*(first++)));
         }
     }
 

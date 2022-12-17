@@ -139,7 +139,7 @@ namespace hpx { namespace agas { namespace server {
 
         if (p.objectname_ != "agas")
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "symbol_namespace::statistics_counter",
                 "unknown performance counter (unrelated to AGAS)");
         }
@@ -158,7 +158,7 @@ namespace hpx { namespace agas { namespace server {
 
         if (code == invalid_request || target == detail::counter_target_invalid)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "symbol_namespace::statistics_counter",
                 "unknown performance counter (unrelated to AGAS)");
         }
@@ -201,7 +201,7 @@ namespace hpx { namespace agas { namespace server {
                 service.counter_data_.enable_all();
                 break;
             default:
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "symbol_namespace::statistics",
                     "bad action code while querying statistics");
             }
@@ -242,7 +242,7 @@ namespace hpx { namespace agas { namespace server {
                 service.counter_data_.enable_all();
                 break;
             default:
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "symbol_namespace::statistics",
                     "bad action code while querying statistics");
             }

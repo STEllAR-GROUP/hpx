@@ -124,14 +124,14 @@ namespace hpx {
         {
             if (!threads::get_self_ptr())
             {
-                HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::finalize",
                     "this function can be called from an HPX thread only");
                 return -1;
             }
 
             if (!is_running())
             {
-                HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::finalize",
                     "the runtime system is not active (did you already "
                     "call finalize?)");
                 return -1;
@@ -143,7 +143,7 @@ namespace hpx {
             runtime* rt = get_runtime_ptr();
             if (nullptr == rt)
             {
-                HPX_THROWS_IF(ec, invalid_status, "hpx::finalize",
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::finalize",
                     "the runtime system is not active (did you already "
                     "call hpx::stop?)");
                 return -1;
@@ -158,7 +158,7 @@ namespace hpx {
         {
             if (threads::get_self_ptr())
             {
-                HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::stop",
                     "this function cannot be called from an HPX thread");
                 return -1;
             }
@@ -167,7 +167,7 @@ namespace hpx {
                 get_runtime_ptr());    // take ownership!
             if (nullptr == rt.get())
             {
-                HPX_THROWS_IF(ec, invalid_status, "hpx::stop",
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::stop",
                     "the runtime system is not active (did you already "
                     "call hpx::stop?)");
                 return -1;
@@ -186,7 +186,7 @@ namespace hpx {
         {
             if (threads::get_self_ptr())
             {
-                HPX_THROWS_IF(ec, invalid_status, "hpx::suspend",
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::suspend",
                     "this function cannot be called from an HPX thread");
                 return -1;
             }
@@ -194,7 +194,7 @@ namespace hpx {
             runtime* rt = get_runtime_ptr();
             if (nullptr == rt)
             {
-                HPX_THROWS_IF(ec, invalid_status, "hpx::suspend",
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::suspend",
                     "the runtime system is not active (did you already "
                     "call hpx::stop?)");
                 return -1;
@@ -208,7 +208,7 @@ namespace hpx {
         {
             if (threads::get_self_ptr())
             {
-                HPX_THROWS_IF(ec, invalid_status, "hpx::resume",
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::resume",
                     "this function cannot be called from an HPX thread");
                 return -1;
             }
@@ -216,7 +216,7 @@ namespace hpx {
             runtime* rt = get_runtime_ptr();
             if (nullptr == rt)
             {
-                HPX_THROWS_IF(ec, invalid_status, "hpx::resume",
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::resume",
                     "the runtime system is not active (did you already "
                     "call hpx::stop?)");
                 return -1;

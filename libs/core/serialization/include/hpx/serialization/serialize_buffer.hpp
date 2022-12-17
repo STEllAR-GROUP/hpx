@@ -167,7 +167,7 @@ namespace hpx::serialization {
             else
             {
                 // can't take ownership of const buffer
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "serialize_buffer::serialize_buffer",
                     "can't take ownership of const data");
             }
@@ -239,7 +239,7 @@ namespace hpx::serialization {
             else
             {
                 // can't take ownership of const buffer
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "serialize_buffer::serialize_buffer",
                     "can't take ownership of const data");
             }

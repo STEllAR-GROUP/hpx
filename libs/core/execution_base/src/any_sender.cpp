@@ -18,7 +18,7 @@ namespace hpx::execution::experimental::detail {
 
     void empty_any_operation_state::start() & noexcept
     {
-        HPX_THROW_EXCEPTION(hpx::bad_function_call,
+        HPX_THROW_EXCEPTION(hpx::error::bad_function_call,
             "any_operation_state::start",
             "attempted to call start on empty any_operation_state");
     }
@@ -36,7 +36,7 @@ namespace hpx::execution::experimental::detail {
 
     void throw_bad_any_call(char const* class_name, char const* function_name)
     {
-        HPX_THROW_EXCEPTION(hpx::bad_function_call,
+        HPX_THROW_EXCEPTION(hpx::error::bad_function_call,
             hpx::util::format("{}::{}", class_name, function_name),
             hpx::util::format(
                 "attempted to call {} on empty {}", function_name, class_name));

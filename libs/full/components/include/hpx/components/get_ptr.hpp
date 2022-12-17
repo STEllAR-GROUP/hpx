@@ -100,7 +100,7 @@ namespace hpx {
             if (agas::get_locality_id() !=
                 naming::get_locality_id_from_gid(addr.locality_))
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::get_ptr_postproc<Component, Deleter>",
                     "the given component id does not belong to a local object");
                 return std::shared_ptr<Component>();
@@ -108,7 +108,7 @@ namespace hpx {
 
             if (!traits::component_type_is_compatible<Component>::call(addr))
             {
-                HPX_THROW_EXCEPTION(bad_component_type,
+                HPX_THROW_EXCEPTION(hpx::error::bad_component_type,
                     "hpx::get_ptr_postproc<Component, Deleter>",
                     "requested component type does not match the given "
                     "component id");

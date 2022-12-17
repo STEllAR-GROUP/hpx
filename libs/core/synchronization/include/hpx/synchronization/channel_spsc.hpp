@@ -100,7 +100,7 @@ namespace hpx { namespace lcos { namespace local {
             // invoke destructors for allocated buffer
             for (std::size_t i = 0; i != size_; ++i)
             {
-                (&buffer_[i])->~T();
+                std::destroy_at(&buffer_[i]);
             }
 
             if (!closed_.load(std::memory_order_relaxed))
@@ -167,7 +167,7 @@ namespace hpx { namespace lcos { namespace local {
             bool expected = false;
             if (!closed_.compare_exchange_weak(expected, true))
             {
-                HPX_THROW_EXCEPTION(hpx::invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "hpx::lcos::local::channel_spsc::close",
                     "attempting to close an already closed channel");
             }

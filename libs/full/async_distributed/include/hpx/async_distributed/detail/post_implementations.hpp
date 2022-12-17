@@ -30,7 +30,8 @@ namespace hpx { namespace detail {
     {
         if (!traits::action_is_target_valid<Action>::call(id))
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::post_impl",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::detail::post_impl",
                 "the target (destination) does not match the action type ({})",
                 hpx::actions::detail::get_action_name<Action>());
             return false;
@@ -67,7 +68,7 @@ namespace hpx { namespace detail {
         return hpx::detail::post_r_p<Action>(HPX_MOVE(addr),
             HPX_FORWARD(Continuation, c), id, priority, HPX_FORWARD(Ts, vs)...);
 #else
-        HPX_THROW_EXCEPTION(invalid_status, "hpx::post_impl",
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status, "hpx::post_impl",
             "unexpected attempt to send a parcel with networking disabled");
 #endif
     }
@@ -82,7 +83,8 @@ namespace hpx { namespace detail {
         {
             if (!traits::action_is_target_valid<Action>::call(id))
             {
-                HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::post_impl",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::detail::post_impl",
                     "the target (destination) does not match the action type "
                     "({})",
                     hpx::actions::detail::get_action_name<Action>());
@@ -122,7 +124,8 @@ namespace hpx { namespace detail {
                     HPX_FORWARD(Continuation, c), id, priority,
                     HPX_FORWARD(Ts, vs)...);
 #else
-                HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::post_impl",
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "hpx::detail::post_impl",
                     "unexpected attempt to send a parcel with networking "
                     "disabled");
 #endif
@@ -139,7 +142,8 @@ namespace hpx { namespace detail {
     {
         if (!traits::action_is_target_valid<Action>::call(id))
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::post_impl",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::detail::post_impl",
                 "the target (destination) does not match the action type ({})",
                 hpx::actions::detail::get_action_name<Action>());
             return false;
@@ -174,7 +178,7 @@ namespace hpx { namespace detail {
         return hpx::detail::post_r_p<Action>(
             HPX_MOVE(addr), id, priority, HPX_FORWARD(Ts, vs)...);
 #else
-        HPX_THROW_EXCEPTION(invalid_status, "hpx::post_impl",
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status, "hpx::post_impl",
             "unexpected attempt to send a parcel with networking disabled");
 #endif
     }
@@ -188,7 +192,8 @@ namespace hpx { namespace detail {
         {
             if (!traits::action_is_target_valid<Action>::call(id))
             {
-                HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::post_impl",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::detail::post_impl",
                     "the target (destination) does not match the action type "
                     "({})",
                     hpx::actions::detail::get_action_name<Action>());
@@ -225,7 +230,8 @@ namespace hpx { namespace detail {
                 return hpx::detail::post_r_p<Action>(
                     HPX_MOVE(addr), id, priority, HPX_FORWARD(Ts, vs)...);
 #else
-                HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::post_impl",
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "hpx::detail::post_impl",
                     "unexpected attempt to send a parcel with networking "
                     "disabled");
 #endif
@@ -242,7 +248,8 @@ namespace hpx { namespace detail {
     {
         if (!traits::action_is_target_valid<Action>::call(id))
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::post_cb_impl",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::detail::post_cb_impl",
                 "the target (destination) does not match the action type ({})",
                 hpx::actions::detail::get_action_name<Action>());
             return false;
@@ -296,7 +303,8 @@ namespace hpx { namespace detail {
             HPX_FORWARD(Continuation, c), id, priority,
             HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
 #else
-        HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::post_cb_impl",
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+            "hpx::detail::post_cb_impl",
             "unexpected attempt to send a parcel with networking disabled");
 #endif
     }
@@ -307,7 +315,8 @@ namespace hpx { namespace detail {
     {
         if (!traits::action_is_target_valid<Action>::call(id))
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "hpx::detail::post_cb_impl",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::detail::post_cb_impl",
                 "the target (destination) does not match the action type ({})",
                 hpx::actions::detail::get_action_name<Action>());
             return false;
@@ -358,7 +367,8 @@ namespace hpx { namespace detail {
         return hpx::detail::post_r_p_cb<Action>(HPX_MOVE(addr), id, priority,
             HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
 #else
-        HPX_THROW_EXCEPTION(invalid_status, "hpx::detail::post_cb_impl",
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+            "hpx::detail::post_cb_impl",
             "unexpected attempt to send a parcel with networking disabled");
 #endif
     }

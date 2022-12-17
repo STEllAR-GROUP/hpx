@@ -61,7 +61,7 @@ void handle_interruption_using_error_code(hpx::id_type const& id)
     ca.do_it(ec);
 
     // we should get an error reporting hpx::thread_interrupted
-    HPX_ASSERT(ec && ec.value() == hpx::thread_cancelled);
+    HPX_ASSERT(ec && ec.value() == hpx::error::thread_cancelled);
 
     // wait for the cancellation thread to exit
     t.join();

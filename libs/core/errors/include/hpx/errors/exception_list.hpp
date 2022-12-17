@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,6 +23,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     /// The class exception_list is a container of exception_ptr objects
     /// parallel algorithms may use to communicate uncaught exceptions
     /// encountered during parallel execution to the caller of the algorithm
@@ -60,10 +61,10 @@ namespace hpx {
         explicit exception_list(exception_list_type&& l);
 
         exception_list(exception_list const& l);
-        exception_list(exception_list&& l);
+        exception_list(exception_list&& l) noexcept;
 
         exception_list& operator=(exception_list const& l);
-        exception_list& operator=(exception_list&& l);
+        exception_list& operator=(exception_list&& l) noexcept;
 
         ///
         void add(std::exception_ptr const& e);

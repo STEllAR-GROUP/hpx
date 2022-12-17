@@ -96,7 +96,7 @@ namespace hpx { namespace agas { namespace server {
             {
                 l.unlock();
 
-                HPX_THROW_EXCEPTION(lock_error,
+                HPX_THROW_EXCEPTION(hpx::error::lock_error,
                     "component_namespace::bind_prefix",
                     "component id table insertion failed due to a locking "
                     "error or memory corruption");
@@ -121,7 +121,7 @@ namespace hpx { namespace agas { namespace server {
                 // Duplicate type registration for this locality.
                 l.unlock();
 
-                HPX_THROW_EXCEPTION(duplicate_component_id,
+                HPX_THROW_EXCEPTION(hpx::error::duplicate_component_id,
                     "component_namespace::bind_prefix",
                     "component id is already registered for the given "
                     "locality, key({1}), prefix({2}), ctype({3})",
@@ -152,7 +152,8 @@ namespace hpx { namespace agas { namespace server {
         {
             l.unlock();
 
-            HPX_THROW_EXCEPTION(lock_error, "component_namespace::bind_prefix",
+            HPX_THROW_EXCEPTION(hpx::error::lock_error,
+                "component_namespace::bind_prefix",
                 "factory table insertion failed due to a locking "
                 "error or memory corruption");
             return components::component_invalid;
@@ -190,7 +191,7 @@ namespace hpx { namespace agas { namespace server {
             {
                 l.unlock();
 
-                HPX_THROW_EXCEPTION(lock_error,
+                HPX_THROW_EXCEPTION(hpx::error::lock_error,
                     "component_namespace::bind_name",
                     "component id table insertion failed due to a locking "
                     "error or memory corruption");

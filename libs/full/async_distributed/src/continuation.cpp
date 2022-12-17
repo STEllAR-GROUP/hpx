@@ -65,7 +65,8 @@ namespace hpx { namespace actions {
     {
         if (!id_)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "continuation::trigger_error",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "continuation::trigger_error",
                 "attempt to trigger invalid LCO (the id is invalid)");
             return;
         }
@@ -78,7 +79,8 @@ namespace hpx { namespace actions {
     {
         if (!id_)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "continuation::trigger_error",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "continuation::trigger_error",
                 "attempt to trigger invalid LCO (the id is invalid)");
             return;
         }
@@ -133,7 +135,7 @@ namespace hpx { namespace actions {
         {
             if (!this->get_id())
             {
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "typed_continuation<void>::trigger",
                     "attempt to trigger invalid LCO (the id is invalid)");
                 return;

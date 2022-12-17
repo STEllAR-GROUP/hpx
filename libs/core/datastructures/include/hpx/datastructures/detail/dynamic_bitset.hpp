@@ -1523,8 +1523,8 @@ namespace hpx::detail {
         // large bitsets but is required by the specification, sorry
         if (find_next(ulong_width - 1) != npos)
         {
-            HPX_THROW_EXCEPTION(
-                hpx::out_of_range, "hpx::dynamic_bitset::to_ulong", "overflow");
+            HPX_THROW_EXCEPTION(hpx::error::out_of_range,
+                "hpx::dynamic_bitset::to_ulong", "overflow");
         }
 
         // Ok, from now on we can be sure there's no "on" bit

@@ -114,7 +114,7 @@ void test_initial_state()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::no_state);
+        HPX_TEST_EQ(e.get_error(), hpx::error::no_state);
     }
     catch (...)
     {
@@ -150,7 +150,7 @@ void test_cannot_get_future_twice()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::future_already_retrieved);
+        HPX_TEST_EQ(e.get_error(), hpx::error::future_already_retrieved);
     }
     catch (...)
     {
@@ -247,7 +247,7 @@ void test_invoking_a_packaged_task_twice_throws()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::promise_already_satisfied);
+        HPX_TEST_EQ(e.get_error(), hpx::error::promise_already_satisfied);
     }
     catch (...)
     {
@@ -272,7 +272,7 @@ void test_cannot_get_future_twice_from_task()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::future_already_retrieved);
+        HPX_TEST_EQ(e.get_error(), hpx::error::future_already_retrieved);
     }
     catch (...)
     {
@@ -490,7 +490,7 @@ void test_packaged_task_can_be_moved()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::no_state);
+        HPX_TEST_EQ(e.get_error(), hpx::error::no_state);
     }
     catch (...)
     {
@@ -522,7 +522,7 @@ void test_destroying_a_promise_stores_broken_promise()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::broken_promise);
+        HPX_TEST_EQ(e.get_error(), hpx::error::broken_promise);
     }
     catch (...)
     {
@@ -548,7 +548,7 @@ void test_destroying_a_packaged_task_stores_broken_task()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::broken_promise);
+        HPX_TEST_EQ(e.get_error(), hpx::error::broken_promise);
     }
     catch (...)
     {

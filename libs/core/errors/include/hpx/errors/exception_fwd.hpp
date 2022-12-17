@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,6 +15,7 @@
 #include <cstdint>
 
 namespace hpx {
+
     /// \cond NOINTERNAL
     // forward declaration
     class error_code;

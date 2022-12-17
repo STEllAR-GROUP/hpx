@@ -179,7 +179,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<std::vector<T>>(
-                HPX_GET_EXCEPTION(hpx::bad_parameter,
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::collectives::all_to_all",
                     "the generation number shouldn't be zero"));
         }

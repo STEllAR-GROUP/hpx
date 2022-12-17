@@ -89,7 +89,7 @@ namespace hpx { namespace components {
             fallback_console_logging_locked(msgs);
 
             // raise error as this should get called from outside a HPX-thread
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "components::console_logging_locked",
                 "console_logging_locked was not called from a HPX-thread");
         }

@@ -36,7 +36,7 @@ namespace hpx { namespace performance_counters { namespace server {
     {
         if (info.type_ != counter_type::elapsed_time)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "elapsed_time_counter::elapsed_time_counter",
                 "unexpected counter type specified for elapsed_time_counter");
         }
@@ -47,7 +47,7 @@ namespace hpx { namespace performance_counters { namespace server {
     {
         if (reset)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "elapsed_time_counter::get_counter_value",
                 "counter /runtime/uptime does no support reset");
         }
@@ -66,7 +66,7 @@ namespace hpx { namespace performance_counters { namespace server {
 
     void elapsed_time_counter::reset_counter_value()
     {
-        HPX_THROW_EXCEPTION(bad_parameter,
+        HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
             "elapsed_time_counter::reset_counter_value",
             "counter /runtime/uptime does no support reset");
     }
@@ -114,7 +114,8 @@ namespace hpx { namespace performance_counters { namespace detail {
             // allowed counter names: /runtime(locality#%d/*)/uptime
             if (paths.parentinstance_is_basename_)
             {
-                HPX_THROWS_IF(ec, bad_parameter, "uptime_counter_creator",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "uptime_counter_creator",
                     "invalid counter instance parent name: {}",
                     paths.parentinstancename_);
                 return naming::invalid_gid;
@@ -125,8 +126,8 @@ namespace hpx { namespace performance_counters { namespace detail {
         }
 
         default:
-            HPX_THROWS_IF(ec, bad_parameter, "uptime_counter_creator",
-                "invalid counter type requested");
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "uptime_counter_creator", "invalid counter type requested");
             return naming::invalid_gid;
         }
     }

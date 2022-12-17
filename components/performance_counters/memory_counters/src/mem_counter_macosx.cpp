@@ -29,7 +29,7 @@ namespace hpx { namespace performance_counters { namespace memory
                 reinterpret_cast<task_info_t>(&t_info),
                 &t_info_count) != KERN_SUCCESS)
         {
-            HPX_THROW_EXCEPTION(kernel_error,
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::performance_counters::memory::read_psm_virtual",
                 "task_info failed");
 
@@ -51,7 +51,7 @@ namespace hpx { namespace performance_counters { namespace memory
                 reinterpret_cast<task_info_t>(&t_info),
                 &t_info_count) != KERN_SUCCESS)
         {
-            HPX_THROW_EXCEPTION(kernel_error,
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::performance_counters::memory::read_psm_virtual",
                 "task_info failed");
 

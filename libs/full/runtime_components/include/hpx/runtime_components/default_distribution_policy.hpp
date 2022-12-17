@@ -325,7 +325,7 @@ namespace hpx { namespace components {
         {
             if (localities_->empty())
             {
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "default_distribution_policy::default_distribution_"
                     "policy",
                     "unexpectedly empty list of localities");
@@ -338,7 +338,7 @@ namespace hpx { namespace components {
         {
             if (localities_->empty())
             {
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "default_distribution_policy::default_distribution_policy",
                     "unexpectedly empty list of localities");
             }
