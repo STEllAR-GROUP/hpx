@@ -16,11 +16,11 @@
 #include <map>
 #include <utility>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     namespace detail {
-        // This is explicitly instantiated to ensure that the id is stable across
-        // shared libraries.
+        // This is explicitly instantiated to ensure that the id is stable
+        // across shared libraries.
         extra_archive_data_id_type
         extra_archive_data_helper<input_pointer_tracker>::id() noexcept
         {
@@ -73,4 +73,4 @@ namespace hpx { namespace serialization {
         }
         return it->second;
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

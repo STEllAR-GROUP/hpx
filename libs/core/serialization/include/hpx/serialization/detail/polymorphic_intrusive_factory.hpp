@@ -20,7 +20,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
 
     class polymorphic_intrusive_factory
     {
@@ -76,8 +76,7 @@ namespace hpx { namespace serialization { namespace detail {
 
     template <typename T, typename Enable>
     register_class_name<T, Enable> register_class_name<T, Enable>::instance;
-
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_SERIALIZATION_ADD_GET_NAME_MEMBERS_WITH_NAME(                      \

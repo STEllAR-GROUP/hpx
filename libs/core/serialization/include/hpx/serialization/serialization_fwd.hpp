@@ -11,6 +11,7 @@
 #include <hpx/serialization/config/defines.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 
+#include <cstddef>
 #include <type_traits>
 
 namespace hpx::serialization {
@@ -39,6 +40,12 @@ namespace hpx::serialization {
         template <typename Archive, typename T>
         void serialize_one(Archive& ar, T& t);
     }
+
+    template <typename T>
+    class array;
+
+    template <typename T>
+    constexpr array<T> make_array(T* begin, std::size_t size) noexcept;
 }    // namespace hpx::serialization
 
 #define HPX_SERIALIZATION_SPLIT_MEMBER()                                       \

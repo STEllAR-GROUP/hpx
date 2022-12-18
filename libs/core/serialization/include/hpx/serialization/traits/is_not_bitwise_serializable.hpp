@@ -23,9 +23,9 @@ namespace hpx::traits {
     template <typename T>
     struct is_not_bitwise_serializable
       : std::integral_constant<bool,
-            std::is_abstract<T>::value ||
-                hpx::serialization::access::has_serialize<T>::value ||
-                hpx::serialization::has_serialize_adl<T>::value>
+            std::is_abstract_v<T> ||
+                hpx::serialization::access::has_serialize_v<T> ||
+                hpx::serialization::has_serialize_adl_v<T>>
     {
     };
 

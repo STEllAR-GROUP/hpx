@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <deque>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename T, typename Allocator>
     void serialize(input_archive& ar, std::deque<T, Allocator>& d, unsigned)
@@ -38,4 +38,4 @@ namespace hpx { namespace serialization {
 
         detail::save_collection(ar, d);
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

@@ -14,7 +14,8 @@
 
 #include <string>
 
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
+
     polymorphic_intrusive_factory& polymorphic_intrusive_factory::instance()
     {
         hpx::util::static_<polymorphic_intrusive_factory> factory;
@@ -42,4 +43,4 @@ namespace hpx { namespace serialization { namespace detail {
     {
         return map_.at(name)();
     }
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail

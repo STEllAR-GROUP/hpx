@@ -13,7 +13,7 @@
 #include <set>
 #include <utility>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename T, typename Compare, typename Allocator>
     void serialize(
@@ -45,4 +45,4 @@ namespace hpx { namespace serialization {
             ar << i;
         }
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

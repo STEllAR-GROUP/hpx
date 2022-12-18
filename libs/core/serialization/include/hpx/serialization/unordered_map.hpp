@@ -15,7 +15,7 @@
 #include <unordered_map>
 #include <utility>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename Key, typename Value, typename Hash, typename KeyEqual,
         typename Alloc>
@@ -46,15 +46,10 @@ namespace hpx { namespace serialization {
         const std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>& t,
         unsigned)
     {
-        using container_type =
-            std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>;
-
-        using value_type = typename container_type::value_type;
-
         ar << t.size();    //-V128
-        for (value_type const& val : t)
+        for (auto const& val : t)
         {
             ar << val;
         }
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

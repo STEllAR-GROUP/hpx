@@ -9,11 +9,12 @@
 
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
+
     polymorphic_nonintrusive_factory&
     polymorphic_nonintrusive_factory::instance()
     {
         hpx::util::static_<polymorphic_nonintrusive_factory> factory;
         return factory.get();
     }
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail
