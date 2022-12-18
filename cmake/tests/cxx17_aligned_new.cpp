@@ -12,7 +12,7 @@ int main()
 {
 #if defined(_MSC_VER)
 #pragma warning(push)
-#pragma warning(enable: 4316)
+#pragma warning(error: 4316)
 #elif defined(__GNUC__)
 #pragma GCC diagnostic push
 // NOTE: The actual error we're looking for here is triggered by -Waligned-new,
