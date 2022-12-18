@@ -31,15 +31,15 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail {
+namespace hpx::threads::coroutines::detail {
 
     struct coroutine_accessor
     {
         template <typename Coroutine>
         HPX_FORCEINLINE static typename Coroutine::impl_ptr get_impl(
-            Coroutine& x)
+            Coroutine& x) noexcept
         {
             return x.get_impl();
         }
     };
-}}}}    // namespace hpx::threads::coroutines::detail
+}    // namespace hpx::threads::coroutines::detail

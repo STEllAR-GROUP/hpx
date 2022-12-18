@@ -25,7 +25,7 @@ namespace hpx { namespace program_options {
 
     extern HPX_CORE_EXPORT std::string arg;
 
-    template <class T, class Char>
+    template <typename T, typename Char>
     std::string typed_value<T, Char>::name() const
     {
         std::string const& var = (m_value_name.empty() ? arg : m_value_name);
@@ -48,10 +48,10 @@ namespace hpx { namespace program_options {
         }
     }
 
-    template <class T, class Char>
-    void typed_value<T, Char>::notify(const hpx::any_nonser& value_store) const
+    template <typename T, typename Char>
+    void typed_value<T, Char>::notify(hpx::any_nonser const& value_store) const
     {
-        const T* value = hpx::any_cast<T>(&value_store);
+        T const* value = hpx::any_cast<T>(&value_store);
         if (m_store_to)
         {
             *m_store_to = *value;
@@ -69,9 +69,9 @@ namespace hpx { namespace program_options {
            Otherwise, returns a reference to a statically allocated
            empty string if 'allow_empty' and throws validation_error
            otherwise. */
-        template <class Char>
-        const std::basic_string<Char>& get_single_string(
-            const std::vector<std::basic_string<Char>>& v,
+        template <typename Char>
+        std::basic_string<Char> const& get_single_string(
+            std::vector<std::basic_string<Char>> const& v,
             bool allow_empty = false)
         {
             static std::basic_string<Char> empty;
@@ -88,7 +88,7 @@ namespace hpx { namespace program_options {
 
         /* Throws multiple_occurrences if 'value' is not empty. */
         HPX_CORE_EXPORT void check_first_occurrence(
-            const hpx::any_nonser& value);
+            hpx::any_nonser const& value);
     }    // namespace validators
 
     using namespace validators;
@@ -100,9 +100,9 @@ namespace hpx { namespace program_options {
         pointer to the desired type. This is workaround for compilers without
         partial template ordering, just like the last 'long/int' parameter.
     */
-    template <class T, class Char>
+    template <typename T, typename Char>
     void validate(hpx::any_nonser& v,
-        const std::vector<std::basic_string<Char>>& xs, T*, long)
+        std::vector<std::basic_string<Char>> const& xs, T*, long)
     {
         validators::check_first_occurrence(v);
         std::basic_string<Char> s(validators::get_single_string(xs));
@@ -110,31 +110,31 @@ namespace hpx { namespace program_options {
         {
             v = hpx::any_nonser(hpx::util::from_string<T>(s));
         }
-        catch (const hpx::util::bad_lexical_cast&)
+        catch (hpx::util::bad_lexical_cast const&)
         {
             throw invalid_option_value(s);
         }
     }
 
     HPX_CORE_EXPORT void validate(
-        hpx::any_nonser& v, const std::vector<std::string>& xs, bool*, int);
+        hpx::any_nonser& v, std::vector<std::string> const& xs, bool*, int);
 
     HPX_CORE_EXPORT void validate(
-        hpx::any_nonser& v, const std::vector<std::wstring>& xs, bool*, int);
+        hpx::any_nonser& v, std::vector<std::wstring> const& xs, bool*, int);
 
     // For some reason, this declaration, which is require by the standard,
     // cause msvc 7.1 to not generate code to specialization defined in
     // value_semantic.cpp
     HPX_CORE_EXPORT void validate(hpx::any_nonser& v,
-        const std::vector<std::string>& xs, std::string*, int);
+        std::vector<std::string> const& xs, std::string*, int);
     HPX_CORE_EXPORT void validate(hpx::any_nonser& v,
-        const std::vector<std::wstring>& xs, std::string*, int);
+        std::vector<std::wstring> const& xs, std::string*, int);
 
     /** Validates sequences. Allows multiple values per option occurrence
        and multiple occurrences. */
-    template <class T, class Char>
+    template <typename T, typename Char>
     void validate(hpx::any_nonser& v,
-        const std::vector<std::basic_string<Char>>& s, std::vector<T>*, int)
+        std::vector<std::basic_string<Char>> const& s, std::vector<T>*, int)
     {
         if (!v.has_value())
         {
@@ -155,7 +155,7 @@ namespace hpx { namespace program_options {
                 validate(a, cv, (T*) nullptr, 0);
                 tv->push_back(hpx::any_cast<T>(a));
             }
-            catch (const hpx::util::bad_lexical_cast& /*e*/)
+            catch (hpx::util::bad_lexical_cast const& /*e*/)
             {
                 throw invalid_option_value(s[i]);
             }
@@ -163,9 +163,9 @@ namespace hpx { namespace program_options {
     }
 
     /** Validates optional arguments. */
-    template <class T, class Char>
+    template <typename T, typename Char>
     void validate(hpx::any_nonser& v,
-        const std::vector<std::basic_string<Char>>& s, hpx::optional<T>*, int)
+        std::vector<std::basic_string<Char>> const& s, hpx::optional<T>*, int)
     {
         validators::check_first_occurrence(v);
         validators::get_single_string(s);
@@ -174,9 +174,9 @@ namespace hpx { namespace program_options {
         v = hpx::any_nonser(hpx::optional<T>(hpx::any_cast<T>(a)));
     }
 
-    template <class T, class Char>
+    template <typename T, typename Char>
     void typed_value<T, Char>::xparse(hpx::any_nonser& value_store,
-        const std::vector<std::basic_string<Char>>& new_tokens) const
+        std::vector<std::basic_string<Char>> const& new_tokens) const
     {
         // If no tokens were given, and the option accepts an implicit
         // value, then assign the implicit value as the stored value;
@@ -187,14 +187,14 @@ namespace hpx { namespace program_options {
             validate(value_store, new_tokens, (T*) nullptr, 0);
     }
 
-    template <class T>
+    template <typename T>
     typed_value<T>* value()
     {
         // Explicit qualification is vc6 workaround.
         return hpx::program_options::value<T>(nullptr);
     }
 
-    template <class T>
+    template <typename T>
     typed_value<T>* value(T* v)
     {
         typed_value<T>* r = new typed_value<T>(v);
@@ -202,13 +202,13 @@ namespace hpx { namespace program_options {
         return r;
     }
 
-    template <class T>
+    template <typename T>
     typed_value<T, wchar_t>* wvalue()
     {
         return wvalue<T>(nullptr);
     }
 
-    template <class T>
+    template <typename T>
     typed_value<T, wchar_t>* wvalue(T* v)
     {
         typed_value<T, wchar_t>* r = new typed_value<T, wchar_t>(v);

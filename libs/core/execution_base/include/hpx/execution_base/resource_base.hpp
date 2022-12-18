@@ -8,11 +8,11 @@
 
 #pragma once
 
-namespace hpx { namespace execution_base {
+namespace hpx::execution_base {
 
     /// TODO: implement, this is currently just a dummy
     struct resource_base
     {
         virtual ~resource_base() = default;
     };
-}}    // namespace hpx::execution_base
+}    // namespace hpx::execution_base

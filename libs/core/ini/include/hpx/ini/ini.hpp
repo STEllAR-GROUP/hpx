@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2018 Hartmut Kaiser
+//  Copyright (c) 2005-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -32,19 +32,20 @@
 #define HPX_SECTION_VERSION 0x10
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     class HPX_CORE_EXPORT section
     {
     public:
-        typedef hpx::function<void(std::string const&, std::string const&)>
-            entry_changed_func;
-        typedef std::pair<std::string, entry_changed_func> entry_type;
-        typedef std::map<std::string, entry_type> entry_map;
-        typedef std::map<std::string, section> section_map;
+        using entry_changed_func =
+            hpx::function<void(std::string const&, std::string const&)>;
+        using entry_type = std::pair<std::string, entry_changed_func>;
+        using entry_map = std::map<std::string, entry_type>;
+        using section_map = std::map<std::string, section>;
 
     private:
-        section* this_()
+        section* this_() noexcept
         {
             return this;
         }
@@ -63,10 +64,10 @@ namespace hpx { namespace util {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void save(Archive& ar, const unsigned int version) const;
+        void save(Archive& ar, unsigned int const version) const;
 
         template <typename Archive>
-        void load(Archive& ar, const unsigned int version);
+        void load(Archive& ar, unsigned int const version);
 
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
@@ -109,7 +110,7 @@ namespace hpx { namespace util {
             std::string const& key, entry_changed_func const& callback);
 
     public:
-        section();
+        section() noexcept;
         explicit section(std::string const& filename, section* root = nullptr);
         section(section const& in);
         ~section() {}
@@ -167,11 +168,11 @@ namespace hpx { namespace util {
             return get_section(l, sec_name);
         }
 
-        section_map& get_sections()
+        section_map& get_sections() noexcept
         {
             return sections_;
         }
-        section_map const& get_sections() const
+        section_map const& get_sections() const noexcept
         {
             return sections_;
         }
@@ -221,7 +222,7 @@ namespace hpx { namespace util {
             add_notification_callback(l, key, callback);
         }
 
-        entry_map const& get_entries() const
+        entry_map const& get_entries() const noexcept
         {
             return entries_;
         }
@@ -271,7 +272,7 @@ namespace hpx { namespace util {
                     si->second.set_root(r, true);
             }
         }
-        section* get_root() const
+        section* get_root() const noexcept
         {
             return root_;
         }
@@ -295,5 +296,4 @@ namespace hpx { namespace util {
             name_ = name;
         }
     };
-
-}}    // namespace hpx::util
+}    // namespace hpx::util

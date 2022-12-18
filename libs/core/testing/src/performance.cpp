@@ -9,12 +9,32 @@
 #include <chrono>
 #include <cstddef>
 #include <iostream>
+#include <map>
 #include <string>
+#include <tuple>
 #include <type_traits>
+#include <vector>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
+
+        // Json output for performance reports
+        class json_perf_times
+        {
+            using key_t = std::tuple<std::string, std::string>;
+            using value_t = std::vector<double>;
+            using map_t = std::map<key_t, value_t>;
+
+            map_t m_map;
+
+            HPX_CORE_EXPORT friend std::ostream& operator<<(
+                std::ostream& strm, json_perf_times const& obj);
+
+        public:
+            HPX_CORE_EXPORT void add(std::string const& name,
+                std::string const& executor, double time);
+        };
 
         json_perf_times& times()
         {
@@ -28,8 +48,7 @@ namespace hpx { namespace util {
             times().add(test_name, executor, time);
         }
 
-        HPX_CORE_EXPORT std::ostream& operator<<(
-            std::ostream& strm, json_perf_times const& obj)
+        std::ostream& operator<<(std::ostream& strm, json_perf_times const& obj)
         {
             strm << "{\n";
             strm << "  \"outputs\" : [";
@@ -62,13 +81,20 @@ namespace hpx { namespace util {
             strm << "}\n";
             return strm;
         }
+
+        void json_perf_times::add(
+            std::string const& name, std::string const& executor, double time)
+        {
+            m_map[key_t(name, executor)].push_back(time);
+        }
     }    // namespace detail
 
     void perftests_report(std::string const& name, std::string const& exec,
-        const std::size_t steps, hpx::function<void(void)>&& test)
+        std::size_t const steps, hpx::function<void(void)>&& test)
     {
         if (steps == 0)
             return;
+
         // First iteration to cache the data
         test();
         using timer = std::chrono::high_resolution_clock;
@@ -91,4 +117,4 @@ namespace hpx { namespace util {
     {
         std::cout << detail::times();
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

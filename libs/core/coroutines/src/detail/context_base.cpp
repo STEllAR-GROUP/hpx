@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2012-2022 Hartmut Kaiser
 //  Copyright (c) 2009 Oliver Kowalke
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,8 +12,7 @@
 #include <hpx/coroutines/detail/context_base.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail {
+namespace hpx::threads::coroutines::detail {
 
     template class context_base<coroutine_impl>;
-
-}}}}    // namespace hpx::threads::coroutines::detail
+}    // namespace hpx::threads::coroutines::detail

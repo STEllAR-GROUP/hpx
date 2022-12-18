@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -172,7 +172,8 @@ namespace {
 
 }    // namespace
 
-namespace hpx { namespace util { namespace batch_environments {
+namespace hpx::util::batch_environments {
+
     slurm_environment::slurm_environment(
         std::vector<std::string>& nodelist, bool debug)
       : node_num_(0)
@@ -359,4 +360,4 @@ namespace hpx { namespace util { namespace batch_environments {
             }
         }
     }
-}}}    // namespace hpx::util::batch_environments
+}    // namespace hpx::util::batch_environments

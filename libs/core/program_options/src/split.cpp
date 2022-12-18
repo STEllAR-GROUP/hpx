@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace program_options { namespace detail {
+namespace hpx::program_options::detail {
 
     template <typename Char>
     std::vector<std::basic_string<Char>> split_unix(
@@ -33,23 +33,23 @@ namespace hpx { namespace program_options { namespace detail {
         }
         return result;
     }
-}}}    // namespace hpx::program_options::detail
+}    // namespace hpx::program_options::detail
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
     // Take a command line string and splits in into tokens, according
     // to the given collection of separators chars.
-    std::vector<std::string> split_unix(const std::string& cmdline,
-        const std::string& separator, const std::string& quote,
-        const std::string& escape)
+    std::vector<std::string> split_unix(std::string const& cmdline,
+        std::string const& separator, std::string const& quote,
+        std::string const& escape)
     {
         return detail::split_unix<char>(cmdline, separator, quote, escape);
     }
 
-    std::vector<std::wstring> split_unix(const std::wstring& cmdline,
-        const std::wstring& separator, const std::wstring& quote,
-        const std::wstring& escape)
+    std::vector<std::wstring> split_unix(std::wstring const& cmdline,
+        std::wstring const& separator, std::wstring const& quote,
+        std::wstring const& escape)
     {
         return detail::split_unix<wchar_t>(cmdline, separator, quote, escape);
     }
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options

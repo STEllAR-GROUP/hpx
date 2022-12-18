@@ -14,29 +14,31 @@
 #include <cstddef>
 
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
-namespace hpx { namespace util { namespace detail {
+
+namespace hpx::util::detail {
+
     static bool spinlock_break_on_deadlock_enabled = false;
     static std::size_t spinlock_deadlock_detection_limit =
         HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT;
 
-    void set_spinlock_break_on_deadlock_enabled(bool enabled)
+    void set_spinlock_break_on_deadlock_enabled(bool enabled) noexcept
     {
         spinlock_break_on_deadlock_enabled = enabled;
     }
 
-    bool get_spinlock_break_on_deadlock_enabled()
+    bool get_spinlock_break_on_deadlock_enabled() noexcept
     {
         return spinlock_break_on_deadlock_enabled;
     }
 
-    void set_spinlock_deadlock_detection_limit(std::size_t limit)
+    void set_spinlock_deadlock_detection_limit(std::size_t limit) noexcept
     {
         spinlock_deadlock_detection_limit = limit;
     }
 
-    std::size_t get_spinlock_deadlock_detection_limit()
+    std::size_t get_spinlock_deadlock_detection_limit() noexcept
     {
         return spinlock_deadlock_detection_limit;
     }
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail
 #endif

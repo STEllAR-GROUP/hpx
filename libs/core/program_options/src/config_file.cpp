@@ -14,24 +14,22 @@
 #include <set>
 #include <string>
 
-namespace hpx { namespace program_options { namespace detail {
-
-    using namespace std;
+namespace hpx::program_options::detail {
 
     common_config_file_iterator::common_config_file_iterator(
-        const std::set<std::string>& allowed_options, bool allow_unregistered)
+        std::set<std::string> const& allowed_options, bool allow_unregistered)
       : allowed_options(allowed_options)
       , m_allow_unregistered(allow_unregistered)
     {
-        for (const auto& allowed_option : allowed_options)
+        for (auto const& allowed_option : allowed_options)
         {
             add_option(allowed_option.c_str());
         }
     }
 
-    void common_config_file_iterator::add_option(const char* name)
+    void common_config_file_iterator::add_option(char const* name)
     {
-        string s(name);
+        std::string s(name);
         HPX_ASSERT(!s.empty());
         if (*s.rbegin() == '*')
         {
@@ -41,7 +39,7 @@ namespace hpx { namespace program_options { namespace detail {
             // lower_bound will return that element.
             // If some element is prefix of 's', then lower_bound will
             // return the next element.
-            set<string>::iterator i = allowed_prefixes.lower_bound(s);
+            std::set<std::string>::iterator i = allowed_prefixes.lower_bound(s);
             if (i != allowed_prefixes.end())
             {
                 if (i->find(s) == 0)
@@ -54,20 +52,21 @@ namespace hpx { namespace program_options { namespace detail {
                     bad_prefixes = true;
             }
             if (bad_prefixes)
-                throw error("options '" + string(name) + "' and '" + *i +
-                    "*' will both match the same "
-                    "arguments from the configuration file");
+                throw error("options '" + std::string(name) + "' and '" + *i +
+                    "*' will both match the same arguments from the "
+                    "configuration file");
             allowed_prefixes.insert(s);
         }
     }
 
     namespace {
-        string trim_ws(const string& s)
+
+        inline std::string trim_ws(std::string const& s)
         {
-            string::size_type n, n2;
+            std::string::size_type n, n2;
             n = s.find_first_not_of(" \t\r\n");
-            if (n == string::npos)
-                return string();
+            if (n == std::string::npos)
+                return std::string();
             else
             {
                 n2 = s.find_last_not_of(" \t\r\n");
@@ -78,14 +77,14 @@ namespace hpx { namespace program_options { namespace detail {
 
     void common_config_file_iterator::get()
     {
-        string s;
-        string::size_type n;
+        std::string s;
+        std::string::size_type n;
         bool found = false;
 
         while (this->getline(s))
         {
             // strip '#' comments and whitespace
-            if ((n = s.find('#')) != string::npos)
+            if ((n = s.find('#')) != std::string::npos)
                 s = s.substr(0, n);
             s = trim_ws(s);
 
@@ -98,10 +97,10 @@ namespace hpx { namespace program_options { namespace detail {
                     if (*m_prefix.rbegin() != '.')
                         m_prefix += '.';
                 }
-                else if ((n = s.find('=')) != string::npos)
+                else if ((n = s.find('=')) != std::string::npos)
                 {
-                    string name = m_prefix + trim_ws(s.substr(0, n));
-                    string value = trim_ws(s.substr(n + 1));
+                    std::string name = m_prefix + trim_ws(s.substr(0, n));
+                    std::string value = trim_ws(s.substr(n + 1));
 
                     bool registered = allowed_option(name);
                     if (!registered && !m_allow_unregistered)
@@ -128,9 +127,9 @@ namespace hpx { namespace program_options { namespace detail {
             found_eof();
     }
 
-    bool common_config_file_iterator::allowed_option(const std::string& s) const
+    bool common_config_file_iterator::allowed_option(std::string const& s) const
     {
-        set<string>::const_iterator i = allowed_options.find(s);
+        std::set<std::string>::const_iterator i = allowed_options.find(s);
         if (i != allowed_options.end())
             return true;
         // If s is "pa" where "p" is allowed prefix then
@@ -163,5 +162,4 @@ namespace hpx { namespace program_options { namespace detail {
         }
     }
 #endif
-
-}}}    // namespace hpx::program_options::detail
+}    // namespace hpx::program_options::detail

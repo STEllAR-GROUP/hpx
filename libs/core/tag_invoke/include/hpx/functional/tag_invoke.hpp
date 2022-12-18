@@ -223,14 +223,17 @@ namespace hpx::functional {
         // poison pill
         void tag_invoke();
 
+        // use this tag type to enable the tag_invoke function overloads
+        struct enable_tag_invoke_t;
+
         ///////////////////////////////////////////////////////////////////////////
         // helper base class implementing the tag_invoke logic for CPOs
         template <typename Tag, typename Enable>
         struct tag
         {
             template <typename... Args,
-                typename = std::enable_if_t<
-                    meta::value<meta::invoke<Enable, Args...>>>>
+                typename = std::enable_if_t<meta::value<
+                    meta::invoke<Enable, enable_tag_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
@@ -247,7 +250,8 @@ namespace hpx::functional {
             template <typename... Args,
                 typename =
                     std::enable_if_t<is_nothrow_tag_invocable_v<Tag, Args...> &&
-                        meta::value<meta::invoke<Enable, Args...>>>>
+                        meta::value<meta::invoke<Enable, enable_tag_invoke_t,
+                            Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> tag_invoke_result_t<Tag, decltype(args)...>
@@ -267,6 +271,8 @@ namespace hpx::functional {
         template <typename Tag,
             typename Enable = meta::constant<meta::bool_<true>>>
         using tag_noexcept = tag_base_ns::tag_noexcept<Tag, Enable>;
+
+        using enable_tag_invoke_t = tag_base_ns::enable_tag_invoke_t;
     }    // namespace tag_invoke_base_ns
 
     inline namespace tag_invoke_f_ns {

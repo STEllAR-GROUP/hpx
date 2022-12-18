@@ -87,7 +87,7 @@ namespace hpx::detail {
         // Returns true when it's safe to use the embedded storage, i.e.
         // when the size and alignment of Impl are small enough.
         template <typename Impl>
-        static constexpr bool can_use_embedded_storage()
+        static constexpr bool can_use_embedded_storage() noexcept
         {
             constexpr bool fits_storage =
                 sizeof(std::decay_t<Impl>) <= embedded_storage_size;
@@ -165,12 +165,12 @@ namespace hpx::detail {
             }
         }
 
-        movable_sbo_storage(movable_sbo_storage&& other)
+        movable_sbo_storage(movable_sbo_storage&& other) noexcept
         {
             move_assign(HPX_MOVE(other));
         }
 
-        movable_sbo_storage& operator=(movable_sbo_storage&& other)
+        movable_sbo_storage& operator=(movable_sbo_storage&& other) noexcept
         {
             if (&other != this)
             {
@@ -263,6 +263,7 @@ namespace hpx::detail {
         using storage_base_type::store;
 
         copyable_sbo_storage() = default;
+
         copyable_sbo_storage(copyable_sbo_storage&&) = default;
         copyable_sbo_storage& operator=(copyable_sbo_storage&&) = default;
 
@@ -288,6 +289,7 @@ namespace hpx::detail {
 }    // namespace hpx::detail
 
 namespace hpx::execution::experimental::detail {
+
     struct HPX_CORE_EXPORT any_operation_state_base
     {
         virtual ~any_operation_state_base() = default;
@@ -308,6 +310,7 @@ namespace hpx::execution::experimental::detail {
 }    // namespace hpx::execution::experimental::detail
 
 namespace hpx::detail {
+
     template <>
     struct empty_vtable_type<
         hpx::execution::experimental::detail::any_operation_state_base>
@@ -318,6 +321,7 @@ namespace hpx::detail {
 }    // namespace hpx::detail
 
 namespace hpx::execution::experimental::detail {
+
     template <typename Sender, typename Receiver>
     struct any_operation_state_impl final : any_operation_state_base
     {
@@ -357,6 +361,7 @@ namespace hpx::execution::experimental::detail {
         }
 
         ~any_operation_state() = default;
+
         any_operation_state(any_operation_state&&) = delete;
         any_operation_state(any_operation_state const&) = delete;
         any_operation_state& operator=(any_operation_state&&) = delete;
@@ -415,6 +420,7 @@ namespace hpx::execution::experimental::detail {
 }    // namespace hpx::execution::experimental::detail
 
 namespace hpx::detail {
+
     template <typename... Ts>
     struct empty_vtable_type<
         hpx::execution::experimental::detail::any_receiver_base<Ts...>>
@@ -425,6 +431,7 @@ namespace hpx::detail {
 }    // namespace hpx::detail
 
 namespace hpx::execution::experimental::detail {
+
     template <typename Receiver, typename... Ts>
     struct any_receiver_impl final : any_receiver_base<Ts...>
     {
@@ -494,6 +501,7 @@ namespace hpx::execution::experimental::detail {
         }
 
         ~any_receiver() = default;
+
         any_receiver(any_receiver&&) = default;
         any_receiver(any_receiver const&) = delete;
         any_receiver& operator=(any_receiver&&) = default;
@@ -502,8 +510,8 @@ namespace hpx::execution::experimental::detail {
         friend void tag_invoke(hpx::execution::experimental::set_value_t,
             any_receiver&& r, Ts... ts)
         {
-            // We first move the storage to a temporary variable so that
-            // this any_receiver is empty after this set_value. Doing
+            // We first move the storage to a temporary variable so that this
+            // any_receiver is empty after this set_value. Doing
             // HPX_MOVE(storage.get()).set_value(...) would leave us with a
             // non-empty any_receiver holding a moved-from receiver.
             auto moved_storage = HPX_MOVE(r.storage);
@@ -513,8 +521,8 @@ namespace hpx::execution::experimental::detail {
         friend void tag_invoke(hpx::execution::experimental::set_error_t,
             any_receiver&& r, std::exception_ptr ep) noexcept
         {
-            // We first move the storage to a temporary variable so that
-            // this any_receiver is empty after this set_error. Doing
+            // We first move the storage to a temporary variable so that this
+            // any_receiver is empty after this set_error. Doing
             // HPX_MOVE(storage.get()).set_error(...) would leave us with a
             // non-empty any_receiver holding a moved-from receiver.
             auto moved_storage = HPX_MOVE(r.storage);
@@ -524,8 +532,8 @@ namespace hpx::execution::experimental::detail {
         friend void tag_invoke(hpx::execution::experimental::set_stopped_t,
             any_receiver&& r) noexcept
         {
-            // We first move the storage to a temporary variable so that
-            // this any_receiver is empty after this set_stopped. Doing
+            // We first move the storage to a temporary variable so that this
+            // any_receiver is empty after this set_stopped. Doing
             // HPX_MOVE(storage.get()).set_stopped(...) would leave us with a
             // non-empty any_receiver holding a moved-from receiver.
             auto moved_storage = HPX_MOVE(r.storage);
@@ -551,6 +559,7 @@ namespace hpx::execution::experimental::detail {
     {
         virtual any_sender_base* clone() const = 0;
         virtual void clone_into(void* p) const = 0;
+
         using unique_any_sender_base<Ts...>::connect;
         virtual any_operation_state connect(
             any_receiver<Ts...>&& receiver) & = 0;
@@ -683,16 +692,16 @@ namespace hpx::execution::experimental {
 #if defined(HPX_MSVC) || !defined(HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR)
     namespace detail {
         // This helper only exists to make it possible to use
-        // any_(unique_)sender in global variables or in general static
-        // that may be created before main. When used as a base for
-        // any_(unique_)_sender, this ensures that the empty vtables for
-        // any_receiver and any_operation_state are created as the first thing
-        // when creating an any_(unique_)sender. The empty vtables for
-        // any_receiver and any_operation_state may otherwise be created much
-        // later (when the sender is connected and started), and thus destroyed
-        // before the any_(unique_)sender is destroyed. This would be
-        // problematic since the any_(unique_)sender can hold previously created
-        // any_receivers and any_operation_states indirectly.
+        // any_(unique_)sender in global variables or in general static that may
+        // be created before main. When used as a base for any_(unique_)_sender,
+        // this ensures that the empty vtables for any_receiver and
+        // any_operation_state are created as the first thing when creating an
+        // any_(unique_)sender. The empty vtables for any_receiver and
+        // any_operation_state may otherwise be created much later (when the
+        // sender is connected and started), and thus destroyed before the
+        // any_(unique_)sender is destroyed. This would be problematic since the
+        // any_(unique_)sender can hold previously created any_receivers and
+        // any_operation_states indirectly.
         template <typename... Ts>
         struct any_sender_static_empty_vtable_helper
         {
@@ -712,8 +721,10 @@ namespace hpx::execution::experimental {
 #endif
     {
         using base_type = detail::unique_any_sender_base<Ts...>;
+
         template <typename Sender>
         using impl_type = detail::unique_any_sender_impl<Sender, Ts...>;
+
         using storage_type =
             hpx::detail::movable_sbo_storage<base_type, 4 * sizeof(void*)>;
 
@@ -742,6 +753,7 @@ namespace hpx::execution::experimental {
         }
 
         ~unique_any_sender() = default;
+
         unique_any_sender(unique_any_sender&&) = default;
         unique_any_sender(unique_any_sender const&) = delete;
         unique_any_sender& operator=(unique_any_sender&&) = default;
@@ -775,8 +787,10 @@ namespace hpx::execution::experimental {
 #endif
     {
         using base_type = detail::any_sender_base<Ts...>;
+
         template <typename Sender>
         using impl_type = detail::any_sender_impl<Sender, Ts...>;
+
         using storage_type =
             hpx::detail::copyable_sbo_storage<base_type, 4 * sizeof(void*)>;
 
@@ -815,6 +829,7 @@ namespace hpx::execution::experimental {
         }
 
         ~any_sender() = default;
+
         any_sender(any_sender&&) = default;
         any_sender(any_sender const&) = default;
         any_sender& operator=(any_sender&&) = default;
@@ -849,6 +864,7 @@ namespace hpx::execution::experimental {
 }    // namespace hpx::execution::experimental
 
 namespace hpx::detail {
+
     template <typename... Ts>
     struct empty_vtable_type<
         hpx::execution::experimental::detail::unique_any_sender_base<Ts...>>

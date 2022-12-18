@@ -18,7 +18,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
     class options_description;
     class positional_options_description;
@@ -28,16 +28,17 @@ namespace hpx { namespace program_options {
         component to value storage component. This class does not makes
         much sense itself.
     */
-    template <class Char>
+    template <typename Char>
     class basic_parsed_options
     {
     public:
         explicit basic_parsed_options(
-            const options_description* xdescription, int options_prefix = 0)
+            options_description const* xdescription, int options_prefix = 0)
           : description(xdescription)
           , m_options_prefix(options_prefix)
         {
         }
+
         /** Options found in the source. */
         std::vector<basic_option<Char>> options;
         /** Options description that was used for parsing.
@@ -45,7 +46,7 @@ namespace hpx { namespace program_options {
             option_description passed to them, and issues of lifetime are
             up to the caller. Can be NULL.
          */
-        const options_description* description;
+        options_description const* description;
 
         /** Mainly used for the diagnostic messages in exceptions.
          *  The canonical option prefix  for the parser which generated these results,
@@ -68,10 +69,10 @@ namespace hpx { namespace program_options {
     {
     public:
         /** Constructs wrapped options from options in UTF8 encoding. */
-        explicit basic_parsed_options(const basic_parsed_options<char>& po);
+        explicit basic_parsed_options(basic_parsed_options<char> const& po);
 
         std::vector<basic_option<wchar_t>> options;
-        const options_description* description;
+        options_description const* description;
 
         /** Stores UTF8 encoded options that were passed to constructor,
             to avoid reverse conversion in some cases. */
@@ -96,7 +97,7 @@ namespace hpx { namespace program_options {
         'parsed_options' */
 
     using ext_parser =
-        std::function<std::pair<std::string, std::string>(const std::string&)>;
+        std::function<std::pair<std::string, std::string>(std::string const&)>;
 
     /** Command line parser.
 
@@ -112,7 +113,7 @@ namespace hpx { namespace program_options {
         There are two typedefs \-- command_line_parser and wcommand_line_parser,
         for charT == char and charT == wchar_t cases.
     */
-    template <class Char>
+    template <typename Char>
     class basic_command_line_parser : private detail::cmdline
     {
     public:
@@ -120,17 +121,17 @@ namespace hpx { namespace program_options {
             list. The 'args' parameter should not include program name.
         */
         basic_command_line_parser(
-            const std::vector<std::basic_string<Char>>& args);
+            std::vector<std::basic_string<Char>> const& args);
         /** Creates a command line parser for the specified arguments
             list. The parameters should be the same as passed to 'main'.
         */
-        basic_command_line_parser(int argc, const Char* const argv[]);
+        basic_command_line_parser(int argc, Char const* const argv[]);
 
         /** Sets options descriptions to use. */
-        basic_command_line_parser& options(const options_description& desc);
+        basic_command_line_parser& options(options_description const& desc);
         /** Sets positional options description to use. */
         basic_command_line_parser& positional(
-            const positional_options_description& desc);
+            positional_options_description const& desc);
 
         /** Sets the command line style. */
         basic_command_line_parser& style(int);
@@ -157,7 +158,7 @@ namespace hpx { namespace program_options {
         basic_command_line_parser& extra_style_parser(style_parser s);
 
     private:
-        const options_description* m_desc;
+        options_description const* m_desc;
     };
 
     using command_line_parser = basic_command_line_parser<char>;
@@ -166,19 +167,19 @@ namespace hpx { namespace program_options {
     /** Creates instance of 'command_line_parser', passes parameters to it,
         and returns the result of calling the 'run' method.
      */
-    template <class Char>
+    template <typename Char>
     basic_parsed_options<Char> parse_command_line(int argc,
-        const Char* const argv[], const options_description&, int style = 0,
-        std::function<std::pair<std::string, std::string>(const std::string&)>
+        Char const* const argv[], options_description const&, int style = 0,
+        std::function<std::pair<std::string, std::string>(std::string const&)>
             ext = ext_parser());
 
     /** Parse a config file.
 
         Read from given stream.
     */
-    template <class Char>
+    template <typename Char>
     HPX_CORE_EXPORT basic_parsed_options<Char> parse_config_file(
-        std::basic_istream<Char>&, const options_description&,
+        std::basic_istream<Char>&, options_description const&,
         bool allow_unregistered = false);
 
     /** Parse a config file.
@@ -186,9 +187,9 @@ namespace hpx { namespace program_options {
         Read from file with the given name. The character type is
         passed to the file stream.
     */
-    template <class Char = char>
+    template <typename Char = char>
     HPX_CORE_EXPORT basic_parsed_options<Char> parse_config_file(
-        const char* filename, const options_description&,
+        char const* filename, options_description const&,
         bool allow_unregistered = false);
 
     /** Controls if the 'collect_unregistered' function should
@@ -205,9 +206,9 @@ namespace hpx { namespace program_options {
         Returns the vector of original tokens for all collected
         options.
     */
-    template <class Char>
+    template <typename Char>
     std::vector<std::basic_string<Char>> collect_unrecognized(
-        const std::vector<basic_option<Char>>& options,
+        std::vector<basic_option<Char>> const& options,
         enum collect_unrecognized_mode mode);
 
     /** Parse environment.
@@ -219,8 +220,8 @@ namespace hpx { namespace program_options {
         This is done since naming of environment variables is typically
         different from the naming of command line options.
     */
-    HPX_CORE_EXPORT parsed_options parse_environment(const options_description&,
-        const std::function<std::string(std::string)>& name_mapper);
+    HPX_CORE_EXPORT parsed_options parse_environment(options_description const&,
+        std::function<std::string(std::string)> const& name_mapper);
 
     /** Parse environment.
 
@@ -229,7 +230,7 @@ namespace hpx { namespace program_options {
         converting the remaining string into lower case.
     */
     HPX_CORE_EXPORT parsed_options parse_environment(
-        const options_description&, const std::string& prefix);
+        options_description const&, std::string const& prefix);
 
     /** @overload
         This function exists to resolve ambiguity between the two above
@@ -237,7 +238,7 @@ namespace hpx { namespace program_options {
         conversion to both std::function and string.
     */
     HPX_CORE_EXPORT parsed_options parse_environment(
-        const options_description&, const char* prefix);
+        options_description const&, char const* prefix);
 
     /** Splits a given string to a collection of single strings which
         can be passed to command_line_parser. The second parameter is
@@ -247,13 +248,13 @@ namespace hpx { namespace program_options {
         and escape characters '\'
     */
     HPX_CORE_EXPORT std::vector<std::string> split_unix(
-        const std::string& cmdline, const std::string& separator = " \t",
-        const std::string& quote = "'\"", const std::string& escape = "\\");
+        std::string const& cmdline, std::string const& separator = " \t",
+        std::string const& quote = "'\"", std::string const& escape = "\\");
 
     /** @overload */
     HPX_CORE_EXPORT std::vector<std::wstring> split_unix(
-        const std::wstring& cmdline, const std::wstring& separator = L" \t",
-        const std::wstring& quote = L"'\"", const std::wstring& escape = L"\\");
+        std::wstring const& cmdline, std::wstring const& separator = L" \t",
+        std::wstring const& quote = L"'\"", std::wstring const& escape = L"\\");
 
 #ifdef HPX_WINDOWS
     /** Parses the char* string which is passed to WinMain function on
@@ -263,14 +264,13 @@ namespace hpx { namespace program_options {
         This function is available only on Windows.
     */
     HPX_CORE_EXPORT std::vector<std::string> split_winmain(
-        const std::string& cmdline);
+        std::string const& cmdline);
 
     /** @overload */
     HPX_CORE_EXPORT std::vector<std::wstring> split_winmain(
-        const std::wstring& cmdline);
+        std::wstring const& cmdline);
 #endif
-
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options
 
 #include <hpx/config/warnings_suffix.hpp>
 

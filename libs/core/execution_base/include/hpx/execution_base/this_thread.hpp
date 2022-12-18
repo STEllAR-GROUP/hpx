@@ -11,10 +11,12 @@
 #include <hpx/execution_base/agent_base.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
 #include <hpx/execution_base/detail/spinlock_deadlock_detection.hpp>
+#include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/type_support/meta.hpp>
 
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
 #include <hpx/errors/throw_exception.hpp>
@@ -24,13 +26,16 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace hpx { namespace execution_base {
+namespace hpx::execution_base {
+
     namespace detail {
+
         HPX_CORE_EXPORT agent_base& get_default_agent();
     }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace this_thread {
+
         namespace detail {
 
             struct agent_storage;
@@ -39,8 +44,9 @@ namespace hpx { namespace execution_base {
 
         struct HPX_CORE_EXPORT reset_agent
         {
+            explicit reset_agent(agent_base& impl);
             reset_agent(detail::agent_storage*, agent_base& impl);
-            reset_agent(agent_base& impl);
+
             ~reset_agent();
 
             detail::agent_storage* storage_;
@@ -70,45 +76,64 @@ namespace hpx { namespace execution_base {
         {
             agent().sleep_until(sleep_time, desc);
         }
-
-        // [exec.sched_queries.execute_may_block_caller]
-        // 1. `this_thread::execute_may_block_caller` is used to ask a scheduler s
-        // whether a call `execution::execute(s, f)` with any invocable f
-        // may block the thread where such a call occurs.
-        //
-        // 2. The name `this_thread::execute_may_block_caller` denotes a
-        // customization point object. For some subexpression s, let S be decltype((s)).
-        // If S does not satisfy `execution::scheduler`,
-        // `this_thread::execute_may_block_caller` is ill-formed. Otherwise,
-        // `this_thread::execute_may_block_caller(s)` is expression equivalent to:
-        //      1. `tag_invoke(this_thread::execute_may_block_caller, as_const(s))`,
-        //          if this expression is well formed.
-        //      -- Mandates: The tag_invoke expression above is not
-        //          potentially throwing and its type is bool.
-        //      2. Otherwise, true.
-        //
-        // 3. If `this_thread::execute_may_block_caller(s)` for some scheduler s
-        // returns false, no execution::execute(s, f) call with some invocable f
-        // shall block the calling thread.
-        HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct
-            execute_may_block_caller_t final
-          : hpx::functional::detail::tag_fallback_noexcept<
-                execute_may_block_caller_t>
-        {
-            template <typename T>
-            friend constexpr HPX_FORCEINLINE bool tag_fallback_invoke(
-                execute_may_block_caller_t,
-                const hpx::util::unwrap_reference<T>&) noexcept
-            {
-                return true;
-            }
-        } execute_may_block_caller{};
     }    // namespace this_thread
-}}       // namespace hpx::execution_base
+}    // namespace hpx::execution_base
 
-namespace hpx { namespace util {
+namespace hpx::this_thread::experimental {
+
+    // [exec.sched_queries.execute_may_block_caller]
+    //
+    // 1. `this_thread::execute_may_block_caller` is used to ask a scheduler s
+    // whether a call `execution::execute(s, f)` with any invocable f may block
+    // the thread where such a call occurs.
+    //
+    // 2. The name `this_thread::execute_may_block_caller` denotes a
+    // customization point object. For some subexpression s, let S be
+    // decltype((s)). If S does not satisfy `execution::scheduler`,
+    // `this_thread::execute_may_block_caller` is ill-formed. Otherwise,
+    // `this_thread::execute_may_block_caller(s)` is expression equivalent to:
+    //
+    //      1. `tag_invoke(this_thread::execute_may_block_caller, as_const(s))`,
+    //          if this expression is well formed.
+    //
+    //          -- Mandates: The tag_invoke expression above is not
+    //                       potentially throwing and its type is bool.
+    //
+    //      2. Otherwise, true.
+    //
+    // 3. If `this_thread::execute_may_block_caller(s)` for some scheduler s
+    // returns false, no execution::execute(s, f) call with some invocable f
+    // shall block the calling thread.
     namespace detail {
-        inline void yield_k(std::size_t k, const char* thread_name)
+
+        // apply this meta function to all tag_invoke variations
+        struct is_scheduler
+        {
+            template <typename EnableTag, typename... T>
+            using apply = hpx::execution::experimental::is_scheduler<T...>;
+        };
+    }    // namespace detail
+
+    HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct execute_may_block_caller_t
+        final
+      : hpx::functional::detail::tag_fallback_noexcept<
+            execute_may_block_caller_t, detail::is_scheduler>
+    {
+    private:
+        template <typename T>
+        friend constexpr HPX_FORCEINLINE bool tag_fallback_invoke(
+            execute_may_block_caller_t, T const&) noexcept
+        {
+            return true;
+        }
+    } execute_may_block_caller{};
+}    // namespace hpx::this_thread::experimental
+
+namespace hpx::util {
+
+    namespace detail {
+
+        inline void yield_k(std::size_t k, char const* thread_name)
         {
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
             if (k > 32 && get_spinlock_break_on_deadlock_enabled() &&
@@ -123,7 +148,7 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     template <typename Predicate>
-    void yield_while(Predicate&& predicate, const char* thread_name = nullptr,
+    void yield_while(Predicate&& predicate, char const* thread_name = nullptr,
         bool allow_timed_suspension = true)
     {
         for (std::size_t k = 0; predicate(); ++k)
@@ -144,7 +169,7 @@ namespace hpx { namespace util {
         // replaced if and when a better solution appears.
         template <typename Predicate>
         void yield_while_count(Predicate&& predicate,
-            std::size_t required_count, const char* thread_name = nullptr,
+            std::size_t required_count, char const* thread_name = nullptr,
             bool allow_timed_suspension = true)
         {
             std::size_t count = 0;
@@ -173,7 +198,7 @@ namespace hpx { namespace util {
         template <typename Predicate>
         [[nodiscard]] bool yield_while_count_timeout(Predicate&& predicate,
             std::size_t required_count, std::chrono::duration<double> timeout,
-            const char* thread_name = nullptr,
+            char const* thread_name = nullptr,
             bool allow_timed_suspension = true)
         {
             // Seconds represented using a double
@@ -213,4 +238,4 @@ namespace hpx { namespace util {
             }
         }
     }    // namespace detail
-}}       // namespace hpx::util
+}    // namespace hpx::util

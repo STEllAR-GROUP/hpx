@@ -161,7 +161,7 @@ namespace hpx::lockfree {
         friend constexpr bool operator==(
             tagged_ptr_pair const& lhs, tagged_ptr_pair const& rhs) noexcept
         {
-            return (lhs.pair_ == rhs.pair_);
+            return lhs.pair_ == rhs.pair_;
         }
 
         friend constexpr bool operator!=(

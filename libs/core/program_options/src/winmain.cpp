@@ -14,23 +14,21 @@
 #include <string>
 #include <vector>
 
-using std::size_t;
+namespace hpx::program_options {
 
-namespace hpx { namespace program_options {
-
-    // Take a command line string and splits in into tokens, according
-    // to the rules windows command line processor uses.
+    // Take a command line string and splits in into tokens, according to the
+    // rules windows command line processor uses.
     //
     // The rules are pretty funny, see
     //    http://article.gmane.org/gmane.comp.lib.boost.user/3005
     //    http://msdn.microsoft.com/library/en-us/vccelng/htm/progs_12.asp
     HPX_CORE_EXPORT
-    std::vector<std::string> split_winmain(const std::string& input)
+    std::vector<std::string> split_winmain(std::string const& input)
     {
         std::vector<std::string> result;
 
         std::string::const_iterator i = input.begin(), e = input.end();
-        for (; i != e; ++i)
+        for (/**/; i != e; ++i)
             if (!isspace((unsigned char) *i))
                 break;
 
@@ -68,8 +66,8 @@ namespace hpx { namespace program_options {
                 }
                 else
                 {
-                    // Not quote or backslash. All accumulated backslashes should be
-                    // added
+                    // Not quote or backslash. All accumulated backslashes
+                    // should be added
                     if (backslash_count)
                     {
                         current.append(backslash_count, '\\');
@@ -77,7 +75,8 @@ namespace hpx { namespace program_options {
                     }
                     if (std::isspace((unsigned char) *i) && !inside_quoted)
                     {
-                        // Space outside quoted section terminate the current argument
+                        // Space outside quoted section terminate the current
+                        // argument
                         result.push_back(current);
                         current.resize(0);
                         empty_quote = false;
@@ -96,23 +95,22 @@ namespace hpx { namespace program_options {
             if (backslash_count)
                 current.append(backslash_count, '\\');
 
-            // If we have non-empty 'current' or we're still in quoted
-            // section (even if 'current' is empty), add the last token.
+            // If we have non-empty 'current' or we're still in quoted section
+            // (even if 'current' is empty), add the last token.
             if (!current.empty() || inside_quoted || empty_quote)
                 result.push_back(current);
         }
         return result;
     }
 
-    std::vector<std::wstring> split_winmain(const std::wstring& cmdline)
+    std::vector<std::wstring> split_winmain(std::wstring const& cmdline)
     {
         std::vector<std::wstring> result;
         std::vector<std::string> aux = split_winmain(to_internal(cmdline));
-        for (const auto& i : aux)
+        for (auto const& i : aux)
             result.push_back(from_utf8(i));
         return result;
     }
-
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options
 
 #endif

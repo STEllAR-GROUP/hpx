@@ -12,10 +12,11 @@
 #include <hpx/datastructures/any.hpp>
 #include <hpx/datastructures/optional.hpp>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
     using any = hpx::any_nonser;
     using hpx::any_cast;
+
     template <typename T>
     using optional = hpx::optional<T>;
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options

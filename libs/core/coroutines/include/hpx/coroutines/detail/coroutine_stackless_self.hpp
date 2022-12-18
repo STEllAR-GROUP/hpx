@@ -18,17 +18,17 @@
 #include <limits>
 #include <utility>
 
-namespace hpx { namespace threads { namespace coroutines {
+namespace hpx ::threads::coroutines {
 
     class stackless_coroutine;
-}}}    // namespace hpx::threads::coroutines
+}    // namespace hpx::threads::coroutines
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail {
+namespace hpx ::threads::coroutines::detail {
 
     class coroutine_stackless_self : public coroutine_self
     {
     public:
-        explicit coroutine_stackless_self(stackless_coroutine* pimpl)
+        explicit coroutine_stackless_self(stackless_coroutine* pimpl) noexcept
           : coroutine_self(nullptr)
           , pimpl_(pimpl)
         {
@@ -41,33 +41,36 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             return threads::thread_restart_state::abort;
         }
 
-        thread_id_type get_thread_id() const override
+        thread_id_type get_thread_id() const noexcept override
         {
             HPX_ASSERT(pimpl_);
             return pimpl_->get_thread_id();
         }
 
-        std::size_t get_thread_phase() const override
-        {
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
+        std::size_t get_thread_phase() const noexcept override
+        {
             HPX_ASSERT(pimpl_);
             return pimpl_->get_thread_phase();
-#else
-            return 0;
-#endif
         }
+#else
+        std::size_t get_thread_phase() const noexcept override
+        {
+            return 0;
+        }
+#endif
 
-        std::ptrdiff_t get_available_stack_space() override
+        std::ptrdiff_t get_available_stack_space() const noexcept override
         {
             return (std::numeric_limits<std::ptrdiff_t>::max)();
         }
 
-        std::size_t get_thread_data() const override
+        std::size_t get_thread_data() const noexcept override
         {
             HPX_ASSERT(pimpl_);
             return pimpl_->get_thread_data();
         }
-        std::size_t set_thread_data(std::size_t data) override
+        std::size_t set_thread_data(std::size_t data) noexcept override
         {
             HPX_ASSERT(pimpl_);
             return pimpl_->set_thread_data(data);
@@ -109,27 +112,33 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 #endif
 
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         tss_storage* get_thread_tss_data() override
         {
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             HPX_ASSERT(pimpl_);
             return pimpl_->get_thread_tss_data(false);
-#else
-            return nullptr;
-#endif
         }
+#else
+        tss_storage* get_thread_tss_data() override
+        {
+            return nullptr;
+        }
+#endif
 
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         tss_storage* get_or_create_thread_tss_data() override
         {
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             HPX_ASSERT(pimpl_);
             return pimpl_->get_thread_tss_data(true);
-#else
-            return nullptr;
-#endif
         }
+#else
+        tss_storage* get_or_create_thread_tss_data() override
+        {
+            return nullptr;
+        }
+#endif
 
-        std::size_t& get_continuation_recursion_count() override
+        std::size_t& get_continuation_recursion_count() noexcept override
         {
             HPX_ASSERT(pimpl_);
             return pimpl_->get_continuation_recursion_count();
@@ -138,4 +147,4 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     private:
         stackless_coroutine* pimpl_;
     };
-}}}}    // namespace hpx::threads::coroutines::detail
+}    // namespace hpx::threads::coroutines::detail

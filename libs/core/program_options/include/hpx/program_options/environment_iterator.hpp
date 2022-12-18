@@ -13,7 +13,7 @@
 #include <string>
 #include <utility>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
     class environment_iterator
       : public eof_iterator<environment_iterator,
@@ -51,4 +51,4 @@ namespace hpx { namespace program_options {
     private:
         char** m_environment;
     };
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options

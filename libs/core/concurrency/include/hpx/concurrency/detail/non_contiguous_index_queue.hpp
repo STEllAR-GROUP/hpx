@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace concurrency { namespace detail {
+namespace hpx::concurrency::detail {
 
     /// \brief A concurrent queue which can only hold non-contiguous ranges of
     ///        integers.
@@ -168,6 +168,7 @@ namespace hpx { namespace concurrency { namespace detail {
 
                 index = expected_range.first;
                 desired_range = expected_range.increment_first(step);
+
             } while (!current_range.data_.compare_exchange_weak(
                 expected_range, desired_range));
 
@@ -198,6 +199,7 @@ namespace hpx { namespace concurrency { namespace detail {
 
                 desired_range = expected_range.decrement_last(step);
                 index = desired_range.last;
+
             } while (!current_range.data_.compare_exchange_weak(
                 expected_range, desired_range));
 
@@ -220,4 +222,4 @@ namespace hpx { namespace concurrency { namespace detail {
         T step = 1;
         hpx::util::cache_line_data<std::atomic<range>> current_range;
     };
-}}}    // namespace hpx::concurrency::detail
+}    // namespace hpx::concurrency::detail

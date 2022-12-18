@@ -19,14 +19,18 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        // checks whether tag_invoke(CPO, Args...) is
-        // contextually convertible to bool, assumes that the expression is
-        // valid
+        // checks whether tag_invoke(CPO, Args...) is contextually convertible
+        // to bool, apply this meta function only for tag_invoke overloads
         template <typename CPO>
         struct contextually_convertible_to_bool
         {
+            template <typename EnableTag, typename... Args>
+            struct apply : std::true_type
+            {
+            };
+
             template <typename... Args>
-            struct apply
+            struct apply<hpx::functional::enable_tag_invoke_t, Args...>
               : std::is_invocable_r<bool,
                     hpx::functional::tag_t<hpx::functional::tag_invoke>, CPO,
                     Args...>
@@ -37,21 +41,21 @@ namespace hpx::execution::experimental {
 
     // 1. An execution environment contains state associated with the
     //    completion of an asynchronous operation. Every receiver has an
-    //    associated execution environment, accessible with the get_env
-    //    receiver query. The state of an execution environment is accessed
-    //    with customization point objects. An execution environment may
-    //    respond to any number of these environment queries.
+    //    associated execution environment, accessible with the get_env receiver
+    //    query. The state of an execution environment is accessed with
+    //    customization point objects. An execution environment may respond to
+    //    any number of these environment queries.
     //
     // 2. An environment query is a customization point object that accepts
     //    as its first argument an execution environment. For an environment
-    //    query EQ and an object e of type no_env, the expression EQ(e) shall
-    //    be ill-formed.
+    //    query EQ and an object e of type no_env, the expression EQ(e) shall be
+    //    ill-formed.
     //
     namespace exec_envs {
 
-        // no_env is a special environment used by the sender concept and by
-        // the get_completion_signatures customization point when the user
-        // has specified no environment argument.
+        // no_env is a special environment used by the sender concept and by the
+        // get_completion_signatures customization point when the user has
+        // specified no environment argument.
         //
         //  [Note: A user may choose to not specify an environment in order
         //         to see if a sender knows its completion signatures
@@ -202,5 +206,4 @@ namespace hpx::execution::experimental {
             return false;
         }
     } forwarding_env_query{};
-
 }    // namespace hpx::execution::experimental

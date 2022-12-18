@@ -13,17 +13,15 @@
 #include <cstddef>
 #include <iosfwd>
 
-namespace hpx { namespace execution_base {
+namespace hpx::execution_base {
 
     struct agent_base;
 
     class HPX_CORE_EXPORT agent_ref
     {
     public:
-        constexpr agent_ref() noexcept
-          : impl_(nullptr)
-        {
-        }
+        agent_ref() = default;
+
         constexpr agent_ref(agent_base* impl) noexcept
           : impl_(impl)
         {
@@ -35,12 +33,12 @@ namespace hpx { namespace execution_base {
         constexpr agent_ref(agent_ref&&) noexcept = default;
         constexpr agent_ref& operator=(agent_ref&&) noexcept = default;
 
-        constexpr explicit operator bool() const noexcept
+        explicit constexpr operator bool() const noexcept
         {
             return impl_ != nullptr;
         }
 
-        void reset(agent_base* impl = nullptr)
+        void reset(agent_base* impl = nullptr) noexcept
         {
             impl_ = impl;
         }
@@ -69,7 +67,7 @@ namespace hpx { namespace execution_base {
             sleep_until(hpx::chrono::steady_time_point{sleep_time}, desc);
         }
 
-        agent_base& ref()
+        agent_base& ref() noexcept
         {
             return *impl_;
         }
@@ -80,7 +78,7 @@ namespace hpx { namespace execution_base {
         // executor
 
     private:
-        agent_base* impl_;
+        agent_base* impl_ = nullptr;
 
         void sleep_for(hpx::chrono::steady_duration const& sleep_duration,
             char const* desc);
@@ -88,13 +86,13 @@ namespace hpx { namespace execution_base {
             hpx::chrono::steady_time_point const& sleep_time, char const* desc);
 
         friend constexpr bool operator==(
-            agent_ref const& lhs, agent_ref const& rhs)
+            agent_ref const& lhs, agent_ref const& rhs) noexcept
         {
             return lhs.impl_ == rhs.impl_;
         }
 
         friend constexpr bool operator!=(
-            agent_ref const& lhs, agent_ref const& rhs)
+            agent_ref const& lhs, agent_ref const& rhs) noexcept
         {
             return lhs.impl_ != rhs.impl_;
         }
@@ -102,4 +100,4 @@ namespace hpx { namespace execution_base {
         HPX_CORE_EXPORT friend std::ostream& operator<<(
             std::ostream&, agent_ref const&);
     };
-}}    // namespace hpx::execution_base
+}    // namespace hpx::execution_base

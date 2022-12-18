@@ -11,7 +11,7 @@
 
 #include <cstdint>
 
-namespace hpx { namespace execution_base {
+namespace hpx::execution_base {
 
     struct context_base
     {
@@ -19,4 +19,4 @@ namespace hpx { namespace execution_base {
 
         virtual resource_base const& resource() const = 0;
     };
-}}    // namespace hpx::execution_base
+}    // namespace hpx::execution_base

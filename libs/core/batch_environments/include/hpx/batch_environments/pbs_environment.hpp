@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,29 +13,29 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace util { namespace batch_environments {
+namespace hpx::util::batch_environments {
 
     struct pbs_environment
     {
         HPX_CORE_EXPORT pbs_environment(
             std::vector<std::string>& nodelist, bool have_mpi, bool debug);
 
-        bool valid() const
+        constexpr bool valid() const noexcept
         {
             return valid_;
         }
 
-        std::size_t node_num() const
+        constexpr std::size_t node_num() const noexcept
         {
             return node_num_;
         }
 
-        std::size_t num_threads() const
+        constexpr std::size_t num_threads() const noexcept
         {
             return num_threads_;
         }
 
-        std::size_t num_localities() const
+        constexpr std::size_t num_localities() const noexcept
         {
             return num_localities_;
         }
@@ -51,4 +51,4 @@ namespace hpx { namespace util { namespace batch_environments {
         HPX_CORE_EXPORT void read_nodelist(
             std::vector<std::string>& nodelist, bool debug);
     };
-}}}    // namespace hpx::util::batch_environments
+}    // namespace hpx::util::batch_environments

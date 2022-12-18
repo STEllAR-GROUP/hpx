@@ -32,13 +32,14 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace threads { namespace coroutines {
-    namespace detail {
-        class coroutine_self;
+namespace hpx::threads::coroutines {
 
+    namespace detail {
+
+        class coroutine_self;
         class coroutine_impl;
     }    // namespace detail
 
     class coroutine;
     class stackless_coroutine;
-}}}    // namespace hpx::threads::coroutines
+}    // namespace hpx::threads::coroutines

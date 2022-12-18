@@ -5,19 +5,17 @@
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/program_options/detail/convert.hpp>
 #include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
 
+#include <clocale>
 #include <fstream>
-#include <functional>
-#include <locale.h>
 #include <locale>
 #include <stdexcept>
 #include <string>
 
-namespace hpx { namespace program_options { namespace detail {
-
-    using namespace std;
+namespace hpx::program_options::detail {
 
     /* Internal function to actually perform conversion.
        The logic in from_8_bit and to_8_bit function is exactly
@@ -30,17 +28,17 @@ namespace hpx { namespace program_options { namespace detail {
        function will pass functional objects created with std::bind.
        Experiments show that the performance loss is less than 10%.
     */
-    template <class ToChar, class FromChar, class Fun>
+    template <typename ToChar, typename FromChar, typename Fun>
     std::basic_string<ToChar> convert(
-        const std::basic_string<FromChar>& s, Fun fun)
+        std::basic_string<FromChar> const& s, Fun fun)
 
     {
         std::basic_string<ToChar> result;
 
         std::mbstate_t state = std::mbstate_t();
 
-        const FromChar* from = s.data();
-        const FromChar* from_end = s.data() + s.size();
+        FromChar const* from = s.data();
+        FromChar const* from_end = s.data() + s.size();
         // The interface of cvt is not really iterator-like, and it's
         // not possible the tell the required output size without the conversion.
         // All we can is convert data by pieces.
@@ -72,61 +70,60 @@ namespace hpx { namespace program_options { namespace detail {
 
         return result;
     }
-}}}    // namespace hpx::program_options::detail
+}    // namespace hpx::program_options::detail
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
-    std::wstring from_8_bit(const std::string& s,
-        const std::codecvt<wchar_t, char, std::mbstate_t>& cvt)
+    std::wstring from_8_bit(std::string const& s,
+        std::codecvt<wchar_t, char, std::mbstate_t> const& cvt)
     {
-        using namespace std::placeholders;
         return detail::convert<wchar_t>(s,
-            std::bind(&std::codecvt<wchar_t, char, std::mbstate_t>::in, &cvt,
-                _1, _2, _3, _4, _5, _6, _7));
+            hpx::bind_front(
+                &std::codecvt<wchar_t, char, std::mbstate_t>::in, &cvt));
     }
 
-    std::string to_8_bit(const std::wstring& s,
-        const std::codecvt<wchar_t, char, std::mbstate_t>& cvt)
+    std::string to_8_bit(std::wstring const& s,
+        std::codecvt<wchar_t, char, std::mbstate_t> const& cvt)
     {
-        using namespace std::placeholders;
         return detail::convert<char>(s,
-            std::bind(&std::codecvt<wchar_t, char, std::mbstate_t>::out, &cvt,
-                _1, _2, _3, _4, _5, _6, _7));
+            hpx::bind_front(
+                &std::codecvt<wchar_t, char, std::mbstate_t>::out, &cvt));
     }
 
     namespace {
+
         hpx::program_options::detail::utf8_codecvt_facet utf8_facet;
     }
 
-    std::wstring from_utf8(const std::string& s)
+    std::wstring from_utf8(std::string const& s)
     {
         return from_8_bit(s, utf8_facet);
     }
 
-    std::string to_utf8(const std::wstring& s)
+    std::string to_utf8(std::wstring const& s)
     {
         return to_8_bit(s, utf8_facet);
     }
 
-    std::wstring from_local_8_bit(const std::string& s)
+    std::wstring from_local_8_bit(std::string const& s)
     {
         using facet_type = std::codecvt<wchar_t, char, std::mbstate_t>;
         return from_8_bit(s, std::use_facet<facet_type>(std::locale()));
     }
 
-    std::string to_local_8_bit(const std::wstring& s)
+    std::string to_local_8_bit(std::wstring const& s)
     {
         using facet_type = std::codecvt<wchar_t, char, std::mbstate_t>;
         return to_8_bit(s, std::use_facet<facet_type>(std::locale()));
     }
 
-    std::string to_internal(const std::string& s)
+    std::string to_internal(std::string const& s)
     {
         return s;
     }
 
-    std::string to_internal(const std::wstring& s)
+    std::string to_internal(std::wstring const& s)
     {
         return to_utf8(s);
     }
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options

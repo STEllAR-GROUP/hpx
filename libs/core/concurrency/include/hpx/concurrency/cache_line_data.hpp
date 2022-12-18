@@ -17,6 +17,7 @@
 namespace hpx {
 
     namespace threads {
+
         ////////////////////////////////////////////////////////////////////////
         // abstract away cache-line size
         constexpr std::size_t get_cache_line_size() noexcept
@@ -38,6 +39,7 @@ namespace hpx {
     namespace util {
 
         namespace detail {
+
             // Computes the padding required to fill up a full cache line after
             // data_size bytes.
             constexpr std::size_t get_cache_line_padding_size(
@@ -79,14 +81,12 @@ namespace hpx {
             {
             }
 
-            cache_aligned_data(Data&& data) noexcept
-              : data_(HPX_MOVE(data))
-            {
-            }
-
-            cache_aligned_data(Data const& data) noexcept(
-                noexcept(std::is_nothrow_copy_constructible_v<Data>))
-              : data_(data)
+            template <typename... Ts,
+                typename =
+                    std::enable_if_t<std::is_constructible_v<Data, Ts&&...>>>
+            cache_aligned_data(Ts&&... ts) noexcept(
+                std::is_nothrow_constructible_v<Data, Ts&&...>)
+              : data_(HPX_FORWARD(Ts, ts)...)
             {
             }
 
@@ -102,16 +102,18 @@ namespace hpx {
         template <typename Data>
         struct cache_aligned_data<Data, false>
         {
-            cache_aligned_data() = default;
-
-            cache_aligned_data(Data&& data) noexcept
-              : data_(HPX_MOVE(data))
+            constexpr cache_aligned_data() noexcept(
+                std::is_nothrow_default_constructible_v<Data>)
+              : data_()
             {
             }
 
-            cache_aligned_data(Data const& data) noexcept(
-                noexcept(std::is_nothrow_copy_constructible_v<Data>))
-              : data_(data)
+            template <typename... Ts,
+                typename =
+                    std::enable_if_t<std::is_constructible_v<Data, Ts&&...>>>
+            cache_aligned_data(Ts&&... ts) noexcept(
+                std::is_nothrow_constructible_v<Data, Ts&&...>)
+              : data_(HPX_FORWARD(Ts, ts)...)
             {
             }
 
@@ -137,7 +139,7 @@ namespace hpx {
                 typename =
                     std::enable_if_t<std::is_constructible_v<Data, Ts&&...>>>
             cache_aligned_data_derived(Ts&&... ts) noexcept(
-                noexcept(std::is_nothrow_constructible_v<Data, Ts&&...>))
+                std::is_nothrow_constructible_v<Data, Ts&&...>)
               : Data(HPX_FORWARD(Ts, ts)...)
             {
             }
@@ -151,13 +153,17 @@ namespace hpx {
         template <typename Data>
         struct cache_aligned_data_derived<Data, false> : Data
         {
-            cache_aligned_data_derived() = default;
+            constexpr cache_aligned_data_derived() noexcept(
+                std::is_nothrow_default_constructible_v<Data>)
+              : Data()
+            {
+            }
 
             template <typename... Ts,
                 typename =
                     std::enable_if_t<std::is_constructible_v<Data, Ts&&...>>>
             cache_aligned_data_derived(Ts&&... ts) noexcept(
-                noexcept(std::is_nothrow_constructible_v<Data, Ts&&...>))
+                std::is_nothrow_constructible_v<Data, Ts&&...>)
               : Data(HPX_FORWARD(Ts, ts)...)
             {
             }

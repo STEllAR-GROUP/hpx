@@ -606,7 +606,7 @@ namespace hpx { namespace this_thread {
         return threads::get_pool(threads::get_self_id(), ec);
     }
 
-    std::ptrdiff_t get_available_stack_space()
+    std::ptrdiff_t get_available_stack_space() noexcept
     {
         threads::thread_self* self = threads::get_self_ptr();
         if (self)

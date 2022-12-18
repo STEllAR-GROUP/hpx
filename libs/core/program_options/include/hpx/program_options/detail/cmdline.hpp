@@ -20,7 +20,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace program_options { namespace detail {
+namespace hpx::program_options::detail {
 
     /** Command line parser class. Main requirements were:
         - Powerful enough to support all common uses.
@@ -56,26 +56,28 @@ namespace hpx { namespace program_options { namespace detail {
 
         using additional_parser =
             std::function<std::pair<std::string, std::string>(
-                const std::string&)>;
+                std::string const&)>;
 
         using style_parser =
             std::function<std::vector<option>(std::vector<std::string>&)>;
 
-        /** Constructs a command line parser for (argc, argv) pair. Uses
-            style options passed in 'style', which should be binary or'ed values
-            of style_t enum. It can also be zero, in which case a "default"
-            style will be used. If 'allow_unregistered' is true, then allows
-            unregistered options. They will be assigned index 1 and are
-            assumed to have optional parameter.
-        */
-        cmdline(const std::vector<std::string>& args);
+        /// Constructs a command line parser for (argc, argv) pair. Uses style
+        /// options passed in 'style', which should be binary or'ed values of
+        /// style_t enum. It can also be zero, in which case a "default" style
+        /// will be used. If 'allow_unregistered' is true, then allows
+        /// unregistered options. They will be assigned index 1 and are assumed
+        /// to have optional parameter.
+        ///
+        explicit cmdline(std::vector<std::string> const& args);
 
         /** @overload */
-        cmdline(int argc, const char* const* argv);
+        cmdline(int argc, char const* const* argv);
 
-        void style(int style);
+        void style(int style) noexcept;
 
-        /** returns the canonical option prefix associated with the command_line_style
+        /**
+         * returns the canonical option prefix associated with the
+         * command_line_style
          *  In order of precedence:
          *      allow_long           : allow_long
          *      allow_long_disguise  : allow_long_disguise
@@ -83,14 +85,14 @@ namespace hpx { namespace program_options { namespace detail {
          *      allow_slash_for_short: allow_short | allow_slash_for_short
          *
          *      This is mainly used for the diagnostic messages in exceptions
-        */
-        int get_canonical_option_prefix();
+         */
+        int get_canonical_option_prefix() noexcept;
 
-        void allow_unregistered();
+        void allow_unregistered() noexcept;
 
-        void set_options_description(const options_description& desc);
+        void set_options_description(options_description const& desc) noexcept;
         void set_positional_options(
-            const positional_options_description& m_positional);
+            positional_options_description const& m_positional) noexcept;
 
         std::vector<option> run();
 
@@ -103,41 +105,36 @@ namespace hpx { namespace program_options { namespace detail {
         std::vector<option> handle_additional_parser(
             std::vector<std::string>& args);
 
-        /** Set additional parser. This will be called for each token
-            of command line. If first string in pair is not empty,
-            then the token is considered matched by this parser,
-            and the first string will be considered an option name
-            (which can be long or short), while the second will be
-            option's parameter (if not empty).
-            Note that additional parser can match only one token.
-        */
-        void set_additional_parser(additional_parser p);
+        /// Set additional parser. This will be called for each token of command
+        /// line. If first string in pair is not empty, then the token is
+        /// considered matched by this parser, and the first string will be
+        /// considered an option name (which can be long or short), while the
+        /// second will be option's parameter (if not empty). Note that
+        /// additional parser can match only one token.
+        void set_additional_parser(additional_parser p) noexcept;
 
-        void extra_style_parser(style_parser s);
+        void extra_style_parser(style_parser s) noexcept;
 
         void check_style(int style) const;
 
-        bool is_style_active(style_t style) const;
+        bool is_style_active(style_t style) const noexcept;
 
-        void init(const std::vector<std::string>& args);
+        void init(std::vector<std::string> const& args);
 
         void finish_option(option& opt, std::vector<std::string>& other_tokens,
-            const std::vector<style_parser>& style_parsers);
+            std::vector<style_parser> const& style_parsers);
 
         // Copies of input.
         std::vector<std::string> m_args;
         style_t m_style;
         bool m_allow_unregistered;
 
-        const options_description* m_desc;
-        const positional_options_description* m_positional;
+        options_description const* m_desc;
+        positional_options_description const* m_positional;
 
         additional_parser m_additional_parser;
         style_parser m_style_parser;
     };
-
-    void test_cmdline_detail();
-
-}}}    // namespace hpx::program_options::detail
+}    // namespace hpx::program_options::detail
 
 #include <hpx/config/warnings_suffix.hpp>

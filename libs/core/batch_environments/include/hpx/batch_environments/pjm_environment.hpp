@@ -19,22 +19,22 @@ namespace hpx::util::batch_environments {
         HPX_CORE_EXPORT pjm_environment(
             std::vector<std::string>& nodelist, bool have_mpi, bool debug);
 
-        bool valid() const
+        constexpr bool valid() const noexcept
         {
             return valid_;
         }
 
-        std::size_t node_num() const
+        constexpr std::size_t node_num() const noexcept
         {
             return node_num_;
         }
 
-        std::size_t num_threads() const
+        constexpr std::size_t num_threads() const noexcept
         {
             return num_threads_;
         }
 
-        std::size_t num_localities() const
+        constexpr std::size_t num_localities() const noexcept
         {
             return num_localities_;
         }

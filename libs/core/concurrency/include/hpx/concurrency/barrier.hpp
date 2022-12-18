@@ -17,11 +17,12 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     class HPX_CORE_EXPORT barrier
     {
     private:
-        typedef std::mutex mutex_type;
+        using mutex_type = std::mutex;
 
         static constexpr std::size_t barrier_flag = static_cast<std::size_t>(1)
             << (CHAR_BIT * sizeof(std::size_t) - 1);
@@ -39,6 +40,6 @@ namespace hpx { namespace util {
         mutable mutex_type mtx_;
         std::condition_variable cond_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>

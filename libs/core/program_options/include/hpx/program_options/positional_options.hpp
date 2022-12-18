@@ -13,7 +13,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
     /** Describes positional options.
 
@@ -33,25 +33,25 @@ namespace hpx { namespace program_options {
     class HPX_CORE_EXPORT positional_options_description
     {
     public:
-        positional_options_description();
+        positional_options_description() = default;
 
         /** Species that up to 'max_count' next positional options
             should be given the 'name'. The value of '-1' means 'unlimited'.
             No calls to 'add' can be made after call with 'max_value' equal to
             '-1'.
         */
-        positional_options_description& add(const char* name, int max_count);
+        positional_options_description& add(char const* name, int max_count);
 
         /** Returns the maximum number of positional options that can
             be present. Can return (numeric_limits<unsigned>::max)() to
             indicate unlimited number. */
-        unsigned max_total_count() const;
+        unsigned max_total_count() const noexcept;
 
         /** Returns the name that should be associated with positional
             options at 'position'.
             Precondition: position < max_total_count()
         */
-        const std::string& name_for_position(unsigned position) const;
+        std::string const& name_for_position(unsigned position) const noexcept;
 
     private:
         // List of names corresponding to the positions. If the number of
@@ -60,7 +60,6 @@ namespace hpx { namespace program_options {
         std::vector<std::string> m_names;
         std::string m_trailing;
     };
-
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options
 
 #include <hpx/config/warnings_suffix.hpp>

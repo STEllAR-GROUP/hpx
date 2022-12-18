@@ -223,19 +223,22 @@ namespace hpx::functional::detail {
         template <typename Tag, typename... Args>
         struct not_tag_fallback_noexcept_invocable;
 
-        // poison pill
+        // poison pills
         void tag_invoke();
         void tag_fallback_invoke();
 
+        // use this tag type to enable the tag_fallback_invoke function overloads
+        struct enable_tag_fallback_invoke_t;
+
         ///////////////////////////////////////////////////////////////////////////
-        /// Helper base class implementing the tag_invoke logic for CPOs that fall
-        /// back to directly invoke its fallback.
+        /// Helper base class implementing the tag_invoke logic for CPOs that
+        /// fall back to directly invoke its fallback.
         ///
-        /// This base class is in many cases preferable to the plain tag base class.
-        /// With the normal tag base class a default, unconstrained, default
-        /// tag_invoke overload will take precedence over user-defined tag_invoke
-        /// overloads that are not perfect matches. For example, with a default
-        /// overload:
+        /// This base class is in many cases preferable to the plain tag base
+        /// class. With the normal tag base class a default, unconstrained,
+        /// default tag_invoke overload will take precedence over user-defined
+        /// tag_invoke overloads that are not perfect matches. For example, with
+        /// a default overload:
         ///
         /// template <typename T> auto tag_invoke(tag_t, T&& t) {...}
         ///
@@ -243,20 +246,20 @@ namespace hpx::functional::detail {
         ///
         /// auto tag_invoke(my_type t)
         ///
-        /// the user-defined overload will only be considered when it is an exact
-        /// match. This means const and reference qualifiers must match exactly, and
-        /// conversions to a base class are not considered.
+        /// the user-defined overload will only be considered when it is an
+        /// exact match. This means const and reference qualifiers must match
+        /// exactly, and conversions to a base class are not considered.
         ///
-        /// With tag_fallback one can define the default implementation in terms of
-        /// a tag_fallback_invoke overload instead of tag_invoke:
+        /// With tag_fallback one can define the default implementation in terms
+        /// of a tag_fallback_invoke overload instead of tag_invoke:
         ///
         /// template <typename T> auto tag_fallback_invoke(tag_t, T&& t) {...}
         ///
         /// With the same user-defined tag_invoke overload, the user-defined
         /// overload will now be used if it is a match even if it isn't an exact
-        /// match.
-        /// This is because tag_fallback will dispatch to tag_fallback_invoke only
-        /// if there are no matching tag_invoke overloads.
+        /// match. This is because tag_fallback will dispatch to
+        /// tag_fallback_invoke only if there are no matching tag_invoke
+        /// overloads.
         template <typename Tag, typename Enable>
         struct tag_fallback
         {
@@ -264,7 +267,8 @@ namespace hpx::functional::detail {
             template <typename... Args,
                 typename =
                     std::enable_if_t<is_tag_invocable_v<Tag, Args&&...> &&
-                        meta::value<meta::invoke<Enable, Args...>>>>
+                        meta::value<meta::invoke<Enable, enable_tag_invoke_t,
+                            Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
@@ -277,7 +281,9 @@ namespace hpx::functional::detail {
             // is not tag-invocable
             template <typename... Args,
                 typename =
-                    std::enable_if_t<!is_tag_invocable_v<Tag, Args&&...>>>
+                    std::enable_if_t<!is_tag_invocable_v<Tag, Args&&...> &&
+                        meta::value<meta::invoke<Enable,
+                            enable_tag_fallback_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_fallback_invocable_v<Tag, Args...>)
@@ -289,8 +295,9 @@ namespace hpx::functional::detail {
         };
 
         ///////////////////////////////////////////////////////////////////////////
-        // helper base class implementing the tag_invoke logic for DPOs that fall
-        // back to directly invoke its fallback. Either invocation has to be noexcept.
+        // helper base class implementing the tag_invoke logic for DPOs that
+        // fall back to directly invoke its fallback. Either invocation has to
+        // be noexcept.
         template <typename Tag, typename Enable>
         struct tag_fallback_noexcept
         {
@@ -298,7 +305,8 @@ namespace hpx::functional::detail {
             template <typename... Args,
                 typename = std::enable_if_t<
                     is_nothrow_tag_invocable_v<Tag, Args&&...> &&
-                    meta::value<meta::invoke<Enable, Args...>>>>
+                    meta::value<
+                        meta::invoke<Enable, enable_tag_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> tag_invoke_result_t<Tag, Args&&...>
@@ -310,7 +318,9 @@ namespace hpx::functional::detail {
             // is not nothrow tag-invocable
             template <typename... Args,
                 typename = std::enable_if_t<
-                    !is_nothrow_tag_invocable_v<Tag, Args&&...>>>
+                    !is_nothrow_tag_invocable_v<Tag, Args&&...> &&
+                    meta::value<meta::invoke<Enable,
+                        enable_tag_fallback_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
             {
@@ -339,6 +349,9 @@ namespace hpx::functional::detail {
             typename Enable = meta::constant<meta::bool_<true>>>
         using tag_fallback_noexcept =
             tag_base_ns::tag_fallback_noexcept<Tag, Enable>;
+
+        using enable_tag_fallback_invoke_t =
+            tag_base_ns::enable_tag_fallback_invoke_t;
     }    // namespace tag_invoke_base_ns
 
     inline namespace tag_fallback_invoke_f_ns {

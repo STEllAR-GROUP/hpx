@@ -12,7 +12,7 @@
 #include <cstddef>
 #include <string>
 
-namespace hpx { namespace execution_base {
+namespace hpx::execution_base {
 
     struct agent_base
     {
@@ -34,4 +34,4 @@ namespace hpx { namespace execution_base {
             hpx::chrono::steady_time_point const& sleep_time,
             char const* desc) = 0;
     };
-}}    // namespace hpx::execution_base
+}    // namespace hpx::execution_base

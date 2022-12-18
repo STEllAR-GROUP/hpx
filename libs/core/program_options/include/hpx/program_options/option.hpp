@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
     /** Option found in input source.
         Contains a key and a value. The key, in turn, can be a string (name of
@@ -20,23 +20,16 @@ namespace hpx { namespace program_options {
         The template parameter specifies the type of char used for storing the
         option's value.
     */
-    template <class Char>
+    template <typename Char>
     class basic_option
     {
     public:
-        basic_option()
-          : position_key(-1)
-          , unregistered(false)
-          , case_insensitive(false)
-        {
-        }
-        basic_option(const std::string& xstring_key,
-            const std::vector<std::string>& xvalue)
+        basic_option() = default;
+
+        basic_option(std::string const& xstring_key,
+            std::vector<std::string> const& xvalue)
           : string_key(xstring_key)
-          , position_key(-1)
           , value(xvalue)
-          , unregistered(false)
-          , case_insensitive(false)
         {
         }
 
@@ -49,7 +42,8 @@ namespace hpx { namespace program_options {
             position_key and string_key is specified, in case name is implicitly
             added.
          */
-        int position_key;
+        int position_key = -1;
+
         /** Option's value */
         std::vector<std::basic_string<Char>> value;
         /** The original unchanged tokens this option was
@@ -60,14 +54,13 @@ namespace hpx { namespace program_options {
             syntactic parsing of source. The original tokens can be
             recovered from the "original_tokens" member.
         */
-        bool unregistered;
+        bool unregistered = false;
         /** True if string_key has to be handled
             case insensitive.
         */
-        bool case_insensitive;
+        bool case_insensitive = false;
     };
 
     using option = basic_option<char>;
     using woption = basic_option<wchar_t>;
-
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options

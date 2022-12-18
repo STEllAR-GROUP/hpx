@@ -13,10 +13,11 @@
 
 #include <string>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     // set and query the prefix as configured at compile time
-    HPX_CORE_EXPORT void set_hpx_prefix(const char* prefix);
-    HPX_CORE_EXPORT char const* hpx_prefix();
+    HPX_CORE_EXPORT void set_hpx_prefix(const char* prefix) noexcept;
+    HPX_CORE_EXPORT char const* hpx_prefix() noexcept;
 
     // return the installation path of the specified module
     HPX_CORE_EXPORT std::string find_prefix(std::string const& library = "hpx");
@@ -30,7 +31,7 @@ namespace hpx { namespace util {
         char const* argv0 = nullptr);
     HPX_CORE_EXPORT std::string get_executable_prefix(
         char const* argv0 = nullptr);
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 // The HPX runtime needs to know where to look for the HPX ini files if no ini
 // path is specified by the user (default in $HPX_LOCATION/share/hpx-1.0.0/ini).
