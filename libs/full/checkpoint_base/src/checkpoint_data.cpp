@@ -1,5 +1,5 @@
 // Copyright (c) 2018 Adrian Serio
-// Copyright (c) 2018-2021 Hartmut Kaiser
+// Copyright (c) 2018-2022 Hartmut Kaiser
 //
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,7 @@
 
 #include <cstdint>
 
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
 
     // This is explicitly instantiated to ensure that the id is stable across
     // shared libraries.
@@ -20,4 +20,4 @@ namespace hpx { namespace serialization { namespace detail {
         static std::uint8_t id = 0;
         return &id;
     }
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail

@@ -12,6 +12,7 @@
 #include <hpx/errors/throw_exception.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/sender.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -207,7 +208,7 @@ namespace hpx::detail {
             if constexpr (can_use_embedded_storage<Impl>())
             {
                 Impl* p = reinterpret_cast<Impl*>(&embedded_storage);
-                new (p) Impl(HPX_FORWARD(Ts, ts)...);
+                hpx::construct_at(p, HPX_FORWARD(Ts, ts)...);
                 object = p;
             }
             else
@@ -439,7 +440,8 @@ namespace hpx::execution::experimental::detail {
 
         void move_into(void* p) override
         {
-            new (p) any_receiver_impl(HPX_MOVE(receiver));
+            hpx::construct_at(
+                static_cast<any_receiver_impl*>(p), HPX_MOVE(receiver));
         }
 
         void set_value(Ts... ts) && override
@@ -625,7 +627,8 @@ namespace hpx::execution::experimental::detail {
 
         void move_into(void* p) override
         {
-            new (p) unique_any_sender_impl(HPX_MOVE(sender));
+            hpx::construct_at(
+                static_cast<unique_any_sender_impl*>(p), HPX_MOVE(sender));
         }
 
         any_operation_state connect(any_receiver<Ts...>&& receiver) && override
@@ -649,7 +652,8 @@ namespace hpx::execution::experimental::detail {
 
         void move_into(void* p) override
         {
-            new (p) any_sender_impl(HPX_MOVE(sender));
+            hpx::construct_at(
+                static_cast<any_sender_impl*>(p), HPX_MOVE(sender));
         }
 
         any_sender_base<Ts...>* clone() const override
@@ -659,7 +663,7 @@ namespace hpx::execution::experimental::detail {
 
         void clone_into(void* p) const override
         {
-            new (p) any_sender_impl(sender);
+            hpx::construct_at(static_cast<any_sender_impl*>(p), sender);
         }
 
         any_operation_state connect(any_receiver<Ts...>&& receiver) & override

@@ -14,7 +14,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
 #if defined(HPX_HAVE_MSVC_NO_UNIQUE_ADDRESS_ATTRIBUTE) ||                      \
@@ -41,6 +41,7 @@ namespace hpx { namespace util {
         {
             return leaf.member;
         }
+
         template <std::size_t I, typename T>
         static constexpr T const& member_get(
             member_leaf<I, T> const& leaf) noexcept
@@ -83,17 +84,20 @@ namespace hpx { namespace util {
         {
             return leaf.member;
         }
+
         template <std::size_t I, typename T>
         static constexpr T& member_get(member_leaf<I, T, true>& leaf) noexcept
         {
             return leaf;
         }
+
         template <std::size_t I, typename T>
         static constexpr T const& member_get(
             member_leaf<I, T, false> const& leaf) noexcept
         {
             return leaf.member;
         }
+
         template <std::size_t I, typename T>
         static constexpr T const& member_get(
             member_leaf<I, T, true> const& leaf) noexcept
@@ -125,17 +129,20 @@ namespace hpx { namespace util {
         {
             return detail::member_get<I>(*this);
         }
+
         template <std::size_t I>
         constexpr decltype(auto) get() const& noexcept
         {
             return detail::member_get<I>(*this);
         }
+
         template <std::size_t I>
         constexpr decltype(auto) get() && noexcept
         {
             using T = decltype(detail::member_type<I>(*this));
             return static_cast<T&&>(detail::member_get<I>(*this));
         }
+
         template <std::size_t I>
         constexpr decltype(auto) get() const&& noexcept
         {
@@ -147,8 +154,7 @@ namespace hpx { namespace util {
     template <typename... Ts>
     using member_pack_for =
         member_pack<util::make_index_pack_t<sizeof...(Ts)>, Ts...>;
-
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::serialization {

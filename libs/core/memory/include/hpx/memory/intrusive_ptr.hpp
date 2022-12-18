@@ -297,7 +297,8 @@ namespace hpx {
     }
 
     template <typename T, typename U>
-    hpx::intrusive_ptr<T> dynamic_pointer_cast(hpx::intrusive_ptr<U> const& p)
+    hpx::intrusive_ptr<T> dynamic_pointer_cast(
+        hpx::intrusive_ptr<U> const& p) noexcept
     {
         return dynamic_cast<T*>(p.get());
     }
@@ -317,7 +318,8 @@ namespace hpx {
     }
 
     template <typename T, typename U>
-    hpx::intrusive_ptr<T> dynamic_pointer_cast(hpx::intrusive_ptr<U>&& p)
+    hpx::intrusive_ptr<T> dynamic_pointer_cast(
+        hpx::intrusive_ptr<U>&& p) noexcept
     {
         T* p2 = dynamic_cast<T*>(p.get());
 

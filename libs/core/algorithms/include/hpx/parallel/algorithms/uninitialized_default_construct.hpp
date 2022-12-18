@@ -166,6 +166,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
@@ -214,7 +215,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 for (/* */; s_first != first; ++s_first)
                 {
-                    (*s_first).~value_type();
+                    std::destroy_at(std::addressof(*s_first));
                 }
                 throw;
             }
@@ -234,7 +235,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 [](InIter it) -> void {
                     ::new (std::addressof(*it)) value_type;
                 },
-                [](InIter it) -> void { (*it).~value_type(); });
+                [](InIter it) -> void {
+                    std::destroy_at(std::addressof(*it));
+                });
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -341,7 +344,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 for (/* */; s_first != first; ++s_first)
                 {
-                    (*s_first).~value_type();
+                    std::destroy_at(std::addressof(*s_first));
                 }
                 throw;
             }

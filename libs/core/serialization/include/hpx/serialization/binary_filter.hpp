@@ -33,7 +33,7 @@ namespace hpx::serialization {
         virtual void load(void* dst, std::size_t dst_count) = 0;
 
         template <typename T>
-        void serialize(T& /*ar*/, unsigned)
+        constexpr void serialize(T& /*ar*/, unsigned) noexcept
         {
         }
         HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(binary_filter);

@@ -169,5 +169,6 @@ add_hpx_module(
     hpx_thread_support
     hpx_timing
     hpx_topology
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

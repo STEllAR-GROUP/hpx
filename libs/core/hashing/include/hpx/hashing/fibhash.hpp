@@ -14,29 +14,20 @@
 #include <cstdint>
 #include <cstdlib>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
 
         template <std::uint64_t N>
-        struct hash_helper;
+        inline constexpr std::uint64_t log2 = log2<(N >> 1)> + 1;
 
         template <>
-        struct hash_helper<0>
-        {
-            static constexpr int log2 = -1;
-        };
+        inline constexpr std::uint64_t log2<0> = -1;
 
         template <std::uint64_t N>
-        struct hash_helper
-        {
-            static constexpr std::uint64_t log2 =
-                hash_helper<(N >> 1)>::log2 + 1;
-            static constexpr std::uint64_t shift_amount = 64 - log2;
-        };
+        inline constexpr std::uint64_t shift_amount = 64 - log2<N>;
 
-        static inline constexpr std::uint64_t golden_ratio =
-            11400714819323198485llu;
+        inline constexpr std::uint64_t golden_ratio = 11400714819323198485llu;
     }    // namespace detail
 
     // This function calculates the hash based on a multiplicative Fibonacci
@@ -44,11 +35,11 @@ namespace hpx { namespace util {
     template <std::uint64_t N>
     constexpr std::uint64_t fibhash(std::uint64_t i) noexcept
     {
-        using helper = detail::hash_helper<N>;
         static_assert(N != 0, "This algorithm only works with N != 0");
-        static_assert(
-            (1 << helper::log2) == N, "N must be a power of two");    // -V104
-        return (detail::golden_ratio * (i ^ (i >> helper::shift_amount))) >>
-            helper::shift_amount;
+        static_assert((1 << detail::log2<N>) == N,
+            "N must be a power of two");    // -V104
+
+        return (detail::golden_ratio * (i ^ (i >> detail::shift_amount<N>) )) >>
+            detail::shift_amount<N>;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

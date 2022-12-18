@@ -31,6 +31,6 @@ add_hpx_module(
   HEADERS ${allocator_support_headers}
   COMPAT_HEADERS ${allocator_support_compat_headers}
   DEPENDENCIES hpx_dependencies_allocator
-  MODULE_DEPENDENCIES hpx_concepts hpx_config hpx_preprocessor
+  MODULE_DEPENDENCIES hpx_concepts hpx_config hpx_preprocessor hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

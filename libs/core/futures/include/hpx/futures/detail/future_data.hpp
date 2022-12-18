@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,6 +24,7 @@
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <atomic>
@@ -351,15 +352,15 @@ namespace hpx { namespace lcos { namespace detail {
     private:
         static void construct(void* p)
         {
-            ::new (p) result_type();
+            hpx::construct_at(static_cast<result_type*>(p));
         }
 
         template <typename T, typename... Ts>
         static void construct(void* p, T&& t, Ts&&... ts)
         {
-            ::new (p)
-                result_type(future_data_result<Result>::set(HPX_FORWARD(T, t)),
-                    HPX_FORWARD(Ts, ts)...);
+            hpx::construct_at(static_cast<result_type*>(p),
+                future_data_result<Result>::set(HPX_FORWARD(T, t)),
+                HPX_FORWARD(Ts, ts)...);
         }
 
     public:
@@ -396,7 +397,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*) exception_ptr) std::exception_ptr(e);
+            hpx::construct_at(exception_ptr, e);
             state_.store(exception, std::memory_order_relaxed);
         }
         future_data_base(init_no_addref no_addref, std::exception_ptr&& e)
@@ -404,7 +405,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*) exception_ptr) std::exception_ptr(HPX_MOVE(e));
+            hpx::construct_at(exception_ptr, HPX_MOVE(e));
             state_.store(exception, std::memory_order_relaxed);
         }
 
@@ -516,7 +517,7 @@ namespace hpx { namespace lcos { namespace detail {
             // set the data
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*) exception_ptr) std::exception_ptr(HPX_MOVE(data));
+            hpx::construct_at(exception_ptr, HPX_MOVE(data));
 
             // At this point the lock needs to be acquired to safely access the
             // registered continuations

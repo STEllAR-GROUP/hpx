@@ -163,6 +163,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
@@ -195,15 +196,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename InIter, typename Sent>
         InIter std_uninitialized_value_construct(InIter first, Sent last)
         {
-            using value_type =
-                typename std::iterator_traits<InIter>::value_type;
-
             InIter s_first = first;
             try
             {
                 for (/* */; first != last; ++first)
                 {
-                    ::new (std::addressof(*first)) value_type();
+                    hpx::construct_at(std::addressof(*first));
                 }
                 return first;
             }
@@ -211,7 +209,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 for (/* */; s_first != first; ++s_first)
                 {
-                    (*s_first).~value_type();
+                    std::destroy_at(std::addressof(*s_first));
                 }
                 throw;
             }
@@ -223,15 +221,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::size_t count,
             util::cancellation_token<util::detail::no_data>& tok)
         {
-            using value_type =
-                typename std::iterator_traits<InIter>::value_type;
-
             return util::loop_with_cleanup_n_with_token(
                 first, count, tok,
                 [](InIter it) -> void {
-                    ::new (std::addressof(*it)) value_type();
+                    hpx::construct_at(std::addressof(*it));
                 },
-                [](InIter it) -> void { (*it).~value_type(); });
+                [](InIter it) -> void {
+                    std::destroy_at(std::addressof(*it));
+                });
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -323,15 +320,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         InIter std_uninitialized_value_construct_n(
             InIter first, std::size_t count)
         {
-            using value_type =
-                typename std::iterator_traits<InIter>::value_type;
-
             InIter s_first = first;
             try
             {
                 for (/* */; count != 0; (void) ++first, --count)
                 {
-                    ::new (std::addressof(*first)) value_type();
+                    hpx::construct_at(std::addressof(*first));
                 }
                 return first;
             }
@@ -339,7 +333,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 for (/* */; s_first != first; ++s_first)
                 {
-                    (*s_first).~value_type();
+                    std::destroy_at(std::addressof(*s_first));
                 }
                 throw;
             }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2019 Hartmut Kaiser
+//  Copyright (c) 2019-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -59,7 +60,7 @@ namespace hpx { namespace lcos { namespace local {
             // invoke constructors for allocated buffer
             for (std::size_t i = 0; i != size_; ++i)
             {
-                new (&buffer_[i]) T();
+                hpx::construct_at(&buffer_[i]);
             }
 
             head_.data_ = 0;

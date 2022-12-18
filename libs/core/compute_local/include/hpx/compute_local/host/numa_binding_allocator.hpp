@@ -17,6 +17,7 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/topology/topology.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -358,10 +359,10 @@ namespace hpx { namespace compute { namespace host {
 
         // Constructs an object of type T in allocated uninitialized storage
         // pointed to by p, using placement-new
-        template <class U, class... A>
-        void construct(U* const p, A&&... args)
+        template <typename U, typename... A>
+        void construct(U* p, A&&... args)
         {
-            new (p) U(HPX_FORWARD(A, args)...);
+            hpx::construct_at(p, HPX_FORWARD(A, args)...);
         }
 
         template <class U>

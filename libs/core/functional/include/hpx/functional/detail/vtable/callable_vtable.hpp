@@ -53,7 +53,7 @@ namespace hpx { namespace util { namespace detail {
 #endif
 
         template <typename T>
-        constexpr callable_info_vtable(construct_vtable<T>) noexcept
+        explicit constexpr callable_info_vtable(construct_vtable<T>) noexcept
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
           : get_function_address(
                 &callable_info_vtable::template _get_function_address<T>)
@@ -67,7 +67,7 @@ namespace hpx { namespace util { namespace detail {
         {
         }
 
-        constexpr callable_info_vtable(
+        explicit constexpr callable_info_vtable(
             construct_vtable<empty_function>) noexcept
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
           : get_function_address(nullptr)

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2019 Agustin Berge
 //  Copyright (c) 2017 Google
 //
@@ -17,9 +17,11 @@
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <cstring>
+#include <memory>
 #include <new>
 #include <string>
 #include <type_traits>
@@ -168,7 +170,8 @@ namespace hpx { namespace util { namespace detail {
                     HPX_ASSERT(object != nullptr);
                     // reuse object storage
                     buffer = object;
-                    vtable::template get<T>(object).~T();
+                    std::destroy_at(
+                        std::addressof(vtable::template get<T>(object)));
                 }
                 else
                 {
@@ -177,7 +180,8 @@ namespace hpx { namespace util { namespace detail {
                     buffer = vtable::template allocate<T>(
                         storage, function_storage_size);
                 }
-                object = ::new (buffer) T(HPX_FORWARD(F, f));
+                object = hpx::construct_at(
+                    static_cast<T*>(buffer), HPX_FORWARD(F, f));
             }
             else
             {
