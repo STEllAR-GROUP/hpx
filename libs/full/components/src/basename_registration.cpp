@@ -75,8 +75,8 @@ namespace hpx {
     {    // -V813
         if (basename.empty())
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "hpx::find_all_from_basename",
-                "no basename specified");
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::find_all_from_basename", "no basename specified");
         }
 
         std::vector<hpx::future<hpx::id_type>> results;
@@ -94,8 +94,8 @@ namespace hpx {
     {    // -V813
         if (basename.empty())
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "hpx::find_from_basename",
-                "no basename specified");
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::find_from_basename", "no basename specified");
         }
 
         std::vector<hpx::future<hpx::id_type>> results;
@@ -114,8 +114,8 @@ namespace hpx {
     {
         if (basename.empty())
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "hpx::find_from_basename",
-                "no basename specified");
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::find_from_basename", "no basename specified");
         }
 
         if (sequence_nr == ~static_cast<std::size_t>(0))
@@ -133,8 +133,8 @@ namespace hpx {
     {
         if (basename.empty())
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "hpx::register_with_basename",
-                "no basename specified");
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::register_with_basename", "no basename specified");
         }
 
         if (sequence_nr == ~static_cast<std::size_t>(0))
@@ -163,8 +163,8 @@ namespace hpx {
     {    // -V813
         if (basename.empty())
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "hpx::unregister_with_basename",
-                "no basename specified");
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::unregister_with_basename", "no basename specified");
         }
 
         if (sequence_nr == ~static_cast<std::size_t>(0))

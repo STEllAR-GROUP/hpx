@@ -36,13 +36,13 @@ namespace hpx { namespace resource { namespace detail {
     [[noreturn]] void throw_runtime_error(
         std::string const& func, std::string const& message)
     {
-        HPX_THROW_EXCEPTION(invalid_status, func, message);
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status, func, message);
     }
 
     [[noreturn]] void throw_invalid_argument(
         std::string const& func, std::string const& message)
     {
-        HPX_THROW_EXCEPTION(bad_parameter, func, message);
+        HPX_THROW_EXCEPTION(hpx::error::bad_parameter, func, message);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -925,7 +925,8 @@ namespace hpx { namespace resource { namespace detail {
     {
         if (!(mode_ & mode_allow_dynamic_pools))
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "partitioner::shrink_pool",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "partitioner::shrink_pool",
                 "dynamic pools have not been enabled for the partitioner");
         }
 
@@ -953,7 +954,8 @@ namespace hpx { namespace resource { namespace detail {
 
         if (!has_non_exclusive_pus)
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "partitioner::shrink_pool",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "partitioner::shrink_pool",
                 "pool '{}' has no non-exclusive pus associated", pool_name);
         }
 
@@ -970,7 +972,8 @@ namespace hpx { namespace resource { namespace detail {
     {
         if (!(mode_ & mode_allow_dynamic_pools))
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "partitioner::expand_pool",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "partitioner::expand_pool",
                 "dynamic pools have not been enabled for the partitioner");
         }
 
@@ -998,7 +1001,8 @@ namespace hpx { namespace resource { namespace detail {
 
         if (!has_non_exclusive_pus)
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "partitioner::expand_pool",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "partitioner::expand_pool",
                 "pool '{}' has no non-exclusive pus associated", pool_name);
         }
 

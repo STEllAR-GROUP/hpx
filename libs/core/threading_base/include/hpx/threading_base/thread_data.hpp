@@ -467,7 +467,7 @@ namespace hpx { namespace threads {
             if (flag && !enabled_interrupt_)
             {
                 l.unlock();
-                HPX_THROW_EXCEPTION(thread_not_interruptable,
+                HPX_THROW_EXCEPTION(hpx::error::thread_not_interruptable,
                     "thread_data::interrupt",
                     "interrupts are disabled for this thread");
                 return;

@@ -352,7 +352,7 @@ namespace hpx {
 
             if (n > values.size())
             {
-                HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "hpx::wait_some",
                     "number of results to wait for is out of bounds");
                 return false;
             }
@@ -393,7 +393,7 @@ namespace hpx {
 
             if (n > values.size())
             {
-                HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "hpx::wait_some",
                     "number of results to wait for is out of bounds");
                 return false;
             }
@@ -436,7 +436,7 @@ namespace hpx {
         {
             if (n != 0)
             {
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::wait_some_nothrow",
                     "number of results to wait for is out of bounds");
             }
@@ -449,7 +449,7 @@ namespace hpx {
         {
             if (n != 1)
             {
-                HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "hpx::wait_some",
                     "number of results to wait for is out of bounds");
                 return false;
             }
@@ -464,7 +464,7 @@ namespace hpx {
         {
             if (n != 1)
             {
-                HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "hpx::wait_some",
                     "number of results to wait for is out of bounds");
                 return false;
             }
@@ -483,7 +483,8 @@ namespace hpx {
 
             if (n > sizeof...(Ts))
             {
-                HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::lcos::wait_some",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::lcos::wait_some",
                     "number of results to wait for is out of bounds");
                 return false;
             }
@@ -586,7 +587,7 @@ namespace hpx {
         {
             if (n != 0)
             {
-                HPX_THROW_EXCEPTION(hpx::bad_parameter, "hpx::wait_some",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "hpx::wait_some",
                     "number of results to wait for is out of bounds");
             }
         }

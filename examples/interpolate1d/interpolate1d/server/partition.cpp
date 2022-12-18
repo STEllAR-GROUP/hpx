@@ -59,8 +59,8 @@ namespace interpolate1d { namespace server {
     {
         if (value < min_value_ || value > max_value_)
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "partition::interpolate",
-                "argument out of range");
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "partition::interpolate", "argument out of range");
             return 0;
         }
 

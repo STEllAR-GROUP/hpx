@@ -459,7 +459,7 @@ namespace hpx { namespace execution { namespace experimental {
                 HPX_ASSERT(pool_);
                 if (num_threads_ > pool_->get_os_thread_count())
                 {
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "for_join_executor::shared_data::shared_data",
                         hpx::util::format("unexpected number of PUs in given "
                                           "mask: {}, available threads: {}",
@@ -793,7 +793,7 @@ namespace hpx { namespace execution { namespace experimental {
         {
             if (stacksize == threads::thread_stacksize::nostack)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "fork_join_executor::fork_join_executor",
                     "The fork_join_executor does not support using "
                     "thread_stacksize::nostack as the stacksize (stackful "
@@ -823,7 +823,7 @@ namespace hpx { namespace execution { namespace experimental {
         {
             if (stacksize == threads::thread_stacksize::nostack)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "fork_join_executor::fork_join_executor",
                     "The fork_join_executor does not support using "
                     "thread_stacksize::nostack as the stacksize (stackful "

@@ -127,7 +127,7 @@ namespace hpx { namespace util {
         }
 
         // report errors
-        HPX_THROW_EXCEPTION(network_error, "util::resolve_hostname",
+        HPX_THROW_EXCEPTION(hpx::error::network_error, "util::resolve_hostname",
             "{} (while trying to resolve: {}:{})", errors.get_message(),
             hostname, port);
         return tcp::endpoint();
@@ -157,7 +157,8 @@ namespace hpx { namespace util {
         }
 
         // report errors
-        HPX_THROW_EXCEPTION(network_error, "util::resolve_public_ip_address",
+        HPX_THROW_EXCEPTION(hpx::error::network_error,
+            "util::resolve_public_ip_address",
             "{} (while trying to resolve public ip address)",
             errors.get_message());
         return "";
@@ -193,7 +194,7 @@ namespace hpx { namespace util {
         }
         if (i == 2)
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "cleanup_ip_address",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "cleanup_ip_address",
                 "Invalid IP address string");
         }
 
@@ -205,8 +206,8 @@ namespace hpx { namespace util {
         if (inet_ntop(domain[i], buf, str, INET6_ADDRSTRLEN) == nullptr)
         {
 #endif
-            HPX_THROW_EXCEPTION(
-                bad_parameter, "cleanup_ip_address", "inet_ntop failure");
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "cleanup_ip_address",
+                "inet_ntop failure");
         }
         return std::string(str);
     }
@@ -252,7 +253,7 @@ namespace hpx { namespace util {
         }
 
         // report errors
-        HPX_THROW_EXCEPTION(network_error, "connect_begin",
+        HPX_THROW_EXCEPTION(hpx::error::network_error, "connect_begin",
             "{} (while trying to connect to: {}:{})", errors.get_message(),
             address, port);
 
@@ -315,7 +316,7 @@ namespace hpx { namespace util {
         }
 
         // report errors
-        HPX_THROW_EXCEPTION(network_error, "accept_begin",
+        HPX_THROW_EXCEPTION(hpx::error::network_error, "accept_begin",
             "{} (while trying to resolve: {}:{}))", errors.get_message(),
             address, port);
         return endpoint_iterator_type();

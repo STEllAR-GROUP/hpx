@@ -108,7 +108,7 @@ public:
 
     void destroy(pointer p)
     {
-        p->~T();
+        std::destroy_at(p);
     }
 
     friend bool operator==(test_allocator const& x, test_allocator const& y)

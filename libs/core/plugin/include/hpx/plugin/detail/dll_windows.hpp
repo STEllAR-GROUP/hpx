@@ -160,7 +160,8 @@ namespace hpx { namespace util { namespace plugin {
                     symbol_name, dll_name);
 
                 // report error
-                HPX_THROWS_IF(ec, dynamic_link_failure, "plugin::get", str);
+                HPX_THROWS_IF(
+                    ec, hpx::error::dynamic_link_failure, "plugin::get", str);
                 return std::pair<SymbolType, Deleter>();
             }
 
@@ -175,7 +176,8 @@ namespace hpx { namespace util { namespace plugin {
                     "Hpx.Plugin: Could not open shared library '{}'", dll_name);
 
                 // report error
-                HPX_THROWS_IF(ec, filesystem_error, "plugin::get", str);
+                HPX_THROWS_IF(
+                    ec, hpx::error::filesystem_error, "plugin::get", str);
                 return std::pair<SymbolType, Deleter>();
             }
             HPX_ASSERT(handle == dll_handle);
@@ -209,8 +211,8 @@ namespace hpx { namespace util { namespace plugin {
                         "Hpx.Plugin: Could not open shared library '{}'",
                         dll_name);
 
-                    HPX_THROWS_IF(
-                        ec, filesystem_error, "plugin::LoadLibrary", str);
+                    HPX_THROWS_IF(ec, hpx::error::filesystem_error,
+                        "plugin::LoadLibrary", str);
                     return;
                 }
             }
@@ -239,8 +241,8 @@ namespace hpx { namespace util { namespace plugin {
                     "'{}' has been loaded from.",
                     dll_name);
 
-                HPX_THROWS_IF(
-                    ec, filesystem_error, "plugin::get_directory", str);
+                HPX_THROWS_IF(ec, hpx::error::filesystem_error,
+                    "plugin::get_directory", str);
                 return buffer;
             }
 

@@ -63,10 +63,11 @@ namespace hpx {
             /// Acquires ownership of the \a recursive_mutex. Suspends the
             /// current HPX-thread if ownership cannot be obtained immediately.
             ///
-            /// \throws Throws \a hpx#bad_parameter if an error occurs while
-            ///         suspending. Throws \a hpx#yield_aborted if the mutex is
-            ///         destroyed while suspended. Throws \a hpx#null_thread_id if
-            ///         called outside of a HPX-thread.
+            /// \throws Throws \a hpx#error#bad_parameter if an error occurs
+            ///         while suspending. Throws \a hpx#error#yield_aborted if
+            ///         the mutex is destroyed while suspended. Throws \a
+            ///         hpx#error#null_thread_id if called outside of a
+            ///         HPX-thread.
             void lock()
             {
                 auto ctx = hpx::execution_base::this_thread::agent();
@@ -84,9 +85,10 @@ namespace hpx {
 
             /// Release ownership of the \a recursive_mutex.
             ///
-            /// \throws Throws \a hpx#bad_parameter if an error occurs while
-            ///         releasing the mutex. Throws \a hpx#null_thread_id if called
-            ///         outside of a HPX-thread.
+            /// \throws Throws \a hpx#error#bad_parameter if an error occurs
+            ///         while releasing the mutex. Throws \a
+            ///         hpx#error#null_thread_id if called outside of a
+            ///         HPX-thread.
             void unlock()
             {
                 if (0 == --recursion_count)

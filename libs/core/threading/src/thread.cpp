@@ -60,7 +60,7 @@ namespace hpx {
         {
             l2.unlock();
             l.unlock();
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "thread::operator=", "destroying running thread");
         }
         id_ = rhs.id_;
@@ -76,8 +76,8 @@ namespace hpx {
             {
                 try
                 {
-                    HPX_THROW_EXCEPTION(invalid_status, "thread::~thread",
-                        "destroying running thread");
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                        "thread::~thread", "destroying running thread");
                 }
                 catch (...)
                 {
@@ -106,8 +106,8 @@ namespace hpx {
         threads::thread_id_type id = threads::get_self_id();
         if (id == threads::invalid_thread_id)
         {
-            HPX_THROW_EXCEPTION(null_thread_id, "run_thread_exit_callbacks",
-                "null thread id encountered");
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
+                "run_thread_exit_callbacks", "null thread id encountered");
         }
         threads::run_thread_exit_callbacks(id);
         threads::free_thread_exit_callbacks(id);
@@ -180,8 +180,8 @@ namespace hpx {
         pool->create_thread(data, id_, ec);
         if (ec)
         {
-            HPX_THROW_EXCEPTION(thread_resource_error, "thread::start_thread",
-                "Could not create thread");
+            HPX_THROW_EXCEPTION(hpx::error::thread_resource_error,
+                "thread::start_thread", "Could not create thread");
             return;
         }
     }
@@ -199,7 +199,7 @@ namespace hpx {
         if (!joinable_locked())
         {
             l.unlock();
-            HPX_THROW_EXCEPTION(invalid_status, "thread::join",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status, "thread::join",
                 "trying to join a non joinable thread");
         }
 
@@ -208,8 +208,8 @@ namespace hpx {
         if (this_id == id_)
         {
             l.unlock();
-            HPX_THROW_EXCEPTION(thread_resource_error, "thread::join",
-                "hpx::thread: trying joining itself");
+            HPX_THROW_EXCEPTION(hpx::error::thread_resource_error,
+                "thread::join", "hpx::thread: trying joining itself");
             return;
         }
         this_thread::interruption_point();
@@ -323,7 +323,7 @@ namespace hpx {
                 if (!this->is_ready())
                 {
                     threads::interrupt_thread(id_.noref());
-                    this->set_error(thread_cancelled,
+                    this->set_error(hpx::error::thread_cancelled,
                         "thread_task_base::cancel", "future has been canceled");
                     id_ = threads::invalid_thread_id;
                 }
@@ -348,7 +348,7 @@ namespace hpx {
     {
         if (id_ == threads::invalid_thread_id)
         {
-            HPX_THROWS_IF(ec, null_thread_id, "thread::get_future",
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id, "thread::get_future",
                 "null thread id encountered");
             return hpx::future<void>();
         }
@@ -357,7 +357,8 @@ namespace hpx {
         hpx::intrusive_ptr<lcos::detail::future_data<void>> base(p);
         if (!p->valid())
         {
-            HPX_THROWS_IF(ec, thread_resource_error, "thread::get_future",
+            HPX_THROWS_IF(ec, hpx::error::thread_resource_error,
+                "thread::get_future",
                 "Could not create future as thread has been terminated.");
             return hpx::future<void>();
         }

@@ -95,7 +95,7 @@ namespace hpx { namespace lcos { namespace local {
             // invoke destructors for allocated buffer
             for (std::size_t i = 0; i != size_; ++i)
             {
-                (&buffer_[i])->~T();
+                std::destroy_at(&buffer_[i]);
             }
 
             if (!closed_)
@@ -178,7 +178,7 @@ namespace hpx { namespace lcos { namespace local {
             if (closed_)
             {
                 l.unlock();
-                HPX_THROW_EXCEPTION(hpx::invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "hpx::lcos::local::bounded_channel::close",
                     "attempting to close an already closed channel");
             }

@@ -18,7 +18,7 @@ namespace hpx { namespace detail {
         runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::detail::get_locality_name",
                 "the runtime system is not operational at this point");
             return "";

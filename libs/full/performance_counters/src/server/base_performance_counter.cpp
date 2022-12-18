@@ -25,20 +25,20 @@ namespace hpx { namespace performance_counters { namespace server {
 
     void base_performance_counter::reset_counter_value()
     {
-        HPX_THROW_EXCEPTION(invalid_status, "reset_counter_value",
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status, "reset_counter_value",
             "reset_counter_value is not implemented for this counter");
     }
 
     void base_performance_counter::set_counter_value(
         counter_value const& /*value*/)
     {
-        HPX_THROW_EXCEPTION(invalid_status, "set_counter_value",
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status, "set_counter_value",
             "set_counter_value is not implemented for this counter");
     }
 
     counter_value base_performance_counter::get_counter_value(bool /*reset*/)
     {
-        HPX_THROW_EXCEPTION(invalid_status, "get_counter_value",
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status, "get_counter_value",
             "get_counter_value is not implemented for this counter");
         return {};
     }
@@ -46,7 +46,8 @@ namespace hpx { namespace performance_counters { namespace server {
     counter_values_array base_performance_counter::get_counter_values_array(
         bool /*reset*/)
     {
-        HPX_THROW_EXCEPTION(invalid_status, "get_counter_values_array",
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+            "get_counter_values_array",
             "get_counter_values_array is not implemented for this "
             "counter");
         return {};

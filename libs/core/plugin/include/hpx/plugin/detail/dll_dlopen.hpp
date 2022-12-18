@@ -235,7 +235,8 @@ namespace hpx { namespace util { namespace plugin {
                 lock.unlock();
 
                 // report error
-                HPX_THROWS_IF(ec, dynamic_link_failure, "plugin::get", str);
+                HPX_THROWS_IF(
+                    ec, hpx::error::dynamic_link_failure, "plugin::get", str);
                 return std::pair<SymbolType, Deleter>();
             }
 
@@ -257,7 +258,8 @@ namespace hpx { namespace util { namespace plugin {
                 lock.unlock();
 
                 // report error
-                HPX_THROWS_IF(ec, filesystem_error, "plugin::get", str);
+                HPX_THROWS_IF(
+                    ec, hpx::error::filesystem_error, "plugin::get", str);
                 return std::pair<SymbolType, Deleter>();
             }
 
@@ -299,8 +301,8 @@ namespace hpx { namespace util { namespace plugin {
 
                     lock.unlock();
 
-                    HPX_THROWS_IF(
-                        ec, filesystem_error, "plugin::LoadLibrary", str);
+                    HPX_THROWS_IF(ec, hpx::error::filesystem_error,
+                        "plugin::LoadLibrary", str);
                     return;
                 }
 
@@ -329,8 +331,8 @@ namespace hpx { namespace util { namespace plugin {
                     "'{}' has been loaded from (dlerror: {})",
                     dll_name, dlerror());
 
-                HPX_THROWS_IF(
-                    ec, filesystem_error, "plugin::get_directory", str);
+                HPX_THROWS_IF(ec, hpx::error::filesystem_error,
+                    "plugin::get_directory", str);
             }
             result = directory;
             ::dlerror();    // Clear the error state.

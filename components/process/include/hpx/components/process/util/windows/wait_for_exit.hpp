@@ -23,14 +23,14 @@ inline int wait_for_exit(const Process &p)
 {
     if (::WaitForSingleObject(p.process_handle(), INFINITE) == WAIT_FAILED)
     {
-        HPX_THROW_EXCEPTION(invalid_status,
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
             "process::wait_for_exit", "WaitForSingleObject() failed");
     }
 
     DWORD exit_code;
     if (!::GetExitCodeProcess(p.process_handle(), &exit_code))
     {
-        HPX_THROW_EXCEPTION(invalid_status,
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
             "process::wait_for_exit", "GetExitCodeProcess() failed");
     }
     return static_cast<int>(exit_code);
@@ -43,12 +43,12 @@ inline int wait_for_exit(const Process &p, hpx::error_code &ec)
 
     if (::WaitForSingleObject(p.process_handle(), INFINITE) == WAIT_FAILED)
     {
-        HPX_THROWS_IF(ec, invalid_status,
+        HPX_THROWS_IF(ec, hpx::error::invalid_status,
             "process::wait_for_exit", "WaitForSingleObject() failed");
     }
     else if (!::GetExitCodeProcess(p.process_handle(), &exit_code))
     {
-        HPX_THROWS_IF(ec, invalid_status,
+        HPX_THROWS_IF(ec, hpx::error::invalid_status,
             "process::wait_for_exit", "GetExitCodeProcess() failed");
     }
     else

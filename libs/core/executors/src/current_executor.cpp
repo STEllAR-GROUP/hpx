@@ -15,8 +15,8 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::get_executor",
-                "null thread id encountered");
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
+                "hpx::threads::get_executor", "null thread id encountered");
             return hpx::execution::parallel_executor();
         }
 

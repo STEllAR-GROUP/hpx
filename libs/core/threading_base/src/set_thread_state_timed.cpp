@@ -40,7 +40,7 @@ namespace hpx { namespace threads { namespace detail {
     {
         if (HPX_UNLIKELY(!thrd))
         {
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "threads::detail::wake_timer_thread",
                 "null thread id encountered (id)");
             return thread_result_type(
@@ -49,7 +49,7 @@ namespace hpx { namespace threads { namespace detail {
 
         if (HPX_UNLIKELY(!timer_id))
         {
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "threads::detail::wake_timer_thread",
                 "null thread id encountered (timer_id)");
             return thread_result_type(
@@ -81,8 +81,8 @@ namespace hpx { namespace threads { namespace detail {
     {
         if (HPX_UNLIKELY(!thrd))
         {
-            HPX_THROW_EXCEPTION(null_thread_id, "threads::detail::at_timer",
-                "null thread id encountered");
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
+                "threads::detail::at_timer", "null thread id encountered");
             return thread_result_type(
                 thread_schedule_state::terminated, invalid_thread_id);
         }
@@ -173,7 +173,7 @@ namespace hpx { namespace threads { namespace detail {
     {
         if (HPX_UNLIKELY(!thrd))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "threads::detail::set_thread_state",
                 "null thread id encountered");
             return invalid_thread_id;

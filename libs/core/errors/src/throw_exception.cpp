@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,7 +14,8 @@
 #include <string>
 #include <system_error>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     [[noreturn]] void throw_exception(error errcode, std::string const& msg,
         std::string const& func, std::string const& file, long line)
     {
@@ -89,4 +90,4 @@ namespace hpx { namespace detail {
     {
         throw hpx::thread_interrupted();
     }
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

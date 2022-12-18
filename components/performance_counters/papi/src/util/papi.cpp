@@ -45,7 +45,7 @@ namespace hpx {
     {
         std::map<std::string, int>::const_iterator it = papi_domain_map.find(s);
         if (it == papi_domain_map.end())
-            HPX_THROW_EXCEPTION(hpx::commandline_option_error,
+            HPX_THROW_EXCEPTION(hpx::error::commandline_option_error,
                 NS_STR "check_options()",
                 "invalid argument " + s + " to --hpx:papi-domain");
         return it->second;
@@ -90,7 +90,7 @@ namespace hpx {
         variables_map vm;
         if (!retrieve_commandline_arguments(get_options_description(), vm))
         {
-            HPX_THROW_EXCEPTION(hpx::commandline_option_error,
+            HPX_THROW_EXCEPTION(hpx::error::commandline_option_error,
                 NS_STR "get_options()",
                 "failed to handle command line options");
         }
@@ -129,7 +129,7 @@ namespace hpx {
         {
             std::string v = vm["hpx:papi-event-info"].as<std::string>();
             if (v != "preset" && v != "native" && v != "all")
-                HPX_THROW_EXCEPTION(hpx::commandline_option_error,
+                HPX_THROW_EXCEPTION(hpx::error::commandline_option_error,
                     NS_STR "check_options()",
                     "unsupported mode " + v + " in --hpx:papi-event-info");
         }
@@ -144,11 +144,12 @@ namespace hpx {
         }
         // FIXME: implement multiplexing properly and uncomment below when done
         if (vm.count("hpx:papi-multiplex"))
-            HPX_THROW_EXCEPTION(hpx::not_implemented, NS_STR "check_options()",
+            HPX_THROW_EXCEPTION(hpx::error::not_implemented,
+                NS_STR "check_options()",
                 "counter multiplexing is currently not supported");
 #if 0
         if (vm.count("hpx:papi-multiplex") && vm["hpx:papi-multiplex"].as<long>() < 0)
-            HPX_THROW_EXCEPTION(hpx::commandline_option_error,
+            HPX_THROW_EXCEPTION(hpx::error::commandline_option_error,
                 NS_STR "check_options()",
                 "argument to --hpx:papi-multiplex must be positive");
 #endif

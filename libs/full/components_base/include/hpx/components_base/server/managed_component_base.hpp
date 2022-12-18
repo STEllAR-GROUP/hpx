@@ -23,6 +23,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -89,7 +90,7 @@ namespace hpx { namespace components {
                 // The managed_component's controls the lifetime of the
                 // component implementation.
                 back_ptr->finalize();
-                back_ptr->~BackPtr();
+                std::destroy_at(back_ptr);
                 component_heap<typename BackPtr::wrapped_type>().free(back_ptr);
             }
         };
@@ -385,7 +386,7 @@ namespace hpx { namespace components {
         {
             if (!component_)
             {
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "managed_component<Component, Derived>::get_checked",
                     "component pointer ({}) is invalid (gid: {})",
                     components::get_component_type_name(
@@ -399,7 +400,7 @@ namespace hpx { namespace components {
         {
             if (!component_)
             {
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "managed_component<Component, Derived>::get_checked",
                     "component pointer ({}) is invalid (gid: {})",
                     components::get_component_type_name(
@@ -447,7 +448,7 @@ namespace hpx { namespace components {
         {
             if (assign_gid)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "managed_component::get_base_gid",
                     "managed_components must be assigned new gids on creation");
                 return naming::invalid_gid;

@@ -90,7 +90,7 @@ namespace hpx { namespace lcos {
             else
             {
                 // this shouldn't ever be called
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "base_lco_with_value::set_event_nonvirt",
                     "attempt to use a non-default-constructible return type "
                     "with an action in a context where default-construction "

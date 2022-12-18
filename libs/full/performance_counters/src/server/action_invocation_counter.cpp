@@ -79,7 +79,7 @@ namespace hpx { namespace performance_counters {
 
             if (paths.parentinstance_is_basename_)
             {
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "action_invocation_counter_creator",
                     "invalid action invocation counter name (instance name "
                     "must not be a valid base counter name)");
@@ -88,7 +88,7 @@ namespace hpx { namespace performance_counters {
 
             if (paths.parameters_.empty())
             {
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "action_invocation_counter_creator",
                     "invalid action invocation counter parameter: must "
                     "specify an action type");
@@ -104,7 +104,7 @@ namespace hpx { namespace performance_counters {
         break;
 
         default:
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "action_invocation_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;

@@ -228,7 +228,7 @@ namespace hpx { namespace components { namespace stubs {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         if (!naming::is_locality(targetgid))
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "stubs::runtime_support::create_performance_counter_async",
                 "The id passed as the first argument is not representing"
                 " a locality");

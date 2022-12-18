@@ -275,7 +275,7 @@ namespace hpx { namespace util { namespace detail {
         catch (hpx::exception const& e)
         {
             // the lock above might throw yield_aborted
-            if (e.get_error() != yield_aborted)
+            if (e.get_error() != hpx::error::yield_aborted)
                 throw;
         }
 

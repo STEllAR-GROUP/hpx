@@ -287,7 +287,8 @@ namespace hpx { namespace util {
                     }
                     else
                     {
-                        HPX_THROW_EXCEPTION(invalid_status, "verify_no_locks",
+                        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                            "verify_no_locks",
                             "suspending thread while at least one lock is "
                             "being held (default handler)");
                     }
@@ -310,7 +311,8 @@ namespace hpx { namespace util {
         //    // we throw an error if there are still registered locks for
         //    // this OS-thread
         //    if (!held_locks.empty()) {
-        //        HPX_THROW_EXCEPTION(invalid_status, "force_error_on_lock",
+        //        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+        //            "force_error_on_lock",
         //            "At least one lock is held while thread is being "
         //            terminated or interrupted.");
         //    }
@@ -334,7 +336,7 @@ namespace hpx { namespace util {
                     // this can happen if the lock was registered to be ignore
                     // on a different OS thread
                     // HPX_THROW_EXCEPTION(
-                    //     invalid_status, "set_ignore_status",
+                    //     hpx::error::invalid_status, "set_ignore_status",
                     //     "The given lock has not been registered.");
                     return;
                 }

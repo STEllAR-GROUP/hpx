@@ -76,7 +76,7 @@ namespace hpx { namespace collectives {
                     bool result = f.get();
                     if (!result)
                     {
-                        HPX_THROW_EXCEPTION(bad_parameter,
+                        HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                             "hpx::collectives::detail::create_communicator",
                             hpx::util::format(
                                 "the given base name for the communicator "

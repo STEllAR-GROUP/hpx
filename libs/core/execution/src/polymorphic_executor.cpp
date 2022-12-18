@@ -21,7 +21,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     [[noreturn]] void throw_bad_polymorphic_executor()
     {
-        hpx::throw_exception(bad_function_call,
+        hpx::throw_exception(hpx::error::bad_function_call,
             "empty polymorphic_executor object should not be used",
             "polymorphic_executor::operator()");
     }

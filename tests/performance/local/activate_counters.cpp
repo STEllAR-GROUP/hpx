@@ -49,7 +49,8 @@ namespace hpx { namespace util {
         hpx::id_type id = performance_counters::get_counter(info.fullname_, ec);
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, bad_parameter, "activate_counters::find_counter",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "activate_counters::find_counter",
                 hpx::util::format("unknown performance counter: '{1}' ({2})",
                     info.fullname_, ec.get_message()));
             return false;
@@ -135,7 +136,7 @@ namespace hpx { namespace util {
         if (ids_.empty())
         {
             // start has not been called yet
-            HPX_THROWS_IF(ec, invalid_status,
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
                 "activate_counters::stop_counters",
                 "The counters to be evaluated have not been initialized yet");
             return;
@@ -179,7 +180,7 @@ namespace hpx { namespace util {
         if (ids_.empty())
         {
             // start has not been called yet
-            HPX_THROWS_IF(ec, invalid_status,
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
                 "activate_counters::reset_counters",
                 "The counters to be evaluated have not been initialized yet");
             return;
@@ -225,7 +226,7 @@ namespace hpx { namespace util {
         if (ids_.empty())
         {
             // start has not been called yet
-            HPX_THROWS_IF(ec, invalid_status,
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
                 "activate_counters::evaluate_counters_async",
                 "The counters to be evaluated have not been initialized yet");
             return values;

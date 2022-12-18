@@ -46,7 +46,8 @@ namespace hpx { namespace performance_counters { namespace server {
             info.type_ != counter_type::average_count &&
             info.type_ != counter_type::average_timer)
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "raw_counter::raw_counter",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "raw_counter::raw_counter",
                 "unexpected counter type specified for raw_counter");
         }
     }

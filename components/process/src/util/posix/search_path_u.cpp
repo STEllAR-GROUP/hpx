@@ -31,7 +31,8 @@ namespace hpx { namespace components { namespace process { namespace posix {
             path = ::getenv("PATH");
             if (path.empty())
             {
-                HPX_THROW_EXCEPTION(invalid_status, "process::search_path",
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "process::search_path",
                     "Environment variable PATH not found");
             }
         }

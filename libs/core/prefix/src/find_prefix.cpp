@@ -134,7 +134,7 @@ namespace hpx { namespace util {
         char exe_path[MAX_PATH + 1] = {'\0'};
         if (!GetModuleFileNameA(nullptr, exe_path, sizeof(exe_path)))
         {
-            HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
+            HPX_THROW_EXCEPTION(hpx::error::dynamic_link_failure,
                 "get_executable_filename",
                 "unable to find executable filename");
         }
@@ -210,7 +210,7 @@ namespace hpx { namespace util {
             }
         }
 
-        HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
+        HPX_THROW_EXCEPTION(hpx::error::dynamic_link_failure,
             "get_executable_filename", "unable to find executable filename");
 
 #elif defined(__APPLE__)
@@ -221,7 +221,7 @@ namespace hpx { namespace util {
 
         if (0 != _NSGetExecutablePath(exe_path, &len))
         {
-            HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
+            HPX_THROW_EXCEPTION(hpx::error::dynamic_link_failure,
                 "get_executable_filename",
                 "unable to find executable filename");
         }

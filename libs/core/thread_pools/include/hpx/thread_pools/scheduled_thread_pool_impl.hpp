@@ -283,7 +283,7 @@ namespace hpx { namespace threads { namespace detail {
         if (0 == pool_threads)
         {
             HPX_THROW_EXCEPTION(
-                bad_parameter, "run", "number of threads is zero");
+                hpx::error::bad_parameter, "run", "number of threads is zero");
         }
 
         if (!threads_.empty() ||
@@ -412,7 +412,7 @@ namespace hpx { namespace threads { namespace detail {
     {
         if (threads::get_self_ptr() && hpx::this_thread::get_pool() == this)
         {
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "scheduled_thread_pool<Scheduler>::suspend_direct",
                 "cannot suspend a pool from itself");
             return;
@@ -577,7 +577,7 @@ namespace hpx { namespace threads { namespace detail {
             {
                 // Repackage exceptions to avoid slicing.
                 hpx::throw_with_info(
-                    hpx::exception(unhandled_exception, e.what()));
+                    hpx::exception(hpx::error::unhandled_exception, e.what()));
             }
         }
         catch (...)
@@ -606,7 +606,7 @@ namespace hpx { namespace threads { namespace detail {
             !sched_->Scheduler::is_state(hpx::state::running))
         {
             // thread-manager is not currently running
-            HPX_THROWS_IF(ec, invalid_status,
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
                 "thread_pool<Scheduler>::create_thread",
                 "invalid state: thread pool is not running");
             return;
@@ -627,7 +627,7 @@ namespace hpx { namespace threads { namespace detail {
             !sched_->Scheduler::is_state(hpx::state::running))
         {
             // thread-manager is not currently running
-            HPX_THROWS_IF(ec, invalid_status,
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
                 "thread_pool<Scheduler>::create_work",
                 "invalid state: thread pool is not running");
             return invalid_thread_id;
@@ -1864,7 +1864,7 @@ namespace hpx { namespace threads { namespace detail {
         if (threads_[virt_core].joinable())
         {
             l.unlock();
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "scheduled_thread_pool<Scheduler>::add_processing_unit",
                 "the given virtual core has already been added to this "
                 "thread pool");
@@ -1895,7 +1895,7 @@ namespace hpx { namespace threads { namespace detail {
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
             l.unlock();
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "scheduled_thread_pool<Scheduler>::remove_processing_unit",
                 "the given virtual core has already been stopped to run on "
                 "this thread pool");
@@ -1955,7 +1955,7 @@ namespace hpx { namespace threads { namespace detail {
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
             l.unlock();
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "scheduled_thread_pool<Scheduler>::suspend_processing_unit_"
                 "direct",
                 "the given virtual core has already been stopped to run on "
@@ -1995,7 +1995,7 @@ namespace hpx { namespace threads { namespace detail {
         if (threads_.size() <= virt_core || !threads_[virt_core].joinable())
         {
             l.unlock();
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "scheduled_thread_pool<Scheduler>::resume_processing_unit",
                 "the given virtual core has already been stopped to run on "
                 "this thread pool");

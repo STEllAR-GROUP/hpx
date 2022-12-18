@@ -144,7 +144,8 @@ namespace hpx { namespace agas { namespace server {
         {
             l.unlock();
 
-            HPX_THROW_EXCEPTION(lock_error, "symbol_namespace::bind",
+            HPX_THROW_EXCEPTION(hpx::error::lock_error,
+                "symbol_namespace::bind",
                 "GID table insertion failed due to a locking error or "
                 "memory corruption");
         }
@@ -176,7 +177,7 @@ namespace hpx { namespace agas { namespace server {
                 {
                     l.unlock();
 
-                    HPX_THROW_EXCEPTION(invalid_status,
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "symbol_namespace::bind",
                         "unable to re-locate the entry in the GID table");
                 }

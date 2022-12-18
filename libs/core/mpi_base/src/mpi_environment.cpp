@@ -129,7 +129,7 @@ namespace hpx { namespace util {
 
             if (provided < minimal)
             {
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "hpx::util::mpi_environment::init",
                     "MPI doesn't provide minimal requested thread level");
             }

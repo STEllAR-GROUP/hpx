@@ -48,7 +48,7 @@ namespace hpx { namespace threads {
         {
             if (initial_state == thread_schedule_state::staged)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "thread_init_data::thread_init_data",
                     "threads shouldn't have 'staged' as their initial state");
             }
@@ -139,7 +139,7 @@ namespace hpx { namespace threads {
 
             if (initial_state == thread_schedule_state::staged)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "thread_init_data::thread_init_data",
                     "threads shouldn't have 'staged' as their initial state");
             }

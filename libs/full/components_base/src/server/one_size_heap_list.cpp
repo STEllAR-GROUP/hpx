@@ -52,8 +52,8 @@ namespace hpx { namespace util {
         if (HPX_UNLIKELY(0 == count))
         {
             guard.unlock();
-            HPX_THROW_EXCEPTION(
-                bad_parameter, name() + "::alloc", "cannot allocate 0 objects");
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter, name() + "::alloc",
+                "cannot allocate 0 objects");
         }
 
         void* p = nullptr;
@@ -116,7 +116,8 @@ namespace hpx { namespace util {
             {
                 // out of memory
                 guard.unlock();
-                HPX_THROW_EXCEPTION(out_of_memory, name() + "::alloc",
+                HPX_THROW_EXCEPTION(hpx::error::out_of_memory,
+                    name() + "::alloc",
                     "new heap failed to allocate {1} objects", count);
             }
 
@@ -195,7 +196,7 @@ namespace hpx { namespace util {
 
         ul.unlock();
 
-        HPX_THROW_EXCEPTION(bad_parameter, name() + "::free",
+        HPX_THROW_EXCEPTION(hpx::error::bad_parameter, name() + "::free",
             "pointer {1} was not allocated by this {2}", p, name());
     }
 

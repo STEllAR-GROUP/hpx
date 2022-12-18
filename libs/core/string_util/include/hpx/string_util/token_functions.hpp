@@ -105,7 +105,7 @@ namespace hpx::string_util {
         {
             if (++next == end)
             {
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "escaped_list_separator::do_escape",
                     "cannot end with escape");
             }
@@ -122,7 +122,7 @@ namespace hpx::string_util {
             }
             else
             {
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "escaped_list_separator::do_escape",
                     "unknown escape sequence");
             }

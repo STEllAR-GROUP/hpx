@@ -453,7 +453,8 @@ namespace hpx { namespace components {
         {
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state, "client_base::get_gid",
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
+                    "client_base::get_gid",
                     "this client_base has no valid shared state");
             }
 
@@ -486,7 +487,7 @@ namespace hpx { namespace components {
         {
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state, "client_base::wait",
+                HPX_THROW_EXCEPTION(hpx::error::no_state, "client_base::wait",
                     "this client_base has no valid shared state");
                 return;
             }
@@ -501,7 +502,7 @@ namespace hpx { namespace components {
         {
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state,
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
                     "client_base<Derived, Stub>::get_exception_ptr",
                     "this client has no valid shared state");
             }
@@ -531,7 +532,7 @@ namespace hpx { namespace components {
 
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state, "client_base::then",
+                HPX_THROW_EXCEPTION(hpx::error::no_state, "client_base::then",
                     "this client_base has no valid shared state");
                 return hpx::future<result_type>();
             }
@@ -586,7 +587,8 @@ namespace hpx { namespace components {
         {
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state, "client_base::register_as",
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
+                    "client_base::register_as",
                     "this client_base has no valid shared state");
             }
 

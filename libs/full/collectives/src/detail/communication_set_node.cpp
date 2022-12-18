@@ -167,7 +167,7 @@ namespace hpx { namespace lcos { namespace detail {
                 bool result = f.get();
                 if (!result)
                 {
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "hpx::lcos::detail::register_communication_set_name",
                         "the given base name for the communication_set_node "
                         "operation was already registered: {}",

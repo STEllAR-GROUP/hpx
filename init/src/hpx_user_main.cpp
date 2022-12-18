@@ -17,28 +17,28 @@
 // depending on whether the main executable defines this symbol or not.
 int hpx_startup::user_main()
 {
-//     std::string cmdline(hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
-//
-//     using namespace hpx::program_options;
-// #if defined(HPX_WINDOWS)
-//     std::vector<std::string> args = split_winmain(cmdline);
-// #else
-//     std::vector<std::string> args = split_unix(cmdline);
-// #endif
-//
-//     // Copy all arguments which are not hpx related to a temporary array
-//     std::vector<char*> argv(args.size());
-//     std::size_t argcount = 0;
-//     for(std::size_t i = 0; i < args.size(); ++i)
-//     {
-//         if (0 != args[i].find("--hpx:"))
-//             argv[argcount++] = const_cast<char*>(args[i].data());
-//     }
-//
-//     // Invoke hpx_main
-//     return user_main(static_cast<int>(argcount), argv.data());
-    HPX_THROW_EXCEPTION(hpx::not_implemented,
+    //     std::string cmdline(hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
+    //
+    //     using namespace hpx::program_options;
+    // #if defined(HPX_WINDOWS)
+    //     std::vector<std::string> args = split_winmain(cmdline);
+    // #else
+    //     std::vector<std::string> args = split_unix(cmdline);
+    // #endif
+    //
+    //     // Copy all arguments which are not hpx related to a temporary array
+    //     std::vector<char*> argv(args.size());
+    //     std::size_t argcount = 0;
+    //     for(std::size_t i = 0; i < args.size(); ++i)
+    //     {
+    //         if (0 != args[i].find("--hpx:"))
+    //             argv[argcount++] = const_cast<char*>(args[i].data());
+    //     }
+    //
+    //     // Invoke hpx_main
+    //     return user_main(static_cast<int>(argcount), argv.data());
+    HPX_THROW_EXCEPTION(hpx::error::not_implemented, "hpx_startup::user_main",
         "The console locality does not implement any main entry point usable "
-        "as the main HPX thread (e.g. no hpx_main, hpx_startup::user_main, etc.)",
-        "hpx_startup::user_main");
+        "as the main HPX thread (e.g. no hpx_main, hpx_startup::user_main, "
+        "etc.)");
 }

@@ -23,12 +23,14 @@ namespace hpx { namespace threads {
     /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
     ///         to an appropriate value when an error occurs. Otherwise, this
     ///         function will throw an \a hpx#exception with an error code of
-    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
-    ///         If called outside of a HPX-thread, this function will throw
-    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
+    ///         \a hpx#error#yield_aborted if it is signaled with \a
+    ///            wait_aborted.
+    ///         If called outside of a HPX-thread, this function will throw an
+    ///         \a hpx#exception with an error code of \a
+    ///            hpx#error#null_thread_id.
     ///         If this function is called while the thread-manager is not
     ///         running, it will throw an \a hpx#exception with an error code of
-    ///         \a hpx#invalid_status.
+    ///         \a hpx#error#invalid_status.
     ///
     HPX_CORE_EXPORT hpx::execution::parallel_executor get_executor(
         thread_id_type const& id, error_code& ec = throws);
@@ -41,12 +43,14 @@ namespace hpx { namespace this_thread {
     /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
     ///         to an appropriate value when an error occurs. Otherwise, this
     ///         function will throw an \a hpx#exception with an error code of
-    ///         \a hpx#yield_aborted if it is signaled with \a wait_aborted.
-    ///         If called outside of a HPX-thread, this function will throw
-    ///         an \a hpx#exception with an error code of \a hpx::null_thread_id.
+    ///         \a hpx#error#yield_aborted if it is signaled with \a
+    ///            wait_aborted.
+    ///         If called outside of a HPX-thread, this function will throw an
+    ///         \a hpx#exception with an error code of \a
+    ///            hpx#error#null_thread_id.
     ///         If this function is called while the thread-manager is not
     ///         running, it will throw an \a hpx#exception with an error code of
-    ///         \a hpx#invalid_status.
+    ///         \a hpx#error#invalid_status.
     ///
     HPX_CORE_EXPORT hpx::execution::parallel_executor get_executor(
         error_code& ec = throws);

@@ -367,7 +367,7 @@ namespace hpx { namespace compute { namespace host {
         template <class U>
         void destroy(U* const p)
         {
-            p->~U();
+            std::destroy_at(p);
         }
 
         // a utility function that is slightly faster than the hwloc provided one
@@ -388,7 +388,7 @@ namespace hpx { namespace compute { namespace host {
                 }
                 return -1;
             }
-            HPX_THROW_EXCEPTION(kernel_error, "get_numa_domain",
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error, "get_numa_domain",
                 "Error getting numa domain with syscall");
 #else
             return threads::get_topology().get_numa_domain(page);
@@ -412,7 +412,8 @@ namespace hpx { namespace compute { namespace host {
             if (syscall(__NR_move_pages, 0, count, pages.data(), nullptr,
                     status.data(), 0) < 0)
             {
-                HPX_THROW_EXCEPTION(kernel_error, "get_page_numa_domains",
+                HPX_THROW_EXCEPTION(hpx::error::kernel_error,
+                    "get_page_numa_domains",
                     "Error getting numa domains with syscall");
             }
 

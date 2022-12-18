@@ -67,7 +67,8 @@ namespace hpx::parcelset::policies::tcp {
     {
         if (here_.type() != std::string("tcp"))
         {
-            HPX_THROW_EXCEPTION(network_error, "tcp::parcelport::parcelport",
+            HPX_THROW_EXCEPTION(hpx::error::network_error,
+                "tcp::parcelport::parcelport",
                 "this parcelport was instantiated to represent an unexpected "
                 "locality type: {}",
                 here_.type());
@@ -118,8 +119,8 @@ namespace hpx::parcelset::policies::tcp {
         if (errors.size() == tried)
         {
             // all attempts failed
-            HPX_THROW_EXCEPTION(
-                network_error, "tcp::parcelport::run", errors.get_message());
+            HPX_THROW_EXCEPTION(hpx::error::network_error,
+                "tcp::parcelport::run", errors.get_message());
             return false;
         }
         return true;
@@ -202,7 +203,7 @@ namespace hpx::parcelset::policies::tcp {
                 sender_connection->socket().close();
                 sender_connection.reset();
 
-                HPX_THROWS_IF(ec, network_error,
+                HPX_THROWS_IF(ec, hpx::error::network_error,
                     "tcp::connection_handler::get_connection", e.what());
                 return sender_connection;
             }
@@ -216,7 +217,7 @@ namespace hpx::parcelset::policies::tcp {
             if (tolerate_node_faults())
                 return sender_connection;
 
-            HPX_THROWS_IF(ec, network_error,
+            HPX_THROWS_IF(ec, hpx::error::network_error,
                 "tcp::connection_handler::get_connection",
                 "{} (while trying to connect to: {})", error.message(), l);
             return sender_connection;

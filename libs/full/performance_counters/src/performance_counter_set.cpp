@@ -88,7 +88,7 @@ namespace hpx { namespace performance_counters {
         hpx::id_type id = get_counter(info.fullname_, ec);
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "performance_counter_set::find_counter",
                 "unknown performance counter: '{1}' ({2})", info.fullname_,
                 ec.get_message());

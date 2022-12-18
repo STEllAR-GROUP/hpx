@@ -15,8 +15,8 @@ bool thrown_exception = false;
 void throw_hpx_exception()
 {
     thrown_exception = true;
-    HPX_THROW_EXCEPTION(
-        hpx::bad_request, "throw_hpx_exception", "testing HPX exception");
+    HPX_THROW_EXCEPTION(hpx::error::bad_request, "throw_hpx_exception",
+        "testing HPX exception");
 }
 
 HPX_PLAIN_ACTION(throw_hpx_exception, throw_hpx_exception_action)

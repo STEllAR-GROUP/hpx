@@ -771,7 +771,7 @@ namespace hpx { namespace util {
             else
             {
                 // REVIEW: exception type is overused
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "runtime_configuration::get_agas_service_mode",
                     "invalid AGAS router mode \"{}\"", m);
             }

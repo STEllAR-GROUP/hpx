@@ -24,7 +24,7 @@ namespace hpx { namespace agas { namespace detail {
 
         if (p.objectname_ != "agas")
         {
-            HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_code",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter, "retrieve_action_code",
                 "unknown performance counter (unrelated to AGAS)");
             return invalid_request;
         }
@@ -57,7 +57,7 @@ namespace hpx { namespace agas { namespace detail {
                 return symbol_namespace_services[i].code_;
         }
 
-        HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_code",
+        HPX_THROWS_IF(ec, hpx::error::bad_parameter, "retrieve_action_code",
             "unknown performance counter (unrelated to AGAS)");
         return invalid_request;
     }
@@ -73,7 +73,8 @@ namespace hpx { namespace agas { namespace detail {
 
         if (p.objectname_ != "agas")
         {
-            HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_service_code",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "retrieve_action_service_code",
                 "unknown performance counter (unrelated to AGAS)");
             return invalid_request;
         }
@@ -106,7 +107,8 @@ namespace hpx { namespace agas { namespace detail {
                 return symbol_namespace_services[i].service_code_;
         }
 
-        HPX_THROWS_IF(ec, bad_parameter, "retrieve_action_service_code",
+        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+            "retrieve_action_service_code",
             "unknown performance counter (unrelated to AGAS)");
         return invalid_request;
     }

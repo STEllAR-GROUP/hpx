@@ -8,11 +8,11 @@
 
 #include <hpx/config.hpp>
 
+#include <memory>
 #include <type_traits>
 
 #if !defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION) &&                \
     !(HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS))
-#include <memory>    // for placement new
 #include <mutex>
 #endif
 
@@ -104,7 +104,7 @@ namespace hpx::util {
         {
             ~destructor()
             {
-                static_::get_address()->~value_type();
+                std::destroy_at(static_::get_address());
             }
         };
 

@@ -114,8 +114,8 @@ namespace hpx { namespace util {
             if (k > 32 && get_spinlock_break_on_deadlock_enabled() &&
                 k > get_spinlock_deadlock_detection_limit())
             {
-                HPX_THROW_EXCEPTION(
-                    deadlock, thread_name, "possible deadlock detected");
+                HPX_THROW_EXCEPTION(hpx::error::deadlock, thread_name,
+                    "possible deadlock detected");
             }
 #endif
             hpx::execution_base::this_thread::yield_k(k, thread_name);

@@ -22,17 +22,18 @@ namespace hpx { namespace threads {
     {
         if (!threads::get_self_ptr())
         {
-            HPX_THROW_EXCEPTION(invalid_status, "resume_processing_unit",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "resume_processing_unit",
                 "cannot call resume_processing_unit from outside HPX, use"
                 "resume_processing_unit_cb instead");
         }
         else if (!pool.get_scheduler()->has_scheduler_mode(
                      policies::scheduler_mode::enable_elasticity))
         {
-            return hpx::make_exceptional_future<void>(
-                HPX_GET_EXCEPTION(invalid_status, "resume_processing_unit",
-                    "this thread pool does not support suspending "
-                    "processing units"));
+            return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
+                hpx::error::invalid_status, "resume_processing_unit",
+                "this thread pool does not support suspending "
+                "processing units"));
         }
 
         return hpx::async([&pool, virt_core]() -> void {
@@ -47,7 +48,8 @@ namespace hpx { namespace threads {
         if (!pool.get_scheduler()->has_scheduler_mode(
                 policies::scheduler_mode::enable_elasticity))
         {
-            HPX_THROWS_IF(ec, invalid_status, "resume_processing_unit_cb",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "resume_processing_unit_cb",
                 "this thread pool does not support suspending "
                 "processing units");
             return;
@@ -74,26 +76,27 @@ namespace hpx { namespace threads {
     {
         if (!threads::get_self_ptr())
         {
-            HPX_THROW_EXCEPTION(invalid_status, "suspend_processing_unit",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "suspend_processing_unit",
                 "cannot call suspend_processing_unit from outside HPX, use"
                 "suspend_processing_unit_cb instead");
         }
         if (!pool.get_scheduler()->has_scheduler_mode(
                 policies::scheduler_mode::enable_elasticity))
         {
-            return hpx::make_exceptional_future<void>(
-                HPX_GET_EXCEPTION(invalid_status, "suspend_processing_unit",
-                    "this thread pool does not support suspending "
-                    "processing units"));
+            return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
+                hpx::error::invalid_status, "suspend_processing_unit",
+                "this thread pool does not support suspending "
+                "processing units"));
         }
         if (!pool.get_scheduler()->has_scheduler_mode(
                 policies::scheduler_mode::enable_stealing) &&
             hpx::this_thread::get_pool() == &pool)
         {
-            return hpx::make_exceptional_future<void>(
-                HPX_GET_EXCEPTION(invalid_status, "suspend_processing_unit",
-                    "this thread pool does not support suspending "
-                    "processing units from itself (no thread stealing)"));
+            return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
+                hpx::error::invalid_status, "suspend_processing_unit",
+                "this thread pool does not support suspending "
+                "processing units from itself (no thread stealing)"));
         }
 
         return hpx::async([&pool, virt_core]() -> void {
@@ -108,7 +111,8 @@ namespace hpx { namespace threads {
         if (!pool.get_scheduler()->has_scheduler_mode(
                 policies::scheduler_mode::enable_elasticity))
         {
-            HPX_THROWS_IF(ec, invalid_status, "suspend_processing_unit_cb",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "suspend_processing_unit_cb",
                 "this thread pool does not support suspending processing "
                 "units");
             return;
@@ -126,7 +130,7 @@ namespace hpx { namespace threads {
                     policies::scheduler_mode::enable_stealing) &&
                 hpx::this_thread::get_pool() == &pool)
             {
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "suspend_processing_unit_cb",
                     "this thread pool does not support suspending "
                     "processing units from itself (no thread stealing)");
@@ -144,7 +148,7 @@ namespace hpx { namespace threads {
     {
         if (!threads::get_self_ptr())
         {
-            HPX_THROW_EXCEPTION(invalid_status, "resume_pool",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status, "resume_pool",
                 "cannot call resume_pool from outside HPX, use resume_pool_cb "
                 "or the member function resume_direct instead");
             return hpx::make_ready_future();
@@ -177,7 +181,7 @@ namespace hpx { namespace threads {
     {
         if (!threads::get_self_ptr())
         {
-            HPX_THROW_EXCEPTION(invalid_status, "suspend_pool",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status, "suspend_pool",
                 "cannot call suspend_pool from outside HPX, use "
                 "suspend_pool_cb or the member function suspend_direct "
                 "instead");
@@ -186,7 +190,7 @@ namespace hpx { namespace threads {
         if (threads::get_self_ptr() && hpx::this_thread::get_pool() == &pool)
         {
             return hpx::make_exceptional_future<void>(
-                HPX_GET_EXCEPTION(bad_parameter, "suspend_pool",
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter, "suspend_pool",
                     "cannot suspend a pool from itself"));
         }
 
@@ -199,7 +203,7 @@ namespace hpx { namespace threads {
     {
         if (threads::get_self_ptr() && hpx::this_thread::get_pool() == &pool)
         {
-            HPX_THROWS_IF(ec, bad_parameter, "suspend_pool_cb",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter, "suspend_pool_cb",
                 "cannot suspend a pool from itself");
             return;
         }

@@ -364,7 +364,7 @@ namespace hpx { namespace lcos {
         if (ids.empty())
         {
             return hpx::make_exceptional_future<action_result>(
-                HPX_GET_EXCEPTION(bad_parameter, "hpx::lcos::fold",
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter, "hpx::lcos::fold",
                     "empty list of targets for fold operation"));
         }
 
@@ -420,7 +420,8 @@ namespace hpx { namespace lcos {
         if (ids.empty())
         {
             return hpx::make_exceptional_future<action_result>(
-                HPX_GET_EXCEPTION(bad_parameter, "hpx::lcos::inverse_fold",
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::lcos::inverse_fold",
                     "empty list of targets for inverse_fold operation"));
         }
 
@@ -434,7 +435,7 @@ namespace hpx { namespace lcos {
         if (ids.empty())
         {
             return hpx::make_exceptional_future<action_result>(hpx::exception(
-                hpx::bad_parameter, "array of targets is empty"));
+                hpx::error::bad_parameter, "array of targets is empty"));
         }
 
         return hpx::detail::async_colocated<fold_impl_action>(inverted_ids[0],

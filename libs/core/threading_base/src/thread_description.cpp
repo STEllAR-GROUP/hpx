@@ -101,7 +101,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::set_thread_description",
                 "null thread id encountered");
             return util::thread_description();
@@ -118,7 +118,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::get_thread_lco_description",
                 "null thread id encountered");
             return nullptr;
@@ -136,7 +136,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::set_thread_lco_description",
                 "null thread id encountered");
             return nullptr;

@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <exception>
 #include <functional>
+#include <memory>
 #include <new>
 #include <stdexcept>
 #include <string>
@@ -171,7 +172,7 @@ namespace hpx::optional_ns {
             {
                 if (other.empty_)
                 {
-                    reinterpret_cast<T*>(&storage_)->~T();
+                    std::destroy_at(reinterpret_cast<T*>(&storage_));
                     empty_ = true;
                 }
                 else
@@ -186,7 +187,7 @@ namespace hpx::optional_ns {
         {
             if (!empty_)
             {
-                reinterpret_cast<T*>(&storage_)->~T();
+                std::destroy_at(reinterpret_cast<T*>(&storage_));
                 empty_ = true;
             }
 
@@ -219,7 +220,7 @@ namespace hpx::optional_ns {
         {
             if (!empty_)
             {
-                reinterpret_cast<T*>(&storage_)->~T();
+                std::destroy_at(reinterpret_cast<T*>(&storage_));
                 empty_ = true;
             }
             return *this;
@@ -321,7 +322,7 @@ namespace hpx::optional_ns {
         {
             if (!empty_)
             {
-                reinterpret_cast<T*>(&storage_)->~T();
+                std::destroy_at(reinterpret_cast<T*>(&storage_));
                 empty_ = true;
             }
             new (&storage_) T(HPX_FORWARD(Ts, ts)...);
@@ -336,7 +337,7 @@ namespace hpx::optional_ns {
         {
             if (!empty_)
             {
-                reinterpret_cast<T*>(&storage_)->~T();
+                std::destroy_at(reinterpret_cast<T*>(&storage_));
                 empty_ = true;
             }
             new (&storage_) T(HPX_FORWARD(F, f)(HPX_FORWARD(Ts, ts)...));
@@ -367,7 +368,7 @@ namespace hpx::optional_ns {
             optional* non_empty = empty_ ? &other : this;
 
             new (&empty->storage_) T(HPX_MOVE(**non_empty));
-            reinterpret_cast<T*>(&non_empty->storage_)->~T();
+            std::destroy_at(reinterpret_cast<T*>(&non_empty->storage_));
 
             empty->empty_ = false;
             non_empty->empty_ = true;
@@ -377,7 +378,7 @@ namespace hpx::optional_ns {
         {
             if (!empty_)
             {
-                reinterpret_cast<T*>(&storage_)->~T();
+                std::destroy_at(reinterpret_cast<T*>(&storage_));
                 empty_ = true;
             }
         }

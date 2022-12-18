@@ -457,7 +457,7 @@ namespace hpx::detail {
             else
             {
                 auto s = size<D>() - 1;
-                (data<D>() + s)->~T();
+                std::destroy_at(data<D>() + s);
                 set_size<D>(s);
             }
         }

@@ -32,7 +32,7 @@ inline int wait_for_exit(const Process &p)
 
     if (ret == -1)
     {
-        HPX_THROW_EXCEPTION(invalid_status,
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
             "process::wait_for_exit", "waitpid(2) failed");
     }
     return WEXITSTATUS(status);
@@ -50,7 +50,7 @@ inline int wait_for_exit(const Process &p, hpx::error_code &ec)
 
     if (ret == -1)
     {
-        HPX_THROWS_IF(ec, invalid_status,
+        HPX_THROWS_IF(ec, hpx::error::invalid_status,
             "process::wait_for_exit", "waitpid(2) failed");
     }
     else

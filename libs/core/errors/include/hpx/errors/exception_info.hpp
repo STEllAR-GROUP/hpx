@@ -24,6 +24,7 @@
 #endif
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Tag, typename Type>
     struct error_info
@@ -36,7 +37,7 @@ namespace hpx {
         {
         }
 
-        explicit error_info(Type&& value)
+        explicit error_info(Type&& value) noexcept
           : _value(HPX_MOVE(value))
         {
         }
@@ -52,7 +53,7 @@ namespace hpx {
         {                                                                      \
         }                                                                      \
                                                                                \
-        explicit NAME(TYPE&& value)                                            \
+        explicit NAME(TYPE&& value) noexcept                                   \
           : error_info(HPX_FORWARD(TYPE, value))                               \
         {                                                                      \
         }                                                                      \
@@ -60,6 +61,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         class exception_info_node_base
         {
         public:
@@ -149,10 +151,11 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         struct exception_with_info_base : public exception_info
         {
             exception_with_info_base(
-                std::type_info const& type, exception_info xi)
+                std::type_info const& type, exception_info xi) noexcept
               : exception_info(HPX_MOVE(xi))
               , type(type)
             {
@@ -172,7 +175,7 @@ namespace hpx {
             {
             }
 
-            explicit exception_with_info(E&& e, exception_info xi)
+            explicit exception_with_info(E&& e, exception_info xi) noexcept
               : E(HPX_MOVE(e))
               , exception_with_info_base(typeid(E), HPX_MOVE(xi))
             {
@@ -184,10 +187,10 @@ namespace hpx {
     [[noreturn]] void throw_with_info(
         E&& e, exception_info&& xi = exception_info())
     {
-        using ED = typename std::decay<E>::type;
-        static_assert(std::is_class<ED>::value && !std::is_final<ED>::value,
+        using ED = std::decay_t<E>;
+        static_assert(std::is_class_v<ED> && !std::is_final_v<ED>,
             "E shall be a valid base class");
-        static_assert(!std::is_base_of<exception_info, ED>::value,
+        static_assert(!std::is_base_of_v<exception_info, ED>,
             "E shall not derive from exception_info");
 
         throw detail::exception_with_info<ED>(HPX_FORWARD(E, e), HPX_MOVE(xi));
@@ -201,13 +204,13 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename E>
-    exception_info* get_exception_info(E& e)
+    exception_info* get_exception_info(E& e) noexcept
     {
         return dynamic_cast<exception_info*>(std::addressof(e));
     }
 
     template <typename E>
-    exception_info const* get_exception_info(E const& e)
+    exception_info const* get_exception_info(E const& e) noexcept
     {
         return dynamic_cast<exception_info const*>(std::addressof(e));
     }

@@ -405,7 +405,7 @@ namespace hpx { namespace threads { namespace policies {
                 break;
             }
             default:
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "shared_priority_queue_scheduler::create_thread",
                     "Invalid schedule hint mode: {}",
                     static_cast<std::size_t>(data.schedulehint.mode));
@@ -805,7 +805,7 @@ namespace hpx { namespace threads { namespace policies {
             }
 
             default:
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "shared_priority_queue_scheduler::schedule_thread",
                     "Invalid schedule hint mode: {}",
                     static_cast<std::size_t>(schedulehint.mode));
@@ -1229,7 +1229,7 @@ namespace hpx { namespace threads { namespace policies {
         {
             if (thread_num > num_workers_)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "shared_priority_queue_scheduler::on_stop_thread",
                     "Invalid thread number: {}", std::to_string(thread_num));
             }
@@ -1241,7 +1241,7 @@ namespace hpx { namespace threads { namespace policies {
         {
             if (thread_num > num_workers_)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "shared_priority_queue_scheduler::on_error",
                     "Invalid thread number: {}", std::to_string(thread_num));
             }
@@ -1251,7 +1251,7 @@ namespace hpx { namespace threads { namespace policies {
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         std::uint64_t get_creation_time(bool /* reset */) override
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "shared_priority_scheduler::get_creation_time",
                 "the shared_priority_scheduler does not support the "
                 "get_creation_time performance counter");
@@ -1259,7 +1259,7 @@ namespace hpx { namespace threads { namespace policies {
         }
         std::uint64_t get_cleanup_time(bool /* reset */) override
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "shared_priority_scheduler::get_cleanup_time",
                 "the shared_priority_scheduler does not support the "
                 "get_cleanup_time performance counter");
@@ -1271,7 +1271,7 @@ namespace hpx { namespace threads { namespace policies {
         std::int64_t get_num_pending_misses(
             std::size_t /* num */, bool /* reset */) override
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "shared_priority_scheduler::get_num_pending_misses",
                 "the shared_priority_scheduler does not support the "
                 "get_num_pending_misses performance counter");
@@ -1281,7 +1281,7 @@ namespace hpx { namespace threads { namespace policies {
         std::int64_t get_num_pending_accesses(
             std::size_t /* num */, bool /* reset */) override
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "shared_priority_scheduler::get_num_pending_accesses",
                 "the shared_priority_scheduler does not support the "
                 "get_num_pending_accesses performance counter");
@@ -1291,7 +1291,7 @@ namespace hpx { namespace threads { namespace policies {
         std::int64_t get_num_stolen_from_pending(
             std::size_t /* num */, bool /* reset */) override
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "shared_priority_scheduler::get_num_stolen_from_pending",
                 "the shared_priority_scheduler does not support the "
                 "get_num_stolen_from_pending performance counter");
@@ -1301,7 +1301,7 @@ namespace hpx { namespace threads { namespace policies {
         std::int64_t get_num_stolen_to_pending(
             std::size_t /* num */, bool /* reset */) override
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "shared_priority_scheduler::get_creation_time",
                 "the shared_priority_scheduler does not support the "
                 "get_creation_time performance counter");
@@ -1311,7 +1311,7 @@ namespace hpx { namespace threads { namespace policies {
         std::int64_t get_num_stolen_from_staged(
             std::size_t /* num */, bool /* reset */) override
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "shared_priority_scheduler::get_num_stolen_from_staged",
                 "the shared_priority_scheduler does not support the "
                 "get_num_stolen_from_staged performance counter");
@@ -1321,7 +1321,7 @@ namespace hpx { namespace threads { namespace policies {
         std::int64_t get_num_stolen_to_staged(
             std::size_t /* num */, bool /* reset */) override
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "shared_priority_scheduler::get_num_stolen_to_staged",
                 "the shared_priority_scheduler does not support the "
                 "get_num_stolen_to_staged performance counter");
@@ -1333,7 +1333,7 @@ namespace hpx { namespace threads { namespace policies {
         std::int64_t get_average_thread_wait_time(
             std::size_t /* num_thread */ = std::size_t(-1)) const override
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "shared_priority_scheduler::get_average_thread_wait_time",
                 "the shared_priority_scheduler does not support the "
                 "get_average_thread_wait_time performance counter");
@@ -1342,7 +1342,7 @@ namespace hpx { namespace threads { namespace policies {
         std::int64_t get_average_task_wait_time(
             std::size_t /* num_thread */ = std::size_t(-1)) const override
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "shared_priority_scheduler::get_average_task_wait_time",
                 "the shared_priority_scheduler does not support the "
                 "get_average_task_wait_time performance counter");

@@ -282,7 +282,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<std::vector<arg_type>>(
-                HPX_GET_EXCEPTION(hpx::bad_parameter,
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::collectives::gather_here",
                     "the generation number shouldn't be zero"));
         }
@@ -347,7 +347,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
-                hpx::bad_parameter, "hpx::collectives::gather_there",
+                hpx::error::bad_parameter, "hpx::collectives::gather_there",
                 "the generation number shouldn't be zero"));
         }
 

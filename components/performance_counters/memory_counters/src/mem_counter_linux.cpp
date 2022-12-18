@@ -104,7 +104,7 @@ namespace hpx { namespace performance_counters { namespace memory {
 
         if (!read_proc_statm(ps, getpid()))
         {
-            HPX_THROW_EXCEPTION(hpx::invalid_data,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_data,
                 "hpx::performance_counters::memory::read_psm_virtual",
                 "failed to parse '/proc/{1}/statm'", getpid());
             return std::uint64_t(-1);
@@ -121,7 +121,7 @@ namespace hpx { namespace performance_counters { namespace memory {
 
         if (!read_proc_statm(ps, getpid()))
         {
-            HPX_THROW_EXCEPTION(hpx::invalid_data,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_data,
                 "hpx::performance_counters::memory::read_psm_resident",
                 "failed to parse '/proc/{1}/statm'", getpid());
             return std::uint64_t(-1);

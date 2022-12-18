@@ -53,7 +53,7 @@ namespace hpx { namespace util { namespace plugin {
 
                 if (!xw)
                 {
-                    HPX_THROWS_IF(ec, filesystem_error,
+                    HPX_THROWS_IF(ec, hpx::error::filesystem_error,
                         "get_abstract_factory_static",
                         "Hpx.Plugin: Can't cast to the right factory type\n");
                     return std::pair<abstract_factory<BasePlugin>*,
@@ -102,7 +102,7 @@ namespace hpx { namespace util { namespace plugin {
                     str << " No classes exist.";
                 }
 
-                HPX_THROWS_IF(ec, filesystem_error,
+                HPX_THROWS_IF(ec, hpx::error::filesystem_error,
                     "get_abstract_factory_static", str.str());
                 return std::pair<abstract_factory<BasePlugin>*, dll_handle>();
             }

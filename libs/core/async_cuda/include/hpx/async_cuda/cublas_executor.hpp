@@ -88,7 +88,7 @@ namespace hpx { namespace cuda { namespace experimental {
     struct HPX_CORE_EXPORT cublas_exception : hpx::exception
     {
         cublas_exception(const std::string& msg, cublasStatus_t err)
-          : hpx::exception(hpx::bad_function_call, msg)
+          : hpx::exception(hpx::error::bad_function_call, msg)
           , err_(err)
         {
         }

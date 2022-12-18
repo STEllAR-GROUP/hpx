@@ -400,7 +400,8 @@ namespace hpx { namespace components { namespace server {
     {
         if (find_here() != hpx::find_root_locality())
         {
-            HPX_THROW_EXCEPTION(invalid_status, "runtime_support::shutdown_all",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "runtime_support::shutdown_all",
                 "shutdown_all should be invoked on the root locality only");
             return;
         }
@@ -951,7 +952,7 @@ namespace hpx { namespace components { namespace server {
             if (ec.category() != hpx::get_lightweight_hpx_category())
             {
                 // we don't know anything about this component
-                HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                     "runtime_support::create_message_handler",
                     "attempt to create message handler plugin instance of "
                     "invalid/unknown type: {}",
@@ -960,7 +961,7 @@ namespace hpx { namespace components { namespace server {
             else
             {
                 // lightweight error handling
-                HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                     "runtime_support::create_message_handler",
                     "attempt to create message handler plugin instance of "
                     "invalid/unknown type");
@@ -979,7 +980,7 @@ namespace hpx { namespace components { namespace server {
 
         if (ec)
         {
-            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+            HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                 "runtime_support::register_message_handler",
                 "couldn't register action '{}' for message handler plugin of "
                 "type: {}",
@@ -1013,7 +1014,7 @@ namespace hpx { namespace components { namespace server {
             if (ec.category() != hpx::get_lightweight_hpx_category())
             {
                 // we don't know anything about this component
-                HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                     "runtime_support::create_message_handler",
                     "attempt to create message handler plugin instance of "
                     "invalid/unknown type: {}",
@@ -1022,7 +1023,7 @@ namespace hpx { namespace components { namespace server {
             else
             {
                 // lightweight error handling
-                HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                     "runtime_support::create_message_handler",
                     "attempt to create message handler plugin instance of "
                     "invalid/unknown type");
@@ -1041,7 +1042,7 @@ namespace hpx { namespace components { namespace server {
             factory->create(action, pp, num_messages, interval);
         if (nullptr == mh)
         {
-            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+            HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                 "runtime_support::create_message_handler",
                 "couldn't create message handler plugin of type: {}",
                 message_handler_type);
@@ -1071,7 +1072,7 @@ namespace hpx { namespace components { namespace server {
         {
             l.unlock();
             // we don't know anything about this component
-            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+            HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                 "runtime_support::create_binary_filter",
                 "attempt to create binary filter plugin instance of "
                 "invalid/unknown type: {}",
@@ -1090,7 +1091,7 @@ namespace hpx { namespace components { namespace server {
             factory->create(compress, next_filter);
         if (nullptr == bf)
         {
-            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+            HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                 "runtime_support::create_binary_filter",
                 "couldn't create binary filter plugin of type: {}",
                 binary_filter_type);
@@ -1283,7 +1284,7 @@ namespace hpx { namespace components { namespace server {
                 else
                 {
 #if defined(HPX_HAVE_STATIC_LINKING)
-                    HPX_THROW_EXCEPTION(service_unavailable,
+                    HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
                         "runtime_support::load_components",
                         "static linking configuration does not support dynamic "
                         "loading of component '{}'",
@@ -1300,7 +1301,8 @@ namespace hpx { namespace components { namespace server {
                 LRT_(warning).format(
                     "caught exception while loading {}, {}: {}", instance,
                     e.get_error_code().get_message(), e.what());
-                if (e.get_error_code().value() == hpx::commandline_option_error)
+                if (e.get_error_code().value() ==
+                    hpx::error::commandline_option_error)
                 {
                     std::cerr << "runtime_support::load_components: "
                               << "invalid command line option(s) to "
@@ -1766,7 +1768,7 @@ namespace hpx { namespace components { namespace server {
                 if (sect.get_entry("static", "0") == "1")
                 {
                     // FIXME: implement statically linked plugins
-                    HPX_THROW_EXCEPTION(service_unavailable,
+                    HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
                         "runtime_support::load_plugins",
                         "static linking configuration does not support static "
                         "loading of plugin '{}'",
@@ -1775,7 +1777,7 @@ namespace hpx { namespace components { namespace server {
                 else
                 {
 #if defined(HPX_HAVE_STATIC_LINKING)
-                    HPX_THROW_EXCEPTION(service_unavailable,
+                    HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
                         "runtime_support::load_plugins",
                         "static linking configuration does not support dynamic "
                         "loading of plugin '{}'",
@@ -1792,7 +1794,8 @@ namespace hpx { namespace components { namespace server {
                 LRT_(warning).format(
                     "caught exception while loading {}, {}: {}", instance,
                     e.get_error_code().get_message(), e.what());
-                if (e.get_error_code().value() == hpx::commandline_option_error)
+                if (e.get_error_code().value() ==
+                    hpx::error::commandline_option_error)
                 {
                     std::cerr << "runtime_support::load_plugins: "
                               << "invalid command line option(s) to "

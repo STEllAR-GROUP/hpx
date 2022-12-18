@@ -103,7 +103,8 @@ namespace hpx::plugins::parcel {
 
             if (paths.parentinstance_is_basename_)
             {
-                HPX_THROWS_IF(ec, bad_parameter, "num_parcels_counter_creator",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "num_parcels_counter_creator",
                     "invalid counter name for number of parcels (instance "
                     "name must not be a valid base counter name)");
                 return naming::invalid_gid;
@@ -111,7 +112,8 @@ namespace hpx::plugins::parcel {
 
             if (paths.parameters_.empty())
             {
-                HPX_THROWS_IF(ec, bad_parameter, "num_parcels_counter_creator",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "num_parcels_counter_creator",
                     "invalid counter parameter for number of parcels: must "
                     "specify an action type");
                 return naming::invalid_gid;
@@ -135,7 +137,8 @@ namespace hpx::plugins::parcel {
         break;
 
         default:
-            HPX_THROWS_IF(ec, bad_parameter, "num_parcels_counter_creator",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "num_parcels_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;
         }
@@ -184,7 +187,8 @@ namespace hpx::plugins::parcel {
 
             if (paths.parentinstance_is_basename_)
             {
-                HPX_THROWS_IF(ec, bad_parameter, "num_messages_counter_creator",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "num_messages_counter_creator",
                     "invalid counter name for number of parcels (instance "
                     "name must not be a valid base counter name)");
                 return naming::invalid_gid;
@@ -192,7 +196,8 @@ namespace hpx::plugins::parcel {
 
             if (paths.parameters_.empty())
             {
-                HPX_THROWS_IF(ec, bad_parameter, "num_messages_counter_creator",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "num_messages_counter_creator",
                     "invalid counter parameter for number of parcels: must "
                     "specify an action type");
                 return naming::invalid_gid;
@@ -216,7 +221,8 @@ namespace hpx::plugins::parcel {
         break;
 
         default:
-            HPX_THROWS_IF(ec, bad_parameter, "num_messages_counter_creator",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "num_messages_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;
         }
@@ -266,7 +272,7 @@ namespace hpx::plugins::parcel {
 
             if (paths.parentinstance_is_basename_)
             {
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "num_parcels_per_message_counter_creator",
                     "invalid counter name for number of parcels (instance "
                     "name must not be a valid base counter name)");
@@ -275,7 +281,7 @@ namespace hpx::plugins::parcel {
 
             if (paths.parameters_.empty())
             {
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "num_parcels_per_message_counter_creator",
                     "invalid counter parameter for number of parcels: must "
                     "specify an action type");
@@ -301,7 +307,7 @@ namespace hpx::plugins::parcel {
         break;
 
         default:
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "num_parcels_per_message_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;
@@ -352,7 +358,7 @@ namespace hpx::plugins::parcel {
 
             if (paths.parentinstance_is_basename_)
             {
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "average_time_between_parcels_counter_creator",
                     "invalid counter name for number of parcels (instance "
                     "name must not be a valid base counter name)");
@@ -361,7 +367,7 @@ namespace hpx::plugins::parcel {
 
             if (paths.parameters_.empty())
             {
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "average_time_between_parcels_counter_creator",
                     "invalid counter parameter for number of parcels: must "
                     "specify an action type");
@@ -389,7 +395,7 @@ namespace hpx::plugins::parcel {
         break;
 
         default:
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "average_time_between_parcels_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;
@@ -464,7 +470,7 @@ namespace hpx::plugins::parcel {
 
             if (paths.parentinstance_is_basename_)
             {
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "time_between_parcels_histogram_counter_creator",
                     "invalid counter name for "
                     "time-between-parcels histogram (instance "
@@ -474,7 +480,7 @@ namespace hpx::plugins::parcel {
 
             if (paths.parameters_.empty())
             {
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "time_between_parcels_histogram_counter_creator",
                     "invalid counter parameter for "
                     "time-between-parcels histogram: must "
@@ -494,7 +500,7 @@ namespace hpx::plugins::parcel {
 
             if (params.empty() || params[0].empty())
             {
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "time_between_parcels_histogram_counter_creator",
                     "invalid counter parameter for "
                     "time-between-parcels histogram: "
@@ -530,7 +536,7 @@ namespace hpx::plugins::parcel {
         break;
 
         default:
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "time_between_parcels_histogram_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;

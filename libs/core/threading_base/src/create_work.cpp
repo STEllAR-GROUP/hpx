@@ -29,8 +29,9 @@ namespace hpx { namespace threads { namespace detail {
 
         default:
         {
-            HPX_THROWS_IF(ec, bad_parameter, "thread::detail::create_work",
-                "invalid initial state: {}", data.initial_state);
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "thread::detail::create_work", "invalid initial state: {}",
+                data.initial_state);
             return invalid_thread_id;
         }
         }
@@ -38,8 +39,8 @@ namespace hpx { namespace threads { namespace detail {
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
         if (!data.description)
         {
-            HPX_THROWS_IF(ec, bad_parameter, "thread::detail::create_work",
-                "description is nullptr");
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "thread::detail::create_work", "description is nullptr");
             return invalid_thread_id;
         }
 #endif

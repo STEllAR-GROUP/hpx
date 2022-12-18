@@ -456,7 +456,8 @@ namespace hpx { namespace performance_counters {
 
         if (paths.parentinstance_is_basename_)
         {
-            HPX_THROWS_IF(ec, bad_parameter, "locality_raw_counter_creator",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "locality_raw_counter_creator",
                 "invalid counter instance parent name: " +
                     paths.parentinstancename_);
             return naming::invalid_gid;
@@ -466,7 +467,8 @@ namespace hpx { namespace performance_counters {
             return detail::create_raw_counter(
                 info, f, ec);    // overall counter
 
-        HPX_THROWS_IF(ec, bad_parameter, "locality_raw_counter_creator",
+        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+            "locality_raw_counter_creator",
             "invalid counter instance name: " + paths.instancename_);
         return naming::invalid_gid;
     }
@@ -483,7 +485,7 @@ namespace hpx { namespace performance_counters {
 
         if (paths.parentinstance_is_basename_)
         {
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "locality_raw_values_counter_creator",
                 "invalid counter instance parent name: " +
                     paths.parentinstancename_);
@@ -496,7 +498,8 @@ namespace hpx { namespace performance_counters {
                 info, f, ec);    // overall counter
         }
 
-        HPX_THROWS_IF(ec, bad_parameter, "locality_raw_values_counter_creator",
+        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+            "locality_raw_values_counter_creator",
             "invalid counter instance name: " + paths.instancename_);
         return naming::invalid_gid;
     }
@@ -538,7 +541,8 @@ namespace hpx { namespace performance_counters {
                 return action(agas_id, name).get_gid();
             }
             default:
-                HPX_THROWS_IF(ec, bad_parameter, "retrieve_statistics_counter",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "retrieve_statistics_counter",
                     "unknown counter agas counter name: " + name);
                 break;
             }
@@ -570,13 +574,15 @@ namespace hpx { namespace performance_counters {
 
         if (paths.objectname_ != "agas")
         {
-            HPX_THROWS_IF(ec, bad_parameter, "agas_raw_counter_creator",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "agas_raw_counter_creator",
                 "unknown performance counter (unrelated to AGAS)");
             return naming::invalid_gid;
         }
         if (paths.parentinstance_is_basename_)
         {
-            HPX_THROWS_IF(ec, bad_parameter, "agas_raw_counter_creator",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "agas_raw_counter_creator",
                 "invalid counter instance parent name: " +
                     paths.parentinstancename_);
             return naming::invalid_gid;
@@ -592,7 +598,8 @@ namespace hpx { namespace performance_counters {
 
             if (-1 == paths.parentinstanceindex_)
             {
-                HPX_THROWS_IF(ec, bad_parameter, "agas_raw_counter_creator",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "agas_raw_counter_creator",
                     "invalid parent instance index: -1");
                 return naming::invalid_gid;
             }
@@ -605,7 +612,8 @@ namespace hpx { namespace performance_counters {
             hpx::id_type id = agas::resolve_name(launch::sync, service, ec);
             if (id == hpx::invalid_id)
             {
-                HPX_THROWS_IF(ec, not_implemented, "agas_raw_counter_creator",
+                HPX_THROWS_IF(ec, hpx::error::not_implemented,
+                    "agas_raw_counter_creator",
                     "invalid counter name: " +
                         remove_counter_prefix(info.fullname_));
                 return naming::invalid_gid;
@@ -614,7 +622,8 @@ namespace hpx { namespace performance_counters {
             return detail::retrieve_agas_counter(info.fullname_, id, ec);
         }
 
-        HPX_THROWS_IF(ec, not_implemented, "agas_raw_counter_creator",
+        HPX_THROWS_IF(ec, hpx::error::not_implemented,
+            "agas_raw_counter_creator",
             "invalid counter type name: " + paths.instancename_);
         return naming::invalid_gid;
     }

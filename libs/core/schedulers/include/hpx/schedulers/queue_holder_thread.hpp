@@ -581,7 +581,7 @@ namespace hpx { namespace threads { namespace policies {
         static void deallocate(threads::thread_data* p) noexcept
         {
             using threads::thread_data;
-            p->~thread_data();
+            std::destroy_at(p);
             thread_alloc_.deallocate(p, 1);
         }
 
@@ -607,7 +607,7 @@ namespace hpx { namespace threads { namespace policies {
                     debug::threadinfo<thread_id_type*>(&tid));
 
                 lk.unlock();
-                HPX_THROW_EXCEPTION(hpx::out_of_memory,
+                HPX_THROW_EXCEPTION(hpx::error::out_of_memory,
                     "queue_holder_thread::add_to_thread_map",
                     "Couldn't add new thread to the thread map {}", map_size);
             }
@@ -809,7 +809,7 @@ namespace hpx { namespace threads { namespace policies {
             default:
             case thread_priority::unknown:
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "queue_holder_thread::get_thread_count_staged",
                     "unknown thread priority value (thread_priority::unknown)");
             }
@@ -860,7 +860,7 @@ namespace hpx { namespace threads { namespace policies {
             default:
             case thread_priority::unknown:
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "queue_holder_thread::get_thread_count_pending",
                     "unknown thread priority value (thread_priority::unknown)");
             }
@@ -956,7 +956,7 @@ namespace hpx { namespace threads { namespace policies {
             }
             else if (state == thread_schedule_state::staged)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "queue_holder_thread::iterate_threads",
                     "can't iterate over thread ids of staged threads");
                 return false;

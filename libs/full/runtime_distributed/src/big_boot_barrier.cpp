@@ -456,13 +456,15 @@ namespace hpx { namespace agas {
 
         if (HPX_UNLIKELY(agas_client.is_connecting()))
         {
-            HPX_THROW_EXCEPTION(internal_server_error, "agas::register_worker",
+            HPX_THROW_EXCEPTION(hpx::error::internal_server_error,
+                "agas::register_worker",
                 "a locality in connect mode cannot be an AGAS server.");
         }
 
         if (HPX_UNLIKELY(!agas_client.is_bootstrap()))
         {
-            HPX_THROW_EXCEPTION(internal_server_error, "agas::register_worker",
+            HPX_THROW_EXCEPTION(hpx::error::internal_server_error,
+                "agas::register_worker",
                 "registration parcel received by non-bootstrap locality.");
         }
 
@@ -470,7 +472,8 @@ namespace hpx { namespace agas {
         if (prefix != naming::invalid_gid &&
             naming::get_locality_id_from_gid(prefix) == 0)
         {
-            HPX_THROW_EXCEPTION(internal_server_error, "agas::register_worker",
+            HPX_THROW_EXCEPTION(hpx::error::internal_server_error,
+                "agas::register_worker",
                 "worker node ({}) can't suggest locality_id zero, "
                 "this is reserved for the console",
                 header.endpoints);
@@ -480,7 +483,8 @@ namespace hpx { namespace agas {
         if (!agas_client.register_locality(
                 header.endpoints, prefix, header.num_threads))
         {
-            HPX_THROW_EXCEPTION(internal_server_error, "agas::register_worker",
+            HPX_THROW_EXCEPTION(hpx::error::internal_server_error,
+                "agas::register_worker",
                 "attempt to register locality {} more than once",
                 header.endpoints);
             return;
@@ -571,8 +575,9 @@ namespace hpx { namespace agas {
 
         if (HPX_UNLIKELY(agas_client.get_status() != hpx::state::starting))
         {
-            HPX_THROW_EXCEPTION(internal_server_error, "agas::notify_worker",
-                "locality {} has launched early", rt.here());
+            HPX_THROW_EXCEPTION(hpx::error::internal_server_error,
+                "agas::notify_worker", "locality {} has launched early",
+                rt.here());
         }
 
         util::runtime_configuration& cfg = rt.get_config();
@@ -828,7 +833,7 @@ namespace hpx { namespace agas {
             bbb;
         if (bbb.get())
         {
-            HPX_THROW_EXCEPTION(internal_server_error,
+            HPX_THROW_EXCEPTION(hpx::error::internal_server_error,
                 "create_big_boot_barrier",
                 "create_big_boot_barrier was called more than once");
         }
@@ -841,7 +846,7 @@ namespace hpx { namespace agas {
             bbb;
         if (!bbb.get())
         {
-            HPX_THROW_EXCEPTION(internal_server_error,
+            HPX_THROW_EXCEPTION(hpx::error::internal_server_error,
                 "destroy_big_boot_barrier",
                 "big_boot_barrier has not been created yet");
         }
@@ -854,7 +859,8 @@ namespace hpx { namespace agas {
             bbb;
         if (!bbb.get())
         {
-            HPX_THROW_EXCEPTION(internal_server_error, "get_big_boot_barrier",
+            HPX_THROW_EXCEPTION(hpx::error::internal_server_error,
+                "get_big_boot_barrier",
                 "big_boot_barrier has not been created yet");
         }
         return *(bbb.get());

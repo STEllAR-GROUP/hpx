@@ -166,7 +166,7 @@ namespace hpx { namespace lcos { namespace local {
 
             if (generation_value < generation_)
             {
-                HPX_THROWS_IF(ec, hpx::invalid_status, function_name,
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, function_name,
                     "sequencing error, generational counter too small");
                 return;
             }

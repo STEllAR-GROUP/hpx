@@ -53,7 +53,7 @@ namespace hpx { namespace parallel { namespace execution {
                 break;
             }
 
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "hpx::threads::detail::get_service_pool",
                 "unknown pool executor type");
             return nullptr;

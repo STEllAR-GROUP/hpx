@@ -53,7 +53,7 @@ namespace throttle { namespace server {
 
         if (shepherd >= blocked_os_threads_.size())
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttle::suspend",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "throttle::suspend",
                 "invalid thread number");
         }
 
@@ -71,7 +71,7 @@ namespace throttle { namespace server {
 
         if (shepherd >= blocked_os_threads_.size())
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttle::resume",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "throttle::resume",
                 "invalid thread number");
         }
 
@@ -84,8 +84,8 @@ namespace throttle { namespace server {
 
         if (shepherd >= blocked_os_threads_.size())
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter, "throttle::is_suspended",
-                "invalid thread number");
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "throttle::is_suspended", "invalid thread number");
         }
 
         return blocked_os_threads_[shepherd];

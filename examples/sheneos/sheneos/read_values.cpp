@@ -71,8 +71,8 @@ namespace sheneos {
         }
         catch (H5::Exception const& e)
         {
-            HPX_THROW_EXCEPTION(
-                hpx::no_success, "sheneos::extract_data", e.getDetailMsg());
+            HPX_THROW_EXCEPTION(hpx::error::no_success, "sheneos::extract_data",
+                e.getDetailMsg());
         }
     }
 
@@ -119,7 +119,7 @@ namespace sheneos {
         {
             std::string msg = e.getDetailMsg().c_str();
             HPX_THROW_EXCEPTION(
-                hpx::no_success, "sheneos::extract_data_range", msg);
+                hpx::error::no_success, "sheneos::extract_data_range", msg);
         }
 
         // This return statement keeps the compiler from whining.
@@ -178,8 +178,8 @@ namespace sheneos {
         }
         catch (H5::Exception const& e)
         {
-            HPX_THROW_EXCEPTION(
-                hpx::no_success, "sheneos::extract_data", e.getDetailMsg());
+            HPX_THROW_EXCEPTION(hpx::error::no_success, "sheneos::extract_data",
+                e.getDetailMsg());
         }
     }
 }    // namespace sheneos

@@ -194,7 +194,8 @@ namespace hpx { namespace lcos { namespace local {
                 // out of bounds index
                 l.unlock();
                 outer_lock.unlock();
-                HPX_THROWS_IF(ec, bad_parameter, "base_and_gate<>::set",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "base_and_gate<>::set",
                     "index is out of range for this base_and_gate");
                 return false;
             }
@@ -203,7 +204,8 @@ namespace hpx { namespace lcos { namespace local {
                 // segment already filled, logic error
                 l.unlock();
                 outer_lock.unlock();
-                HPX_THROWS_IF(ec, bad_parameter, "base_and_gate<>::set",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "base_and_gate<>::set",
                     "input with the given index has already been triggered");
                 return false;
             }
@@ -296,7 +298,7 @@ namespace hpx { namespace lcos { namespace local {
             if (generation_value < generation_)
             {
                 l.unlock();
-                HPX_THROWS_IF(ec, hpx::invalid_status, function_name,
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, function_name,
                     "sequencing error, generational counter too small");
                 return;
             }
@@ -333,7 +335,7 @@ namespace hpx { namespace lcos { namespace local {
                 if (new_generation < generation_)
                 {
                     l.unlock();
-                    HPX_THROW_EXCEPTION(hpx::invalid_status,
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "and_gate::next_generation",
                         "sequencing error, new generational counter value too "
                         "small");
@@ -379,7 +381,8 @@ namespace hpx { namespace lcos { namespace local {
                 // reset happens while part of the slots are filled
                 l.unlock();
                 outer_lock.unlock();
-                HPX_THROWS_IF(ec, bad_parameter, "base_and_gate<>::init",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "base_and_gate<>::init",
                     "initializing this base_and_gate while slots are filled");
                 return;
             }

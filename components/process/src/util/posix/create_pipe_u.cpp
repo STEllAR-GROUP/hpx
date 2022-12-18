@@ -25,7 +25,7 @@ namespace hpx { namespace components { namespace process { namespace posix
         int fds[2];
         if (::pipe(fds) == -1)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "posix::create_pipe", "pipe(2) failed");
         }
         return pipe(fds[0], fds[1]);
@@ -36,7 +36,7 @@ namespace hpx { namespace components { namespace process { namespace posix
         int fds[2] = { 0, 0 };
         if (::pipe(fds) == -1)
         {
-            HPX_THROWS_IF(ec, invalid_status,
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
                 "posix::create_pipe", "pipe(2) failed");
         }
         else

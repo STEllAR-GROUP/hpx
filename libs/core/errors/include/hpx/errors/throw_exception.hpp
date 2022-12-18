@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -25,7 +25,8 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 /// \cond NODETAIL
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     template <typename Exception>
     [[noreturn]] HPX_CORE_EXPORT void throw_exception(Exception const& e,
         std::string const& func, std::string const& file, long line);
@@ -63,7 +64,7 @@ namespace hpx { namespace detail {
         hpx::error_code& ec, exception const& e, std::string const& func);
 
     [[noreturn]] HPX_CORE_EXPORT void throw_thread_interrupted_exception();
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 /// \endcond
 
 namespace hpx {
@@ -151,7 +152,8 @@ namespace hpx {
 ///          // Throw a hpx::exception initialized from the given parameters.
 ///          // Additionally associate with this exception some detailed
 ///          // diagnostic information about the throw-site.
-///          HPX_THROW_EXCEPTION(hpx::no_success, "raise_exception", "simulated error");
+///          HPX_THROW_EXCEPTION(hpx::error::no_success, "raise_exception",
+///             "simulated error");
 ///      }
 /// \endcode
 ///

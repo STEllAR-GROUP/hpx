@@ -212,7 +212,7 @@ void init_globals()
     if (!hpx::util::retrieve_commandline_arguments(
             get_commandline_options(), vm))
     {
-        HPX_THROW_EXCEPTION(hpx::commandline_option_error,
+        HPX_THROW_EXCEPTION(hpx::error::commandline_option_error,
             "fibonacci_futures_distributed",
             "failed to handle command line options");
         return;
@@ -223,7 +223,7 @@ void init_globals()
     threshold = vm["threshold"].as<unsigned int>();
     if (threshold < 2 || threshold > n)
     {
-        HPX_THROW_EXCEPTION(hpx::commandline_option_error,
+        HPX_THROW_EXCEPTION(hpx::error::commandline_option_error,
             "fibonacci_futures_distributed",
             "wrong command line argument value for option 'threshold', "
             "should be in between 2 and n-value, value specified: " +
@@ -234,7 +234,7 @@ void init_globals()
     distribute_at = vm["distribute-at"].as<unsigned int>();
     if (distribute_at < 2 || distribute_at > n)
     {
-        HPX_THROW_EXCEPTION(hpx::commandline_option_error,
+        HPX_THROW_EXCEPTION(hpx::error::commandline_option_error,
             "fibonacci_futures_distributed",
             "wrong command line argument value for option 'distribute-at', "
             "should be in between 2 and n-value, value specified: " +

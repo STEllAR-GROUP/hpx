@@ -977,7 +977,7 @@ namespace hpx { namespace threads { namespace policies {
                 default:
                 case thread_priority::unknown:
                 {
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "local_priority_queue_scheduler::get_thread_count",
                         "unknown thread priority value "
                         "(thread_priority::unknown)");
@@ -1043,7 +1043,7 @@ namespace hpx { namespace threads { namespace policies {
             default:
             case thread_priority::unknown:
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "local_priority_queue_scheduler::get_thread_count",
                     "unknown thread priority value "
                     "(thread_priority::unknown)");

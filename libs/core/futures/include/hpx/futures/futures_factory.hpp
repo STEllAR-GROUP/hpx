@@ -714,7 +714,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             if (!task_)
             {
-                HPX_THROW_EXCEPTION(task_moved,
+                HPX_THROW_EXCEPTION(hpx::error::task_moved,
                     "futures_factory<Result()>::operator()",
                     "futures_factory invalid (has it been moved?)");
                 return;
@@ -737,7 +737,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             if (!task_)
             {
-                HPX_THROW_EXCEPTION(task_moved,
+                HPX_THROW_EXCEPTION(hpx::error::task_moved,
                     "futures_factory<Result()>::post()",
                     "futures_factory invalid (has it been moved?)");
                 return threads::invalid_thread_id;
@@ -751,14 +751,14 @@ namespace hpx { namespace lcos { namespace local {
         {
             if (!task_)
             {
-                HPX_THROWS_IF(ec, task_moved,
+                HPX_THROWS_IF(ec, hpx::error::task_moved,
                     "futures_factory<Result()>::get_future",
                     "futures_factory invalid (has it been moved?)");
                 return hpx::future<Result>();
             }
             if (future_obtained_)
             {
-                HPX_THROWS_IF(ec, future_already_retrieved,
+                HPX_THROWS_IF(ec, hpx::error::future_already_retrieved,
                     "futures_factory<Result()>::get_future",
                     "future already has been retrieved from this factory");
                 return hpx::future<Result>();
@@ -779,7 +779,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             if (!task_)
             {
-                HPX_THROW_EXCEPTION(task_moved,
+                HPX_THROW_EXCEPTION(hpx::error::task_moved,
                     "futures_factory<Result()>::set_exception",
                     "futures_factory invalid (has it been moved?)");
                 return;

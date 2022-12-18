@@ -59,7 +59,7 @@ namespace hpx { namespace threads { namespace detail {
                     // hpx_main.hpp is included but not linked to libhpx_wrap
                     if (!hpx_start::is_linked && hpx_start::include_libhpx_wrap)
                     {
-                        HPX_THROW_EXCEPTION(invalid_status,
+                        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                             "hpx::threads::detail::get_self_or_default_pool",
                             "Attempting to use hpx_main.hpp functionality "
                             "without linking to libhpx_wrap. If you're using "
@@ -71,7 +71,7 @@ namespace hpx { namespace threads { namespace detail {
                             "for library link order and other subtle nuances.");
                     }
 #endif
-                    HPX_THROW_EXCEPTION(invalid_status,
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "hpx::threads::detail::get_self_or_default_pool",
                         "Attempting to register a thread outside the HPX "
                         "runtime and no default pool handler is installed. "

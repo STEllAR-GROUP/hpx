@@ -31,7 +31,7 @@ namespace hpx { namespace threads { namespace detail {
     {
         if (HPX_UNLIKELY(!thrd))
         {
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "threads::detail::set_active_state",
                 "null thread id encountered");
             return thread_result_type(
@@ -74,7 +74,7 @@ namespace hpx { namespace threads { namespace detail {
     {
         if (HPX_UNLIKELY(!thrd))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "threads::detail::set_thread_state",
                 "null thread id encountered");
             return thread_state(
@@ -84,7 +84,7 @@ namespace hpx { namespace threads { namespace detail {
         // set_state can't be used to force a thread into active state
         if (new_state == thread_schedule_state::active)
         {
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "threads::detail::set_thread_state", "invalid new state: {}",
                 new_state);
             return thread_state(
@@ -201,7 +201,7 @@ namespace hpx { namespace threads { namespace detail {
                     // NOLINTNEXTLINE(bugprone-branch-clone)
                     LTM_(fatal) << str;
 
-                    HPX_THROWS_IF(ec, bad_parameter,
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "threads::detail::set_thread_state", str);
                     return thread_state(thread_schedule_state::unknown,
                         thread_restart_state::unknown);

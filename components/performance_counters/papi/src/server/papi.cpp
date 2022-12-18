@@ -71,7 +71,7 @@ namespace hpx { namespace performance_counters { namespace papi {
                 "cannot assign component index to event set", locstr);
             pid_t tid = tm.get_linux_thread_id(tix);
             if (tid == -1)
-                HPX_THROW_EXCEPTION(hpx::bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     NS_STR "thread_counters::thread_counters()",
                     "unable to retrieve correct OS thread ID for profiling "
                     "(perhaps thread was not registered)");
@@ -267,14 +267,14 @@ namespace hpx { namespace performance_counters { namespace papi {
             std::uint32_t tix = util::get_counter_thread(cpe, label);
             if (tix == hpx::util::thread_mapper::invalid_index)
             {
-                HPX_THROW_EXCEPTION(
-                    hpx::no_success, locstr, "could not find thread " + label);
+                HPX_THROW_EXCEPTION(hpx::error::no_success, locstr,
+                    "could not find thread " + label);
             }
             // associate low level counters object
             counters_ = get_thread_counters(tix);
             if (!counters_)
             {
-                HPX_THROW_EXCEPTION(hpx::no_success, locstr,
+                HPX_THROW_EXCEPTION(hpx::error::no_success, locstr,
                     "failed to find low level counters for thread " + label);
             }
             // counting is not enabled here; it has to be started explicitly

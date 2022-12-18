@@ -556,7 +556,8 @@ executed::
         void some_function_with_error(int arg)
         {
             if (arg < 0) {
-                HPX_THROW_EXCEPTION(bad_parameter, "some_function_with_error",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "some_function_with_error",
                     "some really bad error happened");
             }
             // do something else...
@@ -569,7 +570,7 @@ executed::
 
 The use of :c:macro:`HPX_THROW_EXCEPTION` to report the error encapsulates the
 creation of a :cpp:class:`hpx::exception` which is initialized with the error
-code ``hpx::bad_parameter``. Additionally it carries the passed strings, the
+code ``hpx::error::bad_parameter``. Additionally it carries the passed strings, the
 information about the file name, line number, and call stack of the point the
 exception was thrown from.
 

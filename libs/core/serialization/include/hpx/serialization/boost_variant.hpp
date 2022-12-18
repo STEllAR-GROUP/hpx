@@ -91,7 +91,7 @@ namespace hpx { namespace serialization {
         {
             // this might happen if a type was removed from the list of variant
             // types
-            HPX_THROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                 "load<Archive, Variant, version>",
                 "type was removed from the list of variant types");
         }

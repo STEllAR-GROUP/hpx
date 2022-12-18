@@ -59,7 +59,7 @@ namespace hpx::serialization {
             if ((endianness && (endian::native == endian::little)) ||
                 (!endianness && (endian::native == endian::big)))
             {
-                HPX_THROW_EXCEPTION(hpx::bad_request,
+                HPX_THROW_EXCEPTION(hpx::error::bad_request,
                     "hpx::serialization::input_archive::input_archive",
                     "Converting endianness is not supported by the "
                     "serialization library, please reconfigure HPX with "

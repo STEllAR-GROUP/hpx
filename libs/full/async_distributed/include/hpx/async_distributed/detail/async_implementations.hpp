@@ -300,8 +300,8 @@ namespace hpx { namespace detail {
                 launch::deferred, id, HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...);
         }
 
-        HPX_THROW_EXCEPTION(
-            bad_parameter, "async_remote_impl", "unknown launch policy");
+        HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "async_remote_impl",
+            "unknown launch policy");
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -531,8 +531,8 @@ namespace hpx { namespace detail {
             }
             else
             {
-                HPX_THROW_EXCEPTION(
-                    bad_parameter, "async_cb_impl", "unknown launch policy");
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "async_cb_impl",
+                    "unknown launch policy");
                 return f;
             }
         }

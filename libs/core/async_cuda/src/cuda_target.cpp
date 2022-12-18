@@ -28,7 +28,8 @@ namespace hpx { namespace cuda { namespace experimental {
         if (error != cudaSuccess)
         {
             // report error
-            HPX_THROW_EXCEPTION(kernel_error, "cuda::init_processing_unit()",
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error,
+                "cuda::init_processing_unit()",
                 std::string("cudaGetDeviceProperties failed: ") +
                     cudaGetErrorString(error));
         }
@@ -145,7 +146,7 @@ namespace hpx { namespace cuda { namespace experimental {
             cudaError_t error = cudaSetDevice(device_);
             if (error != cudaSuccess)
             {
-                HPX_THROW_EXCEPTION(kernel_error,
+                HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                     "cuda::experimental::target::native_handle::get_stream()",
                     std::string("cudaSetDevice failed: ") +
                         cudaGetErrorString(error));
@@ -153,7 +154,7 @@ namespace hpx { namespace cuda { namespace experimental {
             error = cudaStreamCreateWithFlags(&stream_, cudaStreamNonBlocking);
             if (error != cudaSuccess)
             {
-                HPX_THROW_EXCEPTION(kernel_error,
+                HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                     "cuda::experimental::target::native_handle::get_stream()",
                     std::string("cudaStreamCreate failed: ") +
                         cudaGetErrorString(error));
@@ -169,7 +170,7 @@ namespace hpx { namespace cuda { namespace experimental {
 
         if (stream == 0)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "cuda::experimental::target::synchronize",
                 "no stream available");
         }
@@ -177,7 +178,7 @@ namespace hpx { namespace cuda { namespace experimental {
         cudaError_t error = cudaStreamSynchronize(stream);
         if (error != cudaSuccess)
         {
-            HPX_THROW_EXCEPTION(kernel_error,
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "cuda::experimental::target::synchronize",
                 std::string("cudaStreamSynchronize failed: ") +
                     cudaGetErrorString(error));

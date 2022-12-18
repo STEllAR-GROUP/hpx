@@ -60,7 +60,7 @@ namespace hpx { namespace serialization { namespace detail {
 
         if (!p.second)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "polymorphic_id_factory::register_typename",
                 "failed to insert {} into typename_to_id_t registry",
                 type_name);
@@ -140,7 +140,7 @@ namespace hpx { namespace serialization { namespace detail {
 
         if (id == id_registry::invalid_id)
         {
-            HPX_THROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                 "polymorphic_id_factory::get_id", "Unknown typename: {}",
                 type_name);
         }

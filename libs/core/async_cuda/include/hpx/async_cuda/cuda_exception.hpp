@@ -21,7 +21,7 @@ namespace hpx { namespace cuda { namespace experimental {
     struct cuda_exception : hpx::exception
     {
         cuda_exception(const std::string& msg, cudaError_t err)
-          : hpx::exception(hpx::bad_function_call, msg)
+          : hpx::exception(hpx::error::bad_function_call, msg)
           , err_(err)
         {
         }

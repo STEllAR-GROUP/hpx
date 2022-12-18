@@ -89,7 +89,7 @@ namespace test {
             {
                 if (is_thread_in(thrd))
                 {
-                    HPX_THROW_EXCEPTION(hpx::thread_resource_error,
+                    HPX_THROW_EXCEPTION(hpx::error::thread_resource_error,
                         "thread_group::add_thread",
                         "resource_deadlock_would_occur: trying to add a "
                         "duplicated thread");
@@ -115,7 +115,7 @@ namespace test {
         {
             if (is_this_thread_in())
             {
-                HPX_THROW_EXCEPTION(hpx::thread_resource_error,
+                HPX_THROW_EXCEPTION(hpx::error::thread_resource_error,
                     "thread_group::join_all",
                     "resource_deadlock_would_occur: trying joining itself");
                 return;

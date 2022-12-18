@@ -22,6 +22,7 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <type_traits>
 
 namespace hpx::lockfree::detail {
@@ -73,14 +74,14 @@ namespace hpx::lockfree::detail {
         void destruct(tagged_node_handle const& tagged_ptr) noexcept
         {
             T* n = tagged_ptr.get_ptr();
-            n->~T();
+            std::destroy_at(n);
             deallocate<ThreadSafe>(n);
         }
 
         template <bool ThreadSafe>
         void destruct(T* n) noexcept
         {
-            n->~T();
+            std::destroy_at(n);
             deallocate<ThreadSafe>(n);
         }
 
@@ -375,7 +376,7 @@ namespace hpx::lockfree::detail {
         {
             if (count > 65535)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "runtime_sized_freelist_storage::runtime_sized_freelist_"
                     "storage",
                     "hpx::concurrency: freelist size is limited to a maximum "
@@ -457,14 +458,14 @@ namespace hpx::lockfree::detail {
         {
             index_t index = tagged_index.get_index();
             T* n = NodeStorage::nodes() + index;
-            n->~T();
+            std::destroy_at(n);
             deallocate<ThreadSafe>(index);
         }
 
         template <bool ThreadSafe>
         void destruct(T* n)
         {
-            n->~T();
+            std::destroy_at(n);
             deallocate<ThreadSafe>(
                 static_cast<index_t>(n - NodeStorage::nodes()));
         }

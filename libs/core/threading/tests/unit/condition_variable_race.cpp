@@ -17,6 +17,7 @@
 #include <atomic>
 #include <cstdlib>
 #include <cstring>
+#include <memory>
 #include <mutex>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -160,7 +161,7 @@ void test_cv_mutex()
         std::unique_lock<hpx::mutex> ul{m};
         f_ready = true;
         cv->notify_one();
-        cv->~condition_variable();
+        std::destroy_at(cv);
         // NOLINTNEXTLINE(bugprone-undefined-memory-manipulation)
         std::memset(
             (void*) cv, 0x55, sizeof(*cv));    // UB but OK to ensure the check
@@ -203,7 +204,7 @@ void test_cv_any_mutex()
         std::unique_lock<hpx::mutex> ul{m};
         f_ready = true;
         cv->notify_one();
-        cv->~condition_variable_any();
+        std::destroy_at(cv);
         // NOLINTNEXTLINE(bugprone-undefined-memory-manipulation)
         std::memset(
             (void*) cv, 0x55, sizeof(*cv));    // UB but OK to ensure the check

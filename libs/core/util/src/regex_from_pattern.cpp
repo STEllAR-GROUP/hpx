@@ -25,7 +25,8 @@ namespace hpx { namespace util {
             }
             else if (*it == ']')
             {
-                HPX_THROWS_IF(ec, bad_parameter, "regex_from_character_set",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "regex_from_character_set",
                     "Invalid pattern (empty character set) at: " +
                         std::string(start, end));
                 return "";
@@ -45,7 +46,8 @@ namespace hpx { namespace util {
 
             if (it == end || *it != ']')
             {
-                HPX_THROWS_IF(ec, bad_parameter, "regex_from_character_set",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "regex_from_character_set",
                     "Invalid pattern (missing closing ']') at: " +
                         std::string(start, end));
                 return "";
@@ -84,7 +86,8 @@ namespace hpx { namespace util {
             case '\\':
                 if (++it == end)
                 {
-                    HPX_THROWS_IF(ec, bad_parameter, "regex_from_pattern",
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                        "regex_from_pattern",
                         "Invalid escape sequence at: " + pattern);
                     return "";
                 }

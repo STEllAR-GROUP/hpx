@@ -198,7 +198,7 @@ namespace hpx::parcelset {
                             (naming::get_locality_id_from_gid(
                                  p.destination_locality()) != here))
                         {
-                            HPX_THROW_EXCEPTION(invalid_status,
+                            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                                 "hpx::parcelset::decode_message",
                                 "parcel destination does not match locality "
                                 "which received the parcel ({}), {}",
@@ -307,7 +307,7 @@ namespace hpx::parcelset {
                 // serialization library as otherwise we will loose the
                 // e.what() description of the problem, due to slicing.
                 hpx::throw_with_info(
-                    hpx::exception(serialization_error, e.what()));
+                    hpx::exception(hpx::error::serialization_error, e.what()));
             }
         }
         catch (...)

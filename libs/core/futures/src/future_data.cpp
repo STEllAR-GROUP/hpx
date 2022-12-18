@@ -124,7 +124,8 @@ namespace hpx { namespace lcos { namespace detail {
         if (s == empty)
         {
             // the value has already been moved out of this future
-            HPX_THROWS_IF(ec, no_state, "future_data_base::get_result",
+            HPX_THROWS_IF(ec, hpx::error::no_state,
+                "future_data_base::get_result",
                 "this future has no valid shared state");
             return nullptr;
         }

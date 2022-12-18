@@ -94,7 +94,7 @@ namespace hpx { namespace iostreams {
     {
         if (!agas::is_console())
         {
-            HPX_THROW_EXCEPTION(service_unavailable,
+            HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
                 "hpx::iostreams::create_cout",
                 "this function should be called on the console only");
         }
@@ -105,7 +105,7 @@ namespace hpx { namespace iostreams {
     {
         if (!agas::is_console())
         {
-            HPX_THROW_EXCEPTION(service_unavailable,
+            HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
                 "hpx::iostreams::create_cerr",
                 "this function should be called on the console only");
         }
@@ -116,7 +116,7 @@ namespace hpx { namespace iostreams {
     {
         if (!agas::is_console())
         {
-            HPX_THROW_EXCEPTION(service_unavailable,
+            HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
                 "hpx::iostreams::create_consolestream",
                 "this function should be called on the console only");
         }
@@ -127,7 +127,7 @@ namespace hpx { namespace iostreams {
     {
         if (get_runtime_ptr() != nullptr && !agas::is_console())
         {
-            HPX_THROW_EXCEPTION(service_unavailable,
+            HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
                 "hpx::iostreams::get_consolestream",
                 "this function should be called on the console only");
         }

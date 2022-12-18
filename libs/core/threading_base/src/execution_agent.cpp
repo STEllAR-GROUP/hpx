@@ -44,7 +44,8 @@ namespace hpx { namespace threads {
         thread_id_type id = self_.get_thread_id();
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROW_EXCEPTION(null_thread_id, "execution_agent::description",
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
+                "execution_agent::description",
                 "null thread id encountered (is this executed on a "
                 "HPX-thread?)");
         }
@@ -151,7 +152,8 @@ namespace hpx { namespace threads {
         thread_id_ref_type id = self_.get_thread_id();    // keep alive
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROW_EXCEPTION(null_thread_id, "execution_agent::do_yield",
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
+                "execution_agent::do_yield",
                 "null thread id encountered (is this executed on a "
                 "HPX-thread?)");
         }
@@ -193,7 +195,7 @@ namespace hpx { namespace threads {
         // handle interrupt and abort
         if (statex == threads::thread_restart_state::abort)
         {
-            HPX_THROW_EXCEPTION(yield_aborted, desc,
+            HPX_THROW_EXCEPTION(hpx::error::yield_aborted, desc,
                 "thread({}) aborted (yield returned wait_abort)",
                 description());
         }

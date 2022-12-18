@@ -26,7 +26,7 @@ namespace hpx { namespace serialization { namespace detail {
     {
         if (name.empty())
         {
-            HPX_THROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                 "polymorphic_intrusive_factory::register_class",
                 "Cannot register a factory with an empty name");
         }

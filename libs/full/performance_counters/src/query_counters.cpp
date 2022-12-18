@@ -452,7 +452,8 @@ namespace hpx { namespace util {
         if (counters_.size() == 0)
         {
             // start has not been called yet
-            HPX_THROWS_IF(ec, invalid_status, "query_counters::start_counters",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "query_counters::start_counters",
                 "The counters to be evaluated have not been initialized yet");
             return;
         }
@@ -466,7 +467,8 @@ namespace hpx { namespace util {
         if (counters_.size() == 0)
         {
             // start has not been called yet
-            HPX_THROWS_IF(ec, invalid_status, "query_counters::stop_counters",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "query_counters::stop_counters",
                 "The counters to be evaluated have not been initialized yet");
             return;
         }
@@ -480,7 +482,8 @@ namespace hpx { namespace util {
         if (counters_.size() == 0)
         {
             // start has not been called yet
-            HPX_THROWS_IF(ec, invalid_status, "query_counters::reset_counters",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "query_counters::reset_counters",
                 "The counters to be evaluated have not been initialized yet");
             return;
         }
@@ -494,7 +497,8 @@ namespace hpx { namespace util {
         if (counters_.size() == 0)
         {
             // start has not been called yet
-            HPX_THROWS_IF(ec, invalid_status, "query_counters::reinit_counters",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "query_counters::reinit_counters",
                 "The counters to be evaluated have not been initialized yet");
             return;
         }
@@ -642,7 +646,8 @@ namespace hpx { namespace util {
         if (counters_.size() == 0)
         {
             // start has not been called yet
-            HPX_THROWS_IF(ec, invalid_status, "query_counters::evaluate",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "query_counters::evaluate",
                 "The counters to be evaluated have not been initialized yet");
             return false;
         }

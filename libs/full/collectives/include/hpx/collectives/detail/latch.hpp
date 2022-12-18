@@ -123,8 +123,8 @@ namespace hpx { namespace lcos { namespace server {
             catch (std::exception const& e)
             {
                 // rethrow again, but this time using the native hpx mechanics
-                HPX_THROW_EXCEPTION(hpx::no_success, "latch::set_exception",
-                    hpx::diagnostic_information(e));
+                HPX_THROW_EXCEPTION(hpx::error::no_success,
+                    "latch::set_exception", hpx::diagnostic_information(e));
             }
         }
 

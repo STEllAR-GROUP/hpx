@@ -118,13 +118,13 @@ namespace hpx::serialization::detail {
         {
             if (!typeinfo.name() && std::string(typeinfo.name()).empty())
             {
-                HPX_THROW_EXCEPTION(serialization_error,
+                HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                     "polymorphic_nonintrusive_factory::register_class",
                     "Cannot register a factory with an empty type name");
             }
             if (class_name.empty())
             {
-                HPX_THROW_EXCEPTION(serialization_error,
+                HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                     "polymorphic_nonintrusive_factory::register_class",
                     "Cannot register a factory with an empty name");
             }

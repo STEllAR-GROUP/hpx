@@ -176,7 +176,8 @@ namespace hpx { namespace threads {
         tid = syscall(SYS_gettid);
         if (setpriority(PRIO_PROCESS, tid, 19))
         {
-            HPX_THROWS_IF(ec, no_success, "topology::reduce_thread_priority",
+            HPX_THROWS_IF(ec, hpx::error::no_success,
+                "topology::reduce_thread_priority",
                 "setpriority returned an error");
             return false;
         }
@@ -184,7 +185,8 @@ namespace hpx { namespace threads {
 
         if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST))
         {
-            HPX_THROWS_IF(ec, no_success, "topology::reduce_thread_priority",
+            HPX_THROWS_IF(ec, hpx::error::no_success,
+                "topology::reduce_thread_priority",
                 "SetThreadPriority returned an error");
             return false;
         }
@@ -210,7 +212,7 @@ namespace hpx { namespace threads {
         int err = hwloc_topology_init(&topo);
         if (err != 0)
         {
-            HPX_THROW_EXCEPTION(no_success, "topology::topology",
+            HPX_THROW_EXCEPTION(hpx::error::no_success, "topology::topology",
                 "Failed to init hwloc topology");
         }
 
@@ -223,7 +225,7 @@ namespace hpx { namespace threads {
             topo, HWLOC_OBJ_CORE, HWLOC_TYPE_FILTER_KEEP_NONE);
         if (err != 0)
         {
-            HPX_THROW_EXCEPTION(no_success, "topology::topology",
+            HPX_THROW_EXCEPTION(hpx::error::no_success, "topology::topology",
                 "Failed to set core filter for hwloc topology");
         }
 #endif
@@ -232,7 +234,7 @@ namespace hpx { namespace threads {
         err = hwloc_topology_load(topo);
         if (err != 0)
         {
-            HPX_THROW_EXCEPTION(no_success, "topology::topology",
+            HPX_THROW_EXCEPTION(hpx::error::no_success, "topology::topology",
                 "Failed to load hwloc topology");
         }
 
@@ -366,7 +368,7 @@ namespace hpx { namespace threads {
             num_cores = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
             if (num_cores <= 0)
             {
-                HPX_THROWS_IF(ec, no_success,
+                HPX_THROWS_IF(ec, hpx::error::no_success,
                     "topology::hwloc_get_nobjs_by_type",
                     "Failed to get number of cores");
                 return std::size_t(-1);
@@ -413,7 +415,7 @@ namespace hpx { namespace threads {
             return socket_affinity_masks_[num_pu];
         }
 
-        HPX_THROWS_IF(ec, bad_parameter,
+        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
             "hpx::threads::topology::get_socket_affinity_mask",
             "thread number {1} is out of range", num_thread);
         return empty_mask;
@@ -432,7 +434,7 @@ namespace hpx { namespace threads {
             return numa_node_affinity_masks_[num_pu];
         }
 
-        HPX_THROWS_IF(ec, bad_parameter,
+        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
             "hpx::threads::topology::get_numa_node_affinity_mask",
             "thread number {1} is out of range", num_thread);
         return empty_mask;
@@ -451,7 +453,7 @@ namespace hpx { namespace threads {
             return core_affinity_masks_[num_pu];
         }
 
-        HPX_THROWS_IF(ec, bad_parameter,
+        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
             "hpx::threads::topology::get_core_affinity_mask",
             "thread number {1} is out of range", num_thread);
         return empty_mask;
@@ -470,7 +472,7 @@ namespace hpx { namespace threads {
             return thread_affinity_masks_[num_pu];
         }
 
-        HPX_THROWS_IF(ec, bad_parameter,
+        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
             "hpx::threads::topology::get_thread_affinity_mask",
             "thread number {1} is out of range", num_thread);
         return empty_mask;
@@ -512,7 +514,7 @@ namespace hpx { namespace threads {
                     hwloc_bitmap_snprintf(buffer.get(), 1024, cpuset);
                     hwloc_bitmap_free(cpuset);
 
-                    HPX_THROWS_IF(ec, kernel_error,
+                    HPX_THROWS_IF(ec, hpx::error::kernel_error,
                         "hpx::threads::topology::set_thread_affinity_mask",
                         "failed to set thread affinity mask ({}) for cpuset {}",
                         hpx::threads::to_string(mask), buffer.get());
@@ -584,7 +586,7 @@ namespace hpx { namespace threads {
                 std::string errstr = std::strerror(errno);
 
                 lk.unlock();
-                HPX_THROW_EXCEPTION(no_success,
+                HPX_THROW_EXCEPTION(hpx::error::no_success,
                     "topology::get_thread_affinity_mask_from_lva",
                     "failed calling 'hwloc_get_area_membind_nodeset', "
                     "reported error: {}",
@@ -732,7 +734,7 @@ namespace hpx { namespace threads {
         int nobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_SOCKET);
         if (0 > nobjs)
         {
-            HPX_THROW_EXCEPTION(kernel_error,
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::get_number_of_sockets",
                 "hwloc_get_nbobjs_by_type failed");
             return std::size_t(nobjs);
@@ -745,7 +747,7 @@ namespace hpx { namespace threads {
         int nobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NUMANODE);
         if (0 > nobjs)
         {
-            HPX_THROW_EXCEPTION(kernel_error,
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::get_number_of_numa_nodes",
                 "hwloc_get_nbobjs_by_type failed");
             return std::size_t(nobjs);
@@ -760,7 +762,7 @@ namespace hpx { namespace threads {
         // If num_cores is smaller 0, we have an error
         if (0 > nobjs)
         {
-            HPX_THROW_EXCEPTION(kernel_error,
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::get_number_of_cores",
                 "hwloc_get_nbobjs_by_type(HWLOC_OBJ_CORE) failed");
             return std::size_t(nobjs);
@@ -772,7 +774,7 @@ namespace hpx { namespace threads {
             nobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
             if (0 > nobjs)
             {
-                HPX_THROW_EXCEPTION(kernel_error,
+                HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                     "hpx::threads::topology::get_number_of_cores",
                     "hwloc_get_nbobjs_by_type(HWLOC_OBJ_PU) failed");
                 return std::size_t(nobjs);
@@ -783,7 +785,7 @@ namespace hpx { namespace threads {
         // avoid division by zero, we should always have at least one core
         if (0 == nobjs)
         {
-            HPX_THROW_EXCEPTION(kernel_error,
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::get_number_of_cores",
                 "hwloc_get_nbobjs_by_type reports zero cores/pus");
             return std::size_t(nobjs);
@@ -965,7 +967,7 @@ namespace hpx { namespace threads {
                 hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU, unsigned(i));
             if (!obj)
             {
-                HPX_THROW_EXCEPTION(kernel_error,
+                HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                     "hpx::threads::topology::print_affinity_mask",
                     "object not found");
                 return;
@@ -1014,7 +1016,7 @@ namespace hpx { namespace threads {
             return machine_affinity_mask;
         }
 
-        HPX_THROW_EXCEPTION(kernel_error,
+        HPX_THROW_EXCEPTION(hpx::error::kernel_error,
             "hpx::threads::topology::init_machine_affinity_mask",
             "failed to initialize machine affinity mask");
         return empty_mask;
@@ -1159,7 +1161,7 @@ namespace hpx { namespace threads {
             // core
             if (num_cores <= 0)
             {
-                HPX_THROW_EXCEPTION(kernel_error,
+                HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                     "hpx::threads::topology::init_thread_affinity_mask",
                     "hwloc_get_nbobjs_by_type failed");
                 return empty_mask;
@@ -1235,7 +1237,7 @@ namespace hpx { namespace threads {
             if (hwloc_get_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
             {
                 hwloc_bitmap_free(cpuset);
-                HPX_THROWS_IF(ec, kernel_error,
+                HPX_THROWS_IF(ec, hpx::error::kernel_error,
                     "hpx::threads::topology::get_cpubind_mask",
                     "hwloc_get_cpubind failed");
                 return empty_mask;
@@ -1282,7 +1284,7 @@ namespace hpx { namespace threads {
 #endif
             {
                 hwloc_bitmap_free(cpuset);
-                HPX_THROWS_IF(ec, kernel_error,
+                HPX_THROWS_IF(ec, hpx::error::kernel_error,
                     "hpx::threads::topology::get_cpubind_mask",
                     "hwloc_get_cpubind failed");
                 return empty_mask;
@@ -1355,7 +1357,7 @@ namespace hpx { namespace threads {
                 msg = "the action is not supported";
             if (errno == EXDEV)
                 msg = "the binding cannot be enforced";
-            HPX_THROW_EXCEPTION(kernel_error,
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::set_area_membind_nodeset",
                 "hwloc_set_area_membind_nodeset failed : {}", msg);
             return false;
@@ -1401,7 +1403,7 @@ namespace hpx { namespace threads {
 #endif
             == -1)
         {
-            HPX_THROW_EXCEPTION(kernel_error,
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::get_area_membind_nodeset",
                 "hwloc_get_area_membind_nodeset failed");
             return bitmap_to_mask(ns, HWLOC_OBJ_MACHINE);
@@ -1432,7 +1434,7 @@ namespace hpx { namespace threads {
             return 0;
 #else
             std::string msg(strerror(errno));
-            HPX_THROW_EXCEPTION(kernel_error,
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::get_numa_domain",
                 "hwloc_get_area_memlocation failed {}", msg);
             return -1;
@@ -1461,7 +1463,8 @@ namespace hpx { namespace threads {
 
         if (pu_obj == nullptr)
         {
-            HPX_THROW_EXCEPTION(no_success, "topology::get_core_obj",
+            HPX_THROW_EXCEPTION(hpx::error::no_success,
+                "topology::get_core_obj",
                 "Couldn't find required object representing the given core in "
                 "topology");
         }

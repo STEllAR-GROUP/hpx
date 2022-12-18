@@ -226,7 +226,7 @@ namespace hpx { namespace agas {
                 if (!res.second)
                 {
                     l.unlock();
-                    HPX_THROWS_IF(ec, bad_parameter,
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "addressing_service::register_locality",
                         "locality insertion failed because of a duplicate");
                     return false;
@@ -291,7 +291,7 @@ namespace hpx { namespace agas {
 
                     l.unlock();
 
-                    HPX_THROWS_IF(ec, bad_parameter,
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "addressing_service::resolve_locality", str);
                     return resolved_localities_[naming::invalid_gid];
                 }
@@ -308,7 +308,7 @@ namespace hpx { namespace agas {
                 {
                     l.unlock();
 
-                    HPX_THROWS_IF(ec, internal_server_error,
+                    HPX_THROWS_IF(ec, hpx::error::internal_server_error,
                         "addressing_service::resolve_locality",
                         "resolved locality insertion failed "
                         "due to a locking error or memory corruption");
@@ -1009,7 +1009,7 @@ namespace hpx { namespace agas {
     {
         if (!gid)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::resolve_async", "invalid reference id");
             return make_ready_future(naming::address());
         }
@@ -1038,7 +1038,7 @@ namespace hpx { namespace agas {
     {
         if (!id)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::get_colocation_id_async",
                 "invalid reference id");
             return make_ready_future(hpx::invalid_id);
@@ -1059,7 +1059,7 @@ namespace hpx { namespace agas {
         if (get<0>(rep) == naming::invalid_gid ||
             get<2>(rep) == naming::invalid_gid)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::resolve_full_postproc",
                 "could no resolve global id");
             return addr;
@@ -1098,7 +1098,7 @@ namespace hpx { namespace agas {
     {
         if (!gid)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::resolve_full_async",
                 "invalid reference id");
             return make_ready_future(naming::address());
@@ -1275,7 +1275,7 @@ namespace hpx { namespace agas {
 
         if (HPX_UNLIKELY(0 >= credit))
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::incref_async",
                 "invalid credit count of {1}", credit);
             return hpx::future<std::int64_t>();
@@ -1386,8 +1386,9 @@ namespace hpx { namespace agas {
 
         if (HPX_UNLIKELY(credit <= 0))
         {
-            HPX_THROWS_IF(ec, bad_parameter, "addressing_service::decref",
-                "invalid credit count of {1}", credit);
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "addressing_service::decref", "invalid credit count of {1}",
+                credit);
             return;
         }
 
@@ -1413,7 +1414,7 @@ namespace hpx { namespace agas {
                 {
                     l.unlock();
 
-                    HPX_THROWS_IF(ec, bad_parameter,
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "addressing_service::decref",
                         "couldn't insert decref request for {1} ({2})", raw,
                         credit);
@@ -1549,7 +1550,7 @@ namespace hpx { namespace agas {
         {
             if (!f.get())
             {
-                HPX_THROW_EXCEPTION(bad_request,
+                HPX_THROW_EXCEPTION(hpx::error::bad_request,
                     "hpx::agas::detail::on_register_event",
                     "request 'symbol_ns_on_event' failed");
                 return hpx::future<hpx::id_type>();
@@ -1665,7 +1666,7 @@ namespace hpx { namespace agas {
                         {
                             // This is impossible under sane conditions.
                             lock.unlock();
-                            HPX_THROWS_IF(ec, invalid_data,
+                            HPX_THROWS_IF(ec, hpx::error::invalid_data,
                                 "addressing_service::update_cache_entry",
                                 "data corruption or lock error occurred in "
                                 "cache");
@@ -1711,7 +1712,7 @@ namespace hpx { namespace agas {
             if (HPX_UNLIKELY(id_msb != idbase_key.get_gid().get_msb()))
             {
                 lock.unlock();
-                HPX_THROWS_IF(ec, internal_server_error,
+                HPX_THROWS_IF(ec, hpx::error::internal_server_error,
                     "addressing_service::get_cache_entry",
                     "bad entry in cache, MSBs of GID base and GID do not "
                     "match");
@@ -1929,7 +1930,7 @@ namespace hpx { namespace agas {
     {
         if (!l.owns_lock())
         {
-            HPX_THROWS_IF(ec, lock_error,
+            HPX_THROWS_IF(ec, hpx::error::lock_error,
                 "addressing_service::send_refcnt_requests",
                 "mutex is not locked");
             return;
@@ -2134,9 +2135,10 @@ namespace hpx { namespace agas {
         HPX_UNUSED(expect_to_be_marked_as_migrating);
         if (!gid_)
         {
-            return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
-                bad_parameter, "addressing_service::mark_as_migrated",
-                "invalid reference gid"));
+            return hpx::make_exceptional_future<void>(
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                    "addressing_service::mark_as_migrated",
+                    "invalid reference gid"));
         }
 
         HPX_ASSERT(naming::detail::is_migratable(gid_));
@@ -2194,7 +2196,7 @@ namespace hpx { namespace agas {
     {
         if (!gid_)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::unmark_as_migrated",
                 "invalid reference gid");
             return;
@@ -2231,7 +2233,7 @@ namespace hpx { namespace agas {
     {
         if (!id)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::begin_migration", "invalid reference id");
         }
 
@@ -2246,7 +2248,7 @@ namespace hpx { namespace agas {
     {
         if (!id)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::end_migration", "invalid reference id");
         }
 
@@ -2273,7 +2275,7 @@ namespace hpx { namespace agas {
     {
         if (!gid)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "addressing_service::was_object_migrated",
                 "invalid reference gid");
             return std::make_pair(false, components::pinned_ptr());

@@ -109,8 +109,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         cudaEvent_t event;
         if (!cuda_event_pool::get_event_pool().pop(event))
         {
-            HPX_THROW_EXCEPTION(
-                invalid_status, "add_event_callback", "could not get an event");
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "add_event_callback", "could not get an event");
         }
         check_cuda_error(cudaEventRecord(event, stream));
 

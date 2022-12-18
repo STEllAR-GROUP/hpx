@@ -134,7 +134,7 @@ namespace hpx::plugins::compression {
         std::size_t s = load_impl(buffer_.data(), buffer_size, buffer, size);
         if (s > size)
         {
-            HPX_THROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                 "bzip2_serialization_filter::load",
                 hpx::util::format(
                     "decompression failure, number of "
@@ -151,7 +151,7 @@ namespace hpx::plugins::compression {
     {
         if (current_ + dst_count > buffer_.size())
         {
-            HPX_THROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                 "bzip2_serialization_filter::load",
                 "archive data bstream is too short");
             return;

@@ -10,11 +10,11 @@
 
 #include <vector>
 
-namespace hpx { namespace components { namespace server
-{
+namespace hpx { namespace components { namespace server {
     component_storage::component_storage()
       : data_(container_layout(find_all_localities()))
-    {}
+    {
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     naming::gid_type component_storage::migrate_to_here(
@@ -26,16 +26,16 @@ namespace hpx { namespace components { namespace server
 
         // rebind the object to this storage locality
         naming::address addr(current_lva);
-        addr.address_ = nullptr;       // invalidate lva
+        addr.address_ = nullptr;    // invalidate lva
         if (!agas::bind(launch::sync, gid, addr, this->gid_))
         {
-            HPX_THROW_EXCEPTION(duplicate_component_address,
+            HPX_THROW_EXCEPTION(hpx::error::duplicate_component_address,
                 "component_storage::migrate_to_here",
                 "failed to rebind id {} to storage locality: {}", id, gid_);
             return naming::invalid_gid;
         }
 
-        id.make_unmanaged();            // we can now release the object
+        id.make_unmanaged();    // we can now release the object
         return naming::invalid_gid;
     }
 
@@ -43,9 +43,10 @@ namespace hpx { namespace components { namespace server
         naming::gid_type const& id)
     {
         // return the stored data and erase it from the map
-        return data_.get_value(launch::sync,
-            naming::detail::get_stripped_gid(id), true);
+        return data_.get_value(
+            launch::sync, naming::detail::get_stripped_gid(id), true);
     }
-}}}
+}}}    // namespace hpx::components::server
 
-HPX_REGISTER_UNORDERED_MAP(hpx::naming::gid_type, hpx_component_storage_data_type)
+HPX_REGISTER_UNORDERED_MAP(
+    hpx::naming::gid_type, hpx_component_storage_data_type)
