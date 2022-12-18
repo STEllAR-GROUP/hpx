@@ -27,8 +27,9 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util { namespace detail {
-    static const std::size_t function_storage_size = 3 * sizeof(void*);
+namespace hpx::util::detail {
+
+    inline constexpr std::size_t function_storage_size = 3 * sizeof(void*);
 
     ///////////////////////////////////////////////////////////////////////////
     class HPX_CORE_EXPORT function_base
@@ -36,7 +37,7 @@ namespace hpx { namespace util { namespace detail {
         using vtable = function_base_vtable;
 
     public:
-        constexpr explicit function_base(
+        explicit constexpr function_base(
             function_base_vtable const* empty_vptr) noexcept
           : vptr(empty_vptr)
           , object(nullptr)
@@ -56,12 +57,12 @@ namespace hpx { namespace util { namespace detail {
         void reset(vtable const* empty_vptr) noexcept;
         void swap(function_base& f) noexcept;
 
-        bool empty() const noexcept
+        constexpr bool empty() const noexcept
         {
             return object == nullptr;
         }
 
-        explicit operator bool() const noexcept
+        explicit constexpr operator bool() const noexcept
         {
             return !empty();
         }
@@ -93,7 +94,8 @@ namespace hpx { namespace util { namespace detail {
         return mp == nullptr;
     }
 
-    inline bool is_empty_function_impl(function_base const* f) noexcept
+    inline constexpr bool is_empty_function_impl(
+        function_base const* f) noexcept
     {
         return f->empty();
     }
@@ -156,9 +158,8 @@ namespace hpx { namespace util { namespace detail {
         template <typename F>
         void assign(F&& f)
         {
-            using T = typename std::decay<F>::type;
-            static_assert(
-                !Copyable || std::is_constructible<T, T const&>::value,
+            using T = std::decay_t<F>;
+            static_assert(!Copyable || std::is_constructible_v<T, T const&>,
                 "F shall be CopyConstructible");
 
             if (!detail::is_empty_function(f))
@@ -168,6 +169,7 @@ namespace hpx { namespace util { namespace detail {
                 if (vptr == f_vptr)
                 {
                     HPX_ASSERT(object != nullptr);
+
                     // reuse object storage
                     buffer = object;
                     std::destroy_at(
@@ -201,8 +203,8 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         T* target() noexcept
         {
-            using TD = typename std::remove_cv<T>::type;
-            static_assert(is_invocable_r_v<R, TD&, Ts...>,
+            using TD = std::remove_cv_t<T>;
+            static_assert(hpx::is_invocable_r_v<R, TD&, Ts...>,
                 "T shall be Callable with the function signature");
 
             vtable const* f_vptr = get_vtable<TD>();
@@ -215,8 +217,8 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         T const* target() const noexcept
         {
-            using TD = typename std::remove_cv<T>::type;
-            static_assert(is_invocable_r_v<R, TD&, Ts...>,
+            using TD = std::remove_cv_t<T>;
+            static_assert(hpx::is_invocable_r_v<R, TD&, Ts...>,
                 "T shall be Callable with the function signature");
 
             vtable const* f_vptr = get_vtable<TD>();
@@ -243,7 +245,7 @@ namespace hpx { namespace util { namespace detail {
         }
 
         template <typename T>
-        static vtable const* get_vtable() noexcept
+        static constexpr vtable const* get_vtable() noexcept
         {
             return detail::get_vtable<vtable, T>();
         }
@@ -253,4 +255,4 @@ namespace hpx { namespace util { namespace detail {
         using base_type::storage;
         using base_type::vptr;
     };
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

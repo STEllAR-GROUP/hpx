@@ -22,7 +22,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // Helper class to gain access to the implementation functions in the
@@ -697,4 +697,4 @@ namespace hpx { namespace util {
         Derived tmp(static_cast<Derived const&>(it));
         return tmp += n;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,15 +20,14 @@ namespace hpx { namespace plugins {
     /// plugin registries.
     struct HPX_CORE_EXPORT plugin_registry_base
     {
-        virtual ~plugin_registry_base() {}
+        virtual ~plugin_registry_base() = default;
 
         /// Return the configuration information for any plugin implemented by
         /// this module
         ///
         /// \param fillini  [in, out] The module is expected to fill this vector
         ///                 with the ini-information (one line per vector
-        ///                 element) for all plugins implemented in this
-        ///                 module.
+        ///                 element) for all plugins implemented in this module.
         ///
         /// \return Returns \a true if the parameter \a fillini has been
         ///         successfully initialized with the registry data of all
@@ -42,7 +41,7 @@ namespace hpx { namespace plugins {
     };
 }}    // namespace hpx::plugins
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /// This macro is used to register the given component factory with
 /// Hpx.Plugin. This macro has to be used for each of the components.
 #define HPX_REGISTER_PLUGIN_BASE_REGISTRY(PluginType, name)                    \

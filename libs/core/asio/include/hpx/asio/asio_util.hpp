@@ -23,7 +23,7 @@
 #undef VT1
 #undef VT2
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT bool get_endpoint(std::string const& addr,
@@ -87,12 +87,12 @@ namespace hpx { namespace util {
     {
         return endpoint_iterator_type();
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
     HPX_CORE_EXPORT bool split_ip_address(
         std::string const& v, std::string& host, std::uint16_t& port);
-}}    // namespace hpx::util
+}    // namespace hpx::util

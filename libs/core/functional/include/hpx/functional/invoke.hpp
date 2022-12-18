@@ -35,9 +35,9 @@ namespace hpx {
     ///
     /// \note This function is similar to `std::invoke` (C++17)
     template <typename F, typename... Ts>
-    constexpr HPX_HOST_DEVICE typename util::invoke_result<F, Ts...>::type
-    invoke(F&& f, Ts&&... vs) noexcept(
-        noexcept(HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...)))
+    constexpr HPX_HOST_DEVICE util::invoke_result_t<F, Ts&&...> invoke(
+        F&& f, Ts&&... vs) noexcept(noexcept(HPX_INVOKE(HPX_FORWARD(F, f),
+        HPX_FORWARD(Ts, vs)...)))
     {
         return HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
     }
@@ -45,8 +45,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// \copydoc invoke
     ///
-    /// \tparam R The result type of the function when it's called
-    ///           with the content of the given argument types vs.
+    /// \tparam R The result type of the function when it's called with the
+    ///           content of the given argument types vs.
     template <typename R, typename F, typename... Ts>
     constexpr HPX_HOST_DEVICE R invoke_r(F&& f, Ts&&... vs) noexcept(
         noexcept(HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...)))
@@ -60,10 +60,9 @@ namespace hpx {
         struct invoke
         {
             template <typename F, typename... Ts>
-            constexpr HPX_HOST_DEVICE
-                typename util::invoke_result<F, Ts...>::type
-                operator()(F&& f, Ts&&... vs) const noexcept(noexcept(
-                    HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...)))
+            constexpr HPX_HOST_DEVICE util::invoke_result_t<F, Ts&&...>
+            operator()(F&& f, Ts&&... vs) const noexcept(
+                noexcept(HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...)))
             {
                 return HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
             }

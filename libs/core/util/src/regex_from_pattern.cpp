@@ -10,8 +10,10 @@
 
 #include <string>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         inline std::string regex_from_character_set(
             std::string::const_iterator& it, std::string::const_iterator end,
@@ -27,8 +29,8 @@ namespace hpx { namespace util {
             {
                 HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "regex_from_character_set",
-                    "Invalid pattern (empty character set) at: " +
-                        std::string(start, end));
+                    "Invalid pattern (empty character set) at: {}",
+                    std::string(start, end));
                 return "";
             }
             else
@@ -48,8 +50,8 @@ namespace hpx { namespace util {
             {
                 HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "regex_from_character_set",
-                    "Invalid pattern (missing closing ']') at: " +
-                        std::string(start, end));
+                    "Invalid pattern (missing closing ']') at: {}",
+                    std::string(start, end));
                 return "";
             }
 
@@ -87,8 +89,8 @@ namespace hpx { namespace util {
                 if (++it == end)
                 {
                     HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                        "regex_from_pattern",
-                        "Invalid escape sequence at: " + pattern);
+                        "regex_from_pattern", "Invalid escape sequence at: {}",
+                        pattern);
                     return "";
                 }
                 result.append(1, *it);
@@ -121,4 +123,4 @@ namespace hpx { namespace util {
         }
         return result;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

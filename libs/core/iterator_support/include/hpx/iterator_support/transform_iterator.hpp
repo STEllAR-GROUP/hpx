@@ -15,7 +15,7 @@
 #include <iterator>
 #include <type_traits>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator, typename Transformer,
@@ -138,4 +138,4 @@ namespace hpx { namespace util {
     {
         return transform_iterator<Iterator, Transformer>(it, Transformer());
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

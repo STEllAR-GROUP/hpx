@@ -17,16 +17,17 @@
 #pragma warning(disable : 4251)
 #endif
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     // Try to map a given host name based on the list of mappings read from a
     // file
     struct HPX_CORE_EXPORT map_hostnames
     {
-        typedef hpx::function<std::string(std::string const&)>
-            transform_function_type;
+        using transform_function_type =
+            hpx::function<std::string(std::string const&)>;
 
-        map_hostnames(bool debug = false)
+        explicit map_hostnames(bool debug = false) noexcept
           : ipv4_(false)
           , debug_(debug)
         {
@@ -47,7 +48,7 @@ namespace hpx { namespace util {
             transform_ = f;
         }
 
-        void force_ipv4(bool f)
+        void force_ipv4(bool f) noexcept
         {
             ipv4_ = f;
         }
@@ -61,7 +62,7 @@ namespace hpx { namespace util {
         bool ipv4_;
         bool debug_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)

@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     template <typename Iterator, typename Sentinel = Iterator>
     class iterator_range
@@ -40,7 +40,7 @@ namespace hpx { namespace util {
             typename Enable =
                 std::enable_if_t<
                     hpx::traits::is_range_v<std::decay_t<Range>> &&
-                   !std ::is_same_v<iterator_range, std::decay_t<Range>>>>
+                   !std::is_same_v<iterator_range, std::decay_t<Range>>>>
         // clang-format on
         HPX_HOST_DEVICE explicit constexpr iterator_range(Range&& r) noexcept
           : iterator_range(util::begin(r), util::end(r))
@@ -116,7 +116,7 @@ namespace hpx { namespace util {
     {
         return iterator_range<Iterator, Sentinel>(HPX_MOVE(it), HPX_MOVE(sent));
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 namespace hpx { namespace ranges {
     template <typename I, typename S = I>

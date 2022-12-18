@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,7 +18,8 @@
 #include <string>
 #include <type_traits>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     template <typename VTable>
     struct serializable_function_vtable;
 
@@ -29,14 +30,15 @@ namespace hpx { namespace util { namespace detail {
     };
 
     template <typename VTable, typename T>
-    serializable_function_vtable<VTable> const serializable_vtables<VTable,
-        T>::instance = detail::construct_vtable<T>();
+    serializable_function_vtable<VTable> const
+        serializable_vtables<VTable, T>::instance =
+            serializable_function_vtable<VTable>(detail::construct_vtable<T>());
 
     template <typename VTable, typename T>
-    serializable_function_vtable<VTable> const*
+    constexpr serializable_function_vtable<VTable> const*
     get_serializable_vtable() noexcept
     {
-        static_assert(std::is_same<T, typename std::decay<T>::type>::value,
+        static_assert(std::is_same_v<T, std::decay_t<T>>,
             "T shall have no cv-ref-qualifiers");
 
         return &serializable_vtables<VTable, T>::instance;
@@ -50,7 +52,7 @@ namespace hpx { namespace util { namespace detail {
         char const* name;
 
         template <typename T>
-        serializable_function_vtable(construct_vtable<T>) noexcept
+        explicit serializable_function_vtable(construct_vtable<T>) noexcept
           : serializable_vtable(construct_vtable<T>())
           , vptr(detail::get_vtable<VTable, T>())
           , name(detail::get_function_name<VTable, T>())
@@ -61,7 +63,8 @@ namespace hpx { namespace util { namespace detail {
                         name, &serializable_function_vtable::get<T>);
         }
 
-        serializable_function_vtable(construct_vtable<empty_function>) noexcept
+        explicit serializable_function_vtable(
+            construct_vtable<empty_function>) noexcept
           : serializable_vtable(construct_vtable<empty_function>())
           , vptr(detail::get_empty_function_vtable<VTable>())
           , name("empty")
@@ -71,7 +74,7 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         static void* get()
         {
-            typedef serializable_function_vtable<VTable> vtable_type;
+            using vtable_type = serializable_function_vtable<VTable>;
             return const_cast<vtable_type*>(
                 detail::get_serializable_vtable<VTable, T>());
         }
@@ -86,4 +89,4 @@ namespace hpx { namespace util { namespace detail {
             instance()
                 .create<serializable_vtable const>(name);
     }
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

@@ -10,9 +10,10 @@
 #include <cstddef>
 #include <string>
 
-namespace hpx { namespace string_util {
-    template <typename CharT, class Traits, class Alloc>
-    void trim(std::basic_string<CharT, Traits, Alloc>& s)
+namespace hpx::string_util {
+
+    template <typename Char, typename Traits, typename Alloc>
+    void trim(std::basic_string<Char, Traits, Alloc>& s)
     {
         // When using the pre-C++11 ABI in libstdc++, basic_string::erase
         // does not have an overload taking different begin and end iterators.
@@ -33,13 +34,13 @@ namespace hpx { namespace string_util {
         s.erase(last.base(), std::end(s));
     }
 
-    template <typename CharT, class Traits, class Alloc>
-    std::basic_string<CharT, Traits, Alloc> trim_copy(
-        std::basic_string<CharT, Traits, Alloc> const& s)
+    template <typename Char, typename Traits, typename Alloc>
+    std::basic_string<Char, Traits, Alloc> trim_copy(
+        std::basic_string<Char, Traits, Alloc> const& s)
     {
         auto t = s;
         trim(t);
 
         return t;
     }
-}}    // namespace hpx::string_util
+}    // namespace hpx::string_util

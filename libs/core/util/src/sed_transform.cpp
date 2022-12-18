@@ -12,7 +12,7 @@
 #include <regex>
 #include <string>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     bool parse_sed_expression(
         std::string const& input, std::string& search, std::string& replace)
@@ -106,5 +106,4 @@ namespace hpx { namespace util {
             std::regex_constants::match_default |
                 std::regex_constants::format_sed);
     }
-
-}}    // namespace hpx::util
+}    // namespace hpx::util

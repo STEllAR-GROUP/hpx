@@ -200,10 +200,10 @@ namespace hpx::util {
 }    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
     template <typename F, typename... Ts>
     struct get_function_address<hpx::detail::bound_front<F, Ts...>>
     {
@@ -236,8 +236,8 @@ namespace hpx { namespace traits {
         }
     };
 #endif
+}    // namespace hpx::traits
 #endif
-}}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace serialization {

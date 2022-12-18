@@ -12,7 +12,7 @@
 #include <iterator>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
 
@@ -217,4 +217,4 @@ namespace hpx { namespace util {
     }    // namespace range_adl
 
     using namespace range_adl;
-}}    // namespace hpx::util
+}    // namespace hpx::util

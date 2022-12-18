@@ -21,7 +21,7 @@
 #include <iterator>
 #include <type_traits>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     template <typename Incrementable, typename CategoryOrTraversal = void,
         typename Difference = void, typename Enable = void>
@@ -202,4 +202,4 @@ namespace hpx { namespace util {
     {
         return counting_iterator<Incrementable>(HPX_MOVE(x));
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

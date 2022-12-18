@@ -66,7 +66,7 @@ namespace hpx {
             {
             }
 
-            constexpr HPX_HOST_DEVICE bound_back(bound_back&& other)
+            constexpr HPX_HOST_DEVICE bound_back(bound_back&& other) noexcept
               : _f(HPX_MOVE(other._f))
               , _args(HPX_MOVE(other._args))
             {
@@ -184,9 +184,10 @@ namespace hpx::util {
 }    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
-    ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+namespace hpx::traits {
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
     struct get_function_address<hpx::detail::bound_back<F, Ts...>>
     {
@@ -219,11 +220,11 @@ namespace hpx { namespace traits {
         }
     };
 #endif
+}    // namespace hpx::traits
 #endif
-}}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     // serialization of the bound_back object
     template <typename Archive, typename F, typename... Ts>
@@ -232,4 +233,4 @@ namespace hpx { namespace serialization {
     {
         bound.serialize(ar, version);
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

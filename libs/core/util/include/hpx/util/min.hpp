@@ -9,8 +9,10 @@
 #include <hpx/config.hpp>
 
 namespace hpx::detail {
+
     template <typename T>
-    HPX_HOST_DEVICE constexpr inline T const&(min)(T const& a, T const& b)
+    HPX_HOST_DEVICE constexpr inline T const&(min)(
+        T const& a, T const& b) noexcept(noexcept(a < b))
     {
         return a < b ? a : b;
     }

@@ -9,25 +9,36 @@
 #include <cctype>
 #include <string>
 
-namespace hpx { namespace string_util {
+namespace hpx::string_util {
+
     namespace detail {
-        template <typename CharT, typename Traits, typename Allocator>
+
+        template <typename Char, typename Traits, typename Allocator>
         struct is_any_of_pred
         {
+            using string_type = std::basic_string<Char, Traits, Allocator>;
+
             bool operator()(int c) const noexcept
             {
-                return chars.find(c) != std::string::npos;
+                return chars.find(c) != string_type::npos;
             }
 
-            std::basic_string<CharT, Traits, Allocator> chars;
+            string_type chars;
         };
     }    // namespace detail
 
-    template <typename CharT, typename Traits, typename Allocator>
-    detail::is_any_of_pred<CharT, Traits, Allocator> is_any_of(
-        std::basic_string<CharT, Traits, Allocator> const& chars)
+    template <typename Char, typename Traits, typename Allocator>
+    detail::is_any_of_pred<Char, Traits, Allocator> is_any_of(
+        std::basic_string<Char, Traits, Allocator> const& chars)
     {
-        return detail::is_any_of_pred<CharT, Traits, Allocator>{chars};
+        return detail::is_any_of_pred<Char, Traits, Allocator>{chars};
+    }
+
+    template <typename Char, typename Traits, typename Allocator>
+    detail::is_any_of_pred<Char, Traits, Allocator> is_any_of(
+        std::basic_string<Char, Traits, Allocator>&& chars)
+    {
+        return detail::is_any_of_pred<Char, Traits, Allocator>{HPX_MOVE(chars)};
     }
 
     inline auto is_any_of(char const* chars)
@@ -43,4 +54,4 @@ namespace hpx { namespace string_util {
             return std::isspace(c);
         }
     };
-}}    // namespace hpx::string_util
+}    // namespace hpx::string_util

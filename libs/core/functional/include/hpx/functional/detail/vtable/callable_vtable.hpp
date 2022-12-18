@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,7 +19,8 @@
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     struct empty_function;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -95,7 +96,7 @@ namespace hpx { namespace util { namespace detail {
         R (*invoke)(void*, Ts&&...);
 
         template <typename T>
-        constexpr callable_vtable(construct_vtable<T>) noexcept
+        explicit constexpr callable_vtable(construct_vtable<T>) noexcept
           : invoke(&callable_vtable::template _invoke<T>)
         {
         }
@@ -105,9 +106,10 @@ namespace hpx { namespace util { namespace detail {
             return throw_bad_function_call<R>();
         }
 
-        constexpr callable_vtable(construct_vtable<empty_function>) noexcept
+        explicit constexpr callable_vtable(
+            construct_vtable<empty_function>) noexcept
           : invoke(&callable_vtable::_empty_invoke)
         {
         }
     };
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2019 Agustin Berge
 //  Copyright (c) 2017 Google
 //
@@ -24,7 +24,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     function_base::function_base(
         function_base const& other, vtable const* /* empty_vtable */)
@@ -48,6 +49,7 @@ namespace hpx { namespace util { namespace detail {
             std::memcpy(storage, other.storage, function_storage_size);
             object = &storage;
         }
+
         other.vptr = empty_vptr;
         other.object = nullptr;
     }
@@ -65,6 +67,7 @@ namespace hpx { namespace util { namespace detail {
             if (this != &other && object)
             {
                 HPX_ASSERT(other.object != nullptr);
+
                 // reuse object storage
                 object = vptr->copy(
                     object, std::size_t(-1), other.object, /*destroy*/ true);
@@ -100,8 +103,7 @@ namespace hpx { namespace util { namespace detail {
     {
         if (object != nullptr)
         {
-            vptr->deallocate(object, function_storage_size,
-                /*destroy*/ true);
+            vptr->deallocate(object, function_storage_size, /*destroy*/ true);
         }
     }
 
@@ -149,4 +151,4 @@ namespace hpx { namespace util { namespace detail {
         return util::itt::string_handle{};
 #endif
     }
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

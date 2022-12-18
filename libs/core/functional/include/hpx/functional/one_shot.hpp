@@ -18,33 +18,26 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename F>
         class one_shot_wrapper    //-V690
         {
         public:
             // default constructor is needed for serialization
-            constexpr one_shot_wrapper()
-#if defined(HPX_DEBUG)
-              : _called(false)
-#endif
-            {
-            }
+            constexpr one_shot_wrapper() noexcept {}
 
             template <typename F_,
-                typename = typename std::enable_if<
-                    std::is_constructible<F, F_>::value>::type>
+                typename = std::enable_if_t<std::is_constructible_v<F, F_>>>
             constexpr explicit one_shot_wrapper(F_&& f)
               : _f(HPX_FORWARD(F_, f))
-#if defined(HPX_DEBUG)
-              , _called(false)
-#endif
             {
             }
 
-            constexpr one_shot_wrapper(one_shot_wrapper&& other)
+            constexpr one_shot_wrapper(one_shot_wrapper&& other) noexcept
               : _f(HPX_MOVE(other._f))
 #if defined(HPX_DEBUG)
               , _called(other._called)
@@ -55,7 +48,7 @@ namespace hpx { namespace util {
 #endif
             }
 
-            void check_call()
+            void check_call() noexcept
             {
 #if defined(HPX_DEBUG)
                 HPX_ASSERT(!_called);
@@ -64,9 +57,8 @@ namespace hpx { namespace util {
             }
 
             template <typename... Ts>
-            constexpr HPX_HOST_DEVICE
-                typename util::invoke_result<F, Ts...>::type
-                operator()(Ts&&... vs)
+            constexpr HPX_HOST_DEVICE util::invoke_result_t<F, Ts...>
+            operator()(Ts&&... vs)
             {
                 check_call();
 
@@ -76,15 +68,17 @@ namespace hpx { namespace util {
             template <typename Archive>
             void serialize(Archive& ar, unsigned int const /*version*/)
             {
-                ar& _f;
+                // clang-format off
+                ar & _f;
+                // clang-format on
             }
 
-            constexpr std::size_t get_function_address() const
+            constexpr std::size_t get_function_address() const noexcept
             {
                 return traits::get_function_address<F>::call(_f);
             }
 
-            constexpr char const* get_function_annotation() const
+            constexpr char const* get_function_annotation() const noexcept
             {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
                 return traits::get_function_annotation<F>::call(_f);
@@ -108,26 +102,24 @@ namespace hpx { namespace util {
         public:    // exposition-only
             F _f;
 #if defined(HPX_DEBUG)
-            bool _called;
+            bool _called = false;
 #endif
         };
     }    // namespace detail
 
     template <typename F>
-    constexpr detail::one_shot_wrapper<typename std::decay<F>::type> one_shot(
-        F&& f)
+    constexpr detail::one_shot_wrapper<std::decay_t<F>> one_shot(F&& f)
     {
-        typedef detail::one_shot_wrapper<typename std::decay<F>::type>
-            result_type;
-
+        using result_type = detail::one_shot_wrapper<std::decay_t<F>>;
         return result_type(HPX_FORWARD(F, f));
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
-    ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+namespace hpx::traits {
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename F>
     struct get_function_address<util::detail::one_shot_wrapper<F>>
     {
@@ -160,11 +152,12 @@ namespace hpx { namespace traits {
         }
     };
 #endif
+}    // namespace hpx::traits
 #endif
-}}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
+
     template <typename Archive, typename F>
     void serialize(Archive& ar,
         ::hpx::util::detail::one_shot_wrapper<F>& one_shot_wrapper,
@@ -172,4 +165,4 @@ namespace hpx { namespace serialization {
     {
         one_shot_wrapper.serialize(ar, version);
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

@@ -15,14 +15,15 @@
 #include <cstddef>
 #include <map>
 #include <memory>
-#ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
-#include <string>
-#endif
 #include <type_traits>
 #include <utility>
 
+#ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+#include <string>
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     struct register_lock_data
     {
@@ -37,8 +38,7 @@ namespace hpx { namespace util {
 
         struct HPX_CORE_EXPORT lock_data
         {
-#ifdef HPX_HAVE_VERIFY_LOCKS
-            lock_data(std::size_t trace_depth);
+            explicit lock_data(std::size_t trace_depth);
             lock_data(register_lock_data* data, std::size_t trace_depth);
 
             ~lock_data();
@@ -47,7 +47,6 @@ namespace hpx { namespace util {
             register_lock_data* user_data_;
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
             std::string backtrace_;
-#endif
 #endif
         };
     }    // namespace detail
@@ -69,17 +68,17 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT bool register_lock(
-        void const* lock, register_lock_data* data = nullptr);
-    HPX_CORE_EXPORT bool unregister_lock(void const* lock);
+        void const* lock, register_lock_data* data = nullptr) noexcept;
+    HPX_CORE_EXPORT bool unregister_lock(void const* lock) noexcept;
     HPX_CORE_EXPORT void verify_no_locks();
     HPX_CORE_EXPORT void force_error_on_lock();
-    HPX_CORE_EXPORT void enable_lock_detection();
-    HPX_CORE_EXPORT void disable_lock_detection();
-    HPX_CORE_EXPORT void trace_depth_lock_detection(std::size_t value);
-    HPX_CORE_EXPORT void ignore_lock(void const* lock);
-    HPX_CORE_EXPORT void reset_ignored(void const* lock);
-    HPX_CORE_EXPORT void ignore_all_locks();
-    HPX_CORE_EXPORT void reset_ignored_all();
+    HPX_CORE_EXPORT void enable_lock_detection() noexcept;
+    HPX_CORE_EXPORT void disable_lock_detection() noexcept;
+    HPX_CORE_EXPORT void trace_depth_lock_detection(std::size_t value) noexcept;
+    HPX_CORE_EXPORT void ignore_lock(void const* lock) noexcept;
+    HPX_CORE_EXPORT void reset_ignored(void const* lock) noexcept;
+    HPX_CORE_EXPORT void ignore_all_locks() noexcept;
+    HPX_CORE_EXPORT void reset_ignored_all() noexcept;
 
     using registered_locks_error_handler_type = hpx::function<void()>;
 
@@ -87,7 +86,7 @@ namespace hpx { namespace util {
     /// fails. Can be used to print information at the point of failure such as
     /// a backtrace.
     HPX_CORE_EXPORT void set_registered_locks_error_handler(
-        registered_locks_error_handler_type);
+        registered_locks_error_handler_type) noexcept;
 
     using register_locks_predicate_type = hpx::function<bool()>;
 
@@ -99,23 +98,24 @@ namespace hpx { namespace util {
     /// as if lock detection is enabled globally). The predicate may return
     /// different values depending on context.
     HPX_CORE_EXPORT void set_register_locks_predicate(
-        register_locks_predicate_type);
+        register_locks_predicate_type) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     struct ignore_all_while_checking
     {
-        ignore_all_while_checking()
+        ignore_all_while_checking() noexcept
         {
             ignore_all_locks();
         }
 
-        ~ignore_all_while_checking()
+        ~ignore_all_while_checking() noexcept
         {
             reset_ignored_all();
         }
     };
 
     namespace detail {
+
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(mutex)
     }
 
@@ -123,7 +123,7 @@ namespace hpx { namespace util {
         typename Enable = std::enable_if_t<detail::has_mutex_v<Lock>>>
     struct ignore_while_checking
     {
-        explicit ignore_while_checking(Lock const* lock)
+        explicit ignore_while_checking(Lock const* lock) noexcept
           : mtx_(lock->mutex())
         {
             ignore_lock(mtx_);
@@ -191,15 +191,12 @@ namespace hpx { namespace util {
     {
     };
 
-    inline std::unique_ptr<held_locks_data> get_held_locks_data()
+    constexpr inline held_locks_data* get_held_locks_data() noexcept
     {
-        return std::unique_ptr<held_locks_data>();
+        return nullptr;
     }
 
-    constexpr inline void set_held_locks_data(
-        std::unique_ptr<held_locks_data>&& /*data*/) noexcept
-    {
-    }
+    constexpr inline void set_held_locks_data(held_locks_data*) noexcept {}
 
 #endif
-}}    // namespace hpx::util
+}    // namespace hpx::util
