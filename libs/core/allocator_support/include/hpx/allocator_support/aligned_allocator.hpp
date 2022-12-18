@@ -7,6 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -14,8 +16,6 @@
 #include <new>
 #include <type_traits>
 #include <utility>
-
-#include <hpx/preprocessor/cat.hpp>
 
 #if defined(HPX_HAVE_JEMALLOC_PREFIX)
 // this is currently used only for jemalloc and if a special API prefix is
@@ -258,7 +258,7 @@ namespace hpx::util {
         template <typename U, typename... Args>
         void construct(U* p, Args&&... args)
         {
-            ::new ((void*) p) U(HPX_FORWARD(Args, args)...);
+            hpx::construct_at(p, HPX_FORWARD(Args, args)...);
         }
 
         template <typename U>

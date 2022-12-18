@@ -12,20 +12,13 @@
 #include <hpx/config.hpp>
 
 #include <cstddef>
+#include <type_traits>
 
-namespace hpx { namespace memory { namespace detail {
+namespace hpx::memory::detail {
 
     template <typename Y, typename T>
-    struct sp_convertible
+    struct sp_convertible : std::is_convertible<Y*, T*>
     {
-        typedef char (&yes)[1];
-        typedef char (&no)[2];
-
-        static yes f(T*);
-        static no f(...);
-
-        static constexpr bool value =
-            sizeof((f)(static_cast<Y*>(nullptr))) == sizeof(yes);
     };
 
     template <typename Y, typename T>
@@ -48,5 +41,4 @@ namespace hpx { namespace memory { namespace detail {
 
     template <typename Y, typename T>
     inline constexpr bool sp_convertible_v = sp_convertible<Y, T>::value;
-
-}}}    // namespace hpx::memory::detail
+}    // namespace hpx::memory::detail

@@ -10,7 +10,7 @@
 
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     namespace detail {
         template <typename T, typename Enable = void>
@@ -31,4 +31,4 @@ namespace hpx { namespace traits {
     struct is_tuple_like : detail::is_tuple_like_impl<std::remove_cv_t<T>>
     {
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

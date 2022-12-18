@@ -11,7 +11,8 @@
 
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for streaming with util::any
     template <typename T, typename Enable = void>
@@ -28,4 +29,4 @@ namespace hpx { namespace traits {
         serialization::serialize_buffer<T, Allocator>> : std::false_type
     {
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -73,7 +74,8 @@ namespace hpx::optional_ns {
         {
             if (!other.empty_)
             {
-                new (&storage_) T(other.value());
+                hpx::construct_at(
+                    reinterpret_cast<T*>(&storage_), other.value());
                 empty_ = false;
             }
         }
@@ -83,7 +85,8 @@ namespace hpx::optional_ns {
         {
             if (!other.empty_)
             {
-                new (&storage_) T(HPX_MOVE(other.value()));
+                hpx::construct_at(
+                    reinterpret_cast<T*>(&storage_), HPX_MOVE(other.value()));
                 empty_ = false;
             }
         }
@@ -94,7 +97,7 @@ namespace hpx::optional_ns {
             std::is_nothrow_move_constructible_v<T>)
           : empty_(true)
         {
-            new (&storage_) T(HPX_MOVE(val));
+            hpx::construct_at(reinterpret_cast<T*>(&storage_), HPX_MOVE(val));
             empty_ = false;
         }
 
@@ -105,7 +108,7 @@ namespace hpx::optional_ns {
         {
             if (val.has_value())
             {
-                new (&storage_) T(*val);
+                hpx::construct_at(reinterpret_cast<T*>(&storage_), *val);
                 empty_ = false;
             }
         }
@@ -117,7 +120,8 @@ namespace hpx::optional_ns {
         {
             if (val.has_value())
             {
-                new (&storage_) T(HPX_MOVE(*val));
+                hpx::construct_at(
+                    reinterpret_cast<T*>(&storage_), HPX_MOVE(*val));
                 empty_ = false;
             }
         }
@@ -126,7 +130,8 @@ namespace hpx::optional_ns {
         explicit optional(std::in_place_t, Ts&&... ts)
           : empty_(true)
         {
-            new (&storage_) T(HPX_FORWARD(Ts, ts)...);
+            hpx::construct_at(
+                reinterpret_cast<T*>(&storage_), HPX_FORWARD(Ts, ts)...);
             empty_ = false;
         }
 
@@ -135,7 +140,8 @@ namespace hpx::optional_ns {
             std::in_place_t, std::initializer_list<U> il, Ts&&... ts)
           : empty_(true)
         {
-            new (&storage_) T(il, HPX_FORWARD(Ts, ts)...);
+            hpx::construct_at(
+                reinterpret_cast<T*>(&storage_), il, HPX_FORWARD(Ts, ts)...);
             empty_ = false;
         }
 
@@ -164,7 +170,8 @@ namespace hpx::optional_ns {
             {
                 if (!other.empty_)
                 {
-                    new (&storage_) T(HPX_MOVE(other.value()));
+                    hpx::construct_at(reinterpret_cast<T*>(&storage_),
+                        HPX_MOVE(other.value()));
                     empty_ = false;
                 }
             }
@@ -191,7 +198,7 @@ namespace hpx::optional_ns {
                 empty_ = true;
             }
 
-            new (&storage_) T(HPX_MOVE(other));
+            hpx::construct_at(reinterpret_cast<T*>(&storage_), HPX_MOVE(other));
             empty_ = false;
 
             return *this;
@@ -325,7 +332,8 @@ namespace hpx::optional_ns {
                 std::destroy_at(reinterpret_cast<T*>(&storage_));
                 empty_ = true;
             }
-            new (&storage_) T(HPX_FORWARD(Ts, ts)...);
+            hpx::construct_at(
+                reinterpret_cast<T*>(&storage_), HPX_FORWARD(Ts, ts)...);
             empty_ = false;
         }
 
@@ -340,7 +348,8 @@ namespace hpx::optional_ns {
                 std::destroy_at(reinterpret_cast<T*>(&storage_));
                 empty_ = true;
             }
-            new (&storage_) T(HPX_FORWARD(F, f)(HPX_FORWARD(Ts, ts)...));
+            std::construct_at(reinterpret_cast<T*>(&storage_),
+                HPX_FORWARD(F, f)(HPX_FORWARD(Ts, ts)...));
             empty_ = false;
         }
 #endif
@@ -367,7 +376,8 @@ namespace hpx::optional_ns {
             optional* empty = empty_ ? this : &other;
             optional* non_empty = empty_ ? &other : this;
 
-            new (&empty->storage_) T(HPX_MOVE(**non_empty));
+            std::construct_at(
+                reinterpret_cast<T*>(&empty->storage_), HPX_MOVE(**non_empty));
             std::destroy_at(reinterpret_cast<T*>(&non_empty->storage_));
 
             empty->empty_ = false;
@@ -395,6 +405,7 @@ namespace hpx::optional_ns {
             using result_type = std::invoke_result_t<F, decltype(value())>;
             return std::remove_cv_t<std::remove_reference_t<result_type>>();
         }
+
         template <typename F>
         constexpr auto and_then(F&& f) const&
         {
@@ -407,6 +418,7 @@ namespace hpx::optional_ns {
             using result_type = std::invoke_result_t<F, decltype(value())>;
             return std::remove_cv_t<std::remove_reference_t<result_type>>();
         }
+
         template <typename F>
         auto and_then(F&& f) &&
         {
@@ -420,6 +432,7 @@ namespace hpx::optional_ns {
                 std::invoke_result_t<F, decltype(HPX_MOVE(value()))>;
             return std::remove_cv_t<std::remove_reference_t<result_type>>();
         }
+
         template <typename F>
         auto and_then(F&& f) const&&
         {
@@ -446,6 +459,7 @@ namespace hpx::optional_ns {
             }
             return optional<result_type>();
         }
+
         template <typename F>
         constexpr auto transform(F&& f) const&
         {
@@ -458,6 +472,7 @@ namespace hpx::optional_ns {
             }
             return optional<result_type>();
         }
+
         template <typename F>
         auto transform(F&& f) &&
         {
@@ -471,6 +486,7 @@ namespace hpx::optional_ns {
             }
             return optional<result_type>();
         }
+
         template <typename F>
         auto transform(F&& f) const&&
         {
@@ -496,6 +512,7 @@ namespace hpx::optional_ns {
             }
             return {HPX_FORWARD(F, f)()};
         }
+
         template <typename F,
             typename = std::enable_if_t<std::is_invocable_v<F> &&
                 std::is_move_constructible_v<T>>>
@@ -509,7 +526,7 @@ namespace hpx::optional_ns {
         }
 
     private:
-        typename std::aligned_storage_t<sizeof(T), alignof(T)> storage_;
+        std::aligned_storage_t<sizeof(T), alignof(T)> storage_;
         bool empty_;
     };
 
@@ -517,9 +534,12 @@ namespace hpx::optional_ns {
     template <typename T>
     constexpr bool operator==(optional<T> const& lhs, optional<T> const& rhs)
     {
+        // different clang-format versions disagree
+        // clang-format off
         return (bool(lhs) != bool(rhs)) ? false :
             (!bool(lhs) && !bool(rhs))  ? true :
                                           (*lhs == *rhs);
+        // clang-format on
     }
 
     template <typename T>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2006 Joao Abecasis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -56,14 +56,14 @@ namespace hpx { namespace util {
         static void default_construct()
         {
             for (std::size_t i = 0; i < N; ++i)
-                new (get_address(i)) value_type();
+                hpx::construct_at(get_address(i));
         }
 
         template <typename U>
         static void value_construct(U const& v)
         {
             for (std::size_t i = 0; i < N; ++i)
-                new (get_address(i)) value_type(v);
+                hpx::construct_at(get_address(i), v);
         }
 
         static void destruct()

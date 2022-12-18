@@ -11,8 +11,11 @@
 #include <hpx/hpx_main.hpp>
 #include <hpx/include/actions.hpp>
 #include <hpx/include/runtime.hpp>
+#include <hpx/include/util.hpp>
 #include <hpx/serialization.hpp>
+
 #include <iostream>
+#include <memory>
 
 //[point_member_serialization
 struct point_member_serialization
@@ -178,7 +181,7 @@ inline void load_construct_data(
     ar >> g;
 
     // ::new(ptr) construct new object at given address
-    ::new (weight_calc) planet_weight_calculator(g);
+    hpx::construct_at(weight_calc, g);
 }
 //]
 

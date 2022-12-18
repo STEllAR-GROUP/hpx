@@ -87,7 +87,7 @@ namespace hpx { namespace collectives { namespace detail {
             util::ignore_while_checking il(&l);
             HPX_UNUSED(il);
 
-            data_[which].channels_[tag].set(HPX_MOVE(value));
+            data_[which].channels_[tag].set(unique_any_nonser(HPX_MOVE(value)));
         }
 
         template <typename T>

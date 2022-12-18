@@ -23,7 +23,8 @@ namespace hpx { namespace util { namespace detail {
     template <typename VTable, typename T>
     struct vtables
     {
-        static constexpr VTable instance = detail::construct_vtable<T>();
+        static constexpr VTable instance =
+            VTable(detail::construct_vtable<T>());
     };
 
     template <typename VTable, typename T>
@@ -86,7 +87,7 @@ namespace hpx { namespace util { namespace detail {
         void (*deallocate)(void*, std::size_t storage_size, bool) noexcept;
 
         template <typename T>
-        constexpr vtable(construct_vtable<T>) noexcept
+        explicit constexpr vtable(construct_vtable<T>) noexcept
           : deallocate(&vtable::template _deallocate<T>)
         {
         }

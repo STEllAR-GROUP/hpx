@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011-2017 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -148,7 +148,7 @@ namespace hpx { namespace components { namespace server {
             for (std::size_t i = 0; i != count; ++i, ++storage_it)
             {
                 Component* c = nullptr;
-                c = new (storage_it) Component(HPX_FORWARD(Ts, ts)...);
+                c = new (storage_it) Component(ts...);
                 naming::gid_type gid = c->get_base_gid();
                 if (!gid)
                 {

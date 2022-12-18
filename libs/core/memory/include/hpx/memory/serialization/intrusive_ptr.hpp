@@ -11,7 +11,7 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/serialization/serialize.hpp>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename T>
     void load(input_archive& ar, hpx::intrusive_ptr<T>& ptr, unsigned)
@@ -27,4 +27,4 @@ namespace hpx { namespace serialization {
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
         (template <typename T>), (hpx::intrusive_ptr<T>) )
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

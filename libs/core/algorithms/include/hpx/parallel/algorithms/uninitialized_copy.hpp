@@ -195,6 +195,7 @@ namespace hpx {
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -228,15 +229,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         util::in_out_result<InIter1, FwdIter2> sequential_uninitialized_copy(
             InIter1 first, FwdIter2 dest, Cond cond)
         {
-            using value_type =
-                typename std::iterator_traits<FwdIter2>::value_type;
-
             FwdIter2 current = dest;
             try
             {
                 for (/* */; cond(first, current); (void) ++first, ++current)
                 {
-                    ::new (std::addressof(*current)) value_type(*first);
+                    hpx::construct_at(std::addressof(*current), *first);
                 }
                 return util::in_out_result<InIter1, FwdIter2>{first, current};
             }
@@ -244,7 +242,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 for (/* */; dest != current; ++dest)
                 {
-                    (*dest).~value_type();
+                    std::destroy_at(std::addressof(*dest));
                 }
                 throw;
             }
@@ -256,16 +254,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
             InIter1 first, std::size_t count, InIter2 dest,
             util::cancellation_token<util::detail::no_data>& tok)
         {
-            typedef
-                typename std::iterator_traits<InIter2>::value_type value_type;
-
             return {std::next(first, count),
                 util::loop_with_cleanup_n_with_token(
                     first, count, dest, tok,
                     [](InIter1 it, InIter2 dest) -> void {
-                        ::new (std::addressof(*dest)) value_type(*it);
+                        hpx::construct_at(std::addressof(*dest), *it);
                     },
-                    [](InIter2 dest) -> void { (*dest).~value_type(); })};
+                    [](InIter2 dest) -> void {
+                        std::destroy_at(std::addressof(*dest));
+                    })};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -421,15 +418,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
             static util::in_out_result<InIter, FwdIter2> sequential(
                 ExPolicy, InIter first, std::size_t count, FwdIter2 dest)
             {
-                using value_type =
-                    typename std::iterator_traits<FwdIter2>::value_type;
-
                 FwdIter2 current = dest;
                 try
                 {
                     for (/* */; count > 0; ++first, (void) ++current, --count)
                     {
-                        ::new (std::addressof(*current)) value_type(*first);
+                        hpx::construct_at(std::addressof(*current), *first);
                     }
                     return util::in_out_result<InIter, FwdIter2>{
                         first, current};
@@ -438,7 +432,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 {
                     for (/* */; dest != current; ++dest)
                     {
-                        (*dest).~value_type();
+                        std::destroy_at(std::addressof(*dest));
                     }
                     throw;
                 }

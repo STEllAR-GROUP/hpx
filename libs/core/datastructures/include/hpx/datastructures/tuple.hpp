@@ -116,6 +116,7 @@ namespace hpx {
 #endif
 
 namespace hpx {
+
     template <typename... Ts>
     class tuple;
 

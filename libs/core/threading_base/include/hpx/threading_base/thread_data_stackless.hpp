@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -17,6 +17,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -161,8 +162,8 @@ namespace hpx { namespace threads {
     inline thread_data* thread_data_stackless::create(thread_init_data& data,
         void* queue, std::ptrdiff_t stacksize, thread_id_addref addref)
     {
-        thread_data* p = thread_alloc_.allocate(1);
-        new (p) thread_data_stackless(data, queue, stacksize, addref);
+        thread_data_stackless* p = thread_alloc_.allocate(1);
+        hpx::construct_at(p, data, queue, stacksize, addref);
         return p;
     }
 }}    // namespace hpx::threads

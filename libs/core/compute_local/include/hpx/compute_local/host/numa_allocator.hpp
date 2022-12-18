@@ -17,6 +17,7 @@
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/runtime_local/get_worker_thread_num.hpp>
 #include <hpx/topology/topology.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -156,9 +157,9 @@ namespace hpx { namespace parallel { namespace util {
         }
 
         // construction/destruction
-        void construct(pointer p, const T& t)
+        void construct(pointer p, T const& t)
         {
-            new (p) T(t);
+            hpx::construct_at(p, t);
         }
         void destroy(pointer p)
         {

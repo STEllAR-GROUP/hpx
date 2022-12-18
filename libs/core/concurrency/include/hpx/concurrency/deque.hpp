@@ -23,6 +23,7 @@
 #include <hpx/concurrency/detail/freelist.hpp>
 #include <hpx/concurrency/detail/tagged_ptr.hpp>
 #include <hpx/concurrency/detail/tagged_ptr_pair.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -264,7 +265,7 @@ namespace hpx::lockfree {
             {
                 throw std::bad_alloc();
             }
-            new (chunk) node(lptr, rptr, v, ltag, rtag);
+            hpx::construct_at(chunk, lptr, rptr, v, ltag, rtag);
             return chunk;
         }
 
@@ -276,7 +277,7 @@ namespace hpx::lockfree {
             {
                 throw std::bad_alloc();
             }
-            new (chunk) node(lptr, rptr, HPX_MOVE(v), ltag, rtag);
+            hpx::construct_at(chunk, lptr, rptr, HPX_MOVE(v), ltag, rtag);
             return chunk;
         }
 

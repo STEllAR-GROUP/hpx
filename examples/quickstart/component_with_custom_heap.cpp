@@ -265,11 +265,11 @@ namespace allocator {
                 return nullptr;
             }
 
-            new (pg) alloc_page(alloc_block<T>::allocation_size);
+            hpx::construct_at(pg, alloc_block<T>::allocation_size);
 
             // FIXME: move block construction into alloc_page constructor
             blk = new_chain = (*pg->template get_block<T>())[1];
-            new (blk) alloc_block<T>(pg);
+            hpx::construct_at(blk, pg);
 
             std::size_t blocks =
                 (alloc_page::page_size / alloc_block<T>::allocation_size) - 2;
@@ -277,7 +277,7 @@ namespace allocator {
             do
             {
                 alloc_block<T>* next = (*blk)[1];
-                new (next) alloc_block<T>(pg);
+                hpx::construct_at(next, pg);
 
                 blk->next_free = next;
                 blk = next;
@@ -286,7 +286,7 @@ namespace allocator {
             blk->next_free = nullptr;
 
             blk = pg->template get_block<T>();
-            new (blk) alloc_block<T>(pg);
+            hpx::construct_at(blk, pg);
 
             blk->next_free = nullptr;
         }

@@ -112,7 +112,7 @@ namespace hpx::util {
         {
             static void construct()
             {
-                new (static_::get_address()) value_type();
+                hpx::construct_at(static_::get_address());
                 static destructor d;
             }
         };

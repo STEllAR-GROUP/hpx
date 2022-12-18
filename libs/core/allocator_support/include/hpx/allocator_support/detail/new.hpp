@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#include <hpx/type_support/construct_at.hpp>
+
 #include <utility>
 
 namespace hpx::util::functional {
@@ -26,7 +29,8 @@ namespace hpx::util::functional {
         template <typename... Ts>
         T* operator()(void* p, Ts&&... vs) const
         {
-            return new (p) T(HPX_FORWARD(Ts, vs)...);
+            return hpx::construct_at(
+                static_cast<T*>(p), HPX_FORWARD(Ts, vs)...);
         }
     };
 
@@ -41,7 +45,8 @@ namespace hpx::util::functional {
         template <typename... Ts>
         T* operator()(Ts&&... vs) const
         {
-            return new (p_) T(HPX_FORWARD(Ts, vs)...);
+            return hpx::construct_at(
+                static_cast<T*>(p_), HPX_FORWARD(Ts, vs)...);
         }
 
         void* p_;
