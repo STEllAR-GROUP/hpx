@@ -51,6 +51,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'breathe',
     'sphinx-hpx', # Custom HPX roles
+    'sphinx_copybutton',
 ]
 
 breathe_projects = { "hpx": "../hpx_autodoc" }
@@ -669,6 +670,10 @@ html_context = {
     'github_repo': 'hpx',
     'github_version': 'master/docs/sphinx/',
 }
+
+# Add custom CSS rules
+html_static_path = ["_static"]
+html_css_files = ["custom.css"]
 
 if "@HPX_WITH_GIT_COMMIT_SHORT@" != "":
     html_context['commit'] = "@HPX_WITH_GIT_COMMIT_SHORT@"
