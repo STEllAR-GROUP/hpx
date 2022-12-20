@@ -10,7 +10,7 @@
 #include <hpx/iterator_support/counting_iterator.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Incrementable>
@@ -66,4 +66,4 @@ namespace hpx { namespace util {
             return counting_shape(b, e);
         }
     }    // namespace detail
-}}       // namespace hpx::util
+}    // namespace hpx::util

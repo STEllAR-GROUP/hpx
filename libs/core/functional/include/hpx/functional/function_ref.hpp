@@ -59,7 +59,7 @@ namespace hpx {
           , callable_info_vtable
         {
             template <typename T>
-            constexpr function_ref_vtable(construct_vtable<T>) noexcept
+            explicit constexpr function_ref_vtable(construct_vtable<T>) noexcept
               : callable_vtable<Sig>(construct_vtable<T>())
               , callable_info_vtable(construct_vtable<T>())
             {
@@ -208,7 +208,7 @@ namespace hpx {
 
     private:
         template <typename T>
-        static VTable const* get_vtable() noexcept
+        static constexpr VTable const* get_vtable() noexcept
         {
             return util::detail::get_vtable<VTable, T>();
         }
@@ -233,7 +233,7 @@ namespace hpx::util {
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     template <typename Sig>
     struct get_function_address<hpx::function_ref<Sig>>
@@ -266,5 +266,5 @@ namespace hpx { namespace traits {
         }
     };
 #endif
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 #endif

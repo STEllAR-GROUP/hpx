@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,20 +27,18 @@ namespace hpx::plugins {
 
 namespace hpx::util::plugin {
 
-    ///////////////////////////////////////////////////////////////////////////
-    // The following specialization of the virtual_constructor template
-    // defines the argument list for the constructor of the concrete component
-    // factory (derived from the component_factory_base above). This magic is needed
-    // because we use hpx::plugin for the creation of instances of derived
-    // types using the component_factory_base virtual base class only (essentially
+    ////////////////////////////////////////////////////////////////////////////
+    // The following specialization of the virtual_constructor template defines
+    // the argument list for the constructor of the concrete component factory
+    // (derived from the component_factory_base above). This magic is needed
+    // because we use hpx::plugin for the creation of instances of derived types
+    // using the component_factory_base virtual base class only (essentially
     // implementing a virtual constructor).
     //
     // All derived component factories have to expose a constructor with the
     // matching signature. For instance:
     //
-    //     class my_factory : public plugin_factory_base
-    //     {
-    //     public:
+    //     class my_factory : public plugin_factory_base { public:
     //         my_factory (hpx::util::section const*,
     //              hpx::util::section const*, bool)
     //         {}
@@ -54,7 +52,7 @@ namespace hpx::util::plugin {
     };
 }    // namespace hpx::util::plugin
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 /// This macro is used to register the given component factory with
 /// Hpx.Plugin. This macro has to be used for each of the component factories.
 #define HPX_REGISTER_PLUGIN_FACTORY_BASE(FactoryType, pluginname)              \

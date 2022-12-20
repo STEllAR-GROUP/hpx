@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,7 +15,8 @@
 #include <cstddef>
 #include <new>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     struct serializable_vtable
     {
         template <typename T>
@@ -40,10 +41,10 @@ namespace hpx { namespace util { namespace detail {
             void*, std::size_t, serialization::input_archive&, unsigned);
 
         template <typename T>
-        constexpr serializable_vtable(construct_vtable<T>) noexcept
+        explicit constexpr serializable_vtable(construct_vtable<T>) noexcept
           : save_object(&serializable_vtable::template _save_object<T>)
           , load_object(&serializable_vtable::template _load_object<T>)
         {
         }
     };
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

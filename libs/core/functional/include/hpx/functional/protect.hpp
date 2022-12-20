@@ -16,18 +16,20 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     namespace detail {
+
         template <typename F>
         class protected_bind : public F
         {
         public:
-            explicit protected_bind(F const& f)
+            HPX_HOST_DEVICE explicit protected_bind(F const& f)
               : F(f)
             {
             }
 
-            explicit protected_bind(F&& f)
+            HPX_HOST_DEVICE explicit protected_bind(F&& f) noexcept
               : F(HPX_MOVE(f))
             {
             }
@@ -41,7 +43,7 @@ namespace hpx { namespace util {
             {
             }
 
-            HPX_HOST_DEVICE protected_bind(protected_bind&& other)
+            HPX_HOST_DEVICE protected_bind(protected_bind&& other) noexcept
               : F(HPX_MOVE(other))
             {
             }
@@ -63,9 +65,9 @@ namespace hpx { namespace util {
     // leave everything that is not a bind expression as is
     template <typename T>
     HPX_HOST_DEVICE
-        std::enable_if_t<!hpx::is_bind_expression_v<std::decay_t<T>>, T>
+        std::enable_if_t<!hpx::is_bind_expression_v<std::decay_t<T>>, T&&>
         protect(T&& v)    //-V659
     {
         return HPX_FORWARD(T, v);
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

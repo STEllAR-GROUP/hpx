@@ -23,7 +23,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     // Default template argument handling for iterator_adaptor
     namespace detail {
@@ -234,4 +234,4 @@ namespace hpx { namespace util {
     private:    // data members
         Base iterator_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util

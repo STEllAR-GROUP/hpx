@@ -10,7 +10,8 @@
 #include <hpx/functional/traits/is_action.hpp>
 #include <type_traits>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
@@ -42,7 +43,7 @@ namespace hpx { namespace util {
         template <typename ReturnType, typename Arg0, typename... Args>
         struct function_first_argument<ReturnType (*)(Arg0, Args...)>
         {
-            using type = typename std::decay<Arg0>::type;
+            using type = std::decay_t<Arg0>;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -60,7 +61,7 @@ namespace hpx { namespace util {
         struct lambda_first_argument<ReturnType (ClassType::*)(Arg0, Args...)
                 const>
         {
-            using type = typename std::decay<Arg0>::type;
+            using type = std::decay_t<Arg0>;
         };
     }    // namespace detail
 
@@ -71,8 +72,7 @@ namespace hpx { namespace util {
 
     // Specialization for actions
     template <typename F>
-    struct first_argument<F,
-        typename std::enable_if<hpx::traits::is_action<F>::value>::type>
+    struct first_argument<F, std::enable_if_t<hpx::traits::is_action_v<F>>>
       : detail::tuple_first_argument<typename F::arguments_type>
     {
     };
@@ -80,18 +80,18 @@ namespace hpx { namespace util {
     // Specialization for functions
     template <typename F>
     struct first_argument<F,
-        typename std::enable_if<!hpx::traits::is_action<F>::value &&
-            std::is_function<typename std::remove_pointer<F>::type>::value>::
-            type> : detail::function_first_argument<F>
+        std::enable_if_t<!hpx::traits::is_action_v<F> &&
+            std::is_function_v<std::remove_pointer_t<F>>>>
+      : detail::function_first_argument<F>
     {
     };
 
     // Specialization for lambdas
     template <typename F>
     struct first_argument<F,
-        typename std::enable_if<!hpx::traits::is_action<F>::value &&
-            !std::is_function<typename std::remove_pointer<F>::type>::value>::
-            type> : detail::lambda_first_argument<decltype(&F::operator())>
+        std::enable_if_t<!hpx::traits::is_action_v<F> &&
+            !std::is_function_v<std::remove_pointer_t<F>>>>
+      : detail::lambda_first_argument<decltype(&F::operator())>
     {
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util

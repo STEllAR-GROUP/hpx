@@ -15,7 +15,8 @@
 
 #include <type_traits>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename VTable, typename T>
     struct get_function_name_declared : std::false_type
@@ -42,12 +43,12 @@ namespace hpx { namespace util { namespace detail {
     {
         return get_function_name_impl<VTable, F>::call();
     }
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // clang-format off
 #define HPX_DECLARE_GET_FUNCTION_NAME(VTable, F, Name)                         \
-    namespace hpx { namespace util { namespace detail {                        \
+    namespace hpx::util::detail {                                              \
          template <>                                                           \
          HPX_ALWAYS_EXPORT char const* get_function_name<VTable,               \
              std::decay<HPX_PP_STRIP_PARENS(F)>::type>();                      \
@@ -57,11 +58,11 @@ namespace hpx { namespace util { namespace detail {
              std::decay<HPX_PP_STRIP_PARENS(F)>::type> : std::true_type        \
          {                                                                     \
          };                                                                    \
-    }}}                                                                        \
+    }                                                                          \
     /**/
 
 #define HPX_DEFINE_GET_FUNCTION_NAME(VTable, F, Name)                          \
-    namespace hpx { namespace util { namespace detail {                        \
+    namespace hpx::util::detail {                                              \
         template <>                                                            \
         HPX_ALWAYS_EXPORT char const* get_function_name<VTable,                \
             std::decay<HPX_PP_STRIP_PARENS(F)>::type>()                        \
@@ -77,7 +78,7 @@ namespace hpx { namespace util { namespace detail {
                  "missing for " HPX_PP_STRINGIZE(Name));                       \
              return HPX_PP_STRINGIZE(Name);                                    \
         }                                                                      \
-    }}}                                                                        \
+    }                                                                          \
     /**/
 
 // clang-format on

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2019 Agustin Berge
 //  Copyright (c) 2017 Google
 //
@@ -22,7 +22,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     template <bool Copyable, typename R, typename... Ts>
     class basic_function<R(Ts...), Copyable, /*Serializable*/ true>
       : public basic_function<R(Ts...), Copyable, /*Serializable*/ false>
@@ -41,7 +42,7 @@ namespace hpx { namespace util { namespace detail {
         template <typename F>
         void assign(F&& f)
         {
-            using target_type = typename std::decay<F>::type;
+            using target_type = std::decay_t<F>;
 
             base_type::assign(HPX_FORWARD(F, f));
             if (!base_type::empty())
@@ -66,9 +67,7 @@ namespace hpx { namespace util { namespace detail {
             ar << is_empty;
             if (!is_empty)
             {
-                std::string const name = serializable_vptr->name;
-                ar << name;
-
+                ar << std::string(serializable_vptr->name);
                 serializable_vptr->save_object(object, ar, version);
             }
         }
@@ -84,7 +83,7 @@ namespace hpx { namespace util { namespace detail {
                 std::string name;
                 ar >> name;
                 serializable_vptr =
-                    detail::get_serializable_vtable<vtable>(name);
+                    detail::get_serializable_vtable<vtable>(HPX_MOVE(name));
 
                 vptr = serializable_vptr->vptr;
                 object = serializable_vptr->load_object(
@@ -95,7 +94,8 @@ namespace hpx { namespace util { namespace detail {
         HPX_SERIALIZATION_SPLIT_MEMBER()
 
         template <typename T>
-        static serializable_vtable const* get_serializable_vtable() noexcept
+        static constexpr serializable_vtable const*
+        get_serializable_vtable() noexcept
         {
             return detail::get_serializable_vtable<vtable, T>();
         }
@@ -106,4 +106,4 @@ namespace hpx { namespace util { namespace detail {
         using base_type::vptr;
         serializable_vtable const* serializable_vptr;
     };
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

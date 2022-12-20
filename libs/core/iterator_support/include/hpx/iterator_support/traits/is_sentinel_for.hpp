@@ -11,7 +11,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // The trait checks whether sentinel Sent is proper for iterator I.
@@ -26,8 +26,7 @@ namespace hpx { namespace traits {
     template <typename Sent, typename Iter>
     struct is_sentinel_for<Sent, Iter,
         typename std::enable_if_t<is_iterator_v<Iter> &&
-            is_weakly_equality_comparable_with<Iter, Sent>::value>>
-      : std::true_type
+            is_weakly_equality_comparable_with_v<Iter, Sent>>> : std::true_type
     {
     };
 
@@ -54,16 +53,14 @@ namespace hpx { namespace traits {
     struct is_sized_sentinel_for<Sent, Iter,
         std::void_t<
             std::enable_if_t<hpx::traits::is_sentinel_for<Sent, Iter>::value &&
-                !disable_sized_sentinel_for<typename std::remove_cv<Sent>::type,
-                    typename std::remove_cv<Iter>::type>>,
-            typename detail::subtraction_result<Iter, Sent>::type,
-            typename detail::subtraction_result<Sent, Iter>::type>>
-      : std::true_type
+                !disable_sized_sentinel_for<std::remove_cv_t<Sent>,
+                    std::remove_cv_t<Iter>>>,
+            detail::subtraction_result_t<Iter, Sent>,
+            detail::subtraction_result_t<Sent, Iter>>> : std::true_type
     {
     };
 
     template <typename Sent, typename Iter>
     inline constexpr bool is_sized_sentinel_for_v =
         is_sized_sentinel_for<Sent, Iter>::value;
-
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

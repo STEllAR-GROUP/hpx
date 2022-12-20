@@ -6,7 +6,7 @@
 
 #pragma once
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for plugin config data injection
@@ -19,4 +19,4 @@ namespace hpx { namespace traits {
             return nullptr;
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

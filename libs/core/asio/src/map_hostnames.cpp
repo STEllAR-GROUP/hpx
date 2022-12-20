@@ -18,7 +18,7 @@
 #include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     std::string map_hostnames::map(
         std::string host_name, std::uint16_t port) const
@@ -36,7 +36,8 @@ namespace hpx { namespace util {
         }
 
         if (!!transform_)
-        {    // If the transform is not empty
+        {
+            // if the transform is not empty
             host_name = transform_(host_name);
             if (debug_)
             {
@@ -58,4 +59,4 @@ namespace hpx { namespace util {
         }
         return resolved_addr;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

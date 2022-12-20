@@ -19,7 +19,7 @@
 #include <iterator>
 #include <type_traits>
 
-namespace hpx { namespace iterators {
+namespace hpx::iterators {
 
     // Traversal Categories
     struct no_traversal_tag
@@ -122,7 +122,7 @@ namespace hpx { namespace iterators {
       : pure_traversal_tag<typename iterator_traversal<Iterator>::type>
     {
     };
-}}    // namespace hpx::iterators
+}    // namespace hpx::iterators
 
 #define HPX_ITERATOR_TRAVERSAL_TAG_NS hpx
 
@@ -155,10 +155,6 @@ namespace hpx {
         using pure_traversal_tag_t =
             typename pure_traversal_tag<Traversal>::type;
 
-        template <typename Traversal>
-        inline constexpr bool pure_traversal_tag_v =
-            pure_traversal_tag<Traversal>::value;
-
         template <typename Iterator>
         using pure_iterator_traversal =
             HPX_ITERATOR_TRAVERSAL_TAG_NS::iterators::pure_iterator_traversal<
@@ -167,10 +163,6 @@ namespace hpx {
         template <typename Iterator>
         using pure_iterator_traversal_t =
             typename pure_iterator_traversal<Iterator>::type;
-
-        template <typename Iterator>
-        inline constexpr bool pure_iterator_traversal_v =
-            pure_iterator_traversal<Iterator>::value;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Cat>
@@ -181,10 +173,6 @@ namespace hpx {
         using iterator_category_to_traversal_t =
             typename iterator_category_to_traversal<Cat>::type;
 
-        template <typename Cat>
-        inline constexpr bool iterator_category_to_traversal_v =
-            iterator_category_to_traversal<Cat>::value;
-
         template <typename Iterator>
         using iterator_traversal =
             HPX_ITERATOR_TRAVERSAL_TAG_NS::iterators::iterator_traversal<
@@ -193,10 +181,6 @@ namespace hpx {
         template <typename Iterator>
         using iterator_traversal_t =
             typename iterator_traversal<Iterator>::type;
-
-        template <typename Iterator>
-        inline constexpr bool iterator_traversal_v =
-            iterator_traversal<Iterator>::value;
     }    // namespace traits
 }    // namespace hpx
 

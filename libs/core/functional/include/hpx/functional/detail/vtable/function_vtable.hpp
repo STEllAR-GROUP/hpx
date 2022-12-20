@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,7 +15,8 @@
 
 #include <type_traits>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     struct function_base_vtable
       : vtable
       , copyable_vtable
@@ -80,4 +81,4 @@ namespace hpx { namespace util { namespace detail {
 
     template <typename Sig>
     using unique_function_vtable = function_vtable<Sig, false>;
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

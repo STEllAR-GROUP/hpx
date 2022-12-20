@@ -15,7 +15,7 @@
 #include <memory>
 #include <new>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
 
     struct copyable_vtable
     {
@@ -44,4 +44,4 @@ namespace hpx { namespace util { namespace detail {
         {
         }
     };
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

@@ -105,7 +105,7 @@ namespace hpx::util {
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     template <typename Sig, bool Serializable>
     struct get_function_address<hpx::function<Sig, Serializable>>
@@ -138,10 +138,10 @@ namespace hpx { namespace traits {
         }
     };
 #endif
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 #endif
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 #define HPX_UTIL_REGISTER_FUNCTION_DECLARATION(Sig, F, Name)                   \
     HPX_DECLARE_GET_FUNCTION_NAME(function_vtable<Sig>, F, Name)               \
     /**/

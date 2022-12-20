@@ -54,11 +54,12 @@ namespace hpx::string_util {
     // comma, the quotation mark, and the escape character (backslash \), can be
     // assigned to other characters.
     template <typename Char,
-        typename Traits = typename std::basic_string<Char>::traits_type>
+        typename Traits = typename std::basic_string<Char>::traits_type,
+        typename Allocator = typename std::basic_string<Char>::allocator_type>
     class escaped_list_separator
     {
     private:
-        using string_type = std::basic_string<Char, Traits>;
+        using string_type = std::basic_string<Char, Traits, Allocator>;
 
         struct char_eq
         {
@@ -100,8 +101,8 @@ namespace hpx::string_util {
                 quote_.end();
         }
 
-        template <typename iterator, typename Token>
-        void do_escape(iterator& next, iterator end, Token& tok)
+        template <typename Iterator, typename Token>
+        void do_escape(Iterator& next, Iterator end, Token& tok)
         {
             if (++next == end)
             {
@@ -153,7 +154,7 @@ namespace hpx::string_util {
         template <typename InputIterator, typename Token>
         bool operator()(InputIterator& next, InputIterator end, Token& tok)
         {
-            bool bInQuote = false;
+            bool in_quote = false;
             tok = Token();
 
             if (next == end)
@@ -170,7 +171,7 @@ namespace hpx::string_util {
             }
 
             last_ = false;
-            for (; next != end; ++next)
+            for (/**/; next != end; ++next)
             {
                 if (is_escape(*next))
                 {
@@ -178,7 +179,7 @@ namespace hpx::string_util {
                 }
                 else if (is_c(*next))
                 {
-                    if (!bInQuote)
+                    if (!in_quote)
                     {
                         // If we are not in quote, then we are done
                         ++next;
@@ -195,7 +196,7 @@ namespace hpx::string_util {
                 }
                 else if (is_quote(*next))
                 {
-                    bInQuote = !bInQuote;
+                    in_quote = !in_quote;
                 }
                 else
                 {
@@ -452,13 +453,13 @@ namespace hpx::string_util {
         keep
     };
 
-    // The out of the box GCC 2.95 on cygwin does not have a char_traits class.
     template <typename Char,
-        typename Tr = typename std::basic_string<Char>::traits_type>
+        typename Traits = typename std::basic_string<Char>::traits_type,
+        typename Allocator = typename std::basic_string<Char>::allocator_type>
     class char_separator
     {
-        using Traits = detail::traits_extension<Tr>;
-        using string_type = std::basic_string<Char, Tr>;
+        using traits_type = detail::traits_extension<Traits>;
+        using string_type = std::basic_string<Char, Traits, Allocator>;
 
     public:
         explicit char_separator(Char const* dropped_delims,
@@ -469,7 +470,6 @@ namespace hpx::string_util {
           , m_use_isspace(false)
           , m_empty_tokens(empty_tokens)
         {
-            // Borland workaround
             if (kept_delims)
                 m_kept_delims = kept_delims;
         }
@@ -477,7 +477,7 @@ namespace hpx::string_util {
         // use ispunct() for kept delimiters and isspace for dropped.
         char_separator() = default;
 
-        void reset() noexcept {}
+        constexpr void reset() noexcept {}
 
         template <typename InputIterator, typename Token>
         bool operator()(InputIterator& next, InputIterator end, Token& tok)
@@ -490,7 +490,7 @@ namespace hpx::string_util {
             // skip past all dropped_delims
             if (m_empty_tokens == empty_token_policy::drop)
             {
-                for (; next != end && is_dropped(*next); ++next)
+                for (/**/; next != end && is_dropped(*next); ++next)
                 {
                 }
             }
@@ -511,7 +511,8 @@ namespace hpx::string_util {
                 else
                 {
                     // append all the non delim characters
-                    for (; next != end && !is_dropped(*next) && !is_kept(*next);
+                    for (/**/;
+                         next != end && !is_dropped(*next) && !is_kept(*next);
                          ++next)
                     {
                         assigner::plus_equal(tok, *next);
@@ -519,12 +520,13 @@ namespace hpx::string_util {
                 }
             }
             else
-            {    // m_empty_tokens == empty_token_policy::keep
+            {
+                // m_empty_tokens == empty_token_policy::keep
 
                 // Handle empty token at the end
                 if (next == end)
                 {
-                    if (m_output_done == false)
+                    if (!m_output_done)
                     {
                         m_output_done = true;
                         assigner::assign(start, next, tok);
@@ -538,7 +540,7 @@ namespace hpx::string_util {
 
                 if (is_kept(*next))
                 {
-                    if (m_output_done == false)
+                    if (!m_output_done)
                     {
                         m_output_done = true;
                     }
@@ -549,7 +551,7 @@ namespace hpx::string_util {
                         m_output_done = false;
                     }
                 }
-                else if (m_output_done == false && is_dropped(*next))
+                else if (!m_output_done && is_dropped(*next))
                 {
                     m_output_done = true;
                 }
@@ -560,7 +562,8 @@ namespace hpx::string_util {
                         start = ++next;
                     }
 
-                    for (; next != end && !is_dropped(*next) && !is_kept(*next);
+                    for (/**/;
+                         next != end && !is_dropped(*next) && !is_kept(*next);
                          ++next)
                     {
                         assigner::plus_equal(tok, *next);
@@ -585,29 +588,27 @@ namespace hpx::string_util {
         bool is_kept(Char E) const
         {
             if (m_kept_delims.length())
+            {
                 return m_kept_delims.find(E) != string_type::npos;
+            }
             else if (m_use_ispunct)
             {
-                return Traits::ispunct(E) != 0;
+                return traits_type::ispunct(E) != 0;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         bool is_dropped(Char E) const
         {
             if (m_dropped_delims.length())
+            {
                 return m_dropped_delims.find(E) != string_type::npos;
+            }
             else if (m_use_isspace)
             {
-                return Traits::isspace(E) != 0;
+                return traits_type::isspace(E) != 0;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
     };
 
@@ -619,14 +620,14 @@ namespace hpx::string_util {
     // punctuation. Nonreturnable delimiters cannot be returned as tokens. These
     // are often whitespace
 
-    // The out of the box GCC 2.95 on cygwin does not have a char_traits class.
     template <typename Char,
-        typename Tr = typename std::basic_string<Char>::traits_type>
+        typename Traits = typename std::basic_string<Char>::traits_type,
+        typename Allocator = typename std::basic_string<Char>::allocator_type>
     class char_delimiters_separator
     {
     private:
-        using Traits = detail::traits_extension<Tr>;
-        using string_type = std::basic_string<Char, Tr>;
+        using traits_type = detail::traits_extension<Traits>;
+        using string_type = std::basic_string<Char, Traits, Allocator>;
 
         string_type returnable_;
         string_type nonreturnable_;
@@ -648,7 +649,7 @@ namespace hpx::string_util {
                 }
                 else
                 {
-                    int r = Traits::ispunct(E);
+                    int r = traits_type::ispunct(E);
                     return r != 0;
                 }
             }
@@ -668,7 +669,7 @@ namespace hpx::string_util {
                 }
                 else
                 {
-                    int r = Traits::isspace(E);
+                    int r = traits_type::isspace(E);
                     return r != 0;
                 }
             }
@@ -687,7 +688,7 @@ namespace hpx::string_util {
         {
         }
 
-        void reset() noexcept {}
+        constexpr void reset() noexcept {}
 
     public:
         template <typename InputIterator, typename Token>
@@ -697,7 +698,7 @@ namespace hpx::string_util {
 
             // skip past all nonreturnable delims
             // skip past the returnable only if we are not returning delims
-            for (; next != end &&
+            for (/**/; next != end &&
                  (is_nonret(*next) || (is_ret(*next) && !return_delims_));
                  ++next)
             {
@@ -718,7 +719,7 @@ namespace hpx::string_util {
             else
             {
                 // append all the non delim characters
-                for (; next != end && !is_nonret(*next) && !is_ret(*next);
+                for (/**/; next != end && !is_nonret(*next) && !is_ret(*next);
                      ++next)
                 {
                     tok += *next;

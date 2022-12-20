@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,7 +11,8 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     struct empty_function
     {
@@ -51,4 +52,4 @@ namespace hpx { namespace util { namespace detail {
         return &empty_vtable;
     }
 #endif
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

@@ -14,24 +14,26 @@
 
 /// Top level namespace
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename MemberPointer>
         struct mem_fn
         {
-            constexpr explicit mem_fn(MemberPointer pm)
+            constexpr explicit mem_fn(MemberPointer pm) noexcept
               : _pm(pm)
             {
             }
 
-            constexpr mem_fn(mem_fn const& other)
+            constexpr mem_fn(mem_fn const& other) noexcept
               : _pm(other._pm)
             {
             }
 
             template <typename... Ts>
-            constexpr typename util::invoke_result<MemberPointer, Ts...>::type
-            operator()(Ts&&... vs) const
+            constexpr util::invoke_result_t<MemberPointer, Ts...> operator()(
+                Ts&&... vs) const
             {
                 return HPX_INVOKE(_pm, HPX_FORWARD(Ts, vs)...);
             }
@@ -64,14 +66,14 @@ namespace hpx {
     ///         Each argument in \c vs is perfectly forwarded,
     ///         as if by \c std::forward<Ts>(vs)... .
     template <typename M, typename C>
-    constexpr detail::mem_fn<M C::*> mem_fn(M C::*pm)
+    constexpr detail::mem_fn<M C::*> mem_fn(M C::*pm) noexcept
     {
         return detail::mem_fn<M C::*>(pm);
     }
 
     /// \copydoc hpx::mem_fn
     template <typename R, typename C, typename... Ps>
-    constexpr detail::mem_fn<R (C::*)(Ps...)> mem_fn(R (C::*pm)(Ps...))
+    constexpr detail::mem_fn<R (C::*)(Ps...)> mem_fn(R (C::*pm)(Ps...)) noexcept
     {
         return detail::mem_fn<R (C::*)(Ps...)>(pm);
     }
@@ -79,7 +81,7 @@ namespace hpx {
     /// \copydoc hpx::mem_fn
     template <typename R, typename C, typename... Ps>
     constexpr detail::mem_fn<R (C::*)(Ps...) const> mem_fn(
-        R (C::*pm)(Ps...) const)
+        R (C::*pm)(Ps...) const) noexcept
     {
         return detail::mem_fn<R (C::*)(Ps...) const>(pm);
     }
@@ -112,5 +114,4 @@ namespace hpx::util {
     {
         return hpx::detail::mem_fn<R (C::*)(Ps...) const>(pm);
     }
-
 }    // namespace hpx::util

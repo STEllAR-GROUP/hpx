@@ -15,7 +15,7 @@
 #include <functional>
 #include <iterator>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     template <typename Generator>
     class generator_iterator
@@ -41,7 +41,8 @@ namespace hpx { namespace util {
             m_value = (*m_g)();
         }
 
-        constexpr typename Generator::result_type const& dereference() const
+        constexpr typename Generator::result_type const& dereference()
+            const noexcept
         {
             return m_value;
         }
@@ -71,4 +72,4 @@ namespace hpx { namespace util {
     template <typename Generator>
     generator_iterator(Generator*)->generator_iterator<Generator>;
     // clang-format on
-}}    // namespace hpx::util
+}    // namespace hpx::util

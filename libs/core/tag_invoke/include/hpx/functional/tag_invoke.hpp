@@ -8,7 +8,8 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx { namespace functional {
+namespace hpx::functional {
+
     inline namespace unspecified {
         /// The `hpx::functional::tag_invoke` name defines a constexpr object
         /// that is invocable with one or more arguments. The first argument
@@ -96,7 +97,7 @@ namespace hpx { namespace functional {
     /// The implementation has to be noexcept
     template <typename Tag>
     struct tag_noexcept;
-}}    // namespace hpx::functional
+}    // namespace hpx::functional
 #else
 
 #include <hpx/config.hpp>

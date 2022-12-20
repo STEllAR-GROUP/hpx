@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2016 Agustin Berge
 //  Copyright (c) 2017 Anton Bikineev
 //
@@ -20,7 +20,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace hpx { namespace traits { namespace detail {
+namespace hpx::traits::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // not every random access sequence is reservable
@@ -69,4 +69,4 @@ namespace hpx { namespace traits { namespace detail {
             v.reserve(std::distance(begin, end));
         }
     }
-}}}    // namespace hpx::traits::detail
+}    // namespace hpx::traits::detail

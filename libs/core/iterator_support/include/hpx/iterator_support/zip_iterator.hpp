@@ -21,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
 
@@ -420,9 +420,9 @@ namespace hpx { namespace util {
       : detail::zip_iterator_category<typename ZipIter::iterator_tuple_type>
     {
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     namespace functional {
 
@@ -466,4 +466,4 @@ namespace hpx { namespace traits {
     struct is_zip_iterator<hpx::util::zip_iterator<Iter...>> : std::true_type
     {
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

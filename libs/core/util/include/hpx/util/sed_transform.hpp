@@ -18,7 +18,7 @@
 #pragma warning(disable : 4251)
 #endif
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     /// Parse a sed command.
     ///
@@ -58,13 +58,12 @@ namespace hpx { namespace util {
             return command_.get() ? true : false;
         }
 
-        bool operator!() const
+        bool operator!() const noexcept
         {
             return !command_.get();
         }
     };
-
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)

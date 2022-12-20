@@ -10,9 +10,10 @@
 
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     namespace detail {
+
         template <typename Action, typename Enable = void>
         struct is_action_impl : std::false_type
         {
@@ -32,7 +33,7 @@ namespace hpx { namespace traits {
 
     template <typename T>
     inline constexpr bool is_action_v = is_action<T>::value;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
 namespace hpx {
 

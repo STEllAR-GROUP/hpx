@@ -48,7 +48,7 @@ asio::detail::winsock_init<>::manual manual_winsock_init;
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     bool get_endpoint(std::string const& addr, std::uint16_t port,
@@ -321,12 +321,12 @@ namespace hpx { namespace util {
             address, port);
         return endpoint_iterator_type();
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
-    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     // Addresses are supposed to have the format <hostname>[:port]
     bool split_ip_address(
         std::string const& v, std::string& host, std::uint16_t& port)
@@ -394,4 +394,4 @@ namespace hpx { namespace util {
         }
         return true;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

@@ -1,9 +1,9 @@
-// Copyright Vladimir Prus 2004.
-// Copyright (c) 2005-2014 Hartmut Kaiser
+//  Copyright Vladimir Prus 2004.
+//  Copyright (c) 2005-2014 Hartmut Kaiser
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -16,7 +16,7 @@
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace plugin {
+namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     using exported_plugins_type = std::map<std::string, hpx::any_nonser>;
@@ -31,4 +31,7 @@ namespace hpx { namespace util { namespace plugin {
         using type = hpx::util::pack<>;
     };
 
-}}}    // namespace hpx::util::plugin
+    template <typename BasePlugin>
+    using virtual_constructor_t =
+        typename virtual_constructor<BasePlugin>::type;
+}    // namespace hpx::util::plugin

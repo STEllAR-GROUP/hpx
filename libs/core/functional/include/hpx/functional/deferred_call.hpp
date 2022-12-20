@@ -21,7 +21,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits { namespace detail {
+namespace hpx::traits::detail {
 
     template <typename F, typename... Ts>
     struct is_deferred_invocable
@@ -32,10 +32,10 @@ namespace hpx { namespace traits { namespace detail {
     template <typename F, typename... Ts>
     inline constexpr bool is_deferred_invocable_v =
         is_deferred_invocable<F, Ts...>::value;
+}    // namespace hpx::traits::detail
 
-}}}    // namespace hpx::traits::detail
+namespace hpx::util {
 
-namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
@@ -96,12 +96,12 @@ namespace hpx { namespace util {
                 // clang-format on
             }
 
-            constexpr std::size_t get_function_address() const
+            constexpr std::size_t get_function_address() const noexcept
             {
                 return traits::get_function_address<F>::call(_f);
             }
 
-            constexpr char const* get_function_annotation() const
+            constexpr char const* get_function_annotation() const noexcept
             {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
                 return traits::get_function_annotation<F>::call(_f);
@@ -152,11 +152,12 @@ namespace hpx { namespace util {
 
         return HPX_FORWARD(F, f);
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
     struct get_function_address<util::detail::deferred<F, Ts...>>
@@ -190,7 +191,7 @@ namespace hpx { namespace traits {
         }
     };
 #endif
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
