@@ -18,8 +18,10 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace threads { namespace policies { namespace detail {
-    inline std::size_t count_initialized(std::vector<mask_type> const& masks)
+namespace hpx::threads::policies::detail {
+
+    inline std::size_t count_initialized(
+        std::vector<mask_type> const& masks) noexcept
     {
         std::size_t count = 0;
         for (mask_cref_type m : masks)
@@ -319,4 +321,4 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
     }
 
     std::atomic<int> affinity_data::instance_number_counter_(-1);
-}}}}    // namespace hpx::threads::policies::detail
+}    // namespace hpx::threads::policies::detail

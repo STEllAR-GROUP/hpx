@@ -113,7 +113,8 @@ namespace hpx { namespace local { namespace detail {
     // Additional command line parser which interprets '@something' as an
     // option "options-file" with the value "something". Additionally we
     // resolve defined command line option aliases.
-    option_parser::option_parser(util::section const& ini, bool ignore_aliases)
+    option_parser::option_parser(
+        util::section const& ini, bool ignore_aliases) noexcept
       : ini_(ini)
       , ignore_aliases_(ignore_aliases)
     {
@@ -141,11 +142,13 @@ namespace hpx { namespace local { namespace detail {
     ///////////////////////////////////////////////////////////////////////
     hpx::program_options::basic_command_line_parser<char>&
     get_commandline_parser(
-        hpx::program_options::basic_command_line_parser<char>& p, int mode)
+        hpx::program_options::basic_command_line_parser<char>& p,
+        util::commandline_error_mode mode)
     {
         if ((mode &
-                ~(util::report_missing_config_file | util::ignore_aliases)) ==
-            util::allow_unregistered)
+                ~(util::commandline_error_mode::report_missing_config_file |
+                    util::commandline_error_mode::ignore_aliases)) ==
+            util::commandline_error_mode::allow_unregistered)
         {
             return p.allow_unregistered();
         }
@@ -155,14 +158,15 @@ namespace hpx { namespace local { namespace detail {
     ///////////////////////////////////////////////////////////////////////
     // Read all options from a given config file
     std::vector<std::string> read_config_file_options(
-        std::string const& filename, int error_mode)
+        std::string const& filename, util::commandline_error_mode error_mode)
     {
         std::vector<std::string> options;
 
         std::ifstream ifs(filename.c_str());
         if (!ifs.is_open())
         {
-            if (error_mode & util::report_missing_config_file)
+            if (as_bool(error_mode &
+                    util::commandline_error_mode::report_missing_config_file))
             {
                 std::cerr << "hpx::init: command line warning: command line "
                              "options file not found ("
@@ -207,7 +211,7 @@ namespace hpx { namespace local { namespace detail {
     bool handle_config_file_options(std::vector<std::string> const& options,
         hpx::program_options::options_description const& desc,
         hpx::program_options::variables_map& vm, util::section const& rtcfg,
-        int error_mode)
+        util::commandline_error_mode error_mode)
     {
         // add options to parsed settings
         if (!options.empty())
@@ -216,13 +220,17 @@ namespace hpx { namespace local { namespace detail {
             using hpx::program_options::store;
             using hpx::program_options::command_line_style::unix_style;
 
-            store(hpx::local::detail::get_commandline_parser(
+            util::commandline_error_mode mode =
+                error_mode & util::commandline_error_mode::ignore_aliases;
+            util::commandline_error_mode notmode =
+                error_mode & util::commandline_error_mode::ignore_aliases;
+
+            store(get_commandline_parser(
                       command_line_parser(options)
                           .options(desc)
                           .style(unix_style)
-                          .extra_parser(hpx::local::detail::option_parser(
-                              rtcfg, error_mode & util::ignore_aliases)),
-                      error_mode & ~util::ignore_aliases)
+                          .extra_parser(option_parser(rtcfg, as_bool(mode))),
+                      notmode)
                       .run(),
                 vm);
             notify(vm);
@@ -237,7 +245,7 @@ namespace hpx { namespace local { namespace detail {
     void handle_generic_config_options(std::string appname,
         hpx::program_options::variables_map& vm,
         hpx::program_options::options_description const& desc_cfgfile,
-        util::section const& ini, int error_mode)
+        util::section const& ini, util::commandline_error_mode error_mode)
     {
         if (appname.empty())
             return;
@@ -250,12 +258,14 @@ namespace hpx { namespace local { namespace detail {
         while (!dir.empty())
         {
             filesystem::path filename = dir / (appname + ".cfg");
-            std::vector<std::string> options =
-                hpx::local::detail::read_config_file_options(filename.string(),
-                    error_mode & ~util::report_missing_config_file);
+            util::commandline_error_mode mode = error_mode &
+                ~util::commandline_error_mode::report_missing_config_file;
 
-            bool result = handle_config_file_options(options, desc_cfgfile, vm,
-                ini, error_mode & ~util::report_missing_config_file);
+            std::vector<std::string> options =
+                read_config_file_options(filename.string(), mode);
+
+            bool result = handle_config_file_options(
+                options, desc_cfgfile, vm, ini, mode);
             if (result)
             {
                 break;    // break on the first options file found
@@ -279,7 +289,7 @@ namespace hpx { namespace local { namespace detail {
     // handle all --options-config found on the command line
     void handle_config_options(hpx::program_options::variables_map& vm,
         hpx::program_options::options_description const& desc_cfgfile,
-        util::section const& ini, int error_mode)
+        util::section const& ini, util::commandline_error_mode error_mode)
     {
         using hpx::program_options::options_description;
         if (vm.count("hpx:options-file"))
@@ -317,7 +327,8 @@ namespace hpx { namespace local { namespace detail {
     bool parse_commandline(util::section const& rtcfg, options_map& all_options,
         hpx::program_options::options_description const& app_options,
         std::vector<std::string> const& args,
-        hpx::program_options::variables_map& vm, int error_mode,
+        hpx::program_options::variables_map& vm,
+        util::commandline_error_mode error_mode,
         hpx::program_options::options_description* visible,
         std::vector<std::string>* unregistered_options)
     {
@@ -348,14 +359,18 @@ namespace hpx { namespace local { namespace detail {
             pd.add("hpx:positional", -1);
 
             // parse command line, allow for unregistered options this point
+            util::commandline_error_mode mode =
+                error_mode & util::commandline_error_mode::ignore_aliases;
+            util::commandline_error_mode notmode =
+                error_mode & ~util::commandline_error_mode::ignore_aliases;
+
             parsed_options opts(get_commandline_parser(
                 command_line_parser(args)
                     .options(all_options[options_type::desc_cmdline])
                     .positional(pd)
                     .style(unix_style)
-                    .extra_parser(option_parser(
-                        rtcfg, error_mode & util::ignore_aliases)),
-                error_mode & ~util::ignore_aliases)
+                    .extra_parser(option_parser(rtcfg, as_bool(mode))),
+                notmode)
                                     .run());
 
             // collect unregistered options, if needed
@@ -374,13 +389,17 @@ namespace hpx { namespace local { namespace detail {
         else
         {
             // parse command line, allow for unregistered options this point
+            util::commandline_error_mode mode =
+                error_mode & util::commandline_error_mode::ignore_aliases;
+            util::commandline_error_mode notmode =
+                error_mode & ~util::commandline_error_mode::ignore_aliases;
+
             parsed_options opts(get_commandline_parser(
                 command_line_parser(args)
                     .options(all_options[options_type::desc_cmdline])
                     .style(unix_style)
-                    .extra_parser(option_parser(
-                        rtcfg, error_mode & util::ignore_aliases)),
-                error_mode & ~util::ignore_aliases)
+                    .extra_parser(option_parser(rtcfg, as_bool(mode))),
+                notmode)
                                     .run());
 
             // collect unregistered options, if needed
@@ -577,7 +596,8 @@ namespace hpx { namespace local { namespace detail {
     bool parse_commandline(util::section const& rtcfg,
         hpx::program_options::options_description const& app_options,
         std::string const& arg0, std::vector<std::string> const& args,
-        hpx::program_options::variables_map& vm, int error_mode,
+        hpx::program_options::variables_map& vm,
+        util::commandline_error_mode error_mode,
         hpx::program_options::options_description* visible,
         std::vector<std::string>* unregistered_options)
     {
@@ -599,7 +619,8 @@ namespace hpx { namespace local { namespace detail {
         }
         catch (std::exception const& e)
         {
-            if (error_mode & util::rethrow_on_error)
+            if (as_bool(error_mode &
+                    util::commandline_error_mode::rethrow_on_error))
                 throw;
 
             std::cerr << "hpx::init: exception caught: " << e.what()
@@ -610,6 +631,7 @@ namespace hpx { namespace local { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         std::string extract_arg0(std::string const& cmdline)
         {
             std::string::size_type p = cmdline.find_first_of(" \t");
@@ -624,7 +646,8 @@ namespace hpx { namespace local { namespace detail {
     bool parse_commandline(util::section const& rtcfg,
         hpx::program_options::options_description const& app_options,
         std::string const& cmdline, hpx::program_options::variables_map& vm,
-        int error_mode, hpx::program_options::options_description* visible,
+        util::commandline_error_mode error_mode,
+        hpx::program_options::options_description* visible,
         std::vector<std::string>* unregistered_options)
     {
         using namespace hpx::program_options;

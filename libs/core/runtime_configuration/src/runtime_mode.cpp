@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2017 Hartmut Kaiser
+//  Copyright (c) 2012-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,8 +14,10 @@
 #include <string>
 
 namespace hpx {
+
     namespace strings {
-        char const* const runtime_mode_names[] = {
+
+        inline constexpr char const* const runtime_mode_names[] = {
             "invalid",    // -1
             "console",    // 0
             "worker",     // 1
@@ -25,7 +27,7 @@ namespace hpx {
         };
     }
 
-    char const* get_runtime_mode_name(runtime_mode state)
+    char const* get_runtime_mode_name(runtime_mode state) noexcept
     {
         if (state < runtime_mode::invalid || state >= runtime_mode::last)
             return "invalid (value out of bounds)";

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -28,7 +28,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     // The runtime_configuration class is a wrapper for the runtime
     // configuration data allowing to extract configuration information in a
@@ -199,4 +200,4 @@ namespace hpx { namespace util {
 
         std::map<std::string, hpx::util::plugin::dll> modules_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util

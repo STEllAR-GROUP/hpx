@@ -148,7 +148,7 @@ namespace hpx { namespace agas {
 
         bool is_bootstrap() const
         {
-            return service_type == service_mode_bootstrap;
+            return service_type == service_mode::bootstrap;
         }
 
         /// \brief Returns whether this addressing_service represents the console

@@ -18,7 +18,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace threads { namespace policies { namespace detail {
+namespace hpx::threads::policies::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     // Structure holding the information related to thread affinity selection
     // for the shepherd threads of this instance
@@ -33,7 +34,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
             std::string const& affinity_description = "balanced",
             bool use_process_mask = false);
 
-        void set_num_threads(size_t num_threads)
+        void set_num_threads(size_t num_threads) noexcept
         {
             num_threads_ = num_threads;
         }
@@ -44,12 +45,12 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
             affinity_masks_ = affinity_masks;
         }
         void set_affinity_masks(
-            std::vector<threads::mask_type>&& affinity_masks)
+            std::vector<threads::mask_type>&& affinity_masks) noexcept
         {
             affinity_masks_ = HPX_MOVE(affinity_masks);
         }
 
-        std::size_t get_num_threads() const
+        constexpr std::size_t get_num_threads() const noexcept
         {
             return num_threads_;
         }
@@ -62,7 +63,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
         std::size_t get_thread_occupancy(
             threads::topology const& topo, std::size_t pu_num) const;
 
-        std::size_t get_pu_num(std::size_t num_thread) const
+        std::size_t get_pu_num(std::size_t num_thread) const noexcept
         {
             HPX_ASSERT(num_thread < pu_nums_.size());
             return pu_nums_[num_thread];
@@ -71,7 +72,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
         {
             pu_nums_ = pu_nums;
         }
-        void set_pu_nums(std::vector<std::size_t>&& pu_nums)
+        void set_pu_nums(std::vector<std::size_t>&& pu_nums) noexcept
         {
             pu_nums_ = HPX_MOVE(pu_nums);
         }
@@ -79,7 +80,7 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
         void add_punit(std::size_t virt_core, std::size_t thread_num);
         void init_cached_pu_nums(std::size_t hardware_concurrency);
 
-        std::size_t get_num_pus_needed() const
+        constexpr std::size_t get_num_pus_needed() const noexcept
         {
             return num_pus_needed_;
         }
@@ -112,6 +113,6 @@ namespace hpx { namespace threads { namespace policies { namespace detail {
         ///< counter for instance numbers
         static std::atomic<int> instance_number_counter_;
     };
-}}}}    // namespace hpx::threads::policies::detail
+}    // namespace hpx::threads::policies::detail
 
 #include <hpx/config/warnings_suffix.hpp>

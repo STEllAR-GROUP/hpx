@@ -14,7 +14,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace plugins {
+namespace hpx::plugins {
+
     ///////////////////////////////////////////////////////////////////////////
     /// The \a plugin_registry_base has to be used as a base class for all
     /// plugin registries.
@@ -39,15 +40,15 @@ namespace hpx { namespace plugins {
         {
         }
     };
-}}    // namespace hpx::plugins
+}    // namespace hpx::plugins
 
 ////////////////////////////////////////////////////////////////////////////////
-/// This macro is used to register the given component factory with
-/// Hpx.Plugin. This macro has to be used for each of the components.
+/// This macro is used to register the given component factory with Hpx.Plugin.
+/// This macro has to be used for each of the components.
 #define HPX_REGISTER_PLUGIN_BASE_REGISTRY(PluginType, name)                    \
     HPX_PLUGIN_EXPORT(HPX_PLUGIN_PLUGIN_PREFIX,                                \
         hpx::plugins::plugin_registry_base, PluginType, name, plugin)          \
-/**/
+    /**/
 
 /// This macro is used to define the required Hpx.Plugin entry points. This
 /// macro has to be used in exactly one compilation unit of a component module.

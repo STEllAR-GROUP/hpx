@@ -12,12 +12,12 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     // dispatch point used for post implementations
     template <typename Func, typename Enable = void>
     struct post_dispatch;
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 namespace hpx {
 

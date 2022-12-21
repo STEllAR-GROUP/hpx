@@ -27,11 +27,12 @@
 #endif
 // clang-format on
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     std::string to_string(mask_cref_type val)
     {
         std::ostringstream ostr;
         ostr << std::hex << HPX_CPU_MASK_PREFIX << val;
         return ostr.str();
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

@@ -192,9 +192,10 @@ namespace hpx {
         return lhs & static_cast<int>(rhs);
     }
 
-    inline constexpr int operator|=(int lhs, error rhs) noexcept
+    inline constexpr int operator|=(int& lhs, error rhs) noexcept
     {
-        return lhs | static_cast<int>(rhs);
+        lhs = lhs | static_cast<int>(rhs);
+        return lhs;
     }
 
 #define HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG                                \

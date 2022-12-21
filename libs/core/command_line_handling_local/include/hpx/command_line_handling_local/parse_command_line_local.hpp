@@ -12,102 +12,137 @@
 #include <hpx/modules/program_options.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
-namespace hpx {
-    namespace util {
-        enum commandline_error_mode
-        {
-            return_on_error,
-            rethrow_on_error,
-            allow_unregistered,
-            ignore_aliases = 0x40,
-            report_missing_config_file = 0x80
-        };
+namespace hpx::util {
 
-        namespace detail {
-            ///////////////////////////////////////////////////////////////////
-            inline std::string enquote(std::string const& arg)
-            {
-                if (arg.find_first_of(" \t\"") != std::string::npos)
-                    return std::string("\"") + arg + "\"";
-                return arg;
-            }
-        }    // namespace detail
-    }        // namespace util
+    enum class commandline_error_mode : std::uint8_t
+    {
+        return_on_error,
+        rethrow_on_error,
+        allow_unregistered,
+        ignore_aliases = 0x40,
+        report_missing_config_file = 0x80
+    };
 
-    namespace local { namespace detail {
+    constexpr bool as_bool(commandline_error_mode val) noexcept
+    {
+        return static_cast<int>(val) != 0;
+    }
 
-        HPX_CORE_EXPORT std::string trim_whitespace(std::string const& s);
+    constexpr int operator~(commandline_error_mode val) noexcept
+    {
+        return ~static_cast<int>(val);
+    }
 
-        struct HPX_CORE_EXPORT option_parser
-        {
-            option_parser(util::section const& ini, bool ignore_aliases);
+    constexpr commandline_error_mode operator&(
+        commandline_error_mode lhs, commandline_error_mode rhs) noexcept
+    {
+        return static_cast<commandline_error_mode>(
+            static_cast<int>(lhs) & static_cast<int>(rhs));
+    }
 
-            std::pair<std::string, std::string> operator()(
-                std::string const& s) const;
+    constexpr commandline_error_mode operator&(
+        commandline_error_mode lhs, int rhs) noexcept
+    {
+        return static_cast<commandline_error_mode>(static_cast<int>(lhs) & rhs);
+    }
 
-            util::section const& ini_;
-            bool ignore_aliases_;
-        };
+    constexpr commandline_error_mode operator|(
+        commandline_error_mode lhs, commandline_error_mode rhs) noexcept
+    {
+        return static_cast<commandline_error_mode>(
+            static_cast<int>(lhs) | static_cast<int>(rhs));
+    }
 
-        HPX_CORE_EXPORT hpx::program_options::basic_command_line_parser<char>&
-        get_commandline_parser(
-            hpx::program_options::basic_command_line_parser<char>& p, int mode);
+    constexpr commandline_error_mode operator|=(
+        commandline_error_mode& lhs, commandline_error_mode rhs) noexcept
+    {
+        lhs = static_cast<commandline_error_mode>(
+            static_cast<int>(lhs) | static_cast<int>(rhs));
+        return lhs;
+    }
+}    // namespace hpx::util
 
-        HPX_CORE_EXPORT std::vector<std::string> read_config_file_options(
-            std::string const& filename, int error_mode);
+namespace hpx::local::detail {
 
-        enum class options_type
-        {
-            commandline_options,
-            hpx_options,
-            hidden_options,
-            config_options,
-            debugging_options,
-            counter_options,
-            desc_cfgfile,
-            desc_cmdline
-        };
+    HPX_CORE_EXPORT std::string enquote(std::string arg);
 
-        using options_map =
-            std::map<options_type, hpx::program_options::options_description>;
+    HPX_CORE_EXPORT std::string trim_whitespace(std::string const& s);
 
-        HPX_CORE_EXPORT options_map compose_local_options();
-        HPX_CORE_EXPORT void compose_all_options(
-            hpx::program_options::options_description const& app_options,
-            options_map& all_options);
+    struct HPX_CORE_EXPORT option_parser
+    {
+        option_parser(util::section const& ini, bool ignore_aliases) noexcept;
 
-        HPX_CORE_EXPORT std::string reconstruct_command_line(
-            hpx::program_options::variables_map const& vm);
+        std::pair<std::string, std::string> operator()(
+            std::string const& s) const;
 
-        HPX_CORE_EXPORT bool parse_commandline(util::section const& rtcfg,
-            options_map& all_options,
-            hpx::program_options::options_description const& app_options,
-            std::vector<std::string> const& args,
-            hpx::program_options::variables_map& vm, int error_mode,
-            hpx::program_options::options_description* visible,
-            std::vector<std::string>* unregistered_options);
+        util::section const& ini_;
+        bool ignore_aliases_;
+    };
 
-        HPX_CORE_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
-            hpx::program_options::options_description const& app_options,
-            std::string const& cmdline, hpx::program_options::variables_map& vm,
-            int error_mode = util::return_on_error,
-            hpx::program_options::options_description* visible = nullptr,
-            std::vector<std::string>* unregistered_options = nullptr);
+    HPX_CORE_EXPORT
+    hpx::program_options::basic_command_line_parser<char>&
+    get_commandline_parser(
+        hpx::program_options::basic_command_line_parser<char>& p,
+        util::commandline_error_mode mode);
 
-        HPX_CORE_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
-            hpx::program_options::options_description const& app_options,
-            std::string const& arg0, std::vector<std::string> const& args,
-            hpx::program_options::variables_map& vm,
-            int error_mode = util::return_on_error,
-            hpx::program_options::options_description* visible = nullptr,
-            std::vector<std::string>* unregistered_options = nullptr);
+    HPX_CORE_EXPORT std::vector<std::string> read_config_file_options(
+        std::string const& filename, util::commandline_error_mode error_mode);
 
-        HPX_CORE_EXPORT std::string reconstruct_command_line(
-            hpx::program_options::variables_map const& vm);
-    }}    // namespace local::detail
-}    // namespace hpx
+    enum class options_type
+    {
+        commandline_options,
+        hpx_options,
+        hidden_options,
+        config_options,
+        debugging_options,
+        counter_options,
+        desc_cfgfile,
+        desc_cmdline
+    };
+
+    using options_map =
+        std::map<options_type, hpx::program_options::options_description>;
+
+    HPX_CORE_EXPORT options_map compose_local_options();
+    HPX_CORE_EXPORT void compose_all_options(
+        hpx::program_options::options_description const& app_options,
+        options_map& all_options);
+
+    HPX_CORE_EXPORT std::string reconstruct_command_line(
+        hpx::program_options::variables_map const& vm);
+
+    HPX_CORE_EXPORT bool parse_commandline(util::section const& rtcfg,
+        options_map& all_options,
+        hpx::program_options::options_description const& app_options,
+        std::vector<std::string> const& args,
+        hpx::program_options::variables_map& vm,
+        util::commandline_error_mode error_mode,
+        hpx::program_options::options_description* visible,
+        std::vector<std::string>* unregistered_options);
+
+    HPX_CORE_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
+        hpx::program_options::options_description const& app_options,
+        std::string const& cmdline, hpx::program_options::variables_map& vm,
+        util::commandline_error_mode error_mode =
+            util::commandline_error_mode::return_on_error,
+        hpx::program_options::options_description* visible = nullptr,
+        std::vector<std::string>* unregistered_options = nullptr);
+
+    HPX_CORE_EXPORT bool parse_commandline(hpx::util::section const& rtcfg,
+        hpx::program_options::options_description const& app_options,
+        std::string const& arg0, std::vector<std::string> const& args,
+        hpx::program_options::variables_map& vm,
+        util::commandline_error_mode error_mode =
+            util::commandline_error_mode::return_on_error,
+        hpx::program_options::options_description* visible = nullptr,
+        std::vector<std::string>* unregistered_options = nullptr);
+
+    HPX_CORE_EXPORT std::string reconstruct_command_line(
+        hpx::program_options::variables_map const& vm);
+}    // namespace hpx::local::detail

@@ -117,7 +117,7 @@ namespace hpx { namespace util {
         bool handle_config_file_options(std::vector<std::string> const& options,
             hpx::program_options::options_description const& desc,
             hpx::program_options::variables_map& vm, util::section const& rtcfg,
-            std::size_t node, int error_mode)
+            std::size_t node, util::commandline_error_mode error_mode)
         {
             // add options to parsed settings
             if (!options.empty())
@@ -126,14 +126,18 @@ namespace hpx { namespace util {
                 using hpx::program_options::store;
                 using hpx::program_options::command_line_style::unix_style;
 
+                util::commandline_error_mode mode =
+                    error_mode & util::commandline_error_mode::ignore_aliases;
+                util::commandline_error_mode notmode =
+                    error_mode & ~util::commandline_error_mode::ignore_aliases;
+
                 store(hpx::local::detail::get_commandline_parser(
                           command_line_parser(options)
                               .options(desc)
                               .style(unix_style)
-                              .extra_parser(
-                                  hpx::util::detail::option_parser(rtcfg, node,
-                                      error_mode & util::ignore_aliases)),
-                          error_mode & ~util::ignore_aliases)
+                              .extra_parser(hpx::util::detail::option_parser(
+                                  rtcfg, node, as_bool(mode))),
+                          notmode)
                           .run(),
                     vm);
                 notify(vm);
@@ -148,7 +152,8 @@ namespace hpx { namespace util {
         void handle_generic_config_options(std::string appname,
             hpx::program_options::variables_map& vm,
             hpx::program_options::options_description const& desc_cfgfile,
-            util::section const& ini, std::size_t node, int error_mode)
+            util::section const& ini, std::size_t node,
+            util::commandline_error_mode error_mode)
         {
             if (appname.empty())
                 return;
@@ -161,14 +166,14 @@ namespace hpx { namespace util {
             while (!dir.empty())
             {
                 filesystem::path filename = dir / (appname + ".cfg");
+                util::commandline_error_mode mode = error_mode &
+                    ~util::commandline_error_mode::report_missing_config_file;
                 std::vector<std::string> options =
                     hpx::local::detail::read_config_file_options(
-                        filename.string(),
-                        error_mode & ~util::report_missing_config_file);
+                        filename.string(), mode);
 
-                bool result =
-                    handle_config_file_options(options, desc_cfgfile, vm, ini,
-                        node, error_mode & ~util::report_missing_config_file);
+                bool result = handle_config_file_options(
+                    options, desc_cfgfile, vm, ini, node, mode);
                 if (result)
                 {
                     break;    // break on the first options file found
@@ -192,7 +197,8 @@ namespace hpx { namespace util {
         // handle all --options-config found on the command line
         void handle_config_options(hpx::program_options::variables_map& vm,
             hpx::program_options::options_description const& desc_cfgfile,
-            util::section const& ini, std::size_t node, int error_mode)
+            util::section const& ini, std::size_t node,
+            util::commandline_error_mode error_mode)
         {
             using hpx::program_options::options_description;
             if (vm.count("hpx:options-file"))
@@ -424,7 +430,7 @@ namespace hpx { namespace util {
         hpx::program_options::options_description const& app_options,
         std::string const& arg0, std::vector<std::string> const& args,
         hpx::program_options::variables_map& vm, std::size_t node,
-        int error_mode, hpx::runtime_mode mode,
+        util::commandline_error_mode error_mode, hpx::runtime_mode mode,
         hpx::program_options::options_description* visible,
         std::vector<std::string>* unregistered_options)
     {
@@ -465,8 +471,11 @@ namespace hpx { namespace util {
         }
         catch (std::exception const& e)
         {
-            if (error_mode & rethrow_on_error)
+            if (as_bool(error_mode &
+                    util::commandline_error_mode::rethrow_on_error))
+            {
                 throw;
+            }
 
             std::cerr << "hpx::init: exception caught: " << e.what()
                       << std::endl;
@@ -490,7 +499,8 @@ namespace hpx { namespace util {
     bool parse_commandline(util::section const& rtcfg,
         hpx::program_options::options_description const& app_options,
         std::string const& cmdline, hpx::program_options::variables_map& vm,
-        std::size_t node, int error_mode, hpx::runtime_mode mode,
+        std::size_t node, util::commandline_error_mode error_mode,
+        hpx::runtime_mode mode,
         hpx::program_options::options_description* visible,
         std::vector<std::string>* unregistered_options)
     {

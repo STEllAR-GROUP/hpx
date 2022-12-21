@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace local { namespace detail {
+namespace hpx::local::detail {
 
     HPX_CORE_EXPORT int handle_late_commandline_options(
         util::runtime_configuration& ini,
@@ -33,4 +33,4 @@ namespace hpx { namespace local { namespace detail {
 
     HPX_CORE_EXPORT std::string get_full_commandline(
         util::runtime_configuration& ini);
-}}}    // namespace hpx::local::detail
+}    // namespace hpx::local::detail
