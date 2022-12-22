@@ -31,7 +31,7 @@ namespace hpx::threads {
         using thread_id_repr = void*;
 
     public:
-        thread_id() noexcept = default;
+        constexpr thread_id() noexcept = default;
 
         thread_id(thread_id const&) = default;
         thread_id& operator=(thread_id const&) = default;

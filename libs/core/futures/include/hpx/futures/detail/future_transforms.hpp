@@ -20,7 +20,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx::lcos::detail {
 
     // Returns true when the given future is ready,
     // the future is deferred executed if possible first.
@@ -94,4 +94,4 @@ namespace hpx { namespace lcos { namespace detail {
 
         return values;
     }
-}}}    // namespace hpx::lcos::detail
+}    // namespace hpx::lcos::detail

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,13 +12,15 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
 #include <hpx/coroutines/detail/tss.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 
 #include <memory>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     class thread_specific_ptr
@@ -26,8 +28,8 @@ namespace hpx { namespace threads {
     private:
         typedef coroutines::detail::tss_cleanup_function cleanup_function;
 
-        thread_specific_ptr(thread_specific_ptr&);
-        thread_specific_ptr& operator=(thread_specific_ptr&);
+        thread_specific_ptr(thread_specific_ptr const&) = delete;
+        thread_specific_ptr& operator=(thread_specific_ptr const&) = delete;
 
         struct delete_data : coroutines::detail::tss_cleanup_function
         {
@@ -56,7 +58,7 @@ namespace hpx { namespace threads {
         std::shared_ptr<cleanup_function> cleanup_;
 
     public:
-        typedef T element_type;
+        using element_type = T;
 
         thread_specific_ptr()
           : cleanup_(std::make_shared<delete_data>())
@@ -98,6 +100,7 @@ namespace hpx { namespace threads {
                 this, std::shared_ptr<cleanup_function>());
             return temp;
         }
+
         void reset(T* new_value = nullptr)
         {
             T* const current_value = get();
@@ -108,5 +111,6 @@ namespace hpx { namespace threads {
             }
         }
     };
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
+
 #endif

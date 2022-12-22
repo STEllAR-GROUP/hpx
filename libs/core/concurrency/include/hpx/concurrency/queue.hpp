@@ -295,7 +295,7 @@ namespace hpx::lockfree {
          *       queue. Therefore it is rarely practical to use this value in
          *       program logic.
          */
-        constexpr bool empty() const noexcept
+        bool empty() const noexcept
         {
             return pool.get_handle(head_.load()) ==
                 pool.get_handle(tail_.load());

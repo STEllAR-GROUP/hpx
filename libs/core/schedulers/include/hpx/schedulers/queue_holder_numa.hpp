@@ -43,11 +43,13 @@
 #endif
 
 namespace hpx {
-    static hpx::debug::enable_print<QUEUE_HOLDER_NUMA_DEBUG> nq_deb("QH_NUMA");
+
+    inline constexpr hpx::debug::enable_print<QUEUE_HOLDER_NUMA_DEBUG> nq_deb(
+        "QH_NUMA");
 }
 
-// ------------------------------------------------------------////////
-namespace hpx { namespace threads { namespace policies {
+namespace hpx::threads::policies {
+
     // ----------------------------------------------------------------
     // Helper class to hold a set of thread queue holders.
     // ----------------------------------------------------------------
@@ -59,7 +61,7 @@ namespace hpx { namespace threads { namespace policies {
         using mutex_type = typename QueueType::mutex_type;
 
         // ----------------------------------------------------------------
-        queue_holder_numa()
+        queue_holder_numa() noexcept
           : num_queues_(0)
           , domain_(0)
         {
@@ -83,13 +85,13 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        inline std::size_t size() const
+        inline std::size_t size() const noexcept
         {
             return queues_.size();
         }
 
         // ----------------------------------------------------------------
-        inline ThreadQueue* thread_queue(std::size_t id) const
+        inline ThreadQueue* thread_queue(std::size_t id) const noexcept
         {
             return queues_[id];
         }
@@ -118,6 +120,7 @@ namespace hpx { namespace threads { namespace policies {
                     // clang-format on
                     return true;
                 }
+
                 // if stealing disabled, do not check other queues
                 if (!core_stealing)
                     return false;
@@ -130,8 +133,8 @@ namespace hpx { namespace threads { namespace policies {
             threads::thread_id_ref_type& thrd, bool stealing,
             bool core_stealing)
         {
-            // loop over queues and take one task,
-            // starting with the requested queue
+            // loop over queues and take one task, starting with the requested
+            // queue
             std::size_t q = qidx;
             for (std::size_t i = 0; i < num_queues_;
                  ++i, q = fast_mod((qidx + i), num_queues_))
@@ -147,6 +150,7 @@ namespace hpx { namespace threads { namespace policies {
                         debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
                     return true;
                 }
+
                 // if stealing disabled, do not check other queues
                 if (!core_stealing)
                     return false;
@@ -178,6 +182,7 @@ namespace hpx { namespace threads { namespace policies {
                     // clang-format on
                     return true;
                 }
+
                 // if stealing disabled, do not check other queues
                 if (!allow_stealing)
                     return false;
@@ -209,6 +214,7 @@ namespace hpx { namespace threads { namespace policies {
                     // clang-format on
                     return true;
                 }
+
                 // if stealing disabled, do not check other queues
                 if (!allow_stealing)
                     return false;
@@ -254,37 +260,39 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        // ----------------------------------------------------------------
-        // ----------------------------------------------------------------
         std::size_t num_queues_;
         std::size_t domain_;
         std::vector<ThreadQueue*> queues_;
 
     public:
-        //        // ------------------------------------------------------------
-        //        // This returns the current length of the pending queue
-        //        std::int64_t get_pending_queue_length() const
-        //        {
-        //            return work_items_count_;
-        //        }
-
-        //        // This returns the current length of the staged queue
-        //        std::int64_t get_staged_queue_length(
-        //            std::memory_order order = std::memory_order_seq_cst) const
-        //        {
-        //            return new_tasks_count_.load(order);
-        //        }
-
-        void increment_num_pending_misses(std::size_t /* num */ = 1) {}
-        void increment_num_pending_accesses(std::size_t /* num */ = 1) {}
-        void increment_num_stolen_from_pending(std::size_t /* num */ = 1) {}
-        void increment_num_stolen_from_staged(std::size_t /* num */ = 1) {}
-        void increment_num_stolen_to_pending(std::size_t /* num */ = 1) {}
-        void increment_num_stolen_to_staged(std::size_t /* num */ = 1) {}
+        constexpr void increment_num_pending_misses(
+            std::size_t /* num */ = 1) noexcept
+        {
+        }
+        constexpr void increment_num_pending_accesses(
+            std::size_t /* num */ = 1) noexcept
+        {
+        }
+        constexpr void increment_num_stolen_from_pending(
+            std::size_t /* num */ = 1) noexcept
+        {
+        }
+        constexpr void increment_num_stolen_from_staged(
+            std::size_t /* num */ = 1) noexcept
+        {
+        }
+        constexpr void increment_num_stolen_to_pending(
+            std::size_t /* num */ = 1) noexcept
+        {
+        }
+        constexpr void increment_num_stolen_to_staged(
+            std::size_t /* num */ = 1) noexcept
+        {
+        }
 
         // ------------------------------------------------------------
         bool dump_suspended_threads(std::size_t /* num_thread */,
-            std::int64_t& /* idle_loop_count */, bool /* running */)
+            std::int64_t& /* idle_loop_count */, bool /* running */) noexcept
         {
             return false;
         }
@@ -297,11 +305,11 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ------------------------------------------------------------
-        void on_start_thread(std::size_t /* num_thread */) {}
-        void on_stop_thread(std::size_t /* num_thread */) {}
-        void on_error(
-            std::size_t /* num_thread */, std::exception_ptr const& /* e */)
+        constexpr void on_start_thread(std::size_t /* num_thread */) noexcept {}
+        constexpr void on_stop_thread(std::size_t /* num_thread */) noexcept {}
+        constexpr void on_error(std::size_t /* num_thread */,
+            std::exception_ptr const& /* e */) noexcept
         {
         }
     };
-}}}    // namespace hpx::threads::policies
+}    // namespace hpx::threads::policies

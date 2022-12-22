@@ -10,7 +10,6 @@
 #include <hpx/modules/command_line_handling_local.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <cstddef>
@@ -18,7 +17,7 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     int handle_late_commandline_options(util::runtime_configuration& ini,
         hpx::program_options::options_description const& options,
@@ -39,7 +38,7 @@ namespace hpx { namespace util {
                 std::string allow_unknown(
                     ini.get_entry("hpx.commandline.allow_unknown", "0"));
                 if (allow_unknown != "0")
-                    mode = util::commandline_error_mode::allow_unregistered;
+                    mode |= util::commandline_error_mode::allow_unregistered;
 
                 hpx::program_options::variables_map vm;
                 std::vector<std::string> still_unregistered_options;
@@ -101,4 +100,4 @@ namespace hpx { namespace util {
 
         return 0;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

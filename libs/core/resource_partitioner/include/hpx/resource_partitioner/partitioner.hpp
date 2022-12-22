@@ -19,15 +19,16 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resource {
+namespace hpx::resource {
+
     ///////////////////////////////////////////////////////////////////////////
     class pu
     {
         static constexpr const std::size_t invalid_pu_id = std::size_t(-1);
 
     public:
-        explicit pu(std::size_t id = invalid_pu_id, core* core = nullptr,
-            std::size_t thread_occupancy = 0)
+        explicit constexpr pu(std::size_t id = invalid_pu_id,
+            core* core = nullptr, std::size_t thread_occupancy = 0) noexcept
           : id_(id)
           , core_(core)
           , thread_occupancy_(thread_occupancy)
@@ -35,7 +36,7 @@ namespace hpx { namespace resource {
         {
         }
 
-        std::size_t id() const
+        constexpr std::size_t id() const noexcept
         {
             return id_;
         }
@@ -66,18 +67,18 @@ namespace hpx { namespace resource {
         static constexpr const std::size_t invalid_core_id = std::size_t(-1);
 
     public:
-        explicit core(
-            std::size_t id = invalid_core_id, numa_domain* domain = nullptr)
+        explicit core(std::size_t id = invalid_core_id,
+            numa_domain* domain = nullptr) noexcept
           : id_(id)
           , domain_(domain)
         {
         }
 
-        std::vector<pu> const& pus() const
+        constexpr std::vector<pu> const& pus() const noexcept
         {
             return pus_;
         }
-        std::size_t id() const
+        constexpr std::size_t id() const noexcept
         {
             return id_;
         }
@@ -100,16 +101,16 @@ namespace hpx { namespace resource {
             std::size_t(-1);
 
     public:
-        explicit numa_domain(std::size_t id = invalid_numa_domain_id)
+        explicit numa_domain(std::size_t id = invalid_numa_domain_id) noexcept
           : id_(id)
         {
         }
 
-        std::vector<core> const& cores() const
+        constexpr std::vector<core> const& cores() const noexcept
         {
             return cores_;
         }
-        std::size_t id() const
+        constexpr std::size_t id() const noexcept
         {
             return id_;
         }
@@ -125,8 +126,9 @@ namespace hpx { namespace resource {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         inline ::hpx::resource::partitioner make_partitioner(
-            resource::partitioner_mode rpmode, hpx::util::section rtcfg,
+            resource::partitioner_mode rpmode, hpx::util::section const& rtcfg,
             hpx::threads::policies::detail::affinity_data affinity_data);
     }
 
@@ -134,10 +136,11 @@ namespace hpx { namespace resource {
     {
     private:
         friend ::hpx::resource::partitioner detail::make_partitioner(
-            resource::partitioner_mode rpmode, hpx::util::section rtcfg,
+            resource::partitioner_mode rpmode, hpx::util::section const& rtcfg,
             hpx::threads::policies::detail::affinity_data affinity_data);
 
-        partitioner(resource::partitioner_mode rpmode, hpx::util::section rtcfg,
+        partitioner(resource::partitioner_mode rpmode,
+            hpx::util::section const& rtcfg,
             hpx::threads::policies::detail::affinity_data affinity_data)
           : partitioner_(
                 detail::create_partitioner(rpmode, rtcfg, affinity_data))
@@ -159,16 +162,17 @@ namespace hpx { namespace resource {
         // allow the default pool to be renamed to something else
         HPX_CORE_EXPORT void set_default_pool_name(std::string const& name);
 
-        HPX_CORE_EXPORT const std::string& get_default_pool_name() const;
+        HPX_CORE_EXPORT std::string const& get_default_pool_name() const;
 
         ///////////////////////////////////////////////////////////////////////
-        // Functions to add processing units to thread pools via
-        // the pu/core/numa_domain API
+        // Functions to add processing units to thread pools via the
+        // pu/core/numa_domain API
         void add_resource(hpx::resource::pu const& p,
             std::string const& pool_name, std::size_t num_threads = 1)
         {
             add_resource(p, pool_name, true, num_threads);
         }
+
         HPX_CORE_EXPORT void add_resource(hpx::resource::pu const& p,
             std::string const& pool_name, bool exclusive,
             std::size_t num_threads = 1);
@@ -204,11 +208,12 @@ namespace hpx { namespace resource {
     };
 
     namespace detail {
+
         ::hpx::resource::partitioner make_partitioner(
-            resource::partitioner_mode rpmode, hpx::util::section rtcfg,
+            resource::partitioner_mode rpmode, hpx::util::section const& rtcfg,
             hpx::threads::policies::detail::affinity_data affinity_data)
         {
             return ::hpx::resource::partitioner(rpmode, rtcfg, affinity_data);
         }
     }    // namespace detail
-}}       // namespace hpx::resource
+}    // namespace hpx::resource

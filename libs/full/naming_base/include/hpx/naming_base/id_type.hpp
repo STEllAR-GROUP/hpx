@@ -421,7 +421,7 @@ namespace hpx::naming {
 }    // namespace hpx::naming
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     template <>
     struct get_remote_result<hpx::id_type, naming::gid_type>
@@ -450,6 +450,6 @@ namespace hpx { namespace traits {
     {
         using type = std::vector<hpx::id_type>;
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
 #include <hpx/config/warnings_suffix.hpp>

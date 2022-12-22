@@ -23,12 +23,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // This header holds components that can be used to asynchronously request that
-// an operation stops execution in a timely manner, typically because the
-// result is no longer required. Such a request is called a stop request.
+// an operation stops execution in a timely manner, typically because the result
+// is no longer required. Such a request is called a stop request.
 //
 // stop_source, stop_token, and stop_callback implement semantics of shared
-// ownership of a stop state. Any stop_source, stop_token, or stop_callback
-// that shares ownership of the same stop state is an associated stop_source,
+// ownership of a stop state. Any stop_source, stop_token, or stop_callback that
+// shares ownership of the same stop state is an associated stop_source,
 // stop_token, or stop_callback, respectively. The last remaining owner of the
 // stop state automatically releases the resources associated with the stop
 // state.
@@ -44,11 +44,11 @@
 // Callbacks registered via a stop_callback object are called when a stop
 // request is first made by any associated stop_source object.
 //
-// Calls to the functions request_stop, stop_requested, and stop_possible
-// do not introduce data races. A call to request_stop that returns true
-// synchronizes with a call to stop_requested on an associated stop_token
-// or stop_source object that returns true. Registration of a callback
-// synchronizes with the invocation of that callback.
+// Calls to the functions request_stop, stop_requested, and stop_possible do not
+// introduce data races. A call to request_stop that returns true synchronizes
+// with a call to stop_requested on an associated stop_token or stop_source
+// object that returns true. Registration of a callback synchronizes with the
+// invocation of that callback.
 
 namespace hpx {
 
@@ -80,23 +80,24 @@ namespace hpx {
         struct stop_state
         {
         private:
+            using flag_t = std::uint64_t;
+
             // bits 0-30 - token ref count (31 bits)
-            static constexpr std::uint64_t token_ref_increment = 1ull;
-            static constexpr std::uint64_t token_ref_mask = 0x7fffffffull;
+            static constexpr flag_t token_ref_increment = 1ull;
+            static constexpr flag_t token_ref_mask = 0x7fffffffull;
+
             // bit 31 - stop-requested
-            static constexpr std::uint64_t stop_requested_flag = 1ull << 31;
+            static constexpr flag_t stop_requested_flag = 1ull << 31;
 
             // bits 32-62 - source ref count (31 bits)
-            static constexpr std::uint64_t source_ref_increment =
-                token_ref_increment << 32;
-            static constexpr std::uint64_t source_ref_mask = token_ref_mask
+            static constexpr flag_t source_ref_increment = token_ref_increment
                 << 32;
+            static constexpr flag_t source_ref_mask = token_ref_mask << 32;
             // bit 63 - locked
-            static constexpr std::uint64_t locked_flag = stop_requested_flag
-                << 32;
+            static constexpr flag_t locked_flag = stop_requested_flag << 32;
 
         public:
-            stop_state() noexcept
+            constexpr stop_state() noexcept
               : state_(token_ref_increment)
             {
             }
@@ -203,12 +204,12 @@ namespace hpx {
     //
     // 32.3.3, class stop_token
     //
-    // The class stop_token provides an interface for querying whether a
-    // stop request has been made (stop_requested) or can ever be made
+    // The class stop_token provides an interface for querying whether a stop
+    // request has been made (stop_requested) or can ever be made
     // (stop_possible) using an associated stop_source object (32.3.4). A
-    // stop_token can also be passed to a stop_callback (32.3.5) constructor
-    // to register a callback to be called when a stop request has been made
-    // from an associated stop_source.
+    // stop_token can also be passed to a stop_callback (32.3.5) constructor to
+    // register a callback to be called when a stop request has been made from
+    // an associated stop_source.
 
     /// The \a stop_token class provides the means to check if a stop request has
     /// been made or can be made, for its associated \a hpx::stop_source object.
@@ -241,7 +242,7 @@ namespace hpx {
         //      false. [Note: Because the created stop_token object can never
         //      receive a stop request, no resources are allocated for a stop
         //      state]
-        stop_token() noexcept = default;
+        constexpr stop_token() noexcept = default;
 
         stop_token(stop_token const& rhs) noexcept
           : state_(rhs.state_)
@@ -291,14 +292,14 @@ namespace hpx {
         // Returns: true if lhs and rhs have ownership of the same stop state or
         //      if both lhs and rhs do not have ownership of a stop state;
         //      otherwise false.
-        [[nodiscard]] friend bool operator==(
+        [[nodiscard]] friend constexpr bool operator==(
             stop_token const& lhs, stop_token const& rhs) noexcept
         {
             return lhs.state_ == rhs.state_;
         }
 
         // Returns: !(lhs==rhs).
-        [[nodiscard]] friend bool operator!=(
+        [[nodiscard]] friend constexpr bool operator!=(
             stop_token const& lhs, stop_token const& rhs) noexcept
         {
             return !(lhs == rhs);
@@ -306,8 +307,8 @@ namespace hpx {
 
     private:
         explicit stop_token(
-            hpx::intrusive_ptr<detail::stop_state> const& state) noexcept
-          : state_(state)
+            hpx::intrusive_ptr<detail::stop_state> state) noexcept
+          : state_(HPX_MOVE(state))
         {
         }
 
@@ -339,24 +340,25 @@ namespace hpx {
     /// non-default constructor.
     inline constexpr nostopstate_t nostopstate{};
 
-    /// The \a stop_source class provides the means to issue a stop request, such
-    /// as for \a hpx::jthread cancellation. A stop request made for one
+    /// The \a stop_source class provides the means to issue a stop request,
+    /// such as for \a hpx::jthread cancellation. A stop request made for one
     /// \a stop_source object is visible to all \a stop_sources and \a
     /// hpx::stop_tokens of the same associated stop-state; any \a
-    /// hpx::stop_callback(s) registered for associated \a hpx::stop_token(s) will
-    /// be invoked, and any hpx::condition_variable_any objects waiting on associated
-    /// \a hpx::stop_token(s) will be awoken.
-    /// Once a stop is requested, it cannot be withdrawn. Additional stop requests
-    /// have no effect.
+    /// hpx::stop_callback(s) registered for associated \a hpx::stop_token(s)
+    /// will be invoked, and any hpx::condition_variable_any objects waiting on
+    /// associated \a hpx::stop_token(s) will be awoken. Once a stop is
+    /// requested, it cannot be withdrawn. Additional stop requests have no
+    /// effect.
     ///
-    /// \note For the purposes of \a hpx::jthread cancellation the \a stop_source
-    ///       object should be retrieved from the hpx::jthread object using \a
-    ///       get_stop_source(); or stop should be requested directly from the
-    ///       \a hpx::jthread object using \a request_stop(). This will then use the
-    ///       same associated stop-state as that passed into the \a hpx::jthread's
-    ///       invoked function argument (i.e., the function being executed on its thread).
-    ///       For other uses, however, a \a stop_source can be constructed separately
-    ///       using the default constructor, which creates new stop-state.
+    /// \note For the purposes of \a hpx::jthread cancellation the \a
+    ///       stop_source object should be retrieved from the hpx::jthread
+    ///       object using \a get_stop_source(); or stop should be requested
+    ///       directly from the \a hpx::jthread object using \a request_stop().
+    ///       This will then use the same associated stop-state as that passed
+    ///       into the \a hpx::jthread's invoked function argument (i.e., the
+    ///       function being executed on its thread). For other uses, however, a
+    ///       \a stop_source can be constructed separately using the default
+    ///       constructor, which creates new stop-state.
     class stop_source
     {
     public:
@@ -439,16 +441,15 @@ namespace hpx {
         }
 
         // Effects: If *this does not have ownership of a stop state, returns
-        //      false. Otherwise, atomically determines whether the owned
-        //      stop state has received a stop request, and if not, makes a
-        //      stop request. The determination and making of the stop
-        //      request are an atomic read-modify-write operation (6.9.2.1).
-        //      If the request was made, the callbacks registered by
-        //      associated stop_callback objects are synchronously called.
-        //      If an invocation of a callback exits via an exception then
-        //      std::terminate is called (14.6.1). [Note: A stop request
-        //      includes notifying all condition variables of type
-        //      condition_variable_any temporarily registered during an
+        //      false. Otherwise, atomically determines whether the owned stop
+        //      state has received a stop request, and if not, makes a stop
+        //      request. The determination and making of the stop request are an
+        //      atomic read-modify-write operation (6.9.2.1). If the request was
+        //      made, the callbacks registered by associated stop_callback
+        //      objects are synchronously called. If an invocation of a callback
+        //      exits via an exception then std::terminate is called (14.6.1).
+        //      [Note: A stop request includes notifying all condition variables
+        //      of type condition_variable_any temporarily registered during an
         //      interruptible wait (32.6.4.2). end note]
         //
         // Postconditions: stop_possible() is false or stop_requested() is true.
@@ -534,13 +535,13 @@ namespace hpx {
         }
 
         // Effects: Unregisters the callback from the owned stop state, if any.
-        //      The destructor does not block waiting for the execution of
-        //      anrhs callback registered by an associated stop_callback. If
-        //      the callback is concurrently executing on anrhs thread, then
-        //      the return from the invocation of callback strongly happens
-        //      before (6.9.2.1) callback is destroyed. If callback is executing
-        //      on the current thread, then the destructor does not block (3.6)
-        //      waiting for the return from the invocation of callback. Releases
+        //      The destructor does not block waiting for the execution of anrhs
+        //      callback registered by an associated stop_callback. If the
+        //      callback is concurrently executing on anrhs thread, then the
+        //      return from the invocation of callback strongly happens before
+        //      (6.9.2.1) callback is destroyed. If callback is executing on the
+        //      current thread, then the destructor does not block (3.6) waiting
+        //      for the return from the invocation of callback. Releases
         //      ownership of the stop state, if any.
         ~stop_callback()
         {
@@ -577,26 +578,27 @@ namespace hpx {
 
     // clang-format produces inconsistent result between different versions
     // clang-format off
-    /// The \a stop_callback class template provides an RAII object type that registers
-    /// a callback function for an associated \a hpx::stop_token object, such that the
-    /// callback function will be invoked when the \a hpx::stop_token's associated
-    /// \a hpx::stop_source is requested to stop.
-    /// Callback functions registered via \a stop_callback's constructor are invoked
-    /// either in the same thread that successfully invokes \a request_stop() for a
-    /// \a hpx::stop_source of the \a stop_callback's associated \a hpx::stop_token;
-    /// or if stop has already been requested prior to the constructor's registration,
-    /// then the callback is invoked in the thread constructing the \a stop_callback.
-    /// More than one \a stop_callback can be created for the same \a hpx::stop_token,
-    /// from the same or different threads concurrently. No guarantee is provided
-    /// for the order in which they will be executed, but they will be invoked
-    /// synchronously; except for \a stop_callback(s) constructed after stop has already
-    /// been requested for the \a hpx::stop_token, as described previously.
-    /// If an invocation of a callback exits via an exception then hpx::terminate is
-    /// called.
+    /// The \a stop_callback class template provides an RAII object type that
+    /// registers a callback function for an associated \a hpx::stop_token
+    /// object, such that the callback function will be invoked when the \a
+    /// hpx::stop_token's associated \a hpx::stop_source is requested to stop.
+    /// Callback functions registered via \a stop_callback's constructor are
+    /// invoked either in the same thread that successfully invokes \a
+    /// request_stop() for a \a hpx::stop_source of the \a stop_callback's
+    /// associated \a hpx::stop_token; or if stop has already been requested
+    /// prior to the constructor's registration, then the callback is invoked in
+    /// the thread constructing the \a stop_callback. More than one \a
+    /// stop_callback can be created for the same \a hpx::stop_token, from the
+    /// same or different threads concurrently. No guarantee is provided for the
+    /// order in which they will be executed, but they will be invoked
+    /// synchronously; except for \a stop_callback(s) constructed after stop has
+    /// already been requested for the \a hpx::stop_token, as described
+    /// previously. If an invocation of a callback exits via an exception then
+    /// hpx::terminate is called.
     /// \a hpx::stop_callback is not \a CopyConstructible, \a CopyAssignable, \a
-    /// MoveConstructible, nor \a MoveAssignable.
-    /// The template param Callback type must be both \a invocable and \a destructible.
-    /// Any return value is ignored.
+    /// MoveConstructible, nor \a MoveAssignable. The template param Callback
+    /// type must be both \a invocable and \a destructible. Any return value is
+    /// ignored.
     template <typename Callback>
     stop_callback(stop_token, Callback) -> stop_callback<Callback>;
     // clang-format on
@@ -705,14 +707,15 @@ namespace hpx::p2300_stop_token {
         [[nodiscard]] in_place_stop_token get_token() const noexcept;
 
         // Effects: Atomically determines whether the stop state inside *this
-        // has received a stop request, and if not, makes a stop request.
-        // The determination and making of the stop request are an atomic
-        // read-modify-write operation ([intro.races]). If the request was
-        // made, the callbacks registered by associated in_place_stop_callback
-        // objects are synchronously called. If an invocation of a callback
-        // exits via an exception then terminate is invoked ([except.terminate]).
+        // has received a stop request, and if not, makes a stop request. The
+        // determination and making of the stop request are an atomic
+        // read-modify-write operation ([intro.races]). If the request was made,
+        // the callbacks registered by associated in_place_stop_callback objects
+        // are synchronously called. If an invocation of a callback exits via an
+        // exception then terminate is invoked ([except.terminate]).
         //
-        // Postconditions: stop_possible() is false and stop_requested() is true.
+        // Postconditions: stop_possible() is false and stop_requested() is
+        // true.
         //
         // Returns: true if this call made a stop request; otherwise false.
         //
@@ -857,8 +860,8 @@ namespace hpx::p2300_stop_token {
 
     // [stopcallback.inplace], class template in_place_stop_callback
     //
-    // Mandates: in_place_stop_callback is instantiated with an argument for
-    // the template parameter Callback that satisfies both invocable and
+    // Mandates: in_place_stop_callback is instantiated with an argument for the
+    // template parameter Callback that satisfies both invocable and
     // destructible.
     //
     // Preconditions: in_place_stop_callback is instantiated with an argument
@@ -926,17 +929,17 @@ namespace hpx::p2300_stop_token {
         }
 
         // Effects: Unregisters the callback from the stop state of the
-        // associated in_place_stop_source object, if any. The destructor
-        // does not block waiting for the execution of another callback
-        // registered by an associated stop_callback. If callback_ is
-        // concurrently executing on another thread, then the return from
-        // the invocation of callback_ strongly happens before ([intro.races])
-        // callback_ is destroyed. If callback_ is executing on the current
-        // thread, then the destructor does not block ([defns.block]) waiting
-        // for the return from the invocation of callback_.
+        // associated in_place_stop_source object, if any. The destructor does
+        // not block waiting for the execution of another callback registered by
+        // an associated stop_callback. If callback_ is concurrently executing
+        // on another thread, then the return from the invocation of callback_
+        // strongly happens before ([intro.races]) callback_ is destroyed. If
+        // callback_ is executing on the current thread, then the destructor
+        // does not block ([defns.block]) waiting for the return from the
+        // invocation of callback_.
         //
-        // Remarks: A program has undefined behavior if the invocation of
-        // this function does not strongly happen before the beginning of the
+        // Remarks: A program has undefined behavior if the invocation of this
+        // function does not strongly happen before the beginning of the
         // invocation of the destructor of the associated in_place_stop_source
         // object, if any.
         //

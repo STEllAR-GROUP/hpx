@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -29,10 +29,11 @@
 #include <utility>
 
 namespace hpx {
+
     bool HPX_EXPORT is_pre_startup();
 }
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////
     template <typename Action>
@@ -66,9 +67,9 @@ namespace hpx { namespace detail {
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-        data.description =
-            util::thread_description(actions::detail::get_action_name<Action>(),
-                actions::detail::get_action_name_itt<Action>());
+        data.description = threads::thread_description(
+            actions::detail::get_action_name<Action>(),
+            actions::detail::get_action_name_itt<Action>());
 #else
         data.description = actions::detail::get_action_name<Action>();
 #endif
@@ -101,9 +102,9 @@ namespace hpx { namespace detail {
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-        data.description =
-            util::thread_description(actions::detail::get_action_name<Action>(),
-                actions::detail::get_action_name_itt<Action>());
+        data.description = threads::thread_description(
+            actions::detail::get_action_name<Action>(),
+            actions::detail::get_action_name_itt<Action>());
 #else
         data.description = actions::detail::get_action_name<Action>();
 #endif
@@ -245,4 +246,4 @@ namespace hpx { namespace detail {
             }
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

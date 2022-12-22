@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Shoshana Jakobovits
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -34,7 +34,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
     struct init_tss_helper;
@@ -49,7 +50,7 @@ namespace hpx { namespace threads { namespace detail {
             thread_pool_init_parameters const& init);
         virtual ~scheduled_thread_pool();
 
-        void print_pool(std::ostream& os) override;
+        void print_pool(std::ostream& os) const override;
 
         threads::policies::scheduler_base* get_scheduler() const override
         {
@@ -111,7 +112,7 @@ namespace hpx { namespace threads { namespace detail {
 
         void get_idle_core_mask(mask_type&) const override;
 
-        std::int64_t get_background_thread_count() override
+        std::int64_t get_background_thread_count() const override
         {
             return sched_->Scheduler::get_background_thread_count();
         }
@@ -299,7 +300,7 @@ namespace hpx { namespace threads { namespace detail {
     private:
         std::vector<std::thread> threads_;    // vector of OS-threads
 
-        // hold the used scheduler
+        // holds the used scheduler
         std::unique_ptr<Scheduler> sched_;
 
     public:
@@ -310,7 +311,8 @@ namespace hpx { namespace threads { namespace detail {
         // reduce false sharing
         struct scheduling_counter_data
         {
-            // count number of executed HPX-threads and thread phases (invocations)
+            // count number of executed HPX-threads and thread phases
+            // (invocations)
             std::int64_t executed_threads_;
             std::int64_t executed_thread_phases_;
 
@@ -399,6 +401,6 @@ namespace hpx { namespace threads { namespace detail {
         std::size_t max_busy_loop_count_;
         std::size_t shutdown_check_count_;
     };
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail
 
 #include <hpx/config/warnings_suffix.hpp>

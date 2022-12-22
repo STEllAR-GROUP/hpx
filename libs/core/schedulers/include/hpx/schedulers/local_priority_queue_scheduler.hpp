@@ -36,10 +36,9 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-// TODO: add branch prediction and function heat
-
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies {
+namespace hpx::threads::policies {
+
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
     using default_local_priority_queue_scheduler_terminated_queue =
@@ -53,10 +52,10 @@ namespace hpx { namespace threads { namespace policies {
     /// The local_priority_queue_scheduler maintains exactly one queue of work
     /// items (threads) per OS thread, where this OS thread pulls its next work
     /// from. Additionally it maintains separate queues: several for high
-    /// priority threads and one for low priority threads.
-    /// High priority threads are executed by the first N OS threads before any
-    /// other work is executed. Low priority threads are executed by the last
-    /// OS thread whenever no other work is available.
+    /// priority threads and one for low priority threads. High priority threads
+    /// are executed by the first N OS threads before any other work is
+    /// executed. Low priority threads are executed by the last OS thread
+    /// whenever no other work is available.
     template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
@@ -65,11 +64,10 @@ namespace hpx { namespace threads { namespace policies {
     class HPX_CORE_EXPORT local_priority_queue_scheduler : public scheduler_base
     {
     public:
-        typedef std::false_type has_periodic_maintenance;
+        using has_periodic_maintenance = std::false_type;
 
-        typedef thread_queue<Mutex, PendingQueuing, StagedQueuing,
-            TerminatedQueuing>
-            thread_queue_type;
+        using thread_queue_type = thread_queue<Mutex, PendingQueuing,
+            StagedQueuing, TerminatedQueuing>;
 
         // the scheduler type takes two initialization parameters:
         //    the number of queues
@@ -80,8 +78,10 @@ namespace hpx { namespace threads { namespace policies {
             init_parameter(std::size_t num_queues,
                 detail::affinity_data const& affinity_data,
                 std::size_t num_high_priority_queues = std::size_t(-1),
-                thread_queue_init_parameters thread_queue_init = {},
-                char const* description = "local_priority_queue_scheduler")
+                thread_queue_init_parameters thread_queue_init =
+                    thread_queue_init_parameters{},
+                char const* description =
+                    "local_priority_queue_scheduler") noexcept
               : num_queues_(num_queues)
               , num_high_priority_queues_(
                     num_high_priority_queues == std::size_t(-1) ?
@@ -95,7 +95,7 @@ namespace hpx { namespace threads { namespace policies {
 
             init_parameter(std::size_t num_queues,
                 detail::affinity_data const& affinity_data,
-                char const* description)
+                char const* description) noexcept
               : num_queues_(num_queues)
               , num_high_priority_queues_(num_queues)
               , thread_queue_init_()
@@ -110,7 +110,7 @@ namespace hpx { namespace threads { namespace policies {
             detail::affinity_data const& affinity_data_;
             char const* description_;
         };
-        typedef init_parameter init_parameter_type;
+        using init_parameter_type = init_parameter;
 
         local_priority_queue_scheduler(init_parameter_type const& init,
             bool deferred_initialization = true)
@@ -557,72 +557,93 @@ namespace hpx { namespace threads { namespace policies {
             data.schedulehint.hint = static_cast<std::int16_t>(num_thread);
 
             // now create the thread
-            if (data.priority == thread_priority::high_recursive ||
-                data.priority == thread_priority::high ||
-                data.priority == thread_priority::boost)
+            switch (data.priority)
             {
-                if (data.priority == thread_priority::boost)
-                {
-                    data.priority = thread_priority::normal;
-                }
+            case thread_priority::boost:
+                data.priority = thread_priority::normal;
+                [[fallthrough]];
+            case thread_priority::high_recursive:
+                [[fallthrough]];
+            case thread_priority::high:
+            {
                 std::size_t num = num_thread % num_high_priority_queues_;
-
                 high_priority_queues_[num].data_->create_thread(data, id, ec);
 
                 LTM_(debug)
                     .format("local_priority_queue_scheduler::create_thread, "
-                            "high priority queue: "
-                            "pool({}), scheduler({}), worker_thread({}), "
-                            "thread({}), priority({})",
+                            "high priority queue: pool({}), scheduler({}), "
+                            "worker_thread({}), thread({}), priority({})",
                         *this->get_parent_pool(), *this, num,
                         id ? *id : invalid_thread_id, data.priority)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
                     .format(", description({})", data.description)
 #endif
                     ;
-
-                return;
+                break;
             }
 
-            if (data.priority == thread_priority::low)
+            case thread_priority::low:
             {
                 low_priority_queue_.create_thread(data, id, ec);
 
                 LTM_(debug)
                     .format("local_priority_queue_scheduler::create_thread, "
-                            "low priority queue: "
-                            "pool({}), scheduler({}), thread({}), priority({})",
+                            "low priority queue: pool({}), scheduler({}), "
+                            "thread({}), priority({})",
                         *this->get_parent_pool(), *this,
                         id ? *id : invalid_thread_id, data.priority)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
                     .format(", description({})", data.description)
 #endif
                     ;
-
-                return;
+                break;
             }
 
-            HPX_ASSERT(num_thread < num_queues_);
-            if (data.priority == thread_priority::bound)
+            case thread_priority::bound:
             {
+                HPX_ASSERT(num_thread < num_queues_);
                 bound_queues_[num_thread].data_->create_thread(data, id, ec);
-            }
-            else
-            {
-                queues_[num_thread].data_->create_thread(data, id, ec);
+
+                LTM_(debug)
+                    .format("local_priority_queue_scheduler::create_thread, "
+                            "bound priority queue: pool({}), scheduler({}), "
+                            "worker_thread({}), thread({}), priority({})",
+                        *this->get_parent_pool(), *this, num_thread,
+                        id ? *id : invalid_thread_id, data.priority)
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
+                    .format(", description({})", data.description)
+#endif
+                    ;
+                break;
             }
 
-            LTM_(debug)
-                .format("local_priority_queue_scheduler::create_thread normal "
-                        "priority queue: pool({}), scheduler({}), "
-                        "worker_thread({}), "
-                        "thread({}), priority({})",
-                    *this->get_parent_pool(), *this, num_thread,
-                    id ? *id : invalid_thread_id, data.priority)
+            case thread_priority::normal:
+            {
+                HPX_ASSERT(num_thread < num_queues_);
+                queues_[num_thread].data_->create_thread(data, id, ec);
+
+                LTM_(debug)
+                    .format("local_priority_queue_scheduler::create_thread, "
+                            "normal priority queue: pool({}), scheduler({}), "
+                            "worker_thread({}), thread({}), priority({})",
+                        *this->get_parent_pool(), *this, num_thread,
+                        id ? *id : invalid_thread_id, data.priority)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-                .format(", description({})", data.description)
+                    .format(", description({})", data.description)
 #endif
-                ;
+                    ;
+                break;
+            }
+
+            default:
+            case thread_priority::unknown:
+            {
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "local_priority_queue_scheduler::create_thread",
+                    "unknown thread priority value (thread_priority::unknown)");
+            }
+            break;
+            }
         }
 
         // Return the next thread to be executed, return false if none is
@@ -745,25 +766,20 @@ namespace hpx { namespace threads { namespace policies {
             std::unique_lock<pu_mutex_type> l;
             num_thread = select_active_pu(l, num_thread, allow_fallback);
 
-            auto* thrdptr = get_thread_id_data(thrd);
-            (void) thrdptr;
-
-            if (priority == thread_priority::default_)
+            [[maybe_unused]] auto* thrdptr = get_thread_id_data(thrd);
+            switch (priority)
             {
-                //thrdptr->get_priority();
-                priority = thread_priority::normal;
-            }
-
-            if (priority == thread_priority::high_recursive ||
-                priority == thread_priority::high ||
-                priority == thread_priority::boost)
+            case thread_priority::high_recursive:
+            case thread_priority::high:
+                [[fallthrough]];
+            case thread_priority::boost:
             {
                 std::size_t num = num_thread % num_high_priority_queues_;
                 LTM_(debug).format(
                     "local_priority_queue_scheduler::schedule_thread, "
-                    "high priority queue: "
-                    "pool({}), scheduler({}), worker_thread({}), "
-                    "thread({}), priority({}), description({})",
+                    "high priority queue: pool({}), scheduler({}), "
+                    "worker_thread({}), thread({}), priority({}), "
+                    "description({})",
                     *this->get_parent_pool(), *this, num,
                     thrdptr->get_thread_id(), priority,
                     thrdptr->get_description());
@@ -771,40 +787,66 @@ namespace hpx { namespace threads { namespace policies {
                 high_priority_queues_[num].data_->schedule_thread(
                     HPX_MOVE(thrd));
             }
-            else if (priority == thread_priority::low)
+            break;
+
+            case thread_priority::low:
             {
                 LTM_(debug).format(
                     "local_priority_queue_scheduler::schedule_thread, "
-                    "low priority queue: "
-                    "pool({}), scheduler({}), "
+                    "low priority queue: pool({}), scheduler({}), "
                     "thread({}), priority({}), description({})",
                     *this->get_parent_pool(), *this, thrdptr->get_thread_id(),
                     priority, thrdptr->get_description());
 
                 low_priority_queue_.schedule_thread(HPX_MOVE(thrd));
             }
-            else
+            break;
+
+            case thread_priority::default_:
+                [[fallthrough]];
+            case thread_priority::normal:
             {
                 HPX_ASSERT(num_thread < num_queues_);
 
                 LTM_(debug).format(
                     "local_priority_queue_scheduler::schedule_thread, "
-                    "normal priority queue: "
-                    "pool({}), scheduler({}), worker_thread({}), "
-                    "thread({}), priority({}), description({})",
+                    "normal priority queue: pool({}), scheduler({}), "
+                    "worker_thread({}), thread({}), priority({}), "
+                    "description({})",
                     *this->get_parent_pool(), *this, num_thread,
                     thrdptr->get_thread_id(), priority,
                     thrdptr->get_description());
 
-                if (priority == thread_priority::bound)
-                {
-                    bound_queues_[num_thread].data_->schedule_thread(
-                        HPX_MOVE(thrd));
-                }
-                else
-                {
-                    queues_[num_thread].data_->schedule_thread(HPX_MOVE(thrd));
-                }
+                queues_[num_thread].data_->schedule_thread(HPX_MOVE(thrd));
+            }
+            break;
+
+            case thread_priority::bound:
+            {
+                HPX_ASSERT(num_thread < num_queues_);
+
+                LTM_(debug).format(
+                    "local_priority_queue_scheduler::schedule_thread, "
+                    "bound priority queue: pool({}), scheduler({}), "
+                    "worker_thread({}), thread({}), priority({}), "
+                    "description({})",
+                    *this->get_parent_pool(), *this, num_thread,
+                    thrdptr->get_thread_id(), priority,
+                    thrdptr->get_description());
+
+                bound_queues_[num_thread].data_->schedule_thread(
+                    HPX_MOVE(thrd));
+            }
+            break;
+
+            default:
+            case thread_priority::unknown:
+            {
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "local_priority_queue_scheduler::schedule_thread",
+                    "unknown thread priority value (thread_priority::unknown)");
+            }
+            break;
             }
         }
 
@@ -836,40 +878,51 @@ namespace hpx { namespace threads { namespace policies {
             std::unique_lock<pu_mutex_type> l;
             num_thread = select_active_pu(l, num_thread, allow_fallback);
 
-            if (priority == thread_priority::default_)
+            switch (priority)
             {
-                // get_thread_id_data(thrd)->get_priority();
-                priority = thread_priority::normal;
-            }
-
-            if (priority == thread_priority::high_recursive ||
-                priority == thread_priority::high ||
-                priority == thread_priority::boost)
+            case thread_priority::high_recursive:
+            case thread_priority::high:
+                [[fallthrough]];
+            case thread_priority::boost:
             {
                 std::size_t num = num_thread % num_high_priority_queues_;
                 high_priority_queues_[num].data_->schedule_thread(thrd, true);
             }
-            else if (priority == thread_priority::low)
+            break;
+            case thread_priority::low:
             {
                 low_priority_queue_.schedule_thread(HPX_MOVE(thrd), true);
             }
-            else
+            break;
+            case thread_priority::default_:
+                [[fallthrough]];
+            case thread_priority::normal:
             {
                 HPX_ASSERT(num_thread < num_queues_);
-                if (priority == thread_priority::bound)
-                {
-                    bound_queues_[num_thread].data_->schedule_thread(
-                        HPX_MOVE(thrd), true);
-                }
-                else
-                {
-                    queues_[num_thread].data_->schedule_thread(
-                        HPX_MOVE(thrd), true);
-                }
+                queues_[num_thread].data_->schedule_thread(
+                    HPX_MOVE(thrd), true);
+            }
+            break;
+            case thread_priority::bound:
+            {
+                HPX_ASSERT(num_thread < num_queues_);
+                bound_queues_[num_thread].data_->schedule_thread(
+                    HPX_MOVE(thrd), true);
+            }
+            break;
+
+            default:
+            case thread_priority::unknown:
+            {
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "local_priority_queue_scheduler::schedule_thread_last",
+                    "unknown thread priority value (thread_priority::unknown)");
+            }
+            break;
             }
         }
 
-        /// Destroy the passed thread as it has been terminated
+        // Destroy the passed thread as it has been terminated
         void destroy_thread(threads::thread_data* thrd) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
@@ -1206,10 +1259,10 @@ namespace hpx { namespace threads { namespace policies {
         }
 #endif
 
-        /// This is a function which gets called periodically by the thread
-        /// manager to allow for maintenance tasks to be executed in the
-        /// scheduler. Returns true if the OS thread calling this function
-        /// has to be terminated (i.e. no more work has to be done).
+        // This is a function which gets called periodically by the thread
+        // manager to allow for maintenance tasks to be executed in the
+        // scheduler. Returns true if the OS thread calling this function has to
+        // be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, bool enable_stealing,
             std::size_t& added) override
@@ -1315,10 +1368,10 @@ namespace hpx { namespace threads { namespace policies {
                     else
                     {
                         LHPX_CONSOLE_(hpx::util::logging::level::error)
-                            .format(
-                                "  [TM] pool({}), scheduler({}), "
-                                "worker_thread({}): "
-                                "no new work available, are we deadlocked?\n",
+                            .format("  [TM] pool({}), scheduler({}), "
+                                    "worker_thread({}): "
+                                    "no new work available, are we "
+                                    "deadlocked?\n",
                                 *this->get_parent_pool(), *this, num_thread);
                     }
                 }
@@ -1528,7 +1581,7 @@ namespace hpx { namespace threads { namespace policies {
             high_priority_queues_;
         std::vector<util::cache_line_data<std::vector<std::size_t>>>
             victim_threads_;
-    };
-}}}    // namespace hpx::threads::policies
+    };    // namespace hpx::threads::policies
+}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>

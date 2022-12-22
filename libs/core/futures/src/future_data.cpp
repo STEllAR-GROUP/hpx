@@ -24,14 +24,14 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx::lcos::detail {
 
     static run_on_completed_error_handler_type run_on_completed_error_handler;
 
     void set_run_on_completed_error_handler(
         run_on_completed_error_handler_type f)
     {
-        run_on_completed_error_handler = f;
+        run_on_completed_error_handler = HPX_MOVE(f);
     }
 
     future_data_refcnt_base::~future_data_refcnt_base() = default;
@@ -215,7 +215,7 @@ namespace hpx { namespace lcos { namespace detail {
 
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    constexpr void (*p)(Callback &&) =
+                    constexpr void (*p)(Callback &&) noexcept =
                         &future_data_base::run_on_completed;
                     run_on_completed_on_new_thread(util::deferred_call(
                         p, HPX_FORWARD(Callback, on_completed)));
@@ -245,9 +245,8 @@ namespace hpx { namespace lcos { namespace detail {
     future_data_base<traits::detail::future_data_void>::handle_on_completed<
         completed_callback_vector_type>(completed_callback_vector_type&&);
 
-    /// Set the callback which needs to be invoked when the future becomes
-    /// ready. If the future is ready the function will be invoked
-    /// immediately.
+    // Set the callback which needs to be invoked when the future becomes ready.
+    // If the future is ready the function will be invoked immediately.
     void future_data_base<traits::detail::future_data_void>::set_on_completed(
         completed_callback_type data_sink)
     {
@@ -336,4 +335,4 @@ namespace hpx { namespace lcos { namespace detail {
         }
         return hpx::future_status::ready;    //-V110
     }
-}}}    // namespace hpx::lcos::detail
+}    // namespace hpx::lcos::detail

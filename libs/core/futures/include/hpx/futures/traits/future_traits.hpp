@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,15 +12,19 @@
 #include <type_traits>
 
 namespace hpx {
+
     template <typename R>
     class future;
+
     template <typename R>
     class shared_future;
 }    // namespace hpx
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Future, typename Enable = void>
         struct future_traits_customization_point
         {
@@ -82,4 +86,7 @@ namespace hpx { namespace traits {
       : std::is_void<future_traits_t<Future>>
     {
     };
-}}    // namespace hpx::traits
+
+    template <typename Future>
+    inline constexpr bool is_future_void_v = is_future_void<Future>::value;
+}    // namespace hpx::traits

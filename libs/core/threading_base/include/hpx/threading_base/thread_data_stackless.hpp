@@ -26,7 +26,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
     /// A \a thread is the representation of a ParalleX thread. It's a first
@@ -49,7 +49,7 @@ namespace hpx { namespace threads {
     {
     private:
         // Avoid warning about using 'this' in initializer list
-        thread_data* this_()
+        thread_data* this_() noexcept
         {
             return this;
         }
@@ -166,6 +166,6 @@ namespace hpx { namespace threads {
         hpx::construct_at(p, data, queue, stacksize, addref);
         return p;
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>

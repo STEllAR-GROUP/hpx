@@ -56,7 +56,7 @@ namespace hpx { namespace components {
             hpx::threads::thread_init_data& data,
             hpx::threads::thread_schedule_state /* initial_state */)
         {
-            hpx::util::thread_description desc(&executor_component::execute);
+            hpx::threads::thread_description desc(&executor_component::execute);
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             desc = data.description;
 #endif

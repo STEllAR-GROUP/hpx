@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2020 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,20 +20,20 @@
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local { namespace detail {
+namespace hpx::lcos::local::detail {
 
     class sliding_semaphore
     {
     private:
-        typedef hpx::spinlock mutex_type;
+        using mutex_type = hpx::spinlock;
 
     public:
         HPX_CORE_EXPORT sliding_semaphore(
-            std::int64_t max_difference, std::int64_t lower_limit);
+            std::int64_t max_difference, std::int64_t lower_limit) noexcept;
         HPX_CORE_EXPORT ~sliding_semaphore();
 
         HPX_CORE_EXPORT void set_max_difference(std::unique_lock<mutex_type>& l,
-            std::int64_t max_difference, std::int64_t lower_limit);
+            std::int64_t max_difference, std::int64_t lower_limit) noexcept;
 
         HPX_CORE_EXPORT void wait(
             std::unique_lock<mutex_type>& l, std::int64_t upper_limit);
@@ -51,7 +51,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         std::int64_t lower_limit_;
         local::detail::condition_variable cond_;
     };
-}}}}    // namespace hpx::lcos::local::detail
+}    // namespace hpx::lcos::local::detail
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)

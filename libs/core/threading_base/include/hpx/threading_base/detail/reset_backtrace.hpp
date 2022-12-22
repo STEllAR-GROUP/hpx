@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,35 +12,19 @@
 
 #include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 
 #include <memory>
 #include <string>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
 
-    struct reset_backtrace
+    struct HPX_CORE_EXPORT reset_backtrace
     {
-        reset_backtrace(
-            threads::thread_id_type const& id, error_code& ec = throws)
-          : id_(id)
-          , backtrace_(new hpx::util::backtrace())
-#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
-          , full_backtrace_(backtrace_->trace())
-#endif
-          , ec_(ec)
-        {
-#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
-            threads::set_thread_backtrace(id_, full_backtrace_.c_str(), ec_);
-#else
-            threads::set_thread_backtrace(id_, backtrace_.get(), ec_);
-#endif
-        }
-        ~reset_backtrace()
-        {
-            threads::set_thread_backtrace(id_, 0, ec_);
-        }
+        explicit reset_backtrace(
+            threads::thread_id_type const& id, error_code& ec = throws);
+
+        ~reset_backtrace();
 
         threads::thread_id_type id_;
         std::unique_ptr<hpx::util::backtrace> backtrace_;
@@ -49,6 +33,6 @@ namespace hpx { namespace threads { namespace detail {
 #endif
         error_code& ec_;
     };
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail
 
 #endif    // HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,7 +26,7 @@
 #include <system_error>
 #include <utility>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     /// This thread function is used by the at_timer thread below to trigger
@@ -71,8 +71,8 @@ namespace hpx { namespace threads { namespace detail {
             thread_schedule_state::terminated, invalid_thread_id);
     }
 
-    /// This thread function initiates the required set_state action (on
-    /// behalf of one of the threads#detail#set_thread_state functions).
+    // This thread function initiates the required set_state action (on behalf
+    // of one of the threads#detail#set_thread_state functions).
     thread_result_type at_timer(policies::scheduler_base* scheduler,
         std::chrono::steady_clock::time_point& abs_time,
         thread_id_ref_type const& thrd, thread_schedule_state newstate,
@@ -148,6 +148,7 @@ namespace hpx { namespace threads { namespace detail {
         if (thread_restart_state::timeout != statex)    //-V601
         {
             triggered->store(true);
+
             // wake_timer_thread has not been executed yet, cancel timer
             t.cancel();
         }
@@ -161,8 +162,8 @@ namespace hpx { namespace threads { namespace detail {
             thread_schedule_state::terminated, invalid_thread_id);
     }
 
-    /// Set a timer to set the state of the given \a thread to the given
-    /// new value after it expired (at the given time)
+    // Set a timer to set the state of the given \a thread to the given new
+    // value after it expired (at the given time)
     thread_id_ref_type set_thread_state_timed(
         policies::scheduler_base* scheduler,
         hpx::chrono::steady_time_point const& abs_time,
@@ -192,4 +193,4 @@ namespace hpx { namespace threads { namespace detail {
         create_thread(scheduler, data, newid, ec);    //-V601
         return newid;
     }
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail

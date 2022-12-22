@@ -19,7 +19,7 @@
 #include <memory>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
 
     ////////////////////////////////////////////////////////////////////////////
     // A simple but very high performance implementation of the channel concept.
@@ -78,6 +78,9 @@ namespace hpx { namespace lcos { namespace local {
                 std::memory_order_relaxed);
             rhs.closed_.store(true, std::memory_order_release);
         }
+
+        channel_spsc(channel_spsc const& rhs) = delete;
+        channel_spsc& operator=(channel_spsc const& rhs) = delete;
 
         channel_spsc& operator=(channel_spsc&& rhs) noexcept
         {
@@ -175,7 +178,7 @@ namespace hpx { namespace lcos { namespace local {
             return 0;
         }
 
-        std::size_t capacity() const
+        constexpr std::size_t capacity() const noexcept
         {
             return size_ - 1;
         }
@@ -194,4 +197,4 @@ namespace hpx { namespace lcos { namespace local {
         // this channel was closed, i.e. no further operations are possible
         std::atomic<bool> closed_;
     };
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

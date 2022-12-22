@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +13,7 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
 
     thread_id_ref_type create_work(policies::scheduler_base* scheduler,
         threads::thread_init_data& data, error_code& ec)
@@ -21,9 +21,13 @@ namespace hpx { namespace threads { namespace detail {
         // verify parameters
         switch (data.initial_state)
         {
+        // NOLINTNEXTLINE(bugprone-branch-clone)
         case thread_schedule_state::pending:
+            [[fallthrough]];
         case thread_schedule_state::pending_do_not_schedule:
+            [[fallthrough]];
         case thread_schedule_state::pending_boost:
+            [[fallthrough]];
         case thread_schedule_state::suspended:
             break;
 
@@ -103,4 +107,4 @@ namespace hpx { namespace threads { namespace detail {
 
         return id;
     }
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail

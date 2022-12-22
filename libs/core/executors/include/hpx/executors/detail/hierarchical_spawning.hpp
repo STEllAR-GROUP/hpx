@@ -44,7 +44,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     template <typename Launch, typename F, typename S, typename... Ts>
     std::vector<hpx::future<detail::bulk_function_result_t<F, S, Ts...>>>
     hierarchical_bulk_async_execute_helper(
-        hpx::util::thread_description const& desc,
+        hpx::threads::thread_description const& desc,
         threads::thread_pool_base* pool, std::size_t first_thread,
         std::size_t num_threads, std::size_t hierarchical_threshold,
         Launch policy, F&& f, S const& shape, Ts&&... ts)
@@ -119,7 +119,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     // hpx::future.
     template <typename Launch, typename F, typename S, typename... Ts>
     decltype(auto) hierarchical_bulk_async_execute_void(
-        hpx::util::thread_description const& desc,
+        hpx::threads::thread_description const& desc,
         threads::thread_pool_base* pool, std::size_t first_thread,
         std::size_t num_threads, std::size_t hierarchical_threshold,
         Launch policy, F&& f, S const& shape, Ts&&... ts)
@@ -128,7 +128,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
         return hpx::detail::async_launch_policy_dispatch<Launch>::call(
             policy, desc, pool,
-            [](hpx::util::thread_description const& desc,
+            [](hpx::threads::thread_description const& desc,
                 threads::thread_pool_base* pool, std::size_t first_thread,
                 std::size_t num_threads, std::size_t hierarchical_threshold,
                 Launch policy, std::decay_t<F> f, S const& shape,
@@ -223,7 +223,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
     template <typename Launch, typename F, typename S, typename... Ts>
     decltype(auto) hierarchical_bulk_async_execute(
-        hpx::util::thread_description const& desc,
+        hpx::threads::thread_description const& desc,
         threads::thread_pool_base* pool, std::size_t first_thread,
         std::size_t num_threads, std::size_t hierarchical_threshold,
         Launch policy, F&& f, S const& shape, Ts&&... ts)
@@ -249,7 +249,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         std::size_t num_threads, std::size_t hierarchical_threshold,
         Launch policy, F&& f, S const& shape, Ts&&... ts)
     {
-        hpx::util::thread_description const desc(
+        hpx::threads::thread_description const desc(
             f, "hierarchical_bulk_async_execute");
 
         return hierarchical_bulk_async_execute(desc, pool, first_thread,

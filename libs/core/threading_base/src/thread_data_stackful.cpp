@@ -1,4 +1,4 @@
-//  Copyright (c) 2019 Hartmut Kaiser
+//  Copyright (c) 2019-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,7 @@
 #include <hpx/threading_base/thread_data.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     util::internal_allocator<thread_data_stackful>
         thread_data_stackful::thread_alloc_;
@@ -21,5 +21,4 @@ namespace hpx { namespace threads {
             "~thread_data_stackful({}), description({}), phase({})", this,
             this->get_description(), this->get_thread_phase());
     }
-
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

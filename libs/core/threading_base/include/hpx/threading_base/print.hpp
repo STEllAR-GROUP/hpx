@@ -14,20 +14,17 @@
 
 // ------------------------------------------------------------
 /// \cond NODETAIL
-namespace hpx { namespace debug {
-    // ------------------------------------------------------------------
+namespace hpx::debug {
+
     // safely dump thread pointer/description
-    // ------------------------------------------------------------------
     template <typename T>
     struct threadinfo;
 
-    // ------------------------------------------------------------------
     // safely dump thread pointer/description
-    // ------------------------------------------------------------------
     template <>
     struct threadinfo<threads::thread_data*>
     {
-        constexpr threadinfo(threads::thread_data const* v)
+        explicit constexpr threadinfo(threads::thread_data const* v) noexcept
           : data(v)
         {
         }
@@ -41,7 +38,7 @@ namespace hpx { namespace debug {
     template <>
     struct threadinfo<threads::thread_id_type*>
     {
-        constexpr threadinfo(threads::thread_id_type const* v)
+        explicit constexpr threadinfo(threads::thread_id_type const* v) noexcept
           : data(v)
         {
         }
@@ -55,7 +52,8 @@ namespace hpx { namespace debug {
     template <>
     struct threadinfo<threads::thread_id_ref_type*>
     {
-        constexpr threadinfo(threads::thread_id_ref_type const* v)
+        explicit constexpr threadinfo(
+            threads::thread_id_ref_type const* v) noexcept
           : data(v)
         {
         }
@@ -69,7 +67,8 @@ namespace hpx { namespace debug {
     template <>
     struct threadinfo<hpx::threads::thread_init_data>
     {
-        constexpr threadinfo(hpx::threads::thread_init_data const& v)
+        explicit constexpr threadinfo(
+            hpx::threads::thread_init_data const& v) noexcept
           : data(v)
         {
         }
@@ -79,5 +78,5 @@ namespace hpx { namespace debug {
         HPX_CORE_EXPORT friend std::ostream& operator<<(
             std::ostream& os, threadinfo const& d);
     };
-}}    // namespace hpx::debug
+}    // namespace hpx::debug
 /// \endcond

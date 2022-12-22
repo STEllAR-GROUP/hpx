@@ -1,4 +1,4 @@
-//  Copyright (c) 2019 Hartmut Kaiser
+//  Copyright (c) 2019-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,18 +12,21 @@
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads {
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
+
+namespace hpx::threads {
+
     ////////////////////////////////////////////////////////////////////////////
     struct background_work_duration_counter
     {
-        background_work_duration_counter(std::int64_t& background_exec_time)
+        explicit background_work_duration_counter(
+            std::int64_t& background_exec_time) noexcept
           : background_exec_time_(background_exec_time)
         {
         }
 
-        void collect_background_exec_time(std::int64_t timestamp)
+        void collect_background_exec_time(std::int64_t timestamp) noexcept
         {
             if (background_exec_time_ != -1)
             {
@@ -37,8 +40,8 @@ namespace hpx { namespace threads {
 
     struct background_exec_time_wrapper
     {
-        background_exec_time_wrapper(
-            background_work_duration_counter& background_work_duration)
+        explicit background_exec_time_wrapper(
+            background_work_duration_counter& background_work_duration) noexcept
           : timestamp_(background_work_duration.background_exec_time_ != -1 ?
                     util::hardware::timestamp() :
                     -1)
@@ -54,5 +57,6 @@ namespace hpx { namespace threads {
         std::int64_t timestamp_;
         background_work_duration_counter& background_work_duration_;
     };
+}    // namespace hpx::threads
+
 #endif
-}}    // namespace hpx::threads

@@ -27,6 +27,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <new>
 #include <type_traits>
@@ -34,14 +35,24 @@
 
 namespace hpx::lockfree {
 
-    // The "left" and "right" terminology is used instead of top and bottom to stay
-    // consistent with the paper that this code is based on..
-    enum deque_status_type
+    // The "left" and "right" terminology is used instead of top and bottom to
+    // stay consistent with the paper that this code is based on..
+    enum class deque_status_type : std::int8_t
     {
         stable,
         rpush,
         lpush
     };
+
+    constexpr bool operator==(int lhs, deque_status_type rhs) noexcept
+    {
+        return lhs == static_cast<int>(rhs);
+    }
+
+    constexpr bool operator==(deque_status_type lhs, int rhs) noexcept
+    {
+        return static_cast<int>(lhs) == rhs;
+    }
 
     template <typename T>
     struct deque_node    //-V690
@@ -49,7 +60,7 @@ namespace hpx::lockfree {
         using pointer = hpx::lockfree::detail::tagged_ptr<deque_node>;
         using atomic_pointer = std::atomic<pointer>;
 
-        typedef typename pointer::tag_t tag_t;
+        using tag_t = typename pointer::tag_t;
 
         atomic_pointer left;
         atomic_pointer right;
@@ -85,8 +96,8 @@ namespace hpx::lockfree {
         }
     };
 
-    // FIXME: A lot of these methods can be dropped; in fact, it may make sense to
-    // re-structure this class like deque_node.
+    // FIXME: A lot of these methods can be dropped; in fact, it may make sense
+    // to re-structure this class like deque_node.
     template <typename T>
     struct deque_anchor    //-V690
     {
@@ -105,7 +116,7 @@ namespace hpx::lockfree {
 
     public:
         constexpr deque_anchor() noexcept
-          : pair_(pair(nullptr, nullptr, stable, 0))
+          : pair_(pair(nullptr, nullptr, deque_status_type::stable, 0))
         {
         }
 
@@ -114,13 +125,13 @@ namespace hpx::lockfree {
         {
         }
 
-        deque_anchor(pair const& p)
+        explicit deque_anchor(pair const& p)
           : pair_(p)
         {
         }
 
-        deque_anchor(node* lptr, node* rptr, tag_t status = stable,
-            tag_t tag = 0) noexcept
+        deque_anchor(node* lptr, node* rptr,
+            tag_t status = deque_status_type::stable, tag_t tag = 0) noexcept
           : pair_(pair(lptr, rptr, status, tag))
         {
         }
@@ -183,45 +194,49 @@ namespace hpx::lockfree {
             return pair_.compare_exchange_strong(expected, desired, mo);
         }
 
-        bool operator==(deque_anchor const& rhs) const
+        bool operator==(deque_anchor const& rhs) const noexcept
         {
             return pair_.load(std::memory_order_acquire) ==
                 rhs.pair_.load(std::memory_order_acquire);
         }
 
-        bool operator!=(deque_anchor const& rhs) const
+        bool operator!=(deque_anchor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        friend bool operator==(deque_anchor const& lhs, pair const& rhs)
+        friend bool operator==(
+            deque_anchor const& lhs, pair const& rhs) noexcept
         {
             return lhs.pair_.load(std::memory_order_acquire) == rhs;
         }
 
-        friend bool operator!=(deque_anchor const& lhs, pair const& rhs)
+        friend bool operator!=(
+            deque_anchor const& lhs, pair const& rhs) noexcept
         {
             return !(lhs == rhs);
         }
 
-        friend bool operator==(pair const& lhs, deque_anchor const& rhs)
+        friend bool operator==(
+            pair const& lhs, deque_anchor const& rhs) noexcept
         {
             return lhs == rhs.pair_.load(std::memory_order_acquire);
         }
 
-        friend bool operator!=(pair const& lhs, deque_anchor const& rhs)
+        friend bool operator!=(
+            pair const& lhs, deque_anchor const& rhs) noexcept
         {
             return !(lhs == rhs);
         }
 
-        bool is_lock_free() const
+        bool is_lock_free() const noexcept
         {
             return pair_.is_lock_free();
         }
     };
 
-    // TODO: Experiment with memory ordering to see where we can optimize without
-    // breaking things.
+    // TODO: Experiment with memory ordering to see where we can optimize
+    // without breaking things.
     template <typename T, typename freelist_t = caching_freelist_t,
         typename Alloc = std::allocator<T>>
     struct deque
@@ -290,18 +305,18 @@ namespace hpx::lockfree {
             }
         }
 
-        void stabilize_left(anchor_pair& lrs)
+        void stabilize_left(anchor_pair& lrs) noexcept
         {
-            // Get the right node of the leftmost pointer held by lrs and its ABA
-            // tag (tagged_ptr).
+            // Get the right node of the leftmost pointer held by lrs and its
+            // ABA tag (tagged_ptr).
             node_pointer prev =
                 lrs.get_left_ptr()->right.load(std::memory_order_acquire);
 
             if (anchor_ != lrs)
                 return;
 
-            // Get the left node of prev and its tag (again, a tuple represented by
-            // a tagged_ptr).
+            // Get the left node of prev and its tag (again, a tuple represented
+            // by a tagged_ptr).
             node_pointer prevnext =
                 prev.get_ptr()->left.load(std::memory_order_acquire);
 
@@ -320,22 +335,22 @@ namespace hpx::lockfree {
             }
             // Try to update the anchor, modifying the status and ABA tag.
             anchor_.cas(lrs,
-                anchor_pair(lrs.get_left_ptr(), lrs.get_right_ptr(), stable,
-                    lrs.get_right_tag() + 1));
+                anchor_pair(lrs.get_left_ptr(), lrs.get_right_ptr(),
+                    deque_status_type::stable, lrs.get_right_tag() + 1));
         }
 
-        void stabilize_right(anchor_pair& lrs)
+        void stabilize_right(anchor_pair& lrs) noexcept
         {
-            // Get the left node of the rightmost pointer held by lrs and its ABA
-            // tag (tagged_ptr).
+            // Get the left node of the rightmost pointer held by lrs and its
+            // ABA tag (tagged_ptr).
             node_pointer prev =
                 lrs.get_right_ptr()->left.load(std::memory_order_acquire);
 
             if (anchor_ != lrs)
                 return;
 
-            // Get the right node of prev and its tag (again, a tuple represented
-            // by a tagged_ptr).
+            // Get the right node of prev and its tag (again, a tuple
+            // represented by a tagged_ptr).
             node_pointer prevnext =
                 prev.get_ptr()->right.load(std::memory_order_acquire);
 
@@ -354,21 +369,21 @@ namespace hpx::lockfree {
             }
             // Try to update the anchor, modifying the status and ABA tag.
             anchor_.cas(lrs,
-                anchor_pair(lrs.get_left_ptr(), lrs.get_right_ptr(), stable,
-                    lrs.get_right_tag() + 1));
+                anchor_pair(lrs.get_left_ptr(), lrs.get_right_ptr(),
+                    deque_status_type::stable, lrs.get_right_tag() + 1));
         }
 
-        void stabilize(anchor_pair& lrs)
+        void stabilize(anchor_pair& lrs) noexcept
         {
             // The left tag stores the status.
-            if (lrs.get_left_tag() == rpush)
+            if (lrs.get_left_tag() == deque_status_type::rpush)
                 stabilize_right(lrs);
             else    // lrs.s() == lpush
                 stabilize_left(lrs);
         }
 
     public:
-        deque(std::size_t initial_nodes = 128)
+        explicit deque(std::size_t initial_nodes = 128)
           : anchor_()
           , pool_(initial_nodes)
         {
@@ -392,7 +407,7 @@ namespace hpx::lockfree {
         // Not thread-safe.
         // Complexity: O(Processes)
         // FIXME: Should we check both pointers here?
-        bool empty() const
+        bool empty() const noexcept
         {
             return anchor_.lrs(std::memory_order_relaxed).get_left_ptr() ==
                 nullptr;
@@ -400,15 +415,14 @@ namespace hpx::lockfree {
 
         // Thread-safe and non-blocking.
         // Complexity: O(1)
-        bool is_lock_free() const
+        bool is_lock_free() const noexcept
         {
             return anchor_.is_lock_free();
         }
 
         // Thread-safe and non-blocking (may block if node needs to be allocated
-        // from the operating system). Returns false if the freelist is not able to
-        // allocate a new deque node.
-        // Complexity: O(Processes)
+        // from the operating system). Returns false if the freelist is not able
+        // to allocate a new deque node. Complexity: O(Processes)
         bool push_left(T data)
         {
             // Allocate the new node which we will be inserting.
@@ -427,9 +441,9 @@ namespace hpx::lockfree {
                 // FIXME: Should we check both pointers here?
                 if (lrs.get_left_ptr() == nullptr)
                 {
-                    // If the deque is empty, we simply install a new anchor which
-                    // points to the new node as both its leftmost and rightmost
-                    // element.
+                    // If the deque is empty, we simply install a new anchor
+                    // which points to the new node as both its leftmost and
+                    // rightmost element.
                     if (anchor_.cas(lrs,
                             anchor_pair(n, n, lrs.get_left_tag(),
                                 lrs.get_right_tag() + 1)))
@@ -437,17 +451,17 @@ namespace hpx::lockfree {
                 }
 
                 // Check if the deque is stable.
-                else if (lrs.get_left_tag() == stable)
+                else if (lrs.get_left_tag() == deque_status_type::stable)
                 {
                     // Make the right pointer on our new node refer to the current
                     // leftmost node.
                     n->right.store(node_pointer(lrs.get_left_ptr()));
 
-                    // Now we want to make the anchor point to our new node as the
-                    // leftmost node. We change the state to lpush as the deque
-                    // will become unstable if this operation succeeds.
-                    anchor_pair new_anchor(
-                        n, lrs.get_right_ptr(), lpush, lrs.get_right_tag() + 1);
+                    // Now we want to make the anchor point to our new node as
+                    // the leftmost node. We change the state to lpush as the
+                    // deque will become unstable if this operation succeeds.
+                    anchor_pair new_anchor(n, lrs.get_right_ptr(),
+                        deque_status_type::lpush, lrs.get_right_tag() + 1);
 
                     if (anchor_.cas(lrs, new_anchor))
                     {
@@ -464,9 +478,8 @@ namespace hpx::lockfree {
         }
 
         // Thread-safe and non-blocking (may block if node needs to be allocated
-        // from the operating system). Returns false if the freelist is not able to
-        // allocate a new deque node.
-        // Complexity: O(Processes)
+        // from the operating system). Returns false if the freelist is not able
+        // to allocate a new deque node. Complexity: O(Processes)
         bool push_right(T data)
         {
             // Allocate the new node which we will be inserting.
@@ -485,9 +498,9 @@ namespace hpx::lockfree {
                 // FIXME: Should we check both pointers here?
                 if (lrs.get_right_ptr() == nullptr)
                 {
-                    // If the deque is empty, we simply install a new anchor which
-                    // points to the new node as both its leftmost and rightmost
-                    // element.
+                    // If the deque is empty, we simply install a new anchor
+                    // which points to the new node as both its leftmost and
+                    // rightmost element.
                     if (anchor_.cas(lrs,
                             anchor_pair(n, n, lrs.get_left_tag(),
                                 lrs.get_right_tag() + 1)))
@@ -495,17 +508,17 @@ namespace hpx::lockfree {
                 }
 
                 // Check if the deque is stable.
-                else if (lrs.get_left_tag() == stable)
+                else if (lrs.get_left_tag() == deque_status_type::stable)
                 {
-                    // Make the left pointer on our new node refer to the current
-                    // rightmost node.
+                    // Make the left pointer on our new node refer to the
+                    // current rightmost node.
                     n->left.store(node_pointer(lrs.get_right_ptr()));
 
-                    // Now we want to make the anchor point to our new node as the
-                    // leftmost node. We change the state to lpush as the deque
-                    // will become unstable if this operation succeeds.
-                    anchor_pair new_anchor(
-                        lrs.get_left_ptr(), n, rpush, lrs.get_right_tag() + 1);
+                    // Now we want to make the anchor point to our new node as
+                    // the leftmost node. We change the state to lpush as the
+                    // deque will become unstable if this operation succeeds.
+                    anchor_pair new_anchor(lrs.get_left_ptr(), n,
+                        deque_status_type::rpush, lrs.get_right_tag() + 1);
 
                     if (anchor_.cas(lrs, new_anchor))
                     {
@@ -523,9 +536,10 @@ namespace hpx::lockfree {
 
         // Thread-safe and non-blocking. Returns false if the deque is empty.
         // Complexity: O(Processes)
-        bool pop_left(T& r)
+        bool pop_left(T& r) noexcept
         {
-            // Loop until we either pop an element or learn that the deque is empty.
+            // Loop until we either pop an element or learn that the deque is
+            // empty.
             while (true)
             {
                 // Load the anchor.
@@ -544,7 +558,8 @@ namespace hpx::lockfree {
                             anchor_pair(nullptr, nullptr, lrs.get_left_tag(),
                                 lrs.get_right_tag() + 1)))
                     {
-                        // Set the result, deallocate the popped node, and return.
+                        // Set the result, deallocate the popped node, and
+                        // return.
                         r = HPX_MOVE(lrs.get_left_ptr()->data);
                         dealloc_node(lrs.get_left_ptr());
                         return true;
@@ -552,7 +567,7 @@ namespace hpx::lockfree {
                 }
 
                 // Check if the deque is stable.
-                else if (lrs.get_left_tag() == stable)
+                else if (lrs.get_left_tag() == deque_status_type::stable)
                 {
                     // Make sure the anchor hasn't changed since we loaded it.
                     if (anchor_ != lrs)
@@ -582,16 +597,17 @@ namespace hpx::lockfree {
             }
         }
 
-        bool pop_left(T* r)
+        bool pop_left(T* r) noexcept
         {
             return pop_left(*r);
         }
 
         // Thread-safe and non-blocking. Returns false if the deque is empty.
         // Complexity: O(Processes)
-        bool pop_right(T& r)
+        bool pop_right(T& r) noexcept
         {
-            // Loop until we either pop an element or learn that the deque is empty.
+            // Loop until we either pop an element or learn that the deque is
+            // empty.
             while (true)
             {
                 // Load the anchor.
@@ -610,7 +626,8 @@ namespace hpx::lockfree {
                             anchor_pair(nullptr, nullptr, lrs.get_left_tag(),
                                 lrs.get_right_tag() + 1)))
                     {
-                        // Set the result, deallocate the popped node, and return.
+                        // Set the result, deallocate the popped node, and
+                        // return.
                         r = HPX_MOVE(lrs.get_right_ptr()->data);
                         dealloc_node(lrs.get_right_ptr());
                         return true;
@@ -618,7 +635,7 @@ namespace hpx::lockfree {
                 }
 
                 // Check if the deque is stable.
-                else if (lrs.get_left_tag() == stable)
+                else if (lrs.get_left_tag() == deque_status_type::stable)
                 {
                     // Make sure the anchor hasn't changed since we loaded it.
                     if (anchor_ != lrs)
@@ -628,13 +645,14 @@ namespace hpx::lockfree {
                     node_pointer prev = lrs.get_right_ptr()->left.load(
                         std::memory_order_acquire);
 
-                    // Try to update the anchor to point to prev as the rightmost
-                    // node.
+                    // Try to update the anchor to point to prev as the
+                    // rightmost node.
                     if (anchor_.cas(lrs,
                             anchor_pair(lrs.get_left_ptr(), prev.get_ptr(),
                                 lrs.get_left_tag(), lrs.get_right_tag() + 1)))
                     {
-                        // Set the result, deallocate the popped node, and return.
+                        // Set the result, deallocate the popped node, and
+                        // return.
                         r = HPX_MOVE(lrs.get_right_ptr()->data);
                         dealloc_node(lrs.get_right_ptr());
                         return true;
@@ -648,7 +666,7 @@ namespace hpx::lockfree {
             }
         }
 
-        bool pop_right(T* r)
+        bool pop_right(T* r) noexcept
         {
             return pop_right(*r);
         }

@@ -22,14 +22,14 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
 
     ////////////////////////////////////////////////////////////////////////////
     // A simple but very high performance implementation of the channel concept.
     // This channel is bounded to a size given at construction time and supports
     // a multiple producers and a single consumer. The data is stored in a
     // ring-buffer.
-    template <typename T, typename Mutex = util::spinlock>
+    template <typename T, typename Mutex = hpx::util::spinlock>
     class base_channel_mpsc
     {
     private:
@@ -69,6 +69,9 @@ namespace hpx { namespace lcos { namespace local {
             head_.data_.store(0, std::memory_order_relaxed);
             tail_.data_.tail_.store(0, std::memory_order_relaxed);
         }
+
+        base_channel_mpsc(base_channel_mpsc const& rhs) = delete;
+        base_channel_mpsc& operator=(base_channel_mpsc const& rhs) = delete;
 
         base_channel_mpsc(base_channel_mpsc&& rhs) noexcept
           : size_(rhs.size_)
@@ -185,7 +188,7 @@ namespace hpx { namespace lcos { namespace local {
             return 0;
         }
 
-        std::size_t capacity() const
+        constexpr std::size_t capacity() const noexcept
         {
             return size_ - 1;
         }
@@ -217,5 +220,4 @@ namespace hpx { namespace lcos { namespace local {
     // of this channel with non-HPX threads.
     template <typename T>
     using channel_mpsc = base_channel_mpsc<T, hpx::spinlock>;
-
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

@@ -346,7 +346,7 @@ void measure_function_futures_create_thread(std::uint64_t count, bool csv)
     };
     auto const thread_func =
         hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
-    auto const desc = hpx::util::thread_description();
+    auto const desc = hpx::threads::thread_description();
     auto const prio = hpx::threads::thread_priority::normal;
     auto const hint = hpx::threads::thread_schedule_hint();
     auto const stack_size = hpx::threads::thread_stacksize::small_;
@@ -395,7 +395,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
     };
     auto const thread_func =
         hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
-    auto const desc = hpx::util::thread_description();
+    auto const desc = hpx::threads::thread_description();
     auto prio = hpx::threads::thread_priority::normal;
     auto const stack_size = hpx::threads::thread_stacksize::small_;
     auto const num_threads = hpx::get_num_worker_threads();

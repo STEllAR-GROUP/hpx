@@ -130,7 +130,7 @@ namespace hpx::local::detail {
                 std::string allow_unknown(
                     ini.get_entry("hpx.commandline.allow_unknown", "0"));
                 if (allow_unknown != "0")
-                    mode = util::commandline_error_mode::allow_unregistered;
+                    mode |= util::commandline_error_mode::allow_unregistered;
 
                 hpx::program_options::variables_map vm;
                 std::vector<std::string> still_unregistered_options;

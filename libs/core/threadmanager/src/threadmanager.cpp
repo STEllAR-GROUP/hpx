@@ -197,7 +197,7 @@ namespace hpx { namespace threads {
 
             switch (sched_type)
             {
-            case resource::user_defined:
+            case resource::scheduling_policy::user_defined:
             {
                 auto pool_func = rp.get_pool_creator(i);
                 std::unique_ptr<thread_pool_base> pool(
@@ -205,13 +205,13 @@ namespace hpx { namespace threads {
                 pools_.push_back(HPX_MOVE(pool));
                 break;
             }
-            case resource::unspecified:
+            case resource::scheduling_policy::unspecified:
             {
                 throw std::invalid_argument(
                     "cannot instantiate a thread-manager if the thread-pool" +
                     name + " has an unspecified scheduler type");
             }
-            case resource::local:
+            case resource::scheduling_policy::local:
             {
                 // instantiate the scheduler
                 using local_sched_type =
@@ -240,7 +240,7 @@ namespace hpx { namespace threads {
                 break;
             }
 
-            case resource::local_priority_fifo:
+            case resource::scheduling_policy::local_priority_fifo:
             {
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
@@ -280,7 +280,7 @@ namespace hpx { namespace threads {
                 break;
             }
 
-            case resource::local_priority_lifo:
+            case resource::scheduling_policy::local_priority_lifo:
             {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
                 // set parameters for scheduler and pool instantiation and
@@ -326,7 +326,7 @@ namespace hpx { namespace threads {
                 break;
             }
 
-            case resource::static_:
+            case resource::scheduling_policy::static_:
             {
                 // instantiate the scheduler
                 using local_sched_type =
@@ -355,7 +355,7 @@ namespace hpx { namespace threads {
                 break;
             }
 
-            case resource::static_priority:
+            case resource::scheduling_policy::static_priority:
             {
                 // set parameters for scheduler and pool instantiation and
                 // perform compatibility checks
@@ -393,7 +393,7 @@ namespace hpx { namespace threads {
                 break;
             }
 
-            case resource::abp_priority_fifo:
+            case resource::scheduling_policy::abp_priority_fifo:
             {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
                 // set parameters for scheduler and pool instantiation and
@@ -440,7 +440,7 @@ namespace hpx { namespace threads {
                 break;
             }
 
-            case resource::abp_priority_lifo:
+            case resource::scheduling_policy::abp_priority_lifo:
             {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
                 // set parameters for scheduler and pool instantiation and
@@ -487,7 +487,7 @@ namespace hpx { namespace threads {
                 break;
             }
 
-            case resource::shared_priority:
+            case resource::scheduling_policy::shared_priority:
             {
                 // instantiate the scheduler
                 typedef hpx::threads::policies::
@@ -678,7 +678,7 @@ namespace hpx { namespace threads {
         return mask;
     }
 
-    std::int64_t threadmanager::get_background_thread_count()
+    std::int64_t threadmanager::get_background_thread_count() const
     {
         std::int64_t total_count = 0;
         std::lock_guard<mutex_type> lk(mtx_);

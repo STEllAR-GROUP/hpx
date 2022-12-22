@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2021 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //  Copyright (c) 2015-2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,7 +18,7 @@
 #include <utility>
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
 
     // This class allows to register futures during serialization preprocessing
     // to ensure each future is ready before serializing it.
@@ -27,12 +27,19 @@ namespace hpx { namespace serialization { namespace detail {
         using mutex_type = hpx::spinlock;
 
     public:
-        preprocess_futures()
+        preprocess_futures() noexcept
           : mtx_()
           , done_(false)
           , num_futures_(0)
           , triggered_futures_(0)
         {
+        }
+
+        ~preprocess_futures()
+        {
+            HPX_ASSERT(done_);
+            HPX_ASSERT(num_futures_ == 0);
+            HPX_ASSERT(num_futures_ == triggered_futures_);
         }
 
         preprocess_futures(preprocess_futures&& rhs) noexcept
@@ -45,13 +52,6 @@ namespace hpx { namespace serialization { namespace detail {
             rhs.done_ = true;
             rhs.num_futures_ = 0;
             rhs.triggered_futures_ = 0;
-        }
-
-        ~preprocess_futures()
-        {
-            HPX_ASSERT(done_);
-            HPX_ASSERT(num_futures_ == 0);
-            HPX_ASSERT(num_futures_ == triggered_futures_);
         }
 
         preprocess_futures& operator=(preprocess_futures&& rhs) noexcept
@@ -192,4 +192,4 @@ namespace hpx { namespace serialization { namespace detail {
         HPX_CORE_EXPORT static extra_archive_data_id_type id() noexcept;
         static constexpr void reset(preprocess_futures*) noexcept {}
     };
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail

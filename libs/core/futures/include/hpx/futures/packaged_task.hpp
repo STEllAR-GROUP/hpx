@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,13 +25,13 @@
 
 namespace hpx {
 
-    /// The class template hpx::packaged_task wraps any Callable` target (function,
-    /// lambda expression, bind expression, or another function object) so that it
-    /// can be invoked asynchronously. Its return value or exception thrown is
-    /// stored in a shared state which can be accessed through hpx::future objects.
-    /// Just like hpx::function, hpx::packaged_task is a polymorphic, allocator-aware
-    /// container: the stored callable target may be allocated on heap or with a
-    /// provided allocator.
+    /// The class template hpx::packaged_task wraps any Callable` target
+    /// (function, lambda expression, bind expression, or another function
+    /// object) so that it can be invoked asynchronously. Its return value or
+    /// exception thrown is stored in a shared state which can be accessed
+    /// through hpx::future objects. Just like hpx::function, hpx::packaged_task
+    /// is a polymorphic, allocator-aware container: the stored callable target
+    /// may be allocated on heap or with a provided allocator.
     template <typename Sig>
     class packaged_task;
 

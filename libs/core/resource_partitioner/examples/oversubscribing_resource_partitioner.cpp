@@ -278,7 +278,7 @@ int main(int argc, char* argv[])
     hpx::local::init_params iparams;
 
     iparams.desc_cmdline = desc_cmdline;
-    iparams.rp_mode = hpx::resource::mode_allow_oversubscription;
+    iparams.rp_mode = hpx::resource::partitioner_mode::allow_oversubscription;
     iparams.rp_callback = init_resource_partitioner_handler;
 
     return hpx::local::init(hpx_main, argc, argv, iparams);

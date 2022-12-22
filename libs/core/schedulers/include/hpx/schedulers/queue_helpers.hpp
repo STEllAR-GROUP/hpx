@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2017-2018 John Biddiscombe
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -24,26 +24,21 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies {
+namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////////
     namespace detail {
-        ///////////////////////////////////////////////////////////////////////////
-        // debug helper function, logs all suspended threads
-        // this returns true if all threads in the map are currently suspended
-        template <typename Map>
-        bool dump_suspended_threads(std::size_t num_thread, Map& tm,
-            std::int64_t& idle_loop_count, bool running) HPX_COLD;
 
+        ///////////////////////////////////////////////////////////////////////////
+        // debug helper function, logs all suspended threads this returns true
+        // if all threads in the map are currently suspended
         template <typename Map>
-        bool dump_suspended_threads(std::size_t num_thread, Map& tm,
-            std::int64_t& idle_loop_count, bool running)
+        bool dump_suspended_threads([[maybe_unused]] std::size_t num_thread,
+            [[maybe_unused]] Map& tm,
+            [[maybe_unused]] std::int64_t& idle_loop_count,
+            [[maybe_unused]] bool running)
         {
 #if !defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
-            HPX_UNUSED(num_thread);
-            HPX_UNUSED(tm);
-            HPX_UNUSED(idle_loop_count);
-            HPX_UNUSED(running);    //-V601
             return false;
 #else
             if (!get_minimal_deadlock_detection_enabled())
@@ -125,15 +120,16 @@ namespace hpx { namespace threads { namespace policies {
                             break;
 
                         case threads::thread_schedule_state::pending:
+                            [[fallthrough]];
                         case threads::thread_schedule_state::active:
-                            result =
-                                false;    // one is active, no deadlock (yet)
+                            // one is active, no deadlock (yet)
+                            result = false;
                             collect_suspended = false;
                             break;
 
                         default:
-                            // If the thread is terminated we don't care too much
-                            // anymore.
+                            // If the thread is terminated we don't care too
+                            // much anymore.
                             break;
                         }
                     }
@@ -143,5 +139,4 @@ namespace hpx { namespace threads { namespace policies {
 #endif
         }
     }    // namespace detail
-
-}}}    // namespace hpx::threads::policies
+}    // namespace hpx::threads::policies

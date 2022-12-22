@@ -17,6 +17,6 @@ namespace hpx::execution_base {
     {
         virtual ~context_base() = default;
 
-        virtual resource_base const& resource() const = 0;
+        virtual resource_base const& resource() const noexcept = 0;
     };
 }    // namespace hpx::execution_base

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Parts of this code were taken from the Boost.Asio library
@@ -26,7 +26,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     io_service_pool::io_service_pool(std::size_t pool_size,
         threads::policies::callback_notifier const& notifier,
@@ -316,5 +316,4 @@ namespace hpx { namespace util {
         HPX_ASSERT(thread_num < pool_size_);
         return threads_[thread_num];
     }
-
-}}    // namespace hpx::util
+}    // namespace hpx::util

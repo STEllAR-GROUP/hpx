@@ -133,7 +133,7 @@ namespace hpx::naming {
 }    // namespace hpx::naming
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     hpx::id_type get_remote_result<hpx::id_type, naming::gid_type>::call(
         naming::gid_type const& rhs)
@@ -161,4 +161,4 @@ namespace hpx { namespace traits {
         }
         return result;
     }
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

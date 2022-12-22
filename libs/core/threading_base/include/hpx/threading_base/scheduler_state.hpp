@@ -35,26 +35,6 @@ namespace hpx {
         last_valid_runtime_state = stopped
     };
 
-    inline constexpr bool operator<(state lhs, state rhs) noexcept
-    {
-        return static_cast<std::int8_t>(lhs) < static_cast<std::int8_t>(rhs);
-    }
-
-    inline constexpr bool operator<=(state lhs, state rhs) noexcept
-    {
-        return static_cast<std::int8_t>(lhs) <= static_cast<std::int8_t>(rhs);
-    }
-
-    inline constexpr bool operator>(state lhs, state rhs) noexcept
-    {
-        return static_cast<std::int8_t>(lhs) > static_cast<std::int8_t>(rhs);
-    }
-
-    inline constexpr bool operator>=(state lhs, state rhs) noexcept
-    {
-        return static_cast<std::int8_t>(lhs) >= static_cast<std::int8_t>(rhs);
-    }
-
 #define HPX_STATE_UNSCOPED_ENUM_DEPRECATION_MSG                                \
     "The unscoped state names are deprecated. Please use state::<state> "      \
     "instead."

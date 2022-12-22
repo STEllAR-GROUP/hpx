@@ -8,12 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
 
     HPX_CORE_EXPORT thread_id_ref_type create_work(
         policies::scheduler_base* scheduler, threads::thread_init_data& data,
         error_code& ec = throws);
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail

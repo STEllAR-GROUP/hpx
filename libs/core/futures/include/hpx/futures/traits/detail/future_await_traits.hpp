@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,7 +23,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx::lcos::detail {
 
     template <typename Promise = void>
     using coroutine_handle = coro::coroutine_handle<Promise>;
@@ -44,6 +44,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             return is_ready_;
         }
+
         constexpr void await_suspend(coroutine_handle<>) const noexcept {}
         constexpr void await_resume() const noexcept {}
     };
@@ -132,7 +133,7 @@ namespace hpx { namespace lcos { namespace detail {
         using allocator_type = hpx::util::internal_allocator<char>;
 
         // the shared state is held alive by the coroutine
-        coroutine_promise_base()
+        coroutine_promise_base() noexcept
           : base_type(init_no_addref{})
         {
         }
@@ -191,11 +192,12 @@ namespace hpx { namespace lcos { namespace detail {
             traits::deallocate(alloc, static_cast<char*>(p), size);
         }
     };
-}}}    // namespace hpx::lcos::detail
+}    // namespace hpx::lcos::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace HPX_COROUTINE_NAMESPACE_STD {
-    // Allow for functions which use co_await to return an hpx::future<T>
+
+    // Allow for functions that use co_await to return an hpx::future<T>
     template <typename T, typename... Ts>
     struct coroutine_traits<hpx::future<T>, Ts...>
     {
@@ -271,8 +273,7 @@ namespace HPX_COROUTINE_NAMESPACE_STD {
         };
     };
 
-    // Allow for functions which use co_await to return an
-    // hpx::shared_future<T>
+    // Allow for functions that use co_await to return an hpx::shared_future<T>
     template <typename T, typename... Ts>
     struct coroutine_traits<hpx::shared_future<T>, Ts...>
     {

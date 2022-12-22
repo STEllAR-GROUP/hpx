@@ -184,7 +184,8 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         template <typename... T>
-        future_data(init_no_addref no_addref, in_place in_place, T&&... ts)
+        future_data(
+            init_no_addref no_addref, std::in_place_t in_place, T&&... ts)
           : future_data_base<id_type>(
                 no_addref, in_place, HPX_FORWARD(T, ts)...)
         {
@@ -224,7 +225,7 @@ namespace hpx { namespace lcos { namespace detail {
             hpx::id_type id = *this->get_result();
             if (!manage_lifetime)
             {
-                id = hpx::naming::unmanaged(id);
+                id = hpx::unmanaged(id);
             }
             return hpx::agas::register_name(launch::sync, registered_name_, id);
         }

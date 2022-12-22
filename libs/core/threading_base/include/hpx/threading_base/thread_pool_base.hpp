@@ -34,23 +34,24 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
     struct pool_id_type
     {
-        pool_id_type(std::size_t index, std::string const& name)
+        pool_id_type(std::size_t index, std::string name) noexcept
           : index_(index)
-          , name_(name)
+          , name_(HPX_MOVE(name))
         {
         }
 
-        std::size_t index() const
+        std::size_t index() const noexcept
         {
             return index_;
-        };
-        std::string const& name() const
+        }
+
+        std::string const& name() const noexcept
         {
             return name_;
         }
@@ -113,7 +114,7 @@ namespace hpx { namespace threads {
     {
     public:
         /// \cond NOINTERNAL
-        thread_pool_base(thread_pool_init_parameters const& init);
+        explicit thread_pool_base(thread_pool_init_parameters const& init);
 
         virtual ~thread_pool_base() = default;
 
@@ -129,7 +130,7 @@ namespace hpx { namespace threads {
         virtual bool is_busy() = 0;
         virtual bool is_idle() = 0;
 
-        virtual void print_pool(std::ostream&) = 0;
+        virtual void print_pool(std::ostream&) const = 0;
 
         pool_id_type get_pool_id() const
         {
@@ -199,15 +200,17 @@ namespace hpx { namespace threads {
             thread_restart_state newstate_ex, thread_priority priority,
             error_code& ec) = 0;
 
-        std::size_t get_pool_index() const
+        std::size_t get_pool_index() const noexcept
         {
             return id_.index();
         }
-        std::string const& get_pool_name() const
+
+        std::string const& get_pool_name() const noexcept
         {
             return id_.name();
         }
-        std::size_t get_thread_offset() const
+
+        std::size_t get_thread_offset() const noexcept
         {
             return thread_offset_;
         }
@@ -270,7 +273,6 @@ namespace hpx { namespace threads {
         }
 #endif
 #endif
-
         virtual std::int64_t get_cumulative_duration(
             std::size_t /*thread_num*/, bool /*reset*/)
         {
@@ -336,7 +338,6 @@ namespace hpx { namespace threads {
         }
 #endif
 #endif
-
         virtual std::int64_t get_queue_length(std::size_t, bool)
         {
             return 0;
@@ -388,7 +389,6 @@ namespace hpx { namespace threads {
             return 0;
         }
 #endif
-
         virtual std::int64_t get_thread_count(thread_schedule_state /*state*/,
             thread_priority /*priority*/, std::size_t /*num_thread*/,
             bool /*reset*/)
@@ -403,7 +403,7 @@ namespace hpx { namespace threads {
 
         virtual void get_idle_core_mask(mask_type&) const {}
 
-        virtual std::int64_t get_background_thread_count()
+        virtual std::int64_t get_background_thread_count() const
         {
             return 0;
         }
@@ -480,7 +480,7 @@ namespace hpx { namespace threads {
             notifier_.on_error(global_thread_num, e);
         }
 
-        double timestamp_scale() const
+        double timestamp_scale() const noexcept
         {
             return timestamp_scale_;
         }
@@ -514,6 +514,6 @@ namespace hpx { namespace threads {
 
     HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, thread_pool_base const& thread_pool);
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>

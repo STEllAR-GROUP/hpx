@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,45 +33,44 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     using thread_termination_handler_type =
         hpx::function<void(std::exception_ptr const& e)>;
     HPX_CORE_EXPORT void set_thread_termination_handler(
         thread_termination_handler_type f);
 
-    /// \brief The class thread represents a single thread of execution.
-    ///        Threads allow multiple functions to execute concurrently.
-    ///        hreads begin execution immediately upon construction of the
-    ///        associated thread object (pending any OS scheduling delays),
-    ///        starting at the top-level function provided as a constructor
-    ///        argument. The return value of the top-level function is ignored
-    ///        and if it terminates by throwing an exception, \a hpx::terminate
-    ///        is called. The top-level function may communicate its return
-    ///        value or an exception to the caller via \a hpx::promise or by
-    ///        modifying shared variables (which may require synchronization,
-    ///        see hpx::mutex and hpx::atomic)
-    ///        hpx::thread objects may also be in the state that does not
-    ///        represent any thread (after default construction, move from,
-    ///        detach, or join), and a thread of execution may not be associated
-    ///        with any thread objects (after detach).
-    ///        No two hpx::thread objects may represent the same thread of
-    ///        execution; \a hpx::thread is not \a CopyConstructible or \a
-    ///        CopyAssignable, although it is \a MoveConstructible and \a
-    ///        MoveAssignable.
+    /// The class thread represents a single thread of execution. Threads allow
+    /// multiple functions to execute concurrently. hreads begin execution
+    /// immediately upon construction of the associated thread object (pending
+    /// any OS scheduling delays), starting at the top-level function provided
+    /// as a constructor argument. The return value of the top-level function is
+    /// ignored and if it terminates by throwing an exception, \a hpx::terminate
+    /// is called. The top-level function may communicate its return value or an
+    /// exception to the caller via \a hpx::promise or by modifying shared
+    /// variables (which may require synchronization, see hpx::mutex and
+    /// hpx::atomic) hpx::thread objects may also be in the state that does not
+    /// represent any thread (after default construction, move from, detach, or
+    /// join), and a thread of execution may not be associated with any thread
+    /// objects (after detach). No two hpx::thread objects may represent the
+    /// same thread of execution; \a hpx::thread is not \a CopyConstructible or
+    /// \a CopyAssignable, although it is \a MoveConstructible and \a
+    /// MoveAssignable.
     class HPX_CORE_EXPORT thread
     {
-        typedef hpx::spinlock mutex_type;
-        void terminate(const char* function, const char* reason) const;
+        using mutex_type = hpx::spinlock;
+
+        void terminate(char const* function, char const* reason) const;
 
     public:
         class id;
-        typedef threads::thread_id_type native_handle_type;
+        using native_handle_type = threads::thread_id_type;
 
         thread() noexcept;
 
         template <typename F,
-            typename Enable = typename std::enable_if<!std::is_same<
-                typename std::decay<F>::type, thread>::value>::type>
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<std::decay_t<F>, thread>>>
         explicit thread(F&& f)
         {
             auto thrd_data = threads::get_self_id_data();
@@ -108,36 +107,39 @@ namespace hpx {
         thread(thread&&) noexcept;
         thread& operator=(thread&&) noexcept;
 
-        /// \brief swaps two thread objects
+        /// swaps two thread objects
         void swap(thread&) noexcept;
-        /// \brief checks whether the thread is joinable, i.e.
-        ///        potentially running in parallel context
+
+        /// Checks whether the thread is joinable, i.e. potentially running in
+        /// parallel context
         bool joinable() const noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             return joinable_locked();
         }
 
-        /// \brief waits for the thread to finish its execution
+        /// waits for the thread to finish its execution
         void join();
-        /// \brief permits the thread to execute independently from the thread handle
+
+        /// permits the thread to execute independently from the thread handle
         void detach()
         {
             std::lock_guard<mutex_type> l(mtx_);
             detach_locked();
         }
 
-        /// \brief returns the id of the thread
+        /// returns the id of the thread
         id get_id() const noexcept;
 
-        /// \brief returns the underlying implementation-defined thread handle
+        /// returns the underlying implementation-defined thread handle
         native_handle_type native_handle() const    //-V659
         {
             std::lock_guard<mutex_type> l(mtx_);
             return id_.noref();
         }
 
-        /// \brief returns the number of concurrent threads supported by the implementation
+        /// returns the number of concurrent threads supported by the
+        /// implementation
         [[nodiscard]] static unsigned int hardware_concurrency() noexcept;
 
         // extensions
@@ -165,12 +167,15 @@ namespace hpx {
         {
             return threads::invalid_thread_id != id_;
         }
+
         void detach_locked()
         {
             id_ = threads::invalid_thread_id;
         }
+
         void start_thread(threads::thread_pool_base* pool,
             hpx::move_only_function<void()>&& func);
+
         static threads::thread_result_type thread_function_nullary(
             hpx::move_only_function<void()> const& func);
 
@@ -228,7 +233,7 @@ namespace hpx {
         {
         }
 
-        threads::thread_id_type const& native_handle() const
+        threads::thread_id_type const& native_handle() const noexcept
         {
             return id_;
         }
@@ -272,31 +277,29 @@ namespace hpx {
         return out;
     }
 
-    //     template <class T> struct hash;
-    //     template <> struct hash<thread::id>;
-
     ///////////////////////////////////////////////////////////////////////////
     namespace this_thread {
 
         /// \brief Returns the id of the current thread
         HPX_CORE_EXPORT thread::id get_id() noexcept;
 
-        /// \brief Provides a hint to the implementation to reschedule the
-        ///        execution of threads, allowing other threads to run.
+        /// Provides a hint to the implementation to reschedule the execution of
+        /// threads, allowing other threads to run.
+        ///
         /// \note  The exact behavior of this function depends on the
         ///        implementation, in particular on the mechanics of the OS
-        ///        scheduler in use and the state of the system. For example,
-        ///        a first-in-first-out realtime scheduler (SCHED_FIFO in Linux)
+        ///        scheduler in use and the state of the system. For example, a
+        ///        first-in-first-out realtime scheduler (SCHED_FIFO in Linux)
         ///        would suspend the current thread and put it on the back of
         ///        the queue of the same-priority threads that are ready to run
-        ///        (and if there are no other threads at the same priority, yield
-        ///        has no effect).
+        ///        (and if there are no other threads at the same priority,
+        ///        yield has no effect).
         HPX_CORE_EXPORT void yield() noexcept;
         HPX_CORE_EXPORT void yield_to(thread::id) noexcept;
 
         // extensions
-        HPX_CORE_EXPORT threads::thread_priority get_priority();
-        HPX_CORE_EXPORT std::ptrdiff_t get_stack_size();
+        HPX_CORE_EXPORT threads::thread_priority get_priority() noexcept;
+        HPX_CORE_EXPORT std::ptrdiff_t get_stack_size() noexcept;
 
         HPX_CORE_EXPORT void interruption_point();
         HPX_CORE_EXPORT bool interruption_enabled();
@@ -304,26 +307,28 @@ namespace hpx {
 
         HPX_CORE_EXPORT void interrupt();
 
-        /// \brief Blocks the execution of the current thread until specified
-        ///        \a abs_time has been reached.
-        /// \details It is recommended to use the clock tied to \a abs_time,
-        ///          in which case adjustments of the clock may be taken into
+        /// Blocks the execution of the current thread until specified
+        /// \a abs_time has been reached.
+        ///
+        /// \details It is recommended to use the clock tied to \a abs_time, in
+        ///          which case adjustments of the clock may be taken into
         ///          account. Thus, the duration of the block might be more or
         ///          less than \c abs_time-Clock::now() at the time of the call,
         ///          depending on the direction of the adjustment and whether it
-        ///          is honored by the implementation. The function also may block
-        ///          until after \a abs_time has been reached due to process scheduling
-        ///          or resource contention delays.
+        ///          is honored by the implementation. The function also may
+        ///          block until after \a abs_time has been reached due to
+        ///          process scheduling or resource contention delays.
         /// \param abs_time absolute time to block until
         HPX_CORE_EXPORT void sleep_until(
             hpx::chrono::steady_time_point const& abs_time);
 
-        /// \brief Blocks the execution of the current thread for at least the
-        ///        specified \a rel_time. This function may block for longer
-        ///        than \a rel_time due to scheduling or resource contention delays.
-        /// \details It is recommended to use a steady clock to measure the duration.
-        ///          If an implementation uses a system clock instead, the wait time
-        ///          may also be sensitive to clock adjustments.
+        /// Blocks the execution of the current thread for at least the
+        /// specified \a rel_time. This function may block for longer than \a
+        /// rel_time due to scheduling or resource contention delays.
+        ///
+        /// \details It is recommended to use a steady clock to measure the
+        ///          duration. If an implementation uses a system clock instead,
+        ///          the wait time may also be sensitive to clock adjustments.
         /// \param rel_time time duration to sleep
         inline void sleep_for(hpx::chrono::steady_duration const& rel_time)
         {

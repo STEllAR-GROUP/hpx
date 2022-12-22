@@ -145,10 +145,7 @@ namespace hpx { namespace local { namespace detail {
         hpx::program_options::basic_command_line_parser<char>& p,
         util::commandline_error_mode mode)
     {
-        if ((mode &
-                ~(util::commandline_error_mode::report_missing_config_file |
-                    util::commandline_error_mode::ignore_aliases)) ==
-            util::commandline_error_mode::allow_unregistered)
+        if (as_bool(mode & util::commandline_error_mode::allow_unregistered))
         {
             return p.allow_unregistered();
         }
@@ -286,7 +283,7 @@ namespace hpx { namespace local { namespace detail {
         }
     }
 
-    // handle all --options-config found on the command line
+    // handle all --options-file found on the command line
     void handle_config_options(hpx::program_options::variables_map& vm,
         hpx::program_options::options_description const& desc_cfgfile,
         util::section const& ini, util::commandline_error_mode error_mode)

@@ -105,7 +105,7 @@ namespace hpx { namespace threads {
         }
 
         template <typename F>
-        thread_init_data(F&& f, util::thread_description const& desc,
+        thread_init_data(F&& f, threads::thread_description const& desc,
             thread_priority priority_ = thread_priority::normal,
             thread_schedule_hint os_thread = thread_schedule_hint(),
             thread_stacksize stacksize_ = thread_stacksize::default_,
@@ -148,7 +148,7 @@ namespace hpx { namespace threads {
         threads::thread_function_type func;
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        util::thread_description description;
+        threads::thread_description description;
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         std::uint32_t parent_locality_id;

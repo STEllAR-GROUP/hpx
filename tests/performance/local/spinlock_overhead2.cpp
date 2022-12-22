@@ -120,7 +120,7 @@ namespace test {
 
             do
             {
-                hpx::util::yield_while(
+                hpx::util::yield_while<true>(
                     [this]() noexcept { return is_locked(); },
                     "test::local_spinlock::lock");
             } while (!acquire_lock());
@@ -239,7 +239,7 @@ int hpx_main(variables_map& vm)
                     futures);
 
                 // stop the clock
-                const double duration = walltime.elapsed();
+                double const duration = walltime.elapsed();
 
                 if (vm.count("csv"))
                     hpx::util::format_to(

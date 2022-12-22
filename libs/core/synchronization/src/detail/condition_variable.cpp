@@ -80,20 +80,16 @@ namespace hpx::lcos::local::detail {
     }
 
     bool condition_variable::empty(
-        std::unique_lock<mutex_type>& lock) const noexcept
+        [[maybe_unused]] std::unique_lock<mutex_type>& lock) const noexcept
     {
         HPX_ASSERT_OWNS_LOCK(lock);
-        HPX_UNUSED(lock);
-
         return queue_.empty();
     }
 
     std::size_t condition_variable::size(
-        std::unique_lock<mutex_type>& lock) const noexcept
+        [[maybe_unused]] std::unique_lock<mutex_type>& lock) const noexcept
     {
         HPX_ASSERT_OWNS_LOCK(lock);
-        HPX_UNUSED(lock);
-
         return queue_.size();
     }
 
@@ -281,11 +277,10 @@ namespace hpx::lcos::local::detail {
 
     // re-add the remaining items to the original queue
     void condition_variable::prepend_entries(
-        std::unique_lock<mutex_type>& lock, queue_type& queue) noexcept
+        [[maybe_unused]] std::unique_lock<mutex_type>& lock,
+        queue_type& queue) noexcept
     {
         HPX_ASSERT_OWNS_LOCK(lock);
-        HPX_UNUSED(lock);
-
         queue.splice(queue_);
         queue_.swap(queue);
     }

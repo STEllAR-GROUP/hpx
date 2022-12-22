@@ -24,7 +24,8 @@
 #include <string>
 #include <thread>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     ///////////////////////////////////////////////////////////////////////////
     thread_pool_base::thread_pool_base(thread_pool_init_parameters const& init)
       : id_(init.index_, init.name_)
@@ -145,4 +146,4 @@ namespace hpx { namespace threads {
 
         return os;
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

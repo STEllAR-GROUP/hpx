@@ -85,7 +85,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
                 hpx::threads::policies::scheduler_mode::
                     steal_high_priority_first);
     }
-    auto const desc = hpx::util::thread_description();
+    auto const desc = hpx::threads::thread_description();
     auto prio = hpx::threads::thread_priority::normal;
     auto const stack_size = hpx::threads::thread_stacksize::small_;
     auto const num_threads = hpx::get_num_worker_threads();

@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2017 Hartmut Kaiser
+//  Copyright (c) 2005-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,18 +8,19 @@
 #include <hpx/config.hpp>
 #include <hpx/schedulers/maintain_queue_wait_times.hpp>
 
-namespace hpx { namespace threads { namespace policies {
+namespace hpx::threads::policies {
+
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
     static bool maintain_queue_wait_times_enabled = false;
 
-    void set_maintain_queue_wait_times_enabled(bool enabled)
+    void set_maintain_queue_wait_times_enabled(bool enabled) noexcept
     {
         maintain_queue_wait_times_enabled = enabled;
     }
 
-    bool get_maintain_queue_wait_times_enabled()
+    bool get_maintain_queue_wait_times_enabled() noexcept
     {
         return maintain_queue_wait_times_enabled;
     }
 #endif
-}}}    // namespace hpx::threads::policies
+}    // namespace hpx::threads::policies

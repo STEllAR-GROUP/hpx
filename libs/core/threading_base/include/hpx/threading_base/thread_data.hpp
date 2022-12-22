@@ -55,7 +55,7 @@ namespace hpx { namespace threads {
     /// The function \a get_self_id_data returns the data of the HPX thread id
     /// associated with the current thread (or nullptr if the current thread is
     /// not a HPX thread).
-    HPX_CORE_EXPORT thread_data* get_self_id_data();
+    HPX_CORE_EXPORT thread_data* get_self_id_data() noexcept;
 
     ////////////////////////////////////////////////////////////////////////////
     /// A \a thread is the representation of a ParalleX thread. It's a first
@@ -250,33 +250,34 @@ namespace hpx { namespace threads {
         }
 
 #if !defined(HPX_HAVE_THREAD_DESCRIPTION)
-        util::thread_description get_description() const
+        threads::thread_description get_description() const
         {
-            return util::thread_description("<unknown>");
+            return threads::thread_description("<unknown>");
         }
-        util::thread_description set_description(
-            util::thread_description /*value*/)
+        threads::thread_description set_description(
+            threads::thread_description /*value*/)
         {
-            return util::thread_description("<unknown>");
+            return threads::thread_description("<unknown>");
         }
 
-        util::thread_description get_lco_description() const
+        threads::thread_description get_lco_description() const
         {
-            return util::thread_description("<unknown>");
+            return threads::thread_description("<unknown>");
         }
-        util::thread_description set_lco_description(
-            util::thread_description /*value*/)
+        threads::thread_description set_lco_description(
+            threads::thread_description /*value*/)
         {
-            return util::thread_description("<unknown>");
+            return threads::thread_description("<unknown>");
         }
 #else
-        util::thread_description get_description() const
+        threads::thread_description get_description() const
         {
             std::lock_guard<hpx::util::detail::spinlock> l(
                 spinlock_pool::spinlock_for(this));
             return description_;
         }
-        util::thread_description set_description(util::thread_description value)
+        threads::thread_description set_description(
+            threads::thread_description value)
         {
             std::lock_guard<hpx::util::detail::spinlock> l(
                 spinlock_pool::spinlock_for(this));
@@ -284,14 +285,14 @@ namespace hpx { namespace threads {
             return value;
         }
 
-        util::thread_description get_lco_description() const
+        threads::thread_description get_lco_description() const
         {
             std::lock_guard<hpx::util::detail::spinlock> l(
                 spinlock_pool::spinlock_for(this));
             return lco_description_;
         }
-        util::thread_description set_lco_description(
-            util::thread_description value)
+        threads::thread_description set_lco_description(
+            threads::thread_description value)
         {
             std::lock_guard<hpx::util::detail::spinlock> l(
                 spinlock_pool::spinlock_for(this));
@@ -590,8 +591,8 @@ namespace hpx { namespace threads {
         ///////////////////////////////////////////////////////////////////////
         // Debugging/logging information
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-        util::thread_description description_;
-        util::thread_description lco_description_;
+        threads::thread_description description_;
+        threads::thread_description lco_description_;
 #endif
 
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
@@ -638,18 +639,20 @@ namespace hpx { namespace threads {
     };
 
     HPX_FORCEINLINE thread_data* get_thread_id_data(
-        thread_id_ref_type const& tid)
+        thread_id_ref_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get().get());
     }
 
-    HPX_FORCEINLINE thread_data* get_thread_id_data(thread_id_type const& tid)
+    HPX_FORCEINLINE thread_data* get_thread_id_data(
+        thread_id_type const& tid) noexcept
     {
         return static_cast<thread_data*>(tid.get());
     }
 
     namespace detail {
-        HPX_CORE_EXPORT void set_self_ptr(thread_self*);
+
+        HPX_CORE_EXPORT void set_self_ptr(thread_self*) noexcept;
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -659,7 +662,7 @@ namespace hpx { namespace threads {
 
     /// The function \a get_self_ptr returns a pointer to the (OS thread
     /// specific) self reference to the current HPX thread.
-    HPX_CORE_EXPORT thread_self* get_self_ptr();
+    HPX_CORE_EXPORT thread_self* get_self_ptr() noexcept;
 
     /// The function \a get_ctx_ptr returns a pointer to the internal data
     /// associated with each coroutine.
@@ -671,7 +674,7 @@ namespace hpx { namespace threads {
 
     /// The function \a get_self_id returns the HPX thread id of the current
     /// thread (or zero if the current thread is not a HPX thread).
-    HPX_CORE_EXPORT thread_id_type get_self_id();
+    HPX_CORE_EXPORT thread_id_type get_self_id() noexcept;
 
     /// The function \a get_parent_id returns the HPX thread id of the
     /// current thread's parent (or zero if the current thread is not a
@@ -680,7 +683,7 @@ namespace hpx { namespace threads {
     /// \note This function will return a meaningful value only if the
     ///       code was compiled with HPX_HAVE_THREAD_PARENT_REFERENCE
     ///       being defined.
-    HPX_CORE_EXPORT thread_id_type get_parent_id();
+    HPX_CORE_EXPORT thread_id_type get_parent_id() noexcept;
 
     /// The function \a get_parent_phase returns the HPX phase of the
     /// current thread's parent (or zero if the current thread is not a
@@ -689,16 +692,16 @@ namespace hpx { namespace threads {
     /// \note This function will return a meaningful value only if the
     ///       code was compiled with HPX_HAVE_THREAD_PARENT_REFERENCE
     ///       being defined.
-    HPX_CORE_EXPORT std::size_t get_parent_phase();
+    HPX_CORE_EXPORT std::size_t get_parent_phase() noexcept;
 
     /// The function \a get_self_stacksize returns the stack size of the
     /// current thread (or zero if the current thread is not a HPX thread).
-    HPX_CORE_EXPORT std::ptrdiff_t get_self_stacksize();
+    HPX_CORE_EXPORT std::ptrdiff_t get_self_stacksize() noexcept;
 
     /// The function \a get_self_stacksize_enum returns the stack size of the /
     //current thread (or thread_stacksize::default if the current thread is not
     //a HPX thread).
-    HPX_CORE_EXPORT thread_stacksize get_self_stacksize_enum();
+    HPX_CORE_EXPORT thread_stacksize get_self_stacksize_enum() noexcept;
 
     /// The function \a get_parent_locality_id returns the id of the locality of
     /// the current thread's parent (or zero if the current thread is not a
@@ -707,15 +710,14 @@ namespace hpx { namespace threads {
     /// \note This function will return a meaningful value only if the
     ///       code was compiled with HPX_HAVE_THREAD_PARENT_REFERENCE
     ///       being defined.
-    HPX_CORE_EXPORT std::uint32_t get_parent_locality_id();
+    HPX_CORE_EXPORT std::uint32_t get_parent_locality_id() noexcept;
 
-    /// The function \a get_self_component_id returns the lva of the
-    /// component the current thread is acting on
+    /// The function \a get_self_component_id returns the lva of the component
+    /// the current thread is acting on
     ///
-    /// \note This function will return a meaningful value only if the
-    ///       code was compiled with HPX_HAVE_THREAD_TARGET_ADDRESS
-    ///       being defined.
-    HPX_CORE_EXPORT std::uint64_t get_self_component_id();
+    /// \note This function will return a meaningful value only if the code was
+    ///       compiled with HPX_HAVE_THREAD_TARGET_ADDRESS being defined.
+    HPX_CORE_EXPORT std::uint64_t get_self_component_id() noexcept;
 }}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>

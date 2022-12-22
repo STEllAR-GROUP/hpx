@@ -39,13 +39,13 @@ namespace hpx {
     ///
     enum class cv_status
     {
-        ///
-        /// \brief the condition variable was awakened with \a notify_all,
+        /// The condition variable was awakened with \a notify_all,
         /// \a notify_one, or spuriously
-        ///
         no_timeout,
+
         /// the condition variable was awakened by timeout expiration
         timeout,
+
         /// there was an error
         error
     };

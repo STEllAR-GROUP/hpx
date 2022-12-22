@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2018 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
@@ -29,7 +29,8 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief  Set the thread state of the \a thread referenced by the
     ///         thread_id \a id.
@@ -212,7 +213,7 @@ namespace hpx { namespace threads {
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT thread_state get_thread_state(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, error_code& ec = throws) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// The function get_thread_phase is part of the thread related API.
@@ -235,7 +236,7 @@ namespace hpx { namespace threads {
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT std::size_t get_thread_phase(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, error_code& ec = throws) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// Returns whether the given thread can be interrupted at this point.
@@ -357,7 +358,7 @@ namespace hpx { namespace threads {
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT threads::thread_priority get_thread_priority(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, error_code& ec = throws) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// Return stack size of the given thread
@@ -374,7 +375,7 @@ namespace hpx { namespace threads {
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     HPX_CORE_EXPORT std::ptrdiff_t get_stack_size(
-        thread_id_type const& id, error_code& ec = throws);
+        thread_id_type const& id, error_code& ec = throws) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
@@ -433,9 +434,10 @@ namespace hpx { namespace threads {
     ///         \a hpx#error#invalid_status.
     HPX_CORE_EXPORT threads::thread_pool_base* get_pool(
         thread_id_type const& id, error_code& ec = throws);
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
 
-namespace hpx { namespace this_thread {
+namespace hpx::this_thread {
+
     ///////////////////////////////////////////////////////////////////////////
     /// The function \a suspend will return control to the thread manager
     /// (suspends the current thread). It sets the new state of this thread to
@@ -457,8 +459,8 @@ namespace hpx { namespace this_thread {
     ///
     HPX_CORE_EXPORT threads::thread_restart_state suspend(
         threads::thread_schedule_state state, threads::thread_id_type id,
-        util::thread_description const& description = util::thread_description(
-            "this_thread::suspend"),
+        threads::thread_description const& description =
+            threads::thread_description("this_thread::suspend"),
         error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
@@ -482,8 +484,8 @@ namespace hpx { namespace this_thread {
     inline threads::thread_restart_state suspend(
         threads::thread_schedule_state state =
             threads::thread_schedule_state::pending,
-        util::thread_description const& description = util::thread_description(
-            "this_thread::suspend"),
+        threads::thread_description const& description =
+            threads::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
         return suspend(state, threads::invalid_thread_id, description, ec);
@@ -511,8 +513,8 @@ namespace hpx { namespace this_thread {
     HPX_CORE_EXPORT threads::thread_restart_state suspend(
         hpx::chrono::steady_time_point const& abs_time,
         threads::thread_id_type id,
-        util::thread_description const& description = util::thread_description(
-            "this_thread::suspend"),
+        threads::thread_description const& description =
+            threads::thread_description("this_thread::suspend"),
         error_code& ec = throws);
 
     /// The function \a suspend will return control to the thread manager
@@ -536,8 +538,8 @@ namespace hpx { namespace this_thread {
     ///
     inline threads::thread_restart_state suspend(
         hpx::chrono::steady_time_point const& abs_time,
-        util::thread_description const& description = util::thread_description(
-            "this_thread::suspend"),
+        threads::thread_description const& description =
+            threads::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
         return suspend(abs_time, threads::invalid_thread_id, description, ec);
@@ -564,8 +566,8 @@ namespace hpx { namespace this_thread {
     ///
     inline threads::thread_restart_state suspend(
         hpx::chrono::steady_duration const& rel_time,
-        util::thread_description const& description = util::thread_description(
-            "this_thread::suspend"),
+        threads::thread_description const& description =
+            threads::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
         return suspend(
@@ -594,8 +596,8 @@ namespace hpx { namespace this_thread {
     inline threads::thread_restart_state suspend(
         hpx::chrono::steady_duration const& rel_time,
         threads::thread_id_type const& id,
-        util::thread_description const& description = util::thread_description(
-            "this_thread::suspend"),
+        threads::thread_description const& description =
+            threads::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
         return suspend(rel_time.from_now(), id, description, ec);
@@ -621,8 +623,8 @@ namespace hpx { namespace this_thread {
     ///         \a hpx#error#invalid_status.
     ///
     inline threads::thread_restart_state suspend(std::uint64_t ms,
-        util::thread_description const& description = util::thread_description(
-            "this_thread::suspend"),
+        threads::thread_description const& description =
+            threads::thread_description("this_thread::suspend"),
         error_code& ec = throws)
     {
         return suspend(std::chrono::milliseconds(ms),
@@ -652,6 +654,6 @@ namespace hpx { namespace this_thread {
     // returns whether the remaining stack-space is at least as large as
     // requested
     HPX_CORE_EXPORT bool has_sufficient_stack_space(
-        std::size_t space_needed = 8 * HPX_THREADS_STACK_OVERHEAD);
+        std::size_t space_needed = 8 * HPX_THREADS_STACK_OVERHEAD) noexcept;
     /// \endcond
-}}    // namespace hpx::this_thread
+}    // namespace hpx::this_thread

@@ -21,20 +21,20 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
 
     ////////////////////////////////////////////////////////////////////////////
     // A simple but very high performance implementation of the channel concept.
     // This channel is bounded to a size given at construction time and supports
     // multiple producers and multiple consumers. The data is stored in a
     // ring-buffer.
-    template <typename T, typename Mutex = util::spinlock>
+    template <typename T, typename Mutex = hpx::util::spinlock>
     class bounded_channel
     {
     private:
         using mutex_type = Mutex;
 
-        bool is_full(std::size_t tail) const noexcept
+        constexpr bool is_full(std::size_t tail) const noexcept
         {
             std::size_t numitems = size_ + tail - head_.data_;
             if (numitems < size_)
@@ -44,7 +44,7 @@ namespace hpx { namespace lcos { namespace local {
             return numitems - size_ == size_ - 1;
         }
 
-        bool is_empty(std::size_t head) const noexcept
+        constexpr bool is_empty(std::size_t head) const noexcept
         {
             return head == tail_.data_;
         }
@@ -66,6 +66,9 @@ namespace hpx { namespace lcos { namespace local {
             head_.data_ = 0;
             tail_.data_ = 0;
         }
+
+        bounded_channel(bounded_channel const& rhs) = delete;
+        bounded_channel& operator=(bounded_channel const& rhs) = delete;
 
         bounded_channel(bounded_channel&& rhs) noexcept
           : head_(rhs.head_)
@@ -166,7 +169,7 @@ namespace hpx { namespace lcos { namespace local {
             return close(l);
         }
 
-        std::size_t capacity() const
+        constexpr std::size_t capacity() const noexcept
         {
             return size_ - 1;
         }
@@ -213,5 +216,4 @@ namespace hpx { namespace lcos { namespace local {
     // using hpx::spinlock.
     template <typename T>
     using channel_mpmc = bounded_channel<T, hpx::spinlock>;
-
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

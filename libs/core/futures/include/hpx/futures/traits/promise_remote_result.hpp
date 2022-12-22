@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,20 +8,21 @@
 
 #include <hpx/type_support/unused.hpp>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     template <typename Result, typename Enable = void>
     struct promise_remote_result
     {
-        typedef Result type;
+        using type = Result;
     };
 
     template <>
     struct promise_remote_result<void>
     {
-        typedef hpx::util::unused_type type;
+        using type = hpx::util::unused_type;
     };
 
     template <typename Result>
     using promise_remote_result_t =
         typename promise_remote_result<Result>::type;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
