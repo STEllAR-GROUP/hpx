@@ -20,7 +20,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace local { namespace detail {
+namespace hpx::local::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_CORE_EXPORT command_line_handling
@@ -28,21 +28,7 @@ namespace hpx { namespace local { namespace detail {
         command_line_handling(hpx::util::runtime_configuration rtcfg,
             std::vector<std::string> ini_config,
             hpx::function<int(hpx::program_options::variables_map& vm)>
-                hpx_main_f)
-          : rtcfg_(rtcfg)
-          , ini_config_(ini_config)
-          , hpx_main_f_(hpx_main_f)
-          , num_threads_(1)
-          , num_cores_(1)
-          , pu_step_(1)
-          , pu_offset_(std::size_t(-1))
-          , numa_sensitive_(0)
-          , use_process_mask_(false)
-          , cmd_line_parsed_(false)
-          , info_printed_(false)
-          , version_printed_(false)
-        {
-        }
+                hpx_main_f);
 
         int call(hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv);
@@ -123,7 +109,6 @@ namespace hpx { namespace local { namespace detail {
 
     HPX_CORE_EXPORT void print_config(
         std::vector<std::string> const& ini_config);
-
-}}}    // namespace hpx::local::detail
+}    // namespace hpx::local::detail
 
 #include <hpx/config/warnings_suffix.hpp>

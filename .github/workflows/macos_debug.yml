@@ -18,9 +18,13 @@ jobs:
       run: |
         # Workaround for https://github.com/actions/virtual-environments/issues/2322
         rm -rf /usr/local/bin/2to3
+        rm -rf /usr/local/bin/idle3
+        rm -rf /usr/local/bin/pydoc3
+        rm -rf /usr/local/bin/python3*
         brew upgrade
         brew update && \
-            brew install boost hwloc gperftools ninja && \
+            brew install --overwrite python-tk && \
+            brew install --overwrite boost hwloc gperftools ninja && \
             brew upgrade cmake
     - name: Configure
       shell: bash

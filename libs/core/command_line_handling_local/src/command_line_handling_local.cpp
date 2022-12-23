@@ -35,7 +35,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace local { namespace detail {
+namespace hpx::local::detail {
+
     std::string runtime_configuration_string(command_line_handling const& cfg)
     {
         std::ostringstream strm;
@@ -90,7 +91,7 @@ namespace hpx { namespace local { namespace detail {
     inline std::string encode_and_enquote(std::string str)
     {
         encode(str, '\"', "\\\"", 2);
-        return util::detail::enquote(str);
+        return enquote(HPX_MOVE(str));
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -205,10 +206,7 @@ namespace hpx { namespace local { namespace detail {
             threads::topology& top = threads::create_topology();
             return threads::count(top.get_cpubind_mask());
         }
-        else
-        {
-            return threads::hardware_concurrency();
-        }
+        return threads::hardware_concurrency();
     }
 
     std::size_t get_number_of_default_cores(bool use_process_mask)
@@ -295,10 +293,10 @@ namespace hpx { namespace local { namespace detail {
             if (threads > HPX_HAVE_MAX_CPU_COUNT)
             {
                 // clang-format off
-                    throw hpx::detail::command_line_error("Requested more than "
-                        HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
-                        "to use for this application, use the option "
-                        "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
+                throw hpx::detail::command_line_error("Requested more than "
+                    HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)" --hpx:threads "
+                    "to use for this application, use the option "
+                    "-DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
                 // clang-format on
             }
 #endif
@@ -311,26 +309,20 @@ namespace hpx { namespace local { namespace detail {
         if (min_os_threads == 0)
         {
             throw hpx::detail::command_line_error(
-                "Number of hpx.force_min_os_threads must be greater "
-                "than "
-                "0");
+                "Number of hpx.force_min_os_threads must be greater than 0");
         }
 
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
         if (min_os_threads > HPX_HAVE_MAX_CPU_COUNT)
         {
+            // clang-format off
             throw hpx::detail::command_line_error(
-                "Requested more than " HPX_PP_STRINGIZE(
-                    HPX_HAVE_MAX_CPU_COUNT) " hpx.force_min_os_threads "
-                                            "to use for this "
-                                            "application, "
-                                            "use the option "
-                                            "-DHPX_WITH_MAX_CPU_COUNT=<"
-                                            "N> "
-                                            "when configuring HPX.");
+                "Requested more than " HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)
+                " hpx.force_min_os_threads to use for this application, use the "
+                "option -DHPX_WITH_MAX_CPU_COUNT=<N> when configuring HPX.");
+            // clang-format on
         }
 #endif
-
         threads = (std::max)(threads, min_os_threads);
 
         return threads;
@@ -384,6 +376,25 @@ namespace hpx { namespace local { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////
+    command_line_handling::command_line_handling(
+        hpx::util::runtime_configuration rtcfg,
+        std::vector<std::string> ini_config,
+        hpx::function<int(hpx::program_options::variables_map& vm)> hpx_main_f)
+      : rtcfg_(HPX_MOVE(rtcfg))
+      , ini_config_(HPX_MOVE(ini_config))
+      , hpx_main_f_(HPX_MOVE(hpx_main_f))
+      , num_threads_(1)
+      , num_cores_(1)
+      , pu_step_(1)
+      , pu_offset_(std::size_t(-1))
+      , numa_sensitive_(0)
+      , use_process_mask_(false)
+      , cmd_line_parsed_(false)
+      , info_printed_(false)
+      , version_printed_(false)
+    {
+    }
+
     void command_line_handling::check_affinity_domain() const
     {
         if (affinity_domain_ != "pu")
@@ -752,11 +763,10 @@ namespace hpx { namespace local { namespace detail {
             }
             else
             {
-                throw hpx::detail::command_line_error(
-                    hpx::util::format("Invalid argument for option --hpx:help: "
-                                      "'{1}', allowed values: "
-                                      "'minimal' (default) and 'full'",
-                        help_option));
+                throw hpx::detail::command_line_error(hpx::util::format(
+                    "Invalid argument for option --hpx:help: '{1}', allowed "
+                    "values: 'minimal' (default) and 'full'",
+                    help_option));
             }
         }
         return false;
@@ -894,10 +904,11 @@ namespace hpx { namespace local { namespace detail {
             rtcfg_.parse("<user supplied config>", e, true, false);
 
         // support re-throwing command line exceptions for testing purposes
-        int error_mode = util::allow_unregistered;
+        util::commandline_error_mode error_mode =
+            util::commandline_error_mode::allow_unregistered;
         if (cfgmap.get_value("hpx.commandline.rethrow_errors", 0) != 0)
         {
-            error_mode |= util::rethrow_on_error;
+            error_mode |= util::commandline_error_mode::rethrow_on_error;
         }
 
         // The cfg registry may hold command line options to prepend to the
@@ -936,9 +947,9 @@ namespace hpx { namespace local { namespace detail {
         hpx::program_options::options_description help;
         std::vector<std::string> unregistered_options;
 
+        error_mode |= util::commandline_error_mode::report_missing_config_file;
         if (!parse_commandline(rtcfg_, desc_cmdline, argv[0], args, vm_,
-                error_mode | util::report_missing_config_file, &help,
-                &unregistered_options))
+                error_mode, &help, &unregistered_options))
         {
             return -1;
         }
@@ -1000,4 +1011,4 @@ namespace hpx { namespace local { namespace detail {
         // all is good
         return 0;
     }
-}}}    // namespace hpx::local::detail
+}    // namespace hpx::local::detail

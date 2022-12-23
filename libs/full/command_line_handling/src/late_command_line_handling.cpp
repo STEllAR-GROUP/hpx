@@ -34,11 +34,12 @@ namespace hpx { namespace util {
             {
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
 
-                util::commandline_error_mode mode = util::rethrow_on_error;
+                util::commandline_error_mode mode =
+                    util::commandline_error_mode::rethrow_on_error;
                 std::string allow_unknown(
                     ini.get_entry("hpx.commandline.allow_unknown", "0"));
                 if (allow_unknown != "0")
-                    mode = util::allow_unregistered;
+                    mode = util::commandline_error_mode::allow_unregistered;
 
                 hpx::program_options::variables_map vm;
                 std::vector<std::string> still_unregistered_options;
@@ -66,7 +67,9 @@ namespace hpx { namespace util {
 
                 util::parse_commandline(ini, options, cmd_line, vm,
                     std::size_t(-1),
-                    util::allow_unregistered | util::report_missing_config_file,
+                    util::commandline_error_mode::allow_unregistered |
+                        util::commandline_error_mode::
+                            report_missing_config_file,
                     get_runtime_mode_from_name(runtime_mode));
 
 #if defined(HPX_HAVE_NETWORKING)

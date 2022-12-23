@@ -890,6 +890,7 @@ namespace hpx {
     }
 
     namespace util {
+
         ///////////////////////////////////////////////////////////////////////////
         // retrieve the command line arguments for the current locality
         bool retrieve_commandline_arguments(
@@ -908,8 +909,8 @@ namespace hpx {
             if (cfg.has_entry("hpx.cmd_line"))
                 cmdline = cfg.get_entry("hpx.cmd_line");
 
-            return hpx::local::detail::parse_commandline(
-                cfg, app_options, cmdline, vm, allow_unregistered);
+            return hpx::local::detail::parse_commandline(cfg, app_options,
+                cmdline, vm, util::commandline_error_mode::allow_unregistered);
         }
 
         ///////////////////////////////////////////////////////////////////////////
@@ -1010,7 +1011,8 @@ namespace hpx {
 }    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
+
     std::string expand(std::string const& in)
     {
         return get_runtime().get_config().expand(in);
@@ -1020,10 +1022,11 @@ namespace hpx { namespace util {
     {
         get_runtime().get_config().expand(in, std::string::size_type(-1));
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     threadmanager& get_thread_manager()
     {
         return get_runtime().get_thread_manager();
@@ -1083,7 +1086,7 @@ namespace hpx { namespace threads {
         }
         return rt->get_topology();
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {

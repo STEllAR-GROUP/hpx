@@ -349,6 +349,15 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
+    command_line_handling::command_line_handling(runtime_configuration rtcfg,
+        std::vector<std::string> ini_config,
+        hpx::function<int(hpx::program_options::variables_map& vm)> hpx_main_f)
+      : base_type(HPX_MOVE(rtcfg), HPX_MOVE(ini_config), HPX_MOVE(hpx_main_f))
+      , node_(std::size_t(-1))
+      , num_localities_(1)
+    {
+    }
+
     bool command_line_handling::handle_arguments(util::manage_config& cfgmap,
         hpx::program_options::variables_map& vm,
         std::vector<std::string>& ini_config, std::size_t& node, bool initial)
@@ -914,10 +923,11 @@ namespace hpx { namespace util {
             rtcfg_.parse("<user supplied config>", e, true, false);
 
         // support re-throwing command line exceptions for testing purposes
-        int error_mode = util::allow_unregistered;
+        util::commandline_error_mode error_mode =
+            util::commandline_error_mode::allow_unregistered;
         if (cfgmap.get_value("hpx.commandline.rethrow_errors", 0) != 0)
         {
-            error_mode |= util::rethrow_on_error;
+            error_mode |= util::commandline_error_mode::rethrow_on_error;
         }
 
         // The cfg registry may hold command line options to prepend to the
@@ -935,10 +945,10 @@ namespace hpx { namespace util {
             // Boost V1.47 and before do not properly reset a variables_map when
             // calling vm.clear(). We work around that problems by creating a
             // separate instance just for the preliminary command line handling.
+            error_mode |= util::commandline_error_mode::ignore_aliases;
             hpx::program_options::variables_map prevm;
             if (!util::parse_commandline(rtcfg_, desc_cmdline, argv[0], args,
-                    prevm, std::size_t(-1), error_mode | util::ignore_aliases,
-                    rtcfg_.mode_))
+                    prevm, std::size_t(-1), error_mode, rtcfg_.mode_))
             {
                 return -1;
             }
@@ -1000,9 +1010,9 @@ namespace hpx { namespace util {
         hpx::program_options::options_description help;
         std::vector<std::string> unregistered_options;
 
+        error_mode |= util::commandline_error_mode::report_missing_config_file;
         if (!util::parse_commandline(rtcfg_, desc_cmdline, argv[0], args, vm_,
-                node_, error_mode | util::report_missing_config_file,
-                rtcfg_.mode_, &help, &unregistered_options))
+                node_, error_mode, rtcfg_.mode_, &help, &unregistered_options))
         {
             return -1;
         }

@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2001-2011 Joel de Guzman
-    Copyright (c) 2001-2016 Hartmut Kaiser
+    Copyright (c) 2001-2022 Hartmut Kaiser
     Copyright (c)      2010 Bryce Lelbach
 
 //  SPDX-License-Identifier: BSL-1.0
@@ -20,7 +20,7 @@
 #include <string>
 #include <type_traits>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
 
     template <typename Char, typename Iterator>
     inline bool partial_string_parse(
@@ -113,10 +113,10 @@ namespace hpx { namespace threads { namespace detail {
     struct partlit_parser
       : boost::spirit::x3::parser<partlit_parser<String, Attribute>>
     {
-        typedef Attribute attribute_type;
-        static bool const has_attribute =
-            !std::is_same<boost::spirit::x3::unused_type,
-                attribute_type>::value;
+        using attribute_type = Attribute;
+
+        static constexpr bool const has_attribute =
+            !std::is_same_v<boost::spirit::x3::unused_type, attribute_type>;
 
         constexpr partlit_parser(String const& str, Attribute const& value)
           : str{str}
@@ -160,6 +160,5 @@ namespace hpx { namespace threads { namespace detail {
         }
     };
 
-    constexpr partlit_gen partlit{};
-
-}}}    // namespace hpx::threads::detail
+    inline constexpr partlit_gen const partlit{};
+}    // namespace hpx::threads::detail

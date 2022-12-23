@@ -102,14 +102,14 @@ namespace {
 
     // clang-format off
     auto distribution_def =
-            partlit("compact", compact)
-        |   partlit("scatter", scatter)
-        |   partlit("balanced", balanced)
-        |   partlit("numa-balanced", numa_balanced)
+            partlit("compact", distribution_type::compact)
+        |   partlit("scatter", distribution_type::scatter)
+        |   partlit("balanced", distribution_type::balanced)
+        |   partlit("numa-balanced", distribution_type::numa_balanced)
         ;
 
     auto thread_spec_def =
-            partlit("thread", spec_type::thread) >> ':' >>  specs
+            partlit("thread", spec_type::type::thread) >> ':' >>  specs
         ;
 
     auto pu_specs_def =
@@ -118,19 +118,20 @@ namespace {
         ;
 
     auto socket_spec_def =
-            (partlit("socket", spec_type::socket) >> ':' >> specs)
-        |   (partlit("numanode", spec_type::numanode) >> ':' >> specs)
-        |   x3::attr(spec_type(spec_type::unknown))
+            (partlit("socket", spec_type::type::socket) >> ':' >> specs)
+        |   (partlit("numanode", spec_type::type::numanode) >> ':' >> specs)
+        |   x3::attr(spec_type(spec_type::type::unknown))
         ;
 
     auto core_spec_def =
-           (-x3::lit('.') >> partlit("core", spec_type::core) >> ':' >> specs)
-        |   x3::attr(spec_type(spec_type::unknown))
+           (-x3::lit('.')
+                >> partlit("core", spec_type::type::core) >> ':' >> specs)
+        |   x3::attr(spec_type(spec_type::type::unknown))
         ;
 
     auto pu_spec_def =
-           (-x3::lit('.') >> partlit("pu", spec_type::pu) >> ':' >> specs)
-        |   x3::attr(spec_type(spec_type::unknown))
+           (-x3::lit('.') >> partlit("pu", spec_type::type::pu) >> ':' >> specs)
+        |   x3::attr(spec_type(spec_type::type::unknown))
         ;
 
     auto specs_def = spec % ',';
@@ -146,15 +147,16 @@ namespace {
 
 }    // namespace
 
-namespace hpx { namespace threads { namespace detail {
-    static char const* const type_names[] = {
+namespace hpx::threads::detail {
+
+    inline constexpr char const* const type_names[] = {
         "unknown", "thread", "socket", "numanode", "core", "pu"};
 
-    char const* spec_type::type_name(spec_type::type t)
+    char const* spec_type::type_name(spec_type::type t) noexcept
     {
-        if (t < spec_type::unknown || t > spec_type::pu)
+        if (t < spec_type::type::unknown || t > spec_type::type::pu)
             return type_names[0];
-        return type_names[t];
+        return type_names[static_cast<int>(t)];
     }
 
     template <typename Iterator>
@@ -325,7 +327,7 @@ namespace hpx { namespace threads { namespace detail {
     {
         switch (s.type_)
         {
-        case spec_type::socket:
+        case spec_type::type::socket:
             // requested top level is a socket
             {
                 std::size_t num_sockets = t.get_number_of_sockets();
@@ -333,7 +335,7 @@ namespace hpx { namespace threads { namespace detail {
                     t, extract_bounds(s, num_sockets, ec));
             }
 
-        case spec_type::numanode:
+        case spec_type::type::numanode:
             // requested top level is a NUMA node
             {
                 std::size_t num_numanodes = t.get_number_of_numa_nodes();
@@ -341,7 +343,7 @@ namespace hpx { namespace threads { namespace detail {
                     t, extract_bounds(s, num_numanodes, ec));
             }
 
-        case spec_type::unknown:
+        case spec_type::type::unknown:
         {
             std::vector<mask_info> masks;
             masks.push_back(
@@ -368,7 +370,7 @@ namespace hpx { namespace threads { namespace detail {
 
         switch (s.type_)
         {
-        case spec_type::core:
+        case spec_type::type::core:
         {
             std::size_t base = 0;
             std::size_t num_cores = 0;
@@ -378,11 +380,10 @@ namespace hpx { namespace threads { namespace detail {
                 for (std::size_t i = 0; i != socket; ++i)
                 {
                     // The number of NUMA nodes might be zero if there hwloc
-                    // doesn't detect a NUMA domain. This might be the case
-                    // when there is no NUMA support configured, or when
-                    // there are just sockets, but no direct numa domains.
-                    // The bind description might relate to sockets, not
-                    // NUMA domains.
+                    // doesn't detect a NUMA domain. This might be the case when
+                    // there is no NUMA support configured, or when there are
+                    // just sockets, but no direct numa domains. The bind
+                    // description might relate to sockets, not NUMA domains.
                     if (t.get_number_of_numa_nodes() == 0)
                         base += t.get_number_of_socket_cores(i);
                     else
@@ -412,7 +413,7 @@ namespace hpx { namespace threads { namespace detail {
         }
         break;
 
-        case spec_type::unknown:
+        case spec_type::type::unknown:
         {
             mask_type mask = extract_machine_mask(t, ec);
             masks.push_back(
@@ -438,7 +439,7 @@ namespace hpx { namespace threads { namespace detail {
 
         switch (s.type_)
         {
-        case spec_type::pu:
+        case spec_type::type::pu:
         {
             std::size_t num_pus = 0;
             std::size_t socket_base = 0;
@@ -496,7 +497,7 @@ namespace hpx { namespace threads { namespace detail {
         }
         break;
 
-        case spec_type::unknown:
+        case spec_type::type::unknown:
         {
             mask_type mask = extract_machine_mask(t, ec);
             masks.push_back(hpx::make_tuple(std::size_t(-1), mask & core_mask));
@@ -550,7 +551,7 @@ namespace hpx { namespace threads { namespace detail {
             if (get_index(cmi) == std::size_t(-1))
             {
                 // all cores
-                if (specs[2].type_ == spec_type::unknown)
+                if (specs[2].type_ == spec_type::type::unknown)
                 {
                     // no pu information
                     affinities.push_back(get_mask(cmi));
@@ -598,10 +599,10 @@ namespace hpx { namespace threads { namespace detail {
             if (get_index(smi) == std::size_t(-1))
             {
                 // all NUMA domains
-                if (specs[1].type_ == spec_type::unknown)
+                if (specs[1].type_ == spec_type::type::unknown)
                 {
                     // no core information
-                    if (specs[2].type_ == spec_type::unknown)
+                    if (specs[2].type_ == spec_type::type::unknown)
                     {
                         // no pu information
                         affinities.push_back(get_mask(smi));
@@ -625,7 +626,7 @@ namespace hpx { namespace threads { namespace detail {
                 {
                     // no socket given, assume cores are numbered for whole
                     // machine
-                    if (specs[2].type_ == spec_type::unknown)
+                    if (specs[2].type_ == spec_type::type::unknown)
                     {
                         // no pu information
                         std::vector<mask_info> core_masks = extract_core_masks(
@@ -889,9 +890,8 @@ namespace hpx { namespace threads { namespace detail {
         std::vector<std::vector<std::size_t>> pu_indexes(num_cores);
         num_pus.resize(num_threads);
 
-        // At first, calculate the number of used pus per core.
-        // This needs to be done to make sure that we occupy all the available
-        // cores
+        // At first, calculate the number of used pus per core. This needs to be
+        // done to make sure that we occupy all the available cores
         for (std::size_t num_thread = 0; num_thread < num_threads; /**/)
         {
             for (std::size_t num_core = 0; num_core < num_cores; ++num_core)
@@ -1113,22 +1113,22 @@ namespace hpx { namespace threads { namespace detail {
         affinities.resize(num_threads);
         switch (d)
         {
-        case compact:
+        case distribution_type::compact:
             decode_compact_distribution(t, affinities, used_cores, max_cores,
                 num_pus, use_process_mask, ec);
             break;
 
-        case scatter:
+        case distribution_type::scatter:
             decode_scatter_distribution(t, affinities, used_cores, max_cores,
                 num_pus, use_process_mask, ec);
             break;
 
-        case balanced:
+        case distribution_type::balanced:
             decode_balanced_distribution(t, affinities, used_cores, max_cores,
                 num_pus, use_process_mask, ec);
             break;
 
-        case numa_balanced:
+        case distribution_type::numa_balanced:
             decode_numabalanced_distribution(t, affinities, used_cores,
                 max_cores, num_pus, use_process_mask, ec);
             break;
@@ -1137,9 +1137,10 @@ namespace hpx { namespace threads { namespace detail {
             HPX_ASSERT(false);
         }
     }
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     ///////////////////////////////////////////////////////////////////////////
     void parse_affinity_options(std::string const& spec,
         std::vector<mask_type>& affinities, std::size_t used_cores,
@@ -1184,7 +1185,7 @@ namespace hpx { namespace threads {
             affinities.clear();
             for (detail::full_mapping_type& m : mappings_specs)
             {
-                if (m.first.type_ != detail::spec_type::thread)
+                if (m.first.type_ != detail::spec_type::type::thread)
                 {
                     HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "parse_affinity_options",
@@ -1200,9 +1201,9 @@ namespace hpx { namespace threads {
                     return;
                 }
 
-                if (m.second[0].type_ == detail::spec_type::unknown &&
-                    m.second[1].type_ == detail::spec_type::unknown &&
-                    m.second[2].type_ == detail::spec_type::unknown)
+                if (m.second[0].type_ == detail::spec_type::type::unknown &&
+                    m.second[1].type_ == detail::spec_type::type::unknown &&
+                    m.second[2].type_ == detail::spec_type::type::unknown)
                 {
                     HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "parse_affinity_options",
@@ -1238,4 +1239,4 @@ namespace hpx { namespace threads {
         break;
         }
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

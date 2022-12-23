@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,6 +14,8 @@
 #include <string>
 
 namespace hpx {
+
+    ///////////////////////////////////////////////////////////////////////////
     /// A HPX runtime can be executed in two different modes: console mode
     /// and worker mode.
     enum class runtime_mode
@@ -31,7 +33,8 @@ namespace hpx {
 
     /// Get the readable string representing the name of the given runtime_mode
     /// constant.
-    HPX_CORE_EXPORT char const* get_runtime_mode_name(runtime_mode state);
+    HPX_CORE_EXPORT char const* get_runtime_mode_name(
+        runtime_mode state) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Returns the internal representation (runtime_mode constant) from

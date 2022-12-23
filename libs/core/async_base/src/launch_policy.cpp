@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <hpx/serialization/serialize.hpp>
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     const detail::async_policy launch::async =
         detail::async_policy{threads::thread_priority::default_};
@@ -33,35 +34,21 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         void policy_holder_base::load(
             serialization::input_archive& ar, unsigned)
         {
-            int value = 0;
-            // clang-format off
-            ar & value;
-            policy_ = static_cast<launch_policy>(value);
-
-            ar & value;
-            priority_ = static_cast<threads::thread_priority>(value);
-
-            ar & hint_.hint & value;
-            hint_.mode = static_cast<threads::thread_schedule_hint_mode>(value);
-            // clang-format on
+            ar >> policy_;
+            ar >> priority_;
+            ar >> hint_.hint >> hint_.mode >> hint_.placement_mode;
         }
 
         void policy_holder_base::save(
             serialization::output_archive& ar, unsigned) const
         {
-            // clang-format off
-            int value = static_cast<int>(policy_);
-            ar & value;
-
-            value = static_cast<int>(priority_);
-            ar & value;
-
-            value = static_cast<int>(hint_.mode);
-            ar & value & hint_.hint;
-            // clang-format on
+            ar << policy_;
+            ar << priority_;
+            ar << hint_.hint << hint_.mode << hint_.placement_mode;
         }
     }    // namespace detail
 }    // namespace hpx

@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2014 Hartmut Kaiser
+//  Copyright (c) 2005-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,7 +19,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     bool handle_ini_file(section& ini, std::string const& loc);
     bool handle_ini_file_env(
@@ -52,4 +53,4 @@ namespace hpx { namespace util {
         std::map<std::string, hpx::util::plugin::dll>& modules,
         std::vector<std::shared_ptr<components::component_registry_base>>&
             component_registries);
-}}    // namespace hpx::util
+}    // namespace hpx::util

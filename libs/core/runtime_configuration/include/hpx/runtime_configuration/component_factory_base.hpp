@@ -11,21 +11,22 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     struct HPX_CORE_EXPORT component_factory_base;
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
-///////////////////////////////////////////////////////////////////////////////
-/// This macro is used to register the given component factory with
-/// Hpx.Plugin. This macro has to be used for each of the component factories.
+////////////////////////////////////////////////////////////////////////////////
+/// This macro is used to register the given component factory with Hpx.Plugin.
+/// This macro has to be used for each of the component factories.
 #define HPX_REGISTER_COMPONENT_FACTORY(componentname)                          \
     HPX_INIT_REGISTRY_FACTORY_STATIC(                                          \
         HPX_PLUGIN_COMPONENT_PREFIX, componentname, factory)                   \
 /**/
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_APPLICATION_NAME) && !defined(HPX_HAVE_STATIC_LINKING)
+
 /// This macro is used to define the required Hpx.Plugin entry points. This
 /// macro has to be used in exactly one compilation unit of a component module.
 #define HPX_REGISTER_COMPONENT_MODULE()                                        \
@@ -35,10 +36,12 @@ namespace hpx { namespace components {
 #define HPX_REGISTER_COMPONENT_MODULE_DYNAMIC()                                \
     HPX_PLUGIN_EXPORT_LIST_DYNAMIC(HPX_PLUGIN_COMPONENT_PREFIX, factory)       \
     HPX_REGISTER_REGISTRY_MODULE_DYNAMIC()                                     \
-/**/
+    /**/
+
 #else
-// in executables (when HPX_APPLICATION_NAME is defined) this needs to expand
-// to nothing
+
+// in executables (when HPX_APPLICATION_NAME is defined) this needs to expand to
+// nothing
 #if defined(HPX_HAVE_STATIC_LINKING)
 #define HPX_REGISTER_COMPONENT_MODULE()                                        \
     HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, factory)               \
@@ -48,6 +51,7 @@ namespace hpx { namespace components {
 #define HPX_REGISTER_COMPONENT_MODULE()
 #endif
 #define HPX_REGISTER_COMPONENT_MODULE_DYNAMIC()
+
 #endif
 
 #else    // COMPUTE DEVICE CODE

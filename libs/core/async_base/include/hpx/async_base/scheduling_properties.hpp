@@ -13,7 +13,7 @@
 
 #include <type_traits>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Property, typename Enable = void>
@@ -152,4 +152,4 @@ namespace hpx { namespace execution { namespace experimental {
     struct is_scheduling_property<get_annotation_t> : std::true_type
     {
     };
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

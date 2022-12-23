@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,11 +12,11 @@
 
 #include <cstddef>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     HPX_EXPORT int handle_late_commandline_options(
         util::runtime_configuration& ini,
         hpx::program_options::options_description const& options,
         void (*handle_print_bind)(std::size_t),
         void (*handle_list_parcelports)() = nullptr);
-}}    // namespace hpx::util
+}    // namespace hpx::util

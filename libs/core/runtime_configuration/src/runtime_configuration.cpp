@@ -762,11 +762,11 @@ namespace hpx { namespace util {
 
             if (m == "hosted")
             {
-                return agas::service_mode_hosted;
+                return agas::service_mode::hosted;
             }
             else if (m == "bootstrap")
             {
-                return agas::service_mode_bootstrap;
+                return agas::service_mode::bootstrap;
             }
             else
             {
@@ -776,7 +776,7 @@ namespace hpx { namespace util {
                     "invalid AGAS router mode \"{}\"", m);
             }
         }
-        return agas::service_mode_hosted;
+        return agas::service_mode::hosted;
     }
 
     std::uint32_t runtime_configuration::get_num_localities() const
@@ -798,7 +798,7 @@ namespace hpx { namespace util {
         std::uint32_t num_localities_)
     {
         // this function should not be called on the AGAS server
-        HPX_ASSERT(agas::service_mode_bootstrap != get_agas_service_mode());
+        HPX_ASSERT(agas::service_mode::bootstrap != get_agas_service_mode());
         num_localities = num_localities_;
 
         if (util::section* sec = get_section("hpx"); nullptr != sec)

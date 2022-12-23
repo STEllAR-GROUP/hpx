@@ -18,7 +18,8 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace components {
+namespace hpx::components {
+
     ///////////////////////////////////////////////////////////////////////////
     struct static_factory_load_data_type
     {
@@ -26,7 +27,7 @@ namespace hpx { namespace components {
         hpx::util::plugin::get_plugins_list_type get_factory;
     };
 
-    HPX_CORE_EXPORT bool& get_initial_static_loading();
+    HPX_CORE_EXPORT bool& get_initial_static_loading() noexcept;
 
     HPX_CORE_EXPORT std::vector<static_factory_load_data_type>&
     get_static_module_data();
@@ -47,9 +48,9 @@ namespace hpx { namespace components {
         std::string const& instance, util::plugin::get_plugins_list_type& f);
     HPX_CORE_EXPORT
     void init_registry_startup_shutdown(static_factory_load_data_type const&);
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 #define HPX_DECLARE_FACTORY_STATIC(name, base)                                 \
     extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string, hpx::any_nonser>*   \
         HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME(name, base)() /**/
@@ -58,7 +59,7 @@ namespace hpx { namespace components {
     {                                                                          \
         HPX_PP_STRINGIZE(module), HPX_PLUGIN_LIST_NAME(name, base)             \
     }                                                                          \
-/**/
+    /**/
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_INIT_REGISTRY_MODULE_STATIC(name, base)                            \

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,15 +10,16 @@
 
 #include <type_traits>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     // forward declaration only
     struct policy_holder_base;
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     namespace detail {
+
         template <typename Policy>
         struct is_launch_policy
           : std::is_base_of<hpx::detail::policy_holder_base, Policy>
@@ -33,4 +34,4 @@ namespace hpx { namespace traits {
 
     template <typename Policy>
     inline constexpr bool is_launch_policy_v = is_launch_policy<Policy>::value;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

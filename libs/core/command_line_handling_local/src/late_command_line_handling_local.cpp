@@ -17,7 +17,17 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace local { namespace detail {
+namespace hpx::local::detail {
+
+    std::string enquote(std::string arg)
+    {
+        if (arg.find_first_of(" \t\"") != std::string::npos)
+        {
+            return std::string("\"") + HPX_MOVE(arg) + "\"";
+        }
+        return arg;
+    }
+
     void decode(std::string& str, char const* s, char const* r)
     {
         std::string::size_type pos = 0;
@@ -43,8 +53,7 @@ namespace hpx { namespace local { namespace detail {
             {
                 still_unknown_commandline += " ";
             }
-            still_unknown_commandline +=
-                util::detail::enquote(still_unregistered_options[i]);
+            still_unknown_commandline += enquote(still_unregistered_options[i]);
         }
 
         if (!still_unknown_commandline.empty())
@@ -116,11 +125,12 @@ namespace hpx { namespace local { namespace detail {
                 ini.get_entry("hpx.unknown_cmd_line", ""));
             if (!unknown_cmd_line.empty())
             {
-                util::commandline_error_mode mode = util::rethrow_on_error;
+                util::commandline_error_mode mode =
+                    util::commandline_error_mode::rethrow_on_error;
                 std::string allow_unknown(
                     ini.get_entry("hpx.commandline.allow_unknown", "0"));
                 if (allow_unknown != "0")
-                    mode = util::allow_unregistered;
+                    mode = util::commandline_error_mode::allow_unregistered;
 
                 hpx::program_options::variables_map vm;
                 std::vector<std::string> still_unregistered_options;
@@ -144,8 +154,9 @@ namespace hpx { namespace local { namespace detail {
                 hpx::program_options::variables_map vm;
 
                 parse_commandline(ini, options, cmd_line, vm,
-                    util::allow_unregistered |
-                        util::report_missing_config_file);
+                    util::commandline_error_mode::allow_unregistered |
+                        util::commandline_error_mode::
+                            report_missing_config_file);
 
                 if (handle_late_options(ini, vm, handle_print_bind))
                 {
@@ -163,4 +174,4 @@ namespace hpx { namespace local { namespace detail {
 
         return 0;
     }
-}}}    // namespace hpx::local::detail
+}    // namespace hpx::local::detail

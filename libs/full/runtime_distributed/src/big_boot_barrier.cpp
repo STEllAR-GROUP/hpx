@@ -649,8 +649,9 @@ namespace hpx { namespace agas {
         {
             cond.wait(lock);
         }
+
         // pre-cache all known locality endpoints in local AGAS on locality 0 as well
-        if (service_mode_bootstrap == service_type)
+        if (service_mode::bootstrap == service_type)
         {
             naming::resolver_client& agas_client = naming::get_agas_client();
             agas_client.pre_cache_endpoints(localities);
@@ -663,7 +664,7 @@ namespace hpx { namespace agas {
         service_mode service_type = ini.get_agas_service_mode();
         std::size_t result = 1;
 
-        if (service_mode_bootstrap == service_type)
+        if (service_mode::bootstrap == service_type)
         {
             std::size_t num_localities =
                 static_cast<std::size_t>(ini.get_num_localities());
@@ -686,7 +687,7 @@ namespace hpx { namespace agas {
       , thunks(32)
     {
         // register all not registered typenames
-        if (service_type == service_mode_bootstrap)
+        if (service_type == service_mode::bootstrap)
         {
             detail::register_unassigned_typenames();
             // store endpoints of root locality for later
@@ -696,7 +697,7 @@ namespace hpx { namespace agas {
 
     void big_boot_barrier::wait_bootstrap()
     {    // {{{
-        HPX_ASSERT(service_mode_bootstrap == service_type);
+        HPX_ASSERT(service_mode::bootstrap == service_type);
 
         // the root just waits until all localities have connected
         spin();
@@ -727,7 +728,7 @@ namespace hpx { namespace agas {
         naming::address::address_type primary_ns_server,
         naming::address::address_type symbol_ns_server)
     {    // {{{
-        HPX_ASSERT(service_mode_bootstrap != service_type);
+        HPX_ASSERT(service_mode::bootstrap != service_type);
 
         // any worker sends a request for registration and waits
         HPX_ASSERT(nullptr != primary_ns_server);
@@ -790,7 +791,7 @@ namespace hpx { namespace agas {
     // until this point so that the AGAS locality can come up.
     void big_boot_barrier::trigger()
     {
-        if (service_mode_bootstrap == service_type)
+        if (service_mode::bootstrap == service_type)
         {
             hpx::move_only_function<void()>* p;
 
