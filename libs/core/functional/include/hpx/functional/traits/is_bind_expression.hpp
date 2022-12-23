@@ -14,16 +14,18 @@
 
 namespace hpx {
 
-    /// If T is the type produced by a call to std::bind, this template is
-    /// derived from std::true_type. For any other type, this template is
-    /// derived from std::false_type.
+    /// \brief If \c T is the type produced by a call to \c hpx::bind, this
+    ///        template is derived from \c std::true_type. For any other type,
+    ///        this template is derived from \c std::false_type.
     ///
-    /// This template may be specialized for a user-defined type T to implement
-    /// UnaryTypeTrait with base characteristic of std::true_type to indicate
-    /// that T should be treated by std::bind as if it were the type of a bind
-    /// subexpression: when a bind-generated function object is invoked, a bound
-    /// argument of this type will be invoked as a function object and will be
-    /// given all the unbound arguments passed to the bind-generated object.
+    /// \details This template may be specialized for a user-defined type \c T
+    ///          to implement \a UnaryTypeTrait with base characteristic of
+    ///          \c std::true_type to indicate that \c T should be treated by
+    ///          \c hpx::bind as if it were the type of a bind subexpression:
+    ///          when a bind-generated function object is invoked, a bound
+    ///          argument of this type will be invoked as a function object and
+    ///          will be given all the unbound arguments passed to the
+    ///          bind-generated object.
     template <typename T>
     struct is_bind_expression : std::is_bind_expression<T>
     {
