@@ -48,7 +48,7 @@ namespace hpx::parcelset {
             std::int64_t num_parcels_ = 0;
             std::int64_t num_messages_ = 0;
             std::int64_t overall_raw_bytes_ = 0;
-            std::int64_t buffer_allocate_time_;
+            std::int64_t buffer_allocate_time_ = 0;
             std::int64_t num_zchunks_ = 0;
             std::int64_t num_zchunks_per_msg_max_ = 0;
             std::int64_t size_zchunks_total_ = 0;

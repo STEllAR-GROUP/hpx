@@ -617,9 +617,9 @@ Parallel algorithms
      * In header
      * Algorithm page at cppreference.com
    * * :cpp:func:`hpx::nth_element`
-       * Partially sorts the given range making sure that it is partitioned by the given element
-       * ``<hpx/algorithm.hpp>``
-       * :cppreference-algorithm:`nth_element`
+     * Partially sorts the given range making sure that it is partitioned by the given element
+     * ``<hpx/algorithm.hpp>``
+     * :cppreference-algorithm:`nth_element`
    * * :cpp:func:`hpx::is_partitioned`
      * Returns ``true`` if each true element for a predicate precedes the false elements in a range.
      * ``<hpx/algorithm.hpp>``
@@ -664,10 +664,10 @@ Parallel algorithms
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`partial_sort`
    * * :cpp:func:`hpx::partial_sort_copy`
-       * Sorts the first elements in a range, storing the result in another range.
-       * ``<hpx/algorithm.hpp>``
-       * :cppreference-algorithm:`partial_sort_copy`
-   * * :cpp:func:`hpx::parallel::v1::sort_by_key`
+     * Sorts the first elements in a range, storing the result in another range.
+     * ``<hpx/algorithm.hpp>``
+     * :cppreference-algorithm:`partial_sort_copy`
+   * * :cpp:func:`hpx::experimental::sort_by_key`
      * Sorts one range of data using keys supplied in another range.
      * ``<hpx/algorithm.hpp>``
      *
@@ -695,7 +695,7 @@ Parallel algorithms
      * Does an inclusive parallel scan over a range of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`inclusive_scan`
-   * * :cpp:func:`hpx::parallel::v1::reduce_by_key`
+   * * :cpp:func:`hpx::experimental::reduce_by_key`
      * Performs an inclusive scan on consecutive elements with matching keys,
        with a reduction to output only the final sum for each key. The key
        sequence ``{1,1,1,2,3,3,3,3,1}`` and value sequence

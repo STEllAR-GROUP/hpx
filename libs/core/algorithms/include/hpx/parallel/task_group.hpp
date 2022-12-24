@@ -30,9 +30,12 @@
 #include <type_traits>
 #include <utility>
 
+/// Top-level namespace
 namespace hpx { namespace execution { namespace experimental {
 
-    ///////////////////////////////////////////////////////////////////////////
+    /// \brief A \c task_group represents concurrent execution of a
+    ///        group of tasks. Tasks can be dynamically added to the
+    //         group while it is executing.
     class task_group
     {
     public:
@@ -55,12 +58,23 @@ namespace hpx { namespace execution { namespace experimental {
         };
 
     public:
-        // Spawns a task to compute f() and returns immediately.
-        // clang-format off
+        /// \brief Adds a task to compute \c f() and returns immediately.
+        ///
+        /// \tparam Executor  The type of the executor to associate with this
+        ///                   execution policy.
+        /// \tparam F         The type of the user defined function to invoke.
+        /// \tparam Ts        The type of additional arguments used to invoke \c f().
+        ///
+        /// \param exec       The executor to use for the execution of the
+        ///                   parallel algorithm the returned execution
+        ///                   policy is used with.
+        /// \param f          The user defined function to invoke inside the task
+        ///                   group.
+        /// \param ts         Additional arguments to use to invoke \c f().
+        /// clang-format off
         template <typename Executor, typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<std::decay_t<Executor>>
-            )>
+                hpx::traits::is_executor_any_v<std::decay_t<Executor>>)>
         // clang-format on
         void run(Executor&& exec, F&& f, Ts&&... ts)
         {
@@ -91,6 +105,14 @@ namespace hpx { namespace execution { namespace experimental {
                 });
         }
 
+        /// \brief Adds a task to compute \c f() and returns immediately.
+        ///
+        /// \tparam F  The type of the user defined function to invoke.
+        /// \tparam Ts The type of additional arguments used to invoke \c f().
+        ///
+        /// \param f   The user defined function to invoke inside the task
+        ///            group.
+        /// \param ts  Additional arguments to use to invoke \c f().
         // clang-format off
         template <typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
@@ -103,10 +125,10 @@ namespace hpx { namespace execution { namespace experimental {
                 HPX_FORWARD(Ts, ts)...);
         }
 
-        // Waits for all tasks in the group to complete.
+        /// \brief Waits for all tasks in the group to complete or be cancelled.
         HPX_CORE_EXPORT void wait();
 
-        // Add an exception to this task_group
+        /// \brief Adds an exception to this \c task_group
         HPX_CORE_EXPORT void add_exception(std::exception_ptr p);
 
     private:

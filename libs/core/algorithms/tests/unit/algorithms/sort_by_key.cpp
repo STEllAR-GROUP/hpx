@@ -103,7 +103,7 @@ void sort_by_key_benchmark()
         o_values = values;
 
         hpx::chrono::high_resolution_timer t;
-        hpx::parallel::sort_by_key(
+        hpx::experimental::sort_by_key(
             hpx::execution::par, keys.begin(), keys.end(), values.begin());
         auto elapsed = static_cast<std::uint64_t>(t.elapsed_nanoseconds());
 
@@ -155,7 +155,7 @@ void test_sort_by_key1(
     o_values = values;
 
     // sort_by_key, blocking when seq, par, par_vec
-    hpx::parallel::sort_by_key(std::forward<ExPolicy>(policy), keys.begin(),
+    hpx::experimental::sort_by_key(std::forward<ExPolicy>(policy), keys.begin(),
         keys.end(), values.begin());
 
     // after sorting by key, the values should be equal to the original keys
@@ -208,8 +208,9 @@ void test_sort_by_key_async(
     o_values = values;
 
     // sort_by_key, blocking when seq, par, par_vec
-    auto fresult = hpx::parallel::sort_by_key(std::forward<ExPolicy>(policy),
-        keys.begin(), keys.end(), values.begin());
+    auto fresult =
+        hpx::experimental::sort_by_key(std::forward<ExPolicy>(policy),
+            keys.begin(), keys.end(), values.begin());
     fresult.get();
 
     // after sorting by key, the values should be equal to the original keys

@@ -16,7 +16,7 @@ jobs:
   build:
     name: Bors
     runs-on: ubuntu-latest
-    container: stellargroup/build_env:13
+    container: stellargroup/build_env:14
 
     steps:
     - uses: actions/checkout@v3

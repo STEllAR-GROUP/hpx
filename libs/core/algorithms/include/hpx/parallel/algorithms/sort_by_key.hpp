@@ -9,7 +9,7 @@
 
 #if defined(DOXYGEN)
 
-namespace hpx { namespace parallel { namespace v1 {
+namespace hpx { namespace experimental {
     // clang-format off
     /// Sorts one range of data using keys supplied in another range.
     /// The key elements in the range [key_first, key_last) are sorted in
@@ -89,7 +89,7 @@ namespace hpx { namespace parallel { namespace v1 {
     sort_by_key(ExPolicy&& policy, KeyIter key_first, KeyIter key_last,
         ValueIter value_first, Compare&& comp = Compare());
     // clang-format on
-}}}    // namespace hpx::parallel::v1
+}}    // namespace hpx::experimental
 
 #else
 
@@ -126,10 +126,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
+}}}      // namespace hpx::parallel::v1
+
+namespace hpx { namespace experimental {
+
+    template <typename KeyIter, typename ValueIter>
+    using sort_by_key_result = std::pair<KeyIter, ValueIter>;
 
     template <typename ExPolicy, typename KeyIter, typename ValueIter,
-        typename Compare = detail::less>
-    util::detail::algorithm_result_t<ExPolicy,
+        typename Compare = hpx::parallel::v1::detail::less>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         sort_by_key_result<KeyIter, ValueIter>>
     sort_by_key(ExPolicy&& policy, KeyIter key_first, KeyIter key_last,
         ValueIter value_first, Compare&& comp = Compare())
@@ -149,13 +155,31 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         using iterator_type = hpx::util::zip_iterator<KeyIter, ValueIter>;
 
-        return detail::get_iter_pair<iterator_type>(
-            detail::sort<iterator_type>().call(HPX_FORWARD(ExPolicy, policy),
+        return hpx::parallel::v1::detail::get_iter_pair<iterator_type>(
+            hpx::parallel::v1::detail::sort<iterator_type>().call(
+                HPX_FORWARD(ExPolicy, policy),
                 hpx::util::zip_iterator(key_first, value_first),
                 hpx::util::zip_iterator(key_last, value_last),
-                HPX_FORWARD(Compare, comp), detail::extract_key()));
+                HPX_FORWARD(Compare, comp),
+                hpx::parallel::v1::detail::extract_key()));
 #endif
     }
+}}    // namespace hpx::experimental
+
+namespace hpx { namespace parallel { inline namespace v1 {
+
+    template <typename ExPolicy, typename KeyIter, typename ValueIter,
+        typename Compare = detail::less>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::parallel::sort_by_key is deprecated. Please use "
+        "hpx::experimental::sort_by_key instead.")
+    constexpr decltype(auto) sort_by_key(ExPolicy&& policy, KeyIter key_first,
+        KeyIter key_last, ValueIter value_first, Compare&& comp = Compare())
+    {
+        return hpx::experimental::sort_by_key(
+            policy, key_first, key_last, value_first, comp);
+    }
+
 }}}    // namespace hpx::parallel::v1
 
 #endif

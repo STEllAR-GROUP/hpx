@@ -262,7 +262,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T, typename Op>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction is deprecated. Please use "
+        "hpx::parallel::reduction is deprecated. Please use "
         "hpx::experimental::reduction instead.")
     constexpr decltype(auto) reduction(T& var, T const& identity, Op&& combiner)
     {
@@ -272,7 +272,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_plus is deprecated. Please use "
+        "hpx::parallel::reduction_plus is deprecated. Please use "
         "hpx::experimental::reduction_plus instead.")
     constexpr decltype(auto) reduction_plus(T& var)
     {
@@ -281,7 +281,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_plus is deprecated. Please use "
+        "hpx::parallel::reduction_plus is deprecated. Please use "
         "hpx::experimental::reduction_plus instead.")
     constexpr decltype(auto) reduction_plus(T& var, T const& identity)
     {
@@ -290,7 +290,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_multiplies is deprecated. Please use "
+        "hpx::parallel::reduction_multiplies is deprecated. Please use "
         "hpx::experimental::reduction_multiplies instead.")
     constexpr decltype(auto) reduction_multiplies(T& var)
     {
@@ -299,7 +299,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_multiplies is deprecated. Please use "
+        "hpx::parallel::reduction_multiplies is deprecated. Please use "
         "hpx::experimental::reduction_multiplies instead.")
     constexpr decltype(auto) reduction_multiplies(T& var, T const& identity)
     {
@@ -308,7 +308,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_bit_and is deprecated. Please use "
+        "hpx::parallel::reduction_bit_and is deprecated. Please use "
         "hpx::experimental::reduction_bit_and instead.")
     constexpr decltype(auto) reduction_bit_and(T& var)
     {
@@ -317,7 +317,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_bit_and is deprecated. Please use "
+        "hpx::parallel::reduction_bit_and is deprecated. Please use "
         "hpx::experimental::reduction_bit_and instead.")
     constexpr decltype(auto) reduction_bit_and(T& var, T const& identity)
     {
@@ -326,7 +326,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_bit_or is deprecated. Please use "
+        "hpx::parallel::reduction_bit_or is deprecated. Please use "
         "hpx::experimental::reduction_bit_or instead.")
     constexpr decltype(auto) reduction_bit_or(T& var)
     {
@@ -335,7 +335,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_bit_or is deprecated. Please use "
+        "hpx::parallel::reduction_bit_or is deprecated. Please use "
         "hpx::experimental::reduction_bit_or instead.")
     constexpr decltype(auto) reduction_bit_or(T& var, T const& identity)
     {
@@ -344,7 +344,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_bit_xor is deprecated. Please use "
+        "hpx::parallel::reduction_bit_xor is deprecated. Please use "
         "hpx::experimental::reduction_bit_xor instead.")
     constexpr decltype(auto) reduction_bit_xor(T& var)
     {
@@ -353,7 +353,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_bit_xor is deprecated. Please use "
+        "hpx::parallel::reduction_bit_xor is deprecated. Please use "
         "hpx::experimental::reduction_bit_xor instead.")
     constexpr decltype(auto) reduction_bit_xor(T& var, T const& identity)
     {
@@ -362,7 +362,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_min is deprecated. Please use "
+        "hpx::parallel::reduction_min is deprecated. Please use "
         "hpx::experimental::reduction_min instead.")
     constexpr decltype(auto) reduction_min(T& var)
     {
@@ -371,7 +371,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_min is deprecated. Please use "
+        "hpx::parallel::reduction_min is deprecated. Please use "
         "hpx::experimental::reduction_min instead.")
     constexpr decltype(auto) reduction_min(T& var, T const& identity)
     {
@@ -380,7 +380,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_max is deprecated. Please use "
+        "hpx::parallel::reduction_max is deprecated. Please use "
         "hpx::experimental::reduction_max instead.")
     constexpr decltype(auto) reduction_max(T& var)
     {
@@ -389,7 +389,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::reduction_max is deprecated. Please use "
+        "hpx::parallel::reduction_max is deprecated. Please use "
         "hpx::experimental::reduction_max instead.")
     constexpr decltype(auto) reduction_max(T& var, T const& identity)
     {

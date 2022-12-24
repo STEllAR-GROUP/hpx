@@ -29,13 +29,14 @@ packages:
 - ``breathe 4.33.1`` (Python package)
 - ``doxygen``
 - ``sphinxcontrib-bibtex``
+- ``sphinx-copybutton``
 
 If the |python|_ dependencies are not available through your system package
 manager, you can install them using the Python package manager ``pip``:
 
 .. code-block:: bash
 
-   pip install --user "sphinx<5" sphinx-book-theme breathe sphinxcontrib-bibtex
+   pip install --user "sphinx<5" sphinx-book-theme breathe sphinxcontrib-bibtex sphinx-copybutton
 
 You may need to set the following CMake variables to make sure CMake can
 find the required dependencies.

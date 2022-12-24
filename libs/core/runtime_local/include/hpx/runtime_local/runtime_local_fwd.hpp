@@ -117,7 +117,7 @@ namespace hpx {
     ///
     /// This function returns whether the runtime system is currently stopped
     /// or not, e.g.  whether the current state of the runtime system is
-    /// \a hpx::hpx::state::stopped
+    /// \a hpx::state::stopped
     ///
     /// \note   This function needs to be executed on a HPX-thread. It will
     ///         return false otherwise.
