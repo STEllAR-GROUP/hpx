@@ -38,16 +38,19 @@
 #include <cstdint>
 #include <string>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     static const char* prefix_ = nullptr;
 
-    void set_hpx_prefix(const char* prefix)
+    void set_hpx_prefix(const char* prefix) noexcept
     {
         if (prefix_ == nullptr)
+        {
             prefix_ = prefix;
+        }
     }
 
-    char const* hpx_prefix()
+    char const* hpx_prefix() noexcept
     {
         return prefix_;
     }
@@ -93,7 +96,9 @@ namespace hpx { namespace util {
         for (auto it = tokens.begin(); it != tokens.end(); ++it)
         {
             if (it != tokens.begin())
+            {
                 result += HPX_INI_PATH_DELIMITER;
+            }
             result += *it;
             result += suffix;
 
@@ -247,4 +252,4 @@ namespace hpx { namespace util {
 
         return r;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

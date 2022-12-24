@@ -29,7 +29,8 @@
 
 #pragma once
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail {
+namespace hpx::threads::coroutines::detail {
+
     class default_hint
     {
     };
@@ -45,4 +46,4 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     struct context_impl_base
     {
     };
-}}}}    // namespace hpx::threads::coroutines::detail
+}    // namespace hpx::threads::coroutines::detail

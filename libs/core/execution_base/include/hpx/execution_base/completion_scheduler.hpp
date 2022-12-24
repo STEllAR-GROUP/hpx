@@ -95,6 +95,7 @@ namespace hpx::execution::experimental {
     inline constexpr get_completion_scheduler_t<CPO> get_completion_scheduler{};
 
     namespace detail {
+
         template <bool TagInvocable, typename CPO, typename Sender>
         struct has_completion_scheduler_impl : std::false_type
         {
@@ -156,6 +157,5 @@ namespace hpx::execution::experimental {
         inline constexpr bool is_completion_scheduler_tag_invocable_v =
             is_completion_scheduler_tag_invocable<ReceiverCPO, Sender,
                 AlgorithmCPO, Ts...>::value;
-
     }    // namespace detail
 }    // namespace hpx::execution::experimental

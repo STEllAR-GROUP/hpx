@@ -21,34 +21,34 @@
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace threads { namespace coroutines {
+namespace hpx::threads::coroutines {
 
     ////////////////////////////////////////////////////////////////////////////
     class stackless_coroutine
     {
     private:
-        enum context_state
+        friend struct detail::coroutine_accessor;
+
+        enum class context_state
         {
-            ctx_running,    // context running.
-            ctx_ready,      // context at yield point.
-            ctx_exited      // context is finished.
+            running,    // context running.
+            ready,      // context at yield point.
+            exited      // context is finished.
         };
 
-        static constexpr std::ptrdiff_t default_stack_size = -1;
+        static constexpr std::ptrdiff_t const default_stack_size = -1;
 
-        bool running() const
+        constexpr bool running() const noexcept
         {
-            return state_ == ctx_running;
+            return state_ == context_state::running;
         }
 
-        bool exited() const
+        constexpr bool exited() const noexcept
         {
-            return state_ == ctx_exited;
+            return state_ == context_state::exited;
         }
 
     public:
-        friend struct detail::coroutine_accessor;
-
         using thread_id_type = hpx::threads::thread_id;
 
         using result_type = std::pair<thread_schedule_state, thread_id_type>;
@@ -57,9 +57,9 @@ namespace hpx { namespace threads { namespace coroutines {
         using functor_type = hpx::move_only_function<result_type(arg_type)>;
 
         stackless_coroutine(functor_type&& f, thread_id_type id,
-            std::ptrdiff_t /*stack_size*/ = default_stack_size)
+            std::ptrdiff_t /*stack_size*/ = default_stack_size) noexcept
           : f_(HPX_MOVE(f))
-          , state_(ctx_ready)
+          , state_(context_state::ready)
           , id_(id)
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
           , phase_(0)
@@ -87,38 +87,44 @@ namespace hpx { namespace threads { namespace coroutines {
         stackless_coroutine(stackless_coroutine&& src) = delete;
         stackless_coroutine& operator=(stackless_coroutine&& src) = delete;
 
-        thread_id_type get_thread_id() const
+        constexpr thread_id_type get_thread_id() const noexcept
         {
             return id_;
         }
 
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-        std::size_t get_thread_phase() const
+        constexpr std::size_t get_thread_phase() const noexcept
         {
             return phase_;
         }
 #endif
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         std::size_t get_thread_data() const
         {
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             if (!thread_data_)
                 return 0;
             return detail::get_tss_thread_data(thread_data_);
-#else
-            return thread_data_;
-#endif
         }
+#else
+        constexpr std::size_t get_thread_data() const noexcept
+        {
+            return thread_data_;
+        }
+#endif
 
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         std::size_t set_thread_data(std::size_t data)
         {
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             return detail::set_tss_thread_data(thread_data_, data);
+        }
 #else
+        std::size_t set_thread_data(std::size_t data) noexcept
+        {
             std::size_t olddata = thread_data_;
             thread_data_ = data;
             return olddata;
-#endif
         }
+#endif
 
 #if defined(HPX_HAVE_LIBCDS)
         std::size_t get_libcds_data() const
@@ -164,7 +170,7 @@ namespace hpx { namespace threads { namespace coroutines {
         }
 #endif
 
-        void rebind(functor_type&& f, thread_id_type id)
+        void rebind(functor_type&& f, thread_id_type id) noexcept
         {
             HPX_ASSERT(exited());
 
@@ -179,17 +185,20 @@ namespace hpx { namespace threads { namespace coroutines {
 #else
             HPX_ASSERT(thread_data_ == 0);
 #endif
-            state_ = stackless_coroutine::ctx_ready;
+            state_ = context_state::ready;
         }
 
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         void reset_tss()
         {
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             detail::delete_tss_storage(thread_data_);
-#else
-            thread_data_ = 0;
-#endif
         }
+#else
+        void reset_tss() noexcept
+        {
+            thread_data_ = 0;
+        }
+#endif
 
         void reset()
         {
@@ -206,16 +215,18 @@ namespace hpx { namespace threads { namespace coroutines {
     private:
         struct reset_on_exit
         {
-            reset_on_exit(stackless_coroutine& this__)
+            explicit constexpr reset_on_exit(
+                stackless_coroutine& this__) noexcept
               : this_(this__)
             {
-                this_.state_ = stackless_coroutine::ctx_running;
+                this_.state_ = context_state::running;
             }
 
             ~reset_on_exit()
             {
-                this_.state_ = stackless_coroutine::ctx_exited;
+                this_.state_ = context_state::exited;
             }
+
             stackless_coroutine& this_;
         };
         friend struct reset_on_exit;
@@ -223,22 +234,22 @@ namespace hpx { namespace threads { namespace coroutines {
     public:
         HPX_FORCEINLINE result_type operator()(arg_type arg = arg_type());
 
-        explicit operator bool() const
+        explicit constexpr operator bool() const noexcept
         {
             return !exited();
         }
 
-        bool is_ready() const
+        constexpr bool is_ready() const noexcept
         {
-            return state_ == ctx_ready;
+            return state_ == context_state::ready;
         }
 
-        std::ptrdiff_t get_available_stack_space()
+        constexpr std::ptrdiff_t get_available_stack_space() const noexcept
         {
             return (std::numeric_limits<std::ptrdiff_t>::max)();
         }
 
-        std::size_t& get_continuation_recursion_count()
+        std::size_t& get_continuation_recursion_count() noexcept
         {
             return continuation_recursion_count_;
         }
@@ -263,13 +274,12 @@ namespace hpx { namespace threads { namespace coroutines {
         mutable std::size_t libcds_dynamic_hazard_pointer_data_;
 #endif
     };
-
-}}}    // namespace hpx::threads::coroutines
+}    // namespace hpx::threads::coroutines
 
 ////////////////////////////////////////////////////////////////////////////////
 #include <hpx/coroutines/detail/coroutine_stackless_self.hpp>
 
-namespace hpx { namespace threads { namespace coroutines {
+namespace hpx::threads::coroutines {
 
     HPX_FORCEINLINE stackless_coroutine::result_type
     stackless_coroutine::operator()(arg_type arg)
@@ -301,5 +311,4 @@ namespace hpx { namespace threads { namespace coroutines {
 
         return result;
     }
-
-}}}    // namespace hpx::threads::coroutines
+}    // namespace hpx::threads::coroutines

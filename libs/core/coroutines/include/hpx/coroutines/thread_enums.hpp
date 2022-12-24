@@ -15,7 +15,7 @@
 #include <cstdint>
 #include <ostream>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
     // clang-format off
@@ -66,7 +66,7 @@ namespace hpx { namespace threads {
     ///
     /// \param state this represents the thread state.
     HPX_CORE_EXPORT char const* get_thread_state_name(
-        thread_schedule_state state);
+        thread_schedule_state state) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     // clang-format off
@@ -120,7 +120,7 @@ namespace hpx { namespace threads {
     ///
     /// \param this represents the thread priority.
     HPX_CORE_EXPORT char const* get_thread_priority_name(
-        thread_priority priority);
+        thread_priority priority) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \enum thread_restart_state
@@ -131,8 +131,7 @@ namespace hpx { namespace threads {
     {
         unknown = 0,
         signaled = 1,     ///< The thread has been signaled
-        timeout = 2,      ///< The thread has been reactivated after a
-                          ///< timeout
+        timeout = 2,      ///< The thread has been reactivated after a timeout
         terminate = 3,    ///< The thread needs to be terminated
         abort = 4         ///< The thread needs to be aborted
     };
@@ -143,7 +142,7 @@ namespace hpx { namespace threads {
     /// Get the readable string representing the name of the given
     /// thread_restart_state constant.
     HPX_CORE_EXPORT char const* get_thread_state_ex_name(
-        thread_restart_state state);
+        thread_restart_state state) noexcept;
 
     /// \cond NOINTERNAL
     // special type storing both state in one tagged structure
@@ -154,7 +153,8 @@ namespace hpx { namespace threads {
 
     /// Get the readable string representing the name of the given
     /// thread_state constant.
-    HPX_CORE_EXPORT char const* get_thread_state_name(thread_state state);
+    HPX_CORE_EXPORT char const* get_thread_state_name(
+        thread_state state) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \enum thread_stacksize
@@ -165,7 +165,7 @@ namespace hpx { namespace threads {
     {
         unknown = -1,
         small_ = 1,     ///< use small stack size (the underscore is to work
-                        ///  around small being defined to char on Windows)
+                        ///  around 'small' being defined to char on Windows)
         medium = 2,     ///< use medium sized stack size
         large = 3,      ///< use large stack size
         huge = 4,       ///< use very large stack size
@@ -188,7 +188,8 @@ namespace hpx { namespace threads {
     /// constant.
     ///
     /// \param size this represents the stack size
-    HPX_CORE_EXPORT char const* get_stack_size_enum_name(thread_stacksize size);
+    HPX_CORE_EXPORT char const* get_stack_size_enum_name(
+        thread_stacksize size) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \enum thread_schedule_hint_mode
@@ -199,6 +200,7 @@ namespace hpx { namespace threads {
         /// A hint that leaves the choice of scheduling entirely up to the
         /// scheduler.
         none = 0,
+
         /// A hint that tells the scheduler to prefer scheduling a task on the
         /// local thread number associated with this hint. Local thread numbers
         /// are indexed from zero. It is up to the scheduler to decide how to
@@ -206,6 +208,7 @@ namespace hpx { namespace threads {
         /// available to the scheduler. Typically thread numbers will wrap
         /// around when too large.
         thread = 1,
+
         /// A hint that tells the scheduler to prefer scheduling a task on the
         /// NUMA domain associated with this hint. NUMA domains are indexed from
         /// zero. It is up to the scheduler to decide how to interpret NUMA
@@ -307,4 +310,4 @@ namespace hpx { namespace threads {
         /// The mode of the desired thread placement.
         thread_placement_hint placement_mode = thread_placement_hint::none;
     };
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

@@ -8,23 +8,23 @@
 
 #include <hpx/program_options/config.hpp>
 
-namespace hpx { namespace program_options { namespace command_line_style {
+namespace hpx::program_options::command_line_style {
 
     /** Various possible styles of options.
 
-    There are "long" options, which start with "--" and "short",
-    which start with either "-" or "/". Both kinds can be allowed or
-    disallowed, see allow_long and allow_short. The allowed character
-    for short options is also configurable.
+        There are "long" options, which start with "--" and "short",
+        which start with either "-" or "/". Both kinds can be allowed or
+        disallowed, see allow_long and allow_short. The allowed character
+        for short options is also configurable.
 
-    Option's value can be specified in the same token as name
-    ("--foo=bar"), or in the next token.
+        Option's value can be specified in the same token as name
+        ("--foo=bar"), or in the next token.
 
-    It's possible to introduce long options by the same character as
-    short options, see allow_long_disguise.
+        It's possible to introduce long options by the same character as
+        short options, see allow_long_disguise.
 
-    Finally, guessing (specifying only prefix of option) and case
-    insensitive processing are supported.
+        Finally, guessing (specifying only prefix of option) and case
+        insensitive processing are supported.
     */
     enum style_t
     {
@@ -86,6 +86,6 @@ namespace hpx { namespace program_options { namespace command_line_style {
         /** The default style. */
         default_style = unix_style
     };
-}}}    // namespace hpx::program_options::command_line_style
+}    // namespace hpx::program_options::command_line_style
 
 #include <hpx/program_options/detail/cmdline.hpp>

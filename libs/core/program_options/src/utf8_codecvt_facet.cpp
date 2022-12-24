@@ -24,7 +24,7 @@
 // compile this file.
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
-namespace hpx { namespace program_options { namespace detail {
+namespace hpx::program_options::detail {
 
     // implementation for wchar_t
 
@@ -33,22 +33,22 @@ namespace hpx { namespace program_options { namespace detail {
     {
     }
 
-    utf8_codecvt_facet::~utf8_codecvt_facet() {}
+    utf8_codecvt_facet::~utf8_codecvt_facet() = default;
 
     // Translate incoming UTF-8 into UCS-4
     std::codecvt_base::result utf8_codecvt_facet::do_in(
-        std::mbstate_t& /*state*/, const char* from, const char* from_end,
-        const char*& from_next, wchar_t* to, wchar_t* to_end,
+        std::mbstate_t& /*state*/, char const* from, char const* from_end,
+        char const*& from_next, wchar_t* to, wchar_t* to_end,
         wchar_t*& to_next) const
     {
         // Basic algorithm:  The first octet determines how many
         // octets total make up the UCS-4 character.  The remaining
-        // "continuing octets" all begin with "10". To convert, subtract
-        // the amount that specifies the number of octets from the first
+        // "continuing octets" all begin with "10". To convert, subtract the
+        // amount that specifies the number of octets from the first
         // octet.  Subtract 0x80 (1000 0000) from each continuing octet,
         // then mash the whole lot together.  Note that each continuing
-        // octet only uses 6 bits as unique values, so only shift by
-        // multiples of 6 to combine.
+        // octet only uses 6 bits as unique values, so only shift by multiples
+        // of 6 to combine.
         while (from != from_end && to != to_end)
         {
             // Error checking   on the first octet
@@ -59,9 +59,9 @@ namespace hpx { namespace program_options { namespace detail {
                 return std::codecvt_base::error;
             }
 
-            // The first octet is   adjusted by a value dependent upon
-            // the number   of "continuing octets" encoding the character
-            const int cont_octet_count =
+            // The first octet is   adjusted by a value dependent upon the
+            // number   of "continuing octets" encoding the character
+            int const cont_octet_count =
                 static_cast<int>(get_cont_octet_count(*from));
             const wchar_t octet1_modifier_table[] = {
                 0x00, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc};
@@ -108,21 +108,19 @@ namespace hpx { namespace program_options { namespace detail {
         to_next = to;
 
         // Were we done converting or did we run out of destination space?
-        if (from == from_end)
-            return std::codecvt_base::ok;
-        else
-            return std::codecvt_base::partial;
+        return from == from_end ? std::codecvt_base::ok :
+                                  std::codecvt_base::partial;
     }
 
     std::codecvt_base::result utf8_codecvt_facet::do_out(
-        std::mbstate_t& /*state*/, const wchar_t* from, const wchar_t* from_end,
-        const wchar_t*& from_next, char* to, char* to_end, char*& to_next) const
+        std::mbstate_t& /*state*/, wchar_t const* from, wchar_t const* from_end,
+        wchar_t const*& from_next, char* to, char* to_end, char*& to_next) const
     {
         // RG - consider merging this table with the other one
         const wchar_t octet1_modifier_table[] = {
             0x00, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc};
 
-        wchar_t max_wchar = (std::numeric_limits<wchar_t>::max)();
+        constexpr wchar_t max_wchar = (std::numeric_limits<wchar_t>::max)();
         while (from != from_end && to != to_end)
         {
             // Check for invalid UCS-4 character
@@ -166,17 +164,16 @@ namespace hpx { namespace program_options { namespace detail {
         }
         from_next = from;
         to_next = to;
+
         // Were we done or did we run out of destination space
-        if (from == from_end)
-            return std::codecvt_base::ok;
-        else
-            return std::codecvt_base::partial;
+        return from == from_end ? std::codecvt_base::ok :
+                                  std::codecvt_base::partial;
     }
 
     // How many char objects can I process to get <= max_limit
     // wchar_t objects?
-    int utf8_codecvt_facet::do_length(std::mbstate_t&, const char* from,
-        const char* from_end, std::size_t max_limit) const noexcept
+    int utf8_codecvt_facet::do_length(std::mbstate_t&, char const* from,
+        char const* from_end, std::size_t max_limit) const noexcept
     {
         // RG - this code is confusing!  I need a better way to express it.
         // and test cases.
@@ -189,7 +186,8 @@ namespace hpx { namespace program_options { namespace detail {
         // last measured character.
         std::size_t last_octet_count = 0;
         std::size_t char_count = 0;
-        const char* from_next = from;
+        char const* from_next = from;
+
         // Use "<" because the buffer may represent incomplete characters
         while (
             from_next + last_octet_count <= from_end && char_count <= max_limit)
@@ -201,7 +199,8 @@ namespace hpx { namespace program_options { namespace detail {
         return static_cast<int>(from_next - from);
     }
 
-    unsigned int utf8_codecvt_facet::get_octet_count(unsigned char lead_octet)
+    unsigned int utf8_codecvt_facet::get_octet_count(
+        unsigned char lead_octet) noexcept
     {
         // if the 0-bit (MSB) is 0, then 1 character
         if (lead_octet <= 0x7f)
@@ -225,7 +224,7 @@ namespace hpx { namespace program_options { namespace detail {
     namespace detail {
 
         template <std::size_t s>
-        int get_cont_octet_out_count_impl(wchar_t word)
+        int get_cont_octet_out_count_impl(wchar_t word) noexcept
         {
             if (word < 0x80)
             {
@@ -239,7 +238,7 @@ namespace hpx { namespace program_options { namespace detail {
         }
 
         template <>
-        int get_cont_octet_out_count_impl<4>(wchar_t word)
+        int get_cont_octet_out_count_impl<4>(wchar_t word) noexcept
         {
             if (word < 0x80)
             {
@@ -284,9 +283,9 @@ namespace hpx { namespace program_options { namespace detail {
 
     // How many "continuing octets" will be needed for this word
     // ==   total octets - 1.
-    int utf8_codecvt_facet::get_cont_octet_out_count(wchar_t word) const
+    int utf8_codecvt_facet::get_cont_octet_out_count(
+        wchar_t word) const noexcept
     {
         return detail::get_cont_octet_out_count_impl<sizeof(wchar_t)>(word);
     }
-
-}}}    // namespace hpx::program_options::detail
+}    // namespace hpx::program_options::detail

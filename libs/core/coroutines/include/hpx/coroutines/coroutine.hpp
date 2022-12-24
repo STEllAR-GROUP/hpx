@@ -45,14 +45,15 @@
 #include <limits>
 #include <utility>
 
-namespace hpx { namespace threads { namespace coroutines {
+namespace hpx::threads::coroutines {
 
-    /////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
     class coroutine
     {
-    public:
+    private:
         friend struct detail::coroutine_accessor;
 
+    public:
         using impl_type = detail::coroutine_impl;
         using thread_id_type = impl_type::thread_id_type;
 
@@ -73,24 +74,24 @@ namespace hpx { namespace threads { namespace coroutines {
         coroutine(coroutine&& src) = delete;
         coroutine& operator=(coroutine&& src) = delete;
 
-        thread_id_type get_thread_id() const
+        constexpr thread_id_type get_thread_id() const noexcept
         {
             return impl_.get_thread_id();
         }
 
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-        std::size_t get_thread_phase() const
+        constexpr std::size_t get_thread_phase() const noexcept
         {
             return impl_.get_thread_phase();
         }
 #endif
 
-        std::size_t get_thread_data() const
+        constexpr std::size_t get_thread_data() const noexcept
         {
             return impl_.get_thread_data();
         }
 
-        std::size_t set_thread_data(std::size_t data)
+        std::size_t set_thread_data(std::size_t data) noexcept
         {
             return impl_.set_thread_data(data);
         }
@@ -148,21 +149,24 @@ namespace hpx { namespace threads { namespace coroutines {
             return impl_.result();
         }
 
-        bool is_ready() const
+        bool is_ready() const noexcept
         {
             return impl_.is_ready();
         }
 
-        std::ptrdiff_t get_available_stack_space()
-        {
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+        std::ptrdiff_t get_available_stack_space() const noexcept
+        {
             return impl_.get_available_stack_space();
-#else
-            return (std::numeric_limits<std::ptrdiff_t>::max)();
-#endif
         }
+#else
+        std::ptrdiff_t get_available_stack_space() const noexcept
+        {
+            return (std::numeric_limits<std::ptrdiff_t>::max)();
+        }
+#endif
 
-        impl_type* impl()
+        constexpr impl_type* impl() noexcept
         {
             return &impl_;
         }
@@ -170,4 +174,4 @@ namespace hpx { namespace threads { namespace coroutines {
     private:
         impl_type impl_;
     };
-}}}    // namespace hpx::threads::coroutines
+}    // namespace hpx::threads::coroutines

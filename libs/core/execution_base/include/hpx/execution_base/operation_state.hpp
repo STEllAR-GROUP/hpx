@@ -51,15 +51,23 @@ namespace hpx::execution::experimental {
     namespace detail {
 
         // start should not be callable for operation states that are rvalues
-        template <typename State>
-        struct enable_start : std::is_lvalue_reference<State>
+        struct enable_start
         {
+            template <typename EnableTag, typename... Ts>
+            struct apply : std::false_type
+            {
+            };
+
+            template <typename EnableTag, typename State>
+            struct apply<EnableTag, State> : std::is_lvalue_reference<State>
+            {
+            };
         };
     }    // namespace detail
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE
     struct start_t
-      : hpx::functional::tag_noexcept<start_t, meta::func<detail::enable_start>>
+      : hpx::functional::tag_noexcept<start_t, detail::enable_start>
     {
     } start{};
 

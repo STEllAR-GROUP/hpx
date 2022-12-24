@@ -63,30 +63,32 @@ void __splitstack_setcontext(void* [HPX_COROUTINES_SEGMENTS]);
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace coroutines {
+namespace hpx::threads::coroutines {
+
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
     {
-        constexpr prepare_main_thread() {}
+        prepare_main_thread() = default;
     };
 
-    namespace detail { namespace generic_context {
+    namespace detail::generic_context {
+
         ///////////////////////////////////////////////////////////////////////
         // This is taken directly from one of the Boost.Context examples
 #if !defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
         struct stack_allocator
         {
-            static std::size_t maximum_stacksize()
+            static constexpr std::size_t maximum_stacksize() noexcept
             {
                 return HPX_HUGE_STACK_SIZE;
             }
 
-            static std::size_t default_stacksize()
+            static constexpr std::size_t default_stacksize() noexcept
             {
                 return HPX_MEDIUM_STACK_SIZE;
             }
 
-            static std::size_t minimum_stacksize()
+            static constexpr std::size_t minimum_stacksize() noexcept
             {
                 return HPX_SMALL_STACK_SIZE;
             }
@@ -121,18 +123,18 @@ namespace hpx { namespace threads { namespace coroutines {
         {
             typedef void* segments_context[HPX_COROUTINES_SEGMENTS];
 
-            static std::size_t maximum_stacksize()
+            static std::size_t maximum_stacksize() noexcept
             {
                 HPX_ASSERT_MSG(false, "segmented stack is unbound");
                 return 0;
             }
 
-            static std::size_t default_stacksize()
+            static constexpr std::size_t default_stacksize() noexcept
             {
                 return minimum_stacksize();
             }
 
-            static std::size_t minimum_stacksize()
+            static constexpr std::size_t minimum_stacksize() noexcept
             {
                 return SIGSTKSZ + sizeof(boost::context::detail::fcontext_t) +
                     15;
@@ -165,16 +167,16 @@ namespace hpx { namespace threads { namespace coroutines {
         // Generic implementation for the context_impl_base class based on
         // Boost.Context.
         template <typename T>
-        HPX_FORCEINLINE void trampoline(boost::context::detail::transfer_t tr)
+        [[noreturn]] void trampoline(boost::context::detail::transfer_t tr)
         {
-            auto arg = reinterpret_cast<
+            auto arg = static_cast<
                 std::pair<void*, boost::context::detail::fcontext_t*>*>(
                 tr.data);
 
             HPX_ASSERT(arg->second);
             *arg->second = tr.fctx;
 
-            T* fun = reinterpret_cast<T*>(arg->first);
+            T* fun = static_cast<T*>(arg->first);
             HPX_ASSERT(fun);
             (*fun)();
 
@@ -188,12 +190,12 @@ namespace hpx { namespace threads { namespace coroutines {
             HPX_NON_COPYABLE(fcontext_context_impl);
 
         public:
-            typedef fcontext_context_impl context_impl_base;
+            using context_impl_base = fcontext_context_impl;
 
             // Create a context that on restore invokes Functor on
             // a new stack. The stack size can be optionally specified.
             explicit fcontext_context_impl(std::ptrdiff_t stack_size = -1)
-              : cb_(std::make_pair(reinterpret_cast<void*>(this), nullptr))
+              : cb_(std::make_pair(static_cast<void*>(this), nullptr))
               , funp_(&trampoline<CoroutineImpl>)
               , ctx_(0)
               , alloc_()
@@ -227,22 +229,24 @@ namespace hpx { namespace threads { namespace coroutines {
             }
 
             // Return the size of the reserved stack address space.
-            std::ptrdiff_t get_stacksize() const
+            constexpr std::ptrdiff_t get_stacksize() const noexcept
             {
                 return stack_size_;
             }
 
-            std::ptrdiff_t get_available_stack_space()
-            {
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+            std::ptrdiff_t get_available_stack_space() const noexcept
+            {
                 return stack_size_ -
                     (reinterpret_cast<std::size_t>(stack_pointer_) -
                         get_stack_ptr());
-#else
-                return (std::numeric_limits<std::ptrdiff_t>::max)();
-#endif
             }
-
+#else
+            constexpr std::ptrdiff_t get_available_stack_space() const noexcept
+            {
+                return (std::numeric_limits<std::ptrdiff_t>::max)();
+            }
+#endif
             void reset_stack()
             {
                 if (ctx_)
@@ -275,45 +279,44 @@ namespace hpx { namespace threads { namespace coroutines {
             }
 
 #if defined(HPX_HAVE_COROUTINE_COUNTERS)
-            typedef std::atomic<std::int64_t> counter_type;
+            using counter_type = std::atomic<std::int64_t>;
 
         private:
-            static counter_type& get_stack_unbind_counter()
+            static counter_type& get_stack_unbind_counter() noexcept
             {
                 static counter_type counter(0);
                 return counter;
             }
 
-            static std::uint64_t increment_stack_unbind_count()
+            static std::uint64_t increment_stack_unbind_count() noexcept
             {
                 return ++get_stack_unbind_counter();
             }
 
-            static counter_type& get_stack_recycle_counter()
+            static counter_type& get_stack_recycle_counter() noexcept
             {
                 static counter_type counter(0);
                 return counter;
             }
 
-            static std::uint64_t increment_stack_recycle_count()
+            static std::uint64_t increment_stack_recycle_count() noexcept
             {
                 return ++get_stack_recycle_counter();
             }
 
         public:
-            static std::uint64_t get_stack_unbind_count(bool reset)
+            static std::uint64_t get_stack_unbind_count(bool reset) noexcept
             {
                 return util::get_and_reset_value(
                     get_stack_unbind_counter(), reset);
             }
 
-            static std::uint64_t get_stack_recycle_count(bool reset)
+            static std::uint64_t get_stack_recycle_count(bool reset) noexcept
             {
                 return util::get_and_reset_value(
                     get_stack_recycle_counter(), reset);
             }
 #endif
-
         private:
             friend void swap_context(fcontext_context_impl& from,
                 fcontext_context_impl& to, detail::default_hint)
@@ -325,7 +328,7 @@ namespace hpx { namespace threads { namespace coroutines {
                 // switch to other coroutine context
                 to.cb_.second = &from.ctx_;
                 auto transfer = boost::context::detail::jump_fcontext(
-                    to.ctx_, reinterpret_cast<void*>(&to.cb_));
+                    to.ctx_, static_cast<void*>(&to.cb_));
                 to.ctx_ = transfer.fctx;
 
 #if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
@@ -341,7 +344,7 @@ namespace hpx { namespace threads { namespace coroutines {
             std::size_t stack_size_;
             void* stack_pointer_;
         };
-    }}    // namespace detail::generic_context
-}}}       // namespace hpx::threads::coroutines
+    }    // namespace detail::generic_context
+}    // namespace hpx::threads::coroutines
 
 #undef HPX_USE_POSIX_STACK_UTILITIES

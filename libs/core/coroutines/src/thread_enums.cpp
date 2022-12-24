@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2015 Patricia Grubel
@@ -13,12 +13,13 @@
 
 #include <cstddef>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     ///////////////////////////////////////////////////////////////////////
     namespace strings {
 
         // clang-format off
-        char const* const thread_state_names[] = {
+        inline constexpr char const* const thread_state_names[] = {
             "unknown",
             "active",
             "pending",
@@ -33,14 +34,17 @@ namespace hpx { namespace threads {
 
     }    // namespace strings
 
-    char const* get_thread_state_name(thread_schedule_state state)
+    char const* get_thread_state_name(thread_schedule_state state) noexcept
     {
-        if (state > thread_schedule_state::pending_boost)
+        if (state < thread_schedule_state::active ||
+            state > thread_schedule_state::pending_boost)
+        {
             return "unknown";
+        }
         return strings::thread_state_names[static_cast<std::size_t>(state)];
     }
 
-    char const* get_thread_state_name(thread_state state)
+    char const* get_thread_state_name(thread_state state) noexcept
     {
         return get_thread_state_name(state.state());
     }
@@ -56,7 +60,7 @@ namespace hpx { namespace threads {
     namespace strings {
 
         // clang-format off
-        char const* const thread_state_ex_names[] = {
+        inline constexpr char const* const thread_state_ex_names[] = {
             "wait_unknown",
             "wait_signaled",
             "wait_timeout",
@@ -67,10 +71,13 @@ namespace hpx { namespace threads {
 
     }    // namespace strings
 
-    char const* get_thread_state_ex_name(thread_restart_state state_ex)
+    char const* get_thread_state_ex_name(thread_restart_state state_ex) noexcept
     {
-        if (state_ex > thread_restart_state::abort)
+        if (state_ex < thread_restart_state::signaled ||
+            state_ex > thread_restart_state::abort)
+        {
             return "wait_unknown";
+        }
         return strings::thread_state_ex_names[static_cast<std::size_t>(
             state_ex)];
     }
@@ -86,7 +93,7 @@ namespace hpx { namespace threads {
     namespace strings {
 
         // clang-format off
-        char const* const thread_priority_names[] = {
+        inline constexpr char const* const thread_priority_names[] = {
             "default",
             "low",
             "normal",
@@ -98,7 +105,7 @@ namespace hpx { namespace threads {
         // clang-format on
     }    // namespace strings
 
-    char const* get_thread_priority_name(thread_priority priority)
+    char const* get_thread_priority_name(thread_priority priority) noexcept
     {
         if (priority < thread_priority::default_ ||
             priority > thread_priority::bound)
@@ -119,7 +126,7 @@ namespace hpx { namespace threads {
     namespace strings {
 
         // clang-format off
-        char const* const stack_size_names[] = {
+        inline constexpr char const* const stack_size_names[] = {
             "small",
             "medium",
             "large",
@@ -130,7 +137,7 @@ namespace hpx { namespace threads {
 
     }    // namespace strings
 
-    char const* get_stack_size_enum_name(thread_stacksize size)
+    char const* get_stack_size_enum_name(thread_stacksize size) noexcept
     {
         if (size == thread_stacksize::unknown)
             return "unknown";
@@ -147,4 +154,4 @@ namespace hpx { namespace threads {
            << ")";
         return os;
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

@@ -1,5 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  This code may be used under either of the following two licences:
 //
@@ -55,15 +55,10 @@
 #include <limits>
 #include <utility>
 
-///////////////////////////////////////////////////////////////////////////////
-#define HPX_COROUTINE_NUM_ALL_HEAPS                                            \
-    (HPX_COROUTINE_NUM_HEAPS + HPX_COROUTINE_NUM_HEAPS / 2 +                   \
-        HPX_COROUTINE_NUM_HEAPS / 4 + HPX_COROUTINE_NUM_HEAPS / 4) /**/
-
-namespace hpx { namespace threads { namespace coroutines { namespace detail {
+namespace hpx::threads::coroutines::detail {
 
     /////////////////////////////////////////////////////////////////////////////
-    constexpr std::ptrdiff_t const default_stack_size = -1;
+    inline constexpr std::ptrdiff_t const default_stack_size = -1;
 
     template <typename CoroutineImpl>
     class context_base : public default_context_impl<CoroutineImpl>
@@ -77,9 +72,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         context_base(std::ptrdiff_t stack_size, thread_id_type id)
           : base_type(stack_size)
           , m_caller()
-          , m_state(ctx_ready)
-          , m_exit_state(ctx_exit_not_requested)
-          , m_exit_status(ctx_not_exited)
+          , m_state(context_state::ready)
+          , m_exit_state(context_exit_state::not_requested)
+          , m_exit_status(context_exit_status::not_exited)
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
           , m_phase(0)
 #endif
@@ -122,13 +117,13 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-        std::size_t phase() const
+        constexpr std::size_t phase() const noexcept
         {
             return m_phase;
         }
 #endif
 
-        thread_id_type get_thread_id() const
+        constexpr thread_id_type get_thread_id() const noexcept
         {
             return m_thread_id;
         }
@@ -136,19 +131,19 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         /*
          * Returns true if the context is runnable.
          */
-        bool is_ready() const
+        constexpr bool is_ready() const noexcept
         {
-            return m_state == ctx_ready;
+            return m_state == context_state::ready;
         }
 
-        bool running() const
+        constexpr bool running() const noexcept
         {
-            return m_state == ctx_running;
+            return m_state == context_state::running;
         }
 
-        bool exited() const
+        constexpr bool exited() const noexcept
         {
-            return m_state == ctx_exited;
+            return m_state == context_state::exited;
         }
 
         void init()
@@ -170,11 +165,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             HPX_ASSERT(is_ready());
             do_invoke();
 
-            if (m_exit_status != ctx_not_exited)
+            if (m_exit_status != context_exit_status::not_exited)
             {
-                if (m_exit_status == ctx_exited_return)
+                if (m_exit_status == context_exit_status::exited_return)
                     return;
-                if (m_exit_status == ctx_exited_abnormally)
+                if (m_exit_status == context_exit_status::exited_abnormally)
                 {
                     HPX_ASSERT(m_type_info);
                     std::rethrow_exception(m_type_info);
@@ -194,10 +189,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         void yield()
         {
             //prevent infinite loops
-            HPX_ASSERT(m_exit_state < ctx_exit_signaled);
+            HPX_ASSERT(m_exit_state < context_exit_state::signaled);
             HPX_ASSERT(running());
 
-            m_state = ctx_ready;
+            m_state = context_state::ready;
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
             this->start_yield_fiber(&this->asan_fake_stack, m_caller);
 #endif
@@ -206,7 +201,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
             this->finish_yield_fiber(this->asan_fake_stack);
 #endif
-            m_exit_status = ctx_not_exited;
+            m_exit_status = context_exit_status::not_exited;
 
             HPX_ASSERT(running());
         }
@@ -233,27 +228,33 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #endif
         }
 
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         std::size_t get_thread_data() const
         {
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             if (!m_thread_data)
                 return 0;
             return get_tss_thread_data(m_thread_data);
-#else
-            return m_thread_data;
-#endif
         }
+#else
+        constexpr std::size_t get_thread_data() const noexcept
+        {
+            return m_thread_data;
+        }
+#endif
 
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
         std::size_t set_thread_data(std::size_t data)
         {
-#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             return set_tss_thread_data(m_thread_data, data);
+        }
 #else
+        std::size_t set_thread_data(std::size_t data) noexcept
+        {
             std::size_t olddata = m_thread_data;
             m_thread_data = data;
             return olddata;
-#endif
         }
+#endif
 
 #if defined(HPX_HAVE_LIBCDS)
         std::size_t get_libcds_data() const
@@ -299,35 +300,35 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 #endif
 
-        std::size_t& get_continuation_recursion_count()
+        std::size_t& get_continuation_recursion_count() noexcept
         {
             return continuation_recursion_count_;
         }
 
     public:
         // global coroutine state
-        enum context_state
+        enum class context_state
         {
-            ctx_running = 0,    // context running.
-            ctx_ready,          // context at yield point.
-            ctx_exited          // context is finished.
+            running = 0,    // context running.
+            ready,          // context at yield point.
+            exited          // context is finished.
         };
 
     protected:
         // exit request state
-        enum context_exit_state
+        enum class context_exit_state
         {
-            ctx_exit_not_requested = 0,    // exit not requested.
-            ctx_exit_pending,              // exit requested.
-            ctx_exit_signaled              // exit request delivered.
+            not_requested = 0,    // exit not requested.
+            pending,              // exit requested.
+            signaled              // exit request delivered.
         };
 
         // exit status
-        enum context_exit_status
+        enum class context_exit_status
         {
-            ctx_not_exited,
-            ctx_exited_return,       // process exited by return.
-            ctx_exited_abnormally    // process exited uncleanly.
+            not_exited,
+            exited_return,       // process exited by return.
+            exited_abnormally    // process exited uncleanly.
         };
 
         void rebind_base(thread_id_type id)
@@ -335,9 +336,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             HPX_ASSERT(!running());
 
             m_thread_id = id;
-            m_state = ctx_ready;
-            m_exit_state = ctx_exit_not_requested;
-            m_exit_status = ctx_not_exited;
+            m_state = context_state::ready;
+            m_exit_state = context_exit_state::not_requested;
+            m_exit_status = context_exit_status::not_exited;
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
             HPX_ASSERT(m_phase == 0);
 #endif
@@ -359,10 +360,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         void do_return(
             context_exit_status status, std::exception_ptr&& info) noexcept
         {
-            HPX_ASSERT(status != ctx_not_exited);
-            HPX_ASSERT(m_state == ctx_running);
+            HPX_ASSERT(status != context_exit_status::not_exited);
+            HPX_ASSERT(m_state == context_state::running);
+
             m_type_info = HPX_MOVE(info);
-            m_state = ctx_exited;
+            m_state = context_state::exited;
             m_exit_status = status;
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
             this->start_yield_fiber(&this->asan_fake_stack, m_caller);
@@ -385,7 +387,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
             ++m_phase;
 #endif
-            m_state = ctx_running;
+            m_state = context_state::running;
 
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
             this->start_switch_fiber(&this->asan_fake_stack);
@@ -424,4 +426,4 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         std::size_t continuation_recursion_count_;
     };
-}}}}    // namespace hpx::threads::coroutines::detail
+}    // namespace hpx::threads::coroutines::detail

@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
 
 #if defined(DOXYGEN)
     /// set_value is a customization point object. The expression
@@ -129,6 +129,7 @@ namespace hpx { namespace execution { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <bool ConstructionRequirements, typename T, typename E>
         struct is_receiver_impl;
 
@@ -160,6 +161,7 @@ namespace hpx { namespace execution { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <bool IsReceiverOf, typename T, typename CS>
         struct is_receiver_of_impl;
 
@@ -214,6 +216,7 @@ namespace hpx { namespace execution { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename F, typename T, typename Variant>
         struct is_nothrow_invocable_variant_of_tuples : std::false_type
         {
@@ -272,6 +275,7 @@ namespace hpx { namespace execution { namespace experimental {
         is_nothrow_receiver_of<T, CS>::value;
 
     namespace detail {
+
         template <typename CPO>
         struct is_receiver_cpo : std::false_type
         {
@@ -295,4 +299,4 @@ namespace hpx { namespace execution { namespace experimental {
         template <typename CPO>
         inline constexpr bool is_receiver_cpo_v = is_receiver_cpo<CPO>::value;
     }    // namespace detail
-}}}      // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

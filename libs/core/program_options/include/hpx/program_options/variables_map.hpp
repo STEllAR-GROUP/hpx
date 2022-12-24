@@ -16,9 +16,9 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
-    template <class Char>
+    template <typename Char>
     class basic_parsed_options;
 
     class value_semantic;
@@ -31,7 +31,7 @@ namespace hpx { namespace program_options {
         is not changed, even if 'options' specify some value.
     */
     HPX_CORE_EXPORT
-    void store(const basic_parsed_options<char>& options, variables_map& m,
+    void store(basic_parsed_options<char> const& options, variables_map& m,
         bool utf8 = false);
 
     /** Stores in 'm' all options that are defined in 'options'.
@@ -40,7 +40,7 @@ namespace hpx { namespace program_options {
         This is wide character variant.
     */
     HPX_CORE_EXPORT
-    void store(const basic_parsed_options<wchar_t>& options, variables_map& m);
+    void store(basic_parsed_options<wchar_t> const& options, variables_map& m);
 
     /** Runs all 'notify' function for options in 'm'. */
     HPX_CORE_EXPORT void notify(variables_map& m);
@@ -51,11 +51,8 @@ namespace hpx { namespace program_options {
     class HPX_CORE_EXPORT variable_value
     {
     public:
-        variable_value()
-          : m_defaulted(false)
-        {
-        }
-        variable_value(const hpx::any_nonser& xv, bool xdefaulted)
+        variable_value() = default;
+        variable_value(hpx::any_nonser const& xv, bool xdefaulted)
           : v(xv)
           , m_defaulted(xdefaulted)
         {
@@ -64,9 +61,9 @@ namespace hpx { namespace program_options {
         /** If stored value if of type T, returns that value. Otherwise,
             throws boost::bad_any_cast exception. */
         template <class T>
-        const T& as() const
+        T const& as() const
         {
-            return hpx::any_cast<const T&>(v);
+            return hpx::any_cast<T const&>(v);
         }
         /** @overload */
         template <class T>
@@ -76,28 +73,28 @@ namespace hpx { namespace program_options {
         }
 
         /// Returns true if no value is stored.
-        bool empty() const;
+        bool empty() const noexcept;
         /** Returns true if the value was not explicitly
             given, but has default value. */
-        bool defaulted() const;
+        bool defaulted() const noexcept;
         /** Returns the contained value. */
-        const hpx::any_nonser& value() const;
+        hpx::any_nonser const& value() const noexcept;
 
         /** Returns the contained value. */
-        hpx::any_nonser& value();
+        hpx::any_nonser& value() noexcept;
 
     private:
         hpx::any_nonser v;
-        bool m_defaulted;
+        bool m_defaulted = false;
         // Internal reference to value semantic. We need to run
         // notifications when *final* values of options are known, and
         // they are known only after all sources are stored. By that
         // time options_description for the first source might not
         // be easily accessible, so we need to store semantic here.
-        std::shared_ptr<const value_semantic> m_value_semantic;
+        std::shared_ptr<value_semantic const> m_value_semantic;
 
         friend HPX_CORE_EXPORT void store(
-            const basic_parsed_options<char>& options, variables_map& m, bool);
+            basic_parsed_options<char> const& options, variables_map& m, bool);
 
         friend class HPX_CORE_EXPORT variables_map;
     };
@@ -108,9 +105,9 @@ namespace hpx { namespace program_options {
     {
     public:
         abstract_variables_map();
-        abstract_variables_map(const abstract_variables_map* next);
+        explicit abstract_variables_map(abstract_variables_map const* next);
 
-        virtual ~abstract_variables_map() {}
+        virtual ~abstract_variables_map() = default;
 
         /** Obtains the value of variable 'name', from *this and
             possibly from the chain of variable maps.
@@ -126,7 +123,7 @@ namespace hpx { namespace program_options {
 
             - if there's a non-defaulted value, returns it.
         */
-        const variable_value& operator[](const std::string& name) const;
+        variable_value const& operator[](std::string const& name) const;
 
         /** Sets next variable map, which will be used to find
            variables not found in *this. */
@@ -135,9 +132,9 @@ namespace hpx { namespace program_options {
     private:
         /** Returns value of variable 'name' stored in *this, or
             empty value otherwise. */
-        virtual const variable_value& get(const std::string& name) const = 0;
+        virtual variable_value const& get(std::string const& name) const = 0;
 
-        const abstract_variables_map* m_next;
+        abstract_variables_map const* m_next;
     };
 
     /** Concrete variables map which store variables in real map.
@@ -151,10 +148,10 @@ namespace hpx { namespace program_options {
     {
     public:
         variables_map();
-        variables_map(const abstract_variables_map* next);
+        explicit variables_map(abstract_variables_map const* next);
 
         // Resolve conflict between inherited operators.
-        const variable_value& operator[](const std::string& name) const
+        variable_value const& operator[](std::string const& name) const
         {
             return abstract_variables_map::operator[](name);
         }
@@ -167,14 +164,14 @@ namespace hpx { namespace program_options {
     private:
         /** Implementation of abstract_variables_map::get
             which does 'find' in *this. */
-        const variable_value& get(const std::string& name) const override;
+        variable_value const& get(std::string const& name) const override;
 
         /** Names of option with 'final' values \-- which should not
             be changed by subsequence assignments. */
         std::set<std::string> m_final;
 
         friend HPX_CORE_EXPORT void store(
-            const basic_parsed_options<char>& options, variables_map& xm,
+            basic_parsed_options<char> const& options, variables_map& xm,
             bool utf8);
 
         /** Names of required options, filled by parser which has
@@ -188,26 +185,25 @@ namespace hpx { namespace program_options {
      * Templates/inlines
      */
 
-    inline bool variable_value::empty() const
+    inline bool variable_value::empty() const noexcept
     {
         return !v.has_value();
     }
 
-    inline bool variable_value::defaulted() const
+    inline bool variable_value::defaulted() const noexcept
     {
         return m_defaulted;
     }
 
-    inline const hpx::any_nonser& variable_value::value() const
+    inline hpx::any_nonser const& variable_value::value() const noexcept
     {
         return v;
     }
 
-    inline hpx::any_nonser& variable_value::value()
+    inline hpx::any_nonser& variable_value::value() noexcept
     {
         return v;
     }
-
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options
 
 #include <hpx/config/warnings_suffix.hpp>

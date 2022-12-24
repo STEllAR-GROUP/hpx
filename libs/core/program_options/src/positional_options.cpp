@@ -12,12 +12,10 @@
 #include <limits>
 #include <string>
 
-namespace hpx { namespace program_options {
-
-    positional_options_description::positional_options_description() {}
+namespace hpx::program_options {
 
     positional_options_description& positional_options_description::add(
-        const char* name, int max_count)
+        char const* name, int max_count)
     {
         HPX_ASSERT(max_count != -1 || m_trailing.empty());
 
@@ -31,14 +29,14 @@ namespace hpx { namespace program_options {
         return *this;
     }
 
-    unsigned positional_options_description::max_total_count() const
+    unsigned positional_options_description::max_total_count() const noexcept
     {
         return m_trailing.empty() ? static_cast<unsigned>(m_names.size()) :
                                     (std::numeric_limits<unsigned>::max)();
     }
 
-    const std::string& positional_options_description::name_for_position(
-        unsigned position) const
+    std::string const& positional_options_description::name_for_position(
+        unsigned position) const noexcept
     {
         HPX_ASSERT(position < max_total_count());
 
@@ -47,5 +45,4 @@ namespace hpx { namespace program_options {
 
         return m_trailing;
     }
-
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options

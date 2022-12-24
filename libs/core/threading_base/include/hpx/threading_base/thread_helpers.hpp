@@ -647,7 +647,7 @@ namespace hpx { namespace this_thread {
 
     /// \cond NOINTERNAL
     // returns the remaining available stack space
-    HPX_CORE_EXPORT std::ptrdiff_t get_available_stack_space();
+    HPX_CORE_EXPORT std::ptrdiff_t get_available_stack_space() noexcept;
 
     // returns whether the remaining stack-space is at least as large as
     // requested

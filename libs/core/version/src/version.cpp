@@ -55,6 +55,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     std::uint8_t major_version()
     {
         return HPX_VERSION_MAJOR;
@@ -105,6 +106,8 @@ namespace hpx {
         hpx::util::format_to(strm, "MPICH V{}", MPICH_VERSION);
 #elif defined(MVAPICH2_VERSION)
         hpx::util::format_to(strm, "MVAPICH2 V{}", MVAPICH2_VERSION);
+#elif defined(MSMPI_VER)
+        hpx::util::format_to(strm, "MSMPI V{}", MSMPI_VER);
 #else
         strm << "Unknown MPI";
 #endif
@@ -135,8 +138,8 @@ namespace hpx {
             "(A general purpose parallel C++ runtime system for distributed "
             "applications\n"
             "of any scale).\n\n"
-            "Copyright (c) 2007-2020, The STE||AR Group,\n"
-            "http://stellar-group.org, email:hpx-users@stellar.cct.lsu.edu\n\n"
+            "Copyright (c) 2007-2022, The STE||AR Group,\n"
+            "http://stellar-group.org, email:hpx-users@stellar-group.org\n\n"
             "Distributed under the Boost Software License, "
             "Version 1.0. (See accompanying\n"
             "file LICENSE_1_0.txt or copy at "

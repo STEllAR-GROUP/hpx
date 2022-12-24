@@ -17,7 +17,7 @@ namespace hpx::lockfree {
     template <typename T, typename Alloc = std::allocator<T>>
     class caching_freelist : public lockfree::detail::freelist_stack<T, Alloc>
     {
-        typedef lockfree::detail::freelist_stack<T, Alloc> base_type;
+        using base_type = lockfree::detail::freelist_stack<T, Alloc>;
 
     public:
         caching_freelist(std::size_t n = 0)
@@ -39,7 +39,7 @@ namespace hpx::lockfree {
     template <typename T, typename Alloc = std::allocator<T>>
     class static_freelist : public lockfree::detail::freelist_stack<T, Alloc>
     {
-        typedef lockfree::detail::freelist_stack<T, Alloc> base_type;
+        using base_type = lockfree::detail::freelist_stack<T, Alloc>;
 
     public:
         static_freelist(std::size_t n = 0)

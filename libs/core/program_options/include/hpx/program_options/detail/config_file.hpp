@@ -19,7 +19,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace program_options { namespace detail {
+namespace hpx::program_options::detail {
 
     /** Standalone parser for config files in ini-line format.
         The parser is a model of single-pass lvalue iterator, and
@@ -61,8 +61,9 @@ namespace hpx { namespace program_options { namespace detail {
         {
             found_eof();
         }
-        common_config_file_iterator(
-            const std::set<std::string>& allowed_options,
+
+        explicit common_config_file_iterator(
+            std::set<std::string> const& allowed_options,
             bool allow_unregistered = false);
 
         virtual ~common_config_file_iterator() = default;
@@ -71,30 +72,29 @@ namespace hpx { namespace program_options { namespace detail {
         void get();
 
 #if defined(HPX_MSVC) && HPX_MSVC <= 1900
-        void decrement() {}
-        void advance(difference_type) {}
+        constexpr void decrement() noexcept {}
+        constexpr void advance(difference_type) noexcept {}
 #endif
 
     protected:    // Stubs for derived classes
-        // Obtains next line from the config file
-        // Note: really, this design is a bit ugly
-        // The most clean thing would be to pass 'line_iterator' to
-        // constructor of this class, but to avoid templating this class
-        // we'd need polymorphic iterator, which does not exist yet.
+        // Obtains next line from the config file Note: really, this design is a
+        // bit ugly The most clean thing would be to pass 'line_iterator' to
+        // constructor of this class, but to avoid templating this class we'd
+        // need polymorphic iterator, which does not exist yet.
         virtual bool getline(std::string&)
         {
             return false;
         }
 
     private:
-        /** Adds another allowed option. If the 'name' ends with
-            '*', then all options with the same prefix are
-            allowed. For example, if 'name' is 'foo*', then 'foo1' and
-            'foo_bar' are allowed. */
-        void add_option(const char* name);
+        /// Adds another allowed option. If the 'name' ends with '*', then all
+        /// options with the same prefix are allowed. For example, if 'name' is
+        /// 'foo*', then 'foo1' and 'foo_bar' are allowed.
+        ///
+        void add_option(char const* name);
 
         // Returns true if 's' is a registered option name.
-        bool allowed_option(const std::string& s) const;
+        bool allowed_option(std::string const& s) const;
 
         // That's probably too much data for iterator, since
         // it will be copied, but let's not bother for now.
@@ -117,7 +117,7 @@ namespace hpx { namespace program_options { namespace detail {
         /** Creates a config file parser for the specified stream.
         */
         basic_config_file_iterator(std::basic_istream<Char>& is,
-            const std::set<std::string>& allowed_options,
+            std::set<std::string> const& allowed_options,
             bool allow_unregistered = false);
 
     private:    // base overrides
@@ -132,23 +132,22 @@ namespace hpx { namespace program_options { namespace detail {
 
     struct null_deleter
     {
-        void operator()(void const*) const {}
+        constexpr void operator()(void const*) const noexcept {}
     };
 
     template <class Char>
     basic_config_file_iterator<Char>::basic_config_file_iterator(
         std::basic_istream<Char>& is,
-        const std::set<std::string>& allowed_options, bool allow_unregistered)
+        std::set<std::string> const& allowed_options, bool allow_unregistered)
       : common_config_file_iterator(allowed_options, allow_unregistered)
     {
         this->is.reset(&is, null_deleter());
         get();
     }
 
-    // Specializing this function for wchar_t causes problems on
-    // borland and vc7, as well as on metrowerks. On the first two
-    // I don't know a workaround, so make use of 'to_internal' to
-    // avoid specialization.
+    // Specializing this function for wchar_t causes problems on borland and
+    // vc7, as well as on metrowerks. On the first two I don't know a
+    // workaround, so make use of 'to_internal' to avoid specialization.
     template <class Char>
     bool basic_config_file_iterator<Char>::getline(std::string& s)
     {
@@ -163,7 +162,6 @@ namespace hpx { namespace program_options { namespace detail {
             return false;
         }
     }
-
-}}}    // namespace hpx::program_options::detail
+}    // namespace hpx::program_options::detail
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -12,22 +12,23 @@
 #include <functional>
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     // new executor framework
     template <typename Parameters, typename Enable = void>
     struct is_executor_parameters;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     ///////////////////////////////////////////////////////////////////////////
     // Default sequential executor parameters
     struct sequential_executor_parameters
     {
     };
 
-    // If an executor exposes 'executor_parameter_type' this type is
-    // assumed to represent the default parameters for the given executor
-    // type.
+    // If an executor exposes 'executor_parameter_type' this type is assumed to
+    // represent the default parameters for the given executor type.
     template <typename Executor, typename Enable = void>
     struct extract_executor_parameters
     {
@@ -93,6 +94,7 @@ namespace hpx { namespace parallel { namespace execution {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         /// \cond NOINTERNAL
         template <typename T>
         struct is_executor_parameters : std::false_type
@@ -120,14 +122,12 @@ namespace hpx { namespace parallel { namespace execution {
     };
 
     template <typename T>
-    using is_executor_parameters_t = typename is_executor_parameters<T>::type;
-
-    template <typename T>
     inline constexpr bool is_executor_parameters_v =
         is_executor_parameters<T>::value;
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     // new executor framework
     template <typename Parameters, typename Enable>
     struct is_executor_parameters
@@ -136,9 +136,6 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    using is_executor_parameters_t = typename is_executor_parameters<T>::type;
-
-    template <typename T>
     inline constexpr bool is_executor_parameters_v =
         is_executor_parameters<T>::value;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

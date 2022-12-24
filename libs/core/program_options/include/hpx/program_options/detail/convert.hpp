@@ -15,48 +15,47 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
     /** Converts from local 8 bit encoding into wchar_t string using
         the specified locale facet. */
-    HPX_CORE_EXPORT std::wstring from_8_bit(const std::string& s,
-        const std::codecvt<wchar_t, char, std::mbstate_t>& cvt);
+    HPX_CORE_EXPORT std::wstring from_8_bit(std::string const& s,
+        std::codecvt<wchar_t, char, std::mbstate_t> const& cvt);
 
     /** Converts from wchar_t string into local 8 bit encoding into using
         the specified locale facet. */
-    HPX_CORE_EXPORT std::string to_8_bit(const std::wstring& s,
-        const std::codecvt<wchar_t, char, std::mbstate_t>& cvt);
+    HPX_CORE_EXPORT std::string to_8_bit(std::wstring const& s,
+        std::codecvt<wchar_t, char, std::mbstate_t> const& cvt);
 
     /** Converts 's', which is assumed to be in UTF8 encoding, into wide
         string. */
-    HPX_CORE_EXPORT std::wstring from_utf8(const std::string& s);
+    HPX_CORE_EXPORT std::wstring from_utf8(std::string const& s);
 
     /** Converts wide string 's' into string in UTF8 encoding. */
-    HPX_CORE_EXPORT std::string to_utf8(const std::wstring& s);
+    HPX_CORE_EXPORT std::string to_utf8(std::wstring const& s);
 
     /** Converts wide string 's' into local 8 bit encoding determined by
         the current locale. */
-    HPX_CORE_EXPORT std::string to_local_8_bit(const std::wstring& s);
+    HPX_CORE_EXPORT std::string to_local_8_bit(std::wstring const& s);
 
     /** Converts 's', which is assumed to be in local 8 bit encoding, into wide
         string. */
-    HPX_CORE_EXPORT std::wstring from_local_8_bit(const std::string& s);
+    HPX_CORE_EXPORT std::wstring from_local_8_bit(std::string const& s);
 
     /** Convert the input string into internal encoding used by
             program_options. Presence of this function allows to avoid
             specializing all methods which access input on wchar_t.
         */
-    HPX_CORE_EXPORT std::string to_internal(const std::string&);
+    HPX_CORE_EXPORT std::string to_internal(std::string const&);
     /** @overload */
-    HPX_CORE_EXPORT std::string to_internal(const std::wstring&);
+    HPX_CORE_EXPORT std::string to_internal(std::wstring const&);
 
-    template <class T>
-    std::vector<std::string> to_internal(const std::vector<T>& s)
+    template <typename T>
+    std::vector<std::string> to_internal(std::vector<T> const& s)
     {
         std::vector<std::string> result;
         for (std::size_t i = 0; i < s.size(); ++i)
             result.push_back(to_internal(s[i]));
         return result;
     }
-
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options

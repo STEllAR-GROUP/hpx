@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -25,7 +25,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     batch_environment::batch_environment(std::vector<std::string>& nodelist,
         bool have_mpi, bool debug, bool enable)
       : agas_node_num_(0)
@@ -39,7 +40,7 @@ namespace hpx { namespace util {
 
         struct onexit
         {
-            explicit onexit(batch_environment const& env)
+            explicit onexit(batch_environment const& env) noexcept
               : env_(env)
             {
             }
@@ -72,6 +73,7 @@ namespace hpx { namespace util {
             node_num_ = alps_env.node_num();
             return;
         }
+
         batch_environments::pjm_environment pjm_env(nodelist, have_mpi, debug);
         if (pjm_env.valid())
         {
@@ -81,6 +83,7 @@ namespace hpx { namespace util {
             node_num_ = pjm_env.node_num();
             return;
         }
+
         batch_environments::slurm_environment slurm_env(nodelist, debug);
         if (slurm_env.valid())
         {
@@ -90,6 +93,7 @@ namespace hpx { namespace util {
             node_num_ = slurm_env.node_num();
             return;
         }
+
         batch_environments::pbs_environment pbs_env(nodelist, have_mpi, debug);
         if (pbs_env.valid())
         {
@@ -102,7 +106,7 @@ namespace hpx { namespace util {
     }
 
     // This function returns true if a batch environment was found.
-    bool batch_environment::found_batch_environment() const
+    bool batch_environment::found_batch_environment() const noexcept
     {
         return !batch_name_.empty();
     }
@@ -156,8 +160,8 @@ namespace hpx { namespace util {
         }
 #endif
 
-        // if an AGAS host is specified, it needs to be in the list
-        // of nodes participating in this run
+        // if an AGAS host is specified, it needs to be in the list of nodes
+        // participating in this run
         if (!agas_host.empty() && !found_agas_host)
         {
             throw hpx::detail::command_line_error("Requested AGAS host (" +
@@ -187,25 +191,26 @@ namespace hpx { namespace util {
     }
 
     // The number of threads is either one (if no PBS/SLURM information was
-    // found), or it is the same as the number of times this node has
-    // been listed in the node file. Additionally this takes into account
-    // the number of tasks run on this node.
-    std::size_t batch_environment::retrieve_number_of_threads() const
+    // found), or it is the same as the number of times this node has been
+    // listed in the node file. Additionally this takes into account the number
+    // of tasks run on this node.
+    std::size_t batch_environment::retrieve_number_of_threads() const noexcept
     {
         return num_threads_;
     }
 
-    // The number of localities is either one (if no PBS information
-    // was found), or it is the same as the number of distinct node
-    // names listed in the node file. In case of SLURM we can extract
-    // the number of localities from the job environment.
-    std::size_t batch_environment::retrieve_number_of_localities() const
+    // The number of localities is either one (if no PBS information was found),
+    // or it is the same as the number of distinct node names listed in the node
+    // file. In case of SLURM we can extract the number of localities from the
+    // job environment.
+    std::size_t batch_environment::retrieve_number_of_localities()
+        const noexcept
     {
         return num_localities_;
     }
 
     // Try to retrieve the node number from the PBS/SLURM environment
-    std::size_t batch_environment::retrieve_node_number() const
+    std::size_t batch_environment::retrieve_node_number() const noexcept
     {
         return node_num_;
     }
@@ -227,8 +232,8 @@ namespace hpx { namespace util {
         return host;
     }
 
-    // We either select the first host listed in the node file or a given
-    // host name to host the AGAS server.
+    // We either select the first host listed in the node file or a given host
+    // name to host the AGAS server.
     std::string batch_environment::agas_host_name(
         std::string const& def_agas) const
     {
@@ -238,9 +243,14 @@ namespace hpx { namespace util {
         return host;
     }
 
+    std::size_t batch_environment::agas_node() const noexcept
+    {
+        return agas_node_num_;
+    }
+
     // Return a string containing the name of the batch system
     std::string batch_environment::get_batch_name() const
     {
         return batch_name_;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,12 +24,10 @@
 
 #include <cstddef>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail {
-    namespace posix {
+namespace hpx::threads::coroutines::detail::posix {
 
-        std::ptrdiff_t ucontext_context_impl_base::default_stack_size =
-            SIGSTKSZ;
-}}}}}    // namespace hpx::threads::coroutines::detail::posix
+    std::ptrdiff_t ucontext_context_impl_base::default_stack_size = SIGSTKSZ;
+}    // namespace hpx::threads::coroutines::detail::posix
 
 #elif defined(HPX_HAVE_FIBER_BASED_COROUTINES)
 

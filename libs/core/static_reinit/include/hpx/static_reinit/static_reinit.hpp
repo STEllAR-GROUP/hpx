@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     // This is a global API allowing to register functions to be called before
     // the runtime system is about to start and after the runtime system has
@@ -23,4 +24,4 @@ namespace hpx { namespace util {
 
     // Invoke all globally registered destruction functions
     HPX_CORE_EXPORT void reinit_destruct();
-}}    // namespace hpx::util
+}    // namespace hpx::util

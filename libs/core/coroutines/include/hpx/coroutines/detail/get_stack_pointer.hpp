@@ -18,7 +18,7 @@
 #else
 #if defined(__x86_64__) || defined(__amd64) || defined(__i386__) ||            \
     defined(__i486__) || defined(__i586__) || defined(__i686__) ||             \
-    defined(__powerpc__) || defined(__arm__)
+    defined(__powerpc__) || defined(__arm__) || defined(__riscv)
 #define HPX_HAVE_THREADS_GET_STACK_POINTER
 #endif
 #endif
@@ -26,9 +26,9 @@
 #include <cstddef>
 #include <limits>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail {
+namespace hpx::threads::coroutines::detail {
 
-    inline std::size_t get_stack_ptr()
+    inline std::size_t get_stack_ptr() noexcept
     {
 #if defined(HPX_GCC_VERSION)
         return std::size_t(__builtin_frame_address(0));
@@ -50,5 +50,5 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         return stack_ptr;
 #endif
     }
-}}}}    // namespace hpx::threads::coroutines::detail
+}    // namespace hpx::threads::coroutines::detail
 #endif

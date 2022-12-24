@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,7 +12,8 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace util { namespace batch_environments {
+namespace hpx::util::batch_environments {
+
     alps_environment::alps_environment(
         std::vector<std::string>& /* nodelist */, bool /* debug */)
       : node_num_(0)
@@ -47,4 +48,4 @@ namespace hpx { namespace util { namespace batch_environments {
                 from_string<std::size_t>(total_num_threads) / num_threads_;
         }
     }
-}}}    // namespace hpx::util::batch_environments
+}    // namespace hpx::util::batch_environments

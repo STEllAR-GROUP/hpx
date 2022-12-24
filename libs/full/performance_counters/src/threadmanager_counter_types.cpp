@@ -26,7 +26,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace detail {
+namespace hpx::performance_counters::detail {
 
     using threadmanager_counter_func = std::int64_t (threads::threadmanager::*)(
         bool reset);
@@ -249,99 +249,6 @@ namespace hpx { namespace performance_counters { namespace detail {
         return naming::invalid_gid;
     }
 
-    ///////////////////////////////////////////////////////////////////////
-    bool locality_allocator_counter_discoverer(counter_info const& info,
-        discover_counter_func const& f, discover_counters_mode mode,
-        error_code& ec)
-    {
-        counter_info i = info;
-
-        // compose the counter name templates
-        counter_path_elements p;
-        counter_status status =
-            get_counter_path_elements(info.fullname_, p, ec);
-        if (!status_is_valid(status))
-        {
-            return false;
-        }
-
-        if (mode == discover_counters_mode::minimal ||
-            p.parentinstancename_.empty() || p.instancename_.empty())
-        {
-            if (p.parentinstancename_.empty())
-            {
-                p.parentinstancename_ = "locality#*";
-                p.parentinstanceindex_ = -1;
-            }
-
-            if (p.instancename_.empty())
-            {
-                p.instancename_ = "total";
-                p.instanceindex_ = -1;
-            }
-
-            status = get_counter_name(p, i.fullname_, ec);
-            if (!status_is_valid(status) || !f(i, ec) || ec)
-            {
-                return false;
-            }
-
-            p.instancename_ = "allocator#*";
-            p.instanceindex_ = -1;
-
-            if (mode == discover_counters_mode::full)
-            {
-                for (std::size_t t = 0; t != HPX_COROUTINE_NUM_ALL_HEAPS; ++t)
-                {
-                    p.instancename_ = "allocator";
-                    p.instanceindex_ = static_cast<std::int32_t>(t);
-                    status = get_counter_name(p, i.fullname_, ec);
-                    if (!status_is_valid(status) || !f(i, ec) || ec)
-                        return false;
-                }
-            }
-            else
-            {
-                status = get_counter_name(p, i.fullname_, ec);
-                if (!status_is_valid(status) || !f(i, ec) || ec)
-                    return false;
-            }
-        }
-        else if (p.instancename_ == "total" && p.instanceindex_ == -1)
-        {
-            // overall counter
-            status = get_counter_name(p, i.fullname_, ec);
-            if (!status_is_valid(status) || !f(i, ec) || ec)
-            {
-                return false;
-            }
-        }
-        else if (p.instancename_ == "allocator#*")
-        {
-            for (std::size_t t = 0; t != HPX_COROUTINE_NUM_ALL_HEAPS; ++t)
-            {
-                p.instancename_ = "allocator";
-                p.instanceindex_ = static_cast<std::int32_t>(t);
-                status = get_counter_name(p, i.fullname_, ec);
-                if (!status_is_valid(status) || !f(i, ec) || ec)
-                {
-                    return false;
-                }
-            }
-        }
-        else if (!f(i, ec) || ec)
-        {
-            return false;
-        }
-
-        if (&ec != &throws)
-        {
-            ec = make_success_code();
-        }
-
-        return true;
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     naming::gid_type counter_creator(counter_info const& info,
         counter_path_elements const& paths,
@@ -435,9 +342,9 @@ namespace hpx { namespace performance_counters { namespace detail {
         return naming::invalid_gid;
     }
 #endif
-}}}    // namespace hpx::performance_counters::detail
+}    // namespace hpx::performance_counters::detail
 
-namespace hpx { namespace performance_counters {
+namespace hpx::performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     void register_threadmanager_counter_types(threads::threadmanager& tm)
@@ -703,11 +610,6 @@ namespace hpx { namespace performance_counters {
                 HPX_PERFORMANCE_COUNTER_V1, counts_creator,
                 &locality_counter_discoverer, ""},
 #endif
-            {"/threads/count/objects", counter_type::monotonically_increasing,
-                "returns the overall number of created HPX-thread objects for "
-                "the referenced locality",
-                HPX_PERFORMANCE_COUNTER_V1, counts_creator,
-                &detail::locality_allocator_counter_discoverer, ""},
 #endif
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
             {"/threads/count/pending-misses",
@@ -799,4 +701,4 @@ namespace hpx { namespace performance_counters {
         install_counter_types(
             counter_types, sizeof(counter_types) / sizeof(counter_types[0]));
     }
-}}    // namespace hpx::performance_counters
+}    // namespace hpx::performance_counters
