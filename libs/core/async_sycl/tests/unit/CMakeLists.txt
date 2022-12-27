@@ -5,7 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests sycl_vector_add_get_future sycl_vector_add_executor
-          sycl_vector_add_concurrent_executors
+          sycl_vector_add_concurrent_executors sycl_stream
 )
 
 foreach(test ${tests})
