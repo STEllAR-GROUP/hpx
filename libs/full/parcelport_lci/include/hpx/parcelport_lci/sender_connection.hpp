@@ -43,9 +43,8 @@ namespace hpx::parcelset::policies::lci {
             parcelset::parcelport_connection<sender_connection, data_type>;
 
     public:
-        sender_connection(sender_type* s, int dst, parcelset::parcelport* pp)
-          : sender_(s)
-          , dst_rank(dst)
+        sender_connection(int dst, parcelset::parcelport* pp)
+          : dst_rank(dst)
           , pp_(pp)
           , there_(parcelset::locality(locality(dst_rank)))
         {
@@ -222,15 +221,18 @@ namespace hpx::parcelset::policies::lci {
             buffer_.clear();
             iovec.count = -1;
 
-            hpx::move_only_function<void(error_code const&,
-                parcelset::locality const&, std::shared_ptr<sender_connection>)>
-                postprocess_handler;
-            std::swap(postprocess_handler, postprocess_handler_);
-            error_code ec2;
-            postprocess_handler(ec2, there_, shared_from_this());
+            if (postprocess_handler_)
+            {
+                hpx::move_only_function<void(error_code const&,
+                    parcelset::locality const&,
+                    std::shared_ptr<sender_connection>)>
+                    postprocess_handler;
+                std::swap(postprocess_handler, postprocess_handler_);
+                error_code ec2;
+                postprocess_handler(ec2, there_, shared_from_this());
+            }
         }
 
-        sender_type* sender_;
         int dst_rank;
         hpx::move_only_function<void(error_code const&)> handler_;
         hpx::move_only_function<void(error_code const&,
