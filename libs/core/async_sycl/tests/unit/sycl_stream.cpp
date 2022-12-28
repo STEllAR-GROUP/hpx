@@ -35,69 +35,67 @@ int hpx_main(int, char**)
     std::cout << "SYCL Future polling enabled!\n";
     std::cout << "SYCL language version: " << SYCL_LANGUAGE_VERSION << "\n";
 
-    hpx::sycl::experimental::sycl_executor exec(
-        cl::sycl::default_selector{});
-    auto a = cl::sycl::malloc_device<float>(vectorsize, exec.get_device(),
-        exec.get_context());
-    auto b = cl::sycl::malloc_device<float>(vectorsize, exec.get_device(),
-        exec.get_context());
-    auto c = cl::sycl::malloc_device<float>(vectorsize, exec.get_device(),
-        exec.get_context());
-    auto a_host = cl::sycl::malloc_host<float>(vectorsize,
-        exec.get_context());
-    auto b_host = cl::sycl::malloc_host<float>(vectorsize,
-        exec.get_context());
-    auto c_host = cl::sycl::malloc_host<float>(vectorsize,
-        exec.get_context());
+    hpx::sycl::experimental::sycl_executor exec(cl::sycl::default_selector{});
+    auto a = cl::sycl::malloc_device<float>(
+        vectorsize, exec.get_device(), exec.get_context());
+    auto b = cl::sycl::malloc_device<float>(
+        vectorsize, exec.get_device(), exec.get_context());
+    auto c = cl::sycl::malloc_device<float>(
+        vectorsize, exec.get_device(), exec.get_context());
+    auto a_host = cl::sycl::malloc_host<float>(vectorsize, exec.get_context());
+    auto b_host = cl::sycl::malloc_host<float>(vectorsize, exec.get_context());
+    auto c_host = cl::sycl::malloc_host<float>(vectorsize, exec.get_context());
 
-    hpx::apply(exec, &cl::sycl::queue::memset, static_cast<void*>(c), 0,
-        static_cast<size_t>(num_bytes));
+    // Note: Parameter types needs to match exactly, otherwise the correct
+    // function won't be found -- in this case we need to cast from float* to void*
+    // otherwise the correct memset overload won't be found
+    hpx::apply(
+        exec, &cl::sycl::queue::memset, static_cast<void*>(c), 0, num_bytes);
     hpx::apply(exec, &cl::sycl::queue::memset, static_cast<void*>(a_host), 0,
-        static_cast<size_t>(num_bytes));
+        num_bytes);
     hpx::apply(exec, &cl::sycl::queue::memset, static_cast<void*>(b_host), 0,
-        static_cast<size_t>(num_bytes));
+        num_bytes);
     hpx::apply(exec, &cl::sycl::queue::memset, static_cast<void*>(c_host), 0,
-        static_cast<size_t>(num_bytes));
+        num_bytes);
 
     float aj = 1.0;
     float bj = 2.0;
     float cj = 0.0;
     const float scalar = 3.0;
-    const auto reset_input_method = [=] (cl::sycl::id<1> i) {
-      a[i] = aj;
-      b[i] = bj;
+    const auto reset_input_method = [=](cl::sycl::id<1> i) {
+        a[i] = aj;
+        b[i] = bj;
     };
-
     hpx::apply(exec, &cl::sycl::queue::parallel_for,
         cl::sycl::range<1>{vectorsize}, reset_input_method);
 
-    const auto copy_step = [=] (cl::sycl::id<1> i) {
-      c[i] = a[i];
-    };
-    const auto scale_step = [=] (cl::sycl::id<1> i) {
-      b[i] = scalar * c[i];
-    };
-    const auto add_step = [=] (cl::sycl::id<1> i) {
-      c[i] = a[i] + b [i];
-    };
-    const auto triad_step = [=] (cl::sycl::id<1> i) {
-      a[i] = b[i] + scalar * c[i];
+    const auto copy_step = [=](cl::sycl::id<1> i) { c[i] = a[i]; };
+    const auto scale_step = [=](cl::sycl::id<1> i) { b[i] = scalar * c[i]; };
+    const auto add_step = [=](cl::sycl::id<1> i) { c[i] = a[i] + b[i]; };
+    const auto triad_step = [=](cl::sycl::id<1> i) {
+        a[i] = b[i] + scalar * c[i];
     };
 
-    hpx::apply(exec, &cl::sycl::queue::parallel_for, cl::sycl::range<1>{vectorsize}, copy_step); 
-    hpx::apply(exec, &cl::sycl::queue::parallel_for, cl::sycl::range<1>{vectorsize}, scale_step); 
-    hpx::apply(exec, &cl::sycl::queue::parallel_for, cl::sycl::range<1>{vectorsize}, add_step); 
-    hpx::apply(exec, &cl::sycl::queue::parallel_for, cl::sycl::range<1>{vectorsize}, triad_step); 
+    hpx::apply(exec, &cl::sycl::queue::parallel_for,
+        cl::sycl::range<1>{vectorsize}, copy_step);
+    hpx::apply(exec, &cl::sycl::queue::parallel_for,
+        cl::sycl::range<1>{vectorsize}, scale_step);
+    hpx::apply(exec, &cl::sycl::queue::parallel_for,
+        cl::sycl::range<1>{vectorsize}, add_step);
+    hpx::apply(exec, &cl::sycl::queue::parallel_for,
+        cl::sycl::range<1>{vectorsize}, triad_step);
 
+    // Note: Parameter types needs to match exactly, otherwise the correct
+    // function won't be found -- in this case we need to cast from float* to const float*
+    // otherwise the correct copy overload won't be found
     hpx::apply(exec, &cl::sycl::queue::copy, static_cast<const float*>(c),
-        static_cast<float*>(c_host), static_cast<size_t>(vectorsize)); 
+        c_host, vectorsize);
     hpx::apply(exec, &cl::sycl::queue::copy, static_cast<const float*>(b),
-        static_cast<float*>(b_host), static_cast<size_t>(vectorsize)); 
-    auto fut = hpx::async(exec, &cl::sycl::queue::copy, static_cast<const float*>(a),
-        static_cast<float*>(a_host), static_cast<size_t>(vectorsize)); 
+        b_host, vectorsize);
+    auto fut = hpx::async(exec, &cl::sycl::queue::copy,
+        static_cast<const float*>(a), a_host, vectorsize);
 
     fut.get();
-
 
     cj = aj;
     bj = scalar * cj;
@@ -107,10 +105,11 @@ int hpx_main(int, char**)
     float aSumErr = 0.0;
     float bSumErr = 0.0;
     float cSumErr = 0.0;
-    for (std::size_t j = 0; j < vectorsize; j++) {
-      aSumErr += std::abs(a_host[j] - aj);
-      bSumErr += std::abs(b_host[j] - bj);
-      cSumErr += std::abs(c_host[j] - cj);
+    for (std::size_t j = 0; j < vectorsize; j++)
+    {
+        aSumErr += std::abs(a_host[j] - aj);
+        bSumErr += std::abs(b_host[j] - bj);
+        cSumErr += std::abs(c_host[j] - cj);
     }
     const float aAvgErr = aSumErr / static_cast<float>(vectorsize);
     const float bAvgErr = bSumErr / static_cast<float>(vectorsize);

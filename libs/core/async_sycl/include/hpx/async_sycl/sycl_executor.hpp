@@ -58,14 +58,14 @@ namespace hpx { namespace sycl { namespace experimental {
             return detail::get_future(event);
         }
 
-
-        // Default Implementation without the extra intel code_location
-        // parameter
-
-        /// sycl::queue::member_function type
+        /// Default Implementation without the extra intel code_location
+        /// parameter. Removes the reference for trivial types to make the
+        /// function matching easier (see sycl_stream.cpp test)
         template <typename... Params>
         using queue_function_ptr_t = cl::sycl::event (cl::sycl::queue::*)(
-            Params...);
+            typename std::conditional<
+                std::is_trivial<std::remove_reference_t<Params>>::value,
+                std::decay_t<Params>, Params>::type...);
         /// Invoke queue member function given queue and parameters -- do not
         /// use event to return a hpx::future (One way)
         template <typename... Params>
@@ -130,8 +130,8 @@ namespace hpx { namespace sycl { namespace experimental {
 
         /// sycl::queue::member_function type with code_location parameter
         template <typename Param>
-        using queue_function_code_loc_ptr_t = cl::sycl::event (cl::sycl::queue::*)(
-            Param, cl::sycl::detail::code_location const&);
+        using queue_function_code_loc_ptr_t = cl::sycl::event (
+            cl::sycl::queue::*)(Param, cl::sycl::detail::code_location const&);
         /// Invoke member function given queue and parameters. Default
         /// code_location argument added automatically.
         template <typename Param>
@@ -160,11 +160,11 @@ namespace hpx { namespace sycl { namespace experimental {
             // into the future
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    cl::sycl::event e =
-                        HPX_INVOKE(HPX_FORWARD(queue_function_code_loc_ptr_t<Param>,
-                                       queue_member_function),
-                            command_queue, HPX_FORWARD(Param, args),
-                            cl::sycl::detail::code_location::current());
+                    cl::sycl::event e = HPX_INVOKE(
+                        HPX_FORWARD(queue_function_code_loc_ptr_t<Param>,
+                            queue_member_function),
+                        command_queue, HPX_FORWARD(Param, args),
+                        cl::sycl::detail::code_location::current());
                     return get_future(e);
                 },
                 [&](std::exception_ptr&& ep) {
@@ -215,115 +215,105 @@ namespace hpx { namespace sycl { namespace experimental {
 }}}    // namespace hpx::sycl::experimental
 
 namespace hpx {
-    namespace parallel { namespace execution {
+namespace parallel { namespace execution {
 
-        /// \cond NOINTERNAL
-        template <>
-        struct is_one_way_executor<hpx::sycl::experimental::sycl_executor>
-          : std::true_type
-        {
-            // support for fire and forget without returning a waitable/future
-        };
-
-        template <>
-        struct is_two_way_executor<hpx::sycl::experimental::sycl_executor>
-          : std::true_type
-        {
-            // support for a waitable/future
-        };
-        /// \endcond
-    }}    // namespace parallel::execution
-
-    // Add overloads for apply and async to help the compiler determine the
-    // correct sycl queue member function/overload by passing it the types for
-    // subsequent arguments.  Without this, the user would have to specify the
-    // exact type for the queue_function_ptr on his/her own which can be
-    // annoying, especially when the type depends on a kernel lambda (as it
-    // does for example in the submit member function).
-
-    /// hpx::async overload for launching sycl queue member functions with an
-    /// sycl executor
-    template <typename Executor, typename... Ts>
-    HPX_FORCEINLINE decltype(auto) async(Executor&& exec,
-        hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>&& f,
-        Ts&&... ts)
+    /// \cond NOINTERNAL
+    template <>
+    struct is_one_way_executor<hpx::sycl::experimental::sycl_executor>
+      : std::true_type
     {
-        // Make sure we only use this for sycl executors
-        static_assert(std::is_same<std::decay_t<Executor>,
-            hpx::sycl::experimental::sycl_executor>::value);
-        // Use the same async_dispatch than the normal async otherwise
-        return detail::async_dispatch<
-            typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
-                                                           exec),
-            HPX_FORWARD(
-                hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<
-                    Ts...>,
-                f),
-            HPX_FORWARD(Ts, ts)...);
-    }
+        // support for fire and forget without returning a waitable/future
+    };
 
-    /// hpx::apply overload for launching sycl queue member functions with an
-    /// sycl executor
-    template <typename Executor, typename... Ts>
-    HPX_FORCEINLINE bool apply(Executor&& exec,
-        hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>&& f,
-        Ts&&... ts)
+    template <>
+    struct is_two_way_executor<hpx::sycl::experimental::sycl_executor>
+      : std::true_type
     {
-        // Make sure we only use this for sycl executors
-        static_assert(std::is_same<std::decay_t<Executor>,
-            hpx::sycl::experimental::sycl_executor>::value);
-        // Use the same apply_dispatch than the normal apply otherwise
-        return detail::apply_dispatch<
-            typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
-                                                           exec),
-            HPX_FORWARD(
-                hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<
-                    Ts...>,
-                f),
-            HPX_FORWARD(Ts, ts)...);
-    }
+        // support for a waitable/future
+    };
+    /// \endcond
+}}    // namespace parallel::execution
+
+// Add overloads for apply and async to help the compiler determine the
+// correct sycl queue member function/overload by passing it the types for
+// subsequent arguments.  Without this, the user would have to specify the
+// exact type for the queue_function_ptr on his/her own which can be
+// annoying, especially when the type depends on a kernel lambda (as it
+// does for example in the submit member function).
+
+/// hpx::async overload for launching sycl queue member functions with an
+/// sycl executor
+template <typename Executor, typename... Ts>
+HPX_FORCEINLINE decltype(auto) async(Executor&& exec,
+    hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>&& f,
+    Ts&&... ts)
+{
+// Make sure we only use this for sycl executors
+static_assert(std::is_same<std::decay_t<Executor>,
+    hpx::sycl::experimental::sycl_executor>::value);
+// Use the same async_dispatch than the normal async otherwise
+return detail::async_dispatch<typename std::decay<Executor>::type>::call(
+    HPX_FORWARD(Executor, exec),
+    HPX_FORWARD(
+        hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>, f),
+    HPX_FORWARD(Ts, ts)...);
+}
+
+/// hpx::apply overload for launching sycl queue member functions with an
+/// sycl executor
+template <typename Executor, typename... Ts>
+HPX_FORCEINLINE bool apply(Executor&& exec,
+    hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>&& f,
+    Ts&&... ts)
+{
+// Make sure we only use this for sycl executors
+static_assert(std::is_same<std::decay_t<Executor>,
+    hpx::sycl::experimental::sycl_executor>::value);
+// Use the same apply_dispatch than the normal apply otherwise
+return detail::apply_dispatch<typename std::decay<Executor>::type>::call(
+    HPX_FORWARD(Executor, exec),
+    HPX_FORWARD(
+        hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>, f),
+    HPX_FORWARD(Ts, ts)...);
+}
 
 #if defined(__INTEL_LLVM_COMPILER)
-    /// hpx::async overload for launching sycl queue member functions with an
-    /// sycl executor and code location ptrs
-    template <typename Executor, typename Ts>
-    HPX_FORCEINLINE decltype(auto) async(Executor&& exec,
-        hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<Ts>&& f,
-        Ts&& ts)
-    {
-        // Make sure we only use this for sycl executors
-        static_assert(std::is_same<std::decay_t<Executor>,
-            hpx::sycl::experimental::sycl_executor>::value);
-        // Use the same async_dispatch than the normal async otherwise
-        return detail::async_dispatch<
-            typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
-                                                           exec),
-            HPX_FORWARD(
-                hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<
-                    Ts>,
-                f),
-            HPX_FORWARD(Ts, ts));
-    }
+/// hpx::async overload for launching sycl queue member functions with an
+/// sycl executor and code location ptrs
+template <typename Executor, typename Ts>
+HPX_FORCEINLINE decltype(auto) async(Executor&& exec,
+    hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<Ts>&&
+        f,
+    Ts&& ts)
+{
+// Make sure we only use this for sycl executors
+static_assert(std::is_same<std::decay_t<Executor>,
+    hpx::sycl::experimental::sycl_executor>::value);
+// Use the same async_dispatch than the normal async otherwise
+return detail::async_dispatch<typename std::decay<Executor>::type>::call(
+    HPX_FORWARD(Executor, exec),
+    HPX_FORWARD(
+        hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts>, f),
+    HPX_FORWARD(Ts, ts));
+}
 
-    /// hpx::apply overload for launching sycl queue member functions with an
-    /// sycl executor and code location ptrs
-    template <typename Executor, typename Ts>
-    HPX_FORCEINLINE bool apply(Executor&& exec,
-        hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<Ts>&& f,
-        Ts&& ts)
-    {
-        // Make sure we only use this for sycl executors
-        static_assert(std::is_same<std::decay_t<Executor>,
-            hpx::sycl::experimental::sycl_executor>::value);
-        // Use the same apply_dispatch than the normal apply otherwise
-        return detail::apply_dispatch<
-            typename std::decay<Executor>::type>::call(HPX_FORWARD(Executor,
-                                                           exec),
-            HPX_FORWARD(
-                hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<
-                    Ts>,
-                f),
-            HPX_FORWARD(Ts, ts));
-    }
+/// hpx::apply overload for launching sycl queue member functions with an
+/// sycl executor and code location ptrs
+template <typename Executor, typename Ts>
+HPX_FORCEINLINE bool apply(Executor&& exec,
+    hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<Ts>&&
+        f,
+    Ts&& ts)
+{
+// Make sure we only use this for sycl executors
+static_assert(std::is_same<std::decay_t<Executor>,
+    hpx::sycl::experimental::sycl_executor>::value);
+// Use the same apply_dispatch than the normal apply otherwise
+return detail::apply_dispatch<typename std::decay<Executor>::type>::call(
+    HPX_FORWARD(Executor, exec),
+    HPX_FORWARD(
+        hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts>, f),
+    HPX_FORWARD(Ts, ts));
+}
 #endif
 }    // namespace hpx
