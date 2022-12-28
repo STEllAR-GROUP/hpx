@@ -350,7 +350,7 @@ namespace hpx { namespace parallel { namespace util {
                     break;
                 }
 
-                return it + num;
+                return static_cast<Iter>(it + num);
             }
 
             template <typename Iter, typename CancelToken, typename F,
@@ -487,7 +487,7 @@ namespace hpx { namespace parallel { namespace util {
                     break;
                 }
 
-                return it + num;
+                return static_cast<Iter>(it + num);
             }
 
             template <typename Iter, typename CancelToken, typename F,
@@ -859,7 +859,7 @@ namespace hpx { namespace parallel { namespace util {
                     break;
                 }
 
-                return it + num;
+                return static_cast<Iter>(it + num);
             }
 
             template <typename Iter, typename CancelToken, typename F>

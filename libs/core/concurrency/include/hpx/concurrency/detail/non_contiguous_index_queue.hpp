@@ -9,6 +9,7 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/concurrency/detail/contiguous_index_queue.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/tuple.hpp>
 
@@ -177,8 +178,8 @@ namespace hpx::concurrency::detail {
 
         /// \brief Attempt to pop an item from the right of the queue.
         ///
-        /// Attempt to pop an item from the right (end) of the queue. If
-        /// no items are left hpx::nullopt is returned.
+        /// Attempt to pop an item from the right (end) of the queue. If no
+        /// items are left hpx::nullopt is returned.
         hpx::optional<T> pop_right() noexcept
         {
             range desired_range{0, 0};
@@ -204,6 +205,23 @@ namespace hpx::concurrency::detail {
                 expected_range, desired_range));
 
             return hpx::optional<T>(HPX_MOVE(index));
+        }
+
+        /// \brief Attempt to pop an item from the given end of the queue.
+        ///
+        /// Attempt to pop an item from the given end of the queue. If no items
+        /// are left hpx::nullopt is returned.
+        template <queue_end Which>
+        hpx::optional<T> pop() noexcept
+        {
+            if constexpr (Which == queue_end::left)
+            {
+                return pop_left();
+            }
+            else
+            {
+                return pop_right();
+            }
         }
 
         constexpr bool empty() const noexcept

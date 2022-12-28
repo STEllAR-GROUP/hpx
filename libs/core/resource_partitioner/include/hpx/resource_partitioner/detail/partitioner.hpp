@@ -189,6 +189,11 @@ namespace hpx::resource::detail {
             return initial_thread_pools_[0].pool_name_;
         }
 
+        constexpr bool is_initialized() const noexcept
+        {
+            return is_initialized_;
+        }
+
     private:
         ////////////////////////////////////////////////////////////////////////
         void fill_topology_vectors();
@@ -246,5 +251,8 @@ namespace hpx::resource::detail {
         threads::topology& topo_;
 
         threads::policies::scheduler_mode default_scheduler_mode_;
+
+        // resource partitioner was initialized
+        bool is_initialized_ = false;
     };
 }    // namespace hpx::resource::detail
