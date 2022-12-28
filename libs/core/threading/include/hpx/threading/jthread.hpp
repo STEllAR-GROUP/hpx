@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,34 +19,31 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 
-    /// \brief The class \a jthread represents a single thread of execution. It
-    ///        has the same general behavior as \a hpx::thread, except that \a
-    ///        jthread automatically rejoins on destruction, and can be
-    ///        cancelled/stopped in certain situations.
-    ///        Threads begin execution immediately upon construction of the
-    ///        associated thread object (pending any OS scheduling delays),
-    ///        starting at the top-level function provided as a constructor
-    ///        argument. The return value of the top-level function is ignored
-    ///        and if it terminates by throwing an exception, \a hpx::terminate is
-    ///        called. The top-level function may communicate its return value
-    ///        or an exception to the caller via \a hpx::promise or by modifying
-    ///        shared variables (which may require synchronization, see \a
-    ///        hpx::mutex and \a hpx::atomic)
-    ///        Unlike \a hpx::thread, the jthread logically holds an internal
-    ///        private member of type \a hpx::stop_source, which maintains a shared
-    ///        stop-state. The \a jthread constructor accepts a function that
-    ///        takes a \a hpx::stop_token as its first argument, which will be
-    ///        passed in by the jthread from its internal \a stop_source. This
-    ///        allows the function to check if stop has been requested during
-    ///        its execution, and return if it has.
-    ///        \a hpx::jthread objects may also be in the state that does not
-    ///        represent any thread (after default construction, move from,
-    ///        detach, or join), and a thread of execution may be not associated
-    ///        with any \a jthread objects (after detach).
-    ///        No two \a hpx::jthread objects may represent the same thread of
-    ///        execution; \a hpx::jthread is not \a CopyConstructible or \a
-    ///        CopyAssignable, although it is \a MoveConstructible and \a
-    ///        MoveAssignable.
+    /// The class \a jthread represents a single thread of execution. It has the
+    /// same general behavior as \a hpx::thread, except that \a jthread
+    /// automatically rejoins on destruction, and can be cancelled/stopped in
+    /// certain situations. Threads begin execution immediately upon
+    /// construction of the associated thread object (pending any OS scheduling
+    /// delays), starting at the top-level function provided as a constructor
+    /// argument. The return value of the top-level function is ignored and if
+    /// it terminates by throwing an exception, \a hpx::terminate is called. The
+    /// top-level function may communicate its return value or an exception to
+    /// the caller via \a hpx::promise or by modifying shared variables (which
+    /// may require synchronization, see \a hpx::mutex and \a hpx::atomic)
+    /// Unlike \a hpx::thread, the jthread logically holds an internal private
+    /// member of type \a hpx::stop_source, which maintains a shared stop-state.
+    /// The \a jthread constructor accepts a function that takes a \a
+    /// hpx::stop_token as its first argument, which will be passed in by the
+    /// jthread from its internal \a stop_source. This allows the function to
+    /// check if stop has been requested during its execution, and return if it
+    /// has.
+    /// \a hpx::jthread objects may also be in the state that does not
+    /// represent any thread (after default construction, move from, detach, or
+    /// join), and a thread of execution may be not associated with any \a
+    /// jthread objects (after detach). No two \a hpx::jthread objects may
+    /// represent the same thread of execution; \a hpx::jthread is not \a
+    /// CopyConstructible or \a CopyAssignable, although it is \a
+    /// MoveConstructible and \a MoveAssignable.
     class jthread
     {
     private:
@@ -129,8 +126,8 @@ namespace hpx {
         //          would be exceeded.
         //
         template <typename F, typename... Ts,
-            typename Enable = typename std::enable_if<!std::is_same<
-                typename std::decay<F>::type, jthread>::value>::type>
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<std::decay_t<F>, jthread>>>
         explicit jthread(F&& f, Ts&&... ts)
           : ssource_{}    // initialize stop_source
           , thread_{

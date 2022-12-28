@@ -24,10 +24,12 @@
 #include <utility>
 
 namespace hpx::detail {
+
     HPX_CORE_EXPORT char const* store_function_annotation(std::string name);
 }    // namespace hpx::detail
 
-namespace hpx::util {
+namespace hpx::threads {
+
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
     struct thread_description
@@ -171,13 +173,15 @@ namespace hpx::util {
         {
             switch (kind())
             {
-            case util::thread_description::data_type_description:
+            case threads::thread_description::data_type_description:
                 return util::itt::task(domain, get_description_itt());
                 break;
-            case util::thread_description::data_type_address:
+
+            case threads::thread_description::data_type_address:
                 return util::itt::task(
                     domain, util::itt::string_handle("address"), get_address());
                 break;
+
             default:
                 HPX_ASSERT(false);
                 break;
@@ -270,12 +274,14 @@ namespace hpx::util {
         {
             switch (kind())
             {
-            case util::thread_description::data_type_description:
+            case threads::thread_description::data_type_description:
                 return util::itt::task(domain, get_description_itt());
                 break;
-            case util::thread_description::data_type_address:
+
+            case threads::thread_description::data_type_address:
                 return util::itt::task(domain, "address", get_address());
                 break;
+
             default:
                 HPX_ASSERT(false);
                 break;
@@ -305,7 +311,7 @@ namespace hpx::util {
     HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream&, thread_description const&);
     HPX_CORE_EXPORT std::string as_string(thread_description const& desc);
-}    // namespace hpx::util
+}    // namespace hpx::threads
 
 namespace hpx::threads {
     ///////////////////////////////////////////////////////////////////////////
@@ -328,17 +334,25 @@ namespace hpx::threads {
     ///                   throw but returns the result code using the
     ///                   parameter \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    HPX_CORE_EXPORT util::thread_description get_thread_description(
+    HPX_CORE_EXPORT threads::thread_description get_thread_description(
         thread_id_type const& id, error_code& ec = throws);
-    HPX_CORE_EXPORT util::thread_description set_thread_description(
+    HPX_CORE_EXPORT threads::thread_description set_thread_description(
         thread_id_type const& id,
-        util::thread_description const& desc = util::thread_description(),
+        threads::thread_description const& desc = threads::thread_description(),
         error_code& ec = throws);
 
-    HPX_CORE_EXPORT util::thread_description get_thread_lco_description(
+    HPX_CORE_EXPORT threads::thread_description get_thread_lco_description(
         thread_id_type const& id, error_code& ec = throws);
-    HPX_CORE_EXPORT util::thread_description set_thread_lco_description(
+    HPX_CORE_EXPORT threads::thread_description set_thread_lco_description(
         thread_id_type const& id,
-        util::thread_description const& desc = util::thread_description(),
+        threads::thread_description const& desc = threads::thread_description(),
         error_code& ec = throws);
 }    // namespace hpx::threads
+
+namespace hpx::util {
+
+    using thread_description HPX_DEPRECATED_V(1, 9,
+        "hpx::util::thread_description is deprecated, use "
+        "hpx::threads::thread_description instead") =
+        hpx::threads::thread_description;
+}

@@ -77,7 +77,7 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(Policy const&, hpx::util::thread_description const& desc, F&& f,
+        call(Policy const&, hpx::threads::thread_description const& desc, F&& f,
             Ts&&... ts)
         {
             auto ann = hpx::scoped_annotation(desc.get_description());
@@ -88,7 +88,7 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(Policy const&, hpx::util::thread_description const& desc,
+        call(Policy const&, hpx::threads::thread_description const& desc,
             threads::thread_pool_base*, F&& f, Ts&&... ts)
         {
             auto ann = hpx::scoped_annotation(desc.get_description());
@@ -117,7 +117,7 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(Policy const& policy, hpx::util::thread_description const& desc,
+        call(Policy const& policy, hpx::threads::thread_description const& desc,
             F&& f, Ts&&... ts)
         {
             return call(policy,
@@ -130,7 +130,7 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(Policy const& policy, hpx::util::thread_description const& desc,
+        call(Policy const& policy, hpx::threads::thread_description const& desc,
             threads::thread_pool_base*, F&& f, Ts&&... ts)
         {
             return call(policy,
@@ -147,7 +147,7 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(Policy const& policy, hpx::util::thread_description const& desc,
+        call(Policy const& policy, hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
             HPX_ASSERT(pool);
@@ -177,7 +177,7 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(Policy const& policy, hpx::util::thread_description const& desc,
+        call(Policy const& policy, hpx::threads::thread_description const& desc,
             F&& f, Ts&&... ts)
         {
             return call(policy, desc,
@@ -191,7 +191,7 @@ namespace hpx { namespace detail {
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(Policy const& policy, F&& f, Ts&&... ts)
         {
-            hpx::util::thread_description desc(f);
+            hpx::threads::thread_description desc(f);
             return call(policy, desc,
                 threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
                 HPX_FORWARD(Ts, ts)...);
@@ -205,7 +205,7 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(Policy const& policy, hpx::util::thread_description const& desc,
+        call(Policy const& policy, hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
             HPX_ASSERT(pool);
@@ -244,7 +244,7 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(Policy const& policy, hpx::util::thread_description const& desc,
+        call(Policy const& policy, hpx::threads::thread_description const& desc,
             F&& f, Ts&&... ts)
         {
             return call(policy, desc,
@@ -258,7 +258,7 @@ namespace hpx { namespace detail {
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(Policy const& policy, F&& f, Ts&&... ts)
         {
-            hpx::util::thread_description desc(f);
+            hpx::threads::thread_description desc(f);
             return call(policy, desc,
                 threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
                 HPX_FORWARD(Ts, ts)...);
@@ -273,7 +273,7 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(launch policy, hpx::util::thread_description const& desc,
+        call(launch policy, hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
             if (policy == launch::sync)
@@ -304,7 +304,7 @@ namespace hpx { namespace detail {
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(launch policy, hpx::util::thread_description const& desc, F&& f,
+        call(launch policy, hpx::threads::thread_description const& desc, F&& f,
             Ts&&... ts)
         {
             return call(policy, desc,
@@ -318,7 +318,7 @@ namespace hpx { namespace detail {
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
         call(launch policy, F&& f, Ts&&... ts)
         {
-            hpx::util::thread_description desc(f);
+            hpx::threads::thread_description desc(f);
             return call(policy, desc,
                 threads::detail::get_self_or_default_pool(), HPX_FORWARD(F, f),
                 HPX_FORWARD(Ts, ts)...);

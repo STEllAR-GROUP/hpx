@@ -48,7 +48,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { namespace execution { namespace detail {
+namespace hpx::parallel::execution::detail {
     template <typename Policy>
     struct get_default_policy
     {
@@ -77,9 +77,9 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
     template <typename F, typename Shape, typename Future, typename... Ts>
     struct then_bulk_function_result;
-}}}}    // namespace hpx::parallel::execution::detail
+}    // namespace hpx::parallel::execution::detail
 
-namespace hpx { namespace execution {
+namespace hpx::execution {
 
     ///////////////////////////////////////////////////////////////////////////
     /// A \a parallel_executor creates groups of parallel execution agents
@@ -300,9 +300,9 @@ namespace hpx { namespace execution {
             parallel_policy_executor const& exec, F&& f, Ts&&... ts)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            hpx::util::thread_description desc(f, exec.annotation_);
+            hpx::threads::thread_description desc(f, exec.annotation_);
 #else
-            hpx::util::thread_description desc(f);
+            hpx::threads::thread_description desc(f);
 #endif
             auto pool = exec.pool_ ?
                 exec.pool_ :
@@ -345,9 +345,9 @@ namespace hpx { namespace execution {
         void post_impl(F&& f, Ts&&... ts) const
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            hpx::util::thread_description desc(f, annotation_);
+            hpx::threads::thread_description desc(f, annotation_);
 #else
-            hpx::util::thread_description desc(f);
+            hpx::threads::thread_description desc(f);
 #endif
             auto pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
@@ -375,9 +375,9 @@ namespace hpx { namespace execution {
             Ts&&... ts)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            hpx::util::thread_description desc(f, exec.annotation_);
+            hpx::threads::thread_description desc(f, exec.annotation_);
 #else
-            hpx::util::thread_description desc(f);
+            hpx::threads::thread_description desc(f);
 #endif
             auto pool = exec.pool_ ?
                 exec.pool_ :
@@ -442,7 +442,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /* version */)
+        void serialize(Archive& ar, unsigned int const /* version */)
         {
             // clang-format off
             ar & policy_ & hierarchical_threshold_ & num_cores_;
@@ -496,9 +496,9 @@ namespace hpx { namespace execution {
     }
 
     using parallel_executor = parallel_policy_executor<hpx::launch>;
-}}    // namespace hpx::execution
+}    // namespace hpx::execution
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     /// \cond NOINTERNAL
     template <typename Policy>
     struct is_one_way_executor<hpx::execution::parallel_policy_executor<Policy>>
@@ -524,4 +524,4 @@ namespace hpx { namespace parallel { namespace execution {
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

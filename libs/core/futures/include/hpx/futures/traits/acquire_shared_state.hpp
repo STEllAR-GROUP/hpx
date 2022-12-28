@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     namespace detail {
 
@@ -192,4 +192,4 @@ namespace hpx { namespace traits {
             }
         };
     }    // namespace detail
-}}       // namespace hpx::traits
+}    // namespace hpx::traits

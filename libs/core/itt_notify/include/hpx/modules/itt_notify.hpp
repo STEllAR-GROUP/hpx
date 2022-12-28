@@ -89,8 +89,8 @@ HPX_CORE_EXPORT extern bool use_ittnotify_api;
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_CORE_EXPORT void itt_sync_create(
-    void* addr, const char* objtype, const char* objname) noexcept;
-HPX_CORE_EXPORT void itt_sync_rename(void* addr, const char* name) noexcept;
+    void* addr, char const* objtype, char const* objname) noexcept;
+HPX_CORE_EXPORT void itt_sync_rename(void* addr, char const* name) noexcept;
 HPX_CORE_EXPORT void itt_sync_prepare(void* addr) noexcept;
 HPX_CORE_EXPORT void itt_sync_acquired(void* addr) noexcept;
 HPX_CORE_EXPORT void itt_sync_cancel(void* addr) noexcept;
@@ -131,7 +131,7 @@ HPX_CORE_EXPORT void itt_id_create(
 HPX_CORE_EXPORT void itt_id_destroy(___itt_id* id) noexcept;
 
 HPX_CORE_EXPORT __itt_heap_function itt_heap_function_create(
-    const char*, const char*) noexcept;
+    char const*, char const*) noexcept;
 HPX_CORE_EXPORT void itt_heap_allocate_begin(
     __itt_heap_function, std::size_t, int) noexcept;
 HPX_CORE_EXPORT void itt_heap_allocate_end(
@@ -435,7 +435,7 @@ namespace hpx::util::itt {
             if (use_ittnotify_api && id_)
             {
                 HPX_ITT_COUNTER_SET_VALUE(
-                    id_, const_cast<void*>(static_cast<const void*>(&value)));
+                    id_, const_cast<void*>(static_cast<void const*>(&value)));
             }
         }
 
@@ -507,10 +507,10 @@ namespace hpx::util::itt {
 
 #else
 
-inline constexpr void itt_sync_create(void*, const char*, const char*) noexcept
+inline constexpr void itt_sync_create(void*, char const*, char const*) noexcept
 {
 }
-inline constexpr void itt_sync_rename(void*, const char*) noexcept {}
+inline constexpr void itt_sync_rename(void*, char const*) noexcept {}
 inline constexpr void itt_sync_prepare(void*) noexcept {}
 inline constexpr void itt_sync_acquired(void*) noexcept {}
 inline constexpr void itt_sync_cancel(void*) noexcept {}
@@ -573,7 +573,7 @@ inline constexpr void itt_id_create(___itt_domain const*, ___itt_id*) noexcept
 inline constexpr void itt_id_destroy(___itt_id*) noexcept {}
 
 inline constexpr __itt_heap_function itt_heap_function_create(
-    const char*, const char*) noexcept
+    char const*, char const*) noexcept
 {
     return nullptr;
 }
@@ -644,10 +644,10 @@ inline constexpr void itt_metadata_add(
 }
 
 //////////////////////////////////////////////////////////////////////////////
-namespace hpx::util {
+namespace hpx::threads {
 
     struct thread_description;
-}    // namespace hpx::util
+}    // namespace hpx::threads
 
 namespace hpx::util::itt {
 

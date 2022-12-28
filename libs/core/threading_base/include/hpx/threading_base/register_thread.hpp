@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2018 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
@@ -23,16 +23,17 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     ///////////////////////////////////////////////////////////////////////////
-    /// \brief Create a new \a thread using the given function as the work to
-    ///        be executed.
+    /// \brief Create a new \a thread using the given function as the work to be
+    ///        executed.
     ///
-    /// \param func       [in] The function to be executed as the thread-function.
-    ///                   This function has to expose the minimal low level
-    ///                   HPX-thread interface, i.e. it takes one argument (a
-    ///                   \a threads#thread_restart_state). The thread will be
-    ///                   terminated after the function returns.
+    /// \param func       [in] The function to be executed as the
+    ///                   thread-function. This function has to expose the
+    ///                   minimal low level HPX-thread interface, i.e. it takes
+    ///                   one argument (a \a threads#thread_restart_state). The
+    ///                   thread will be terminated after the function returns.
     ///
     /// \note All other arguments are equivalent to those of the function
     ///       \a threads#register_thread_plain
@@ -51,8 +52,7 @@ namespace hpx { namespace threads {
                 f(threads::thread_restart_state::signaled);
 
                 // Verify that there are no more registered locks for this
-                // OS-thread. This will throw if there are still any locks
-                // held.
+                // OS-thread. This will throw if there are still any locks held.
                 util::force_error_on_lock();
 
                 // run and free all registered exit functions for this thread
@@ -79,8 +79,7 @@ namespace hpx { namespace threads {
                 f();
 
                 // Verify that there are no more registered locks for this
-                // OS-thread. This will throw if there are still any locks
-                // held.
+                // OS-thread. This will throw if there are still any locks held.
                 util::force_error_on_lock();
 
                 // run and free all registered exit functions for this thread
@@ -115,8 +114,8 @@ namespace hpx { namespace threads {
     /// \param data       [in] The data to use for creating the thread.
     /// \param pool       [in] The thread pool to use for launching the work.
     /// \param ec         [in,out] This represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
+    ///                   if this is pre-initialized to \a hpx#throws the
+    ///                   function will throw on error instead.
     ///
     /// \returns This function will return the internal id of the newly created
     ///          HPX-thread.
@@ -125,8 +124,8 @@ namespace hpx { namespace threads {
     ///
     /// \note             As long as \a ec is not pre-initialized to
     ///                   \a hpx#throws this function doesn't
-    ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
+    ///                   throw but returns the result code using the parameter
+    ///                   \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
     inline threads::thread_id_ref_type register_thread(
         threads::thread_init_data& data, threads::thread_pool_base* pool,
@@ -141,13 +140,13 @@ namespace hpx { namespace threads {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Create a new \a thread using the given data on the same thread
-    ///        pool as the calling thread, or on the default thread pool if
-    ///        not on an HPX thread.
+    ///        pool as the calling thread, or on the default thread pool if not
+    ///        on an HPX thread.
     ///
     /// \param data       [in] The data to use for creating the thread.
     /// \param ec         [in,out] This represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
+    ///                   if this is pre-initialized to \a hpx#throws the
+    ///                   function will throw on error instead.
     ///
     /// \returns This function will return the internal id of the newly created
     ///          HPX-thread.
@@ -155,10 +154,9 @@ namespace hpx { namespace threads {
     /// \throws invalid_status if the runtime system has not been started yet.
     ///
     /// \note             As long as \a ec is not pre-initialized to
-    ///                   \a hpx#throws this function doesn't
-    ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
-    ///                   of hpx#exception.
+    ///                   \a hpx#throws this function doesn't throw but returns
+    ///                   the result code using the parameter \a ec. Otherwise
+    ///                   it throws an instance of hpx#exception.
     inline threads::thread_id_ref_type register_thread(
         threads::thread_init_data& data, error_code& ec = throws)
     {
@@ -170,16 +168,15 @@ namespace hpx { namespace threads {
     /// \param data       [in] The data to use for creating the thread.
     /// \param pool       [in] The thread pool to use for launching the work.
     /// \param ec         [in,out] This represents the error status on exit,
-    ///                   if this is pre-initialized to \a hpx#throws
-    ///                   the function will throw on error instead.
+    ///                   if this is pre-initialized to \a hpx#throws the
+    ///                   function will throw on error instead.
     ///
     /// \throws invalid_status if the runtime system has not been started yet.
     ///
     /// \note             As long as \a ec is not pre-initialized to
-    ///                   \a hpx#throws this function doesn't
-    ///                   throw but returns the result code using the
-    ///                   parameter \a ec. Otherwise it throws an instance
-    ///                   of hpx#exception.
+    ///                   \a hpx#throws this function doesn't throw but returns
+    ///                   the result code using the parameter \a ec. Otherwise
+    ///                   it throws an instance of hpx#exception.
     inline thread_id_ref_type register_work(threads::thread_init_data& data,
         threads::thread_pool_base* pool, error_code& ec = throws)
     {
@@ -209,6 +206,6 @@ namespace hpx { namespace threads {
     {
         return register_work(data, detail::get_self_or_default_pool(), ec);
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
 
 /// \endcond

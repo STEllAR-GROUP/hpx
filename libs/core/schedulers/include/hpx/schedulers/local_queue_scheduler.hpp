@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -37,7 +37,8 @@
 // TODO: add branch prediction and function heat
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies {
+namespace hpx::threads::policies {
+
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
     using default_local_queue_scheduler_terminated_queue = lockfree_lifo;
@@ -57,17 +58,17 @@ namespace hpx { namespace threads { namespace policies {
     class HPX_CORE_EXPORT local_queue_scheduler : public scheduler_base
     {
     public:
-        typedef std::false_type has_periodic_maintenance;
+        using has_periodic_maintenance = std::false_type;
 
-        typedef thread_queue<Mutex, PendingQueuing, StagedQueuing,
-            TerminatedQueuing>
-            thread_queue_type;
+        using thread_queue_type = thread_queue<Mutex, PendingQueuing,
+            StagedQueuing, TerminatedQueuing>;
 
         struct init_parameter
         {
             init_parameter(std::size_t num_queues,
                 detail::affinity_data const& affinity_data,
-                thread_queue_init_parameters thread_queue_init = {},
+                thread_queue_init_parameters thread_queue_init =
+                    thread_queue_init_parameters{},
                 char const* description = "local_queue_scheduler")
               : num_queues_(num_queues)
               , thread_queue_init_(thread_queue_init)
@@ -91,19 +92,18 @@ namespace hpx { namespace threads { namespace policies {
             detail::affinity_data const& affinity_data_;
             char const* description_;
         };
-        typedef init_parameter init_parameter_type;
+        using init_parameter_type = init_parameter;
 
-        local_queue_scheduler(init_parameter_type const& init,
+        explicit local_queue_scheduler(init_parameter_type const& init,
             bool deferred_initialization = true)
           : scheduler_base(
                 init.num_queues_, init.description_, init.thread_queue_init_)
           , queues_(init.num_queues_)
           , curr_queue_(0)
           , affinity_data_(init.affinity_data_)
-          ,
-#if !defined(                                                                  \
-    HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only)
-          steals_in_numa_domain_()
+        // we know that the MIC has one NUMA domain only)
+#if !defined(HPX_NATIVE_MIC)
+          , steals_in_numa_domain_()
           , steals_outside_numa_domain_()
 #endif
           , numa_domain_masks_(
@@ -316,8 +316,7 @@ namespace hpx { namespace threads { namespace policies {
 
             LTM_(debug)
                 .format("local_queue_scheduler::create_thread: pool({}), "
-                        "scheduler({}), "
-                        "worker_thread({}), thread({})",
+                        "scheduler({}), worker_thread({}), thread({})",
                     *this->get_parent_pool(), *this, num_thread,
                     id ? *id : invalid_thread_id)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
@@ -326,8 +325,8 @@ namespace hpx { namespace threads { namespace policies {
                 ;
         }
 
-        /// Return the next thread to be executed, return false if none is
-        /// available
+        // Return the next thread to be executed, return false if none is
+        // available
         virtual bool get_next_thread(std::size_t num_thread, bool running,
             threads::thread_id_ref_type& thrd,
             bool /*enable_stealing*/) override
@@ -366,9 +365,9 @@ namespace hpx { namespace threads { namespace policies {
                 // the same NUMA node
                 std::size_t pu_number = affinity_data_.get_pu_num(num_thread);
 
-#if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only
-                if (test(steals_in_numa_domain_,
-                        pu_number))    //-V600 //-V111
+                // we know that the MIC has one NUMA domain only
+#if !defined(HPX_NATIVE_MIC)
+                if (test(steals_in_numa_domain_, pu_number))    //-V600 //-V111
 #endif
                 {
                     mask_cref_type this_numa_domain =
@@ -398,8 +397,8 @@ namespace hpx { namespace threads { namespace policies {
                     }
                 }
 
-#if !defined(                                                                  \
-    HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only)
+                // we know that the MIC has one NUMA domain only)
+#if !defined(HPX_NATIVE_MIC)
                 // if nothing found, ask everybody else
                 if (test(steals_outside_numa_domain_,
                         pu_number))    //-V600 //-V111
@@ -455,7 +454,7 @@ namespace hpx { namespace threads { namespace policies {
             return false;
         }
 
-        /// Schedule the passed thread
+        // Schedule the passed thread
         void schedule_thread(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint, bool allow_fallback,
             thread_priority /* priority */ = thread_priority::default_) override
@@ -534,7 +533,7 @@ namespace hpx { namespace threads { namespace policies {
             queues_[num_thread]->schedule_thread(thrd, true);
         }
 
-        /// Destroy the passed thread as it has been terminated
+        // Destroy the passed thread as it has been terminated
         void destroy_thread(threads::thread_data* thrd) override
         {
             HPX_ASSERT(thrd->get_scheduler_base() == this);
@@ -583,10 +582,12 @@ namespace hpx { namespace threads { namespace policies {
                 case thread_priority::normal:
                 case thread_priority::boost:
                 case thread_priority::high:
+                    [[fallthrough]];
                 case thread_priority::high_recursive:
                     return queues_[num_thread]->get_thread_count(state);
 
                 default:
+                    [[fallthrough]];
                 case thread_priority::unknown:
                 {
                     HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
@@ -608,6 +609,7 @@ namespace hpx { namespace threads { namespace policies {
             case thread_priority::normal:
             case thread_priority::boost:
             case thread_priority::high:
+                [[fallthrough]];
             case thread_priority::high_recursive:
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
@@ -616,6 +618,7 @@ namespace hpx { namespace threads { namespace policies {
             }
 
             default:
+                [[fallthrough]];
             case thread_priority::unknown:
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
@@ -701,10 +704,10 @@ namespace hpx { namespace threads { namespace policies {
         }
 #endif
 
-        /// This is a function which gets called periodically by the thread
-        /// manager to allow for maintenance tasks to be executed in the
-        /// scheduler. Returns true if the OS thread calling this function
-        /// has to be terminated (i.e. no more work has to be done).
+        // This is a function which gets called periodically by the thread
+        // manager to allow for maintenance tasks to be executed in the
+        // scheduler. Returns true if the OS thread calling this function has to
+        // be terminated (i.e. no more work has to be done).
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, bool /* enable_stealing */,
             std::size_t& added) override
@@ -732,13 +735,13 @@ namespace hpx { namespace threads { namespace policies {
             // limited or no stealing across domains
             if (!numa_stealing_)
             {
-                // steal work items: first try to steal from other cores in
-                // the same NUMA node
+                // steal work items: first try to steal from other cores in the
+                // same NUMA node
                 std::size_t pu_number = affinity_data_.get_pu_num(num_thread);
 
-#if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only
-                if (test(steals_in_numa_domain_,
-                        pu_number))    //-V600 //-V111
+                // we know that the MIC has one NUMA domain only
+#if !defined(HPX_NATIVE_MIC)
+                if (test(steals_in_numa_domain_, pu_number))    //-V600 //-V111
 #endif
                 {
                     mask_cref_type numa_domain_mask =
@@ -769,8 +772,8 @@ namespace hpx { namespace threads { namespace policies {
                     }
                 }
 
-#if !defined(                                                                  \
-    HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only)
+                // we know that the MIC has one NUMA domain only)
+#if !defined(HPX_NATIVE_MIC)
                 // if nothing found, ask everybody else
                 if (test(steals_outside_numa_domain_,
                         pu_number))    //-V600 //-V111
@@ -805,7 +808,6 @@ namespace hpx { namespace threads { namespace policies {
                 }
 #endif
             }
-
             else    // not NUMA-sensitive : numa stealing ok
             {
                 for (std::size_t i = 1; i != queues_size; ++i)
@@ -945,6 +947,6 @@ namespace hpx { namespace threads { namespace policies {
         std::vector<mask_type> numa_domain_masks_;
         std::vector<mask_type> outside_numa_domain_masks_;
     };
-}}}    // namespace hpx::threads::policies
+}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>

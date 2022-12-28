@@ -54,51 +54,55 @@ namespace hpx {
     ///          concurrently, from several threads.
     /// \details In detail:
     ///          - If, by the time \a call_once is called, flag indicates that
-    ///            \a f was already called, \a call_once returns right away (such
-    ///            a call to \a call_once is known as passive).
+    ///            \a f was already called, \a call_once returns right away
+    ///            (such a call to \a call_once is known as passive).
     ///          - Otherwise, \a call_once invokes \c std::forward<Callable>(f)
-    ///            with the arguments \c std::forward<Args>(args)...
-    ///            (as if by \c hpx::invoke). Unlike the \c hpx::thread constructor or
-    ///            \c hpx::async, the arguments are not moved or copied because they
-    ///            don't need to be transferred to another thread of execution.
-    ///            (such a call to \a call_once is known as active).
-    ///             - If that invocation throws an exception, it is propagated to
-    ///               the caller of \a call_once, and the flag is not flipped so that
-    ///               another call will be attempted (such a call to \a call_once is
-    ///               known as exceptional).
-    ///             - If that invocation returns normally (such a call to \a call_once
-    ///               is known as returning), the flag is flipped, and all other calls
-    ///               to \a call_once with the same flag are guaranteed to be passive.
-    ///          All active calls on the same flag form a single total order consisting
-    ///          of zero or more exceptional calls, followed by one returning call.
-    ///          The end of each active call synchronizes-with the next active call in
-    ///          that order.
-    ///          The return from the returning call synchronizes-with the returns from
-    ///          all passive calls on the same flag: this means that all concurrent calls
-    ///          to \a call_once are guaranteed to observe any side-effects made by the
+    ///            with the arguments \c std::forward<Args>(args)... (as if by
+    ///            \c hpx::invoke). Unlike the \c hpx::thread constructor or
+    ///            \c hpx::async, the arguments are not moved or copied because
+    ///            they don't need to be transferred to another thread of
+    ///            execution. (such a call to \a call_once is known as active).
+    ///             - If that invocation throws an exception, it is propagated
+    ///               to the caller of \a call_once, and the flag is not flipped
+    ///               so that another call will be attempted (such a call to \a
+    ///               call_once is known as exceptional).
+    ///             - If that invocation returns normally (such a call to \a
+    ///               call_once is known as returning), the flag is flipped, and
+    ///               all other calls to \a call_once with the same flag are
+    ///               guaranteed to be passive.
+    ///          All active calls on the same flag form a single total order
+    ///          consisting of zero or more exceptional calls, followed by one
+    ///          returning call. The end of each active call synchronizes-with
+    ///          the next active call in that order. The return from the
+    ///          returning call synchronizes-with the returns from all passive
+    ///          calls on the same flag: this means that all concurrent calls to
+    ///          \a call_once are guaranteed to observe any side-effects made by
+    ///             the
     ///          active call, with no additional synchronization.
     ///
     /// \param flag    an object, for which exactly one function gets executed
     /// \param f       Callable object to invoke
     /// \param args... arguments to pass to the function
     ///
-    /// \throws std::system_error if any condition prevents calls to \a call_once
-    ///         from executing as specified or any exception thrown by \a f
+    /// \throws std::system_error if any condition prevents calls to \a
+    ///         call_once from executing as specified or any exception thrown by
+    ///         \a f
     ///
     /// \note If concurrent calls to \a call_once pass different functions \a f,
-    ///       it is unspecified which f will be called. The selected function runs in the
-    ///       same thread as the \a call_once invocation it was passed to.
-    ///       Initialization of function-local statics is guaranteed to occur only once
-    ///       even when called from multiple threads, and may be more efficient than the
-    ///       equivalent code using \c hpx::call_once.
-    ///       The POSIX equivalent of this function is \a pthread_once.
+    ///       it is unspecified which f will be called. The selected function
+    ///       runs in the same thread as the \a call_once invocation it was
+    ///       passed to. Initialization of function-local statics is guaranteed
+    ///       to occur only once even when called from multiple threads, and may
+    ///       be more efficient than the equivalent code using \c
+    ///       hpx::call_once. The POSIX equivalent of this function is \a
+    ///       pthread_once.
     template <typename F, typename... Args>
     void call_once(once_flag& flag, F&& f, Args&&... args)
     {
         // Try for a quick win: if the procedure has already been called
         // just skip through:
-        long const function_complete_flag_value = 0xc15730e2;
-        long const running_value = 0x7f0725e3;
+        constexpr long const function_complete_flag_value = 0xc15730e2;
+        constexpr long const running_value = 0x7f0725e3;
 
         while (flag.status_.load(std::memory_order_acquire) !=
             function_complete_flag_value)

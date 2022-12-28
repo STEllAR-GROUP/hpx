@@ -17,18 +17,19 @@
 #include <utility>
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
+
     /// Event semaphores can be used for synchronizing multiple threads that
     /// need to wait for an event to occur. When the event occurs, all threads
     /// waiting for the event are woken up.
     class event
     {
     private:
-        typedef hpx::spinlock mutex_type;
+        using mutex_type = hpx::spinlock;
 
     public:
         /// \brief Construct a new event semaphore
-        event()
+        event() noexcept
           : mtx_()
           , cond_()
           , event_(false)
@@ -36,7 +37,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         /// \brief Check if the event has occurred.
-        bool occurred()
+        bool occurred() noexcept
         {
             return event_.load(std::memory_order_acquire);
         }
@@ -61,7 +62,7 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         /// \brief Reset the event
-        void reset()
+        void reset() noexcept
         {
             event_.store(false, std::memory_order_release);
         }
@@ -69,7 +70,7 @@ namespace hpx { namespace lcos { namespace local {
     private:
         void wait_locked(std::unique_lock<mutex_type>& l)
         {
-            HPX_ASSERT(l.owns_lock());
+            HPX_ASSERT_OWNS_LOCK(l);
 
             while (!event_.load(std::memory_order_acquire))
             {
@@ -79,7 +80,7 @@ namespace hpx { namespace lcos { namespace local {
 
         void set_locked(std::unique_lock<mutex_type> l)
         {
-            HPX_ASSERT(l.owns_lock());
+            HPX_ASSERT_OWNS_LOCK(l);
 
             // release the threads
             cond_.notify_all(HPX_MOVE(l));
@@ -90,4 +91,4 @@ namespace hpx { namespace lcos { namespace local {
 
         std::atomic<bool> event_;
     };
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

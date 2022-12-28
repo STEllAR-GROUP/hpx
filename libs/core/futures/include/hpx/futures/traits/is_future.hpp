@@ -13,6 +13,7 @@
 #include <type_traits>
 
 namespace hpx {
+
     template <typename R>
     class future;
 
@@ -20,8 +21,10 @@ namespace hpx {
     class shared_future;
 }    // namespace hpx
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     namespace detail {
+
         template <typename Future, typename Enable = void>
         struct is_unique_future : std::false_type
         {
@@ -84,4 +87,4 @@ namespace hpx { namespace traits {
     template <typename R>
     inline constexpr bool is_ref_wrapped_future_v =
         is_ref_wrapped_future<R>::value;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

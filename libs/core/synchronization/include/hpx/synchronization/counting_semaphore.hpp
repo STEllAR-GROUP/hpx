@@ -19,10 +19,7 @@
 #include <mutex>
 #include <utility>
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
+#include <hpx/config/warnings_prefix.hpp>
 
 #ifdef DOXYGEN
 namespace hpx {
@@ -200,57 +197,50 @@ namespace hpx {
     };
 
     ///
-    /// \brief A semaphore is a protected variable (an entity storing a
-    ///        value) or abstract data type (an entity grouping several
-    ///        variables that may or may not be numerical) which
-    ///        constitutes the classic method for restricting access to
-    ///        shared resources, such as shared memory, in a
-    ///        multiprogramming environment. Semaphores exist in many
-    ///        variants, though usually the term refers to a counting
-    ///        semaphore, since a binary semaphore is better known as a
-    ///        mutex. A counting semaphore is a counter for a set of
-    ///        available resources, rather than a locked/unlocked flag of a
-    ///        single resource. It was invented by Edsger Dijkstra.
-    ///        Semaphores are the classic solution to preventing race
-    ///        conditions in the dining philosophers problem, although they
-    ///        do not prevent resource deadlocks.
+    /// A semaphore is a protected variable (an entity storing a value) or
+    /// abstract data type (an entity grouping several variables that may or may
+    /// not be numerical) which constitutes the classic method for restricting
+    /// access to shared resources, such as shared memory, in a multiprogramming
+    /// environment. Semaphores exist in many variants, though usually the term
+    /// refers to a counting semaphore, since a binary semaphore is better known
+    /// as a mutex. A counting semaphore is a counter for a set of available
+    /// resources, rather than a locked/unlocked flag of a single resource. It
+    /// was invented by Edsger Dijkstra. Semaphores are the classic solution to
+    /// preventing race conditions in the dining philosophers problem, although
+    /// they do not prevent resource deadlocks.
     ///
-    ///        Counting semaphores can be used for synchronizing multiple
-    ///        threads as well: one thread waiting for several other
-    ///        threads to touch (signal) the semaphore, or several threads
-    ///        waiting for one other thread to touch this semaphore. Unlike
-    ///        \a hpx::mutex a \a counting_semaphore_var is not tied to threads
-    ///        of execution -- acquiring a semaphore can occur on a
-    ///        different thread than releasing the semaphore, for example.
-    ///        All operations on \a counting_semaphore_var can be performed
-    ///        concurrently and without any relation to specific threads of
-    ///        execution, with the exception of the destructor which cannot
-    ///        be performed concurrently but can be performed on a different
-    ///        thread.
+    /// Counting semaphores can be used for synchronizing multiple threads as
+    /// well: one thread waiting for several other threads to touch (signal) the
+    /// semaphore, or several threads waiting for one other thread to touch this
+    /// semaphore. Unlike
+    /// \a hpx::mutex a \a counting_semaphore_var is not tied to threads
+    /// of execution -- acquiring a semaphore can occur on a different thread
+    /// than releasing the semaphore, for example. All operations on \a
+    /// counting_semaphore_var can be performed concurrently and without any
+    /// relation to specific threads of execution, with the exception of the
+    /// destructor which cannot be performed concurrently but can be performed
+    /// on a different thread.
     ///
-    ///        Semaphores are lightweight synchronization primitives used
-    ///        to constrain concurrent access to a shared resource. They
-    ///        are widely used to implement other synchronization
-    ///        primitives and, whenever both are applicable, can be more
-    ///        efficient than condition variables.
+    /// Semaphores are lightweight synchronization primitives used to constrain
+    /// concurrent access to a shared resource. They are widely used to
+    /// implement other synchronization primitives and, whenever both are
+    /// applicable, can be more efficient than condition variables.
     ///
-    ///        A counting semaphore is a semaphore object that models a
-    ///        non-negative resource count.
+    /// A counting semaphore is a semaphore object that models a non-negative
+    /// resource count.
     ///
-    ///        Class template \a counting_semaphore_var maintains an internal
-    ///        counter that is initialized when the semaphore is created.
-    ///        The counter is decremented when a thread acquires the
-    ///        semaphore, and is incremented when a thread releases the
-    ///        semaphore. If a thread tries to acquire the semaphore when
-    ///        the counter is zero, the thread will block until another
-    ///        thread increments the counter by releasing the semaphore.
+    /// Class template \a counting_semaphore_var maintains an internal counter
+    /// that is initialized when the semaphore is created. The counter is
+    /// decremented when a thread acquires the semaphore, and is incremented
+    /// when a thread releases the semaphore. If a thread tries to acquire the
+    /// semaphore when the counter is zero, the thread will block until another
+    /// thread increments the counter by releasing the semaphore.
     ///
-    ///        Specializations of \a hpx::counting_semaphore_var are not
-    ///        \namedrequirement{DefaultConstructible},
-    ///        \namedrequirement{CopyConstructible},
-    ///        \namedrequirement{MoveConstructible},
-    ///        \namedrequirement{CopyAssignable},
-    ///        or \namedrequirement{MoveAssignable}.
+    /// Specializations of \a hpx::counting_semaphore_var are not
+    /// \namedrequirement{DefaultConstructible},
+    /// \namedrequirement{CopyConstructible},
+    /// \namedrequirement{MoveConstructible}, \namedrequirement{CopyAssignable},
+    /// or \namedrequirement{MoveAssignable}.
     ///
     /// \note \a counting_semaphore_var's \a try_acquire() can spuriously fail.
     ///
@@ -266,9 +256,8 @@ namespace hpx {
 
     public:
         ///
-        /// \brief Constructs an object of type
-        ///        \a hpx::counting_semaphore_value
-        ///        with the internal counter initialized to \a N.
+        /// Constructs an object of type \a hpx::counting_semaphore_value with
+        /// the internal counter initialized to \a N.
         ///
         /// \param value The initial value of the internal semaphore lock
         ///              count. Normally this value should be zero, values
@@ -342,6 +331,7 @@ namespace hpx {
         bool try_acquire_for(hpx::chrono::steady_duration const& rel_time);
     };
 }    // namespace hpx
+
 #else
 
 namespace hpx {
@@ -367,7 +357,7 @@ namespace hpx {
                 return LeastMaxValue;
             }
 
-            explicit counting_semaphore(std::ptrdiff_t value)
+            explicit counting_semaphore(std::ptrdiff_t value) noexcept
               : sem_(value)
             {
             }
@@ -422,7 +412,7 @@ namespace hpx {
         using mutex_type = Mutex;
 
     public:
-        explicit counting_semaphore_var(std::ptrdiff_t value = N)
+        explicit counting_semaphore_var(std::ptrdiff_t value = N) noexcept
           : detail::counting_semaphore<PTRDIFF_MAX, Mutex>(value)
         {
         }
@@ -482,6 +472,4 @@ namespace hpx::lcos::local {
 
 #endif
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
-#endif
+#include <hpx/config/warnings_suffix.hpp>

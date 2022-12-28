@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  Parts of this code were taken from the Boost.Asio library
 //  Copyright (c) 2003-2007 Christopher M. Kohlhoff (chris at kohlhoff dot com)
@@ -16,10 +16,10 @@
 #include <hpx/threading_base/callback_notifier.hpp>
 
 #include <asio/io_context.hpp>
-/* The boost asio support includes termios.h.
- * The termios.h file on ppc64le defines these macros, which
- * are also used by blaze, blaze_tensor as Template names.
- * Make sure we undefine them before continuing. */
+
+// The boost asio support includes termios.h. The termios.h file on ppc64le
+// defines these macros, which are also used by blaze, blaze_tensor as Template
+// names. Make sure we undefine them before continuing.
 #undef VT1
 #undef VT2
 
@@ -32,7 +32,8 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
+
     /// A pool of io_service objects.
     class HPX_CORE_EXPORT io_service_pool
     {
@@ -90,7 +91,7 @@ namespace hpx { namespace util {
         std::thread& get_os_thread_handle(std::size_t thread_num);
 
         /// \brief Get number of threads associated with this I/O service.
-        std::size_t size() const
+        constexpr std::size_t size() const noexcept
         {
             return pool_size_;
         }
@@ -99,7 +100,7 @@ namespace hpx { namespace util {
         void thread_run(std::size_t index, barrier* startup = nullptr);
 
         /// \brief Return name of this pool
-        char const* get_name() const
+        constexpr char const* get_name() const noexcept
         {
             return pool_name_;
         }
@@ -119,57 +120,54 @@ namespace hpx { namespace util {
 
 // FIXME: Intel compilers don't like this
 #if defined(HPX_NATIVE_MIC)
-            typedef std::unique_ptr<asio::io_context::work> work_type;
+        using work_type = std::unique_ptr<asio::io_context::work>;
 #else
-            using work_type = asio::io_context::work;
+        using work_type = asio::io_context::work;
 #endif
 
-            HPX_FORCEINLINE work_type initialize_work(
-                asio::io_context& io_service)
-            {
-                return work_type(
+        HPX_FORCEINLINE work_type initialize_work(asio::io_context& io_service)
+        {
+            return work_type(
 // FIXME: Intel compilers don't like this
 #if defined(HPX_NATIVE_MIC)
-                    new asio::io_context::work(io_service)
+                new asio::io_context::work(io_service)
 #else
-                    io_service
+                io_service
 #endif
-                );
-            }
+            );
+        }
 
-            std::mutex mtx_;
+        std::mutex mtx_;
 
-            /// The pool of io_services.
-            std::vector<io_service_ptr> io_services_;
-            std::vector<std::thread> threads_;
+        /// The pool of io_services.
+        std::vector<io_service_ptr> io_services_;
+        std::vector<std::thread> threads_;
 
-            /// The work that keeps the io_services running.
-            std::vector<work_type> work_;
+        /// The work that keeps the io_services running.
+        std::vector<work_type> work_;
 
-            /// The next io_service to use for a connection.
-            std::size_t next_io_service_;
+        /// The next io_service to use for a connection.
+        std::size_t next_io_service_;
 
-            /// set to true if stopped
-            bool stopped_;
+        /// set to true if stopped
+        bool stopped_;
 
-            /// initial number of OS threads to execute in this pool
-            std::size_t pool_size_;
+        /// initial number of OS threads to execute in this pool
+        std::size_t pool_size_;
 
-            /// call this for each thread start/stop
-            threads::policies::callback_notifier const& notifier_;
+        /// call this for each thread start/stop
+        threads::policies::callback_notifier const& notifier_;
 
-            char const* pool_name_;
-            char const* pool_name_postfix_;
+        char const* pool_name_;
+        char const* pool_name_postfix_;
 
-            /// Set to true if waiting for work to finish
-            bool waiting_;
+        /// Set to true if waiting for work to finish
+        bool waiting_;
 
-            // Barriers for waiting for work to finish on all worker threads
-            std::unique_ptr<barrier> wait_barrier_;
-            std::unique_ptr<barrier> continue_barrier_;
-        };
-
-        ///////////////////////////////////////////////////////////////////////////////
-}}    // namespace hpx::util
+        // Barriers for waiting for work to finish on all worker threads
+        std::unique_ptr<barrier> wait_barrier_;
+        std::unique_ptr<barrier> continue_barrier_;
+    };
+}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>

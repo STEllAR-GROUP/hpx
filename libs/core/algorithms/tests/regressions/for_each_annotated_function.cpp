@@ -25,7 +25,7 @@ int hpx_main()
     hpx::ranges::for_each(hpx::execution::par, c,
         hpx::annotated_function(
             [](int) -> void {
-                hpx::util::thread_description desc(
+                hpx::threads::thread_description desc(
                     hpx::threads::get_thread_description(
                         hpx::threads::get_self_id()));
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)

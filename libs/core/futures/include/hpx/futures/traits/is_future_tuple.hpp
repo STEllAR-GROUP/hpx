@@ -12,7 +12,8 @@
 
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     template <typename Tuple, typename Enable = void>
     struct is_future_tuple : std::false_type
     {
@@ -25,4 +26,4 @@ namespace hpx { namespace traits {
 
     template <typename... Ts>
     inline constexpr bool is_future_tuple_v = is_future_tuple<Ts...>::value;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

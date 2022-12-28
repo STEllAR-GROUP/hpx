@@ -166,7 +166,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
     };
     auto const thread_func =
         hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
-    auto desc = hpx::util::thread_description();
+    auto desc = hpx::threads::thread_description();
     auto prio = hpx::threads::thread_priority::normal;
     auto stack_size = hpx::threads::thread_stacksize::small_;
     auto num_threads = hpx::get_num_worker_threads();

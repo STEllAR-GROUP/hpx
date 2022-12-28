@@ -22,7 +22,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
+
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
@@ -89,8 +90,8 @@ namespace hpx { namespace util {
         {
             using base_type = hpx::local::detail::option_parser;
 
-            option_parser(
-                util::section const& ini, std::size_t node, bool ignore_aliases)
+            option_parser(util::section const& ini, std::size_t node,
+                bool ignore_aliases) noexcept
               : base_type(ini, ignore_aliases)
               , node_(node)
             {
@@ -194,7 +195,7 @@ namespace hpx { namespace util {
             }
         }
 
-        // handle all --options-config found on the command line
+        // handle all --options-file found on the command line
         void handle_config_options(hpx::program_options::variables_map& vm,
             hpx::program_options::options_description const& desc_cfgfile,
             util::section const& ini, std::size_t node,
@@ -250,6 +251,7 @@ namespace hpx { namespace util {
 #if defined(HPX_HAVE_NETWORKING)
             case runtime_mode::worker:
             case runtime_mode::console:
+                [[fallthrough]];
             case runtime_mode::connect:
                 // If the runtime for this application is always run in worker
                 // mode, silently ignore the worker option for hpx_pbs
@@ -277,6 +279,7 @@ namespace hpx { namespace util {
                 break;
 
             case runtime_mode::invalid:
+                [[fallthrough]];
             default:
                 throw hpx::detail::command_line_error(
                     "Invalid runtime mode specified");
@@ -438,8 +441,8 @@ namespace hpx { namespace util {
 
         try
         {
-            // construct the overall options description and parse the
-            // command line
+            // construct the overall options description and parse the command
+            // line
             hpx::local::detail::options_map all_options =
                 detail::compose_all_options(mode);
 
@@ -485,6 +488,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         std::string extract_arg0(std::string const& cmdline)
         {
             std::string::size_type p = cmdline.find_first_of(" \t");
@@ -514,4 +518,4 @@ namespace hpx { namespace util {
             detail::extract_arg0(cmdline), args, vm, node, error_mode, mode,
             visible, unregistered_options);
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

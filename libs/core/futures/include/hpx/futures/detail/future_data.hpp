@@ -41,6 +41,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     enum class future_status
     {
         ready,
@@ -50,6 +51,7 @@ namespace hpx {
     };
 
     namespace lcos {
+
         enum class HPX_DEPRECATED_V(1, 8,
             "hpx::lcos::future_status is deprecated. Use "
             "hpx::future_status instead.") future_status
@@ -63,7 +65,7 @@ namespace hpx {
 }    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx::lcos::detail {
 
     using run_on_completed_error_handler_type =
         hpx::function<void(std::exception_ptr const& e)>;
@@ -95,8 +97,6 @@ namespace hpx { namespace lcos { namespace detail {
         using completed_callback_vector_type =
             hpx::detail::small_vector<completed_callback_type, 1>;
 
-        using has_future_data_refcnt_base = void;
-
         virtual ~future_data_refcnt_base();
 
         virtual void set_on_completed(completed_callback_type) = 0;
@@ -118,11 +118,11 @@ namespace hpx { namespace lcos { namespace detail {
         };
 
     protected:
-        future_data_refcnt_base() noexcept
+        constexpr future_data_refcnt_base() noexcept
           : count_(0)
         {
         }
-        explicit future_data_refcnt_base(init_no_addref) noexcept
+        constexpr explicit future_data_refcnt_base(init_no_addref) noexcept
           : count_(1)
         {
         }
@@ -342,10 +342,6 @@ namespace hpx { namespace lcos { namespace detail {
         local::detail::condition_variable cond_;    // threads waiting in read
     };
 
-    struct in_place
-    {
-    };
-
     template <typename Result>
     struct future_data_base : future_data_base<traits::detail::future_data_void>
     {
@@ -384,7 +380,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         template <typename... Ts>
-        future_data_base(init_no_addref no_addref, in_place, Ts&&... ts)
+        future_data_base(init_no_addref no_addref, std::in_place_t, Ts&&... ts)
           : base_type(no_addref)
         {
             result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
@@ -392,15 +388,8 @@ namespace hpx { namespace lcos { namespace detail {
             state_.store(value, std::memory_order_relaxed);
         }
 
-        future_data_base(init_no_addref no_addref, std::exception_ptr const& e)
-          : base_type(no_addref)
-        {
-            std::exception_ptr* exception_ptr =
-                reinterpret_cast<std::exception_ptr*>(&storage_);
-            hpx::construct_at(exception_ptr, e);
-            state_.store(exception, std::memory_order_relaxed);
-        }
-        future_data_base(init_no_addref no_addref, std::exception_ptr&& e)
+        future_data_base(
+            init_no_addref no_addref, std::exception_ptr e) noexcept
           : base_type(no_addref)
         {
             std::exception_ptr* exception_ptr =
@@ -667,17 +656,14 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         template <typename... Ts>
-        future_data(init_no_addref no_addref, in_place in_place, Ts&&... ts)
+        future_data(
+            init_no_addref no_addref, std::in_place_t in_place, Ts&&... ts)
           : future_data_base<Result>(
                 no_addref, in_place, HPX_FORWARD(Ts, ts)...)
         {
         }
 
-        future_data(init_no_addref no_addref, std::exception_ptr const& e)
-          : future_data_base<Result>(no_addref, e)
-        {
-        }
-        future_data(init_no_addref no_addref, std::exception_ptr&& e)
+        future_data(init_no_addref no_addref, std::exception_ptr e) noexcept
           : future_data_base<Result>(no_addref, HPX_MOVE(e))
         {
         }
@@ -711,26 +697,22 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         template <typename... T>
-        future_data_allocator(init_no_addref no_addref, in_place in_place,
-            other_allocator const& alloc, T&&... ts)
+        future_data_allocator(init_no_addref no_addref,
+            std::in_place_t in_place, other_allocator const& alloc, T&&... ts)
           : future_data<Result>(no_addref, in_place, HPX_FORWARD(T, ts)...)
           , alloc_(alloc)
         {
         }
 
-        future_data_allocator(init_no_addref no_addref,
-            std::exception_ptr const& e, other_allocator const& alloc)
-          : future_data<Result>(no_addref, e)
-          , alloc_(alloc)
-        {
-        }
-
-        future_data_allocator(init_no_addref no_addref, std::exception_ptr&& e,
-            other_allocator const& alloc)
+        // clang-format off
+        future_data_allocator(init_no_addref no_addref, std::exception_ptr e,
+            other_allocator const& alloc) noexcept(noexcept(
+                std::is_nothrow_copy_constructible_v<other_allocator>))
           : future_data<Result>(no_addref, HPX_MOVE(e))
           , alloc_(alloc)
         {
         }
+        // clang-format on
 
     protected:
         void destroy() noexcept override
@@ -910,7 +892,7 @@ namespace hpx { namespace lcos { namespace detail {
 
         // run in a separate thread
         virtual threads::thread_id_ref_type post(
-            threads::thread_pool_base* /*pool*/, const char* /*annotation*/,
+            threads::thread_pool_base* /*pool*/, char const* /*annotation*/,
             launch /*policy*/, error_code& /*ec*/)
         {
             HPX_ASSERT(false);    // shouldn't ever be called
@@ -966,7 +948,7 @@ namespace hpx { namespace lcos { namespace detail {
         void set_thread_id(threads::thread_id_type id) noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
-            id_ = id;
+            id_ = HPX_MOVE(id);
         }
 
     public:
@@ -984,7 +966,7 @@ namespace hpx { namespace lcos { namespace detail {
     private:
         struct reset_id
         {
-            reset_id(cancelable_task_base& target)
+            explicit reset_id(cancelable_task_base& target)
               : target_(target)
             {
                 target.set_thread_id(threads::get_self_id());
@@ -1056,15 +1038,15 @@ namespace hpx { namespace lcos { namespace detail {
     protected:
         threads::thread_id_type id_;
     };
-}}}    // namespace hpx::lcos::detail
+}    // namespace hpx::lcos::detail
 
-namespace hpx { namespace traits { namespace detail {
+namespace hpx::traits::detail {
 
     template <typename R, typename Allocator>
     struct shared_state_allocator<lcos::detail::future_data<R>, Allocator>
     {
         using type = lcos::detail::future_data_allocator<R, Allocator>;
     };
-}}}    // namespace hpx::traits::detail
+}    // namespace hpx::traits::detail
 
 #include <hpx/config/warnings_suffix.hpp>

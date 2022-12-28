@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2016 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -22,8 +22,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     namespace detail {
+
         template <typename T, typename Enable = void>
         struct acquire_future_impl;
     }
@@ -47,6 +49,7 @@ namespace hpx { namespace traits {
     };
 
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable>
         struct acquire_future_impl
@@ -113,22 +116,19 @@ namespace hpx { namespace traits {
             using type = Range;
 
             template <typename Range_>
-            std::enable_if_t<has_push_back_v<std::decay_t<Range_>>>
-            transform_future_disp(Range_&& futures, Range& values) const
+            void transform_future_disp(Range_&& futures, Range& values) const
             {
                 detail::reserve_if_random_access_by_range(values, futures);
-                std::transform(util::begin(futures), util::end(futures),
-                    std::back_inserter(values), acquire_future_disp());
-            }
-
-            template <typename Range_>
-            typename std::enable_if<
-                !has_push_back<typename std::decay<Range_>::type>::value>::type
-            transform_future_disp(Range_&& futures, Range& values) const
-            {
-                detail::reserve_if_random_access_by_range(values, futures);
-                std::transform(util::begin(futures), util::end(futures),
-                    util::begin(values), acquire_future_disp());
+                if constexpr (has_push_back_v<std::decay_t<Range_>>)
+                {
+                    std::transform(util::begin(futures), util::end(futures),
+                        std::back_inserter(values), acquire_future_disp());
+                }
+                else
+                {
+                    std::transform(util::begin(futures), util::end(futures),
+                        util::begin(values), acquire_future_disp());
+                }
             }
 
             template <typename Range_>
@@ -140,4 +140,4 @@ namespace hpx { namespace traits {
             }
         };
     }    // namespace detail
-}}       // namespace hpx::traits
+}    // namespace hpx::traits

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@
 
 #include <atomic>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
 
     /// Set a timer to set the state of the given \a thread to the given
     /// new value after it expired (at the given time)
@@ -66,4 +66,4 @@ namespace hpx { namespace threads { namespace detail {
             thread_priority::normal, thread_schedule_hint(), started,
             retry_on_active, ec);
     }
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail

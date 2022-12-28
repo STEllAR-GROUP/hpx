@@ -372,7 +372,7 @@ namespace hpx { namespace execution { namespace experimental {
                                 threads::thread_schedule_hint{
                                     static_cast<std::int16_t>(t)});
 
-                        hpx::util::thread_description desc(
+                        hpx::threads::thread_description desc(
                             generate_annotation(pu_num, "fork_join_executor"));
                         hpx::detail::async_launch_policy_dispatch<
                             launch::async_policy>::call(policy, desc, pool_,

@@ -7,7 +7,7 @@
 <!-- or copy at http://www.boost.org/LICENSE_1_0.txt)                       -->
 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-    <Type Name="hpx::util::thread_description">
+    <Type Name="hpx::threads::thread_description">
         <DisplayString Condition="type_ == 0">[desc] {data_.desc_,s}</DisplayString>
         <DisplayString Condition="type_ == 1">[addr] {(void*)data_.addr_,na}</DisplayString>
     </Type>

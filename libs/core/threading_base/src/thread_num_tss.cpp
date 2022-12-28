@@ -13,8 +13,10 @@
 #include <tuple>
 #include <utility>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
+
     namespace {
+
         thread_nums& thread_nums_tss()
         {
             static thread_local thread_nums thread_nums_tss_ = {
@@ -65,10 +67,10 @@ namespace hpx { namespace threads { namespace detail {
     {
         return thread_nums_tss();
     }
-
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail
 
 namespace hpx {
+
     std::size_t get_worker_thread_num(error_code& /* ec */)
     {
         return threads::detail::thread_nums_tss().global_thread_num;

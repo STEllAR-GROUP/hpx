@@ -12,7 +12,8 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
+
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
     using network_background_callback_type =
@@ -20,4 +21,4 @@ namespace hpx { namespace threads { namespace detail {
 #else
     using network_background_callback_type = hpx::function<bool(std::size_t)>;
 #endif
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail

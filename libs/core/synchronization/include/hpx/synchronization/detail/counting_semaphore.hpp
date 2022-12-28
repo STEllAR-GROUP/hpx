@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,15 +21,16 @@
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local { namespace detail {
+namespace hpx::lcos::local::detail {
 
     class counting_semaphore
     {
     private:
-        typedef hpx::spinlock mutex_type;
+        using mutex_type = hpx::spinlock;
 
     public:
-        HPX_CORE_EXPORT counting_semaphore(std::ptrdiff_t value = 0);
+        HPX_CORE_EXPORT explicit counting_semaphore(
+            std::ptrdiff_t value = 0) noexcept;
         HPX_CORE_EXPORT ~counting_semaphore();
 
         HPX_CORE_EXPORT void wait(
@@ -54,7 +55,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         std::ptrdiff_t value_;
         local::detail::condition_variable cond_;
     };
-}}}}    // namespace hpx::lcos::local::detail
+}    // namespace hpx::lcos::local::detail
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)

@@ -91,8 +91,10 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
+
     namespace detail {
+
         struct debug_object
         {
 #ifdef HPX_DEBUG
@@ -100,7 +102,7 @@ namespace hpx { namespace lcos { namespace local {
 
             int magic;
 
-            debug_object()
+            constexpr debug_object() noexcept
               : magic(debug_magic)
             {
             }
@@ -111,42 +113,44 @@ namespace hpx { namespace lcos { namespace local {
                 magic = ~debug_magic;
             }
 
-            void check_()
+            void check_() noexcept
             {
                 HPX_ASSERT(magic != ~debug_magic);
                 HPX_ASSERT(magic == debug_magic);
             }
 #else
-            void check_() {}
+            constexpr void check_() noexcept {}
 #endif
         };
 
         struct guard_task;
 
-        typedef std::atomic<guard_task*> guard_atomic;
-
         HPX_CORE_EXPORT void free(guard_task* task);
 
-        typedef hpx::move_only_function<void()> guard_function;
+        using guard_function = hpx::move_only_function<void()>;
     }    // namespace detail
 
     class guard : public detail::debug_object
     {
     public:
-        detail::guard_atomic task;
+        using guard_atomic = std::atomic<detail::guard_task*>;
 
-        guard()
+        guard_atomic task;
+
+        constexpr guard() noexcept
           : task(nullptr)
         {
         }
+
         HPX_CORE_EXPORT ~guard();
     };
 
     class guard_set : public detail::debug_object
     {
         std::vector<std::shared_ptr<guard>> guards;
-        // the guards need to be sorted, but we don't
-        // want to sort them more often than necessary
+
+        // the guards need to be sorted, but we don't want to sort them more
+        // often than necessary
         bool sorted;
 
         void sort();
@@ -157,21 +161,22 @@ namespace hpx { namespace lcos { namespace local {
           , sorted(true)
         {
         }
-        ~guard_set() {}
 
-        std::shared_ptr<guard> get(std::size_t i)
+        ~guard_set() = default;
+
+        std::shared_ptr<guard> get(std::size_t i) const
         {
             return guards[i];
         }
 
-        void add(std::shared_ptr<guard> const& guard_ptr)
+        void add(std::shared_ptr<guard> guard_ptr)
         {
             HPX_ASSERT(guard_ptr.get() != nullptr);
-            guards.push_back(guard_ptr);
+            guards.push_back(HPX_MOVE(guard_ptr));
             sorted = false;
         }
 
-        std::size_t size()
+        std::size_t size() const noexcept
         {
             return guards.size();
         }
@@ -192,8 +197,9 @@ namespace hpx { namespace lcos { namespace local {
                 HPX_FORWARD(F, f), HPX_FORWARD(Args, args)...)));
     }
 
-    /// Conceptually, a guard_set acts like a set of mutexes on an asynchronous task.
-    /// The mutexes are locked before the task runs, and unlocked afterwards.
+    /// Conceptually, a guard_set acts like a set of mutexes on an asynchronous
+    /// task. The mutexes are locked before the task runs, and unlocked
+    /// afterwards.
     HPX_CORE_EXPORT void run_guarded(
         guard_set& guards, detail::guard_function task);
 
@@ -204,4 +210,4 @@ namespace hpx { namespace lcos { namespace local {
             detail::guard_function(util::deferred_call(
                 HPX_FORWARD(F, f), HPX_FORWARD(Args, args)...)));
     }
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

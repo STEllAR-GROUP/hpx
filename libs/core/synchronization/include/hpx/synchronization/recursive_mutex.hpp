@@ -25,8 +25,8 @@ namespace hpx {
 
     namespace detail {
 
-        /// An exclusive-ownership recursive mutex which implements Boost.Thread's
-        /// TimedLockable concept.
+        /// An exclusive-ownership recursive mutex which implements
+        /// Boost.Thread's TimedLockable concept.
         template <typename Mutex = hpx::spinlock>
         struct recursive_mutex_impl
         {
@@ -39,12 +39,15 @@ namespace hpx {
             Mutex mtx;
 
         public:
-            recursive_mutex_impl(
-                char const* const desc = "recursive_mutex_impl")
+            // clang-format off
+            recursive_mutex_impl(char const* desc = "recursive_mutex_impl")
+                noexcept(noexcept(
+                    std::is_nothrow_constructible_v<Mutex, char const*>))
               : recursion_count(0)
               , mtx(desc)
             {
             }
+            // clang-format on
 
             /// Attempts to acquire ownership of the \a recursive_mutex.
             /// Never blocks.

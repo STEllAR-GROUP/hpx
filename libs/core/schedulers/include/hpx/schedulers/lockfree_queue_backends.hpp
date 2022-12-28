@@ -24,9 +24,10 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 #include <utility>
 
-namespace hpx { namespace threads { namespace policies {
+namespace hpx::threads::policies {
 
     struct lockfree_fifo;
 
@@ -49,7 +50,7 @@ namespace hpx { namespace threads { namespace policies {
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
-        lockfree_fifo_backend(size_type initial_size = 0,
+        explicit lockfree_fifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = size_type(-1))
           : queue_(std::size_t(initial_size))
         {
@@ -73,7 +74,7 @@ namespace hpx { namespace threads { namespace policies {
 #endif
         }
 
-        bool pop(reference val, bool /* steal */ = true)
+        bool pop(reference val, bool /* steal */ = true) noexcept
         {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
             return queue_.pop_right(val);
@@ -82,7 +83,7 @@ namespace hpx { namespace threads { namespace policies {
 #endif
         }
 
-        bool empty()
+        bool empty() noexcept
         {
             return queue_.empty();
         }
@@ -113,7 +114,7 @@ namespace hpx { namespace threads { namespace policies {
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
-        moodycamel_fifo_backend(size_type initial_size = 0,
+        explicit moodycamel_fifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = size_type(-1))
           : queue_(std::size_t(initial_size))
         {
@@ -129,12 +130,13 @@ namespace hpx { namespace threads { namespace policies {
             return queue_.enqueue(HPX_MOVE(val));
         }
 
-        bool pop(reference val, bool /* steal */ = true)
+        bool pop(reference val, bool /* steal */ = true) noexcept(
+            noexcept(std::is_nothrow_copy_constructible_v<T>))
         {
             return queue_.try_dequeue(val);
         }
 
-        bool empty()
+        bool empty() noexcept
         {
             return (queue_.size_approx() == 0);
         }
@@ -168,7 +170,7 @@ namespace hpx { namespace threads { namespace policies {
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
-        lockfree_lifo_backend(size_type initial_size = 0,
+        explicit lockfree_lifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = size_type(-1))
           : queue_(std::size_t(initial_size))
         {
@@ -188,12 +190,12 @@ namespace hpx { namespace threads { namespace policies {
             return queue_.push_left(HPX_MOVE(val));
         }
 
-        bool pop(reference val, bool /* steal */ = true)
+        bool pop(reference val, bool /* steal */ = true) noexcept
         {
             return queue_.pop_left(val);
         }
 
-        bool empty()
+        bool empty() noexcept
         {
             return queue_.empty();
         }
@@ -228,7 +230,7 @@ namespace hpx { namespace threads { namespace policies {
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
-        lockfree_abp_fifo_backend(size_type initial_size = 0,
+        explicit lockfree_abp_fifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = size_type(-1))
           : queue_(std::size_t(initial_size))
         {
@@ -244,14 +246,14 @@ namespace hpx { namespace threads { namespace policies {
             return queue_.push_left(HPX_MOVE(val));
         }
 
-        bool pop(reference val, bool steal = true)
+        bool pop(reference val, bool steal = true) noexcept
         {
             if (steal)
                 return queue_.pop_left(val);
             return queue_.pop_right(val);
         }
 
-        bool empty()
+        bool empty() noexcept
         {
             return queue_.empty();
         }
@@ -285,7 +287,7 @@ namespace hpx { namespace threads { namespace policies {
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
-        lockfree_abp_lifo_backend(size_type initial_size = 0,
+        explicit lockfree_abp_lifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = size_type(-1))
           : queue_(std::size_t(initial_size))
         {
@@ -305,14 +307,14 @@ namespace hpx { namespace threads { namespace policies {
             return queue_.push_left(val);
         }
 
-        bool pop(reference val, bool steal = true)
+        bool pop(reference val, bool steal = true) noexcept
         {
             if (steal)
                 return queue_.pop_right(val);
             return queue_.pop_left(val);
         }
 
-        bool empty()
+        bool empty() noexcept
         {
             return queue_.empty();
         }
@@ -331,5 +333,4 @@ namespace hpx { namespace threads { namespace policies {
     };
 
 #endif    // HPX_HAVE_CXX11_STD_ATOMIC_128BIT
-
-}}}    // namespace hpx::threads::policies
+}    // namespace hpx::threads::policies

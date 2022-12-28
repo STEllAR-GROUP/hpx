@@ -14,6 +14,7 @@
 #include <utility>
 
 namespace hpx::detail {
+
     char const* store_function_annotation(std::string name)
     {
         static thread_local std::unordered_set<std::string> names;
@@ -29,6 +30,7 @@ namespace hpx::detail {
 #include <string>
 
 namespace hpx::detail {
+
     char const* store_function_annotation(std::string)
     {
         return "<unknown>";

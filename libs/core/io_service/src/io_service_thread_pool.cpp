@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,8 @@
 #include <cstddef>
 #include <exception>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
+
     io_service_thread_pool::io_service_thread_pool(
         hpx::threads::thread_pool_init_parameters const& init)
       : thread_pool_base(init)
@@ -129,4 +130,4 @@ namespace hpx { namespace threads { namespace detail {
     {
         return threads_.size();
     }
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail

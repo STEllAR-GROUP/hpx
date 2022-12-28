@@ -7,6 +7,7 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(thread_pools_headers
+    hpx/thread_pools/detail/scheduling_log.hpp
     hpx/thread_pools/detail/scoped_background_timer.hpp
     hpx/thread_pools/scheduled_thread_pool.hpp
     hpx/thread_pools/scheduled_thread_pool_impl.hpp
@@ -20,7 +21,7 @@ set(thread_pools_compat_headers
 )
 # cmake-format: on
 
-set(thread_pools_sources scheduled_thread_pool.cpp)
+set(thread_pools_sources detail/scheduling_log.cpp scheduled_thread_pool.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(

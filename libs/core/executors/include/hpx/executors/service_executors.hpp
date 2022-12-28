@@ -33,7 +33,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { namespace execution { namespace detail {
+namespace hpx::parallel::execution::detail {
 
     class service_executor
     {
@@ -213,4 +213,4 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         hpx::util::io_service_pool* pool_;
 #endif
     };
-}}}}    // namespace hpx::parallel::execution::detail
+}    // namespace hpx::parallel::execution::detail

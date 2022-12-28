@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -37,12 +37,15 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies {
+namespace hpx::threads::policies {
+
     namespace detail {
+
         enum class polling_status
         {
             /// Signals that a polling function currently has no more work to do
             idle = 0,
+
             /// Signals that a polling function still has outstanding work to
             /// poll for
             busy = 1
@@ -58,21 +61,22 @@ namespace hpx { namespace threads { namespace policies {
         HPX_NON_COPYABLE(scheduler_base);
 
     public:
-        typedef std::mutex pu_mutex_type;
+        using pu_mutex_type = std::mutex;
 
         scheduler_base(std::size_t num_threads, char const* description = "",
-            thread_queue_init_parameters thread_queue_init = {},
+            thread_queue_init_parameters thread_queue_init =
+                thread_queue_init_parameters{},
             scheduler_mode mode = scheduler_mode::nothing_special);
 
         virtual ~scheduler_base() = default;
 
-        threads::thread_pool_base* get_parent_pool() const
+        threads::thread_pool_base* get_parent_pool() const noexcept
         {
             HPX_ASSERT(parent_pool_ != nullptr);
             return parent_pool_;
         }
 
-        void set_parent_pool(threads::thread_pool_base* p)
+        void set_parent_pool(threads::thread_pool_base* p) noexcept
         {
             HPX_ASSERT(parent_pool_ == nullptr);
             parent_pool_ = p;
@@ -88,7 +92,7 @@ namespace hpx { namespace threads { namespace policies {
             return n + parent_pool_->get_thread_offset();
         }
 
-        char const* get_description() const
+        char const* get_description() const noexcept
         {
             return description_;
         }
@@ -119,13 +123,13 @@ namespace hpx { namespace threads { namespace policies {
 
         ///////////////////////////////////////////////////////////////////////
         // get/set scheduler mode
-        scheduler_mode get_scheduler_mode() const
+        scheduler_mode get_scheduler_mode() const noexcept
         {
             return mode_.data_.load(std::memory_order_relaxed);
         }
 
         // get/set scheduler mode
-        bool has_scheduler_mode(scheduler_mode mode) const
+        bool has_scheduler_mode(scheduler_mode mode) const noexcept
         {
             return (mode_.data_.load(std::memory_order_relaxed) & mode) != 0;
         }
@@ -150,7 +154,7 @@ namespace hpx { namespace threads { namespace policies {
         // conditionally add or remove depending on set true/false
         void update_scheduler_mode(scheduler_mode mode, bool set);
 
-        pu_mutex_type& get_pu_mutex(std::size_t num_thread)
+        pu_mutex_type& get_pu_mutex(std::size_t num_thread) noexcept
         {
             HPX_ASSERT(num_thread < pu_mtxs_.size());
             return pu_mtxs_[num_thread];
@@ -166,7 +170,7 @@ namespace hpx { namespace threads { namespace policies {
         // either threads in same domain, or not in same domain
         // depending on the predicate
         std::vector<std::size_t> domain_threads(std::size_t local_id,
-            const std::vector<std::size_t>& ts,
+            std::vector<std::size_t> const& ts,
             hpx::function<bool(std::size_t, std::size_t)> pred);
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
@@ -203,9 +207,9 @@ namespace hpx { namespace threads { namespace policies {
         virtual bool is_core_idle(std::size_t num_thread) const = 0;
 
         // count active background threads
-        std::int64_t get_background_thread_count();
-        void increment_background_thread_count();
-        void decrement_background_thread_count();
+        std::int64_t get_background_thread_count() const noexcept;
+        void increment_background_thread_count() noexcept;
+        void decrement_background_thread_count() noexcept;
 
         // Enumerate all matching threads
         virtual bool enumerate_threads(
@@ -255,7 +259,8 @@ namespace hpx { namespace threads { namespace policies {
 
         virtual void reset_thread_distribution() {}
 
-        std::ptrdiff_t get_stack_size(threads::thread_stacksize stacksize) const
+        std::ptrdiff_t get_stack_size(
+            threads::thread_stacksize stacksize) const noexcept
         {
             if (stacksize == thread_stacksize::current)
             {
@@ -293,81 +298,24 @@ namespace hpx { namespace threads { namespace policies {
         using polling_function_ptr = detail::polling_status (*)();
         using polling_work_count_function_ptr = std::size_t (*)();
 
-        static detail::polling_status null_polling_function()
+        static constexpr detail::polling_status null_polling_function() noexcept
         {
             return detail::polling_status::idle;
         }
 
-        static std::size_t null_polling_work_count_function()
+        static constexpr std::size_t null_polling_work_count_function() noexcept
         {
             return 0;
         }
 
         void set_mpi_polling_functions(polling_function_ptr mpi_func,
-            polling_work_count_function_ptr mpi_work_count_func)
-        {
-            polling_function_mpi_.store(mpi_func, std::memory_order_relaxed);
-            polling_work_count_function_mpi_.store(
-                mpi_work_count_func, std::memory_order_relaxed);
-        }
-
-        void clear_mpi_polling_function()
-        {
-            polling_function_mpi_.store(
-                &null_polling_function, std::memory_order_relaxed);
-            polling_work_count_function_mpi_.store(
-                &null_polling_work_count_function, std::memory_order_relaxed);
-        }
-
+            polling_work_count_function_ptr mpi_work_count_func);
+        void clear_mpi_polling_function();
         void set_cuda_polling_functions(polling_function_ptr cuda_func,
-            polling_work_count_function_ptr cuda_work_count_func)
-        {
-            polling_function_cuda_.store(cuda_func, std::memory_order_relaxed);
-            polling_work_count_function_cuda_.store(
-                cuda_work_count_func, std::memory_order_relaxed);
-        }
-
-        void clear_cuda_polling_function()
-        {
-            polling_function_cuda_.store(
-                &null_polling_function, std::memory_order_relaxed);
-            polling_work_count_function_cuda_.store(
-                &null_polling_work_count_function, std::memory_order_relaxed);
-        }
-
-        detail::polling_status custom_polling_function() const
-        {
-            detail::polling_status status = detail::polling_status::idle;
-#if defined(HPX_HAVE_MODULE_ASYNC_MPI)
-            if ((*polling_function_mpi_.load(std::memory_order_relaxed))() ==
-                detail::polling_status::busy)
-            {
-                status = detail::polling_status::busy;
-            }
-#endif
-#if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
-            if ((*polling_function_cuda_.load(std::memory_order_relaxed))() ==
-                detail::polling_status::busy)
-            {
-                status = detail::polling_status::busy;
-            }
-#endif
-            return status;
-        }
-
-        std::size_t get_polling_work_count() const
-        {
-            std::size_t work_count = 0;
-#if defined(HPX_HAVE_MODULE_ASYNC_MPI)
-            work_count += polling_work_count_function_mpi_.load(
-                std::memory_order_relaxed)();
-#endif
-#if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
-            work_count += polling_work_count_function_cuda_.load(
-                std::memory_order_relaxed)();
-#endif
-            return work_count;
-        }
+            polling_work_count_function_ptr cuda_work_count_func);
+        void clear_cuda_polling_function();
+        detail::polling_status custom_polling_function() const;
+        std::size_t get_polling_work_count() const;
 
     protected:
         // the scheduler mode, protected from false sharing
@@ -430,6 +378,6 @@ namespace hpx { namespace threads { namespace policies {
 
     HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, scheduler_base const& scheduler);
-}}}    // namespace hpx::threads::policies
+}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>

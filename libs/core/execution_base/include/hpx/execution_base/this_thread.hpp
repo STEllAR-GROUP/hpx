@@ -147,13 +147,33 @@ namespace hpx::util {
         }
     }    // namespace detail
 
+    template <bool AllowTimedSuspension, typename Predicate>
+    void yield_while(Predicate&& predicate, char const* thread_name = nullptr)
+    {
+        for (std::size_t k = 0; predicate(); ++k)
+        {
+            if constexpr (AllowTimedSuspension)
+            {
+                detail::yield_k(k, thread_name);
+            }
+            else
+            {
+                detail::yield_k(k % 16, thread_name);
+            }
+        }
+    }
+
     template <typename Predicate>
     void yield_while(Predicate&& predicate, char const* thread_name = nullptr,
         bool allow_timed_suspension = true)
     {
-        for (std::size_t k = 0; predicate(); ++k)
+        if (allow_timed_suspension)
         {
-            detail::yield_k(allow_timed_suspension ? k : k % 16, thread_name);
+            yield_while<true>(HPX_FORWARD(Predicate, predicate), thread_name);
+        }
+        else
+        {
+            yield_while<false>(HPX_FORWARD(Predicate, predicate), thread_name);
         }
     }
 

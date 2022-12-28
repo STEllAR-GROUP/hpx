@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,19 +14,21 @@
 
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
+
     ///////////////////////////////////////////////////////////////////////////
     struct conditional_trigger
     {
     public:
         conditional_trigger() = default;
 
-        conditional_trigger(conditional_trigger&& rhs) noexcept = default;
+        conditional_trigger(conditional_trigger const& rhs) = delete;
+        conditional_trigger& operator=(conditional_trigger const& rhs) = delete;
 
-        conditional_trigger& operator=(
-            conditional_trigger&& rhs) noexcept = default;
+        conditional_trigger(conditional_trigger&& rhs) = default;
+        conditional_trigger& operator=(conditional_trigger&& rhs) = default;
 
-        /// \brief get a future allowing to wait for the trigger to fire
+        /// Get a future allowing to wait for the trigger to fire
         template <typename Condition>
         hpx::future<void> get_future(
             Condition&& func, error_code& ec = hpx::throws)
@@ -45,7 +47,7 @@ namespace hpx { namespace lcos { namespace local {
             cond_.reset();
         }
 
-        /// \brief Trigger this object.
+        /// Trigger this object.
         bool set(error_code& ec = throws)
         {
             if (&ec != &throws)
@@ -66,4 +68,4 @@ namespace hpx { namespace lcos { namespace local {
         hpx::promise<void> promise_;
         hpx::function<bool()> cond_;
     };
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

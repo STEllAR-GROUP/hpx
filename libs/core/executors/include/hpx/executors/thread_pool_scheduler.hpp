@@ -173,9 +173,9 @@ namespace hpx::execution::experimental {
         void execute(F&& f, Policy const& policy) const
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            hpx::util::thread_description desc(f, annotation_);
+            hpx::threads::thread_description desc(f, annotation_);
 #else
-            hpx::util::thread_description desc(f);
+            hpx::threads::thread_description desc(f);
 #endif
             auto pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();

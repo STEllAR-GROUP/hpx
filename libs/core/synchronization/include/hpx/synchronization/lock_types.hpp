@@ -49,16 +49,19 @@ namespace hpx {
         {
             lock();
         }
+
         upgrade_lock(Mutex& m_, std::adopt_lock_t)
           : m(&m_)
           , is_locked(true)
         {
         }
+
         upgrade_lock(Mutex& m_, std::defer_lock_t) noexcept
           : m(&m_)
           , is_locked(false)
         {
         }
+
         upgrade_lock(Mutex& m_, std::try_to_lock_t)
           : m(&m_)
           , is_locked(false)
@@ -97,6 +100,7 @@ namespace hpx {
             std::swap(m, other.m);
             std::swap(is_locked, other.is_locked);
         }
+
         Mutex* mutex() const noexcept
         {
             return m;
@@ -109,6 +113,7 @@ namespace hpx {
             is_locked = false;
             return res;
         }
+
         ~upgrade_lock()
         {
             if (owns_lock())
@@ -132,6 +137,7 @@ namespace hpx {
             m->lock_upgrade();
             is_locked = true;
         }
+
         bool try_lock()
         {
             if (m == nullptr)
@@ -147,6 +153,7 @@ namespace hpx {
             is_locked = m->try_lock_upgrade();
             return is_locked;
         }
+
         void unlock()
         {
             if (m == nullptr)
@@ -162,11 +169,13 @@ namespace hpx {
             m->unlock_upgrade();
             is_locked = false;
         }
-        explicit operator bool() const noexcept
+
+        explicit constexpr operator bool() const noexcept
         {
             return owns_lock();
         }
-        bool owns_lock() const noexcept
+
+        constexpr bool owns_lock() const noexcept
         {
             return is_locked;
         }
@@ -207,6 +216,7 @@ namespace hpx {
             }
             m_.release();
         }
+
         ~upgrade_to_unique_lock()
         {
             if (source != nullptr)
@@ -236,15 +246,16 @@ namespace hpx {
             exclusive.swap(other.exclusive);
         }
 
-        explicit operator bool() const noexcept
+        explicit constexpr operator bool() const noexcept
         {
             return owns_lock();
         }
 
-        bool owns_lock() const noexcept
+        constexpr bool owns_lock() const noexcept
         {
             return exclusive.owns_lock();
         }
+
         Mutex* mutex() const noexcept
         {
             return exclusive.mutex();

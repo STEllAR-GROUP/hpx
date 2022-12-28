@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,7 +22,8 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     class HPX_CORE_EXPORT io_service_thread_pool : public thread_pool_base
     {
@@ -30,57 +31,62 @@ namespace hpx { namespace threads { namespace detail {
         explicit io_service_thread_pool(
             threads::thread_pool_init_parameters const& init);
 
-        void print_pool(std::ostream&) {}
+        void print_pool(std::ostream&) const override {}
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::state get_state() const;
-        hpx::state get_state(std::size_t num_thread) const;
-        bool has_reached_state(hpx::state s) const;
+        hpx::state get_state() const override;
+        hpx::state get_state(std::size_t num_thread) const override;
+        bool has_reached_state(hpx::state s) const override;
 
         ///////////////////////////////////////////////////////////////////////
-        void create_thread(
-            thread_init_data& data, thread_id_ref_type& id, error_code& ec);
+        void create_thread(thread_init_data& data, thread_id_ref_type& id,
+            error_code& ec) override;
 
-        thread_id_ref_type create_work(thread_init_data& data, error_code& ec);
+        thread_id_ref_type create_work(
+            thread_init_data& data, error_code& ec) override;
 
         thread_state set_state(thread_id_type const& id,
             thread_schedule_state new_state, thread_restart_state new_state_ex,
-            thread_priority priority, error_code& ec);
+            thread_priority priority, error_code& ec) override;
 
         thread_id_ref_type set_state(
             hpx::chrono::steady_time_point const& abs_time,
             thread_id_type const& id, thread_schedule_state newstate,
             thread_restart_state newstate_ex, thread_priority priority,
-            error_code& ec);
+            error_code& ec) override;
 
-        void report_error(std::size_t num, std::exception_ptr const& e);
-
-        ///////////////////////////////////////////////////////////////////////
-        bool run(std::unique_lock<std::mutex>& l, std::size_t pool_threads);
+        void report_error(
+            std::size_t num, std::exception_ptr const& e) override;
 
         ///////////////////////////////////////////////////////////////////////
-        void stop(std::unique_lock<std::mutex>& l, bool blocking = true);
+        bool run(
+            std::unique_lock<std::mutex>& l, std::size_t pool_threads) override;
 
         ///////////////////////////////////////////////////////////////////////
-        void resume_direct(error_code& ec = throws);
+        void stop(
+            std::unique_lock<std::mutex>& l, bool blocking = true) override;
 
-        void suspend_direct(error_code& ec = throws);
+        ///////////////////////////////////////////////////////////////////////
+        void resume_direct(error_code& ec = throws) override;
+
+        void suspend_direct(error_code& ec = throws) override;
 
         ///////////////////////////////////////////////////////////////////////
         void suspend_processing_unit_direct(
-            std::size_t virt_core, error_code& ec = throws);
+            std::size_t virt_core, error_code& ec = throws) override;
 
         void resume_processing_unit_direct(
-            std::size_t virt_core, error_code& ec = throws);
+            std::size_t virt_core, error_code& ec = throws) override;
 
         ///////////////////////////////////////////////////////////////////////
-        std::thread& get_os_thread_handle(std::size_t global_thread_num);
+        std::thread& get_os_thread_handle(
+            std::size_t global_thread_num) override;
 
-        std::size_t get_os_thread_count() const;
+        std::size_t get_os_thread_count() const override;
 
     private:
         util::io_service_pool threads_;
     };
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail
 
 #include <hpx/config/warnings_suffix.hpp>

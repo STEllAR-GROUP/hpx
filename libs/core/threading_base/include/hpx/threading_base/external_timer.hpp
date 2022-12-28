@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,18 +7,19 @@
 #pragma once    // prevent multiple inclusions of this header file.
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 
 #include <cstdint>
 #include <memory>
-#include <string>
-
-namespace hpx { namespace util {
 
 #ifdef HPX_HAVE_APEX
+#include <hpx/assert.hpp>
+#include <hpx/functional/function.hpp>
+
+#include <string>
+
+namespace hpx::util {
 
     using enable_parent_task_handler_type = hpx::function<bool()>;
 
@@ -35,7 +36,7 @@ namespace hpx { namespace util {
         };
 
         // Enumeration of function type flags
-        typedef enum functions_t
+        enum functions_t
         {
             init_flag = 0,
             finalize_flag,
@@ -50,30 +51,31 @@ namespace hpx { namespace util {
             start_flag,
             stop_flag,
             yield_flag
-        } functions_t;
+        };
 
         // Typedefs of function pointers
-        typedef uint64_t init_t(const char*, const uint64_t, const uint64_t);
-        typedef void finalize_t(void);
-        typedef void register_thread_t(const std::string&);
-        typedef std::shared_ptr<task_wrapper> new_task_string_t(
-            const std::string&, const uint64_t,
+        using init_t = std::uint64_t(
+            char const*, const uint64_t, const uint64_t);
+        using finalize_t = void(void);
+        using register_thread_t = void(std::string const&);
+        using new_task_string_t = std::shared_ptr<task_wrapper>(
+            std::string const&, const uint64_t,
             const std::shared_ptr<task_wrapper>);
-        typedef std::shared_ptr<task_wrapper> new_task_address_t(
+        using new_task_address_t = std::shared_ptr<task_wrapper>(
             uintptr_t, const uint64_t, const std::shared_ptr<task_wrapper>);
-        typedef void sample_value_t(const std::string&, double);
-        typedef void send_t(uint64_t, uint64_t, uint64_t);
-        typedef void recv_t(uint64_t, uint64_t, uint64_t, uint64_t);
-        typedef std::shared_ptr<task_wrapper> update_task_string_t(
-            std::shared_ptr<task_wrapper>, const std::string&);
-        typedef std::shared_ptr<task_wrapper> update_task_address_t(
+        using sample_value_t = void(std::string const&, double);
+        using send_t = void(uint64_t, uint64_t, uint64_t);
+        using recv_t = void(uint64_t, uint64_t, uint64_t, uint64_t);
+        using update_task_string_t = std::shared_ptr<task_wrapper>(
+            std::shared_ptr<task_wrapper>, std::string const&);
+        using update_task_address_t = std::shared_ptr<task_wrapper>(
             std::shared_ptr<task_wrapper>, uintptr_t);
-        typedef void start_t(std::shared_ptr<task_wrapper>);
-        typedef void stop_t(std::shared_ptr<task_wrapper>);
-        typedef void yield_t(std::shared_ptr<task_wrapper>);
+        using start_t = void(std::shared_ptr<task_wrapper>);
+        using stop_t = void(std::shared_ptr<task_wrapper>);
+        using yield_t = void(std::shared_ptr<task_wrapper>);
 
         // Structure for compiler type-checking of function pointer assignment
-        typedef struct registration
+        struct registration
         {
             functions_t type;
             union
@@ -92,7 +94,8 @@ namespace hpx { namespace util {
                 stop_t* stop;
                 yield_t* yield;
             } record;
-        } registration_t;
+        };
+        using registration_t = registration;
 
         // The actual function pointers. Some of them need to be exported,
         // because through the miracle of chained headers they get referenced
@@ -115,12 +118,12 @@ namespace hpx { namespace util {
 
         // The function registration interface
         HPX_CORE_EXPORT void register_external_timer(
-            registration_t& registration_record);
+            registration& registration_record);
 
         // The actual API. For all cases, check if the function pointer is null,
         // and if not null call the registered function.
-        static inline uint64_t init(const char* thread_name,
-            const uint64_t comm_rank, const uint64_t comm_size)
+        static inline std::uint64_t init(char const* thread_name,
+            std::uint64_t const comm_rank, uint64_t const comm_size)
         {
             return (init_function == nullptr) ?
                 0ULL :
@@ -133,7 +136,7 @@ namespace hpx { namespace util {
                 finalize_function();
             }
         }
-        static inline void register_thread(const std::string& name)
+        static inline void register_thread(std::string const& name)
         {
             if (register_thread_function != nullptr)
             {
@@ -141,7 +144,7 @@ namespace hpx { namespace util {
             }
         }
         static inline std::shared_ptr<task_wrapper> new_task(
-            const std::string& name, const uint64_t task_id,
+            std::string const& name, const uint64_t task_id,
             const std::shared_ptr<task_wrapper> parent_task)
         {
             return (new_task_string_function == nullptr) ?
@@ -172,7 +175,7 @@ namespace hpx { namespace util {
             }
         }
         static inline std::shared_ptr<task_wrapper> update_task(
-            std::shared_ptr<task_wrapper> wrapper, const std::string& name)
+            std::shared_ptr<task_wrapper> wrapper, std::string const& name)
         {
             return (update_task_string_function == nullptr) ?
                 0ULL :
@@ -208,13 +211,13 @@ namespace hpx { namespace util {
         }
 
         HPX_CORE_EXPORT std::shared_ptr<task_wrapper> new_task(
-            thread_description const& description,
+            threads::thread_description const& description,
             std::uint32_t parent_locality_id,
             threads::thread_id_type parent_task);
 
-        HPX_CORE_EXPORT inline std::shared_ptr<task_wrapper> update_task(
+        inline std::shared_ptr<task_wrapper> update_task(
             std::shared_ptr<task_wrapper> wrapper,
-            thread_description const& description)
+            threads::thread_description const& description)
         {
             if (wrapper == nullptr)
             {
@@ -223,7 +226,7 @@ namespace hpx { namespace util {
                 return new_task(description, 0, parent_task);
             }
             else if (description.kind() ==
-                thread_description::data_type_description)
+                threads::thread_description::data_type_description)
             {
                 // Disambiguate the call by making a temporary string object
                 return update_task(
@@ -232,7 +235,7 @@ namespace hpx { namespace util {
             else
             {
                 HPX_ASSERT(description.kind() ==
-                    thread_description::data_type_address);
+                    threads::thread_description::data_type_address);
                 return update_task(wrapper, description.get_address());
             }
         }
@@ -243,17 +246,17 @@ namespace hpx { namespace util {
         {
             explicit scoped_timer(std::shared_ptr<task_wrapper> data_ptr)
               : stopped(false)
-              , data_(nullptr)
+              , data_(data_ptr)
             {
                 // APEX internal actions are not timed. Otherwise, we would end
                 // up with recursive timers. So it's possible to have a null
                 // task wrapper pointer here.
                 if (data_ptr != nullptr)
                 {
-                    data_ = data_ptr;
                     hpx::util::external_timer::start(data_);
                 }
             }
+
             ~scoped_timer()
             {
                 stop();
@@ -264,6 +267,7 @@ namespace hpx { namespace util {
                 if (!stopped)
                 {
                     stopped = true;
+
                     // APEX internal actions are not timed. Otherwise, we would
                     // end up with recursive timers. So it's possible to have a
                     // null task wrapper pointer here.
@@ -279,6 +283,7 @@ namespace hpx { namespace util {
                 if (!stopped)
                 {
                     stopped = true;
+
                     // APEX internal actions are not timed. Otherwise, we would
                     // end up with recursive timers. So it's possible to have a
                     // null task wrapper pointer here.
@@ -293,34 +298,37 @@ namespace hpx { namespace util {
             std::shared_ptr<task_wrapper> data_;
         };
     }    // namespace external_timer
+}    // namespace hpx::util
 
 #else
-    namespace external_timer {
 
-        struct task_wrapper
-        {
-        };
+namespace hpx::util::external_timer {
 
-        inline std::shared_ptr<task_wrapper> new_task(
-            thread_description const&, std::uint32_t, threads::thread_id_type)
-        {
-            return nullptr;
-        }
+    struct task_wrapper
+    {
+    };
 
-        inline std::shared_ptr<task_wrapper> update_task(
-            std::shared_ptr<task_wrapper>, thread_description const&)
-        {
-            return nullptr;
-        }
+    inline std::shared_ptr<task_wrapper> new_task(
+        threads::thread_description const&, std::uint32_t,
+        threads::thread_id_type)
+    {
+        return {};
+    }
 
-        struct scoped_timer
-        {
-            explicit scoped_timer(std::shared_ptr<task_wrapper>) {}
-            ~scoped_timer() = default;
+    inline std::shared_ptr<task_wrapper> update_task(
+        std::shared_ptr<task_wrapper>, threads::thread_description const&)
+    {
+        return {};
+    }
 
-            void stop(void) {}
-            void yield(void) {}
-        };
-    }    // namespace external_timer
+    struct scoped_timer
+    {
+        explicit scoped_timer(std::shared_ptr<task_wrapper>) noexcept {}
+        ~scoped_timer() = default;
+
+        constexpr void stop(void) noexcept {}
+        constexpr void yield(void) noexcept {}
+    };
+}    // namespace hpx::util::external_timer
+
 #endif
-}}    // namespace hpx::util

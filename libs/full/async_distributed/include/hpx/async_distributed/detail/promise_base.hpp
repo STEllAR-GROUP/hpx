@@ -87,7 +87,7 @@ namespace hpx {
             {
             }
 
-            promise_data_allocator(init_no_addref no_addref, in_place,
+            promise_data_allocator(init_no_addref no_addref, std::in_place_t,
                 other_allocator const& alloc)
               : promise_data<Result>(no_addref)
               , alloc_(alloc)
@@ -345,7 +345,7 @@ namespace hpx {
                 this->shared_state_->set_on_completed(keep_alive(lco_ptr));
             }
 
-            void check_abandon_shared_state(const char* fun)
+            void check_abandon_shared_state(char const* fun)
             {
                 if (this->shared_state_ != nullptr && this->future_retrieved_ &&
                     !(this->shared_state_->is_ready() || id_retrieved_))

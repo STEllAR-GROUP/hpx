@@ -25,7 +25,8 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace resource { namespace detail {
+namespace hpx::resource::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     // structure used to encapsulate all characteristics of thread_pools
     // as specified by the user in int main()
@@ -52,7 +53,7 @@ namespace hpx { namespace resource { namespace detail {
         static std::size_t num_threads_overall;
 
     private:
-        init_pool_data(const std::string& name, scheduling_policy policy,
+        init_pool_data(std::string const& name, scheduling_policy policy,
             hpx::threads::policies::scheduler_mode mode);
 
         init_pool_data(std::string const& name, scheduler_function create_func,
@@ -76,7 +77,7 @@ namespace hpx { namespace resource { namespace detail {
     ///////////////////////////////////////////////////////////////////////
     class partitioner
     {
-        typedef hpx::spinlock mutex_type;
+        using mutex_type = hpx::spinlock;
 
     public:
         partitioner();
@@ -95,8 +96,8 @@ namespace hpx { namespace resource { namespace detail {
         void create_thread_pool(
             std::string const& name, scheduler_function scheduler_creation);
 
-        // Functions to add processing units to thread pools via
-        // the pu/core/numa_domain API
+        // Functions to add processing units to thread pools via the
+        // pu/core/numa_domain API
         void add_resource(hpx::resource::pu const& p,
             std::string const& pool_name, std::size_t num_threads = 1)
         {
@@ -105,19 +106,19 @@ namespace hpx { namespace resource { namespace detail {
         void add_resource(hpx::resource::pu const& p,
             std::string const& pool_name, bool exclusive,
             std::size_t num_threads = 1);
-        void add_resource(const std::vector<hpx::resource::pu>& pv,
+        void add_resource(std::vector<hpx::resource::pu> const& pv,
             std::string const& pool_name, bool exclusive = true);
-        void add_resource(const hpx::resource::core& c,
+        void add_resource(hpx::resource::core const& c,
             std::string const& pool_name, bool exclusive = true);
-        void add_resource(const std::vector<hpx::resource::core>& cv,
+        void add_resource(std::vector<hpx::resource::core> const& cv,
             std::string const& pool_name, bool exclusive = true);
-        void add_resource(const hpx::resource::numa_domain& nd,
+        void add_resource(hpx::resource::numa_domain const& nd,
             std::string const& pool_name, bool exclusive = true);
-        void add_resource(const std::vector<hpx::resource::numa_domain>& ndv,
+        void add_resource(std::vector<hpx::resource::numa_domain> const& ndv,
             std::string const& pool_name, bool exclusive = true);
 
         threads::policies::detail::affinity_data const& get_affinity_data()
-            const
+            const noexcept
         {
             return affinity_data_;
         }
@@ -126,11 +127,10 @@ namespace hpx { namespace resource { namespace detail {
         // resource partitioner called in hpx_init
         void configure_pools();
 
-        // returns the number of threads(pus) requested
-        // by the user at startup.
+        // returns the number of threads(pus) requested by the user at startup.
         // This should not be called before the RP has parsed the config and
         // assigned affinity data
-        std::size_t threads_needed()
+        std::size_t threads_needed() noexcept
         {
             HPX_ASSERT(pus_needed_ != std::size_t(-1));
             return pus_needed_;
@@ -138,9 +138,9 @@ namespace hpx { namespace resource { namespace detail {
 
         ////////////////////////////////////////////////////////////////////////
         scheduling_policy which_scheduler(std::string const& pool_name);
-        threads::topology& get_topology() const;
+        threads::topology& get_topology() const noexcept;
 
-        std::size_t get_num_pools() const;
+        std::size_t get_num_pools() const noexcept;
 
         std::size_t get_num_threads() const;
         std::size_t get_num_threads(std::string const& pool_name) const;
@@ -157,12 +157,13 @@ namespace hpx { namespace resource { namespace detail {
         std::size_t get_thread_occupancy(std::size_t pu_num) const;
         threads::mask_type get_used_pus_mask(std::size_t pu_num) const;
 
-        void init(resource::partitioner_mode rpmode, hpx::util::section cfg,
+        void init(resource::partitioner_mode rpmode,
+            hpx::util::section const& cfg,
             hpx::threads::policies::detail::affinity_data affinity_data);
 
         scheduler_function get_pool_creator(size_t index) const;
 
-        std::vector<numa_domain> const& numa_domains() const
+        std::vector<numa_domain> const& numa_domains() const noexcept
         {
             return numa_domains_;
         }
@@ -178,12 +179,12 @@ namespace hpx { namespace resource { namespace detail {
         std::size_t expand_pool(std::string const& pool_name,
             hpx::function<void(std::size_t)> const& add_pu);
 
-        void set_default_pool_name(const std::string& name)
+        void set_default_pool_name(std::string const& name)
         {
             initial_thread_pools_[0].pool_name_ = name;
         }
 
-        const std::string& get_default_pool_name() const
+        std::string const& get_default_pool_name() const noexcept
         {
             return initial_thread_pools_[0].pool_name_;
         }
@@ -246,4 +247,4 @@ namespace hpx { namespace resource { namespace detail {
 
         threads::policies::scheduler_mode default_scheduler_mode_;
     };
-}}}    // namespace hpx::resource::detail
+}    // namespace hpx::resource::detail

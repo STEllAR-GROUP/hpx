@@ -110,7 +110,7 @@ namespace hpx {
             mutable startup_function_type startup;
             mutable shutdown_function_type shutdown;
             hpx::resource::partitioner_mode rp_mode =
-                ::hpx::resource::mode_default;
+                ::hpx::resource::partitioner_mode::default_;
             hpx::local::detail::rp_callback_type rp_callback;
         };
 

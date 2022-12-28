@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
 #include <hpx/assert.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
@@ -27,10 +26,9 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-// TODO: add branch prediction and function heat
-
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies {
+namespace hpx::threads::policies {
+
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
     using default_static_queue_scheduler_terminated_queue = lockfree_lifo;
@@ -52,11 +50,10 @@ namespace hpx { namespace threads { namespace policies {
             TerminatedQueuing>
     {
     public:
-        typedef local_queue_scheduler<Mutex, PendingQueuing, StagedQueuing,
-            TerminatedQueuing>
-            base_type;
+        using base_type = local_queue_scheduler<Mutex, PendingQueuing,
+            StagedQueuing, TerminatedQueuing>;
 
-        static_queue_scheduler(
+        explicit static_queue_scheduler(
             typename base_type::init_parameter_type const& init,
             bool deferred_initialization = true)
           : base_type(init, deferred_initialization)
@@ -82,7 +79,7 @@ namespace hpx { namespace threads { namespace policies {
             threads::thread_id_ref_type& thrd,
             bool /*enable_stealing*/) override
         {
-            typedef typename base_type::thread_queue_type thread_queue_type;
+            using thread_queue_type = typename base_type::thread_queue_type;
 
             {
                 HPX_ASSERT(num_thread < this->queues_.size());
@@ -99,13 +96,13 @@ namespace hpx { namespace threads { namespace policies {
             return false;
         }
 
-        /// This is a function which gets called periodically by the thread
-        /// manager to allow for maintenance tasks to be executed in the
-        /// scheduler. Returns true if the OS thread calling this function
-        /// has to be terminated (i.e. no more work has to be done).
+        // This is a function which gets called periodically by the thread
+        // manager to allow for maintenance tasks to be executed in the
+        // scheduler. Returns true if the OS thread calling this function has to
+        // be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count, bool /*enable_stealing*/,
-            std::size_t& added) override
+            [[maybe_unused]] std::int64_t& idle_loop_count,
+            bool /*enable_stealing*/, std::size_t& added) override
         {
             HPX_ASSERT(num_thread < this->queues_.size());
 
@@ -146,13 +143,11 @@ namespace hpx { namespace threads { namespace policies {
                         num_thread);
                 }
             }
-#else
-            HPX_UNUSED(idle_loop_count);
 #endif
 
             return result;
         }
     };
-}}}    // namespace hpx::threads::policies
+}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>

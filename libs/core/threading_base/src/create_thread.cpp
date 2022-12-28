@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,7 @@
 
 #include <cstddef>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
 
     void create_thread(policies::scheduler_base* scheduler,
         threads::thread_init_data& data, threads::thread_id_ref_type& id,
@@ -103,4 +103,4 @@ namespace hpx { namespace threads { namespace detail {
         // thread.
         scheduler->do_some_work(data.schedulehint.hint);
     }
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail

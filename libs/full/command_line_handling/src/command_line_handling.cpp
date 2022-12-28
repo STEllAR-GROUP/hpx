@@ -40,7 +40,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
 
@@ -292,13 +292,13 @@ namespace hpx { namespace util {
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
             if (min_os_threads > HPX_HAVE_MAX_CPU_COUNT)
             {
-                throw hpx::detail::command_line_error(
-                    "Requested more than " HPX_PP_STRINGIZE(
-                        HPX_HAVE_MAX_CPU_COUNT) " hpx.force_min_os_threads to "
-                                                "use for this application, use "
-                                                "the option "
-                                                "-DHPX_WITH_MAX_CPU_COUNT=<N> "
-                                                "when configuring HPX.");
+                // clang-format off
+                throw hpx::detail::command_line_error("Requested more than "
+                    HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)
+                    " hpx.force_min_os_threads to use for this application, "
+                    "use the option -DHPX_WITH_MAX_CPU_COUNT=<N> when "
+                    "configuring HPX.");
+                // clang-format on
             }
 #endif
 
@@ -555,13 +555,13 @@ namespace hpx { namespace util {
                 1)
             {
                 throw hpx::detail::command_line_error(
-                    "Ambiguous command line options. "
-                    "Do not specify more than one of --hpx:local, "
-                    "--hpx:console, --hpx:worker, or --hpx:connect");
+                    "Ambiguous command line options. Do not specify more than "
+                    "one of --hpx:local, --hpx:console, --hpx:worker, or "
+                    "--hpx:connect");
             }
 
-            // In these cases we default to executing with an empty
-            // hpx_main, except if specified otherwise.
+            // In these cases we default to executing with an empty hpx_main,
+            // except if specified otherwise.
             if (vm.count("hpx:worker"))
             {
                 rtcfg_.mode_ = hpx::runtime_mode::worker;
@@ -628,8 +628,8 @@ namespace hpx { namespace util {
                     if (vm.count("hpx:agas"))
                     {
                         throw hpx::detail::command_line_error(
-                            "Command line option --hpx:node "
-                            "is not compatible with --hpx:agas");
+                            "Command line option --hpx:node is not compatible "
+                            "with --hpx:agas");
                     }
                     node = vm["hpx:node"].as<std::size_t>();
                 }
@@ -794,8 +794,8 @@ namespace hpx { namespace util {
 
         if (rtcfg_.mode_ != hpx::runtime_mode::local)
         {
-            // Set number of localities in configuration (do it everywhere,
-            // even if this information is only used by the AGAS server).
+            // Set number of localities in configuration (do it everywhere, even
+            // if this information is only used by the AGAS server).
             ini_config.emplace_back(
                 "hpx.localities!=" + std::to_string(num_localities_));
 
@@ -1029,4 +1029,4 @@ namespace hpx { namespace util {
         return finalize_commandline_handling(
             argc, argv, help, unregistered_options);
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

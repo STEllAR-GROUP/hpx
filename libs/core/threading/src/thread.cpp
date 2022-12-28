@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,13 +31,15 @@
 #endif
 
 namespace hpx {
+
     namespace detail {
+
         static thread_termination_handler_type thread_termination_handler;
     }
 
     void set_thread_termination_handler(thread_termination_handler_type f)
     {
-        detail::thread_termination_handler = f;
+        detail::thread_termination_handler = HPX_MOVE(f);
     }
 
     thread::thread() noexcept
@@ -128,8 +130,7 @@ namespace hpx {
         catch (hpx::exception const&)
         {
             // Verify that there are no more registered locks for this
-            // OS-thread. This will throw if there are still any locks
-            // held.
+            // OS-thread. This will throw if there are still any locks held.
             util::force_error_on_lock();
 
             // run all callbacks attached to the exit event for this thread
@@ -138,9 +139,8 @@ namespace hpx {
             throw;    // rethrow any exception except 'thread_interrupted'
         }
 
-        // Verify that there are no more registered locks for this
-        // OS-thread. This will throw if there are still any locks
-        // held.
+        // Verify that there are no more registered locks for this OS-thread.
+        // This will throw if there are still any locks held.
         util::force_error_on_lock();
 
         // run all callbacks attached to the exit event for this thread
@@ -174,8 +174,8 @@ namespace hpx {
             threads::thread_stacksize::default_,
             threads::thread_schedule_state::pending, true);
 
-        // create the new thread, note that id_ is guaranteed to be valid
-        // before the thread function is executed
+        // create the new thread, note that id_ is guaranteed to be valid before
+        // the thread function is executed
         error_code ec(throwmode::lightweight);
         pool->create_thread(data, id_, ec);
         if (ec)
@@ -284,10 +284,11 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         struct thread_task_base : lcos::detail::future_data<void>
         {
         private:
-            typedef hpx::intrusive_ptr<thread_task_base> future_base_type;
+            using future_base_type = hpx::intrusive_ptr<thread_task_base>;
 
         protected:
             using base_type = lcos::detail::future_data<void>;
@@ -388,12 +389,12 @@ namespace hpx {
         }
 
         // extensions
-        threads::thread_priority get_priority()
+        threads::thread_priority get_priority() noexcept
         {
             return threads::get_thread_priority(threads::get_self_id());
         }
 
-        std::ptrdiff_t get_stack_size()
+        std::ptrdiff_t get_stack_size() noexcept
         {
             return threads::get_stack_size(threads::get_self_id());
         }

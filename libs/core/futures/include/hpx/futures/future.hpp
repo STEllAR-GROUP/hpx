@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -42,7 +42,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx::lcos::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     enum class future_state
     {
@@ -71,7 +72,7 @@ namespace hpx { namespace lcos { namespace detail {
 
                 hpx::intrusive_ptr<shared_state> p(
                     new shared_state(
-                        init_no_addref{}, in_place{}, HPX_MOVE(value)),
+                        init_no_addref{}, std::in_place, HPX_MOVE(value)),
                     false);
 
                 f = hpx::traits::future_access<Future>::create(HPX_MOVE(p));
@@ -84,7 +85,7 @@ namespace hpx { namespace lcos { namespace detail {
 
                 hpx::intrusive_ptr<shared_state> p(
                     new shared_state(
-                        init_no_addref{}, in_place{}, HPX_MOVE(value)),
+                        init_no_addref{}, std::in_place, HPX_MOVE(value)),
                     false);
 
                 f = hpx::traits::future_access<Future>::create(HPX_MOVE(p));
@@ -127,7 +128,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             hpx::intrusive_ptr<shared_state> p(
                 new shared_state(
-                    init_no_addref{}, in_place{}, hpx::util::unused),
+                    init_no_addref{}, std::in_place, hpx::util::unused),
                 false);
 
             f = hpx::traits::future_access<Future>::create(HPX_MOVE(p));
@@ -723,7 +724,7 @@ namespace hpx { namespace lcos { namespace detail {
     protected:
         hpx::intrusive_ptr<shared_state_type> shared_state_;
     };
-}}}    // namespace hpx::lcos::detail
+}    // namespace hpx::lcos::detail
 
 /// Top level HPX namespace
 namespace hpx {
@@ -1365,12 +1366,11 @@ namespace hpx {
         using unique_ptr = std::unique_ptr<shared_state,
             util::allocator_deleter<other_allocator>>;
 
-        using lcos::detail::in_place;
         other_allocator alloc(a);
         unique_ptr p(traits::allocate(alloc, 1),
             util::allocator_deleter<other_allocator>{alloc});
-        traits::construct(alloc, p.get(), init_no_addref{}, in_place{}, alloc,
-            HPX_FORWARD(Ts, ts)...);
+        traits::construct(alloc, p.get(), init_no_addref{}, std::in_place,
+            alloc, HPX_FORWARD(Ts, ts)...);
 
         return hpx::traits::future_access<future<result_type>>::create(
             p.release(), false);
@@ -1541,7 +1541,7 @@ namespace hpx {
     }
 }    // namespace hpx
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename Archive, typename T>
     HPX_FORCEINLINE void serialize(
@@ -1556,11 +1556,11 @@ namespace hpx { namespace serialization {
     {
         hpx::lcos::detail::serialize_future(ar, f, version);
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
 ///////////////////////////////////////////////////////////////////////////////
 // hoist deprecated names into old namespace
-namespace hpx { namespace lcos {
+namespace hpx::lcos {
 
     template <typename R, typename U>
     HPX_DEPRECATED_V(1, 8,
@@ -1778,7 +1778,7 @@ namespace hpx { namespace lcos {
     {
         return f;
     }
-}}    // namespace hpx::lcos
+}    // namespace hpx::lcos
 
 #include <hpx/futures/packaged_continuation.hpp>
 

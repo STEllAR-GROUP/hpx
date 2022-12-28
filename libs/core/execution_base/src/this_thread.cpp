@@ -41,7 +41,7 @@ namespace hpx::execution_base {
 
         struct default_context : execution_base::context_base
         {
-            resource_base const& resource() const override
+            resource_base const& resource() const noexcept override
             {
                 return resource_;
             }
@@ -57,7 +57,7 @@ namespace hpx::execution_base {
                 return hpx::util::format("{}", id_);
             }
 
-            default_context const& context() const override
+            default_context const& context() const noexcept override
             {
                 return context_;
             }

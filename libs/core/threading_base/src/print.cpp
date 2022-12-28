@@ -11,9 +11,8 @@
 #include <cstdint>
 #include <thread>
 
-// ------------------------------------------------------------
 /// \cond NODETAIL
-namespace hpx { namespace debug {
+namespace hpx::debug {
 
     std::ostream& operator<<(
         std::ostream& os, threadinfo<threads::thread_data*> const& d)
@@ -66,9 +65,7 @@ namespace hpx { namespace debug {
         return os;
     }
 
-    // ------------------------------------------------------------------
     // helper class for printing thread ID, either std:: or hpx::
-    // ------------------------------------------------------------------
     namespace detail {
 
         void print_thread_info(std::ostream& os)
@@ -87,8 +84,7 @@ namespace hpx { namespace debug {
 #ifdef DEBUGGING_PRINT_LINUX
                << " cpu " << debug::dec<3, int>(sched_getcpu()) << " ";
 #else
-               << " cpu "
-               << "--- ";
+               << " cpu --- ";
 #endif
         }
 
@@ -104,5 +100,5 @@ namespace hpx { namespace debug {
 
         current_thread_print_helper current_thread_print_helper::helper_{};
     }    // namespace detail
-}}       // namespace hpx::debug
+}    // namespace hpx::debug
 /// \endcond

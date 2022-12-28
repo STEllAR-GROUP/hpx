@@ -8,11 +8,20 @@
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/naming_base/unmanaged.hpp>
 
+namespace hpx {
+
+    hpx::id_type unmanaged(hpx::id_type const& id)
+    {
+        return hpx::id_type(
+            naming::detail::strip_internal_bits_from_gid(id.get_msb()),
+            id.get_lsb(), hpx::id_type::management_type::unmanaged);
+    }
+}    // namespace hpx
+
 namespace hpx::naming {
 
     hpx::id_type unmanaged(hpx::id_type const& id)
     {
-        return hpx::id_type(detail::strip_internal_bits_from_gid(id.get_msb()),
-            id.get_lsb(), hpx::id_type::management_type::unmanaged);
+        return hpx::unmanaged(id);
     }
 }    // namespace hpx::naming
