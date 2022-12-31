@@ -127,6 +127,7 @@ namespace hpx::execution::experimental::detail {
             HPX_UNREACHABLE;
         }
 
+    private:
         // Perform the work in one element indexed by index. The index
         // represents a range of indices (iterators) in the given shape.
         template <typename Ts>
@@ -142,9 +143,8 @@ namespace hpx::execution::experimental::detail {
 
             auto const i_begin =
                 static_cast<std::size_t>(index) * task_f->chunk_size;
-            auto const i_end = (std::min)(
-                static_cast<std::size_t>(index + 1) * task_f->chunk_size,
-                task_f->size);
+            auto const i_end =
+                (std::min)(i_begin + task_f->chunk_size, task_f->size);
 
             auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
             for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
@@ -154,6 +154,43 @@ namespace hpx::execution::experimental::detail {
             }
         }
 
+        template <hpx::concurrency::detail::queue_end Which, typename Ts>
+        void do_work(Ts& ts) const
+        {
+            auto worker_thread = task_f->worker_thread;
+            auto& local_queue = op_state->queues[worker_thread].data_;
+
+            // Handle local queue first
+            hpx::optional<std::uint32_t> index;
+            while ((index = local_queue.template pop<Which>()))
+            {
+                do_work_chunk(ts, index.value());
+            }
+
+            if (task_f->allow_stealing)
+            {
+                // Then steal from the opposite end of the neighboring queues
+                static constexpr auto opposite_end =
+                    hpx::concurrency::detail::opposite_end_v<Which>;
+
+                for (std::uint32_t offset = 1;
+                     offset != op_state->num_worker_threads; ++offset)
+                {
+                    std::size_t neighbor_thread =
+                        (worker_thread + offset) % op_state->num_worker_threads;
+                    auto& neighbor_queue =
+                        op_state->queues[neighbor_thread].data_;
+
+                    while (
+                        (index = neighbor_queue.template pop<opposite_end>()))
+                    {
+                        do_work_chunk(ts, index.value());
+                    }
+                }
+            }
+        }
+
+    public:
         // Visit the values sent from the predecessor sender. This function
         // first tries to handle all chunks in the queue owned by worker_thread.
         // It then tries to steal chunks from neighboring threads.
@@ -166,57 +203,14 @@ namespace hpx::execution::experimental::detail {
         // clang-format on
         void operator()(Ts& ts) const
         {
-            auto worker_thread = task_f->worker_thread;
-            auto& local_queue = op_state->queues[worker_thread].data_;
-
             // schedule chunks from the end, if needed
             if (task_f->reverse_placement)
             {
-                // Handle local queue first
-                hpx::optional<std::uint32_t> index;
-                while ((index = local_queue.pop_right()))
-                {
-                    do_work_chunk(ts, index.value());
-                }
-
-                // Then steal from neighboring queues
-                for (std::uint32_t offset = 1;
-                     offset != op_state->num_worker_threads; ++offset)
-                {
-                    std::size_t neighbor_thread =
-                        (worker_thread + offset) % op_state->num_worker_threads;
-                    auto& neighbor_queue =
-                        op_state->queues[neighbor_thread].data_;
-
-                    while ((index = neighbor_queue.pop_left()))
-                    {
-                        do_work_chunk(ts, index.value());
-                    }
-                }
+                do_work<hpx::concurrency::detail::queue_end::right>(ts);
             }
             else
             {
-                // Handle local queue first
-                hpx::optional<std::uint32_t> index;
-                while ((index = local_queue.pop_left()))
-                {
-                    do_work_chunk(ts, index.value());
-                }
-
-                // Then steal from neighboring queues
-                for (std::uint32_t offset = 1;
-                     offset != op_state->num_worker_threads; ++offset)
-                {
-                    std::size_t neighbor_thread =
-                        (worker_thread + offset) % op_state->num_worker_threads;
-                    auto& neighbor_queue =
-                        op_state->queues[neighbor_thread].data_;
-
-                    while ((index = neighbor_queue.pop_right()))
-                    {
-                        do_work_chunk(ts, index.value());
-                    }
-                }
+                do_work<hpx::concurrency::detail::queue_end::left>(ts);
             }
         }
     };
@@ -259,6 +253,7 @@ namespace hpx::execution::experimental::detail {
         std::uint32_t const chunk_size;
         std::uint32_t const worker_thread;
         bool reverse_placement;
+        bool allow_stealing;
 
         // Visit the values sent by the predecessor sender.
         void do_work() const
@@ -484,9 +479,10 @@ namespace hpx::execution::experimental::detail {
             hpx::threads::thread_schedule_hint hint =
                 hpx::execution::experimental::get_hint(op_state->scheduler);
 
+            using placement = hpx::threads::thread_placement_hint;
+
             // Initialize the queues for all worker threads so that worker
             // threads can start stealing immediately when they start.
-            using placement = hpx::threads::thread_placement_hint;
             for (std::uint32_t worker_thread = 0;
                  worker_thread != op_state->num_worker_threads; ++worker_thread)
             {
@@ -524,6 +520,9 @@ namespace hpx::execution::experimental::detail {
             bool reverse_placement =
                 hint.placement_mode == placement::depth_first_reverse ||
                 hint.placement_mode == placement::breadth_first_reverse;
+            bool allow_stealing =
+                !hpx::threads::do_not_share_function(hint.sharing_mode);
+
             for (std::uint32_t pu = 0;
                  worker_thread != op_state->num_worker_threads && pu != num_pus;
                  ++pu)
@@ -555,8 +554,9 @@ namespace hpx::execution::experimental::detail {
                 }
 
                 // Schedule task for this worker thread
-                do_work_task(task_function<OperationState>{op_state, size,
-                    chunk_size, worker_thread, reverse_placement});
+                do_work_task(
+                    task_function<OperationState>{op_state, size, chunk_size,
+                        worker_thread, reverse_placement, allow_stealing});
 
                 ++worker_thread;
             }
@@ -569,8 +569,9 @@ namespace hpx::execution::experimental::detail {
             HPX_ASSERT(worker_thread == op_state->num_worker_threads);
 
             // Handle the queue for the local thread.
-            do_work_local(task_function<OperationState>{this->op_state, size,
-                chunk_size, local_worker_thread, reverse_placement});
+            do_work_local(
+                task_function<OperationState>{this->op_state, size, chunk_size,
+                    local_worker_thread, reverse_placement, allow_stealing});
         }
 
         // clang-format off

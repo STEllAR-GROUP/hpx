@@ -17,6 +17,31 @@
 
 namespace hpx::concurrency::detail {
 
+    /// \brief Identify one of the ends of the queue
+    enum class queue_end
+    {
+        left = 0,
+        right = 1
+    };
+
+    template <queue_end Which>
+    struct opposite_end;
+
+    template <>
+    struct opposite_end<queue_end::left>
+    {
+        static constexpr queue_end value = queue_end::right;
+    };
+
+    template <>
+    struct opposite_end<queue_end::right>
+    {
+        static constexpr queue_end value = queue_end::left;
+    };
+
+    template <queue_end Which>
+    inline constexpr queue_end opposite_end_v = opposite_end<Which>::value;
+
     /// \brief A concurrent queue which can only hold contiguous ranges of
     ///        integers.
     ///
@@ -159,8 +184,8 @@ namespace hpx::concurrency::detail {
 
         /// \brief Attempt to pop an item from the right of the queue.
         ///
-        /// Attempt to pop an item from the right (end) of the queue. If
-        /// no items are left hpx::nullopt is returned.
+        /// Attempt to pop an item from the right (end) of the queue. If no
+        /// items are left hpx::nullopt is returned.
         hpx::optional<T> pop_right() noexcept
         {
             range desired_range{0, 0};
@@ -188,7 +213,24 @@ namespace hpx::concurrency::detail {
             return hpx::optional<T>(HPX_MOVE(index));
         }
 
-        bool empty() const noexcept
+        /// \brief Attempt to pop an item from the given end of the queue.
+        ///
+        /// Attempt to pop an item from the given end of the queue. If no items
+        /// are left hpx::nullopt is returned.
+        template <queue_end Which>
+        hpx::optional<T> pop() noexcept
+        {
+            if constexpr (Which == queue_end::left)
+            {
+                return pop_left();
+            }
+            else
+            {
+                return pop_right();
+            }
+        }
+
+        constexpr bool empty() const noexcept
         {
             return current_range.data_.load(std::memory_order_relaxed).empty();
         }

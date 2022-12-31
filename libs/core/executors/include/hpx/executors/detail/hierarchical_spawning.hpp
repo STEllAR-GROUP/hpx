@@ -38,7 +38,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { namespace execution { namespace detail {
+namespace hpx::parallel::execution::detail {
 
     ////////////////////////////////////////////////////////////////////////////
     template <typename Launch, typename F, typename S, typename... Ts>
@@ -61,7 +61,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         auto post_policy = hpx::execution::experimental::with_stacksize(
             policy, threads::thread_stacksize::small_);
 
-        hpx::latch l(size);
+        hpx::latch l(size + 1);
         std::size_t part_begin = 0;
         auto it = std::begin(shape);
         for (std::size_t t = 0; t != num_threads; ++t)
@@ -73,7 +73,8 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 threads::thread_schedule_hint{
                     static_cast<std::int16_t>(first_thread + t)});
 
-            if (part_size > hierarchical_threshold)
+            if (hierarchical_threshold != 0 &&
+                part_size > hierarchical_threshold)
             {
                 hpx::detail::post_policy_dispatch<Launch>::call(post_policy,
                     desc, pool,
@@ -109,7 +110,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         }
         HPX_ASSERT(it == hpx::util::end(shape));
 
-        l.wait();
+        l.arrive_and_wait();
 
         return results;
     }
@@ -139,7 +140,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
                 std::exception_ptr e;
                 hpx::spinlock mtx_e;
-                hpx::latch l(size);
+                hpx::latch l(size + 1);
 
                 auto wrapped = [&, f](auto&&... args) mutable {
                     // properly handle all exceptions thrown from 'f'
@@ -189,7 +190,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
                     // launch a special thread to schedule work for each core,
                     // except the last one
-                    if (t != num_threads - 1 &&
+                    if (t != num_threads - 1 && hierarchical_threshold != 0 &&
                         part_size > hierarchical_threshold)
                     {
                         hpx::detail::post_policy_dispatch<Launch>::call(
@@ -206,11 +207,11 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
                 }
                 HPX_ASSERT(it == hpx::util::end(shape));
 
-                l.wait();
+                l.arrive_and_wait();
 
                 // rethrow any exceptions caught during processing the
-                // bulk_execute, note that we don't need to acquire the lock
-                // at this point as no other threads may access the exception
+                // bulk_execute, note that we don't need to acquire the lock at
+                // this point as no other threads may access the exception
                 // concurrently
                 if (e)
                 {
@@ -293,4 +294,4 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         return hpx::traits::future_access<result_future_type>::create(
             HPX_MOVE(p));
     }
-}}}}    // namespace hpx::parallel::execution::detail
+}    // namespace hpx::parallel::execution::detail

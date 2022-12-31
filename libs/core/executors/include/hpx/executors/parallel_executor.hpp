@@ -22,7 +22,7 @@
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/executors/detail/hierarchical_spawning.hpp>
+#include <hpx/executors/detail/index_queue_spawning.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -49,6 +49,7 @@
 #include <vector>
 
 namespace hpx::parallel::execution::detail {
+
     template <typename Policy>
     struct get_default_policy
     {
@@ -162,6 +163,11 @@ namespace hpx::execution {
           , policy_(l, priority, stacksize, schedulehint)
           , hierarchical_threshold_(hierarchical_threshold)
         {
+        }
+
+        void set_hierarchical_threshold(std::size_t threshold)
+        {
+            hierarchical_threshold_ = threshold;
         }
 
     private:
@@ -383,6 +389,20 @@ namespace hpx::execution {
                 exec.pool_ :
                 threads::detail::get_self_or_default_pool();
 
+            bool do_not_combine_tasks = hpx::threads::do_not_combine_tasks(
+                exec.policy().get_hint().sharing_mode);
+
+            // use scheduling based on index_queue if no hierarchical threshold
+            // is given
+            if (exec.hierarchical_threshold_ == 0 && !do_not_combine_tasks)
+            {
+                return parallel::execution::detail::
+                    index_queue_bulk_async_execute(desc, pool,
+                        exec.get_first_core(), exec.get_num_cores(),
+                        exec.hierarchical_threshold_, exec.policy_,
+                        HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+            }
+
             return parallel::execution::detail::hierarchical_bulk_async_execute(
                 desc, pool, exec.get_first_core(), exec.get_num_cores(),
                 exec.hierarchical_threshold_, exec.policy_, HPX_FORWARD(F, f),
@@ -452,7 +472,7 @@ namespace hpx::execution {
 
     private:
         /// \cond NOINTERNAL
-        static constexpr std::size_t hierarchical_threshold_default_ = 6;
+        static constexpr std::size_t hierarchical_threshold_default_ = 0;
 
         threads::thread_pool_base* pool_;
         Policy policy_;

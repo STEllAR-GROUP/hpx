@@ -252,6 +252,49 @@ namespace hpx::threads {
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    /// \enum thread_sharing_hint
+    ///
+    /// The type of hint given to the scheduler related to whether it is ok to
+    /// share the invoked function object between threads
+    enum class thread_sharing_hint : std::uint8_t
+    {
+        /// No hint is specified. The implementation is free to chose what
+        /// sharing methods to use.
+        none = 0,
+
+        /// A hint that tells the scheduler to avoid sharing the given function
+        /// (object) between threads.
+        do_not_share_function = 1,
+
+        /// A hint that tells the scheduler to avoid combining tasks on the same
+        /// thread. This is important for tasks that may synchronize between
+        /// each other, which could lead to deadlocks if those tasks are
+        /// combined running by the same threead.
+        do_not_combine_tasks = 2
+    };
+
+    constexpr bool do_not_share_function(thread_sharing_hint hint) noexcept
+    {
+        return static_cast<std::uint8_t>(hint) &
+            static_cast<std::uint8_t>(
+                thread_sharing_hint::do_not_share_function);
+    }
+
+    constexpr bool do_not_combine_tasks(thread_sharing_hint hint) noexcept
+    {
+        return static_cast<std::uint8_t>(hint) &
+            static_cast<std::uint8_t>(
+                thread_sharing_hint::do_not_combine_tasks);
+    }
+
+    constexpr thread_sharing_hint operator|(
+        thread_sharing_hint lhs, thread_sharing_hint rhs) noexcept
+    {
+        return static_cast<thread_sharing_hint>(
+            static_cast<std::uint8_t>(lhs) | static_cast<std::uint8_t>(rhs));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     /// \brief A hint given to a scheduler to guide where a task should be
     /// scheduled.
     ///
@@ -260,16 +303,21 @@ namespace hpx::threads {
     struct thread_schedule_hint
     {
         /// Construct a default hint with mode thread_schedule_hint_mode::none.
-        constexpr thread_schedule_hint() noexcept = default;
+        constexpr thread_schedule_hint() noexcept
+          : placement_mode(thread_placement_hint::none)
+          , sharing_mode(thread_sharing_hint::none)
+        {
+        }
 
         /// Construct a hint with mode thread_schedule_hint_mode::thread and the
         /// given hint as the local thread number.
         constexpr explicit thread_schedule_hint(std::int16_t thread_hint,
-            thread_placement_hint placement =
-                thread_placement_hint::none) noexcept
+            thread_placement_hint placement = thread_placement_hint::none,
+            thread_sharing_hint sharing = thread_sharing_hint::none) noexcept
           : hint(thread_hint)
           , mode(thread_schedule_hint_mode::thread)
           , placement_mode(placement)
+          , sharing_mode(sharing)
         {
         }
 
@@ -277,11 +325,12 @@ namespace hpx::threads {
         /// unused when the mode is thread_schedule_hint_mode::none.
         constexpr thread_schedule_hint(thread_schedule_hint_mode mode,
             std::int16_t hint,
-            thread_placement_hint placement =
-                thread_placement_hint::none) noexcept
+            thread_placement_hint placement = thread_placement_hint::none,
+            thread_sharing_hint sharing = thread_sharing_hint::none) noexcept
           : hint(hint)
           , mode(mode)
           , placement_mode(placement)
+          , sharing_mode(sharing)
         {
         }
 
@@ -290,7 +339,8 @@ namespace hpx::threads {
             thread_schedule_hint const& rhs) const noexcept
         {
             return mode == rhs.mode && hint == rhs.hint &&
-                placement_mode == rhs.placement_mode;
+                placement_mode == rhs.placement_mode &&
+                sharing_mode == rhs.sharing_mode;
         }
 
         constexpr bool operator!=(
@@ -308,6 +358,9 @@ namespace hpx::threads {
         thread_schedule_hint_mode mode = thread_schedule_hint_mode::none;
 
         /// The mode of the desired thread placement.
-        thread_placement_hint placement_mode = thread_placement_hint::none;
+        thread_placement_hint placement_mode : 6;
+
+        /// The mode of the desired sharing hint
+        thread_sharing_hint sharing_mode : 2;
     };
 }    // namespace hpx::threads

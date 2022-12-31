@@ -42,7 +42,7 @@ pipeline {
                     // number of node-hours consumed
                     axis {
                         name 'configuration_name'
-                        values 'gcc-11', 'gcc-8', 'gcc-cuda', 'clang-10', 'clang-13', 'clang-cuda', 'clang-apex'
+                        values 'gcc-11', 'gcc-cuda', 'clang-10', 'clang-13', 'clang-cuda', 'clang-apex'
                     }
                     axis {
                          name 'build_type'

@@ -11,25 +11,27 @@
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
 
+#include <cstdint>
+
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
-    const detail::async_policy launch::async =
+    detail::async_policy const launch::async =
         detail::async_policy{threads::thread_priority::default_};
-    const detail::fork_policy launch::fork =
+    detail::fork_policy const launch::fork =
         detail::fork_policy{threads::thread_priority::default_};
-    const detail::sync_policy launch::sync = detail::sync_policy{};
-    const detail::deferred_policy launch::deferred = detail::deferred_policy{};
-    const detail::apply_policy launch::apply = detail::apply_policy{};
+    detail::sync_policy const launch::sync = detail::sync_policy{};
+    detail::deferred_policy const launch::deferred = detail::deferred_policy{};
+    detail::apply_policy const launch::apply = detail::apply_policy{};
 
-    const detail::select_policy_generator launch::select =
+    detail::select_policy_generator const launch::select =
         detail::select_policy_generator{};
 
-    const detail::policy_holder<> launch::all =
+    detail::policy_holder<> const launch::all =
         detail::policy_holder<>{detail::launch_policy::all};
-    const detail::policy_holder<> launch::sync_policies =
+    detail::policy_holder<> const launch::sync_policies =
         detail::policy_holder<>{detail::launch_policy::sync_policies};
-    const detail::policy_holder<> launch::async_policies =
+    detail::policy_holder<> const launch::async_policies =
         detail::policy_holder<>{detail::launch_policy::async_policies};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -40,7 +42,14 @@ namespace hpx {
         {
             ar >> policy_;
             ar >> priority_;
-            ar >> hint_.hint >> hint_.mode >> hint_.placement_mode;
+            ar >> hint_.hint >> hint_.mode;
+            std::int8_t mode = 0;
+            ar >> mode;
+            hint_.placement_mode =
+                static_cast<hpx::threads::thread_placement_hint>(mode);
+            ar >> mode;
+            hint_.sharing_mode =
+                static_cast<hpx::threads::thread_sharing_hint>(mode);
         }
 
         void policy_holder_base::save(
@@ -48,7 +57,9 @@ namespace hpx {
         {
             ar << policy_;
             ar << priority_;
-            ar << hint_.hint << hint_.mode << hint_.placement_mode;
+            ar << hint_.hint << hint_.mode
+               << static_cast<std::int8_t>(hint_.placement_mode)
+               << static_cast<std::int8_t>(hint_.sharing_mode);
         }
     }    // namespace detail
 }    // namespace hpx

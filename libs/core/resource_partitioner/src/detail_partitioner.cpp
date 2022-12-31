@@ -761,6 +761,8 @@ namespace hpx::resource::detail {
         setup_pools();
         setup_schedulers();
         reconfigure_affinities();
+
+        is_initialized_ = true;
     }
 
     ////////////////////////////////////////////////////////////////////////
@@ -866,7 +868,12 @@ namespace hpx::resource::detail {
 
     std::size_t partitioner::get_pu_num(std::size_t global_thread_num) const
     {
-        return affinity_data_.get_pu_num(global_thread_num);
+        // protect against stand-alone use of schedulers
+        if (is_initialized_)
+        {
+            return affinity_data_.get_pu_num(global_thread_num);
+        }
+        return global_thread_num;
     }
 
     std::size_t partitioner::get_thread_occupancy(std::size_t pu_num) const
@@ -876,13 +883,29 @@ namespace hpx::resource::detail {
 
     threads::mask_type partitioner::get_used_pus_mask(std::size_t pu_num) const
     {
-        return affinity_data_.get_used_pus_mask(topo_, pu_num);
+        if (is_initialized_)
+        {
+            return affinity_data_.get_used_pus_mask(topo_, pu_num);
+        }
+
+        auto mask = hpx::threads::mask_type();
+        hpx::threads::resize(mask, hpx::threads::hardware_concurrency());
+        threads::set(mask, pu_num);
+        return mask;
     }
 
     threads::mask_type partitioner::get_pu_mask(
         std::size_t global_thread_num) const
     {
-        return affinity_data_.get_pu_mask(topo_, global_thread_num);
+        if (is_initialized_)
+        {
+            return affinity_data_.get_pu_mask(topo_, global_thread_num);
+        }
+
+        auto mask = hpx::threads::mask_type();
+        hpx::threads::resize(mask, hpx::threads::hardware_concurrency());
+        threads::set(mask, global_thread_num);
+        return mask;
     }
 
     void partitioner::init(resource::partitioner_mode rpmode,
