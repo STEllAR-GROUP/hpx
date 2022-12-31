@@ -287,6 +287,13 @@ namespace hpx::threads {
                 thread_sharing_hint::do_not_combine_tasks);
     }
 
+    constexpr thread_sharing_hint operator|(
+        thread_sharing_hint lhs, thread_sharing_hint rhs) noexcept
+    {
+        return static_cast<thread_sharing_hint>(
+            static_cast<std::uint8_t>(lhs) | static_cast<std::uint8_t>(rhs));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief A hint given to a scheduler to guide where a task should be
     /// scheduled.

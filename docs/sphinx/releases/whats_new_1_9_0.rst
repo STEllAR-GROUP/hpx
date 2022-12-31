@@ -19,6 +19,7 @@ Breaking changes
 ================
 
 - Stopped supporting Clang V8, the minimal version supported is now Clang V10
+- Stopped supporting gcc V8, the minimal version supported is now gcc V9
 - Stopped supporting Visual Studio 2015, the minimal version supported is
   now Visual Studion 2019
 
