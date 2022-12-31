@@ -9,16 +9,15 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_VC)
-#include <cstddef>
-
 #include <Vc/Vc>
 #include <Vc/global.h>
 
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
+
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE int find_first_of(
-        Vc::Mask<T, Abi> const& msk)
+        Vc::Mask<T, Abi> const& msk) noexcept
     {
         if (Vc::any_of(msk))
         {
@@ -26,6 +25,6 @@ namespace hpx { namespace parallel { namespace traits {
         }
         return -1;
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

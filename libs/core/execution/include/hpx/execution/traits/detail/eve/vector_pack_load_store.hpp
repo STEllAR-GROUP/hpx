@@ -16,7 +16,7 @@
 #include <memory>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename V, typename ValueType, typename Enable>
@@ -56,6 +56,6 @@ namespace hpx { namespace parallel { namespace traits {
             return;
         }
     };
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

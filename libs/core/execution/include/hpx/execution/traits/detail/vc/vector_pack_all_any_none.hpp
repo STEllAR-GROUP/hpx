@@ -14,11 +14,12 @@
 #include <Vc/Vc>
 #include <Vc/global.h>
 
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
+
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t all_of(
-        Vc::Mask<T, Abi> const& msk)
+        Vc::Mask<T, Abi> const& msk) noexcept
     {
         return Vc::all_of(msk);
     }
@@ -26,7 +27,7 @@ namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t any_of(
-        Vc::Mask<T, Abi> const& msk)
+        Vc::Mask<T, Abi> const& msk) noexcept
     {
         return Vc::any_of(msk);
     }
@@ -34,10 +35,10 @@ namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t none_of(
-        Vc::Mask<T, Abi> const& msk)
+        Vc::Mask<T, Abi> const& msk) noexcept
     {
         return Vc::none_of(msk);
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

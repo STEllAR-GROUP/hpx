@@ -12,13 +12,12 @@
 
 #include <hpx/execution/traits/detail/simd/vector_pack_simd.hpp>
 
-#include <cstddef>
+namespace hpx::parallel::traits {
 
-namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE int find_first_of(
-        datapar::experimental::simd_mask<T, Abi> const& msk)
+        datapar::experimental::simd_mask<T, Abi> const& msk) noexcept
     {
         if (datapar::experimental::any_of(msk))
         {
@@ -26,6 +25,6 @@ namespace hpx { namespace parallel { namespace traits {
         }
         return -1;
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

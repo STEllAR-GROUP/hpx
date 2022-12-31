@@ -9,16 +9,16 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_VC)
-#include <cstddef>
-
 #include <Vc/Vc>
 #include <Vc/global.h>
 
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
+
     ////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto choose(Vc::Mask<T, Abi> const& msk,
-        Vc::Vector<T, Abi> const& v_true, Vc::Vector<T, Abi> const& v_false)
+        Vc::Vector<T, Abi> const& v_true,
+        Vc::Vector<T, Abi> const& v_false) noexcept
     {
         Vc::Vector<T, Abi> v;
         where(msk, v) = v_true;
@@ -30,10 +30,10 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE void mask_assign(
         Vc::Mask<T, Abi> const& msk, Vc::Vector<T, Abi>& v,
-        Vc::Vector<T, Abi> const& val)
+        Vc::Vector<T, Abi> const& val) noexcept
     {
         where(msk, v) = val;
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

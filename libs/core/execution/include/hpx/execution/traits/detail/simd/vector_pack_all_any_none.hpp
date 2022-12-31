@@ -9,16 +9,16 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_EXPERIMENTAL_SIMD)
+#include <cstddef>
 
 #include <hpx/execution/traits/detail/simd/vector_pack_simd.hpp>
 
-#include <cstddef>
+namespace hpx::parallel::traits {
 
-namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t all_of(
-        datapar::experimental::simd_mask<T, Abi> const& msk)
+        datapar::experimental::simd_mask<T, Abi> const& msk) noexcept
     {
         return datapar::experimental::all_of(msk);
     }
@@ -26,7 +26,7 @@ namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t any_of(
-        datapar::experimental::simd_mask<T, Abi> const& msk)
+        datapar::experimental::simd_mask<T, Abi> const& msk) noexcept
     {
         return datapar::experimental::any_of(msk);
     }
@@ -34,10 +34,10 @@ namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t none_of(
-        datapar::experimental::simd_mask<T, Abi> const& msk)
+        datapar::experimental::simd_mask<T, Abi> const& msk) noexcept
     {
         return datapar::experimental::none_of(msk);
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

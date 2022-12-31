@@ -12,16 +12,15 @@
 
 #include <hpx/execution/traits/detail/simd/vector_pack_simd.hpp>
 
-#include <cstddef>
+namespace hpx::parallel::traits {
 
-namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi, typename Reduce>
     HPX_HOST_DEVICE HPX_FORCEINLINE T reduce(
-        Reduce r, datapar::experimental::simd<T, Abi> const& val)
+        Reduce r, datapar::experimental::simd<T, Abi> const& val) noexcept
     {
         return datapar::experimental::reduce(val, r);
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

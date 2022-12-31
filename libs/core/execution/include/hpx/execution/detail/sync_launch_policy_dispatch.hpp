@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     // dispatch point used for launch_policy implementations
     template <typename Action, typename Enable = void>
@@ -101,8 +101,7 @@ namespace hpx { namespace detail {
                         policy.priority());
                 if (tid && policy == launch::fork)
                 {
-                    // make sure this thread is executed last
-                    // yield_to
+                    // make sure this thread is executed last: yield_to
                     hpx::this_thread::suspend(
                         threads::thread_schedule_state::pending, tid.noref(),
                         "sync_launch_policy_dispatch<fork>");
@@ -112,4 +111,4 @@ namespace hpx { namespace detail {
             return p.get_future().get();
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

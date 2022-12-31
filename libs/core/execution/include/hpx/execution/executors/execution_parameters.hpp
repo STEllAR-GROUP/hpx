@@ -34,7 +34,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     namespace detail {
         /// \cond NOINTERNAL
@@ -572,6 +572,7 @@ namespace hpx { namespace parallel { namespace execution {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         /// \cond NOINTERNAL
         template <bool... Flags>
         struct parameters_type_counter;
@@ -596,8 +597,8 @@ namespace hpx { namespace parallel { namespace execution {
         {
             // default constructor is needed for serialization purposes
             template <typename Dependent = void,
-                typename Enable = std::enable_if_t<
-                    std::is_constructible<T>::value, Dependent>>
+                typename Enable =
+                    std::enable_if_t<std::is_constructible_v<T>, Dependent>>
             unwrapper()
               : T()
             {
@@ -606,7 +607,7 @@ namespace hpx { namespace parallel { namespace execution {
             // generic poor-man's forwarding constructor
             template <typename U,
                 typename Enable = std::enable_if_t<
-                    !std::is_same<std::decay_t<U>, unwrapper>::value>>
+                    !std::is_same_v<std::decay_t<U>, unwrapper>>>
             unwrapper(U&& u)
               : T(HPX_FORWARD(U, u))
             {
@@ -621,7 +622,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct maximal_number_of_chunks_call_helper<T, Wrapper,
-            std::enable_if_t<has_maximal_number_of_chunks<T>::value>>
+            std::enable_if_t<has_maximal_number_of_chunks_v<T>>>
         {
             template <typename Executor>
             HPX_FORCEINLINE std::size_t maximal_number_of_chunks(
@@ -642,7 +643,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct get_chunk_size_call_helper<T, Wrapper,
-            std::enable_if_t<has_get_chunk_size<T>::value>>
+            std::enable_if_t<has_get_chunk_size_v<T>>>
         {
             template <typename Executor>
             HPX_FORCEINLINE std::size_t get_chunk_size(Executor&& exec,
@@ -664,7 +665,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct measure_iteration_call_helper<T, Wrapper,
-            std::enable_if_t<has_measure_iteration<T>::value>>
+            std::enable_if_t<has_measure_iteration_v<T>>>
         {
             template <typename Executor, typename F>
             HPX_FORCEINLINE std::size_t measure_iteration(Executor&& exec,
@@ -685,7 +686,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct mark_begin_execution_call_helper<T, Wrapper,
-            std::enable_if_t<has_mark_begin_execution<T>::value>>
+            std::enable_if_t<has_mark_begin_execution_v<T>>>
         {
             template <typename Executor>
             HPX_FORCEINLINE void mark_begin_execution(Executor&& exec)
@@ -704,7 +705,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct mark_end_of_scheduling_call_helper<T, Wrapper,
-            std::enable_if_t<has_mark_begin_execution<T>::value>>
+            std::enable_if_t<has_mark_begin_execution_v<T>>>
         {
             template <typename Executor>
             HPX_FORCEINLINE void mark_end_of_scheduling(Executor&& exec)
@@ -723,7 +724,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct mark_end_execution_call_helper<T, Wrapper,
-            std::enable_if_t<has_mark_begin_execution<T>::value>>
+            std::enable_if_t<has_mark_begin_execution_v<T>>>
         {
             template <typename Executor>
             HPX_FORCEINLINE void mark_end_execution(Executor&& exec)
@@ -742,7 +743,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct processing_units_count_call_helper<T, Wrapper,
-            std::enable_if_t<has_processing_units_count<T>::value>>
+            std::enable_if_t<has_processing_units_count_v<T>>>
         {
             template <typename Executor>
             HPX_FORCEINLINE std::size_t processing_units_count(
@@ -763,7 +764,7 @@ namespace hpx { namespace parallel { namespace execution {
 
         template <typename T, typename Wrapper>
         struct reset_thread_distribution_call_helper<T, Wrapper,
-            std::enable_if_t<has_reset_thread_distribution<T>::value>>
+            std::enable_if_t<has_reset_thread_distribution_v<T>>>
         {
             template <typename Executor>
             HPX_FORCEINLINE void reset_thread_distribution(Executor&& exec)
@@ -778,8 +779,8 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename T>
         struct base_member_helper
         {
-            explicit constexpr base_member_helper(T t)
-              : member_(t)
+            explicit constexpr base_member_helper(T t) noexcept
+              : member_(HPX_MOVE(t))
             {
             }
 
@@ -801,8 +802,8 @@ namespace hpx { namespace parallel { namespace execution {
         {
             using wrapper_type = std::reference_wrapper<T>;
 
-            constexpr unwrapper(wrapper_type wrapped_param)
-              : base_member_helper<wrapper_type>(wrapped_param)
+            constexpr explicit unwrapper(wrapper_type wrapped_param) noexcept
+              : base_member_helper<wrapper_type>(HPX_MOVE(wrapped_param))
             {
             }
         };
@@ -852,7 +853,7 @@ namespace hpx { namespace parallel { namespace execution {
                 typename Enable =
                     std::enable_if_t<hpx::util::pack<Params...>::size ==
                         hpx::util::pack<Params_...>::size>>
-            constexpr executor_parameters(Params_&&... params)
+            constexpr explicit executor_parameters(Params_&&... params)
               : unwrapper<Params>(HPX_FORWARD(Params_, params))...
             {
             }
@@ -861,7 +862,7 @@ namespace hpx { namespace parallel { namespace execution {
             friend class hpx::serialization::access;
 
             template <typename Archive>
-            void serialize(Archive& ar, const unsigned int /* version */)
+            void serialize(Archive& ar, unsigned int const /* version */)
             {
                 (hpx::serialization::detail::serialize_one(
                      ar, serialization::base_object<Params>(*this)),
@@ -915,4 +916,4 @@ namespace hpx { namespace parallel { namespace execution {
 
         return HPX_FORWARD(Param, param);
     }
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

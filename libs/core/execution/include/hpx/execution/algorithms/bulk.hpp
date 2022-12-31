@@ -32,6 +32,7 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Sender, typename Shape, typename F>
         struct bulk_sender
         {

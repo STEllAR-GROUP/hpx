@@ -42,7 +42,7 @@ namespace hpx::execution::experimental {
         ///       and 80 microseconds as the minimal time for which
         ///       any of the scheduled chunks should run.
         ///
-        constexpr persistent_auto_chunk_size(
+        constexpr explicit persistent_auto_chunk_size(
             std::uint64_t num_iters_for_timing = 0) noexcept
           : chunk_size_time_(0)
           , min_time_(200000)
@@ -86,7 +86,7 @@ namespace hpx::execution::experimental {
 
         // Estimate execution time for one iteration
         template <typename Executor, typename F>
-        auto measure_iteration(Executor&&, F&& f, std::size_t count) noexcept
+        auto measure_iteration(Executor&&, F&& f, std::size_t count)
         {
             // by default use 1% of the iterations
             if (num_iters_for_timing_ == 0)
@@ -147,7 +147,7 @@ namespace hpx::execution::experimental {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /* version */)
+        void serialize(Archive& ar, unsigned int const /* version */)
         {
             // clang-format off
             ar & chunk_size_time_ & min_time_ & num_iters_for_timing_;

@@ -28,7 +28,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     namespace detail {
 
@@ -163,7 +163,7 @@ namespace hpx { namespace parallel { namespace execution {
                 return end_;
             }
 
-            std::ptrdiff_t size() const noexcept
+            constexpr std::ptrdiff_t size() const noexcept
             {
                 return size_;
             }
@@ -235,10 +235,10 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename T>
             static void* allocate(void* storage, std::size_t storage_size)
             {
-                using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
-
                 if (sizeof(T) > storage_size)
                 {
+                    using storage_t =
+                        std::aligned_storage_t<sizeof(T), alignof(T)>;
                     return new storage_t;
                 }
                 return storage;
@@ -248,8 +248,6 @@ namespace hpx { namespace parallel { namespace execution {
             static void _deallocate(
                 void* obj, std::size_t storage_size, bool destroy) noexcept
             {
-                using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
-
                 if (destroy)
                 {
                     get<T>(obj).~T();
@@ -257,6 +255,8 @@ namespace hpx { namespace parallel { namespace execution {
 
                 if (sizeof(T) > storage_size)
                 {
+                    using storage_t =
+                        std::aligned_storage_t<sizeof(T), alignof(T)>;
                     delete static_cast<storage_t*>(obj);
                 }
             }
@@ -267,7 +267,9 @@ namespace hpx { namespace parallel { namespace execution {
                 void const* src, bool destroy)
             {
                 if (destroy)
+                {
                     get<T>(storage).~T();
+                }
 
                 void* buffer = allocate<T>(storage, storage_size);
                 return hpx::construct_at(static_cast<T*>(buffer), get<T>(src));
@@ -924,10 +926,6 @@ namespace hpx { namespace parallel { namespace execution {
         using base_type::vptr;
     };
 
-}}}    // namespace hpx::parallel::execution
-
-namespace hpx { namespace parallel { namespace execution {
-
     /// \cond NOINTERNAL
     template <typename Sig>
     struct is_never_blocking_one_way_executor<
@@ -959,4 +957,4 @@ namespace hpx { namespace parallel { namespace execution {
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

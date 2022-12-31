@@ -10,17 +10,17 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 
-#if !defined(__CUDACC__)
+namespace hpx::parallel::traits {
 
-namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Reduce>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T reduce(Reduce, T val)
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T reduce(Reduce, T val) noexcept
     {
         return val;
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
+#if !defined(__CUDACC__)
 #include <hpx/execution/traits/detail/eve/vector_pack_reduce.hpp>
 #include <hpx/execution/traits/detail/simd/vector_pack_reduce.hpp>
 #include <hpx/execution/traits/detail/vc/vector_pack_reduce.hpp>

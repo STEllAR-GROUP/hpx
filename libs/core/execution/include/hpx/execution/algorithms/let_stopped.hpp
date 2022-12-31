@@ -201,9 +201,9 @@ namespace hpx::execution::experimental {
                                                 HPX_MOVE(r.receiver));
                                     }));
 #else
-                                // MSVC doesn't get copy elision quite right,
-                                // the operation state must be constructed
-                                // explicitly directly in place
+                                // earlier versions of MSVC don't get copy
+                                // elision quite right, the operation state must
+                                // be constructed explicitly directly in place
                                 r.op_state.successor_op_state.emplace_f(
                                     hpx::execution::experimental::connect,
                                     HPX_INVOKE(HPX_MOVE(r.f), ),
@@ -280,10 +280,10 @@ namespace hpx::execution::experimental {
     // let_stopped is very similar to then: when it is started, it invokes the
     // provided function with the values sent by the input sender as arguments.
     // However, where the sender returned from then sends exactly what that
-    // function ends up returning - let_stopped requires that the function return
-    // a sender, and the sender returned by let_stopped sends the values sent by
-    // the sender returned from the callback. This is similar to the notion of
-    // "future unwrapping" in future/promise-based frameworks.
+    // function ends up returning - let_stopped requires that the function
+    // return a sender, and the sender returned by let_stopped sends the values
+    // sent by the sender returned from the callback. This is similar to the
+    // notion of "future unwrapping" in future/promise-based frameworks.
     //
     // let_stopped is guaranteed to not begin executing function until the
     // returned sender is started.

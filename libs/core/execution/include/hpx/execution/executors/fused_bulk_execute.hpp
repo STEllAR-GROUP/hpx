@@ -19,7 +19,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { namespace execution { namespace detail {
+namespace hpx::parallel::execution::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename Shape, typename Future, typename... Ts>
@@ -97,8 +97,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         {
             return fused_bulk_sync_execute(exec_, f_, shape_,
                 HPX_FORWARD(Future, predecessor),
-                typename hpx::util::make_index_pack<sizeof...(Ts)>::type(),
-                args_);
+                hpx::util::make_index_pack_t<sizeof...(Ts)>(), args_);
         }
     };
 
@@ -146,8 +145,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         {
             return fused_bulk_async_execute(exec_, f_, shape_,
                 HPX_FORWARD(Future, predecessor),
-                typename hpx::util::make_index_pack<sizeof...(Ts)>::type(),
-                args_);
+                hpx::util::make_index_pack_t<sizeof...(Ts)>(), args_);
         }
     };
 
@@ -162,4 +160,4 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
             HPX_FORWARD(Shape, shape), HPX_FORWARD(Args, args)};
     }
-}}}}    // namespace hpx::parallel::execution::detail
+}    // namespace hpx::parallel::execution::detail

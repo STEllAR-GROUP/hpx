@@ -14,11 +14,12 @@
 #include <Vc/Vc>
 #include <Vc/global.h>
 
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
+
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi, typename Reduce>
     HPX_HOST_DEVICE HPX_FORCEINLINE T reduce(
-        Reduce r, Vc::Vector<T, Abi> const& val)
+        Reduce r, Vc::Vector<T, Abi> const& val) noexcept
     {
         T init = val[0];
         for (std::size_t i = 1; i != val.size(); i++)
@@ -27,6 +28,6 @@ namespace hpx { namespace parallel { namespace traits {
         }
         return init;
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

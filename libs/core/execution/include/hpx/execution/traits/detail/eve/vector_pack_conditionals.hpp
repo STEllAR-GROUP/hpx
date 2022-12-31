@@ -11,12 +11,14 @@
 #if defined(HPX_HAVE_DATAPAR_EVE)
 #include <eve/eve.hpp>
 
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
+
     ////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE eve::wide<T, Abi> choose(
         eve::logical<eve::wide<T, Abi>> const& msk,
-        eve::wide<T, Abi> const& v_true, eve::wide<T, Abi> const& v_false)
+        eve::wide<T, Abi> const& v_true,
+        eve::wide<T, Abi> const& v_false) noexcept
     {
         return eve::if_else(msk, v_true, v_false);
     }
@@ -25,10 +27,10 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE void mask_assign(
         eve::logical<eve::wide<T, Abi>> const& msk, eve::wide<T, Abi>& v,
-        eve::wide<T, Abi> const& val)
+        eve::wide<T, Abi> const& val) noexcept
     {
         v = eve::if_else(msk, val, v);
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

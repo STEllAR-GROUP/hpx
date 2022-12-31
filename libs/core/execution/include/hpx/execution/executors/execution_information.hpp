@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,13 +21,16 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     ///////////////////////////////////////////////////////////////////////////
-    // define member traits
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(has_pending_closures)
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_pu_mask)
-    HPX_HAS_MEMBER_XXX_TRAIT_DEF(set_scheduler_mode)
+    namespace detail {
+
+        // define member traits
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(has_pending_closures)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(get_pu_mask)
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(set_scheduler_mode)
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     // define customization points
@@ -47,7 +50,7 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -59,8 +62,8 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value &&
-                has_has_pending_closures<Executor>::value
+                hpx::traits::is_executor_any_v<Executor> &&
+                detail::has_has_pending_closures_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_invoke(
@@ -92,7 +95,7 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(get_pu_mask_t,
@@ -105,8 +108,8 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value &&
-                has_get_pu_mask<Executor>::value
+                hpx::traits::is_executor_any_v<Executor> &&
+                detail::has_get_pu_mask_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_invoke(get_pu_mask_t,
@@ -132,7 +135,7 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename Mode,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE void tag_fallback_invoke(
@@ -143,8 +146,8 @@ namespace hpx { namespace parallel { namespace execution {
         // clang-format off
         template <typename Executor, typename Mode,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value &&
-                has_set_scheduler_mode<Executor>::value
+                hpx::traits::is_executor_any_v<Executor> &&
+                detail::has_set_scheduler_mode_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE void tag_invoke(
@@ -153,4 +156,4 @@ namespace hpx { namespace parallel { namespace execution {
             exec.set_scheduler_mode(mode);
         }
     } set_scheduler_mode{};
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

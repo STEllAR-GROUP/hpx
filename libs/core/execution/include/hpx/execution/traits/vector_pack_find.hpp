@@ -10,16 +10,17 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 
-#if !defined(__CUDACC__)
+namespace hpx::parallel::traits {
 
-namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
-    HPX_HOST_DEVICE HPX_FORCEINLINE int find_first_of(bool msk)
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr int find_first_of(
+        bool msk) noexcept
     {
         return msk ? 0 : -1;
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
+#if !defined(__CUDACC__)
 #include <hpx/execution/traits/detail/eve/vector_pack_find.hpp>
 #include <hpx/execution/traits/detail/simd/vector_pack_find.hpp>
 #include <hpx/execution/traits/detail/vc/vector_pack_find.hpp>

@@ -168,7 +168,9 @@ namespace hpx {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Sequence>
         struct wait_some;
@@ -176,7 +178,8 @@ namespace hpx {
         template <typename Sequence>
         struct set_wait_some_callback_impl
         {
-            explicit set_wait_some_callback_impl(wait_some<Sequence>& wait)
+            explicit set_wait_some_callback_impl(
+                wait_some<Sequence>& wait) noexcept
               : wait_(wait)
             {
             }
@@ -197,8 +200,9 @@ namespace hpx {
                     {
                         if (!shared_state->is_ready(std::memory_order_relaxed))
                         {
-                            // handle future only if not enough futures are ready yet
-                            // also, do not touch any futures which are already ready
+                            // handle future only if not enough futures are
+                            // ready yet also, do not touch any futures which
+                            // are already ready
                             shared_state->execute_deferred();
 
                             // execute_deferred might have made the future ready
@@ -290,7 +294,7 @@ namespace hpx {
         public:
             using argument_type = Sequence;
 
-            wait_some(argument_type const& values, std::size_t n)
+            wait_some(argument_type const& values, std::size_t n) noexcept
               : values_(values)
               , count_(0)
               , needed_count_(n)

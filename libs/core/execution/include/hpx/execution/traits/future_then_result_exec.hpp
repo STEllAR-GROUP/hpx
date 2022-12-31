@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -20,9 +20,11 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Future, typename F,
             typename Enable = void>
@@ -59,4 +61,4 @@ namespace hpx { namespace traits {
     template <typename Executor, typename Future, typename F>
     using future_then_executor_result_t =
         typename future_then_executor_result<Executor, Future, F>::type;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

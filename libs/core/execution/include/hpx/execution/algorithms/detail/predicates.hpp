@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,7 +20,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel { inline namespace v1 { namespace detail {
 
     template <typename InputIterator, typename Distance>
     HPX_HOST_DEVICE constexpr void advance_impl(
@@ -419,9 +419,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             return t1 / t2;
         }
     };
-}}}}    // namespace hpx::parallel::v1::detail
+}}}    // namespace hpx::parallel::v1::detail
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     using equal_to = hpx::parallel::v1::detail::equal_to;
@@ -430,4 +430,4 @@ namespace hpx { namespace ranges {
     using greater = hpx::parallel::v1::detail::greater;
     using greater_equal = hpx::parallel::v1::detail::greater_equal;
     using less_equal = hpx::parallel::v1::detail::less_equal;
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
