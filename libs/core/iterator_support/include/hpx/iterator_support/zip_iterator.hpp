@@ -150,15 +150,31 @@ namespace hpx::util {
         public:
             HPX_HOST_DEVICE constexpr zip_iterator_base() noexcept {}
 
-            HPX_HOST_DEVICE
-            constexpr zip_iterator_base(IteratorTuple const& iterators)
+            HPX_HOST_DEVICE explicit constexpr zip_iterator_base(
+                IteratorTuple const& iterators)
               : iterators_(iterators)
             {
             }
-            HPX_HOST_DEVICE
-            constexpr zip_iterator_base(IteratorTuple&& iterators) noexcept
+            HPX_HOST_DEVICE explicit constexpr zip_iterator_base(
+                IteratorTuple&& iterators) noexcept
               : iterators_(HPX_MOVE(iterators))
             {
+            }
+
+            HPX_HOST_DEVICE
+            constexpr zip_iterator_base& operator=(
+                IteratorTuple const& iterators)
+            {
+                iterators_ = iterators;
+                return *this;
+            }
+
+            HPX_HOST_DEVICE
+            constexpr zip_iterator_base& operator=(
+                IteratorTuple&& iterators) noexcept
+            {
+                iterators_ = HPX_MOVE(iterators);
+                return *this;
             }
 
             using iterator_tuple_type = IteratorTuple;
@@ -275,26 +291,15 @@ namespace hpx::util {
         {
         }
 
-        HPX_HOST_DEVICE constexpr zip_iterator(zip_iterator const& other)
-          : base_type(other)
-        {
-        }
+        HPX_HOST_DEVICE constexpr zip_iterator(
+            zip_iterator const& other) = default;
+        HPX_HOST_DEVICE constexpr zip_iterator(
+            zip_iterator&& other) noexcept = default;
 
-        HPX_HOST_DEVICE constexpr zip_iterator(zip_iterator&& other) noexcept
-          : base_type(HPX_MOVE(other))
-        {
-        }
-
-        HPX_HOST_DEVICE zip_iterator& operator=(zip_iterator const& other)
-        {
-            base_type::operator=(other);
-            return *this;
-        }
-        HPX_HOST_DEVICE zip_iterator& operator=(zip_iterator&& other) noexcept
-        {
-            base_type::operator=(HPX_MOVE(other));
-            return *this;
-        }
+        HPX_HOST_DEVICE zip_iterator& operator=(
+            zip_iterator const& other) = default;
+        HPX_HOST_DEVICE zip_iterator& operator=(
+            zip_iterator&& other) noexcept = default;
 
         template <typename... Ts_>
         HPX_HOST_DEVICE std::enable_if_t<
@@ -303,7 +308,7 @@ namespace hpx::util {
             zip_iterator&>
         operator=(zip_iterator<Ts_...> const& other)
         {
-            base_type::operator=(base_type(other.get_iterator_tuple()));
+            base_type::operator=(other.get_iterator_tuple());
             return *this;
         }
 
@@ -314,8 +319,7 @@ namespace hpx::util {
             zip_iterator&>
         operator=(zip_iterator<Ts_...>&& other) noexcept
         {
-            base_type::operator=(
-                base_type(HPX_MOVE(other).get_iterator_tuple()));
+            base_type::operator=(HPX_MOVE(other).get_iterator_tuple());
             return *this;
         }
     };
@@ -368,27 +372,15 @@ namespace hpx::util {
         {
         }
 
-        HPX_HOST_DEVICE constexpr zip_iterator(zip_iterator const& other)
-          : base_type(other)
-        {
-        }
+        HPX_HOST_DEVICE constexpr zip_iterator(
+            zip_iterator const& other) = default;
+        HPX_HOST_DEVICE constexpr zip_iterator(
+            zip_iterator&& other) noexcept = default;
 
-        HPX_HOST_DEVICE constexpr zip_iterator(zip_iterator&& other) noexcept
-          : base_type(HPX_MOVE(other))
-        {
-        }
-
-        HPX_HOST_DEVICE zip_iterator& operator=(zip_iterator const& other)
-        {
-            base_type::operator=(other);
-            return *this;
-        }
-
-        HPX_HOST_DEVICE zip_iterator& operator=(zip_iterator&& other) noexcept
-        {
-            base_type::operator=(HPX_MOVE(other));
-            return *this;
-        }
+        HPX_HOST_DEVICE zip_iterator& operator=(
+            zip_iterator const& other) = default;
+        HPX_HOST_DEVICE zip_iterator& operator=(
+            zip_iterator&& other) noexcept = default;
 
         template <typename... Ts_>
         HPX_HOST_DEVICE std::enable_if_t<

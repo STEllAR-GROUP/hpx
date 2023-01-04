@@ -92,7 +92,7 @@ This will output something similar to:
     protected:
         explicit high_precision_time(std::string const& format)
         {
-            configure(format);
+            manipulator::configure(format);
         }
     };
 

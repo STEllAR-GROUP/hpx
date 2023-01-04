@@ -69,7 +69,7 @@ namespace hpx::lcos::detail {
         policy.set_stacksize(threads::thread_stacksize::current);
 
         // launch a new thread executing the given function
-        threads::thread_id_ref_type tid =
+        threads::thread_id_ref_type tid =    //-V821
             p.post("run_on_completed_on_new_thread", policy);
 
         // wait for the task to run

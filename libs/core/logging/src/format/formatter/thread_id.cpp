@@ -48,6 +48,6 @@ namespace hpx::util::logging::formatter {
 
     std::unique_ptr<thread_id> thread_id::make()
     {
-        return std::unique_ptr<thread_id>(new thread_id_impl());
+        return std::make_unique<thread_id_impl>();
     }
 }    // namespace hpx::util::logging::formatter

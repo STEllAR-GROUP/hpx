@@ -254,28 +254,30 @@ namespace hpx::program_options {
         // Create untyped semantic which accepts zero tokens: i.e.
         // no value can be specified on command line.
         // FIXME: does not look exception-safe
-        std::shared_ptr<option_description> d(
-            new option_description(name, new untyped_value(true), description));
+        std::shared_ptr<option_description> d =
+            std::make_shared<option_description>(
+                name, new untyped_value(true), description);
 
-        owner->add(d);
+        owner->add(HPX_MOVE(d));
         return *this;
     }
 
     options_description_easy_init& options_description_easy_init::operator()(
         char const* name, value_semantic const* s)
     {
-        std::shared_ptr<option_description> d(new option_description(name, s));
-        owner->add(d);
+        std::shared_ptr<option_description> d =
+            std::make_shared<option_description>(name, s);
+        owner->add(HPX_MOVE(d));
         return *this;
     }
 
     options_description_easy_init& options_description_easy_init::operator()(
         char const* name, value_semantic const* s, char const* description)
     {
-        std::shared_ptr<option_description> d(
-            new option_description(name, s, description));
+        std::shared_ptr<option_description> d =
+            std::make_shared<option_description>(name, s, description);
 
-        owner->add(d);
+        owner->add(HPX_MOVE(d));
         return *this;
     }
 
@@ -301,19 +303,20 @@ namespace hpx::program_options {
     void options_description::add(std::shared_ptr<option_description> desc)
     {
         m_options.push_back(desc);
-        belong_to_group.push_back(false);
+        belong_to_group.push_back(0);
     }
 
     options_description& options_description::add(
         options_description const& desc)
     {
-        std::shared_ptr<options_description> d(new options_description(desc));
-        groups.push_back(d);
+        std::shared_ptr<options_description> d =
+            std::make_shared<options_description>(desc);
+        groups.push_back(HPX_MOVE(d));
 
         for (auto const& option : desc.m_options)
         {
             add(option);
-            belong_to_group.back() = true;
+            belong_to_group.back() = 1;
         }
 
         return *this;
@@ -479,7 +482,7 @@ namespace hpx::program_options {
                     // Take care to never increment the iterator past
                     // the end, since MSVC 8.0 (brokenly), assumes that
                     // doing that, even if no access happens, is a bug.
-                    unsigned remaining = static_cast<unsigned>(
+                    auto remaining = static_cast<std::size_t>(
                         std::distance(line_begin, par_end));
                     std::string::const_iterator line_end = line_begin +
                         ((remaining < line_length) ? remaining : line_length);
@@ -502,7 +505,7 @@ namespace hpx::program_options {
                         {
                             // is last_space within the second half ot the
                             // current line
-                            if (static_cast<unsigned>(std::distance(
+                            if (static_cast<std::size_t>(std::distance(
                                     last_space, line_end)) < (line_length / 2))
                             {
                                 line_end = last_space;
@@ -515,9 +518,10 @@ namespace hpx::program_options {
 
                     if (first_line)
                     {
-                        indent += static_cast<unsigned>(par_indent);
-                        line_length -= static_cast<unsigned>(
-                            par_indent);    // there's less to work with now
+                        indent += par_indent;    //-V101
+
+                        // there's less to work with now
+                        line_length -= par_indent;
                         first_line = false;
                     }
 

@@ -19,6 +19,7 @@
 #include <hpx/util/ios_flags_saver.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -207,7 +208,8 @@ namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_HAVE_MAX_CPU_COUNT)
-    mask_type topology::empty_mask = mask_type(hardware_concurrency());
+    mask_type topology::empty_mask =
+        mask_type(static_cast<std::size_t>(hardware_concurrency()));
 #else
     mask_type topology::empty_mask = mask_type();
 #endif
@@ -297,23 +299,23 @@ namespace hpx::threads {
 
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
-            socket_affinity_masks_.push_back(init_socket_affinity_mask(i));
+            socket_affinity_masks_.emplace_back(init_socket_affinity_mask(i));
         }
 
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
-            numa_node_affinity_masks_.push_back(
+            numa_node_affinity_masks_.emplace_back(
                 init_numa_node_affinity_mask(i));
         }
 
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
-            core_affinity_masks_.push_back(init_core_affinity_mask(i));
+            core_affinity_masks_.emplace_back(init_core_affinity_mask(i));
         }
 
         for (std::size_t i = 0; i < num_of_pus_; ++i)
         {
-            thread_affinity_masks_.push_back(init_thread_affinity_mask(i));
+            thread_affinity_masks_.emplace_back(init_thread_affinity_mask(i));
         }
     }
 
@@ -517,7 +519,8 @@ namespace hpx::threads {
                 // Strict binding not supported or failed, try weak binding.
                 if (hwloc_set_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
                 {
-                    std::unique_ptr<char[]> buffer(new char[1024]);
+                    std::unique_ptr<char[]> buffer =
+                        std::make_unique<char[]>(1024);
 
                     hwloc_bitmap_snprintf(buffer.get(), 1024, cpuset);
                     hwloc_bitmap_free(cpuset);
@@ -601,9 +604,6 @@ namespace hpx::threads {
                     errstr);
             }
         }
-
-        hwloc_bitmap_free(nodeset);
-        return empty_mask;
     }
 
     std::size_t topology::init_numa_node_number(std::size_t num_thread)
@@ -629,7 +629,7 @@ namespace hpx::threads {
             if (hwloc_bitmap_intersects(tmp->cpuset, obj->cpuset))
             {
                 /* tmp matches, use it */
-                return tmp->logical_index;
+                return static_cast<std::size_t>(tmp->logical_index);
             }
         }
         return 0;
@@ -1633,10 +1633,10 @@ namespace hpx::threads {
             return;
         }
 
-        os << v[0];
+        os << static_cast<std::uint64_t>(v[0]);
         for (std::size_t i = 1; i != s; i++)
         {
-            os << ", " << std::dec << v[i];
+            os << ", " << std::dec << static_cast<std::uint64_t>(v[i]);
         }
         os << "\n";
     }
@@ -1644,11 +1644,14 @@ namespace hpx::threads {
     void topology::print_hwloc(std::ostream& os) const
     {
         os << "[HWLOC topology info] number of ...\n"
-           << std::dec << "number of sockets     : " << get_number_of_sockets()
-           << "\n"
-           << "number of numa nodes  : " << get_number_of_numa_nodes() << "\n"
-           << "number of cores       : " << get_number_of_cores() << "\n"
-           << "number of PUs         : " << get_number_of_pus() << "\n"
+           << std::dec << "number of sockets     : "
+           << static_cast<std::uint64_t>(get_number_of_sockets()) << "\n"
+           << "number of numa nodes  : "
+           << static_cast<std::uint64_t>(get_number_of_numa_nodes()) << "\n"
+           << "number of cores       : "
+           << static_cast<std::uint64_t>(get_number_of_cores()) << "\n"
+           << "number of PUs         : "
+           << static_cast<std::uint64_t>(get_number_of_pus()) << "\n"
            << "hardware concurrency  : " << hpx::threads::hardware_concurrency()
            << "\n"
            << std::endl;

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -626,12 +626,12 @@ inline constexpr int itt_event_end(int) noexcept
     return 0;
 }
 
-inline constexpr void itt_metadata_add(___itt_domain*, ___itt_id*,
-    ___itt_string_handle*, std::uint64_t const&) noexcept
+inline constexpr void itt_metadata_add(
+    ___itt_domain*, ___itt_id*, ___itt_string_handle*, std::uint64_t) noexcept
 {
 }
 inline constexpr void itt_metadata_add(
-    ___itt_domain*, ___itt_id*, ___itt_string_handle*, double const&) noexcept
+    ___itt_domain*, ___itt_id*, ___itt_string_handle*, double) noexcept
 {
 }
 inline constexpr void itt_metadata_add(

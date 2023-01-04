@@ -258,7 +258,7 @@ namespace hpx::lockfree::detail {
         using index_t = std::uint16_t;
 
         /** uninitialized constructor */
-        tagged_index_data() noexcept    //: index(0), tag(0)
+        tagged_index_data() noexcept    //-V832 //-V730
         {
         }
 

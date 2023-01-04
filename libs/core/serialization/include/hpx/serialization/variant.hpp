@@ -19,6 +19,7 @@
 #endif
 
 #include <cstddef>
+#include <cstdint>
 #include <utility>
 #include <variant>
 
@@ -79,7 +80,7 @@ namespace hpx::serialization {
     template <typename... Ts>
     void save(output_archive& ar, std::variant<Ts...> const& v, unsigned)
     {
-        std::size_t which = v.index();
+        auto which = static_cast<std::uint64_t>(v.index());
         ar << which;
         detail::std_variant_save_visitor visitor(ar);
         std::visit(visitor, v);
@@ -88,9 +89,9 @@ namespace hpx::serialization {
     template <typename... Ts>
     void load(input_archive& ar, std::variant<Ts...>& v, unsigned)
     {
-        std::size_t which;
+        std::uint64_t which;
         ar >> which;
-        if (which >= sizeof...(Ts))
+        if (static_cast<std::size_t>(which) >= sizeof...(Ts))
         {
             // this might happen if a type was removed from the list of variant
             // types
@@ -98,7 +99,8 @@ namespace hpx::serialization {
                 "load<Archive, Variant, version>",
                 "type was removed from the list of variant types");
         }
-        detail::std_variant_impl<Ts...>::load(ar, which, v);
+        detail::std_variant_impl<Ts...>::load(
+            ar, static_cast<std::size_t>(which), v);
     }
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(

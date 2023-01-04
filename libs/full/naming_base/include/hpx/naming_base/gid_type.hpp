@@ -58,7 +58,8 @@ namespace hpx::naming {
 
         static constexpr std::uint64_t credit_mask = credit_base_mask
             << credit_shift;
-        static constexpr std::uint64_t was_split_mask = 0x80000000ull;
+        static constexpr std::uint64_t was_split_mask =
+            0x80000000ull;    //-V112
         static constexpr std::uint64_t has_credits_mask = 0x40000000ull;
         static constexpr std::uint64_t is_locked_mask = 0x20000000ull;
 

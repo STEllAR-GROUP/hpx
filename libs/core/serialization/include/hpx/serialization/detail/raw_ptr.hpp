@@ -17,7 +17,7 @@ namespace hpx::serialization::detail {
     {
         using element_type = T;
 
-        constexpr raw_ptr_type(T* t) noexcept
+        explicit constexpr raw_ptr_type(T* t) noexcept
           : t(t)
         {
         }
@@ -44,12 +44,12 @@ namespace hpx::serialization::detail {
     template <typename T>
     struct raw_ptr_proxy
     {
-        constexpr raw_ptr_proxy(T*& t) noexcept
+        explicit constexpr raw_ptr_proxy(T*& t) noexcept
           : t(t)
         {
         }
 
-        constexpr raw_ptr_proxy(T* const& t) noexcept
+        explicit constexpr raw_ptr_proxy(T* const& t) noexcept    //-V835
           : t(const_cast<T*&>(t))
         {
         }
@@ -76,7 +76,8 @@ namespace hpx::serialization::detail {
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr raw_ptr_proxy<T> raw_ptr(T* const& t) noexcept
+    HPX_FORCEINLINE constexpr raw_ptr_proxy<T> raw_ptr(
+        T* const& t) noexcept    //-V835
     {
         return raw_ptr_proxy<T>(t);
     }
@@ -99,16 +100,16 @@ namespace hpx::serialization::detail {
     }
 
     template <typename T>
-    HPX_FORCEINLINE output_archive& operator&(
-        output_archive& ar, raw_ptr_proxy<T> t)    //-V524
+    HPX_FORCEINLINE output_archive& operator&(    //-V524
+        output_archive& ar, raw_ptr_proxy<T> t)
     {
         t.serialize(ar);
         return ar;
     }
 
     template <typename T>
-    HPX_FORCEINLINE input_archive& operator&(
-        input_archive& ar, raw_ptr_proxy<T> t)    //-V524
+    HPX_FORCEINLINE input_archive& operator&(    //-V524
+        input_archive& ar, raw_ptr_proxy<T> t)
     {
         t.serialize(ar);
         return ar;

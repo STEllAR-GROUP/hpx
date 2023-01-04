@@ -99,7 +99,7 @@ namespace hpx::util::detail {
             static_cast<char*>(allocated_mem) + sizeof(void*));
 
         std::align(alignment, size, aligned_mem, space);
-        *(static_cast<void**>(aligned_mem) - 1) = allocated_mem;
+        *(static_cast<void**>(aligned_mem) - 1) = allocated_mem;    //-V206
 
         return aligned_mem;
     }
@@ -108,7 +108,7 @@ namespace hpx::util::detail {
     {
         if (nullptr != p)
         {
-            std::free(*(static_cast<void**>(p) - 1));
+            std::free(*(static_cast<void**>(p) - 1));    //-V206
         }
     }
 }    // namespace hpx::util::detail
@@ -140,7 +140,7 @@ namespace hpx::util::detail {
             static_cast<char*>(allocated_mem) + sizeof(void*));
 
         std::align(alignment, size, aligned_mem, space);
-        *(static_cast<void**>(aligned_mem) - 1) = allocated_mem;
+        *(static_cast<void**>(aligned_mem) - 1) = allocated_mem;    //-V206
 
         return aligned_mem;
     }
@@ -162,7 +162,7 @@ namespace hpx::util::detail {
                 Allocator>::template rebind_alloc<char>;
 
             char_alloc a(alloc);
-            a.deallocate(*(static_cast<void**>(p) - 1), size);
+            a.deallocate(*(static_cast<void**>(p) - 1), size);    //-V206
         }
     }
 
@@ -188,7 +188,7 @@ namespace hpx::util {
     public:
         using value_type = T;
         using pointer = T*;
-        using const_pointer = const T*;
+        using const_pointer = T const*;
         using reference = T&;
         using const_reference = T const&;
         using size_type = std::size_t;

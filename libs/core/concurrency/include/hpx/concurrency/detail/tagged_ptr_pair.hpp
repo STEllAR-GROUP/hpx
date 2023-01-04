@@ -23,14 +23,14 @@ namespace hpx::lockfree {
         std::uint64_t left;
         std::uint64_t right;
 
-        friend constexpr bool operator==(
-            uint128_type const& lhs, uint128_type const& rhs) noexcept
+        friend constexpr bool operator==(uint128_type const& lhs,    //-V835
+            uint128_type const& rhs) noexcept                        //-V835
         {
             return (lhs.left == rhs.left) && (lhs.right == rhs.right);
         }
 
-        friend constexpr bool operator!=(
-            uint128_type const& lhs, uint128_type const& rhs) noexcept
+        friend constexpr bool operator!=(uint128_type const& lhs,    //-V835
+            uint128_type const& rhs) noexcept                        //-V835
         {
             return !(lhs == rhs);
         }
@@ -53,17 +53,17 @@ namespace hpx::lockfree {
         static constexpr std::size_t right_tag_index = 7;
         static constexpr compressed_ptr_t ptr_mask = 0xffffffffffff;
 
-        static Left* extract_left_ptr(compressed_ptr_pair_t const& i) noexcept
+        static Left* extract_left_ptr(compressed_ptr_pair_t i) noexcept
         {
             return reinterpret_cast<Left*>(i.left & ptr_mask);
         }
 
-        static Right* extract_right_ptr(compressed_ptr_pair_t const& i) noexcept
+        static Right* extract_right_ptr(compressed_ptr_pair_t i) noexcept
         {
             return reinterpret_cast<Right*>(i.right & ptr_mask);
         }
 
-        static tag_t extract_left_tag(compressed_ptr_pair_t const& i) noexcept
+        static tag_t extract_left_tag(compressed_ptr_pair_t i) noexcept
         {
             cast_unit cu;
             cu.value.left = i.left;
@@ -71,7 +71,7 @@ namespace hpx::lockfree {
             return cu.tags[left_tag_index];
         }
 
-        static tag_t extract_right_tag(compressed_ptr_pair_t const& i) noexcept
+        static tag_t extract_right_tag(compressed_ptr_pair_t i) noexcept
         {
             cast_unit cu;
             cu.value.left = i.left;
@@ -92,7 +92,7 @@ namespace hpx::lockfree {
         }
 
         /** uninitialized constructor */
-        tagged_ptr_pair() {}
+        tagged_ptr_pair() {}    //-V730 //-V832
 
         template <typename IntegralL>
         tagged_ptr_pair(Left* lptr, Right* rptr, IntegralL ltag) noexcept

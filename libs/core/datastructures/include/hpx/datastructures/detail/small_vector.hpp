@@ -1251,7 +1251,7 @@ namespace hpx::detail {
 }    // namespace hpx::detail
 
 // NOLINTNEXTLINE(cert-dcl58-cpp)
-namespace std {
+namespace std {    //-V1061
 
     template <typename T, std::size_t N, typename U>
     constexpr auto erase(hpx::detail::small_vector<T, N>& sv, U const& value) ->

@@ -108,7 +108,7 @@ namespace hpx::program_options {
         std::vector<std::wstring> result;
         std::vector<std::string> aux = split_winmain(to_internal(cmdline));
         for (auto const& i : aux)
-            result.push_back(from_utf8(i));
+            result.emplace_back(from_utf8(i));
         return result;
     }
 }    // namespace hpx::program_options

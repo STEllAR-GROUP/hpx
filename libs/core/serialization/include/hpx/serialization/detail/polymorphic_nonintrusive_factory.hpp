@@ -40,12 +40,12 @@ namespace hpx::serialization::detail {
         ;
 #else
     {
-        const char* operator()() const noexcept
+        char const* operator()() const noexcept
         {
-            /// If you encounter this assert while compiling code, that means that
-            /// you have a HPX_REGISTER_ACTION macro somewhere in a source file,
-            /// but the header in which the action is defined misses a
-            /// HPX_REGISTER_ACTION_DECLARATION
+            // If you encounter this assert while compiling code, that means
+            // that you have a HPX_REGISTER_ACTION macro somewhere in a source
+            // file, but the header in which the action is defined misses a
+            // HPX_REGISTER_ACTION_DECLARATION
             static_assert(traits::needs_automatic_registration_v<T>,
                 "HPX_REGISTER_ACTION_DECLARATION missing");
             return util::debug::type_id<T>::typeid_.type_id();
@@ -82,7 +82,7 @@ namespace hpx::serialization::detail {
                 using storage_type =
                     std::aligned_storage_t<sizeof(T), alignof(T)>;
 
-                t.reset(reinterpret_cast<T*>(new storage_type));
+                t.reset(reinterpret_cast<T*>(new storage_type));    //-V572
                 load_construct_data(ar, t.get(), 0);
             }
 
@@ -139,7 +139,7 @@ namespace hpx::serialization::detail {
 
         // the following templates are defined in *.ipp file
         template <typename T>
-        void save(output_archive& ar, const T& t);
+        void save(output_archive& ar, T const& t);
 
         template <typename T>
         void load(input_archive& ar, T& t);
@@ -150,7 +150,7 @@ namespace hpx::serialization::detail {
         T* load(input_archive& ar);
 
     private:
-        polymorphic_nonintrusive_factory() {}
+        polymorphic_nonintrusive_factory() = default;
 
         friend struct hpx::util::static_<polymorphic_nonintrusive_factory>;
 
@@ -161,7 +161,7 @@ namespace hpx::serialization::detail {
     template <typename Derived>
     struct register_class
     {
-        static void save(output_archive& ar, const void* base)
+        static void save(output_archive& ar, void const* base)
         {
             serialize(ar, *static_cast<Derived*>(const_cast<void*>(base)), 0);
         }

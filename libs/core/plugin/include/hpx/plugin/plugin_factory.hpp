@@ -225,7 +225,7 @@ namespace hpx::util::plugin {
         struct static_plugin_factory_item_base
         {
             explicit static_plugin_factory_item_base(
-                get_plugins_list_type const& f_) noexcept
+                get_plugins_list_type const& f_) noexcept    //-V835
               : f(f_)
             {
             }
@@ -251,7 +251,7 @@ namespace hpx::util::plugin {
             hpx::util::pack<Parameters...>> : public Base
         {
             explicit static_plugin_factory_item(
-                get_plugins_list_type const& f) noexcept
+                get_plugins_list_type const& f) noexcept    //-V835
               : Base(f)
             {
             }
@@ -311,7 +311,8 @@ namespace hpx::util::plugin {
             virtual_constructor_t<BasePlugin>>;
 
     public:
-        explicit static_plugin_factory(get_plugins_list_type const& f) noexcept
+        explicit static_plugin_factory(
+            get_plugins_list_type const& f) noexcept    //-V835
           : base_type(f)
         {
         }

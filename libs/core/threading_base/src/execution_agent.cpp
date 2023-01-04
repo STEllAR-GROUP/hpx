@@ -112,7 +112,7 @@ namespace hpx::threads {
         std::size_t k = 0;
         do
         {
-            if (k < 32 || k & 1)
+            if (k < 32 || k & 1)    //-V112
             {
                 do_yield(
                     desc, hpx::threads::thread_schedule_state::pending_boost);

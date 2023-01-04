@@ -297,9 +297,9 @@ namespace hpx::threads::detail {
         std::vector<mask_info> masks;
         for (std::int64_t index : b)
         {
-            masks.push_back(hpx::make_tuple(static_cast<std::size_t>(index),
+            masks.emplace_back(static_cast<std::size_t>(index),
                 t.init_socket_affinity_mask_from_socket(
-                    static_cast<std::size_t>(index))));
+                    static_cast<std::size_t>(index)));
         }
         return masks;
     }
@@ -310,9 +310,9 @@ namespace hpx::threads::detail {
         std::vector<mask_info> masks;
         for (std::int64_t index : b)
         {
-            masks.push_back(hpx::make_tuple(static_cast<std::size_t>(index),
+            masks.emplace_back(static_cast<std::size_t>(index),
                 t.init_numa_node_affinity_mask_from_numa_node(
-                    static_cast<std::size_t>(index))));
+                    static_cast<std::size_t>(index)));
         }
         return masks;
     }
@@ -346,8 +346,7 @@ namespace hpx::threads::detail {
         case spec_type::type::unknown:
         {
             std::vector<mask_info> masks;
-            masks.push_back(
-                hpx::make_tuple(std::size_t(-1), extract_machine_mask(t, ec)));
+            masks.emplace_back(std::size_t(-1), extract_machine_mask(t, ec));
             return masks;
         }
 
@@ -407,8 +406,8 @@ namespace hpx::threads::detail {
             {
                 mask_type mask = t.init_core_affinity_mask_from_core(
                     static_cast<std::size_t>(index + base));
-                masks.push_back(hpx::make_tuple(
-                    static_cast<std::size_t>(index), mask & socket_mask));
+                masks.emplace_back(
+                    static_cast<std::size_t>(index), mask & socket_mask);
             }
         }
         break;
@@ -416,8 +415,7 @@ namespace hpx::threads::detail {
         case spec_type::type::unknown:
         {
             mask_type mask = extract_machine_mask(t, ec);
-            masks.push_back(
-                hpx::make_tuple(std::size_t(-1), mask & socket_mask));
+            masks.emplace_back(std::size_t(-1), mask & socket_mask);
         }
         break;
 
@@ -471,7 +469,7 @@ namespace hpx::threads::detail {
             for (std::int64_t index : bounds)
             {
                 std::size_t base_core = socket_base;
-                if (std::size_t(-1) != core)
+                if (std::size_t(-1) != core)    //-V1051
                 {
                     base_core += core;
                 }
@@ -491,8 +489,8 @@ namespace hpx::threads::detail {
 
                 mask_type mask = t.init_thread_affinity_mask(
                     base_core, static_cast<std::size_t>(index));
-                masks.push_back(hpx::make_tuple(
-                    static_cast<std::size_t>(index), mask & core_mask));
+                masks.emplace_back(
+                    static_cast<std::size_t>(index), mask & core_mask);
             }
         }
         break;
@@ -500,7 +498,7 @@ namespace hpx::threads::detail {
         case spec_type::type::unknown:
         {
             mask_type mask = extract_machine_mask(t, ec);
-            masks.push_back(hpx::make_tuple(std::size_t(-1), mask & core_mask));
+            masks.emplace_back(std::size_t(-1), mask & core_mask);
         }
         break;
 
@@ -732,7 +730,8 @@ namespace hpx::threads::detail {
         }
         else
         {
-            std::size_t num_threads_available = threads::hardware_concurrency();
+            std::size_t num_threads_available =
+                static_cast<std::size_t>(threads::hardware_concurrency());
 
             if (num_threads > num_threads_available)
             {

@@ -562,7 +562,7 @@ namespace hpx { namespace util {
                 canonical_p = this_p;
 
             std::pair<std::set<std::string>::iterator, bool> p =
-                component_paths.insert(canonical_p.string());
+                component_paths.emplace(canonical_p.string());
 
             if (p.second)
             {

@@ -15,7 +15,8 @@
 namespace hpx::serialization {
 
     template <typename T, typename Allocator>
-    void serialize(input_archive& ar, std::deque<T, Allocator>& d, unsigned)
+    void serialize(
+        input_archive& ar, std::deque<T, Allocator>& d, unsigned)    //-V826
     {
         // normal load ...
         std::uint64_t size;
@@ -27,8 +28,9 @@ namespace hpx::serialization {
     }
 
     template <typename T, typename Allocator>
-    void serialize(
-        output_archive& ar, std::deque<T, Allocator> const& d, unsigned)
+    void serialize(output_archive& ar,
+        std::deque<T, Allocator> const& d,    //-V826
+        unsigned)
     {
         // normal save ...
         std::uint64_t size = d.size();

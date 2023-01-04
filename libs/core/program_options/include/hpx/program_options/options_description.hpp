@@ -238,11 +238,6 @@ namespace hpx::program_options {
         void print(std::ostream& os, std::size_t width = 0) const;
 
     private:
-#if defined(HPX_MSVC) && HPX_MSVC >= 1800
-        // prevent warning C4512: assignment operator could not be generated
-        options_description& operator=(options_description const&);
-#endif
-
         using name2index_iterator = std::map<std::string, int>::const_iterator;
         using approximation_range =
             std::pair<name2index_iterator, name2index_iterator>;

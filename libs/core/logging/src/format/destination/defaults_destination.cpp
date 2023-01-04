@@ -32,7 +32,7 @@ namespace hpx::util::logging::destination {
 
     struct cout_impl : cout
     {
-        void operator()(const message& msg) override
+        void operator()(message const& msg) override
         {
             std::cout << msg.full_string();
         }
@@ -40,14 +40,14 @@ namespace hpx::util::logging::destination {
 
     std::unique_ptr<cout> cout::make()
     {
-        return std::unique_ptr<cout>(new cout_impl());
+        return std::make_unique<cout_impl>();
     }
 
     cerr::~cerr() = default;
 
     struct cerr_impl : cerr
     {
-        void operator()(const message& msg) override
+        void operator()(message const& msg) override
         {
             std::cerr << msg.full_string();
         }
@@ -55,7 +55,7 @@ namespace hpx::util::logging::destination {
 
     std::unique_ptr<cerr> cerr::make()
     {
-        return std::unique_ptr<cerr>(new cerr_impl());
+        return std::make_unique<cerr_impl>();
     }
 
     stream::~stream() = default;
@@ -67,7 +67,7 @@ namespace hpx::util::logging::destination {
         {
         }
 
-        void operator()(const message& msg) override
+        void operator()(message const& msg) override
         {
             if (ptr)
                 *ptr << msg.full_string();
@@ -76,14 +76,14 @@ namespace hpx::util::logging::destination {
 
     std::unique_ptr<stream> stream::make(std::ostream* stream_ptr)
     {
-        return std::unique_ptr<stream>(new stream_impl(stream_ptr));
+        return std::make_unique<stream_impl>(stream_ptr);
     }
 
     dbg_window::~dbg_window() = default;
 
     struct dbg_window_impl : dbg_window
     {
-        void operator()(const message& msg) override
+        void operator()(message const& msg) override
         {
 #ifdef HPX_WINDOWS
             ::OutputDebugStringA(msg.full_string().c_str());
@@ -96,6 +96,6 @@ namespace hpx::util::logging::destination {
 
     std::unique_ptr<dbg_window> dbg_window::make()
     {
-        return std::unique_ptr<dbg_window>(new dbg_window_impl());
+        return std::make_unique<dbg_window_impl>();
     }
 }    // namespace hpx::util::logging::destination

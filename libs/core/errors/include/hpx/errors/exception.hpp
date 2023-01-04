@@ -203,7 +203,7 @@ namespace hpx {
         // Stores the information about the source file line number the exception
         // has been raised at. This information will show up in error messages
         // under the [line] tag.
-        HPX_DEFINE_ERROR_INFO(throw_line, long);
+        HPX_DEFINE_ERROR_INFO(throw_line, long);    //-V835
 
         struct HPX_CORE_EXPORT std_exception : std::exception
         {
@@ -218,7 +218,7 @@ namespace hpx {
 
             ~std_exception() = default;
 
-            const char* what() const noexcept override
+            char const* what() const noexcept override
             {
                 return what_.c_str();
             }
@@ -237,7 +237,7 @@ namespace hpx {
 
             ~bad_alloc() = default;
 
-            const char* what() const noexcept override
+            char const* what() const noexcept override
             {
                 return what_.c_str();
             }
@@ -256,7 +256,7 @@ namespace hpx {
 
             ~bad_exception() = default;
 
-            const char* what() const noexcept override
+            char const* what() const noexcept override
             {
                 return what_.c_str();
             }
@@ -275,7 +275,7 @@ namespace hpx {
 
             ~bad_cast() = default;
 
-            const char* what() const noexcept override
+            char const* what() const noexcept override
             {
                 return what_.c_str();
             }
@@ -294,7 +294,7 @@ namespace hpx {
 
             ~bad_typeid() = default;
 
-            const char* what() const noexcept override
+            char const* what() const noexcept override
             {
                 return what_.c_str();
             }

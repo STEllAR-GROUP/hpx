@@ -62,7 +62,7 @@ namespace hpx {
         inline constexpr detail::placeholder<1> _1 = {};
         inline constexpr detail::placeholder<2> _2 = {};
         inline constexpr detail::placeholder<3> _3 = {};
-        inline constexpr detail::placeholder<4> _4 = {};
+        inline constexpr detail::placeholder<4> _4 = {};    //-V112
         inline constexpr detail::placeholder<5> _5 = {};
         inline constexpr detail::placeholder<6> _6 = {};
         inline constexpr detail::placeholder<7> _7 = {};
@@ -307,7 +307,7 @@ namespace hpx::util {
         HPX_DEPRECATED_V(1, 8,
             "hpx::placeholders::_4 is deprecated, use hpx::placeholders::_4 "
             "instead")
-        inline constexpr hpx::detail::placeholder<4> _4 = {};
+        inline constexpr hpx::detail::placeholder<4> _4 = {};    //-V112
         HPX_DEPRECATED_V(1, 8,
             "hpx::placeholders::_5 is deprecated, use hpx::placeholders::_5 "
             "instead")

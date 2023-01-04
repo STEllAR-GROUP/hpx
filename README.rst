@@ -136,6 +136,10 @@ to the latest release of HPX please use: |zenodo_doi|.
 Acknowledgements
 ================
 
+We have used a free open-source license of `PVS-Studio, a static analyzer for C++ code
+<https://pvs-studio.com/en/pvs-studio/?utm_source=github&utm_medium=organic&utm_campaign=open_source>`_
+to check our code base.
+
 Past and current funding and support for HPX is listed `here
 <https://hpx.stellar-group.org/funding-acknowledgements>`_
 

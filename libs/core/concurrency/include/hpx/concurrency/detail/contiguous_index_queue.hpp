@@ -53,10 +53,10 @@ namespace hpx::concurrency::detail {
     template <typename T = std::uint32_t>
     class contiguous_index_queue
     {
-        static_assert(sizeof(T) <= 4,
+        static_assert(sizeof(T) <= 4,    //-V112
             "contiguous_index_queue assumes at most 32 bit indices to fit two "
             "indices in an at most 64 bit struct");
-        static_assert(std::is_integral<T>::value,
+        static_assert(std::is_integral_v<T>,
             "contiguous_index_queue only works with integral indices");
 
         struct range

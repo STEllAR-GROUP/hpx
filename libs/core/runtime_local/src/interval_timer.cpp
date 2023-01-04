@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,17 +21,13 @@
 #include <mutex>
 #include <string>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     interval_timer::interval_timer()
       : microsecs_(0)
       , id_()
       , timerid_()
-      , pre_shutdown_(false)
-      , is_started_(false)
-      , first_start_(true)
-      , is_terminated_(false)
-      , is_stopped_(false)
     {
     }
 
@@ -45,10 +41,6 @@ namespace hpx { namespace util { namespace detail {
       , timerid_()
       , description_(description)
       , pre_shutdown_(pre_shutdown)
-      , is_started_(false)
-      , first_start_(true)
-      , is_terminated_(false)
-      , is_stopped_(false)
     {
     }
 
@@ -62,10 +54,6 @@ namespace hpx { namespace util { namespace detail {
       , timerid_()
       , description_(description)
       , pre_shutdown_(pre_shutdown)
-      , is_started_(false)
-      , first_start_(true)
-      , is_terminated_(false)
-      , is_stopped_(false)
     {
     }
 
@@ -344,10 +332,11 @@ namespace hpx { namespace util { namespace detail {
         timerid_ = timerid;
         is_started_ = true;
     }
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail
 
-namespace hpx { namespace util {
-    interval_timer::interval_timer() {}    // -V730
+namespace hpx::util {
+
+    interval_timer::interval_timer() = default;
 
     interval_timer::interval_timer(    // -V730
         hpx::function<bool()> const& f, std::int64_t microsecs,
@@ -404,4 +393,4 @@ namespace hpx { namespace util {
     {
         return timer_->change_interval(new_interval.value().count() / 1000);
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

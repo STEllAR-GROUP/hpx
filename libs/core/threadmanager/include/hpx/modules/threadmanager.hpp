@@ -239,8 +239,8 @@ namespace hpx { namespace threads {
         mask_type get_used_processing_units() const
         {
             mask_type total_used_processing_punits = mask_type();
-            threads::resize(
-                total_used_processing_punits, hardware_concurrency());
+            threads::resize(total_used_processing_punits,
+                static_cast<std::size_t>(hardware_concurrency()));
 
             for (auto& pool_iter : pools_)
             {
@@ -252,7 +252,7 @@ namespace hpx { namespace threads {
         }
 
         hwloc_bitmap_ptr get_pool_numa_bitmap(
-            const std::string& pool_name) const
+            std::string const& pool_name) const
         {
             return get_pool(pool_name).get_numa_domain_bitmap();
         }

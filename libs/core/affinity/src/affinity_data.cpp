@@ -44,7 +44,8 @@ namespace hpx::threads::policies::detail {
       , use_process_mask_(false)
       , num_pus_needed_(0)
     {
-        threads::resize(no_affinity_, hardware_concurrency());
+        threads::resize(
+            no_affinity_, static_cast<std::size_t>(hardware_concurrency()));
     }
 
     affinity_data::~affinity_data()
@@ -63,7 +64,8 @@ namespace hpx::threads::policies::detail {
 
         use_process_mask_ = use_process_mask;
         num_threads_ = num_threads;
-        std::size_t num_system_pus = hardware_concurrency();
+        std::size_t num_system_pus =
+            static_cast<std::size_t>(hardware_concurrency());
 
         if (pu_offset == std::size_t(-1))
         {
@@ -158,7 +160,8 @@ namespace hpx::threads::policies::detail {
         if (threads::test(no_affinity_, global_thread_num))
         {
             mask_type m = mask_type();
-            threads::resize(m, hardware_concurrency());
+            threads::resize(
+                m, static_cast<std::size_t>(hardware_concurrency()));
             threads::set(m, get_pu_num(global_thread_num));
             return m;
         }
@@ -199,7 +202,7 @@ namespace hpx::threads::policies::detail {
     mask_type affinity_data::get_used_pus_mask(
         threads::topology const& topo, std::size_t pu_num) const
     {
-        auto overall_threads = hardware_concurrency();
+        auto overall_threads = static_cast<std::size_t>(hardware_concurrency());
 
         mask_type ret = mask_type();
         threads::resize(ret, overall_threads);
@@ -239,7 +242,8 @@ namespace hpx::threads::policies::detail {
         {
             mask_type pu_mask = mask_type();
 
-            threads::resize(pu_mask, hardware_concurrency());
+            threads::resize(
+                pu_mask, static_cast<std::size_t>(hardware_concurrency()));
             threads::set(pu_mask, pu_num);
 
             for (std::size_t num_thread = 0; num_thread != num_threads_;
@@ -256,7 +260,8 @@ namespace hpx::threads::policies::detail {
     // means of adding a processing unit after initialization
     void affinity_data::add_punit(std::size_t virt_core, std::size_t thread_num)
     {
-        std::size_t num_system_pus = hardware_concurrency();
+        std::size_t num_system_pus =
+            static_cast<std::size_t>(hardware_concurrency());
 
         // initialize affinity_masks and set the mask for the given virt_core
         if (affinity_masks_.empty())

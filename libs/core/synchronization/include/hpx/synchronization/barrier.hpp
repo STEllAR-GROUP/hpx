@@ -221,7 +221,7 @@ namespace hpx {
             if (phase_ == old_phase)
             {
                 cond_.wait(l, "barrier::wait");
-                HPX_ASSERT_LOCKED(l, phase_ != old_phase);
+                HPX_ASSERT_LOCKED(l, phase_ != old_phase);    //-V547
             }
         }
 

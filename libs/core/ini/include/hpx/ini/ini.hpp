@@ -113,7 +113,7 @@ namespace hpx::util {
         section() noexcept;
         explicit section(std::string const& filename, section* root = nullptr);
         section(section const& in);
-        ~section() {}
+        ~section() = default;
 
         section& operator=(section const& rhs);
 

@@ -28,7 +28,7 @@ namespace hpx::util {
         {
         public:
             // default constructor is needed for serialization
-            constexpr one_shot_wrapper() noexcept {}
+            constexpr one_shot_wrapper() noexcept = default;
 
             template <typename F_,
                 typename = std::enable_if_t<std::is_constructible_v<F, F_>>>

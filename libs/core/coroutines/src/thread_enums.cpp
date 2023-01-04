@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2015 Patricia Grubel
@@ -12,6 +12,7 @@
 #include <hpx/coroutines/thread_enums.hpp>
 
 #include <cstddef>
+#include <cstdint>
 
 namespace hpx::threads {
 
@@ -51,7 +52,7 @@ namespace hpx::threads {
 
     std::ostream& operator<<(std::ostream& os, thread_schedule_state const t)
     {
-        os << get_thread_state_name(t) << " (" << static_cast<std::size_t>(t)
+        os << get_thread_state_name(t) << " (" << static_cast<std::uint32_t>(t)
            << ")";
         return os;
     }
@@ -84,8 +85,8 @@ namespace hpx::threads {
 
     std::ostream& operator<<(std::ostream& os, thread_restart_state const t)
     {
-        os << get_thread_state_ex_name(t) << " (" << static_cast<std::size_t>(t)
-           << ")";
+        os << get_thread_state_ex_name(t) << " ("
+           << static_cast<std::uint32_t>(t) << ")";
         return os;
     }
 
@@ -118,8 +119,8 @@ namespace hpx::threads {
 
     std::ostream& operator<<(std::ostream& os, thread_priority const t)
     {
-        os << get_thread_priority_name(t) << " (" << static_cast<std::size_t>(t)
-           << ")";
+        os << get_thread_priority_name(t) << " ("
+           << static_cast<std::uint32_t>(t) << ")";
         return os;
     }
 
@@ -150,8 +151,8 @@ namespace hpx::threads {
 
     std::ostream& operator<<(std::ostream& os, thread_stacksize const t)
     {
-        os << get_stack_size_enum_name(t) << " (" << static_cast<std::size_t>(t)
-           << ")";
+        os << get_stack_size_enum_name(t) << " ("
+           << static_cast<std::uint32_t>(t) << ")";
         return os;
     }
 }    // namespace hpx::threads

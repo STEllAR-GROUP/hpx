@@ -259,7 +259,7 @@ namespace hpx {
 
         // constexpr tuple();
         // Value initializes each element.
-        constexpr HPX_HOST_DEVICE tuple() noexcept {}
+        constexpr HPX_HOST_DEVICE tuple() noexcept = default;
 
         // tuple(const tuple& u) = default;
         // Initializes each element of *this with the corresponding element
@@ -303,7 +303,7 @@ namespace hpx {
     };
 
     template <typename... Ts>
-    class tuple
+    class tuple    //-V690
     {
         using index_pack = util::make_index_pack_t<sizeof...(Ts)>;
 
@@ -552,12 +552,12 @@ namespace hpx {
     };
 
     template <class T>
-    struct tuple_size<const T> : tuple_size<T>
+    struct tuple_size<T const> : tuple_size<T>
     {
     };
 
     template <class T>
-    struct tuple_size<volatile T> : tuple_size<T>
+    struct tuple_size<T volatile> : tuple_size<T>
     {
     };
 

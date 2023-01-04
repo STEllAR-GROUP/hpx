@@ -56,7 +56,7 @@ namespace hpx::program_options {
             for (auto const& new_token : new_tokens)
             {
                 std::wstring w = from_utf8(new_token);
-                local_tokens.push_back(to_local_8_bit(w));
+                local_tokens.emplace_back(to_local_8_bit(w));
             }
             xparse(value_store, local_tokens);
         }
@@ -77,7 +77,7 @@ namespace hpx::program_options {
             // Convert from utf8
             for (auto const& new_token : new_tokens)
             {
-                tokens.push_back(from_utf8(new_token));
+                tokens.emplace_back(from_utf8(new_token));
             }
         }
         else
@@ -85,7 +85,7 @@ namespace hpx::program_options {
             // Convert from local encoding
             for (auto const& new_token : new_tokens)
             {
-                tokens.push_back(from_local_8_bit(new_token));
+                tokens.emplace_back(from_local_8_bit(new_token));
             }
         }
 
@@ -109,10 +109,7 @@ namespace hpx::program_options {
 
     unsigned untyped_value::max_tokens() const noexcept
     {
-        if (m_zero_tokens)
-            return 0;
-        else
-            return 1;
+        return min_tokens();
     }
 
     void untyped_value::xparse(hpx::any_nonser& value_store,
@@ -122,7 +119,7 @@ namespace hpx::program_options {
             throw multiple_occurrences();
         if (new_tokens.size() > 1)
             throw multiple_values();
-        value_store = new_tokens.empty() ? std::string("") : new_tokens.front();
+        value_store = new_tokens.empty() ? std::string() : new_tokens.front();
     }
 
     typed_value<bool>* bool_switch()
@@ -271,11 +268,11 @@ namespace hpx::program_options {
         switch (m_option_style)
         {
         case command_line_style::allow_dash_for_short:
+            [[fallthrough]];
+        case command_line_style::allow_long_disguise:
             return "-";
         case command_line_style::allow_slash_for_short:
             return "/";
-        case command_line_style::allow_long_disguise:
-            return "-";
         case command_line_style::allow_long:
             return "--";
         case 0:
@@ -289,13 +286,21 @@ namespace hpx::program_options {
 
     std::string error_with_option_name::get_canonical_option_name() const
     {
-        if (!m_substitutions.find("option")->second.length())
-            return m_substitutions.find("original_token")->second;
+        auto option_it = m_substitutions.find("option");
+        auto original_it = m_substitutions.find("original_token");
+        if (option_it != m_substitutions.end() && !option_it->second.length())
+        {
+            return original_it != m_substitutions.end() ? original_it->second :
+                                                          std::string();
+        }
 
-        std::string original_token =
-            strip_prefixes(m_substitutions.find("original_token")->second);
-        std::string option_name =
-            strip_prefixes(m_substitutions.find("option")->second);
+        std::string original_token;
+        if (original_it != m_substitutions.end())
+            original_token = strip_prefixes(original_it->second);
+
+        std::string option_name;
+        if (option_it != m_substitutions.end())
+            option_name = strip_prefixes(option_it->second);
 
         //  For long options, use option name
         if (m_option_style == command_line_style::allow_long ||

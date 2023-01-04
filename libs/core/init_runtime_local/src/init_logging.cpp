@@ -113,7 +113,7 @@ namespace hpx { namespace util {
             }
 
             // called from outside a HPX thread or no phase given
-            to << std::string(4, '-');
+            to << std::string(4, '-');    //-V112
         }
     };
 
@@ -175,7 +175,7 @@ namespace hpx { namespace util {
             else
             {
                 // called from outside a HPX thread
-                to << std::string(4, '-');
+                to << std::string(4, '-');    //-V112
             }
         }
     };
@@ -1017,7 +1017,7 @@ namespace hpx { namespace util {
             break;
 
         case logging_destination::timing:
-            detail::init_debuglog_log(lvl, logdest, logformat,
+            detail::init_timing_log(lvl, logdest, logformat,
                 detail::default_isconsole, detail::default_set_console_dest,
                 detail::default_define_formatters);
             detail::init_debuglog_console_log(

@@ -25,11 +25,12 @@
 #pragma warning(disable : 4251)
 #endif
 
-namespace hpx { namespace util {
+namespace hpx::util {
     class interval_timer;
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     class HPX_CORE_EXPORT interval_timer
       : public std::enable_shared_from_this<interval_timer>
@@ -79,26 +80,33 @@ namespace hpx { namespace util { namespace detail {
 
     private:
         mutable mutex_type mtx_;
-        hpx::function<bool()> f_;          ///< function to call
-        hpx::function<void()> on_term_;    ///< function to call on termination
-        std::int64_t microsecs_;           ///< time interval
-        threads::thread_id_ref_type
-            id_;    ///< id of currently scheduled thread
-        threads::thread_id_ref_type
-            timerid_;                ///< id of the timer thread for the
-                                     ///< currently scheduled thread
-        std::string description_;    ///< description of this interval timer
+        /// function to call
+        hpx::function<bool()> f_;
+        /// function to call on termination
+        hpx::function<void()> on_term_;
+        /// time interval
+        std::int64_t microsecs_ = 0;
+        /// id of currently scheduled thread
+        threads::thread_id_ref_type id_;
+        /// id of the timer thread for the currently scheduled thread
+        threads::thread_id_ref_type timerid_;
+        /// description of this interval timer
+        std::string description_;
 
-        bool pre_shutdown_;    ///< execute termination during pre-shutdown
-        bool is_started_;      ///< timer has been started (is running)
-        bool first_start_;
-        ///^ flag to distinguish first invocation of start()
-        bool is_terminated_;    ///< The timer has been terminated
-        bool is_stopped_;
+        /// execute termination during pre-shutdown
+        bool pre_shutdown_ = false;
+        /// timer has been started (is running)
+        bool is_started_ = false;
+        /// flag to distinguish first invocation of start()
+        bool first_start_ = true;
+        /// The timer has been terminated
+        bool is_terminated_ = false;
+        bool is_stopped_ = false;
     };
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     class HPX_CORE_EXPORT interval_timer
     {
     public:
@@ -154,7 +162,7 @@ namespace hpx { namespace util {
     private:
         std::shared_ptr<detail::interval_timer> timer_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
 #pragma warning(pop)

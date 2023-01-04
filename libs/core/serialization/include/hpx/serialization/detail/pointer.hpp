@@ -264,8 +264,9 @@ namespace hpx::serialization {
                         detail::pointer_input_dispatcher<Pointer>::type::call(
                             ar);
                     register_pointer(ar, pos,
-                        ptr_helper_ptr(new detail::erase_ptr_helper<Pointer>(
-                            HPX_MOVE(temp), ptr)));
+                        ptr_helper_ptr(    //-V824
+                            new detail::erase_ptr_helper<Pointer>(
+                                HPX_MOVE(temp), ptr)));
                 }
                 else
                 {

@@ -47,17 +47,17 @@ namespace hpx::resource::detail {
 
         void assign_first_core(std::size_t first_core);
 
-        friend class resource::detail::partitioner;
-
         // counter ... overall, in all the thread pools
         static std::size_t num_threads_overall;
 
-    private:
         init_pool_data(std::string const& name, scheduling_policy policy,
             hpx::threads::policies::scheduler_mode mode);
 
         init_pool_data(std::string const& name, scheduler_function create_func,
             hpx::threads::policies::scheduler_mode mode);
+
+    private:
+        friend class resource::detail::partitioner;
 
         std::string pool_name_;
         scheduling_policy scheduling_policy_;
@@ -130,11 +130,7 @@ namespace hpx::resource::detail {
         // returns the number of threads(pus) requested by the user at startup.
         // This should not be called before the RP has parsed the config and
         // assigned affinity data
-        std::size_t threads_needed() noexcept
-        {
-            HPX_ASSERT(pus_needed_ != std::size_t(-1));
-            return pus_needed_;
-        }
+        std::size_t threads_needed() noexcept;
 
         ////////////////////////////////////////////////////////////////////////
         scheduling_policy which_scheduler(std::string const& pool_name);
@@ -159,7 +155,7 @@ namespace hpx::resource::detail {
 
         void init(resource::partitioner_mode rpmode,
             hpx::util::section const& cfg,
-            hpx::threads::policies::detail::affinity_data affinity_data);
+            hpx::threads::policies::detail::affinity_data const& affinity_data);
 
         scheduler_function get_pool_creator(size_t index) const;
 

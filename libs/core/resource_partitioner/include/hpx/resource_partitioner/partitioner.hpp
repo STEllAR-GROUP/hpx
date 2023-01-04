@@ -129,7 +129,7 @@ namespace hpx::resource {
 
         inline ::hpx::resource::partitioner make_partitioner(
             resource::partitioner_mode rpmode, hpx::util::section const& rtcfg,
-            hpx::threads::policies::detail::affinity_data affinity_data);
+            hpx::threads::policies::detail::affinity_data const& affinity_data);
     }
 
     class partitioner
@@ -137,11 +137,11 @@ namespace hpx::resource {
     private:
         friend ::hpx::resource::partitioner detail::make_partitioner(
             resource::partitioner_mode rpmode, hpx::util::section const& rtcfg,
-            hpx::threads::policies::detail::affinity_data affinity_data);
+            hpx::threads::policies::detail::affinity_data const& affinity_data);
 
         partitioner(resource::partitioner_mode rpmode,
             hpx::util::section const& rtcfg,
-            hpx::threads::policies::detail::affinity_data affinity_data)
+            hpx::threads::policies::detail::affinity_data const& affinity_data)
           : partitioner_(
                 detail::create_partitioner(rpmode, rtcfg, affinity_data))
         {
@@ -211,7 +211,7 @@ namespace hpx::resource {
 
         ::hpx::resource::partitioner make_partitioner(
             resource::partitioner_mode rpmode, hpx::util::section const& rtcfg,
-            hpx::threads::policies::detail::affinity_data affinity_data)
+            hpx::threads::policies::detail::affinity_data const& affinity_data)
         {
             return ::hpx::resource::partitioner(rpmode, rtcfg, affinity_data);
         }

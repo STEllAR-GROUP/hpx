@@ -332,7 +332,7 @@ namespace hpx {
 
         if (initialize)
         {
-            init();
+            runtime::init();
         }
     }
 
@@ -488,10 +488,8 @@ namespace hpx {
     {
         state_.store(hpx::state::stopped);
 
-        using value_type = hpx::function<void()>;
-
         std::lock_guard<std::mutex> l(mtx_);
-        for (value_type const& f : on_exit_functions_)
+        for (auto const& f : on_exit_functions_)
             f();
     }
 
@@ -1486,7 +1484,7 @@ namespace hpx {
         while (!stop_done_)
         {
             LRT_(info).format("runtime: about to enter wait state");
-            wait_condition_.wait(l);
+            wait_condition_.wait(l);    //-V1089
             LRT_(info).format("runtime: exiting wait state");
         }
     }
@@ -1535,8 +1533,8 @@ namespace hpx {
         {
             std::unique_lock<std::mutex> lk(mtx);
             // NOLINTNEXTLINE(bugprone-infinite-loop)
-            while (!running)    // -V776 // -V1044
-                cond.wait(lk);
+            while (!running)      //-V776 //-V1044
+                cond.wait(lk);    //-V1089
         }
 
         // use main thread to drive main thread pool
@@ -1580,7 +1578,7 @@ namespace hpx {
 
             std::thread t(hpx::bind(&runtime::stop_helper, this, blocking,
                 std::ref(cond), std::ref(mtx)));
-            cond.wait(l);
+            cond.wait(l);    //-V1089
 
             t.join();
         }

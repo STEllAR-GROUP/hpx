@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2013 Shuangyang Yang
-    Copyright (c) 2007-2022 Hartmut Kaiser
+    Copyright (c) 2007-2023 Hartmut Kaiser
     Copyright (c) Christopher Diggins 2005
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
@@ -63,13 +63,13 @@ namespace hpx {
         ///          member function (e.g. copy assignment operator) on the exception
         ///          object is called.
         /// \note Implementations are allowed but not required to override what().
-        const char* what() const noexcept override
+        char const* what() const noexcept override
         {
             return "bad any cast";
         }
 
-        const char* from;
-        const char* to;
+        char const* from;
+        char const* to;
     };
 }    // namespace hpx
 
@@ -558,11 +558,11 @@ namespace hpx::util::detail::any {
     ////////////////////////////////////////////////////////////////////////
     struct empty
     {
-        bool operator==(empty const&) const
+        constexpr bool operator==(empty) const noexcept
         {
             return false;    // undefined
         }
-        bool operator!=(empty const&) const
+        constexpr bool operator!=(empty) const noexcept
         {
             return false;    // undefined
         }
@@ -588,7 +588,7 @@ namespace hpx::util::detail::any {
 
     template <typename Char>
     inline std::basic_ostream<Char>& operator<<(
-        std::basic_ostream<Char>& o, empty const&)
+        std::basic_ostream<Char>& o, empty)
     {
         return o;
     }
@@ -1399,7 +1399,7 @@ namespace hpx::util {
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    namespace detail { namespace any {
+    namespace detail::any {
 
         struct any_cast_support
         {
@@ -1436,7 +1436,7 @@ namespace hpx::util {
                 return obj.table->stream_out(o, &obj.object);
             }
         };
-    }}    // namespace detail::any
+    }    // namespace detail::any
 
     template <typename IArch, typename OArch, typename Char, typename Copyable,
         typename Enable = std::enable_if_t<!std::is_void_v<Char>>>
@@ -1465,6 +1465,7 @@ namespace hpx::util {
 
 /// Top level HPX namespace
 namespace hpx {
+
     template <typename T, typename... Ts>
     util::basic_any<void, void, void, std::true_type> make_any_nonser(
         Ts&&... ts)

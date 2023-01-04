@@ -790,9 +790,9 @@ namespace hpx { namespace parallel { namespace execution {
         {
             using function_type = typename vtable::post_function_type;
 
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            vptr->post(exec.object, function_type(HPX_FORWARD(F, f)),
+            vptr_->post(exec.object, function_type(HPX_FORWARD(F, f)),
                 HPX_FORWARD(Ts, ts)...);
         }
 
@@ -804,9 +804,9 @@ namespace hpx { namespace parallel { namespace execution {
         {
             using function_type = typename vtable::sync_execute_function_type;
 
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            return vptr->sync_execute(exec.object,
+            return vptr_->sync_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)), HPX_FORWARD(Ts, ts)...);
         }
 
@@ -818,9 +818,9 @@ namespace hpx { namespace parallel { namespace execution {
         {
             using function_type = typename vtable::async_execute_function_type;
 
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            return vptr->async_execute(exec.object,
+            return vptr_->async_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)), HPX_FORWARD(Ts, ts)...);
         }
 
@@ -832,9 +832,9 @@ namespace hpx { namespace parallel { namespace execution {
         {
             using function_type = typename vtable::then_execute_function_type;
 
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            return vptr->then_execute(exec.object,
+            return vptr_->then_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)),
                 hpx::make_shared_future(HPX_FORWARD(Future, predecessor)),
                 HPX_FORWARD(Ts, ts)...);
@@ -855,9 +855,9 @@ namespace hpx { namespace parallel { namespace execution {
                 typename vtable::bulk_sync_execute_function_type;
 
             detail::range_proxy shape(s);
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            return vptr->bulk_sync_execute(exec.object,
+            return vptr_->bulk_sync_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)), shape,
                 HPX_FORWARD(Ts, ts)...);
         }
@@ -877,9 +877,9 @@ namespace hpx { namespace parallel { namespace execution {
                 typename vtable::bulk_async_execute_function_type;
 
             detail::range_proxy shape(s);
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            return vptr->bulk_async_execute(exec.object,
+            return vptr_->bulk_async_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)), shape,
                 HPX_FORWARD(Ts, ts)...);
         }
@@ -899,9 +899,9 @@ namespace hpx { namespace parallel { namespace execution {
                 typename vtable::bulk_then_execute_function_type;
 
             detail::range_proxy shape(s);
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            return vptr->bulk_then_execute(exec.object,
+            return vptr_->bulk_then_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)), shape, predecessor,
                 HPX_FORWARD(Ts, ts)...);
         }

@@ -41,7 +41,7 @@ namespace hpx::util {
                 key.erase(key.size() - 1);
 
             std::string value(trim_whitespace(s.substr(p + 1)));
-            config_.insert(map_type::value_type(key, value));
+            config_.emplace(key, HPX_MOVE(value));
         }
     }
 }    // namespace hpx::util

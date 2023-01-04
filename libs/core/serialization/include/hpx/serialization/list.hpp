@@ -28,8 +28,9 @@ namespace hpx::serialization {
     }
 
     template <typename T, typename Allocator>
-    void serialize(
-        output_archive& ar, std::list<T, Allocator> const& ls, unsigned)
+    void serialize(output_archive& ar,
+        std::list<T, Allocator> const& ls,    //-V826
+        unsigned)
     {
         // normal save ...
         std::uint64_t size = ls.size();

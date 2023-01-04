@@ -80,15 +80,16 @@ namespace hpx::program_options {
                     v = variable_value();
                 }
 
-                d.semantic()->parse(v.value(), opts.value, utf8);
+                auto const& semantic = d.semantic();
+                semantic->parse(v.value(), opts.value, utf8);
 
-                v.m_value_semantic = d.semantic();
+                v.m_value_semantic = semantic;
 
                 // The option is not composing, and the value is explicitly
                 // provided. Ignore values of this option for subsequent calls
                 // to 'store'. We store this to a temporary set, so that several
                 // assignment inside *this* 'store' call are allowed.
-                if (!d.semantic()->is_composing())
+                if (!semantic->is_composing())
                     new_final.insert(option_name);
             }
         }
@@ -136,7 +137,7 @@ namespace hpx::program_options {
                 std::string canonical_name =
                     d.canonical_display_name(options.m_options_prefix);
                 if (canonical_name.length() > xm.m_required[key].length())
-                    xm.m_required[key] = canonical_name;
+                    xm.m_required[key] = HPX_MOVE(canonical_name);
             }
         }
     }

@@ -143,7 +143,9 @@ namespace hpx::threads::detail {
 #endif
            << '\n';
         os << "on numa domains : \n" << get_numa_domain_bitmap() << '\n';
-        os << "pool offset : \n" << std::dec << this->thread_offset_ << "\n";
+        os << "pool offset : \n"
+           << std::dec << static_cast<std::uint64_t>(this->thread_offset_)
+           << "\n";
     }
 
     template <typename Scheduler>
@@ -708,7 +710,7 @@ namespace hpx::threads::detail {
             executed_threads = counter_data_[num].executed_threads_;
             reset_executed_threads = counter_data_[num].reset_executed_threads_;
 
-            if (reset)
+            if (reset)    //-V1051
                 counter_data_[num].reset_executed_threads_ = executed_threads;
         }
         else
@@ -720,7 +722,7 @@ namespace hpx::threads::detail {
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::reset_executed_threads_);
 
-            if (reset)
+            if (reset)    //-V1051
             {
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
@@ -768,7 +770,7 @@ namespace hpx::threads::detail {
             reset_executed_phases =
                 counter_data_[num].reset_executed_thread_phases_;
 
-            if (reset)
+            if (reset)    //-V1051
                 counter_data_[num].reset_executed_thread_phases_ =
                     executed_phases;
         }
@@ -781,7 +783,7 @@ namespace hpx::threads::detail {
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::reset_executed_thread_phases_);
 
-            if (reset)
+            if (reset)    //-V1051
             {
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
@@ -1119,7 +1121,7 @@ namespace hpx::threads::detail {
             reset_exec_total =
                 counter_data_[num].reset_cumulative_thread_duration_;
 
-            if (reset)
+            if (reset)    //-V1051
             {
                 counter_data_[num].reset_cumulative_thread_duration_ =
                     exec_total;
@@ -1134,7 +1136,7 @@ namespace hpx::threads::detail {
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::reset_cumulative_thread_duration_);
 
-            if (reset)
+            if (reset)    //-V1051
             {
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
@@ -1573,7 +1575,7 @@ namespace hpx::threads::detail {
             tfunc_total = counter_data_[num].tfunc_times_;
             reset_tfunc_total = counter_data_[num].reset_tfunc_times_;
 
-            if (reset)
+            if (reset)    //-V1051
                 counter_data_[num].reset_tfunc_times_ = tfunc_total;
         }
         else
@@ -1585,7 +1587,7 @@ namespace hpx::threads::detail {
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::reset_tfunc_times_);
 
-            if (reset)
+            if (reset)    //-V1051
             {
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),

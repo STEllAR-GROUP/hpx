@@ -197,6 +197,7 @@ namespace hpx::program_options::detail {
         HPX_ASSERT(m_desc);
 
         std::vector<style_parser> style_parsers;
+        style_parsers.reserve(7);
 
         if (m_style_parser)
             style_parsers.push_back(m_style_parser);
@@ -227,7 +228,7 @@ namespace hpx::program_options::detail {
             std::bind(&cmdline::parse_terminator, this, std::placeholders::_1));
 
         std::vector<option> result;
-        std::vector<std::string>& args = m_args;
+        std::vector<std::string>& args = m_args;    //-V826
         while (!args.empty())
         {
             bool ok = false;
@@ -301,8 +302,10 @@ namespace hpx::program_options::detail {
             if (!xd)
                 continue;
 
-            std::size_t min_tokens = xd->semantic()->min_tokens();
-            std::size_t max_tokens = xd->semantic()->max_tokens();
+            std::size_t min_tokens =
+                static_cast<std::size_t>(xd->semantic()->min_tokens());
+            std::size_t max_tokens =
+                static_cast<std::size_t>(xd->semantic()->max_tokens());
             if (min_tokens < max_tokens && opt.value.size() < max_tokens)
             {
                 // This option may grab some more tokens.
@@ -426,8 +429,10 @@ namespace hpx::program_options::detail {
             // (the value in --foo=1) counts as a separate token, and if present
             // must be consumed. The following tokens on the command line may be
             // left unconsumed.
-            unsigned min_tokens = d.semantic()->min_tokens();
-            unsigned max_tokens = d.semantic()->max_tokens();
+            std::size_t min_tokens =
+                static_cast<std::size_t>(d.semantic()->min_tokens());
+            std::size_t max_tokens =
+                static_cast<std::size_t>(d.semantic()->max_tokens());
 
             std::size_t present_tokens = opt.value.size() + other_tokens.size();
 
@@ -443,7 +448,7 @@ namespace hpx::program_options::detail {
                 // are not recognized as options themselves.
                 if (opt.value.size() <= min_tokens)
                 {
-                    min_tokens -= static_cast<unsigned>(opt.value.size());
+                    min_tokens -= opt.value.size();    //-V101
                 }
                 else
                 {
@@ -573,7 +578,7 @@ namespace hpx::program_options::detail {
                     opt.string_key = name;
                     result.push_back(opt);
 
-                    if (adjacent.empty())
+                    if (adjacent.empty())    //-V547
                     {
                         args.erase(args.begin());
                         break;

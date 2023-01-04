@@ -36,20 +36,19 @@ namespace hpx::threads::detail {
         static constexpr tagged_state_type const tag_mask =
             0x0000ffffffffffffull;
 
-        static constexpr tag_type extract_tag(
-            tagged_state_type const& i) noexcept
+        static constexpr tag_type extract_tag(tagged_state_type i) noexcept
         {
             return i & tag_mask;
         }
 
         static constexpr thread_state_type extract_state(
-            tagged_state_type const& i) noexcept
+            tagged_state_type i) noexcept
         {
             return (i >> state_shift) & state_mask;
         }
 
         static constexpr thread_state_ex_type extract_state_ex(
-            tagged_state_type const& i) noexcept
+            tagged_state_type i) noexcept
         {
             return (i >> state_ex_shift) & state_ex_mask;
         }

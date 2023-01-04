@@ -897,7 +897,7 @@ namespace hpx::threads::detail {
                                 if (background_thread != nullptr)
                                 {
                                     HPX_ASSERT(background_running);
-                                    *background_running = false;
+                                    *background_running = false;    //-V522
                                     auto priority =
                                         get_thread_id_data(background_thread)
                                             ->get_priority();

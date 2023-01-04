@@ -271,9 +271,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_WINDOWS)
 #  if defined(HPX_DEBUG)
-#    define HPX_MAKE_DLL_STRING(n)  "lib" + n + "d" + HPX_SHARED_LIB_EXTENSION
+#    define HPX_MAKE_DLL_STRING(n)  "lib" + (n) + "d" + HPX_SHARED_LIB_EXTENSION
 #  else
-#    define HPX_MAKE_DLL_STRING(n)  "lib" + n + HPX_SHARED_LIB_EXTENSION
+#    define HPX_MAKE_DLL_STRING(n)  "lib" + (n) + HPX_SHARED_LIB_EXTENSION
 #  endif
 #elif defined(HPX_DEBUG)
 #  define HPX_MAKE_DLL_STRING(n)   (n) + "d" + HPX_SHARED_LIB_EXTENSION

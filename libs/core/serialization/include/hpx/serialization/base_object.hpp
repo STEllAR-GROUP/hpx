@@ -89,16 +89,16 @@ namespace hpx::serialization {
     }
 
     template <typename D, typename B>
-    HPX_FORCEINLINE output_archive& operator&(
-        output_archive& ar, base_object_type<D, B> t)    //-V524
+    HPX_FORCEINLINE output_archive& operator&(    //-V524
+        output_archive& ar, base_object_type<D, B> t)
     {
         ar.save(t);
         return ar;
     }
 
     template <typename D, typename B>
-    HPX_FORCEINLINE input_archive& operator&(
-        input_archive& ar, base_object_type<D, B> t)    //-V524
+    HPX_FORCEINLINE input_archive& operator&(    //-V524
+        input_archive& ar, base_object_type<D, B> t)
     {
         ar.load(t);
         return ar;

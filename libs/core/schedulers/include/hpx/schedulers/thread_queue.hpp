@@ -171,7 +171,7 @@ namespace hpx::threads::policies {
             // ASAN gets confused by reusing threads/stacks
 #if !defined(HPX_HAVE_ADDRESS_SANITIZER)
             // Check for an unused thread object.
-            if (!heap->empty())
+            if (!heap->empty())    //-V522
             {
                 // Take ownership of the thread object and rebind it.
                 thrd = heap->back();
@@ -240,7 +240,7 @@ namespace hpx::threads::policies {
 
                 // add the new entry to the map of all threads
                 std::pair<thread_map_type::iterator, bool> p =
-                    thread_map_.insert(thrd.noref());
+                    thread_map_.emplace(thrd.noref());
 
                 if (HPX_UNLIKELY(!p.second))
                 {
@@ -426,7 +426,7 @@ namespace hpx::threads::policies {
         }
 
     public:
-        bool cleanup_terminated(bool delete_all = false)
+        bool cleanup_terminated(bool delete_all = false)    //-V1071
         {
             if (terminated_items_count_.load(std::memory_order_acquire) == 0)
                 return true;
@@ -685,7 +685,7 @@ namespace hpx::threads::policies {
 
                     // add a new entry in the map for this thread
                     std::pair<thread_map_type::iterator, bool> p =
-                        thread_map_.insert(thrd.noref());
+                        thread_map_.emplace(thrd.noref());
 
                     if (HPX_UNLIKELY(!p.second))
                     {
@@ -720,7 +720,7 @@ namespace hpx::threads::policies {
                         // returned to the caller as otherwise the thread would
                         // go out of scope right away.
                         HPX_ASSERT(id != nullptr);
-                        *id = HPX_MOVE(thrd);
+                        *id = HPX_MOVE(thrd);    //-V1004
                     }
 
                     if (&ec != &throws)

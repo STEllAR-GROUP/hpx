@@ -30,8 +30,8 @@ namespace hpx::serialization {
     }
 
     template <typename T>
-    HPX_FORCEINLINE output_archive& operator&(
-        output_archive& ar, T const& t)    //-V524
+    HPX_FORCEINLINE output_archive& operator&(    //-V524
+        output_archive& ar, T const& t)
     {
         ar.save(t);
         return ar;

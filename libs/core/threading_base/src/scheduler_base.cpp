@@ -52,7 +52,7 @@ namespace hpx::threads::policies {
       , polling_work_count_function_mpi_(&null_polling_work_count_function)
       , polling_work_count_function_cuda_(&null_polling_work_count_function)
     {
-        set_scheduler_mode(mode);
+        scheduler_base::set_scheduler_mode(mode);
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         double max_time = thread_queue_init.max_idle_backoff_time_;
@@ -90,7 +90,8 @@ namespace hpx::threads::policies {
             ++data.wait_count_;
 
             std::unique_lock<pu_mutex_type> l(mtx_);
-            if (cond_.wait_for(l, period) == std::cv_status::no_timeout)
+            if (cond_.wait_for(l, period) ==    //-V1089
+                std::cv_status::no_timeout)
             {
                 // reset counter if thread was woken up
                 data.wait_count_ = 0;
@@ -119,7 +120,7 @@ namespace hpx::threads::policies {
 
         states_[num_thread].store(hpx::state::sleeping);
         std::unique_lock<pu_mutex_type> l(suspend_mtxs_[num_thread]);
-        suspend_conds_[num_thread].wait(l);
+        suspend_conds_[num_thread].wait(l);    //-V1089
 
         // Only set running if still in hpx::state::sleeping. Can be set with
         // non-blocking/locking functions to stopping or terminating, in which

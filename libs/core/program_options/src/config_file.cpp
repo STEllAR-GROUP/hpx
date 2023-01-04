@@ -107,13 +107,15 @@ namespace hpx::program_options::detail {
                         throw unknown_option(name);
 
                     found = true;
-                    this->value().string_key = name;
-                    this->value().value.clear();
-                    this->value().value.push_back(value);
-                    this->value().unregistered = !registered;
-                    this->value().original_tokens.clear();
-                    this->value().original_tokens.push_back(name);
-                    this->value().original_tokens.push_back(value);
+
+                    auto& v = this->value();
+                    v.string_key = name;
+                    v.value.clear();
+                    v.value.push_back(value);
+                    v.unregistered = !registered;
+                    v.original_tokens.clear();
+                    v.original_tokens.push_back(HPX_MOVE(name));
+                    v.original_tokens.push_back(HPX_MOVE(value));
                     break;
                 }
                 else

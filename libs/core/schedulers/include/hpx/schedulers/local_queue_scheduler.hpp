@@ -112,9 +112,10 @@ namespace hpx::threads::policies {
                 init.num_queues_, create_topology().get_machine_affinity_mask())
         {
 #if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only
-            resize(steals_in_numa_domain_, threads::hardware_concurrency());
-            resize(
-                steals_outside_numa_domain_, threads::hardware_concurrency());
+            resize(steals_in_numa_domain_,
+                static_cast<std::size_t>(threads::hardware_concurrency()));
+            resize(steals_outside_numa_domain_,
+                static_cast<std::size_t>(threads::hardware_concurrency()));
 #endif
             if (!deferred_initialization)
             {
@@ -461,7 +462,8 @@ namespace hpx::threads::policies {
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
-            if (schedulehint.mode == thread_schedule_hint_mode::thread)
+            if (schedulehint.mode ==
+                thread_schedule_hint_mode::thread)    //-V1051
             {
                 num_thread = schedulehint.hint;
             }
@@ -504,7 +506,8 @@ namespace hpx::threads::policies {
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
-            if (schedulehint.mode == thread_schedule_hint_mode::thread)
+            if (schedulehint.mode ==
+                thread_schedule_hint_mode::thread)    //-V1051
             {
                 num_thread = schedulehint.hint;
             }

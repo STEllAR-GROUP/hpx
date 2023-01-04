@@ -1308,8 +1308,8 @@ namespace hpx::threads::policies {
                         num_thread < num_high_priority_queues_)
                     {
                         thread_queue_type* q = high_priority_queues_[idx].data_;
-                        result = this_high_priority_queue->wait_or_add_new(
-                                     true, added, q) &&
+                        result = this_high_priority_queue    //-V522
+                                     ->wait_or_add_new(true, added, q) &&
                             result;
 
                         if (0 != added)

@@ -38,12 +38,12 @@ namespace hpx::lockfree::detail {
         static constexpr compressed_ptr_t ptr_mask =
             0xffffffffffffUL;    // (1L<<48L)-1;
 
-        static T* extract_ptr(compressed_ptr_t const& i) noexcept
+        static T* extract_ptr(compressed_ptr_t i) noexcept
         {
             return reinterpret_cast<T*>(i & ptr_mask);
         }
 
-        static tag_t extract_tag(compressed_ptr_t const& i) noexcept
+        static tag_t extract_tag(compressed_ptr_t i) noexcept
         {
             cast_unit cu;
             cu.value = i;
@@ -60,7 +60,7 @@ namespace hpx::lockfree::detail {
 
     public:
         /** uninitialized constructor */
-        constexpr tagged_ptr() noexcept    //: ptr(0), tag(0)
+        constexpr tagged_ptr() noexcept    //-V730 //-V832
         {
         }
 

@@ -75,7 +75,7 @@ namespace hpx {
         {
             // We have an explicit (default) constructor here to avoid for the
             // entire cache-line to be initialized by the compiler.
-            constexpr cache_aligned_data() noexcept(
+            constexpr cache_aligned_data() noexcept(    //-V730
                 std::is_nothrow_default_constructible_v<Data>)
               : data_()
             {
@@ -129,7 +129,7 @@ namespace hpx {
         {
             // We have an explicit (default) constructor here to avoid for the
             // entire cache-line to be initialized by the compiler.
-            constexpr cache_aligned_data_derived() noexcept(
+            constexpr cache_aligned_data_derived() noexcept(    //-V730
                 std::is_nothrow_default_constructible_v<Data>)
               : Data()
             {

@@ -67,7 +67,7 @@ namespace hpx::util::logging::detail {
                 remaining.erase(0, idx + 1);
 
                 formatter::manipulator* fmt = (formatter::manipulator*) -1;
-                write_steps.push_back(write_step(spacer, fmt));
+                write_steps.emplace_back(spacer, fmt);
                 break;
             }
             case '%':
@@ -96,14 +96,13 @@ namespace hpx::util::logging::detail {
                         fmt = iter->value.get();
                 }
                 // note: fmt could be null, in case
-                write_steps.push_back(write_step(spacer, fmt));
+                write_steps.emplace_back(spacer, fmt);
                 break;
             }
             case '\0':
             {
                 // last part
-                write_steps.push_back(
-                    write_step(detail::unescape(remaining), nullptr));
+                write_steps.emplace_back(detail::unescape(remaining), nullptr);
                 remaining.clear();
                 break;
             }
@@ -272,7 +271,7 @@ namespace hpx::util::logging::detail {
     }    // namespace
 }    // namespace hpx::util::logging::detail
 
-namespace hpx { namespace util { namespace logging { namespace writer {
+namespace hpx::util::logging::writer {
 
     named_write::named_write()
     {
@@ -295,5 +294,4 @@ namespace hpx { namespace util { namespace logging { namespace writer {
     {
         detail::configure(m_destination, format, detail::parse_destination{});
     }
-
-}}}}    // namespace hpx::util::logging::writer
+}    // namespace hpx::util::logging::writer

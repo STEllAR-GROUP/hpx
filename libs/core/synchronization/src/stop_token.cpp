@@ -279,7 +279,7 @@ namespace hpx { namespace detail {
             cb->prev_ = nullptr;
 
             bool is_removed = false;
-            cb->is_removed_ = &is_removed;
+            cb->is_removed_ = &is_removed;    //-V506
 
             {
                 // Don't hold lock while executing callback so we don't

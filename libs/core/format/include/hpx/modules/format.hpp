@@ -86,7 +86,7 @@ namespace hpx::util {
                 std::sprintf(format, "%%%.*s%s", (int) spec.size(), spec.data(),
                     conv_spec);
 
-                T const& value = *static_cast<T const*>(ptr);
+                T const& value = *static_cast<T const*>(ptr);    //-V206
                 std::size_t length = std::snprintf(nullptr, 0, format, value);
                 std::vector<char> buffer(length + 1);
                 length =

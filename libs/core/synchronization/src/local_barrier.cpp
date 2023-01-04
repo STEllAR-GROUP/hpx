@@ -25,7 +25,7 @@ namespace hpx { namespace lcos { namespace local {
     {
         std::unique_lock<mutex_type> l(mtx_);
 
-        while (total_ > barrier_flag)
+        while (total_ > barrier_flag)    //-V776
         {
             // Wait until everyone exits the barrier
             cond_.wait(l, "barrier::~barrier");
@@ -36,7 +36,7 @@ namespace hpx { namespace lcos { namespace local {
     {
         std::unique_lock<mutex_type> l(mtx_);
 
-        while (total_ > barrier_flag)
+        while (total_ > barrier_flag)    //-V776
         {
             // wait until everyone exits the barrier
             cond_.wait(l, "barrier::wait");
@@ -55,7 +55,7 @@ namespace hpx { namespace lcos { namespace local {
         }
         else
         {
-            while (total_ < barrier_flag)
+            while (total_ < barrier_flag)    //-V776
             {
                 // wait until enough threads enter the barrier
                 cond_.wait(l, "barrier::wait");
@@ -63,7 +63,7 @@ namespace hpx { namespace lcos { namespace local {
             --total_;
 
             // get entering threads to wake up
-            if (total_ == barrier_flag)
+            if (total_ == barrier_flag)    //-V547
             {
                 cond_.notify_all(HPX_MOVE(l));
             }

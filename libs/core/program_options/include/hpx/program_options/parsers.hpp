@@ -156,9 +156,6 @@ namespace hpx::program_options {
         using detail::cmdline::style_parser;
 
         basic_command_line_parser& extra_style_parser(style_parser s);
-
-    private:
-        options_description const* m_desc;
     };
 
     using command_line_parser = basic_command_line_parser<char>;

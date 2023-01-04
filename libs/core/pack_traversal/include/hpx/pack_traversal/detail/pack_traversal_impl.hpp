@@ -51,7 +51,7 @@ namespace hpx::util::detail {
         class spread_box<>
         {
         public:
-            explicit constexpr spread_box() noexcept {}
+            explicit constexpr spread_box() noexcept = default;
             explicit constexpr spread_box(hpx::tuple<> const&) noexcept {}
 
             constexpr hpx::tuple<> unbox() const noexcept
@@ -97,7 +97,7 @@ namespace hpx::util::detail {
         }
 
         template <typename... T>
-        constexpr auto unpack(spread_box<T...> type) noexcept
+        constexpr auto unpack(spread_box<T...> type) noexcept    //-V524
             -> decltype(type.unbox())
         {
             return type.unbox();
@@ -129,7 +129,7 @@ namespace hpx::util::detail {
         }
 
         template <typename... T>
-        constexpr auto undecorate(spread_box<T...> type) noexcept
+        constexpr auto undecorate(spread_box<T...> type) noexcept    //-V524
             -> decltype(type.unbox())
         {
             return type.unbox();
