@@ -65,7 +65,7 @@ namespace hpx::parallel::traits {
     };
 
     template <typename T>
-    inline constexpr bool vector_pack_alignment_v =
+    inline constexpr std::size_t vector_pack_alignment_v =
         vector_pack_alignment<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ namespace hpx::parallel::traits {
     };
 
     template <typename T>
-    inline constexpr bool vector_pack_size_v = vector_pack_size<T>::value;
+    inline constexpr std::size_t vector_pack_size_v = vector_pack_size<T>::value;
 }    // namespace hpx::parallel::traits
 
 #if !defined(__CUDACC__)
