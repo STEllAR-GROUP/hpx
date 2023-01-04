@@ -49,5 +49,6 @@ add_hpx_module(
 if(HPX_WITH_HIPSYCL)
   add_sycl_to_target(TARGET hpx_async_sycl SOURCES ${async_sycl_sources})
 else()
-  target_compile_options(hpx_async_sycl PUBLIC -fsycl)
+  target_compile_options(hpx_async_sycl PUBLIC -fsycl ${HPX_WITH_SYCL_FLAGS})
+  target_link_options(hpx_async_sycl PUBLIC -fsycl ${HPX_WITH_SYCL_FLAGS})
 endif()

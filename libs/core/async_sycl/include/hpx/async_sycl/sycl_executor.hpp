@@ -121,7 +121,10 @@ namespace hpx { namespace sycl { namespace experimental {
                 });
         }
 
-#if defined(__INTEL_LLVM_COMPILER)
+//#if defined(__LIBSYCL_MAJOR_VERSION) && defined(__LIBSYCL_MINOR_VERSION)
+#if defined(__INTEL_LLVM_COMPILER) ||                                          \
+    (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI) &&              \
+        defined(SYCL_IMPLEMENTATION_ONEAPI))
         // To find the correct overload (or any at all actually) we need to add
         // the code_location argument which is the last argument in every queue
         // member function in the intel oneapi sycl implementation.  As far as
@@ -277,7 +280,10 @@ return detail::apply_dispatch<typename std::decay<Executor>::type>::call(
     HPX_FORWARD(Ts, ts)...);
 }
 
-#if defined(__INTEL_LLVM_COMPILER)
+//#if defined(__LIBSYCL_MAJOR_VERSION) && defined(__LIBSYCL_MINOR_VERSION)
+#if defined(__INTEL_LLVM_COMPILER) ||                                          \
+    (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI) &&              \
+        defined(SYCL_IMPLEMENTATION_ONEAPI))
 /// hpx::async overload for launching sycl queue member functions with an
 /// sycl executor and code location ptrs
 template <typename Executor, typename Ts>

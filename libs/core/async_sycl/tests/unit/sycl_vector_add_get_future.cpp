@@ -30,7 +30,10 @@
 // of the unit test) Uncomment the pragma message commands for more information
 // about the compile passes (2 passes for hipsycl, 3 for dpcpp)
 #if defined(SYCL_LANGUAGE_VERSION)
-#if !defined(__INTEL_LLVM_COMPILER) && !defined(__HIPSYCL__)
+#if !defined(__HIPSYCL__) &&                                                   \
+    !(defined(__INTEL_LLVM_COMPILER) ||                                        \
+        (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI) &&          \
+            defined(SYCL_IMPLEMENTATION_ONEAPI)))
 #warning "HPX-SYCL integration only tested with Intel oneapi and HipSYCL. \
 Utilized compiler appears to be neither of those!"
 #endif

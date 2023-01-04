@@ -550,6 +550,8 @@ endif()
 # ##############################################################################
 set(SYCL_OPTION_STRING "Enable support for Sycl (default: OFF)")
 hpx_option(HPX_WITH_SYCL BOOL "${SYCL_OPTION_STRING}" OFF ADVANCED)
+set(SYCL_OPTION_STRING "Sycl compile flags for selecting specific targets (default: empty)")
+hpx_option(HPX_WITH_SYCL_FLAGS STRING "${SYCL_OPTION_STRING}" "" ADVANCED)
 set(HIPSYCL_OPTION_STRING "Use hipsycl cmake integration (default: OFF)")
 hpx_option(HPX_WITH_HIPSYCL BOOL "${HIPSYCL_OPTION_STRING}" OFF ADVANCED)
 

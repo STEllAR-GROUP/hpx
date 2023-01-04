@@ -86,10 +86,10 @@ void VectorAdd(std::vector<size_t> const& a_vector,
             auto final_fut = kernel_fut.then([exec_id](auto&& fut) {
                 std::cout << "OKAY: SYCL executor " << exec_id + 1
                           << " is done! " << std::endl;
-                number_executors_finished++;
                 fut.get();
             });
             final_fut.get();
+            number_executors_finished++;
         });
     }
     auto when = hpx::when_all(futs);
