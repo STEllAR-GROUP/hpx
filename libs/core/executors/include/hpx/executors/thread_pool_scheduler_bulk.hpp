@@ -725,12 +725,12 @@ namespace hpx::execution::experimental::detail {
             std::atomic<bool> bad_alloc_thrown{false};
             hpx::exception_list exceptions;
 
-            template <typename Sender_, typename Shape_, typename F_,
-                typename Receiver_>
-            operation_state(thread_pool_policy_scheduler<Policy>&& scheduler,
-                Sender_&& sender, Shape_&& shape, F_&& f,
-                hpx::threads::mask_cref_type pumask, Receiver_&& receiver)
-              : scheduler(HPX_MOVE(scheduler))
+            template <typename Scheduler_, typename Sender_, typename Shape_,
+                typename F_, typename Receiver_>
+            operation_state(Scheduler_&& scheduler, Sender_&& sender,
+                Shape_&& shape, F_&& f, hpx::threads::mask_cref_type pumask,
+                Receiver_&& receiver)
+              : scheduler(HPX_FORWARD(Scheduler_, scheduler))
               , op_state(hpx::execution::experimental::connect(
                     HPX_FORWARD(Sender_, sender),
                     bulk_receiver<operation_state, F, Shape>{this}))
@@ -765,7 +765,7 @@ namespace hpx::execution::experimental::detail {
         }
 
         template <typename Receiver>
-        auto tag_invoke(
+        friend auto tag_invoke(
             connect_t, thread_pool_bulk_sender& s, Receiver&& receiver)
         {
             return operation_state<std::decay_t<Receiver>>{s.scheduler,
