@@ -160,6 +160,7 @@ namespace hpx { namespace util {
             "pu_step = 1",
             "pu_offset = 0",
             "numa_sensitive = 0",
+            "loopback_network = 0",
             "max_background_threads = "
             "${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
             "max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:" HPX_PP_STRINGIZE(
@@ -838,6 +839,13 @@ namespace hpx { namespace util {
             // enabled as well
             if (hpx::util::get_entry_as<std::string>(
                     *sec, "runtime_mode", "") != "console")
+            {
+                return true;
+            }
+
+            // whether the user has explicitly asked for network enabled
+            if (hpx::util::get_entry_as<std::int32_t>(
+                    *sec, "loopback_network", 0) != 0)
             {
                 return true;
             }
