@@ -24,11 +24,14 @@ namespace hpx::parallel::traits {
     {
     };
 
-    template <typename T, typename Enable = void>
-    struct is_scalar_vector_pack;
-
     template <typename T>
     inline constexpr bool is_vector_pack_v = is_vector_pack<T>::value;
+
+    template <typename T>
+    using is_vector_pack_t = typename is_vector_pack<T>::type;
+
+    template <typename T, typename Enable = void>
+    struct is_scalar_vector_pack;
 
     template <typename T, typename Enable>
     struct is_scalar_vector_pack : std::false_type
@@ -54,8 +57,7 @@ namespace hpx::parallel::traits {
 
     template <typename... Vector>
     struct vector_pack_alignment<hpx::tuple<Vector...>,
-        typename std::enable_if<
-            hpx::util::all_of<is_vector_pack<Vector>...>::value>::type>
+        std::enable_if_t<hpx::util::all_of_v<is_vector_pack_t<Vector>...>>>
     {
         using pack_type =
             typename hpx::tuple_element<0, hpx::tuple<Vector...>>::type;
@@ -74,7 +76,7 @@ namespace hpx::parallel::traits {
 
     template <typename... Vector>
     struct vector_pack_size<hpx::tuple<Vector...>,
-        std::enable_if_t<hpx::util::all_of_v<is_vector_pack_v<Vector>...>>>
+        std::enable_if_t<hpx::util::all_of_v<is_vector_pack_t<Vector>...>>>
     {
         using pack_type =
             typename hpx::tuple_element<0, hpx::tuple<Vector...>>::type;
@@ -84,7 +86,8 @@ namespace hpx::parallel::traits {
     };
 
     template <typename T>
-    inline constexpr std::size_t vector_pack_size_v = vector_pack_size<T>::value;
+    inline constexpr std::size_t vector_pack_size_v =
+        vector_pack_size<T>::value;
 }    // namespace hpx::parallel::traits
 
 #if !defined(__CUDACC__)
