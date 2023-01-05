@@ -7,6 +7,9 @@
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set(HPX_CXX_MODULES_FLAGS /experimental:module)
   set(HPX_CXX_MODULES_INTERFACE_FLAGS /interface)
+  set(HPX_CXX_MODULES_INTERNAL_PARTITION /internalPartition)
+  set(HPX_CXX_MODULES_MODULE_ONLY /ifcOnly)
+  set(HPX_CXX_MODULES_TRANSLATE_HEADER /translateInclude)
   set(HPX_CXX_MODULES_EXT ifc)
   set(HPX_CXX_MODULES_CREATE_FLAGS -c)
   set(HPX_CXX_MODULES_USE_FLAG /reference)
@@ -46,10 +49,13 @@ function(add_hpx_module_library libname modulename)
   if(NOT ${modulename}_LINKTYPE)
     set(${modulename}_LINKTYPE STATIC)
   endif()
+  
+  set(hpx_module_name "hpx.${libname}.${modulename}.${HPX_CXX_MODULES_EXT}")
+  set(hpx_module_path "${module_output_dir}/${hpx_module_name}")
 
   # Create normal library
   add_library(
-    hpx_${modulename}
+    hpx_module_name
     ${${modulename}_LINKTYPE}
     ${${modulename}_SOURCES}
     ${${modulename}_MODULE_SOURCES}
@@ -62,27 +68,13 @@ function(add_hpx_module_library libname modulename)
   # Enable modules for target
   if(MSVC)
     file(TO_NATIVE_PATH "${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/BMI/"
-         bmi_output_dir
+         module_output_dir
     )
   else()
-    file(TO_NATIVE_PATH "${PROJECT_BINARY_DIR}/BMI/" bmi_output_dir)
+    file(TO_NATIVE_PATH "${PROJECT_BINARY_DIR}/BMI/" module_output_dir)
   endif()
-  set(bmi_name "hpx.${libname}.${modulename}.${HPX_CXX_MODULES_EXT}")
 
-  target_compile_options(hpx_${modulename} PRIVATE ${HPX_CXX_MODULES_FLAGS})
-  target_compile_definitions(hpx_${modulename} PRIVATE HPX_HAVE_CXX20_MODULES)
-  target_compile_options(
-    hpx_${modulename}
-    PRIVATE "${HPX_CXX_MODULES_BMI_SEARCHDIR}${bmi_output_dir}"
-  )
-#  target_compile_options(
-#    hpx_${modulename}
-#    PRIVATE "/sourceDependencies:directives${bmi_output_dir}"
-#  )
-  target_compile_options(
-    hpx_${modulename}
-    PRIVATE "${HPX_CXX_MODULES_OUTPUT_FLAG}${bmi_path}${bmi_name}"
-  )
+
 
   # Create targets for interface files
   foreach(source ${${module}_MODULE_SOURCES})
@@ -91,34 +83,21 @@ function(add_hpx_module_library libname modulename)
     )
   endforeach()
 
-  # get_filename_component(source_basename ${source} NAME_WLE)
-  #
-  # set(bmi_file "${bmi_output_dir}/${source_basename}.${HPX_CXX_MODULES_EXT}")
-  #
-  # # FIXME: CXX flags might be different set(cmd ${CMAKE_CXX_COMPILER}
-  # "$<JOIN:$<TARGET_PROPERTY:hpx_${module},COMPILE_OPTIONS>,\t>"
-  # ${HPX_CXX_MODULES_CREATE_FLAGS} ${source} ${HPX_CXX_MODULES_OUTPUT_FLAG}
-  # ${bmi_file} )
-  #
-  # # Create interface build target add_custom_command( OUTPUT ${bmi_file}
-  # COMMAND ${cmd} DEPENDS ${source} WORKING_DIRECTORY
-  # ${CMAKE_CURRENT_BINARY_DIR} )
-  #
-  # # Generate BMI target name set(bmi_target
-  # "module_${source_basename}_${HPX_CXX_MODULES_EXT}")
-  #
-  # # Create interface build target add_custom_target( ${bmi_target} COMMAND
-  # ${cmd} DEPENDS ${bmi_file} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} )
-  #
-  # if(${module}_FOLDER) set_target_properties(${bmi_target} PROPERTIES FOLDER
-  # ${${module}_FOLDER}) endif()
-  #
-  # list(APPEND _interface_files ${bmi_file}) list(APPEND _interface_targets
-  # ${bmi_target}) endforeach()
-  #
-  # # Store property with interface files set_target_properties( hpx_${module}
-  # PROPERTIES CXX_MODULES_INTERFACE_FILES "${_interface_files}" )
-  #
-  # set_target_properties( hpx_${module} PROPERTIES
-  # CXX_MODULES_INTERFACE_TARGETS "${_interface_targets}" )
+  target_compile_definitions(${hpx_module_name} PRIVATE HPX_HAVE_CXX20_MODULES)
+
+  target_compile_options(${hpx_module_name} PRIVATE ${HPX_CXX_MODULES_FLAGS})
+  target_compile_options(
+    ${hpx_module_name}
+    PRIVATE "${HPX_CXX_MODULES_BMI_SEARCHDIR}${module_output_dir}"
+  )
+  target_compile_options(
+    ${hpx_module_name}
+    PRIVATE "${HPX_CXX_MODULES_OUTPUT_FLAG}${hpx_module_path}"
+  )
+  target_compile_options(
+    ${hpx_module_name}
+    PRIVATE "${HPX_CXX_MODULES_INTERFACE_FLAGS}${source}"
+  )
+
+  add_executable(hpx_${modulename})
 endfunction()
