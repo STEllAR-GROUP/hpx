@@ -325,9 +325,7 @@ namespace hpx::execution::experimental::detail {
     template <typename Sender, typename Receiver>
     struct any_operation_state_impl final : any_operation_state_base
     {
-        std::decay_t<
-            connect_result_t<std::decay_t<Sender>, std::decay_t<Receiver>>>
-            operation_state;
+        std::decay_t<connect_result_t<Sender, Receiver>> operation_state;
 
         template <typename Sender_, typename Receiver_>
         any_operation_state_impl(Sender_&& sender, Receiver_&& receiver)
