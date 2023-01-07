@@ -30,23 +30,21 @@ namespace hpx::threads::detail {
         policies::scheduler_base const& scheduler, std::size_t num_thread,
         thread_id_ref_type const& thrd);
 #else
-    constexpr void write_state_log(policies::scheduler_base const& scheduler,
-        std::size_t num_thread, thread_id_ref_type const& thrd,
-        thread_schedule_state const old_state,
-        thread_schedule_state const new_state) noexcept
+    constexpr void write_state_log(policies::scheduler_base const&, std::size_t,
+        thread_id_ref_type const&, thread_schedule_state const,
+        thread_schedule_state const) noexcept
     {
     }
 
-    constexpr void write_state_log_warning(
-        policies::scheduler_base const& scheduler, std::size_t num_thread,
-        thread_id_ref_type const& thrd, thread_schedule_state state,
-        char const* info) noexcept
+    constexpr void write_state_log_warning(policies::scheduler_base const&,
+        std::size_t, thread_id_ref_type const&, thread_schedule_state stat,
+        char const*) noexcept
     {
     }
 
     constexpr void write_rescheduling_log_warning(
-        policies::scheduler_base const& scheduler, std::size_t num_thread,
-        thread_id_ref_type const& thrd) noexcept
+        policies::scheduler_base const&, std::size_t,
+        thread_id_ref_type const&) noexcept
     {
     }
 #endif
