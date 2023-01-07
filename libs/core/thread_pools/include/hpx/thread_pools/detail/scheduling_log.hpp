@@ -37,7 +37,7 @@ namespace hpx::threads::detail {
     }
 
     constexpr void write_state_log_warning(policies::scheduler_base const&,
-        std::size_t, thread_id_ref_type const&, thread_schedule_state stat,
+        std::size_t, thread_id_ref_type const&, thread_schedule_state,
         char const*) noexcept
     {
     }
