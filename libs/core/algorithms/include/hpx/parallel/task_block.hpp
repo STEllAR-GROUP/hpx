@@ -489,74 +489,73 @@ namespace hpx { namespace experimental {
 
 /// \cond NOINTERNAL
 namespace std {
-template <typename ExPolicy>
-hpx::experimental::task_block<ExPolicy>* addressof(
-    hpx::experimental::task_block<ExPolicy>&) = delete;
+    template <typename ExPolicy>
+    hpx::experimental::task_block<ExPolicy>* addressof(
+        hpx::experimental::task_block<ExPolicy>&) = delete;
 }
 /// \endcond
 
 namespace hpx { namespace parallel { inline namespace v2 {
 
-        using task_canceled_exception HPX_DEPRECATED_V(1, 9,
-            "hpx::parallel:v2::task_canceled_exception is deprecated, use "
-            "hpx::experimental::task_canceled_exception instead") =
-            hpx::experimental::task_canceled_exception;
+    using task_canceled_exception HPX_DEPRECATED_V(1, 9,
+        "hpx::parallel:v2::task_canceled_exception is deprecated, use "
+        "hpx::experimental::task_canceled_exception instead") =
+        hpx::experimental::task_canceled_exception;
 
-        template <typename ExPolicy = hpx::execution::parallel_policy>
-        using task_block HPX_DEPRECATED_V(1, 9,
-            "hpx::parallel:v2::task_block is deprecated, use "
-            "hpx::experimental::task_block instead") =
-            hpx::experimental::task_block<ExPolicy>;
+    template <typename ExPolicy = hpx::execution::parallel_policy>
+    using task_block HPX_DEPRECATED_V(1, 9,
+        "hpx::parallel:v2::task_block is deprecated, use "
+        "hpx::experimental::task_block instead") =
+        hpx::experimental::task_block<ExPolicy>;
 
-        template <typename ExPolicy, typename F,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value)>
-        HPX_DEPRECATED_V(1, 9,
-            "hpx::parallel:v2::define_task_block is deprecated, use "
-            "hpx::experimental::define_task_block instead")
-        hpx::future<void> define_task_block(ExPolicy&& policy, F&& f)
-        {
-            return hpx::experimental::define_task_block(policy, f);
-        }
+    template <typename ExPolicy, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value)>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::parallel:v2::define_task_block is deprecated, use "
+        "hpx::experimental::define_task_block instead")
+    hpx::future<void> define_task_block(ExPolicy&& policy, F&& f)
+    {
+        return hpx::experimental::define_task_block(policy, f);
+    }
 
-        template <typename ExPolicy, typename F,
-            HPX_CONCEPT_REQUIRES_(
-                !hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value)>
-        HPX_DEPRECATED_V(1, 9,
-            "hpx::parallel:v2::define_task_block is deprecated, use "
-            "hpx::experimental::define_task_block instead")
-        void define_task_block(ExPolicy&& policy, F&& f)
-        {
-            return hpx::experimental::define_task_block(policy, f);
-        }
+    template <typename ExPolicy, typename F,
+        HPX_CONCEPT_REQUIRES_(
+            !hpx::is_async_execution_policy<std::decay_t<ExPolicy>>::value)>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::parallel:v2::define_task_block is deprecated, use "
+        "hpx::experimental::define_task_block instead")
+    void define_task_block(ExPolicy&& policy, F&& f)
+    {
+        return hpx::experimental::define_task_block(policy, f);
+    }
 
-        template <typename F>
-        HPX_DEPRECATED_V(1, 9,
-            "hpx::parallel:v2::define_task_block is deprecated, use "
-            "hpx::experimental::define_task_block instead")
-        void define_task_block(F&& f)
-        {
-            return hpx::experimental::define_task_block(f);
-        }
+    template <typename F>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::parallel:v2::define_task_block is deprecated, use "
+        "hpx::experimental::define_task_block instead")
+    void define_task_block(F&& f)
+    {
+        return hpx::experimental::define_task_block(f);
+    }
 
-        template <typename ExPolicy, typename F>
-        HPX_DEPRECATED_V(1, 9,
-            "hpx::parallel:v2::define_task_block is deprecated, use "
-            "hpx::experimental::define_task_block instead")
-        typename util::detail::algorithm_result<ExPolicy>::type
-            define_task_block_restore_thread(ExPolicy&& policy, F&& f)
-        {
-            return hpx::experimental::define_task_block_restore_thread(
-                policy, f);
-        }
+    template <typename ExPolicy, typename F>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::parallel:v2::define_task_block is deprecated, use "
+        "hpx::experimental::define_task_block instead")
+    typename util::detail::algorithm_result<ExPolicy>::type
+        define_task_block_restore_thread(ExPolicy&& policy, F&& f)
+    {
+        return hpx::experimental::define_task_block_restore_thread(policy, f);
+    }
 
-        template <typename F>
-        HPX_DEPRECATED_V(1, 9,
-            "hpx::parallel:v2::define_task_block is deprecated, use "
-            "hpx::experimental::define_task_block instead")
-        void define_task_block_restore_thread(F&& f)
-        {
-            return hpx::experimental::define_task_block_restore_thread(f);
-        }
+    template <typename F>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::parallel:v2::define_task_block is deprecated, use "
+        "hpx::experimental::define_task_block instead")
+    void define_task_block_restore_thread(F&& f)
+    {
+        return hpx::experimental::define_task_block_restore_thread(f);
+    }
 
 }}}    // namespace hpx::parallel::v2

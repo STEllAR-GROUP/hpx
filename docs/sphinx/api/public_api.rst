@@ -890,7 +890,7 @@ Classes
 ======================
 
 The header :hpx-header:`libs/full/include/include,hpx/task_block.hpp` corresponds to the
-``task_block`` feature in |cpp11_n4088|_. See :ref:`using_task_block` for more details on using task
+``task_block`` feature in |cpp17_n4755|_. See :ref:`using_task_block` for more details on using task
 blocks.
 
 Classes
@@ -901,9 +901,9 @@ Classes
    +---------------------------------------------------------+
    | Class                                                   |
    +=========================================================+
-   | :cpp:class:`hpx::parallel::v2::task_canceled_exception` |
+   | :cpp:class:`hpx::experimental::task_canceled_exception` |
    +---------------------------------------------------------+
-   | :cpp:class:`hpx::parallel::v2::task_block`              |
+   | :cpp:class:`hpx::experimental::task_block`              |
    +---------------------------------------------------------+
 
 Functions
@@ -914,9 +914,9 @@ Functions
    +-----------------------------------------------------------------+
    | Function                                                        |
    +=================================================================+
-   | :cpp:func:`hpx::parallel::v2::define_task_block`                |
+   | :cpp:func:`hpx::experimental::define_task_block`                |
    +-----------------------------------------------------------------+
-   | :cpp:func:`hpx::parallel::v2::define_task_block_restore_thread` |
+   | :cpp:func:`hpx::experimental::define_task_block_restore_thread` |
    +-----------------------------------------------------------------+
 
 .. _public_api_header_hpx_task_group:
