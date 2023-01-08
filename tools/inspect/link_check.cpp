@@ -508,7 +508,7 @@ namespace boost { namespace inspect {
         {
             target_path = source_path.parent_path() /= path(decoded_path);
         }
-        catch (const fs::filesystem_error&)
+        catch (fs::filesystem_error const&)
         {
             if (!no_link_errors)
             {

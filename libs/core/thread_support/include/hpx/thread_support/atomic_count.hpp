@@ -11,14 +11,15 @@
 
 #include <atomic>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     class atomic_count
     {
     public:
         HPX_NON_COPYABLE(atomic_count);
 
     public:
-        explicit atomic_count(long value) noexcept
+        explicit constexpr atomic_count(long value) noexcept
           : value_(value)
         {
         }
@@ -59,4 +60,4 @@ namespace hpx { namespace util {
     private:
         std::atomic<long> value_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util

@@ -196,7 +196,8 @@ namespace hpx { namespace components {
                         l.unlock();
                         return std::make_pair(false,
                             hpx::make_exceptional_future<
-                                void>(HPX_GET_EXCEPTION(invalid_status,
+                                void>(HPX_GET_EXCEPTION(
+                                hpx::error::invalid_status,
                                 "migration_support::mark_as_migrated",
                                 "migration operation is already in flight")));
                     }

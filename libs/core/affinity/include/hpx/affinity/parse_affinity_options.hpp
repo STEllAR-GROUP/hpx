@@ -24,11 +24,13 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace threads {
-    namespace detail {
-        typedef std::vector<std::int64_t> bounds_type;
+namespace hpx::threads {
 
-        enum distribution_type
+    namespace detail {
+
+        using bounds_type = std::vector<std::int64_t>;
+
+        enum class distribution_type : std::int8_t
         {
             compact = 0x01,
             scatter = 0x02,
@@ -38,7 +40,7 @@ namespace hpx { namespace threads {
 
         struct spec_type
         {
-            enum type
+            enum class type : std::int8_t
             {
                 unknown,
                 thread,
@@ -47,15 +49,16 @@ namespace hpx { namespace threads {
                 core,
                 pu
             };
-            HPX_CORE_EXPORT static char const* type_name(type t);
 
-            static std::int64_t all_entities() noexcept
+            HPX_CORE_EXPORT static char const* type_name(type t) noexcept;
+
+            static constexpr std::int64_t all_entities() noexcept
             {
                 return (std::numeric_limits<std::int64_t>::min)();
             }
 
             spec_type() noexcept
-              : type_(unknown)
+              : type_(type::unknown)
             {
             }
 
@@ -64,7 +67,7 @@ namespace hpx { namespace threads {
               : type_(t)
               , index_bounds_()
             {
-                if (t != unknown)
+                if (t != type::unknown)
                 {
                     if (max == 0 || max == all_entities())
                     {
@@ -81,20 +84,24 @@ namespace hpx { namespace threads {
                 }
             }
 
-            bool operator==(spec_type const& rhs) const noexcept
+            constexpr bool operator==(spec_type const& rhs) const noexcept
             {
                 return type_ == rhs.type_ && index_bounds_ == rhs.index_bounds_;
+            }
+            constexpr bool operator!=(spec_type const& rhs) const noexcept
+            {
+                return !(*this == rhs);
             }
 
             type type_;
             bounds_type index_bounds_;
         };
 
-        typedef std::vector<spec_type> mapping_type;
-        typedef std::pair<spec_type, mapping_type> full_mapping_type;
-        typedef std::vector<full_mapping_type> mappings_spec_type;
-        typedef boost::variant<distribution_type, mappings_spec_type>
-            mappings_type;
+        using mapping_type = std::vector<spec_type>;
+        using full_mapping_type = std::pair<spec_type, mapping_type>;
+        using mappings_spec_type = std::vector<full_mapping_type>;
+        using mappings_type =
+            boost::variant<distribution_type, mappings_spec_type>;
 
         HPX_CORE_EXPORT bounds_type extract_bounds(
             spec_type const& m, std::size_t default_last, error_code& ec);
@@ -117,4 +124,4 @@ namespace hpx { namespace threads {
         parse_affinity_options(
             spec, affinities, 1, 1, affinities.size(), num_pus, false, ec);
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

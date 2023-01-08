@@ -22,16 +22,15 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
-    using namespace std;
     using namespace hpx::program_options::command_line_style;
 
-    string invalid_syntax::get_template(kind_t kind)
+    std::string invalid_syntax::get_template(kind_t kind)
     {
         // Initially, store the message in 'const char*' variable,
         // to avoid conversion to string in all cases.
-        const char* msg;
+        char const* msg;
         switch (kind)
         {
         case empty_adjacent_parameter:
@@ -66,27 +65,23 @@ namespace hpx { namespace program_options {
         }
         return msg;
     }
+}    // namespace hpx::program_options
 
-}}    // namespace hpx::program_options
+namespace hpx::program_options::detail {
 
-namespace hpx { namespace program_options { namespace detail {
-
-    using namespace std;
-    using namespace program_options;
-
-    cmdline::cmdline(const vector<string>& args)
+    cmdline::cmdline(std::vector<std::string> const& args)
     {
         init(args);
     }
 
-    cmdline::cmdline(int argc, const char* const* argv)
+    cmdline::cmdline(int argc, char const* const* argv)
     {
-        init(vector<string>(argv + 1,
+        init(std::vector<std::string>(argv + 1,
             argv + static_cast<std::size_t>(argc) +
                 static_cast<std::size_t>(!argc)));
     }
 
-    void cmdline::init(const vector<string>& args)
+    void cmdline::init(std::vector<std::string> const& args)
     {
         this->m_args = args;
         m_style = command_line_style::default_style;
@@ -95,7 +90,7 @@ namespace hpx { namespace program_options { namespace detail {
         m_allow_unregistered = false;
     }
 
-    void cmdline::style(int style)
+    void cmdline::style(int style) noexcept
     {
         if (style == 0)
             style = default_style;
@@ -104,7 +99,7 @@ namespace hpx { namespace program_options { namespace detail {
         this->m_style = style_t(style);
     }
 
-    void cmdline::allow_unregistered()
+    void cmdline::allow_unregistered() noexcept
     {
         this->m_allow_unregistered = true;
     }
@@ -114,60 +109,62 @@ namespace hpx { namespace program_options { namespace detail {
         bool allow_some_long =
             (style & allow_long) || (style & allow_long_disguise);
 
-        const char* error = nullptr;
+        char const* error = nullptr;
         if (allow_some_long && !(style & long_allow_adjacent) &&
             !(style & long_allow_next))
+        {
             error =
-                "hpx::program_options misconfiguration: "
-                "choose one or other of 'command_line_style::long_allow_next' "
-                "(whitespace separated arguments) or "
-                "'command_line_style::long_allow_adjacent' ('=' separated "
-                "arguments) for "
-                "long options.";
+                "hpx::program_options misconfiguration: choose one or other of "
+                "'command_line_style::long_allow_next' (whitespace separated "
+                "arguments) or 'command_line_style::long_allow_adjacent' ('=' "
+                "separated arguments) for long options.";
+        }
 
         if (!error && (style & allow_short) &&
             !(style & short_allow_adjacent) && !(style & short_allow_next))
+        {
             error =
-                "hpx::program_options misconfiguration: "
-                "choose one or other of 'command_line_style::short_allow_next' "
-                "(whitespace separated arguments) or "
-                "'command_line_style::short_allow_adjacent' ('=' separated "
-                "arguments) for "
-                "short options.";
+                "hpx::program_options misconfiguration: choose one or other of "
+                "'command_line_style::short_allow_next' (whitespace separated "
+                "arguments) or 'command_line_style::short_allow_adjacent' ('=' "
+                "separated arguments) for short options.";
+        }
 
         if (!error && (style & allow_short) &&
             !(style & allow_dash_for_short) && !(style & allow_slash_for_short))
-            error = "hpx::program_options misconfiguration: "
-                    "choose one or other of "
-                    "'command_line_style::allow_slash_for_short' "
-                    "(slashes) or 'command_line_style::allow_dash_for_short' "
-                    "(dashes) for "
-                    "short options.";
+        {
+            error =
+                "hpx::program_options misconfiguration: choose one or other of "
+                "'command_line_style::allow_slash_for_short' (slashes) or "
+                "'command_line_style::allow_dash_for_short' (dashes) for short "
+                "options.";
+        }
 
         if (error)
             throw invalid_command_line_style(error);
 
-        // Need to check that if guessing and long disguise are enabled
-        // -f will mean the same as -foo
+        // Need to check that if guessing and long disguise are enabled -f will
+        // mean the same as -foo
     }
 
-    bool cmdline::is_style_active(style_t style) const
+    bool cmdline::is_style_active(style_t style) const noexcept
     {
         return ((m_style & style) ? true : false);
     }
 
-    void cmdline::set_options_description(const options_description& desc)
+    void cmdline::set_options_description(
+        options_description const& desc) noexcept
     {
         m_desc = &desc;
     }
 
     void cmdline::set_positional_options(
-        const positional_options_description& positional)
+        positional_options_description const& positional) noexcept
     {
         m_positional = &positional;
     }
 
-    int cmdline::get_canonical_option_prefix()
+    int cmdline::get_canonical_option_prefix() noexcept
     {
         if (m_style & allow_long)
             return allow_long;
@@ -184,23 +181,22 @@ namespace hpx { namespace program_options { namespace detail {
         return 0;
     }
 
-    vector<option> cmdline::run()
+    std::vector<option> cmdline::run()
     {
-        // The parsing is done by having a set of 'style parsers'
-        // and trying then in order. Each parser is passed a vector
-        // of unparsed tokens and can consume some of them (by
-        // removing elements on front) and return a vector of options.
+        // The parsing is done by having a set of 'style parsers' and trying
+        // then in order. Each parser is passed a vector of unparsed tokens and
+        // can consume some of them (by removing elements on front) and return a
+        // vector of options.
         //
-        // We try each style parser in turn, until some input
-        // is consumed. The returned vector of option may contain the
-        // result of just syntactic parsing of token, say --foo will
-        // be parsed as option with name 'foo', and the style parser
-        // is not required to care if that option is defined, and how
-        // many tokens the value may take.
-        // So, after vector is returned, we validate them.
+        // We try each style parser in turn, until some input is consumed. The
+        // returned vector of option may contain the result of just syntactic
+        // parsing of token, say --foo will be parsed as option with name 'foo',
+        // and the style parser is not required to care if that option is
+        // defined, and how many tokens the value may take. So, after vector is
+        // returned, we validate them.
         HPX_ASSERT(m_desc);
 
-        vector<style_parser> style_parsers;
+        std::vector<style_parser> style_parsers;
 
         if (m_style_parser)
             style_parsers.push_back(m_style_parser);
@@ -230,21 +226,21 @@ namespace hpx { namespace program_options { namespace detail {
         style_parsers.emplace_back(
             std::bind(&cmdline::parse_terminator, this, std::placeholders::_1));
 
-        vector<option> result;
-        vector<string>& args = m_args;
+        std::vector<option> result;
+        std::vector<std::string>& args = m_args;
         while (!args.empty())
         {
             bool ok = false;
             for (std::size_t i = 0; i < style_parsers.size(); ++i)
             {
                 std::size_t current_size = args.size();
-                vector<option> next = style_parsers[i](args);
+                std::vector<option> next = style_parsers[i](args);
 
                 // Check that option names
                 // are valid, and that all values are in place.
                 if (!next.empty())
                 {
-                    vector<std::string> e;
+                    std::vector<std::string> e;
                     for (std::size_t k = 0; k < next.size() - 1; ++k)
                     {
                         finish_option(next[k], e, style_parsers);
@@ -253,7 +249,7 @@ namespace hpx { namespace program_options { namespace detail {
                     // so that they can be added to next.back()'s values
                     // if appropriate.
                     finish_option(next.back(), args, style_parsers);
-                    for (const auto& j : next)
+                    for (auto const& j : next)
                         result.push_back(j);
                 }
 
@@ -277,7 +273,7 @@ namespace hpx { namespace program_options { namespace detail {
         /* If an key option is followed by a positional option,
            can can consume more tokens (e.g. it's multitoken option),
            give those tokens to it.  */
-        vector<option> result2;
+        std::vector<option> result2;
         for (std::size_t i = 0; i < result.size(); ++i)
         {
             result2.push_back(result[i]);
@@ -286,7 +282,7 @@ namespace hpx { namespace program_options { namespace detail {
             if (opt.string_key.empty())
                 continue;
 
-            const option_description* xd = nullptr;
+            option_description const* xd = nullptr;
             try
             {
                 xd = m_desc->find_nothrow(opt.string_key,
@@ -386,8 +382,9 @@ namespace hpx { namespace program_options { namespace detail {
         return result;
     }
 
-    void cmdline::finish_option(option& opt, vector<string>& other_tokens,
-        const vector<style_parser>& style_parsers)
+    void cmdline::finish_option(option& opt,
+        std::vector<std::string>& other_tokens,
+        std::vector<style_parser> const& style_parsers)
     {
         if (opt.string_key.empty())
             return;
@@ -402,7 +399,7 @@ namespace hpx { namespace program_options { namespace detail {
         try
         {
             // First check that the option is valid, and get its description.
-            const option_description* xd = m_desc->find_nothrow(opt.string_key,
+            option_description const* xd = m_desc->find_nothrow(opt.string_key,
                 is_style_active(allow_guessing),
                 is_style_active(long_case_insensitive),
                 is_style_active(short_case_insensitive));
@@ -419,7 +416,7 @@ namespace hpx { namespace program_options { namespace detail {
                     throw unknown_option();
                 }
             }
-            const option_description& d = *xd;
+            option_description const& d = *xd;
 
             // Canonize the name
             opt.string_key = d.key(opt.string_key);
@@ -459,8 +456,8 @@ namespace hpx { namespace program_options { namespace detail {
                     // check if extra parameter looks like a known option
                     // we use style parsers to check if it is syntactically an option,
                     // additionally we check if an option_description exists
-                    vector<option> followed_option;
-                    vector<std::string> next_token(1, other_tokens[0]);
+                    std::vector<option> followed_option;
+                    std::vector<std::string> next_token(1, other_tokens[0]);
                     for (std::size_t i = 0;
                          followed_option.empty() && i < style_parsers.size();
                          ++i)
@@ -470,7 +467,7 @@ namespace hpx { namespace program_options { namespace detail {
                     if (!followed_option.empty())
                     {
                         original_token_for_exceptions = other_tokens[0];
-                        const option_description* od = m_desc->find_nothrow(
+                        option_description const* od = m_desc->find_nothrow(
                             other_tokens[0], is_style_active(allow_guessing),
                             is_style_active(long_case_insensitive),
                             is_style_active(short_case_insensitive));
@@ -501,15 +498,16 @@ namespace hpx { namespace program_options { namespace detail {
         }
     }
 
-    vector<option> cmdline::parse_long_option(vector<string>& args)
+    std::vector<option> cmdline::parse_long_option(
+        std::vector<std::string>& args)
     {
-        vector<option> result;
-        const string& tok = args[0];
+        std::vector<option> result;
+        std::string const& tok = args[0];
         if (tok.size() >= 3 && tok[0] == '-' && tok[1] == '-')
         {
-            string name, adjacent;
+            std::string name, adjacent;
 
-            string::size_type p = tok.find('=');
+            std::string::size_type p = tok.find('=');
             if (p != tok.npos)
             {
                 name = tok.substr(2, p - 2);
@@ -534,15 +532,16 @@ namespace hpx { namespace program_options { namespace detail {
         return result;
     }
 
-    vector<option> cmdline::parse_short_option(vector<string>& args)
+    std::vector<option> cmdline::parse_short_option(
+        std::vector<std::string>& args)
     {
-        const string& tok = args[0];
+        std::string const& tok = args[0];
         if (tok.size() >= 2 && tok[0] == '-' && tok[1] != '-')
         {
-            vector<option> result;
+            std::vector<option> result;
 
-            string name = tok.substr(0, 2);
-            string adjacent = tok.substr(2);
+            std::string name = tok.substr(0, 2);
+            std::string adjacent = tok.substr(2);
 
             // Short options can be 'grouped', so that
             // "-d -a" becomes "-da". Loop, processing one
@@ -552,7 +551,7 @@ namespace hpx { namespace program_options { namespace detail {
             // option.
             for (;;)
             {
-                const option_description* d;
+                option_description const* d;
                 try
                 {
                     d = m_desc->find_nothrow(name, false, false,
@@ -580,7 +579,7 @@ namespace hpx { namespace program_options { namespace detail {
                         break;
                     }
 
-                    name = string("-") + adjacent[0];
+                    name = std::string("-") + adjacent[0];
                     adjacent.erase(adjacent.begin());
                 }
                 else
@@ -597,17 +596,18 @@ namespace hpx { namespace program_options { namespace detail {
             }
             return result;
         }
-        return vector<option>();
+        return std::vector<option>();
     }
 
-    vector<option> cmdline::parse_dos_option(vector<string>& args)
+    std::vector<option> cmdline::parse_dos_option(
+        std::vector<std::string>& args)
     {
-        vector<option> result;
-        const string& tok = args[0];
+        std::vector<option> result;
+        std::string const& tok = args[0];
         if (tok.size() >= 2 && tok[0] == '/')
         {
-            string name = "-" + tok.substr(1, 1);
-            string adjacent = tok.substr(2);
+            std::string name = "-" + tok.substr(1, 1);
+            std::string adjacent = tok.substr(2);
 
             option opt;
             opt.string_key = HPX_MOVE(name);
@@ -620,9 +620,10 @@ namespace hpx { namespace program_options { namespace detail {
         return result;
     }
 
-    vector<option> cmdline::parse_disguised_long_option(vector<string>& args)
+    std::vector<option> cmdline::parse_disguised_long_option(
+        std::vector<std::string>& args)
     {
-        const string& tok = args[0];
+        std::string const& tok = args[0];
         if (tok.size() >= 2 &&
             ((tok[0] == '-' && tok[1] != '-') ||
                 ((m_style & allow_slash_for_short) && tok[0] == '/')))
@@ -647,13 +648,14 @@ namespace hpx { namespace program_options { namespace detail {
                 throw;
             }
         }
-        return vector<option>();
+        return std::vector<option>();
     }
 
-    vector<option> cmdline::parse_terminator(vector<string>& args)
+    std::vector<option> cmdline::parse_terminator(
+        std::vector<std::string>& args)
     {
-        vector<option> result;
-        const string& tok = args[0];
+        std::vector<option> result;
+        std::string const& tok = args[0];
         if (tok == "--")
         {
             for (std::size_t i = 1; i < args.size(); ++i)
@@ -669,10 +671,11 @@ namespace hpx { namespace program_options { namespace detail {
         return result;
     }
 
-    vector<option> cmdline::handle_additional_parser(vector<string>& args)
+    std::vector<option> cmdline::handle_additional_parser(
+        std::vector<std::string>& args)
     {
-        vector<option> result;
-        pair<string, string> r = m_additional_parser(args[0]);
+        std::vector<option> result;
+        std::pair<std::string, std::string> r = m_additional_parser(args[0]);
         if (!r.first.empty())
         {
             option next;
@@ -685,14 +688,13 @@ namespace hpx { namespace program_options { namespace detail {
         return result;
     }
 
-    void cmdline::set_additional_parser(additional_parser p)
+    void cmdline::set_additional_parser(additional_parser p) noexcept
     {
         m_additional_parser = p;
     }
 
-    void cmdline::extra_style_parser(style_parser s)
+    void cmdline::extra_style_parser(style_parser s) noexcept
     {
         m_style_parser = s;
     }
-
-}}}    // namespace hpx::program_options::detail
+}    // namespace hpx::program_options::detail

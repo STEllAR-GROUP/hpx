@@ -8,19 +8,18 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/functional/bind.hpp>
-#include <hpx/modules/testing.hpp>
-
+#include <hpx/modules/allocator_support.hpp>
+#include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/program_options.hpp>
-#include <boost/lockfree/queue.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstdint>
 #include <iostream>
 #include <thread>
 #include <vector>
 
-using queue = boost::lockfree::queue<std::uint64_t,
+using queue = hpx::lockfree::queue<std::uint64_t,
     hpx::util::aligned_allocator<std::uint64_t>>;
 
 std::vector<queue*> queues;

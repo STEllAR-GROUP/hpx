@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(iterator_support_headers
+    hpx/iterator_support/detail/minimum_category.hpp
     hpx/iterator_support/traits/is_iterator.hpp
     hpx/iterator_support/traits/is_range.hpp
     hpx/iterator_support/traits/is_sentinel_for.hpp

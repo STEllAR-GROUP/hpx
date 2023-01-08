@@ -14,7 +14,7 @@
 
 namespace hpx::util {
 
-    enum exception_type
+    enum class exception_type
     {
         // unknown exception
         unknown_exception = 0,
@@ -47,8 +47,10 @@ namespace hpx::util {
 }    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
+
     namespace detail {
+
         using save_custom_exception_handler_type =
             std::function<void(hpx::serialization::output_archive&,
                 std::exception_ptr const&, unsigned int)>;
@@ -71,4 +73,4 @@ namespace hpx { namespace serialization {
     void load(Archive& ar, std::exception_ptr& e, unsigned int);
 
     HPX_SERIALIZATION_SPLIT_FREE(std::exception_ptr)
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

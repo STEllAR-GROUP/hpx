@@ -14,7 +14,7 @@ jobs:
     container: stellargroup/crosscompile_arm_sve_build_env:1
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Configure
       shell: bash
       run: |

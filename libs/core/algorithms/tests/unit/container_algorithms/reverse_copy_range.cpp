@@ -388,7 +388,7 @@ void test_reverse_copy_bad_alloc_async(ExPolicy p, IteratorTag)
     bool returned_from_algorithm = false;
     try
     {
-        auto f = hpx::parallel::reverse_copy(p,
+        auto f = hpx::ranges::reverse_copy(p,
             hpx::util::iterator_range(decorated_iterator(std::begin(c)),
                 decorated_iterator(
                     std::end(c), []() { throw std::bad_alloc(); })),

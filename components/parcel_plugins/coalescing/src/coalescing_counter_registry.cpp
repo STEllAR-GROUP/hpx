@@ -37,7 +37,7 @@ namespace hpx::plugins::parcel {
     {
         if (name.empty())
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "coalescing_counter_registry::register_action",
                 "Cannot register an action with an empty name");
         }
@@ -86,7 +86,7 @@ namespace hpx::plugins::parcel {
     {
         if (name.empty())
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "coalescing_counter_registry::register_action",
                 "Cannot register an action with an empty name");
         }
@@ -111,7 +111,7 @@ namespace hpx::plugins::parcel {
         if (it == map_.end())
         {
             l.unlock();
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "coalescing_counter_registry::get_num_parcels_counter",
                 "unknown action type");
             return get_counter_type();
@@ -129,7 +129,7 @@ namespace hpx::plugins::parcel {
         if (it == map_.end())
         {
             l.unlock();
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "coalescing_counter_registry::get_num_messages_counter",
                 "unknown action type");
             return get_counter_type();
@@ -147,7 +147,7 @@ namespace hpx::plugins::parcel {
         if (it == map_.end())
         {
             l.unlock();
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "coalescing_counter_registry::get_num_messages_counter",
                 "unknown action type");
             return get_counter_type();
@@ -165,7 +165,7 @@ namespace hpx::plugins::parcel {
         if (it == map_.end())
         {
             l.unlock();
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "coalescing_counter_registry::"
                 "get_average_time_between_parcels_counter",
                 "unknown action type");
@@ -185,7 +185,7 @@ namespace hpx::plugins::parcel {
         if (it == map_.end())
         {
             l.unlock();
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "coalescing_counter_registry::"
                 "get_time_between_parcels_histogram_counter",
                 "unknown action type");
@@ -301,7 +301,7 @@ namespace hpx::plugins::parcel {
                     }
                 }
 
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "coalescing_counter_registry::counter_discoverer",
                     "action type {} does not match any known type, "
                     "known action types: \n{}",
@@ -348,7 +348,7 @@ namespace hpx::plugins::parcel {
                 }
 
                 l.unlock();
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "coalescing_counter_registry::counter_discoverer",
                     "action type {} does not match any known type, "
                     "known action types: \n{}",

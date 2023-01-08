@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,18 +23,23 @@
 #include <utility>
 
 #if defined(HPX_HAVE_APEX)
-namespace hpx { namespace util { namespace external_timer {
+namespace hpx::util::external_timer {
+
     struct task_wrapper;
-}}}    // namespace hpx::util::external_timer
+}    // namespace hpx::util::external_timer
 #endif
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     class thread_data;
     class thread_data_stackful;
     class thread_data_stackless;
 
+    class thread_init_data;
+    struct thread_description;
+
     namespace policies {
+
         struct scheduler_base;
     }
     class HPX_CORE_EXPORT thread_pool_base;
@@ -62,4 +67,4 @@ namespace hpx { namespace threads {
         std::shared_ptr<hpx::util::external_timer::task_wrapper> data);
 #endif
     /// \endcond
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

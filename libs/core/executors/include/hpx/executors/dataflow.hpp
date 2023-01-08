@@ -22,7 +22,6 @@
 #include <hpx/pack_traversal/pack_traversal_async.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <cstddef>
 #include <exception>

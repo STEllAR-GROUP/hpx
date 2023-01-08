@@ -25,6 +25,7 @@
 #include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -34,7 +35,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace execution {
+namespace hpx::execution {
+
     ///////////////////////////////////////////////////////////////////////////
     /// A \a sequential_executor creates groups of sequential execution agents
     /// which execute in the calling thread. The sequential order is given by
@@ -91,7 +93,7 @@ namespace hpx { namespace execution {
         // TwoWayExecutor interface
         template <typename F, typename... Ts>
         static decltype(auto) async_execute_impl(
-            hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
+            hpx::threads::thread_description const& desc, F&& f, Ts&&... ts)
         {
             return hpx::detail::async_launch_policy_dispatch<
                 launch::deferred_policy>::call(launch::deferred, desc,
@@ -104,9 +106,9 @@ namespace hpx { namespace execution {
             sequenced_executor const& exec, F&& f, Ts&&... ts)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            hpx::util::thread_description desc(f, exec.annotation_);
+            hpx::threads::thread_description desc(f, exec.annotation_);
 #else
-            hpx::util::thread_description desc(f);
+            hpx::threads::thread_description desc(f);
             HPX_UNUSED(exec);
 #endif
             return sequenced_executor::async_execute_impl(
@@ -141,9 +143,9 @@ namespace hpx { namespace execution {
             sequenced_executor const& exec, F&& f, S const& shape, Ts&&... ts)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            hpx::util::thread_description desc(f, exec.annotation_);
+            hpx::threads::thread_description desc(f, exec.annotation_);
 #else
-            hpx::util::thread_description desc(f);
+            hpx::threads::thread_description desc(f);
             HPX_UNUSED(exec);
 #endif
 
@@ -216,7 +218,9 @@ namespace hpx { namespace execution {
 
         friend constexpr std::size_t tag_invoke(
             hpx::parallel::execution::processing_units_count_t,
-            sequenced_executor const&)
+            sequenced_executor const&,
+            hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
+            std::size_t = 0)
         {
             return 1;
         }
@@ -240,7 +244,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& /* ar */, const unsigned int /* version */)
+        void serialize(Archive& /* ar */, unsigned int const /* version */)
         {
         }
 
@@ -249,9 +253,9 @@ namespace hpx { namespace execution {
 #endif
         /// \endcond
     };
-}}    // namespace hpx::execution
+}    // namespace hpx::execution
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     /// \cond NOINTERNAL
     template <>
     struct is_one_way_executor<hpx::execution::sequenced_executor>
@@ -283,4 +287,4 @@ namespace hpx { namespace parallel { namespace execution {
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

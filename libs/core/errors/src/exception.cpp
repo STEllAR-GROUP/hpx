@@ -39,11 +39,12 @@ namespace hpx {
     ///
     /// \param e    The parameter \p e holds the hpx::error code the new
     ///             exception should encapsulate.
-    exception::exception(error e)
+    exception::exception(hpx::error e)
       : std::system_error(make_error_code(e, throwmode::plain))
     {
-        HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
-        if (e != success)
+        HPX_ASSERT((e >= hpx::error::success && e < hpx::error::last_error) ||
+            (e & hpx::error::system_error_flag));
+        if (e != hpx::error::success)
         {
             LERR_(error).format("created exception: {}", this->what());
         }
@@ -75,11 +76,12 @@ namespace hpx {
     ///               \a hpx_category (if mode is \a throwmode::plain, this is the
     ///               default) or to the category \a hpx_category_rethrow
     ///               (if mode is \a throwmode::rethrow).
-    exception::exception(error e, char const* msg, throwmode mode)
+    exception::exception(hpx::error e, char const* msg, throwmode mode)
       : std::system_error(make_system_error_code(e, mode), msg)
     {
-        HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
-        if (e != success)
+        HPX_ASSERT((e >= hpx::error::success && e < hpx::error::last_error) ||
+            (e & hpx::error::system_error_flag));
+        if (e != hpx::error::success)
         {
             LERR_(error).format("created exception: {}", this->what());
         }
@@ -96,11 +98,12 @@ namespace hpx {
     ///               \a hpx_category (if mode is \a throwmode::plain, this is the
     ///               default) or to the category \a hpx_category_rethrow
     ///               (if mode is \a throwmode::rethrow).
-    exception::exception(error e, std::string const& msg, throwmode mode)
+    exception::exception(hpx::error e, std::string const& msg, throwmode mode)
       : std::system_error(make_system_error_code(e, mode), msg)
     {
-        HPX_ASSERT((e >= success && e < last_error) || (e & system_error_flag));
-        if (e != success)
+        HPX_ASSERT((e >= hpx::error::success && e < hpx::error::last_error) ||
+            (e & hpx::error::system_error_flag));
+        if (e != hpx::error::success)
         {
             LERR_(error).format("created exception: {}", this->what());
         }
@@ -109,7 +112,7 @@ namespace hpx {
     /// Destruct a hpx::exception
     ///
     /// \throws nothing
-    exception::~exception() noexcept {}
+    exception::~exception() = default;
 
     /// The function \a get_error() returns the hpx::error code stored
     /// in the referenced instance of a hpx::exception. It returns
@@ -140,18 +143,19 @@ namespace hpx {
 
     void set_custom_exception_info_handler(custom_exception_info_handler_type f)
     {
-        custom_exception_info_handler = f;
+        custom_exception_info_handler = HPX_MOVE(f);
     }
 
     static pre_exception_handler_type pre_exception_handler;
 
     void set_pre_exception_handler(pre_exception_handler_type f)
     {
-        pre_exception_handler = f;
+        pre_exception_handler = HPX_MOVE(f);
     }
 }    // namespace hpx
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     template <typename Exception>
     HPX_CORE_EXPORT std::exception_ptr construct_lightweight_exception(
         Exception const& e, std::string const& func, std::string const& file,
@@ -231,12 +235,13 @@ namespace hpx { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Exception>
-    inline bool is_of_lightweight_hpx_category(Exception const&)
+    inline constexpr bool is_of_lightweight_hpx_category(
+        Exception const&) noexcept
     {
         return false;
     }
 
-    inline bool is_of_lightweight_hpx_category(hpx::exception const& e)
+    inline bool is_of_lightweight_hpx_category(hpx::exception const& e) noexcept
     {
         return e.get_error_code().category() == get_lightweight_hpx_category();
     }
@@ -362,7 +367,7 @@ namespace hpx { namespace detail {
         std::out_of_range const&, std::string const&, std::string const&, long);
     template HPX_CORE_EXPORT void throw_exception(std::invalid_argument const&,
         std::string const&, std::string const&, long);
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
@@ -416,7 +421,7 @@ namespace hpx {
         }
         catch (hpx::thread_interrupted const&)
         {
-            return hpx::thread_cancelled;
+            return hpx::error::thread_cancelled;
         }
         catch (hpx::exception const& he)
         {
@@ -425,13 +430,15 @@ namespace hpx {
         catch (std::system_error const& e)
         {
             int code = e.code().value();
-            if (code < success || code >= last_error)
-                code |= system_error_flag;
+            if (code < hpx::error::success || code >= hpx::error::last_error)
+            {
+                code |= hpx::error::system_error_flag;
+            }
             return static_cast<hpx::error>(code);
         }
         catch (...)
         {
-            return unknown_error;
+            return hpx::error::unknown_error;
         }
     }
 

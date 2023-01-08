@@ -281,7 +281,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
-                hpx::bad_parameter, "hpx::collectives::scatter_from",
+                hpx::error::bad_parameter, "hpx::collectives::scatter_from",
                 "the generation number shouldn't be zero"));
         }
 
@@ -341,7 +341,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
-                hpx::bad_parameter, "hpx::collectives::scatter_to",
+                hpx::error::bad_parameter, "hpx::collectives::scatter_to",
                 "the generation number shouldn't be zero"));
         }
 
@@ -390,108 +390,6 @@ namespace hpx { namespace collectives {
             HPX_MOVE(local_result), this_site);
     }
 }}    // namespace hpx::collectives
-
-////////////////////////////////////////////////////////////////////////////////
-// compatibility functions
-namespace hpx { namespace lcos {
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::scatter_to is deprecated, use "
-        "hpx::collectives::scatter_to instead")
-    hpx::future<T> scatter_to(char const* basename,
-        std::vector<T>&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::scatter_to(basename, HPX_MOVE(local_result),
-            hpx::collectives::num_sites_arg(num_sites),
-            hpx::collectives::this_site_arg(this_site),
-            hpx::collectives::generation_arg(generation));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::scatter_to is deprecated, use "
-        "hpx::collectives::scatter_to instead")
-    hpx::future<T> scatter_to(char const* basename,
-        hpx::future<std::vector<T>>&& local_result,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
-    {
-        return local_result.then([=](hpx::future<T>&& f) {
-            return hpx::collectives::scatter_to(basename, f.get(),
-                hpx::collectives::num_sites_arg(num_sites),
-                hpx::collectives::this_site_arg(this_site),
-                hpx::collectives::generation_arg(generation));
-        });
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::scatter is deprecated, use hpx::collectives::scatter "
-        "instead")
-    hpx::future<T> scatter_to(hpx::collectives::communicator comm,
-        std::vector<T>&& local_result, std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::scatter_to(HPX_MOVE(comm),
-            HPX_MOVE(local_result), hpx::collectives::this_site_arg(this_site));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::scatter_to is deprecated, use "
-        "hpx::collectives::scatter_to instead")
-    hpx::future<T> scatter_to(hpx::collectives::communicator comm,
-        hpx::future<std::vector<T>>&& local_result,
-        std::size_t this_site = std::size_t(-1))
-    {
-        return local_result.then([=](hpx::future<T>&& f) mutable {
-            hpx::collectives::scatter_to(HPX_MOVE(comm), f.get(),
-                hpx::collectives::this_site_arg(this_site));
-        });
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::scatter_from is deprecated, use "
-        "hpx::collectives::scatter_from instead")
-    hpx::future<T> scatter_from(char const* basename,
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        return hpx::collectives::scatter_from<T>(basename,
-            hpx::collectives::this_site_arg(this_site),
-            hpx::collectives::generation_arg(generation),
-            hpx::collectives::root_site_arg(root_site));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::scatter_from is deprecated, use "
-        "hpx::collectives::scatter_from instead")
-    hpx::future<T> scatter_from(hpx::collectives::communicator comm,
-        std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::scatter_from<T>(
-            HPX_MOVE(comm), hpx::collectives::this_site_arg(this_site));
-    }
-
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::create_scatter is deprecated, use "
-        "hpx::collectives::create_communicator instead")
-    inline hpx::collectives::communicator create_scatterer(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::create_communicator(basename,
-            hpx::collectives::num_sites_arg(num_sites),
-            hpx::collectives::this_site_arg(this_site),
-            hpx::collectives::generation_arg(generation));
-    }
-}}    // namespace hpx::lcos
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_SCATTER_DECLARATION(...) /**/

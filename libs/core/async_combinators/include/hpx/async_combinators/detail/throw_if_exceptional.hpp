@@ -58,7 +58,6 @@ namespace hpx::detail {
     template <typename... Ts>
     void throw_if_exceptional(Ts const&... ts)
     {
-        int const _sequencer[] = {0, (throw_if_exceptional(ts), 0)...};
-        (void) _sequencer;
+        (throw_if_exceptional(ts), ...);
     }
 }    // namespace hpx::detail

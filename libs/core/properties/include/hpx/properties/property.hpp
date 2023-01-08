@@ -13,7 +13,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace experimental {
+namespace hpx::experimental {
 
     inline constexpr struct prefer_t
       : hpx::functional::detail::tag_fallback<prefer_t>
@@ -21,7 +21,7 @@ namespace hpx { namespace experimental {
         // clang-format off
         template <typename Tag, typename... Tn>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
-                prefer_t, Tag const& tag, Tn&&... tn)
+                prefer_t, Tag tag, Tn&&... tn)
             noexcept(noexcept(tag(HPX_FORWARD(Tn, tn)...)))
             -> decltype(tag(HPX_FORWARD(Tn, tn)...))
         // clang-format on
@@ -44,4 +44,4 @@ namespace hpx { namespace experimental {
             return HPX_FORWARD(T0, t0);
         }
     } prefer{};
-}}    // namespace hpx::experimental
+}    // namespace hpx::experimental

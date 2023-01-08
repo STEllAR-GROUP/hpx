@@ -120,8 +120,8 @@ namespace hpx::serialization {
                 typename traits::serialization_access_data<
                     Container>::preprocessing_only()))
         {
-            // cache the preprocessing flag in the base class to avoid
-            // asking the buffer repeatedly
+            // cache the preprocessing flag in the base class to avoid asking
+            // the buffer repeatedly
             if (buffer_->is_preprocessing())
             {
                 flags_ = flags_ |
@@ -130,6 +130,7 @@ namespace hpx::serialization {
 
             // endianness needs to be saved separately as it is needed to
             // properly interpret the flags
+            //
             // FIXME: make bool once integer compression is implemented
             std::uint64_t const endianness = endian_big() ? ~0ul : 0ul;
             save(endianness);

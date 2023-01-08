@@ -16,7 +16,7 @@
 
 #include <atomic>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
 
     /// Lockable spinlock class
     struct spinlock
@@ -30,15 +30,16 @@ namespace hpx { namespace util { namespace detail {
         HPX_CORE_EXPORT void yield_k(unsigned) noexcept;
 
     public:
-        spinlock() noexcept
+        constexpr spinlock() noexcept
           : m(false)
         {
         }
 
         HPX_FORCEINLINE bool try_lock() noexcept
         {
-            // First do a relaxed load to check if lock is free in order to prevent
-            // unnecessary cache misses if someone does while(!try_lock())
+            // First do a relaxed load to check if lock is free in order to
+            // prevent unnecessary cache misses if someone does
+            // while(!try_lock())
             return !m.load(std::memory_order_relaxed) &&
                 !m.exchange(true, std::memory_order_acquire);
         }
@@ -59,5 +60,4 @@ namespace hpx { namespace util { namespace detail {
             m.store(false, std::memory_order_release);
         }
     };
-
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

@@ -20,26 +20,27 @@
 
 #include <boost/variant.hpp>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     namespace detail {
 
         ////////////////////////////////////////////////////////////////////////
         struct boost_variant_save_visitor : boost::static_visitor<>
         {
-            boost_variant_save_visitor(output_archive& ar)
-              : m_ar(ar)
+            explicit constexpr boost_variant_save_visitor(
+                output_archive& ar) noexcept
+              : ar(ar)
             {
             }
 
             template <typename T>
             void operator()(T const& value) const
             {
-                m_ar << value;
+                ar << value;
             }
 
         private:
-            output_archive& m_ar;
+            output_archive& ar;
         };
 
         ////////////////////////////////////////////////////////////////////////
@@ -67,7 +68,7 @@ namespace hpx { namespace serialization {
         struct boost_variant_impl<>
         {
             template <typename V>
-            static void load(input_archive& /*ar*/, int /*which*/, V& /*v*/)
+            static constexpr void load(input_archive&, int, V&) noexcept
             {
             }
         };
@@ -91,7 +92,7 @@ namespace hpx { namespace serialization {
         {
             // this might happen if a type was removed from the list of variant
             // types
-            HPX_THROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                 "load<Archive, Variant, version>",
                 "type was removed from the list of variant types");
         }
@@ -100,6 +101,6 @@ namespace hpx { namespace serialization {
 
     HPX_SERIALIZATION_SPLIT_FREE_TEMPLATE(
         (template <typename... T>), (boost::variant<T...>) )
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
 #endif    // HPX_SERIALIZATION_HAVE_BOOST_TYPES

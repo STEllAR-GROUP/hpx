@@ -32,7 +32,7 @@ namespace hpx { namespace actions { namespace detail {
     {
         if (name.empty())
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "per_action_data_counter_registry::register_class",
                 "Cannot register an action with an empty name");
         }
@@ -51,7 +51,7 @@ namespace hpx { namespace actions { namespace detail {
         map_type::const_iterator it = map_.find(name);
         if (it == map_.end())
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "per_action_data_counter_registry::get_receive_counter",
                 "unknown action type");
             return nullptr;

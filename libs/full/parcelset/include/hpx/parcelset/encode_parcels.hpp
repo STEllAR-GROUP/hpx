@@ -282,7 +282,7 @@ namespace hpx::parcelset {
                 // serialization library as otherwise we will loose the
                 // e.what() description of the problem, due to slicing.
                 hpx::throw_with_info(
-                    hpx::exception(serialization_error, e.what()));
+                    hpx::exception(hpx::error::serialization_error, e.what()));
                 return 0;
             }
         }

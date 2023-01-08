@@ -22,14 +22,16 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     struct HPX_CORE_EXPORT execution_context : hpx::execution_base::context_base
     {
-        hpx::execution_base::resource_base const& resource() const override
+        hpx::execution_base::resource_base const& resource()
+            const noexcept override
         {
             return resource_;
         }
+
         hpx::execution_base::resource_base resource_;
     };
 
@@ -40,7 +42,7 @@ namespace hpx { namespace threads {
 
         std::string description() const override;
 
-        execution_context const& context() const override
+        execution_context const& context() const noexcept override
         {
             return context_;
         }
@@ -66,6 +68,6 @@ namespace hpx { namespace threads {
 
         execution_context context_;
     };
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>

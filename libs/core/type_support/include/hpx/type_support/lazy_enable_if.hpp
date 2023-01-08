@@ -6,7 +6,8 @@
 
 #pragma once
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     template <bool Enable, typename T>
     struct lazy_enable_if
     {
@@ -17,4 +18,4 @@ namespace hpx { namespace util {
     {
         using type = typename T::type;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util

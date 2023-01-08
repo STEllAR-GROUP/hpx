@@ -39,9 +39,9 @@
 #include <exception>
 #include <utility>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail {
-    ///////////////////////////////////////////////////////////////////////////
+namespace hpx::threads::coroutines::detail {
 
+    ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_DEBUG)
     coroutine_impl::~coroutine_impl()
     {
@@ -52,7 +52,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     void coroutine_impl::operator()() noexcept
     {
         using context_exit_status = super_type::context_exit_status;
-        context_exit_status status = super_type::ctx_not_exited;
+        context_exit_status status =
+            super_type::context_exit_status::not_exited;
 
         // yield value once the thread function has finished executing
         result_type result_last(
@@ -74,11 +75,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
                     result_last = m_fun(*this->args());
                     HPX_ASSERT(
                         result_last.first == thread_schedule_state::terminated);
-                    status = super_type::ctx_exited_return;
+                    status = super_type::context_exit_status::exited_return;
                 }
                 catch (...)
                 {
-                    status = super_type::ctx_exited_abnormally;
+                    status = super_type::context_exit_status::exited_abnormally;
                     tinfo = std::current_exception();
                 }
 
@@ -91,9 +92,9 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
             }
 
             this->do_return(status, HPX_MOVE(tinfo));
-        } while (this->m_state == super_type::ctx_running);
+        } while (this->m_state == super_type::context_state::running);
 
         // should not get here, never
-        HPX_ASSERT(this->m_state == super_type::ctx_running);
+        HPX_ASSERT(this->m_state == super_type::context_state::running);
     }
-}}}}    // namespace hpx::threads::coroutines::detail
+}    // namespace hpx::threads::coroutines::detail

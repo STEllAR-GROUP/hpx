@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -527,34 +527,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename F = detail::less,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<FwdIter> &&
-            traits::is_projected_v<Proj, FwdIter> &&
-            traits::is_indirect_callable_v<
-                ExPolicy, F,
-                traits::projected<Proj, FwdIter>,
-                traits::projected<Proj, FwdIter>
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::min_element is deprecated, use hpx::min_element "
-        "instead") hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-        FwdIter> min_element(ExPolicy&& policy, FwdIter first, FwdIter last,
-        F&& f = F(), Proj&& proj = Proj())
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        return detail::min_element<FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-            HPX_FORWARD(Proj, proj));
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // max_element
     namespace detail {
@@ -689,34 +661,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename F = detail::less,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<FwdIter> &&
-            traits::is_projected_v<Proj, FwdIter> &&
-            traits::is_indirect_callable_v<
-                ExPolicy, F,
-                traits::projected<Proj, FwdIter>,
-                traits::projected<Proj, FwdIter>
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::max_element is deprecated, use hpx::max_element "
-        "instead") hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-        FwdIter> max_element(ExPolicy&& policy, FwdIter first, FwdIter last,
-        F&& f = F(), Proj&& proj = Proj())
-    {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-            "Requires at least forward iterator.");
-
-        return detail::max_element<FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-            HPX_FORWARD(Proj, proj));
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     // minmax_element
@@ -881,35 +825,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter, typename F = detail::less,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<FwdIter> &&
-            traits::is_projected_v<Proj, FwdIter> &&
-            traits::is_indirect_callable_v<
-                ExPolicy, F,
-                traits::projected<Proj, FwdIter>,
-                traits::projected<Proj, FwdIter>
-            >
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::minmax_element is deprecated, use hpx::minmax_element "
-        "instead") hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-        minmax_element_result<FwdIter>> minmax_element(ExPolicy&& policy,
-        FwdIter first, FwdIter last, F&& f = F(), Proj&& proj = Proj())
-    {
-        static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-            "Requires at least forward iterator.");
-
-        return detail::minmax_element<FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-            HPX_FORWARD(Proj, proj));
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 

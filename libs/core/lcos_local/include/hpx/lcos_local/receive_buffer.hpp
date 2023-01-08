@@ -21,22 +21,21 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Mutex = hpx::spinlock>
     struct receive_buffer
     {
     protected:
-        typedef Mutex mutex_type;
-        typedef hpx::promise<T> buffer_promise_type;
+        using mutex_type = Mutex;
+        using buffer_promise_type = hpx::promise<T>;
 
         struct entry_data
         {
-        public:
             HPX_NON_COPYABLE(entry_data);
 
-        public:
-            entry_data()
+            entry_data() noexcept
               : can_be_deleted_(false)
               , value_set_(false)
             {
@@ -70,9 +69,9 @@ namespace hpx { namespace lcos { namespace local {
             bool value_set_;
         };
 
-        typedef std::map<std::size_t, std::shared_ptr<entry_data>>
-            buffer_map_type;
-        typedef typename buffer_map_type::iterator iterator;
+        using buffer_map_type =
+            std::map<std::size_t, std::shared_ptr<entry_data>>;
+        using iterator = typename buffer_map_type::iterator;
 
         struct erase_on_exit
         {
@@ -94,15 +93,15 @@ namespace hpx { namespace lcos { namespace local {
     public:
         receive_buffer() = default;
 
+        ~receive_buffer()
+        {
+            HPX_ASSERT(buffer_map_.empty());
+        }
+
         receive_buffer(receive_buffer&& other) noexcept
           : mtx_()
           , buffer_map_(HPX_MOVE(other.buffer_map_))
         {
-        }
-
-        ~receive_buffer()
-        {
-            HPX_ASSERT(buffer_map_.empty());
         }
 
         receive_buffer& operator=(receive_buffer&& other) noexcept
@@ -122,8 +121,8 @@ namespace hpx { namespace lcos { namespace local {
             iterator it = get_buffer_entry(step);
             HPX_ASSERT(it != buffer_map_.end());
 
-            // if the value was already set we delete the entry after
-            // retrieving the future
+            // if the value was already set we delete the entry after retrieving
+            // the future
             if (it->second->can_be_deleted_)
             {
                 erase_on_exit t(buffer_map_, it);
@@ -198,7 +197,7 @@ namespace hpx { namespace lcos { namespace local {
             entry->set_value(HPX_MOVE(val));
         }
 
-        bool empty() const
+        bool empty() const noexcept
         {
             return buffer_map_.empty();
         }
@@ -233,7 +232,7 @@ namespace hpx { namespace lcos { namespace local {
                     std::make_pair(step, std::make_shared<entry_data>()));
                 if (!res.second)
                 {
-                    HPX_THROW_EXCEPTION(invalid_status,
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "base_receive_buffer::get_buffer_entry",
                         "couldn't insert a new entry into the receive buffer");
                 }
@@ -252,16 +251,14 @@ namespace hpx { namespace lcos { namespace local {
     struct receive_buffer<void, Mutex>
     {
     protected:
-        typedef Mutex mutex_type;
-        typedef hpx::promise<void> buffer_promise_type;
+        using mutex_type = Mutex;
+        using buffer_promise_type = hpx::promise<void>;
 
         struct entry_data
         {
-        public:
             HPX_NON_COPYABLE(entry_data);
 
-        public:
-            entry_data()
+            entry_data() noexcept
               : can_be_deleted_(false)
               , value_set_(false)
             {
@@ -294,9 +291,9 @@ namespace hpx { namespace lcos { namespace local {
             bool value_set_;
         };
 
-        typedef std::map<std::size_t, std::shared_ptr<entry_data>>
-            buffer_map_type;
-        typedef typename buffer_map_type::iterator iterator;
+        using buffer_map_type =
+            std::map<std::size_t, std::shared_ptr<entry_data>>;
+        using iterator = typename buffer_map_type::iterator;
 
         struct erase_on_exit
         {
@@ -316,16 +313,16 @@ namespace hpx { namespace lcos { namespace local {
         };
 
     public:
-        receive_buffer() {}
-
-        receive_buffer(receive_buffer&& other)
-          : buffer_map_(HPX_MOVE(other.buffer_map_))
-        {
-        }
+        receive_buffer() = default;
 
         ~receive_buffer()
         {
             HPX_ASSERT(buffer_map_.empty());
+        }
+
+        receive_buffer(receive_buffer&& other)
+          : buffer_map_(HPX_MOVE(other.buffer_map_))
+        {
         }
 
         receive_buffer& operator=(receive_buffer&& other)
@@ -420,7 +417,7 @@ namespace hpx { namespace lcos { namespace local {
             entry->set_value();
         }
 
-        bool empty() const
+        bool empty() const noexcept
         {
             return buffer_map_.empty();
         }
@@ -455,7 +452,7 @@ namespace hpx { namespace lcos { namespace local {
                     std::make_pair(step, std::make_shared<entry_data>()));
                 if (!res.second)
                 {
-                    HPX_THROW_EXCEPTION(invalid_status,
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "base_receive_buffer::get_buffer_entry",
                         "couldn't insert a new entry into the receive buffer");
                 }
@@ -468,4 +465,4 @@ namespace hpx { namespace lcos { namespace local {
         mutable mutex_type mtx_;
         buffer_map_type buffer_map_;
     };
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

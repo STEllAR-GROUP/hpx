@@ -282,7 +282,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<std::vector<arg_type>>(
-                HPX_GET_EXCEPTION(hpx::bad_parameter,
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::collectives::gather_here",
                     "the generation number shouldn't be zero"));
         }
@@ -347,7 +347,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
-                hpx::bad_parameter, "hpx::collectives::gather_there",
+                hpx::error::bad_parameter, "hpx::collectives::gather_there",
                 "the generation number shouldn't be zero"));
         }
 
@@ -396,141 +396,6 @@ namespace hpx { namespace collectives {
             HPX_FORWARD(T, local_result), this_site);
     }
 }}    // namespace hpx::collectives
-
-////////////////////////////////////////////////////////////////////////////////
-// compatibility functions
-namespace hpx { namespace lcos {
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::gather_here is deprecated, use "
-        "hpx::collectives::gather_here instead")
-    hpx::future<std::vector<typename std::decay<T>::type>> gather_here(
-        char const* basename, T&& local_result,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::gather_here(basename,
-            HPX_FORWARD(T, local_result),
-            hpx::collectives::num_sites_arg(num_sites),
-            hpx::collectives::this_site_arg(this_site),
-            hpx::collectives::generation_arg(generation));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::gather_here is deprecated, use "
-        "hpx::collectives::gather_here instead")
-    hpx::future<std::vector<T>> gather_here(char const* basename,
-        hpx::future<T>&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
-    {
-        return local_result.then([=](hpx::future<T>&& f) {
-            return hpx::collectives::gather_here(basename, f.get(),
-                hpx::collectives::num_sites_arg(num_sites),
-                hpx::collectives::this_site_arg(this_site),
-                hpx::collectives::generation_arg(generation));
-        });
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::gather is deprecated, use hpx::collectives::gather "
-        "instead")
-    hpx::future<std::vector<std::decay_t<T>>> gather_here(
-        hpx::collectives::communicator comm, T&& local_result,
-        std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::gather_here(HPX_MOVE(comm),
-            HPX_FORWARD(T, local_result),
-            hpx::collectives::this_site_arg(this_site));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::gather_here is deprecated, use "
-        "hpx::collectives::gather_here instead")
-    hpx::future<std::vector<T>> gather_here(hpx::collectives::communicator comm,
-        hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
-    {
-        return local_result.then([=](hpx::future<T>&& f) mutable {
-            hpx::collectives::gather_here(HPX_MOVE(comm), f.get(),
-                hpx::collectives::this_site_arg(this_site));
-        });
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::gather_there is deprecated, use "
-        "hpx::collectives::gather_there instead")
-    hpx::future<void> gather_there(char const* basename, T&& local_result,
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        return hpx::collectives::gather_there(basename,
-            HPX_FORWARD(T, local_result),
-            hpx::collectives::this_site_arg(this_site),
-            hpx::collectives::generation_arg(generation),
-            hpx::collectives::root_site_arg(root_site));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::gather_there is deprecated, use "
-        "hpx::collectives::gather_there instead")
-    hpx::future<void> gather_there(char const* basename,
-        hpx::future<T>&& local_result, std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        return local_result.then([=](hpx::future<T>&& f) {
-            return hpx::collectives::gather_there(basename, f.get(),
-                hpx::collectives::this_site_arg(this_site),
-                hpx::collectives::generation_arg(generation),
-                hpx::collectives::root_site_arg(root_site));
-        });
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::gather_there is deprecated, use "
-        "hpx::collectives::gather_there instead")
-    hpx::future<void> gather_there(hpx::collectives::communicator comm,
-        T&& local_result, std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::gather_there(HPX_MOVE(comm),
-            HPX_FORWARD(T, local_result),
-            hpx::collectives::this_site_arg(this_site));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::gather_there is deprecated, use "
-        "hpx::collectives::gather_there instead")
-    hpx::future<void> gather_there(hpx::collectives::communicator comm,
-        hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
-    {
-        return local_result.then([=](hpx::future<T>&& f) mutable {
-            return hpx::collectives::gather_there(HPX_MOVE(comm), f.get(),
-                hpx::collectives::this_site_arg(this_site));
-        });
-    }
-
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::create_gatherer is deprecated, use "
-        "hpx::collectives::create_communicator instead")
-    inline hpx::collectives::communicator create_gatherer(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::create_communicator(basename,
-            hpx::collectives::num_sites_arg(num_sites),
-            hpx::collectives::this_site_arg(this_site),
-            hpx::collectives::generation_arg(generation));
-    }
-}}    // namespace hpx::lcos
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_GATHER_DECLARATION(...) /**/

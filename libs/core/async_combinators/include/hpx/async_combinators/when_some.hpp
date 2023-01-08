@@ -298,8 +298,7 @@ namespace hpx::lcos::detail {
         template <typename Tuple, std::size_t... Is>
         HPX_FORCEINLINE void apply(Tuple& tuple, util::index_pack<Is...>) const
         {
-            int const _sequencer[] = {(((*this)(hpx::get<Is>(tuple))), 0)...};
-            (void) _sequencer;
+            ((*this)(hpx::get<Is>(tuple)), ...);
         }
 
         template <typename... Ts>
@@ -432,9 +431,9 @@ namespace hpx {
             if (n > values.size())
             {
                 return hpx::make_exceptional_future<
-                    when_some_result<result_type>>(
-                    HPX_GET_EXCEPTION(hpx::bad_parameter, "hpx::when_some",
-                        "number of results to wait for is out of bounds"));
+                    when_some_result<result_type>>(HPX_GET_EXCEPTION(
+                    hpx::error::bad_parameter, "hpx::when_some",
+                    "number of results to wait for is out of bounds"));
             }
 
             auto f = std::make_shared<lcos::detail::when_some<result_type>>(
@@ -446,7 +445,7 @@ namespace hpx {
                 });
 
             auto result = p.get_future();
-            p.apply();
+            p.post();
 
             return result;
         }
@@ -480,7 +479,7 @@ namespace hpx {
             }
 
             return hpx::make_exceptional_future<when_some_result<result_type>>(
-                HPX_GET_EXCEPTION(hpx::bad_parameter, "hpx::when_some",
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter, "hpx::when_some",
                     "number of results to wait for is out of bounds"));
         }
 
@@ -501,9 +500,9 @@ namespace hpx {
             if (n > 1 + sizeof...(Ts))
             {
                 return hpx::make_exceptional_future<
-                    when_some_result<result_type>>(
-                    HPX_GET_EXCEPTION(hpx::bad_parameter, "hpx::when_some",
-                        "number of results to wait for is out of bounds"));
+                    when_some_result<result_type>>(HPX_GET_EXCEPTION(
+                    hpx::error::bad_parameter, "hpx::when_some",
+                    "number of results to wait for is out of bounds"));
             }
 
             traits::acquire_future_disp func;
@@ -519,7 +518,7 @@ namespace hpx {
                 });
 
             auto result = p.get_future();
-            p.apply();
+            p.post();
 
             return result;
         }

@@ -168,7 +168,7 @@ namespace hpx { namespace performance_counters { namespace server {
             {
                 if (parameter2 == 0)
                 {
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "counter_type_from_statistic<Statistic>",
                         "base rolling window size is specified to be zero");
                 }
@@ -209,7 +209,7 @@ namespace hpx { namespace performance_counters { namespace server {
             {
                 if (parameter2 == 0)
                 {
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "counter_type_from_statistic<Statistic>",
                         "base rolling window size is specified to be zero");
                 }
@@ -309,7 +309,7 @@ namespace hpx { namespace performance_counters { namespace server {
             {
                 if (parameter2 == 0)
                 {
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "counter_type_from_statistic<Statistic>",
                         "base rolling window size is specified to be zero");
                 }
@@ -349,7 +349,7 @@ namespace hpx { namespace performance_counters { namespace server {
             {
                 if (parameter2 == 0)
                 {
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "counter_type_from_statistic<Statistic>",
                         "base rolling window size is specified to be zero");
                 }
@@ -402,14 +402,14 @@ namespace hpx { namespace performance_counters { namespace server {
     {
         if (parameter1 == 0)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "statistics_counter<Statistic>::statistics_counter",
                 "base interval is specified to be zero");
         }
 
         if (info.type_ != counter_type::aggregating)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "statistics_counter<Statistic>::statistics_counter",
                 "unexpected counter type specified");
         }
@@ -460,7 +460,7 @@ namespace hpx { namespace performance_counters { namespace server {
             base_value.scale_inverse_ != prev_value_.scale_inverse_)
         {
             // not supported right now
-            HPX_THROW_EXCEPTION(not_implemented,
+            HPX_THROW_EXCEPTION(hpx::error::not_implemented,
                 "statistics_counter<Statistic>::evaluate",
                 "base counter should keep scaling constant over time");
             return false;
@@ -488,7 +488,7 @@ namespace hpx { namespace performance_counters { namespace server {
             hpx::id_type base_counter_id;
             {
                 // We need to unlock the lock here since get_counter might suspend
-                util::unlock_guard<std::unique_lock<mutex_type>> unlock(l);
+                unlock_guard<std::unique_lock<mutex_type>> unlock(l);
                 base_counter_id = get_counter(base_counter_name_, ec);
             }
 
@@ -507,7 +507,7 @@ namespace hpx { namespace performance_counters { namespace server {
             if (HPX_UNLIKELY(ec || !base_counter_id_))
             {
                 // base counter could not be retrieved
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "statistics_counter<Statistic>::evaluate_base_counter",
                     "could not get or create performance counter: '{}'",
                     base_counter_name_);
@@ -765,7 +765,8 @@ namespace hpx { namespace performance_counters { namespace detail {
 
             if (!paths.parentinstance_is_basename_)
             {
-                HPX_THROWS_IF(ec, bad_parameter, "statistics_counter_creator",
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "statistics_counter_creator",
                     "invalid aggregate counter "
                     "name (instance name must be valid base counter name)");
                 return naming::invalid_gid;
@@ -784,7 +785,7 @@ namespace hpx { namespace performance_counters { namespace detail {
                 if (!x3::parse(paths.parameters_.begin(),
                         paths.parameters_.end(), x3::uint_ % ',', parameters))
                 {
-                    HPX_THROWS_IF(ec, bad_parameter,
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "statistics_counter_creator",
                         "invalid parameter specification format for "
                         "this counter: {}",
@@ -795,7 +796,7 @@ namespace hpx { namespace performance_counters { namespace detail {
                 {
                     if (parameters.size() > 3)
                     {
-                        HPX_THROWS_IF(ec, bad_parameter,
+                        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                             "statistics_counter_creator",
                             "too many parameter specifications for "
                             "this counter: {}",
@@ -805,7 +806,7 @@ namespace hpx { namespace performance_counters { namespace detail {
                 }
                 else if (parameters.size() > 2)
                 {
-                    HPX_THROWS_IF(ec, bad_parameter,
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "statistics_counter_creator",
                         "too many parameter specifications for "
                         "this counter: {}",
@@ -829,8 +830,8 @@ namespace hpx { namespace performance_counters { namespace detail {
         break;
 
         default:
-            HPX_THROWS_IF(ec, bad_parameter, "statistics_counter_creator",
-                "invalid counter type requested");
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "statistics_counter_creator", "invalid counter type requested");
             return naming::invalid_gid;
         }
     }

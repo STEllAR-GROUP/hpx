@@ -1,5 +1,5 @@
 //  Copyright (c) 2018 Thomas Heller
-//  Copyright (c) 2019-2021 Hartmut Kaiser
+//  Copyright (c) 2019-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,14 +15,13 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 
-#include <boost/utility/string_ref.hpp>
-
 #include <cstddef>
 #include <functional>
 #include <iosfwd>
+#include <string_view>
 #include <utility>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
     // same as below, just not holding a reference count
@@ -32,7 +31,7 @@ namespace hpx { namespace threads {
         using thread_id_repr = void*;
 
     public:
-        thread_id() noexcept = default;
+        constexpr thread_id() noexcept = default;
 
         thread_id(thread_id const&) = default;
         thread_id& operator=(thread_id const&) = default;
@@ -44,8 +43,11 @@ namespace hpx { namespace threads {
         }
         constexpr thread_id& operator=(thread_id&& rhs) noexcept
         {
-            thrd_ = rhs.thrd_;
-            rhs.thrd_ = nullptr;
+            if (this != &rhs)
+            {
+                thrd_ = rhs.thrd_;
+                rhs.thrd_ = nullptr;
+            }
             return *this;
         }
 
@@ -143,7 +145,7 @@ namespace hpx { namespace threads {
         }
 
         friend void format_value(
-            std::ostream& os, boost::string_ref spec, thread_id const& id)
+            std::ostream& os, std::string_view spec, thread_id const& id)
         {
             // propagate spec
             char format[16];
@@ -175,9 +177,9 @@ namespace hpx { namespace threads {
             // the initial reference count is one by default as each newly
             // created thread will be held alive by the variable returned from
             // the creation function;
-            explicit thread_data_reference_counting(
-                thread_id_addref addref = thread_id_addref::yes)
-              : count_(addref == thread_id_addref::yes)
+            explicit constexpr thread_data_reference_counting(
+                thread_id_addref addref = thread_id_addref::yes) noexcept
+              : count_(addref == thread_id_addref::yes ? 1 : 0)
             {
             }
 
@@ -246,7 +248,7 @@ namespace hpx { namespace threads {
 
         explicit thread_id_ref(thread_repr* thrd,
             thread_id_addref addref = thread_id_addref::yes) noexcept
-          : thrd_(thrd, addref == thread_id_addref::yes)
+          : thrd_(thrd, addref == thread_id_addref::yes ? 1 : 0)
         {
         }
 
@@ -280,17 +282,17 @@ namespace hpx { namespace threads {
             return *this;
         }
 
-        explicit operator bool() const noexcept
+        explicit constexpr operator bool() const noexcept
         {
             return nullptr != thrd_;
         }
 
-        thread_id noref() const noexcept
+        constexpr thread_id noref() const noexcept
         {
             return thread_id(thrd_.get());
         }
 
-        thread_id_repr& get() & noexcept
+        constexpr thread_id_repr& get() & noexcept
         {
             return thrd_;
         }
@@ -299,7 +301,7 @@ namespace hpx { namespace threads {
             return HPX_MOVE(thrd_);
         }
 
-        thread_id_repr const& get() const& noexcept
+        constexpr thread_id_repr const& get() const& noexcept
         {
             return thrd_;
         }
@@ -319,63 +321,63 @@ namespace hpx { namespace threads {
             return thrd_.detach();
         }
 
-        friend bool operator==(
+        friend constexpr bool operator==(
             std::nullptr_t, thread_id_ref const& rhs) noexcept
         {
             return nullptr == rhs.thrd_;
         }
 
-        friend bool operator!=(
+        friend constexpr bool operator!=(
             std::nullptr_t, thread_id_ref const& rhs) noexcept
         {
             return nullptr != rhs.thrd_;
         }
 
-        friend bool operator==(
+        friend constexpr bool operator==(
             thread_id_ref const& lhs, std::nullptr_t) noexcept
         {
             return nullptr == lhs.thrd_;
         }
 
-        friend bool operator!=(
+        friend constexpr bool operator!=(
             thread_id_ref const& lhs, std::nullptr_t) noexcept
         {
             return nullptr != lhs.thrd_;
         }
 
-        friend bool operator==(
+        friend constexpr bool operator==(
             thread_id_ref const& lhs, thread_id_ref const& rhs) noexcept
         {
             return lhs.thrd_ == rhs.thrd_;
         }
 
-        friend bool operator!=(
+        friend constexpr bool operator!=(
             thread_id_ref const& lhs, thread_id_ref const& rhs) noexcept
         {
             return lhs.thrd_ != rhs.thrd_;
         }
 
-        friend bool operator<(
+        friend constexpr bool operator<(
             thread_id_ref const& lhs, thread_id_ref const& rhs) noexcept
         {
             return std::less<thread_repr const*>{}(
                 lhs.thrd_.get(), rhs.thrd_.get());
         }
 
-        friend bool operator>(
+        friend constexpr bool operator>(
             thread_id_ref const& lhs, thread_id_ref const& rhs) noexcept
         {
             return std::less<thread_repr const*>{}(
                 rhs.thrd_.get(), lhs.thrd_.get());
         }
 
-        friend bool operator<=(
+        friend constexpr bool operator<=(
             thread_id_ref const& lhs, thread_id_ref const& rhs) noexcept
         {
             return !(rhs > lhs);
         }
 
-        friend bool operator>=(
+        friend constexpr bool operator>=(
             thread_id_ref const& lhs, thread_id_ref const& rhs) noexcept
         {
             return !(rhs < lhs);
@@ -390,7 +392,7 @@ namespace hpx { namespace threads {
         }
 
         friend void format_value(
-            std::ostream& os, boost::string_ref spec, thread_id_ref const& id)
+            std::ostream& os, std::string_view spec, thread_id_ref const& id)
         {
             // propagate spec
             char format[16];
@@ -410,7 +412,7 @@ namespace hpx { namespace threads {
 #else
     inline constexpr thread_id const invalid_thread_id;
 #endif
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
 
 namespace std {
 

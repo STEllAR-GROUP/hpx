@@ -10,7 +10,7 @@
 
 #if defined(DOXYGEN)
 
-namespace hpx { namespace parallel { namespace v1 {
+namespace hpx { namespace experimental {
     // clang-format off
     /// Reduce by Key performs an inclusive scan reduction operation on elements
     /// supplied in key/value pairs. The algorithm produces a single output
@@ -114,7 +114,7 @@ namespace hpx { namespace parallel { namespace v1 {
         RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
         Compare&& comp = Compare(), Func&& func = Func());
     // clang-format on
-}}}    // namespace hpx::parallel::v1
+}}    // namespace hpx::experimental
 
 #else
 //
@@ -146,375 +146,359 @@ namespace hpx { namespace parallel { namespace v1 {
 #endif
 /// \endcond
 
-namespace hpx { namespace parallel { inline namespace v1 {
-    ///////////////////////////////////////////////////////////////////////////
-    // reduce_by_key
-    namespace detail {
-        /// \cond NOINTERNAL
+namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+    /// \cond NOINTERNAL
 
-        // -------------------------------------------------------------------
-        // simple iterator helper object for access to prev/next items
-        // -------------------------------------------------------------------
-        struct reduce_stencil_transformer
+    // -------------------------------------------------------------------
+    // simple iterator helper object for access to prev/next items
+    // -------------------------------------------------------------------
+    struct reduce_stencil_transformer
+    {
+        // declare result type as a template
+        template <typename T>
+        struct result;
+
+        // specialize result for iterator type
+        template <typename This, typename Iterator>
+        struct result<This(Iterator)>
         {
-            // declare result type as a template
-            template <typename T>
-            struct result;
-
-            // specialize result for iterator type
-            template <typename This, typename Iterator>
-            struct result<This(Iterator)>
-            {
-                typedef typename std::iterator_traits<Iterator>::reference
-                    element_type;
-                typedef hpx::tuple<element_type, element_type, element_type>
-                    type;
-            };
-
-            // call operator for stencil transform
-            // it will dereference tuple(it-1, it, it+1)
-            template <typename Iterator>
-            typename result<reduce_stencil_transformer(Iterator)>::type
-            operator()(Iterator const& it) const
-            {
-                typedef
-                    typename result<reduce_stencil_transformer(Iterator)>::type
-                        type;
-                return type(*std::prev(it), *it, *std::next(it));
-            }
+            typedef
+                typename std::iterator_traits<Iterator>::reference element_type;
+            typedef hpx::tuple<element_type, element_type, element_type> type;
         };
 
-        // -------------------------------------------------------------------
-        // transform iterator using reduce_stencil_transformer helper
-        // -------------------------------------------------------------------
-        template <typename Iterator,
-            typename Transformer = detail::reduce_stencil_transformer>
-        class reduce_stencil_iterator
-          : public hpx::util::transform_iterator<Iterator, Transformer>
+        // call operator for stencil transform
+        // it will dereference tuple(it-1, it, it+1)
+        template <typename Iterator>
+        typename result<reduce_stencil_transformer(Iterator)>::type operator()(
+            Iterator const& it) const
         {
-        private:
-            typedef hpx::util::transform_iterator<Iterator, Transformer>
-                base_type;
+            typedef typename result<reduce_stencil_transformer(Iterator)>::type
+                type;
+            return type(*std::prev(it), *it, *std::next(it));
+        }
+    };
 
-        public:
-            reduce_stencil_iterator() {}
+    // -------------------------------------------------------------------
+    // transform iterator using reduce_stencil_transformer helper
+    // -------------------------------------------------------------------
+    template <typename Iterator,
+        typename Transformer = detail::reduce_stencil_transformer>
+    class reduce_stencil_iterator
+      : public hpx::util::transform_iterator<Iterator, Transformer>
+    {
+    private:
+        typedef hpx::util::transform_iterator<Iterator, Transformer> base_type;
 
-            explicit reduce_stencil_iterator(Iterator const& it)
-              : base_type(it, Transformer())
-            {
-            }
+    public:
+        reduce_stencil_iterator() {}
 
-            reduce_stencil_iterator(Iterator const& it, Transformer const& t)
-              : base_type(it, t)
-            {
-            }
-        };
-
-        template <typename Iterator, typename Transformer>
-        inline reduce_stencil_iterator<Iterator, Transformer>
-        make_reduce_stencil_iterator(Iterator const& it, Transformer const& t)
+        explicit reduce_stencil_iterator(Iterator const& it)
+          : base_type(it, Transformer())
         {
-            return reduce_stencil_iterator<Iterator, Transformer>(it, t);
         }
 
-        // -------------------------------------------------------------------
-        // state of a reduce by key step
-        // -------------------------------------------------------------------
-        struct reduce_key_series_states
+        reduce_stencil_iterator(Iterator const& it, Transformer const& t)
+          : base_type(it, t)
         {
-            bool start;    // START of a segment
-            bool end;      // END of a segment
-            reduce_key_series_states(bool s = false, bool e = false)
-              : start(s)
-              , end(e)
+        }
+    };
+
+    template <typename Iterator, typename Transformer>
+    inline reduce_stencil_iterator<Iterator, Transformer>
+    make_reduce_stencil_iterator(Iterator const& it, Transformer const& t)
+    {
+        return reduce_stencil_iterator<Iterator, Transformer>(it, t);
+    }
+
+    // -------------------------------------------------------------------
+    // state of a reduce by key step
+    // -------------------------------------------------------------------
+    struct reduce_key_series_states
+    {
+        bool start;    // START of a segment
+        bool end;      // END of a segment
+        reduce_key_series_states(bool s = false, bool e = false)
+          : start(s)
+          , end(e)
+        {
+        }
+    };
+
+    // -------------------------------------------------------------------
+    // callable that actually computes the state using the stencil iterator
+    // -------------------------------------------------------------------
+    template <typename Transformer, typename StencilIterType,
+        typename KeyStateIterType, typename Compare>
+    struct reduce_stencil_generate
+    {
+        typedef typename Transformer::template result<Transformer(
+            StencilIterType)>::element_type element_type;
+        typedef typename Transformer::template result<Transformer(
+            StencilIterType)>::type tuple_type;
+        typedef typename std::iterator_traits<KeyStateIterType>::reference
+            KeyStateType;
+
+        reduce_stencil_generate() {}
+
+        void operator()(const tuple_type& value, KeyStateType& kiter,
+            const Compare& comp) const
+        {
+            // resolves to a tuple of values for *(it-1), *it, *(it+1)
+
+            element_type left = hpx::get<0>(value);
+            element_type mid = hpx::get<1>(value);
+            element_type right = hpx::get<2>(value);
+
+            // we need to determine which of three states this
+            // index is. It can be:
+            // 1. Middle of a set of equivalent keys.
+            // 2. Start of a set of equivalent keys.
+            // 3. End of a set of equivalent keys.
+            // 4. Both the start and end of a set of keys
+
             {
+                const bool leftMatches(comp(left, mid));
+                const bool rightMatches(comp(mid, right));
+                kiter = reduce_key_series_states(!leftMatches, !rightMatches);
             }
-        };
+        }
+    };
 
-        // -------------------------------------------------------------------
-        // callable that actually computes the state using the stencil iterator
-        // -------------------------------------------------------------------
-        template <typename Transformer, typename StencilIterType,
-            typename KeyStateIterType, typename Compare>
-        struct reduce_stencil_generate
+    // -------------------------------------------------------------------
+    // helper that extracts the final output iterators from copy_if
+    // -------------------------------------------------------------------
+    // Zip iterator has 3 iterators inside
+    // Iter1, key type : Iter2, value type : Iter3, state type
+    template <typename ZIter, typename iKey, typename iVal>
+    util::in_out_result<iKey, iVal> make_pair_result(
+        ZIter zipiter, iKey key_start, iVal val_start)
+    {
+        // the iterator we want is 'second' part of pair type (from copy_if)
+        auto t = zipiter.out.get_iterator_tuple();
+        iKey key_end = hpx::get<0>(t);
+        return util::in_out_result<iKey, iVal>{
+            key_end, std::next(val_start, std::distance(key_start, key_end))};
+    }
+
+    // async version that returns future<pair> from future<zip_iterator<blah>>
+    template <typename ZIter, typename iKey, typename iVal>
+    hpx::future<util::in_out_result<iKey, iVal>> make_pair_result(
+        hpx::future<ZIter>&& ziter, iKey key_start, iVal val_start)
+    {
+        typedef util::in_out_result<iKey, iVal> result_type;
+
+        return hpx::make_future<result_type>(
+            HPX_MOVE(ziter), [=](ZIter zipiter) {
+                auto t = zipiter.second.get_iterator_tuple();
+                iKey key_end = hpx::get<0>(t);
+                return result_type{key_end,
+                    std::next(val_start, std::distance(key_start, key_end))};
+            });
+    }
+
+    // -------------------------------------------------------------------
+    // The main algorithm is implemented here, it replaces any async
+    // execution policy with a non async one so that no waits are
+    // necessry on the internal algorithms. Async execution is handled
+    // by the wrapper layer that calls this.
+    // -------------------------------------------------------------------
+    template <typename ExPolicy, typename RanIter, typename RanIter2,
+        typename FwdIter1, typename FwdIter2, typename Compare, typename Func>
+    static util::in_out_result<FwdIter1, FwdIter2> reduce_by_key_impl(
+        ExPolicy&& policy, RanIter key_first, RanIter key_last,
+        RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
+        Compare&& comp, Func&& func)
+    {
+        using namespace hpx::parallel::v1::detail;
+        using namespace hpx::util;
+
+        // we need to determine based on the keys what is the keystate for
+        // each key. The states are start, middle, end of a series and the special
+        // state start and end of the sequence
+        std::vector<reduce_key_series_states> key_state;
+        using keystate_iter_type =
+            std::vector<reduce_key_series_states>::iterator;
+        using reducebykey_iter = detail::reduce_stencil_iterator<RanIter,
+            reduce_stencil_transformer>;
+        using element_type = typename std::iterator_traits<RanIter>::reference;
+        using zip_ref = typename zip_iterator<reducebykey_iter,
+            keystate_iter_type>::reference;
+        //
+        const std::uint64_t number_of_keys = std::distance(key_first, key_last);
+        //
+        key_state.assign(number_of_keys, reduce_key_series_states());
         {
-            typedef typename Transformer::template result<Transformer(
-                StencilIterType)>::element_type element_type;
-            typedef typename Transformer::template result<Transformer(
-                StencilIterType)>::type tuple_type;
-            typedef typename std::iterator_traits<KeyStateIterType>::reference
-                KeyStateType;
+            reduce_stencil_transformer r_s_t;
+            reducebykey_iter reduce_begin =
+                make_reduce_stencil_iterator(key_first, r_s_t);
+            reducebykey_iter reduce_end =
+                make_reduce_stencil_iterator(key_last, r_s_t);
 
-            reduce_stencil_generate() {}
+            // FIXME: handle cases number_of_keys == 0 and
+            //        number_of_keys == 1
 
-            void operator()(const tuple_type& value, KeyStateType& kiter,
-                const Compare& comp) const
+            if (number_of_keys == 2)
             {
-                // resolves to a tuple of values for *(it-1), *it, *(it+1)
-
-                element_type left = hpx::get<0>(value);
-                element_type mid = hpx::get<1>(value);
-                element_type right = hpx::get<2>(value);
-
-                // we need to determine which of three states this
-                // index is. It can be:
-                // 1. Middle of a set of equivalent keys.
-                // 2. Start of a set of equivalent keys.
-                // 3. End of a set of equivalent keys.
-                // 4. Both the start and end of a set of keys
-
-                {
-                    const bool leftMatches(comp(left, mid));
-                    const bool rightMatches(comp(mid, right));
-                    kiter =
-                        reduce_key_series_states(!leftMatches, !rightMatches);
-                }
+                // for two entries, one is a start, the other an end,
+                // if they are different, then they are both start/end
+                element_type left = *key_first;
+                element_type right = *std::next(key_first);
+                key_state[0] =
+                    reduce_key_series_states(true, !comp(left, right));
+                key_state[1] =
+                    reduce_key_series_states(!comp(left, right), true);
             }
-        };
-
-        // -------------------------------------------------------------------
-        // helper that extracts the final output iterators from copy_if
-        // -------------------------------------------------------------------
-        // Zip iterator has 3 iterators inside
-        // Iter1, key type : Iter2, value type : Iter3, state type
-        template <typename ZIter, typename iKey, typename iVal>
-        util::in_out_result<iKey, iVal> make_pair_result(
-            ZIter zipiter, iKey key_start, iVal val_start)
+            else
+            {
+                // do the first and last elements by hand to simplify the iterator
+                // traversal as there is no prev/next for first/last
+                element_type elem0 = *key_first;
+                element_type elem1 = *std::next(key_first);
+                key_state[0] = reduce_key_series_states(true, elem0 != elem1);
+                // middle elements
+                reduce_stencil_generate<reduce_stencil_transformer, RanIter,
+                    keystate_iter_type, Compare>
+                    kernel;
+                hpx::for_each(policy(hpx::execution::non_task),
+                    zip_iterator(reduce_begin + 1, key_state.begin() + 1),
+                    zip_iterator(reduce_end - 1, key_state.end() - 1),
+                    [&kernel, &comp](zip_ref ref) {
+                        kernel(hpx::get<0>(ref), hpx::get<1>(ref), comp);
+                    });
+                // Last element
+                element_type elemN = *std::prev(key_last);
+                element_type elemn = *std::prev(std::prev(key_last));
+                key_state.back() =
+                    reduce_key_series_states(elemN != elemn, true);
+            }
+        }
         {
-            // the iterator we want is 'second' part of pair type (from copy_if)
-            auto t = zipiter.out.get_iterator_tuple();
-            iKey key_end = hpx::get<0>(t);
-            return util::in_out_result<iKey, iVal>{key_end,
-                std::next(val_start, std::distance(key_start, key_end))};
+            using zip_iterator_in = zip_iterator<RanIter2,
+                std::vector<reduce_key_series_states>::iterator>;
+            using zip_type_in = typename zip_iterator_in::value_type;
+
+            using zip_iterator_vout = zip_iterator<FwdIter2,
+                std::vector<reduce_key_series_states>::iterator>;
+
+            using value_type =
+                typename std::iterator_traits<RanIter2>::value_type;
+
+            zip_iterator_in states_begin =
+                zip_iterator(values_first, hpx::util::begin(key_state));
+            zip_iterator_in states_end = zip_iterator(
+                values_first + number_of_keys, hpx::util::end(key_state));
+            zip_iterator_vout states_out_begin =
+                zip_iterator(values_output, hpx::util::begin(key_state));
+            //
+
+            zip_type_in initial;
+            //
+            using lambda_type =
+                hpx::tuple<value_type, reduce_key_series_states>;
+            hpx::inclusive_scan(
+                policy(hpx::execution::non_task), states_begin, states_end,
+                states_out_begin,
+                // B is the current entry, A is the one passed in from 'previous'
+                [&func](zip_type_in a, zip_type_in b) -> lambda_type {
+                    value_type a_val = hpx::get<0>(a);
+                    reduce_key_series_states a_state = hpx::get<1>(a);
+                    value_type b_val = hpx::get<0>(b);
+                    reduce_key_series_states b_state = hpx::get<1>(b);
+                    debug_reduce_by_key("{ " << a_val << "+" << b_val << " },\t"
+                                             << a_state << b_state);
+                    // if carrying a start flag, then copy - don't add
+                    if (b_state.start)
+                    {
+                        debug_reduce_by_key(" = " << b_val << std::endl);
+                        return hpx::make_tuple(b_val,
+                            reduce_key_series_states(
+                                a_state.start || b_state.start, b_state.end));
+                    }
+                    // normal add of previous + this
+                    else
+                    {
+                        debug_reduce_by_key(
+                            " = " << func(a_val, b_val) << std::endl);
+                        value_type temp = func(a_val, b_val);
+                        return hpx::make_tuple(temp,
+                            reduce_key_series_states(
+                                a_state.start || b_state.start, b_state.end));
+                    }
+                },
+                initial);
+
+            // now copy the values and keys for each element that
+            // is marked by an 'END' state to the final output
+            using zip2_ref = typename hpx::util::zip_iterator<RanIter, FwdIter2,
+                std::vector<reduce_key_series_states>::iterator>::reference;
+
+            std::vector<value_type> temp(number_of_keys);
+            hpx::copy(policy(hpx::execution::non_task), values_output,
+                values_output + number_of_keys, temp.begin());
+
+            return make_pair_result(
+                hpx::ranges::copy_if(policy(hpx::execution::non_task),
+                    zip_iterator(
+                        key_first, temp.begin(), hpx::util::begin(key_state)),
+                    zip_iterator(key_last, temp.begin() + number_of_keys,
+                        hpx::util::end(key_state)),
+                    zip_iterator(keys_output, values_output,
+                        hpx::util::begin(key_state)),
+                    // copies to dest only when 'end' state is true
+                    [](zip2_ref it) { return hpx::get<2>(it).end; }),
+                keys_output, values_output);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////
+    // reduce_by_key wrapper struct
+    template <typename FwdIter1, typename FwdIter2>
+    struct reduce_by_key
+      : public detail::algorithm<reduce_by_key<FwdIter1, FwdIter2>,
+            util::in_out_result<FwdIter1, FwdIter2>>
+    {
+        reduce_by_key()
+          : reduce_by_key::algorithm("reduce_by_key")
+        {
         }
 
-        // async version that returns future<pair> from future<zip_iterator<blah>>
-        template <typename ZIter, typename iKey, typename iVal>
-        hpx::future<util::in_out_result<iKey, iVal>> make_pair_result(
-            hpx::future<ZIter>&& ziter, iKey key_start, iVal val_start)
-        {
-            typedef util::in_out_result<iKey, iVal> result_type;
-
-            return hpx::make_future<result_type>(
-                HPX_MOVE(ziter), [=](ZIter zipiter) {
-                    auto t = zipiter.second.get_iterator_tuple();
-                    iKey key_end = hpx::get<0>(t);
-                    return result_type{key_end,
-                        std::next(
-                            val_start, std::distance(key_start, key_end))};
-                });
-        }
-
-        // -------------------------------------------------------------------
-        // The main algorithm is implemented here, it replaces any async
-        // execution policy with a non async one so that no waits are
-        // necessry on the internal algorithms. Async execution is handled
-        // by the wrapper layer that calls this.
-        // -------------------------------------------------------------------
         template <typename ExPolicy, typename RanIter, typename RanIter2,
-            typename FwdIter1, typename FwdIter2, typename Compare,
-            typename Func>
-        static util::in_out_result<FwdIter1, FwdIter2> reduce_by_key_impl(
+            typename Compare, typename Func>
+        static util::in_out_result<FwdIter1, FwdIter2> sequential(
             ExPolicy&& policy, RanIter key_first, RanIter key_last,
             RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
             Compare&& comp, Func&& func)
         {
-            using namespace hpx::parallel::v1::detail;
-            using namespace hpx::util;
-
-            // we need to determine based on the keys what is the keystate for
-            // each key. The states are start, middle, end of a series and the special
-            // state start and end of the sequence
-            std::vector<reduce_key_series_states> key_state;
-            using keystate_iter_type =
-                std::vector<reduce_key_series_states>::iterator;
-            using reducebykey_iter = detail::reduce_stencil_iterator<RanIter,
-                reduce_stencil_transformer>;
-            using element_type =
-                typename std::iterator_traits<RanIter>::reference;
-            using zip_ref = typename zip_iterator<reducebykey_iter,
-                keystate_iter_type>::reference;
-            //
-            const std::uint64_t number_of_keys =
-                std::distance(key_first, key_last);
-            //
-            key_state.assign(number_of_keys, reduce_key_series_states());
-            {
-                reduce_stencil_transformer r_s_t;
-                reducebykey_iter reduce_begin =
-                    make_reduce_stencil_iterator(key_first, r_s_t);
-                reducebykey_iter reduce_end =
-                    make_reduce_stencil_iterator(key_last, r_s_t);
-
-                // FIXME: handle cases number_of_keys == 0 and
-                //        number_of_keys == 1
-
-                if (number_of_keys == 2)
-                {
-                    // for two entries, one is a start, the other an end,
-                    // if they are different, then they are both start/end
-                    element_type left = *key_first;
-                    element_type right = *std::next(key_first);
-                    key_state[0] =
-                        reduce_key_series_states(true, !comp(left, right));
-                    key_state[1] =
-                        reduce_key_series_states(!comp(left, right), true);
-                }
-                else
-                {
-                    // do the first and last elements by hand to simplify the iterator
-                    // traversal as there is no prev/next for first/last
-                    element_type elem0 = *key_first;
-                    element_type elem1 = *std::next(key_first);
-                    key_state[0] =
-                        reduce_key_series_states(true, elem0 != elem1);
-                    // middle elements
-                    reduce_stencil_generate<reduce_stencil_transformer, RanIter,
-                        keystate_iter_type, Compare>
-                        kernel;
-                    hpx::for_each(policy(hpx::execution::non_task),
-                        zip_iterator(reduce_begin + 1, key_state.begin() + 1),
-                        zip_iterator(reduce_end - 1, key_state.end() - 1),
-                        [&kernel, &comp](zip_ref ref) {
-                            kernel(hpx::get<0>(ref), hpx::get<1>(ref), comp);
-                        });
-                    // Last element
-                    element_type elemN = *std::prev(key_last);
-                    element_type elemn = *std::prev(std::prev(key_last));
-                    key_state.back() =
-                        reduce_key_series_states(elemN != elemn, true);
-                }
-            }
-            {
-                using zip_iterator_in = zip_iterator<RanIter2,
-                    std::vector<reduce_key_series_states>::iterator>;
-                using zip_type_in = typename zip_iterator_in::value_type;
-
-                using zip_iterator_vout = zip_iterator<FwdIter2,
-                    std::vector<reduce_key_series_states>::iterator>;
-
-                using value_type =
-                    typename std::iterator_traits<RanIter2>::value_type;
-
-                zip_iterator_in states_begin =
-                    zip_iterator(values_first, hpx::util::begin(key_state));
-                zip_iterator_in states_end = zip_iterator(
-                    values_first + number_of_keys, hpx::util::end(key_state));
-                zip_iterator_vout states_out_begin =
-                    zip_iterator(values_output, hpx::util::begin(key_state));
-                //
-
-                zip_type_in initial;
-                //
-                using lambda_type =
-                    hpx::tuple<value_type, reduce_key_series_states>;
-                hpx::inclusive_scan(
-                    policy(hpx::execution::non_task), states_begin, states_end,
-                    states_out_begin,
-                    // B is the current entry, A is the one passed in from 'previous'
-                    [&func](zip_type_in a, zip_type_in b) -> lambda_type {
-                        value_type a_val = hpx::get<0>(a);
-                        reduce_key_series_states a_state = hpx::get<1>(a);
-                        value_type b_val = hpx::get<0>(b);
-                        reduce_key_series_states b_state = hpx::get<1>(b);
-                        debug_reduce_by_key("{ " << a_val << "+" << b_val
-                                                 << " },\t" << a_state
-                                                 << b_state);
-                        // if carrying a start flag, then copy - don't add
-                        if (b_state.start)
-                        {
-                            debug_reduce_by_key(" = " << b_val << std::endl);
-                            return hpx::make_tuple(b_val,
-                                reduce_key_series_states(
-                                    a_state.start || b_state.start,
-                                    b_state.end));
-                        }
-                        // normal add of previous + this
-                        else
-                        {
-                            debug_reduce_by_key(
-                                " = " << func(a_val, b_val) << std::endl);
-                            value_type temp = func(a_val, b_val);
-                            return hpx::make_tuple(temp,
-                                reduce_key_series_states(
-                                    a_state.start || b_state.start,
-                                    b_state.end));
-                        }
-                    },
-                    initial);
-
-                // now copy the values and keys for each element that
-                // is marked by an 'END' state to the final output
-                using zip2_ref = typename hpx::util::zip_iterator<RanIter,
-                    FwdIter2,
-                    std::vector<reduce_key_series_states>::iterator>::reference;
-
-                std::vector<value_type> temp(number_of_keys);
-                hpx::copy(policy(hpx::execution::non_task), values_output,
-                    values_output + number_of_keys, temp.begin());
-
-                return make_pair_result(
-                    hpx::ranges::copy_if(policy(hpx::execution::non_task),
-                        zip_iterator(key_first, temp.begin(),
-                            hpx::util::begin(key_state)),
-                        zip_iterator(key_last, temp.begin() + number_of_keys,
-                            hpx::util::end(key_state)),
-                        zip_iterator(keys_output, values_output,
-                            hpx::util::begin(key_state)),
-                        // copies to dest only when 'end' state is true
-                        [](zip2_ref it) { return hpx::get<2>(it).end; }),
-                    keys_output, values_output);
-            }
+            return reduce_by_key_impl(HPX_FORWARD(ExPolicy, policy), key_first,
+                key_last, values_first, keys_output, values_output,
+                HPX_FORWARD(Compare, comp), HPX_FORWARD(Func, func));
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        // reduce_by_key wrapper struct
-        template <typename FwdIter1, typename FwdIter2>
-        struct reduce_by_key
-          : public detail::algorithm<reduce_by_key<FwdIter1, FwdIter2>,
-                util::in_out_result<FwdIter1, FwdIter2>>
+        template <typename ExPolicy, typename RanIter, typename RanIter2,
+            typename Compare, typename Func>
+        static typename util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<FwdIter1, FwdIter2>>::type
+        parallel(ExPolicy&& policy, RanIter key_first, RanIter key_last,
+            RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
+            Compare&& comp, Func&& func)
         {
-            reduce_by_key()
-              : reduce_by_key::algorithm("reduce_by_key")
-            {
-            }
-
-            template <typename ExPolicy, typename RanIter, typename RanIter2,
-                typename Compare, typename Func>
-            static util::in_out_result<FwdIter1, FwdIter2> sequential(
-                ExPolicy&& policy, RanIter key_first, RanIter key_last,
-                RanIter2 values_first, FwdIter1 keys_output,
-                FwdIter2 values_output, Compare&& comp, Func&& func)
-            {
-                return reduce_by_key_impl(HPX_FORWARD(ExPolicy, policy),
-                    key_first, key_last, values_first, keys_output,
+            return util::detail::algorithm_result<ExPolicy,
+                util::in_out_result<FwdIter1,
+                    FwdIter2>>::get(execution::async_execute(policy.executor(),
+                hpx::util::deferred_call(
+                    &hpx::parallel::v1::detail::reduce_by_key_impl<ExPolicy&&,
+                        RanIter, RanIter2, FwdIter1, FwdIter2, Compare&&,
+                        Func&&>,
+                    policy, key_first, key_last, values_first, keys_output,
                     values_output, HPX_FORWARD(Compare, comp),
-                    HPX_FORWARD(Func, func));
-            }
+                    HPX_FORWARD(Func, func))));
+        }
+    };
+    /// \endcond
+}}}}    // namespace hpx::parallel::v1::detail
 
-            template <typename ExPolicy, typename RanIter, typename RanIter2,
-                typename Compare, typename Func>
-            static typename util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<FwdIter1, FwdIter2>>::type
-            parallel(ExPolicy&& policy, RanIter key_first, RanIter key_last,
-                RanIter2 values_first, FwdIter1 keys_output,
-                FwdIter2 values_output, Compare&& comp, Func&& func)
-            {
-                return util::detail::algorithm_result<ExPolicy,
-                    util::in_out_result<FwdIter1, FwdIter2>>::
-                    get(execution::async_execute(policy.executor(),
-                        hpx::util::deferred_call(
-                            &hpx::parallel::v1::detail::reduce_by_key_impl<
-                                ExPolicy&&, RanIter, RanIter2, FwdIter1,
-                                FwdIter2, Compare&&, Func&&>,
-                            policy, key_first, key_last, values_first,
-                            keys_output, values_output,
-                            HPX_FORWARD(Compare, comp),
-                            HPX_FORWARD(Func, func))));
-            }
-        };
-        /// \endcond
-    }    // namespace detail
+namespace hpx { namespace experimental {
 
 #ifdef EXTRA_DEBUG
     std::ostream& operator<<(
@@ -536,14 +520,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     hpx::traits::is_iterator<RanIter2>::value&&
                         hpx::traits::is_iterator<FwdIter1>::value&&
                             hpx::traits::is_iterator<FwdIter2>::value)>
-    typename util::detail::algorithm_result<ExPolicy,
-        util::in_out_result<FwdIter1, FwdIter2>>::type
+    typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+        hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>::type
     reduce_by_key(ExPolicy&& policy, RanIter key_first, RanIter key_last,
         RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
         Compare&& comp = Compare(), Func&& func = Func())
     {
-        typedef util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<FwdIter1, FwdIter2>>
+        typedef hpx::parallel::util::detail::algorithm_result<ExPolicy,
+            hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>
             result;
 
         static_assert(
@@ -559,15 +543,38 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {    // we only have a single key/value so that is our output
             *keys_output = *key_first;
             *values_output = *values_first;
-            return result::get(util::in_out_result<FwdIter1, FwdIter2>{
-                keys_output, values_output});
+            return result::get(
+                hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>{
+                    keys_output, values_output});
         }
 
-        return detail::reduce_by_key<FwdIter1, FwdIter2>().call(
-            HPX_FORWARD(ExPolicy, policy), key_first, key_last, values_first,
-            keys_output, values_output, HPX_FORWARD(Compare, comp),
-            HPX_FORWARD(Func, func));
+        return hpx::parallel::v1::detail::reduce_by_key<FwdIter1, FwdIter2>()
+            .call(HPX_FORWARD(ExPolicy, policy), key_first, key_last,
+                values_first, keys_output, values_output,
+                HPX_FORWARD(Compare, comp), HPX_FORWARD(Func, func));
     }
+}}    // namespace hpx::experimental
+
+namespace hpx { namespace parallel { inline namespace v1 {
+
+    template <typename ExPolicy, typename RanIter, typename RanIter2,
+        typename FwdIter1, typename FwdIter2,
+        typename Compare =
+            std::equal_to<typename std::iterator_traits<RanIter>::value_type>,
+        typename Func =
+            std::plus<typename std::iterator_traits<RanIter2>::value_type>>
+    HPX_DEPRECATED_V(1, 9,
+        "hpx::parallel::reduce_by_key is deprecated. Please use "
+        "hpx::experimental::reduce_by_key instead.")
+    constexpr decltype(auto)
+        reduce_by_key(ExPolicy&& policy, RanIter key_first, RanIter key_last,
+            RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
+            Compare&& comp = Compare(), Func&& func = Func())
+    {
+        return hpx::experimental::reduce_by_key(policy, key_first, key_last,
+            values_first, keys_output, values_output, comp, func);
+    }
+
 }}}    // namespace hpx::parallel::v1
 
 #endif

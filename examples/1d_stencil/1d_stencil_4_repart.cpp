@@ -21,14 +21,13 @@
 
 #include <hpx/algorithm.hpp>
 #include <hpx/include/performance_counters.hpp>
+#include <hpx/modules/iterator_support.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
 #else
 #include <memory>
 #endif
-
-#include <boost/range/irange.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -43,8 +42,6 @@
 #include <apex_api.hpp>
 
 #include "print_time_results.hpp"
-
-#include <boost/shared_array.hpp>
 
 using hpx::id_type;
 using hpx::performance_counters::counter_value;
@@ -264,8 +261,7 @@ struct stepper
         if (!data)
         {
             // Initial conditions: f(0, i) = i
-            std::size_t b = 0;
-            auto range = boost::irange(b, np);
+            auto range = hpx::util::counting_shape(np);
             using hpx::execution::par;
             hpx::ranges::for_each(par, range, [&U, nx](std::size_t i) {
                 U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
@@ -274,8 +270,7 @@ struct stepper
         else
         {
             // Initialize from existing data
-            std::size_t b = 0;
-            auto range = boost::irange(b, np);
+            auto range = hpx::util::counting_shape(np);
             using hpx::execution::par;
             hpx::ranges::for_each(par, range, [&U, nx, data](std::size_t i) {
                 U[0][i] = hpx::make_ready_future(

@@ -1,9 +1,9 @@
-// Copyright Vladimir Prus 2004.
-// Copyright (c) 2005-2018 Hartmut Kaiser
+//  Copyright Vladimir Prus 2004.
+//  Copyright (c) 2005-2022 Hartmut Kaiser
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -55,7 +55,7 @@ using HMODULE = struct HINSTANCE__*;
 #define MyGetProcAddress(x, y) dlsym(x, y)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace plugin {
+namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     class dll
@@ -66,7 +66,7 @@ namespace hpx { namespace util { namespace plugin {
         {
 #if defined(__AIX__) && defined(__GNUC__)
             dlerror();    // Clear the error state.
-            typedef void (*init_proc_type)();
+            using init_proc_type = void (*)();
             init_proc_type init_proc =
                 (init_proc_type) MyGetProcAddress(dll_hand, "_GLOBAL__DI");
             if (init_proc)
@@ -78,7 +78,7 @@ namespace hpx { namespace util { namespace plugin {
         {
 #if defined(__AIX__) && defined(__GNUC__)
             dlerror();    // Clear the error state.
-            typedef void (*free_proc_type)();
+            using free_proc_type = void (*)();
             free_proc_type free_proc =
                 (free_proc_type) MyGetProcAddress(dll_hand, "_GLOBAL__DD");
             if (free_proc)
@@ -90,9 +90,10 @@ namespace hpx { namespace util { namespace plugin {
         template <typename T>
         struct free_dll
         {
-            free_dll(HMODULE h, std::shared_ptr<std::recursive_mutex> mtx)
+            free_dll(
+                HMODULE h, std::shared_ptr<std::recursive_mutex> mtx) noexcept
               : h_(h)
-              , mtx_(mtx)
+              , mtx_(HPX_MOVE(mtx))
             {
             }
 
@@ -111,6 +112,7 @@ namespace hpx { namespace util { namespace plugin {
             HMODULE h_;
             std::shared_ptr<std::recursive_mutex> mtx_;
         };
+
         template <typename T>
         friend struct free_dll;
 
@@ -198,11 +200,11 @@ namespace hpx { namespace util { namespace plugin {
             FreeLibrary();
         }
 
-        std::string const& get_name() const
+        std::string const& get_name() const noexcept
         {
             return dll_name;
         }
-        std::string const& get_mapname() const
+        std::string const& get_mapname() const noexcept
         {
             return map_name;
         }
@@ -211,15 +213,15 @@ namespace hpx { namespace util { namespace plugin {
         std::pair<SymbolType, Deleter> get(
             std::string const& symbol_name, error_code& ec = throws) const
         {
-            const_cast<dll&>(*this).LoadLibrary(ec);
             // make sure everything is initialized
+            const_cast<dll&>(*this).LoadLibrary(ec);
             if (ec)
                 return std::pair<SymbolType, Deleter>();
 
             std::unique_lock<std::recursive_mutex> lock(*mtx_);
 
-            static_assert(std::is_pointer<SymbolType>::value,
-                "std::is_pointer<SymbolType>::value");
+            static_assert(
+                std::is_pointer_v<SymbolType>, "std::is_pointer_v<SymbolType>");
 
             SymbolType address =
                 (SymbolType) MyGetProcAddress(dll_handle, symbol_name.c_str());
@@ -235,15 +237,14 @@ namespace hpx { namespace util { namespace plugin {
                 lock.unlock();
 
                 // report error
-                HPX_THROWS_IF(ec, dynamic_link_failure, "plugin::get", str);
+                HPX_THROWS_IF(
+                    ec, hpx::error::dynamic_link_failure, "plugin::get", str);
                 return std::pair<SymbolType, Deleter>();
             }
 
-            // Open the library. Yes, we do it on every access to
-            // a symbol, the LoadLibrary function increases the refcnt of the dll
-            // so in the end the dll class holds one refcnt and so does every
-            // symbol.
-
+            // Open the library. Yes, we do it on every access to a symbol, the
+            // LoadLibrary function increases the refcnt of the dll so in the
+            // end the dll class holds one refcnt and so does every symbol.
             dlerror();    // Clear the error state.
             HMODULE handle =
                 MyLoadLibrary((dll_name.empty() ? nullptr : dll_name.c_str()));
@@ -257,7 +258,8 @@ namespace hpx { namespace util { namespace plugin {
                 lock.unlock();
 
                 // report error
-                HPX_THROWS_IF(ec, filesystem_error, "plugin::get", str);
+                HPX_THROWS_IF(
+                    ec, hpx::error::filesystem_error, "plugin::get", str);
                 return std::pair<SymbolType, Deleter>();
             }
 
@@ -299,8 +301,8 @@ namespace hpx { namespace util { namespace plugin {
 
                     lock.unlock();
 
-                    HPX_THROWS_IF(
-                        ec, filesystem_error, "plugin::LoadLibrary", str);
+                    HPX_THROWS_IF(ec, hpx::error::filesystem_error,
+                        "plugin::LoadLibrary", str);
                     return;
                 }
 
@@ -329,8 +331,8 @@ namespace hpx { namespace util { namespace plugin {
                     "'{}' has been loaded from (dlerror: {})",
                     dll_name, dlerror());
 
-                HPX_THROWS_IF(
-                    ec, filesystem_error, "plugin::get_directory", str);
+                HPX_THROWS_IF(ec, hpx::error::filesystem_error,
+                    "plugin::get_directory", str);
             }
             result = directory;
             ::dlerror();    // Clear the error state.
@@ -396,5 +398,4 @@ namespace hpx { namespace util { namespace plugin {
         HMODULE dll_handle;
         std::shared_ptr<std::recursive_mutex> mtx_;
     };
-
-}}}    // namespace hpx::util::plugin
+}    // namespace hpx::util::plugin

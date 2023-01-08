@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/preprocessor/seq/for_each.hpp>
-
 #include <hpx/config.hpp>
 
 #include <hpx/assert.hpp>
@@ -66,16 +64,11 @@ void cuda_trivial_kernel(T t, cudaStream_t stream)
 // -------------------------------------------------------------------------
 // To make the kernel visible for all template instantiations we might use
 // we must instantiate them here first in the cuda compiled code.
-// Use a simple boost preprocessor macro to allow any types to
-// be added.
 
-// list of types to generate code for
-#define TYPES (double) (float)    //
+template __global__ void trivial_kernel<float>(float);
+template __global__ void copy_kernel<float>(float*, float*);
+template void cuda_trivial_kernel<float>(float, cudaStream_t);
 
-#define GENERATE_SPECIALIZATIONS(_1, _2, elem)                                 \
-    template __global__ void trivial_kernel<elem>(elem);                       \
-    template __global__ void copy_kernel<elem>(elem*, elem*);                  \
-    template void cuda_trivial_kernel<elem>(elem, cudaStream_t);               \
-    //
-
-BOOST_PP_SEQ_FOR_EACH(GENERATE_SPECIALIZATIONS, _, TYPES)
+template __global__ void trivial_kernel<double>(double);
+template __global__ void copy_kernel<double>(double*, double*);
+template void cuda_trivial_kernel<double>(double, cudaStream_t);

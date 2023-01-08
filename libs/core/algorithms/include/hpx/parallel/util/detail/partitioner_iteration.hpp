@@ -14,7 +14,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace util { namespace detail {
+namespace hpx::parallel::util::detail {
     // Hand-crafted function object allowing to replace a more complex
     // bind(hpx::functional::invoke_fused(), f1, _1)
     template <typename Result, typename F>
@@ -28,13 +28,14 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             return hpx::invoke_fused_r<Result>(f_, HPX_FORWARD(T, t));
         }
     };
-}}}}    // namespace hpx::parallel::util::detail
+}    // namespace hpx::parallel::util::detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     template <typename Result, typename F>
     struct get_function_address<
         parallel::util::detail::partitioner_iteration<Result, F>>
@@ -72,5 +73,5 @@ namespace hpx { namespace traits {
         }
     };
 #endif
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 #endif

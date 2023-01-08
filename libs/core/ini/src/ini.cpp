@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2018 Hartmut Kaiser
+//  Copyright (c) 2005-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -42,14 +42,15 @@ extern char** environ;
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////////
     // example ini line: line # comment
-    const char pattern_comment[] = "^([^#]*)(#.*)$";
+    inline constexpr char const pattern_comment[] = "^([^#]*)(#.*)$";
     ///////////////////////////////////////////////////////////////////////////////
 
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////////
         inline std::string trim_whitespace(std::string const& s)
         {
@@ -82,7 +83,7 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////////
-    section::section()
+    section::section() noexcept
       : root_(this_())
     {
     }
@@ -94,7 +95,7 @@ namespace hpx { namespace util {
         read(filename);
     }
 
-    section::section(const section& in)
+    section::section(section const& in)
       : root_(this_())
       , name_(in.get_name())
       , parent_name_(in.get_parent_name())
@@ -280,6 +281,7 @@ namespace hpx { namespace util {
                     current = current->add_section_if_new(
                         sec_key.substr(pos, dot_pos - pos));
                 }
+
                 // if we don't have section qualifiers, restore current...
                 if (current == this)
                 {
@@ -354,7 +356,7 @@ namespace hpx { namespace util {
             if (it != sections_.end())
             {
                 std::string sub_sec_name = sec_name.substr(i + 1);
-                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*it).second.has_section(sub_sec_name);
             }
             return false;
@@ -373,7 +375,7 @@ namespace hpx { namespace util {
             if (it != sections_.end())
             {
                 std::string sub_sec_name = sec_name.substr(i + 1);
-                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*it).second.get_section(sub_sec_name);
             }
 
@@ -381,8 +383,9 @@ namespace hpx { namespace util {
             if (name.empty())
                 name = "<root>";
 
-            HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
-                "No such section ({}) in section: {}", sec_name, name);
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "section::get_section", "No such section ({}) in section: {}",
+                sec_name, name);
             return nullptr;
         }
 
@@ -390,7 +393,7 @@ namespace hpx { namespace util {
         if (it != sections_.end())
             return &((*it).second);
 
-        HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
+        HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "section::get_section",
             "No such section ({}) in section: {}", sec_name, get_name());
         return nullptr;
     }
@@ -406,7 +409,7 @@ namespace hpx { namespace util {
             if (it != sections_.end())
             {
                 std::string sub_sec_name = sec_name.substr(i + 1);
-                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*it).second.get_section(sub_sec_name);
             }
 
@@ -414,8 +417,9 @@ namespace hpx { namespace util {
             if (name.empty())
                 name = "<root>";
 
-            HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
-                "No such section ({}) in section: {}", sec_name, name);
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "section::get_section", "No such section ({}) in section: {}",
+                sec_name, name);
             return nullptr;
         }
 
@@ -423,7 +427,7 @@ namespace hpx { namespace util {
         if (it != sections_.end())
             return &((*it).second);
 
-        HPX_THROW_EXCEPTION(bad_parameter, "section::get_section",
+        HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "section::get_section",
             "No such section ({}) in section: {}", sec_name, get_name());
         return nullptr;
     }
@@ -469,7 +473,7 @@ namespace hpx { namespace util {
                     std::string value = e.first;
                     entry_changed_func f = e.second;
 
-                    hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     f(fullkey, value);
                 }
             }
@@ -518,7 +522,7 @@ namespace hpx { namespace util {
                     std::string value = it->second.first;
                     entry_changed_func f = it->second.second;
 
-                    hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     f(fullkey, value);
                 }
             }
@@ -535,7 +539,7 @@ namespace hpx { namespace util {
                     std::string value = p.first->second.first;
                     entry_changed_func f = p.first->second.second;
 
-                    hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     f(key, value);
                 }
             }
@@ -576,9 +580,8 @@ namespace hpx { namespace util {
             return HPX_FORWARD(F1, f1);
 
         // otherwise create a combined callback
-        typedef compose_callback_impl<typename std::decay<F1>::type,
-            typename std::decay<F2>::type>
-            result_type;
+        using result_type =
+            compose_callback_impl<std::decay_t<F1>, std::decay_t<F2>>;
         return result_type(HPX_FORWARD(F1, f1), HPX_FORWARD(F2, f2));
     }
 
@@ -635,7 +638,7 @@ namespace hpx { namespace util {
             {
                 section_map::const_iterator cit = sections_.find(sub_sec);
                 HPX_ASSERT(cit != sections_.end());
-                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*cit).second.has_entry(sub_key);
             }
             return false;
@@ -655,11 +658,11 @@ namespace hpx { namespace util {
             {
                 section_map::const_iterator cit = sections_.find(sub_sec);
                 HPX_ASSERT(cit != sections_.end());
-                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*cit).second.get_entry(sub_key);
             }
 
-            HPX_THROW_EXCEPTION(bad_parameter, "section::get_entry",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "section::get_entry",
                 "No such key ({}) in section: {}", key, get_name());
             return "";
         }
@@ -671,7 +674,7 @@ namespace hpx { namespace util {
             return expand(l, (*cit).second.first);
         }
 
-        HPX_THROW_EXCEPTION(bad_parameter, "section::get_entry",
+        HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "section::get_entry",
             "No such section ({}) in section: {}", key, get_name());
         return "";
     }
@@ -821,7 +824,7 @@ namespace hpx { namespace util {
         if (!line.empty())
             msg += " (offending entry: " + line + ")";
 
-        HPX_THROW_EXCEPTION(no_success, "section::line_msg", msg);
+        HPX_THROW_EXCEPTION(hpx::error::no_success, "section::line_msg", msg);
     }
 
     ///////////////////////////////////////////////////////////////////////////////
@@ -1002,7 +1005,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////////
     template <typename Archive>
-    void section::save(Archive& ar, const unsigned int /* version */) const
+    void section::save(Archive& ar, unsigned int const /* version */) const
     {
         ar << name_;
         ar << parent_name_;
@@ -1018,7 +1021,7 @@ namespace hpx { namespace util {
     }
 
     template <typename Archive>
-    void section::load(Archive& ar, const unsigned int /* version */)
+    void section::load(Archive& ar, unsigned int const /* version */)
     {
         ar >> name_;
         ar >> parent_name_;
@@ -1043,9 +1046,8 @@ namespace hpx { namespace util {
 
     // explicit instantiation for the correct archive types
     template HPX_CORE_EXPORT void section::save(
-        serialization::output_archive&, const unsigned int version) const;
+        serialization::output_archive&, unsigned int const version) const;
 
     template HPX_CORE_EXPORT void section::load(
-        serialization::input_archive&, const unsigned int version);
-
-}}    // namespace hpx::util
+        serialization::input_archive&, unsigned int const version);
+}    // namespace hpx::util

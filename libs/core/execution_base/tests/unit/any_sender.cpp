@@ -311,7 +311,7 @@ void test_any_sender(F&& f, Ts&&... ts)
         }
         catch (hpx::exception const& e)
         {
-            HPX_TEST_EQ(e.get_error(), hpx::bad_function_call);
+            HPX_TEST_EQ(e.get_error(), hpx::error::bad_function_call);
         }
         catch (...)
         {
@@ -332,7 +332,7 @@ void test_any_sender(F&& f, Ts&&... ts)
         }
         catch (hpx::exception const& e)
         {
-            HPX_TEST_EQ(e.get_error(), hpx::bad_function_call);
+            HPX_TEST_EQ(e.get_error(), hpx::error::bad_function_call);
         }
         catch (...)
         {
@@ -387,7 +387,7 @@ void test_unique_any_sender(F&& f, Ts&&... ts)
         }
         catch (hpx::exception const& e)
         {
-            HPX_TEST_EQ(e.get_error(), hpx::bad_function_call);
+            HPX_TEST_EQ(e.get_error(), hpx::error::bad_function_call);
         }
         catch (...)
         {
@@ -447,7 +447,7 @@ void test_any_sender_set_error()
         }
         catch (hpx::exception const& e)
         {
-            HPX_TEST_EQ(e.get_error(), hpx::bad_function_call);
+            HPX_TEST_EQ(e.get_error(), hpx::error::bad_function_call);
         }
         catch (...)
         {
@@ -468,7 +468,7 @@ void test_any_sender_set_error()
         }
         catch (hpx::exception const& e)
         {
-            HPX_TEST_EQ(e.get_error(), hpx::bad_function_call);
+            HPX_TEST_EQ(e.get_error(), hpx::error::bad_function_call);
         }
         catch (...)
         {
@@ -506,7 +506,7 @@ void test_unique_any_sender_set_error()
         }
         catch (hpx::exception const& e)
         {
-            HPX_TEST_EQ(e.get_error(), hpx::bad_function_call);
+            HPX_TEST_EQ(e.get_error(), hpx::error::bad_function_call);
         }
         catch (...)
         {

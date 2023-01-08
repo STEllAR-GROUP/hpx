@@ -1,5 +1,5 @@
 //  Copyright (c) 2015-2017 Francisco Jose Tapia
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 
 #include <hpx/config/forward.hpp>
 #include <hpx/config/move.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <algorithm>
 #include <functional>
@@ -28,7 +29,7 @@ namespace hpx { namespace parallel { namespace util {
     template <typename Value, typename... Args>
     inline void construct_object(Value* ptr, Args&&... args)
     {
-        (::new (static_cast<void*>(ptr)) Value(HPX_FORWARD(Args, args)...));
+        hpx::construct_at(ptr, HPX_FORWARD(Args, args)...);
     }
 
     /// \brief destroy an object in the memory specified by ptr
@@ -38,7 +39,7 @@ namespace hpx { namespace parallel { namespace util {
     template <typename Value>
     inline void destroy_object(Value* ptr)
     {
-        ptr->~Value();
+        std::destroy_at(ptr);
     }
 
     /// Initialize a range of objects with the object val moving across them
@@ -54,13 +55,13 @@ namespace hpx { namespace parallel { namespace util {
             return;
         }
 
-        construct_object(&(*first), HPX_MOVE(val));
+        construct_object(std::addressof(*first), HPX_MOVE(val));
 
         Iter it1 = first, it2 = first + 1;
         while (it2 != last)
         {
             // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
-            construct_object(&(*(it2++)), HPX_MOVE(*(it1++)));
+            construct_object(std::addressof(*(it2++)), HPX_MOVE(*(it1++)));
         }
 
         val = HPX_MOVE(*(last - 1));
@@ -74,7 +75,7 @@ namespace hpx { namespace parallel { namespace util {
     template <typename Value, typename... Args>
     inline void construct(Value* ptr, Args&&... args)
     {
-        (::new (static_cast<void*>(ptr)) Value(HPX_FORWARD(Args, args)...));
+        hpx::construct_at(ptr, HPX_FORWARD(Args, args)...);
     }
 
     /// \brief Move objects
@@ -110,7 +111,7 @@ namespace hpx { namespace parallel { namespace util {
         while (first != last)
         {
             // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
-            ::new (static_cast<void*>(ptr++)) Value(HPX_MOVE(*(first++)));
+            hpx::construct_at(ptr++, HPX_MOVE(*(first++)));
         }
 
         return ptr;
@@ -124,10 +125,9 @@ namespace hpx { namespace parallel { namespace util {
     template <typename Iter, typename Sent>
     inline void destroy(Iter first, Sent last)
     {
-        using value_type = typename std::iterator_traits<Iter>::value_type;
         while (first != last)
         {
-            (&(*(first++)))->~value_type();
+            std::destroy_at(&(*(first++)));
         }
     }
 

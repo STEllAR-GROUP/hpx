@@ -24,7 +24,7 @@ bool on_thread_error(std::size_t, std::exception_ptr const&)
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    HPX_THROW_EXCEPTION(hpx::invalid_status, "test", "test");
+    HPX_THROW_EXCEPTION(hpx::error::invalid_status, "test", "test");
     return hpx::local::finalize();
 }
 

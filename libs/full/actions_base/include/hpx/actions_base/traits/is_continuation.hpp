@@ -8,7 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <type_traits>
 
@@ -23,8 +22,8 @@ namespace hpx { namespace traits {
 
         template <typename Continuation>
         struct is_continuation_impl<Continuation,
-            typename util::always_void<
-                typename Continuation::continuation_tag>::type> : std::true_type
+            std::void_t<typename Continuation::continuation_tag>>
+          : std::true_type
         {
         };
     }    // namespace detail

@@ -22,7 +22,7 @@
 #include <memory>
 #include <string>
 
-namespace hpx { namespace util { namespace logging { namespace formatter {
+namespace hpx::util::logging::formatter {
 
     /**
 @brief prefixes each message with an index.
@@ -51,38 +51,37 @@ This will output something similar to:
     };
 
     /**
-@brief Prefixes the message with a high-precision time (.
-You pass the format string at construction.
+    @brief Prefixes the message with a high-precision time (
+    You pass the format string at construction.
 
-@code
-#include <hpx/logging/format/formatters.hpp>
-@endcode
+    @code
+    #include <hpx/logging/format/formatters.hpp>
+    @endcode
 
-Internally, it uses hpx::util::date_time::microsec_time_clock.
-So, our precision matches this class.
+    Internally, it uses hpx::util::date_time::microsec_time_clock.
+    So, our precision matches this class.
 
-The format can contain escape sequences:
-$dd - day, 2 digits
-$MM - month, 2 digits
-$yy - year, 2 digits
-$yyyy - year, 4 digits
-$hh - hour, 2 digits
-$mm - minute, 2 digits
-$ss - second, 2 digits
-$mili - milliseconds
-$micro - microseconds (if the high precision clock allows; otherwise, it pads zeros)
-$nano - nanoseconds (if the high precision clock allows; otherwise, it pads zeros)
+    The format can contain escape sequences:
+    $dd - day, 2 digits
+    $MM - month, 2 digits
+    $yy - year, 2 digits
+    $yyyy - year, 4 digits
+    $hh - hour, 2 digits
+    $mm - minute, 2 digits
+    $ss - second, 2 digits
+    $mili - milliseconds
+    $micro - microseconds (if the high precision clock allows; otherwise, it pads zeros)
+    $nano - nanoseconds (if the high precision clock allows; otherwise, it pads zeros)
 
+    Example:
 
-Example:
+    @code
+    high_precision_time("$mm:$ss:$micro");
+    @endcode
 
-@code
-high_precision_time("$mm:$ss:$micro");
-@endcode
-
-@param convert [optional] In case there needs to be a conversion between
-std::(w)string and the string that holds your logged message. See convert_format.
-*/
+    @param convert [optional] In case there needs to be a conversion between
+    std::(w)string and the string that holds your logged message. See convert_format.
+    */
     struct high_precision_time : manipulator
     {
         HPX_CORE_EXPORT static std::unique_ptr<high_precision_time> make(
@@ -98,11 +97,11 @@ std::(w)string and the string that holds your logged message. See convert_format
     };
 
     /**
-@brief Writes the thread_id to the log
+    @brief Writes the thread_id to the log
 
-@param convert [optional] In case there needs to be a conversion between
-std::(w)string and the string that holds your logged message. See convert_format.
-*/
+    @param convert [optional] In case there needs to be a conversion between
+    std::(w)string and the string that holds your logged message. See convert_format.
+    */
     struct thread_id : manipulator
     {
         HPX_CORE_EXPORT static std::unique_ptr<thread_id> make();
@@ -112,5 +111,4 @@ std::(w)string and the string that holds your logged message. See convert_format
     protected:
         thread_id() = default;
     };
-
-}}}}    // namespace hpx::util::logging::formatter
+}    // namespace hpx::util::logging::formatter

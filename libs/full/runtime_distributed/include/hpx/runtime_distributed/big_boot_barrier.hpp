@@ -14,13 +14,13 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/concurrency/queue.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <boost/lockfree/queue.hpp>
 
 #include <condition_variable>
 #include <cstddef>
@@ -54,7 +54,7 @@ namespace hpx { namespace agas {
         std::size_t connected;
 
         using thunk_type = hpx::move_only_function<void()>*;
-        boost::lockfree::queue<thunk_type,
+        hpx::lockfree::queue<thunk_type,
             hpx::util::aligned_allocator<thunk_type>>
             thunks;
 

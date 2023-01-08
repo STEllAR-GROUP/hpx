@@ -236,7 +236,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::induction is deprecated. Please use "
+        "hpx::parallel::induction is deprecated. Please use "
         "hpx::experimental::induction instead.")
     constexpr decltype(auto) induction(T&& value, std::size_t stride)
     {
@@ -245,7 +245,7 @@ namespace hpx::parallel { inline namespace v2 {
 
     template <typename T>
     HPX_DEPRECATED_V(1, 8,
-        "hpx::hpx::parallel::induction is deprecated. Please use "
+        "hpx::parallel::induction is deprecated. Please use "
         "hpx::experimental::induction instead.")
     constexpr decltype(auto) induction(T&& value)
     {

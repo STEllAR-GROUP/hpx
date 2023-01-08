@@ -20,10 +20,9 @@
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 
-#include <boost/utility/string_ref.hpp>
-
 #include <cstdlib>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 
@@ -37,7 +36,7 @@ namespace hpx { namespace actions {
 
         ///////////////////////////////////////////////////////////////////////
         inline std::string make_component_action_name(
-            boost::string_ref action_name, void const* lva)
+            std::string_view action_name, void const* lva)
         {
             return hpx::util::format(
                 "component action({}) lva({})", action_name, lva);

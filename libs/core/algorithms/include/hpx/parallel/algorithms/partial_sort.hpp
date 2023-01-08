@@ -399,12 +399,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
             if (middle >= c_last)
             {
                 // figure out the chunk size to use
-                std::size_t const cores = execution::processing_units_count(
-                    policy.parameters(), policy.executor());
+                std::size_t const cores =
+                    execution::processing_units_count(policy.parameters(),
+                        policy.executor(), hpx::chrono::null_duration, nelem);
 
                 // number of elements to sort
                 std::size_t chunk_size = execution::get_chunk_size(
-                    policy.parameters(), policy.executor(), 0, cores, nelem);
+                    policy.parameters(), policy.executor(),
+                    hpx::chrono::null_duration, cores, nelem);
 
                 hpx::future<Iter> left = execution::async_execute(
                     policy.executor(), sort_thread_helper(), policy, first,

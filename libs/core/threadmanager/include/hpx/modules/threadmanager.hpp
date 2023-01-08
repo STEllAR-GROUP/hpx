@@ -176,7 +176,7 @@ namespace hpx { namespace threads {
 
         mask_type get_idle_core_mask();
 
-        std::int64_t get_background_thread_count();
+        std::int64_t get_background_thread_count() const;
 
         // Enumerate all matching threads
         bool enumerate_threads(hpx::function<bool(thread_id_type)> const& f,

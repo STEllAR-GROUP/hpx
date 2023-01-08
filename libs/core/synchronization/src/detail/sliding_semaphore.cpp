@@ -16,10 +16,10 @@
 #include <utility>
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local { namespace detail {
+namespace hpx::lcos::local::detail {
 
     sliding_semaphore::sliding_semaphore(
-        std::int64_t max_difference, std::int64_t lower_limit)
+        std::int64_t max_difference, std::int64_t lower_limit) noexcept
       : max_difference_(max_difference)
       , lower_limit_(lower_limit)
       , cond_()
@@ -29,7 +29,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
     sliding_semaphore::~sliding_semaphore() = default;
 
     void sliding_semaphore::set_max_difference(std::unique_lock<mutex_type>& l,
-        std::int64_t max_difference, std::int64_t lower_limit)
+        std::int64_t max_difference, std::int64_t lower_limit) noexcept
     {
         HPX_ASSERT_OWNS_LOCK(l);
 
@@ -90,4 +90,4 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         signal(HPX_MOVE(l), lower_limit_);
         return lower_limit_;
     }
-}}}}    // namespace hpx::lcos::local::detail
+}    // namespace hpx::lcos::local::detail

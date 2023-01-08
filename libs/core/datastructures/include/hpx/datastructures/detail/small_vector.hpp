@@ -33,6 +33,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <algorithm>
 #include <array>
@@ -179,7 +180,7 @@ namespace hpx::detail {
             {
                 throw std::bad_alloc();
             }
-            return new (ptr) storage<T>(capacity);
+            return hpx::construct_at(static_cast<storage<T>*>(ptr), capacity);
         }
 
         static void dealloc(storage* strg)
@@ -457,7 +458,7 @@ namespace hpx::detail {
             else
             {
                 auto s = size<D>() - 1;
-                (data<D>() + s)->~T();
+                std::destroy_at(data<D>() + s);
                 set_size<D>(s);
             }
         }
@@ -482,7 +483,8 @@ namespace hpx::detail {
                 for (auto ptr = d + current_size, end = d + count; ptr != end;
                      ++ptr)
                 {
-                    new (static_cast<void*>(ptr)) T(HPX_FORWARD(Args, args)...);
+                    hpx::construct_at(
+                        static_cast<T*>(ptr), HPX_FORWARD(Args, args)...);
                 }
             }
             set_size<D>(count);
@@ -885,8 +887,9 @@ namespace hpx::detail {
                 if (s < N)
                 {
                     set_direct_and_size(s + 1);
-                    return *new (static_cast<void*>(direct_data() + s))
-                        T(HPX_FORWARD(Args, args)...);
+                    return *hpx::construct_at(
+                        static_cast<T*>(direct_data() + s),
+                        HPX_FORWARD(Args, args)...);
                 }
                 realloc(calculate_new_capacity(N + 1, N));
             }
@@ -900,8 +903,9 @@ namespace hpx::detail {
             }
 
             set_size<direction::indirect>(s + 1);
-            return *new (static_cast<void*>(data<direction::indirect>() + s))
-                T(HPX_FORWARD(Args, args)...);
+            return *hpx::construct_at(
+                static_cast<T*>(data<direction::indirect>() + s),
+                HPX_FORWARD(Args, args)...);
         }
 
         void push_back(T const& value)
@@ -1113,7 +1117,8 @@ namespace hpx::detail {
         auto emplace(const_iterator pos, Args&&... args) -> iterator
         {
             auto* p = make_uninitialized_space(pos, 1);
-            return new (static_cast<void*>(p)) T(HPX_FORWARD(Args, args)...);
+            return hpx::construct_at(
+                static_cast<T*>(p), HPX_FORWARD(Args, args)...);
         }
 
         auto insert(const_iterator pos, T const& value) -> iterator

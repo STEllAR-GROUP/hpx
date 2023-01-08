@@ -58,8 +58,11 @@ namespace hpx::parallel::execution {
     constexpr decltype(auto) tag_invoke(
         with_processing_units_count_t, ExPolicy&& policy, Params&& params)
     {
+        // explicitly extract pu count from given parameters object as otherwise
+        // the executor might take precedence
         auto exec = with_processing_units_count(policy.executor(),
-            params.processing_units_count(policy.executor()));
+            params.processing_units_count(
+                policy.executor(), hpx::chrono::null_duration, 0));
 
         return create_rebound_policy(
             policy, HPX_MOVE(exec), policy.parameters());

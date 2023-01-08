@@ -15,23 +15,22 @@
 
 #include <cstddef>
 #include <map>
+#include <memory>
 #include <set>
 #include <string>
+#include <vector>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
-    using namespace std;
-
-    // First, performs semantic actions for 'oa'.
-    // Then, stores in 'm' all options that are defined in 'desc'.
+    // First, performs semantic actions for 'oa'. Then, stores in 'm' all
+    // options that are defined in 'desc'.
     HPX_CORE_EXPORT
-    void store(const parsed_options& options, variables_map& xm, bool utf8)
+    void store(parsed_options const& options, variables_map& xm, bool utf8)
     {
-        // TODO: what if we have different definition
-        // for the same option name during different calls
-        // 'store'.
+        // TODO: what if we have different definition for the same option name
+        // during different calls 'store'.
         HPX_ASSERT(options.description);
-        const options_description& desc = *options.description;
+        options_description const& desc = *options.description;
 
         // We need to access map's operator[], not the overridden version
         // variables_map. Ehmm.. messy.
@@ -43,8 +42,8 @@ namespace hpx { namespace program_options {
         std::size_t i;
 
         // Declared here so can be used to provide context for exceptions
-        string option_name;
-        string original_token;
+        std::string option_name;
+        std::string original_token;
 
         try
         {
@@ -57,11 +56,10 @@ namespace hpx { namespace program_options {
                 if (option_name.empty())
                     continue;
 
-                // Ignore unregistered option. The 'unregistered'
-                // field can be true only if user has explicitly asked
-                // to allow unregistered options. We can't store them
-                // to variables map (lacking any information about paring),
-                // so just ignore them.
+                // Ignore unregistered option. The 'unregistered' field can be
+                // true only if user has explicitly asked to allow unregistered
+                // options. We can't store them to variables map (lacking any
+                // information about paring), so just ignore them.
                 if (opts.unregistered)
                     continue;
 
@@ -72,7 +70,7 @@ namespace hpx { namespace program_options {
                 original_token = !opts.original_tokens.empty() ?
                     opts.original_tokens[0] :
                     "";
-                const option_description& d =
+                option_description const& d =
                     desc.find(option_name, false, false, false);
 
                 variable_value& v = m[option_name];
@@ -87,10 +85,9 @@ namespace hpx { namespace program_options {
                 v.m_value_semantic = d.semantic();
 
                 // The option is not composing, and the value is explicitly
-                // provided. Ignore values of this option for subsequent
-                // calls to 'store'. We store this to a temporary set,
-                // so that several assignment inside *this* 'store' call
-                // are allowed.
+                // provided. Ignore values of this option for subsequent calls
+                // to 'store'. We store this to a temporary set, so that several
+                // assignment inside *this* 'store' call are allowed.
                 if (!d.semantic()->is_composing())
                     new_final.insert(option_name);
             }
@@ -106,16 +103,15 @@ namespace hpx { namespace program_options {
         xm.m_final.insert(new_final.begin(), new_final.end());
 
         // Second, apply default values and store required options.
-        const vector<shared_ptr<option_description>>& all = desc.options();
+        std::vector<std::shared_ptr<option_description>> const& all =
+            desc.options();
         for (i = 0; i < all.size(); ++i)
         {
-            const option_description& d = *all[i];
-            string key = d.key("");
+            option_description const& d = *all[i];
+            std::string key = d.key("");
             // FIXME: this logic relies on knowledge of option_description
-            // internals.
-            // The 'key' is empty if options description contains '*'.
-            // In that
-            // case, default value makes no sense at all.
+            // internals. The 'key' is empty if options description contains
+            // '*'. In that case, default value makes no sense at all.
             if (key.empty())
             {
                 continue;
@@ -133,11 +129,11 @@ namespace hpx { namespace program_options {
             // add empty value if this is an required option
             if (d.semantic()->is_required())
             {
-                // For option names specified in multiple ways, e.g. on the command line,
-                // config file etc, the following precedence rules apply:
-                //  "--"  >  ("-" or "/")  >  ""
-                //  Precedence is set conveniently by a single call to length()
-                string canonical_name =
+                // For option names specified in multiple ways, e.g. on the
+                // command line, config file etc, the following precedence rules
+                // apply: "--"  >  ("-" or "/")  >  ""
+                // Precedence is set conveniently by a single call to length()
+                std::string canonical_name =
                     d.canonical_display_name(options.m_options_prefix);
                 if (canonical_name.length() > xm.m_required[key].length())
                     xm.m_required[key] = canonical_name;
@@ -145,7 +141,7 @@ namespace hpx { namespace program_options {
         }
     }
 
-    void store(const wparsed_options& options, variables_map& m)
+    void store(wparsed_options const& options, variables_map& m)
     {
         store(options.utf8_encoded_options, m, true);
     }
@@ -161,20 +157,20 @@ namespace hpx { namespace program_options {
     }
 
     abstract_variables_map::abstract_variables_map(
-        const abstract_variables_map* next)
+        abstract_variables_map const* next)
       : m_next(next)
     {
     }
 
-    const variable_value& abstract_variables_map::operator[](
-        const std::string& name) const
+    variable_value const& abstract_variables_map::operator[](
+        std::string const& name) const
     {
-        const variable_value& v = get(name);
+        variable_value const& v = get(name);
         if (v.empty() && m_next)
             return (*m_next)[name];
         else if (v.defaulted() && m_next)
         {
-            const variable_value& v2 = (*m_next)[name];
+            variable_value const& v2 = (*m_next)[name];
             if (!v2.empty() && !v2.defaulted())
                 return v2;
             else
@@ -193,7 +189,7 @@ namespace hpx { namespace program_options {
 
     variables_map::variables_map() {}
 
-    variables_map::variables_map(const abstract_variables_map* next)
+    variables_map::variables_map(abstract_variables_map const* next)
       : abstract_variables_map(next)
     {
     }
@@ -205,7 +201,7 @@ namespace hpx { namespace program_options {
         m_required.clear();
     }
 
-    const variable_value& variables_map::get(const std::string& name) const
+    variable_value const& variables_map::get(std::string const& name) const
     {
         static variable_value empty;
         const_iterator i = this->find(name);
@@ -218,12 +214,14 @@ namespace hpx { namespace program_options {
     void variables_map::notify()
     {
         // This checks if all required options occur
-        for (map<string, string>::const_iterator r = m_required.begin();
+        for (std::map<std::string, std::string>::const_iterator r =
+                 m_required.begin();
              r != m_required.end(); ++r)
         {
-            const string& opt = r->first;
-            const string& display_opt = r->second;
-            map<string, variable_value>::const_iterator iter = find(opt);
+            std::string const& opt = r->first;
+            std::string const& display_opt = r->second;
+            std::map<std::string, variable_value>::const_iterator iter =
+                find(opt);
             if (iter == end() || iter->second.empty())
             {
                 throw required_option(display_opt);
@@ -245,5 +243,4 @@ namespace hpx { namespace program_options {
                 k.second.m_value_semantic->notify(k.second.value());
         }
     }
-
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011-2017 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,6 +15,7 @@
 #include <hpx/naming_base/address.hpp>
 
 #include <cstddef>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -30,7 +31,8 @@ namespace hpx { namespace components { namespace server {
             get_component_type<typename Component::wrapped_type>();
         if (!enabled(type))
         {
-            HPX_THROW_EXCEPTION(bad_request, "components::server::::create",
+            HPX_THROW_EXCEPTION(hpx::error::bad_request,
+                "components::server::::create",
                 "the component is disabled for this locality ({})",
                 get_component_type_name(type));
             return naming::invalid_gid;
@@ -53,10 +55,10 @@ namespace hpx { namespace components { namespace server {
         if (!gid)
         {
             c->finalize();
-            c->~Component();
+            std::destroy_at(c);
             component_heap<Component>().free(c, 1);
 
-            HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+            HPX_THROW_EXCEPTION(hpx::error::unknown_component_address,
                 "create<Component>", "can't assign global id");
         }
         ++instance_count(type);
@@ -72,7 +74,7 @@ namespace hpx { namespace components { namespace server {
             get_component_type<typename Component::wrapped_type>();
         if (!enabled(type))
         {
-            HPX_THROW_EXCEPTION(bad_request,
+            HPX_THROW_EXCEPTION(hpx::error::bad_request,
                 "components::server::create_migrated",
                 "the component is disabled for this locality ({})",
                 get_component_type_name(type));
@@ -105,10 +107,10 @@ namespace hpx { namespace components { namespace server {
         }
 
         c->finalize();
-        c->~Component();
+        std::destroy_at(c);
         component_heap<Component>().free(c, 1);
 
-        HPX_THROW_EXCEPTION(hpx::duplicate_component_address,
+        HPX_THROW_EXCEPTION(hpx::error::duplicate_component_address,
             "create<Component>(naming::gid_type, ctor)",
             "the global id {} is already bound to a different component "
             "instance",
@@ -127,7 +129,8 @@ namespace hpx { namespace components { namespace server {
         std::vector<naming::gid_type> gids;
         if (!enabled(type))
         {
-            HPX_THROW_EXCEPTION(bad_request, "components::server::bulk_create",
+            HPX_THROW_EXCEPTION(hpx::error::bad_request,
+                "components::server::bulk_create",
                 "the component is disabled for this locality ({})",
                 get_component_type_name(type));
             return gids;
@@ -145,13 +148,13 @@ namespace hpx { namespace components { namespace server {
             for (std::size_t i = 0; i != count; ++i, ++storage_it)
             {
                 Component* c = nullptr;
-                c = new (storage_it) Component(HPX_FORWARD(Ts, ts)...);
+                c = new (storage_it) Component(ts...);
                 naming::gid_type gid = c->get_base_gid();
                 if (!gid)
                 {
                     c->finalize();
-                    c->~Component();
-                    HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+                    std::destroy_at(c);
+                    HPX_THROW_EXCEPTION(hpx::error::unknown_component_address,
                         "bulk_create<Component>", "can't assign global id");
                 }
                 gids.push_back(HPX_MOVE(gid));
@@ -166,7 +169,7 @@ namespace hpx { namespace components { namespace server {
             for (std::size_t i = 0; i != succeeded; ++i, ++storage_it)
             {
                 storage_it->finalize();
-                storage_it->~Component();
+                std::destroy_at(storage_it);
                 --instance_count(type);
             }
             component_heap<Component>().free(storage, count);

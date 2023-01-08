@@ -13,7 +13,7 @@
 
 #include <cstdint>
 
-namespace hpx { namespace chrono {
+namespace hpx::chrono {
 
     /// \brief high_resolution_timer is a timer object which measures
     ///        the elapsed time
@@ -91,4 +91,4 @@ namespace hpx { namespace chrono {
     private:
         std::uint64_t start_time_;
     };
-}}    // namespace hpx::chrono
+}    // namespace hpx::chrono

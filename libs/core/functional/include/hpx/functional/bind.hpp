@@ -35,23 +35,28 @@ namespace hpx {
         template <std::size_t I>
         struct placeholder
         {
-            static std::size_t const value = I;
+            static constexpr std::size_t value = I;
         };
 
         template <>
         struct placeholder<0>;    // not a valid placeholder
-    }                             // namespace detail
 
-    /// The hpx::placeholders namespace contains the placeholder objects [_1, ..., _N]
-    /// where N is an implementation defined maximum number.
-    /// When used as an argument in a hpx::bind expression, the placeholder objects are
-    /// stored in the generated function object, and when that function object is invoked
-    /// with unbound arguments, each placeholder _N is replaced by the corresponding Nth
-    /// unbound argument.
-    /// The types of the placeholder objects are DefaultConstructible and CopyConstructible,
-    /// their default copy/move constructors do not throw exceptions, and for any placeholder
-    /// _N, the type hpx::is_placeholder<decltype(_N)> is defined, where
-    /// hpx::is_placeholder<decltype(_N)> is derived from std::integral_constant<int, N>.
+    }    // namespace detail
+
+    /// The hpx::placeholders namespace contains the placeholder objects [_1,
+    /// ..., _N] where N is an implementation defined maximum number.
+    ///
+    /// When used as an argument in a hpx::bind expression, the placeholder
+    /// objects are stored in the generated function object, and when that
+    /// function object is invoked with unbound arguments, each placeholder _N
+    /// is replaced by the corresponding Nth unbound argument.
+    ///
+    /// The types of the placeholder objects are DefaultConstructible and
+    /// CopyConstructible, their default copy/move constructors do not throw
+    /// exceptions, and for any placeholder _N, the type
+    /// hpx::is_placeholder<decltype(_N)> is defined, where
+    /// hpx::is_placeholder<decltype(_N)> is derived from
+    /// std::integral_constant<int, N>.
     namespace placeholders {
 
         inline constexpr detail::placeholder<1> _1 = {};
@@ -156,7 +161,7 @@ namespace hpx {
             {
             }
 
-            constexpr HPX_HOST_DEVICE bound(bound&& other)
+            constexpr HPX_HOST_DEVICE bound(bound&& other) noexcept
               : _f(HPX_MOVE(other._f))
               , _args(HPX_MOVE(other._args))
             {
@@ -288,40 +293,40 @@ namespace hpx::util {
     namespace placeholders {
 
         HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_1 is deprecated, use "
-            "hpx::placeholders::_1 instead")
+            "hpx::placeholders::_1 is deprecated, use hpx::placeholders::_1 "
+            "instead")
         inline constexpr hpx::detail::placeholder<1> _1 = {};
         HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_2 is deprecated, use "
-            "hpx::placeholders::_2 instead")
+            "hpx::placeholders::_2 is deprecated, use hpx::placeholders::_2 "
+            "instead")
         inline constexpr hpx::detail::placeholder<2> _2 = {};
         HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_3 is deprecated, use "
-            "hpx::placeholders::_3 instead")
+            "hpx::placeholders::_3 is deprecated, use hpx::placeholders::_3 "
+            "instead")
         inline constexpr hpx::detail::placeholder<3> _3 = {};
         HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_4 is deprecated, use "
-            "hpx::placeholders::_4 instead")
+            "hpx::placeholders::_4 is deprecated, use hpx::placeholders::_4 "
+            "instead")
         inline constexpr hpx::detail::placeholder<4> _4 = {};
         HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_5 is deprecated, use "
-            "hpx::placeholders::_5 instead")
+            "hpx::placeholders::_5 is deprecated, use hpx::placeholders::_5 "
+            "instead")
         inline constexpr hpx::detail::placeholder<5> _5 = {};
         HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_6 is deprecated, use "
-            "hpx::placeholders::_6 instead")
+            "hpx::placeholders::_6 is deprecated, use hpx::placeholders::_6 "
+            "instead")
         inline constexpr hpx::detail::placeholder<6> _6 = {};
         HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_7 is deprecated, use "
-            "hpx::placeholders::_7 instead")
+            "hpx::placeholders::_7 is deprecated, use hpx::placeholders::_7 "
+            "instead")
         inline constexpr hpx::detail::placeholder<7> _7 = {};
         HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_8 is deprecated, use "
-            "hpx::placeholders::_8 instead")
+            "hpx::placeholders::_8 is deprecated, use hpx::placeholders::_8 "
+            "instead")
         inline constexpr hpx::detail::placeholder<8> _8 = {};
         HPX_DEPRECATED_V(1, 8,
-            "hpx::placeholders::_9 is deprecated, use "
-            "hpx::placeholders::_9 instead")
+            "hpx::placeholders::_9 is deprecated, use hpx::placeholders::_9 "
+            "instead")
         inline constexpr hpx::detail::placeholder<9> _9 = {};
     }    // namespace placeholders
 }    // namespace hpx::util
@@ -343,10 +348,10 @@ namespace hpx {
     };
 }    // namespace hpx
 
-namespace hpx { namespace traits {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
     template <typename F, typename... Ts>
     struct get_function_address<hpx::detail::bound<F, Ts...>>
     {
@@ -379,11 +384,11 @@ namespace hpx { namespace traits {
         }
     };
 #endif
+}    // namespace hpx::traits
 #endif
-}}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     // serialization of the bound object
     template <typename Archive, typename F, typename... Ts>
@@ -400,4 +405,4 @@ namespace hpx { namespace serialization {
         unsigned int const /*version*/ = 0) noexcept
     {
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

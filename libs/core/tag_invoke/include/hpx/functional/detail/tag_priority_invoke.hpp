@@ -109,6 +109,7 @@ namespace hpx::functional::detail {
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/type_support/meta.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -135,13 +136,13 @@ namespace hpx::functional::detail {
             }
 
             friend constexpr bool operator==(
-                tag_override_invoke_t, tag_override_invoke_t)
+                tag_override_invoke_t, tag_override_invoke_t) noexcept
             {
                 return true;
             }
 
             friend constexpr bool operator!=(
-                tag_override_invoke_t, tag_override_invoke_t)
+                tag_override_invoke_t, tag_override_invoke_t) noexcept
             {
                 return false;
             }
@@ -226,26 +227,32 @@ namespace hpx::functional::detail {
         void tag_fallback_invoke();
         void tag_override_invoke();
 
+        // use this tag type to enable the tag_override_invoke function overloads
+        struct enable_tag_override_invoke_t;
+
         ///////////////////////////////////////////////////////////////////////////
-        /// Helper base class implementing the tag_invoke logic for CPOs that allow
-        /// overriding user-defined tag_invoke overloads with tag_override_invoke,
-        /// and that allow setting a fallback with tag_fallback_invoke.
+        /// Helper base class implementing the tag_invoke logic for CPOs that
+        /// allow overriding user-defined tag_invoke overloads with
+        /// tag_override_invoke, and that allow setting a fallback with
+        /// tag_fallback_invoke.
         ///
         /// This helper class is otherwise identical to tag_fallback, but allows
         /// defining an implementation that will always take priority if it is
-        /// feasible. This is useful for example in cases where a member function
-        /// should always take priority over any free function tag_invoke overloads,
-        /// when available, like this:
+        /// feasible. This is useful for example in cases where a member
+        /// function should always take priority over any free function
+        /// tag_invoke overloads, when available, like this:
         ///
-        /// template <typename T>
-        /// auto tag_override_invoke(T&& t) -> decltype(t.foo()){ return t.foo(); }
-        template <typename Tag>
+        /// template <typename T> auto tag_override_invoke(T&& t) ->
+        /// decltype(t.foo()){ return t.foo(); }
+        template <typename Tag, typename Enable>
         struct tag_priority
         {
             // Is tag-override-invocable
             template <typename... Args,
-                typename Enable = std::enable_if_t<
-                    is_tag_override_invocable_v<Tag, Args&&...>>>
+                typename = std::enable_if_t<
+                    is_tag_override_invocable_v<Tag, Args&&...> &&
+                    meta::value<meta::invoke<Enable,
+                        enable_tag_override_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_override_invocable_v<Tag, Args...>)
@@ -257,9 +264,11 @@ namespace hpx::functional::detail {
 
             // Is not tag-override-invocable, but tag-invocable
             template <typename... Args,
-                typename Enable = std::enable_if_t<
+                typename = std::enable_if_t<
                     !is_tag_override_invocable_v<Tag, Args&&...> &&
-                    is_tag_invocable_v<Tag, Args&&...>>>
+                    is_tag_invocable_v<Tag, Args&&...> &&
+                    meta::value<
+                        meta::invoke<Enable, enable_tag_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
@@ -272,10 +281,12 @@ namespace hpx::functional::detail {
             // Is not tag-override-invocable, not tag-invocable, but
             // tag-fallback-invocable
             template <typename... Args,
-                typename Enable = std::enable_if_t<
+                typename = std::enable_if_t<
                     !is_tag_override_invocable_v<Tag, Args&&...> &&
                     !is_tag_invocable_v<Tag, Args&&...> &&
-                    is_tag_fallback_invocable_v<Tag, Args&&...>>>
+                    is_tag_fallback_invocable_v<Tag, Args&&...> &&
+                    meta::value<meta::invoke<Enable,
+                        enable_tag_fallback_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_fallback_invocable_v<Tag, Args...>)
@@ -291,13 +302,15 @@ namespace hpx::functional::detail {
         // that allow overriding user-defined tag_invoke overloads with
         // tag_override_invoke, and that allow setting a fallback with
         // tag_fallback_invoke.
-        template <typename Tag>
+        template <typename Tag, typename Enable>
         struct tag_priority_noexcept
         {
             // Is nothrow tag-override-invocable
             template <typename... Args,
-                typename Enable = std::enable_if_t<
-                    is_nothrow_tag_override_invocable_v<Tag, Args&&...>>>
+                typename = std::enable_if_t<
+                    is_nothrow_tag_override_invocable_v<Tag, Args&&...> &&
+                    meta::value<meta::invoke<Enable,
+                        enable_tag_override_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> tag_override_invoke_result_t<Tag, Args&&...>
@@ -309,9 +322,11 @@ namespace hpx::functional::detail {
             // Is not nothrow tag-override-invocable, but nothrow
             // tag-invocable
             template <typename... Args,
-                typename Enable = std::enable_if_t<
+                typename = std::enable_if_t<
                     !is_nothrow_tag_override_invocable_v<Tag, Args&&...> &&
-                    is_nothrow_tag_invocable_v<Tag, Args&&...>>>
+                    is_nothrow_tag_invocable_v<Tag, Args&&...> &&
+                    meta::value<
+                        meta::invoke<Enable, enable_tag_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> tag_invoke_result_t<Tag, Args&&...>
@@ -323,10 +338,12 @@ namespace hpx::functional::detail {
             // Is not nothrow tag-override-invocable, not nothrow
             // tag-invocable, but nothrow tag-fallback-invocable
             template <typename... Args,
-                typename Enable = std::enable_if_t<
+                typename = std::enable_if_t<
                     !is_nothrow_tag_override_invocable_v<Tag, Args&&...> &&
                     !is_nothrow_tag_invocable_v<Tag, Args&&...> &&
-                    is_nothrow_tag_fallback_invocable_v<Tag, Args&&...>>>
+                    is_nothrow_tag_fallback_invocable_v<Tag, Args&&...> &&
+                    meta::value<meta::invoke<Enable,
+                        enable_tag_fallback_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> tag_fallback_invoke_result_t<Tag, Args&&...>
@@ -339,11 +356,17 @@ namespace hpx::functional::detail {
 
     inline namespace tag_invoke_base_ns {
 
-        template <typename Tag>
-        using tag_priority = tag_base_ns::tag_priority<Tag>;
+        template <typename Tag,
+            typename Enable = meta::constant<meta::bool_<true>>>
+        using tag_priority = tag_base_ns::tag_priority<Tag, Enable>;
 
-        template <typename Tag>
-        using tag_priority_noexcept = tag_base_ns::tag_priority_noexcept<Tag>;
+        template <typename Tag,
+            typename Enable = meta::constant<meta::bool_<true>>>
+        using tag_priority_noexcept =
+            tag_base_ns::tag_priority_noexcept<Tag, Enable>;
+
+        using enable_tag_override_invoke_t =
+            tag_base_ns::enable_tag_override_invoke_t;
     }    // namespace tag_invoke_base_ns
 
     inline namespace tag_override_invoke_f_ns {

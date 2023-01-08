@@ -284,7 +284,7 @@ namespace hpx { namespace detail {
             {
                 // Don't hold lock while executing callback so we don't
                 // block other threads from unregistering callbacks.
-                util::unlock_guard ul(*this);
+                unlock_guard ul(*this);
                 cb->execute();
             }
 

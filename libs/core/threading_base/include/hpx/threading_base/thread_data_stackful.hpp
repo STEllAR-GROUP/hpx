@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -17,15 +17,17 @@
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
     /// A \a thread is the representation of a ParalleX thread. It's a first
@@ -48,7 +50,7 @@ namespace hpx { namespace threads {
     {
     private:
         // Avoid warning about using 'this' in initializer list
-        thread_data* this_()
+        thread_data* this_() noexcept
         {
             return this;
         }
@@ -157,7 +159,7 @@ namespace hpx { namespace threads {
 
         void destroy() noexcept override
         {
-            this->~thread_data_stackful();
+            std::destroy_at(this);
             thread_alloc_.deallocate(this, 1);
         }
 
@@ -170,10 +172,10 @@ namespace hpx { namespace threads {
     inline thread_data* thread_data_stackful::create(thread_init_data& data,
         void* queue, std::ptrdiff_t stacksize, thread_id_addref addref)
     {
-        thread_data* p = thread_alloc_.allocate(1);
-        new (p) thread_data_stackful(data, queue, stacksize, addref);
+        thread_data_stackful* p = thread_alloc_.allocate(1);
+        hpx::construct_at(p, data, queue, stacksize, addref);
         return p;
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>

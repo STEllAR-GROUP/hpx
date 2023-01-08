@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2013 Shuangyang Yang
-    Copyright (c) 2007-2019 Hartmut Kaiser
+    Copyright (c) 2007-2022 Hartmut Kaiser
     Copyright (c) Christopher Diggins 2005
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
@@ -25,6 +25,7 @@
 #include <cstddef>
 #include <initializer_list>
 #include <iosfwd>
+#include <memory>
 #include <stdexcept>
 #include <type_traits>
 #include <typeinfo>
@@ -72,7 +73,7 @@ namespace hpx {
     };
 }    // namespace hpx
 
-namespace hpx { namespace util { namespace detail { namespace any {
+namespace hpx::util::detail::any {
 
     ////////////////////////////////////////////////////////////////////////
     template <typename T>
@@ -244,11 +245,11 @@ namespace hpx { namespace util { namespace detail { namespace any {
             }
             static void static_delete(void** x)
             {
-                reinterpret_cast<T*>(x)->~T();
+                std::destroy_at(reinterpret_cast<T*>(x));
             }
             static void destruct(void** x)
             {
-                reinterpret_cast<T*>(x)->~T();
+                std::destroy_at(reinterpret_cast<T*>(x));
             }
             static void clone(void* const* src, void** dest)
             {
@@ -302,7 +303,7 @@ namespace hpx { namespace util { namespace detail { namespace any {
             static void destruct(void** x)
             {
                 // destruct only, we'll reuse memory
-                (*reinterpret_cast<T**>(x))->~T();
+                std::destroy_at(*reinterpret_cast<T**>(x));
             }
             static void clone(void* const* src, void** dest)
             {
@@ -355,11 +356,11 @@ namespace hpx { namespace util { namespace detail { namespace any {
             }
             static void static_delete(void** x)
             {
-                reinterpret_cast<T*>(x)->~T();
+                std::destroy_at(reinterpret_cast<T*>(x));
             }
             static void destruct(void** x)
             {
-                reinterpret_cast<T*>(x)->~T();
+                std::destroy_at(reinterpret_cast<T*>(x));
             }
             static bool equal_to(void* const* x, void* const* y)
             {
@@ -405,7 +406,7 @@ namespace hpx { namespace util { namespace detail { namespace any {
             static void destruct(void** x)
             {
                 // destruct only, we'll reuse memory
-                (*reinterpret_cast<T**>(x))->~T();
+                std::destroy_at(*reinterpret_cast<T**>(x));
             }
             static bool equal_to(void* const* x, void* const* y)
             {
@@ -520,7 +521,7 @@ namespace hpx { namespace util { namespace detail { namespace any {
     struct any_vtable
     {
         static_assert(
-            !std::is_reference<T>::value, "T shall have no ref-qualifiers");
+            !std::is_reference_v<T>, "T shall have no ref-qualifiers");
 
         static Vtable* call()
         {
@@ -595,10 +596,9 @@ namespace hpx { namespace util { namespace detail { namespace any {
     // helper types allowing to access internal data of basic_any
     struct stream_support;
     struct any_cast_support;
+}    // namespace hpx::util::detail::any
 
-}}}}    // namespace hpx::util::detail::any
-
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename IArch, typename OArch, typename Char = char,
@@ -641,51 +641,47 @@ namespace hpx { namespace util {
 
         // Perfect forwarding of T
         template <typename T,
-            typename Enable = typename std::enable_if<!std::is_same<basic_any,
-                typename std::decay<T>::type>::value>::type>
-        basic_any(T&& x,
-            typename std::enable_if<std::is_copy_constructible<
-                typename std::decay<T>::type>::value>::type* = nullptr)
-          : table(detail::any::get_table<typename std::decay<T>::type>::
-                    template get<void, void, void, std::true_type>())
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<basic_any, std::decay_t<T>>>>
+        explicit basic_any(T&& x,
+            std::enable_if_t<std::is_copy_constructible_v<std::decay_t<T>>>* =
+                nullptr)
+          : table(detail::any::get_table<std::decay_t<T>>::template get<void,
+                void, void, std::true_type>())
           , object(nullptr)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(),
                 HPX_FORWARD(T, x));
         }
 
         template <typename T, typename... Ts,
-            typename Enable = typename std::enable_if<
-                std::is_constructible<typename std::decay<T>::type,
-                    Ts...>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type>
+            typename Enable = std::enable_if_t<
+                std::is_constructible_v<std::decay_t<T>, Ts...> &&
+                std::is_copy_constructible_v<std::decay_t<T>>>>
         explicit basic_any(std::in_place_type_t<T>, Ts&&... ts)
-          : table(detail::any::get_table<typename std::decay<T>::type>::
-                    template get<void, void, void, std::true_type>())
+          : table(detail::any::get_table<std::decay_t<T>>::template get<void,
+                void, void, std::true_type>())
           , object(nullptr)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(),
                 HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename T, typename U, typename... Ts,
-            typename Enable = typename std::enable_if<
-                std::is_constructible<typename std::decay<T>::type,
-                    Ts...>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type>
+            typename Enable = std::enable_if_t<
+                std::is_constructible_v<std::decay_t<T>, Ts...> &&
+                std::is_copy_constructible_v<std::decay_t<T>>>>
         explicit basic_any(
             std::in_place_type_t<T>, std::initializer_list<U> il, Ts&&... ts)
-          : table(detail::any::get_table<typename std::decay<T>::type>::
-                    template get<void, void, void, std::true_type>())
+          : table(detail::any::get_table<std::decay_t<T>>::template get<void,
+                void, void, std::true_type>())
           , object(nullptr)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(), il,
                 HPX_FORWARD(Ts, ts)...);
@@ -720,14 +716,14 @@ namespace hpx { namespace util {
         template <typename T, typename... Ts>
         static void new_object(void*& object, std::true_type, Ts&&... ts)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new (&object) value_type(HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename T, typename... Ts>
         static void new_object(void*& object, std::false_type, Ts&&... ts)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             object = new value_type(HPX_FORWARD(Ts, ts)...);
         }
 
@@ -749,10 +745,9 @@ namespace hpx { namespace util {
 
         // Perfect forwarding of T
         template <typename T,
-            typename Enable = typename std::enable_if<
-                !std::is_same<basic_any, typename std::decay<T>::type>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type>
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<basic_any, std::decay_t<T>> &&
+                    std::is_copy_constructible_v<std::decay_t<T>>>>
         basic_any& operator=(T&& rhs)
         {
             basic_any(HPX_FORWARD(T, rhs)).swap(*this);
@@ -859,51 +854,47 @@ namespace hpx { namespace util {
 
         // Perfect forwarding of T
         template <typename T,
-            typename Enable = typename std::enable_if<!std::is_same<basic_any,
-                typename std::decay<T>::type>::value>::type>
-        basic_any(T&& x,
-            typename std::enable_if<std::is_copy_constructible<
-                typename std::decay<T>::type>::value>::type* = nullptr)
-          : table(detail::any::get_table<typename std::decay<T>::type>::
-                    template get<void, void, Char, std::true_type>())
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<basic_any, std::decay_t<T>>>>
+        explicit basic_any(T&& x,
+            std::enable_if_t<std::is_copy_constructible_v<std::decay_t<T>>>* =
+                nullptr)
+          : table(detail::any::get_table<std::decay_t<T>>::template get<void,
+                void, Char, std::true_type>())
           , object(nullptr)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(),
                 HPX_FORWARD(T, x));
         }
 
         template <typename T, typename... Ts,
-            typename Enable = typename std::enable_if<
-                std::is_constructible<typename std::decay<T>::type,
-                    Ts...>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type>
+            typename Enable = std::enable_if_t<
+                std::is_constructible_v<std::decay_t<T>, Ts...> &&
+                std::is_copy_constructible_v<std::decay_t<T>>>>
         explicit basic_any(std::in_place_type_t<T>, Ts&&... ts)
-          : table(detail::any::get_table<typename std::decay<T>::type>::
-                    template get<void, void, Char, std::true_type>())
+          : table(detail::any::get_table<std::decay_t<T>>::template get<void,
+                void, Char, std::true_type>())
           , object(nullptr)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(),
                 HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename T, typename U, typename... Ts,
-            typename Enable = typename std::enable_if<
-                std::is_constructible<typename std::decay<T>::type,
-                    Ts...>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type>
+            typename Enable = std::enable_if_t<
+                std::is_constructible_v<std::decay_t<T>, Ts...> &&
+                std::is_copy_constructible_v<std::decay_t<T>>>>
         explicit basic_any(
             std::in_place_type_t<T>, std::initializer_list<U> il, Ts&&... ts)
-          : table(detail::any::get_table<typename std::decay<T>::type>::
-                    template get<void, void, Char, std::true_type>())
+          : table(detail::any::get_table<std::decay_t<T>>::template get<void,
+                void, Char, std::true_type>())
           , object(nullptr)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(), il,
                 HPX_FORWARD(Ts, ts)...);
@@ -938,14 +929,14 @@ namespace hpx { namespace util {
         template <typename T, typename... Ts>
         static void new_object(void*& object, std::true_type, Ts&&... ts)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new (&object) value_type(HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename T, typename... Ts>
         static void new_object(void*& object, std::false_type, Ts&&... ts)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             object = new value_type(HPX_FORWARD(Ts, ts)...);
         }
 
@@ -969,10 +960,9 @@ namespace hpx { namespace util {
 
         // Perfect forwarding of T
         template <typename T,
-            typename Enable = typename std::enable_if<
-                !std::is_same<basic_any, typename std::decay<T>::type>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type>
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<basic_any, std::decay_t<T>> &&
+                    std::is_copy_constructible_v<std::decay_t<T>>>>
         basic_any& operator=(T&& rhs) noexcept
         {
             basic_any(HPX_FORWARD(T, rhs)).swap(*this);
@@ -1073,51 +1063,47 @@ namespace hpx { namespace util {
 
         // Perfect forwarding of T
         template <typename T,
-            typename Enable = typename std::enable_if<!std::is_same<basic_any,
-                typename std::decay<T>::type>::value>::type>
-        basic_any(T&& x,
-            typename std::enable_if<std::is_move_constructible<
-                typename std::decay<T>::type>::value>::type* = nullptr)
-          : table(detail::any::get_table<typename std::decay<T>::type>::
-                    template get<void, void, void, std::false_type>())
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<basic_any, std::decay_t<T>>>>
+        explicit basic_any(T&& x,
+            std::enable_if_t<std::is_move_constructible_v<std::decay_t<T>>>* =
+                nullptr)
+          : table(detail::any::get_table<std::decay_t<T>>::template get<void,
+                void, void, std::false_type>())
           , object(nullptr)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(),
                 HPX_FORWARD(T, x));
         }
 
         template <typename T, typename... Ts,
-            typename Enable = typename std::enable_if<
-                std::is_constructible<typename std::decay<T>::type,
-                    Ts...>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type>
+            typename Enable = std::enable_if_t<
+                std::is_constructible_v<std::decay_t<T>, Ts...> &&
+                std::is_copy_constructible_v<std::decay_t<T>>>>
         explicit basic_any(std::in_place_type_t<T>, Ts&&... ts)
-          : table(detail::any::get_table<typename std::decay<T>::type>::
-                    template get<void, void, void, std::false_type>())
+          : table(detail::any::get_table<std::decay_t<T>>::template get<void,
+                void, void, std::false_type>())
           , object(nullptr)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(),
                 HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename T, typename U, typename... Ts,
-            typename Enable = typename std::enable_if<
-                std::is_constructible<typename std::decay<T>::type,
-                    Ts...>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type>
+            typename Enable = std::enable_if_t<
+                std::is_constructible_v<std::decay_t<T>, Ts...> &&
+                std::is_copy_constructible_v<std::decay_t<T>>>>
         explicit basic_any(
             std::in_place_type_t<T>, std::initializer_list<U> il, Ts&&... ts)
-          : table(detail::any::get_table<typename std::decay<T>::type>::
-                    template get<void, void, void, std::false_type>())
+          : table(detail::any::get_table<std::decay_t<T>>::template get<void,
+                void, void, std::false_type>())
           , object(nullptr)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(), il,
                 HPX_FORWARD(Ts, ts)...);
@@ -1135,14 +1121,14 @@ namespace hpx { namespace util {
         template <typename T, typename... Ts>
         static void new_object(void*& object, std::true_type, Ts&&... ts)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new (&object) value_type(HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename T, typename... Ts>
         static void new_object(void*& object, std::false_type, Ts&&... ts)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             object = new value_type(HPX_FORWARD(Ts, ts)...);
         }
 
@@ -1157,10 +1143,9 @@ namespace hpx { namespace util {
 
         // Perfect forwarding of T
         template <typename T,
-            typename Enable = typename std::enable_if<
-                !std::is_same<basic_any, typename std::decay<T>::type>::value &&
-                std::is_move_constructible<
-                    typename std::decay<T>::type>::value>::type>
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<basic_any, std::decay_t<T>> &&
+                    std::is_move_constructible_v<std::decay_t<T>>>>
         basic_any& operator=(T&& rhs)
         {
             basic_any(HPX_FORWARD(T, rhs)).swap(*this);
@@ -1258,51 +1243,47 @@ namespace hpx { namespace util {
 
         // Perfect forwarding of T
         template <typename T,
-            typename Enable = typename std::enable_if<!std::is_same<basic_any,
-                typename std::decay<T>::type>::value>::type>
-        basic_any(T&& x,
-            typename std::enable_if<std::is_move_constructible<
-                typename std::decay<T>::type>::value>::type* = nullptr)
-          : table(detail::any::get_table<typename std::decay<T>::type>::
-                    template get<void, void, Char, std::false_type>())
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<basic_any, std::decay_t<T>>>>
+        explicit basic_any(T&& x,
+            std::enable_if_t<std::is_move_constructible_v<std::decay_t<T>>>* =
+                nullptr)
+          : table(detail::any::get_table<std::decay_t<T>>::template get<void,
+                void, Char, std::false_type>())
           , object(nullptr)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(),
                 HPX_FORWARD(T, x));
         }
 
         template <typename T, typename... Ts,
-            typename Enable = typename std::enable_if<
-                std::is_constructible<typename std::decay<T>::type,
-                    Ts...>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type>
+            typename Enable = std::enable_if_t<
+                std::is_constructible_v<std::decay_t<T>, Ts...> &&
+                std::is_copy_constructible_v<std::decay_t<T>>>>
         explicit basic_any(std::in_place_type_t<T>, Ts&&... ts)
-          : table(detail::any::get_table<typename std::decay<T>::type>::
-                    template get<void, void, Char, std::false_type>())
+          : table(detail::any::get_table<std::decay_t<T>>::template get<void,
+                void, Char, std::false_type>())
           , object(nullptr)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(),
                 HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename T, typename U, typename... Ts,
-            typename Enable = typename std::enable_if<
-                std::is_constructible<typename std::decay<T>::type,
-                    Ts...>::value &&
-                std::is_copy_constructible<
-                    typename std::decay<T>::type>::value>::type>
+            typename Enable = std::enable_if_t<
+                std::is_constructible_v<std::decay_t<T>, Ts...> &&
+                std::is_copy_constructible_v<std::decay_t<T>>>>
         explicit basic_any(
             std::in_place_type_t<T>, std::initializer_list<U> il, Ts&&... ts)
-          : table(detail::any::get_table<typename std::decay<T>::type>::
-                    template get<void, void, Char, std::false_type>())
+          : table(detail::any::get_table<std::decay_t<T>>::template get<void,
+                void, Char, std::false_type>())
           , object(nullptr)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new_object<T>(object,
                 typename detail::any::get_table<value_type>::is_small(), il,
                 HPX_FORWARD(Ts, ts)...);
@@ -1320,14 +1301,14 @@ namespace hpx { namespace util {
         template <typename T, typename... Ts>
         static void new_object(void*& object, std::true_type, Ts&&... ts)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new (&object) value_type(HPX_FORWARD(Ts, ts)...);
         }
 
         template <typename T, typename... Ts>
         static void new_object(void*& object, std::false_type, Ts&&... ts)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             object = new value_type(HPX_FORWARD(Ts, ts)...);
         }
 
@@ -1342,10 +1323,9 @@ namespace hpx { namespace util {
 
         // Perfect forwarding of T
         template <typename T,
-            typename Enable = typename std::enable_if<
-                !std::is_same<basic_any, typename std::decay<T>::type>::value &&
-                std::is_move_constructible<
-                    typename std::decay<T>::type>::value>::type>
+            typename Enable =
+                std::enable_if_t<!std::is_same_v<basic_any, std::decay_t<T>> &&
+                    std::is_move_constructible_v<std::decay_t<T>>>>
         basic_any& operator=(T&& rhs) noexcept
         {
             basic_any(HPX_FORWARD(T, rhs)).swap(*this);
@@ -1459,8 +1439,7 @@ namespace hpx { namespace util {
     }}    // namespace detail::any
 
     template <typename IArch, typename OArch, typename Char, typename Copyable,
-        typename Enable =
-            typename std::enable_if<!std::is_void<Char>::value>::type>
+        typename Enable = std::enable_if_t<!std::is_void_v<Char>>>
     std::basic_istream<Char>& operator>>(std::basic_istream<Char>& i,
         basic_any<IArch, OArch, Char, Copyable>& obj)
     {
@@ -1468,8 +1447,7 @@ namespace hpx { namespace util {
     }
 
     template <typename IArch, typename OArch, typename Char, typename Copyable,
-        typename Enable =
-            typename std::enable_if<!std::is_void<Char>::value>::type>
+        typename Enable = std::enable_if_t<!std::is_void_v<Char>>>
     std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& o,
         basic_any<IArch, OArch, Char, Copyable> const& obj)
     {
@@ -1483,7 +1461,7 @@ namespace hpx { namespace util {
     {
         lhs.swap(rhs);
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 /// Top level HPX namespace
 namespace hpx {
@@ -1578,7 +1556,7 @@ namespace hpx {
         typename Copyable>
     T any_cast(util::basic_any<IArch, OArch, Char, Copyable>& operand)
     {
-        using nonref = typename std::remove_reference<T>::type;
+        using nonref = std::remove_reference_t<T>;
 
         nonref* result = hpx::any_cast<nonref>(&operand);
         if (!result)
@@ -1597,7 +1575,7 @@ namespace hpx {
     T const& any_cast(
         util::basic_any<IArch, OArch, Char, Copyable> const& operand)
     {
-        using nonref = typename std::remove_reference<T>::type;
+        using nonref = std::remove_reference_t<T>;
 
         return hpx::any_cast<nonref const&>(
             const_cast<util::basic_any<IArch, OArch, Char, Copyable>&>(
@@ -1605,7 +1583,7 @@ namespace hpx {
     }
 }    // namespace hpx
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ////////////////////////////////////////////////////////////////////////////
     // make copyable any
@@ -1670,8 +1648,7 @@ namespace hpx { namespace util {
         basic_any<void, void, char, std::false_type>;
     using streamable_unique_wany_nonser =
         basic_any<void, void, wchar_t, std::false_type>;
-
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 ////////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_MSVC) && HPX_MSVC >= 1400

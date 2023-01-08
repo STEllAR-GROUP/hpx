@@ -6,7 +6,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(components io memory papi power)
+set(components io memory_counters papi power)
 
 foreach(component ${components})
   add_hpx_pseudo_target(components.performance_counters.${component})

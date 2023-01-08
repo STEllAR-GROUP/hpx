@@ -52,7 +52,7 @@ void test_scheduler(
     {
         for (std::size_t i = 0; i < default_pool_threads * 10000; ++i)
         {
-            hpx::apply([]() {});
+            hpx::post([]() {});
         }
 
         bool suspended = false;
@@ -76,7 +76,7 @@ void test_scheduler(
         }
     }
 
-    hpx::apply([]() { hpx::local::finalize(); });
+    hpx::post([]() { hpx::local::finalize(); });
 
     HPX_TEST_EQ(hpx::local::stop(), 0);
 }

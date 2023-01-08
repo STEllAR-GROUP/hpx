@@ -62,7 +62,7 @@ void test_for_each_seq(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each(ExPolicy&& policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::is_execution_policy<ExPolicy>::value);
+    static_assert(hpx::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -155,7 +155,7 @@ void test_for_each_exception_seq(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each_exception(ExPolicy&& policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::is_execution_policy<ExPolicy>::value);
+    static_assert(hpx::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
@@ -268,7 +268,7 @@ void test_for_each_bad_alloc_seq(IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
-    BOOST_STATIC_ASSERT(hpx::is_execution_policy<ExPolicy>::value);
+    static_assert(hpx::is_execution_policy<ExPolicy>::value);
 
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;

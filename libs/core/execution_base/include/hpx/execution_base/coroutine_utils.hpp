@@ -46,6 +46,7 @@ namespace hpx::execution::experimental {
     struct connect_awaitable_t;
 
     namespace detail {
+
         template <typename Value>
         struct receiver_base;
 
@@ -54,21 +55,20 @@ namespace hpx::execution::experimental {
 
         template <typename PromiseId, typename SenderId>
         struct sender_awaitable;
-
     }    // namespace detail
 
     namespace detail {
-        struct with_awaitable_senders_base;
 
+        struct with_awaitable_senders_base;
     }    // namespace detail
 
     // with_awaitable_senders, when used as the base class of a coroutine
     // promise type, makes senders awaitable in that coroutine type. In
     // addition, it provides a default implementation of unhandled_stopped()
-    // such that if a sender completes by calling execution::set_stopped, it
-    // is treated as if an uncatchable "stopped" exception were thrown from
-    // the await-expression. In practice, the coroutine is never resumed, and
-    // the unhandled_stopped of the coroutine caller's promise type is called.
+    // such that if a sender completes by calling execution::set_stopped, it is
+    // treated as if an uncatchable "stopped" exception were thrown from the
+    // await-expression. In practice, the coroutine is never resumed, and the
+    // unhandled_stopped of the coroutine caller's promise type is called.
     //
     template <typename Promise>
     struct with_awaitable_senders;
@@ -82,7 +82,6 @@ namespace hpx::execution::experimental {
 
     template <typename ReceiverId>
     struct operation;
-
 }    // namespace hpx::execution::experimental
 
 #endif    // HPX_HAVE_CXX20_COROUTINES

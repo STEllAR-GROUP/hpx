@@ -5,6 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file bind_back.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -66,7 +68,7 @@ namespace hpx {
             {
             }
 
-            constexpr HPX_HOST_DEVICE bound_back(bound_back&& other)
+            constexpr HPX_HOST_DEVICE bound_back(bound_back&& other) noexcept
               : _f(HPX_MOVE(other._f))
               , _args(HPX_MOVE(other._args))
             {
@@ -152,6 +154,18 @@ namespace hpx {
         };
     }    // namespace detail
 
+    /// \brief Function templates \c bind_back generate a forwarding call wrapper
+    ///        for \c f. Calling this wrapper is equivalent to invoking \c f with its
+    ///        last \c sizeof...(Ts) parameters bound to \c vs.
+    ///
+    /// \param f    Callable object (function object, pointer to function,
+    ///             reference to function, pointer to member function, or pointer
+    ///             to data member) that will be bound to some arguments
+    /// \param vs   list of the arguments to bind to the last \c sizeof...(Ts)
+    ///             parameters of \c f
+    /// \returns    A function object of type \c T that is unspecified, except that
+    ///             the types of objects returned by two calls to \c hpx::bind_back
+    ///             with the same arguments are the same.
     template <typename F, typename... Ts>
     constexpr hpx::detail::bound_back<std::decay_t<F>,
         util::make_index_pack_t<sizeof...(Ts)>, util::decay_unwrap_t<Ts>...>
@@ -184,9 +198,10 @@ namespace hpx::util {
 }    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
-    ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+namespace hpx::traits {
+
+    ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
     struct get_function_address<hpx::detail::bound_back<F, Ts...>>
     {
@@ -219,11 +234,11 @@ namespace hpx { namespace traits {
         }
     };
 #endif
+}    // namespace hpx::traits
 #endif
-}}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     // serialization of the bound_back object
     template <typename Archive, typename F, typename... Ts>
@@ -232,4 +247,4 @@ namespace hpx { namespace serialization {
     {
         bound.serialize(ar, version);
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

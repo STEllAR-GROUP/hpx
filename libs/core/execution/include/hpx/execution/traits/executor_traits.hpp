@@ -25,8 +25,11 @@ namespace hpx {
 }    // namespace hpx
 
 namespace hpx { namespace execution {
-    ///////////////////////////////////////////////////////////////////////////
-    struct static_chunk_size;
+
+    namespace experimental {
+        ///////////////////////////////////////////////////////////////////////
+        struct static_chunk_size;
+    }    // namespace experimental
 
     ///////////////////////////////////////////////////////////////////////////
     struct sequenced_execution_tag;
@@ -149,8 +152,9 @@ namespace hpx { namespace parallel { namespace execution {
         using parameters_type = typename T::parameters_type;
 
     public:
-        using type = hpx::util::detected_or_t<hpx::execution::static_chunk_size,
-            parameters_type, Executor>;
+        using type = hpx::util::detected_or_t<
+            hpx::execution::experimental::static_chunk_size, parameters_type,
+            Executor>;
     };
 
     ///////////////////////////////////////////////////////////////////////////

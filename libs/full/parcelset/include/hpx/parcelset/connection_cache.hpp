@@ -78,7 +78,7 @@ namespace hpx { namespace util {
         {
             if (max_connections_per_locality_ > max_connections_)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "connection_cache::connection_cache",
                     "the maximum number of connections per locality cannot "
                     "exceed the overall maximum number of connections");

@@ -1,4 +1,5 @@
 //  Copyright (c) 2017-2021 Agustin Berge
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,8 +9,6 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/utility/string_ref.hpp>
-
 #include <cctype>
 #include <cstddef>
 #include <cstdio>
@@ -17,12 +16,15 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         struct type_specifier
@@ -34,7 +36,7 @@ namespace hpx { namespace util {
     template <>                                                                \
     struct type_specifier<Type>                                                \
     {                                                                          \
-        static char const* value() noexcept                                    \
+        static constexpr char const* value() noexcept                          \
         {                                                                      \
             return #Spec;                                                      \
         }                                                                      \
@@ -72,7 +74,7 @@ namespace hpx { namespace util {
         struct formatter
         {
             static void call(
-                std::ostream& os, boost::string_ref spec, void const* ptr)
+                std::ostream& os, std::string_view spec, void const* ptr)
             {
                 // conversion specifier
                 char const* conv_spec = "";
@@ -98,7 +100,7 @@ namespace hpx { namespace util {
         struct formatter<bool> : formatter<int>
         {
             static void call(
-                std::ostream& os, boost::string_ref spec, void const* ptr)
+                std::ostream& os, std::string_view spec, void const* ptr)
             {
                 int const value = *static_cast<bool const*>(ptr) ? 1 : 0;
                 return formatter<int>::call(os, spec, &value);
@@ -109,7 +111,7 @@ namespace hpx { namespace util {
         struct formatter<void const*, /*IsFundamental=*/false>
         {
             static void call(
-                std::ostream& os, boost::string_ref /*spec*/, void const* ptr)
+                std::ostream& os, std::string_view /*spec*/, void const* ptr)
             {
                 os << ptr;
             }
@@ -125,7 +127,7 @@ namespace hpx { namespace util {
         struct formatter<char const*, /*IsFundamental=*/false>
         {
             static void call(
-                std::ostream& os, boost::string_ref spec, void const* ptr)
+                std::ostream& os, std::string_view spec, void const* ptr)
             {
                 char const* value = static_cast<char const*>(ptr);
 
@@ -157,7 +159,7 @@ namespace hpx { namespace util {
           : formatter<char const*>
         {
             static void call(
-                std::ostream& os, boost::string_ref spec, void const* ptr)
+                std::ostream& os, std::string_view spec, void const* ptr)
             {
                 std::string const& value =
                     *static_cast<std::string const*>(ptr);
@@ -173,7 +175,7 @@ namespace hpx { namespace util {
         struct formatter<std::tm, /*IsFundamental=*/false>
         {
             static void call(
-                std::ostream& os, boost::string_ref spec, void const* ptr)
+                std::ostream& os, std::string_view spec, void const* ptr)
             {
                 std::tm const& value = *static_cast<std::tm const*>(ptr);
 
@@ -182,7 +184,7 @@ namespace hpx { namespace util {
                     spec = "%c";    // standard date and time string
 
                 // copy spec to a null terminated buffer
-                std::string format(spec.to_string());
+                std::string format(spec);
 
                 std::size_t length = 0;
                 std::vector<char> buffer(1);
@@ -201,7 +203,7 @@ namespace hpx { namespace util {
 
         template <typename T>
         void format_value(
-            std::ostream& os, boost::string_ref spec, T const& value)
+            std::ostream& os, std::string_view spec, T const& value)
         {
             if (!spec.empty())
                 throw std::runtime_error("Not a valid format specifier");
@@ -213,7 +215,7 @@ namespace hpx { namespace util {
         struct formatter<T, /*IsFundamental=*/false>
         {
             static void call(
-                std::ostream& os, boost::string_ref spec, void const* value)
+                std::ostream& os, std::string_view spec, void const* value)
             {
                 // ADL customization point
                 format_value(os, spec, *static_cast<T const*>(value));
@@ -222,70 +224,75 @@ namespace hpx { namespace util {
 
         struct format_arg
         {
+            format_arg() = default;
+
             template <typename T>
-            format_arg(T const& arg)
+            explicit constexpr format_arg(T const& arg) noexcept
               : _data(&arg)
               , _formatter(&detail::formatter<T>::call)
             {
             }
 
             template <typename T>
-            format_arg(T* arg)
+            explicit constexpr format_arg(T* arg) noexcept
               : _data(arg)
               , _formatter(&detail::formatter<T const*>::call)
             {
             }
             template <typename T>
-            format_arg(T const* arg)
+            explicit constexpr format_arg(T const* arg) noexcept
               : _data(arg)
               , _formatter(&detail::formatter<T const*>::call)
             {
             }
 
-            void operator()(std::ostream& os, boost::string_ref spec) const
+            void operator()(std::ostream& os, std::string_view spec) const
             {
                 _formatter(os, spec, _data);
             }
 
-            void const* _data;
+            void const* _data = nullptr;
             void (*_formatter)(
-                std::ostream&, boost::string_ref spec, void const*);
+                std::ostream&, std::string_view spec, void const*) = nullptr;
         };
 
         ///////////////////////////////////////////////////////////////////////
         HPX_CORE_EXPORT void format_to(std::ostream& os,
-            boost::string_ref format_str, format_arg const* args,
+            std::string_view format_str, format_arg const* args,
             std::size_t count);
 
-        HPX_CORE_EXPORT std::string format(boost::string_ref format_str,
+        HPX_CORE_EXPORT std::string format(std::string_view format_str,
             format_arg const* args, std::size_t count);
     }    // namespace detail
 
     template <typename... Args>
-    std::string format(boost::string_ref format_str, Args const&... args)
+    std::string format(std::string_view format_str, Args const&... args)
     {
-        detail::format_arg const format_args[] = {args..., 0};
+        detail::format_arg const format_args[] = {
+            detail::format_arg(args)..., detail::format_arg()};
         return detail::format(format_str, format_args, sizeof...(Args));
     }
 
     template <typename... Args>
     std::ostream& format_to(
-        std::ostream& os, boost::string_ref format_str, Args const&... args)
+        std::ostream& os, std::string_view format_str, Args const&... args)
     {
-        detail::format_arg const format_args[] = {args..., 0};
+        detail::format_arg const format_args[] = {
+            detail::format_arg(args)..., detail::format_arg()};
         detail::format_to(os, format_str, format_args, sizeof...(Args));
         return os;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Range>
         struct format_join
         {
             Range const& rng;
-            boost::string_ref delim;
+            std::string_view delim;
 
-            friend void format_value(std::ostream& os, boost::string_ref spec,
+            friend void format_value(std::ostream& os, std::string_view spec,
                 format_join const& value)
             {
                 bool first = true;
@@ -304,8 +311,8 @@ namespace hpx { namespace util {
 
     template <typename Range>
     detail::format_join<Range> format_join(
-        Range const& range, boost::string_ref delimiter) noexcept
+        Range const& range, std::string_view delimiter) noexcept
     {
         return {range, delimiter};
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

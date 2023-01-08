@@ -242,6 +242,15 @@ function(hpx_check_for_unistd_h)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_builtin_forward_move)
+  add_hpx_config_test(
+    HPX_WITH_BUILTIN_FORWARD_MOVE
+    SOURCE cmake/tests/builtin_forward_move.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_libfun_std_experimental_optional)
   add_hpx_config_test(
     HPX_WITH_LIBFUN_EXPERIMENTAL_OPTIONAL
@@ -556,6 +565,15 @@ function(hpx_check_for_cxx20_trivial_virtual_destructor)
   add_hpx_config_test(
     HPX_WITH_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR
     SOURCE cmake/tests/cxx20_trivial_virtual_destructor.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx20_std_construct_at)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_STD_CONSTRUCT_AT
+    SOURCE cmake/tests/cxx20_std_construct_at.cpp
     FILE ${ARGN}
   )
 endfunction()

@@ -154,7 +154,7 @@ namespace hpx::serialization {
         public:
             using type = util::lazy_conditional_t<
                 hpx::traits::is_serialized_with_id_v<referred_type>,
-                hpx::util::identity<polymorphic_with_id>,
+                hpx::type_identity<polymorphic_with_id>,
                 std::conditional<
                     hpx::traits::is_intrusive_polymorphic_v<referred_type>,
                     intrusive_polymorphic,

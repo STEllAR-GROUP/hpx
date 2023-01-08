@@ -67,7 +67,7 @@ namespace hpx { namespace agas {
             naming::get_locality_id_from_gid(dest);
         if (service_locality_id == naming::invalid_locality_id)
         {
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "symbol_namespace::get_service_instance",
                 "can't retrieve a valid locality id from global address "
                 "({1}): ",

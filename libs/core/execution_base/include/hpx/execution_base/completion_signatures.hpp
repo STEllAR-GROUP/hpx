@@ -264,7 +264,7 @@ namespace hpx::execution::experimental {
         {
 #if defined(HPX_HAVE_CXX20_COROUTINES)
             bool await_ready();
-            void await_suspend(const hpx::coro::coroutine_handle<no_env>&);
+            void await_suspend(hpx::coro::coroutine_handle<no_env> const&);
             dependent_completion_signatures<no_env> await_resume();
 #endif
         };
@@ -353,8 +353,8 @@ namespace hpx::execution::experimental {
                     Sender>::completion_signatures{};
             }
 #if defined(HPX_HAVE_CXX20_COROUTINES)
-            // TODO: Handle a case where is_awaitable_v<Sender,Promise>
-            // where Promise type is not void.
+            // TODO: Handle a case where is_awaitable_v<Sender,Promise> where
+            // Promise type is not void.
             else if constexpr (is_awaitable_v<Sender>)
             {
                 using result_type = await_result_t<Sender>;
@@ -407,38 +407,38 @@ namespace hpx::execution::experimental {
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         constexpr bool has_value_types(
-            typename T::template value_types<meta::pack, meta::pack>*)
+            typename T::template value_types<meta::pack, meta::pack>*) noexcept
         {
             return true;
         }
 
         template <typename T>
-        constexpr bool has_value_types(...)
+        constexpr bool has_value_types(...) noexcept
         {
             return false;
         }
 
         template <typename T>
         constexpr bool has_error_types(
-            typename T::template error_types<meta::pack>*)
+            typename T::template error_types<meta::pack>*) noexcept
         {
             return true;
         }
 
         template <typename T>
-        constexpr bool has_error_types(...)
+        constexpr bool has_error_types(...) noexcept
         {
             return false;
         }
 
         template <typename T>
-        constexpr bool has_sends_stopped(decltype(T::sends_stopped)*)
+        constexpr bool has_sends_stopped(decltype(T::sends_stopped)*) noexcept
         {
             return true;
         }
 
         template <typename T>
-        constexpr bool has_sends_stopped(...)
+        constexpr bool has_sends_stopped(...) noexcept
         {
             return false;
         }
@@ -637,6 +637,7 @@ namespace hpx::execution::experimental {
     inline constexpr bool is_sender_v = is_sender<Sender, Env>::value;
 
     namespace detail {
+
         template <bool IsSenderOf, typename S, typename E, typename... Ts>
         struct is_sender_of_impl;
 
@@ -742,6 +743,7 @@ namespace hpx::execution::experimental {
     // have the form Variant<Tuple<>> or Variant<>, then
     // single-sender-value-type<S, E> is an alias for type void.
     // 3. Otherwise, single-sender-value-type<S, E> is ill-formed.
+    //
     template <typename Sender, typename Env = no_env>
     using single_sender_value_t =
         detail::value_types_from<detail::completion_signatures_of<Sender, Env>,
@@ -766,26 +768,24 @@ namespace hpx::execution::experimental {
     struct has_nothrow_connect;
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
-
-    // 4.18. Cancellation of a sender can unwind a stack of coroutines
-    // As described in the section "All awaitables are senders", the sender
-    // customization points recognize awaitables and adapt them transparently
-    // to model the sender concept. When connect-ing an awaitable and a
-    // receiver, the adaptation layer awaits the awaitable within a coroutine
-    // that implements unhandled_stopped in its promise type. The effect of
-    // this is that an "uncatchable" stopped exception propagates seamlessly
-    // out of awaitables, causing execution::set_stopped to be called on the
-    // receiver.
-    // Obviously, unhandled_stopped is a library extension of the
-    // coroutine promise interface. Many promise types will not implement
+    // 4.18. Cancellation of a sender can unwind a stack of coroutines As
+    // described in the section "All awaitables are senders", the sender
+    // customization points recognize awaitables and adapt them transparently to
+    // model the sender concept. When connect-ing an awaitable and a receiver,
+    // the adaptation layer awaits the awaitable within a coroutine that
+    // implements unhandled_stopped in its promise type. The effect of this is
+    // that an "uncatchable" stopped exception propagates seamlessly out of
+    // awaitables, causing execution::set_stopped to be called on the receiver.
+    // Obviously, unhandled_stopped is a library extension of the coroutine
+    // promise interface. Many promise types will not implement
     // unhandled_stopped. When an uncatchable stopped exception tries to
     // propagate through such a coroutine, it is treated as an unhandled
     // exception and terminate is called. The solution, as described above, is
     // to use a sender adaptor to handle the stopped exception before awaiting
     // it. It goes without saying that any future Standard Library coroutine
     // types ought to implement unhandled_stopped. The author of Add lazy
-    // coroutine (coroutine task) type, which proposes a standard coroutine
-    // task type, is in agreement.
+    // coroutine (coroutine task) type, which proposes a standard coroutine task
+    // type, is in agreement.
     template <typename Promise, typename = void>
     inline constexpr bool has_unhandled_stopped = false;
 
@@ -806,9 +806,12 @@ namespace hpx::execution::experimental {
     struct as_awaitable_t;
 
     namespace detail {
+
+        // clang-format off
         template <typename T, typename U>
         inline constexpr bool decays_to = std::is_same_v<std::decay_t<T>, U>&&
             std::is_same_v<std::decay_t<U>, T>;
+        // clang-format on
 
         struct void_type
         {
@@ -846,13 +849,19 @@ namespace hpx::execution::experimental {
                 set_error_t, receiver_base&& self, Error&& err) noexcept
             {
                 if constexpr (decays_to<Error, std::exception_ptr>)
+                {
                     self.result->template emplace<2>(HPX_FORWARD(Error, err));
+                }
                 else if constexpr (decays_to<Error, std::error_code>)
+                {
                     self.result->template emplace<2>(
                         make_exception_ptr(system_error(err)));
+                }
                 else
+                {
                     self.result->template emplace<2>(
                         make_exception_ptr(HPX_FORWARD(Error, err)));
+                }
                 self.continuation.resume();
             }
 
@@ -877,7 +886,7 @@ namespace hpx::execution::experimental {
                 }
 
                 // Forward get_env query to the coroutine promise
-                friend auto tag_invoke(get_env_t, const receiver& self)
+                friend auto tag_invoke(get_env_t, receiver const& self)
                     -> env_of_t<Promise>
                 {
                     auto continuation =
@@ -899,11 +908,17 @@ namespace hpx::execution::experimental {
                 case 0:    // receiver contract not satisfied
                     HPX_ASSERT_MSG(0, "_Should never get here");
                     break;
+
                 case 1:    // set_value
                     if constexpr (!std::is_void_v<Value>)
+                    {
                         return HPX_MOVE(std::get<1>(result));
+                    }
                     else
+                    {
                         return;
+                    }
+
                 case 2:    // set_error
                     std::rethrow_exception(std::get<2>(result));
                 }
@@ -926,17 +941,19 @@ namespace hpx::execution::experimental {
             typename sender_awaitable_base<hpx::meta::hidden<Promise>,
                 single_sender_value_t<Sender, env_of_t<Promise>>>::receiver;
 
+        // clang-format off
         template <typename Sender, typename Env = no_env>
         inline constexpr bool is_single_typed_sender_v =
-            is_sender_v<Sender, Env>&& hpx::meta::value<
+            is_sender_v<Sender, Env> &&
+            hpx::meta::value<
                 hpx::meta::is_valid<single_sender_value_t, Sender, Env>>;
 
         template <typename Sender, typename Promise>
         inline constexpr bool is_awaitable_sender_v =
-            is_single_typed_sender_v<Sender, env_of_t<Promise>>&&
-                is_sender_to_v<Sender, receiver<Sender, Promise>>&&
-                    has_unhandled_stopped<Promise>;
-
+            is_single_typed_sender_v<Sender, env_of_t<Promise>> &&
+            is_sender_to_v<Sender, receiver<Sender, Promise>> &&
+            has_unhandled_stopped<Promise>;
+        // clang-format on
     }    // namespace detail
 
     inline constexpr struct as_awaitable_t
@@ -986,6 +1003,7 @@ namespace hpx::execution::experimental {
     } as_awaitable{};
 
     namespace detail {
+
         struct with_awaitable_senders_base
         {
             with_awaitable_senders_base() = default;
@@ -995,21 +1013,22 @@ namespace hpx::execution::experimental {
                 hpx::coro::coroutine_handle<OtherPromise> hcoro) noexcept
             {
                 static_assert(!std::is_void_v<OtherPromise>);
+
                 continuation_handle = hcoro;
                 if constexpr (has_unhandled_stopped<OtherPromise>)
                 {
                     stopped_callback = [](void* address) noexcept
                         -> hpx::coro::coroutine_handle<> {
-                        // This causes the rest of the coroutine
-                        // (the part after the co_await of the sender)
-                        // to be skipped and invokes the calling
-                        // coroutine's stopped handler.
+                        // This causes the rest of the coroutine (the part after
+                        // the co_await of the sender) to be skipped and invokes
+                        // the calling coroutine's stopped handler.
                         return hpx::coro::coroutine_handle<
                             OtherPromise>::from_address(address)
                             .promise()
                             .unhandled_stopped();
                     };
                 }
+
                 // If OtherPromise doesn't implement unhandled_stopped(),
                 // then if a "stopped" unwind reaches this point,
                 // it's considered an unhandled exception and terminate()
@@ -1035,9 +1054,11 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 
+    // clang-format off
     template <typename A, typename B>
-    inline constexpr bool is_derived_from_v = std::is_base_of_v<B, A>&&
+    inline constexpr bool is_derived_from_v = std::is_base_of_v<B, A> &&
         std::is_convertible_v<const volatile A*, const volatile B*>;
+    // clang-format on
 
     template <typename Promise>
     struct with_awaitable_senders : detail::with_awaitable_senders_base
@@ -1058,28 +1079,34 @@ namespace hpx::execution::experimental {
         {
             return {};
         }
+
         [[noreturn]] hpx::coro::suspend_always final_suspend() noexcept
         {
             std::terminate();
         }
+
         [[noreturn]] void unhandled_exception() noexcept
         {
             std::terminate();
         }
+
         [[noreturn]] void return_void() noexcept
         {
             std::terminate();
         }
+
         template <typename Fun>
         auto yield_value(Fun&& fun) noexcept
         {
             struct awaiter
             {
                 Fun&& fun;
+
                 bool await_ready() noexcept
                 {
                     return false;
                 }
+
                 void await_suspend(hpx::coro::coroutine_handle<>) noexcept(
                     std::is_nothrow_invocable_v<Fun>)
                 {
@@ -1087,13 +1114,15 @@ namespace hpx::execution::experimental {
                     // resumes the connect_awaitable coroutine, and immediately
                     // rethrows the exception. The end result is that an
                     // exception_ptr to the exception gets passed to set_error.
-                    (HPX_FORWARD(Fun, fun))();
+                    HPX_FORWARD(Fun, fun)();
                 }
+
                 [[noreturn]] void await_resume() noexcept
                 {
                     std::terminate();
                 }
             };
+
             return awaiter{HPX_FORWARD(Fun, fun)};
         }
     };
@@ -1179,7 +1208,7 @@ namespace hpx::execution::experimental {
         }
 
         // Pass through the get_env receiver query
-        friend auto tag_invoke(get_env_t, const promise& self)
+        friend auto tag_invoke(get_env_t, promise const& self)
             -> env_of_t<Receiver>
         {
             return get_env(self.rcvr);
@@ -1206,13 +1235,12 @@ namespace hpx::execution::experimental {
             std::exception_ptr eptr;
             try
             {
-                // This is a bit mind bending control-flow wise.
-                // We are first evaluating the co_await expression.
-                // Then the result of that is passed into a lambda
-                // that curries a reference to the result into another
-                // lambda which is then returned to 'co_yield'.
-                // The 'co_yield' expression then invokes this lambda
-                // after the coroutine is suspended so that it is safe
+                // This is a bit mind bending control-flow wise. We are first
+                // evaluating the co_await expression. Then the result of that
+                // is passed into a lambda that curries a reference to the
+                // result into another lambda which is then returned to
+                // 'co_yield'. The 'co_yield' expression then invokes this
+                // lambda after the coroutine is suspended so that it is safe
                 // for the receiver to destroy the coroutine.
                 auto fun = [&](auto&&... as) noexcept {
                     return [&]() noexcept -> void {
@@ -1220,15 +1248,23 @@ namespace hpx::execution::experimental {
                             (std::add_rvalue_reference_t<result_t>) as...);
                     };
                 };
+
                 if constexpr (std::is_void_v<result_t>)
-                    co_yield(co_await HPX_FORWARD(Awaitable, await), fun());
+                {
+                    // clang-format off
+                    co_yield (co_await HPX_FORWARD(Awaitable, await), fun());
+                    // clang-format on
+                }
                 else
+                {
                     co_yield fun(co_await HPX_FORWARD(Awaitable, await));
+                }
             }
             catch (...)
             {
                 eptr = std::current_exception();
             }
+
             co_yield [&]() noexcept -> void {
                 set_error(HPX_FORWARD(Receiver, rcvr),
                     HPX_FORWARD(std::exception_ptr, eptr));
@@ -1256,14 +1292,12 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(Awaitable, await), HPX_FORWARD(Receiver, rcvr));
         }
     } connect_awaitable{};
-
 #endif    // HPX_HAVE_CXX20_COROUTINES
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct connect_t
       : hpx::functional::detail::tag_fallback<connect_t>
     {
 #if defined(HPX_HAVE_CXX20_COROUTINES)
-
         template <typename Sender, typename Receiver,
             typename = std::enable_if_t<
                 hpx::is_invocable_v<connect_awaitable_t, Sender, Receiver> ||
@@ -1295,6 +1329,7 @@ namespace hpx::execution::experimental {
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
     namespace detail {
+
         template <typename PromiseId, typename SenderId>
         struct sender_awaitable
           : sender_awaitable_base<PromiseId,
@@ -1308,6 +1343,7 @@ namespace hpx::execution::experimental {
             using Value = single_sender_value_t<Sender, Env>;
             using Base = sender_awaitable_base<PromiseId, Value>;
             using receiver = typename Base::receiver;
+
             connect_result_t<Sender, receiver> op_state_;
 
         public:
@@ -1325,8 +1361,7 @@ namespace hpx::execution::experimental {
                 start(op_state_);
             }
         };
-    }    // namespace detail
-
+    }     // namespace detail
 #endif    // HPX_HAVE_CXX20_COROUTINES
 
     /// End definitions from coroutine_utils and sender
@@ -1441,14 +1476,12 @@ namespace hpx::execution::experimental {
     // exception_ptr error completion if its not already there, and leaving the
     // other signals alone.
     //
-    //      template <typename... Args>
-    //      using my_set_value_t =
+    //      template <typename... Args> using my_set_value_t =
     //          execution::set_value_t(add_lvalue_reference_t<Args>...);
     //
     //      using my_completion_signals =
     //          execution::make_completion_signatures<
-    //              S, Env,
-    //              execution::completion_signatures<
+    //              S, Env, execution::completion_signatures<
     //                  execution::set_error_t(exception_ptr)>,
     //              my_set_value_t>;
     //
@@ -1497,5 +1530,4 @@ namespace hpx::execution::experimental {
     using make_completion_signatures =
         meta::type<detail::make_helper<Sender, Env, AddlSignatures,
             meta::func<SetValue>, meta::func1<SetError>, SendsStopped>>;
-
 }    // namespace hpx::execution::experimental

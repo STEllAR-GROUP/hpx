@@ -44,9 +44,9 @@
 
 #if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
 
+#include <cstdlib>
 #include <cstring>
 #include <signal.h>
-#include <stdlib.h>
 #include <strings.h>
 
 #if !defined(SEGV_STACK_SIZE)
@@ -72,11 +72,10 @@
 #include <sanitizer/asan_interface.h>
 #endif
 
-// Defining HPX_COROUTINE_NO_SEPARATE_CALL_SITES will disable separate
-// invoke, and yield swap_context functions. Separate calls sites
-// increase performance by 25% at least on P4 for invoke+yield back loops
-// at the cost of a slightly higher instruction cache use and is thus enabled by
-// default.
+// Defining HPX_COROUTINE_NO_SEPARATE_CALL_SITES will disable separate invoke,
+// and yield swap_context functions. Separate calls sites increase performance
+// by 25% at least on P4 for invoke+yield back loops at the cost of a slightly
+// higher instruction cache use and is thus enabled by default.
 
 #if defined(__x86_64__)
 extern "C" void swapcontext_stack(void***, void**) noexcept;
@@ -94,8 +93,9 @@ namespace hpx::threads::coroutines {
 #if defined(HPX_HAVE_STACKOVERFLOW_DETECTION) &&                               \
     !defined(HPX_HAVE_ADDRESS_SANITIZER)
 
-// heuristic value 1 kilobyte
-#define COROUTINE_STACKOVERFLOW_ADDR_EPSILON 1000UL
+    // heuristic value 1 kilobyte
+    inline constexpr std::size_t const coroutine_stackoverflow_addr_epsilon =
+        1000UL;
 
     static inline void check_coroutine_stack_overflow(
         siginfo_t* infoptr, void* ctxptr)
@@ -111,12 +111,11 @@ namespace hpx::threads::coroutines {
             (sigsegv_ptr - stk_ptr) :
             (stk_ptr - sigsegv_ptr);
 
-        // check the stack addresses, if they're < 10 apart, terminate
-        // program should filter segmentation faults caused by
-        // coroutine stack overflows from 'genuine' stack overflows
-        //
+        // check the stack addresses, if they're < 10 apart, terminate program
+        // should filter segmentation faults caused by coroutine stack overflows
+        // from 'genuine' stack overflows
         if (static_cast<size_t>(addr_delta) <
-            COROUTINE_STACKOVERFLOW_ADDR_EPSILON)
+            coroutine_stackoverflow_addr_epsilon)
         {
             std::cerr << "Stack overflow in coroutine at address "
                       << std::internal << std::hex
@@ -125,8 +124,8 @@ namespace hpx::threads::coroutines {
 
             std::cerr
                 << "Configure the hpx runtime to allocate a larger coroutine "
-                   "stack size.\n Use the hpx.stacks.small_size, "
-                   "hpx.stacks.medium_size,\n hpx.stacks.large_size, or "
+                   "stack size.\nUse the hpx.stacks.small_size, "
+                   "hpx.stacks.medium_size,\nhpx.stacks.large_size, or "
                    "hpx.stacks.huge_size configuration\nflags to configure "
                    "coroutine stack sizes.\n"
                 << std::endl;
@@ -143,15 +142,13 @@ namespace hpx::threads::coroutines {
 
         if (diagnostics_on_terminate)
         {
-            int const verbosity = exception_verbosity;
-
-            if (verbosity >= 2)
+            if (exception_verbosity >= 2)
             {
                 std::cerr << full_build_string() << "\n";
             }
 
 #if defined(HPX_HAVE_STACKTRACES)
-            if (verbosity >= 1)
+            if (exception_verbosity >= 1)
             {
                 std::cerr << "{stack-trace}: " << hpx::util::trace(trace_depth)
                           << "\n";
@@ -172,14 +169,14 @@ namespace hpx::threads::coroutines {
     // some platforms need special preparation of the main thread
     struct prepare_main_thread
     {
-        constexpr prepare_main_thread() = default;
+        prepare_main_thread() = default;
     };
 }    // namespace hpx::threads::coroutines
 
 namespace hpx::threads::coroutines::detail::lx {
 
     template <typename T>
-    HPX_FORCEINLINE void trampoline(void* fun)
+    [[noreturn]] void trampoline(void* fun)
     {
         (*static_cast<T*>(fun))();
         std::abort();
@@ -204,9 +201,9 @@ namespace hpx::threads::coroutines::detail::lx {
         void prefetch() const
         {
 #if defined(__x86_64__)
-            HPX_ASSERT(sizeof(void*) == 8);
+            static_assert(sizeof(void*) == 8);
 #else
-            HPX_ASSERT(sizeof(void*) == 4);
+            static_assert(sizeof(void*) == 4);
 #endif
 
             __builtin_prefetch(m_sp, 1, 3);
@@ -231,28 +228,28 @@ namespace hpx::threads::coroutines::detail::lx {
                 static_cast<void**>(m_sp) - 64 / sizeof(void*), 0, 3);
         }
 
-        // Free function. Saves the current context in @p from
-        // and restores the context in @p to.
+        // Free function. Saves the current context in @p from and restores the
+        // context in @p to.
         // @note This function is found by ADL.
         friend void swap_context(x86_linux_context_impl_base& from,
-            x86_linux_context_impl_base const& to, default_hint);
+            x86_linux_context_impl_base const& to, default_hint) noexcept;
 
         friend void swap_context(x86_linux_context_impl_base& from,
-            x86_linux_context_impl_base const& to, yield_hint);
+            x86_linux_context_impl_base const& to, yield_hint) noexcept;
 
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
-        void start_switch_fiber(void** fake_stack)
+        void start_switch_fiber(void** fake_stack) noexcept
         {
             __sanitizer_start_switch_fiber(
                 fake_stack, asan_stack_bottom, asan_stack_size);
         }
         void start_yield_fiber(
-            void** fake_stack, x86_linux_context_impl_base& caller)
+            void** fake_stack, x86_linux_context_impl_base& caller) noexcept
         {
             __sanitizer_start_switch_fiber(
                 fake_stack, caller.asan_stack_bottom, caller.asan_stack_size);
         }
-        void finish_yield_fiber(void* fake_stack)
+        void finish_yield_fiber(void* fake_stack) noexcept
         {
             __sanitizer_finish_switch_fiber(
                 fake_stack, &asan_stack_bottom, &asan_stack_size);
@@ -280,12 +277,10 @@ namespace hpx::threads::coroutines::detail::lx {
     class x86_linux_context_impl : public x86_linux_context_impl_base
     {
     public:
-        enum
-        {
-            default_stack_size = 4 * EXEC_PAGESIZE
-        };
+        static constexpr std::size_t const default_stack_size =
+            4 * EXEC_PAGESIZE;
 
-        typedef x86_linux_context_impl_base context_impl_base;
+        using context_impl_base = x86_linux_context_impl_base;
 
         // Create a context that on restore invokes Functor on
         //  a new stack. The stack size can be optionally specified.
@@ -326,8 +321,8 @@ namespace hpx::threads::coroutines::detail::lx {
             posix::watermark_stack(
                 m_stack, static_cast<std::size_t>(m_stack_size));
 
-            typedef void fun(void*);
-            fun* funp = trampoline<CoroutineImpl>;
+            using fun_type = void(void*);
+            fun_type* funp = trampoline<CoroutineImpl>;
 
             m_sp = (static_cast<void**>(m_stack) +
                        static_cast<std::size_t>(m_stack_size) / sizeof(void*)) -
@@ -345,7 +340,7 @@ namespace hpx::threads::coroutines::detail::lx {
 #endif
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
             asan_stack_size = m_stack_size;
-            asan_stack_bottom = const_cast<const void*>(m_stack);
+            asan_stack_bottom = const_cast<void const*>(m_stack);
 #endif
 
             set_sigsegv_handler();
@@ -400,11 +395,11 @@ namespace hpx::threads::coroutines::detail::lx {
             m_sp[funp_idx] = reinterpret_cast<void*>(funp);
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
             asan_stack_size = m_stack_size;
-            asan_stack_bottom = const_cast<const void*>(m_stack);
+            asan_stack_bottom = const_cast<void const*>(m_stack);
 #endif
         }
 
-        std::ptrdiff_t get_available_stack_space()
+        std::ptrdiff_t get_available_stack_space() const noexcept
         {
             return get_stack_ptr() - reinterpret_cast<std::size_t>(m_stack) -
                 context_size;
@@ -414,35 +409,35 @@ namespace hpx::threads::coroutines::detail::lx {
 
 #if defined(HPX_HAVE_COROUTINE_COUNTERS)
     private:
-        static counter_type& get_stack_unbind_counter()
+        static counter_type& get_stack_unbind_counter() noexcept
         {
             static counter_type counter(0);
             return counter;
         }
 
-        static counter_type& get_stack_recycle_counter()
+        static counter_type& get_stack_recycle_counter() noexcept
         {
             static counter_type counter(0);
             return counter;
         }
 
-        static std::uint64_t increment_stack_unbind_count()
+        static std::uint64_t increment_stack_unbind_count() noexcept
         {
             return ++get_stack_unbind_counter();
         }
 
-        static std::uint64_t increment_stack_recycle_count()
+        static std::uint64_t increment_stack_recycle_count() noexcept
         {
             return ++get_stack_recycle_counter();
         }
 
     public:
-        static std::uint64_t get_stack_unbind_count(bool reset)
+        static std::uint64_t get_stack_unbind_count(bool reset) noexcept
         {
             return util::get_and_reset_value(get_stack_unbind_counter(), reset);
         }
 
-        static std::uint64_t get_stack_recycle_count(bool reset)
+        static std::uint64_t get_stack_recycle_count(bool reset) noexcept
         {
             return util::get_and_reset_value(
                 get_stack_recycle_counter(), reset);
@@ -450,10 +445,10 @@ namespace hpx::threads::coroutines::detail::lx {
 #endif
 
         friend void swap_context(x86_linux_context_impl_base& from,
-            x86_linux_context_impl_base const& to, default_hint);
+            x86_linux_context_impl_base const& to, default_hint) noexcept;
 
         friend void swap_context(x86_linux_context_impl_base& from,
-            x86_linux_context_impl_base const& to, yield_hint);
+            x86_linux_context_impl_base const& to, yield_hint) noexcept;
 
     private:
         void set_sigsegv_handler()
@@ -465,18 +460,21 @@ namespace hpx::threads::coroutines::detail::lx {
             // https://rethinkdb.com/blog/handling-stack-overflow-on-custom-stacks/
             // http://www.evanjones.ca/software/threading.html
             //
-            segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
-            segv_stack.ss_flags = 0;
-            segv_stack.ss_size = SEGV_STACK_SIZE;
+            if (register_signal_handler)
+            {
+                segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
+                segv_stack.ss_flags = 0;
+                segv_stack.ss_size = SEGV_STACK_SIZE;
 
-            std::memset(&action, '\0', sizeof(action));
-            action.sa_flags = SA_SIGINFO | SA_ONSTACK;
-            action.sa_sigaction = &sigsegv_handler;
+                std::memset(&action, '\0', sizeof(action));
+                action.sa_flags = SA_SIGINFO | SA_ONSTACK;
+                action.sa_sigaction = &sigsegv_handler;
 
-            sigaltstack(&segv_stack, nullptr);
-            sigemptyset(&action.sa_mask);
-            sigaddset(&action.sa_mask, SIGSEGV);
-            sigaction(SIGSEGV, &action, nullptr);
+                sigaltstack(&segv_stack, nullptr);
+                sigemptyset(&action.sa_mask);
+                sigaddset(&action.sa_mask, SIGSEGV);
+                sigaction(SIGSEGV, &action, nullptr);
+            }
 #endif
         }
 
@@ -495,12 +493,12 @@ namespace hpx::threads::coroutines::detail::lx {
         // 1:  r14
         // 0:  r15
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
-        static const std::size_t valgrind_id_idx = 11;
+        static constexpr std::size_t const valgrind_id_idx = 11;
 #endif
 
-        static const std::size_t context_size = 12;
-        static const std::size_t cb_idx = 10;
-        static const std::size_t funp_idx = 8;
+        static constexpr std::size_t const context_size = 12;
+        static constexpr std::size_t const cb_idx = 10;
+        static constexpr std::size_t const funp_idx = 8;
 #else
         // structure of context_data:
         // 7: valgrind_id (if enabled)
@@ -512,11 +510,11 @@ namespace hpx::threads::coroutines::detail::lx {
         // 1: esi
         // 0: edi
 #if defined(HPX_HAVE_VALGRIND) && !defined(NVALGRIND)
-        static const std::size_t valgrind_id_idx = 7;
+        static constexpr std::size_t const valgrind_id_idx = 7;
 #endif
-        static const std::size_t context_size = 8;
-        static const std::size_t cb_idx = 6;
-        static const std::size_t funp_idx = 4;
+        static constexpr std::size_t const context_size = 8;
+        static constexpr std::size_t const cb_idx = 6;
+        static constexpr std::size_t const funp_idx = 4;
 #endif
 
         std::ptrdiff_t m_stack_size;
@@ -533,7 +531,7 @@ namespace hpx::threads::coroutines::detail::lx {
     // and restores the context in @p to.
     // @note This function is found by ADL.
     inline void swap_context(x86_linux_context_impl_base& from,
-        x86_linux_context_impl_base const& to, default_hint)
+        x86_linux_context_impl_base const& to, default_hint) noexcept
     {
         // HPX_ASSERT(*(void**)to.m_stack == (void*)~0);
         to.prefetch();
@@ -541,7 +539,7 @@ namespace hpx::threads::coroutines::detail::lx {
     }
 
     inline void swap_context(x86_linux_context_impl_base& from,
-        x86_linux_context_impl_base const& to, yield_hint)
+        x86_linux_context_impl_base const& to, yield_hint) noexcept
     {
         // HPX_ASSERT(*(void**)from.m_stack == (void*)~0);
         to.prefetch();

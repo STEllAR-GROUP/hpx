@@ -11,7 +11,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     // hpx::util::nonesuch is a class type used by hpx::util::detected_t to
     // indicate detection failure.
     struct nonesuch
@@ -24,6 +25,7 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Default, typename AlwaysVoid,
             template <typename...> class Op, typename... Args>
         struct detector
@@ -64,8 +66,8 @@ namespace hpx { namespace util {
     //
     // - If the template-id Op<Args...> is valid, then value_t is an alias for
     //   std::true_type, and type is an alias for Op<Args...>;
-    // - Otherwise, value_t is an alias for std::false_type and type is an
-    //   alias for Default.
+    // - Otherwise, value_t is an alias for std::false_type and type is an alias
+    //   for Default.
     template <typename Default, template <typename...> class Op,
         typename... Args>
     using detected_or = detail::detector<Default, void, Op, Args...>;
@@ -85,4 +87,4 @@ namespace hpx { namespace util {
     template <typename To, template <typename...> class Op, typename... Args>
     using is_detected_convertible =
         std::is_convertible<detected_t<Op, Args...>, To>;
-}}    // namespace hpx::util
+}    // namespace hpx::util

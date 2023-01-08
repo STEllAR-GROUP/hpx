@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,9 +10,10 @@
 #include <cstdint>
 #include <vector>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     // helper function for counter evaluation
-    inline std::uint64_t get_and_reset_value(
+    inline constexpr std::uint64_t get_and_reset_value(
         std::uint64_t& value, bool reset) noexcept
     {
         std::uint64_t result = value;
@@ -21,7 +22,7 @@ namespace hpx { namespace util {
         return result;
     }
 
-    inline std::int64_t get_and_reset_value(
+    inline constexpr std::int64_t get_and_reset_value(
         std::int64_t& value, bool reset) noexcept
     {
         std::int64_t result = value;
@@ -47,4 +48,4 @@ namespace hpx { namespace util {
 
         return result;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

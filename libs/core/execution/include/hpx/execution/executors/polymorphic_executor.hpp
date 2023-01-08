@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@
 #include <hpx/functional/move_only_function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/thread_support.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -269,7 +270,7 @@ namespace hpx { namespace parallel { namespace execution {
                     get<T>(storage).~T();
 
                 void* buffer = allocate<T>(storage, storage_size);
-                return ::new (buffer) T(get<T>(src));
+                return hpx::construct_at(static_cast<T*>(buffer), get<T>(src));
             }
             void* (*copy)(void*, std::size_t, void const*, bool);
 
@@ -755,7 +756,8 @@ namespace hpx { namespace parallel { namespace execution {
                     buffer = vtable::template allocate<T>(
                         storage, detail::polymorphic_executor_storage_size);
                 }
-                object = ::new (buffer) T(HPX_FORWARD(Exec, exec));
+                object = hpx::construct_at(
+                    static_cast<T*>(buffer), HPX_FORWARD(Exec, exec));
             }
             else
             {

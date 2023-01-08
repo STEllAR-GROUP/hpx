@@ -19,9 +19,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
+
         template <typename T, typename Enable = void>
         struct from_string
         {
@@ -128,7 +129,7 @@ namespace hpx { namespace util {
             static void call(std::basic_string<Char> const& value, U& target)
             {
                 using promoted_t = decltype(+std::declval<U>());
-                static_assert(!std::is_same<promoted_t, U>::value, "");
+                static_assert(!std::is_same_v<promoted_t, U>);
 
                 promoted_t promoted;
                 call(value, promoted);
@@ -228,5 +229,4 @@ namespace hpx { namespace util {
             return HPX_FORWARD(U, default_value);
         }
     }
-
-}}    // namespace hpx::util
+}    // namespace hpx::util

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,7 @@
 #include <hpx/functional/move_only_function.hpp>
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/modules/itt_notify.hpp>
-#include <hpx/modules/logging.hpp>
+#include <hpx/thread_pools/detail/scheduling_log.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>
@@ -33,47 +33,19 @@
 #include <memory>
 #include <utility>
 
-namespace hpx { namespace threads { namespace detail {
-
-    ///////////////////////////////////////////////////////////////////////
-    inline void write_state_log(policies::scheduler_base const& scheduler,
-        std::size_t num_thread, thread_id_ref_type const& thrd,
-        thread_schedule_state const old_state,
-        thread_schedule_state const new_state)
-    {
-        LTM_(debug).format("scheduling_loop state change: pool({}), "
-                           "scheduler({}), worker_thread({}), thread({}), "
-                           "description({}), old state({}), new state({})",
-            *scheduler.get_parent_pool(), scheduler, num_thread,
-            get_thread_id_data(thrd),
-            get_thread_id_data(thrd)->get_description(),
-            get_thread_state_name(old_state), get_thread_state_name(new_state));
-    }
-
-    inline void write_state_log_warning(
-        policies::scheduler_base const& scheduler, std::size_t num_thread,
-        thread_id_ref_type const& thrd, thread_schedule_state state,
-        char const* info)
-    {
-        LTM_(warning).format("scheduling_loop state change failed: pool({}), "
-                             "scheduler({}), worker thread ({}), thread({}), "
-                             "description({}), state({}), {}",
-            *scheduler.get_parent_pool(), scheduler, num_thread,
-            get_thread_id_data(thrd)->get_thread_id(),
-            get_thread_id_data(thrd)->get_description(),
-            get_thread_state_name(state), info);
-    }
+namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////
     // helper class for switching thread state in and out during execution
     class switch_status
     {
     public:
-        switch_status(thread_id_ref_type const& t, thread_state prev_state)
-          : thread_(t)
+        switch_status(
+            thread_id_ref_type const& t, thread_state prev_state) noexcept
+          : thread_(get_thread_id_data(t))
           , prev_state_(prev_state)
           , next_thread_id_(nullptr)
-          , need_restore_state_(get_thread_id_data(thread_)->set_state_tagged(
+          , need_restore_state_(thread_->set_state_tagged(
                 thread_schedule_state::active, prev_state_, orig_state_))
         {
         }
@@ -86,39 +58,40 @@ namespace hpx { namespace threads { namespace detail {
             }
         }
 
-        bool is_valid() const
+        constexpr bool is_valid() const noexcept
         {
             return need_restore_state_;
         }
 
         // allow to change the state the thread will be switched to after
         // execution
-        thread_state operator=(thread_result_type&& new_state)
+        thread_state operator=(thread_result_type&& new_state) noexcept
         {
             prev_state_ = thread_state(
                 new_state.first, prev_state_.state_ex(), prev_state_.tag() + 1);
-            next_thread_id_ = HPX_MOVE(new_state.second);
+            if (new_state.second != nullptr)
+            {
+                next_thread_id_ = HPX_MOVE(new_state.second);
+            }
             return prev_state_;
         }
 
         // Get the state this thread was in before execution (usually pending),
-        // this helps making sure no other worker-thread is started to execute this
-        // HPX-thread in the meantime.
-        thread_schedule_state get_previous() const
+        // this helps making sure no other worker-thread is started to execute
+        // this HPX-thread in the meantime.
+        thread_schedule_state get_previous() const noexcept
         {
             return prev_state_.state();
         }
 
-        // This restores the previous state, while making sure that the
-        // original state has not been changed since we started executing this
-        // thread. The function returns true if the state has been set, false
-        // otherwise.
-        bool store_state(thread_state& newstate)
+        // This restores the previous state, while making sure that the original
+        // state has not been changed since we started executing this thread.
+        // The function returns true if the state has been set, false otherwise.
+        bool store_state(thread_state& newstate) noexcept
         {
             disable_restore();
 
-            if (get_thread_id_data(thread_)->restore_state(
-                    prev_state_, orig_state_))
+            if (thread_->restore_state(prev_state_, orig_state_))
             {
                 newstate = prev_state_;
                 return true;
@@ -127,23 +100,23 @@ namespace hpx { namespace threads { namespace detail {
         }
 
         // disable default handling in destructor
-        void disable_restore()
+        void disable_restore() noexcept
         {
             need_restore_state_ = false;
         }
 
-        thread_id_ref_type const& get_next_thread() const
+        constexpr thread_id_ref_type const& get_next_thread() const noexcept
         {
             return next_thread_id_;
         }
 
-        thread_id_ref_type move_next_thread()
+        thread_id_ref_type move_next_thread() noexcept
         {
             return HPX_MOVE(next_thread_id_);
         }
 
     private:
-        thread_id_ref_type const& thread_;
+        thread_data* thread_;
         thread_state prev_state_;
         thread_state orig_state_;
         thread_id_ref_type next_thread_id_;
@@ -154,13 +127,13 @@ namespace hpx { namespace threads { namespace detail {
     {
     public:
         switch_status_background(
-            thread_id_ref_type const& t, thread_state prev_state)
-          : thread_(t)
+            thread_id_ref_type const& t, thread_state prev_state) noexcept
+          : thread_(get_thread_id_data(t))
           , prev_state_(prev_state)
           , next_thread_id_(nullptr)
-          , need_restore_state_(get_thread_id_data(thread_)->set_state_tagged(
-                thread_schedule_state::active, prev_state_, orig_state_,
-                std::memory_order_relaxed))
+          , need_restore_state_(
+                thread_->set_state_tagged(thread_schedule_state::active,
+                    prev_state_, orig_state_, std::memory_order_relaxed))
         {
         }
 
@@ -172,39 +145,39 @@ namespace hpx { namespace threads { namespace detail {
             }
         }
 
-        bool is_valid() const
+        constexpr bool is_valid() const noexcept
         {
             return need_restore_state_;
         }
 
         // allow to change the state the thread will be switched to after
         // execution
-        thread_state operator=(thread_result_type&& new_state)
+        thread_state operator=(thread_result_type&& new_state) noexcept
         {
             prev_state_ = thread_state(
                 new_state.first, prev_state_.state_ex(), prev_state_.tag() + 1);
-            next_thread_id_ = HPX_MOVE(new_state.second);
+            if (new_state.second != nullptr)
+            {
+                next_thread_id_ = HPX_MOVE(new_state.second);
+            }
             return prev_state_;
         }
 
         // Get the state this thread was in before execution (usually pending),
-        // this helps making sure no other worker-thread is started to execute this
-        // HPX-thread in the meantime.
-        thread_schedule_state get_previous() const
+        // this helps making sure no other worker-thread is started to execute
+        // this HPX-thread in the meantime.
+        thread_schedule_state get_previous() const noexcept
         {
             return prev_state_.state();
         }
 
-        // This restores the previous state, while making sure that the
-        // original state has not been changed since we started executing this
-        // thread. The function returns true if the state has been set, false
-        // otherwise.
-        bool store_state(thread_state& newstate)
+        // This restores the previous state, while making sure that the original
+        // state has not been changed since we started executing this thread.
+        // The function returns true if the state has been set, false otherwise.
+        bool store_state(thread_state& newstate) noexcept
         {
             disable_restore();
-            if (get_thread_id_data(thread_)->restore_state(prev_state_,
-                    orig_state_, std::memory_order_relaxed,
-                    std::memory_order_relaxed))
+            if (thread_->restore_state(prev_state_, orig_state_))
             {
                 newstate = prev_state_;
                 return true;
@@ -213,23 +186,23 @@ namespace hpx { namespace threads { namespace detail {
         }
 
         // disable default handling in destructor
-        void disable_restore()
+        void disable_restore() noexcept
         {
             need_restore_state_ = false;
         }
 
-        thread_id_ref_type const& get_next_thread() const
+        constexpr thread_id_ref_type const& get_next_thread() const noexcept
         {
             return next_thread_id_;
         }
 
-        thread_id_ref_type move_next_thread()
+        thread_id_ref_type move_next_thread() noexcept
         {
             return HPX_MOVE(next_thread_id_);
         }
 
     private:
-        thread_id_ref_type const& thread_;
+        thread_data* thread_;
         thread_state prev_state_;
         thread_state orig_state_;
         thread_id_ref_type next_thread_id_;
@@ -239,18 +212,20 @@ namespace hpx { namespace threads { namespace detail {
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
     struct idle_collect_rate
     {
-        idle_collect_rate(std::int64_t& tfunc_time, std::int64_t& exec_time)
+        idle_collect_rate(
+            std::int64_t& tfunc_time, std::int64_t& exec_time) noexcept
           : start_timestamp_(util::hardware::timestamp())
           , tfunc_time_(tfunc_time)
           , exec_time_(exec_time)
         {
         }
 
-        void collect_exec_time(std::int64_t timestamp)
+        void collect_exec_time(std::int64_t timestamp) noexcept
         {
             exec_time_ += util::hardware::timestamp() - timestamp;
         }
-        void take_snapshot()
+
+        void take_snapshot() noexcept
         {
             if (tfunc_time_ == std::int64_t(-1))
             {
@@ -272,7 +247,7 @@ namespace hpx { namespace threads { namespace detail {
 
     struct exec_time_wrapper
     {
-        exec_time_wrapper(idle_collect_rate& idle_rate)
+        explicit exec_time_wrapper(idle_collect_rate& idle_rate) noexcept
           : timestamp_(util::hardware::timestamp())
           , idle_rate_(idle_rate)
         {
@@ -288,7 +263,8 @@ namespace hpx { namespace threads { namespace detail {
 
     struct tfunc_time_wrapper
     {
-        tfunc_time_wrapper(idle_collect_rate& idle_rate)
+        explicit constexpr tfunc_time_wrapper(
+            idle_collect_rate& idle_rate) noexcept
           : idle_rate_(idle_rate)
         {
         }
@@ -302,24 +278,27 @@ namespace hpx { namespace threads { namespace detail {
 #else
     struct idle_collect_rate
     {
-        idle_collect_rate(std::int64_t&, std::int64_t&) {}
+        explicit constexpr idle_collect_rate(
+            std::int64_t&, std::int64_t&) noexcept
+        {
+        }
     };
 
     struct exec_time_wrapper
     {
-        exec_time_wrapper(idle_collect_rate&) {}
+        explicit constexpr exec_time_wrapper(idle_collect_rate&) noexcept {}
     };
 
     struct tfunc_time_wrapper
     {
-        tfunc_time_wrapper(idle_collect_rate&) {}
+        explicit constexpr tfunc_time_wrapper(idle_collect_rate&) noexcept {}
     };
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
     struct is_active_wrapper
     {
-        is_active_wrapper(bool& is_active)
+        explicit is_active_wrapper(bool& is_active) noexcept
           : is_active_(is_active)
         {
             is_active = true;
@@ -343,7 +322,7 @@ namespace hpx { namespace threads { namespace detail {
             std::int64_t& busy_loop_count, bool& is_active,
             std::int64_t& background_work_duration,
             std::int64_t& background_send_duration,
-            std::int64_t& background_receive_duration)
+            std::int64_t& background_receive_duration) noexcept
           : executed_threads_(executed_threads)
           , executed_thread_phases_(executed_thread_phases)
           , tfunc_time_(tfunc_time)
@@ -374,7 +353,7 @@ namespace hpx { namespace threads { namespace detail {
         scheduling_counters(std::int64_t& executed_threads,
             std::int64_t& executed_thread_phases, std::int64_t& tfunc_time,
             std::int64_t& exec_time, std::int64_t& idle_loop_count,
-            std::int64_t& busy_loop_count, bool& is_active)
+            std::int64_t& busy_loop_count, bool& is_active) noexcept
           : executed_threads_(executed_threads)
           , executed_thread_phases_(executed_thread_phases)
           , tfunc_time_(tfunc_time)
@@ -442,8 +421,8 @@ namespace hpx { namespace threads { namespace detail {
                     if (callbacks.background_())
                     {
                         // we only update the idle_loop_count if
-                        // background_running is true. If it was false, this task
-                        // was given back to the scheduler.
+                        // background_running is true. If it was false, this
+                        // task was given back to the scheduler.
                         if (*background_running)
                             idle_loop_count = 0;
                     }
@@ -454,7 +433,7 @@ namespace hpx { namespace threads { namespace detail {
                 return thread_result_type(
                     thread_schedule_state::terminated, invalid_thread_id);
             },
-            hpx::util::thread_description("background_work"),
+            hpx::threads::thread_description("background_work"),
             thread_priority::high_recursive, schedulehint,
             thread_stacksize::large,
             // Create in suspended to prevent the thread from being scheduled
@@ -472,12 +451,12 @@ namespace hpx { namespace threads { namespace detail {
     }
 
     // This function tries to invoke the background work thread. It returns
-    // false when we need to give the background thread back to scheduler
-    // and create a new one that is supposed to be executed inside the
+    // false when we need to give the background thread back to scheduler and
+    // create a new one that is supposed to be executed inside the
     // scheduling_loop, true otherwise
-    template <typename SchedulingPolicy>
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
+    template <typename SchedulingPolicy>
     bool call_background_thread(thread_id_ref_type& background_thread,
         thread_id_ref_type& next_thrd, SchedulingPolicy& scheduler,
         std::size_t num_thread, bool /* running */,
@@ -485,6 +464,7 @@ namespace hpx { namespace threads { namespace detail {
         hpx::execution_base::this_thread::detail::agent_storage*
             context_storage)
 #else
+    template <typename SchedulingPolicy>
     bool call_background_thread(thread_id_ref_type& background_thread,
         thread_id_ref_type& next_thrd, SchedulingPolicy& scheduler,
         std::size_t num_thread, bool /* running */,
@@ -596,7 +576,7 @@ namespace hpx { namespace threads { namespace detail {
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
         idle_collect_rate idle_rate(counters.tfunc_time_, counters.exec_time_);
-        tfunc_time_wrapper tfunc_time_collector(idle_rate);
+        [[maybe_unused]] tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
         // spin for some time after queues have become empty
         bool may_exit = false;
@@ -650,7 +630,8 @@ namespace hpx { namespace threads { namespace detail {
                     scheduler.SchedulingPolicy::get_next_thread(
                         num_thread, running, thrd, enable_stealing)))
             {
-                tfunc_time_wrapper tfunc_time_collector(idle_rate);
+                [[maybe_unused]] tfunc_time_wrapper tfunc_time_collector(
+                    idle_rate);
                 HPX_ASSERT(get_thread_id_data(thrd)->get_scheduler_base() ==
                     &scheduler);
 
@@ -659,16 +640,16 @@ namespace hpx { namespace threads { namespace detail {
 
                 may_exit = false;
 
-                // Only pending HPX threads will be executed.
-                // Any non-pending HPX threads are leftovers from a set_state()
-                // call for a previously pending HPX thread (see comments above).
+                // Only pending HPX threads will be executed. Any non-pending
+                // HPX threads are leftovers from a set_state() call for a
+                // previously pending HPX thread (see comments above).
                 thread_state state = get_thread_id_data(thrd)->get_state();
                 thread_schedule_state state_val = state.state();
 
                 if (HPX_LIKELY(thread_schedule_state::pending == state_val))
                 {
-                    // switch the state of the thread to active and back to
-                    // what the thread reports as its return value
+                    // switch the state of the thread to active and back to what
+                    // the thread reports as its return value
 
                     {
                         // tries to set state to active (only if state is still
@@ -682,10 +663,11 @@ namespace hpx { namespace threads { namespace detail {
                                 thrd_stat.get_previous(),
                                 thread_schedule_state::active);
 
-                            tfunc_time_wrapper tfunc_time_collector(idle_rate);
+                            [[maybe_unused]] tfunc_time_wrapper
+                                tfunc_time_collector(idle_rate);
 
-                            // thread returns new required state
-                            // store the returned state in the thread
+                            // thread returns new required state store the
+                            // returned state in the thread
                             {
                                 is_active_wrapper utilization(
                                     counters.is_active_);
@@ -702,16 +684,16 @@ namespace hpx { namespace threads { namespace detail {
 #endif
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.
-                                exec_time_wrapper exec_time_collector(
-                                    idle_rate);
+                                [[maybe_unused]] exec_time_wrapper
+                                    exec_time_collector(idle_rate);
 
 #if defined(HPX_HAVE_APEX)
-                                // get the APEX data pointer, in case we are resuming the
-                                // thread and have to restore any leaf timers from
-                                // direct actions, etc.
+                                // get the APEX data pointer, in case we are
+                                // resuming the thread and have to restore any
+                                // leaf timers from direct actions, etc.
 
-                                // the address of tmp_data is getting stored
-                                // by APEX during this call
+                                // the address of tmp_data is getting stored by
+                                // APEX during this call
                                 util::external_timer::scoped_timer profiler(
                                     thrdptr->get_timer_data());
 
@@ -743,9 +725,9 @@ namespace hpx { namespace threads { namespace detail {
                         }
                         else
                         {
-                            // some other worker-thread got in between and started
-                            // executing this HPX-thread, we just continue with
-                            // the next one
+                            // some other worker-thread got in between and
+                            // started executing this HPX-thread, we just
+                            // continue with the next one
                             thrd_stat.disable_restore();
                             detail::write_state_log_warning(scheduler,
                                 num_thread, thrd, state_val, "no execution");
@@ -755,9 +737,9 @@ namespace hpx { namespace threads { namespace detail {
                         // store and retrieve the new state in the thread
                         if (HPX_UNLIKELY(!thrd_stat.store_state(state)))
                         {
-                            // some other worker-thread got in between and changed
-                            // the state of this thread, we just continue with
-                            // the next one
+                            // some other worker-thread got in between and
+                            // changed the state of this thread, we just
+                            // continue with the next one
                             detail::write_state_log_warning(scheduler,
                                 num_thread, thrd, state_val, "no state change");
                             continue;
@@ -773,9 +755,9 @@ namespace hpx { namespace threads { namespace detail {
                         next_thrd = thrd_stat.move_next_thread();
                     }
 
-                    // Re-add this work item to our list of work items if the HPX
-                    // thread should be re-scheduled. If the HPX thread is suspended
-                    // now we just keep it in the map of threads.
+                    // Re-add this work item to our list of work items if the
+                    // HPX thread should be re-scheduled. If the HPX thread is
+                    // suspended now we just keep it in the map of threads.
                     if (HPX_UNLIKELY(
                             state_val == thread_schedule_state::pending))
                     {
@@ -846,17 +828,13 @@ namespace hpx { namespace threads { namespace detail {
                 else if (HPX_UNLIKELY(
                              thread_schedule_state::active == state_val))
                 {
-                    auto* thrdptr = get_thread_id_data(thrd);
-                    LTM_(warning).format("pool({}), scheduler({}), "
-                                         "worker_thread({}), thread({}), "
-                                         "description({}), rescheduling",
-                        *scheduler.get_parent_pool(), scheduler, num_thread,
-                        thrdptr->get_thread_id(), thrdptr->get_description());
+                    write_rescheduling_log_warning(scheduler, num_thread, thrd);
 
-                    // re-schedule thread, if it is still marked as active
-                    // this might happen, if some thread has been added to the
+                    // re-schedule thread, if it is still marked as active this
+                    // might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset
                     // yet
+                    auto* thrdptr = get_thread_id_data(thrd);
                     auto priority = thrdptr->get_priority();
                     scheduler.SchedulingPolicy::schedule_thread(HPX_MOVE(thrd),
                         threads::thread_schedule_hint(
@@ -866,8 +844,8 @@ namespace hpx { namespace threads { namespace detail {
                 }
 
                 // Remove the mapping from thread_map_ if HPX thread is depleted
-                // or terminated, this will delete the HPX thread.
-                // REVIEW: what has to be done with depleted HPX threads?
+                // or terminated, this will delete the HPX thread. REVIEW: what
+                // has to be done with depleted HPX threads?
                 if (HPX_LIKELY(state_val == thread_schedule_state::depleted ||
                         state_val == thread_schedule_state::terminated))
                 {
@@ -894,7 +872,8 @@ namespace hpx { namespace threads { namespace detail {
                         scheduler.SchedulingPolicy::get_queue_length(
                             num_thread) == 0;
 
-                    if (this_state.load() == hpx::state::pre_sleep)
+                    if (this_state.load(std::memory_order_relaxed) ==
+                        hpx::state::pre_sleep)
                     {
                         if (can_exit)
                         {
@@ -913,7 +892,8 @@ namespace hpx { namespace threads { namespace detail {
                             if (!scheduler.SchedulingPolicy::has_scheduler_mode(
                                     policies::scheduler_mode::delay_exit))
                             {
-                                // If this is an inner scheduler, try to exit immediately
+                                // If this is an inner scheduler, try to exit
+                                // immediately
                                 if (background_thread != nullptr)
                                 {
                                     HPX_ASSERT(background_running);
@@ -973,8 +953,8 @@ namespace hpx { namespace threads { namespace detail {
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
                 {
                     // Let the current background thread terminate as soon as
-                    // possible. No need to reschedule, as another LCO will
-                    // set it to pending and schedule it back eventually
+                    // possible. No need to reschedule, as another LCO will set
+                    // it to pending and schedule it back eventually
                     HPX_ASSERT(background_thread);
                     HPX_ASSERT(background_running);
                     *background_running = false;
@@ -1005,8 +985,11 @@ namespace hpx { namespace threads { namespace detail {
             }
 
             // something went badly wrong, give up
-            if (HPX_UNLIKELY(this_state.load() == hpx::state::terminating))
+            if (HPX_UNLIKELY(this_state.load(std::memory_order_relaxed) ==
+                    hpx::state::terminating))
+            {
                 break;
+            }
 
             if (busy_loop_count > params.max_busy_loop_count_)
             {
@@ -1024,17 +1007,17 @@ namespace hpx { namespace threads { namespace detail {
                         scheduler, num_thread, running, context_storage))
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
                 {
-                    // Let the current background thread terminate as soon
-                    // as possible. No need to reschedule, as another LCO
-                    // will set it to pending and schedule it back eventually
+                    // Let the current background thread terminate as soon as
+                    // possible. No need to reschedule, as another LCO will set
+                    // it to pending and schedule it back eventually
                     HPX_ASSERT(background_thread);
                     HPX_ASSERT(background_running);
                     *background_running = false;
                     scheduler
                         .SchedulingPolicy::decrement_background_thread_count();
-                    // Create a new one which will replace the current such
-                    // we avoid deadlock situations, if all background
-                    // threads are blocked.
+                    // Create a new one which will replace the current such we
+                    // avoid deadlock situations, if all background threads are
+                    // blocked.
                     background_thread = create_background_thread(scheduler,
                         params, background_running,
                         thread_schedule_hint(
@@ -1058,7 +1041,8 @@ namespace hpx { namespace threads { namespace detail {
                 // break if we were idling after 'may_exit'
                 if (may_exit)
                 {
-                    HPX_ASSERT(this_state.load() != hpx::state::pre_sleep);
+                    HPX_ASSERT(this_state.load(std::memory_order_relaxed) !=
+                        hpx::state::pre_sleep);
 
                     if (background_thread)
                     {
@@ -1106,7 +1090,7 @@ namespace hpx { namespace threads { namespace detail {
             }
         }
     }
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail
 
 // NOTE: This line only exists to please doxygen. Without the line doxygen
 // generates incomplete xml output.

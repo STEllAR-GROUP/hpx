@@ -23,7 +23,7 @@
 #include <hpx/hardware/timestamp/cuda.hpp>
 #endif
 
-namespace hpx { namespace util { namespace hardware {
+namespace hpx::util::hardware {
 
     HPX_HOST_DEVICE inline std::uint64_t timestamp()
     {
@@ -33,7 +33,6 @@ namespace hpx { namespace util { namespace hardware {
         return GetTimeBase();
 #endif
     }
-
-}}}    // namespace hpx::util::hardware
+}    // namespace hpx::util::hardware
 
 #endif

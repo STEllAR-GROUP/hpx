@@ -11,7 +11,3 @@
 #include <hpx/synchronization/once.hpp>
 #include <hpx/synchronization/recursive_mutex.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-
-namespace hpx {
-    using hpx::util::unlock_guard;
-}    // namespace hpx

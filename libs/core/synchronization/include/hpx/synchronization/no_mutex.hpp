@@ -12,9 +12,9 @@
 
 namespace hpx {
 
-    /// \brief \c no_mutex class can be used in cases where the shared data between
-    ///        multiple threads can be accessed simultaneously without causing
-    ///        inconsistencies.
+    /// \c no_mutex class can be used in cases where the shared data between
+    /// multiple threads can be accessed simultaneously without causing
+    /// inconsistencies.
     struct no_mutex
     {
         constexpr void lock() noexcept {}

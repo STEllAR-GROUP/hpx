@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,7 @@
 #include <cstdint>
 #include <ostream>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
     // clang-format off
@@ -66,7 +66,7 @@ namespace hpx { namespace threads {
     ///
     /// \param state this represents the thread state.
     HPX_CORE_EXPORT char const* get_thread_state_name(
-        thread_schedule_state state);
+        thread_schedule_state state) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     // clang-format off
@@ -120,7 +120,7 @@ namespace hpx { namespace threads {
     ///
     /// \param this represents the thread priority.
     HPX_CORE_EXPORT char const* get_thread_priority_name(
-        thread_priority priority);
+        thread_priority priority) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \enum thread_restart_state
@@ -131,8 +131,7 @@ namespace hpx { namespace threads {
     {
         unknown = 0,
         signaled = 1,     ///< The thread has been signaled
-        timeout = 2,      ///< The thread has been reactivated after a
-                          ///< timeout
+        timeout = 2,      ///< The thread has been reactivated after a timeout
         terminate = 3,    ///< The thread needs to be terminated
         abort = 4         ///< The thread needs to be aborted
     };
@@ -143,7 +142,7 @@ namespace hpx { namespace threads {
     /// Get the readable string representing the name of the given
     /// thread_restart_state constant.
     HPX_CORE_EXPORT char const* get_thread_state_ex_name(
-        thread_restart_state state);
+        thread_restart_state state) noexcept;
 
     /// \cond NOINTERNAL
     // special type storing both state in one tagged structure
@@ -154,7 +153,8 @@ namespace hpx { namespace threads {
 
     /// Get the readable string representing the name of the given
     /// thread_state constant.
-    HPX_CORE_EXPORT char const* get_thread_state_name(thread_state state);
+    HPX_CORE_EXPORT char const* get_thread_state_name(
+        thread_state state) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \enum thread_stacksize
@@ -165,7 +165,7 @@ namespace hpx { namespace threads {
     {
         unknown = -1,
         small_ = 1,     ///< use small stack size (the underscore is to work
-                        ///  around small being defined to char on Windows)
+                        ///  around 'small' being defined to char on Windows)
         medium = 2,     ///< use medium sized stack size
         large = 3,      ///< use large stack size
         huge = 4,       ///< use very large stack size
@@ -188,7 +188,8 @@ namespace hpx { namespace threads {
     /// constant.
     ///
     /// \param size this represents the stack size
-    HPX_CORE_EXPORT char const* get_stack_size_enum_name(thread_stacksize size);
+    HPX_CORE_EXPORT char const* get_stack_size_enum_name(
+        thread_stacksize size) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \enum thread_schedule_hint_mode
@@ -199,6 +200,7 @@ namespace hpx { namespace threads {
         /// A hint that leaves the choice of scheduling entirely up to the
         /// scheduler.
         none = 0,
+
         /// A hint that tells the scheduler to prefer scheduling a task on the
         /// local thread number associated with this hint. Local thread numbers
         /// are indexed from zero. It is up to the scheduler to decide how to
@@ -206,6 +208,7 @@ namespace hpx { namespace threads {
         /// available to the scheduler. Typically thread numbers will wrap
         /// around when too large.
         thread = 1,
+
         /// A hint that tells the scheduler to prefer scheduling a task on the
         /// NUMA domain associated with this hint. NUMA domains are indexed from
         /// zero. It is up to the scheduler to decide how to interpret NUMA
@@ -214,6 +217,82 @@ namespace hpx { namespace threads {
         /// too large.
         numa = 2,
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \enum thread_placement_hint
+    ///
+    /// The type of hint given to the scheduler related to thread placement
+    enum class thread_placement_hint : std::uint8_t
+    {
+        /// No hint is specified. The implementation is free to chose what
+        /// placement methods to use.
+        none = 0,
+
+        /// A hint that tells the scheduler to prefer spreading thread placement
+        /// on a depth-first basis (i.e. consecutively scheduled threads are
+        /// placed on the same core).
+        depth_first = 1,
+
+        /// A hint that tells the scheduler to prefer spreading thread placement
+        /// on a breadth-first basis (i.e. consecutively scheduled threads are
+        /// placed on the neighboring cores).
+        breadth_first = 2,
+
+        /// A hint that tells the scheduler to prefer spreading thread placement
+        /// on a depth-first basis (i.e. consecutively scheduled threads are
+        /// placed on the same core). Threads are being scheduled in reverse
+        /// order.
+        depth_first_reverse = 5,
+
+        /// A hint that tells the scheduler to prefer spreading thread placement
+        /// on a breadth-first basis (i.e. consecutively scheduled threads are
+        /// placed on the neighboring cores). Threads are being scheduled in
+        /// reverse order.
+        breadth_first_reverse = 6
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \enum thread_sharing_hint
+    ///
+    /// The type of hint given to the scheduler related to whether it is ok to
+    /// share the invoked function object between threads
+    enum class thread_sharing_hint : std::uint8_t
+    {
+        /// No hint is specified. The implementation is free to chose what
+        /// sharing methods to use.
+        none = 0,
+
+        /// A hint that tells the scheduler to avoid sharing the given function
+        /// (object) between threads.
+        do_not_share_function = 1,
+
+        /// A hint that tells the scheduler to avoid combining tasks on the same
+        /// thread. This is important for tasks that may synchronize between
+        /// each other, which could lead to deadlocks if those tasks are
+        /// combined running by the same threead.
+        do_not_combine_tasks = 2
+    };
+
+    constexpr bool do_not_share_function(thread_sharing_hint hint) noexcept
+    {
+        return static_cast<std::uint8_t>(hint) &
+            static_cast<std::uint8_t>(
+                thread_sharing_hint::do_not_share_function);
+    }
+
+    constexpr bool do_not_combine_tasks(thread_sharing_hint hint) noexcept
+    {
+        return static_cast<std::uint8_t>(hint) &
+            static_cast<std::uint8_t>(
+                thread_sharing_hint::do_not_combine_tasks);
+    }
+
+    constexpr thread_sharing_hint operator|(
+        thread_sharing_hint lhs, thread_sharing_hint rhs) noexcept
+    {
+        return static_cast<thread_sharing_hint>(
+            static_cast<std::uint8_t>(lhs) | static_cast<std::uint8_t>(rhs));
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief A hint given to a scheduler to guide where a task should be
@@ -225,36 +304,47 @@ namespace hpx { namespace threads {
     {
         /// Construct a default hint with mode thread_schedule_hint_mode::none.
         constexpr thread_schedule_hint() noexcept
-          : hint(-1)
-          , mode(thread_schedule_hint_mode::none)
+          : placement_mode(thread_placement_hint::none)
+          , sharing_mode(thread_sharing_hint::none)
         {
         }
 
         /// Construct a hint with mode thread_schedule_hint_mode::thread and the
         /// given hint as the local thread number.
-        constexpr explicit thread_schedule_hint(
-            std::int16_t thread_hint) noexcept
+        constexpr explicit thread_schedule_hint(std::int16_t thread_hint,
+            thread_placement_hint placement = thread_placement_hint::none,
+            thread_sharing_hint sharing = thread_sharing_hint::none) noexcept
           : hint(thread_hint)
           , mode(thread_schedule_hint_mode::thread)
+          , placement_mode(placement)
+          , sharing_mode(sharing)
         {
         }
 
         /// Construct a hint with the given mode and hint. The numerical hint is
         /// unused when the mode is thread_schedule_hint_mode::none.
-        constexpr thread_schedule_hint(
-            thread_schedule_hint_mode mode, std::int16_t hint) noexcept
+        constexpr thread_schedule_hint(thread_schedule_hint_mode mode,
+            std::int16_t hint,
+            thread_placement_hint placement = thread_placement_hint::none,
+            thread_sharing_hint sharing = thread_sharing_hint::none) noexcept
           : hint(hint)
           , mode(mode)
+          , placement_mode(placement)
+          , sharing_mode(sharing)
         {
         }
 
         /// \cond NOINTERNAL
-        bool operator==(thread_schedule_hint const& rhs) const noexcept
+        constexpr bool operator==(
+            thread_schedule_hint const& rhs) const noexcept
         {
-            return mode == rhs.mode && hint == rhs.hint;
+            return mode == rhs.mode && hint == rhs.hint &&
+                placement_mode == rhs.placement_mode &&
+                sharing_mode == rhs.sharing_mode;
         }
 
-        bool operator!=(thread_schedule_hint const& rhs) const noexcept
+        constexpr bool operator!=(
+            thread_schedule_hint const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
@@ -262,9 +352,15 @@ namespace hpx { namespace threads {
 
         /// The hint associated with the mode. The interepretation of this hint
         /// depends on the given mode.
-        std::int16_t hint;
+        std::int16_t hint = -1;
 
         /// The mode of the scheduling hint.
-        thread_schedule_hint_mode mode;
+        thread_schedule_hint_mode mode = thread_schedule_hint_mode::none;
+
+        /// The mode of the desired thread placement.
+        thread_placement_hint placement_mode : 6;
+
+        /// The mode of the desired sharing hint
+        thread_sharing_hint sharing_mode : 2;
     };
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

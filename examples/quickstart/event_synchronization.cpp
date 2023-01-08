@@ -52,7 +52,7 @@ int hpx_main()
     hpx::counting_semaphore_var<> sem;
 
     for (std::size_t i = 0; i < 10; ++i)
-        hpx::apply(&worker, i, std::ref(d), std::ref(sem));
+        hpx::post(&worker, i, std::ref(d), std::ref(sem));
 
     d.initialize("initialized");    // signal the event
 

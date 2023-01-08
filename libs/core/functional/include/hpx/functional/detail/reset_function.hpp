@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,7 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/move_only_function.hpp>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
 
     template <typename Sig, bool Serializable>
     inline void reset_function(hpx::function<Sig, Serializable>& f)
@@ -28,4 +28,4 @@ namespace hpx { namespace util { namespace detail {
     {
         f = Function();
     }
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

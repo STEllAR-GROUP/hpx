@@ -9,8 +9,7 @@
 
 #include <hpx/async_cuda/cuda_exception.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
-
-#include <boost/lockfree/stack.hpp>
+#include <hpx/concurrency/stack.hpp>
 
 namespace hpx { namespace cuda { namespace experimental {
 
@@ -80,7 +79,6 @@ namespace hpx { namespace cuda { namespace experimental {
         }
 
         // pool is dynamically sized and can grow if needed
-        boost::lockfree::stack<cudaEvent_t, boost::lockfree::fixed_sized<false>>
-            free_list_;
+        hpx::lockfree::stack<cudaEvent_t> free_list_;
     };
 }}}    // namespace hpx::cuda::experimental

@@ -3,7 +3,7 @@
 // Copyright (c) 2009 Boris Schaeling
 // Copyright (c) 2010 Felipe Tanus, Boris Schaeling
 // Copyright (c) 2011, 2012 Jeff Flinn, Boris Schaeling
-// Copyright (c) 2016 Hartmut Kaiser
+// Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,8 +15,7 @@
 #include <hpx/components/process/util/search_path.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
-
-#include <boost/tokenizer.hpp>
+#include <hpx/modules/string_util.hpp>
 
 #include <unistd.h>
 
@@ -24,24 +23,25 @@
 #include <stdexcept>
 #include <string>
 
-namespace hpx { namespace components { namespace process { namespace posix
-{
-    std::string search_path(const std::string &filename, std::string path)
+namespace hpx { namespace components { namespace process { namespace posix {
+    std::string search_path(const std::string& filename, std::string path)
     {
         if (path.empty())
         {
             path = ::getenv("PATH");
             if (path.empty())
             {
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "process::search_path",
                     "Environment variable PATH not found");
             }
         }
 
         std::string result;
-        typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-        boost::char_separator<char> sep(":");
+        typedef hpx::string_util::tokenizer<
+            hpx::string_util::char_separator<char>>
+            tokenizer;
+        hpx::string_util::char_separator<char> sep(":");
         tokenizer tok(path, sep);
         for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)
         {
@@ -55,6 +55,6 @@ namespace hpx { namespace components { namespace process { namespace posix
         }
         return result;
     }
-}}}}
+}}}}    // namespace hpx::components::process::posix
 
 #endif

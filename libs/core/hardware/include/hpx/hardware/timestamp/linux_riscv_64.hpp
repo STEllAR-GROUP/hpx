@@ -12,7 +12,7 @@
 
 #include <cstdint>
 
-namespace hpx { namespace util { namespace hardware {
+namespace hpx::util::hardware {
 
     // clang-format off
     HPX_HOST_DEVICE inline std::uint64_t timestamp()
@@ -25,5 +25,4 @@ namespace hpx { namespace util { namespace hardware {
         return val;
     }
     // clang-format on
-
-}}}    // namespace hpx::util::hardware
+}    // namespace hpx::util::hardware

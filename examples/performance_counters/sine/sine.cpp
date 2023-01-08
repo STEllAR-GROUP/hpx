@@ -61,11 +61,11 @@ namespace performance_counters { namespace sine {
         using hpx::program_options::variables_map;
         using hpx::util::retrieve_commandline_arguments;
 
-        // Retrieve command line using the Boost.ProgramOptions library.
+        // Retrieve command line using the HPX.ProgramOptions library.
         variables_map vm;
         if (!retrieve_commandline_arguments(command_line_options(), vm))
         {
-            HPX_THROW_EXCEPTION(hpx::commandline_option_error,
+            HPX_THROW_EXCEPTION(hpx::error::commandline_option_error,
                 "sine::need_perf_counters",
                 "Failed to handle command line options");
             return false;
@@ -155,7 +155,7 @@ namespace performance_counters { namespace sine {
 
         if (paths.parentinstance_is_basename_)
         {
-            HPX_THROWS_IF(ec, hpx::bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "sine::explicit_sine_counter_creator",
                 "invalid counter instance parent name: " +
                     paths.parentinstancename_);
@@ -193,7 +193,7 @@ namespace performance_counters { namespace sine {
             return id;
         }
 
-        HPX_THROWS_IF(ec, hpx::bad_parameter,
+        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
             "sine::explicit_sine_counter_creator",
             "invalid counter instance name: " + paths.instancename_);
         return hpx::naming::invalid_gid;
@@ -261,7 +261,7 @@ namespace performance_counters { namespace sine {
         // check whether the performance counters need to be enabled
         if (!need_perf_counters())
         {
-            HPX_THROW_EXCEPTION(hpx::dynamic_link_failure,
+            HPX_THROW_EXCEPTION(hpx::error::dynamic_link_failure,
                 "performance_counters::sine::get_startup",
                 "the sine component is not enabled on the commandline "
                 "(--sine), bailing out");

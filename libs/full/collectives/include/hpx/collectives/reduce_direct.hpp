@@ -299,7 +299,8 @@ namespace hpx { namespace lcos {
         if (ids.empty())
         {
             return hpx::make_exceptional_future<action_result>(
-                HPX_GET_EXCEPTION(bad_parameter, "hpx::lcos::reduce",
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
+                    "hpx::lcos::reduce",
                     "empty list of targets for reduce operation"));
         }
 

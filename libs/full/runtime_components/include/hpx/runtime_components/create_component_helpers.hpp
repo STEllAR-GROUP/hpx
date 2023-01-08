@@ -38,7 +38,7 @@ namespace hpx { namespace components {
     {
         if (!naming::is_locality(gid))
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "stubs::runtime_support::create_component_async",
                 "The id passed as the first argument is not representing"
                 " a locality");
@@ -57,7 +57,7 @@ namespace hpx { namespace components {
     {
         if (!naming::is_locality(gid))
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "stubs::runtime_support::bulk_create_component_async",
                 "The id passed as the first argument is not representing"
                 " a locality");

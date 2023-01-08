@@ -14,20 +14,21 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     struct reinit_functions_storage
     {
         // Use util::spinlock instead of hpx::spinlock to avoid possible
         // suspensions of HPX threads as this will cause a deadlock when the
         // register_functions function is called from within std::call_once
-        typedef util::spinlock mutex_type;
+        using mutex_type = util::spinlock;
 
-        typedef hpx::function<void()> construct_type;
-        typedef hpx::function<void()> destruct_type;
+        using construct_type = hpx::function<void()>;
+        using destruct_type = hpx::function<void()>;
 
-        typedef std::pair<construct_type, destruct_type> value_type;
-        typedef std::vector<value_type> reinit_functions_type;
+        using value_type = std::pair<construct_type, destruct_type>;
+        using reinit_functions_type = std::vector<value_type>;
 
         void register_functions(
             construct_type const& construct, destruct_type const& destruct)
@@ -91,4 +92,4 @@ namespace hpx { namespace util {
     {
         reinit_functions_storage::get().destruct_all();
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

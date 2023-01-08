@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/invoke_result.hpp>
+#include <hpx/iterator_support/detail/minimum_category.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
@@ -20,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
 
@@ -47,130 +48,6 @@ namespace hpx { namespace util {
         };
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, typename U>
-        struct zip_iterator_category_impl
-        {
-            static_assert(sizeof(T) == 0 && sizeof(U) == 0,
-                "unknown combination of iterator categories");
-        };
-
-        // random_access_iterator_tag
-        template <>
-        struct zip_iterator_category_impl<std::random_access_iterator_tag,
-            std::random_access_iterator_tag>
-        {
-            using type = std::random_access_iterator_tag;
-        };
-
-        template <>
-        struct zip_iterator_category_impl<std::random_access_iterator_tag,
-            std::bidirectional_iterator_tag>
-        {
-            using type = std::bidirectional_iterator_tag;
-        };
-
-        template <>
-        struct zip_iterator_category_impl<std::bidirectional_iterator_tag,
-            std::random_access_iterator_tag>
-        {
-            using type = std::bidirectional_iterator_tag;
-        };
-
-        template <>
-        struct zip_iterator_category_impl<std::random_access_iterator_tag,
-            std::forward_iterator_tag>
-        {
-            using type = std::forward_iterator_tag;
-        };
-
-        template <>
-        struct zip_iterator_category_impl<std::forward_iterator_tag,
-            std::random_access_iterator_tag>
-        {
-            using type = std::forward_iterator_tag;
-        };
-
-        template <>
-        struct zip_iterator_category_impl<std::random_access_iterator_tag,
-            std::input_iterator_tag>
-        {
-            using type = std::input_iterator_tag;
-        };
-
-        template <>
-        struct zip_iterator_category_impl<std::input_iterator_tag,
-            std::random_access_iterator_tag>
-        {
-            using type = std::input_iterator_tag;
-        };
-
-        // bidirectional_iterator_tag
-        template <>
-        struct zip_iterator_category_impl<std::bidirectional_iterator_tag,
-            std::bidirectional_iterator_tag>
-        {
-            using type = std::bidirectional_iterator_tag;
-        };
-
-        template <>
-        struct zip_iterator_category_impl<std::bidirectional_iterator_tag,
-            std::forward_iterator_tag>
-        {
-            using type = std::forward_iterator_tag;
-        };
-
-        template <>
-        struct zip_iterator_category_impl<std::forward_iterator_tag,
-            std::bidirectional_iterator_tag>
-        {
-            using type = std::forward_iterator_tag;
-        };
-
-        template <>
-        struct zip_iterator_category_impl<std::bidirectional_iterator_tag,
-            std::input_iterator_tag>
-        {
-            using type = std::input_iterator_tag;
-        };
-
-        template <>
-        struct zip_iterator_category_impl<std::input_iterator_tag,
-            std::bidirectional_iterator_tag>
-        {
-            using type = std::input_iterator_tag;
-        };
-
-        // forward_iterator_tag
-        template <>
-        struct zip_iterator_category_impl<std::forward_iterator_tag,
-            std::forward_iterator_tag>
-        {
-            using type = std::forward_iterator_tag;
-        };
-
-        template <>
-        struct zip_iterator_category_impl<std::input_iterator_tag,
-            std::forward_iterator_tag>
-        {
-            using type = std::input_iterator_tag;
-        };
-
-        template <>
-        struct zip_iterator_category_impl<std::forward_iterator_tag,
-            std::input_iterator_tag>
-        {
-            using type = std::input_iterator_tag;
-        };
-
-        // input_iterator_tag
-        template <>
-        struct zip_iterator_category_impl<std::input_iterator_tag,
-            std::input_iterator_tag>
-        {
-            using type = std::input_iterator_tag;
-        };
-
-        ///////////////////////////////////////////////////////////////////////
         template <typename IteratorTuple, typename Enable = void>
         struct zip_iterator_category;
 
@@ -184,7 +61,7 @@ namespace hpx { namespace util {
         template <typename T, typename U>
         struct zip_iterator_category<hpx::tuple<T, U>,
             std::enable_if_t<hpx::tuple_size<hpx::tuple<T, U>>::value == 2>>
-          : zip_iterator_category_impl<
+          : minimum_category<
                 typename std::iterator_traits<T>::iterator_category,
                 typename std::iterator_traits<U>::iterator_category>
         {
@@ -194,8 +71,8 @@ namespace hpx { namespace util {
         struct zip_iterator_category<hpx::tuple<T, U, Tail...>,
             std::enable_if_t<(
                 hpx::tuple_size<hpx::tuple<T, U, Tail...>>::value > 2)>>
-          : zip_iterator_category_impl<
-                typename zip_iterator_category_impl<
+          : minimum_category<
+                typename minimum_category<
                     typename std::iterator_traits<T>::iterator_category,
                     typename std::iterator_traits<U>::iterator_category>::type,
                 typename zip_iterator_category<hpx::tuple<Tail...>>::type>
@@ -343,9 +220,7 @@ namespace hpx { namespace util {
             template <typename F, std::size_t... Is>
             HPX_HOST_DEVICE void apply(F&& f, util::index_pack<Is...>)
             {
-                int const _sequencer[] = {
-                    ((f(hpx::get<Is>(iterators_))), 0)...};
-                (void) _sequencer;
+                (f(hpx::get<Is>(iterators_)), ...);
             }
 
             template <typename F>
@@ -545,9 +420,9 @@ namespace hpx { namespace util {
       : detail::zip_iterator_category<typename ZipIter::iterator_tuple_type>
     {
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     namespace functional {
 
@@ -591,4 +466,4 @@ namespace hpx { namespace traits {
     struct is_zip_iterator<hpx::util::zip_iterator<Iter...>> : std::true_type
     {
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

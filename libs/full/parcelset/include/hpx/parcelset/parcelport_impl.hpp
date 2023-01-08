@@ -268,7 +268,8 @@ namespace hpx::parcelset {
         {
             if (parcels.size() != handlers.size())
             {
-                HPX_THROW_EXCEPTION(bad_parameter, "parcelport::put_parcels",
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                    "parcelport::put_parcels",
                     "mismatched number of parcels and handlers");
                 return;
             }
@@ -421,7 +422,7 @@ namespace hpx::parcelset {
                 break;
             }
 
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "parcelport_impl::get_connection_cache_statistics",
                 "invalid connection cache statistics type");
             return 0;
@@ -453,7 +454,8 @@ namespace hpx::parcelset {
             {
                 HPX_UNUSED(dest);
                 HPX_UNUSED(p);
-                HPX_THROW_EXCEPTION(network_error, "send_early_parcel",
+                HPX_THROW_EXCEPTION(hpx::error::network_error,
+                    "send_early_parcel",
                     "This parcelport does not support sending early parcels");
             }
         }

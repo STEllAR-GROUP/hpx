@@ -10,8 +10,8 @@
 #include <hpx/actions_base/component_action.hpp>
 #include <hpx/agas_base/locality_namespace.hpp>
 #include <hpx/agas_base/server/locality_namespace.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
+#include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/serialization/vector.hpp>
 
 using hpx::components::component_agas_locality_namespace;

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2016 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,7 +13,7 @@
 #include <functional>
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename R, typename Enable = void>
@@ -66,6 +66,7 @@ namespace hpx { namespace traits {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename T>
         struct is_future_or_future_range
           : std::integral_constant<bool, is_future_v<T> || is_future_range_v<T>>
@@ -76,4 +77,4 @@ namespace hpx { namespace traits {
         inline constexpr bool is_future_or_future_range_v =
             is_future_or_future_range<R>::value;
     }    // namespace detail
-}}       // namespace hpx::traits
+}    // namespace hpx::traits

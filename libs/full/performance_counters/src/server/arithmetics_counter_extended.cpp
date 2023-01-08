@@ -47,7 +47,7 @@ namespace hpx { namespace performance_counters { namespace server {
     {
         if (info.type_ != counter_type::aggregating)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "arithmetics_counter_extended<Statistic>::"
                 "arithmetics_counter_extended",
                 "unexpected counter type specified");
@@ -299,7 +299,7 @@ namespace hpx { namespace performance_counters { namespace detail {
 
                 if (names.empty())
                 {
-                    HPX_THROWS_IF(ec, bad_parameter,
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "arithmetics_counter_extended_creator",
                         "the parameter specification for an arithmetic counter "
                         "has to expand to at least one counter name: {}",
@@ -314,7 +314,7 @@ namespace hpx { namespace performance_counters { namespace detail {
                             get_counter_path_elements(name, paths, ec) ||
                         ec)
                     {
-                        HPX_THROWS_IF(ec, bad_parameter,
+                        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                             "arithmetics_counter_extended_creator",
                             "the given (expanded) counter name is not "
                             "a validly formed performance counter name: {}",
@@ -327,7 +327,7 @@ namespace hpx { namespace performance_counters { namespace detail {
             }
             else
             {
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "arithmetics_counter_extended_creator",
                     "the parameter specification for an arithmetic counter "
                     "has to be a comma separated list of performance "
@@ -338,7 +338,7 @@ namespace hpx { namespace performance_counters { namespace detail {
         break;
 
         default:
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "arithmetics_counter_extended_creator",
                 "invalid counter type requested");
             break;

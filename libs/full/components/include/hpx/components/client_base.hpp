@@ -27,7 +27,6 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/naming_base/unmanaged.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <exception>
 #include <string>
@@ -49,8 +48,7 @@ namespace hpx { namespace traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Derived>
-    struct is_client<Derived,
-        typename util::always_void<typename Derived::is_client_tag>::type>
+    struct is_client<Derived, std::void_t<typename Derived::is_client_tag>>
       : std::true_type
     {
     };
@@ -186,7 +184,8 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         template <typename... T>
-        future_data(init_no_addref no_addref, in_place in_place, T&&... ts)
+        future_data(
+            init_no_addref no_addref, std::in_place_t in_place, T&&... ts)
           : future_data_base<id_type>(
                 no_addref, in_place, HPX_FORWARD(T, ts)...)
         {
@@ -226,7 +225,7 @@ namespace hpx { namespace lcos { namespace detail {
             hpx::id_type id = *this->get_result();
             if (!manage_lifetime)
             {
-                id = hpx::naming::unmanaged(id);
+                id = hpx::unmanaged(id);
             }
             return hpx::agas::register_name(launch::sync, registered_name_, id);
         }
@@ -255,7 +254,7 @@ namespace hpx { namespace components {
         // derived from a) stub_base.
         template <typename Stub>
         struct make_stub<Stub,
-            util::always_void_t<typename Stub::server_component_type>>
+            std::void_t<typename Stub::server_component_type>>
         {
             using type = Stub;
             using server_component_type = typename Stub::server_component_type;
@@ -455,7 +454,8 @@ namespace hpx { namespace components {
         {
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state, "client_base::get_gid",
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
+                    "client_base::get_gid",
                     "this client_base has no valid shared state");
             }
 
@@ -488,7 +488,7 @@ namespace hpx { namespace components {
         {
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state, "client_base::wait",
+                HPX_THROW_EXCEPTION(hpx::error::no_state, "client_base::wait",
                     "this client_base has no valid shared state");
                 return;
             }
@@ -503,7 +503,7 @@ namespace hpx { namespace components {
         {
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state,
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
                     "client_base<Derived, Stub>::get_exception_ptr",
                     "this client has no valid shared state");
             }
@@ -533,7 +533,7 @@ namespace hpx { namespace components {
 
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state, "client_base::then",
+                HPX_THROW_EXCEPTION(hpx::error::no_state, "client_base::then",
                     "this client_base has no valid shared state");
                 return hpx::future<result_type>();
             }
@@ -588,7 +588,8 @@ namespace hpx { namespace components {
         {
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state, "client_base::register_as",
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
+                    "client_base::register_as",
                     "this client_base has no valid shared state");
             }
 

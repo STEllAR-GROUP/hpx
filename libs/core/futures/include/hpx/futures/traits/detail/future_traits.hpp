@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,11 +9,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
-#include <hpx/type_support/always_void.hpp>
 
 #include <iterator>
+#include <type_traits>
 
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx::lcos::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Enable = void>
     struct future_iterator_traits
@@ -22,8 +23,7 @@ namespace hpx { namespace lcos { namespace detail {
 
     template <typename Iterator>
     struct future_iterator_traits<Iterator,
-        hpx::util::always_void_t<
-            typename std::iterator_traits<Iterator>::value_type>>
+        std::void_t<typename std::iterator_traits<Iterator>::value_type>>
     {
         using type = typename std::iterator_traits<Iterator>::value_type;
         using traits_type = hpx::traits::future_traits<type>;
@@ -32,4 +32,4 @@ namespace hpx { namespace lcos { namespace detail {
     template <typename Iter>
     using future_iterator_traits_t =
         typename future_iterator_traits<Iter>::type;
-}}}    // namespace hpx::lcos::detail
+}    // namespace hpx::lcos::detail

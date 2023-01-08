@@ -1,4 +1,4 @@
-//  Copyright (c) 2018 Hartmut Kaiser
+//  Copyright (c) 2018-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/preprocessor/cat.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -14,8 +16,6 @@
 #include <new>
 #include <type_traits>
 #include <utility>
-
-#include <hpx/preprocessor/cat.hpp>
 
 #if defined(HPX_HAVE_JEMALLOC_PREFIX)
 // this is currently used only for jemalloc and if a special API prefix is
@@ -25,33 +25,34 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
 #if defined(HPX_HAVE_JEMALLOC_PREFIX)
     ///////////////////////////////////////////////////////////////////////////
     template <typename T = int>
     struct internal_allocator
     {
-        typedef T value_type;
-        typedef T* pointer;
-        typedef const T* const_pointer;
-        typedef T& reference;
-        typedef T const& const_reference;
-        typedef std::size_t size_type;
-        typedef std::ptrdiff_t difference_type;
+        using value_type = T;
+        using pointer = T*;
+        using const_pointer = const T*;
+        using reference = T&;
+        using const_reference = T const&;
+        using size_type = std::size_t;
+        using difference_type = std::ptrdiff_t;
 
         template <typename U>
         struct rebind
         {
-            typedef internal_allocator<U> other;
+            using other = internal_allocator<U>;
         };
 
-        typedef std::true_type is_always_equal;
-        typedef std::true_type propagate_on_container_move_assignment;
+        using is_always_equal = std::true_type;
+        using propagate_on_container_move_assignment = std::true_type;
 
         internal_allocator() = default;
 
         template <typename U>
-        internal_allocator(internal_allocator<U> const&)
+        constexpr internal_allocator(internal_allocator<U> const&) noexcept
         {
         }
 
@@ -86,7 +87,7 @@ namespace hpx { namespace util {
             HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
         }
 
-        size_type max_size() const noexcept
+        constexpr size_type max_size() const noexcept
         {
             return (std::numeric_limits<size_type>::max)() / sizeof(T);
         }
@@ -94,26 +95,26 @@ namespace hpx { namespace util {
         template <typename U, typename... Args>
         void construct(U* p, Args&&... args)
         {
-            ::new ((void*) p) U(HPX_FORWARD(Args, args)...);
+            hpx::construct_at(p, HPX_FORWARD(Args, args)...);
         }
 
         template <typename U>
-        void destroy(U* p)
+        void destroy(U* p) noexcept
         {
-            p->~U();
+            std::destroy_at(p);
         }
     };
 
     template <typename T>
     constexpr bool operator==(
-        internal_allocator<T> const&, internal_allocator<T> const&)
+        internal_allocator<T> const&, internal_allocator<T> const&) noexcept
     {
         return true;
     }
 
     template <typename T>
     constexpr bool operator!=(
-        internal_allocator<T> const&, internal_allocator<T> const&)
+        internal_allocator<T> const&, internal_allocator<T> const&) noexcept
     {
         return false;
     }
@@ -122,6 +123,6 @@ namespace hpx { namespace util {
     template <typename T = int>
     using internal_allocator = std::allocator<T>;
 #endif
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>

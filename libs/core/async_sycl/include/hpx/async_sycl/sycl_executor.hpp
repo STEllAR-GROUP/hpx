@@ -9,7 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/apply.hpp>
+//#include <hpx/async_base/apply.hpp>
+#include <hpx/include/post.hpp>
 #include <hpx/async_base/async.hpp>
 #include <hpx/async_sycl/sycl_future.hpp>
 #include <hpx/errors/exception.hpp>
@@ -123,8 +124,7 @@ namespace hpx { namespace sycl { namespace experimental {
 
 //#if defined(__LIBSYCL_MAJOR_VERSION) && defined(__LIBSYCL_MINOR_VERSION)
 #if defined(__INTEL_LLVM_COMPILER) ||                                          \
-    (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI) &&              \
-        defined(SYCL_IMPLEMENTATION_ONEAPI))
+    (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI)) 
         // To find the correct overload (or any at all actually) we need to add
         // the code_location argument which is the last argument in every queue
         // member function in the intel oneapi sycl implementation.  As far as
@@ -273,7 +273,7 @@ HPX_FORCEINLINE bool apply(Executor&& exec,
 static_assert(std::is_same<std::decay_t<Executor>,
     hpx::sycl::experimental::sycl_executor>::value);
 // Use the same apply_dispatch than the normal apply otherwise
-return detail::apply_dispatch<typename std::decay<Executor>::type>::call(
+return detail::post_dispatch<typename std::decay<Executor>::type>::call(
     HPX_FORWARD(Executor, exec),
     HPX_FORWARD(
         hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts...>, f),
@@ -282,8 +282,7 @@ return detail::apply_dispatch<typename std::decay<Executor>::type>::call(
 
 //#if defined(__LIBSYCL_MAJOR_VERSION) && defined(__LIBSYCL_MINOR_VERSION)
 #if defined(__INTEL_LLVM_COMPILER) ||                                          \
-    (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI) &&              \
-        defined(SYCL_IMPLEMENTATION_ONEAPI))
+    (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI)) 
 /// hpx::async overload for launching sycl queue member functions with an
 /// sycl executor and code location ptrs
 template <typename Executor, typename Ts>
@@ -299,7 +298,7 @@ static_assert(std::is_same<std::decay_t<Executor>,
 return detail::async_dispatch<typename std::decay<Executor>::type>::call(
     HPX_FORWARD(Executor, exec),
     HPX_FORWARD(
-        hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts>, f),
+        hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<Ts>, f),
     HPX_FORWARD(Ts, ts));
 }
 
@@ -315,10 +314,10 @@ HPX_FORCEINLINE bool apply(Executor&& exec,
 static_assert(std::is_same<std::decay_t<Executor>,
     hpx::sycl::experimental::sycl_executor>::value);
 // Use the same apply_dispatch than the normal apply otherwise
-return detail::apply_dispatch<typename std::decay<Executor>::type>::call(
+return detail::post_dispatch<typename std::decay<Executor>::type>::call(
     HPX_FORWARD(Executor, exec),
     HPX_FORWARD(
-        hpx::sycl::experimental::sycl_executor::queue_function_ptr_t<Ts>, f),
+        hpx::sycl::experimental::sycl_executor::queue_function_code_loc_ptr_t<Ts>, f),
     HPX_FORWARD(Ts, ts));
 }
 #endif

@@ -20,12 +20,11 @@
 #include <hpx/logging/message.hpp>
 #include <hpx/modules/format.hpp>
 
-#include <boost/utility/string_ref.hpp>
-
 #include <iosfwd>
 #include <string>
+#include <string_view>
 
-namespace hpx { namespace util { namespace logging {
+namespace hpx::util::logging {
 
     /// @brief Formatter is a manipulator.
     /// It allows you to format the message before writing it to the destination(s)
@@ -42,7 +41,7 @@ namespace hpx { namespace util { namespace logging {
             virtual void operator()(std::ostream&) const = 0;
 
             friend void format_value(std::ostream& os,
-                boost::string_ref /*spec*/, manipulator const& value)
+                std::string_view /*spec*/, manipulator const& value)
             {
                 value(os);
             }
@@ -88,5 +87,4 @@ namespace hpx { namespace util { namespace logging {
         };
 
     }    // namespace destination
-
-}}}    // namespace hpx::util::logging
+}    // namespace hpx::util::logging

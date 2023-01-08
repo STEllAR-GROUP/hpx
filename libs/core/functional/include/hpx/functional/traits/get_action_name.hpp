@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -13,7 +13,8 @@
 #include <hpx/modules/itt_notify.hpp>
 #endif
 
-namespace hpx { namespace actions { namespace detail {
+namespace hpx::actions::detail {
+
     template <typename Action>
     char const* get_action_name() noexcept;
 
@@ -21,4 +22,4 @@ namespace hpx { namespace actions { namespace detail {
     template <typename Action>
     util::itt::string_handle const& get_action_name_itt() noexcept;
 #endif
-}}}    // namespace hpx::actions::detail
+}    // namespace hpx::actions::detail

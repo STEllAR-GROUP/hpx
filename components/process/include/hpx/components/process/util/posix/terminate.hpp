@@ -25,7 +25,7 @@ void terminate(const Process &p)
 {
     if (::kill(p.pid, SIGKILL) == -1)
     {
-        HPX_THROW_EXCEPTION(invalid_status,
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
             "process::terminate", "kill(2) failed");
     }
 }
@@ -35,7 +35,7 @@ void terminate(const Process &p, hpx::error_code &ec)
 {
     if (::kill(p.pid, SIGKILL) == -1)
     {
-        HPX_THROWS_IF(ec, invalid_status,
+        HPX_THROWS_IF(ec, hpx::error::invalid_status,
             "process::terminate", "kill(2) failed");
     }
     else

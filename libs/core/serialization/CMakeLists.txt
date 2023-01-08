@@ -124,7 +124,6 @@ set(serialization_headers
     hpx/serialization/exception_ptr.hpp
     hpx/serialization/list.hpp
     hpx/serialization/map.hpp
-    hpx/serialization/multi_array.hpp
     hpx/serialization/set.hpp
     hpx/serialization/serialize_buffer.hpp
     hpx/serialization/string.hpp
@@ -133,7 +132,6 @@ set(serialization_headers
     hpx/serialization/vector.hpp
     hpx/serialization/variant.hpp
     hpx/serialization/valarray.hpp
-    hpx/serialization/intrusive_ptr.hpp
     hpx/serialization/shared_ptr.hpp
     hpx/serialization/unique_ptr.hpp
     hpx/serialization/access.hpp
@@ -157,12 +155,6 @@ set(serialization_headers
     hpx/serialization/traits/polymorphic_traits.hpp
     hpx/serialization/traits/serialization_access_data.hpp
 )
-
-if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
-  set(serialization_headers ${serialization_headers}
-                            hpx/serialization/boost_variant.hpp
-  )
-endif()
 
 # Default location is $HPX_ROOT/libs/serialization/include_compatibility
 # cmake-format: off
@@ -205,6 +197,24 @@ set(serialization_compat_headers
     hpx/traits/serialization_access_data.hpp => hpx/serialization.hpp
 )
 # cmake-format: on
+
+if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
+  set(serialization_headers
+      ${serialization_headers}
+      hpx/serialization/boost_array.hpp
+      hpx/serialization/boost_intrusive_ptr.hpp
+      hpx/serialization/boost_multi_array.hpp
+      hpx/serialization/boost_shared_ptr.hpp
+      hpx/serialization/boost_variant.hpp
+  )
+
+  # cmake-format: off
+  set(serialization_compat_headers ${serialization_compat_headers}
+    hpx/serialization/multi_array.hpp => hpx/serialization/boost_multi_array.hpp
+    hpx/serialization/intrusive_ptr.hpp => hpx/serialization/boost_intrusive_ptr.hpp
+  )
+  # cmake-format: on
+endif()
 
 # Default location is $HPX_ROOT/libs/serialization/src
 set(serialization_sources

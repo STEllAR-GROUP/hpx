@@ -268,10 +268,10 @@ namespace hpx {
         // blocking all of the entering threads until all of the threads have
         // entered the barrier.
         //
-        // \note   A \a barrier is not a LCO in the sense that it has no global id
-        //         and it can't be triggered using the action (parcel) mechanism.
-        //         It is just a low level synchronization primitive allowing to
-        //         synchronize a given number of \a threads.
+        // \note   A \a barrier is not a LCO in the sense that it has no global
+        //         id and it can't be triggered using the action (parcel)
+        //         mechanism. It is just a low level synchronization primitive
+        //         allowing to synchronize a given number of \a threads.
         class HPX_CORE_EXPORT barrier
         {
         private:
@@ -299,17 +299,17 @@ namespace hpx {
             // to be waited in \a wait function.
             void count_up();
 
-            // The function \a reset will reset the number of \a threads
-            // as given by the function parameter \a number_of_threads.
-            // the newer coming \a threads executing the function
-            // \a wait will be waiting until \a total_ is equal to  \a barrier_flag.
-            // The last \a thread exiting the \a wait function will notify
-            // the newer \a threads waiting and the newer \a threads
-            // will get the reset \a number_of_threads_.
-            // The function \a reset can be executed while previous \a threads
-            // executing waiting after they have been waken up.
-            // Thus \a total_ can not be reset to \a barrier_flag which
-            // will break the comparison condition under the function \a wait.
+            // The function \a reset will reset the number of \a threads as
+            // given by the function parameter \a number_of_threads. the newer
+            // coming \a threads executing the function \a wait will be waiting
+            // until \a total_ is equal to  \a barrier_flag.
+            // The last \a thread exiting the \a wait function will notify the
+            // newer \a threads waiting and the newer \a threads will get the
+            // reset \a number_of_threads_. The function \a reset can be
+            // executed while previous \a threads executing waiting after they
+            // have been waken up. Thus \a total_ can not be reset to \a
+            // barrier_flag which will break the comparison condition under the
+            // function \a wait.
             void reset(std::size_t number_of_threads);
 
         private:
@@ -330,7 +330,6 @@ namespace hpx::lcos::local {
     using cpp20_barrier HPX_DEPRECATED_V(1, 8,
         "hpx::lcos::local::cpp20_barrier is deprecated, use hpx::barrier "
         "instead") = hpx::barrier<OnCompletion>;
-
 }    // namespace hpx::lcos::local
 /// \endcond
 

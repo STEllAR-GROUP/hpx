@@ -23,7 +23,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
     /** Describes one possible command line/config file option. There are two
         kinds of properties of an option. First describe it syntactically and
@@ -62,12 +62,12 @@ namespace hpx { namespace program_options {
             - otherwise, the part before "," specifies long name and the part
             after \-- short name.
         */
-        option_description(const char* name, const value_semantic* s);
+        option_description(char const* name, value_semantic const* s);
 
         /** Initializes the class with the passed data.
          */
         option_description(
-            const char* name, const value_semantic* s, const char* description);
+            char const* name, value_semantic const* s, char const* description);
 
         virtual ~option_description();
 
@@ -81,7 +81,7 @@ namespace hpx { namespace program_options {
         /** Given 'option', specified in the input source,
             returns 'true' if 'option' specifies *this.
         */
-        match_result match(const std::string& option, bool approx,
+        match_result match(std::string const& option, bool approx,
             bool long_ignore_case, bool short_ignore_case) const;
 
         /** Returns the key that should identify the option, in
@@ -92,7 +92,7 @@ namespace hpx { namespace program_options {
             If long name was specified, it's the long name, otherwise
             it's a short name with pre-pended '-'.
         */
-        const std::string& key(const std::string& option) const;
+        std::string const& key(std::string const& option) const;
 
         /** Returns the canonical name for the option description to enable the user to
             recognized a matching option.
@@ -104,15 +104,15 @@ namespace hpx { namespace program_options {
         std::string canonical_display_name(
             int canonical_option_style = 0) const;
 
-        const std::string& long_name() const;
+        std::string const& long_name() const;
 
-        const std::pair<const std::string*, std::size_t> long_names() const;
+        std::pair<std::string const*, std::size_t> long_names() const;
 
         /// Explanation of this option
-        const std::string& description() const;
+        std::string const& description() const;
 
         /// Semantic of option's value
-        std::shared_ptr<const value_semantic> semantic() const;
+        std::shared_ptr<value_semantic const> semantic() const;
 
         /// Returns the option name, formatted suitably for usage message.
         std::string format_name() const;
@@ -122,7 +122,7 @@ namespace hpx { namespace program_options {
         std::string format_parameter() const;
 
     private:
-        option_description& set_names(const char* name);
+        option_description& set_names(char const* name);
 
         /**
          * a one-character "switch" name - with its prefix,
@@ -142,7 +142,7 @@ namespace hpx { namespace program_options {
 
         // shared_ptr is needed to simplify memory management in
         // copy ctor and destructor.
-        std::shared_ptr<const value_semantic> m_value_semantic;
+        std::shared_ptr<value_semantic const> m_value_semantic;
     };
 
     class options_description;
@@ -152,16 +152,16 @@ namespace hpx { namespace program_options {
     class HPX_CORE_EXPORT options_description_easy_init
     {
     public:
-        options_description_easy_init(options_description* owner);
+        explicit options_description_easy_init(options_description* owner);
 
         options_description_easy_init& operator()(
-            const char* name, const char* description);
+            char const* name, char const* description);
 
         options_description_easy_init& operator()(
-            const char* name, const value_semantic* s);
+            char const* name, value_semantic const* s);
 
         options_description_easy_init& operator()(
-            const char* name, const value_semantic* s, const char* description);
+            char const* name, value_semantic const* s, char const* description);
 
     private:
         options_description* owner;
@@ -177,7 +177,7 @@ namespace hpx { namespace program_options {
     class HPX_CORE_EXPORT options_description
     {
     public:
-        static const unsigned m_default_line_length;
+        static constexpr unsigned const m_default_line_length = 80;
 
         /** Creates the instance. */
         options_description(unsigned line_length = m_default_line_length,
@@ -189,7 +189,7 @@ namespace hpx { namespace program_options {
             encroaches into this, then the description will start on the next
             line.
         */
-        options_description(const std::string& caption,
+        options_description(std::string const& caption,
             unsigned line_length = m_default_line_length,
             unsigned min_description_length = m_default_line_length / 2);
         /** Adds new variable description. Throws duplicate_variable_error if
@@ -202,7 +202,7 @@ namespace hpx { namespace program_options {
             a separate group.
             Returns *this.
         */
-        options_description& add(const options_description& desc);
+        options_description& add(options_description const& desc);
 
         /** Find the maximum width of the option column, including options
             in groups. */
@@ -217,21 +217,21 @@ namespace hpx { namespace program_options {
         */
         options_description_easy_init add_options();
 
-        const option_description& find(const std::string& name, bool approx,
+        option_description const& find(std::string const& name, bool approx,
             bool long_ignore_case = false,
             bool short_ignore_case = false) const;
 
-        const option_description* find_nothrow(const std::string& name,
+        option_description const* find_nothrow(std::string const& name,
             bool approx, bool long_ignore_case = false,
             bool short_ignore_case = false) const;
 
-        const std::vector<std::shared_ptr<option_description>>& options() const;
+        std::vector<std::shared_ptr<option_description>> const& options() const;
 
         /** Produces a human readable output of 'desc', listing options,
             their descriptions and allowed parameters. Other options_description
             instances previously passed to add will be output separately. */
         friend HPX_CORE_EXPORT std::ostream& operator<<(
-            std::ostream& os, const options_description& desc);
+            std::ostream& os, options_description const& desc);
 
         /** Outputs 'desc' to the specified stream, calling 'f' to output each
             option_description element. */
@@ -240,14 +240,14 @@ namespace hpx { namespace program_options {
     private:
 #if defined(HPX_MSVC) && HPX_MSVC >= 1800
         // prevent warning C4512: assignment operator could not be generated
-        options_description& operator=(const options_description&);
+        options_description& operator=(options_description const&);
 #endif
 
         using name2index_iterator = std::map<std::string, int>::const_iterator;
         using approximation_range =
             std::pair<name2index_iterator, name2index_iterator>;
 
-        //approximation_range find_approximation(const std::string& prefix) const;
+        // approximation_range find_approximation(const std::string& prefix) const;
 
         std::string m_caption;
         std::size_t const m_line_length;
@@ -270,12 +270,11 @@ namespace hpx { namespace program_options {
     class HPX_ALWAYS_EXPORT duplicate_option_error : public error
     {
     public:
-        duplicate_option_error(const std::string& xwhat)
+        explicit duplicate_option_error(std::string const& xwhat)
           : error(xwhat)
         {
         }
     };
-
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options
 
 #include <hpx/config/warnings_suffix.hpp>

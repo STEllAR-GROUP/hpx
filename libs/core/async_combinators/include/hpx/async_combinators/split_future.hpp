@@ -241,7 +241,7 @@ namespace hpx {
                         result_type* result = state->get_result();
                         if (i >= result->size())
                         {
-                            HPX_THROW_EXCEPTION(length_error,
+                            HPX_THROW_EXCEPTION(hpx::error::length_error,
                                 "split_continuation::on_ready",
                                 "index out of bounds");
                         }

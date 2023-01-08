@@ -14,6 +14,7 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threading.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
@@ -163,7 +164,8 @@ namespace hpx {
     }
 }    // namespace hpx
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     // This is a local helper used to get the backtrace on a new new stack if
     // possible.
     std::string trace_on_new_stack(
@@ -190,7 +192,7 @@ namespace hpx { namespace util {
 
         error_code ec(throwmode::lightweight);
         threads::thread_id_ref_type tid =
-            p.apply("hpx::util::trace_on_new_stack",
+            p.post("hpx::util::trace_on_new_stack",
                 launch::fork_policy(threads::thread_priority::default_,
                     threads::thread_stacksize::medium),
                 ec);
@@ -205,9 +207,10 @@ namespace hpx { namespace util {
         return "";
 #endif
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     void pre_exception_handler()
     {
         if (!expect_exception_flag.load(std::memory_order_relaxed))
@@ -421,7 +424,7 @@ namespace hpx { namespace detail {
 
         std::size_t shepherd = std::size_t(-1);
         threads::thread_id_type thread_id;
-        util::thread_description thread_name;
+        threads::thread_description thread_name;
 
         threads::thread_self* self = threads::get_self_ptr();
         if (nullptr != self)
@@ -443,14 +446,14 @@ namespace hpx { namespace detail {
             hpx::detail::throw_shepherd(shepherd),
             hpx::detail::throw_thread_id(
                 reinterpret_cast<std::size_t>(thread_id.get())),
-            hpx::detail::throw_thread_name(util::as_string(thread_name)),
+            hpx::detail::throw_thread_name(threads::as_string(thread_name)),
             hpx::detail::throw_function(func), hpx::detail::throw_file(file),
             hpx::detail::throw_line(line), hpx::detail::throw_env(env),
             hpx::detail::throw_config(config),
             hpx::detail::throw_state(state_name),
             hpx::detail::throw_auxinfo(auxinfo));
     }
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {

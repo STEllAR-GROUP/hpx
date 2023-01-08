@@ -1,27 +1,28 @@
-// Copyright Vladimir Prus 2004.
+//  Copyright Vladimir Prus 2004.
+//  Copyright (c) 2005-2022 Hartmut Kaiser
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
 #include <hpx/plugin/config.hpp>
 #include <hpx/plugin/virtual_constructor.hpp>
 
-namespace hpx { namespace util { namespace plugin {
+namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
         struct dll_handle_holder
         {
-            dll_handle_holder(dll_handle const& dll)
+            explicit dll_handle_holder(dll_handle const& dll) noexcept
               : m_dll(dll)
             {
             }
 
-            ~dll_handle_holder() {}
+            ~dll_handle_holder() = default;
 
         private:
             dll_handle m_dll;
@@ -34,10 +35,10 @@ namespace hpx { namespace util { namespace plugin {
       : public detail::dll_handle_holder
       , public Wrapped
     {
-        plugin_wrapper(dll_handle dll, Parameters... parameters)
+        explicit plugin_wrapper(dll_handle const& dll, Parameters... parameters)
           : detail::dll_handle_holder(dll)
           , Wrapped(parameters...)
         {
         }
     };
-}}}    // namespace hpx::util::plugin
+}    // namespace hpx::util::plugin

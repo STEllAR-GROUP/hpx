@@ -18,9 +18,11 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         struct future_data_void
         {
         };
@@ -118,6 +120,7 @@ namespace hpx { namespace traits {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename T, typename Enable = void>
         struct future_access_customization_point;
     }
@@ -276,4 +279,4 @@ namespace hpx { namespace traits {
     template <typename SharedState, typename Allocator>
     using shared_state_allocator_t =
         typename shared_state_allocator<SharedState, Allocator>::type;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

@@ -13,25 +13,6 @@
 #include <hpx/preprocessor/expand.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Deprecate a given functionality starting HPX V1.7
-#if !defined(HPX_HAVE_DEPRECATION_WARNINGS_V1_7)
-#define HPX_HAVE_DEPRECATION_WARNINGS_V1_7 1
-#endif
-
-#if (HPX_VERSION_FULL >= 0x010700) && (HPX_HAVE_DEPRECATION_WARNINGS_V1_7 != 0)
-#define HPX_DEPRECATED_MSG_V1_7                                                \
-    "This functionality is deprecated starting HPX V1.7 and will be removed "  \
-    "in the future. You can define HPX_HAVE_DEPRECATION_WARNINGS_V1_7=0 to "   \
-    "acknowledge that you have received this warning."
-#define HPX_DEPRECATED_V1_7(x)                                                 \
-    [[deprecated(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V1_7) ")")]]
-#endif
-
-#if !defined(HPX_DEPRECATED_V1_7)
-#define HPX_DEPRECATED_V1_7(x)
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // Deprecate a given functionality starting HPX V1.8
 #if !defined(HPX_HAVE_DEPRECATION_WARNINGS_V1_8)
 #define HPX_HAVE_DEPRECATION_WARNINGS_V1_8 1
@@ -67,6 +48,25 @@
 
 #if !defined(HPX_DEPRECATED_V1_9)
 #define HPX_DEPRECATED_V1_9(x)
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Deprecate a given functionality starting HPX V1.10
+#if !defined(HPX_HAVE_DEPRECATION_WARNINGS_V1_10)
+#define HPX_HAVE_DEPRECATION_WARNINGS_V1_10 1
+#endif
+
+#if (HPX_VERSION_FULL >= 0x011000) && (HPX_HAVE_DEPRECATION_WARNINGS_V1_10 != 0)
+#define HPX_DEPRECATED_MSG_V1_10                                               \
+    "This functionality is deprecated starting HPX V1.10 and will be removed " \
+    "in the future. You can define HPX_HAVE_DEPRECATION_WARNINGS_V1_9=0 to "   \
+    "acknowledge that you have received this warning."
+#define HPX_DEPRECATED_V1_10(x)                                                \
+    [[deprecated(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V1_10) ")")]]
+#endif
+
+#if !defined(HPX_DEPRECATED_V1_10)
+#define HPX_DEPRECATED_V1_10(x)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

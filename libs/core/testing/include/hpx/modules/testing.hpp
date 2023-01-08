@@ -19,24 +19,25 @@
 #include <hpx/thread_support/spinlock.hpp>
 #include <hpx/util/ios_flags_saver.hpp>
 
-#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
 #include <ostream>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     using test_failure_handler_type = hpx::function<void()>;
+
     HPX_CORE_EXPORT void set_test_failure_handler(test_failure_handler_type f);
 
-    enum counter_type
+    enum class counter_type
     {
-        counter_sanity,
-        counter_test
+        sanity,
+        test
     };
 
     namespace detail {
+
         struct fixture
         {
         public:
@@ -44,19 +45,17 @@ namespace hpx { namespace util {
 
         private:
             std::ostream& stream_;
-            static std::atomic<std::size_t> sanity_failures_;
-            static std::atomic<std::size_t> test_failures_;
             mutex_type mutex_;
 
         public:
-            explicit fixture(std::ostream& stream)
+            explicit fixture(std::ostream& stream) noexcept
               : stream_(stream)
             {
             }
 
-            HPX_CORE_EXPORT void increment(counter_type c);
+            HPX_CORE_EXPORT void increment(counter_type c) noexcept;
 
-            HPX_CORE_EXPORT std::size_t get(counter_type c) const;
+            HPX_CORE_EXPORT std::size_t get(counter_type c) const noexcept;
 
             template <typename T>
             bool check_(char const* file, int line, char const* function,
@@ -173,18 +172,17 @@ namespace hpx { namespace util {
             }
         };
 
-        HPX_CORE_EXPORT fixture& global_fixture();
+        HPX_CORE_EXPORT fixture& global_fixture() noexcept;
 
     }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT int report_errors();
     HPX_CORE_EXPORT int report_errors(std::ostream& stream);
-    HPX_CORE_EXPORT void print_cdash_timing(const char* name, double time);
+    HPX_CORE_EXPORT void print_cdash_timing(char const* name, double time);
     HPX_CORE_EXPORT void print_cdash_timing(
-        const char* name, std::uint64_t time);
-
-}}    // namespace hpx::util
+        char const* name, std::uint64_t time);
+}    // namespace hpx::util
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_TEST(...)                                                          \
@@ -202,7 +200,8 @@ namespace hpx { namespace util {
 
 #define HPX_TEST_IMPL(fixture, expr)                                           \
     fixture.check_(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,            \
-        ::hpx::util::counter_test, expr, "test '" HPX_PP_STRINGIZE(expr) "'")
+        ::hpx::util::counter_type::test, expr,                                 \
+        "test '" HPX_PP_STRINGIZE(expr) "'")
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_TEST_MSG(...)                                                      \
@@ -220,7 +219,7 @@ namespace hpx { namespace util {
 
 #define HPX_TEST_MSG_IMPL(fixture, expr, msg)                                  \
     fixture.check_(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,            \
-        ::hpx::util::counter_test, expr, msg)
+        ::hpx::util::counter_type::test, expr, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_TEST_EQ(...)                                                       \
@@ -238,7 +237,7 @@ namespace hpx { namespace util {
 
 #define HPX_TEST_EQ_IMPL(fixture, expr1, expr2)                                \
     fixture.check_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
-        ::hpx::util::counter_test, expr1, expr2,                               \
+        ::hpx::util::counter_type::test, expr1, expr2,                         \
         "test '" HPX_PP_STRINGIZE(expr1) " == " HPX_PP_STRINGIZE(expr2) "'")
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -257,7 +256,7 @@ namespace hpx { namespace util {
 
 #define HPX_TEST_NEQ_IMPL(fixture, expr1, expr2)                               \
     fixture.check_not_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,   \
-        ::hpx::util::counter_test, expr1, expr2,                               \
+        ::hpx::util::counter_type::test, expr1, expr2,                         \
         "test '" HPX_PP_STRINGIZE(expr1) " != " HPX_PP_STRINGIZE(expr2) "'")
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -276,7 +275,7 @@ namespace hpx { namespace util {
 
 #define HPX_TEST_LT_IMPL(fixture, expr1, expr2)                                \
     fixture.check_less(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,        \
-        ::hpx::util::counter_test, expr1, expr2,                               \
+        ::hpx::util::counter_type::test, expr1, expr2,                         \
         "test '" HPX_PP_STRINGIZE(expr1) " < " HPX_PP_STRINGIZE(expr2) "'")
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -295,7 +294,7 @@ namespace hpx { namespace util {
 
 #define HPX_TEST_LTE_IMPL(fixture, expr1, expr2)                               \
     fixture.check_less_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,  \
-        ::hpx::util::counter_test, expr1, expr2,                               \
+        ::hpx::util::counter_type::test, expr1, expr2,                         \
         "test '" HPX_PP_STRINGIZE(expr1) " <= " HPX_PP_STRINGIZE(expr2) "'")
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -315,7 +314,7 @@ namespace hpx { namespace util {
 
 #define HPX_TEST_RANGE_IMPL(fixture, expr1, expr2, expr3)                      \
     fixture.check_range(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
-        ::hpx::util::counter_test, expr1, expr2, expr3,                        \
+        ::hpx::util::counter_type::test, expr1, expr2, expr3,                  \
         "test '" HPX_PP_STRINGIZE(expr2) " <= " HPX_PP_STRINGIZE(              \
             expr1) " <= " HPX_PP_STRINGIZE(expr3) "'")
 
@@ -336,7 +335,7 @@ namespace hpx { namespace util {
 
 #define HPX_TEST_EQ_MSG_IMPL(fixture, expr1, expr2, msg)                       \
     fixture.check_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
-        ::hpx::util::counter_test, expr1, expr2, msg)
+        ::hpx::util::counter_type::test, expr1, expr2, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_TEST_NEQ_MSG(...)                                                  \
@@ -355,7 +354,7 @@ namespace hpx { namespace util {
 
 #define HPX_TEST_NEQ_MSG_IMPL(fixture, expr1, expr2, msg)                      \
     fixture.check_not_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,   \
-        ::hpx::util::counter_test, expr1, expr2, msg)
+        ::hpx::util::counter_type::test, expr1, expr2, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_TEST_LT_MSG(...)                                                   \
@@ -374,7 +373,7 @@ namespace hpx { namespace util {
 
 #define HPX_TEST_LT_MSG_IMPL(fixture, expr1, expr2, msg)                       \
     fixture.check_less(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,        \
-        ::hpx::util::counter_test, expr1, expr2, msg)
+        ::hpx::util::counter_type::test, expr1, expr2, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_TEST_LTE_MSG(...)                                                  \
@@ -393,7 +392,7 @@ namespace hpx { namespace util {
 
 #define HPX_TEST_LTE_MSG_IMPL(fixture, expr1, expr2, msg)                      \
     fixture.check_less_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,  \
-        ::hpx::util::counter_test, expr1, expr2, msg)
+        ::hpx::util::counter_type::test, expr1, expr2, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_TEST_RANGE_MSG(...)                                                \
@@ -413,7 +412,7 @@ namespace hpx { namespace util {
 
 #define HPX_TEST_RANGE_MSG_IMPL(fixture, expr1, expr2, expr3, msg)             \
     fixture.check_range(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
-        ::hpx::util::counter_test, expr1, expr2, expr3, msg)
+        ::hpx::util::counter_type::test, expr1, expr2, expr3, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_SANITY(...)                                                        \
@@ -431,7 +430,7 @@ namespace hpx { namespace util {
 
 #define HPX_SANITY_IMPL(fixture, expr)                                         \
     fixture.check_(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,            \
-        ::hpx::util::counter_sanity, expr,                                     \
+        ::hpx::util::counter_type::sanity, expr,                               \
         "sanity check '" HPX_PP_STRINGIZE(expr) "'")
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -450,7 +449,7 @@ namespace hpx { namespace util {
 
 #define HPX_SANITY_MSG_IMPL(fixture, expr, msg)                                \
     fixture.check_(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,            \
-        ::hpx::util::counter_sanity, expr, msg)
+        ::hpx::util::counter_type::sanity, expr, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_SANITY_EQ(...)                                                     \
@@ -468,7 +467,7 @@ namespace hpx { namespace util {
 
 #define HPX_SANITY_EQ_IMPL(fixture, expr1, expr2)                              \
     fixture.check_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
-        ::hpx::util::counter_sanity, expr1, expr2,                             \
+        ::hpx::util::counter_type::sanity, expr1, expr2,                       \
         "sanity check '" HPX_PP_STRINGIZE(expr1) " == " HPX_PP_STRINGIZE(      \
             expr2) "'")
 
@@ -488,7 +487,7 @@ namespace hpx { namespace util {
 
 #define HPX_SANITY_NEQ_IMPL(fixture, expr1, expr2)                             \
     fixture.check_not_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,   \
-        ::hpx::util::counter_sanity, expr1, expr2,                             \
+        ::hpx::util::counter_type::sanity, expr1, expr2,                       \
         "sanity check '" HPX_PP_STRINGIZE(expr1) " != " HPX_PP_STRINGIZE(      \
             expr2) "'")
 
@@ -508,7 +507,7 @@ namespace hpx { namespace util {
 
 #define HPX_SANITY_LT_IMPL(fixture, expr1, expr2)                              \
     fixture.check_less(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,        \
-        ::hpx::util::counter_sanity, expr1, expr2,                             \
+        ::hpx::util::counter_type::sanity, expr1, expr2,                       \
         "sanity check '" HPX_PP_STRINGIZE(expr1) " < " HPX_PP_STRINGIZE(       \
             expr2) "'")
 
@@ -528,7 +527,7 @@ namespace hpx { namespace util {
 
 #define HPX_SANITY_LTE_IMPL(fixture, expr1, expr2)                             \
     fixture.check_less_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,  \
-        ::hpx::util::counter_sanity, expr1, expr2,                             \
+        ::hpx::util::counter_type::sanity, expr1, expr2,                       \
         "sanity check '" HPX_PP_STRINGIZE(expr1) " <= " HPX_PP_STRINGIZE(      \
             expr2) "'")
 
@@ -550,7 +549,7 @@ namespace hpx { namespace util {
 
 #define HPX_SANITY_RANGE_IMPL(fixture, expr1, expr2, expr3)                    \
     fixture.check_range(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
-        ::hpx::util::counter_sanity, expr1, expr2, expr3,                      \
+        ::hpx::util::counter_type::sanity, expr1, expr2, expr3,                \
         "sanity check '" HPX_PP_STRINGIZE(expr2) " <= " HPX_PP_STRINGIZE(      \
             expr1) " <= " HPX_PP_STRINGIZE(expr3) "'")
 
@@ -572,7 +571,7 @@ namespace hpx { namespace util {
 
 #define HPX_SANITY_EQ_MSG_IMPL(fixture, expr1, expr2, msg)                     \
     fixture.check_equal(__FILE__, __LINE__, HPX_ASSERT_CURRENT_FUNCTION,       \
-        ::hpx::util::counter_sanity, expr1, expr2, msg)
+        ::hpx::util::counter_type::sanity, expr1, expr2, msg)
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_TEST_THROW(...)                                                    \

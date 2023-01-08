@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,8 @@
 
 #include <utility>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     template <typename Result, typename RemoteResult, typename Enable = void>
     struct get_remote_result
     {
@@ -19,7 +20,7 @@ namespace hpx { namespace traits {
             return Result(rhs);
         }
 
-        static Result call(RemoteResult&& rhs)    //-V659
+        static Result call(RemoteResult&& rhs) noexcept    //-V659
         {
             return Result(HPX_MOVE(rhs));
         }
@@ -28,14 +29,14 @@ namespace hpx { namespace traits {
     template <typename Result>
     struct get_remote_result<Result, Result>
     {
-        static Result const& call(Result const& rhs)
+        static constexpr Result const& call(Result const& rhs) noexcept
         {
             return rhs;
         }
 
-        static Result&& call(Result&& rhs)
+        static constexpr Result&& call(Result&& rhs) noexcept
         {
             return HPX_MOVE(rhs);
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

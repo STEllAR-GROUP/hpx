@@ -17,7 +17,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resource {
+namespace hpx::resource {
+
     ///////////////////////////////////////////////////////////////////////////
     std::vector<pu> pu::pus_sharing_core()
     {
@@ -69,6 +70,7 @@ namespace hpx { namespace resource {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         std::recursive_mutex& partitioner_mtx()
         {
             static std::recursive_mutex mtx;
@@ -109,7 +111,7 @@ namespace hpx { namespace resource {
         {
             // if the resource partitioner is not accessed for the first time
             // if the command-line parsing has not yet been done
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::resource::get_partitioner",
                 "can be called only after the resource partitioner has "
                 "been initialized and before it has been deleted.");
@@ -124,8 +126,9 @@ namespace hpx { namespace resource {
     }
 
     namespace detail {
+
         detail::partitioner& create_partitioner(
-            resource::partitioner_mode rpmode, hpx::util::section rtcfg,
+            resource::partitioner_mode rpmode, hpx::util::section const& rtcfg,
             hpx::threads::policies::detail::affinity_data affinity_data)
         {
             std::unique_ptr<detail::partitioner>& rp =
@@ -218,4 +221,4 @@ namespace hpx { namespace resource {
     {
         partitioner_.configure_pools();
     }
-}}    // namespace hpx::resource
+}    // namespace hpx::resource

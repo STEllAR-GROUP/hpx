@@ -274,7 +274,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<arg_type>(HPX_GET_EXCEPTION(
-                hpx::bad_parameter, "hpx::collectives::broadcast_to",
+                hpx::error::bad_parameter, "hpx::collectives::broadcast_to",
                 "the generation number shouldn't be zero"));
         }
 
@@ -337,7 +337,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
-                hpx::bad_parameter, "hpx::collectives::broadcast_from",
+                hpx::error::bad_parameter, "hpx::collectives::broadcast_from",
                 "the generation number shouldn't be zero"));
         }
 
@@ -383,111 +383,6 @@ namespace hpx { namespace collectives {
             this_site);
     }
 }}    // namespace hpx::collectives
-
-////////////////////////////////////////////////////////////////////////////////
-// compatibility functions
-namespace hpx { namespace lcos {
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::broadcast_to is deprecated, use "
-        "hpx::collectives::broadcast_to instead")
-    hpx::future<std::decay_t<T>> broadcast_to(char const* basename,
-        T&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        return hpx::collectives::broadcast_to(basename,
-            HPX_FORWARD(T, local_result),
-            hpx::collectives::num_sites_arg(num_sites),
-            hpx::collectives::this_site_arg(this_site),
-            hpx::collectives::generation_arg(generation),
-            hpx::collectives::root_site_arg(root_site));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::broadcast_to is deprecated, use "
-        "hpx::collectives::broadcast_to instead")
-    hpx::future<T> broadcast_to(char const* basename,
-        hpx::future<T>&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        return local_result.then([=](hpx::future<T>&& f) {
-            return hpx::collectives::broadcast_to(basename, f.get(),
-                hpx::collectives::num_sites_arg(num_sites),
-                hpx::collectives::this_site_arg(this_site),
-                hpx::collectives::generation_arg(generation),
-                hpx::collectives::root_site_arg(root_site));
-        });
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::broadcast is deprecated, use hpx::collectives::broadcast "
-        "instead")
-    hpx::future<typename std::decay<T>::type> broadcast_to(
-        hpx::collectives::communicator comm, T&& local_result,
-        std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::broadcast_to(HPX_MOVE(comm),
-            HPX_FORWARD(T, local_result),
-            hpx::collectives::this_site_arg(this_site));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::broadcast_to is deprecated, use "
-        "hpx::collectives::broadcast_to instead")
-    hpx::future<T> broadcast_to(hpx::collectives::communicator comm,
-        hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
-    {
-        return local_result.then([=](hpx::future<T>&& f) mutable {
-            hpx::collectives::broadcast_to(HPX_MOVE(comm), f.get(),
-                hpx::collectives::this_site_arg(this_site));
-        });
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::broadcast_from is deprecated, use "
-        "hpx::collectives::broadcast_from instead")
-    hpx::future<T> broadcast_from(char const* basename,
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        return hpx::collectives::broadcast_from<T>(basename,
-            hpx::collectives::this_site_arg(this_site),
-            hpx::collectives::generation_arg(generation),
-            hpx::collectives::root_site_arg(root_site));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::broadcast_from is deprecated, use "
-        "hpx::collectives::broadcast_from instead")
-    hpx::future<T> broadcast_from(hpx::collectives::communicator comm,
-        std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::broadcast_from<T>(
-            HPX_MOVE(comm), hpx::collectives::this_site_arg(this_site));
-    }
-
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::create_broadcast is deprecated, use "
-        "hpx::collectives::create_communicator instead")
-    inline hpx::collectives::communicator create_broadcast(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::create_communicator(basename,
-            hpx::collectives::num_sites_arg(num_sites),
-            hpx::collectives::this_site_arg(this_site),
-            hpx::collectives::generation_arg(generation));
-    }
-}}    // namespace hpx::lcos
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_BROADCAST_DECLARATION(...) /**/

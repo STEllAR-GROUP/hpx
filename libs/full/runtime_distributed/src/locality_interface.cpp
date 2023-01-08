@@ -58,7 +58,7 @@ namespace hpx::parcelset {
             if (nullptr != rt)
                 return rt->get_parcel_handler().set_write_handler(f);
 
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::set_default_parcel_write_handler",
                 "the runtime system is not operational at this point");
         }
@@ -100,7 +100,8 @@ namespace hpx::parcelset {
                     pp, num_messages, interval, ec);
             }
 
-            HPX_THROWS_IF(ec, invalid_status, "create_message_handler",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "create_message_handler",
                 "the runtime system is not available at this time");
             return nullptr;
         }

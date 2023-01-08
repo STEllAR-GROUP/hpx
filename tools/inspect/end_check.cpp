@@ -9,9 +9,10 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/modules/string_util.hpp>
 
 #include <boost/next_prior.hpp>
-#include <boost/tokenizer.hpp>
+
 #include <iterator>
 #include <string>
 #include "end_check.hpp"
@@ -38,8 +39,9 @@ namespace boost { namespace inspect {
         if (contents.find("hpxinspect:"
                           "noend") != string::npos)
             return;
-        char_separator<char> sep("\n", "", boost::keep_empty_tokens);
-        tokenizer<char_separator<char>> tokens(contents, sep);
+        hpx::string_util::char_separator sep(
+            "\n", "", hpx::string_util::empty_token_policy::keep);
+        hpx::string_util::tokenizer tokens(contents, sep);
         const auto linenumb = std::distance(tokens.begin(), tokens.end());
         std::string lineloc = std::to_string(linenumb);
         // this file deliberately contains errors

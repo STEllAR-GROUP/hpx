@@ -128,7 +128,7 @@ namespace hpx { namespace components { namespace server {
     {
         if (!traits::component_supports_migration<Component>::call())
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::components::server::trigger_migrate_from_storage_here",
                 "attempting to migrate an instance of a component which "
                 "does not support migration");
@@ -137,7 +137,7 @@ namespace hpx { namespace components { namespace server {
 
         if (naming::get_locality_id_from_id(to_resurrect) != get_locality_id())
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::components::server::trigger_migrate_from_storage_here",
                 "this function has to be executed on the locality responsible "
                 "for managing the address of the given object");

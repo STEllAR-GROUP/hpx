@@ -42,7 +42,7 @@ namespace hpx { namespace performance_counters { namespace detail {
 
             if (paths.parentinstance_is_basename_)
             {
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "component_instance_counter_creator",
                     "invalid instance counter name (instance name must not "
                     "be a valid base counter name)");
@@ -63,7 +63,7 @@ namespace hpx { namespace performance_counters { namespace detail {
                         return true;
                     });
 
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "component_instance_counter_creator", strm.str());
 
                 return naming::invalid_gid;
@@ -75,7 +75,7 @@ namespace hpx { namespace performance_counters { namespace detail {
 
             if (type == components::component_invalid)
             {
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "component_instance_counter_creator",
                     "invalid component type as counter parameter: {}",
                     paths.parameters_);
@@ -89,7 +89,7 @@ namespace hpx { namespace performance_counters { namespace detail {
         break;
 
         default:
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "component_instance_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;

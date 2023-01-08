@@ -129,7 +129,7 @@ namespace hpx { namespace components { namespace server {
                 agas::unmark_as_migrated(to_migrate.get_gid());
 
                 return hpx::make_exceptional_future<id_type>(
-                    HPX_GET_EXCEPTION(invalid_status,
+                    HPX_GET_EXCEPTION(hpx::error::invalid_status,
                         "hpx::components::server::migrate_component",
                         "attempting to migrate an instance of a component "
                         "that was already migrated"));
@@ -140,7 +140,7 @@ namespace hpx { namespace components { namespace server {
                 agas::unmark_as_migrated(to_migrate.get_gid());
 
                 return hpx::make_exceptional_future<id_type>(
-                    HPX_GET_EXCEPTION(migration_needs_retry,
+                    HPX_GET_EXCEPTION(hpx::error::migration_needs_retry,
                         "hpx::components::server::migrate_component",
                         "attempting to migrate an instance of a component "
                         "that is currently pinned"));
@@ -174,10 +174,11 @@ namespace hpx { namespace components { namespace server {
         {
             agas::unmark_as_migrated(to_migrate.get_gid());
 
-            return hpx::make_exceptional_future<hpx::id_type>(HPX_GET_EXCEPTION(
-                invalid_status, "hpx::components::server::migrate_component",
-                "attempting to migrate an instance of a component that "
-                "does not support migration"));
+            return hpx::make_exceptional_future<hpx::id_type>(
+                HPX_GET_EXCEPTION(hpx::error::invalid_status,
+                    "hpx::components::server::migrate_component",
+                    "attempting to migrate an instance of a component that "
+                    "does not support migration"));
         }
 
         // retrieve pointer to object (must be local)
@@ -211,7 +212,7 @@ namespace hpx { namespace components { namespace server {
         if (!traits::component_supports_migration<Component>::call())
         {
             return hpx::make_exceptional_future<id_type>(
-                HPX_GET_EXCEPTION(invalid_status,
+                HPX_GET_EXCEPTION(hpx::error::invalid_status,
                     "hpx::components::server::trigger_migrate_component",
                     "attempting to migrate an instance of a component that "
                     "does not support migration"));
@@ -220,7 +221,7 @@ namespace hpx { namespace components { namespace server {
         if (naming::get_locality_id_from_id(to_migrate) != get_locality_id())
         {
             return hpx::make_exceptional_future<id_type>(HPX_GET_EXCEPTION(
-                invalid_status,
+                hpx::error::invalid_status,
                 "hpx::components::server::trigger_migrate_component",
                 "this function has to be executed on the locality "
                 "responsible for managing the address of the given object"));
@@ -246,7 +247,7 @@ namespace hpx { namespace components { namespace server {
                         // simply retry if the migration operation detected
                         // a (global) race between scheduled actions waiting
                         // in AGAS and other migration operations
-                        if (e.get_error() == migration_needs_retry)
+                        if (e.get_error() == hpx::error::migration_needs_retry)
                         {
                             return trigger_migrate_component<Component>(
                                 to_migrate, policy, id, addr);
@@ -284,7 +285,7 @@ namespace hpx { namespace components { namespace server {
         if (!traits::component_supports_migration<Component>::call())
         {
             return hpx::make_exceptional_future<id_type>(
-                HPX_GET_EXCEPTION(invalid_status,
+                HPX_GET_EXCEPTION(hpx::error::invalid_status,
                     "hpx::components::server::perform_migrate_component",
                     "attempting to migrate an instance of a component that "
                     "does not support migration"));

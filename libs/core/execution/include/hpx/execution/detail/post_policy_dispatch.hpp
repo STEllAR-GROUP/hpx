@@ -33,7 +33,7 @@ namespace hpx::detail {
     {
         template <typename Policy, typename F, typename... Ts>
         static void call(Policy const& policy,
-            hpx::util::thread_description const& desc,
+            hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
             threads::thread_init_data data(
@@ -47,7 +47,7 @@ namespace hpx::detail {
 
         template <typename Policy, typename F, typename... Ts>
         static void call(Policy const& policy,
-            hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
+            hpx::threads::thread_description const& desc, F&& f, Ts&&... ts)
         {
             call(policy, desc, threads::detail::get_self_or_default_pool(),
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -59,7 +59,7 @@ namespace hpx::detail {
     {
         template <typename Policy, typename F, typename... Ts>
         static void call(Policy const& policy,
-            hpx::util::thread_description const& desc,
+            hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
             threads::thread_init_data data(
@@ -89,7 +89,7 @@ namespace hpx::detail {
 
         template <typename Policy, typename F, typename... Ts>
         static void call(Policy const& policy,
-            hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
+            hpx::threads::thread_description const& desc, F&& f, Ts&&... ts)
         {
             call(policy, desc, threads::detail::get_self_or_default_pool(),
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -101,7 +101,7 @@ namespace hpx::detail {
     {
         template <typename Policy, typename F, typename... Ts>
         static void call(Policy const& policy,
-            hpx::util::thread_description const&, threads::thread_pool_base*,
+            hpx::threads::thread_description const&, threads::thread_pool_base*,
             F&& f, Ts&&... ts)
         {
             hpx::detail::sync_launch_policy_dispatch<launch::sync_policy>::call(
@@ -110,7 +110,7 @@ namespace hpx::detail {
 
         template <typename Policy, typename F, typename... Ts>
         static void call(Policy const& policy,
-            hpx::util::thread_description const&, F&& f, Ts&&... ts)
+            hpx::threads::thread_description const&, F&& f, Ts&&... ts)
         {
             hpx::detail::sync_launch_policy_dispatch<launch::sync_policy>::call(
                 policy, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -122,7 +122,7 @@ namespace hpx::detail {
     {
         template <typename Policy, typename F, typename... Ts>
         static void call(Policy const& policy,
-            hpx::util::thread_description const&, threads::thread_pool_base*,
+            hpx::threads::thread_description const&, threads::thread_pool_base*,
             F&& f, Ts&&... ts)
         {
             hpx::detail::sync_launch_policy_dispatch<
@@ -132,7 +132,7 @@ namespace hpx::detail {
 
         template <typename Policy, typename F, typename... Ts>
         static void call(Policy const& policy,
-            hpx::util::thread_description const&, F&& f, Ts&&... ts)
+            hpx::threads::thread_description const&, F&& f, Ts&&... ts)
         {
             hpx::detail::sync_launch_policy_dispatch<
                 launch::deferred_policy>::call(policy, HPX_FORWARD(F, f),
@@ -145,7 +145,7 @@ namespace hpx::detail {
     {
         template <typename F, typename... Ts>
         static void call(Policy const& policy,
-            hpx::util::thread_description const& desc,
+            hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
             if (policy == launch::sync)
@@ -173,7 +173,7 @@ namespace hpx::detail {
 
         template <typename F, typename... Ts>
         static void call(Policy const& policy,
-            hpx::util::thread_description const& desc, F&& f, Ts&&... ts)
+            hpx::threads::thread_description const& desc, F&& f, Ts&&... ts)
         {
             call(policy, desc, threads::detail::get_self_or_default_pool(),
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);

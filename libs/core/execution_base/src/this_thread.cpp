@@ -1,6 +1,6 @@
 //  Copyright (c) 2013-2019 Thomas Heller
 //  Copyright (c) 2008 Peter Dimov
-//  Copyright (c) 2018 Hartmut Kaiser
+//  Copyright (c) 2018-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -35,13 +35,13 @@ extern "C" int sched_yield(void);
 #include <time.h>
 #endif
 
-namespace hpx { namespace execution_base {
+namespace hpx::execution_base {
 
     namespace {
 
         struct default_context : execution_base::context_base
         {
-            resource_base const& resource() const override
+            resource_base const& resource() const noexcept override
             {
                 return resource_;
             }
@@ -57,7 +57,7 @@ namespace hpx { namespace execution_base {
                 return hpx::util::format("{}", id_);
             }
 
-            default_context const& context() const override
+            default_context const& context() const noexcept override
             {
                 return context_;
             }
@@ -150,7 +150,7 @@ namespace hpx { namespace execution_base {
 
             if (aborted_)
             {
-                HPX_THROW_EXCEPTION(yield_aborted, "suspend",
+                HPX_THROW_EXCEPTION(hpx::error::yield_aborted, "suspend",
                     "std::thread({}) aborted (yield returned wait_abort)", id_);
             }
         }
@@ -198,6 +198,7 @@ namespace hpx { namespace execution_base {
     }    // namespace
 
     namespace detail {
+
         agent_base& get_default_agent()
         {
             static thread_local default_agent agent;
@@ -270,4 +271,4 @@ namespace hpx { namespace execution_base {
             agent().suspend(desc);
         }
     }    // namespace this_thread
-}}       // namespace hpx::execution_base
+}    // namespace hpx::execution_base

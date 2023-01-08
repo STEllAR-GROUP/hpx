@@ -45,7 +45,7 @@ namespace hpx { namespace performance_counters { namespace server {
         if (info.type_ != counter_type::histogram &&
             info.type_ != counter_type::raw_values)
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "raw_values_counter::raw_values_counter",
                 "unexpected counter type specified for raw_values_counter "
                 "should be counter_type::histogram or "

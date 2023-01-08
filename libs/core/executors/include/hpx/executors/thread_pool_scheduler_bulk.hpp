@@ -10,7 +10,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/concurrency/detail/contiguous_index_queue.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/concurrency/detail/non_contiguous_index_queue.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -38,6 +39,7 @@
 #include <hpx/topology/topology.hpp>
 #include <hpx/type_support/pack.hpp>
 
+#include <algorithm>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -125,6 +127,7 @@ namespace hpx::execution::experimental::detail {
             HPX_UNREACHABLE;
         }
 
+    private:
         // Perform the work in one element indexed by index. The index
         // represents a range of indices (iterators) in the given shape.
         template <typename Ts>
@@ -140,9 +143,8 @@ namespace hpx::execution::experimental::detail {
 
             auto const i_begin =
                 static_cast<std::size_t>(index) * task_f->chunk_size;
-            auto const i_end = (std::min)(
-                static_cast<std::size_t>(index + 1) * task_f->chunk_size,
-                task_f->size);
+            auto const i_end =
+                (std::min)(i_begin + task_f->chunk_size, task_f->size);
 
             auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
             for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
@@ -152,6 +154,43 @@ namespace hpx::execution::experimental::detail {
             }
         }
 
+        template <hpx::concurrency::detail::queue_end Which, typename Ts>
+        void do_work(Ts& ts) const
+        {
+            auto worker_thread = task_f->worker_thread;
+            auto& local_queue = op_state->queues[worker_thread].data_;
+
+            // Handle local queue first
+            hpx::optional<std::uint32_t> index;
+            while ((index = local_queue.template pop<Which>()))
+            {
+                do_work_chunk(ts, index.value());
+            }
+
+            if (task_f->allow_stealing)
+            {
+                // Then steal from the opposite end of the neighboring queues
+                static constexpr auto opposite_end =
+                    hpx::concurrency::detail::opposite_end_v<Which>;
+
+                for (std::uint32_t offset = 1;
+                     offset != op_state->num_worker_threads; ++offset)
+                {
+                    std::size_t neighbor_thread =
+                        (worker_thread + offset) % op_state->num_worker_threads;
+                    auto& neighbor_queue =
+                        op_state->queues[neighbor_thread].data_;
+
+                    while (
+                        (index = neighbor_queue.template pop<opposite_end>()))
+                    {
+                        do_work_chunk(ts, index.value());
+                    }
+                }
+            }
+        }
+
+    public:
         // Visit the values sent from the predecessor sender. This function
         // first tries to handle all chunks in the queue owned by worker_thread.
         // It then tries to steal chunks from neighboring threads.
@@ -164,28 +203,14 @@ namespace hpx::execution::experimental::detail {
         // clang-format on
         void operator()(Ts& ts) const
         {
-            auto worker_thread = task_f->worker_thread;
-            auto& local_queue = op_state->queues[worker_thread].data_;
-
-            // Handle local queue first
-            hpx::optional<std::uint32_t> index;
-            while ((index = local_queue.pop_left()))
+            // schedule chunks from the end, if needed
+            if (task_f->reverse_placement)
             {
-                do_work_chunk(ts, index.value());
+                do_work<hpx::concurrency::detail::queue_end::right>(ts);
             }
-
-            // Then steal from neighboring queues
-            for (std::uint32_t offset = 1;
-                 offset != op_state->num_worker_threads; ++offset)
+            else
             {
-                std::size_t neighbor_thread =
-                    (worker_thread + offset) % op_state->num_worker_threads;
-                auto& neighbor_queue = op_state->queues[neighbor_thread].data_;
-
-                while ((index = neighbor_queue.pop_right()))
-                {
-                    do_work_chunk(ts, index.value());
-                }
+                do_work<hpx::concurrency::detail::queue_end::left>(ts);
             }
         }
     };
@@ -227,6 +252,8 @@ namespace hpx::execution::experimental::detail {
         std::size_t const size;
         std::uint32_t const chunk_size;
         std::uint32_t const worker_thread;
+        bool reverse_placement;
+        bool allow_stealing;
 
         // Visit the values sent by the predecessor sender.
         void do_work() const
@@ -327,8 +354,8 @@ namespace hpx::execution::experimental::detail {
         }
 
         // Initialize a queue for a worker thread.
-        void init_queue(std::uint32_t const worker_thread,
-            std::uint32_t const size, std::uint32_t num_threads)
+        void init_queue_depth_first(std::uint32_t const worker_thread,
+            std::uint32_t const size, std::uint32_t num_threads) noexcept
         {
             auto& queue = op_state->queues[worker_thread].data_;
             auto const part_begin = static_cast<std::uint32_t>(
@@ -336,6 +363,22 @@ namespace hpx::execution::experimental::detail {
             auto const part_end = static_cast<std::uint32_t>(
                 ((worker_thread + 1) * size) / num_threads);
             queue.reset(part_begin, part_end);
+        }
+
+        void init_queue_breadth_first(std::uint32_t const worker_thread,
+            std::uint32_t const size, std::uint32_t num_threads) noexcept
+        {
+            auto& queue = op_state->queues[worker_thread].data_;
+            auto const num_steps = size / num_threads + 1;
+            auto const part_begin = worker_thread;
+            auto part_end = (std::min)(
+                size + num_threads - 1, part_begin + num_steps * num_threads);
+            auto const remainder = (part_end - part_begin) % num_threads;
+            if (remainder != 0)
+            {
+                part_end -= remainder;
+            }
+            queue.reset(part_begin, part_end, num_threads);
         }
 
         // Spawn a task which will process a number of chunks. If the queue
@@ -432,13 +475,29 @@ namespace hpx::execution::experimental::detail {
             op_state->ts.template emplace<hpx::tuple<Ts...>>(
                 HPX_FORWARD(Ts, ts)...);
 
+            // thread placement
+            hpx::threads::thread_schedule_hint hint =
+                hpx::execution::experimental::get_hint(op_state->scheduler);
+
+            using placement = hpx::threads::thread_placement_hint;
+
             // Initialize the queues for all worker threads so that worker
             // threads can start stealing immediately when they start.
             for (std::uint32_t worker_thread = 0;
                  worker_thread != op_state->num_worker_threads; ++worker_thread)
             {
-                init_queue(
-                    worker_thread, num_chunks, op_state->num_worker_threads);
+                if (hint.placement_mode == placement::breadth_first ||
+                    hint.placement_mode == placement::breadth_first_reverse)
+                {
+                    init_queue_breadth_first(worker_thread, num_chunks,
+                        op_state->num_worker_threads);
+                }
+                else
+                {
+                    // the default for this scheduler is depth-first placement
+                    init_queue_depth_first(worker_thread, num_chunks,
+                        op_state->num_worker_threads);
+                }
             }
 
             // Spawn the worker threads for all except the local queue.
@@ -457,6 +516,12 @@ namespace hpx::execution::experimental::detail {
                 local_worker_thread = worker_thread++;
                 main_pu_num = rp.get_pu_num(local_worker_thread);
             }
+
+            bool reverse_placement =
+                hint.placement_mode == placement::depth_first_reverse ||
+                hint.placement_mode == placement::breadth_first_reverse;
+            bool allow_stealing =
+                !hpx::threads::do_not_share_function(hint.sharing_mode);
 
             for (std::uint32_t pu = 0;
                  worker_thread != op_state->num_worker_threads && pu != num_pus;
@@ -489,8 +554,9 @@ namespace hpx::execution::experimental::detail {
                 }
 
                 // Schedule task for this worker thread
-                do_work_task(task_function<OperationState>{
-                    op_state, size, chunk_size, worker_thread});
+                do_work_task(
+                    task_function<OperationState>{op_state, size, chunk_size,
+                        worker_thread, reverse_placement, allow_stealing});
 
                 ++worker_thread;
             }
@@ -503,8 +569,9 @@ namespace hpx::execution::experimental::detail {
             HPX_ASSERT(worker_thread == op_state->num_worker_threads);
 
             // Handle the queue for the local thread.
-            do_work_local(task_function<OperationState>{
-                this->op_state, size, chunk_size, local_worker_thread});
+            do_work_local(
+                task_function<OperationState>{this->op_state, size, chunk_size,
+                    local_worker_thread, reverse_placement, allow_stealing});
         }
 
         // clang-format off
@@ -644,7 +711,7 @@ namespace hpx::execution::experimental::detail {
             std::size_t num_worker_threads;
             hpx::threads::mask_type pu_mask;
             std::vector<hpx::util::cache_aligned_data<
-                hpx::concurrency::detail::contiguous_index_queue<>>>
+                hpx::concurrency::detail::non_contiguous_index_queue<>>>
                 queues;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
@@ -658,12 +725,12 @@ namespace hpx::execution::experimental::detail {
             std::atomic<bool> bad_alloc_thrown{false};
             hpx::exception_list exceptions;
 
-            template <typename Sender_, typename Shape_, typename F_,
-                typename Receiver_>
-            operation_state(thread_pool_policy_scheduler<Policy>&& scheduler,
-                Sender_&& sender, Shape_&& shape, F_&& f,
-                hpx::threads::mask_cref_type pumask, Receiver_&& receiver)
-              : scheduler(HPX_MOVE(scheduler))
+            template <typename Scheduler_, typename Sender_, typename Shape_,
+                typename F_, typename Receiver_>
+            operation_state(Scheduler_&& scheduler, Sender_&& sender,
+                Shape_&& shape, F_&& f, hpx::threads::mask_cref_type pumask,
+                Receiver_&& receiver)
+              : scheduler(HPX_FORWARD(Scheduler_, scheduler))
               , op_state(hpx::execution::experimental::connect(
                     HPX_FORWARD(Sender_, sender),
                     bulk_receiver<operation_state, F, Shape>{this}))
@@ -698,7 +765,7 @@ namespace hpx::execution::experimental::detail {
         }
 
         template <typename Receiver>
-        auto tag_invoke(
+        friend auto tag_invoke(
             connect_t, thread_pool_bulk_sender& s, Receiver&& receiver)
         {
             return operation_state<std::decay_t<Receiver>>{s.scheduler,

@@ -60,8 +60,8 @@ namespace interpolate1d {
 
             if (numdims != 1)
             {
-                HPX_THROW_EXCEPTION(hpx::no_success, "extract_data_range",
-                    "number of dimensions was not 1");
+                HPX_THROW_EXCEPTION(hpx::error::no_success,
+                    "extract_data_range", "number of dimensions was not 1");
             }
 
             // Get the dimension size of each dimension in the dataspace.
@@ -80,7 +80,7 @@ namespace interpolate1d {
         catch (H5::Exception const& e)
         {
             HPX_THROW_EXCEPTION(
-                hpx::no_success, "extract_data_range", e.getDetailMsg());
+                hpx::error::no_success, "extract_data_range", e.getDetailMsg());
         }
         return 0;    // keep compiler happy
     }
@@ -106,7 +106,7 @@ namespace interpolate1d {
 
             if (numdims != 1)
             {
-                HPX_THROW_EXCEPTION(hpx::no_success, "extract_data",
+                HPX_THROW_EXCEPTION(hpx::error::no_success, "extract_data",
                     "number of dimensions was not 1");
             }
 
@@ -119,7 +119,7 @@ namespace interpolate1d {
         catch (H5::Exception const& e)
         {
             HPX_THROW_EXCEPTION(
-                hpx::no_success, "extract_data", e.getDetailMsg());
+                hpx::error::no_success, "extract_data", e.getDetailMsg());
         }
     }
 }    // namespace interpolate1d

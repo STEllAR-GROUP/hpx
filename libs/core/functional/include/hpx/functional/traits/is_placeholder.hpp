@@ -19,11 +19,17 @@
 
 namespace hpx {
 #if defined(DOXYGEN)
-    /// If \p T is a standard, Boost, or HPX placeholder (_1, _2, _3, ...) then
-    /// this template is derived from ``std::integral_constant<int, 1>``,
-    /// ``std::integral_constant<int, 2>``, ``std::integral_constant<int, 3>``,
-    /// respectively. Otherwise it is derived from ,
-    /// ``std::integral_constant<int, 0>``.
+    /// \brief If \c T is a standard, Boost, or HPX placeholder (_1, _2, _3, ...)
+    ///        then this template is derived from \c std::integral_constant<int,1>,
+    ///        \c std::integral_constant<int,2>, \c std::integral_constant<int,3>,
+    ///        respectively. Otherwise, it is derived from
+    ///        \c std::integral_constant<int,0>.
+    /// \details The template may be specialized for any user-defined \c T type: the
+    ///          specialization must satisfy \a UnaryTypeTrait with base characteristic
+    ///          of \c std::integral_constant<int,N> with N>0 to indicate that
+    ///          \c T should be treated as N'th placeholder type.
+    ///          \c hpx::bind uses \c hpx::is_placeholder to detect placeholders for
+    ///          unbound arguments.
     template <typename T>
     struct is_placeholder;
 #else

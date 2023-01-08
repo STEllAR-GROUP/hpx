@@ -17,8 +17,7 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace iostreams { namespace detail
-{
+namespace hpx { namespace iostreams { namespace detail {
     struct order_output
     {
         typedef std::map<std::uint64_t, buffer> output_data_type;
@@ -31,14 +30,14 @@ namespace hpx { namespace iostreams { namespace detail
         {
             detail::buffer in(buf_in);
             std::unique_lock<Mutex> l(mtx);
-            data_type& data = output_data_map_[locality_id]; //-V108
+            data_type& data = output_data_map_[locality_id];    //-V108
 
             if (count == data.first)
             {
                 // this is the next expected output line
                 {
                     // output the line as requested
-                    util::unlock_guard<std::unique_lock<Mutex> > ul(l);
+                    unlock_guard<std::unique_lock<Mutex>> ul(l);
                     in.write(write_f, mtx);
                 }
                 ++data.first;
@@ -50,7 +49,7 @@ namespace hpx { namespace iostreams { namespace detail
                     buffer next_in = (*next).second;
                     {
                         // output the next line
-                        util::unlock_guard<std::unique_lock<Mutex> > ul(l);
+                        unlock_guard<std::unique_lock<Mutex>> ul(l);
                         next_in.write(write_f, mtx);
                     }
                     data.second.erase(next);
@@ -70,7 +69,4 @@ namespace hpx { namespace iostreams { namespace detail
     private:
         output_data_map_type output_data_map_;
     };
-}}}
-
-
-
+}}}    // namespace hpx::iostreams::detail

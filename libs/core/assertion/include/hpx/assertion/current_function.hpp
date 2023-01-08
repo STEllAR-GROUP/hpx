@@ -14,7 +14,7 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace assertion { namespace detail {
+namespace hpx::assertion::detail {
 
     constexpr inline void current_function_helper()
     {
@@ -56,4 +56,4 @@ namespace hpx { namespace assertion { namespace detail {
 #endif
     }
 
-}}}    // namespace hpx::assertion::detail
+}    // namespace hpx::assertion::detail

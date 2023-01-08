@@ -6,44 +6,39 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
-#ifdef HPX_HAVE_VERIFY_LOCKS
-#include <hpx/lock_registration/detail/register_locks.hpp>
-#endif
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/format.hpp>
 
 #include <cstddef>
 #include <ostream>
 
-namespace hpx { namespace execution_base {
+namespace hpx::execution_base {
 
     void agent_ref::yield(const char* desc)
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
+
         // verify that there are no more registered locks for this OS-thread
-#ifdef HPX_HAVE_VERIFY_LOCKS
         util::verify_no_locks();
-#endif
         impl_->yield(desc);
     }
 
     void agent_ref::yield_k(std::size_t k, const char* desc)
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
+
         // verify that there are no more registered locks for this OS-thread
-#ifdef HPX_HAVE_VERIFY_LOCKS
         util::verify_no_locks();
-#endif
         impl_->yield_k(k, desc);
     }
 
     void agent_ref::suspend(const char* desc)
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
+
         // verify that there are no more registered locks for this OS-thread
-#ifdef HPX_HAVE_VERIFY_LOCKS
         util::verify_no_locks();
-#endif
         impl_->suspend(desc);
     }
 
@@ -78,4 +73,4 @@ namespace hpx { namespace execution_base {
         hpx::util::format_to(os, "agent_ref{{{}}}", a.impl_->description());
         return os;
     }
-}}    // namespace hpx::execution_base
+}    // namespace hpx::execution_base

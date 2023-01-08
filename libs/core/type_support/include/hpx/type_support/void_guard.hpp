@@ -8,7 +8,8 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     // This utility simplifies templates returning compatible types
     //
@@ -29,4 +30,4 @@ namespace hpx { namespace util {
         {
         }
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util

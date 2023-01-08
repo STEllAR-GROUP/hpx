@@ -109,7 +109,7 @@ namespace hpx { namespace performance_counters {
                     strm << "  " << e.first << "\n";
                 }
 
-                HPX_THROWS_IF(ec, bad_parameter,
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "invocation_count_registry::counter_discoverer",
                     strm.str());
                 return false;
@@ -132,7 +132,7 @@ namespace hpx { namespace performance_counters {
                 types += "  " + e.first + "\n";
             }
 
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "invocation_count_registry::counter_discoverer",
                 "action type {} does not match any known type, known action "
                 "types: \n{}",

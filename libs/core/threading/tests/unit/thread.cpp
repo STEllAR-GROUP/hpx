@@ -189,7 +189,7 @@ void do_test_thread_no_interrupt_if_interrupts_disabled_at_interruption_point()
     }
     catch (hpx::exception& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::thread_not_interruptable);
+        HPX_TEST_EQ(e.get_error(), hpx::error::thread_not_interruptable);
         caught = true;
     }
 
@@ -350,7 +350,7 @@ void test_double_join()
     }
     catch (hpx::exception& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::invalid_status);
+        HPX_TEST_EQ(e.get_error(), hpx::error::invalid_status);
         caught = true;
     }
 

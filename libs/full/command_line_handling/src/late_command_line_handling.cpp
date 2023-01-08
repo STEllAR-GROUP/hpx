@@ -10,7 +10,6 @@
 #include <hpx/modules/command_line_handling_local.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <cstddef>
@@ -18,7 +17,7 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     int handle_late_commandline_options(util::runtime_configuration& ini,
         hpx::program_options::options_description const& options,
@@ -34,11 +33,12 @@ namespace hpx { namespace util {
             {
                 std::string runtime_mode(ini.get_entry("hpx.runtime_mode", ""));
 
-                util::commandline_error_mode mode = util::rethrow_on_error;
+                util::commandline_error_mode mode =
+                    util::commandline_error_mode::rethrow_on_error;
                 std::string allow_unknown(
                     ini.get_entry("hpx.commandline.allow_unknown", "0"));
                 if (allow_unknown != "0")
-                    mode = util::allow_unregistered;
+                    mode |= util::commandline_error_mode::allow_unregistered;
 
                 hpx::program_options::variables_map vm;
                 std::vector<std::string> still_unregistered_options;
@@ -66,7 +66,9 @@ namespace hpx { namespace util {
 
                 util::parse_commandline(ini, options, cmd_line, vm,
                     std::size_t(-1),
-                    util::allow_unregistered | util::report_missing_config_file,
+                    util::commandline_error_mode::allow_unregistered |
+                        util::commandline_error_mode::
+                            report_missing_config_file,
                     get_runtime_mode_from_name(runtime_mode));
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -98,4 +100,4 @@ namespace hpx { namespace util {
 
         return 0;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,7 +15,8 @@
 
 #include <type_traits>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     struct function_base_vtable
       : vtable
       , copyable_vtable
@@ -52,7 +53,7 @@ namespace hpx { namespace util { namespace detail {
         using copyable_tag = std::integral_constant<bool, false>;
 
         template <typename T>
-        constexpr function_vtable(construct_vtable<T>) noexcept
+        explicit constexpr function_vtable(construct_vtable<T>) noexcept
           : function_base_vtable(construct_vtable<T>(), copyable_tag{})
           , callable_vtable<Sig>(construct_vtable<T>())
         {
@@ -72,7 +73,7 @@ namespace hpx { namespace util { namespace detail {
         using copyable_tag = std::integral_constant<bool, true>;
 
         template <typename T>
-        constexpr function_vtable(construct_vtable<T>) noexcept
+        explicit constexpr function_vtable(construct_vtable<T>) noexcept
           : function_vtable<Sig, false>(construct_vtable<T>(), copyable_tag{})
         {
         }
@@ -80,4 +81,4 @@ namespace hpx { namespace util { namespace detail {
 
     template <typename Sig>
     using unique_function_vtable = function_vtable<Sig, false>;
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

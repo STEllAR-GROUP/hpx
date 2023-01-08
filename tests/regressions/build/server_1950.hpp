@@ -12,7 +12,7 @@
 #include <hpx/include/components.hpp>
 
 struct HPX_COMPONENT_EXPORT test_server
-  : hpx::components::simple_component_base<test_server>
+  : hpx::components::component_base<test_server>
 {
     test_server() {}
 

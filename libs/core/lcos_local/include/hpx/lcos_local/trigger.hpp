@@ -8,7 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/bind.hpp>
+#include <hpx/datastructures/detail/intrusive_list.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/lcos_local/conditional_trigger.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
@@ -18,23 +19,32 @@
 #include <hpx/thread_support/unlock_guard.hpp>
 
 #include <cstddef>
-#include <list>
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Mutex = hpx::spinlock>
     struct base_trigger
     {
     protected:
-        typedef Mutex mutex_type;
+        using mutex_type = Mutex;
 
     private:
-        typedef std::list<conditional_trigger*> condition_list_type;
+        struct condition_list_entry : conditional_trigger
+        {
+            condition_list_entry() = default;
+
+            condition_list_entry* prev = nullptr;
+            condition_list_entry* next = nullptr;
+        };
+
+        using condition_list_type =
+            hpx::detail::intrusive_list<condition_list_entry>;
 
     public:
-        base_trigger()
+        base_trigger() noexcept
           : generation_(0)
         {
         }
@@ -67,11 +77,17 @@ namespace hpx { namespace lcos { namespace local {
         {
             bool triggered = false;
             error_code rc(throwmode::lightweight);
-            for (conditional_trigger* c : conditions_)
+            condition_list_entry* next = nullptr;
+            for (auto* c = conditions_.front(); c != nullptr; c = next)
             {
+                // item me be deleted during processing
+                next = c->next;
                 triggered |= c->set(rc);
+
                 if (rc && (&ec != &throws))
+                {
                     ec = rc;
+                }
             }
             return triggered;
         }
@@ -90,7 +106,9 @@ namespace hpx { namespace lcos { namespace local {
             if (!ec)
             {
                 if (generation_value)
+                {
                     *generation_value = generation_;
+                }
                 return promise_.get_future(ec);
             }
             return hpx::future<void>();
@@ -114,35 +132,35 @@ namespace hpx { namespace lcos { namespace local {
         }
 
     private:
-        bool test_condition(std::size_t generation_value)
+        bool test_condition(std::size_t generation_value) noexcept
         {
             return !(generation_value > generation_);
         }
 
         struct manage_condition
         {
-            manage_condition(base_trigger& gate, conditional_trigger& cond)
+            manage_condition(
+                base_trigger& gate, condition_list_entry& cond) noexcept
               : this_(gate)
+              , e_(cond)
             {
-                this_.conditions_.push_back(&cond);
-                it_ = this_.conditions_.end();
-                --it_;    // refer to the newly added element
+                this_.conditions_.push_back(cond);
             }
 
             ~manage_condition()
             {
-                this_.conditions_.erase(it_);
+                this_.conditions_.erase(&e_);
             }
 
             template <typename Condition>
             hpx::future<void> get_future(
                 Condition&& func, error_code& ec = hpx::throws)
             {
-                return (*it_)->get_future(HPX_FORWARD(Condition, func), ec);
+                return e_.get_future(HPX_FORWARD(Condition, func), ec);
             }
 
             base_trigger& this_;
-            condition_list_type::iterator it_;
+            condition_list_entry& e_;
         };
 
     public:
@@ -166,7 +184,7 @@ namespace hpx { namespace lcos { namespace local {
 
             if (generation_value < generation_)
             {
-                HPX_THROWS_IF(ec, hpx::invalid_status, function_name,
+                HPX_THROWS_IF(ec, hpx::error::invalid_status, function_name,
                     "sequencing error, generational counter too small");
                 return;
             }
@@ -174,14 +192,14 @@ namespace hpx { namespace lcos { namespace local {
             // make sure this set operation has not arrived ahead of time
             if (!test_condition(generation_value))
             {
-                conditional_trigger c;
+                condition_list_entry c;
                 manage_condition cond(*this, c);
 
-                hpx::future<void> f = cond.get_future(hpx::bind(
+                hpx::future<void> f = cond.get_future(hpx::bind_front(
                     &base_trigger::test_condition, this, generation_value));
 
                 {
-                    hpx::util::unlock_guard<Lock> ul(l);
+                    hpx::unlock_guard<Lock> ul(l);
                     f.get();
                 }    // make sure lock gets re-acquired
             }
@@ -222,10 +240,10 @@ namespace hpx { namespace lcos { namespace local {
     struct trigger : public base_trigger<hpx::no_mutex>
     {
     private:
-        typedef base_trigger<hpx::no_mutex> base_type;
+        using base_type = base_trigger<hpx::no_mutex>;
 
     public:
-        trigger() {}
+        trigger() = default;
 
         trigger(trigger&& rhs) noexcept
           : base_type(HPX_MOVE(static_cast<base_type&>(rhs)))
@@ -248,4 +266,4 @@ namespace hpx { namespace lcos { namespace local {
                 generation_value, l, function_name, ec);
         }
     };
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

@@ -17,6 +17,7 @@
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/runtime_local/get_worker_thread_num.hpp>
 #include <hpx/topology/topology.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -102,7 +103,8 @@ namespace hpx { namespace parallel { namespace util {
                 first_touch.push_back(hpx::for_each(
                     hpx::execution::par(hpx::execution::task)
                         .on(executors_[i])
-                        .with(hpx::execution::static_chunk_size()),
+                        .with(
+                            hpx::execution::experimental::static_chunk_size()),
                     begin, end,
 #if defined(HPX_DEBUG)
                     [this, i]
@@ -155,9 +157,9 @@ namespace hpx { namespace parallel { namespace util {
         }
 
         // construction/destruction
-        void construct(pointer p, const T& t)
+        void construct(pointer p, T const& t)
         {
-            new (p) T(t);
+            hpx::construct_at(p, t);
         }
         void destroy(pointer p)
         {

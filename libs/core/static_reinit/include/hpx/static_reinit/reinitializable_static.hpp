@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2006 Joao Abecasis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -26,7 +26,8 @@
 #endif
 // clang-format on
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     //  Provides thread-safe initialization of a single static instance of T.
     //
@@ -50,26 +51,26 @@ namespace hpx { namespace util {
         HPX_NON_COPYABLE(reinitializable_static);
 
     public:
-        typedef T value_type;
+        using value_type = T;
 
     private:
         static void default_construct()
         {
             for (std::size_t i = 0; i < N; ++i)
-                new (get_address(i)) value_type();
+                hpx::construct_at(get_address(i));
         }
 
         template <typename U>
         static void value_construct(U const& v)
         {
             for (std::size_t i = 0; i < N; ++i)
-                new (get_address(i)) value_type(v);
+                hpx::construct_at(get_address(i), v);
         }
 
         static void destruct()
         {
             for (std::size_t i = 0; i < N; ++i)
-                get_address(i)->~value_type();
+                std::destroy_at(get_address(i));
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -91,8 +92,8 @@ namespace hpx { namespace util {
         }
 
     public:
-        typedef T& reference;
-        typedef T const& const_reference;
+        using reference = T&;
+        using const_reference = T const&;
 
         reinitializable_static()
         {
@@ -117,37 +118,37 @@ namespace hpx { namespace util {
 #endif
         }
 
-        operator reference()
+        operator reference() noexcept
         {
             return this->get();
         }
 
-        operator const_reference() const
+        operator const_reference() const noexcept
         {
             return this->get();
         }
 
-        reference get(std::size_t item = 0)
+        reference get(std::size_t item = 0) noexcept
         {
             return *this->get_address(item);
         }
 
-        const_reference get(std::size_t item = 0) const
+        const_reference get(std::size_t item = 0) const noexcept
         {
             return *this->get_address(item);
         }
 
     private:
-        typedef typename std::add_pointer<value_type>::type pointer;
+        using pointer = std::add_pointer_t<value_type>;
 
-        static pointer get_address(std::size_t item)
+        static pointer get_address(std::size_t item) noexcept
         {
             HPX_ASSERT(item < N);
             return reinterpret_cast<pointer>(data_ + item);
         }
 
-        typedef typename std::aligned_storage<sizeof(value_type),
-            std::alignment_of<value_type>::value>::type storage_type;
+        using storage_type = std::aligned_storage_t<sizeof(value_type),
+            std::alignment_of<value_type>::value>;
 
         static storage_type data_[N];
         static std::once_flag constructed_;
@@ -159,6 +160,6 @@ namespace hpx { namespace util {
 
     template <typename T, typename Tag, std::size_t N>
     std::once_flag reinitializable_static<T, Tag, N>::constructed_;
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #undef HPX_CORE_EXPORT_REINITIALIZABLE_STATIC

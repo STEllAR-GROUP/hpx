@@ -19,6 +19,7 @@
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/serialization/base_object.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -111,15 +112,15 @@ namespace hpx { namespace parallel { namespace execution {
         struct get_chunk_size_property
         {
             // default implementation
-            template <typename Target, typename F>
+            template <typename Target>
             HPX_FORCEINLINE static constexpr std::size_t get_chunk_size(Target,
-                F&& /*f*/, std::size_t /*cores*/,
-                std::size_t /*num_tasks*/) noexcept
+                hpx::chrono::steady_duration const&, std::size_t,
+                std::size_t) noexcept
             {
-                // return zero for the chunk-size which will tell the
-                // implementation to calculate the chunk size either based
-                // on a specified maximum number of chunks or based on some
-                // internal rule (if no maximum number of chunks was given)
+                // return zero for the chunk-size, which will tell the
+                // implementation to calculate the chunk size either based on a
+                // specified maximum number of chunks or based on some internal
+                // rule (if no maximum number of chunks was given)
                 return 0;
             }
         };
@@ -139,10 +140,11 @@ namespace hpx { namespace parallel { namespace execution {
         struct get_chunk_size_fn_helper<Parameters, Executor_,
             std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
         {
-            template <typename Executor, typename F>
+            template <typename Executor>
             HPX_FORCEINLINE static constexpr std::size_t call(
-                Parameters& params, Executor&& exec, F&& f, std::size_t cores,
-                std::size_t num_tasks)
+                Parameters& params, Executor&& exec,
+                hpx::chrono::steady_duration const& iteration_duration,
+                std::size_t cores, std::size_t num_tasks)
             {
                 auto getprop =
                     get_parameters_chunk_size(HPX_FORWARD(Executor, exec),
@@ -150,17 +152,77 @@ namespace hpx { namespace parallel { namespace execution {
 
                 return getprop.first.get_chunk_size(
                     HPX_FORWARD(decltype(getprop.second), getprop.second),
-                    HPX_FORWARD(F, f), cores, num_tasks);
+                    iteration_duration, cores, num_tasks);
+            }
+
+            template <typename AnyParameters, typename Executor>
+            HPX_FORCEINLINE static constexpr std::size_t call(
+                AnyParameters params, Executor&& exec,
+                hpx::chrono::steady_duration const& iteration_duration,
+                std::size_t cores, std::size_t num_tasks)
+            {
+                return call(static_cast<Parameters&>(params),
+                    HPX_FORWARD(Executor, exec), iteration_duration, cores,
+                    num_tasks);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        // define member traits
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(measure_iteration)
+
+        ///////////////////////////////////////////////////////////////////////
+        // default property implementation allowing to handle measure_iteration
+        struct measure_iteration_property
+        {
+            // default implementation
+            template <typename Target, typename F>
+            HPX_FORCEINLINE static constexpr decltype(auto) measure_iteration(
+                Target, F&&, std::size_t) noexcept
+            {
+                // return zero for the iteration duration, which will tell the
+                // implementation to calculate the chunk size either based on a
+                // specified maximum number of chunks or based on some internal
+                // rule (if no maximum number of chunks was given)
+                return hpx::chrono::null_duration;
+            }
+        };
+
+        //////////////////////////////////////////////////////////////////////
+        // Generate a type that is guaranteed to support measure_iteration
+        using measure_iteration_t =
+            get_parameters_property_t<measure_iteration_property,
+                has_measure_iteration_t>;
+
+        inline constexpr measure_iteration_t get_parameters_measure_iteration{};
+
+        //////////////////////////////////////////////////////////////////////
+        // customization point for interface measure_iteration()
+        template <typename Parameters, typename Executor_>
+        struct measure_iteration_fn_helper<Parameters, Executor_,
+            std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
+        {
+            template <typename Executor, typename F>
+            HPX_FORCEINLINE static constexpr decltype(auto) call(
+                Parameters& params, Executor&& exec, F&& f,
+                std::size_t num_tasks)
+            {
+                auto getprop = get_parameters_measure_iteration(
+                    HPX_FORWARD(Executor, exec), params,
+                    measure_iteration_property{});
+
+                return getprop.first.measure_iteration(
+                    HPX_FORWARD(decltype(getprop.second), getprop.second),
+                    HPX_FORWARD(F, f), num_tasks);
             }
 
             template <typename AnyParameters, typename Executor, typename F>
-            HPX_FORCEINLINE static constexpr std::size_t call(
-                AnyParameters params, Executor&& exec, F&& f, std::size_t cores,
+            HPX_FORCEINLINE static constexpr decltype(auto) call(
+                AnyParameters params, Executor&& exec, F&& f,
                 std::size_t num_tasks)
             {
                 return call(static_cast<Parameters&>(params),
-                    HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f), cores,
-                    num_tasks);
+                    HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f), num_tasks);
             }
         };
 
@@ -295,7 +357,10 @@ namespace hpx { namespace parallel { namespace execution {
         {
             // default implementation
             template <typename Target>
-            HPX_FORCEINLINE static std::size_t processing_units_count(Target)
+            HPX_FORCEINLINE static std::size_t processing_units_count(Target,
+                hpx::chrono::steady_duration const& =
+                    hpx::chrono::null_duration,
+                std::size_t = 0)
             {
                 return get_os_thread_count();
             }
@@ -319,22 +384,27 @@ namespace hpx { namespace parallel { namespace execution {
         {
             template <typename Executor>
             HPX_FORCEINLINE static constexpr std::size_t call(
-                Parameters& params, Executor&& exec)
+                Parameters& params, Executor&& exec,
+                hpx::chrono::steady_duration const& iteration_duration,
+                std::size_t num_tasks)
             {
                 auto getprop = get_processing_units_count_target(
                     HPX_FORWARD(Executor, exec), params,
                     processing_units_count_property{});
 
                 return getprop.first.processing_units_count(
-                    HPX_FORWARD(decltype(getprop.second), getprop.second));
+                    HPX_FORWARD(decltype(getprop.second), getprop.second),
+                    iteration_duration, num_tasks);
             }
 
             template <typename AnyParameters, typename Executor>
             HPX_FORCEINLINE static constexpr std::size_t call(
-                AnyParameters params, Executor&& exec)
+                AnyParameters params, Executor&& exec,
+                hpx::chrono::steady_duration const& iteration_duration,
+                std::size_t num_tasks)
             {
                 return call(static_cast<Parameters&>(params),
-                    HPX_FORWARD(Executor, exec));
+                    HPX_FORWARD(Executor, exec), iteration_duration, num_tasks);
             }
         };
 
@@ -574,13 +644,35 @@ namespace hpx { namespace parallel { namespace execution {
         struct get_chunk_size_call_helper<T, Wrapper,
             std::enable_if_t<has_get_chunk_size<T>::value>>
         {
-            template <typename Executor, typename F>
-            HPX_FORCEINLINE std::size_t get_chunk_size(Executor&& exec, F&& f,
+            template <typename Executor>
+            HPX_FORCEINLINE std::size_t get_chunk_size(Executor&& exec,
+                hpx::chrono::steady_duration const& iteration_duration,
                 std::size_t cores, std::size_t num_tasks) const
             {
                 auto& wrapped =
                     static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
                 return wrapped.get_chunk_size(HPX_FORWARD(Executor, exec),
+                    iteration_duration, cores, num_tasks);
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Wrapper, typename Enable = void>
+        struct measure_iteration_call_helper
+        {
+        };
+
+        template <typename T, typename Wrapper>
+        struct measure_iteration_call_helper<T, Wrapper,
+            std::enable_if_t<has_measure_iteration<T>::value>>
+        {
+            template <typename Executor, typename F>
+            HPX_FORCEINLINE std::size_t measure_iteration(Executor&& exec,
+                F&& f, std::size_t cores, std::size_t num_tasks) const
+            {
+                auto& wrapped =
+                    static_cast<unwrapper<Wrapper> const*>(this)->member_.get();
+                return wrapped.measure_iteration(HPX_FORWARD(Executor, exec),
                     HPX_FORWARD(F, f), cores, num_tasks);
             }
         };
@@ -700,6 +792,7 @@ namespace hpx { namespace parallel { namespace execution {
           : base_member_helper<std::reference_wrapper<T>>
           , maximal_number_of_chunks_call_helper<T, std::reference_wrapper<T>>
           , get_chunk_size_call_helper<T, std::reference_wrapper<T>>
+          , measure_iteration_call_helper<T, std::reference_wrapper<T>>
           , mark_begin_execution_call_helper<T, std::reference_wrapper<T>>
           , mark_end_of_scheduling_call_helper<T, std::reference_wrapper<T>>
           , mark_end_execution_call_helper<T, std::reference_wrapper<T>>
@@ -737,6 +830,7 @@ namespace hpx { namespace parallel { namespace execution {
                 "objects");
 
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(get_chunk_size);
+            HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(measure_iteration);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_begin_execution);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_end_of_scheduling);
             HPX_STATIC_ASSERT_ON_PARAMETERS_AMBIGUITY(mark_end_execution);
@@ -769,9 +863,9 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename Archive>
             void serialize(Archive& ar, const unsigned int /* version */)
             {
-                int const sequencer[] = {
-                    (ar & serialization::base_object<Params>(*this), 0)..., 0};
-                (void) sequencer;
+                (hpx::serialization::detail::serialize_one(
+                     ar, serialization::base_object<Params>(*this)),
+                    ...);
             }
         };
 

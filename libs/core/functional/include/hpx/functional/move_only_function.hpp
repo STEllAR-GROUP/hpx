@@ -30,16 +30,18 @@ namespace hpx {
     /// target -- functions, lambda expressions, bind expressions, or other
     /// function objects, as well as pointers to member functions and pointers
     /// to member objects.
-    /// The stored callable object is called the target of hpx::move_only_function.
-    /// If an hpx::move_only_function contains no target, it is called empty. Unlike
-    /// hpx::function, invoking an empty hpx::move_only_function results in undefined
-    /// behavior.
-    /// hpx::move_only_functions supports every possible combination of cv-qualifiers,
-    /// ref-qualifiers, and noexcept-specifiers not including volatile provided
-    /// in its template parameter. These qualifiers and specifier (if any) are added
-    /// to its operator().
-    /// hpx::move_only_function satisfies the requirements of MoveConstructible and
-    /// MoveAssignable, but does not satisfy CopyConstructible or CopyAssignable.
+    ///
+    /// The stored callable object is called the target of
+    /// hpx::move_only_function. If an hpx::move_only_function contains no
+    /// target, it is called empty. Unlike hpx::function, invoking an empty
+    /// hpx::move_only_function results in undefined behavior.
+    ///
+    /// hpx::move_only_functions supports every possible combination of
+    /// cv-qualifiers, ref-qualifiers, and noexcept-specifiers not including
+    /// volatile provided in its template parameter. These qualifiers and
+    /// specifier (if any) are added to its operator(). hpx::move_only_function
+    /// satisfies the requirements of MoveConstructible and MoveAssignable, but
+    /// does not satisfy CopyConstructible or CopyAssignable.
     template <typename Sig, bool Serializable = false>
     class move_only_function;
 
@@ -115,7 +117,7 @@ namespace hpx::util {
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     template <typename Sig, bool Serializable>
     struct get_function_address<hpx::move_only_function<Sig, Serializable>>
@@ -149,10 +151,10 @@ namespace hpx { namespace traits {
         }
     };
 #endif
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 #endif
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 #define HPX_UTIL_REGISTER_UNIQUE_FUNCTION_DECLARATION(Sig, F, Name)            \
     HPX_DECLARE_GET_FUNCTION_NAME(unique_function_vtable<Sig>, F, Name)        \
     /**/

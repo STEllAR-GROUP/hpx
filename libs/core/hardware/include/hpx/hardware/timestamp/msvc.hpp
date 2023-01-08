@@ -21,7 +21,8 @@
 #include <hpx/hardware/timestamp/cuda.hpp>
 #endif
 
-namespace hpx { namespace util { namespace hardware {
+namespace hpx::util::hardware {
+
     HPX_HOST_DEVICE inline std::uint64_t timestamp()
     {
 #if defined(HPX_HAVE_CUDA) && defined(HPX_COMPUTE_DEVICE_CODE)
@@ -32,6 +33,6 @@ namespace hpx { namespace util { namespace hardware {
         return static_cast<std::uint64_t>(now.QuadPart);
 #endif
     }
-}}}    // namespace hpx::util::hardware
+}    // namespace hpx::util::hardware
 
 #endif

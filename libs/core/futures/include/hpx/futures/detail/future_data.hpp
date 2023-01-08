@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,6 +24,7 @@
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <atomic>
@@ -40,6 +41,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     enum class future_status
     {
         ready,
@@ -49,6 +51,7 @@ namespace hpx {
     };
 
     namespace lcos {
+
         enum class HPX_DEPRECATED_V(1, 8,
             "hpx::lcos::future_status is deprecated. Use "
             "hpx::future_status instead.") future_status
@@ -62,7 +65,7 @@ namespace hpx {
 }    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx::lcos::detail {
 
     using run_on_completed_error_handler_type =
         hpx::function<void(std::exception_ptr const& e)>;
@@ -94,8 +97,6 @@ namespace hpx { namespace lcos { namespace detail {
         using completed_callback_vector_type =
             hpx::detail::small_vector<completed_callback_type, 1>;
 
-        using has_future_data_refcnt_base = void;
-
         virtual ~future_data_refcnt_base();
 
         virtual void set_on_completed(completed_callback_type) = 0;
@@ -117,11 +118,11 @@ namespace hpx { namespace lcos { namespace detail {
         };
 
     protected:
-        future_data_refcnt_base() noexcept
+        constexpr future_data_refcnt_base() noexcept
           : count_(0)
         {
         }
-        explicit future_data_refcnt_base(init_no_addref) noexcept
+        constexpr explicit future_data_refcnt_base(init_no_addref) noexcept
           : count_(1)
         {
         }
@@ -277,7 +278,8 @@ namespace hpx { namespace lcos { namespace detail {
         }
         virtual void cancel()
         {
-            HPX_THROW_EXCEPTION(future_does_not_support_cancellation,
+            HPX_THROW_EXCEPTION(
+                hpx::error::future_does_not_support_cancellation,
                 "future_data_base::cancel",
                 "this future does not support cancellation");
         }
@@ -316,19 +318,20 @@ namespace hpx { namespace lcos { namespace detail {
 
         virtual std::string const& get_registered_name() const
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "future_data_base::get_registered_name",
                 "this future does not support name registration");
         }
         virtual void set_registered_name(std::string /*name*/)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "future_data_base::set_registered_name",
                 "this future does not support name registration");
         }
         virtual bool register_as(std::string /*name*/, bool /*manage_lifetime*/)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "future_data_base::register_as",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "future_data_base::register_as",
                 "this future does not support name registration");
         }
 
@@ -339,25 +342,21 @@ namespace hpx { namespace lcos { namespace detail {
         local::detail::condition_variable cond_;    // threads waiting in read
     };
 
-    struct in_place
-    {
-    };
-
     template <typename Result>
     struct future_data_base : future_data_base<traits::detail::future_data_void>
     {
     private:
         static void construct(void* p)
         {
-            ::new (p) result_type();
+            hpx::construct_at(static_cast<result_type*>(p));
         }
 
         template <typename T, typename... Ts>
         static void construct(void* p, T&& t, Ts&&... ts)
         {
-            ::new (p)
-                result_type(future_data_result<Result>::set(HPX_FORWARD(T, t)),
-                    HPX_FORWARD(Ts, ts)...);
+            hpx::construct_at(static_cast<result_type*>(p),
+                future_data_result<Result>::set(HPX_FORWARD(T, t)),
+                HPX_FORWARD(Ts, ts)...);
         }
 
     public:
@@ -381,7 +380,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         template <typename... Ts>
-        future_data_base(init_no_addref no_addref, in_place, Ts&&... ts)
+        future_data_base(init_no_addref no_addref, std::in_place_t, Ts&&... ts)
           : base_type(no_addref)
         {
             result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
@@ -389,20 +388,13 @@ namespace hpx { namespace lcos { namespace detail {
             state_.store(value, std::memory_order_relaxed);
         }
 
-        future_data_base(init_no_addref no_addref, std::exception_ptr const& e)
+        future_data_base(
+            init_no_addref no_addref, std::exception_ptr e) noexcept
           : base_type(no_addref)
         {
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*) exception_ptr) std::exception_ptr(e);
-            state_.store(exception, std::memory_order_relaxed);
-        }
-        future_data_base(init_no_addref no_addref, std::exception_ptr&& e)
-          : base_type(no_addref)
-        {
-            std::exception_ptr* exception_ptr =
-                reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*) exception_ptr) std::exception_ptr(HPX_MOVE(e));
+            hpx::construct_at(exception_ptr, HPX_MOVE(e));
             state_.store(exception, std::memory_order_relaxed);
         }
 
@@ -417,14 +409,15 @@ namespace hpx { namespace lcos { namespace detail {
         /// manager the function will return.
         ///
         /// \param ec     [in,out] this represents the error status on exit,
-        ///               if this is pre-initialized to \a hpx#throws
-        ///               the function will throw on error instead. If the
-        ///               operation blocks and is aborted because the object
-        ///               went out of scope, the code \a hpx#yield_aborted is
-        ///               set or thrown.
+        ///               if this is pre-initialized to \a hpx#throws the
+        ///               function will throw on error instead. If the operation
+        ///               blocks and is aborted because the object went out of
+        ///               scope, the code \a hpx#error#yield_aborted is set or
+        ///               thrown.
         ///
         /// \note         If there has been an error reported (using the action
-        ///               \a base_lco#set_exception), this function will throw an
+        ///               \a base_lco#set_exception), this function will throw
+        ///                  an
         ///               exception encapsulating the reported error code and
         ///               error description if <code>&ec == &throws</code>.
         virtual result_type* get_result(error_code& ec = throws)
@@ -472,7 +465,7 @@ namespace hpx { namespace lcos { namespace detail {
                 // this future should be 'empty' still (it can't be made ready
                 // more than once).
                 l.unlock();
-                HPX_THROW_EXCEPTION(promise_already_satisfied,
+                HPX_THROW_EXCEPTION(hpx::error::promise_already_satisfied,
                     "future_data_base::set_value",
                     "data has already been set for this future");
                 return;
@@ -513,7 +506,7 @@ namespace hpx { namespace lcos { namespace detail {
             // set the data
             std::exception_ptr* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
-            ::new ((void*) exception_ptr) std::exception_ptr(HPX_MOVE(data));
+            hpx::construct_at(exception_ptr, HPX_MOVE(data));
 
             // At this point the lock needs to be acquired to safely access the
             // registered continuations
@@ -532,7 +525,7 @@ namespace hpx { namespace lcos { namespace detail {
                 // this future should be 'empty' still (it can't be made ready
                 // more than once).
                 l.unlock();
-                HPX_THROW_EXCEPTION(promise_already_satisfied,
+                HPX_THROW_EXCEPTION(hpx::error::promise_already_satisfied,
                     "future_data_base::set_exception",
                     "data has already been set for this future");
                 return;
@@ -613,14 +606,14 @@ namespace hpx { namespace lcos { namespace detail {
             {
                 result_type* value_ptr =
                     reinterpret_cast<result_type*>(&storage_);
-                value_ptr->~result_type();
+                std::destroy_at(value_ptr);
                 break;
             }
             case exception:
             {
                 std::exception_ptr* exception_ptr =
                     reinterpret_cast<std::exception_ptr*>(&storage_);
-                exception_ptr->~exception_ptr();
+                std::destroy_at(exception_ptr);
                 break;
             }
             default:
@@ -663,17 +656,14 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         template <typename... Ts>
-        future_data(init_no_addref no_addref, in_place in_place, Ts&&... ts)
+        future_data(
+            init_no_addref no_addref, std::in_place_t in_place, Ts&&... ts)
           : future_data_base<Result>(
                 no_addref, in_place, HPX_FORWARD(Ts, ts)...)
         {
         }
 
-        future_data(init_no_addref no_addref, std::exception_ptr const& e)
-          : future_data_base<Result>(no_addref, e)
-        {
-        }
-        future_data(init_no_addref no_addref, std::exception_ptr&& e)
+        future_data(init_no_addref no_addref, std::exception_ptr e) noexcept
           : future_data_base<Result>(no_addref, HPX_MOVE(e))
         {
         }
@@ -707,26 +697,22 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         template <typename... T>
-        future_data_allocator(init_no_addref no_addref, in_place in_place,
-            other_allocator const& alloc, T&&... ts)
+        future_data_allocator(init_no_addref no_addref,
+            std::in_place_t in_place, other_allocator const& alloc, T&&... ts)
           : future_data<Result>(no_addref, in_place, HPX_FORWARD(T, ts)...)
           , alloc_(alloc)
         {
         }
 
-        future_data_allocator(init_no_addref no_addref,
-            std::exception_ptr const& e, other_allocator const& alloc)
-          : future_data<Result>(no_addref, e)
-          , alloc_(alloc)
-        {
-        }
-
-        future_data_allocator(init_no_addref no_addref, std::exception_ptr&& e,
-            other_allocator const& alloc)
+        // clang-format off
+        future_data_allocator(init_no_addref no_addref, std::exception_ptr e,
+            other_allocator const& alloc) noexcept(noexcept(
+                std::is_nothrow_copy_constructible_v<other_allocator>))
           : future_data<Result>(no_addref, HPX_MOVE(e))
           , alloc_(alloc)
         {
         }
+        // clang-format on
 
     protected:
         void destroy() noexcept override
@@ -888,7 +874,7 @@ namespace hpx { namespace lcos { namespace detail {
             if (started_)
             {
                 l.unlock();
-                HPX_THROW_EXCEPTION(task_already_started,
+                HPX_THROW_EXCEPTION(hpx::error::task_already_started,
                     "task_base::check_started",
                     "this task has already been started");
                 return;
@@ -905,8 +891,8 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         // run in a separate thread
-        virtual threads::thread_id_ref_type apply(
-            threads::thread_pool_base* /*pool*/, const char* /*annotation*/,
+        virtual threads::thread_id_ref_type post(
+            threads::thread_pool_base* /*pool*/, char const* /*annotation*/,
             launch /*policy*/, error_code& /*ec*/)
         {
             HPX_ASSERT(false);    // shouldn't ever be called
@@ -962,7 +948,7 @@ namespace hpx { namespace lcos { namespace detail {
         void set_thread_id(threads::thread_id_type id) noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
-            id_ = id;
+            id_ = HPX_MOVE(id);
         }
 
     public:
@@ -980,7 +966,7 @@ namespace hpx { namespace lcos { namespace detail {
     private:
         struct reset_id
         {
-            reset_id(cancelable_task_base& target)
+            explicit reset_id(cancelable_task_base& target)
               : target_(target)
             {
                 target.set_thread_id(threads::get_self_id());
@@ -1029,14 +1015,15 @@ namespace hpx { namespace lcos { namespace detail {
                         this->started_ = true;
 
                         l.unlock();
-                        this->set_error(future_cancelled,
+                        this->set_error(hpx::error::future_cancelled,
                             "task_base<Result>::cancel",
                             "future has been canceled");
                     }
                     else
                     {
                         l.unlock();
-                        HPX_THROW_EXCEPTION(future_can_not_be_cancelled,
+                        HPX_THROW_EXCEPTION(
+                            hpx::error::future_can_not_be_cancelled,
                             "task_base<Result>::cancel",
                             "future can't be canceled at this time");
                     }
@@ -1051,15 +1038,15 @@ namespace hpx { namespace lcos { namespace detail {
     protected:
         threads::thread_id_type id_;
     };
-}}}    // namespace hpx::lcos::detail
+}    // namespace hpx::lcos::detail
 
-namespace hpx { namespace traits { namespace detail {
+namespace hpx::traits::detail {
 
     template <typename R, typename Allocator>
     struct shared_state_allocator<lcos::detail::future_data<R>, Allocator>
     {
         using type = lcos::detail::future_data_allocator<R, Allocator>;
     };
-}}}    // namespace hpx::traits::detail
+}    // namespace hpx::traits::detail
 
 #include <hpx/config/warnings_suffix.hpp>

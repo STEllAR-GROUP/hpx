@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,8 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     ///////////////////////////////////////////////////////////////////////////
     inline std::string trim_whitespace(std::string const& s)
     {
@@ -43,4 +44,4 @@ namespace hpx { namespace util {
             config_.insert(map_type::value_type(key, value));
         }
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

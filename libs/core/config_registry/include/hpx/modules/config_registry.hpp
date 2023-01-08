@@ -29,7 +29,7 @@
 #define HPX_CONFIG_REGISTRY_EXPORT /* empty */
 #endif
 
-namespace hpx { namespace config_registry {
+namespace hpx::config_registry {
     struct module_config
     {
         std::string module_name;
@@ -45,4 +45,4 @@ namespace hpx { namespace config_registry {
     {
         add_module_config_helper(module_config const& config);
     };
-}}    // namespace hpx::config_registry
+}    // namespace hpx::config_registry

@@ -15,7 +15,8 @@
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     HPX_HAS_MEMBER_XXX_TRAIT_DEF(owns_lock)
 
     template <typename Lock>
@@ -29,7 +30,7 @@ namespace hpx { namespace util { namespace detail {
     }
 
     template <typename Lock>
-    typename std::enable_if<has_owns_lock<Lock>::value>::type assert_owns_lock(
+    std::enable_if_t<has_owns_lock_v<Lock>> assert_owns_lock(
         Lock& l, long) noexcept
     {
         HPX_ASSERT_LOCKED(l, l.owns_lock());
@@ -37,13 +38,13 @@ namespace hpx { namespace util { namespace detail {
     }
 
     template <typename Lock>
-    typename std::enable_if<has_owns_lock<Lock>::value>::type
-    assert_doesnt_own_lock(Lock& l, long) noexcept
+    std::enable_if_t<has_owns_lock_v<Lock>> assert_doesnt_own_lock(
+        Lock& l, long) noexcept
     {
         HPX_ASSERT_LOCKED(l, !l.owns_lock());
         HPX_UNUSED(l);
     }
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail
 
 #define HPX_ASSERT_OWNS_LOCK(l) ::hpx::util::detail::assert_owns_lock(l, 0L)
 

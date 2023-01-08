@@ -21,8 +21,8 @@
 #include <hpx/local/init.hpp>
 
 #include <hpx/local/algorithm.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/synchronization.hpp>
-#include <boost/range/irange.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -161,8 +161,7 @@ struct stepper
         for (space& s : U)
             s.resize(subdomains);
 
-        std::size_t b = 0;
-        auto range = boost::irange(b, subdomains);
+        auto range = hpx::util::counting_shape(subdomains);
         hpx::ranges::for_each(hpx::execution::par, range,
             [&U, subdomain_width, subdomains](std::size_t i) {
                 U[0][i] = hpx::make_ready_future(

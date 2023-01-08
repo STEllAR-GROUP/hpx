@@ -30,14 +30,15 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        ///////////////////////////////////////////////////////////////////////
+
         template <typename T>
         struct channel_impl_base
         {
-            channel_impl_base() noexcept
+            constexpr channel_impl_base() noexcept
               : count_(0)
             {
             }
@@ -103,7 +104,7 @@ namespace hpx { namespace lcos { namespace local {
             HPX_NON_COPYABLE(unlimited_channel);
 
         public:
-            unlimited_channel()
+            constexpr unlimited_channel() noexcept
               : get_generation_(0)
               , set_generation_(0)
               , closed_(false)
@@ -121,7 +122,7 @@ namespace hpx { namespace lcos { namespace local {
                     {
                         l.unlock();
                         return hpx::make_exceptional_future<T>(
-                            HPX_GET_EXCEPTION(hpx::invalid_status,
+                            HPX_GET_EXCEPTION(hpx::error::invalid_status,
                                 "hpx::lcos::local::channel::get",
                                 "this channel is empty and was closed"));
                     }
@@ -130,7 +131,7 @@ namespace hpx { namespace lcos { namespace local {
                     {
                         l.unlock();
                         return hpx::make_exceptional_future<T>(
-                            HPX_GET_EXCEPTION(hpx::invalid_status,
+                            HPX_GET_EXCEPTION(hpx::error::invalid_status,
                                 "hpx::lcos::local::channel::get",
                                 "this channel is empty and is not accessible "
                                 "by any other thread causing a deadlock"));
@@ -139,7 +140,9 @@ namespace hpx { namespace lcos { namespace local {
 
                 ++get_generation_;
                 if (generation == std::size_t(-1))
+                {
                     generation = get_generation_;
+                }
 
                 if (closed_)
                 {
@@ -150,7 +153,7 @@ namespace hpx { namespace lcos { namespace local {
                     {
                         l.unlock();
                         return hpx::make_exceptional_future<T>(
-                            HPX_GET_EXCEPTION(hpx::invalid_status,
+                            HPX_GET_EXCEPTION(hpx::error::invalid_status,
                                 "hpx::lcos::local::channel::get",
                                 "this channel is closed and the requested value"
                                 "has not been received yet"));
@@ -166,15 +169,20 @@ namespace hpx { namespace lcos { namespace local {
                 std::lock_guard<mutex_type> l(mtx_);
 
                 if (buffer_.empty() && closed_)
+                {
                     return false;
+                }
 
                 ++get_generation_;
                 if (generation == std::size_t(-1))
+                {
                     generation = get_generation_;
+                }
 
                 if (f != nullptr)
+                {
                     *f = buffer_.receive(generation);
-
+                }
                 return true;
             }
 
@@ -184,14 +192,17 @@ namespace hpx { namespace lcos { namespace local {
                 if (closed_)
                 {
                     l.unlock();
-                    return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
-                        hpx::invalid_status, "hpx::lcos::local::channel::set",
-                        "attempting to write to a closed channel"));
+                    return hpx::make_exceptional_future<void>(
+                        HPX_GET_EXCEPTION(hpx::error::invalid_status,
+                            "hpx::lcos::local::channel::set",
+                            "attempting to write to a closed channel"));
                 }
 
                 ++set_generation_;
                 if (generation == std::size_t(-1))
+                {
                     generation = set_generation_;
+                }
 
                 buffer_.store_received(generation, HPX_MOVE(t), &l);
                 return hpx::make_ready_future();
@@ -203,7 +214,7 @@ namespace hpx { namespace lcos { namespace local {
                 if (closed_)
                 {
                     l.unlock();
-                    HPX_THROW_EXCEPTION(hpx::invalid_status,
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "hpx::lcos::local::channel::close",
                         "attempting to close an already closed channel");
                     return 0;
@@ -212,18 +223,20 @@ namespace hpx { namespace lcos { namespace local {
                 closed_ = true;
 
                 if (buffer_.empty())
+                {
                     return 0;
+                }
 
                 std::exception_ptr e;
 
                 {
-                    util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
-                    e = HPX_GET_EXCEPTION(hpx::future_cancelled,
+                    unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    e = HPX_GET_EXCEPTION(hpx::error::future_cancelled,
                         hpx::throwmode::lightweight, "hpx::lcos::local::close",
                         "canceled waiting on this entry");
                 }
 
-                // all pending requests which can't be satisfied have to be
+                // all pending requests that can't be satisfied have to be
                 // canceled at this point, force deleting possibly waiting
                 // requests
                 return buffer_.cancel_waiting(e, force_delete_entries);
@@ -252,6 +265,7 @@ namespace hpx { namespace lcos { namespace local {
                 empty_ = false;
                 push_active_ = false;
             }
+
             void set_deferred(T&& val)
             // NVCC with GCC versions less than 10 don't compile push_pt
             // correctly if this is noexcept. hpx::util::result_of (and
@@ -281,13 +295,14 @@ namespace hpx { namespace lcos { namespace local {
                     util::deferred_call(&one_element_queue_async::set_deferred,
                         this, HPX_FORWARD(T1, val)));
             }
+
             hpx::packaged_task<T()> pop_pt()
             {
                 return hpx::packaged_task<T()>([this]() -> T { return get(); });
             }
 
         public:
-            one_element_queue_async()
+            one_element_queue_async() noexcept
               : empty_(true)
               , push_active_(false)
               , pop_active_(false)
@@ -304,7 +319,7 @@ namespace hpx { namespace lcos { namespace local {
                     {
                         l.unlock();
                         return hpx::make_exceptional_future<void>(
-                            HPX_GET_EXCEPTION(hpx::invalid_status,
+                            HPX_GET_EXCEPTION(hpx::error::invalid_status,
                                 "hpx::lcos::local::detail::"
                                 "one_element_queue_async::push",
                                 "attempting to write to a busy queue"));
@@ -350,7 +365,7 @@ namespace hpx { namespace lcos { namespace local {
                     {
                         l.unlock();
                         return hpx::make_exceptional_future<T>(
-                            HPX_GET_EXCEPTION(hpx::invalid_status,
+                            HPX_GET_EXCEPTION(hpx::error::invalid_status,
                                 "hpx::lcos::local::detail::"
                                 "one_element_queue_async::pop",
                                 "attempting to read from an empty queue"));
@@ -422,7 +437,7 @@ namespace hpx { namespace lcos { namespace local {
                     {
                         l.unlock();
                         return hpx::make_exceptional_future<T>(
-                            HPX_GET_EXCEPTION(hpx::invalid_status,
+                            HPX_GET_EXCEPTION(hpx::error::invalid_status,
                                 "hpx::lcos::local::channel::get",
                                 "this channel is empty and was closed"));
                     }
@@ -431,7 +446,7 @@ namespace hpx { namespace lcos { namespace local {
                     {
                         l.unlock();
                         return hpx::make_exceptional_future<T>(
-                            HPX_GET_EXCEPTION(hpx::invalid_status,
+                            HPX_GET_EXCEPTION(hpx::error::invalid_status,
                                 "hpx::lcos::local::channel::get",
                                 "this channel is empty and is not accessible "
                                 "by any other thread causing a deadlock"));
@@ -444,10 +459,11 @@ namespace hpx { namespace lcos { namespace local {
                     // the requested item must be available, otherwise this
                     // would create a deadlock
                     l.unlock();
-                    return hpx::make_exceptional_future<T>(HPX_GET_EXCEPTION(
-                        hpx::invalid_status, "hpx::lcos::local::channel::get",
-                        "this channel is closed and the requested value"
-                        "has not been received yet"));
+                    return hpx::make_exceptional_future<T>(
+                        HPX_GET_EXCEPTION(hpx::error::invalid_status,
+                            "hpx::lcos::local::channel::get",
+                            "this channel is closed and the requested value"
+                            "has not been received yet"));
                 }
 
                 return f;
@@ -477,9 +493,10 @@ namespace hpx { namespace lcos { namespace local {
                 if (closed_)
                 {
                     l.unlock();
-                    return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
-                        hpx::invalid_status, "hpx::lcos::local::channel::set",
-                        "attempting to write to a closed channel"));
+                    return hpx::make_exceptional_future<void>(
+                        HPX_GET_EXCEPTION(hpx::error::invalid_status,
+                            "hpx::lcos::local::channel::set",
+                            "attempting to write to a closed channel"));
                 }
 
                 return buffer_.push(HPX_MOVE(t), l);
@@ -492,7 +509,7 @@ namespace hpx { namespace lcos { namespace local {
                 if (closed_)
                 {
                     l.unlock();
-                    HPX_THROW_EXCEPTION(hpx::invalid_status,
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "hpx::lcos::local::channel::close",
                         "attempting to close an already closed channel");
                     return 0;
@@ -509,9 +526,9 @@ namespace hpx { namespace lcos { namespace local {
                 // canceled at this point
                 std::exception_ptr e;
                 {
-                    util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     e = std::exception_ptr(HPX_GET_EXCEPTION(
-                        hpx::future_cancelled, "hpx::lcos::local::close",
+                        hpx::error::future_cancelled, "hpx::lcos::local::close",
                         "canceled waiting on this entry"));
                 }
 
@@ -543,10 +560,13 @@ namespace hpx { namespace lcos { namespace local {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T = void>
     class channel;
+
     template <typename T = void>
     class one_element_channel;
+
     template <typename T = void>
     class receive_channel;
+
     template <typename T = void>
     class send_channel;
 
@@ -582,7 +602,7 @@ namespace hpx { namespace lcos { namespace local {
 
         friend class hpx::util::iterator_core_access;
 
-        bool equal(channel_iterator const& rhs) const
+        bool equal(channel_iterator const& rhs) const noexcept
         {
             return (channel_ == rhs.channel_ &&
                        data_.second == rhs.data_.second) ||
@@ -596,7 +616,7 @@ namespace hpx { namespace lcos { namespace local {
                 data_ = get_checked();
         }
 
-        typename base_type::reference dereference() const
+        typename base_type::reference dereference() const noexcept
         {
             HPX_ASSERT(data_.second);
             return data_.first;
@@ -639,7 +659,7 @@ namespace hpx { namespace lcos { namespace local {
 
         friend class hpx::util::iterator_core_access;
 
-        bool equal(channel_async_iterator const& rhs) const
+        bool equal(channel_async_iterator const& rhs) const noexcept
         {
             return (channel_ == rhs.channel_ &&
                        data_.second == rhs.data_.second) ||
@@ -653,7 +673,7 @@ namespace hpx { namespace lcos { namespace local {
                 data_ = get_checked();
         }
 
-        typename base_type::reference dereference() const
+        typename base_type::reference dereference() const noexcept
         {
             HPX_ASSERT(data_.second);
             return HPX_MOVE(data_.first);
@@ -666,11 +686,12 @@ namespace hpx { namespace lcos { namespace local {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename T>
         class channel_async_range
         {
         public:
-            explicit channel_async_range(channel_base<T> const& c)
+            explicit channel_async_range(channel_base<T> const& c) noexcept
               : channel_(c)
             {
             }
@@ -693,7 +714,7 @@ namespace hpx { namespace lcos { namespace local {
         class channel_base
         {
         protected:
-            explicit channel_base(channel_impl_base<T>* impl)
+            explicit channel_base(channel_impl_base<T>* impl) noexcept
               : channel_(impl)
             {
             }
@@ -905,11 +926,14 @@ namespace hpx { namespace lcos { namespace local {
     // forward declare specializations
     template <>
     class channel<void>;
+
     template <>
     class receive_channel<void>;
+
     template <>
     class send_channel<void>;
 
+    ///////////////////////////////////////////////////////////////////////////
     template <>
     class channel_iterator<void>
       : public hpx::util::iterator_facade<channel_iterator<void>,
@@ -919,7 +943,7 @@ namespace hpx { namespace lcos { namespace local {
             util::unused_type const, std::input_iterator_tag>;
 
     public:
-        channel_iterator()
+        channel_iterator() noexcept
           : channel_(nullptr)
           , data_(false)
         {
@@ -942,7 +966,7 @@ namespace hpx { namespace lcos { namespace local {
 
         friend class hpx::util::iterator_core_access;
 
-        bool equal(channel_iterator const& rhs) const
+        bool equal(channel_iterator const& rhs) const noexcept
         {
             return (channel_ == rhs.channel_ && data_ == rhs.data_) ||
                 (!data_ && rhs.channel_ == nullptr) ||
@@ -955,7 +979,7 @@ namespace hpx { namespace lcos { namespace local {
                 data_ = get_checked();
         }
 
-        base_type::reference dereference() const
+        base_type::reference dereference() const noexcept
         {
             HPX_ASSERT(data_);
             return util::unused;
@@ -975,7 +999,7 @@ namespace hpx { namespace lcos { namespace local {
         {
         public:
             explicit channel_base(
-                detail::channel_impl_base<util::unused_type>* impl)
+                detail::channel_impl_base<util::unused_type>* impl) noexcept
               : channel_(impl)
             {
             }
@@ -1172,4 +1196,4 @@ namespace hpx { namespace lcos { namespace local {
       , data_(c ? get_checked() : false)
     {
     }
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

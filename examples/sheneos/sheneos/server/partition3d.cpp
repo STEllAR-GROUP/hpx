@@ -118,7 +118,7 @@ namespace sheneos { namespace server {
     {
         if (value < min_value_[d] || value > max_value_[d])
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "sheneos::partition3d::get_index", "argument out of range");
             return 0;
         }
@@ -283,7 +283,7 @@ namespace sheneos { namespace server {
 
         if (detail::more_than_one_value_requested(eosvalue))
         {
-            HPX_THROW_EXCEPTION(hpx::bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "partition3d::interpolate_one",
                 "requested to interpolate more than one physical value: " +
                     std::to_string(eosvalue));
@@ -332,7 +332,8 @@ namespace sheneos { namespace server {
             break;
         }
 
-        HPX_THROW_EXCEPTION(hpx::bad_parameter, "partition3d::interpolate_one",
+        HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+            "partition3d::interpolate_one",
             "requested to interpolate unknown physical value: " +
                 std::to_string(eosvalue));
 

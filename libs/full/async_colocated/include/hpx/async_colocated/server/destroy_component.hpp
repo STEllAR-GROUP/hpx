@@ -14,6 +14,8 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/address.hpp>
 
+#include <memory>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components { namespace server {
 
@@ -41,7 +43,7 @@ namespace hpx { namespace components { namespace server {
         if (!types_are_compatible(type, addr.type_))
         {
             // FIXME: should the component be re-bound ?
-            HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+            HPX_THROW_EXCEPTION(hpx::error::unknown_component_address,
                 "destroy<Component>",
                 "global id: {} is not bound to a component "
                 "instance of type: {}  (it is bound to a {})",
@@ -55,7 +57,7 @@ namespace hpx { namespace components { namespace server {
         // delete the local instances
         Component* c = reinterpret_cast<Component*>(addr.address_);
         c->finalize();
-        c->~Component();
+        std::destroy_at(c);
         component_heap<Component>().free(c, 1);
     }
 
@@ -65,7 +67,7 @@ namespace hpx { namespace components { namespace server {
         naming::address addr;
         if (!agas::resolve_local(gid, addr))
         {
-            HPX_THROW_EXCEPTION(hpx::unknown_component_address,
+            HPX_THROW_EXCEPTION(hpx::error::unknown_component_address,
                 "destroy<Component>",
                 "global id: {} is not bound to any component instance", gid);
             return;

@@ -15,7 +15,32 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace concurrency { namespace detail {
+namespace hpx::concurrency::detail {
+
+    /// \brief Identify one of the ends of the queue
+    enum class queue_end
+    {
+        left = 0,
+        right = 1
+    };
+
+    template <queue_end Which>
+    struct opposite_end;
+
+    template <>
+    struct opposite_end<queue_end::left>
+    {
+        static constexpr queue_end value = queue_end::right;
+    };
+
+    template <>
+    struct opposite_end<queue_end::right>
+    {
+        static constexpr queue_end value = queue_end::left;
+    };
+
+    template <queue_end Which>
+    inline constexpr queue_end opposite_end_v = opposite_end<Which>::value;
 
     /// \brief A concurrent queue which can only hold contiguous ranges of
     ///        integers.
@@ -41,7 +66,7 @@ namespace hpx { namespace concurrency { namespace detail {
 
             range() = default;
 
-            range(T first, T last) noexcept
+            constexpr range(T first, T last) noexcept
               : first(first)
               , last(last)
             {
@@ -72,10 +97,11 @@ namespace hpx { namespace concurrency { namespace detail {
         /// safe to reset the queue.
         ///
         /// \param first Beginning of the new range.
+        /// \param last  End of the new range.
         constexpr void reset(T first, T last) noexcept
         {
-            initial_range = {first, last};
-            current_range.data_ = {first, last};
+            initial_range = range{first, last};
+            current_range.data_ = range{first, last};
             HPX_ASSERT(first <= last);
         }
 
@@ -103,7 +129,7 @@ namespace hpx { namespace concurrency { namespace detail {
         /// No additional synchronization is done to ensure that other threads
         /// are not accessing elements from the queue being copied. It is the
         /// callees responsibility to ensure that it is safe to copy the queue.
-        constexpr contiguous_index_queue(contiguous_index_queue<T> const& other)
+        contiguous_index_queue(contiguous_index_queue<T> const& other) noexcept
           : initial_range{other.initial_range}
           , current_range{}
         {
@@ -116,19 +142,20 @@ namespace hpx { namespace concurrency { namespace detail {
         /// No additional synchronization is done to ensure that other threads
         /// are not accessing elements from the queue being copied. It is the
         /// callees responsibility to ensure that it is safe to copy the queue.
-        constexpr contiguous_index_queue& operator=(
-            contiguous_index_queue const& other)
+        contiguous_index_queue& operator=(
+            contiguous_index_queue const& other) noexcept
         {
             initial_range = other.initial_range;
             current_range =
                 other.current_range.data_.load(std::memory_order_relaxed);
+            return *this;
         }
 
         /// \brief Attempt to pop an item from the left of the queue.
         ///
         /// Attempt to pop an item from the left (beginning) of the queue. If
         /// no items are left hpx::nullopt is returned.
-        constexpr hpx::optional<T> pop_left() noexcept
+        hpx::optional<T> pop_left() noexcept
         {
             range desired_range{0, 0};
             T index = 0;
@@ -143,8 +170,12 @@ namespace hpx { namespace concurrency { namespace detail {
                     return hpx::nullopt;
                 }
 
+                // reduce pipeline pressure
+                HPX_SMT_PAUSE;
+
                 index = expected_range.first;
                 desired_range = expected_range.increment_first();
+
             } while (!current_range.data_.compare_exchange_weak(
                 expected_range, desired_range));
 
@@ -153,9 +184,9 @@ namespace hpx { namespace concurrency { namespace detail {
 
         /// \brief Attempt to pop an item from the right of the queue.
         ///
-        /// Attempt to pop an item from the right (end) of the queue. If
-        /// no items are left hpx::nullopt is returned.
-        constexpr hpx::optional<T> pop_right() noexcept
+        /// Attempt to pop an item from the right (end) of the queue. If no
+        /// items are left hpx::nullopt is returned.
+        hpx::optional<T> pop_right() noexcept
         {
             range desired_range{0, 0};
             T index = 0;
@@ -170,12 +201,33 @@ namespace hpx { namespace concurrency { namespace detail {
                     return hpx::nullopt;
                 }
 
+                // reduce pipeline pressure
+                HPX_SMT_PAUSE;
+
                 desired_range = expected_range.decrement_last();
                 index = desired_range.last;
+
             } while (!current_range.data_.compare_exchange_weak(
                 expected_range, desired_range));
 
             return hpx::optional<T>(HPX_MOVE(index));
+        }
+
+        /// \brief Attempt to pop an item from the given end of the queue.
+        ///
+        /// Attempt to pop an item from the given end of the queue. If no items
+        /// are left hpx::nullopt is returned.
+        template <queue_end Which>
+        hpx::optional<T> pop() noexcept
+        {
+            if constexpr (Which == queue_end::left)
+            {
+                return pop_left();
+            }
+            else
+            {
+                return pop_right();
+            }
         }
 
         constexpr bool empty() const noexcept
@@ -183,7 +235,7 @@ namespace hpx { namespace concurrency { namespace detail {
             return current_range.data_.load(std::memory_order_relaxed).empty();
         }
 
-        std::pair<T, T> get_current_range() const
+        std::pair<T, T> get_current_range() const noexcept
         {
             auto r = current_range.data_.load(std::memory_order_relaxed);
             return {r.first, r.last};
@@ -193,4 +245,4 @@ namespace hpx { namespace concurrency { namespace detail {
         range initial_range;
         hpx::util::cache_line_data<std::atomic<range>> current_range;
     };
-}}}    // namespace hpx::concurrency::detail
+}    // namespace hpx::concurrency::detail

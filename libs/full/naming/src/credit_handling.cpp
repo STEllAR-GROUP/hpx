@@ -34,73 +34,73 @@
 #include <mutex>
 #include <utility>
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 //          Here is how our distributed garbage collection works
 //
 // Each id_type instance - while always referring to some (possibly remote)
 // entity - can either be 'managed' or 'unmanaged'. If an id_type instance is
 // 'unmanaged' it does not perform any garbage collection. Otherwise (if it's
-// 'managed'), all of its copies are globally tracked which allows to
-// automatically delete the entity a particular id_type instance is referring
-// to after the last reference to it goes out of scope.
+// 'managed'), all of its copies are globally tracked, which allows to
+// automatically delete the entity a particular id_type instance is referring to
+// after the last reference to it goes out of scope.
 //
 // An id_type instance is essentially a shared_ptr<> maintaining two reference
 // counts: a local reference count and a global one. The local reference count
-// is incremented whenever the id_type instance is copied locally, and decremented
-// whenever one of the local copies goes out of scope. At the point when the last
-// local copy goes out of scope, it returns its current share of the global
-// reference count back to AGAS. The share of the global reference count owned
-// by all copies of an id_type instance on a single locality is called its
-// credit. Credits are issued in chunks which allows to create a global copy
-// of an id_type instance (like passing it to another locality) without needing
-// to talk to AGAS to request a global reference count increment. The referenced
-// entity is freed when the global reference count falls to zero.
+// is incremented whenever the id_type instance is copied locally, and
+// decremented whenever one of the local copies goes out of scope. At the point
+// when the last local copy goes out of scope, it returns its current share of
+// the global reference count back to AGAS. The share of the global reference
+// count owned by all copies of an id_type instance on a single locality is
+// called its credit. Credits are issued in chunks, which allows to create a
+// global copy of an id_type instance (like passing it to another locality)
+// without needing to talk to AGAS to request a global reference count
+// increment. The referenced entity is freed when the global reference count
+// falls to zero.
 //
 // Any newly created object assumes an initial credit. This credit is not
 // accounted for by AGAS as long as no global increment or decrement requests
-// are received. It is important to understand that there is no way to distinguish
-// whether an object has already been deleted (and therefore no entry exists in
-// the table storing the global reference count for this object) or whether the
-// object is still alive but no increment/decrement requests have been received
-// by AGAS yet. While this is a pure optimization to avoid storing global
-// reference counts for all objects, it has implications for the implemented
-// garbage collection algorithms at large.
+// are received. It is important to understand that there is no way to
+// distinguish whether an object has already been deleted (and therefore no
+// entry exists in the table storing the global reference count for this object)
+// or whether the object is still alive but no increment/decrement requests have
+// been received by AGAS yet. While this is a pure optimization to avoid storing
+// global reference counts for all objects, it has implications for the
+// implemented garbage collection algorithms at large.
 //
 // As long as an id_type instance is not sent to another locality (a locality
 // different from the initial locality creating the referenced entity), all
-// lifetime management for this entity can be handled purely local without
-// even talking to AGAS.
+// lifetime management for this entity can be handled purely local without even
+// talking to AGAS.
 //
 // Sending an id_type instance to another locality (which includes using an
-// id_type as the destination for an action) splits the current credit into
-// two parts. One part stays with the id_type on the sending locality, the
-// other part is sent along to the destination locality where it turns into the
-// global credit associated with the remote copy of the id_type. As stated
-// above, this allows to avoid talking to AGAS for incrementing the global
-// reference count as long as there is sufficient global credit left in order
-// to be split.
+// id_type as the destination for an action) splits the current credit into two
+// parts. One part stays with the id_type on the sending locality, the other
+// part is sent along to the destination locality where it turns into the global
+// credit associated with the remote copy of the id_type. As stated above, this
+// allows to avoid talking to AGAS for incrementing the global reference count
+// as long as there is sufficient global credit left in order to be split.
 //
-// The current share of the global credit associated with an id_type instance
-// is encoded in the bits 88..92 of the underlying gid_type (encoded as the
-// logarithm to the base 2 of the credit value). Bit 94 is a flag which is set
-// whenever the credit is valid. Bit 95 encodes whether the given id_type
-// has been split at any time. This information is needed to be able to decide
+// The current share of the global credit associated with an id_type instance is
+// encoded in the bits 88..92 of the underlying gid_type (encoded as the
+// logarithm to the base 2 of the credit value). Bit 94 is a flag that is set
+// whenever the credit is valid. Bit 95 encodes whether the given id_type has
+// been split at any time. This information is needed to be able to decide
 // whether a garbage collection can be assumed to be a purely local operation.
 // Bit 93 is used by the locking scheme for gid_types.
 //
 // Credit splitting is performed without any additional AGAS traffic as long as
 // sufficient credit is available. If the credit of the id_type to be split is
-// exhausted (reaches the value '1') it has to be replenished. This operation
-// is performed synchronously. This is done to ensure that AGAS has accounted
-// for the requested credit increase.
+// exhausted (reaches the value '1') it has to be replenished. This operation is
+// performed synchronously. This is done to ensure that AGAS has accounted for
+// the requested credit increase.
 //
-// Note that both the id_type instance staying behind and the one sent along
-// are replenished before sending out the parcel at the sending locality.
+// Note that both the id_type instance staying behind and the one sent along are
+// replenished before sending out the parcel at the sending locality.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 namespace hpx::naming::detail {
 
     struct gid_serialization_data;
@@ -108,7 +108,7 @@ namespace hpx::naming::detail {
 
 HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::detail::gid_serialization_data)
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 namespace hpx::naming {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -364,8 +364,7 @@ namespace hpx::naming {
 
             std::int64_t result = 0;
             {
-                hpx::util::unlock_guard<std::unique_lock<gid_type::mutex_type>>
-                    ul(l);
+                hpx::unlock_guard<std::unique_lock<gid_type::mutex_type>> ul(l);
                 result = agas::incref(launch::sync, unlocked_gid, added_credit);
             }
 
@@ -490,7 +489,7 @@ namespace hpx::naming {
             if (ar.try_get_extra_data<util::checkpointing_tag>() != nullptr)
             {
                 // this is a check-pointing operation, we do not support this
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "id_type_impl::preprocess_gid",
                     "can't check-point managed id_type's, use a component "
                     "client instead");
@@ -552,7 +551,8 @@ namespace hpx::naming {
                 ar.try_get_extra_data<util::checkpointing_tag>() != nullptr)
             {
                 // this is a check-pointing operation, we do not support this
-                HPX_THROW_EXCEPTION(invalid_status, "id_type_impl::save",
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "id_type_impl::save",
                     "can't check-point managed id_type's, use a component "
                     "client instead");
             }
@@ -596,7 +596,8 @@ namespace hpx::naming {
             if (hpx::id_type::management_type::unmanaged != data.type_ &&
                 hpx::id_type::management_type::managed != data.type_)
             {
-                HPX_THROW_EXCEPTION(version_too_new, "id_type::load",
+                HPX_THROW_EXCEPTION(hpx::error::version_too_new,
+                    "id_type::load",
                     "trying to load id_type with unknown deleter");
             }
 

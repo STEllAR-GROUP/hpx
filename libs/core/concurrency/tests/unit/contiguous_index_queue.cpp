@@ -19,6 +19,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <iostream>
 #include <iterator>
 #include <memory>
 #include <random>
@@ -105,7 +106,7 @@ void test_concurrent_worker(pop_mode m, std::size_t thread_index,
     std::vector<std::uint32_t>& popped_indices)
 {
     hpx::optional<std::uint32_t> curr;
-    std::mt19937 r(seed + thread_index);
+    std::mt19937 r(static_cast<unsigned int>(seed + thread_index));
     std::uniform_int_distribution<> d(0, 1);
 
     // Make sure all threads start roughly at the same time.
@@ -139,7 +140,7 @@ void test_concurrent_worker(pop_mode m, std::size_t thread_index,
 void test_concurrent(pop_mode m)
 {
     std::uint32_t first = 33;
-    std::uint32_t last = 73210;
+    std::uint32_t last = 732100;
     hpx::concurrency::detail::contiguous_index_queue<> q{first, last};
 
     std::size_t const num_threads = hpx::get_num_worker_threads();
@@ -200,11 +201,13 @@ int hpx_main(hpx::program_options::variables_map& vm)
     {
         seed = vm["seed"].as<unsigned int>();
     }
+    std::cout << "Using seed: " << seed << '\n';
 
     test_basic();
     test_concurrent(pop_mode::left);
     test_concurrent(pop_mode::right);
     test_concurrent(pop_mode::random);
+
     return hpx::local::finalize();
 }
 

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,9 +11,11 @@
 #include <hpx/config.hpp>
 
 #include <cstddef>
+#include <memory>
 #include <type_traits>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct construct_vtable
@@ -23,7 +25,8 @@ namespace hpx { namespace util { namespace detail {
     template <typename VTable, typename T>
     struct vtables
     {
-        static constexpr VTable instance = detail::construct_vtable<T>();
+        static constexpr VTable instance =
+            VTable(detail::construct_vtable<T>());
     };
 
     template <typename VTable, typename T>
@@ -33,7 +36,7 @@ namespace hpx { namespace util { namespace detail {
     constexpr VTable const* get_vtable() noexcept
     {
         static_assert(
-            !std::is_reference<T>::value, "T shall have no ref-qualifiers");
+            !std::is_reference_v<T>, "T shall have no ref-qualifiers");
 
         return &vtables<VTable, T>::instance;
     }
@@ -56,8 +59,7 @@ namespace hpx { namespace util { namespace detail {
         template <typename T>
         static void* allocate(void* storage, std::size_t storage_size)
         {
-            using storage_t =
-                typename std::aligned_storage<sizeof(T), alignof(T)>::type;
+            using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
 
             if (sizeof(T) > storage_size)
             {
@@ -70,12 +72,11 @@ namespace hpx { namespace util { namespace detail {
         static void _deallocate(
             void* obj, std::size_t storage_size, bool destroy) noexcept
         {
-            using storage_t =
-                typename std::aligned_storage<sizeof(T), alignof(T)>::type;
+            using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
 
             if (destroy)
             {
-                get<T>(obj).~T();
+                std::destroy_at(std::addressof(get<T>(obj)));
             }
 
             if (sizeof(T) > storage_size)
@@ -86,9 +87,9 @@ namespace hpx { namespace util { namespace detail {
         void (*deallocate)(void*, std::size_t storage_size, bool) noexcept;
 
         template <typename T>
-        constexpr vtable(construct_vtable<T>) noexcept
+        explicit constexpr vtable(construct_vtable<T>) noexcept
           : deallocate(&vtable::template _deallocate<T>)
         {
         }
     };
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

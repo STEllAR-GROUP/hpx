@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <string>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     // load string
     template <typename Char, typename CharTraits, typename Allocator>
@@ -38,4 +38,4 @@ namespace hpx { namespace serialization {
         ar << size;
         save_binary(ar, s.data(), s.size() * sizeof(Char));
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,24 +9,30 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/executors/rebind_executor.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/annotating_executor.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/properties/property.hpp>
 
 #include <string>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
 
     // with_annotation property implementation for execution policies
     // that simply forwards to the embedded executor
     // clang-format off
     template <typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy>
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::functional::is_tag_invocable_v<
+                hpx::execution::experimental::with_annotation_t,
+                typename std::decay_t<ExPolicy>::executor_type,
+                const char*>
         )>
     // clang-format on
     constexpr decltype(auto) tag_invoke(
@@ -43,7 +49,11 @@ namespace hpx { namespace execution { namespace experimental {
     // clang-format off
     template <typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy>
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::functional::is_tag_invocable_v<
+                hpx::execution::experimental::with_annotation_t,
+                typename std::decay_t<ExPolicy>::executor_type,
+                std::string>
         )>
     // clang-format on
     decltype(auto) tag_invoke(hpx::execution::experimental::with_annotation_t,
@@ -72,4 +82,4 @@ namespace hpx { namespace execution { namespace experimental {
     {
         return hpx::execution::experimental::get_annotation(policy.executor());
     }
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

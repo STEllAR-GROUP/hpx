@@ -42,7 +42,7 @@
 #include <limits>
 #include <utility>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail {
+namespace hpx::threads::coroutines::detail {
 
     class coroutine_self
     {
@@ -50,10 +50,10 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         HPX_NON_COPYABLE(coroutine_self);
 
     protected:
-        // store the current this and write it to the TSS on exit
+        // store the current this and write it back to the TSS on exit
         struct reset_self_on_exit
         {
-            reset_self_on_exit(coroutine_self* self)
+            explicit reset_self_on_exit(coroutine_self* self) noexcept
               : self_(self)
             {
                 set_self(self->next_self_);
@@ -75,7 +75,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         using yield_decorator_type = hpx::function<arg_type(result_type)>;
 
-        explicit coroutine_self(coroutine_self* next_self)
+        explicit coroutine_self(coroutine_self* next_self) noexcept
           : next_self_(next_self)
         {
         }
@@ -118,14 +118,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         virtual arg_type yield_impl(result_type arg) = 0;
 
-        virtual thread_id_type get_thread_id() const = 0;
+        virtual thread_id_type get_thread_id() const noexcept = 0;
 
-        virtual std::size_t get_thread_phase() const = 0;
+        virtual std::size_t get_thread_phase() const noexcept = 0;
 
-        virtual std::ptrdiff_t get_available_stack_space() = 0;
+        virtual std::ptrdiff_t get_available_stack_space() const noexcept = 0;
 
-        virtual std::size_t get_thread_data() const = 0;
-        virtual std::size_t set_thread_data(std::size_t data) = 0;
+        virtual std::size_t get_thread_data() const noexcept = 0;
+        virtual std::size_t set_thread_data(std::size_t data) noexcept = 0;
 
 #if defined(HPX_HAVE_LIBCDS)
         virtual std::size_t get_libcds_data() const = 0;
@@ -143,7 +143,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         virtual tss_storage* get_thread_tss_data() = 0;
         virtual tss_storage* get_or_create_thread_tss_data() = 0;
 
-        virtual std::size_t& get_continuation_recursion_count() = 0;
+        virtual std::size_t& get_continuation_recursion_count() noexcept = 0;
 
         // access coroutines context object
         using impl_type = coroutine_impl;
@@ -151,19 +151,19 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
     private:
         friend struct coroutine_accessor;
-        virtual impl_ptr get_impl()
+        virtual impl_ptr get_impl() noexcept
         {
             return nullptr;
         }
 
     public:
-        static HPX_CORE_EXPORT coroutine_self*& local_self();
+        static HPX_CORE_EXPORT coroutine_self*& local_self() noexcept;
 
-        static void set_self(coroutine_self* self)
+        static void set_self(coroutine_self* self) noexcept
         {
             local_self() = self;
         }
-        static coroutine_self* get_self()
+        static coroutine_self* get_self() noexcept
         {
             return local_self();
         }
@@ -176,8 +176,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     ////////////////////////////////////////////////////////////////////////////
     struct reset_self_on_exit
     {
-        reset_self_on_exit(
-            coroutine_self* val, coroutine_self* old_val = nullptr)
+        explicit reset_self_on_exit(
+            coroutine_self* val, coroutine_self* old_val = nullptr) noexcept
           : old_self(old_val)
         {
             coroutine_self::set_self(val);
@@ -190,5 +190,4 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         coroutine_self* old_self;
     };
-
-}}}}    // namespace hpx::threads::coroutines::detail
+}    // namespace hpx::threads::coroutines::detail

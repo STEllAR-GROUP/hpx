@@ -24,8 +24,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace experimental {
+namespace hpx::experimental {
+
     namespace detail {
+
         enum class async_rw_mutex_access_type
         {
             read,
@@ -37,6 +39,7 @@ namespace hpx { namespace experimental {
         {
             using shared_state_ptr_type =
                 std::shared_ptr<async_rw_mutex_shared_state>;
+
             hpx::optional<T> value;
             shared_state_ptr_type next_state;
             hpx::mutex mtx;
@@ -45,9 +48,11 @@ namespace hpx { namespace experimental {
                 continuations;
 
             async_rw_mutex_shared_state() = default;
+
             async_rw_mutex_shared_state(async_rw_mutex_shared_state&&) = delete;
             async_rw_mutex_shared_state& operator=(
                 async_rw_mutex_shared_state&&) = delete;
+
             async_rw_mutex_shared_state(
                 async_rw_mutex_shared_state const&) = delete;
             async_rw_mutex_shared_state& operator=(
@@ -86,7 +91,7 @@ namespace hpx { namespace experimental {
             }
 
             void set_next_state(
-                std::shared_ptr<async_rw_mutex_shared_state> state)
+                std::shared_ptr<async_rw_mutex_shared_state> state) noexcept
             {
                 // The next state should only be set once
                 HPX_ASSERT(!next_state);
@@ -106,6 +111,7 @@ namespace hpx { namespace experimental {
         {
             using shared_state_ptr_type =
                 std::shared_ptr<async_rw_mutex_shared_state>;
+
             shared_state_ptr_type next_state;
             hpx::mutex mtx;
             hpx::detail::small_vector<
@@ -113,9 +119,11 @@ namespace hpx { namespace experimental {
                 continuations;
 
             async_rw_mutex_shared_state() = default;
+
             async_rw_mutex_shared_state(async_rw_mutex_shared_state&&) = delete;
             async_rw_mutex_shared_state& operator=(
                 async_rw_mutex_shared_state&&) = delete;
+
             async_rw_mutex_shared_state(
                 async_rw_mutex_shared_state const&) = delete;
             async_rw_mutex_shared_state& operator=(
@@ -135,7 +143,7 @@ namespace hpx { namespace experimental {
             }
 
             void set_next_state(
-                std::shared_ptr<async_rw_mutex_shared_state> state)
+                std::shared_ptr<async_rw_mutex_shared_state> state) noexcept
             {
                 // The next state should only be set once
                 HPX_ASSERT(!next_state);
@@ -165,7 +173,8 @@ namespace hpx { namespace experimental {
 
         public:
             async_rw_mutex_access_wrapper() = delete;
-            async_rw_mutex_access_wrapper(shared_state_type state)
+            explicit async_rw_mutex_access_wrapper(
+                shared_state_type state) noexcept
               : state(HPX_MOVE(state))
             {
             }
@@ -211,7 +220,8 @@ namespace hpx { namespace experimental {
 
         public:
             async_rw_mutex_access_wrapper() = delete;
-            async_rw_mutex_access_wrapper(shared_state_type state)
+            explicit async_rw_mutex_access_wrapper(
+                shared_state_type state) noexcept
               : state(HPX_MOVE(state))
             {
             }
@@ -251,7 +261,8 @@ namespace hpx { namespace experimental {
 
         public:
             async_rw_mutex_access_wrapper() = delete;
-            explicit async_rw_mutex_access_wrapper(shared_state_type state)
+            explicit async_rw_mutex_access_wrapper(
+                shared_state_type state) noexcept
               : state(HPX_MOVE(state))
             {
             }
@@ -276,7 +287,8 @@ namespace hpx { namespace experimental {
 
         public:
             async_rw_mutex_access_wrapper() = delete;
-            explicit async_rw_mutex_access_wrapper(shared_state_type state)
+            explicit async_rw_mutex_access_wrapper(
+                shared_state_type state) noexcept
               : state(HPX_MOVE(state))
             {
             }
@@ -725,4 +737,4 @@ namespace hpx { namespace experimental {
         shared_state_ptr_type prev_state;
         shared_state_ptr_type state;
     };
-}}    // namespace hpx::experimental
+}    // namespace hpx::experimental

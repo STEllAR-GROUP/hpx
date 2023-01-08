@@ -12,22 +12,24 @@
 #include <hpx/lcos_local/composable_guard.hpp>
 
 #include <algorithm>
+#include <atomic>
 #include <cstddef>
 #include <memory>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
+
     static void run_composable(detail::guard_task* task);
 
-    static void nothing() {}
+    static constexpr void nothing() noexcept {}
 
     namespace detail {
-        // A link in the list of tasks attached
-        // to a guard
+
+        // A link in the list of tasks attached to a guard
         struct guard_task : detail::debug_object
         {
-            guard_atomic next;
+            std::atomic<guard_task*> next;
             detail::guard_function run;
             bool const single_guard;
 
@@ -37,7 +39,8 @@ namespace hpx { namespace lcos { namespace local {
               , single_guard(true)
             {
             }
-            guard_task(bool sg)
+
+            explicit guard_task(bool sg)
               : next(nullptr)
               , run(nothing)
               , single_guard(sg)
@@ -119,11 +122,12 @@ namespace hpx { namespace lcos { namespace local {
     {
         stage_data* sd;
         std::size_t n;
-        stage_task_cleanup(stage_data* sd_, std::size_t n_)
+        stage_task_cleanup(stage_data* sd_, std::size_t n_) noexcept
           : sd(sd_)
           , n(n_)
         {
         }
+
         ~stage_task_cleanup()
         {
             detail::guard_task* zero = nullptr;
@@ -196,24 +200,22 @@ namespace hpx { namespace lcos { namespace local {
         run_guarded(guard, tptr);
     }
 
-    // This class exists so that a destructor is
-    // used to perform cleanup. By using a destructor
-    // we ensure the code works even if exceptions are
+    // This class exists so that a destructor is used to perform cleanup. By
+    // using a destructor we ensure the code works even if exceptions are
     // thrown.
     struct run_composable_cleanup
     {
         detail::guard_task* task;
-        run_composable_cleanup(detail::guard_task* task_)
+        explicit run_composable_cleanup(detail::guard_task* task_) noexcept
           : task(task_)
         {
         }
         ~run_composable_cleanup()
         {
             detail::guard_task* zero = nullptr;
-            // If single_guard is false, then this is one of the
-            // setup tasks for a multi-guarded task. By not setting
-            // the next field, we halt processing on items queued
-            // to this guard.
+            // If single_guard is false, then this is one of the setup tasks for
+            // a multi-guarded task. By not setting the next field, we halt
+            // processing on items queued to this guard.
             HPX_ASSERT(task != nullptr);
             task->check_();
             if (!task->next.compare_exchange_strong(zero, task))
@@ -226,6 +228,7 @@ namespace hpx { namespace lcos { namespace local {
     };
 
     namespace detail {
+
         struct empty_helper
         {
             static guard_task*& get_empty_guard_task()
@@ -263,9 +266,8 @@ namespace hpx { namespace lcos { namespace local {
         else
         {
             task->run();
-            // Note that by this point in the execution
-            // the task data structure has probably
-            // been deleted.
+            // Note that by this point in the execution the task data structure
+            // has probably been deleted.
         }
     }
 
@@ -280,4 +282,4 @@ namespace hpx { namespace lcos { namespace local {
             free(zero);
         }
     }
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +25,9 @@
 #include <type_traits>
 
 namespace hpx {
+
     namespace detail {
+
         HPX_CORE_EXPORT char const* store_function_annotation(std::string name);
     }    // namespace detail
 
@@ -88,8 +90,9 @@ namespace hpx {
             auto* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
             {
-                desc_ = threads::get_thread_id_data(self->get_thread_id())
-                            ->set_description(hpx::util::thread_description(f));
+                desc_ =
+                    threads::get_thread_id_data(self->get_thread_id())
+                        ->set_description(hpx::threads::thread_description(f));
             }
         }
 
@@ -106,7 +109,7 @@ namespace hpx {
     private:
         hpx::util::itt::thread_domain thread_domain_;
         hpx::util::itt::task task_;
-        hpx::util::thread_description desc_;
+        hpx::threads::thread_description desc_;
     };
 #else
     struct [[nodiscard]] scoped_annotation
@@ -159,8 +162,9 @@ namespace hpx {
             auto* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
             {
-                desc_ = threads::get_thread_id_data(self->get_thread_id())
-                            ->set_description(hpx::util::thread_description(f));
+                desc_ =
+                    threads::get_thread_id_data(self->get_thread_id())
+                        ->set_description(hpx::threads::thread_description(f));
             }
 
 #if defined(HPX_HAVE_APEX)
@@ -179,16 +183,16 @@ namespace hpx {
             }
         }
 
-        hpx::util::thread_description desc_;
+        hpx::threads::thread_description desc_;
     };
 #endif
 
 #else
     /// \brief scoped_annotation associates a \c name with a section of code
-    ///        (scope). It can be used to visualize code execution in
-    ///        profiling tools like \a Intel \a VTune, \a Apex \a Profiler, etc.
-    ///        That allows analysing performance to figure out which part(s)
-    ///        of code is (are) responsible for performance degradation, etc.
+    ///        (scope). It can be used to visualize code execution in profiling
+    ///        tools like \a Intel \a VTune, \a Apex \a Profiler, etc. That
+    ///        allows analysing performance to figure out which part(s) of code
+    ///        is (are) responsible for performance degradation, etc.
     struct [[nodiscard]] scoped_annotation
     {
         HPX_NON_COPYABLE(scoped_annotation);
@@ -207,7 +211,8 @@ namespace hpx {
 }    // namespace hpx
 
 namespace hpx::util {
-    using annotate_function HPX_DEPRECATED_V(1, 8,
-        "Please use hpx::scoped_annotation instead.") = hpx::scoped_annotation;
 
+    using annotate_function HPX_DEPRECATED_V(1, 8,
+        "hpx::util::scoped_annotation has been deprecated, please use "
+        "hpx::scoped_annotation instead.") = hpx::scoped_annotation;
 }    // namespace hpx::util

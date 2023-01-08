@@ -174,10 +174,11 @@ namespace hpx {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT void HPX_CDECL new_handler()
     {
-        HPX_THROW_EXCEPTION(out_of_memory, "new_handler",
+        HPX_THROW_EXCEPTION(hpx::error::out_of_memory, "new_handler",
             "new allocator failed to allocate memory");
     }
 
@@ -220,18 +221,28 @@ namespace hpx {
         // Set console control handler to allow server to be stopped.
         SetConsoleCtrlHandler(hpx::termination_handler, TRUE);
 #else
-        struct sigaction new_action;
-        new_action.sa_handler = hpx::termination_handler;
-        sigemptyset(&new_action.sa_mask);
-        new_action.sa_flags = 0;
+        if (util::from_string<int>(get_config_entry("hpx.handle_signals", 1)))
+        {
+            struct sigaction new_action;
+            new_action.sa_handler = hpx::termination_handler;
+            sigemptyset(&new_action.sa_mask);
+            new_action.sa_flags = 0;
 
-        sigaction(SIGINT, &new_action, nullptr);     // Interrupted
-        sigaction(SIGBUS, &new_action, nullptr);     // Bus error
-        sigaction(SIGFPE, &new_action, nullptr);     // Floating point exception
-        sigaction(SIGILL, &new_action, nullptr);     // Illegal instruction
-        sigaction(SIGPIPE, &new_action, nullptr);    // Bad pipe
-        sigaction(SIGSEGV, &new_action, nullptr);    // Segmentation fault
-        sigaction(SIGSYS, &new_action, nullptr);     // Bad syscall
+            sigaction(SIGINT, &new_action, nullptr);    // Interrupted
+            sigaction(SIGBUS, &new_action, nullptr);    // Bus error
+            sigaction(
+                SIGFPE, &new_action, nullptr);    // Floating point exception
+            sigaction(SIGILL, &new_action, nullptr);     // Illegal instruction
+            sigaction(SIGPIPE, &new_action, nullptr);    // Bad pipe
+            sigaction(SIGSEGV, &new_action, nullptr);    // Segmentation fault
+            sigaction(SIGSYS, &new_action, nullptr);     // Bad syscall
+
+            hpx::threads::coroutines::register_signal_handler = false;
+        }
+        else
+        {
+            hpx::threads::coroutines::register_signal_handler = true;
+        }
 #endif
 
         std::set_new_handler(hpx::new_handler);
@@ -879,6 +890,7 @@ namespace hpx {
     }
 
     namespace util {
+
         ///////////////////////////////////////////////////////////////////////////
         // retrieve the command line arguments for the current locality
         bool retrieve_commandline_arguments(
@@ -897,8 +909,8 @@ namespace hpx {
             if (cfg.has_entry("hpx.cmd_line"))
                 cmdline = cfg.get_entry("hpx.cmd_line");
 
-            return hpx::local::detail::parse_commandline(
-                cfg, app_options, cmdline, vm, allow_unregistered);
+            return hpx::local::detail::parse_commandline(cfg, app_options,
+                cmdline, vm, util::commandline_error_mode::allow_unregistered);
         }
 
         ///////////////////////////////////////////////////////////////////////////
@@ -921,7 +933,8 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "hpx::get_os_thread_count()",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::get_os_thread_count()",
                 "the runtime system has not been initialized yet");
             return std::size_t(0);
         }
@@ -933,7 +946,7 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::is_scheduler_numa_sensitive",
                 "the runtime system has not been initialized yet");
             return false;
@@ -998,7 +1011,8 @@ namespace hpx {
 }    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
+
     std::string expand(std::string const& in)
     {
         return get_runtime().get_config().expand(in);
@@ -1008,10 +1022,11 @@ namespace hpx { namespace util {
     {
         get_runtime().get_config().expand(in, std::string::size_type(-1));
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     threadmanager& get_thread_manager()
     {
         return get_runtime().get_thread_manager();
@@ -1065,12 +1080,13 @@ namespace hpx { namespace threads {
         hpx::runtime* rt = hpx::get_runtime_ptr();
         if (rt == nullptr)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "hpx::threads::get_topology",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::threads::get_topology",
                 "the hpx runtime system has not been initialized yet");
         }
         return rt->get_topology();
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
@@ -1150,7 +1166,7 @@ namespace hpx {
         {
             if (rt->get_state() > hpx::state::pre_startup)
             {
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "register_pre_startup_function",
                     "Too late to register a new pre-startup function.");
                 return;
@@ -1170,7 +1186,8 @@ namespace hpx {
         {
             if (rt->get_state() > hpx::state::startup)
             {
-                HPX_THROW_EXCEPTION(invalid_status, "register_startup_function",
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "register_startup_function",
                     "Too late to register a new startup function.");
                 return;
             }
@@ -1189,7 +1206,7 @@ namespace hpx {
         {
             if (rt->get_state() > hpx::state::pre_shutdown)
             {
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "register_pre_shutdown_function",
                     "Too late to register a new pre-shutdown function.");
                 return;
@@ -1209,7 +1226,7 @@ namespace hpx {
         {
             if (rt->get_state() > hpx::state::shutdown)
             {
-                HPX_THROW_EXCEPTION(invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "register_shutdown_function",
                     "Too late to register a new shutdown function.");
                 return;
@@ -1286,7 +1303,8 @@ namespace hpx {
                     {
                         std::string boundcpu_str = threads::to_string(boundcpu);
                         std::string pu_mask_str = threads::to_string(pu_mask);
-                        HPX_THROW_EXCEPTION(invalid_status, "handle_print_bind",
+                        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                            "handle_print_bind",
                             hpx::util::format(
                                 "unexpected mismatch between locality {1}: "
                                 "binding reported from HWLOC({2}) and HPX({3}) "
@@ -1629,7 +1647,7 @@ namespace hpx {
 
         if (state_.load() != hpx::state::running)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "runtime::suspend",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status, "runtime::suspend",
                 "Can only suspend runtime from running state");
             return -1;
         }
@@ -1659,7 +1677,7 @@ namespace hpx {
 
         if (state_.load() != hpx::state::sleeping)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "runtime::resume",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status, "runtime::resume",
                 "Can only resume runtime from suspended state");
             return -1;
         }
@@ -1871,10 +1889,12 @@ namespace hpx {
                         used_processing_units),
                     ec);
 
-                // comment this out for now as on CircleCI this is causing unending grief
+                // comment this out for now as on CircleCI this is causing
+                // unending grief
                 //if (ec)
                 //{
-                //    HPX_THROW_EXCEPTION(kernel_error, "runtime::init_tss_ex",
+                //    HPX_THROW_EXCEPTION(hpx::error::kernel_error,
+                //        "runtime::init_tss_ex",
                 //        "failed to set thread affinity mask ({}) for service "
                 //        "thread: {}",
                 //        hpx::threads::to_string(used_processing_units),
@@ -1953,8 +1973,9 @@ namespace hpx {
         if (0 == std::strncmp(name, "main", 4))    //-V112
             return &main_pool_;
 
-        HPX_THROW_EXCEPTION(bad_parameter, "runtime::get_thread_pool",
-            "unknown thread pool requested: {}", name);
+        HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+            "runtime::get_thread_pool", "unknown thread pool requested: {}",
+            name);
         return nullptr;
     }
 
@@ -2021,7 +2042,8 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "hpx::get_num_worker_threads",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::get_num_worker_threads",
                 "the runtime system has not been initialized yet");
             return std::size_t(0);
         }
@@ -2036,7 +2058,8 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "hpx::get_num_localities",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::get_num_localities",
                 "the runtime system has not been initialized yet");
             return std::size_t(0);
         }
@@ -2049,7 +2072,7 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::get_initial_num_localities",
                 "the runtime system has not been initialized yet");
             return std::size_t(0);
@@ -2063,7 +2086,8 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "hpx::get_num_localities",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::get_num_localities",
                 "the runtime system has not been initialized yet");
             return make_ready_future(std::uint32_t(0));
         }

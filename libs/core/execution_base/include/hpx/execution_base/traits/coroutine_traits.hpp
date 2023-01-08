@@ -15,7 +15,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
 
     template <typename Promise, typename Awaiter>
     decltype(auto) await_suspend(Awaiter&& await)
@@ -86,7 +86,6 @@ namespace hpx { namespace execution { namespace experimental {
         // clang-format on
         {
         };
-
     }    // namespace detail
 
     // An Awaiter type is a type that implements the three special methods that
@@ -138,7 +137,6 @@ namespace hpx { namespace execution { namespace experimental {
                 std::declval<Awaitable>()))>> = true;
 
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(await_transform);
-
     }    // namespace detail
 
     // Returns the result of applying operator co_await() to the function's
@@ -223,6 +221,6 @@ namespace hpx { namespace execution { namespace experimental {
             .await_resume()));
     // clang-format on
 
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental
 
 #endif    // HPX_HAVE_CXX20_COROUTINES

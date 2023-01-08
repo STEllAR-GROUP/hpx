@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -163,12 +163,14 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -194,15 +196,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename InIter, typename Sent>
         InIter std_uninitialized_value_construct(InIter first, Sent last)
         {
-            using value_type =
-                typename std::iterator_traits<InIter>::value_type;
-
             InIter s_first = first;
             try
             {
                 for (/* */; first != last; ++first)
                 {
-                    ::new (std::addressof(*first)) value_type();
+                    hpx::construct_at(std::addressof(*first));
                 }
                 return first;
             }
@@ -210,7 +209,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 for (/* */; s_first != first; ++s_first)
                 {
-                    (*s_first).~value_type();
+                    std::destroy_at(std::addressof(*s_first));
                 }
                 throw;
             }
@@ -222,15 +221,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
             std::size_t count,
             util::cancellation_token<util::detail::no_data>& tok)
         {
-            using value_type =
-                typename std::iterator_traits<InIter>::value_type;
-
             return util::loop_with_cleanup_n_with_token(
                 first, count, tok,
                 [](InIter it) -> void {
-                    ::new (std::addressof(*it)) value_type();
+                    hpx::construct_at(std::addressof(*it));
                 },
-                [](InIter it) -> void { (*it).~value_type(); });
+                [](InIter it) -> void {
+                    std::destroy_at(std::addressof(*it));
+                });
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -310,37 +308,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
     }    // namespace detail
 
-    template <typename ExPolicy, typename FwdIter,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter>::value)>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::uninitialized_value_construct is deprecated, use "
-        "hpx::uninitialized_value_construct "
-        "instead")
-    typename util::detail::algorithm_result<ExPolicy>::type
-        uninitialized_value_construct(
-            ExPolicy&& policy, FwdIter first, FwdIter last)
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Required at least forward iterator.");
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        using result_type =
-            typename hpx::parallel::util::detail::algorithm_result<
-                ExPolicy>::type;
-
-        return hpx::util::void_guard<result_type>(),
-               hpx::parallel::v1::detail::uninitialized_value_construct<
-                   FwdIter>()
-                   .call(HPX_FORWARD(ExPolicy, policy), first, last);
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // uninitialized_value_construct_n
     namespace detail {
@@ -353,15 +320,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
         InIter std_uninitialized_value_construct_n(
             InIter first, std::size_t count)
         {
-            using value_type =
-                typename std::iterator_traits<InIter>::value_type;
-
             InIter s_first = first;
             try
             {
                 for (/* */; count != 0; (void) ++first, --count)
                 {
-                    ::new (std::addressof(*first)) value_type();
+                    hpx::construct_at(std::addressof(*first));
                 }
                 return first;
             }
@@ -369,7 +333,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             {
                 for (/* */; s_first != first; ++s_first)
                 {
-                    (*s_first).~value_type();
+                    std::destroy_at(std::addressof(*s_first));
                 }
                 throw;
             }
@@ -404,39 +368,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    template <typename ExPolicy, typename FwdIter, typename Size,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy<ExPolicy>::value&&
-                hpx::traits::is_iterator<FwdIter>::value)>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::uninitialized_value_construct_n is deprecated, use "
-        "hpx::uninitialized_value_construct_n "
-        "instead")
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        uninitialized_value_construct_n(
-            ExPolicy&& policy, FwdIter first, Size count)
-    {
-        static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
-            "Requires at least forward iterator.");
-
-        // if count is representing a negative value, we do nothing
-        if (detail::is_negative(count))
-        {
-            return util::detail::algorithm_result<ExPolicy, FwdIter>::get(
-                HPX_MOVE(first));
-        }
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-        return detail::uninitialized_value_construct_n<FwdIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, std::size_t(count));
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
-#pragma GCC diagnostic pop
-#endif
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
     ///////////////////////////////////////////////////////////////////////////

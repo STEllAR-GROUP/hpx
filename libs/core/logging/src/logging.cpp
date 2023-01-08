@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -20,7 +20,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
+
     HPX_DEFINE_LOG(agas, disable_all)
     HPX_DEFINE_LOG(agas_console, disable_all)
     HPX_DEFINE_LOG(app, disable_all)
@@ -38,6 +39,7 @@ namespace hpx { namespace util {
     HPX_DEFINE_LOG(timing_console, disable_all)
 
     namespace detail {
+
         hpx::util::logging::level get_log_level(
             std::string const& env, bool allow_always)
         {
@@ -72,12 +74,12 @@ namespace hpx { namespace util {
             }
         }
     }    // namespace detail
-}}       // namespace hpx::util
+}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
 #include <hpx/logging/detail/logger.hpp>
 
-namespace hpx { namespace util { namespace logging {
+namespace hpx::util::logging {
 
     void logger::turn_cache_off()
     {
@@ -93,7 +95,6 @@ namespace hpx { namespace util { namespace logging {
         for (auto& msg : msgs)
             m_writer(msg);
     }
-
-}}}    // namespace hpx::util::logging
+}    // namespace hpx::util::logging
 
 #endif    // HPX_HAVE_LOGGING

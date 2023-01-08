@@ -1,5 +1,5 @@
 //  Copyright (c)      2020 ETH Zurich
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,16 +24,17 @@
 #include <typeinfo>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
     namespace detail {
         ///////////////////////////////////////////////////////////////////////////
         // TODO: This is not scalable, and painful to update.
         void save(output_archive& ar, std::exception_ptr const& ep,
             unsigned int /* version */)
         {
-            hpx::util::exception_type type(hpx::util::unknown_exception);
+            hpx::util::exception_type type =
+                hpx::util::exception_type::unknown_exception;
             std::string what;
-            int err_value = hpx::success;
+            hpx::error err_value = hpx::error::success;
             std::string err_message;
 
             std::string throw_function_;
@@ -68,66 +69,67 @@ namespace hpx { namespace serialization {
             }
             catch (hpx::thread_interrupted const&)
             {
-                type = hpx::util::hpx_thread_interrupted_exception;
+                type =
+                    hpx::util::exception_type::hpx_thread_interrupted_exception;
                 what = "hpx::thread_interrupted";
-                err_value = hpx::thread_cancelled;
+                err_value = hpx::error::thread_cancelled;
             }
             catch (hpx::exception const& e)
             {
-                type = hpx::util::hpx_exception;
+                type = hpx::util::exception_type::hpx_exception;
                 what = e.what();
                 err_value = e.get_error();
             }
             catch (std::system_error const& e)
             {
-                type = hpx::util::std_system_error;
+                type = hpx::util::exception_type::std_system_error;
                 what = e.what();
-                err_value = e.code().value();
+                err_value = static_cast<hpx::error>(e.code().value());
                 err_message = e.code().message();
             }
             catch (std::runtime_error const& e)
             {
-                type = hpx::util::std_runtime_error;
+                type = hpx::util::exception_type::std_runtime_error;
                 what = e.what();
             }
             catch (std::invalid_argument const& e)
             {
-                type = hpx::util::std_invalid_argument;
+                type = hpx::util::exception_type::std_invalid_argument;
                 what = e.what();
             }
             catch (std::out_of_range const& e)
             {
-                type = hpx::util::std_out_of_range;
+                type = hpx::util::exception_type::std_out_of_range;
                 what = e.what();
             }
             catch (std::logic_error const& e)
             {
-                type = hpx::util::std_logic_error;
+                type = hpx::util::exception_type::std_logic_error;
                 what = e.what();
             }
             catch (std::bad_alloc const& e)
             {
-                type = hpx::util::std_bad_alloc;
+                type = hpx::util::exception_type::std_bad_alloc;
                 what = e.what();
             }
             catch (std::bad_cast const& e)
             {
-                type = hpx::util::std_bad_cast;
+                type = hpx::util::exception_type::std_bad_cast;
                 what = e.what();
             }
             catch (std::bad_typeid const& e)
             {
-                type = hpx::util::std_bad_typeid;
+                type = hpx::util::exception_type::std_bad_typeid;
                 what = e.what();
             }
             catch (std::bad_exception const& e)
             {
-                type = hpx::util::std_bad_exception;
+                type = hpx::util::exception_type::std_bad_exception;
                 what = e.what();
             }
             catch (std::exception const& e)
             {
-                type = hpx::util::std_exception;
+                type = hpx::util::exception_type::std_exception;
                 what = e.what();
             }
 #if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
@@ -139,7 +141,7 @@ namespace hpx { namespace serialization {
 #endif
             catch (...)
             {
-                type = hpx::util::unknown_exception;
+                type = hpx::util::exception_type::unknown_exception;
                 what = "unknown exception";
             }
 
@@ -147,17 +149,17 @@ namespace hpx { namespace serialization {
             ar & type & what & throw_function_ & throw_file_ & throw_line_;
             // clang-format on
 
-            if (hpx::util::hpx_exception == type)
+            if (hpx::util::exception_type::hpx_exception == type)
             {
                 // clang-format off
-                ar & err_value;
+                ar << err_value;
                 // clang-format on
             }
-            else if (hpx::util::boost_system_error == type ||
-                hpx::util::std_system_error == type)
+            else if (hpx::util::exception_type::boost_system_error == type ||
+                hpx::util::exception_type::std_system_error == type)
             {
                 // clang-format off
-                ar & err_value & err_message;
+                ar << err_value << err_message;
                 // clang-format on
             }
         }
@@ -167,9 +169,10 @@ namespace hpx { namespace serialization {
         void load(input_archive& ar, std::exception_ptr& e,
             unsigned int /* version */)
         {
-            hpx::util::exception_type type(hpx::util::unknown_exception);
+            hpx::util::exception_type type =
+                hpx::util::exception_type::unknown_exception;
             std::string what;
-            int err_value = hpx::success;
+            hpx::error err_value = hpx::error::success;
             std::string err_message;
 
             std::string throw_function_;
@@ -180,65 +183,69 @@ namespace hpx { namespace serialization {
             ar & type & what & throw_function_ & throw_file_ & throw_line_;
             // clang-format on
 
-            if (hpx::util::hpx_exception == type)
+            if (hpx::util::exception_type::hpx_exception == type)
             {
                 // clang-format off
                 ar & err_value;
+                ar >> err_value;
                 // clang-format on
             }
-            else if (hpx::util::boost_system_error == type ||
-                hpx::util::std_system_error == type)
+            else if (hpx::util::exception_type::boost_system_error == type ||
+                hpx::util::exception_type::std_system_error == type)
             {
                 // clang-format off
                 ar & err_value& err_message;
+                ar >> err_value >> err_message;
                 // clang-format on
             }
 
             switch (type)
             {
             default:
-            case hpx::util::std_exception:
-            case hpx::util::unknown_exception:
+            case hpx::util::exception_type::std_exception:
+                [[fallthrough]];
+
+            case hpx::util::exception_type::unknown_exception:
                 e = hpx::detail::get_exception(hpx::detail::std_exception(what),
                     throw_function_, throw_file_, throw_line_);
                 break;
 
             // standard exceptions
-            case hpx::util::std_runtime_error:
+            case hpx::util::exception_type::std_runtime_error:
                 e = hpx::detail::get_exception(std::runtime_error(what),
                     throw_function_, throw_file_, throw_line_);
                 break;
 
-            case hpx::util::std_invalid_argument:
+            case hpx::util::exception_type::std_invalid_argument:
                 e = hpx::detail::get_exception(std::invalid_argument(what),
                     throw_function_, throw_file_, throw_line_);
                 break;
 
-            case hpx::util::std_out_of_range:
+            case hpx::util::exception_type::std_out_of_range:
                 e = hpx::detail::get_exception(std::out_of_range(what),
                     throw_function_, throw_file_, throw_line_);
                 break;
 
-            case hpx::util::std_logic_error:
+            case hpx::util::exception_type::std_logic_error:
                 e = hpx::detail::get_exception(std::logic_error(what),
                     throw_function_, throw_file_, throw_line_);
                 break;
 
-            case hpx::util::std_bad_alloc:
+            case hpx::util::exception_type::std_bad_alloc:
                 e = hpx::detail::get_exception(hpx::detail::bad_alloc(what),
                     throw_function_, throw_file_, throw_line_);
                 break;
 
-            case hpx::util::std_bad_cast:
+            case hpx::util::exception_type::std_bad_cast:
                 e = hpx::detail::get_exception(hpx::detail::bad_cast(what),
                     throw_function_, throw_file_, throw_line_);
                 break;
 
-            case hpx::util::std_bad_typeid:
+            case hpx::util::exception_type::std_bad_typeid:
                 e = hpx::detail::get_exception(hpx::detail::bad_typeid(what),
                     throw_function_, throw_file_, throw_line_);
                 break;
-            case hpx::util::std_bad_exception:
+            case hpx::util::exception_type::std_bad_exception:
                 e = hpx::detail::get_exception(hpx::detail::bad_exception(what),
                     throw_function_, throw_file_, throw_line_);
                 break;
@@ -251,27 +258,26 @@ namespace hpx { namespace serialization {
 #endif
 
             // boost::system::system_error
-            case hpx::util::boost_system_error:
+            case hpx::util::exception_type::boost_system_error:
                 [[fallthrough]];
 
             // std::system_error
-            case hpx::util::std_system_error:
+            case hpx::util::exception_type::std_system_error:
                 e = hpx::detail::get_exception(
-                    std::system_error(
-                        err_value, std::system_category(), err_message),
+                    std::system_error(static_cast<int>(err_value),
+                        std::system_category(), err_message),
                     throw_function_, throw_file_, throw_line_);
                 break;
 
             // hpx::exception
-            case hpx::util::hpx_exception:
+            case hpx::util::exception_type::hpx_exception:
                 e = hpx::detail::get_exception(
-                    hpx::exception(static_cast<hpx::error>(err_value), what,
-                        hpx::throwmode::rethrow),
+                    hpx::exception(err_value, what, hpx::throwmode::rethrow),
                     throw_function_, throw_file_, throw_line_);
                 break;
 
             // hpx::thread_interrupted
-            case hpx::util::hpx_thread_interrupted_exception:
+            case hpx::util::exception_type::hpx_thread_interrupted_exception:
                 e = hpx::detail::construct_lightweight_exception(
                     hpx::thread_interrupted());
                 break;
@@ -287,7 +293,7 @@ namespace hpx { namespace serialization {
         HPX_CORE_EXPORT void set_save_custom_exception_handler(
             save_custom_exception_handler_type f)
         {
-            get_save_custom_exception_handler() = f;
+            get_save_custom_exception_handler() = HPX_MOVE(f);
         }
 
         load_custom_exception_handler_type& get_load_custom_exception_handler()
@@ -299,7 +305,7 @@ namespace hpx { namespace serialization {
         HPX_CORE_EXPORT void set_load_custom_exception_handler(
             load_custom_exception_handler_type f)
         {
-            get_load_custom_exception_handler() = f;
+            get_load_custom_exception_handler() = HPX_MOVE(f);
         }
     }    // namespace detail
 
@@ -313,7 +319,8 @@ namespace hpx { namespace serialization {
         }
         else
         {
-            HPX_THROW_EXCEPTION(invalid_status, "hpx::serialization::save",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::serialization::save",
                 "Attempted to save a std::exception_ptr, but there is no "
                 "handler installed. Set one with "
                 "hpx::serialization::detail::set_save_custom_exception_"
@@ -331,7 +338,8 @@ namespace hpx { namespace serialization {
         }
         else
         {
-            HPX_THROW_EXCEPTION(invalid_status, "hpx::serialization::load",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::serialization::load",
                 "Attempted to load a std::exception_ptr, but there is no "
                 "handler installed. Set one with "
                 "hpx::serialization::detail::set_load_custom_exception_"
@@ -344,4 +352,4 @@ namespace hpx { namespace serialization {
 
     template HPX_CORE_EXPORT void load(
         hpx::serialization::input_archive&, std::exception_ptr&, unsigned int);
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

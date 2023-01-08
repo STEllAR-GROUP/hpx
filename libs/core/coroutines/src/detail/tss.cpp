@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,6 +10,7 @@
 // (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
 #include <hpx/config.hpp>
+
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/coroutine.hpp>
@@ -22,9 +23,10 @@
 #include <map>
 #include <memory>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail {
+namespace hpx::threads::coroutines::detail {
+
     ///////////////////////////////////////////////////////////////////////////
-    void tss_data_node::cleanup(bool cleanup_existing)
+    void tss_data_node::cleanup([[maybe_unused]] bool cleanup_existing) noexcept
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         if (cleanup_existing && func_ && (value_ != nullptr))
@@ -33,8 +35,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
         func_.reset();
         value_ = nullptr;
-#else
-        HPX_UNUSED(cleanup_existing);
 #endif
     }
 
@@ -51,13 +51,11 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #endif
     }
 
-    void delete_tss_storage(tss_storage*& storage)
+    void delete_tss_storage([[maybe_unused]] tss_storage*& storage)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         delete storage;
         storage = nullptr;
-#else
-        HPX_UNUSED(storage);
 #endif
     }
 
@@ -67,7 +65,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         coroutine_self* self = coroutine_self::get_self();
         if (nullptr == self)
         {
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "hpx::threads::coroutines::detail::get_tss_thread_data",
                 "null thread id encountered");
             return 0;
@@ -90,13 +88,14 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #endif
     }
 
-    std::size_t set_tss_thread_data(tss_storage*, std::size_t data)
+    std::size_t set_tss_thread_data(
+        tss_storage*, [[maybe_unused]] std::size_t data)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         coroutine_self* self = coroutine_self::get_self();
         if (nullptr == self)
         {
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "hpx::threads::coroutines::detail::set_tss_thread_data",
                 "null thread id encountered");
             return 0;
@@ -121,7 +120,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         return prev_val;
 #else
-        HPX_UNUSED(data);
         throw std::runtime_error(
             "thread local storage has been disabled at configuration time, "
             "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
@@ -130,13 +128,13 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    tss_data_node* find_tss_data(void const* key)
+    tss_data_node* find_tss_data([[maybe_unused]] void const* key)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         coroutine_self* self = coroutine_self::get_self();
         if (nullptr == self)
         {
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "hpx::threads::coroutines::detail::find_tss_data",
                 "null thread id encountered");
             return nullptr;
@@ -148,7 +146,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         return tss_map->find(key);
 #else
-        HPX_UNUSED(key);
         throw std::runtime_error(
             "thread local storage has been disabled at configuration time, "
             "please specify HPX_WITH_THREAD_LOCAL_STORAGE=ON to cmake");
@@ -156,25 +153,24 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 #endif
     }
 
-    void* get_tss_data(void const* key)
+    void* get_tss_data([[maybe_unused]] void const* key)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         if (tss_data_node* const current_node = find_tss_data(key))
             return current_node->get_value();
-#else
-        HPX_UNUSED(key);
 #endif
         return nullptr;
     }
 
-    void add_new_tss_node(void const* key,
-        std::shared_ptr<tss_cleanup_function> const& func, void* tss_data)
+    void add_new_tss_node([[maybe_unused]] void const* key,
+        [[maybe_unused]] std::shared_ptr<tss_cleanup_function> const& func,
+        [[maybe_unused]] void* tss_data)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         coroutine_self* self = coroutine_self::get_self();
         if (nullptr == self)
         {
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "hpx::threads::coroutines::detail::add_new_tss_node",
                 "null thread id encountered");
             return;
@@ -188,20 +184,17 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
         tss_map->insert(key, func, tss_data);
-#else
-        HPX_UNUSED(key);
-        HPX_UNUSED(func);
-        HPX_UNUSED(tss_data);
 #endif
     }
 
-    void erase_tss_node(void const* key, bool cleanup_existing)
+    void erase_tss_node([[maybe_unused]] void const* key,
+        [[maybe_unused]] bool cleanup_existing)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         coroutine_self* self = coroutine_self::get_self();
         if (nullptr == self)
         {
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "hpx::threads::coroutines::detail::erase_tss_node",
                 "null thread id encountered");
             return;
@@ -210,15 +203,12 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         detail::tss_storage* tss_map = self->get_thread_tss_data();
         if (nullptr != tss_map)
             tss_map->erase(key, cleanup_existing);
-#else
-        HPX_UNUSED(key);
-        HPX_UNUSED(cleanup_existing);
 #endif
     }
 
-    void set_tss_data(void const* key,
-        std::shared_ptr<tss_cleanup_function> const& func, void* tss_data,
-        bool cleanup_existing)
+    void set_tss_data([[maybe_unused]] void const* key,
+        [[maybe_unused]] std::shared_ptr<tss_cleanup_function> const& func,
+        [[maybe_unused]] void* tss_data, [[maybe_unused]] bool cleanup_existing)
     {
 #ifdef HPX_HAVE_THREAD_LOCAL_STORAGE
         if (tss_data_node* const current_node = find_tss_data(key))
@@ -232,12 +222,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         {
             add_new_tss_node(key, func, tss_data);
         }
-#else
-        HPX_UNUSED(key);
-        HPX_UNUSED(func);
-        HPX_UNUSED(tss_data);
-        HPX_UNUSED(cleanup_existing);
 #endif
     }
-}}}}    // namespace hpx::threads::coroutines::detail
+}    // namespace hpx::threads::coroutines::detail
 #endif

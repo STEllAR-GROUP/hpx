@@ -73,7 +73,7 @@ void test_tss()
         // The future obtained from this promise will be set ready from the tss
         // variable's dtor. The tss destructors are called after the threads
         // signal its completion through their asynchronous return.
-        hpx::apply(&test_tss_thread, std::move(p));
+        hpx::post(&test_tss_thread, std::move(p));
     }
     hpx::wait_all(threads);
 

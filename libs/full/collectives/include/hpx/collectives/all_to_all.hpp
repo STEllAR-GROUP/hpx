@@ -179,7 +179,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<std::vector<T>>(
-                HPX_GET_EXCEPTION(hpx::bad_parameter,
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::collectives::all_to_all",
                     "the generation number shouldn't be zero"));
         }
@@ -231,85 +231,6 @@ namespace hpx { namespace collectives {
             HPX_MOVE(local_result), this_site);
     }
 }}    // namespace hpx::collectives
-
-////////////////////////////////////////////////////////////////////////////////
-// compatibility functions
-namespace hpx { namespace lcos {
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::all_to_all is deprecated, use hpx::collectives::all_to_all "
-        "instead")
-    hpx::future<std::vector<T>> all_to_all(char const* basename,
-        std::vector<T>&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        return hpx::collectives::all_to_all(basename, HPX_MOVE(local_result),
-            hpx::collectives::num_sites_arg(num_sites),
-            hpx::collectives::this_site_arg(this_site),
-            hpx::collectives::generation_arg(generation),
-            hpx::collectives::root_site_arg(root_site));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::all_to_all is deprecated, use hpx::collectives::all_to_all "
-        "instead")
-    hpx::future<std::vector<T>> all_to_all(char const* basename,
-        hpx::future<std::vector<T>>&& local_result,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        return local_result.then([=](hpx::future<T>&& f) {
-            return hpx::collectives::all_to_all(basename, f.get(),
-                hpx::collectives::num_sites_arg(num_sites),
-                hpx::collectives::this_site_arg(this_site),
-                hpx::collectives::generation_arg(generation),
-                hpx::collectives::root_site_arg(root_site));
-        });
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::all_to_all is deprecated, use hpx::collectives::all_to_all "
-        "instead")
-    hpx::future<std::vector<T>> all_to_all(hpx::collectives::communicator comm,
-        std::vector<T>&& local_result, std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::all_to_all(HPX_MOVE(comm),
-            HPX_MOVE(local_result), hpx::collectives::this_site_arg(this_site));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::all_to_all is deprecated, use hpx::collectives::all_to_all "
-        "instead")
-    hpx::future<std::vector<T>> all_to_all(hpx::collectives::communicator comm,
-        hpx::future<std::vector<T>>&& local_result,
-        std::size_t this_site = std::size_t(-1))
-    {
-        return local_result.then([=](hpx::future<T>&& f) mutable {
-            hpx::collectives::all_to_all(HPX_MOVE(comm), f.get(),
-                hpx::collectives::this_site_arg(this_site));
-        });
-    }
-
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::create_all_to_all is deprecated, use "
-        "hpx::collectives::create_communicator instead")
-    inline hpx::collectives::communicator create_all_to_all(
-        char const* basename, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::create_communicator(basename,
-            hpx::collectives::num_sites_arg(num_sites),
-            hpx::collectives::this_site_arg(this_site),
-            hpx::collectives::generation_arg(generation));
-    }
-}}    // namespace hpx::lcos
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ALLTOALL_DECLARATION(...) /**/

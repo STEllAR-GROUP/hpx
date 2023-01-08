@@ -24,8 +24,8 @@ void calculate_sum()
     std::vector<int> s = {7, 2, 8, -9, 4, 0};
     hpx::lcos::local::channel<int> c;
 
-    hpx::apply(&sum, std::vector<int>(s.begin(), s.begin() + s.size() / 2), c);
-    hpx::apply(&sum, std::vector<int>(s.begin() + s.size() / 2, s.end()), c);
+    hpx::post(&sum, std::vector<int>(s.begin(), s.begin() + s.size() / 2), c);
+    hpx::post(&sum, std::vector<int>(s.begin() + s.size() / 2, s.end()), c);
 
     int x = c.get(hpx::launch::sync);    // receive from c
     int y = c.get(hpx::launch::sync);
@@ -131,7 +131,7 @@ void dispatch_work()
     std::atomic<int> received_jobs(0);
     std::atomic<bool> was_closed(false);
 
-    hpx::apply([jobs, done, &received_jobs, &was_closed]() mutable {
+    hpx::post([jobs, done, &received_jobs, &was_closed]() mutable {
         while (true)
         {
             hpx::error_code ec(hpx::throwmode::lightweight);

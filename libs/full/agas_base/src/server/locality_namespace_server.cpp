@@ -98,7 +98,7 @@ namespace hpx { namespace agas { namespace server {
         {
             l.unlock();
 
-            HPX_THROW_EXCEPTION(internal_server_error,
+            HPX_THROW_EXCEPTION(hpx::error::internal_server_error,
                 "locality_namespace::allocate",
                 "primary namespace has been exhausted");
         }
@@ -147,7 +147,8 @@ namespace hpx { namespace agas { namespace server {
         {
             l.unlock();
 
-            HPX_THROW_EXCEPTION(lock_error, "locality_namespace::allocate",
+            HPX_THROW_EXCEPTION(hpx::error::lock_error,
+                "locality_namespace::allocate",
                 "partition table insertion failed due to a locking "
                 "error or memory corruption, endpoint({1}), "
                 "prefix({2})",
@@ -164,7 +165,8 @@ namespace hpx { namespace agas { namespace server {
 
             if (!primary_->bind_gid(g, id, id))
             {
-                HPX_THROW_EXCEPTION(bad_request, "locality_namespace::allocate",
+                HPX_THROW_EXCEPTION(hpx::error::bad_request,
+                    "locality_namespace::allocate",
                     "unable to bind prefix({1}) to a gid", prefix);
             }
             return prefix;

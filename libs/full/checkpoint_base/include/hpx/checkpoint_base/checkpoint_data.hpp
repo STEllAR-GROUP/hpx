@@ -1,5 +1,5 @@
 // Copyright (c) 2018 Adrian Serio
-// Copyright (c) 2018-2021 Hartmut Kaiser
+// Copyright (c) 2018-2022 Hartmut Kaiser
 //
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // tag used to mark serialization archive during check-pointing
@@ -31,8 +31,10 @@ namespace hpx { namespace util {
     /// \tparam Container    Container used to store the check-pointed data.
     /// \tparam Ts           Types of variables to checkpoint
     ///
-    /// \param cont          Container instance used to store the checkpoint data
-    /// \param ts            Variable instances to be inserted into the checkpoint.
+    /// \param cont          Container instance used to store the checkpoint
+    ///                      data
+    /// \param ts            Variable instances to be inserted into the
+    ///                      checkpoint.
     ///
     /// Save_checkpoint_data takes any number of objects which a user may wish
     /// to store in the given container.
@@ -42,16 +44,12 @@ namespace hpx { namespace util {
         // Create serialization archive from checkpoint data member
         hpx::serialization::output_archive ar(data);
 
-        // force check-pointing flag to be created in the archive,
-        // the serialization of id_type's checks for it
+        // force check-pointing flag to be created in the archive, the
+        // serialization of id_type's checks for it
         ar.get_extra_data<checkpointing_tag>();
 
         // Serialize data
-
-        // Trick to expand the variable pack, takes advantage of the
-        // comma operator.
-        int const sequencer[] = {0, (ar << ts, 0)...};
-        (void) sequencer;    // Suppress unused param. warnings
+        (hpx::serialization::detail::serialize_one(ar, ts), ...);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -59,7 +57,8 @@ namespace hpx { namespace util {
     ///
     /// \tparam Ts           Types of variables to checkpoint
     ///
-    /// \param ts            Variable instances to be inserted into the checkpoint.
+    /// \param ts            Variable instances to be inserted into the
+    ///                      checkpoint.
     ///
     /// prepare_checkpoint_data takes any number of objects which a user may
     /// wish to store in a subsequent save_checkpoint_data operation. The
@@ -73,16 +72,12 @@ namespace hpx { namespace util {
         hpx::serialization::detail::preprocess_container data;
         hpx::serialization::output_archive ar(data);
 
-        // force check-pointing flag to be created in the archive,
-        // the serialization of id_type's checks for it
+        // force check-pointing flag to be created in the archive, the
+        // serialization of id_type's checks for it
         ar.get_extra_data<checkpointing_tag>();
 
         // Serialize data
-
-        // Trick to expand the variable pack, takes advantage of the
-        // comma operator.
-        int const sequencer[] = {0, (ar << ts, 0)...};
-        (void) sequencer;    // Suppress unused param. warnings
+        (hpx::serialization::detail::serialize_one(ar, ts), ...);
 
         return data.size();
     }
@@ -95,10 +90,11 @@ namespace hpx { namespace util {
     ///
     /// \param cont          Container instance used to restore the checkpoint
     ///                      data
-    /// \param ts            Variable instances to be restored from the container
+    /// \param ts            Variable instances to be restored from the
+    ///                      container
     ///
-    /// restore_checkpoint_data takes any number of objects which a user may wish
-    /// to restore from the given container. The sequence of objects has to
+    /// restore_checkpoint_data takes any number of objects which a user may
+    /// wish to restore from the given container. The sequence of objects has to
     /// correspond to the sequence of objects for the corresponding call to
     /// save_checkpoint_data that had used the given container instance.
     template <typename Container, typename... Ts>
@@ -108,11 +104,7 @@ namespace hpx { namespace util {
         hpx::serialization::input_archive ar(cont, cont.size());
 
         // De-serialize data
-
-        // Trick to expand the variable pack, takes advantage of the comma
-        // operator
-        int const sequencer[] = {0, (ar >> ts, 0)...};
-        (void) sequencer;    // Suppress unused variable warnings
+        (hpx::serialization::detail::serialize_one(ar, ts), ...);
     }
 
     /// \cond NOINTERNAL
@@ -123,16 +115,13 @@ namespace hpx { namespace util {
         hpx::serialization::input_archive ar(cont, cont.size());
 
         // De-serialize data
-
-        // Trick to expand the variable pack, takes advantage of the comma
-        // operator
-        int const sequencer[] = {0, (f(ar, ts), 0)...};
-        (void) sequencer;    // Suppress unused variable warnings
+        (f(ar, ts), ...);
     }
     /// \endcond
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
+
     // This is explicitly instantiated to ensure that the id is stable across
     // shared libraries.
     template <>
@@ -141,4 +130,4 @@ namespace hpx { namespace serialization { namespace detail {
         HPX_EXPORT static extra_archive_data_id_type id() noexcept;
         static constexpr void reset(hpx::util::checkpointing_tag*) noexcept {}
     };
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail

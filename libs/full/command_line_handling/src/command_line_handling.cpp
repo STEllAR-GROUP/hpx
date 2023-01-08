@@ -27,8 +27,6 @@
 #include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
 
-#include <boost/tokenizer.hpp>
-
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
@@ -42,7 +40,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
 
@@ -294,13 +292,13 @@ namespace hpx { namespace util {
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
             if (min_os_threads > HPX_HAVE_MAX_CPU_COUNT)
             {
-                throw hpx::detail::command_line_error(
-                    "Requested more than " HPX_PP_STRINGIZE(
-                        HPX_HAVE_MAX_CPU_COUNT) " hpx.force_min_os_threads to "
-                                                "use for this application, use "
-                                                "the option "
-                                                "-DHPX_WITH_MAX_CPU_COUNT=<N> "
-                                                "when configuring HPX.");
+                // clang-format off
+                throw hpx::detail::command_line_error("Requested more than "
+                    HPX_PP_STRINGIZE(HPX_HAVE_MAX_CPU_COUNT)
+                    " hpx.force_min_os_threads to use for this application, "
+                    "use the option -DHPX_WITH_MAX_CPU_COUNT=<N> when "
+                    "configuring HPX.");
+                // clang-format on
             }
 #endif
 
@@ -351,6 +349,15 @@ namespace hpx { namespace util {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
+    command_line_handling::command_line_handling(runtime_configuration rtcfg,
+        std::vector<std::string> ini_config,
+        hpx::function<int(hpx::program_options::variables_map& vm)> hpx_main_f)
+      : base_type(HPX_MOVE(rtcfg), HPX_MOVE(ini_config), HPX_MOVE(hpx_main_f))
+      , node_(std::size_t(-1))
+      , num_localities_(1)
+    {
+    }
+
     bool command_line_handling::handle_arguments(util::manage_config& cfgmap,
         hpx::program_options::variables_map& vm,
         std::vector<std::string>& ini_config, std::size_t& node, bool initial)
@@ -548,13 +555,13 @@ namespace hpx { namespace util {
                 1)
             {
                 throw hpx::detail::command_line_error(
-                    "Ambiguous command line options. "
-                    "Do not specify more than one of --hpx:local, "
-                    "--hpx:console, --hpx:worker, or --hpx:connect");
+                    "Ambiguous command line options. Do not specify more than "
+                    "one of --hpx:local, --hpx:console, --hpx:worker, or "
+                    "--hpx:connect");
             }
 
-            // In these cases we default to executing with an empty
-            // hpx_main, except if specified otherwise.
+            // In these cases we default to executing with an empty hpx_main,
+            // except if specified otherwise.
             if (vm.count("hpx:worker"))
             {
                 rtcfg_.mode_ = hpx::runtime_mode::worker;
@@ -621,8 +628,8 @@ namespace hpx { namespace util {
                     if (vm.count("hpx:agas"))
                     {
                         throw hpx::detail::command_line_error(
-                            "Command line option --hpx:node "
-                            "is not compatible with --hpx:agas");
+                            "Command line option --hpx:node is not compatible "
+                            "with --hpx:agas");
                     }
                     node = vm["hpx:node"].as<std::size_t>();
                 }
@@ -787,8 +794,8 @@ namespace hpx { namespace util {
 
         if (rtcfg_.mode_ != hpx::runtime_mode::local)
         {
-            // Set number of localities in configuration (do it everywhere,
-            // even if this information is only used by the AGAS server).
+            // Set number of localities in configuration (do it everywhere, even
+            // if this information is only used by the AGAS server).
             ini_config.emplace_back(
                 "hpx.localities!=" + std::to_string(num_localities_));
 
@@ -916,10 +923,11 @@ namespace hpx { namespace util {
             rtcfg_.parse("<user supplied config>", e, true, false);
 
         // support re-throwing command line exceptions for testing purposes
-        int error_mode = util::allow_unregistered;
+        util::commandline_error_mode error_mode =
+            util::commandline_error_mode::allow_unregistered;
         if (cfgmap.get_value("hpx.commandline.rethrow_errors", 0) != 0)
         {
-            error_mode |= util::rethrow_on_error;
+            error_mode |= util::commandline_error_mode::rethrow_on_error;
         }
 
         // The cfg registry may hold command line options to prepend to the
@@ -937,10 +945,10 @@ namespace hpx { namespace util {
             // Boost V1.47 and before do not properly reset a variables_map when
             // calling vm.clear(). We work around that problems by creating a
             // separate instance just for the preliminary command line handling.
+            error_mode |= util::commandline_error_mode::ignore_aliases;
             hpx::program_options::variables_map prevm;
             if (!util::parse_commandline(rtcfg_, desc_cmdline, argv[0], args,
-                    prevm, std::size_t(-1), error_mode | util::ignore_aliases,
-                    rtcfg_.mode_))
+                    prevm, std::size_t(-1), error_mode, rtcfg_.mode_))
             {
                 return -1;
             }
@@ -1002,9 +1010,9 @@ namespace hpx { namespace util {
         hpx::program_options::options_description help;
         std::vector<std::string> unregistered_options;
 
+        error_mode |= util::commandline_error_mode::report_missing_config_file;
         if (!util::parse_commandline(rtcfg_, desc_cmdline, argv[0], args, vm_,
-                node_, error_mode | util::report_missing_config_file,
-                rtcfg_.mode_, &help, &unregistered_options))
+                node_, error_mode, rtcfg_.mode_, &help, &unregistered_options))
         {
             return -1;
         }
@@ -1021,4 +1029,4 @@ namespace hpx { namespace util {
         return finalize_commandline_handling(
             argc, argv, help, unregistered_options);
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

@@ -16,7 +16,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution {
+namespace hpx::execution {
+
     ///////////////////////////////////////////////////////////////////////////
     /// Function invocations executed by a group of sequential execution agents
     /// execute in sequential order.
@@ -44,13 +45,14 @@ namespace hpx { namespace execution {
     struct unsequenced_execution_tag
     {
     };
-}}    // namespace hpx::execution
+}    // namespace hpx::execution
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     ///////////////////////////////////////////////////////////////////////////
     // Executor customization points
     namespace detail {
+
         /// \cond NOINTERNAL
         template <typename Executor, typename Enable = void>
         struct async_execute_fn_helper;
@@ -311,12 +313,11 @@ namespace hpx { namespace parallel { namespace execution {
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
-            bulk_sync_execute_t, Executor&& exec, F&& f, Shape const& shape,
+            bulk_sync_execute_t tag, Executor&& exec, F&& f, Shape const& shape,
             Ts&&... ts)
         {
-            return bulk_sync_execute_t{}(HPX_FORWARD(Executor, exec),
-                HPX_FORWARD(F, f), hpx::util::counting_shape(shape),
-                HPX_FORWARD(Ts, ts)...);
+            return tag(HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+                hpx::util::counting_shape(shape), HPX_FORWARD(Ts, ts)...);
         }
     } bulk_sync_execute{};
 
@@ -381,12 +382,11 @@ namespace hpx { namespace parallel { namespace execution {
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
-            bulk_async_execute_t, Executor&& exec, F&& f, Shape const& shape,
-            Ts&&... ts)
+            bulk_async_execute_t tag, Executor&& exec, F&& f,
+            Shape const& shape, Ts&&... ts)
         {
-            return bulk_async_execute_t{}(HPX_FORWARD(Executor, exec),
-                HPX_FORWARD(F, f), hpx::util::counting_shape(shape),
-                HPX_FORWARD(Ts, ts)...);
+            return tag(HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+                hpx::util::counting_shape(shape), HPX_FORWARD(Ts, ts)...);
         }
     } bulk_async_execute{};
 
@@ -458,12 +458,12 @@ namespace hpx { namespace parallel { namespace execution {
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
-            bulk_then_execute_t, Executor&& exec, F&& f, Shape const& shape,
+            bulk_then_execute_t tag, Executor&& exec, F&& f, Shape const& shape,
             Future&& predecessor, Ts&&... ts)
         {
-            return bulk_then_execute_t{}(HPX_FORWARD(Executor, exec),
-                HPX_FORWARD(F, f), hpx::util::counting_shape(shape),
+            return tag(HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+                hpx::util::counting_shape(shape),
                 HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
     } bulk_then_execute{};
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

@@ -56,7 +56,7 @@ namespace startup_shutdown {
         variables_map vm;
         if (!hpx::util::retrieve_commandline_arguments(desc_commandline, vm))
         {
-            HPX_THROW_EXCEPTION(hpx::not_implemented,
+            HPX_THROW_EXCEPTION(hpx::error::not_implemented,
                 "startup_shutdown::startup",
                 "Failed to handle command line options");
         }

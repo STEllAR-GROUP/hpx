@@ -132,7 +132,7 @@ namespace hpx { namespace util { namespace detail {
             {
                 first_start_ = false;
 
-                util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 if (pre_shutdown_)
                 {
                     register_pre_shutdown_function(util::deferred_call(

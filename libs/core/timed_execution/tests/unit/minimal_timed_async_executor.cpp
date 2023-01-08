@@ -243,7 +243,7 @@ struct test_timed_async_executor4 : test_async_executor1
         test_timed_async_executor4 const&, F&& f, Ts&&... ts)
     {
         ++count_apply;
-        hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
+        hpx::post(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
@@ -256,7 +256,7 @@ struct test_timed_async_executor5 : test_timed_async_executor4
     {
         ++count_apply_at;
         hpx::this_thread::sleep_until(abs_time);
-        hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
+        hpx::post(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 

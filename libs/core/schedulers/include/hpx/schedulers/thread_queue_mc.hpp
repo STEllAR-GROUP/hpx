@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -55,11 +55,13 @@
 //#define DEBUG_QUEUE_EXTRA 1
 
 namespace hpx {
-    static hpx::debug::enable_print<THREAD_QUEUE_MC_DEBUG> tqmc_deb("_TQ_MC_");
+
+    inline constexpr hpx::debug::enable_print<THREAD_QUEUE_MC_DEBUG> tqmc_deb(
+        "_TQ_MC_");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies {
+namespace hpx::threads::policies {
 
     template <typename Mutex, typename PendingQueuing, typename StagedQueuing,
         typename TerminatedQueuing>
@@ -67,7 +69,7 @@ namespace hpx { namespace threads { namespace policies {
     {
     public:
         // we use a simple mutex to protect the data members for now
-        typedef Mutex mutex_type;
+        using mutex_type = Mutex;
 
         using thread_queue_type = thread_queue_mc<Mutex, PendingQueuing,
             StagedQueuing, TerminatedQueuing>;
@@ -78,12 +80,11 @@ namespace hpx { namespace threads { namespace policies {
         using task_description = thread_init_data;
         using thread_description = thread_data;
 
-        typedef
-            typename PendingQueuing::template apply<thread_id_ref_type>::type
-                work_items_type;
+        using work_items_type =
+            typename PendingQueuing::template apply<thread_id_ref_type>::type;
 
-        typedef concurrentqueue_fifo::apply<task_description>::type
-            task_items_type;
+        using task_items_type =
+            typename concurrentqueue_fifo::apply<task_description>::type;
 
     public:
         // ----------------------------------------------------------------
@@ -103,7 +104,6 @@ namespace hpx { namespace threads { namespace policies {
             {
                 return 0;
             }
-            //
 
             std::size_t added = 0;
             task_description task;
@@ -137,7 +137,7 @@ namespace hpx { namespace threads { namespace policies {
         }
 
     public:
-        explicit thread_queue_mc(const thread_queue_init_parameters& parameters,
+        explicit thread_queue_mc(thread_queue_init_parameters const& parameters,
             std::size_t queue_num = std::size_t(-1))
           : parameters_(parameters)
           , queue_index_(static_cast<int>(queue_num))
@@ -159,11 +159,12 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         // ----------------------------------------------------------------
-        ~thread_queue_mc() {}
+        ~thread_queue_mc() = default;
 
         // ----------------------------------------------------------------
-        // This returns the current length of the queues (work items and new items)
-        std::int64_t get_queue_length() const
+        // This returns the current length of the queues (work items and new
+        // items)
+        std::int64_t get_queue_length() const noexcept
         {
             return work_items_count_.data_.load(std::memory_order_relaxed) +
                 new_tasks_count_.data_.load(std::memory_order_relaxed);
@@ -171,7 +172,7 @@ namespace hpx { namespace threads { namespace policies {
 
         // ----------------------------------------------------------------
         // This returns the current length of the pending queue
-        std::int64_t get_queue_length_pending() const
+        std::int64_t get_queue_length_pending() const noexcept
         {
             return work_items_count_.data_.load(std::memory_order_relaxed);
         }
@@ -179,16 +180,16 @@ namespace hpx { namespace threads { namespace policies {
         // ----------------------------------------------------------------
         // This returns the current length of the staged queue
         std::int64_t get_queue_length_staged(
-            std::memory_order order = std::memory_order_relaxed) const
+            std::memory_order order = std::memory_order_relaxed) const noexcept
         {
             return new_tasks_count_.data_.load(order);
         }
 
         // ----------------------------------------------------------------
         // Return the number of existing threads with the given state.
-        std::int64_t get_thread_count() const
+        std::int64_t get_thread_count() const noexcept
         {
-            HPX_THROW_EXCEPTION(bad_parameter, "get_thread_count",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "get_thread_count",
                 "use get_queue_length_staged/get_queue_length_pending");
             return 0;
         }
@@ -244,7 +245,7 @@ namespace hpx { namespace threads { namespace policies {
             // away (can't be scheduled).
             if (data.initial_state != thread_schedule_state::pending)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "thread_queue_mc::create_thread",
                     "staged tasks must have 'pending' as their initial state");
             }
@@ -298,7 +299,7 @@ namespace hpx { namespace threads { namespace policies {
                 debug::dec<4>(new_tasks_count_.data_), "w",
                 debug::dec<4>(work_items_count_.data_),
                 debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
-            //
+
             work_items_.push(HPX_MOVE(thrd), other_end);
 #ifdef DEBUG_QUEUE_EXTRA
             debug_queue(work_items_);
@@ -306,10 +307,10 @@ namespace hpx { namespace threads { namespace policies {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void on_start_thread(std::size_t /* num_thread */) {}
-        void on_stop_thread(std::size_t /* num_thread */) {}
-        void on_error(
-            std::size_t /* num_thread */, std::exception_ptr const& /* e */)
+        constexpr void on_start_thread(std::size_t /* num_thread */) noexcept {}
+        constexpr void on_stop_thread(std::size_t /* num_thread */) noexcept {}
+        constexpr void on_error(std::size_t /* num_thread */,
+            std::exception_ptr const& /* e */) noexcept
         {
         }
 
@@ -342,7 +343,7 @@ namespace hpx { namespace threads { namespace policies {
 #endif
 
     public:
-        /*const*/ thread_queue_init_parameters parameters_;
+        thread_queue_init_parameters parameters_;
 
         int const queue_index_;
 
@@ -361,5 +362,4 @@ namespace hpx { namespace threads { namespace policies {
         std::mutex debug_mtx_;
 #endif
     };
-
-}}}    // namespace hpx::threads::policies
+}    // namespace hpx::threads::policies

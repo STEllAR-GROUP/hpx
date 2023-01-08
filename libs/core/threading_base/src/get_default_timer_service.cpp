@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2020 Nikunj Gupta
 //
@@ -13,12 +13,13 @@
 
 #include <asio/io_context.hpp>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
+
     static get_default_timer_service_type get_default_timer_service_f;
 
     void set_get_default_timer_service(get_default_timer_service_type f)
     {
-        get_default_timer_service_f = f;
+        get_default_timer_service_f = HPX_MOVE(f);
     }
 
     asio::io_context* get_default_timer_service()
@@ -32,14 +33,14 @@ namespace hpx { namespace threads { namespace detail {
         else
         {
 #if defined(HPX_HAVE_TIMER_POOL)
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::threads::detail::get_default_timer_service",
                 "No timer service installed. When running timed "
                 "threads without a runtime a timer service has to be "
                 "installed manually using "
                 "hpx::threads::detail::set_get_default_timer_service.");
 #else
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::threads::detail::get_default_timer_service",
                 "No timer service installed. Rebuild HPX with "
                 "HPX_WITH_TIMER_POOL=ON or provide a timer service "
@@ -50,4 +51,4 @@ namespace hpx { namespace threads { namespace detail {
 
         return timer_service;
     }
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail

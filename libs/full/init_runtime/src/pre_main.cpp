@@ -145,7 +145,7 @@ namespace hpx { namespace detail {
                 naming::gid_type console_;
                 if (HPX_UNLIKELY(!agas_client.get_console_locality(console_)))
                 {
-                    HPX_THROW_EXCEPTION(network_error, "pre_main",
+                    HPX_THROW_EXCEPTION(hpx::error::network_error, "pre_main",
                         "no console locality registered");
                 }
 

@@ -15,12 +15,14 @@
 #include <string>
 #include <utility>
 
-namespace hpx { namespace string_util {
+namespace hpx::string_util {
+
     namespace detail {
-        template <typename It, typename CharT, typename Traits,
+
+        template <typename It, typename Char, typename Traits,
             typename Allocator>
-        std::basic_string<CharT, Traits, Allocator> substr(
-            std::basic_string<CharT, Traits, Allocator> const& s,
+        std::basic_string<Char, Traits, Allocator> substr(
+            std::basic_string<Char, Traits, Allocator> const& s,
             It const& first, It const& last)
         {
             std::size_t const pos = std::distance(std::begin(s), first);
@@ -35,11 +37,10 @@ namespace hpx { namespace string_util {
         on
     };
 
-    template <typename Container, typename Predicate, typename CharT,
+    template <typename Container, typename Predicate, typename Char,
         typename Traits, typename Allocator>
     void split(Container& container,
-        std::basic_string<CharT, Traits, Allocator> const& str,
-        Predicate&& pred,
+        std::basic_string<Char, Traits, Allocator> const& str, Predicate&& pred,
         token_compress_mode compress_mode = token_compress_mode::off)
     {
         container.clear();
@@ -76,4 +77,4 @@ namespace hpx { namespace string_util {
         split(container, std::string{str}, HPX_FORWARD(Predicate, pred),
             compress_mode);
     }
-}}    // namespace hpx::string_util
+}    // namespace hpx::string_util

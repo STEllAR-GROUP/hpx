@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2022 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -594,68 +594,6 @@ namespace hpx { namespace ranges {
 
 #include <type_traits>
 #include <utility>
-
-namespace hpx { namespace parallel { inline namespace v1 {
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename OutIter, typename T,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            hpx::traits::is_iterator<OutIter>::value &&
-            hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-            hpx::parallel::traits::is_indirect_callable<
-                ExPolicy, std::equal_to<T>,
-                hpx::parallel::traits::projected_range<Proj, Rng>,
-                hpx::parallel::traits::projected<Proj, T const*>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::remove_copy is deprecated, use "
-        "hpx::ranges::remove_copy instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<
-                typename hpx::traits::range_traits<Rng>::iterator_type,
-                OutIter>>::type remove_copy(ExPolicy&& policy, Rng&& rng,
-            OutIter dest, T const& val, Proj&& proj = Proj())
-    {
-        return hpx::parallel::v1::detail::remove_copy<util::in_out_result<
-            typename hpx::traits::range_traits<Rng>::iterator_type, OutIter>>()
-            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), dest, val, HPX_FORWARD(Proj, proj));
-    }
-
-    // clang-format off
-    template <typename ExPolicy, typename Rng, typename OutIter, typename F,
-        typename Proj = util::projection_identity,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            hpx::traits::is_iterator<OutIter>::value &&
-            hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-            hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
-                hpx::parallel::traits::projected_range<Proj, Rng>
-            >::value
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::remove_copy_if is deprecated, use "
-        "hpx::ranges::remove_copy_if instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<
-                typename hpx::traits::range_traits<Rng>::iterator_type,
-                OutIter>>::type remove_copy_if(ExPolicy&& policy, Rng&& rng,
-            OutIter dest, F&& f, Proj&& proj = Proj())
-    {
-        return hpx::parallel::v1::detail::remove_copy_if<util::in_out_result<
-            typename hpx::traits::range_traits<Rng>::iterator_type, OutIter>>()
-            .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), dest, HPX_FORWARD(F, f),
-                HPX_FORWARD(Proj, proj));
-    }
-}}}    // namespace hpx::parallel::v1
 
 namespace hpx { namespace ranges {
 

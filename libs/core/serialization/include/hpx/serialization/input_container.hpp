@@ -94,7 +94,7 @@ namespace hpx::serialization {
 
                 if (decompressed_size_ < current_)
                 {
-                    HPX_THROW_EXCEPTION(serialization_error,
+                    HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                         "input_container::set_filter",
                         "archive data bstream is too short");
                     return;
@@ -125,7 +125,7 @@ namespace hpx::serialization {
                 std::size_t new_current = current_ + count;
                 if (new_current > access_traits::size(cont_))
                 {
-                    HPX_THROW_EXCEPTION(serialization_error,
+                    HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                         "input_container::load_binary",
                         "archive data bstream is too short");
                     return;
@@ -149,7 +149,7 @@ namespace hpx::serialization {
                         // raise an error if we read past the serialization_chunk
                         if (current_chunk_size_ > current_chunk_size)
                         {
-                            HPX_THROW_EXCEPTION(serialization_error,
+                            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                                 "input_container::load_binary",
                                 "archive data bstream structure mismatch");
                             return;
@@ -180,15 +180,15 @@ namespace hpx::serialization {
 
                 if (get_chunk_size(current_chunk_) != count)
                 {
-                    HPX_THROW_EXCEPTION(serialization_error,
+                    HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                         "input_container::load_binary_chunk",
                         "archive data bstream data chunk size mismatch");
                     return;
                 }
 
-                // unfortunately we can't implement a zero copy policy on
-                // the receiving end
-                // as the memory was already allocated by the serialization code
+                // unfortunately we can't implement a zero copy policy on the
+                // receiving end as the memory was already allocated by the
+                // serialization code
                 std::memcpy(
                     address, get_chunk_data(current_chunk_).pos_, count);
                 ++current_chunk_;

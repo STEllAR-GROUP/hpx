@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -34,7 +34,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies {
+namespace hpx::threads::policies {
+
     scheduler_base::scheduler_base(std::size_t num_threads,
         char const* description, thread_queue_init_parameters thread_queue_init,
         scheduler_mode mode)
@@ -70,7 +71,7 @@ namespace hpx { namespace threads { namespace policies {
             states_[i].store(hpx::state::initialized);
     }
 
-    void scheduler_base::idle_callback(std::size_t num_thread)
+    void scheduler_base::idle_callback([[maybe_unused]] std::size_t num_thread)
     {
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         if (mode_.data_.load(std::memory_order_relaxed) &
@@ -97,8 +98,6 @@ namespace hpx { namespace threads { namespace policies {
                 data.wait_count_ = 0;
             }
         }
-#else
-        (void) num_thread;
 #endif
     }
 
@@ -163,9 +162,9 @@ namespace hpx { namespace threads { namespace policies {
 
             if (!allow_fallback)
             {
-                // Try indefinitely as long as at least one thread is
-                // available for scheduling. Increase allowed state if no
-                // threads are available for scheduling.
+                // Try indefinitely as long as at least one thread is available
+                // for scheduling. Increase allowed state if no threads are
+                // available for scheduling.
                 auto max_allowed_state = hpx::state::suspended;
 
                 hpx::util::yield_while([this, states_size, &l, &num_thread,
@@ -209,9 +208,8 @@ namespace hpx { namespace threads { namespace policies {
                         }
                         else
                         {
-                            // All threads are terminating or stopped.
-                            // Just return num_thread to avoid infinite
-                            // loop.
+                            // All threads are terminating or stopped. Just
+                            // return num_thread to avoid infinite loop.
                             return false;
                         }
                     }
@@ -250,6 +248,7 @@ namespace hpx { namespace threads { namespace policies {
         HPX_ASSERT(num_thread < states_.size());
         return states_[num_thread];
     }
+
     std::atomic<hpx::state> const& scheduler_base::get_state(
         std::size_t num_thread) const
     {
@@ -259,8 +258,7 @@ namespace hpx { namespace threads { namespace policies {
 
     void scheduler_base::set_all_states(hpx::state s)
     {
-        typedef std::atomic<hpx::state> state_type;
-        for (state_type& state : states_)
+        for (auto& state : states_)
         {
             state.store(s);
         }
@@ -268,8 +266,7 @@ namespace hpx { namespace threads { namespace policies {
 
     void scheduler_base::set_all_states_at_least(hpx::state s)
     {
-        typedef std::atomic<hpx::state> state_type;
-        for (state_type& state : states_)
+        for (auto& state : states_)
         {
             if (state < s)
             {
@@ -281,8 +278,7 @@ namespace hpx { namespace threads { namespace policies {
     // return whether all states are at least at the given one
     bool scheduler_base::has_reached_state(hpx::state s) const
     {
-        typedef std::atomic<hpx::state> state_type;
-        for (state_type const& state : states_)
+        for (auto const& state : states_)
         {
             if (state.load(std::memory_order_relaxed) < s)
                 return false;
@@ -292,8 +288,7 @@ namespace hpx { namespace threads { namespace policies {
 
     bool scheduler_base::is_state(hpx::state s) const
     {
-        typedef std::atomic<hpx::state> state_type;
-        for (state_type const& state : states_)
+        for (auto const& state : states_)
         {
             if (state.load(std::memory_order_relaxed) != s)
                 return false;
@@ -307,8 +302,7 @@ namespace hpx { namespace threads { namespace policies {
             hpx::state::last_valid_runtime_state,
             hpx::state::first_valid_runtime_state);
 
-        typedef std::atomic<hpx::state> state_type;
-        for (state_type const& state_iter : states_)
+        for (auto const& state_iter : states_)
         {
             hpx::state s = state_iter.load();
             result.first = (std::min)(result.first, s);
@@ -360,17 +354,17 @@ namespace hpx { namespace threads { namespace policies {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::int64_t scheduler_base::get_background_thread_count()
+    std::int64_t scheduler_base::get_background_thread_count() const noexcept
     {
         return background_thread_count_;
     }
 
-    void scheduler_base::increment_background_thread_count()
+    void scheduler_base::increment_background_thread_count() noexcept
     {
         ++background_thread_count_;
     }
 
-    void scheduler_base::decrement_background_thread_count()
+    void scheduler_base::decrement_background_thread_count() noexcept
     {
         --background_thread_count_;
     }
@@ -430,10 +424,106 @@ namespace hpx { namespace threads { namespace policies {
     }
 #endif
 
+    void scheduler_base::set_mpi_polling_functions(
+        polling_function_ptr mpi_func,
+        polling_work_count_function_ptr mpi_work_count_func)
+    {
+        polling_function_mpi_.store(mpi_func, std::memory_order_relaxed);
+        polling_work_count_function_mpi_.store(
+            mpi_work_count_func, std::memory_order_relaxed);
+    }
+
+    void scheduler_base::clear_mpi_polling_function()
+    {
+        polling_function_mpi_.store(
+            &null_polling_function, std::memory_order_relaxed);
+        polling_work_count_function_mpi_.store(
+            &null_polling_work_count_function, std::memory_order_relaxed);
+    }
+
+    void scheduler_base::set_cuda_polling_functions(
+        polling_function_ptr cuda_func,
+        polling_work_count_function_ptr cuda_work_count_func)
+    {
+        polling_function_cuda_.store(cuda_func, std::memory_order_relaxed);
+        polling_work_count_function_cuda_.store(
+            cuda_work_count_func, std::memory_order_relaxed);
+    }
+
+    void scheduler_base::clear_cuda_polling_function()
+    {
+        polling_function_cuda_.store(
+            &null_polling_function, std::memory_order_relaxed);
+        polling_work_count_function_cuda_.store(
+            &null_polling_work_count_function, std::memory_order_relaxed);
+    }
+
+    void scheduler_base::set_sycl_polling_functions(
+        polling_function_ptr sycl_func,
+        polling_work_count_function_ptr sycl_work_count_func)
+    {
+        polling_function_sycl_.store(sycl_func, std::memory_order_relaxed);
+        polling_work_count_function_sycl_.store(
+            sycl_work_count_func, std::memory_order_relaxed);
+    }
+
+    void scheduler_base::clear_sycl_polling_function()
+    {
+        polling_function_sycl_.store(
+            &null_polling_function, std::memory_order_relaxed);
+        polling_work_count_function_sycl_.store(
+            &null_polling_work_count_function, std::memory_order_relaxed);
+    }
+
+    detail::polling_status scheduler_base::custom_polling_function() const
+    {
+        detail::polling_status status = detail::polling_status::idle;
+#if defined(HPX_HAVE_MODULE_ASYNC_MPI)
+        if ((*polling_function_mpi_.load(std::memory_order_relaxed))() ==
+            detail::polling_status::busy)
+        {
+            status = detail::polling_status::busy;
+        }
+#endif
+#if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
+        if ((*polling_function_cuda_.load(std::memory_order_relaxed))() ==
+            detail::polling_status::busy)
+        {
+            status = detail::polling_status::busy;
+        }
+#endif
+#if defined(HPX_HAVE_MODULE_ASYNC_SYCL)
+        if ((*polling_function_sycl_.load(std::memory_order_relaxed))() ==
+            detail::polling_status::busy)
+        {
+            status = detail::polling_status::busy;
+        }
+#endif
+        return status;
+    }
+
+    std::size_t scheduler_base::get_polling_work_count() const
+    {
+        std::size_t work_count = 0;
+#if defined(HPX_HAVE_MODULE_ASYNC_MPI)
+        work_count +=
+            polling_work_count_function_mpi_.load(std::memory_order_relaxed)();
+#endif
+#if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
+        work_count +=
+            polling_work_count_function_cuda_.load(std::memory_order_relaxed)();
+#endif
+#if defined(HPX_HAVE_MODULE_ASYNC_SYCL)
+        work_count +=
+            polling_work_count_function_sycl_.load(std::memory_order_relaxed)();
+#endif
+        return work_count;
+    }
+
     std::ostream& operator<<(std::ostream& os, scheduler_base const& scheduler)
     {
         os << scheduler.get_description() << "(" << &scheduler << ")";
 
         return os;
     }
-}}}    // namespace hpx::threads::policies
+}    // namespace hpx::threads::policies

@@ -170,7 +170,7 @@ namespace hpx { namespace collectives {
         if (generation == 0)
         {
             return hpx::make_exceptional_future<std::vector<arg_type>>(
-                HPX_GET_EXCEPTION(hpx::bad_parameter,
+                HPX_GET_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::collectives::all_gather",
                     "the generation number shouldn't be zero"));
         }
@@ -222,86 +222,6 @@ namespace hpx { namespace collectives {
             HPX_FORWARD(T, local_result), this_site);
     }
 }}    // namespace hpx::collectives
-
-////////////////////////////////////////////////////////////////////////////////
-// compatibility functions
-namespace hpx { namespace lcos {
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::all_gather is deprecated, use hpx::collectives::all_gather "
-        "instead")
-    hpx::future<std::vector<std::decay_t<T>>> all_gather(char const* basename,
-        T&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        return hpx::collectives::all_gather(basename,
-            HPX_FORWARD(T, local_result),
-            hpx::collectives::num_sites_arg(num_sites),
-            hpx::collectives::this_site_arg(this_site),
-            hpx::collectives::generation_arg(generation),
-            hpx::collectives::root_site_arg(root_site));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::all_gather is deprecated, use hpx::collectives::all_gather "
-        "instead")
-    hpx::future<std::vector<T>> all_gather(char const* basename,
-        hpx::future<T>&& local_result, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1), std::size_t root_site = 0)
-    {
-        return local_result.then([=](hpx::future<T>&& f) {
-            return hpx::collectives::all_gather(basename, f.get(),
-                hpx::collectives::num_sites_arg(num_sites),
-                hpx::collectives::this_site_arg(this_site),
-                hpx::collectives::generation_arg(generation),
-                hpx::collectives::root_site_arg(root_site));
-        });
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::all_gather is deprecated, use hpx::collectives::all_gather "
-        "instead")
-    hpx::future<std::vector<std::decay_t<T>>> all_gather(
-        hpx::collectives::communicator comm, T&& local_result,
-        std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::all_gather(HPX_MOVE(comm),
-            HPX_FORWARD(T, local_result),
-            hpx::collectives::this_site_arg(this_site));
-    }
-
-    template <typename T>
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::all_gather is deprecated, use hpx::collectives::all_gather "
-        "instead")
-    hpx::future<std::vector<T>> all_gather(hpx::collectives::communicator comm,
-        hpx::future<T>&& local_result, std::size_t this_site = std::size_t(-1))
-    {
-        return local_result.then([=](hpx::future<T>&& f) mutable {
-            hpx::collectives::all_gather(HPX_MOVE(comm), f.get(),
-                hpx::collectives::this_site_arg(this_site));
-        });
-    }
-
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::lcos::create_all_gather is deprecated, use "
-        "hpx::collectives::create_communicator instead")
-    inline hpx::collectives::communicator create_all_gather(
-        char const* basename, std::size_t num_sites = std::size_t(-1),
-        std::size_t generation = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1))
-    {
-        return hpx::collectives::create_communicator(basename,
-            hpx::collectives::num_sites_arg(num_sites),
-            hpx::collectives::this_site_arg(this_site),
-            hpx::collectives::generation_arg(generation));
-    }
-}}    // namespace hpx::lcos
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ALLGATHER_DECLARATION(...) /**/

@@ -34,14 +34,17 @@ namespace hpx {
             _ec = _compat;
         }
 
+        // different versions of clang-format disagree
+        // clang-format off
         operator boost::system::error_code&() noexcept
         {
             return _compat;
         }
+        // clang-format on
 
         template <typename E,
-            typename Enable = typename std::enable_if<
-                boost::system::is_error_code_enum<E>::value>::type>
+            typename Enable =
+                std::enable_if_t<boost::system::is_error_code_enum<E>::value>>
         static bool equal(std::error_code const& lhs, E rhs) noexcept
         {
             return lhs == std::error_code(make_error_code(rhs));

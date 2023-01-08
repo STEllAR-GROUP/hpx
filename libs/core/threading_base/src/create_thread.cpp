@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,7 @@
 
 #include <cstddef>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
 
     void create_thread(policies::scheduler_base* scheduler,
         threads::thread_init_data& data, threads::thread_id_ref_type& id,
@@ -36,8 +36,9 @@ namespace hpx { namespace threads { namespace detail {
 
         default:
         {
-            HPX_THROWS_IF(ec, bad_parameter, "threads::detail::create_thread",
-                "invalid initial state: {}", data.initial_state);
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "threads::detail::create_thread", "invalid initial state: {}",
+                data.initial_state);
             return;
         }
         }
@@ -45,8 +46,8 @@ namespace hpx { namespace threads { namespace detail {
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
         if (!data.description)
         {
-            HPX_THROWS_IF(ec, bad_parameter, "threads::detail::create_thread",
-                "description is nullptr");
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "threads::detail::create_thread", "description is nullptr");
             return;
         }
 #endif
@@ -102,4 +103,4 @@ namespace hpx { namespace threads { namespace detail {
         // thread.
         scheduler->do_some_work(data.schedulehint.hint);
     }
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail

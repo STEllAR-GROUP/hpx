@@ -12,7 +12,7 @@
 
 int hpx_main()
 {
-    HPX_THROW_EXCEPTION(hpx::invalid_status, "hpx_main", "testing");
+    HPX_THROW_EXCEPTION(hpx::error::invalid_status, "hpx_main", "testing");
     return hpx::finalize();
 }
 
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST(e.get_error() == hpx::invalid_status);
+        HPX_TEST(e.get_error() == hpx::error::invalid_status);
         caught_exception = true;
     }
     catch (...)

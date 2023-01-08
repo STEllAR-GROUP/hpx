@@ -90,7 +90,7 @@ Functions
    :cpp:func:`hpx::partial_sort_copy`                 :cppreference-generic:`algorithm,partial_sort_copy`
    :cpp:func:`hpx::partition`                         :cppreference-generic:`algorithm,partition`
    :cpp:func:`hpx::partition_copy`                    :cppreference-generic:`algorithm,partition_copy`
-   :cpp:func:`hpx::parallel::v1::reduce_by_key`       `reduce_by_key <https://thrust.github.io/doc/group__reductions_gad5623f203f9b3fdcab72481c3913f0e0.html>`_
+   :cpp:func:`hpx::experimental::reduce_by_key`       `reduce_by_key <https://thrust.github.io/doc/group__reductions_gad5623f203f9b3fdcab72481c3913f0e0.html>`_
    :cpp:func:`hpx::remove`                            :cppreference-generic:`algorithm,remove`
    :cpp:func:`hpx::remove_copy`                       :cppreference-generic:`algorithm,remove_copy`
    :cpp:func:`hpx::remove_copy_if`                    :cppreference-generic:`algorithm,remove_copy,remove_copy_if`
@@ -112,7 +112,7 @@ Functions
    :cpp:func:`hpx::shift_left`                        :cppreference-generic:`algorithm,shift,shift_left`
    :cpp:func:`hpx::shift_right`                       :cppreference-generic:`algorithm,shift,shift_right`
    :cpp:func:`hpx::sort`                              :cppreference-generic:`algorithm,sort`
-   :cpp:func:`hpx::parallel::v1::sort_by_key`         `sort_by_key <https://thrust.github.io/doc/group__sorting_gabe038d6107f7c824cf74120500ef45ea.html>`_
+   :cpp:func:`hpx::experimental::sort_by_key`         `sort_by_key <https://thrust.github.io/doc/group__sorting_gabe038d6107f7c824cf74120500ef45ea.html>`_
    :cpp:func:`hpx::stable_partition`                  :cppreference-generic:`algorithm,stable_partition`
    :cpp:func:`hpx::stable_sort`                       :cppreference-generic:`algorithm,stable_sort`
    :cpp:func:`hpx::starts_with`                       :cppreference-generic:`algorithm/ranges,starts_with`
@@ -406,20 +406,21 @@ Classes
 
 .. table:: Classes of header ``hpx/execution.hpp``
 
-   ========================================================  ========================================================
-   Class                                                     C++ standard
-   ========================================================  ========================================================
-   :cpp:class:`hpx::execution::sequenced_policy`             :cppreference-generic:`algorithm,execution_policy_tag_t`
-   :cpp:class:`hpx::execution::parallel_policy`              :cppreference-generic:`algorithm,execution_policy_tag_t`
-   :cpp:class:`hpx::execution::parallel_unsequenced_policy`  :cppreference-generic:`algorithm,execution_policy_tag_t`
+   =====================================================================  ========================================================
+   Class                                                                  C++ standard
+   =====================================================================  ========================================================
+   :cpp:class:`hpx::execution::sequenced_policy`                          :cppreference-generic:`algorithm,execution_policy_tag_t`
+   :cpp:class:`hpx::execution::parallel_policy`                           :cppreference-generic:`algorithm,execution_policy_tag_t`
+   :cpp:class:`hpx::execution::parallel_unsequenced_policy`               :cppreference-generic:`algorithm,execution_policy_tag_t`
    :cpp:class:`hpx::execution::sequenced_task_policy`
    :cpp:class:`hpx::execution::parallel_task_policy`
-   :cpp:class:`hpx::execution::auto_chunk_size`
-   :cpp:class:`hpx::execution::dynamic_chunk_size`
-   :cpp:class:`hpx::execution::guided_chunk_size`
-   :cpp:class:`hpx::execution::persistent_auto_chunk_size`
-   :cpp:class:`hpx::execution::static_chunk_size`
-   ========================================================  ========================================================
+   :cpp:class:`hpx::execution::experimental::auto_chunk_size`
+   :cpp:class:`hpx::execution::experimental::dynamic_chunk_size`
+   :cpp:class:`hpx::execution::experimental::guided_chunk_size`
+   :cpp:class:`hpx::execution::experimental::persistent_auto_chunk_size`
+   :cpp:class:`hpx::execution::experimental::static_chunk_size`
+   :cpp:class:`hpx::execution::experimental::num_cores`
+   =====================================================================  ========================================================
 
 .. _public_api_header_hpx_functional:
 
@@ -461,8 +462,8 @@ Classes
    :cpp:class:`hpx::function`                     :cppreference-generic:`utility/functional,function`
    :cpp:class:`hpx::function_ref`                 |p0792|_
    :cpp:class:`hpx::move_only_function`           :cppreference-generic:`utility/functional,move_only_function`
-   :cpp:struct:`hpx::traits::is_bind_expression`  :cppreference-generic:`utility/functional,is_bind_expression`
-   :cpp:struct:`hpx::traits::is_placeholder`      :cppreference-generic:`utility/functional,is_placeholder`
+   :cpp:struct:`hpx::is_bind_expression`          :cppreference-generic:`utility/functional,is_bind_expression`
+   :cpp:struct:`hpx::is_placeholder`              :cppreference-generic:`utility/functional,is_placeholder`
    :cpp:struct:`hpx::scoped_annotation`
    =============================================  =============================================================
 
@@ -476,7 +477,7 @@ Functions
    ========================================  =====================================================
    :cpp:func:`hpx::annotated_function`
    :cpp:func:`hpx::bind`                     :cppreference-generic:`utility/functional,bind`
-   :cpp:func:`hpx::experimental::bind_back`
+   :cpp:func:`hpx::bind_back`                :cppreference-generic:`utility/functional,bind_front`
    :cpp:func:`hpx::bind_front`               :cppreference-generic:`utility/functional,bind_front`
    :cpp:func:`hpx::invoke`                   :cppreference-generic:`utility/functional,invoke`
    :cpp:func:`hpx::invoke_fused`             :cppreference-generic:`utility,apply`
@@ -494,7 +495,7 @@ C++ standard library header :cppreference-header:`future`. See :ref:`extend_futu
 information about extensions to futures compared to the C++ standard library.
 
 This header file also contains overloads of :cpp:func:`hpx::async`,
-:cpp:func:`hpx::apply`, :cpp:func:`hpx::sync`, and :cpp:func:`hpx::dataflow` that can be used with
+:cpp:func:`hpx::post`, :cpp:func:`hpx::sync`, and :cpp:func:`hpx::dataflow` that can be used with
 actions. See :ref:`action_invocation` for more information about invoking actions.
 
 Classes
@@ -537,7 +538,7 @@ Functions
    Function                                  C++ standard
    ========================================  =====================================
    :cpp:func:`hpx::async`                    :cppreference-generic:`thread,async`
-   :cpp:func:`hpx::apply`
+   :cpp:func:`hpx::post`
    :cpp:func:`hpx::sync`
    :cpp:func:`hpx::dataflow`
    :cpp:func:`hpx::make_future`
@@ -895,7 +896,7 @@ blocks.
 Classes
 -------
 
-.. table:: Classes of header ``hpx/task_black.hpp``
+.. table:: Classes of header ``hpx/task_block.hpp``
 
    +---------------------------------------------------------+
    | Class                                                   |
@@ -908,7 +909,7 @@ Classes
 Functions
 ---------
 
-.. table:: Functions of header ``hpx/task_black.hpp``
+.. table:: Functions of header ``hpx/task_block.hpp``
 
    +-----------------------------------------------------------------+
    | Function                                                        |
@@ -917,6 +918,25 @@ Functions
    +-----------------------------------------------------------------+
    | :cpp:func:`hpx::parallel::v2::define_task_block_restore_thread` |
    +-----------------------------------------------------------------+
+
+.. _public_api_header_hpx_task_group:
+
+``hpx/task_group.hpp``
+======================
+
+The header :hpx-header:`libs/full/include/include,hpx/task_group.hpp` corresponds to the
+``task_group`` feature in |oneTBB|_.
+
+Classes
+-------
+
+.. table:: Classes of header ``hpx/task_group.hpp``
+
+   +---------------------------------------------------------+
+   | Class                                                   |
+   +=========================================================+
+   | :cpp:class:`hpx::execution::experimental::task_group`   |
+   +---------------------------------------------------------+
 
 .. _public_api_header_hpx_thread:
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Hartmut Kaiser
+# Copyright (c) 2020-2022 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -385,8 +385,16 @@ with section("parse"):
                                   'EXECUTABLE': 1,
                                   'LOCALITIES': 1,
                                   'PARCELPORTS': '+',
-                                  'THREADS_PER_LOCALITY': 1},
-                      'pargs': {'flags': ['FAILURE_EXPECTED'], 'nargs': '2+'}},
+                                  'THREADS_PER_LOCALITY': 1,
+                                  'NO_PARCELPORT_TCP': 1,
+                                  'NO_PARCELPORT_MPI': 1,
+                                  'NO_PARCELPORT_LCI': 1},
+                      'pargs': {'flags': ['FAILURE_EXPECTED',
+                                          'RUN_SERIAL',
+                                          'NO_PARCELPORT_TCP',
+                                          'NO_PARCELPORT_LCI',
+                                          'NO_PARCELPORT_MPI'],
+                                'nargs': '2+'}},
     'add_hpx_test_target_dependencies': { 'kwargs': {'PSEUDO_DEPS_NAME': 1},
                                           'pargs': {'flags': [], 'nargs': '2+'}},
     'add_hpx_unit_compile_test': {

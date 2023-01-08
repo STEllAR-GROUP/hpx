@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,8 @@
 
 #include <string>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     HPX_CORE_EXPORT std::string regex_from_pattern(
         std::string const& pattern, error_code& ec = throws);
-}}    // namespace hpx::util
+}    // namespace hpx::util

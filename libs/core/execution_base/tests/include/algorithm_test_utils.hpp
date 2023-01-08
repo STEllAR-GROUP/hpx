@@ -12,6 +12,7 @@
 
 #include <atomic>
 #include <exception>
+#include <functional>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -306,6 +307,74 @@ struct error_typed_sender
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_value_t(T),
             hpx::execution::experimental::set_error_t(std::exception_ptr)>;
+};
+
+template <typename T>
+struct const_reference_sender
+{
+    std::reference_wrapper<std::decay_t<T>> x;
+
+    template <typename R>
+    struct operation_state
+    {
+        std::reference_wrapper<std::decay_t<T>> const x;
+        std::decay_t<R> r;
+
+        friend void tag_invoke(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
+        {
+            hpx::execution::experimental::set_value(
+                std::move(os.r), os.x.get());
+        };
+    };
+
+    template <typename R>
+    friend auto tag_invoke(hpx::execution::experimental::connect_t,
+        const_reference_sender&& s, R&& r)
+    {
+        return operation_state<R>{std::move(s.x), std::forward<R>(r)};
+    }
+
+    template <typename Env>
+    friend auto tag_invoke(
+        hpx::execution::experimental::get_completion_signatures_t,
+        const_reference_sender const&, Env)
+        -> hpx::execution::experimental::completion_signatures<
+            hpx::execution::experimental::set_value_t(std::decay_t<T>&),
+            hpx::execution::experimental::set_error_t(std::exception_ptr)>;
+};
+
+struct const_reference_error_sender
+{
+    template <typename R>
+    struct operation_state
+    {
+        std::decay_t<R> r;
+
+        friend void tag_invoke(
+            hpx::execution::experimental::start_t, operation_state& os) noexcept
+        {
+            auto const e = std::make_exception_ptr(std::runtime_error("error"));
+            hpx::execution::experimental::set_error(std::move(os.r), e);
+        }
+    };
+
+    template <typename R>
+    friend operation_state<R> tag_invoke(
+        hpx::execution::experimental::connect_t, const_reference_error_sender,
+        R&& r)
+    {
+        return {std::forward<R>(r)};
+    }
+
+    template <typename Env>
+    friend auto tag_invoke(
+        hpx::execution::experimental::get_completion_signatures_t,
+        const_reference_error_sender const&, Env)
+        -> hpx::execution::experimental::completion_signatures<
+            hpx::execution::experimental::set_value_t(),
+            hpx::execution::experimental::set_error_t(
+                std::exception_ptr const&)>;
 };
 
 struct check_exception_ptr
@@ -623,3 +692,145 @@ struct scheduler2 : scheduler
     {
     }
 };
+
+namespace tag_namespace {
+
+    inline constexpr struct my_tag_t
+    {
+        template <typename Sender>
+        auto operator()(Sender&& sender) const
+        {
+            return hpx::functional::tag_invoke(
+                *this, std::forward<Sender>(sender));
+        }
+
+        struct wrapper
+        {
+            wrapper(my_tag_t) {}
+        };
+
+        // This overload should be chosen by test_adl_isolation below. We make
+        // sure this is a worse match than the one in my_namespace by requiring
+        // a conversion.
+        template <typename Sender>
+        friend void tag_invoke(wrapper, Sender&&)
+        {
+        }
+    } my_tag{};
+}    // namespace tag_namespace
+
+namespace my_namespace {
+
+    // The below types should be used as a template argument for the sender in
+    // test_adl_isolation.
+    struct my_type
+    {
+        void operator()() const {}
+        void operator()(int) const {}
+        void operator()(std::exception_ptr) const {}
+    };
+
+    struct my_scheduler
+    {
+        struct sender
+        {
+            template <typename R>
+            struct operation_state
+            {
+                std::decay_t<R> r;
+
+                friend void tag_invoke(hpx::execution::experimental::start_t,
+                    operation_state& os) noexcept
+                {
+                    hpx::execution::experimental::set_value(std::move(os.r));
+                };
+            };
+
+            template <typename R>
+            friend auto tag_invoke(
+                hpx::execution::experimental::connect_t, sender&&, R&& r)
+            {
+                return operation_state<R>{std::forward<R>(r)};
+            }
+
+            friend my_scheduler tag_invoke(
+                hpx::execution::experimental::get_completion_scheduler_t<
+                    hpx::execution::experimental::set_value_t>,
+                sender const&) noexcept
+            {
+                return {};
+            }
+
+            template <typename Env>
+            friend auto tag_invoke(
+                hpx::execution::experimental::get_completion_signatures_t,
+                sender const&, Env)
+                -> hpx::execution::experimental::completion_signatures<
+                    hpx::execution::experimental::set_value_t()>;
+        };
+
+        friend sender tag_invoke(
+            hpx::execution::experimental::schedule_t, my_scheduler)
+        {
+            return {};
+        }
+
+        bool operator==(my_scheduler const&) const noexcept
+        {
+            return true;
+        }
+
+        bool operator!=(my_scheduler const&) const noexcept
+        {
+            return false;
+        }
+    };
+
+    struct my_sender
+    {
+        template <typename R>
+        struct operation_state
+        {
+            std::decay_t<R> r;
+            friend void tag_invoke(hpx::execution::experimental::start_t,
+                operation_state& os) noexcept
+            {
+                hpx::execution::experimental::set_value(std::move(os.r));
+            }
+        };
+
+        template <typename R>
+        friend operation_state<R> tag_invoke(
+            hpx::execution::experimental::connect_t, my_sender, R&& r)
+        {
+            return {std::forward<R>(r)};
+        }
+
+        template <typename Env>
+        friend auto tag_invoke(
+            hpx::execution::experimental::get_completion_signatures_t,
+            my_sender const&, Env)
+            -> hpx::execution::experimental::completion_signatures<
+                hpx::execution::experimental::set_value_t()>;
+    };
+
+    // This overload should not be chosen by test_adl_isolation below. We make
+    // sure this is a better match than the one in tag_namespace so that if this
+    // one is visible it is chosen. It should not be visible.
+    template <typename Sender>
+    void tag_invoke(tag_namespace::my_tag_t, Sender&&)
+    {
+        static_assert(sizeof(Sender) == 0);
+    }
+}    // namespace my_namespace
+
+// This test function expects a type that has my_namespace::my_type as a
+// template argument. If template arguments are correctly hidden from ADL the
+// friend tag_invoke overload in my_tag_t will be chosen. If template arguments
+// are not hidden the unconstrained tag_invoke overload in my_namespace will be
+// chosen instead.
+template <typename Sender>
+void test_adl_isolation(Sender&& sender)
+{
+    tag_namespace::my_tag(std::forward<Sender>(sender));
+}

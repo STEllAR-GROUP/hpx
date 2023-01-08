@@ -79,7 +79,7 @@ namespace hpx { namespace components {
         {
             if (assign_gid)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "fixed_component_base::get_base_gid",
                     "fixed_components must be assigned new gids on creation");
                 return naming::invalid_gid;
@@ -101,7 +101,7 @@ namespace hpx { namespace components {
                     naming::gid_type g = gid_;
                     gid_ = naming::gid_type();    // invalidate GID
 
-                    HPX_THROW_EXCEPTION(duplicate_component_address,
+                    HPX_THROW_EXCEPTION(hpx::error::duplicate_component_address,
                         "fixed_component_base<Component>::get_base_gid",
                         "could not bind_gid(local): {}", g);
                 }
@@ -130,7 +130,7 @@ namespace hpx { namespace components {
         {
             if (gid_)
             {
-                HPX_THROWS_IF(ec, invalid_status,
+                HPX_THROWS_IF(ec, hpx::error::invalid_status,
                     "fixed_component_base::set_locality_id",
                     "can't change locality_id after GID has already been "
                     "registered");

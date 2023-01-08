@@ -22,7 +22,7 @@
 
 #include <string>
 
-namespace hpx { namespace util { namespace logging {
+namespace hpx::util::logging::destination {
 
     /**
 @page macros Macros - how, what for?
@@ -154,5 +154,4 @@ HPX_DEFINE_LOG(g_l, logger_type)
 
 #define HPX_LOG_FORMAT(NAME, LEVEL, FORMAT, ...)                               \
     HPX_LOG_USE_LOG(NAME, LEVEL).format(FORMAT, __VA_ARGS__)
-
-}}}    // namespace hpx::util::logging
+}    // namespace hpx::util::logging::destination

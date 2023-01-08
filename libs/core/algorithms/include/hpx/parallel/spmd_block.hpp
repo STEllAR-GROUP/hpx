@@ -11,12 +11,12 @@
 #include <hpx/functional/first_argument.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/util/adapt_sharing_mode.hpp>
 #include <hpx/synchronization/barrier.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/type_support/pack.hpp>
-
-#include <boost/range/irange.hpp>
 
 #include <cstddef>
 #include <functional>
@@ -30,12 +30,13 @@
 #include <vector>
 
 namespace hpx { namespace lcos { namespace local {
-    /// The class spmd_block defines an interface for launching
-    /// multiple images while giving handles to each image to interact with
-    /// the remaining images. The \a define_spmd_block function templates create
-    /// multiple images of a user-defined function (or lambda) and launches them
-    /// in a possibly separate thread. A temporary spmd block object is created
-    /// and diffused to each image. The constraint for the function (or lambda)
+
+    /// The class spmd_block defines an interface for launching multiple images
+    /// while giving handles to each image to interact with the remaining
+    /// images. The \a define_spmd_block function templates create multiple
+    /// images of a user-defined function (or lambda) and launches them in a
+    /// possibly separate thread. A temporary spmd block object is created and
+    /// diffused to each image. The constraint for the function (or lambda)
     /// given to the define_spmd_block function is to accept a spmd_block as
     /// first parameter.
     struct spmd_block
@@ -142,6 +143,7 @@ namespace hpx { namespace lcos { namespace local {
     };
 
     namespace detail {
+
         template <typename F>
         struct spmd_block_helper
         {
@@ -194,11 +196,17 @@ namespace hpx { namespace lcos { namespace local {
         std::shared_ptr<table_type> barriers = std::make_shared<table_type>();
         std::shared_ptr<mutex_type> mtx = std::make_shared<mutex_type>();
 
-        return hpx::parallel::execution::bulk_async_execute(policy.executor(),
+        // The tasks launched here may synchronize between each other. This may
+        // lead to deadlocks if the tasks are combined to run on the same
+        // thread.
+        decltype(auto) hinted_policy = parallel::util::adapt_sharing_mode(
+            policy, hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+
+        return hpx::parallel::execution::bulk_async_execute(
+            hinted_policy.executor(),
             detail::spmd_block_helper<F>{
                 barrier, barriers, mtx, HPX_FORWARD(F, f), num_images},
-            boost::irange(std::size_t(0), num_images),
-            HPX_FORWARD(Args, args)...);
+            hpx::util::counting_shape(num_images), HPX_FORWARD(Args, args)...);
     }
 
     // Synchronous version
@@ -228,11 +236,16 @@ namespace hpx { namespace lcos { namespace local {
         std::shared_ptr<table_type> barriers = std::make_shared<table_type>();
         std::shared_ptr<mutex_type> mtx = std::make_shared<mutex_type>();
 
-        hpx::parallel::execution::bulk_sync_execute(policy.executor(),
+        // The tasks launched here may synchronize between each other. This may
+        // lead to deadlocks if the tasks are combined to run on the same
+        // thread.
+        decltype(auto) hinted_policy = parallel::util::adapt_sharing_mode(
+            policy, hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+
+        hpx::parallel::execution::bulk_sync_execute(hinted_policy.executor(),
             detail::spmd_block_helper<F>{
                 barrier, barriers, mtx, HPX_FORWARD(F, f), num_images},
-            boost::irange(std::size_t(0), num_images),
-            HPX_FORWARD(Args, args)...);
+            hpx::util::counting_shape(num_images), HPX_FORWARD(Args, args)...);
     }
 
     template <typename F, typename... Args>
@@ -245,12 +258,12 @@ namespace hpx { namespace lcos { namespace local {
 
 namespace hpx { namespace parallel { inline namespace v2 {
 
-    /// The class spmd_block defines an interface for launching
-    /// multiple images while giving handles to each image to interact with
-    /// the remaining images. The \a define_spmd_block function templates create
-    /// multiple images of a user-defined function (or lambda) and launches them
-    /// in a possibly separate thread. A temporary spmd block object is created
-    /// and diffused to each image. The constraint for the function (or lambda)
+    /// The class spmd_block defines an interface for launching multiple images
+    /// while giving handles to each image to interact with the remaining
+    /// images. The \a define_spmd_block function templates create multiple
+    /// images of a user-defined function (or lambda) and launches them in a
+    /// possibly separate thread. A temporary spmd block object is created and
+    /// diffused to each image. The constraint for the function (or lambda)
     /// given to the define_spmd_block function is to accept a spmd_block as
     /// first parameter.
     using spmd_block = hpx::lcos::local::spmd_block;

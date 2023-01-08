@@ -11,9 +11,9 @@
 #include <hpx/modules/lci_base.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/util.hpp>
 #include <asio/ip/host_name.hpp>
-#include <boost/tokenizer.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -36,9 +36,8 @@ namespace hpx { namespace util {
             std::string lci_environment_strings =
                 cfg.get_entry("hpx.parcel.lci.env", default_env);
 
-            boost::char_separator<char> sep(";,: ");
-            boost::tokenizer<boost::char_separator<char>> tokens(
-                lci_environment_strings, sep);
+            hpx::string_util::char_separator sep(";,: ");
+            hpx::string_util::tokenizer tokens(lci_environment_strings, sep);
             for (auto const& tok : tokens)
             {
                 char* env = std::getenv(tok.c_str());

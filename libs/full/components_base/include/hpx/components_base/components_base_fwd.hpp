@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -36,21 +36,9 @@ namespace hpx {
         template <typename Component, typename Derived = detail::this_type>
         class managed_component;
 
-        template <typename Component>
-        using simple_component HPX_DEPRECATED_V(1, 7,
-            "The type hpx::components::simple_component is deprecated. "
-            "Please use hpx::components::component instead.") =
-            component<Component>;
-
         ///////////////////////////////////////////////////////////////////////
         template <typename Component = detail::this_type>
         class component_base;
-
-        template <typename Component>
-        using simple_component_base HPX_DEPRECATED_V(1, 7,
-            "The type hpx::components::simple_component_base is deprecated. "
-            "Please use hpx::components::component_base instead.") =
-            component_base<Component>;
 
         template <typename Component = detail::this_type>
         class fixed_component_base;

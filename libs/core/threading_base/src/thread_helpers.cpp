@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,12 +9,8 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/modules/errors.hpp>
-#ifdef HPX_HAVE_VERIFY_LOCKS
-#include <hpx/lock_registration/detail/register_locks.hpp>
-#endif
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/threading_base/detail/reset_lco_description.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
@@ -22,8 +18,13 @@
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/unused.hpp>
 
+#ifdef HPX_HAVE_VERIFY_LOCKS
+#include <hpx/lock_registration/detail/register_locks.hpp>
+#endif
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
+#include <hpx/threading_base/detail/reset_lco_description.hpp>
+#endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/threading_base/detail/reset_backtrace.hpp>
@@ -37,7 +38,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
     thread_state set_thread_state(thread_id_type const& id,
@@ -66,7 +67,7 @@ namespace hpx { namespace threads {
 
     ///////////////////////////////////////////////////////////////////////////
     thread_state get_thread_state(
-        thread_id_type const& id, error_code& /* ec */)
+        thread_id_type const& id, error_code& /* ec */) noexcept
     {
         return id ? get_thread_id_data(id)->get_state() :
                     thread_state(thread_schedule_state::terminated,
@@ -74,7 +75,8 @@ namespace hpx { namespace threads {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::size_t get_thread_phase(thread_id_type const& id, error_code& /* ec */)
+    std::size_t get_thread_phase(
+        thread_id_type const& id, error_code& /* ec */) noexcept
     {
         return id ? get_thread_id_data(id)->get_thread_phase() :
                     std::size_t(~0);
@@ -82,14 +84,14 @@ namespace hpx { namespace threads {
 
     ///////////////////////////////////////////////////////////////////////////
     threads::thread_priority get_thread_priority(
-        thread_id_type const& id, error_code& /* ec */)
+        thread_id_type const& id, error_code& /* ec */) noexcept
     {
         return id ? get_thread_id_data(id)->get_priority() :
                     thread_priority::unknown;
     }
 
     std::ptrdiff_t get_stack_size(
-        thread_id_type const& id, error_code& /* ec */)
+        thread_id_type const& id, error_code& /* ec */) noexcept
     {
         return id ? get_thread_id_data(id)->get_stack_size() :
                     static_cast<std::ptrdiff_t>(thread_stacksize::unknown);
@@ -99,8 +101,8 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::interrupt_thread",
-                "null thread id encountered");
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
+                "hpx::threads::interrupt_thread", "null thread id encountered");
             return;
         }
 
@@ -119,7 +121,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::interruption_point",
                 "null thread id encountered");
             return;
@@ -137,7 +139,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "hpx::threads::get_thread_interruption_enabled",
                 "null thread id encountered");
             return false;
@@ -154,7 +156,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "hpx::threads::get_thread_interruption_enabled",
                 "null thread id encountered");
             return false;
@@ -171,7 +173,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::get_thread_interruption_requested",
                 "null thread id encountered");
             return false;
@@ -188,8 +190,8 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::get_thread_data",
-                "null thread id encountered");
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
+                "hpx::threads::get_thread_data", "null thread id encountered");
             return 0;
         }
 
@@ -201,8 +203,8 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::set_thread_data",
-                "null thread id encountered");
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
+                "hpx::threads::set_thread_data", "null thread id encountered");
             return 0;
         }
 
@@ -214,8 +216,8 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::get_libcds_data",
-                "null thread id encountered");
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
+                "hpx::threads::get_libcds_data", "null thread id encountered");
             return 0;
         }
 
@@ -227,8 +229,8 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::set_libcds_data",
-                "null thread id encountered");
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
+                "hpx::threads::set_libcds_data", "null thread id encountered");
             return 0;
         }
 
@@ -240,7 +242,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::get_libcds_hazard_pointer_data",
                 "null thread id encountered");
             return 0;
@@ -254,7 +256,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::set_libcds_hazard_pointer_data",
                 "null thread id encountered");
             return 0;
@@ -268,7 +270,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::get_libcds_dynamic_hazard_pointer_data",
                 "null thread id encountered");
             return 0;
@@ -282,7 +284,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::set_libcds_dynamic_hazard_pointer_data",
                 "null thread id encountered");
             return 0;
@@ -317,7 +319,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::run_thread_exit_callbacks",
                 "null thread id encountered");
             return;
@@ -334,7 +336,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::add_thread_exit_callback",
                 "null thread id encountered");
             return false;
@@ -350,7 +352,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::add_thread_exit_callback",
                 "null thread id encountered");
             return;
@@ -372,7 +374,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::get_thread_backtrace",
                 "null thread id encountered");
             return nullptr;
@@ -394,7 +396,7 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::set_thread_backtrace",
                 "null thread id encountered");
             return nullptr;
@@ -411,8 +413,8 @@ namespace hpx { namespace threads {
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id, "hpx::threads::get_pool",
-                "null thread id encountered");
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
+                "hpx::threads::get_pool", "null thread id encountered");
             return nullptr;
         }
 
@@ -421,19 +423,20 @@ namespace hpx { namespace threads {
 
         return get_thread_id_data(id)->get_scheduler_base()->get_parent_pool();
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
 
-namespace hpx { namespace this_thread {
+namespace hpx::this_thread {
 
-    /// The function \a suspend will return control to the thread manager
-    /// (suspends the current thread). It sets the new state of this thread
-    /// to the thread state passed as the parameter.
-    ///
-    /// If the suspension was aborted, this function will throw a
-    /// \a yield_aborted exception.
+    // The function \a suspend will return control to the thread manager
+    // (suspends the current thread). It sets the new state of this thread
+    // to the thread state passed as the parameter.
+    //
+    // If the suspension was aborted, this function will throw a
+    // \a yield_aborted exception.
     threads::thread_restart_state suspend(threads::thread_schedule_state state,
         threads::thread_id_type nextid,
-        util::thread_description const& description, error_code& ec)
+        [[maybe_unused]] threads::thread_description const& description,
+        error_code& ec)
     {
         // let the thread manager do other things while waiting
         threads::thread_self& self = threads::get_self();
@@ -457,8 +460,6 @@ namespace hpx { namespace this_thread {
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             threads::detail::reset_lco_description desc(
                 id.noref(), description, ec);
-#else
-            HPX_UNUSED(description);
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id, ec);
@@ -473,6 +474,7 @@ namespace hpx { namespace this_thread {
                     get_thread_id_data(nextid)->get_scheduler_base();
                 scheduler->schedule_thread(
                     HPX_MOVE(nextid), threads::thread_schedule_hint());
+
                 statex = self.yield(threads::thread_result_type(
                     state, threads::invalid_thread_id));
             }
@@ -491,7 +493,7 @@ namespace hpx { namespace this_thread {
         // handle interrupt and abort
         if (statex == threads::thread_restart_state::abort)
         {
-            HPX_THROWS_IF(ec, yield_aborted, "suspend",
+            HPX_THROWS_IF(ec, hpx::error::yield_aborted, "suspend",
                 "thread({}, {}) aborted (yield returned wait_abort)",
                 id.noref(), threads::get_thread_description(id.noref()));
         }
@@ -505,7 +507,8 @@ namespace hpx { namespace this_thread {
     threads::thread_restart_state suspend(
         hpx::chrono::steady_time_point const& abs_time,
         threads::thread_id_type nextid,
-        util::thread_description const& description, error_code& ec)
+        [[maybe_unused]] threads::thread_description const& description,
+        error_code& ec)
     {
         // schedule a thread waking us up at_time
         threads::thread_self& self = threads::get_self();
@@ -530,8 +533,6 @@ namespace hpx { namespace this_thread {
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             threads::detail::reset_lco_description desc(
                 id.noref(), description, ec);
-#else
-            HPX_UNUSED(description);
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id, ec);
@@ -555,6 +556,7 @@ namespace hpx { namespace this_thread {
                     get_thread_id_data(nextid)->get_scheduler_base();
                 scheduler->schedule_thread(
                     HPX_MOVE(nextid), threads::thread_schedule_hint());
+
                 statex = self.yield(threads::thread_result_type(
                     threads::thread_schedule_state::suspended,
                     threads::invalid_thread_id));
@@ -570,8 +572,9 @@ namespace hpx { namespace this_thread {
             {
                 HPX_ASSERT(statex == threads::thread_restart_state::abort ||
                     statex == threads::thread_restart_state::signaled);
+
                 error_code ec1(throwmode::lightweight);    // do not throw
-                hpx::util::yield_while(
+                hpx::util::yield_while<true>(
                     [&timer_started]() { return !timer_started.load(); },
                     "set_thread_state_timed");
                 threads::set_thread_state(timer_id.noref(),
@@ -589,7 +592,7 @@ namespace hpx { namespace this_thread {
         // handle interrupt and abort
         if (statex == threads::thread_restart_state::abort)
         {
-            HPX_THROWS_IF(ec, yield_aborted, "suspend_at",
+            HPX_THROWS_IF(ec, hpx::error::yield_aborted, "suspend_at",
                 "thread({}, {}) aborted (yield returned wait_abort)",
                 id.noref(), threads::get_thread_description(id.noref()));
         }
@@ -606,7 +609,7 @@ namespace hpx { namespace this_thread {
         return threads::get_pool(threads::get_self_id(), ec);
     }
 
-    std::ptrdiff_t get_available_stack_space()
+    std::ptrdiff_t get_available_stack_space() noexcept
     {
         threads::thread_self* self = threads::get_self_ptr();
         if (self)
@@ -617,7 +620,7 @@ namespace hpx { namespace this_thread {
         return (std::numeric_limits<std::ptrdiff_t>::max)();
     }
 
-    bool has_sufficient_stack_space(std::size_t space_needed)
+    bool has_sufficient_stack_space(std::size_t space_needed) noexcept
     {
         if (nullptr == hpx::threads::get_self_ptr())
             return false;
@@ -626,8 +629,8 @@ namespace hpx { namespace this_thread {
         std::ptrdiff_t remaining_stack = get_available_stack_space();
         if (remaining_stack < 0)
         {
-            HPX_THROW_EXCEPTION(
-                out_of_memory, "has_sufficient_stack_space", "Stack overflow");
+            HPX_THROW_EXCEPTION(hpx::error::out_of_memory,
+                "has_sufficient_stack_space", "Stack overflow");
         }
         bool sufficient_stack_space =
             std::size_t(remaining_stack) >= space_needed;
@@ -637,4 +640,4 @@ namespace hpx { namespace this_thread {
         return true;
 #endif
     }
-}}    // namespace hpx::this_thread
+}    // namespace hpx::this_thread

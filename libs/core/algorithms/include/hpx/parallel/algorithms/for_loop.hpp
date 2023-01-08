@@ -751,6 +751,7 @@ namespace hpx { namespace experimental {
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/for_loop_induction.hpp>
 #include <hpx/parallel/algorithms/for_loop_reduction.hpp>
+#include <hpx/parallel/util/adapt_sharing_mode.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
@@ -763,10 +764,11 @@ namespace hpx { namespace experimental {
 #include <utility>
 #include <vector>
 
-namespace hpx::parallel { inline namespace v2 {
+namespace hpx::parallel {
 
     // for_loop
-    namespace detail {
+    inline namespace v2 { namespace detail {
+
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
@@ -775,9 +777,7 @@ namespace hpx::parallel { inline namespace v2 {
             hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
             std::size_t part_index) noexcept
         {
-            int const _sequencer[] = {
-                0, (hpx::get<Is>(args).init_iteration(part_index), 0)...};
-            (void) _sequencer;
+            (hpx::get<Is>(args).init_iteration(part_index), ...);
         }
 
         template <typename... Ts, std::size_t... Is, typename F, typename B>
@@ -793,9 +793,7 @@ namespace hpx::parallel { inline namespace v2 {
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void next_iteration(
             hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>) noexcept
         {
-            int const _sequencer[] = {
-                0, (hpx::get<Is>(args).next_iteration(), 0)...};
-            (void) _sequencer;
+            (hpx::get<Is>(args).next_iteration(), ...);
         }
 
         template <typename... Ts, std::size_t... Is>
@@ -803,9 +801,7 @@ namespace hpx::parallel { inline namespace v2 {
             hpx::tuple<Ts...>& args, hpx::util::index_pack<Is...>,
             std::size_t size) noexcept
         {
-            int const _sequencer[] = {
-                0, (hpx::get<Is>(args).exit_iteration(size), 0)...};
-            (void) _sequencer;
+            (hpx::get<Is>(args).exit_iteration(size), ...);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -1061,9 +1057,8 @@ namespace hpx::parallel { inline namespace v2 {
                 ExPolicy&&, InIter first, Size size, F&& f, Arg&& arg,
                 Args&&... args)
             {
-                int const init_sequencer[] = {
-                    (arg.init_iteration(0), 0), (args.init_iteration(0), 0)...};
-                (void) init_sequencer;
+                arg.init_iteration(0);
+                (args.init_iteration(0), ...);
 
                 std::size_t count = size;
                 while (count != 1)
@@ -1074,18 +1069,16 @@ namespace hpx::parallel { inline namespace v2 {
                     ++first;
                     --count;
 
-                    int const next_sequencer[] = {(arg.next_iteration(), 0),
-                        (args.next_iteration(), 0)...};
-                    (void) next_sequencer;
+                    arg.next_iteration();
+                    (args.next_iteration(), ...);
                 }
 
                 HPX_INVOKE(
                     f, first, arg.iteration_value(), args.iteration_value()...);
 
                 // make sure live-out variables are properly set on return
-                int const exit_sequencer[] = {(arg.exit_iteration(size), 0),
-                    (args.exit_iteration(size), 0)...};
-                (void) exit_sequencer;
+                arg.exit_iteration(size);
+                (args.exit_iteration(size), ...);
 
                 return hpx::util::unused_type();
             }
@@ -1116,6 +1109,16 @@ namespace hpx::parallel { inline namespace v2 {
                 }
                 else
                 {
+                    // any of the induction or reduction operations prevent us
+                    // from sharing the part_iteration between threads
+                    decltype(auto) hinted_policy =
+                        parallel::util::adapt_sharing_mode(
+                            HPX_FORWARD(ExPolicy, policy),
+                            hpx::threads::thread_sharing_hint::
+                                do_not_share_function);
+
+                    using policy_type = std::decay_t<decltype(policy)>;
+
                     // we need to decay copy here to properly transport
                     // everything to a GPU device
                     using args_type = hpx::tuple<std::decay_t<Ts>...>;
@@ -1123,10 +1126,10 @@ namespace hpx::parallel { inline namespace v2 {
                     args_type args =
                         hpx::forward_as_tuple(HPX_FORWARD(Ts, ts)...);
 
-                    return util::detail::algorithm_result<ExPolicy>::get(
-                        util::partitioner<ExPolicy>::call_with_index(policy,
-                            first, size, 1,
-                            part_iterations<ExPolicy, F, void, args_type>{
+                    return util::detail::algorithm_result<policy_type>::get(
+                        util::partitioner<policy_type>::call_with_index(
+                            hinted_policy, first, size, 1,
+                            part_iterations<policy_type, F, void, args_type>{
                                 HPX_FORWARD(F, f), args},
                             [=](auto&&) mutable {
                                 auto pack =
@@ -1139,7 +1142,7 @@ namespace hpx::parallel { inline namespace v2 {
                             }));
                 }
             }
-        };
+        };    // namespace detail
 
         ///////////////////////////////////////////////////////////////////////
         struct for_loop_strided_algo
@@ -1200,9 +1203,8 @@ namespace hpx::parallel { inline namespace v2 {
                 ExPolicy&&, InIter first, Size size, S stride, F&& f, Arg&& arg,
                 Args&&... args)
             {
-                int const init_sequencer[] = {
-                    (arg.init_iteration(0), 0), (args.init_iteration(0), 0)...};
-                (void) init_sequencer;
+                arg.init_iteration(0);
+                (args.init_iteration(0), ...);
 
                 std::size_t count = size;
                 if (stride > 0)
@@ -1215,9 +1217,8 @@ namespace hpx::parallel { inline namespace v2 {
                         first = parallel::v1::detail::next(first, stride);
                         count -= stride;
 
-                        int const next_sequencer[] = {(arg.next_iteration(), 0),
-                            (args.next_iteration(), 0)...};
-                        (void) next_sequencer;
+                        arg.next_iteration();
+                        (args.next_iteration(), ...);
                     }
                 }
                 else
@@ -1230,9 +1231,8 @@ namespace hpx::parallel { inline namespace v2 {
                         first = parallel::v1::detail::next(first, stride);
                         count += stride;
 
-                        int const next_sequencer[] = {(arg.next_iteration(), 0),
-                            (args.next_iteration(), 0)...};
-                        (void) next_sequencer;
+                        arg.next_iteration();
+                        (args.next_iteration(), ...);
                     }
                 }
 
@@ -1243,9 +1243,8 @@ namespace hpx::parallel { inline namespace v2 {
                 }
 
                 // make sure live-out variables are properly set on return
-                int const exit_sequencer[] = {(arg.exit_iteration(size), 0),
-                    (args.exit_iteration(size), 0)...};
-                (void) exit_sequencer;
+                arg.exit_iteration(size);
+                (args.exit_iteration(size), ...);
 
                 return hpx::util::unused_type();
             }
@@ -1290,6 +1289,16 @@ namespace hpx::parallel { inline namespace v2 {
                 }
                 else
                 {
+                    // any of the induction or reduction operations prevent us
+                    // from sharing the part_iteration between threads
+                    decltype(auto) hinted_policy =
+                        parallel::util::adapt_sharing_mode(
+                            HPX_FORWARD(ExPolicy, policy),
+                            hpx::threads::thread_sharing_hint::
+                                do_not_share_function);
+
+                    using policy_type = std::decay_t<decltype(policy)>;
+
                     // we need to decay copy here to properly transport
                     // everything to a GPU device
                     using args_type = hpx::tuple<std::decay_t<Ts>...>;
@@ -1297,10 +1306,10 @@ namespace hpx::parallel { inline namespace v2 {
                     args_type args =
                         hpx::forward_as_tuple(HPX_FORWARD(Ts, ts)...);
 
-                    return util::detail::algorithm_result<ExPolicy>::get(
-                        util::partitioner<ExPolicy>::call_with_index(policy,
-                            first, size, stride,
-                            part_iterations<ExPolicy, F, S, args_type>{
+                    return util::detail::algorithm_result<policy_type>::get(
+                        util::partitioner<policy_type>::call_with_index(
+                            hinted_policy, first, size, stride,
+                            part_iterations<policy_type, F, S, args_type>{
                                 HPX_FORWARD(F, f), stride, args},
                             [=](auto&&) mutable {
                                 auto pack =
@@ -1413,8 +1422,8 @@ namespace hpx::parallel { inline namespace v2 {
                 hpx::get<Is>(t)...);
         }
         /// \endcond
-    }    // namespace detail
-}}       // namespace hpx::parallel::v2
+    }}    // namespace v2::detail
+}    // namespace hpx::parallel
 
 namespace hpx::experimental {
 
@@ -1639,7 +1648,8 @@ namespace hpx {
 }    // namespace hpx
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     template <typename ExPolicy, typename F, typename S, typename Tuple>
     struct get_function_address<
         hpx::parallel::v2::detail::part_iterations<ExPolicy, F, S, Tuple>>
@@ -1677,6 +1687,6 @@ namespace hpx { namespace traits {
         }
     };
 #endif
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 #endif
 #endif

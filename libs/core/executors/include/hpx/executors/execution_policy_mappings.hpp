@@ -72,7 +72,7 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     // Return the matching non-task (synchronous) execution policy
-    inline constexpr struct to_non_task_t final
+    inline constexpr struct to_non_task_t
       : hpx::functional::detail::tag_fallback<to_non_task_t>
     {
     private:
@@ -93,7 +93,7 @@ namespace hpx::execution::experimental {
     };
 
     // Return the matching task (asynchronous) execution policy
-    inline constexpr struct to_task_t final
+    inline constexpr struct to_task_t
       : hpx::functional::detail::tag_fallback<to_task_t>
     {
     private:

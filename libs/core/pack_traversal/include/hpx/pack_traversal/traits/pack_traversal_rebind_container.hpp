@@ -14,7 +14,8 @@
 #include <type_traits>
 #include <vector>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {
         ////////////////////////////////////////////////////////////////////////
@@ -35,15 +36,18 @@ namespace hpx { namespace traits {
             }
         };
 
-        // Specialization for a container with a single type T and
-        // a particular allocator, which is preserved across the remap.
-        // -> We remap the allocator through std::allocator_traits.
+        // Specialization for a container with a single type T and a particular
+        // allocator, which is preserved across the remap. -> We remap the
+        // allocator through std::allocator_traits.
+        //
+        // clang-format off
         template <typename NewType, template <class, class> class Base,
             typename OldType, typename OldAllocator>
         struct pack_traversal_rebind_container<NewType,
             Base<OldType, OldAllocator>,
-            typename std::enable_if<std::uses_allocator<
-                Base<OldType, OldAllocator>, OldAllocator>::value>::type>
+            std::enable_if_t<std::uses_allocator_v<Base<OldType, OldAllocator>,
+                OldAllocator>>>
+        // clang-format off
         {
             using NewAllocator = typename std::allocator_traits<
                 OldAllocator>::template rebind_alloc<NewType>;
@@ -116,4 +120,4 @@ namespace hpx { namespace traits {
             return std::array<NewType, N>();
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2022 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,11 +10,12 @@
 
 #include <hpx/modules/errors.hpp>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util::detail {
+
     [[noreturn]] void throw_bad_function_call()
     {
-        hpx::throw_exception(bad_function_call,
+        hpx::throw_exception(hpx::error::bad_function_call,
             "empty function object should not be used",
             "empty_function::operator()");
     }
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail

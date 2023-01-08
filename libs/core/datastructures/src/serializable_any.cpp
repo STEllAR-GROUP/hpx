@@ -24,14 +24,14 @@
 #include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {
 
         struct hash_binary_filter : serialization::binary_filter
         {
-            explicit hash_binary_filter(std::size_t seed = 0) noexcept
+            explicit constexpr hash_binary_filter(std::size_t seed = 0) noexcept
               : hash(seed)
             {
             }
@@ -59,7 +59,7 @@ namespace hpx { namespace util {
             void load(void* /* dst */, std::size_t /* dst_count */) override {}
 
             template <class T>
-            void serialize(T&, unsigned)
+            constexpr void serialize(T&, unsigned) noexcept
             {
             }
             HPX_SERIALIZATION_POLYMORPHIC(hash_binary_filter, override);
@@ -70,9 +70,8 @@ namespace hpx { namespace util {
 
     ////////////////////////////////////////////////////////////////////////////
     template <typename Char>
-    std::size_t hash_any::operator()(
-        const basic_any<serialization::input_archive,
-            serialization::output_archive, Char, std::true_type>& elem) const
+    std::size_t hash_any::operator()(basic_any<serialization::input_archive,
+        serialization::output_archive, Char, std::true_type> const& elem) const
     {
         detail::hash_binary_filter hasher;
 
@@ -86,10 +85,10 @@ namespace hpx { namespace util {
     }
 
     template HPX_CORE_EXPORT std::size_t hash_any::operator()(
-        const basic_any<serialization::input_archive,
-            serialization::output_archive, char, std::true_type>& elem) const;
+        basic_any<serialization::input_archive, serialization::output_archive,
+            char, std::true_type> const& elem) const;
 
-    template HPX_CORE_EXPORT std::size_t
-    hash_any::operator()(const basic_any<serialization::input_archive,
-        serialization::output_archive, wchar_t, std::true_type>& elem) const;
-}}    // namespace hpx::util
+    template HPX_CORE_EXPORT std::size_t hash_any::operator()(
+        basic_any<serialization::input_archive, serialization::output_archive,
+            wchar_t, std::true_type> const& elem) const;
+}    // namespace hpx::util

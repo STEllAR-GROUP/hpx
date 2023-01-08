@@ -163,10 +163,11 @@ namespace hpx { namespace cuda { namespace experimental {
 
                 if (error != cudaSuccess)
                 {
-                    this_->set_exception(HPX_GET_EXCEPTION(kernel_error,
-                        "cuda::detail::future_data::stream_callback()",
-                        std::string("cudaStreamAddCallback failed: ") +
-                            cudaGetErrorString(error)));
+                    this_->set_exception(
+                        HPX_GET_EXCEPTION(hpx::error::kernel_error,
+                            "cuda::detail::future_data::stream_callback()",
+                            std::string("cudaStreamAddCallback failed: ") +
+                                cudaGetErrorString(error)));
                     return;
                 }
 

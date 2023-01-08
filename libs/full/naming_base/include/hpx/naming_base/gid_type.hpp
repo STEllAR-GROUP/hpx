@@ -255,7 +255,7 @@ namespace hpx::naming {
 
             while (!acquire_lock())
             {
-                util::yield_while([this] { return is_locked(); },
+                util::yield_while<true>([this] { return is_locked(); },
                     "hpx::naming::gid_type::lock");
             }
 
@@ -355,7 +355,7 @@ namespace hpx::naming {
 // we know that we can serialize a gid as a byte sequence
 HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::gid_type)
 
-namespace hpx { namespace naming {
+namespace hpx::naming {
 
     ///////////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from locality_id
@@ -727,7 +727,7 @@ namespace hpx { namespace naming {
         }
         return *this;
     }
-}}    // namespace hpx::naming
+}    // namespace hpx::naming
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace std {

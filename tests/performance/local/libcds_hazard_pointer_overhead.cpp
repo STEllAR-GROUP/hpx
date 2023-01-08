@@ -7,10 +7,10 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/hpx_init.hpp>
-#include <hpx/include/apply.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/parallel_executors.hpp>
 #include <hpx/include/parallel_for_loop.hpp>
+#include <hpx/include/post.hpp>
 #include <hpx/include/threads.hpp>
 #include <hpx/iostream.hpp>
 #include <hpx/modules/format.hpp>
@@ -42,9 +42,9 @@ using hpx::program_options::variables_map;
 using hpx::find_here;
 using hpx::id_type;
 
-using hpx::apply;
 using hpx::async;
 using hpx::future;
+using hpx::post;
 
 using hpx::chrono::high_resolution_timer;
 
@@ -166,7 +166,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
     };
     auto const thread_func =
         hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
-    auto desc = hpx::util::thread_description();
+    auto desc = hpx::threads::thread_description();
     auto prio = hpx::threads::thread_priority::normal;
     auto stack_size = hpx::threads::thread_stacksize::small_;
     auto num_threads = hpx::get_num_worker_threads();

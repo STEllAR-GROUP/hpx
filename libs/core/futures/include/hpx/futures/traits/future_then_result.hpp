@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,20 +11,13 @@
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
-#include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits {
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
-        struct no_executor
-        {
-        };
-    }    // namespace detail
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -49,8 +42,7 @@ namespace hpx { namespace traits {
 
         template <typename Future, typename F>
         struct future_then_result<Future, F,
-            typename hpx::util::always_void<
-                hpx::util::invoke_result_t<F&, Future>>::type>
+            std::void_t<hpx::util::invoke_result_t<F&, Future>>>
         {
             using cont_result = hpx::util::invoke_result_t<F&, Future>;
 
@@ -58,7 +50,7 @@ namespace hpx { namespace traits {
             using result_type = util::lazy_conditional_t<
                 hpx::traits::detail::is_unique_future<cont_result>::value,
                 hpx::traits::future_traits<cont_result>,
-                hpx::util::identity<cont_result>>;
+                hpx::type_identity<cont_result>>;
 
             using type = hpx::future<result_type>;
         };
@@ -73,5 +65,4 @@ namespace hpx { namespace traits {
 
     template <typename Future, typename F>
     using future_then_result_t = typename future_then_result<Future, F>::type;
-
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

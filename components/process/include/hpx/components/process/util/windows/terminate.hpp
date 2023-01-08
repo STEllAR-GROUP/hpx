@@ -25,7 +25,7 @@ void terminate(const Process &p)
 {
     if (!::TerminateProcess(p.process_handle(), EXIT_FAILURE))
     {
-        HPX_THROW_EXCEPTION(invalid_status,
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
             "process::terminate", "TerminateProcess() failed");
     }
 }
@@ -35,7 +35,7 @@ void terminate(const Process &p, hpx::error_code &ec)
 {
     if (!::TerminateProcess(p.process_handle(), EXIT_FAILURE))
     {
-        HPX_THROWS_IF(ec, invalid_status,
+        HPX_THROWS_IF(ec, hpx::error::invalid_status,
             "process::terminate", "TerminateProcess() failed");
     }
     else

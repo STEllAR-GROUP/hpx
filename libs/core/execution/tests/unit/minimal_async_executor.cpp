@@ -253,7 +253,7 @@ struct test_async_executor5 : test_async_executor1
         test_async_executor5 const&, F&& f, Ts&&... ts)
     {
         ++count_apply;
-        hpx::apply(std::forward<F>(f), std::forward<Ts>(ts)...);
+        hpx::post(std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 

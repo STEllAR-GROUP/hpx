@@ -1,9 +1,9 @@
-// Copyright Vladimir Prus 2004.
-// Copyright (c) 2005-2012 Hartmut Kaiser
+//  Copyright Vladimir Prus 2004.
+//  Copyright (c) 2005-2022 Hartmut Kaiser
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -27,14 +27,14 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace plugin {
+namespace hpx::util::plugin {
 
     namespace detail {
 
         template <typename T>
         struct free_dll
         {
-            free_dll(HMODULE h)
+            explicit free_dll(HMODULE h) noexcept
               : h(h)
             {
             }
@@ -128,11 +128,11 @@ namespace hpx { namespace util { namespace plugin {
             FreeLibrary();
         }
 
-        std::string const& get_name() const
+        std::string const& get_name() const noexcept
         {
             return dll_name;
         }
-        std::string const& get_mapname() const
+        std::string const& get_mapname() const noexcept
         {
             return map_name;
         }
@@ -141,13 +141,13 @@ namespace hpx { namespace util { namespace plugin {
         std::pair<SymbolType, Deleter> get(
             std::string const& symbol_name, error_code& ec = throws) const
         {
-            const_cast<dll&>(*this).LoadLibrary(ec);
             // make sure everything is initialized
+            const_cast<dll&>(*this).LoadLibrary(ec);
             if (ec)
                 return std::pair<SymbolType, Deleter>();
 
-            static_assert(std::is_pointer<SymbolType>::value,
-                "std::is_pointer<SymbolType>::value");
+            static_assert(
+                std::is_pointer_v<SymbolType>, "std::is_pointer_v<SymbolType>");
 
             // Cast the to right type.
             SymbolType address =
@@ -160,14 +160,14 @@ namespace hpx { namespace util { namespace plugin {
                     symbol_name, dll_name);
 
                 // report error
-                HPX_THROWS_IF(ec, dynamic_link_failure, "plugin::get", str);
+                HPX_THROWS_IF(
+                    ec, hpx::error::dynamic_link_failure, "plugin::get", str);
                 return std::pair<SymbolType, Deleter>();
             }
 
-            // Open the library. Yes, we do it on every access to
-            // a symbol, the LoadLibrary function increases the refcnt of the dll
-            // so in the end the dll class holds one refcnt and so does every
-            // symbol.
+            // Open the library. Yes, we do it on every access to a symbol, the
+            // LoadLibrary function increases the refcnt of the dll so in the
+            // end the dll class holds one refcnt and so does every symbol.
             HMODULE handle = ::LoadLibraryA(dll_name.c_str());
             if (!handle)
             {
@@ -175,7 +175,8 @@ namespace hpx { namespace util { namespace plugin {
                     "Hpx.Plugin: Could not open shared library '{}'", dll_name);
 
                 // report error
-                HPX_THROWS_IF(ec, filesystem_error, "plugin::get", str);
+                HPX_THROWS_IF(
+                    ec, hpx::error::filesystem_error, "plugin::get", str);
                 return std::pair<SymbolType, Deleter>();
             }
             HPX_ASSERT(handle == dll_handle);
@@ -209,8 +210,8 @@ namespace hpx { namespace util { namespace plugin {
                         "Hpx.Plugin: Could not open shared library '{}'",
                         dll_name);
 
-                    HPX_THROWS_IF(
-                        ec, filesystem_error, "plugin::LoadLibrary", str);
+                    HPX_THROWS_IF(ec, hpx::error::filesystem_error,
+                        "plugin::LoadLibrary", str);
                     return;
                 }
             }
@@ -224,8 +225,8 @@ namespace hpx { namespace util { namespace plugin {
         {
             char buffer[_MAX_PATH] = {'\0'};
 
-            const_cast<dll&>(*this).LoadLibrary(ec);
             // make sure everything is initialized
+            const_cast<dll&>(*this).LoadLibrary(ec);
             if (ec)
                 return buffer;
 
@@ -239,8 +240,8 @@ namespace hpx { namespace util { namespace plugin {
                     "'{}' has been loaded from.",
                     dll_name);
 
-                HPX_THROWS_IF(
-                    ec, filesystem_error, "plugin::get_directory", str);
+                HPX_THROWS_IF(ec, hpx::error::filesystem_error,
+                    "plugin::get_directory", str);
                 return buffer;
             }
 
@@ -265,5 +266,4 @@ namespace hpx { namespace util { namespace plugin {
         std::string map_name;
         HMODULE dll_handle;
     };
-
-}}}    // namespace hpx::util::plugin
+}    // namespace hpx::util::plugin

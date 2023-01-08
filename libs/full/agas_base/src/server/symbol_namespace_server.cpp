@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/agas_base/server/symbol_namespace.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
+#include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
@@ -144,7 +144,8 @@ namespace hpx { namespace agas { namespace server {
         {
             l.unlock();
 
-            HPX_THROW_EXCEPTION(lock_error, "symbol_namespace::bind",
+            HPX_THROW_EXCEPTION(hpx::error::lock_error,
+                "symbol_namespace::bind",
                 "GID table insertion failed due to a locking error or "
                 "memory corruption");
         }
@@ -176,7 +177,7 @@ namespace hpx { namespace agas { namespace server {
                 {
                     l.unlock();
 
-                    HPX_THROW_EXCEPTION(invalid_status,
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "symbol_namespace::bind",
                         "unable to re-locate the entry in the GID table");
                 }
@@ -185,7 +186,7 @@ namespace hpx { namespace agas { namespace server {
                 std::shared_ptr<naming::gid_type> current_gid = gid_it->second;
 
                 {
-                    util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    unlock_guard<std::unique_lock<mutex_type>> ul(l);
 
                     // split the credit as the receiving end will expect to keep the
                     // object alive
@@ -304,7 +305,7 @@ namespace hpx { namespace agas { namespace server {
 
                 // hold on to entry while map is unlocked
                 std::shared_ptr<naming::gid_type> current_gid(it->second);
-                util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                unlock_guard<std::unique_lock<mutex_type>> ul(l);
 
                 found[it->first] =
                     naming::detail::split_gid_if_needed(*current_gid).get();
@@ -321,7 +322,7 @@ namespace hpx { namespace agas { namespace server {
 
                 // hold on to entry while map is unlocked
                 std::shared_ptr<naming::gid_type> current_gid(it->second);
-                util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                unlock_guard<std::unique_lock<mutex_type>> ul(l);
 
                 found[it->first] =
                     naming::detail::split_gid_if_needed(*current_gid).get();
@@ -356,7 +357,7 @@ namespace hpx { namespace agas { namespace server {
                 // split the credit as the receiving end will expect to keep the
                 // object alive
                 {
-                    util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                    unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     new_gid =
                         naming::detail::split_gid_if_needed(*current_gid).get();
 

@@ -22,7 +22,7 @@
 #include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/executors/detail/hierarchical_spawning.hpp>
+#include <hpx/executors/detail/index_queue_spawning.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -38,6 +38,7 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
@@ -47,7 +48,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { namespace execution { namespace detail {
+namespace hpx::parallel::execution::detail {
+
     template <typename Policy>
     struct get_default_policy
     {
@@ -76,9 +78,10 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
     template <typename F, typename Shape, typename Future, typename... Ts>
     struct then_bulk_function_result;
-}}}}    // namespace hpx::parallel::execution::detail
+}    // namespace hpx::parallel::execution::detail
 
-namespace hpx { namespace execution {
+namespace hpx::execution {
+
     ///////////////////////////////////////////////////////////////////////////
     /// A \a parallel_executor creates groups of parallel execution agents
     /// which execute in threads implicitly created by the executor. This
@@ -98,7 +101,7 @@ namespace hpx { namespace execution {
 
         /// Associate the static_chunk_size executor parameters type as a default
         /// with this executor.
-        using executor_parameters_type = static_chunk_size;
+        using executor_parameters_type = experimental::static_chunk_size;
 
         /// Create a new parallel executor
         constexpr explicit parallel_policy_executor(
@@ -162,6 +165,11 @@ namespace hpx { namespace execution {
         {
         }
 
+        void set_hierarchical_threshold(std::size_t threshold)
+        {
+            hierarchical_threshold_ = threshold;
+        }
+
     private:
         // property implementations
 
@@ -204,7 +212,9 @@ namespace hpx { namespace execution {
 
         friend constexpr std::size_t tag_invoke(
             hpx::parallel::execution::processing_units_count_t,
-            parallel_policy_executor const& exec)
+            parallel_policy_executor const& exec,
+            hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
+            std::size_t = 0)
         {
             return exec.get_num_cores();
         }
@@ -231,7 +241,9 @@ namespace hpx { namespace execution {
     public:
         // backwards compatibility support, will be removed in the future
         template <typename Parameters>
-        std::size_t processing_units_count(Parameters&&) const
+        std::size_t processing_units_count(Parameters&&,
+            hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
+            std::size_t = 0) const
         {
             return get_num_cores();
         }
@@ -294,9 +306,9 @@ namespace hpx { namespace execution {
             parallel_policy_executor const& exec, F&& f, Ts&&... ts)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            hpx::util::thread_description desc(f, exec.annotation_);
+            hpx::threads::thread_description desc(f, exec.annotation_);
 #else
-            hpx::util::thread_description desc(f);
+            hpx::threads::thread_description desc(f);
 #endif
             auto pool = exec.pool_ ?
                 exec.pool_ :
@@ -339,9 +351,9 @@ namespace hpx { namespace execution {
         void post_impl(F&& f, Ts&&... ts) const
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            hpx::util::thread_description desc(f, annotation_);
+            hpx::threads::thread_description desc(f, annotation_);
 #else
-            hpx::util::thread_description desc(f);
+            hpx::threads::thread_description desc(f);
 #endif
             auto pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
@@ -369,13 +381,27 @@ namespace hpx { namespace execution {
             Ts&&... ts)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            hpx::util::thread_description desc(f, exec.annotation_);
+            hpx::threads::thread_description desc(f, exec.annotation_);
 #else
-            hpx::util::thread_description desc(f);
+            hpx::threads::thread_description desc(f);
 #endif
             auto pool = exec.pool_ ?
                 exec.pool_ :
                 threads::detail::get_self_or_default_pool();
+
+            bool do_not_combine_tasks = hpx::threads::do_not_combine_tasks(
+                exec.policy().get_hint().sharing_mode);
+
+            // use scheduling based on index_queue if no hierarchical threshold
+            // is given
+            if (exec.hierarchical_threshold_ == 0 && !do_not_combine_tasks)
+            {
+                return parallel::execution::detail::
+                    index_queue_bulk_async_execute(desc, pool,
+                        exec.get_first_core(), exec.get_num_cores(),
+                        exec.hierarchical_threshold_, exec.policy_,
+                        HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+            }
 
             return parallel::execution::detail::hierarchical_bulk_async_execute(
                 desc, pool, exec.get_first_core(), exec.get_num_cores(),
@@ -436,7 +462,7 @@ namespace hpx { namespace execution {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /* version */)
+        void serialize(Archive& ar, unsigned int const /* version */)
         {
             // clang-format off
             ar & policy_ & hierarchical_threshold_ & num_cores_;
@@ -446,7 +472,7 @@ namespace hpx { namespace execution {
 
     private:
         /// \cond NOINTERNAL
-        static constexpr std::size_t hierarchical_threshold_default_ = 6;
+        static constexpr std::size_t hierarchical_threshold_default_ = 0;
 
         threads::thread_pool_base* pool_;
         Policy policy_;
@@ -490,9 +516,9 @@ namespace hpx { namespace execution {
     }
 
     using parallel_executor = parallel_policy_executor<hpx::launch>;
-}}    // namespace hpx::execution
+}    // namespace hpx::execution
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     /// \cond NOINTERNAL
     template <typename Policy>
     struct is_one_way_executor<hpx::execution::parallel_policy_executor<Policy>>
@@ -518,4 +544,4 @@ namespace hpx { namespace parallel { namespace execution {
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

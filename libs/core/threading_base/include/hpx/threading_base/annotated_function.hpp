@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,9 +31,11 @@
 #include <utility>
 
 namespace hpx {
+
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename F>
         struct annotated_function
         {
@@ -76,7 +78,7 @@ namespace hpx {
             ///
             /// This function returns the passed function address.
             /// \param none
-            constexpr std::size_t get_function_address() const
+            constexpr std::size_t get_function_address() const noexcept
             {
                 return traits::get_function_address<fun_type>::call(f_);
             }
@@ -109,7 +111,7 @@ namespace hpx {
     detail::annotated_function<std::decay_t<F>> annotated_function(
         F&& f, char const* name = nullptr)
     {
-        typedef detail::annotated_function<std::decay_t<F>> result_type;
+        using result_type = detail::annotated_function<std::decay_t<F>>;
 
         return result_type(HPX_FORWARD(F, f), name);
     }
@@ -118,7 +120,7 @@ namespace hpx {
     detail::annotated_function<std::decay_t<F>> annotated_function(
         F&& f, std::string name)
     {
-        typedef detail::annotated_function<std::decay_t<F>> result_type;
+        using result_type = detail::annotated_function<std::decay_t<F>>;
 
         // Store string in a set to ensure it lives for the entire duration of
         // the task.
@@ -175,6 +177,7 @@ namespace hpx::traits {
 }    // namespace hpx::traits
 
 namespace hpx::util {
+
     template <typename F>
     HPX_DEPRECATED_V(1, 8, "Please use hpx::annotated_function instead.")
     constexpr decltype(auto)

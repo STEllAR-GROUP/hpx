@@ -7,11 +7,25 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/testing.hpp>
 
+namespace ex = hpx::execution::experimental;
+namespace tt = hpx::this_thread::experimental;
+
 struct scheduler
 {
+    friend constexpr void tag_invoke(ex::schedule_t, scheduler) noexcept {}
+
     friend constexpr bool tag_invoke(
-        hpx::execution_base::this_thread::execute_may_block_caller_t,
-        const scheduler&) noexcept
+        tt::execute_may_block_caller_t, scheduler) noexcept
+    {
+        return false;
+    }
+
+    friend constexpr bool operator==(scheduler, scheduler) noexcept
+    {
+        return true;
+    }
+
+    friend constexpr bool operator!=(scheduler, scheduler) noexcept
     {
         return false;
     }
@@ -19,12 +33,12 @@ struct scheduler
 
 int main()
 {
+    static_assert(ex::is_scheduler_v<scheduler>);
+
     {
-        scheduler s1;
+        constexpr scheduler s1{};
         static_assert(
-            hpx::execution_base::this_thread::execute_may_block_caller(s1) ==
-                false,
-            "CPO returns false");
+            !tt::execute_may_block_caller(s1), "CPO should return false");
     }
 
     return hpx::util::report_errors();

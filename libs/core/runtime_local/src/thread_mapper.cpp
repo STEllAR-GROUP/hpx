@@ -95,7 +95,7 @@ namespace hpx { namespace util {
         {
             if (tinfo.tid_ == tid)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "thread_mapper::register_thread",
                     "thread already registered");
             }

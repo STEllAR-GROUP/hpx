@@ -1,4 +1,4 @@
-//  Copyright (c) 2019 Hartmut Kaiser
+//  Copyright (c) 2019-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,13 +12,14 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <memory>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
 
     ////////////////////////////////////////////////////////////////////////////
     // A simple but very high performance implementation of the channel concept.
@@ -57,7 +58,7 @@ namespace hpx { namespace lcos { namespace local {
             // invoke constructors for allocated buffer
             for (std::size_t i = 0; i != size_; ++i)
             {
-                new (&buffer_[i]) T();
+                hpx::construct_at(&buffer_[i]);
             }
 
             head_.data_.store(0, std::memory_order_relaxed);
@@ -77,6 +78,9 @@ namespace hpx { namespace lcos { namespace local {
                 std::memory_order_relaxed);
             rhs.closed_.store(true, std::memory_order_release);
         }
+
+        channel_spsc(channel_spsc const& rhs) = delete;
+        channel_spsc& operator=(channel_spsc const& rhs) = delete;
 
         channel_spsc& operator=(channel_spsc&& rhs) noexcept
         {
@@ -100,7 +104,7 @@ namespace hpx { namespace lcos { namespace local {
             // invoke destructors for allocated buffer
             for (std::size_t i = 0; i != size_; ++i)
             {
-                (&buffer_[i])->~T();
+                std::destroy_at(&buffer_[i]);
             }
 
             if (!closed_.load(std::memory_order_relaxed))
@@ -167,14 +171,14 @@ namespace hpx { namespace lcos { namespace local {
             bool expected = false;
             if (!closed_.compare_exchange_weak(expected, true))
             {
-                HPX_THROW_EXCEPTION(hpx::invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "hpx::lcos::local::channel_spsc::close",
                     "attempting to close an already closed channel");
             }
             return 0;
         }
 
-        std::size_t capacity() const
+        constexpr std::size_t capacity() const noexcept
         {
             return size_ - 1;
         }
@@ -193,4 +197,4 @@ namespace hpx { namespace lcos { namespace local {
         // this channel was closed, i.e. no further operations are possible
         std::atomic<bool> closed_;
     };
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

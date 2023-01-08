@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,10 +15,11 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     struct HPX_CORE_EXPORT manage_config
     {
-        typedef std::map<std::string, std::string> map_type;
+        using map_type = std::map<std::string, std::string>;
 
         manage_config(std::vector<std::string> const& cfg);
 
@@ -35,6 +36,6 @@ namespace hpx { namespace util {
 
         map_type config_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>

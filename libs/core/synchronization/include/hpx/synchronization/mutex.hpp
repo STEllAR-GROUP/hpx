@@ -17,19 +17,19 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     using thread_id_ref_type = thread_id_ref;
     using thread_self = coroutines::detail::coroutine_self;
 
     /// The function \a get_self_id returns the HPX thread id of the current
     /// thread (or zero if the current thread is not a HPX thread).
-    HPX_CORE_EXPORT thread_id get_self_id();
+    HPX_CORE_EXPORT thread_id get_self_id() noexcept;
 
     /// The function \a get_self_ptr returns a pointer to the (OS thread
     /// specific) self reference to the current HPX thread.
-    HPX_CORE_EXPORT thread_self* get_self_ptr();
-}}    // namespace hpx::threads
+    HPX_CORE_EXPORT thread_self* get_self_ptr() noexcept;
+}    // namespace hpx::threads
 
 namespace hpx {
 
@@ -52,7 +52,8 @@ namespace hpx {
     ///        The behavior of a program is undefined if a \a mutex is
     ///        destroyed while still owned by any threads, or a thread
     ///        terminates while owning a \a mutex. The mutex class satisfies
-    ///        all requirements of \namedrequirement{Mutex} and \namedrequirement{StandardLayoutType}.
+    ///        all requirements of \namedrequirement{Mutex} and
+    ///        \namedrequirement{StandardLayoutType}.
     ///
     ///        \a hpx::mutex is neither copyable nor movable.
     ///
@@ -64,7 +65,7 @@ namespace hpx {
 
     protected:
         /// \cond NOPROTECTED
-        typedef hpx::spinlock mutex_type;
+        using mutex_type = hpx::spinlock;
         /// \endcond NOPROTECTED
 
     public:
@@ -80,7 +81,14 @@ namespace hpx {
         ///
         /// \param description description of the \a mutex.
         ///
+#if defined(HPX_HAVE_ITTNOTIFY)
         HPX_CORE_EXPORT mutex(char const* const description = "");
+#else
+        HPX_HOST_DEVICE_CONSTEXPR mutex(char const* const = "") noexcept
+          : owner_id_(threads::invalid_thread_id)
+        {
+        }
+#endif
 
         ///
         /// \brief Destroys the \a mutex.

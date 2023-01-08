@@ -16,7 +16,7 @@
 
 #include <hpx/logging/manipulator.hpp>
 
-namespace hpx { namespace util { namespace logging {
+namespace hpx::util::logging {
 
     namespace formatter {
 
@@ -29,5 +29,4 @@ namespace hpx { namespace util { namespace logging {
         manipulator::~manipulator() = default;
 
     }    // namespace destination
-
-}}}    // namespace hpx::util::logging
+}    // namespace hpx::util::logging

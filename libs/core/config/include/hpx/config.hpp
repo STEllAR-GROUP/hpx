@@ -221,12 +221,6 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-/// This defines the default number of coroutine heaps.
-#if !defined(HPX_COROUTINE_NUM_HEAPS)
-#  define HPX_COROUTINE_NUM_HEAPS 7
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 /// By default we do not maintain stack back-traces on suspension. This is a
 /// pure debugging aid to be able to see in the debugger where a suspended
 /// thread got stuck.

@@ -16,7 +16,7 @@
 #include <hpx/hardware/timestamp/cuda.hpp>
 #endif
 
-namespace hpx { namespace util { namespace hardware {
+namespace hpx::util::hardware {
 
     // clang-format off
     HPX_HOST_DEVICE inline std::uint64_t timestamp()
@@ -25,23 +25,24 @@ namespace hpx { namespace util { namespace hardware {
         return timestamp_cuda();
 #else
         std::uint32_t lo = 0, hi = 0;
-        #if defined(HPX_HAVE_RDTSCP)
-            __asm__ __volatile__(
-                "rdtscp ;\n"
-                : "=a"(lo), "=d"(hi)
-                :
-                : "rcx");
-        #elif defined(HPX_HAVE_RDTSC)
-            __asm__ __volatile__(
-                "cpuid ;\n"
-                "rdtsc ;\n"
-                : "=a"(lo), "=d"(hi)
-                :
-                : "rbx", "rcx");
-        #endif
+
+#if defined(HPX_HAVE_RDTSCP)
+        __asm__ __volatile__(
+            "rdtscp ;\n"
+            : "=a"(lo), "=d"(hi)
+            :
+            : "rcx");
+#elif defined(HPX_HAVE_RDTSC)
+        __asm__ __volatile__(
+            "cpuid ;\n"
+            "rdtsc ;\n"
+            : "=a"(lo), "=d"(hi)
+            :
+            : "rbx", "rcx");
+#endif
+
         return ((static_cast<std::uint64_t>(hi)) << 32) | lo;
 #endif
     }
     // clang-format on
-
-}}}    // namespace hpx::util::hardware
+}    // namespace hpx::util::hardware

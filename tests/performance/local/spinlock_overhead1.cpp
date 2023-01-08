@@ -112,7 +112,7 @@ namespace test {
 
             do
             {
-                hpx::util::yield_while(
+                hpx::util::yield_while<true>(
                     [this]() noexcept { return is_locked(); },
                     "test::local_spinlock::lock");
             } while (!acquire_lock());

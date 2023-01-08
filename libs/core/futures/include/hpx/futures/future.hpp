@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -42,7 +42,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx::lcos::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     enum class future_state
     {
@@ -71,7 +72,7 @@ namespace hpx { namespace lcos { namespace detail {
 
                 hpx::intrusive_ptr<shared_state> p(
                     new shared_state(
-                        init_no_addref{}, in_place{}, HPX_MOVE(value)),
+                        init_no_addref{}, std::in_place, HPX_MOVE(value)),
                     false);
 
                 f = hpx::traits::future_access<Future>::create(HPX_MOVE(p));
@@ -84,7 +85,7 @@ namespace hpx { namespace lcos { namespace detail {
 
                 hpx::intrusive_ptr<shared_state> p(
                     new shared_state(
-                        init_no_addref{}, in_place{}, HPX_MOVE(value)),
+                        init_no_addref{}, std::in_place, HPX_MOVE(value)),
                     false);
 
                 f = hpx::traits::future_access<Future>::create(HPX_MOVE(p));
@@ -108,7 +109,8 @@ namespace hpx { namespace lcos { namespace detail {
         }
         else
         {
-            HPX_THROW_EXCEPTION(invalid_status, "serialize_future_load",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "serialize_future_load",
                 "attempting to deserialize a future with an unknown state");
         }
     }
@@ -126,7 +128,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             hpx::intrusive_ptr<shared_state> p(
                 new shared_state(
-                    init_no_addref{}, in_place{}, hpx::util::unused),
+                    init_no_addref{}, std::in_place, hpx::util::unused),
                 false);
 
             f = hpx::traits::future_access<Future>::create(HPX_MOVE(p));
@@ -147,7 +149,8 @@ namespace hpx { namespace lcos { namespace detail {
         }
         else
         {
-            HPX_THROW_EXCEPTION(invalid_status, "serialize_future_load",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "serialize_future_load",
                 "attempting to deserialize a future with an unknown state");
         }
     }
@@ -177,7 +180,8 @@ namespace hpx { namespace lcos { namespace detail {
             }
             else
             {
-                HPX_THROW_EXCEPTION(invalid_status, "serialize_future_save",
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "serialize_future_save",
                     "future must be ready in order for it to be serialized");
             }
             return;
@@ -228,7 +232,8 @@ namespace hpx { namespace lcos { namespace detail {
             }
             else
             {
-                HPX_THROW_EXCEPTION(invalid_status, "serialize_future_save",
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "serialize_future_save",
                     "future must be ready in order for it to be serialized");
             }
             return;
@@ -530,7 +535,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state,
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
                     "future_base<R>::get_exception_ptr",
                     "this future has no valid shared state");
             }
@@ -591,7 +596,7 @@ namespace hpx { namespace lcos { namespace detail {
 
             if (!fut.shared_state_)
             {
-                HPX_THROWS_IF(ec, no_state, "future_base<R>::then",
+                HPX_THROWS_IF(ec, hpx::error::no_state, "future_base<R>::then",
                     "this future has no valid shared state");
                 return result_type();
             }
@@ -611,7 +616,7 @@ namespace hpx { namespace lcos { namespace detail {
 
             if (!fut.shared_state_)
             {
-                HPX_THROWS_IF(ec, no_state, "future_base<R>::then",
+                HPX_THROWS_IF(ec, hpx::error::no_state, "future_base<R>::then",
                     "this future has no valid shared state");
                 return result_type();
             }
@@ -632,7 +637,8 @@ namespace hpx { namespace lcos { namespace detail {
 
             if (!fut.shared_state_)
             {
-                HPX_THROWS_IF(ec, no_state, "future_base<R>::then_alloc",
+                HPX_THROWS_IF(ec, hpx::error::no_state,
+                    "future_base<R>::then_alloc",
                     "this future has no valid shared state");
                 return result_type();
             }
@@ -646,7 +652,7 @@ namespace hpx { namespace lcos { namespace detail {
         {
             if (!shared_state_)
             {
-                HPX_THROWS_IF(ec, no_state, "future_base<R>::wait",
+                HPX_THROWS_IF(ec, hpx::error::no_state, "future_base<R>::wait",
                     "this future has no valid shared state");
                 return;
             }
@@ -670,7 +676,8 @@ namespace hpx { namespace lcos { namespace detail {
         {
             if (!shared_state_)
             {
-                HPX_THROWS_IF(ec, no_state, "future_base<R>::wait_until",
+                HPX_THROWS_IF(ec, hpx::error::no_state,
+                    "future_base<R>::wait_until",
                     "this future has no valid shared state");
                 return hpx::future_status::uninitialized;
             }
@@ -717,7 +724,7 @@ namespace hpx { namespace lcos { namespace detail {
     protected:
         hpx::intrusive_ptr<shared_state_type> shared_state_;
     };
-}}}    // namespace hpx::lcos::detail
+}    // namespace hpx::lcos::detail
 
 /// Top level HPX namespace
 namespace hpx {
@@ -865,7 +872,7 @@ namespace hpx {
         {
             if (!this->shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state, "future<R>::get",
+                HPX_THROW_EXCEPTION(hpx::error::no_state, "future<R>::get",
                     "this future has no valid shared state");
             }
 
@@ -885,7 +892,7 @@ namespace hpx {
         {
             if (!this->shared_state_)
             {
-                HPX_THROWS_IF(ec, no_state, "future<R>::get",
+                HPX_THROWS_IF(ec, hpx::error::no_state, "future<R>::get",
                     "this future has no valid shared state");
                 return lcos::detail::future_value<R>::get_default();
             }
@@ -1147,7 +1154,8 @@ namespace hpx {
         {
             if (!this->shared_state_)
             {
-                HPX_THROW_EXCEPTION(no_state, "shared_future<R>::get",
+                HPX_THROW_EXCEPTION(hpx::error::no_state,
+                    "shared_future<R>::get",
                     "this future has no valid shared state");
             }
 
@@ -1166,7 +1174,7 @@ namespace hpx {
             using result_type = typename shared_state_type::result_type;
             if (!this->shared_state_)
             {
-                HPX_THROWS_IF(ec, no_state, "shared_future<R>::get",
+                HPX_THROWS_IF(ec, hpx::error::no_state, "shared_future<R>::get",
                     "this future has no valid shared state");
                 static result_type res(
                     lcos::detail::future_value<R>::get_default());
@@ -1358,12 +1366,11 @@ namespace hpx {
         using unique_ptr = std::unique_ptr<shared_state,
             util::allocator_deleter<other_allocator>>;
 
-        using lcos::detail::in_place;
         other_allocator alloc(a);
         unique_ptr p(traits::allocate(alloc, 1),
             util::allocator_deleter<other_allocator>{alloc});
-        traits::construct(alloc, p.get(), init_no_addref{}, in_place{}, alloc,
-            HPX_FORWARD(Ts, ts)...);
+        traits::construct(alloc, p.get(), init_no_addref{}, std::in_place,
+            alloc, HPX_FORWARD(Ts, ts)...);
 
         return hpx::traits::future_access<future<result_type>>::create(
             p.release(), false);
@@ -1534,7 +1541,7 @@ namespace hpx {
     }
 }    // namespace hpx
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     template <typename Archive, typename T>
     HPX_FORCEINLINE void serialize(
@@ -1549,11 +1556,11 @@ namespace hpx { namespace serialization {
     {
         hpx::lcos::detail::serialize_future(ar, f, version);
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
 ///////////////////////////////////////////////////////////////////////////////
 // hoist deprecated names into old namespace
-namespace hpx { namespace lcos {
+namespace hpx::lcos {
 
     template <typename R, typename U>
     HPX_DEPRECATED_V(1, 8,
@@ -1771,7 +1778,7 @@ namespace hpx { namespace lcos {
     {
         return f;
     }
-}}    // namespace hpx::lcos
+}    // namespace hpx::lcos
 
 #include <hpx/futures/packaged_continuation.hpp>
 

@@ -50,12 +50,12 @@ namespace hpx {
               , shared_future_retrieved_(false)
             {
                 using allocator_shared_state_type =
-                    typename traits::detail::shared_state_allocator<SharedState,
-                        Allocator>::type;
+                    traits::shared_state_allocator_t<SharedState, Allocator>;
 
                 using other_allocator =
                     typename std::allocator_traits<Allocator>::
                         template rebind_alloc<allocator_shared_state_type>;
+
                 using traits = std::allocator_traits<other_allocator>;
                 using unique_pointer =
                     std::unique_ptr<allocator_shared_state_type,
@@ -65,9 +65,8 @@ namespace hpx {
                 unique_pointer p(traits::allocate(alloc, 1),
                     util::allocator_deleter<other_allocator>{alloc});
 
-                using lcos::detail::in_place;
                 traits::construct(
-                    alloc, p.get(), init_no_addref{}, in_place{}, alloc);
+                    alloc, p.get(), init_no_addref{}, std::in_place, alloc);
                 shared_state_.reset(p.release(), false);
             }
 
@@ -120,7 +119,7 @@ namespace hpx {
             {
                 if (future_retrieved_ || shared_future_retrieved_)
                 {
-                    HPX_THROWS_IF(ec, future_already_retrieved,
+                    HPX_THROWS_IF(ec, hpx::error::future_already_retrieved,
                         "detail::promise_base<R>::get_future",
                         "future or shared future has already been retrieved "
                         "from this promise");
@@ -129,7 +128,7 @@ namespace hpx {
 
                 if (shared_state_ == nullptr)
                 {
-                    HPX_THROWS_IF(ec, no_state,
+                    HPX_THROWS_IF(ec, hpx::error::no_state,
                         "detail::promise_base<R>::get_future",
                         "this promise has no valid shared state");
                     return hpx::future<R>();
@@ -144,7 +143,7 @@ namespace hpx {
             {
                 if (future_retrieved_)
                 {
-                    HPX_THROWS_IF(ec, future_already_retrieved,
+                    HPX_THROWS_IF(ec, hpx::error::future_already_retrieved,
                         "detail::promise_base<R>::get_shared_future",
                         "future has already been retrieved from this promise");
                     return hpx::shared_future<R>();
@@ -152,7 +151,7 @@ namespace hpx {
 
                 if (shared_state_ == nullptr)
                 {
-                    HPX_THROWS_IF(ec, no_state,
+                    HPX_THROWS_IF(ec, hpx::error::no_state,
                         "detail::promise_base<R>::get_shared_future",
                         "this promise has no valid shared state");
                     return hpx::shared_future<R>();
@@ -170,7 +169,7 @@ namespace hpx {
             {
                 if (shared_state_ == nullptr)
                 {
-                    HPX_THROW_EXCEPTION(no_state,
+                    HPX_THROW_EXCEPTION(hpx::error::no_state,
                         "detail::promise_base<R>::set_value",
                         "this promise has no valid shared state");
                     return;
@@ -178,7 +177,7 @@ namespace hpx {
 
                 if (shared_state_->is_ready())
                 {
-                    HPX_THROW_EXCEPTION(promise_already_satisfied,
+                    HPX_THROW_EXCEPTION(hpx::error::promise_already_satisfied,
                         "detail::promise_base<R>::set_value",
                         "result has already been stored for this promise");
                     return;
@@ -192,7 +191,7 @@ namespace hpx {
             {
                 if (shared_state_ == nullptr)
                 {
-                    HPX_THROW_EXCEPTION(no_state,
+                    HPX_THROW_EXCEPTION(hpx::error::no_state,
                         "detail::promise_base<R>::set_exception",
                         "this promise has no valid shared state");
                     return;
@@ -200,7 +199,7 @@ namespace hpx {
 
                 if (shared_state_->is_ready())
                 {
-                    HPX_THROW_EXCEPTION(promise_already_satisfied,
+                    HPX_THROW_EXCEPTION(hpx::error::promise_already_satisfied,
                         "detail::promise_base<R>::set_exception",
                         "result has already been stored for this promise");
                     return;
@@ -210,13 +209,13 @@ namespace hpx {
             }
 
         protected:
-            void check_abandon_shared_state(const char* fun)
+            void check_abandon_shared_state(char const* fun)
             {
                 if (shared_state_ != nullptr &&
                     (future_retrieved_ || shared_future_retrieved_) &&
                     !shared_state_->is_ready())
                 {
-                    shared_state_->set_error(broken_promise, fun,
+                    shared_state_->set_error(hpx::error::broken_promise, fun,
                         "abandoning not ready shared state");
                 }
             }
@@ -231,26 +230,27 @@ namespace hpx {
     /// The class template hpx::promise provides a facility to store a value or
     /// an exception that is later acquired asynchronously via a hpx::future
     /// object created by the hpx::promise object. Note that the hpx::promise
-    /// object is meant to be used only once.
-    /// Each promise is associated with a shared state, which contains some state
-    /// information and a result which may be not yet evaluated, evaluated to a
-    /// value (possibly void) or evaluated to an exception. A promise may do three
-    /// things with the shared state:
-    ///   - make ready: the promise stores the result or the exception in the shared
-    ///     state. Marks the state ready and unblocks any thread waiting on a future
-    ///     associated with the shared state.
-    ///   - release: the promise gives up its reference to the shared state. If this
-    ///     was the last such reference, the shared state is destroyed. Unless this
-    ///     was a shared state created by hpx::async which is not yet ready, this
-    ///     operation does not block.
-    ///   - abandon: the promise stores the exception of type hpx::future_error with
-    ///     error code hpx::future_errc::broken_promise, makes the shared state ready,
-    ///     and then releases it.
-    /// The promise is the "push" end of the promise-future communication channel: the
-    /// operation that stores a value in the shared state synchronizes-with (as defined
-    /// in hpx::memory_order) the successful return from any function that is waiting on
-    /// the shared state (such as hpx::future::get). Concurrent access to the same
-    /// shared state may conflict otherwise: for example multiple callers of
+    /// object is meant to be used only once. Each promise is associated with a
+    /// shared state, which contains some state information and a result which
+    /// may be not yet evaluated, evaluated to a value (possibly void) or
+    /// evaluated to an exception. A promise may do three things with the shared
+    /// state:
+    ///   - make ready: the promise stores the result or the exception in the
+    ///     shared state. Marks the state ready and unblocks any thread waiting
+    ///     on a future associated with the shared state.
+    ///   - release: the promise gives up its reference to the shared state. If
+    ///     this was the last such reference, the shared state is destroyed.
+    ///     Unless this was a shared state created by hpx::async which is not
+    ///     yet ready, this operation does not block.
+    ///   - abandon: the promise stores the exception of type hpx::future_error
+    ///     with error code hpx::error::broken_promise, makes the shared state
+    ///     ready, and then releases it.
+    /// The promise is the "push" end of the promise-future communication
+    /// channel: the operation that stores a value in the shared state
+    /// synchronizes-with (as defined in hpx::memory_order) the successful
+    /// return from any function that is waiting on the shared state (such as
+    /// hpx::future::get). Concurrent access to the same shared state may
+    /// conflict otherwise: for example multiple callers of
     /// hpx::shared_future::get must either all be read-only or provide external
     /// synchronization.
     template <typename R>
@@ -298,6 +298,7 @@ namespace hpx {
         using base_type::valid;
 
         // Returns: A future<R> object with the same shared state as *this.
+        //
         // Throws: future_error if *this has no shared state or if get_future
         //         or get_shared_future has already been called on a promise
         //         with the same shared state as *this.
@@ -308,10 +309,12 @@ namespace hpx {
         //   - no_state if *this has no shared state.
         using base_type::get_future;
 
-        // Returns: A shared_future<R> object with the same shared state as *this.
+        // Returns: A shared_future<R> object with the same shared state as
+        // *this.
+        //
         // Throws: future_error if *this has no shared state or if
-        //         get_shared_future has already been called on a promise
-        //         with the same shared state as *this.
+        //         get_shared_future has already been called on a promise with
+        //         the same shared state as *this.
         // Error conditions:
         //   - future_already_retrieved if get_shared_future has already been
         //     called on a promise with the same shared state as *this.
@@ -439,10 +442,12 @@ namespace hpx {
         //   - no_state if *this has no shared state.
         using base_type::get_future;
 
-        // Returns: A shared_future<R&> object with the same shared state as *this.
+        // Returns: A shared_future<R&> object with the same shared state as
+        // *this.
+        //
         // Throws: future_error if *this has no shared state or if
-        //         get_shared_future has already been called on a promise
-        //         with the same shared state as *this.
+        //         get_shared_future has already been called on a promise with
+        //         the same shared state as *this.
         // Error conditions:
         //   - future_already_retrieved if get_shared_future has already been
         //     called on a promise with the same shared state as *this.
@@ -529,10 +534,12 @@ namespace hpx {
         //   - no_state if *this has no shared state.
         using base_type::get_future;
 
-        // Returns: A shared_future<R> object with the same shared state as *this.
+        // Returns: A shared_future<R> object with the same shared state as
+        // *this.
+        //
         // Throws: future_error if *this has no shared state or if
-        //         get_shared_future has already been called on a promise
-        //         with the same shared state as *this.
+        //         get_shared_future has already been called on a promise with
+        //         the same shared state as *this.
         // Error conditions:
         //   - future_already_retrieved if get_shared_future has already been
         //     called on a promise with the same shared state as *this.

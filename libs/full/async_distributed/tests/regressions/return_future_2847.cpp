@@ -56,7 +56,7 @@ void test_plain_call_future_non_default_ctor(hpx::id_type id)
     // test apply
     for (std::size_t i = 0; i != 100; ++i)
     {
-        hpx::apply<plain_future_non_default_ctor_action>(id);
+        hpx::post<plain_future_non_default_ctor_action>(id);
     }
 
     // test async

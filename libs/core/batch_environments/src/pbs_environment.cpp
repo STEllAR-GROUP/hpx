@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -17,7 +17,8 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace util { namespace batch_environments {
+namespace hpx::util::batch_environments {
+
     pbs_environment::pbs_environment(
         std::vector<std::string>& nodelist, bool have_mpi, bool debug)
       : node_num_(std::size_t(-1))
@@ -139,4 +140,4 @@ namespace hpx { namespace util { namespace batch_environments {
         }
         num_localities_ = nodes.size();
     }
-}}}    // namespace hpx::util::batch_environments
+}    // namespace hpx::util::batch_environments

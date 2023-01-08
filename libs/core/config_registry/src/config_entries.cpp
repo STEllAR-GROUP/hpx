@@ -8,9 +8,9 @@
 
 #include <hpx/modules/config_registry.hpp>
 
-namespace hpx { namespace config_registry_cfg {
+namespace hpx::config_registry_cfg {
 
     config_registry::add_module_config_helper add_config{
         {"config_registry", {}}};
 
-}}    // namespace hpx::config_registry_cfg
+}    // namespace hpx::config_registry_cfg

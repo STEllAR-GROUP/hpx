@@ -42,7 +42,7 @@ void force_recursion_test1()
     }
 
     // make futures ready in backwards sequence
-    hpx::apply([&first_promise]() { first_promise.set_value(); });
+    hpx::post([&first_promise]() { first_promise.set_value(); });
 
     hpx::wait_all(results);
     HPX_TEST_EQ(executed_dataflow.load(), NUM_FUTURES);

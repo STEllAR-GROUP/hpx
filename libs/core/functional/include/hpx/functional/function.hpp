@@ -26,15 +26,14 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// Class template hpx::function is a general-purpose polymorphic function
     /// wrapper. Instances of hpx::function can store, copy, and invoke any
-    /// CopyConstructible Callable target -- functions, lambda expressions,
-    /// bind expressions, or other function objects, as well as pointers to
-    /// member functions and pointers to data members.
-    /// The stored callable object is called the target of hpx::function.
-    /// If an hpx::function contains no target, it is called empty. Invoking the
-    /// target of an empty hpx::function results in hpx::bad_function_call
-    /// exception being thrown.
-    /// hpx::function satisfies the requirements of CopyConstructible and
-    /// CopyAssignable.
+    /// CopyConstructible Callable target -- functions, lambda expressions, bind
+    /// expressions, or other function objects, as well as pointers to member
+    /// functions and pointers to data members. The stored callable object is
+    /// called the target of hpx::function. If an hpx::function contains no
+    /// target, it is called empty. Invoking the target of an empty
+    /// hpx::function results in \a hpx#error#bad_function_call exception being
+    /// thrown. hpx::function satisfies the requirements of CopyConstructible
+    /// and CopyAssignable.
     template <typename Sig, bool Serializable = false>
     class function;
 
@@ -106,7 +105,7 @@ namespace hpx::util {
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     template <typename Sig, bool Serializable>
     struct get_function_address<hpx::function<Sig, Serializable>>
@@ -139,10 +138,10 @@ namespace hpx { namespace traits {
         }
     };
 #endif
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 #endif
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 #define HPX_UTIL_REGISTER_FUNCTION_DECLARATION(Sig, F, Name)                   \
     HPX_DECLARE_GET_FUNCTION_NAME(function_vtable<Sig>, F, Name)               \
     /**/

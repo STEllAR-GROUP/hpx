@@ -202,7 +202,7 @@ namespace hpx::plugins::parcel {
 
         default:
             l.unlock();
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "coalescing_message_handler::put_parcel",
                 "unexpected return value from message_buffer::append");
             return;
@@ -259,13 +259,13 @@ namespace hpx::plugins::parcel {
         {
             stopped_ = true;
             {
-                hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 timer_.stop();    // interrupt timer
             }
         }
         else if (cancel_timer)
         {
-            hpx::util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+            hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
             timer_.stop();    // interrupt timer
         }
 
@@ -377,7 +377,7 @@ namespace hpx::plugins::parcel {
         if (!time_between_parcels_)
         {
             l.unlock();
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "coalescing_message_handler::"
                 "get_time_between_parcels_histogram",
                 "parcel-arrival-histogram counter was not initialized for "

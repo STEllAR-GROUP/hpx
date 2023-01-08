@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,6 +13,7 @@ namespace hpx {
 
     /// \namespace lcos
     namespace lcos::detail {
+
         template <typename Result>
         struct future_data;
 
@@ -51,6 +52,7 @@ namespace hpx {
     class shared_future;
 
     namespace lcos {
+
         template <typename R>
         using future HPX_DEPRECATED_V(
             1, 8, "hpx::lcos::future is deprecated. Use hpx::future instead.") =

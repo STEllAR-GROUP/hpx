@@ -43,6 +43,17 @@ namespace hpx::serialization {
         ar.load(t);
         return ar;
     }
+
+    namespace detail {
+
+        template <typename Archive, typename T>
+        void serialize_one(Archive& ar, T& t)
+        {
+            // clang-format off
+            ar & t;
+            // clang-format on
+        }
+    }    // namespace detail
 }    // namespace hpx::serialization
 
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory_impl.hpp>

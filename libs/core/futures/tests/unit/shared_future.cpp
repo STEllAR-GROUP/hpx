@@ -94,7 +94,7 @@ void test_initial_state()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::no_state);
+        HPX_TEST_EQ(e.get_error(), hpx::error::no_state);
     }
     catch (...)
     {
@@ -130,7 +130,7 @@ void test_cannot_get_future_twice()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::future_already_retrieved);
+        HPX_TEST_EQ(e.get_error(), hpx::error::future_already_retrieved);
     }
     catch (...)
     {
@@ -225,7 +225,7 @@ void test_invoking_a_packaged_task_twice_throws()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::promise_already_satisfied);
+        HPX_TEST_EQ(e.get_error(), hpx::error::promise_already_satisfied);
     }
     catch (...)
     {
@@ -250,7 +250,7 @@ void test_cannot_get_future_twice_from_task()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::future_already_retrieved);
+        HPX_TEST_EQ(e.get_error(), hpx::error::future_already_retrieved);
     }
     catch (...)
     {
@@ -554,7 +554,7 @@ void test_packaged_task_can_be_moved()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::no_state);
+        HPX_TEST_EQ(e.get_error(), hpx::error::no_state);
     }
     catch (...)
     {
@@ -586,7 +586,7 @@ void test_destroying_a_promise_stores_broken_promise()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::broken_promise);
+        HPX_TEST_EQ(e.get_error(), hpx::error::broken_promise);
     }
     catch (...)
     {
@@ -612,7 +612,7 @@ void test_destroying_a_packaged_task_stores_broken_task()
     }
     catch (hpx::exception const& e)
     {
-        HPX_TEST_EQ(e.get_error(), hpx::broken_promise);
+        HPX_TEST_EQ(e.get_error(), hpx::error::broken_promise);
     }
     catch (...)
     {
@@ -1248,7 +1248,7 @@ void test_wait_for_all_from_list()
     {
         hpx::lcos::local::futures_factory<int()> task(make_int_slowly);
         futures.push_back(task.get_future());
-        task.apply();
+        task.post();
     }
 
     hpx::future<std::vector<hpx::shared_future<int>>> r =
@@ -1272,7 +1272,7 @@ void test_wait_for_all_from_list_iterators()
     {
         hpx::lcos::local::futures_factory<int()> task(make_int_slowly);
         futures.push_back(task.get_future());
-        task.apply();
+        task.post();
     }
 
     hpx::future<std::vector<hpx::shared_future<int>>> r =
@@ -1292,10 +1292,10 @@ void test_wait_for_all_two_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::shared_future<int> f1 = pt1.get_future();
-    pt1.apply();
+    pt1.post();
     hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::shared_future<int> f2 = pt2.get_future();
-    pt2.apply();
+    pt2.post();
 
     typedef hpx::tuple<hpx::shared_future<int>, hpx::shared_future<int>>
         result_type;
@@ -1313,13 +1313,13 @@ void test_wait_for_all_three_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::shared_future<int> f1 = pt1.get_future();
-    pt1.apply();
+    pt1.post();
     hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::shared_future<int> f2 = pt2.get_future();
-    pt2.apply();
+    pt2.post();
     hpx::lcos::local::futures_factory<int()> pt3(make_int_slowly);
     hpx::shared_future<int> f3 = pt3.get_future();
-    pt3.apply();
+    pt3.post();
 
     typedef hpx::tuple<hpx::shared_future<int>, hpx::shared_future<int>,
         hpx::shared_future<int>>
@@ -1340,16 +1340,16 @@ void test_wait_for_all_four_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::shared_future<int> f1 = pt1.get_future();
-    pt1.apply();
+    pt1.post();
     hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::shared_future<int> f2 = pt2.get_future();
-    pt2.apply();
+    pt2.post();
     hpx::lcos::local::futures_factory<int()> pt3(make_int_slowly);
     hpx::shared_future<int> f3 = pt3.get_future();
-    pt3.apply();
+    pt3.post();
     hpx::lcos::local::futures_factory<int()> pt4(make_int_slowly);
     hpx::shared_future<int> f4 = pt4.get_future();
-    pt4.apply();
+    pt4.post();
 
     typedef hpx::tuple<hpx::shared_future<int>, hpx::shared_future<int>,
         hpx::shared_future<int>, hpx::shared_future<int>>
@@ -1372,19 +1372,19 @@ void test_wait_for_all_five_futures()
 {
     hpx::lcos::local::futures_factory<int()> pt1(make_int_slowly);
     hpx::shared_future<int> f1 = pt1.get_future();
-    pt1.apply();
+    pt1.post();
     hpx::lcos::local::futures_factory<int()> pt2(make_int_slowly);
     hpx::shared_future<int> f2 = pt2.get_future();
-    pt2.apply();
+    pt2.post();
     hpx::lcos::local::futures_factory<int()> pt3(make_int_slowly);
     hpx::shared_future<int> f3 = pt3.get_future();
-    pt3.apply();
+    pt3.post();
     hpx::lcos::local::futures_factory<int()> pt4(make_int_slowly);
     hpx::shared_future<int> f4 = pt4.get_future();
-    pt4.apply();
+    pt4.post();
     hpx::lcos::local::futures_factory<int()> pt5(make_int_slowly);
     hpx::shared_future<int> f5 = pt5.get_future();
-    pt5.apply();
+    pt5.post();
 
     typedef hpx::tuple<hpx::shared_future<int>, hpx::shared_future<int>,
         hpx::shared_future<int>, hpx::shared_future<int>,

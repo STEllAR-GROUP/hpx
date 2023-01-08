@@ -426,7 +426,8 @@ namespace hpx::parcelset::detail {
         if (HPX_UNLIKELY(
                 !components::types_are_compatible(data_.addr_.type_, comptype)))
         {
-            HPX_THROW_EXCEPTION(bad_component_type, "parcel::determine_lva",
+            HPX_THROW_EXCEPTION(hpx::error::bad_component_type,
+                "parcel::determine_lva",
                 " types are not compatible: destination_type({}) "
                 "action_type({}) parcel ({})",
                 data_.addr_.type_, comptype, *this);

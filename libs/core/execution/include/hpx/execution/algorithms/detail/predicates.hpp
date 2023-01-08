@@ -97,8 +97,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     HPX_FORCEINLINE constexpr std::size_t distance(
         Iterable iter1, Iterable iter2)
     {
-        return calculate_distance<typename std::decay<Iterable>::type>::call(
-            iter1, iter2);
+        return calculate_distance<std::decay_t<Iterable>>::call(iter1, iter2);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -114,38 +113,31 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         template <typename T, typename Stride>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr static T call(
-            T t, std::size_t max_count, Stride& offset, std::true_type)
-        {
-            if (is_negative(offset))
-            {
-                offset = Stride(negate(
-                    // NVCC seems to have a bug with std::min...
-                    max_count < std::size_t(negate(offset)) ? max_count :
-                                                              negate(offset)));
-                return T(t + offset);
-            }
-
-            // NVCC seems to have a bug with std::min...
-            offset =
-                Stride(max_count < std::size_t(offset) ? max_count : offset);
-            return T(t + offset);
-        }
-
-        template <typename T, typename Stride>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr static T call(
-            T t, std::size_t max_count, Stride& offset, std::false_type)
-        {
-            // NVCC seems to have a bug with std::min...
-            offset = max_count < offset ? max_count : offset;
-            return T(t + offset);
-        }
-
-        template <typename T, typename Stride>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr static T call(
             T t, std::size_t max_count, Stride& offset)
         {
-            return call(
-                t, max_count, offset, typename std::is_signed<Stride>::type());
+            if constexpr (std::is_signed_v<Stride>)
+            {
+                if (is_negative(offset))
+                {
+                    offset = Stride(negate(
+                        // NVCC seems to have a bug with std::min...
+                        max_count < std::size_t(negate(offset)) ?
+                            max_count :
+                            negate(offset)));
+                    return T(t + offset);
+                }
+
+                // NVCC seems to have a bug with std::min...
+                offset = Stride(
+                    max_count < std::size_t(offset) ? max_count : offset);
+                return T(t + offset);
+            }
+            else
+            {
+                // NVCC seems to have a bug with std::min...
+                offset = max_count < offset ? max_count : offset;
+                return T(t + offset);
+            }
         }
     };
 
@@ -204,11 +196,38 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         template <typename Iter, typename Stride>
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr static Iter call(
-            Iter iter, std::size_t max_count, Stride& offset, std::true_type)
+            Iter iter, std::size_t max_count, Stride& offset)
         {
-            // advance through the end or max number of elements
-            if (!is_negative(offset))
+            if constexpr (std::is_signed_v<Stride>)
             {
+                // advance through the end or max number of elements
+                if (!is_negative(offset))
+                {
+                    // NVCC seems to have a bug with std::min...
+                    offset = Stride(
+                        max_count < std::size_t(offset) ? max_count : offset);
+#if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
+                    hpx::parallel::v1::detail::advance(iter, offset);
+#else
+                    std::advance(iter, offset);
+#endif
+                }
+                else
+                {
+                    offset = negate(Stride(
+                        // NVCC seems to have a bug with std::min...
+                        max_count < negate(offset) ? max_count :
+                                                     negate(offset)));
+#if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
+                    hpx::parallel::v1::detail::advance(iter, offset);
+#else
+                    std::advance(iter, offset);
+#endif
+                }
+            }
+            else
+            {
+                // advance through the end or max number of elements
                 // NVCC seems to have a bug with std::min...
                 offset = Stride(
                     max_count < std::size_t(offset) ? max_count : offset);
@@ -218,42 +237,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 std::advance(iter, offset);
 #endif
             }
-            else
-            {
-                offset = negate(Stride(
-                    // NVCC seems to have a bug with std::min...
-                    max_count < negate(offset) ? max_count : negate(offset)));
-#if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
-                hpx::parallel::v1::detail::advance(iter, offset);
-#else
-                std::advance(iter, offset);
-#endif
-            }
             return iter;
-        }
-
-        template <typename Iter, typename Stride>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr static Iter call(
-            Iter iter, std::size_t max_count, Stride& offset, std::false_type)
-        {
-            // advance through the end or max number of elements
-            // NVCC seems to have a bug with std::min...
-            offset =
-                Stride(max_count < std::size_t(offset) ? max_count : offset);
-#if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
-            hpx::parallel::v1::detail::advance(iter, offset);
-#else
-            std::advance(iter, offset);
-#endif
-            return iter;
-        }
-
-        template <typename Iter, typename Stride>
-        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr static Iter call(
-            Iter iter, std::size_t max_count, Stride& offset)
-        {
-            return call(iter, max_count, offset,
-                typename std::is_signed<Stride>::type());
         }
     };
 
@@ -261,15 +245,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iterable next(
         Iterable iter, Stride offset)
     {
-        return calculate_next<typename std::decay<Iterable>::type>::call(
-            iter, offset);
+        return calculate_next<std::decay_t<Iterable>>::call(iter, offset);
     }
 
     template <typename Iterable, typename Stride>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iterable next(
         Iterable iter, std::size_t max_count, Stride offset)
     {
-        return calculate_next<typename std::decay<Iterable>::type>::call(
+        return calculate_next<std::decay_t<Iterable>>::call(
             iter, max_count, offset);
     }
 

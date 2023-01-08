@@ -920,7 +920,7 @@ if(HPX_WITH_APEX)
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
   )
   hpx_option(
-    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.5.1"
+    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.6.1"
     CATEGORY "Profiling"
   )
 endif()
@@ -1819,7 +1819,9 @@ if(HPX_WITH_COMPILER_WARNINGS)
 
     # gcc V12.1 and above complain about possible ABI incompatibilities caused
     # by the use of std::destructive_interference_size
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
+       AND "${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER_EQUAL "12.1"
+    )
       hpx_add_compile_flag_if_available(-Wno-interference-size)
     endif()
 
@@ -2334,6 +2336,7 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
       <stack>
       <stdexcept>
       <string>
+      <string_view>
       <system_error>
       <thread>
       <tuple>
@@ -2350,12 +2353,8 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
       <asio/ip/tcp.hpp>
       <boost/config.hpp>
       <boost/fusion/include/vector.hpp>
-      <boost/intrusive/slist.hpp>
-      <boost/lockfree/queue.hpp>
       <boost/optional.hpp>
       <boost/spirit/home/x3.hpp>
-      <boost/tokenizer.hpp>
-      <boost/utility/string_ref.hpp>
   )
 
   if(HPX_WITH_CXX17_FILESYSTEM)

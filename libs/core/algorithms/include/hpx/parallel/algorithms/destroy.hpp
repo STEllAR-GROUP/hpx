@@ -181,11 +181,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Iter, typename Sent>
         Iter sequential_destroy(Iter first, Sent last)
         {
-            using value_type = typename std::iterator_traits<Iter>::value_type;
-
             for (/* */; first != last; ++first)
             {
-                std::addressof(*first)->~value_type();
+                std::destroy_at(std::addressof(*first));
             }
             return first;
         }
@@ -207,10 +205,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 [](Iter first, std::size_t count, std::size_t) {
                     return util::loop_n<std::decay_t<ExPolicy>>(
                         first, count, [](Iter it) -> void {
-                            using value_type =
-                                typename std::iterator_traits<Iter>::value_type;
-
-                            std::addressof(*it)->~value_type();
+                            std::destroy_at(std::addressof(*it));
                         });
                 },
                 util::projection_identity());
@@ -254,13 +249,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Iter>
         Iter sequential_destroy_n(Iter first, std::size_t count)
         {
-            using value_type = typename std::iterator_traits<Iter>::value_type;
-
             for (/* */; count != 0; (void) ++first, --count)
             {
-                std::addressof(*first)->~value_type();
+                std::destroy_at(std::addressof(*first));
             }
-
             return first;
         }
 

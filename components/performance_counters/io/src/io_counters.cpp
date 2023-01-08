@@ -35,7 +35,7 @@
 #endif
 
 // type to store parser output
-BOOST_FUSION_DEFINE_STRUCT((hpx) (performance_counters) (io), proc_io,
+BOOST_FUSION_DEFINE_STRUCT((hpx)(performance_counters)(io), proc_io,
     (std::uint64_t, riss)(std::uint64_t, wiss)(std::uint64_t, rsysc)(
         std::uint64_t, wsysc)(std::uint64_t, rstor)(std::uint64_t, wstor)(
         std::uint64_t, wcanc))
@@ -81,7 +81,7 @@ namespace hpx { namespace performance_counters { namespace io {
         std::ifstream ins(fn);
 
         if (!ins.is_open())
-            HPX_THROW_EXCEPTION(hpx::no_success,
+            HPX_THROW_EXCEPTION(hpx::error::no_success,
                 "hpx::performance_counters::io::parse_proc_io",
                 hpx::util::format("failed to open /proc/{1}/io", pid));
 
@@ -90,7 +90,7 @@ namespace hpx { namespace performance_counters { namespace io {
         proc_io_parser<iterator> p;
 
         if (!qi::phrase_parse(it, end, p, ascii::space, pio))
-            HPX_THROW_EXCEPTION(hpx::no_success,
+            HPX_THROW_EXCEPTION(hpx::error::no_success,
                 "hpx::performance_counters::io::parse_proc_io",
                 hpx::util::format("failed to parse /proc/{1}/io", pid));
     }

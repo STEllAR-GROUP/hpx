@@ -23,12 +23,14 @@
 #include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/parallel/container_algorithms/for_each.hpp>
+#include <hpx/parallel/util/adapt_sharing_mode.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <limits>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -47,7 +49,7 @@ namespace hpx { namespace compute { namespace host {
 
             using value_type = T;
             using pointer = T*;
-            using const_pointer = const T*;
+            using const_pointer = T const*;
             using reference = T&;
             using const_reference = T const&;
             using size_type = std::size_t;
@@ -91,7 +93,7 @@ namespace hpx { namespace compute { namespace host {
             // topo.allocate(). The pointer hint may be used to provide locality of
             // reference: the allocator, if supported by the implementation, will
             // attempt to allocate the new memory block as close as possible to hint.
-            pointer allocate(size_type n, const void* /* hint */ = nullptr)
+            pointer allocate(size_type n, void const* /* hint */ = nullptr)
             {
                 return reinterpret_cast<pointer>(
                     hpx::threads::create_topology().allocate(n * sizeof(T)));
@@ -149,9 +151,14 @@ namespace hpx { namespace compute { namespace host {
                 auto&& arguments =
                     hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
 
+                decltype(auto) hinted_policy =
+                    parallel::util::adapt_sharing_mode(policy_,
+                        hpx::threads::thread_sharing_hint::
+                            do_not_share_function);
+
                 cancellation_token tok;
                 partitioner::call(
-                    policy_, util::begin(irange), count,
+                    hinted_policy, util::begin(irange), count,
                     [&arguments, p, &tok](
                         iterator_type it, std::size_t part_size) mutable
                     -> partition_result_type {
@@ -167,7 +174,9 @@ namespace hpx { namespace compute { namespace host {
                                 },
                                 // cleanup function, called for all elements of
                                 // current partition which succeeded before exception
-                                [p](iterator_type it) { (p + *it)->~U(); });
+                                [p](iterator_type it) {
+                                    std::destroy_at(p + *it);
+                                });
                         return std::make_pair(it, last);
                     },
                     // finalize, called once if no error occurred
@@ -179,7 +188,7 @@ namespace hpx { namespace compute { namespace host {
                     [p](partition_result_type&& r) -> void {
                         while (r.first != r.second)
                         {
-                            (p + *r.first)->~U();
+                            std::destroy_at(p + *r.first);
                             ++r.first;
                         }
                     });
@@ -206,15 +215,15 @@ namespace hpx { namespace compute { namespace host {
 
                 // keep memory locality, use executor...
                 auto irange = hpx::util::counting_shape(count);
-                hpx::ranges::for_each(
-                    policy_, irange, [p](std::size_t i) { (p + i)->~U(); });
+                hpx::ranges::for_each(policy_, irange,
+                    [p](std::size_t i) { std::destroy_at(p + i); });
             }
 
             // Calls the destructor of the object pointed to by p
             template <typename U>
             void destroy(U* p)
             {
-                p->~U();
+                std::destroy_at(p);
             }
 
             // Required by hpx::compute::traits::allocator_traits. Return

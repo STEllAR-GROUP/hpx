@@ -21,7 +21,12 @@ int hpx_main()
     hpx::spinlock mtx;
     std::set<hpx::thread::id> thread_ids;
 
-    hpx::experimental::for_loop(hpx::execution::par, 0, 100, [&](int) {
+    // Make sure the iterations are being scheduled on their own threads
+    decltype(auto) policy =
+        hpx::parallel::util::adapt_sharing_mode(hpx::execution::par,
+            hpx::threads::thread_sharing_hint::do_not_combine_tasks);
+
+    hpx::experimental::for_loop(policy, 0, 100, [&](int) {
         std::lock_guard<hpx::spinlock> l(mtx);
         thread_ids.insert(hpx::this_thread::get_id());
     });
@@ -30,7 +35,7 @@ int hpx_main()
 
     thread_ids.clear();
 
-    hpx::experimental::for_loop_n(hpx::execution::par, 0, 100, [&](int) {
+    hpx::experimental::for_loop_n(policy, 0, 100, [&](int) {
         std::lock_guard<hpx::spinlock> l(mtx);
         thread_ids.insert(hpx::this_thread::get_id());
     });

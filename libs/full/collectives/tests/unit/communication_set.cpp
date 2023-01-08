@@ -92,7 +92,7 @@ namespace hpx { namespace traits {
             if (communicator_.connect_to_ != communicator_.site_ &&
                 which == communicator_.site_)
             {
-                hpx::apply(test::get_connected_to_zero_action{},
+                hpx::post(test::get_connected_to_zero_action{},
                     communicator_.connected_node_.get(), communicator_.site_,
                     test::get_connected_to_zero{});
             }

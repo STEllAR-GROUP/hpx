@@ -68,7 +68,7 @@ namespace hpx::execution::experimental {
                 auto target_mask = targets[0].native_handle().get_device();
                 if (!hpx::threads::test(target_mask, this_pu))
                 {
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "block_fork_join_executor::cores_for_targets",
                         "The thread used to initialize the "
                         "block_fork_join_executor should be part of the given "
@@ -104,7 +104,7 @@ namespace hpx::execution::experimental {
             // current thread is not part of any of the given targets.
             if (!this_thread_is_represented)
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "block_fork_join_executor::cores_for_targets",
                     "The thread used to initialize the "
                     "block_fork_join_executor should be part of at least one "
@@ -116,7 +116,8 @@ namespace hpx::execution::experimental {
     public:
         /// \cond NOINTERNAL
         using execution_category = hpx::execution::parallel_execution_tag;
-        using executor_parameters_type = hpx::execution::static_chunk_size;
+        using executor_parameters_type =
+            hpx::execution::experimental::static_chunk_size;
 
         bool operator==(block_fork_join_executor const& rhs) const noexcept
         {

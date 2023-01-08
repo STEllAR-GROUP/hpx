@@ -17,18 +17,28 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace program_options {
+namespace hpx::program_options {
 
-    using namespace std;
+    inline std::string strip_prefixes(std::string const& text)
+    {
+        // "--foo-bar" -> "foo-bar"
+        std::string::size_type i = text.find_first_not_of("-/");
+        if (i == std::string::npos)
+        {
+            return text;
+        }
+        return text.substr(i);
+    }
 
     namespace {
-        std::string convert_value(const std::wstring& s)
+
+        std::string convert_value(std::wstring const& s)
         {
             try
             {
                 return to_local_8_bit(s);
             }
-            catch (const std::exception&)
+            catch (std::exception const&)
             {
                 return "<unrepresentable unicode string>";
             }
@@ -37,13 +47,13 @@ namespace hpx { namespace program_options {
 
     void value_semantic_codecvt_helper<char>::parse(
         hpx::any_nonser& value_store,
-        const std::vector<std::string>& new_tokens, bool utf8) const
+        std::vector<std::string> const& new_tokens, bool utf8) const
     {
         if (utf8)
         {
             // Need to convert to local encoding.
-            std::vector<string> local_tokens;
-            for (const auto& new_token : new_tokens)
+            std::vector<std::string> local_tokens;
+            for (auto const& new_token : new_tokens)
             {
                 std::wstring w = from_utf8(new_token);
                 local_tokens.push_back(to_local_8_bit(w));
@@ -59,13 +69,13 @@ namespace hpx { namespace program_options {
 
     void value_semantic_codecvt_helper<wchar_t>::parse(
         hpx::any_nonser& value_store,
-        const std::vector<std::string>& new_tokens, bool utf8) const
+        std::vector<std::string> const& new_tokens, bool utf8) const
     {
-        std::vector<wstring> tokens;
+        std::vector<std::wstring> tokens;
         if (utf8)
         {
             // Convert from utf8
-            for (const auto& new_token : new_tokens)
+            for (auto const& new_token : new_tokens)
             {
                 tokens.push_back(from_utf8(new_token));
             }
@@ -73,7 +83,7 @@ namespace hpx { namespace program_options {
         else
         {
             // Convert from local encoding
-            for (const auto& new_token : new_tokens)
+            for (auto const& new_token : new_tokens)
             {
                 tokens.push_back(from_local_8_bit(new_token));
             }
@@ -89,7 +99,7 @@ namespace hpx { namespace program_options {
         return arg;
     }
 
-    unsigned untyped_value::min_tokens() const
+    unsigned untyped_value::min_tokens() const noexcept
     {
         if (m_zero_tokens)
             return 0;
@@ -97,7 +107,7 @@ namespace hpx { namespace program_options {
             return 1;
     }
 
-    unsigned untyped_value::max_tokens() const
+    unsigned untyped_value::max_tokens() const noexcept
     {
         if (m_zero_tokens)
             return 0;
@@ -106,7 +116,7 @@ namespace hpx { namespace program_options {
     }
 
     void untyped_value::xparse(hpx::any_nonser& value_store,
-        const std::vector<std::string>& new_tokens) const
+        std::vector<std::string> const& new_tokens) const
     {
         if (value_store.has_value())
             throw multiple_occurrences();
@@ -135,10 +145,11 @@ namespace hpx { namespace program_options {
         Case is ignored. The 'xs' vector can either be empty, in which
         case the value is 'true', or can contain explicit value.
     */
-    void validate(hpx::any_nonser& v, const vector<string>& xs, bool*, int)
+    void validate(
+        hpx::any_nonser& v, std::vector<std::string> const& xs, bool*, int)
     {
         check_first_occurrence(v);
-        string s(get_single_string(xs, true));
+        std::string s(get_single_string(xs, true));
 
         for (char& i : s)
             i = char(std::tolower(i));
@@ -156,10 +167,11 @@ namespace hpx { namespace program_options {
     // create auxiliary 'widen' routine to convert from char* into
     // needed string type, and that's more work.
     HPX_CORE_EXPORT
-    void validate(hpx::any_nonser& v, const vector<wstring>& xs, bool*, int)
+    void validate(
+        hpx::any_nonser& v, std::vector<std::wstring> const& xs, bool*, int)
     {
         check_first_occurrence(v);
-        wstring s(get_single_string(xs, true));
+        std::wstring s(get_single_string(xs, true));
 
         for (wchar_t& i : s)
             i = wchar_t(tolower(i));
@@ -173,16 +185,16 @@ namespace hpx { namespace program_options {
     }
 
     HPX_CORE_EXPORT
-    void validate(
-        hpx::any_nonser& v, const vector<string>& xs, std::string*, int)
+    void validate(hpx::any_nonser& v, std::vector<std::string> const& xs,
+        std::string*, int)
     {
         check_first_occurrence(v);
         v = hpx::any_nonser(get_single_string(xs));
     }
 
     HPX_CORE_EXPORT
-    void validate(
-        hpx::any_nonser& v, const vector<wstring>& xs, std::string*, int)
+    void validate(hpx::any_nonser& v, std::vector<std::wstring> const& xs,
+        std::string*, int)
     {
         check_first_occurrence(v);
         v = hpx::any_nonser(get_single_string(xs));
@@ -191,35 +203,33 @@ namespace hpx { namespace program_options {
     namespace validators {
 
         HPX_CORE_EXPORT
-        void check_first_occurrence(const hpx::any_nonser& value)
+        void check_first_occurrence(hpx::any_nonser const& value)
         {
             if (value.has_value())
                 throw multiple_occurrences();
         }
     }    // namespace validators
 
-    invalid_option_value::invalid_option_value(const std::string& bad_value)
+    invalid_option_value::invalid_option_value(std::string const& bad_value)
       : validation_error(validation_error::invalid_option_value)
     {
         set_substitute("value", bad_value);
     }
 
-#ifndef BOOST_NO_STD_WSTRING
-    invalid_option_value::invalid_option_value(const std::wstring& bad_value)
+    invalid_option_value::invalid_option_value(std::wstring const& bad_value)
       : validation_error(validation_error::invalid_option_value)
     {
         set_substitute("value", convert_value(bad_value));
     }
-#endif
 
-    invalid_bool_value::invalid_bool_value(const std::string& bad_value)
+    invalid_bool_value::invalid_bool_value(std::string const& bad_value)
       : validation_error(validation_error::invalid_bool_value)
     {
         set_substitute("value", bad_value);
     }
 
-    error_with_option_name::error_with_option_name(const std::string& template_,
-        const std::string& option_name, const std::string& original_token,
+    error_with_option_name::error_with_option_name(std::string const& template_,
+        std::string const& option_name, std::string const& original_token,
         int option_style)
       : error(template_)
       , m_option_style(option_style)
@@ -235,7 +245,7 @@ namespace hpx { namespace program_options {
         m_substitutions["original_token"] = original_token;
     }
 
-    const char* error_with_option_name::what() const noexcept
+    char const* error_with_option_name::what() const noexcept
     {
         // will substitute tokens each time what is run()
         substitute_placeholders(m_error_template);
@@ -244,7 +254,7 @@ namespace hpx { namespace program_options {
     }
 
     void error_with_option_name::replace_token(
-        const string& from, const string& to) const
+        std::string const& from, std::string const& to) const
     {
         for (;;)
         {
@@ -256,7 +266,7 @@ namespace hpx { namespace program_options {
         }
     }
 
-    string error_with_option_name::get_canonical_option_prefix() const
+    std::string error_with_option_name::get_canonical_option_prefix() const
     {
         switch (m_option_style)
         {
@@ -277,14 +287,14 @@ namespace hpx { namespace program_options {
             "allow_long_disguise or allow_long]");
     }
 
-    string error_with_option_name::get_canonical_option_name() const
+    std::string error_with_option_name::get_canonical_option_name() const
     {
         if (!m_substitutions.find("option")->second.length())
             return m_substitutions.find("original_token")->second;
 
-        string original_token =
+        std::string original_token =
             strip_prefixes(m_substitutions.find("original_token")->second);
-        string option_name =
+        std::string option_name =
             strip_prefixes(m_substitutions.find("option")->second);
 
         //  For long options, use option name
@@ -301,7 +311,7 @@ namespace hpx { namespace program_options {
     }
 
     void error_with_option_name::substitute_placeholders(
-        const string& error_template) const
+        std::string const& error_template) const
     {
         m_message = error_template;
         std::map<std::string, std::string> substitutions(m_substitutions);
@@ -311,7 +321,7 @@ namespace hpx { namespace program_options {
         //
         //  replace placeholder with defaults if values are missing
         //
-        for (const auto& substitution_default : m_substitution_defaults)
+        for (auto const& substitution_default : m_substitution_defaults)
         {
             // missing parameter: use default
             if (substitutions.count(substitution_default.first) == 0 ||
@@ -331,7 +341,7 @@ namespace hpx { namespace program_options {
     }
 
     void ambiguous_option::substitute_placeholders(
-        const string& original_error_template) const
+        std::string const& original_error_template) const
     {
         // For short forms, all alternatives must be identical, by
         //      definition, to the specified option, so we don't need to
@@ -344,7 +354,7 @@ namespace hpx { namespace program_options {
             return;
         }
 
-        string error_template = original_error_template;
+        std::string error_template = original_error_template;
         // remove duplicates using std::set
         std::set<std::string> alternatives_set(
             m_alternatives.begin(), m_alternatives.end());
@@ -370,11 +380,11 @@ namespace hpx { namespace program_options {
         error_with_option_name::substitute_placeholders(error_template);
     }
 
-    string validation_error::get_template(kind_t kind)
+    std::string validation_error::get_template(kind_t kind)
     {
         // Initially, store the message in 'const char*' variable,
         // to avoid conversion to std::string in all cases.
-        const char* msg;
+        char const* msg;
         switch (kind)
         {
         case invalid_bool_value:
@@ -401,5 +411,4 @@ namespace hpx { namespace program_options {
         }
         return msg;
     }
-
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options

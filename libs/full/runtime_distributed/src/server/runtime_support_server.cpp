@@ -25,6 +25,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -54,8 +55,6 @@
 #ifdef HPX_HAVE_LIB_MPI_BASE
 #include <hpx/modules/mpi_base.hpp>
 #endif
-
-#include <boost/tokenizer.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -178,14 +177,13 @@ namespace hpx { namespace components { namespace server {
             {
                 // execute locally, action is executed immediately as it is
                 // a direct_action
-                hpx::applier::detail::apply_l<action_type>(
-                    respond_to, HPX_MOVE(addr));
+                hpx::detail::post_l<action_type>(respond_to, HPX_MOVE(addr));
             }
 #if defined(HPX_HAVE_NETWORKING)
             else
             {
                 // apply remotely, parcel is sent synchronously
-                hpx::applier::detail::apply_r_sync<action_type>(
+                hpx::detail::post_r_sync<action_type>(
                     HPX_MOVE(addr), respond_to);
             }
 #endif
@@ -265,7 +263,7 @@ namespace hpx { namespace components { namespace server {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         hpx::id_type id(naming::get_id_from_locality_id(target_locality_id));
-        apply<dijkstra_termination_action>(
+        hpx::post<dijkstra_termination_action>(
             id, initiating_locality_id, num_localities, dijkstra_token);
 #else
         HPX_ASSERT(false);
@@ -364,7 +362,7 @@ namespace hpx { namespace components { namespace server {
                 dijkstra_color_ = false;    // start off with white
 
                 {
-                    util::unlock_guard<dijkstra_scoped_lock> ul(l);
+                    unlock_guard<dijkstra_scoped_lock> ul(l);
                     send_dijkstra_termination_token(target_id - 1,
                         initiating_locality_id, num_localities,
                         dijkstra_color_);
@@ -402,7 +400,8 @@ namespace hpx { namespace components { namespace server {
     {
         if (find_here() != hpx::find_root_locality())
         {
-            HPX_THROW_EXCEPTION(invalid_status, "runtime_support::shutdown_all",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "runtime_support::shutdown_all",
                 "shutdown_all should be invoked on the root locality only");
             return;
         }
@@ -612,7 +611,7 @@ namespace hpx { namespace components { namespace server {
             stop_called_ = true;
 
             {
-                util::unlock_guard<std::mutex> ul(mtx_);
+                unlock_guard<std::mutex> ul(mtx_);
 
                 util::runtime_configuration& cfg = get_runtime().get_config();
                 std::size_t shutdown_check_count =
@@ -682,7 +681,7 @@ namespace hpx { namespace components { namespace server {
                     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
                         // apply remotely, parcel is sent synchronously
-                        hpx::applier::detail::apply_r_sync<action_type>(
+                        hpx::detail::post_r_sync<action_type>(
                             HPX_MOVE(addr), respond_to);
 #else
                         HPX_ASSERT(false);
@@ -866,7 +865,7 @@ namespace hpx { namespace components { namespace server {
         void operator()(Ts&&... /* vs */)
         {
             // This needs to be run on a HPX thread
-            hpx::apply(HPX_MOVE(*pt));
+            hpx::post(HPX_MOVE(*pt));
             pt.reset();
         }
 
@@ -898,7 +897,7 @@ namespace hpx { namespace components { namespace server {
 
             indirect_packaged_task ipt;
             callbacks.push_back(ipt.get_future());
-            apply_cb(
+            hpx::post_cb(
                 act, id, HPX_MOVE(ipt), agas::get_locality(), rtd->endpoints());
         }
 
@@ -926,7 +925,7 @@ namespace hpx { namespace components { namespace server {
 
         // handle console separately
         id_type id = naming::get_id_from_locality_id(0);
-        apply_cb(
+        hpx::post_cb(
             act, id, HPX_MOVE(ipt), agas::get_locality(), rtd->endpoints());
 
         callback.wait();
@@ -953,7 +952,7 @@ namespace hpx { namespace components { namespace server {
             if (ec.category() != hpx::get_lightweight_hpx_category())
             {
                 // we don't know anything about this component
-                HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                     "runtime_support::create_message_handler",
                     "attempt to create message handler plugin instance of "
                     "invalid/unknown type: {}",
@@ -962,7 +961,7 @@ namespace hpx { namespace components { namespace server {
             else
             {
                 // lightweight error handling
-                HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                     "runtime_support::create_message_handler",
                     "attempt to create message handler plugin instance of "
                     "invalid/unknown type");
@@ -981,7 +980,7 @@ namespace hpx { namespace components { namespace server {
 
         if (ec)
         {
-            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+            HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                 "runtime_support::register_message_handler",
                 "couldn't register action '{}' for message handler plugin of "
                 "type: {}",
@@ -1015,7 +1014,7 @@ namespace hpx { namespace components { namespace server {
             if (ec.category() != hpx::get_lightweight_hpx_category())
             {
                 // we don't know anything about this component
-                HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                     "runtime_support::create_message_handler",
                     "attempt to create message handler plugin instance of "
                     "invalid/unknown type: {}",
@@ -1024,7 +1023,7 @@ namespace hpx { namespace components { namespace server {
             else
             {
                 // lightweight error handling
-                HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                     "runtime_support::create_message_handler",
                     "attempt to create message handler plugin instance of "
                     "invalid/unknown type");
@@ -1043,7 +1042,7 @@ namespace hpx { namespace components { namespace server {
             factory->create(action, pp, num_messages, interval);
         if (nullptr == mh)
         {
-            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+            HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                 "runtime_support::create_message_handler",
                 "couldn't create message handler plugin of type: {}",
                 message_handler_type);
@@ -1073,7 +1072,7 @@ namespace hpx { namespace components { namespace server {
         {
             l.unlock();
             // we don't know anything about this component
-            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+            HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                 "runtime_support::create_binary_filter",
                 "attempt to create binary filter plugin instance of "
                 "invalid/unknown type: {}",
@@ -1092,7 +1091,7 @@ namespace hpx { namespace components { namespace server {
             factory->create(compress, next_filter);
         if (nullptr == bf)
         {
-            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+            HPX_THROWS_IF(ec, hpx::error::bad_plugin_type,
                 "runtime_support::create_binary_filter",
                 "couldn't create binary filter plugin of type: {}",
                 binary_filter_type);
@@ -1261,12 +1260,10 @@ namespace hpx { namespace components { namespace server {
                 else
                     component_path = HPX_DEFAULT_COMPONENT_PATH;
 
-                typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-                boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
-                tokenizer tokens(component_path, sep);
+                hpx::string_util::char_separator sep(HPX_INI_PATH_DELIMITER);
+                hpx::string_util::tokenizer tokens(component_path, sep);
                 std::error_code fsec;
-                for (tokenizer::iterator it = tokens.begin();
-                     it != tokens.end(); ++it)
+                for (auto it = tokens.begin(); it != tokens.end(); ++it)
                 {
                     lib = fs::path(*it);
                     fs::path lib_path =
@@ -1287,7 +1284,7 @@ namespace hpx { namespace components { namespace server {
                 else
                 {
 #if defined(HPX_HAVE_STATIC_LINKING)
-                    HPX_THROW_EXCEPTION(service_unavailable,
+                    HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
                         "runtime_support::load_components",
                         "static linking configuration does not support dynamic "
                         "loading of component '{}'",
@@ -1304,7 +1301,8 @@ namespace hpx { namespace components { namespace server {
                 LRT_(warning).format(
                     "caught exception while loading {}, {}: {}", instance,
                     e.get_error_code().get_message(), e.what());
-                if (e.get_error_code().value() == hpx::commandline_option_error)
+                if (e.get_error_code().value() ==
+                    hpx::error::commandline_option_error)
                 {
                     std::cerr << "runtime_support::load_components: "
                               << "invalid command line option(s) to "
@@ -1752,12 +1750,10 @@ namespace hpx { namespace components { namespace server {
                 else
                     component_path = HPX_DEFAULT_COMPONENT_PATH;
 
-                typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-                boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
-                tokenizer tokens(component_path, sep);
+                hpx::string_util::char_separator sep(HPX_INI_PATH_DELIMITER);
+                hpx::string_util::tokenizer tokens(component_path, sep);
                 std::error_code fsec;
-                for (tokenizer::iterator it = tokens.begin();
-                     it != tokens.end(); ++it)
+                for (auto it = tokens.begin(); it != tokens.end(); ++it)
                 {
                     lib = fs::path(*it);
                     fs::path lib_path =
@@ -1772,7 +1768,7 @@ namespace hpx { namespace components { namespace server {
                 if (sect.get_entry("static", "0") == "1")
                 {
                     // FIXME: implement statically linked plugins
-                    HPX_THROW_EXCEPTION(service_unavailable,
+                    HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
                         "runtime_support::load_plugins",
                         "static linking configuration does not support static "
                         "loading of plugin '{}'",
@@ -1781,7 +1777,7 @@ namespace hpx { namespace components { namespace server {
                 else
                 {
 #if defined(HPX_HAVE_STATIC_LINKING)
-                    HPX_THROW_EXCEPTION(service_unavailable,
+                    HPX_THROW_EXCEPTION(hpx::error::service_unavailable,
                         "runtime_support::load_plugins",
                         "static linking configuration does not support dynamic "
                         "loading of plugin '{}'",
@@ -1798,7 +1794,8 @@ namespace hpx { namespace components { namespace server {
                 LRT_(warning).format(
                     "caught exception while loading {}, {}: {}", instance,
                     e.get_error_code().get_message(), e.what());
-                if (e.get_error_code().value() == hpx::commandline_option_error)
+                if (e.get_error_code().value() ==
+                    hpx::error::commandline_option_error)
                 {
                     std::cerr << "runtime_support::load_plugins: "
                               << "invalid command line option(s) to "

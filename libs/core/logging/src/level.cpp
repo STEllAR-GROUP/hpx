@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,16 +8,15 @@
 #include <hpx/logging/level.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
-#include <boost/utility/string_ref.hpp>
-
 #include <cstddef>
 #include <iomanip>
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace logging {
+namespace hpx::util::logging {
 
     static std::string levelname(level value)
     {
@@ -44,7 +43,7 @@ namespace hpx { namespace util { namespace logging {
         return '<' + std::to_string(static_cast<int>(value)) + '>';
     }
 
-    void format_value(std::ostream& os, boost::string_ref spec, level value)
+    void format_value(std::ostream& os, std::string_view spec, level value)
     {
         if (!spec.empty())
             throw std::runtime_error("Not a valid format specifier");
@@ -52,7 +51,6 @@ namespace hpx { namespace util { namespace logging {
         os << std::right << std::setfill(' ') << std::setw(10)
            << levelname(value);
     }
-
-}}}    // namespace hpx::util::logging
+}    // namespace hpx::util::logging
 
 #endif    // HPX_HAVE_LOGGING

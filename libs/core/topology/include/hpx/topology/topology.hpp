@@ -36,34 +36,35 @@ namespace hpx { namespace threads {
         HPX_NON_COPYABLE(hpx_hwloc_bitmap_wrapper);
 
         // take ownership of the hwloc allocated bitmap
-        hpx_hwloc_bitmap_wrapper()
+        hpx_hwloc_bitmap_wrapper() noexcept
           : bmp_(nullptr)
         {
         }
 
-        hpx_hwloc_bitmap_wrapper(void* bmp)
+        explicit hpx_hwloc_bitmap_wrapper(void* bmp) noexcept
           : bmp_(reinterpret_cast<hwloc_bitmap_t>(bmp))
         {
         }
+
         // frees the hwloc allocated bitmap
         ~hpx_hwloc_bitmap_wrapper()
         {
             hwloc_bitmap_free(bmp_);
         }
 
-        void reset(hwloc_bitmap_t bmp)
+        void reset(hwloc_bitmap_t bmp) noexcept
         {
             if (bmp_)
                 hwloc_bitmap_free(bmp_);
             bmp_ = bmp;
         }
 
-        explicit operator bool() const
+        explicit constexpr operator bool() const noexcept
         {
             return bmp_ != nullptr;
         }
 
-        hwloc_bitmap_t get_bmp() const
+        hwloc_bitmap_t get_bmp() const noexcept
         {
             return bmp_;
         }
@@ -110,7 +111,7 @@ namespace hpx { namespace threads {
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         std::size_t get_socket_number(
-            std::size_t num_thread, error_code& /*ec*/ = throws) const
+            std::size_t num_thread, error_code& /*ec*/ = throws) const noexcept
         {
             return socket_numbers_[num_thread % num_of_pus_];
         }
@@ -122,7 +123,7 @@ namespace hpx { namespace threads {
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         std::size_t get_numa_node_number(
-            std::size_t num_thread, error_code& /*ec*/ = throws) const
+            std::size_t num_thread, error_code& /*ec*/ = throws) const noexcept
         {
             return numa_node_numbers_[num_thread % num_of_pus_];
         }
@@ -133,7 +134,8 @@ namespace hpx { namespace threads {
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        mask_cref_type get_machine_affinity_mask(error_code& ec = throws) const;
+        mask_cref_type get_machine_affinity_mask(
+            error_code& ec = throws) const noexcept;
 
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the service threads in the
@@ -221,7 +223,7 @@ namespace hpx { namespace threads {
 
         /// \brief Prints the \param m to os in a human readable form
         void print_affinity_mask(std::ostream& os, std::size_t num_thread,
-            mask_cref_type m, const std::string& pool_name) const;
+            mask_cref_type m, std::string const& pool_name) const;
 
         /// \brief Reduce thread priority of the current thread.
         ///
@@ -240,7 +242,7 @@ namespace hpx { namespace threads {
         std::size_t get_number_of_cores() const;
 
         /// \brief Return the number of available hardware processing units
-        std::size_t get_number_of_pus() const;
+        std::size_t get_number_of_pus() const noexcept;
 
         /// \brief Return number of cores in given numa domain
         std::size_t get_number_of_numa_node_cores(std::size_t numa) const;
@@ -288,12 +290,12 @@ namespace hpx { namespace threads {
             hpx_hwloc_membind_policy policy, int flags) const;
 
         threads::mask_type get_area_membind_nodeset(
-            const void* addr, std::size_t len) const;
+            void const* addr, std::size_t len) const;
 
         bool set_area_membind_nodeset(
-            const void* addr, std::size_t len, void* nodeset) const;
+            void const* addr, std::size_t len, void* nodeset) const;
 
-        int get_numa_domain(const void* addr) const;
+        int get_numa_domain(void const* addr) const;
 
         /// Free memory that was previously allocated by allocate
         void deallocate(void* addr, std::size_t len) const noexcept;

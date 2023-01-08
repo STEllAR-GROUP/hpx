@@ -62,8 +62,11 @@ set(threading_base_compat_headers
 
 set(threading_base_sources
     annotated_function.cpp
+    callback_notifier.cpp
     create_thread.cpp
     create_work.cpp
+    detail/reset_backtrace.cpp
+    detail/reset_lco_description.cpp
     execution_agent.cpp
     external_timer.cpp
     get_default_pool.cpp

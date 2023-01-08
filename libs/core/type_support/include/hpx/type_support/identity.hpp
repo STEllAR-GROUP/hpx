@@ -6,10 +6,38 @@
 
 #pragma once
 
-namespace hpx { namespace util {
-    template <typename T>
+#include <hpx/config.hpp>
+
+#include <functional>
+#include <type_traits>
+
+namespace hpx {
+
     struct identity
+    {
+        using is_transparent = std::true_type;
+
+        template <typename T>
+        HPX_HOST_DEVICE constexpr T&& operator()(T&& t) const noexcept
+        {
+            return HPX_FORWARD(T, t);
+        }
+    };
+
+    template <typename T>
+    struct type_identity
     {
         using type = T;
     };
-}}    // namespace hpx::util
+
+    template <typename T>
+    using type_identity_t = typename type_identity<T>::type;
+}    // namespace hpx
+
+namespace hpx::util {
+
+    template <typename T>
+    using identity HPX_DEPRECATED_V(1, 9,
+        "hpx::util::identity is deprecated, use hpx::type_identity instead") =
+        hpx::type_identity<T>;
+}    // namespace hpx::util

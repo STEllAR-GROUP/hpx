@@ -17,9 +17,7 @@
 */
 
 #include <hpx/modules/program_options.hpp>
-
-#include <boost/token_functions.hpp>
-#include <boost/tokenizer.hpp>
+#include <hpx/modules/string_util.hpp>
 
 #include <algorithm>
 #include <fstream>
@@ -29,7 +27,6 @@
 #include <utility>
 #include <vector>
 
-using namespace boost;
 using namespace hpx::program_options;
 using namespace std;
 
@@ -87,8 +84,8 @@ int main(int ac, char* av[])
 
             // Split the file content
             string sstr = ss.str();
-            char_separator<char> sep(" \n\r");
-            tokenizer<char_separator<char>> tok(sstr, sep);
+            hpx::string_util::char_separator sep(" \n\r");
+            hpx::string_util::tokenizer tok(sstr, sep);
 
             vector<string> args;
             copy(tok.begin(), tok.end(), back_inserter(args));

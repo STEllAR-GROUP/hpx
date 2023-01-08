@@ -260,26 +260,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         /// \endcond
     }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename BidirIter,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<BidirIter>
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::reverse is deprecated, use hpx::reverse "
-        "instead")
-        util::detail::algorithm_result_t<ExPolicy, BidirIter> reverse(
-            ExPolicy&& policy, BidirIter first, BidirIter last)
-    {
-        static_assert((hpx::traits::is_bidirectional_iterator_v<BidirIter>),
-            "Requires at least bidirectional iterator.");
-
-        return detail::reverse<BidirIter>().call(
-            HPX_FORWARD(ExPolicy, policy), first, last);
-    }
-
     ///////////////////////////////////////////////////////////////////////////
     // reverse_copy
     namespace detail {
@@ -338,30 +318,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-
-    // clang-format off
-    template <typename ExPolicy, typename BidirIter, typename FwdIter,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator_v<BidirIter> &&
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<FwdIter>
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 7,
-        "hpx::parallel::reverse_copy is deprecated, use hpx::reverse_copy "
-        "instead") util::detail::algorithm_result_t<ExPolicy,
-        util::in_out_result<BidirIter, FwdIter>> reverse_copy(ExPolicy&& policy,
-        BidirIter first, BidirIter last, FwdIter dest_first)
-    {
-        static_assert((hpx::traits::is_bidirectional_iterator_v<BidirIter>),
-            "Requires at least bidirectional iterator.");
-        static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
-            "Requires at least forward iterator.");
-
-        return detail::reverse_copy<util::in_out_result<BidirIter, FwdIter>>()
-            .call(HPX_FORWARD(ExPolicy, policy), first, last, dest_first);
-    }
-}}}    // namespace hpx::parallel::v1
+}}}      // namespace hpx::parallel::v1
 
 namespace hpx {
 

@@ -24,13 +24,15 @@
 #include <memory>
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     namespace detail {
+
         static get_locality_id_type* get_locality_id_f;
 
         void set_get_locality_id(get_locality_id_type* f)
         {
-            get_locality_id_f = f;
+            get_locality_id_f = HPX_MOVE(f);
         }
 
         std::uint32_t get_locality_id(hpx::error_code& ec)
@@ -124,8 +126,7 @@ namespace hpx { namespace threads {
         while (!exit_funcs_.empty())
         {
             {
-                hpx::util::unlock_guard<
-                    std::unique_lock<hpx::util::detail::spinlock>>
+                hpx::unlock_guard<std::unique_lock<hpx::util::detail::spinlock>>
                     ul(l);
                 if (!exit_funcs_.front().empty())
                     exit_funcs_.front()();
@@ -164,16 +165,15 @@ namespace hpx { namespace threads {
 
     bool thread_data::interruption_point(bool throw_on_interrupt)
     {
-        // We do not protect enabled_interrupt_ and requested_interrupt_
-        // from concurrent access here (which creates a benign data race) in
-        // order to avoid infinite recursion. This function is called by
+        // We do not protect enabled_interrupt_ and requested_interrupt_ from
+        // concurrent access here (which creates a benign data race) in order to
+        // avoid infinite recursion. This function is called by
         // this_thread::suspend which causes problems if the lock would call
         // suspend itself.
         if (enabled_interrupt_ && requested_interrupt_)
         {
             // Verify that there are no more registered locks for this
-            // OS-thread. This will throw if there are still any locks
-            // held.
+            // OS-thread. This will throw if there are still any locks held.
             util::force_error_on_lock();
 
             // now interrupt this thread
@@ -201,7 +201,7 @@ namespace hpx { namespace threads {
 
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
         description_ = init_data.description;
-        lco_description_ = util::thread_description();
+        lco_description_ = threads::thread_description();
 #endif
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         parent_locality_id_ = init_data.parent_locality_id;
@@ -260,20 +260,21 @@ namespace hpx { namespace threads {
         thread_self* p = get_self_ptr();
         if (HPX_UNLIKELY(p == nullptr))
         {
-            HPX_THROW_EXCEPTION(null_thread_id, "threads::get_self",
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id, "threads::get_self",
                 "null thread id encountered (is this executed on a "
                 "HPX-thread?)");
         }
         return *p;
     }
 
-    thread_self* get_self_ptr()
+    thread_self* get_self_ptr() noexcept
     {
         return thread_self::get_self();
     }
 
     namespace detail {
-        void set_self_ptr(thread_self* self)
+
+        void set_self_ptr(thread_self* self) noexcept
         {
             thread_self::set_self(self);
         }
@@ -291,7 +292,8 @@ namespace hpx { namespace threads {
 
         if (HPX_UNLIKELY(p == nullptr))
         {
-            HPX_THROWS_IF(ec, null_thread_id, "threads::get_self_ptr_checked",
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
+                "threads::get_self_ptr_checked",
                 "null thread id encountered (is this executed on a "
                 "HPX-thread?)");
             return nullptr;
@@ -303,7 +305,7 @@ namespace hpx { namespace threads {
         return p;
     }
 
-    thread_id_type get_self_id()
+    thread_id_type get_self_id() noexcept
     {
         thread_self* self = get_self_ptr();
         if (HPX_LIKELY(nullptr != self))
@@ -312,7 +314,7 @@ namespace hpx { namespace threads {
         return threads::invalid_thread_id;
     }
 
-    thread_data* get_self_id_data()
+    thread_data* get_self_id_data() noexcept
     {
         thread_self* self = get_self_ptr();
         if (HPX_LIKELY(nullptr != self))
@@ -321,13 +323,13 @@ namespace hpx { namespace threads {
         return nullptr;
     }
 
-    std::ptrdiff_t get_self_stacksize()
+    std::ptrdiff_t get_self_stacksize() noexcept
     {
         thread_data* thrd_data = get_self_id_data();
         return thrd_data ? thrd_data->get_stack_size() : 0;
     }
 
-    thread_stacksize get_self_stacksize_enum()
+    thread_stacksize get_self_stacksize_enum() noexcept
     {
         thread_data* thrd_data = get_self_id_data();
         thread_stacksize stacksize = thrd_data ?
@@ -338,23 +340,23 @@ namespace hpx { namespace threads {
     }
 
 #ifndef HPX_HAVE_THREAD_PARENT_REFERENCE
-    thread_id_type get_parent_id()
+    thread_id_type get_parent_id() noexcept
     {
         return threads::invalid_thread_id;
     }
 
-    std::size_t get_parent_phase()
+    std::size_t get_parent_phase() noexcept
     {
         return 0;
     }
 
-    std::uint32_t get_parent_locality_id()
+    std::uint32_t get_parent_locality_id() noexcept
     {
         // same as naming::invalid_locality_id
         return ~static_cast<std::uint32_t>(0);
     }
 #else
-    thread_id_type get_parent_id()
+    thread_id_type get_parent_id() noexcept
     {
         thread_data* thrd_data = get_self_id_data();
         if (HPX_LIKELY(nullptr != thrd_data))
@@ -364,7 +366,7 @@ namespace hpx { namespace threads {
         return threads::invalid_thread_id;
     }
 
-    std::size_t get_parent_phase()
+    std::size_t get_parent_phase() noexcept
     {
         thread_data* thrd_data = get_self_id_data();
         if (HPX_LIKELY(nullptr != thrd_data))
@@ -374,7 +376,7 @@ namespace hpx { namespace threads {
         return 0;
     }
 
-    std::uint32_t get_parent_locality_id()
+    std::uint32_t get_parent_locality_id() noexcept
     {
         thread_data* thrd_data = get_self_id_data();
         if (HPX_LIKELY(nullptr != thrd_data))
@@ -387,7 +389,7 @@ namespace hpx { namespace threads {
     }
 #endif
 
-    std::uint64_t get_self_component_id()
+    std::uint64_t get_self_component_id() noexcept
     {
 #ifndef HPX_HAVE_THREAD_TARGET_ADDRESS
         return 0;
@@ -412,6 +414,7 @@ namespace hpx { namespace threads {
         }
         return nullptr;
     }
+
     void set_self_timer_data(
         std::shared_ptr<hpx::util::external_timer::task_wrapper> data)
     {
@@ -423,4 +426,4 @@ namespace hpx { namespace threads {
         return;
     }
 #endif
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

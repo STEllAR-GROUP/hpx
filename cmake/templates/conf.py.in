@@ -51,6 +51,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'breathe',
     'sphinx-hpx', # Custom HPX roles
+    'sphinx_copybutton',
 ]
 
 breathe_projects = { "hpx": "../hpx_autodoc" }
@@ -552,6 +553,9 @@ rst_prolog += '''
 .. _upc: https://upc.lbl.gov/
 .. |fortress| replace:: Fortress
 .. _fortress: https://labs.oracle.com/projects/plrg/Publications/index.html
+.. |oneTBB| replace:: oneAPI Threading Building Blocks (oneTBB)
+.. _oneTBB: https://spec.oneapi.io/versions/1.0-rev-3/elements/oneTBB/source/task_scheduler/task_group/task_group_cls.html
+
 
 .. |email_hkaiser| image:: /_static/images/emails/hkaiser.png
 .. |email_theller| image:: /_static/images/emails/theller.png
@@ -663,6 +667,7 @@ html_favicon = '_static/images/favicon.png'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+html_css_files = ['custom.css']
 html_context = {
     'display_github': True,
     'github_user': 'STEllAR-GROUP',

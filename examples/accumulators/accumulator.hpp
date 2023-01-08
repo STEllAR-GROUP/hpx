@@ -58,7 +58,7 @@ namespace examples {
             HPX_ASSERT(this->get_id());
 
             typedef server::accumulator::reset_action action_type;
-            hpx::apply<action_type>(this->get_id());
+            hpx::post<action_type>(this->get_id());
         }
         //]
 
@@ -84,7 +84,7 @@ namespace examples {
             HPX_ASSERT(this->get_id());
 
             typedef server::accumulator::add_action action_type;
-            hpx::apply<action_type>(this->get_id(), arg);
+            hpx::post<action_type>(this->get_id(), arg);
         }
 
         /// Add \p arg to the accumulator's value.

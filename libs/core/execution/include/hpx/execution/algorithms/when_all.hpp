@@ -207,7 +207,7 @@ namespace hpx::execution::experimental {
                     error_types_of_t<Senders, Env, Variant>...,
                     Variant<std::exception_ptr>>;
 
-                static constexpr bool sends_stopped = false;
+                static constexpr bool sends_stopped = true;
             };
 
             template <typename Env>
@@ -390,7 +390,7 @@ namespace hpx::execution::experimental {
 
                 using operation_state_type =
                     std::decay_t<decltype(hpx::execution::experimental::connect(
-                        HPX_FORWARD(SendersPack, senders).template get<i>(),
+                        std::declval<SendersPack>().template get<i>(),
                         when_all_receiver<operation_state>(
                             std::declval<std::decay_t<operation_state>&>())))>;
                 operation_state_type op_state;
@@ -459,7 +459,8 @@ namespace hpx::execution::experimental {
                 connect_t, when_all_sender& s, Receiver&& receiver)
             {
                 return operation_state<Receiver, senders_type&,
-                    num_predecessors - 1>(receiver, s.senders);
+                    num_predecessors - 1>(
+                    HPX_FORWARD(Receiver, receiver), s.senders);
             }
         };
     }    // namespace detail

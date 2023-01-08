@@ -16,27 +16,13 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace program_options {
-
-    inline std::string strip_prefixes(const std::string& text)
-    {
-        // "--foo-bar" -> "foo-bar"
-        std::string::size_type i = text.find_first_not_of("-/");
-        if (i == std::string::npos)
-        {
-            return text;
-        }
-        else
-        {
-            return text.substr(i);
-        }
-    }
+namespace hpx::program_options {
 
     /** Base class for all errors in the library. */
     class HPX_ALWAYS_EXPORT error : public std::logic_error
     {
     public:
-        error(const std::string& xwhat)
+        explicit error(std::string const& xwhat)
           : std::logic_error(xwhat)
         {
         }
@@ -59,7 +45,7 @@ namespace hpx { namespace program_options {
     class HPX_ALWAYS_EXPORT invalid_command_line_style : public error
     {
     public:
-        invalid_command_line_style(const std::string& msg)
+        explicit invalid_command_line_style(std::string const& msg)
           : error(msg)
         {
         }
@@ -69,7 +55,7 @@ namespace hpx { namespace program_options {
     class HPX_ALWAYS_EXPORT reading_file : public error
     {
     public:
-        reading_file(const char* filename)
+        explicit reading_file(char const* filename)
           : error(std::string("can not read options configuration file '")
                       .append(filename)
                       .append("'"))
@@ -121,48 +107,43 @@ namespace hpx { namespace program_options {
         /** template with placeholders */
         std::string m_error_template;
 
-        error_with_option_name(const std::string& template_,
-            const std::string& option_name = "",
-            const std::string& original_token = "", int option_style = 0);
-
-        /** gcc says that throw specification on dtor is loosened
-         *  without this line
-         *  */
-        ~error_with_option_name() noexcept {}
+        explicit error_with_option_name(std::string const& template_,
+            std::string const& option_name = "",
+            std::string const& original_token = "", int option_style = 0);
 
         /** Substitute
          *      parameter_name->value to create the error message from
          *      the error template */
         void set_substitute(
-            const std::string& parameter_name, const std::string& value)
+            std::string const& parameter_name, std::string const& value)
         {
             m_substitutions[parameter_name] = value;
         }
 
         /** If the parameter is missing, then make the
          *      from->to substitution instead */
-        void set_substitute_default(const std::string& parameter_name,
-            const std::string& from, const std::string& to)
+        void set_substitute_default(std::string const& parameter_name,
+            std::string const& from, std::string const& to)
         {
             m_substitution_defaults[parameter_name] = std::make_pair(from, to);
         }
 
         /** Add context to an exception */
-        void add_context(const std::string& option_name,
-            const std::string& original_token, int option_style)
+        void add_context(std::string const& option_name,
+            std::string const& original_token, int option_style)
         {
             set_option_name(option_name);
             set_original_token(original_token);
             set_prefix(option_style);
         }
 
-        void set_prefix(int option_style)
+        void set_prefix(int option_style) noexcept
         {
             m_option_style = option_style;
         }
 
         /** Overridden in error_with_no_option_name */
-        virtual void set_option_name(const std::string& option_name)
+        virtual void set_option_name(std::string const& option_name)
         {
             set_substitute("option", option_name);
         }
@@ -172,14 +153,14 @@ namespace hpx { namespace program_options {
             return get_canonical_option_name();
         }
 
-        void set_original_token(const std::string& original_token)
+        void set_original_token(std::string const& original_token)
         {
             set_substitute("original_token", original_token);
         }
 
         /** Creates the error_message on the fly
          *      Currently a thin wrapper for substitute_placeholders() */
-        const char* what() const noexcept override;
+        char const* what() const noexcept override;
 
     protected:
         /** Used to hold the error text returned by what() */
@@ -187,11 +168,11 @@ namespace hpx { namespace program_options {
 
         /** Makes all substitutions using the template */
         virtual void substitute_placeholders(
-            const std::string& error_template) const;
+            std::string const& error_template) const;
 
         // helper function for substitute_placeholders
         void replace_token(
-            const std::string& from, const std::string& to) const;
+            std::string const& from, std::string const& to) const;
 
         /** Construct option name in accordance with the appropriate
          *  prefix style: i.e. long dash or short slash etc */
@@ -209,8 +190,6 @@ namespace hpx { namespace program_options {
                 "option '%canonical_option%' only takes a single argument")
         {
         }
-
-        ~multiple_values() noexcept {}
     };
 
     /** Class thrown when there are several occurrences of an
@@ -224,8 +203,6 @@ namespace hpx { namespace program_options {
                                    "specified more than once")
         {
         }
-
-        ~multiple_occurrences() noexcept {}
     };
 
     /** Class thrown when a required/mandatory option is missing */
@@ -233,14 +210,12 @@ namespace hpx { namespace program_options {
     {
     public:
         // option name is constructed by the option_descriptor and never on the fly
-        required_option(const std::string& option_name)
+        explicit required_option(std::string const& option_name)
           : error_with_option_name(
                 "the option '%canonical_option%' is required but missing", "",
                 option_name)
         {
         }
-
-        ~required_option() noexcept {}
     };
 
     /** Base class of un-parsable options,
@@ -259,45 +234,39 @@ namespace hpx { namespace program_options {
       : public error_with_option_name
     {
     public:
-        error_with_no_option_name(const std::string& template_,
-            const std::string& original_token = "")
+        explicit error_with_no_option_name(std::string const& template_,
+            std::string const& original_token = "")
           : error_with_option_name(template_, "", original_token)
         {
         }
 
         /** Does NOT set option name, because no option name makes sense */
-        void set_option_name(const std::string&) override {}
-
-        ~error_with_no_option_name() noexcept {}
+        void set_option_name(std::string const&) override {}
     };
 
     /** Class thrown when option name is not recognized. */
     class HPX_ALWAYS_EXPORT unknown_option : public error_with_no_option_name
     {
     public:
-        unknown_option(const std::string& original_token = "")
+        explicit unknown_option(std::string const& original_token = "")
           : error_with_no_option_name(
                 "unrecognised option '%canonical_option%'", original_token)
         {
         }
-
-        ~unknown_option() noexcept {}
     };
 
     /** Class thrown when there's ambiguity among several possible options. */
     class HPX_ALWAYS_EXPORT ambiguous_option : public error_with_no_option_name
     {
     public:
-        ambiguous_option(const std::vector<std::string>& xalternatives)
+        explicit ambiguous_option(std::vector<std::string> const& xalternatives)
           : error_with_no_option_name(
                 "option '%canonical_option%' is ambiguous")
           , m_alternatives(xalternatives)
         {
         }
 
-        ~ambiguous_option() noexcept {}
-
-        const std::vector<std::string>& alternatives() const noexcept
+        std::vector<std::string> const& alternatives() const noexcept
         {
             return m_alternatives;
         }
@@ -305,7 +274,7 @@ namespace hpx { namespace program_options {
     protected:
         /** Makes all substitutions using the template */
         void substitute_placeholders(
-            const std::string& error_template) const override;
+            std::string const& error_template) const override;
 
     private:
         // TODO: copy ctor might throw
@@ -329,17 +298,16 @@ namespace hpx { namespace program_options {
             unrecognized_line
         };
 
-        invalid_syntax(kind_t kind, const std::string& option_name = "",
-            const std::string& original_token = "", int option_style = 0)
+        explicit invalid_syntax(kind_t kind,
+            std::string const& option_name = "",
+            std::string const& original_token = "", int option_style = 0)
           : error_with_option_name(
                 get_template(kind), option_name, original_token, option_style)
           , m_kind(kind)
         {
         }
 
-        ~invalid_syntax() noexcept {}
-
-        kind_t kind() const
+        constexpr kind_t kind() const noexcept
         {
             return m_kind;
         }
@@ -359,13 +327,11 @@ namespace hpx { namespace program_options {
     class HPX_ALWAYS_EXPORT invalid_config_file_syntax : public invalid_syntax
     {
     public:
-        invalid_config_file_syntax(const std::string& invalid_line, kind_t kind)
+        invalid_config_file_syntax(std::string const& invalid_line, kind_t kind)
           : invalid_syntax(kind)
         {
             m_substitutions["invalid_line"] = invalid_line;
         }
-
-        ~invalid_config_file_syntax() noexcept {}
 
         /** Convenience functions for backwards compatibility */
         std::string tokens() const override
@@ -383,13 +349,12 @@ namespace hpx { namespace program_options {
     class HPX_ALWAYS_EXPORT invalid_command_line_syntax : public invalid_syntax
     {
     public:
-        invalid_command_line_syntax(kind_t kind,
-            const std::string& option_name = "",
-            const std::string& original_token = "", int option_style = 0)
+        explicit invalid_command_line_syntax(kind_t kind,
+            std::string const& option_name = "",
+            std::string const& original_token = "", int option_style = 0)
           : invalid_syntax(kind, option_name, original_token, option_style)
         {
         }
-        ~invalid_command_line_syntax() noexcept {}
     };
 
     /** Class thrown when value of option is incorrect. */
@@ -406,17 +371,16 @@ namespace hpx { namespace program_options {
         };
 
     public:
-        validation_error(kind_t kind, const std::string& option_name = "",
-            const std::string& original_token = "", int option_style = 0)
+        explicit validation_error(kind_t kind,
+            std::string const& option_name = "",
+            std::string const& original_token = "", int option_style = 0)
           : error_with_option_name(
                 get_template(kind), option_name, original_token, option_style)
           , m_kind(kind)
         {
         }
 
-        ~validation_error() noexcept {}
-
-        kind_t kind() const
+        constexpr kind_t kind() const noexcept
         {
             return m_kind;
         }
@@ -431,17 +395,16 @@ namespace hpx { namespace program_options {
     class HPX_ALWAYS_EXPORT invalid_option_value : public validation_error
     {
     public:
-        invalid_option_value(const std::string& value);
-        invalid_option_value(const std::wstring& value);
+        explicit invalid_option_value(std::string const& value);
+        explicit invalid_option_value(std::wstring const& value);
     };
 
     /** Class thrown if there is an invalid bool value given */
     class HPX_ALWAYS_EXPORT invalid_bool_value : public validation_error
     {
     public:
-        invalid_bool_value(const std::string& value);
+        explicit invalid_bool_value(std::string const& value);
     };
-
-}}    // namespace hpx::program_options
+}    // namespace hpx::program_options
 
 #include <hpx/config/warnings_suffix.hpp>

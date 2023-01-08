@@ -11,15 +11,16 @@
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_num_tss.hpp>
-
-#include <hpx/threading_base/detail/reset_lco_description.hpp>
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_description.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 
+#ifdef HPX_HAVE_THREAD_DESCRIPTION
+#include <hpx/threading_base/detail/reset_lco_description.hpp>
+#endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/threading_base/detail/reset_backtrace.hpp>
@@ -31,7 +32,7 @@
 #include <string>
 #include <utility>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     execution_agent::execution_agent(
         coroutines::detail::coroutine_impl* coroutine) noexcept
@@ -44,7 +45,8 @@ namespace hpx { namespace threads {
         thread_id_type id = self_.get_thread_id();
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROW_EXCEPTION(null_thread_id, "execution_agent::description",
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
+                "execution_agent::description",
                 "null thread id encountered (is this executed on a "
                 "HPX-thread?)");
         }
@@ -53,12 +55,12 @@ namespace hpx { namespace threads {
             "{}: {}", id, get_thread_id_data(id)->get_description());
     }
 
-    void execution_agent::yield(const char* desc)
+    void execution_agent::yield(char const* desc)
     {
         do_yield(desc, hpx::threads::thread_schedule_state::pending);
     }
 
-    void execution_agent::yield_k(std::size_t k, const char* desc)
+    void execution_agent::yield_k(std::size_t k, char const* desc)
     {
         if (k < 4)    //-V112
         {
@@ -77,29 +79,29 @@ namespace hpx { namespace threads {
         }
     }
 
-    void execution_agent::resume(const char* desc)
+    void execution_agent::resume(char const* desc)
     {
         do_resume(desc, threads::thread_restart_state::signaled);
     }
 
-    void execution_agent::abort(const char* desc)
+    void execution_agent::abort(char const* desc)
     {
         do_resume(desc, threads::thread_restart_state::abort);
     }
 
-    void execution_agent::suspend(const char* desc)
+    void execution_agent::suspend(char const* desc)
     {
         do_yield(desc, threads::thread_schedule_state::suspended);
     }
 
     void execution_agent::sleep_for(
-        hpx::chrono::steady_duration const& sleep_duration, const char* desc)
+        hpx::chrono::steady_duration const& sleep_duration, char const* desc)
     {
         sleep_until(sleep_duration.from_now(), desc);
     }
 
     void execution_agent::sleep_until(
-        hpx::chrono::steady_time_point const& sleep_time, const char* desc)
+        hpx::chrono::steady_time_point const& sleep_time, char const* desc)
     {
         // Just yield until time has passed by...
         auto now = std::chrono::steady_clock::now();
@@ -146,12 +148,13 @@ namespace hpx { namespace threads {
 #endif
 
     hpx::threads::thread_restart_state execution_agent::do_yield(
-        const char* desc, threads::thread_schedule_state state)
+        char const* desc, threads::thread_schedule_state state)
     {
         thread_id_ref_type id = self_.get_thread_id();    // keep alive
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROW_EXCEPTION(null_thread_id, "execution_agent::do_yield",
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
+                "execution_agent::do_yield",
                 "null thread id encountered (is this executed on a "
                 "HPX-thread?)");
         }
@@ -170,19 +173,21 @@ namespace hpx { namespace threads {
         {
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
             threads::detail::reset_lco_description desc(
-                id.noref(), util::thread_description(desc));
+                id.noref(), threads::thread_description(desc));
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id);
 #endif
-            on_exit_reset_held_lock_data held_locks;
-            HPX_UNUSED(held_locks);
+            [[maybe_unused]] on_exit_reset_held_lock_data held_locks;
 
             HPX_ASSERT(thrd_data->get_state().state() ==
                 thread_schedule_state::active);
             HPX_ASSERT(state != thread_schedule_state::active);
+
+            // actual yield operation
             statex = self_.yield(
                 threads::thread_result_type(state, threads::invalid_thread_id));
+
             HPX_ASSERT(get_thread_id_data(id)->get_state().state() ==
                 thread_schedule_state::active);
         }
@@ -193,7 +198,7 @@ namespace hpx { namespace threads {
         // handle interrupt and abort
         if (statex == threads::thread_restart_state::abort)
         {
-            HPX_THROW_EXCEPTION(yield_aborted, desc,
+            HPX_THROW_EXCEPTION(hpx::error::yield_aborted, desc,
                 "thread({}) aborted (yield returned wait_abort)",
                 description());
         }
@@ -202,10 +207,10 @@ namespace hpx { namespace threads {
     }
 
     void execution_agent::do_resume(
-        const char* /* desc */, hpx::threads::thread_restart_state statex)
+        char const* /* desc */, hpx::threads::thread_restart_state statex)
     {
         threads::detail::set_thread_state(self_.get_thread_id(),
             thread_schedule_state::pending, statex, thread_priority::normal,
             thread_schedule_hint{}, false);
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

@@ -1,7 +1,7 @@
 //  Copyright (c) 2011-2013 Thomas Heller
 //  Copyright (c) 2013-2015 Agustin Berge
 //  Copyright (c) 2019 Mikael Simberg
-//  Copyright (c) 2020-2021 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,7 +18,7 @@
 #include <tuple>
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     template <typename... Ts>
     struct is_bitwise_serializable<std::tuple<Ts...>>
@@ -33,9 +33,9 @@ namespace hpx { namespace traits {
             !is_bitwise_serializable_v<std::tuple<Ts...>>>
     {
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     namespace detail {
 
@@ -49,29 +49,27 @@ namespace hpx { namespace serialization {
             static void call(Archive& ar, std::tuple<Ts...>& t, unsigned int)
             {
 #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS)
-                int const _sequencer[] = {((ar & std::get<Is>(t)), 0)...};
+                (hpx::serialization::detail::serialize_one(ar, std::get<Is>(t)),
+                    ...);
 #else
-                int const _sequencer[] = {
-                    ((ar &
-                         const_cast<std::remove_const_t<Ts>&>(std::get<Is>(t))),
-                        0)...};
+                (hpx::serialization::detail::serialize_one(
+                     ar, const_cast<std::remove_const_t<Ts>&>(std::get<Is>(t))),
+                    ...);
 #endif
-                (void) _sequencer;
             }
-        };
-    }    // namespace detail
+        };    // namespace detail
+    }         // namespace detail
 
     template <typename Archive, typename... Ts>
     void serialize(Archive& ar, std::tuple<Ts...>& t, unsigned int version)
     {
-        using Is = typename hpx::util::make_index_pack<sizeof...(Ts)>::type;
+        using Is = hpx::util::make_index_pack_t<sizeof...(Ts)>;
         detail::std_serialize_with_index_pack<Archive, Is, Ts...>::call(
             ar, t, version);
     }
 
     template <typename Archive>
-    void serialize(Archive&, std::tuple<>&, unsigned int)
+    constexpr void serialize(Archive&, std::tuple<>&, unsigned int) noexcept
     {
     }
-
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

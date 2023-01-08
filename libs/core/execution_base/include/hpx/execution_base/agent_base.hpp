@@ -12,7 +12,7 @@
 #include <cstddef>
 #include <string>
 
-namespace hpx { namespace execution_base {
+namespace hpx::execution_base {
 
     struct agent_base
     {
@@ -20,7 +20,7 @@ namespace hpx { namespace execution_base {
 
         virtual std::string description() const = 0;
 
-        virtual context_base const& context() const = 0;
+        virtual context_base const& context() const noexcept = 0;
 
         virtual void yield(char const* desc) = 0;
         virtual void yield_k(std::size_t k, char const* desc) = 0;
@@ -34,4 +34,4 @@ namespace hpx { namespace execution_base {
             hpx::chrono::steady_time_point const& sleep_time,
             char const* desc) = 0;
     };
-}}    // namespace hpx::execution_base
+}    // namespace hpx::execution_base

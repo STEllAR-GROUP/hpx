@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,8 +12,9 @@
 #include <hpx/actions/actions_fwd.hpp>
 #include <hpx/actions_base/action_priority.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/detail/apply_implementations_fwd.hpp>
 #include <hpx/async_distributed/continuation_fwd.hpp>
+#include <hpx/async_distributed/detail/post_continue_fwd.hpp>
+#include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 #include <hpx/async_distributed/lcos_fwd.hpp>
 #include <hpx/async_distributed/trigger_lco_fwd.hpp>
 #include <hpx/components_base/component_type.hpp>
@@ -30,19 +31,13 @@ namespace hpx {
     /// \cond NOINTERNAL
 
     //////////////////////////////////////////////////////////////////////////
-    // forward declare the required overload of apply.
+    // forward declare the required overload of post.
     template <typename Action, typename... Ts>
-    bool apply(hpx::id_type const& gid, Ts&&... vs);
-
-    template <typename Component, typename Signature, typename Derived,
-        typename Cont, typename... Ts>
-    bool apply_continue(
-        hpx::actions::basic_action<Component, Signature, Derived>, Cont&& cont,
-        hpx::id_type const& gid, Ts&&... vs);
+    bool post(hpx::id_type const& gid, Ts&&... vs);
 
     template <typename Component, typename Signature, typename Derived,
         typename... Ts>
-    inline bool apply_c(
+    inline bool post_c_p(
         hpx::actions::basic_action<Component, Signature, Derived>,
         hpx::id_type const& contgid, hpx::id_type const& gid, Ts&&... vs);
     /// \endcond
@@ -122,13 +117,13 @@ namespace hpx {
                     hpx::id_type::management_type::managed_move_credit);
                 id.make_unmanaged();
 
-                detail::apply_impl<Action>(target, HPX_MOVE(addr),
+                detail::post_impl<Action>(target, HPX_MOVE(addr),
                     actions::action_priority<Action>(),
                     detail::make_rvalue<Result>(t));
             }
             else
             {
-                detail::apply_impl<Action>(id, HPX_MOVE(addr),
+                detail::post_impl<Action>(id, HPX_MOVE(addr),
                     actions::action_priority<Action>(),
                     detail::make_rvalue<Result>(t));
             }
@@ -148,14 +143,14 @@ namespace hpx {
                     hpx::id_type::management_type::managed_move_credit);
                 id.make_unmanaged();
 
-                detail::apply_impl<Action>(
+                detail::post_impl<Action>(
                     actions::typed_continuation<LocalResult, RemoteResult>(
                         cont),
                     target, HPX_MOVE(addr), detail::make_rvalue<Result>(t));
             }
             else
             {
-                detail::apply_impl<Action>(
+                detail::post_impl<Action>(
                     actions::typed_continuation<LocalResult, RemoteResult>(
                         cont),
                     id, HPX_MOVE(addr), detail::make_rvalue<Result>(t));
@@ -257,4 +252,4 @@ namespace hpx {
     /// \endcond
 }    // namespace hpx
 
-#include <hpx/async_distributed/applier/apply.hpp>
+#include <hpx/async_distributed/detail/post.hpp>

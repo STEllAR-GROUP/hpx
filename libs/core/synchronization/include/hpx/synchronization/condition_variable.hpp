@@ -39,13 +39,13 @@ namespace hpx {
     ///
     enum class cv_status
     {
-        ///
-        /// \brief the condition variable was awakened with \a notify_all,
+        /// The condition variable was awakened with \a notify_all,
         /// \a notify_one, or spuriously
-        ///
         no_timeout,
+
         /// the condition variable was awakened by timeout expiration
         timeout,
+
         /// there was an error
         error
     };
@@ -213,7 +213,7 @@ namespace hpx {
             HPX_UNUSED(ignore_lock);
 
             std::unique_lock<mutex_type> l(data->mtx_);
-            util::unlock_guard<std::unique_lock<Mutex>> unlock(lock);
+            unlock_guard<std::unique_lock<Mutex>> unlock(lock);
 
             // The following ensures that the inner lock will be unlocked
             // before the outer to avoid deadlock (fixes issue #3608)
@@ -320,7 +320,7 @@ namespace hpx {
             HPX_UNUSED(ignore_lock);
 
             std::unique_lock<mutex_type> l(data->mtx_);
-            util::unlock_guard<std::unique_lock<Mutex>> unlock(lock);
+            unlock_guard<std::unique_lock<Mutex>> unlock(lock);
 
             // The following ensures that the inner lock will be unlocked
             // before the outer to avoid deadlock (fixes issue #3608)
@@ -695,7 +695,7 @@ namespace hpx {
             HPX_UNUSED(ignore_lock);
 
             std::unique_lock<mutex_type> l(data->mtx_);
-            util::unlock_guard<Lock> unlock(lock);
+            unlock_guard<Lock> unlock(lock);
 
             // The following ensures that the inner lock will be unlocked
             // before the outer to avoid deadlock (fixes issue #3608)
@@ -812,7 +812,7 @@ namespace hpx {
             HPX_UNUSED(ignore_lock);
 
             std::unique_lock<mutex_type> l(data->mtx_);
-            util::unlock_guard<Lock> unlock(lock);
+            unlock_guard<Lock> unlock(lock);
 
             // The following ensures that the inner lock will be unlocked
             // before the outer to avoid deadlock (fixes issue #3608)
@@ -1069,7 +1069,7 @@ namespace hpx {
                     return false;
                 }
 
-                util::unlock_guard<Lock> unlock(lock);
+                unlock_guard<Lock> unlock(lock);
 
                 // The following ensures that the inner lock will be unlocked
                 // before the outer to avoid deadlock (fixes issue #3608)
@@ -1164,7 +1164,7 @@ namespace hpx {
                         return false;
                     }
 
-                    util::unlock_guard<Lock> unlock(lock);
+                    unlock_guard<Lock> unlock(lock);
 
                     // The following ensures that the inner lock will be unlocked
                     // before the outer to avoid deadlock (fixes issue #3608)

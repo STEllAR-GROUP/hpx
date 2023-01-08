@@ -8,7 +8,8 @@
 #pragma once
 
 #if defined(DOXYGEN)
-namespace hpx { namespace functional {
+namespace hpx::functional {
+
     inline namespace unspecified {
         /// The `hpx::functional::tag_invoke` name defines a constexpr object
         /// that is invocable with one or more arguments. The first argument
@@ -96,7 +97,7 @@ namespace hpx { namespace functional {
     /// The implementation has to be noexcept
     template <typename Tag>
     struct tag_noexcept;
-}}    // namespace hpx::functional
+}    // namespace hpx::functional
 #else
 
 #include <hpx/config.hpp>
@@ -133,12 +134,14 @@ namespace hpx::functional {
                 return tag_invoke(tag, HPX_FORWARD(Ts, ts)...);
             }
 
-            friend constexpr bool operator==(tag_invoke_t, tag_invoke_t)
+            friend constexpr bool operator==(
+                tag_invoke_t, tag_invoke_t) noexcept
             {
                 return true;
             }
 
-            friend constexpr bool operator!=(tag_invoke_t, tag_invoke_t)
+            friend constexpr bool operator!=(
+                tag_invoke_t, tag_invoke_t) noexcept
             {
                 return false;
             }
@@ -163,6 +166,7 @@ namespace hpx::functional {
         is_tag_invocable<Tag, Args...>::value;
 
     namespace detail {
+
         template <typename Sig, bool Invocable>
         struct is_nothrow_tag_invocable_impl;
 
@@ -219,14 +223,17 @@ namespace hpx::functional {
         // poison pill
         void tag_invoke();
 
+        // use this tag type to enable the tag_invoke function overloads
+        struct enable_tag_invoke_t;
+
         ///////////////////////////////////////////////////////////////////////////
         // helper base class implementing the tag_invoke logic for CPOs
         template <typename Tag, typename Enable>
         struct tag
         {
             template <typename... Args,
-                typename = std::enable_if_t<
-                    meta::value<meta::invoke<Enable, Args...>>>>
+                typename = std::enable_if_t<meta::value<
+                    meta::invoke<Enable, enable_tag_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
                 noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
@@ -243,7 +250,8 @@ namespace hpx::functional {
             template <typename... Args,
                 typename =
                     std::enable_if_t<is_nothrow_tag_invocable_v<Tag, Args...> &&
-                        meta::value<meta::invoke<Enable, Args...>>>>
+                        meta::value<meta::invoke<Enable, enable_tag_invoke_t,
+                            Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const noexcept
                 -> tag_invoke_result_t<Tag, decltype(args)...>
@@ -263,6 +271,8 @@ namespace hpx::functional {
         template <typename Tag,
             typename Enable = meta::constant<meta::bool_<true>>>
         using tag_noexcept = tag_base_ns::tag_noexcept<Tag, Enable>;
+
+        using enable_tag_invoke_t = tag_base_ns::enable_tag_invoke_t;
     }    // namespace tag_invoke_base_ns
 
     inline namespace tag_invoke_f_ns {

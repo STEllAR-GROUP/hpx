@@ -27,11 +27,16 @@ namespace hpx {
 
             std::string message(int value) const
             {
-                if (value >= success && value < last_error)
+                if (value >= hpx::error::success &&
+                    value < hpx::error::last_error)
+                {
                     return std::string("HPX(") + error_names[value] +
                         ")";    //-V108
-                if (value & system_error_flag)
+                }
+                if (value & hpx::error::system_error_flag)
+                {
                     return std::string("HPX(system_error)");
+                }
                 return "HPX(unknown_error)";
             }
         };
@@ -61,25 +66,25 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    std::error_category const& get_hpx_category()
+    std::error_category const& get_hpx_category() noexcept
     {
         static detail::hpx_category hpx_category;
         return hpx_category;
     }
 
-    std::error_category const& get_hpx_rethrow_category()
+    std::error_category const& get_hpx_rethrow_category() noexcept
     {
         static detail::hpx_category_rethrow hpx_category_rethrow;
         return hpx_category_rethrow;
     }
 
-    std::error_category const& get_lightweight_hpx_category()
+    std::error_category const& get_lightweight_hpx_category() noexcept
     {
         static detail::lightweight_hpx_category lightweight_hpx_category;
         return lightweight_hpx_category;
     }
 
-    std::error_category const& get_hpx_category(throwmode mode)
+    std::error_category const& get_hpx_category(throwmode mode) noexcept
     {
         switch (mode)
         {
@@ -101,15 +106,19 @@ namespace hpx {
     error_code::error_code(error e, throwmode mode)
       : std::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & throwmode::lightweight))
+        if (e != hpx::error::success && e != hpx::error::no_success &&
+            !(mode & throwmode::lightweight))
+        {
             exception_ = detail::get_exception(e, "", mode);
+        }
     }
 
     error_code::error_code(
         error e, char const* func, char const* file, long line, throwmode mode)
       : std::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & throwmode::lightweight))
+        if (e != hpx::error::success && e != hpx::error::no_success &&
+            !(mode & throwmode::lightweight))
         {
             exception_ = detail::get_exception(e, "", mode, func, file, line);
         }
@@ -118,15 +127,19 @@ namespace hpx {
     error_code::error_code(error e, char const* msg, throwmode mode)
       : std::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & throwmode::lightweight))
+        if (e != hpx::error::success && e != hpx::error::no_success &&
+            !(mode & throwmode::lightweight))
+        {
             exception_ = detail::get_exception(e, msg, mode);
+        }
     }
 
     error_code::error_code(error e, char const* msg, char const* func,
         char const* file, long line, throwmode mode)
       : std::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & throwmode::lightweight))
+        if (e != hpx::error::success && e != hpx::error::no_success &&
+            !(mode & throwmode::lightweight))
         {
             exception_ = detail::get_exception(e, msg, mode, func, file, line);
         }
@@ -135,15 +148,19 @@ namespace hpx {
     error_code::error_code(error e, std::string const& msg, throwmode mode)
       : std::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & throwmode::lightweight))
+        if (e != hpx::error::success && e != hpx::error::no_success &&
+            !(mode & throwmode::lightweight))
+        {
             exception_ = detail::get_exception(e, msg, mode);
+        }
     }
 
     error_code::error_code(error e, std::string const& msg, char const* func,
         char const* file, long line, throwmode mode)
       : std::error_code(make_system_error_code(e, mode))
     {
-        if (e != success && e != no_success && !(mode & throwmode::lightweight))
+        if (e != hpx::error::success && e != hpx::error::no_success &&
+            !(mode & throwmode::lightweight))
         {
             exception_ = detail::get_exception(e, msg, mode, func, file, line);
         }
@@ -181,7 +198,7 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     error_code::error_code(error_code const& rhs)
-      : std::error_code(rhs.value() == success ?
+      : std::error_code(rhs.value() == hpx::error::success ?
                 make_success_code(
                     (category() == get_lightweight_hpx_category()) ?
                         hpx::throwmode::lightweight :
@@ -196,7 +213,7 @@ namespace hpx {
     {
         if (this != &rhs)
         {
-            if (rhs.value() == success)
+            if (rhs.value() == hpx::error::success)
             {
                 // if the rhs is a success code, we maintain our throw mode
                 this->std::error_code::operator=(make_success_code(

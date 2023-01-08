@@ -11,8 +11,10 @@
 
 #include <type_traits>
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     namespace detail {
+
         template <typename T>
         struct is_one_way_executor : std::false_type
         {
@@ -92,9 +94,10 @@ namespace hpx { namespace parallel { namespace execution {
       : detail::is_scheduler_executor<std::decay_t<T>>
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     // Concurrency TS V2: executor framework
     template <typename T, typename Enable = void>
     struct is_one_way_executor
@@ -103,7 +106,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    using is_one_way_executor_t = typename is_one_way_executor<T>::type;
+    inline constexpr bool is_one_way_executor_v = is_one_way_executor<T>::value;
 
     template <typename T, typename Enable = void>
     struct is_never_blocking_one_way_executor
@@ -112,8 +115,8 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    using is_never_blocking_one_way_executor_t =
-        typename is_never_blocking_one_way_executor<T>::type;
+    inline constexpr bool is_never_blocking_one_way_executor_v =
+        is_never_blocking_one_way_executor<T>::value;
 
     template <typename T, typename Enable = void>
     struct is_bulk_one_way_executor
@@ -122,8 +125,8 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    using is_bulk_one_way_executor_t =
-        typename is_bulk_one_way_executor<T>::type;
+    inline constexpr bool is_bulk_one_way_executor_v =
+        is_bulk_one_way_executor<T>::value;
 
     template <typename T, typename Enable = void>
     struct is_two_way_executor
@@ -132,7 +135,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    using is_two_way_executor_t = typename is_two_way_executor<T>::type;
+    inline constexpr bool is_two_way_executor_v = is_two_way_executor<T>::value;
 
     template <typename T, typename Enable = void>
     struct is_bulk_two_way_executor
@@ -141,8 +144,8 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    using is_bulk_two_way_executor_t =
-        typename is_bulk_two_way_executor<T>::type;
+    inline constexpr bool is_bulk_two_way_executor_v =
+        is_bulk_two_way_executor<T>::value;
 
     // trait testing for any of the above
     template <typename T, typename Enable = void>
@@ -154,42 +157,17 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    using is_executor_any_t = typename is_executor_any<T>::type;
-
-    template <typename T>
-    inline constexpr bool is_one_way_executor_v = is_one_way_executor<T>::value;
-
-    template <typename T>
-    inline constexpr bool is_never_blocking_one_way_executor_v =
-        is_never_blocking_one_way_executor<T>::value;
-
-    template <typename T>
-    inline constexpr bool is_bulk_one_way_executor_v =
-        is_bulk_one_way_executor<T>::value;
-
-    template <typename T>
-    inline constexpr bool is_two_way_executor_v = is_two_way_executor<T>::value;
-
-    template <typename T>
-    inline constexpr bool is_bulk_two_way_executor_v =
-        is_bulk_two_way_executor<T>::value;
-
-    template <typename T>
     inline constexpr bool is_executor_any_v = is_executor_any<T>::value;
 
     ///////////////////////////////////////////////////////////////////////////
     // is_scheduler_executor evaluates to true for executors that return senders
     // from their scheduling functions
     template <typename T, typename Enable = void>
-    struct is_scheduler_executor
-      : parallel::execution::is_scheduler_executor<std::decay_t<T>>
+    struct is_scheduler_executor : parallel::execution::is_scheduler_executor<T>
     {
     };
 
     template <typename T>
-    using is_scheduler_executor_t = typename is_scheduler_executor<T>::type;
-
-    template <typename T>
     inline constexpr bool is_scheduler_executor_v =
         is_scheduler_executor<T>::value;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

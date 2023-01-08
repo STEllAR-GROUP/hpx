@@ -20,6 +20,7 @@
 namespace hpx {
 
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T, typename Enable = void>
         struct is_invocable_impl : std::false_type

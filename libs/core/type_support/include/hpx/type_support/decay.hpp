@@ -13,10 +13,11 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename TD>
         struct decay_unwrap_impl
         {
@@ -37,4 +38,4 @@ namespace hpx { namespace util {
 
     template <typename T>
     using decay_unwrap_t = typename decay_unwrap<T>::type;
-}}    // namespace hpx::util
+}    // namespace hpx::util

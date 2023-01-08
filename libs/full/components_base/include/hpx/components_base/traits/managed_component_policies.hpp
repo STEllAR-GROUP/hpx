@@ -7,7 +7,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/type_support/always_void.hpp>
+
+#include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace traits {
@@ -30,7 +31,7 @@ namespace hpx { namespace traits {
 
     template <typename Component>
     struct managed_component_ctor_policy<Component,
-        util::always_void_t<typename Component::has_managed_component_base>>
+        std::void_t<typename Component::has_managed_component_base>>
     {
         using type = typename Component::ctor_policy;
     };
@@ -57,7 +58,7 @@ namespace hpx { namespace traits {
 
     template <typename Component>
     struct managed_component_dtor_policy<Component,
-        util::always_void<typename Component::has_managed_component_base>>
+        std::void_t<typename Component::has_managed_component_base>>
     {
         using type = typename Component::dtor_policy;
     };

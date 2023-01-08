@@ -109,7 +109,7 @@ namespace hpx { namespace agas {
             naming::get_locality_id_from_gid(dest);
         if (service_locality_id == naming::invalid_locality_id)
         {
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "primary_namespace::get_service_instance",
                 "can't retrieve a valid locality id from global address "
                 "({1}): ",
@@ -217,7 +217,7 @@ namespace hpx { namespace agas {
         if (naming::get_locality_id_from_gid(dest.get_gid()) ==
             agas::get_locality_id())
         {
-            hpx::apply(
+            hpx::post(
                 &server::primary_namespace::route, server_.get(), HPX_MOVE(p));
             f(std::error_code(), parcelset::parcel());
             return;
@@ -225,7 +225,7 @@ namespace hpx { namespace agas {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         server::primary_namespace::route_action action;
-        hpx::apply_cb(action, HPX_MOVE(dest), HPX_MOVE(f), HPX_MOVE(p));
+        hpx::post_cb(action, HPX_MOVE(dest), HPX_MOVE(f), HPX_MOVE(p));
 #else
         HPX_ASSERT(false);
 #endif

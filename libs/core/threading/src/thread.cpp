@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,13 +31,15 @@
 #endif
 
 namespace hpx {
+
     namespace detail {
+
         static thread_termination_handler_type thread_termination_handler;
     }
 
     void set_thread_termination_handler(thread_termination_handler_type f)
     {
-        detail::thread_termination_handler = f;
+        detail::thread_termination_handler = HPX_MOVE(f);
     }
 
     thread::thread() noexcept
@@ -60,7 +62,7 @@ namespace hpx {
         {
             l2.unlock();
             l.unlock();
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "thread::operator=", "destroying running thread");
         }
         id_ = rhs.id_;
@@ -76,8 +78,8 @@ namespace hpx {
             {
                 try
                 {
-                    HPX_THROW_EXCEPTION(invalid_status, "thread::~thread",
-                        "destroying running thread");
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                        "thread::~thread", "destroying running thread");
                 }
                 catch (...)
                 {
@@ -106,8 +108,8 @@ namespace hpx {
         threads::thread_id_type id = threads::get_self_id();
         if (id == threads::invalid_thread_id)
         {
-            HPX_THROW_EXCEPTION(null_thread_id, "run_thread_exit_callbacks",
-                "null thread id encountered");
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
+                "run_thread_exit_callbacks", "null thread id encountered");
         }
         threads::run_thread_exit_callbacks(id);
         threads::free_thread_exit_callbacks(id);
@@ -128,8 +130,7 @@ namespace hpx {
         catch (hpx::exception const&)
         {
             // Verify that there are no more registered locks for this
-            // OS-thread. This will throw if there are still any locks
-            // held.
+            // OS-thread. This will throw if there are still any locks held.
             util::force_error_on_lock();
 
             // run all callbacks attached to the exit event for this thread
@@ -138,9 +139,8 @@ namespace hpx {
             throw;    // rethrow any exception except 'thread_interrupted'
         }
 
-        // Verify that there are no more registered locks for this
-        // OS-thread. This will throw if there are still any locks
-        // held.
+        // Verify that there are no more registered locks for this OS-thread.
+        // This will throw if there are still any locks held.
         util::force_error_on_lock();
 
         // run all callbacks attached to the exit event for this thread
@@ -174,14 +174,14 @@ namespace hpx {
             threads::thread_stacksize::default_,
             threads::thread_schedule_state::pending, true);
 
-        // create the new thread, note that id_ is guaranteed to be valid
-        // before the thread function is executed
+        // create the new thread, note that id_ is guaranteed to be valid before
+        // the thread function is executed
         error_code ec(throwmode::lightweight);
         pool->create_thread(data, id_, ec);
         if (ec)
         {
-            HPX_THROW_EXCEPTION(thread_resource_error, "thread::start_thread",
-                "Could not create thread");
+            HPX_THROW_EXCEPTION(hpx::error::thread_resource_error,
+                "thread::start_thread", "Could not create thread");
             return;
         }
     }
@@ -199,7 +199,7 @@ namespace hpx {
         if (!joinable_locked())
         {
             l.unlock();
-            HPX_THROW_EXCEPTION(invalid_status, "thread::join",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status, "thread::join",
                 "trying to join a non joinable thread");
         }
 
@@ -208,8 +208,8 @@ namespace hpx {
         if (this_id == id_)
         {
             l.unlock();
-            HPX_THROW_EXCEPTION(thread_resource_error, "thread::join",
-                "hpx::thread: trying joining itself");
+            HPX_THROW_EXCEPTION(hpx::error::thread_resource_error,
+                "thread::join", "hpx::thread: trying joining itself");
             return;
         }
         this_thread::interruption_point();
@@ -219,7 +219,7 @@ namespace hpx {
                 hpx::bind_front(&resume_thread, HPX_MOVE(this_id))))
         {
             // wait for thread to be terminated
-            util::unlock_guard ul(l);
+            unlock_guard ul(l);
             this_thread::suspend(
                 threads::thread_schedule_state::suspended, "thread::join");
         }
@@ -284,10 +284,11 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         struct thread_task_base : lcos::detail::future_data<void>
         {
         private:
-            typedef hpx::intrusive_ptr<thread_task_base> future_base_type;
+            using future_base_type = hpx::intrusive_ptr<thread_task_base>;
 
         protected:
             using base_type = lcos::detail::future_data<void>;
@@ -323,7 +324,7 @@ namespace hpx {
                 if (!this->is_ready())
                 {
                     threads::interrupt_thread(id_.noref());
-                    this->set_error(thread_cancelled,
+                    this->set_error(hpx::error::thread_cancelled,
                         "thread_task_base::cancel", "future has been canceled");
                     id_ = threads::invalid_thread_id;
                 }
@@ -348,7 +349,7 @@ namespace hpx {
     {
         if (id_ == threads::invalid_thread_id)
         {
-            HPX_THROWS_IF(ec, null_thread_id, "thread::get_future",
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id, "thread::get_future",
                 "null thread id encountered");
             return hpx::future<void>();
         }
@@ -357,7 +358,8 @@ namespace hpx {
         hpx::intrusive_ptr<lcos::detail::future_data<void>> base(p);
         if (!p->valid())
         {
-            HPX_THROWS_IF(ec, thread_resource_error, "thread::get_future",
+            HPX_THROWS_IF(ec, hpx::error::thread_resource_error,
+                "thread::get_future",
                 "Could not create future as thread has been terminated.");
             return hpx::future<void>();
         }
@@ -387,12 +389,12 @@ namespace hpx {
         }
 
         // extensions
-        threads::thread_priority get_priority()
+        threads::thread_priority get_priority() noexcept
         {
             return threads::get_thread_priority(threads::get_self_id());
         }
 
-        std::ptrdiff_t get_stack_size()
+        std::ptrdiff_t get_stack_size() noexcept
         {
             return threads::get_stack_size(threads::get_self_id());
         }

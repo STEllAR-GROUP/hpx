@@ -6,19 +6,18 @@
 
 #pragma once
 
-#include <boost/version.hpp>
-
-#include <boost/lockfree/policies.hpp>
-#include <boost/lockfree/queue.hpp>
+#include <hpx/config.hpp>
+#include <hpx/concurrency/queue.hpp>
 
 #include <cstddef>
 
-namespace boost { namespace lockfree {
+namespace hpx::lockfree {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Alloc = std::allocator<T>>
     class caching_freelist : public lockfree::detail::freelist_stack<T, Alloc>
     {
-        typedef lockfree::detail::freelist_stack<T, Alloc> base_type;
+        using base_type = lockfree::detail::freelist_stack<T, Alloc>;
 
     public:
         caching_freelist(std::size_t n = 0)
@@ -40,7 +39,7 @@ namespace boost { namespace lockfree {
     template <typename T, typename Alloc = std::allocator<T>>
     class static_freelist : public lockfree::detail::freelist_stack<T, Alloc>
     {
-        typedef lockfree::detail::freelist_stack<T, Alloc> base_type;
+        using base_type = lockfree::detail::freelist_stack<T, Alloc>;
 
     public:
         static_freelist(std::size_t n = 0)
@@ -62,7 +61,8 @@ namespace boost { namespace lockfree {
     struct caching_freelist_t
     {
     };
+
     struct static_freelist_t
     {
     };
-}}    // namespace boost::lockfree
+}    // namespace hpx::lockfree

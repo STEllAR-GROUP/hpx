@@ -71,7 +71,7 @@ int hpx_main(/*hpx::program_options::variables_map& vm*/)
 
     if (num_threads == 1)
     {
-        HPX_THROW_EXCEPTION(hpx::commandline_option_error, "hpx_main",
+        HPX_THROW_EXCEPTION(hpx::error::commandline_option_error, "hpx_main",
             "the oversubscribing_resource_partitioner example requires at "
             "least 2 worker threads (1 given)");
     }
@@ -145,7 +145,7 @@ int hpx_main(/*hpx::program_options::variables_map& vm*/)
     std::set<std::thread::id> thread_set;
 
     // test a parallel algorithm on custom pool with high priority
-    hpx::execution::static_chunk_size fixed(1);
+    hpx::execution::experimental::static_chunk_size fixed(1);
     hpx::experimental::for_loop_strided(
         hpx::execution::par.with(fixed).on(high_priority_executor), 0,
         loop_count, 1, [&](std::size_t i) {
@@ -278,7 +278,7 @@ int main(int argc, char* argv[])
     hpx::local::init_params iparams;
 
     iparams.desc_cmdline = desc_cmdline;
-    iparams.rp_mode = hpx::resource::mode_allow_oversubscription;
+    iparams.rp_mode = hpx::resource::partitioner_mode::allow_oversubscription;
     iparams.rp_callback = init_resource_partitioner_handler;
 
     return hpx::local::init(hpx_main, argc, argv, iparams);

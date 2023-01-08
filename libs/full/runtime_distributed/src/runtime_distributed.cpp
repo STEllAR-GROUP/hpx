@@ -10,7 +10,7 @@
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_distributed/apply.hpp>
+#include <hpx/async_distributed/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/server/component_base.hpp>
@@ -655,7 +655,7 @@ namespace hpx {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         //   tell main locality to start application exit, duplicated requests
         // will be ignored
-        apply<components::server::runtime_support::shutdown_all_action>(
+        hpx::post<components::server::runtime_support::shutdown_all_action>(
             hpx::find_root_locality(), shutdown_timeout);
 #else
         HPX_ASSERT(false);
@@ -1240,7 +1240,8 @@ namespace hpx {
         }
         else
         {
-            HPX_THROWS_IF(ec, invalid_status, "start_active_counters",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "start_active_counters",
                 "the runtime system is not available at this time");
         }
     }
@@ -1254,7 +1255,8 @@ namespace hpx {
         }
         else
         {
-            HPX_THROWS_IF(ec, invalid_status, "stop_active_counters",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "stop_active_counters",
                 "the runtime system is not available at this time");
         }
     }
@@ -1268,7 +1270,8 @@ namespace hpx {
         }
         else
         {
-            HPX_THROWS_IF(ec, invalid_status, "reset_active_counters",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "reset_active_counters",
                 "the runtime system is not available at this time");
         }
     }
@@ -1282,7 +1285,8 @@ namespace hpx {
         }
         else
         {
-            HPX_THROWS_IF(ec, invalid_status, "reinit_active_counters",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "reinit_active_counters",
                 "the runtime system is not available at this time");
         }
     }
@@ -1297,7 +1301,8 @@ namespace hpx {
         }
         else
         {
-            HPX_THROWS_IF(ec, invalid_status, "evaluate_active_counters",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "evaluate_active_counters",
                 "the runtime system is not available at this time");
         }
     }
@@ -1411,7 +1416,7 @@ namespace hpx {
                 // comment this out for now as on CircleCI this is causing unending grief
                 //if (ec)
                 //{
-                //    HPX_THROW_EXCEPTION(kernel_error,
+                //    HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 //        "runtime_distributed::init_tss_ex",
                 //        "failed to set thread affinity mask ({}) for service "
                 //        "thread: {}",
@@ -1486,7 +1491,7 @@ namespace hpx {
         if (0 == std::strncmp(name, "main", 4))    //-V112
             return &main_pool_;
 
-        HPX_THROW_EXCEPTION(bad_parameter,
+        HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
             "runtime_distributed::get_thread_pool",
             "unknown thread pool requested: {}", name);
         return nullptr;
@@ -1638,7 +1643,7 @@ namespace hpx {
             return rtd->create_binary_filter(
                 binary_filter_type, compress, next_filter, ec);
 
-        HPX_THROWS_IF(ec, invalid_status, "create_binary_filter",
+        HPX_THROWS_IF(ec, hpx::error::invalid_status, "create_binary_filter",
             "the runtime system is not available at this time");
         return nullptr;
     }
@@ -1687,7 +1692,7 @@ namespace hpx {
         runtime* rt = get_runtime_ptr();
         if (nullptr == rt)
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::find_here",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::find_here",
                 "the runtime system is not available at this time");
             return hpx::invalid_id;
         }
@@ -1702,7 +1707,8 @@ namespace hpx {
         runtime_distributed* rt = hpx::get_runtime_distributed_ptr();
         if (nullptr == rt)
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::find_root_locality",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::find_root_locality",
                 "the runtime system is not available at this time");
             return hpx::invalid_id;
         }
@@ -1710,7 +1716,8 @@ namespace hpx {
         naming::gid_type console_locality;
         if (!rt->get_agas_client().get_console_locality(console_locality))
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::find_root_locality",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::find_root_locality",
                 "the root locality is not available at this time");
             return hpx::invalid_id;
         }
@@ -1728,7 +1735,8 @@ namespace hpx {
         std::vector<hpx::id_type> locality_ids;
         if (nullptr == hpx::applier::get_applier_ptr())
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::find_all_localities",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::find_all_localities",
                 "the runtime system is not available at this time");
             return locality_ids;
         }
@@ -1742,7 +1750,8 @@ namespace hpx {
         std::vector<hpx::id_type> locality_ids;
         if (nullptr == hpx::applier::get_applier_ptr())
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::find_all_localities",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::find_all_localities",
                 "the runtime system is not available at this time");
             return locality_ids;
         }
@@ -1757,7 +1766,8 @@ namespace hpx {
         std::vector<hpx::id_type> locality_ids;
         if (nullptr == hpx::applier::get_applier_ptr())
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::find_remote_localities",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::find_remote_localities",
                 "the runtime system is not available at this time");
             return locality_ids;
         }
@@ -1772,7 +1782,8 @@ namespace hpx {
         std::vector<hpx::id_type> locality_ids;
         if (nullptr == hpx::applier::get_applier_ptr())
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::find_remote_localities",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "hpx::find_remote_localities",
                 "the runtime system is not available at this time");
             return locality_ids;
         }
@@ -1788,7 +1799,7 @@ namespace hpx {
     {
         if (nullptr == hpx::applier::get_applier_ptr())
         {
-            HPX_THROWS_IF(ec, invalid_status, "hpx::find_locality",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::find_locality",
                 "the runtime system is not available at this time");
             return hpx::invalid_id;
         }
@@ -1809,7 +1820,8 @@ namespace hpx {
         runtime_distributed* rt = get_runtime_distributed_ptr();
         if (nullptr == rt)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "hpx::get_num_localities",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::get_num_localities",
                 "the runtime system has not been initialized yet");
             return 0;
         }
@@ -1823,7 +1835,8 @@ namespace hpx {
         runtime_distributed* rt = get_runtime_distributed_ptr();
         if (nullptr == rt)
         {
-            HPX_THROW_EXCEPTION(invalid_status, "hpx::get_num_localities",
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::get_num_localities",
                 "the runtime system has not been initialized yet");
             return make_ready_future(std::uint32_t(0));
         }

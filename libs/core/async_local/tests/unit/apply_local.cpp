@@ -59,9 +59,9 @@ int hpx_main()
     {
         using hpx::placeholders::_1;
 
-        hpx::apply(&increment, 1);
-        hpx::apply(hpx::bind(&increment, 1));
-        hpx::apply(hpx::bind(&increment, _1), 1);
+        hpx::post(&increment, 1);
+        hpx::post(hpx::bind(&increment, 1));
+        hpx::post(hpx::bind(&increment, _1), 1);
     }
 
     {
@@ -70,9 +70,9 @@ int hpx_main()
 
         using hpx::placeholders::_1;
 
-        hpx::apply(&increment_with_future, f);
-        hpx::apply(hpx::bind(&increment_with_future, f));
-        hpx::apply(hpx::bind(&increment_with_future, _1), f);
+        hpx::post(&increment_with_future, f);
+        hpx::post(hpx::bind(&increment_with_future, f));
+        hpx::post(hpx::bind(&increment_with_future, _1), f);
 
         p.set_value(1);
     }
@@ -80,9 +80,9 @@ int hpx_main()
     {
         using hpx::placeholders::_1;
 
-        hpx::apply(increment, 1);
-        hpx::apply(hpx::bind(increment, 1));
-        hpx::apply(hpx::bind(increment, _1), 1);
+        hpx::post(increment, 1);
+        hpx::post(hpx::bind(increment, 1));
+        hpx::post(hpx::bind(increment, _1), 1);
     }
 
     {
@@ -90,9 +90,9 @@ int hpx_main()
 
         using hpx::placeholders::_1;
 
-        hpx::apply(&increment_type::call, inc, 1);
-        hpx::apply(hpx::bind(&increment_type::call, inc, 1));
-        hpx::apply(hpx::bind(&increment_type::call, inc, _1), 1);
+        hpx::post(&increment_type::call, inc, 1);
+        hpx::post(hpx::bind(&increment_type::call, inc, 1));
+        hpx::post(hpx::bind(&increment_type::call, inc, _1), 1);
     }
 
     {
@@ -100,17 +100,17 @@ int hpx_main()
 
         using hpx::placeholders::_1;
 
-        hpx::apply(obj, 1);
-        hpx::apply(hpx::bind(obj, 1));
-        hpx::apply(hpx::bind(obj, _1), 1);
+        hpx::post(obj, 1);
+        hpx::post(hpx::bind(obj, 1));
+        hpx::post(hpx::bind(obj, _1), 1);
     }
 
     {
         using hpx::placeholders::_1;
 
-        hpx::apply(increment_lambda, 1);
-        hpx::apply(hpx::bind(increment_lambda, 1));
-        hpx::apply(hpx::bind(increment_lambda, _1), 1);
+        hpx::post(increment_lambda, 1);
+        hpx::post(hpx::bind(increment_lambda, 1));
+        hpx::post(hpx::bind(increment_lambda, _1), 1);
     }
 
     hpx::no_mutex result_mutex;

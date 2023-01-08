@@ -14,7 +14,8 @@
 #include <iterator>
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
     struct is_range : std::false_type
@@ -66,4 +67,4 @@ namespace hpx { namespace traits {
 
     template <typename T>
     using range_iterator_t = typename range_iterator<T>::type;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

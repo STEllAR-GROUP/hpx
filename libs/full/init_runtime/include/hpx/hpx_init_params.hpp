@@ -63,10 +63,10 @@ namespace hpx {
     /// \brief  Parameters used to initialize the HPX runtime through
     ///         \a hpx::init and \a hpx::start
     ///
-    /// \var desc_cmdline   This parameter may hold the description of additional
-    ///                     command line arguments understood by the
-    ///                     application. These options will be prepended to
-    ///                     the default command line options understood by
+    /// \var desc_cmdline   This parameter may hold the description of
+    ///                     additional command line arguments understood by the
+    ///                     application. These options will be prepended to the
+    ///                     default command line options understood by
     ///                     \a hpx::init.
     /// \var cfg            A list of configuration settings which will be added
     ///                     to the system configuration before the runtime
@@ -74,28 +74,29 @@ namespace hpx {
     ///                     must have the format of a fully defined key/value
     ///                     pair from an ini-file (for instance
     ///                     'hpx.component.enabled=1')
-    /// \var startup        A function to be executed inside a HPX
-    ///                     thread before \p f is called. If this parameter
-    ///                     is not given no function will be executed.
+    /// \var startup        A function to be executed inside a HPX thread before
+    ///                     \p f is called. If this parameter is
+    ///                     not given no function will be executed.
     /// \var shutdown       A function to be executed inside an HPX
     ///                     thread while hpx::finalize is executed. If this
-    ///                     parameter is not given no function will be
-    ///                     executed.
+    ///                     parameter is not given no function will be executed.
     /// \var mode           The mode the created runtime environment
     ///                     should be initialized in. There has to be exactly
     ///                     one locality in each HPX application which is
-    ///                     executed in console mode (\a hpx::runtime_mode::console),
-    ///                     all other localities have to be run in worker mode
-    ///                     (\a hpx::runtime_mode::worker). Normally this is
-    ///                     set up automatically, but sometimes it is necessary
-    ///                     to explicitly specify the mode.
+    ///                     executed in console mode (\a
+    ///                     hpx::runtime_mode::console), all other localities
+    ///                     have to be run in worker mode (\a
+    ///                     hpx::runtime_mode::worker). Normally this is set up
+    ///                     automatically, but sometimes it is necessary to
+    ///                     explicitly specify the mode.
     /// \var rp_mode        The mode the resource partitioner should be created
     ///                     in. If none is specified, the
-    ///                     \a hpx::resource::mode_default will be used.
+    ///                     \a hpx::resource::partitioner_mode::default_ will be
+    ///                     used.
     /// \var rp_callback    This callback is called after the resource
-    ///                     partitioner creation, it may be used to
-    ///                     initialize thread pools. If none is specified no
-    ///                     function will be executed.
+    ///                     partitioner creation, it may be used to initialize
+    ///                     thread pools. If none is specified no function will
+    ///                     be executed.
     struct init_params
     {
         init_params()
@@ -112,7 +113,8 @@ namespace hpx {
         mutable startup_function_type startup;
         mutable shutdown_function_type shutdown;
         hpx::runtime_mode mode = ::hpx::runtime_mode::default_;
-        hpx::resource::partitioner_mode rp_mode = ::hpx::resource::mode_default;
+        hpx::resource::partitioner_mode rp_mode =
+            ::hpx::resource::partitioner_mode::default_;
         hpx::resource::rp_callback_type rp_callback;
     };
 }    // namespace hpx

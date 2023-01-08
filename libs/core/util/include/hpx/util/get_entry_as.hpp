@@ -13,11 +13,10 @@
 #include <string>
 #include <type_traits>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     template <typename DestType, typename Config,
-        typename std::enable_if<!std::is_same<DestType, std::string>::value,
-            bool>::type = false>
+        std::enable_if_t<!std::is_same_v<DestType, std::string>, bool> = false>
     DestType get_entry_as(
         Config const& config, std::string const& key, DestType const& dflt)
     {
@@ -28,12 +27,10 @@ namespace hpx { namespace util {
     }
 
     template <typename DestType, typename Config,
-        typename std::enable_if<std::is_same<DestType, std::string>::value,
-            bool>::type = false>
+        std::enable_if_t<std::is_same_v<DestType, std::string>, bool> = false>
     DestType get_entry_as(
         Config const& config, std::string const& key, DestType const& dflt)
     {
         return config.get_entry(key, dflt);
     }
-
-}}    // namespace hpx::util
+}    // namespace hpx::util

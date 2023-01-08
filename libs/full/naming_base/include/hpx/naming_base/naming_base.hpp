@@ -12,6 +12,7 @@
 #include <cstdint>
 
 namespace hpx {
+
     namespace naming {
 
         namespace detail {

@@ -17,6 +17,7 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 #include <hpx/topology/topology.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -358,16 +359,16 @@ namespace hpx { namespace compute { namespace host {
 
         // Constructs an object of type T in allocated uninitialized storage
         // pointed to by p, using placement-new
-        template <class U, class... A>
-        void construct(U* const p, A&&... args)
+        template <typename U, typename... A>
+        void construct(U* p, A&&... args)
         {
-            new (p) U(HPX_FORWARD(A, args)...);
+            hpx::construct_at(p, HPX_FORWARD(A, args)...);
         }
 
         template <class U>
         void destroy(U* const p)
         {
-            p->~U();
+            std::destroy_at(p);
         }
 
         // a utility function that is slightly faster than the hwloc provided one
@@ -388,7 +389,7 @@ namespace hpx { namespace compute { namespace host {
                 }
                 return -1;
             }
-            HPX_THROW_EXCEPTION(kernel_error, "get_numa_domain",
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error, "get_numa_domain",
                 "Error getting numa domain with syscall");
 #else
             return threads::get_topology().get_numa_domain(page);
@@ -412,7 +413,8 @@ namespace hpx { namespace compute { namespace host {
             if (syscall(__NR_move_pages, 0, count, pages.data(), nullptr,
                     status.data(), 0) < 0)
             {
-                HPX_THROW_EXCEPTION(kernel_error, "get_page_numa_domains",
+                HPX_THROW_EXCEPTION(hpx::error::kernel_error,
+                    "get_page_numa_domains",
                     "Error getting numa domains with syscall");
             }
 

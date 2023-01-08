@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,9 +18,9 @@
 #include <utility>
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace local { namespace detail {
+namespace hpx::lcos::local::detail {
 
-    counting_semaphore::counting_semaphore(std::ptrdiff_t value)
+    counting_semaphore::counting_semaphore(std::ptrdiff_t value) noexcept
       : value_(value)
     {
     }
@@ -65,8 +65,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
 
         if (!(value_ < count))
         {
-            // enter wait_locked only if there are sufficient credits
-            // available
+            // enter wait_locked only if there are sufficient credits available
             wait(l, count);
             return true;
         }
@@ -96,8 +95,7 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         value_ += count;
         for (std::int64_t i = 0; value_ >= 0 && i < count; ++i)
         {
-            // notify_one() returns false if no more threads are
-            // waiting
+            // notify_one() returns false if no more threads are waiting
             if (!cond_.notify_one(HPX_MOVE(l)))
                 break;
 
@@ -114,4 +112,4 @@ namespace hpx { namespace lcos { namespace local { namespace detail {
         signal(HPX_MOVE(l), count);
         return count;
     }
-}}}}    // namespace hpx::lcos::local::detail
+}    // namespace hpx::lcos::local::detail

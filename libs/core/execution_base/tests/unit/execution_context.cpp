@@ -19,7 +19,7 @@ std::size_t dummy_called = 0;
 
 struct dummy_context : hpx::execution_base::context_base
 {
-    hpx::execution_base::resource_base const& resource() const override
+    hpx::execution_base::resource_base const& resource() const noexcept override
     {
         return resource_;
     }
@@ -33,7 +33,7 @@ struct dummy_agent : hpx::execution_base::agent_base
     {
         return "";
     }
-    dummy_context const& context() const override
+    dummy_context const& context() const noexcept override
     {
         return context_;
     }

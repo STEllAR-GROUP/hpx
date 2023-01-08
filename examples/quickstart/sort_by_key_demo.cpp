@@ -38,7 +38,7 @@ int hpx_main()
         std::cout << "unsorted sequence: {";
         print_sequence(keys, values);
 
-        hpx::parallel::sort_by_key(
+        hpx::experimental::sort_by_key(
             hpx::execution::par, keys.begin(), keys.end(), values.begin());
 
         std::cout << "sorted sequence:   {";

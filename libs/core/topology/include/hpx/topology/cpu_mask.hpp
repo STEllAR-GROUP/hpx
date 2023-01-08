@@ -30,10 +30,11 @@
 #endif
 // clang-format on
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     /// \cond NOINTERNAL
 
-    [[nodiscard]] HPX_CORE_EXPORT unsigned int hardware_concurrency();
+    [[nodiscard]] HPX_CORE_EXPORT unsigned int hardware_concurrency() noexcept;
 
 #if !defined(HPX_HAVE_MORE_THAN_64_THREADS) ||                                 \
     (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
@@ -247,4 +248,4 @@ namespace hpx { namespace threads {
 
     HPX_CORE_EXPORT std::string to_string(mask_cref_type);
     /// \endcond
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

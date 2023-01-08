@@ -1,5 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  This code may be used under either of the following two licences:
 //
@@ -30,11 +30,6 @@
 
 #pragma once
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4355)    //this used in base member initializer
-#endif
-
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/coroutine_fwd.hpp>
@@ -47,7 +42,9 @@
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace threads { namespace coroutines { namespace detail {
+#include <hpx/config/warnings_prefix.hpp>
+
+namespace hpx::threads::coroutines::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // This type augments the context_base type with the type of the stored
@@ -66,8 +63,8 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
 
         using functor_type = hpx::move_only_function<result_type(arg_type)>;
 
-        coroutine_impl(
-            functor_type&& f, thread_id_type id, std::ptrdiff_t stack_size)
+        coroutine_impl(functor_type&& f, thread_id_type id,
+            std::ptrdiff_t stack_size) noexcept
           : context_base(stack_size, id)
           , m_result(thread_schedule_state::unknown, invalid_thread_id)
           , m_arg(nullptr)
@@ -83,13 +80,13 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         HPX_CORE_EXPORT void operator()() noexcept;
 
     public:
-        void bind_result(result_type res)
+        void bind_result(result_type res) noexcept
         {
             HPX_ASSERT(m_result.first != thread_schedule_state::terminated);
             m_result = res;
         }
 
-        result_type result() const
+        result_type result() const noexcept
         {
             return m_result;
         }
@@ -105,7 +102,7 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         }
 
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-        std::size_t get_thread_phase() const
+        std::size_t get_thread_phase() const noexcept
         {
             return this->phase();
         }
@@ -145,8 +142,6 @@ namespace hpx { namespace threads { namespace coroutines { namespace detail {
         arg_type* m_arg;
         functor_type m_fun;
     };
-}}}}    // namespace hpx::threads::coroutines::detail
+}    // namespace hpx::threads::coroutines::detail
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
-#endif
+#include <hpx/config/warnings_suffix.hpp>

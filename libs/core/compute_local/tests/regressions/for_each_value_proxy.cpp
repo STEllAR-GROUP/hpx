@@ -166,7 +166,7 @@ public:
     template <typename U>
     void destroy(U* p)
     {
-        p->~U();
+        std::destroy_at(p);
     }
 };
 

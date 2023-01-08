@@ -15,10 +15,7 @@
 
 #include <cstddef>
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
+#include <hpx/config/warnings_prefix.hpp>
 
 #ifdef DOXYGEN
 namespace hpx {
@@ -117,6 +114,4 @@ namespace hpx::lcos::local {
 
 #endif
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
-#endif
+#include <hpx/config/warnings_suffix.hpp>

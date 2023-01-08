@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/continuation.hpp>
+#include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/format.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
@@ -222,7 +222,7 @@ namespace hpx { namespace agas { namespace server {
                 {
                     l.unlock();
 
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "primary_namespace::bind_gid",
                         "cannot rebind gids for non-migratable objects");
 
@@ -239,7 +239,7 @@ namespace hpx { namespace agas { namespace server {
                     // REVIEW: Is this the right error code to use?
                     l.unlock();
 
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "primary_namespace::bind_gid",
                         "cannot change block size of existing binding");
                 }
@@ -248,7 +248,7 @@ namespace hpx { namespace agas { namespace server {
                 {
                     l.unlock();
 
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "primary_namespace::bind_gid",
                         "attempt to update a GVA with an invalid type, "
                         "gid({1}), gva({2}), locality({3})",
@@ -259,7 +259,7 @@ namespace hpx { namespace agas { namespace server {
                 {
                     l.unlock();
 
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "primary_namespace::bind_gid",
                         "attempt to update a GVA with an invalid "
                         "locality id, "
@@ -296,7 +296,7 @@ namespace hpx { namespace agas { namespace server {
                     // REVIEW: Is this the right error code to use?
                     l.unlock();
 
-                    HPX_THROW_EXCEPTION(bad_parameter,
+                    HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "primary_namespace::bind_gid",
                         "the new GID is contained in an existing range");
                 }
@@ -313,7 +313,7 @@ namespace hpx { namespace agas { namespace server {
                 // REVIEW: Is this the right error code to use?
                 l.unlock();
 
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "primary_namespace::bind_gid",
                     "the new GID is contained in an existing range");
             }
@@ -337,7 +337,7 @@ namespace hpx { namespace agas { namespace server {
         {
             l.unlock();
 
-            HPX_THROW_EXCEPTION(internal_server_error,
+            HPX_THROW_EXCEPTION(hpx::error::internal_server_error,
                 "primary_namespace::bind_gid",
                 "MSBs of lower and upper range bound do not match");
         }
@@ -346,7 +346,8 @@ namespace hpx { namespace agas { namespace server {
         {
             l.unlock();
 
-            HPX_THROW_EXCEPTION(bad_parameter, "primary_namespace::bind_gid",
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "primary_namespace::bind_gid",
                 "attempt to insert a GVA with an invalid type, "
                 "gid({1}), gva({2}), locality({3})",
                 id, g, locality);
@@ -358,7 +359,8 @@ namespace hpx { namespace agas { namespace server {
         {
             l.unlock();
 
-            HPX_THROW_EXCEPTION(lock_error, "primary_namespace::bind_gid",
+            HPX_THROW_EXCEPTION(hpx::error::lock_error,
+                "primary_namespace::bind_gid",
                 "GVA table insertion failed due to a locking error or "
                 "memory corruption, gid({1}), gva({2}), locality({3})",
                 id, g, locality);
@@ -441,7 +443,7 @@ namespace hpx { namespace agas { namespace server {
             {
                 l.unlock();
 
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "primary_namespace::unbind_gid", "block sizes must match");
             }
 
@@ -508,7 +510,7 @@ namespace hpx { namespace agas { namespace server {
         }
         else
         {
-            HPX_THROW_EXCEPTION(bad_parameter,
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "primary_namespace::increment_credit",
                 "invalid credit count of {1}", credits);
             return 0;
@@ -551,7 +553,7 @@ namespace hpx { namespace agas { namespace server {
             }
             else
             {
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "primary_namespace::decrement_credit",
                     "invalid credit count of {1}", credits);
             }
@@ -596,7 +598,7 @@ namespace hpx { namespace agas { namespace server {
                     (lower.get_msb() & naming::gid_type::virtual_memory_mask) ==
                     naming::gid_type::virtual_memory_mask))
             {
-                HPX_THROW_EXCEPTION(internal_server_error,
+                HPX_THROW_EXCEPTION(hpx::error::internal_server_error,
                     "locality_namespace::allocate",
                     "primary namespace has been exhausted");
             }
@@ -707,7 +709,7 @@ namespace hpx { namespace agas { namespace server {
                 {
                     l.unlock();
 
-                    HPX_THROWS_IF(ec, invalid_data,
+                    HPX_THROWS_IF(ec, hpx::error::invalid_data,
                         "primary_namespace::increment",
                         "couldn't create entry in reference count table, "
                         "raw({1}), ref-count({2})",
@@ -767,7 +769,7 @@ namespace hpx { namespace agas { namespace server {
             {
                 l.unlock();
 
-                HPX_THROWS_IF(ec, internal_server_error,
+                HPX_THROWS_IF(ec, hpx::error::internal_server_error,
                     "primary_namespace::resolve_free_list",
                     "primary_namespace::resolve_free_list, failed to resolve "
                     "gid, gid({1})",
@@ -783,7 +785,7 @@ namespace hpx { namespace agas { namespace server {
             {
                 l.unlock();
 
-                HPX_THROWS_IF(ec, internal_server_error,
+                HPX_THROWS_IF(ec, hpx::error::internal_server_error,
                     "primary_namespace::resolve_free_list",
                     "encountered a GVA with an invalid type while performing a "
                     "decrement, gid({1}), gva({2})",
@@ -794,7 +796,7 @@ namespace hpx { namespace agas { namespace server {
             {
                 l.unlock();
 
-                HPX_THROWS_IF(ec, internal_server_error,
+                HPX_THROWS_IF(ec, hpx::error::internal_server_error,
                     "primary_namespace::resolve_free_list",
                     "encountered a GVA with a count of zero while performing a "
                     "decrement, gid({1}), gva({2})",
@@ -876,7 +878,7 @@ namespace hpx { namespace agas { namespace server {
                     {
                         l.unlock();
 
-                        HPX_THROWS_IF(ec, invalid_data,
+                        HPX_THROWS_IF(ec, hpx::error::invalid_data,
                             "primary_namespace::decrement_sweep",
                             "negative entry in reference count table, "
                             "raw({1}), refcount({2})",
@@ -895,7 +897,7 @@ namespace hpx { namespace agas { namespace server {
                     {
                         l.unlock();
 
-                        HPX_THROWS_IF(ec, invalid_data,
+                        HPX_THROWS_IF(ec, hpx::error::invalid_data,
                             "primary_namespace::decrement_sweep",
                             "couldn't create entry in reference count table, "
                             "raw({1}), ref-count({2})",
@@ -915,7 +917,7 @@ namespace hpx { namespace agas { namespace server {
                 {
                     l.unlock();
 
-                    HPX_THROWS_IF(ec, invalid_data,
+                    HPX_THROWS_IF(ec, hpx::error::invalid_data,
                         "primary_namespace::decrement_sweep",
                         "negative entry in reference count table, raw({1}), "
                         "refcount({2})",
@@ -973,7 +975,7 @@ namespace hpx { namespace agas { namespace server {
                 auto deleter = components::deleter(e.gva_.type);
                 if (deleter == nullptr)
                 {
-                    HPX_THROWS_IF(ec, internal_server_error,
+                    HPX_THROWS_IF(ec, hpx::error::internal_server_error,
                         "primary_namespace::free_components_sync",
                         "Attempting to delete object of unknown component "
                         "type: " +
@@ -1042,7 +1044,7 @@ namespace hpx { namespace agas { namespace server {
                     {
                         l.unlock();
 
-                        HPX_THROWS_IF(ec, internal_server_error,
+                        HPX_THROWS_IF(ec, hpx::error::internal_server_error,
                             "primary_namespace::resolve_gid_locked",
                             "MSBs of lower and upper range bound do not "
                             "match");
@@ -1070,7 +1072,7 @@ namespace hpx { namespace agas { namespace server {
                 {
                     l.unlock();
 
-                    HPX_THROWS_IF(ec, internal_server_error,
+                    HPX_THROWS_IF(ec, hpx::error::internal_server_error,
                         "primary_namespace::resolve_gid_locked",
                         "MSBs of lower and upper range bound do not match");
                     return resolved_type(

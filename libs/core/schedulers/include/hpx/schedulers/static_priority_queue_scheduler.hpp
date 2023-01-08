@@ -1,5 +1,5 @@
 //  Copyright (c)      2013 Thomas Heller
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
 #include <hpx/assert.hpp>
 #include <hpx/schedulers/local_priority_queue_scheduler.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
@@ -22,7 +21,8 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies {
+namespace hpx::threads::policies {
+
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
     using default_static_priority_queue_scheduler_terminated_queue =
@@ -33,14 +33,15 @@ namespace hpx { namespace threads { namespace policies {
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The static_priority_queue_scheduler maintains exactly one queue of work
-    /// items (threads) per OS thread, where this OS thread pulls its next work
-    /// from. Additionally it maintains separate queues: several for high
-    /// priority threads and one for low priority threads.
-    /// High priority threads are executed by the first N OS threads before any
-    /// other work is executed. Low priority threads are executed by the last
-    /// OS thread whenever no other work is available.
-    /// This scheduler does not do any work stealing.
+    // The static_priority_queue_scheduler maintains exactly one queue of work
+    // items (threads) per OS thread, where this OS thread pulls its next work
+    // from. Additionally it maintains separate queues: several for high
+    // priority threads and one for low priority threads.
+    //
+    // High priority threads are executed by the first N OS threads before any
+    // other work is executed. Low priority threads are executed by the last OS
+    // thread whenever no other work is available. This scheduler does not do
+    // any work stealing.
     template <typename Mutex = std::mutex,
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
@@ -56,7 +57,8 @@ namespace hpx { namespace threads { namespace policies {
 
         using init_parameter_type = typename base_type::init_parameter_type;
 
-        static_priority_queue_scheduler(init_parameter_type const& init,
+        explicit static_priority_queue_scheduler(
+            init_parameter_type const& init,
             bool deferred_initialization = true)
           : base_type(init, deferred_initialization)
         {
@@ -81,6 +83,6 @@ namespace hpx { namespace threads { namespace policies {
             return "static_priority_queue_scheduler";
         }
     };
-}}}    // namespace hpx::threads::policies
+}    // namespace hpx::threads::policies
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -51,22 +51,19 @@ namespace hpx { namespace program_options {
             std::forward_iterator_tag>
     {
     public:
-        eof_iterator()
-          : m_at_eof(false)
-        {
-        }
+        eof_iterator() = default;
 
     protected:    // interface for derived
         /** Returns the reference which should be used by derived
             class to store the next value. */
-        ValueType& value()
+        ValueType& value() noexcept
         {
             return m_value;
         }
 
         /** Should be called by derived class to indicate that it can't
             produce next element. */
-        void found_eof()
+        void found_eof() noexcept
         {
             m_at_eof = true;
         }
@@ -79,20 +76,17 @@ namespace hpx { namespace program_options {
             static_cast<Derived&>(*this).get();
         }
 
-        bool equal(const eof_iterator& other) const
+        bool equal(eof_iterator const& other) const noexcept
         {
-            if (m_at_eof && other.m_at_eof)
-                return true;
-            else
-                return false;
+            return m_at_eof && other.m_at_eof;
         }
 
-        const ValueType& dereference() const
+        ValueType const& dereference() const noexcept
         {
             return m_value;
         }
 
-        bool m_at_eof;
+        bool m_at_eof = false;
         ValueType m_value;
     };
 }}    // namespace hpx::program_options

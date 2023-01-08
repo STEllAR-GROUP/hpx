@@ -108,7 +108,7 @@ int main()
     }
     catch (hpx::exception const& e)
     {
-        if (e.get_error() == hpx::serialization_error)
+        if (e.get_error() == hpx::error::serialization_error)
         {
             caught_exception = true;
         }

@@ -18,20 +18,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/type_support/unused.hpp>
-
-#include <boost/utility/string_ref.hpp>
 
 #include <cstddef>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <utility>
 
-namespace hpx { namespace util { namespace logging {
+namespace hpx::util::logging {
 
     /**
-        @brief Optimizes the formatting for prepending and/or appending strings to
-        the original message
+        @brief Optimizes the formatting for prepending and/or appending
+        strings to the original message
 
         It keeps all the modified message in one string.
         Useful if some formatter needs to access the whole
@@ -45,36 +43,26 @@ namespace hpx { namespace util { namespace logging {
     class message
     {
     public:
-        message()
-          : m_full_msg_computed(false)
-        {
-        }
+        message() = default;
 
         /**
-        @param msg - the message that is originally cached
+            @param msg - the message that is originally cached
          */
-        explicit message(std::stringstream msg)
-          :
+        explicit message([[maybe_unused]] std::stringstream msg) noexcept
+          : m_full_msg_computed(false)
 #if defined(HPX_COMPUTE_HOST_CODE)
-          m_str(HPX_MOVE(msg))
-          ,
+          , m_str(HPX_MOVE(msg))
 #endif
-          m_full_msg_computed(false)
         {
-#if !defined(HPX_COMPUTE_HOST_CODE)
-            HPX_UNUSED(msg);
-#endif
         }
 
         message(message&& other) noexcept
-          :
-#if defined(HPX_COMPUTE_HOST_CODE)
-          m_str(HPX_MOVE(other.m_str))
-          ,
-#endif
-          m_full_msg_computed(other.m_full_msg_computed)
+          : m_full_msg_computed(other.m_full_msg_computed)
 #if defined(HPX_COMPUTE_HOST_CODE)
           , m_full_msg(HPX_MOVE(other.m_full_msg))
+#endif
+#if defined(HPX_COMPUTE_HOST_CODE)
+          , m_str(HPX_MOVE(other.m_str))
 #endif
         {
             other.m_full_msg_computed = false;
@@ -89,8 +77,7 @@ namespace hpx { namespace util { namespace logging {
         }
 
         template <typename... Args>
-        message& format(
-            boost::string_ref format_str, Args const&... args) noexcept
+        message& format(std::string_view format_str, Args const&... args)
         {
             util::format_to(m_str, format_str, args...);
             m_full_msg_computed = false;
@@ -110,7 +97,7 @@ namespace hpx { namespace util { namespace logging {
             return m_full_msg;
         }
 
-        bool empty() const
+        bool empty() const noexcept
         {
             return full_string().empty();
         }
@@ -121,10 +108,10 @@ namespace hpx { namespace util { namespace logging {
         }
 
     private:
-        std::stringstream m_str;
-
         // caching
-        mutable bool m_full_msg_computed;
+        mutable bool m_full_msg_computed = false;
         mutable std::string m_full_msg;
+
+        std::stringstream m_str;
     };
-}}}    // namespace hpx::util::logging
+}    // namespace hpx::util::logging

@@ -9,6 +9,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/modules/string_util.hpp>
 #include <hpx/prefix/find_prefix.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/stringize.hpp>
@@ -21,8 +22,6 @@
 #include <hpx/util/from_string.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/version.hpp>
-
-#include <boost/tokenizer.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -161,6 +160,7 @@ namespace hpx { namespace util {
             "pu_step = 1",
             "pu_offset = 0",
             "numa_sensitive = 0",
+            "loopback_network = 0",
             "max_background_threads = "
             "${HPX_MAX_BACKGROUND_THREADS:$[hpx.os_threads]}",
             "max_idle_loop_count = ${HPX_MAX_IDLE_LOOP_COUNT:" HPX_PP_STRINGIZE(
@@ -184,7 +184,9 @@ namespace hpx { namespace util {
             "exception_verbosity = ${HPX_EXCEPTION_VERBOSITY:2}",
             "trace_depth = ${HPX_TRACE_DEPTH:" HPX_PP_STRINGIZE(
                 HPX_PP_EXPAND(HPX_HAVE_THREAD_BACKTRACE_DEPTH)) "}",
-
+#if !defined(HPX_WINDOWS)
+            "handle_signals = ${HPX_HANDLE_SIGNALS:1}",
+#endif
             // arity for collective operations implemented in a tree fashion
             "[hpx.lcos.collectives]",
             "arity = ${HPX_LCOS_COLLECTIVES_ARITY:32}",
@@ -595,22 +597,18 @@ namespace hpx { namespace util {
         // installation location, this allows to install simple components
         // without the need to install an ini file
         // split of the separate paths from the given path list
-        typedef boost::tokenizer<boost::char_separator<char>> tokenizer_type;
+        hpx::string_util::char_separator sep(HPX_INI_PATH_DELIMITER);
+        hpx::string_util::tokenizer tok_path(component_base_paths, sep);
+        hpx::string_util::tokenizer tok_suffixes(component_path_suffixes, sep);
+        auto end_path = tok_path.end();
+        auto end_suffixes = tok_suffixes.end();
 
-        boost::char_separator<char> sep(HPX_INI_PATH_DELIMITER);
-        tokenizer_type tok_path(component_base_paths, sep);
-        tokenizer_type tok_suffixes(component_path_suffixes, sep);
-        tokenizer_type::iterator end_path = tok_path.end();
-        tokenizer_type::iterator end_suffixes = tok_suffixes.end();
-
-        for (tokenizer_type::iterator it = tok_path.begin(); it != end_path;
-             ++it)
+        for (auto it = tok_path.begin(); it != end_path; ++it)
         {
             std::string const& path = *it;
             if (tok_suffixes.begin() != tok_suffixes.end())
             {
-                for (tokenizer_type::iterator jt = tok_suffixes.begin();
-                     jt != end_suffixes; ++jt)
+                for (auto jt = tok_suffixes.begin(); jt != end_suffixes; ++jt)
                 {
                     std::string p = path;
                     p += *jt;
@@ -765,21 +763,21 @@ namespace hpx { namespace util {
 
             if (m == "hosted")
             {
-                return agas::service_mode_hosted;
+                return agas::service_mode::hosted;
             }
             else if (m == "bootstrap")
             {
-                return agas::service_mode_bootstrap;
+                return agas::service_mode::bootstrap;
             }
             else
             {
                 // REVIEW: exception type is overused
-                HPX_THROW_EXCEPTION(bad_parameter,
+                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "runtime_configuration::get_agas_service_mode",
                     "invalid AGAS router mode \"{}\"", m);
             }
         }
-        return agas::service_mode_hosted;
+        return agas::service_mode::hosted;
     }
 
     std::uint32_t runtime_configuration::get_num_localities() const
@@ -801,7 +799,7 @@ namespace hpx { namespace util {
         std::uint32_t num_localities_)
     {
         // this function should not be called on the AGAS server
-        HPX_ASSERT(agas::service_mode_bootstrap != get_agas_service_mode());
+        HPX_ASSERT(agas::service_mode::bootstrap != get_agas_service_mode());
         num_localities = num_localities_;
 
         if (util::section* sec = get_section("hpx"); nullptr != sec)
@@ -841,6 +839,13 @@ namespace hpx { namespace util {
             // enabled as well
             if (hpx::util::get_entry_as<std::string>(
                     *sec, "runtime_mode", "") != "console")
+            {
+                return true;
+            }
+
+            // whether the user has explicitly asked for network enabled
+            if (hpx::util::get_entry_as<std::int32_t>(
+                    *sec, "loopback_network", 0) != 0)
             {
                 return true;
             }

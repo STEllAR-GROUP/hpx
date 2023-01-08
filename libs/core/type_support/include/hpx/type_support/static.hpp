@@ -8,11 +8,11 @@
 
 #include <hpx/config.hpp>
 
+#include <memory>
 #include <type_traits>
 
 #if !defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION) &&                \
     !(HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS))
-#include <memory>    // for placement new
 #include <mutex>
 #endif
 
@@ -24,7 +24,8 @@
 #endif
 // clang-format on
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
 #if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION) ||                  \
     (HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS)) || defined(HPX_MSVC)
 
@@ -39,10 +40,9 @@ namespace hpx { namespace util {
         HPX_NON_COPYABLE(static_);
 
     public:
-        typedef T value_type;
-
-        typedef T& reference;
-        typedef T const& const_reference;
+        using value_type = T;
+        using reference = T&;
+        using const_reference = T const&;
 
         static_()
         {
@@ -97,14 +97,14 @@ namespace hpx { namespace util {
         HPX_NON_COPYABLE(static_);
 
     public:
-        typedef T value_type;
+        using value_type = T;
 
     private:
         struct destructor
         {
             ~destructor()
             {
-                static_::get_address()->~value_type();
+                std::destroy_at(static_::get_address());
             }
         };
 
@@ -112,50 +112,50 @@ namespace hpx { namespace util {
         {
             static void construct()
             {
-                new (static_::get_address()) value_type();
+                hpx::construct_at(static_::get_address());
                 static destructor d;
             }
         };
 
     public:
-        typedef T& reference;
-        typedef T const& const_reference;
+        using reference = T&;
+        using const_reference = T const&;
 
         static_()
         {
             std::call_once(constructed_, &default_constructor::construct);
         }
 
-        operator reference()
+        operator reference() noexcept
         {
             return this->get();
         }
 
-        operator const_reference() const
+        operator const_reference() const noexcept
         {
             return this->get();
         }
 
-        reference get()
+        reference get() noexcept
         {
             return *this->get_address();
         }
 
-        const_reference get() const
+        const_reference get() const noexcept
         {
             return *this->get_address();
         }
 
     private:
-        typedef typename std::add_pointer<value_type>::type pointer;
+        using pointer = std::add_pointer_t<value_type>;
 
-        static pointer get_address()
+        static pointer get_address() noexcept
         {
             return reinterpret_cast<pointer>(data_);
         }
 
-        typedef typename std::aligned_storage<sizeof(value_type),
-            std::alignment_of<value_type>::value>::type storage_type;
+        using storage_type = std::aligned_storage_t<sizeof(value_type),
+            std::alignment_of_v<value_type>>;
 
         static storage_type data_;
         static std::once_flag constructed_;
@@ -167,4 +167,4 @@ namespace hpx { namespace util {
     template <typename T, typename Tag>
     std::once_flag static_<T, Tag>::constructed_;
 #endif
-}}    // namespace hpx::util
+}    // namespace hpx::util

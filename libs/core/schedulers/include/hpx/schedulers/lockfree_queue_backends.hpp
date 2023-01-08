@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2019 Hartmut Kaiser
+//  Copyright (c) 2019-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +14,7 @@
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
 #include <hpx/concurrency/deque.hpp>
 #else
-#include <boost/lockfree/queue.hpp>
+#include <hpx/concurrency/queue.hpp>
 #endif
 
 #include <hpx/allocator_support/aligned_allocator.hpp>
@@ -24,9 +24,10 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 #include <utility>
 
-namespace hpx { namespace threads { namespace policies {
+namespace hpx::threads::policies {
 
     struct lockfree_fifo;
 
@@ -36,12 +37,11 @@ namespace hpx { namespace threads { namespace policies {
     struct lockfree_fifo_backend
     {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-        using container_type =
-            boost::lockfree::deque<T, boost::lockfree::caching_freelist_t,
-                hpx::util::aligned_allocator<T>>;
+        using container_type = hpx::lockfree::deque<T,
+            hpx::lockfree::caching_freelist_t, hpx::util::aligned_allocator<T>>;
 #else
         using container_type =
-            boost::lockfree::queue<T, hpx::util::aligned_allocator<T>>;
+            hpx::lockfree::queue<T, hpx::util::aligned_allocator<T>>;
 #endif
 
         using value_type = T;
@@ -50,7 +50,7 @@ namespace hpx { namespace threads { namespace policies {
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
-        lockfree_fifo_backend(size_type initial_size = 0,
+        explicit lockfree_fifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = size_type(-1))
           : queue_(std::size_t(initial_size))
         {
@@ -74,7 +74,7 @@ namespace hpx { namespace threads { namespace policies {
 #endif
         }
 
-        bool pop(reference val, bool /* steal */ = true)
+        bool pop(reference val, bool /* steal */ = true) noexcept
         {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
             return queue_.pop_right(val);
@@ -83,7 +83,7 @@ namespace hpx { namespace threads { namespace policies {
 #endif
         }
 
-        bool empty()
+        bool empty() noexcept
         {
             return queue_.empty();
         }
@@ -114,7 +114,7 @@ namespace hpx { namespace threads { namespace policies {
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
-        moodycamel_fifo_backend(size_type initial_size = 0,
+        explicit moodycamel_fifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = size_type(-1))
           : queue_(std::size_t(initial_size))
         {
@@ -130,12 +130,13 @@ namespace hpx { namespace threads { namespace policies {
             return queue_.enqueue(HPX_MOVE(val));
         }
 
-        bool pop(reference val, bool /* steal */ = true)
+        bool pop(reference val, bool /* steal */ = true) noexcept(
+            noexcept(std::is_nothrow_copy_constructible_v<T>))
         {
             return queue_.try_dequeue(val);
         }
 
-        bool empty()
+        bool empty() noexcept
         {
             return (queue_.size_approx() == 0);
         }
@@ -160,9 +161,8 @@ namespace hpx { namespace threads { namespace policies {
     template <typename T>
     struct lockfree_lifo_backend
     {
-        using container_type =
-            boost::lockfree::deque<T, boost::lockfree::caching_freelist_t,
-                hpx::util::aligned_allocator<T>>;
+        using container_type = hpx::lockfree::deque<T,
+            hpx::lockfree::caching_freelist_t, hpx::util::aligned_allocator<T>>;
 
         using value_type = T;
         using reference = T&;
@@ -170,7 +170,7 @@ namespace hpx { namespace threads { namespace policies {
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
-        lockfree_lifo_backend(size_type initial_size = 0,
+        explicit lockfree_lifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = size_type(-1))
           : queue_(std::size_t(initial_size))
         {
@@ -190,12 +190,12 @@ namespace hpx { namespace threads { namespace policies {
             return queue_.push_left(HPX_MOVE(val));
         }
 
-        bool pop(reference val, bool /* steal */ = true)
+        bool pop(reference val, bool /* steal */ = true) noexcept
         {
             return queue_.pop_left(val);
         }
 
-        bool empty()
+        bool empty() noexcept
         {
             return queue_.empty();
         }
@@ -221,9 +221,8 @@ namespace hpx { namespace threads { namespace policies {
     template <typename T>
     struct lockfree_abp_fifo_backend
     {
-        using container_type =
-            boost::lockfree::deque<T, boost::lockfree::caching_freelist_t,
-                hpx::util::aligned_allocator<T>>;
+        using container_type = hpx::lockfree::deque<T,
+            hpx::lockfree::caching_freelist_t, hpx::util::aligned_allocator<T>>;
 
         using value_type = T;
         using reference = T&;
@@ -231,7 +230,7 @@ namespace hpx { namespace threads { namespace policies {
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
-        lockfree_abp_fifo_backend(size_type initial_size = 0,
+        explicit lockfree_abp_fifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = size_type(-1))
           : queue_(std::size_t(initial_size))
         {
@@ -247,14 +246,14 @@ namespace hpx { namespace threads { namespace policies {
             return queue_.push_left(HPX_MOVE(val));
         }
 
-        bool pop(reference val, bool steal = true)
+        bool pop(reference val, bool steal = true) noexcept
         {
             if (steal)
                 return queue_.pop_left(val);
             return queue_.pop_right(val);
         }
 
-        bool empty()
+        bool empty() noexcept
         {
             return queue_.empty();
         }
@@ -279,9 +278,8 @@ namespace hpx { namespace threads { namespace policies {
     template <typename T>
     struct lockfree_abp_lifo_backend
     {
-        using container_type =
-            boost::lockfree::deque<T, boost::lockfree::caching_freelist_t,
-                hpx::util::aligned_allocator<T>>;
+        using container_type = hpx::lockfree::deque<T,
+            hpx::lockfree::caching_freelist_t, hpx::util::aligned_allocator<T>>;
 
         using value_type = T;
         using reference = T&;
@@ -289,7 +287,7 @@ namespace hpx { namespace threads { namespace policies {
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
-        lockfree_abp_lifo_backend(size_type initial_size = 0,
+        explicit lockfree_abp_lifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = size_type(-1))
           : queue_(std::size_t(initial_size))
         {
@@ -309,14 +307,14 @@ namespace hpx { namespace threads { namespace policies {
             return queue_.push_left(val);
         }
 
-        bool pop(reference val, bool steal = true)
+        bool pop(reference val, bool steal = true) noexcept
         {
             if (steal)
                 return queue_.pop_right(val);
             return queue_.pop_left(val);
         }
 
-        bool empty()
+        bool empty() noexcept
         {
             return queue_.empty();
         }
@@ -335,5 +333,4 @@ namespace hpx { namespace threads { namespace policies {
     };
 
 #endif    // HPX_HAVE_CXX11_STD_ATOMIC_128BIT
-
-}}}    // namespace hpx::threads::policies
+}    // namespace hpx::threads::policies

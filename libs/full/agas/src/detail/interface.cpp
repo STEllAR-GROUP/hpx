@@ -217,8 +217,8 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         auto* client = naming::get_agas_client_ptr();
         if (nullptr == client)
         {
-            HPX_THROWS_IF(ec, invalid_status, "agas::bind_gid_local",
-                "addressing_service is not valid");
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "agas::bind_gid_local", "addressing_service is not valid");
             return false;
         }
         return client->bind_local(gid_, addr, ec);
@@ -231,7 +231,8 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
             auto* client = naming::get_agas_client_ptr();
             if (nullptr == client)
             {
-                HPX_THROWS_IF(ec, invalid_status, "agas::unbind_gid_local",
+                HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                    "agas::unbind_gid_local",
                     "addressing_service is not valid");
             }
             else
@@ -241,7 +242,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         }
         else
         {
-            HPX_THROWS_IF(ec, bad_parameter, "agas::unbind_gid",
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter, "agas::unbind_gid",
                 "cannot dereference invalid GID");
         }
     }
@@ -252,8 +253,8 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         auto* client = naming::get_agas_client_ptr();
         if (nullptr == client)
         {
-            HPX_THROWS_IF(ec, invalid_status, "agas::bind_range_local",
-                "addressing_service is not valid");
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "agas::bind_range_local", "addressing_service is not valid");
             return false;
         }
         return client->bind_range_local(gid, count, addr, offset, ec);
@@ -265,8 +266,8 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         auto* client = naming::get_agas_client_ptr();
         if (nullptr == client)
         {
-            HPX_THROWS_IF(ec, invalid_status, "agas::unbind_range_local",
-                "addressing_service is not valid");
+            HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                "agas::unbind_range_local", "addressing_service is not valid");
         }
         else
         {
@@ -356,7 +357,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
         {
-            HPX_THROWS_IF(ec, invalid_status, "get_next_id",
+            HPX_THROWS_IF(ec, hpx::error::invalid_status, "get_next_id",
                 "the runtime system has not been started yet.");
             return naming::invalid_gid;
         }

@@ -12,12 +12,12 @@
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_colocated/apply_colocated_callback_fwd.hpp>
-#include <hpx/async_colocated/apply_colocated_fwd.hpp>
 #include <hpx/async_colocated/async_colocated.hpp>
 #include <hpx/async_colocated/async_colocated_callback.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
+#include <hpx/async_colocated/post_colocated_callback_fwd.hpp>
+#include <hpx/async_colocated/post_colocated_fwd.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
+#include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/components/client_base.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
@@ -190,12 +190,12 @@ namespace hpx { namespace components {
         {
             if (!id_)
             {
-                return hpx::detail::apply_impl<Action>(
+                return hpx::detail::post_impl<Action>(
                     HPX_FORWARD(Continuation, c),
                     naming::get_id_from_locality_id(agas::get_locality_id()),
                     priority, HPX_FORWARD(Ts, vs)...);
             }
-            return hpx::detail::apply_colocated<Action>(
+            return hpx::detail::post_colocated<Action>(
                 HPX_FORWARD(Continuation, c), id_, HPX_FORWARD(Ts, vs)...);
         }
 
@@ -204,11 +204,11 @@ namespace hpx { namespace components {
         {
             if (!id_)
             {
-                return hpx::detail::apply_impl<Action>(
+                return hpx::detail::post_impl<Action>(
                     naming::get_id_from_locality_id(agas::get_locality_id()),
                     priority, HPX_FORWARD(Ts, vs)...);
             }
-            return hpx::detail::apply_colocated<Action>(
+            return hpx::detail::post_colocated<Action>(
                 id_, HPX_FORWARD(Ts, vs)...);
         }
 
@@ -222,13 +222,13 @@ namespace hpx { namespace components {
         {
             if (!id_)
             {
-                return hpx::detail::apply_cb_impl<Action>(
+                return hpx::detail::post_cb_impl<Action>(
                     HPX_FORWARD(Continuation, c),
                     naming::get_id_from_locality_id(agas::get_locality_id()),
                     priority, HPX_FORWARD(Callback, cb),
                     HPX_FORWARD(Ts, vs)...);
             }
-            return hpx::detail::apply_colocated_cb<Action>(
+            return hpx::detail::post_colocated_cb<Action>(
                 HPX_FORWARD(Continuation, c), id_, HPX_FORWARD(Callback, cb),
                 HPX_FORWARD(Ts, vs)...);
         }
@@ -239,12 +239,12 @@ namespace hpx { namespace components {
         {
             if (!id_)
             {
-                return hpx::detail::apply_cb_impl<Action>(
+                return hpx::detail::post_cb_impl<Action>(
                     naming::get_id_from_locality_id(agas::get_locality_id()),
                     priority, HPX_FORWARD(Callback, cb),
                     HPX_FORWARD(Ts, vs)...);
             }
-            return hpx::detail::apply_colocated_cb<Action>(
+            return hpx::detail::post_colocated_cb<Action>(
                 id_, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 

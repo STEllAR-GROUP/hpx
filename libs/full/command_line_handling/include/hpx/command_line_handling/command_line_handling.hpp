@@ -22,7 +22,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT command_line_handling
@@ -33,12 +33,7 @@ namespace hpx { namespace util {
         command_line_handling(runtime_configuration rtcfg,
             std::vector<std::string> ini_config,
             hpx::function<int(hpx::program_options::variables_map& vm)>
-                hpx_main_f)
-          : base_type(rtcfg, HPX_MOVE(ini_config), HPX_MOVE(hpx_main_f))
-          , node_(std::size_t(-1))
-          , num_localities_(1)
-        {
-        }
+                hpx_main_f);
 
         int call(hpx::program_options::options_description const& desc_cmdline,
             int argc, char** argv,
@@ -57,6 +52,6 @@ namespace hpx { namespace util {
         void enable_logging_settings(hpx::program_options::variables_map& vm,
             std::vector<std::string>& ini_config);
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>

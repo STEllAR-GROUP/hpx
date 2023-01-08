@@ -21,11 +21,11 @@
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/algorithm.hpp>
-#include <boost/range/irange.hpp>
-
 #include <hpx/include/actions.hpp>
 #include <hpx/include/performance_counters.hpp>
 #include <hpx/include/util.hpp>
+#include <hpx/modules/iterator_support.hpp>
+
 #include "print_time_results.hpp"
 
 #include <cstddef>
@@ -233,8 +233,7 @@ struct stepper
             s.resize(np);
 
         // Initial conditions: f(0, i) = i
-        std::size_t b = 0;
-        auto range = boost::irange(b, np);
+        auto range = hpx::util::counting_shape(np);
         using hpx::execution::par;
         hpx::ranges::for_each(par, range, [&U, nx](std::size_t i) {
             U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));

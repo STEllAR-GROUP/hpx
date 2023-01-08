@@ -7,7 +7,6 @@
 #include <hpx/config.hpp>
 
 #include <hpx/serialization/input_archive.hpp>
-#include <hpx/serialization/multi_array.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/valarray.hpp>

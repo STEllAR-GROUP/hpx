@@ -23,6 +23,7 @@
 #include <hpx/modules/topology.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/register_thread.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -110,7 +111,9 @@ namespace hpx::execution::experimental {
 
         friend constexpr std::size_t tag_invoke(
             hpx::parallel::execution::processing_units_count_t,
-            thread_pool_policy_scheduler const& scheduler)
+            thread_pool_policy_scheduler const& scheduler,
+            hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
+            std::size_t = 0)
         {
             return scheduler.get_num_cores();
         }
@@ -170,9 +173,9 @@ namespace hpx::execution::experimental {
         void execute(F&& f, Policy const& policy) const
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            hpx::util::thread_description desc(f, annotation_);
+            hpx::threads::thread_description desc(f, annotation_);
 #else
-            hpx::util::thread_description desc(f);
+            hpx::threads::thread_description desc(f);
 #endif
             auto pool =
                 pool_ ? pool_ : threads::detail::get_self_or_default_pool();
@@ -268,13 +271,22 @@ namespace hpx::execution::experimental {
             }
         };
 
-        friend hpx::execution::experimental::forward_progress_guarantee
-        tag_invoke(
-            hpx::execution::experimental::get_forward_progress_guarantee_t,
-            thread_pool_policy_scheduler const&) noexcept
+        friend constexpr hpx::execution::experimental::
+            forward_progress_guarantee
+            tag_invoke(
+                hpx::execution::experimental::get_forward_progress_guarantee_t,
+                thread_pool_policy_scheduler const& sched) noexcept
         {
-            return hpx::execution::experimental::forward_progress_guarantee::
-                parallel;
+            if (hpx::detail::has_async_policy(sched.policy()))
+            {
+                return hpx::execution::experimental::
+                    forward_progress_guarantee::parallel;
+            }
+            else
+            {
+                return hpx::execution::experimental::
+                    forward_progress_guarantee::concurrent;
+            }
         }
 
         friend constexpr sender<thread_pool_policy_scheduler> tag_invoke(

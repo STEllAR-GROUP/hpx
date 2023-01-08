@@ -13,7 +13,7 @@
 
 double compute_minmax(const std::vector<double> v)
 {
-    hpx::execution::static_chunk_size param;
+    hpx::execution::experimental::static_chunk_size param;
     hpx::execution::parallel_task_policy par_policy;
     auto policy = par_policy.with(param);
 

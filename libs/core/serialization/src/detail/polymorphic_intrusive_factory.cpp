@@ -14,7 +14,8 @@
 
 #include <string>
 
-namespace hpx { namespace serialization { namespace detail {
+namespace hpx::serialization::detail {
+
     polymorphic_intrusive_factory& polymorphic_intrusive_factory::instance()
     {
         hpx::util::static_<polymorphic_intrusive_factory> factory;
@@ -26,7 +27,7 @@ namespace hpx { namespace serialization { namespace detail {
     {
         if (name.empty())
         {
-            HPX_THROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                 "polymorphic_intrusive_factory::register_class",
                 "Cannot register a factory with an empty name");
         }
@@ -42,4 +43,4 @@ namespace hpx { namespace serialization { namespace detail {
     {
         return map_.at(name)();
     }
-}}}    // namespace hpx::serialization::detail
+}    // namespace hpx::serialization::detail

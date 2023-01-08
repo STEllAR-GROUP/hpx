@@ -110,8 +110,8 @@ namespace hpx::serialization::detail {
 #else
                 HPX_UNUSED(name);
 #endif
-                HPX_THROW_EXCEPTION(
-                    serialization_error, "polymorphic_id_factory::create", msg);
+                HPX_THROW_EXCEPTION(hpx::error::serialization_error,
+                    "polymorphic_id_factory::create", msg);
             }
 
             ctor_t ctor = vec[id];

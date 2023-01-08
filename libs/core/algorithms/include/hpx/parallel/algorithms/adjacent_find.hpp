@@ -121,12 +121,15 @@ namespace hpx {
 #else
 
 #include <hpx/config.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/util/adapt_placement_mode.hpp>
+#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -152,7 +155,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         struct adjacent_find
           : public detail::algorithm<adjacent_find<Iter, Sent>, Iter>
         {
-            adjacent_find()
+            constexpr adjacent_find() noexcept
               : adjacent_find::algorithm("adjacent_find")
             {
             }
@@ -171,7 +174,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 typename Pred, typename Proj>
             static
                 typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-                parallel(ExPolicy&& policy, FwdIter first, Sent_ last,
+                parallel(ExPolicy&& orgpolicy, FwdIter first, Sent_ last,
                     Pred&& pred, Proj&& proj)
             {
                 using zip_iterator = hpx::util::zip_iterator<FwdIter, FwdIter>;
@@ -184,6 +187,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         FwdIter>::get(HPX_MOVE(last));
                 }
 
+                decltype(auto) policy = parallel::util::adapt_placement_mode(
+                    HPX_FORWARD(ExPolicy, orgpolicy),
+                    hpx::threads::thread_placement_hint::breadth_first);
+
+                using policy_type = std::decay_t<decltype(policy)>;
+
                 FwdIter next = first;
                 ++next;
                 difference_type count = std::distance(first, last);
@@ -195,7 +204,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 auto f1 = [pred_projected = HPX_MOVE(pred_projected), tok](
                               zip_iterator it, std::size_t part_size,
                               std::size_t base_idx) mutable {
-                    sequential_adjacent_find<std::decay_t<ExPolicy>>(
+                    sequential_adjacent_find<policy_type>(
                         base_idx, it, part_size, tok, pred_projected);
                 };
 
@@ -206,15 +215,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::detail::clear_container(data);
                     difference_type adj_find_res = tok.get_data();
                     if (adj_find_res != count)
+                    {
                         std::advance(first, adj_find_res);
+                    }
                     else
+                    {
                         first = last;
-
+                    }
                     return HPX_MOVE(first);
                 };
 
-                return util::partitioner<ExPolicy, FwdIter,
-                    void>::call_with_index(HPX_FORWARD(ExPolicy, policy),
+                using partitioner_type =
+                    util::partitioner<policy_type, FwdIter, void>;
+                return partitioner_type::call_with_index(
+                    HPX_FORWARD(decltype(policy), policy),
                     hpx::util::zip_iterator(first, next), count - 1, 1,
                     HPX_MOVE(f1), HPX_MOVE(f2));
             }

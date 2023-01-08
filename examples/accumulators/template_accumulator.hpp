@@ -60,7 +60,7 @@ namespace examples {
 
             typedef typename server::template_accumulator<T>::reset_action
                 action_type;
-            hpx::apply<action_type>(this->get_id());
+            hpx::post<action_type>(this->get_id());
         }
 
         /// Reset the accumulator's value to 0.
@@ -87,7 +87,7 @@ namespace examples {
 
             typedef typename server::template_accumulator<T>::add_action
                 action_type;
-            hpx::apply<action_type>(this->get_id(), arg);
+            hpx::post<action_type>(this->get_id(), arg);
         }
 
         /// Add \p arg to the accumulator's value.

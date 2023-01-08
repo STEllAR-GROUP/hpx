@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_colocated/apply_colocated.hpp>
-#include <hpx/async_colocated/apply_colocated_callback.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
-#include <hpx/async_distributed/applier/trigger.hpp>
+#include <hpx/async_colocated/post_colocated.hpp>
+#include <hpx/async_colocated/post_colocated_callback.hpp>
+#include <hpx/async_distributed/detail/post.hpp>
+#include <hpx/async_distributed/detail/trigger.hpp>
 #include <hpx/runtime_distributed/applier.hpp>

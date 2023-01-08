@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,8 +15,10 @@
 #include <ostream>
 #include <string>
 
-namespace hpx { namespace util {
-    std::ostream& operator<<(std::ostream& os, thread_description const& d)
+namespace hpx::threads {
+
+    std::ostream& operator<<(
+        std::ostream& os, [[maybe_unused]] thread_description const& d)
     {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
         if (d.kind() == thread_description::data_type_description)
@@ -29,27 +31,26 @@ namespace hpx { namespace util {
             os << d.get_address();    //-V128
         }
 #else
-        HPX_UNUSED(d);
         os << "<unknown>";
 #endif
         return os;
     }
 
-    std::string as_string(thread_description const& desc)
+    std::string as_string([[maybe_unused]] thread_description const& desc)
     {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        if (desc.kind() == util::thread_description::data_type_description)
+        if (desc.kind() == threads::thread_description::data_type_description)
             return desc ? desc.get_description() : "<unknown>";
 
         return hpx::util::format("address: {:#x}", desc.get_address());
 #else
-        HPX_UNUSED(desc);
         return "<unknown>";
 #endif
     }
 
     /* The priority of description is altname, id::name, id::address */
-    void thread_description::init_from_alternative_name(char const* altname)
+    void thread_description::init_from_alternative_name(
+        [[maybe_unused]] char const* altname)
     {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION) &&                                    \
     !defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
@@ -59,6 +60,7 @@ namespace hpx { namespace util {
             data_.desc_ = altname;
             return;
         }
+
         hpx::threads::thread_id_type id = hpx::threads::get_self_id();
         if (id)
         {
@@ -82,29 +84,25 @@ namespace hpx { namespace util {
             type_ = data_type_description;
             data_.desc_ = "<unknown>";
         }
-#else
-        HPX_UNUSED(altname);
 #endif
     }
-}}    // namespace hpx::util
 
-namespace hpx { namespace threads {
-    util::thread_description get_thread_description(
+    threads::thread_description get_thread_description(
         thread_id_type const& id, error_code& /* ec */)
     {
         return id ? get_thread_id_data(id)->get_description() :
-                    util::thread_description("<unknown>");
+                    threads::thread_description("<unknown>");
     }
 
-    util::thread_description set_thread_description(thread_id_type const& id,
-        util::thread_description const& desc, error_code& ec)
+    threads::thread_description set_thread_description(thread_id_type const& id,
+        threads::thread_description const& desc, error_code& ec)
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::set_thread_description",
                 "null thread id encountered");
-            return util::thread_description();
+            return threads::thread_description();
         }
         if (&ec != &throws)
             ec = make_success_code();
@@ -113,12 +111,12 @@ namespace hpx { namespace threads {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    util::thread_description get_thread_lco_description(
+    threads::thread_description get_thread_lco_description(
         thread_id_type const& id, error_code& ec)
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::get_thread_lco_description",
                 "null thread id encountered");
             return nullptr;
@@ -130,13 +128,13 @@ namespace hpx { namespace threads {
         return get_thread_id_data(id)->get_lco_description();
     }
 
-    util::thread_description set_thread_lco_description(
-        thread_id_type const& id, util::thread_description const& desc,
+    threads::thread_description set_thread_lco_description(
+        thread_id_type const& id, threads::thread_description const& desc,
         error_code& ec)
     {
         if (HPX_UNLIKELY(!id))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::set_thread_lco_description",
                 "null thread id encountered");
             return nullptr;
@@ -147,4 +145,4 @@ namespace hpx { namespace threads {
 
         return get_thread_id_data(id)->set_lco_description(desc);
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

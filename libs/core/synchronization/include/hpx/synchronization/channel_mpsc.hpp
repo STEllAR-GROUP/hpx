@@ -1,4 +1,4 @@
-//  Copyright (c) 2019 Hartmut Kaiser
+//  Copyright (c) 2019-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -21,14 +22,14 @@
 #include <mutex>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
 
     ////////////////////////////////////////////////////////////////////////////
     // A simple but very high performance implementation of the channel concept.
     // This channel is bounded to a size given at construction time and supports
     // a multiple producers and a single consumer. The data is stored in a
     // ring-buffer.
-    template <typename T, typename Mutex = util::spinlock>
+    template <typename T, typename Mutex = hpx::util::spinlock>
     class base_channel_mpsc
     {
     private:
@@ -62,12 +63,15 @@ namespace hpx { namespace lcos { namespace local {
             // invoke constructors for allocated buffer
             for (std::size_t i = 0; i != size_; ++i)
             {
-                new (&buffer_[i]) T();
+                hpx::construct_at(&buffer_[i]);
             }
 
             head_.data_.store(0, std::memory_order_relaxed);
             tail_.data_.tail_.store(0, std::memory_order_relaxed);
         }
+
+        base_channel_mpsc(base_channel_mpsc const& rhs) = delete;
+        base_channel_mpsc& operator=(base_channel_mpsc const& rhs) = delete;
 
         base_channel_mpsc(base_channel_mpsc&& rhs) noexcept
           : size_(rhs.size_)
@@ -107,7 +111,7 @@ namespace hpx { namespace lcos { namespace local {
             // invoke destructors for allocated buffer
             for (std::size_t i = 0; i != size_; ++i)
             {
-                (&buffer_[i])->~T();
+                std::destroy_at(&buffer_[i]);
             }
 
             if (!closed_.load(std::memory_order_relaxed))
@@ -177,14 +181,14 @@ namespace hpx { namespace lcos { namespace local {
             bool expected = false;
             if (!closed_.compare_exchange_weak(expected, true))
             {
-                HPX_THROW_EXCEPTION(hpx::invalid_status,
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "hpx::lcos::local::base_channel_mpsc::close",
                     "attempting to close an already closed channel");
             }
             return 0;
         }
 
-        std::size_t capacity() const
+        constexpr std::size_t capacity() const noexcept
         {
             return size_ - 1;
         }
@@ -216,5 +220,4 @@ namespace hpx { namespace lcos { namespace local {
     // of this channel with non-HPX threads.
     template <typename T>
     using channel_mpsc = base_channel_mpsc<T, hpx::spinlock>;
-
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

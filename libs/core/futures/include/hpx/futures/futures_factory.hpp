@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,7 +30,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
 
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -92,8 +92,8 @@ namespace hpx { namespace lcos { namespace local {
 
         protected:
             // run in a separate thread
-            threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
-                const char* annotation, launch policy, error_code& ec) override
+            threads::thread_id_ref_type post(threads::thread_pool_base* pool,
+                char const* annotation, launch policy, error_code& ec) override
             {
                 this->check_started();
 
@@ -104,7 +104,7 @@ namespace hpx { namespace lcos { namespace local {
                         threads::make_thread_function_nullary(
                             util::deferred_call(
                                 &base_type::run_impl, HPX_MOVE(this_))),
-                        util::thread_description(f_, annotation),
+                        threads::thread_description(f_, annotation),
                         policy.priority(),
                         threads::thread_schedule_hint(
                             static_cast<std::int16_t>(get_worker_thread_num())),
@@ -118,8 +118,8 @@ namespace hpx { namespace lcos { namespace local {
                 threads::thread_init_data data(
                     threads::make_thread_function_nullary(util::deferred_call(
                         &base_type::run_impl, HPX_MOVE(this_))),
-                    util::thread_description(f_, annotation), policy.priority(),
-                    policy.hint(), policy.stacksize(),
+                    threads::thread_description(f_, annotation),
+                    policy.priority(), policy.hint(), policy.stacksize(),
                     threads::thread_schedule_state::pending);
 
                 return threads::register_work(data, pool, ec);
@@ -232,8 +232,8 @@ namespace hpx { namespace lcos { namespace local {
 
         protected:
             // run in a separate thread
-            threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
-                const char* annotation, launch policy, error_code& ec) override
+            threads::thread_id_ref_type post(threads::thread_pool_base* pool,
+                char const* annotation, launch policy, error_code& ec) override
             {
                 if (exec_)
                 {
@@ -247,7 +247,7 @@ namespace hpx { namespace lcos { namespace local {
                     return threads::invalid_thread_id;
                 }
 
-                return this->base_type::apply(pool, annotation, policy, ec);
+                return this->base_type::post(pool, annotation, policy, ec);
             }
         };
 
@@ -391,9 +391,9 @@ namespace hpx { namespace lcos { namespace local {
             }
         };
     }    // namespace detail
-}}}      // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local
 
-namespace hpx { namespace traits { namespace detail {
+namespace hpx::traits::detail {
 
     template <typename Result, typename F, typename Base, typename Allocator>
     struct shared_state_allocator<
@@ -411,9 +411,9 @@ namespace hpx { namespace traits { namespace detail {
             lcos::local::detail::cancelable_task_object_allocator<Allocator,
                 Result, F>;
     };
-}}}    // namespace hpx::traits::detail
+}    // namespace hpx::traits::detail
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
 
     ///////////////////////////////////////////////////////////////////////////
     // The futures_factory is very similar to a packaged_task except that it
@@ -457,9 +457,8 @@ namespace hpx { namespace lcos { namespace local {
             static return_type call(Allocator const& a, F&& f)
             {
                 using base_allocator = Allocator;
-                using shared_state =
-                    typename traits::detail::shared_state_allocator<
-                        task_object<Result, F, void>, base_allocator>::type;
+                using shared_state = traits::shared_state_allocator_t<
+                    task_object<Result, F, void>, base_allocator>;
 
                 using other_allocator = typename std::allocator_traits<
                     base_allocator>::template rebind_alloc<shared_state>;
@@ -483,10 +482,8 @@ namespace hpx { namespace lcos { namespace local {
             static return_type call(Allocator const& a, R (*f)())
             {
                 using base_allocator = Allocator;
-                using shared_state =
-                    typename traits::detail::shared_state_allocator<
-                        task_object<Result, Result (*)(), void>,
-                        base_allocator>::type;
+                using shared_state = traits::shared_state_allocator_t<
+                    task_object<Result, Result (*)(), void>, base_allocator>;
 
                 using other_allocator = typename std::allocator_traits<
                     base_allocator>::template rebind_alloc<shared_state>;
@@ -563,10 +560,8 @@ namespace hpx { namespace lcos { namespace local {
             static return_type call(Allocator const& a, F&& f)
             {
                 using base_allocator = Allocator;
-                using shared_state =
-                    typename traits::detail::shared_state_allocator<
-                        cancelable_task_object<Result, F, void>,
-                        base_allocator>::type;
+                using shared_state = traits::shared_state_allocator_t<
+                    cancelable_task_object<Result, F, void>, base_allocator>;
 
                 using other_allocator = typename std::allocator_traits<
                     base_allocator>::template rebind_alloc<shared_state>;
@@ -590,10 +585,9 @@ namespace hpx { namespace lcos { namespace local {
             static return_type call(Allocator const& a, R (*f)())
             {
                 using base_allocator = Allocator;
-                using shared_state =
-                    typename traits::detail::shared_state_allocator<
-                        cancelable_task_object<Result, Result (*)(), void>,
-                        base_allocator>::type;
+                using shared_state = traits::shared_state_allocator_t<
+                    cancelable_task_object<Result, Result (*)(), void>,
+                    base_allocator>;
 
                 using other_allocator = typename std::allocator_traits<
                     base_allocator>::template rebind_alloc<shared_state>;
@@ -714,7 +708,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             if (!task_)
             {
-                HPX_THROW_EXCEPTION(task_moved,
+                HPX_THROW_EXCEPTION(hpx::error::task_moved,
                     "futures_factory<Result()>::operator()",
                     "futures_factory invalid (has it been moved?)");
                 return;
@@ -723,26 +717,26 @@ namespace hpx { namespace lcos { namespace local {
         }
 
         // asynchronous execution
-        threads::thread_id_ref_type apply(
-            const char* annotation = "futures_factory::apply",
+        threads::thread_id_ref_type post(
+            char const* annotation = "futures_factory::post",
             launch policy = launch::async, error_code& ec = throws) const
         {
-            return apply(threads::detail::get_self_or_default_pool(),
-                annotation, policy, ec);
+            return post(threads::detail::get_self_or_default_pool(), annotation,
+                policy, ec);
         }
 
-        threads::thread_id_ref_type apply(threads::thread_pool_base* pool,
-            const char* annotation = "futures_factory::apply",
+        threads::thread_id_ref_type post(threads::thread_pool_base* pool,
+            char const* annotation = "futures_factory::post",
             launch policy = launch::async, error_code& ec = throws) const
         {
             if (!task_)
             {
-                HPX_THROW_EXCEPTION(task_moved,
-                    "futures_factory<Result()>::apply()",
+                HPX_THROW_EXCEPTION(hpx::error::task_moved,
+                    "futures_factory<Result()>::post()",
                     "futures_factory invalid (has it been moved?)");
                 return threads::invalid_thread_id;
             }
-            return task_->apply(pool, annotation, policy, ec);
+            return task_->post(pool, annotation, policy, ec);
         }
 
         // This is the same as get_future, except that it moves the
@@ -751,14 +745,14 @@ namespace hpx { namespace lcos { namespace local {
         {
             if (!task_)
             {
-                HPX_THROWS_IF(ec, task_moved,
+                HPX_THROWS_IF(ec, hpx::error::task_moved,
                     "futures_factory<Result()>::get_future",
                     "futures_factory invalid (has it been moved?)");
                 return hpx::future<Result>();
             }
             if (future_obtained_)
             {
-                HPX_THROWS_IF(ec, future_already_retrieved,
+                HPX_THROWS_IF(ec, hpx::error::future_already_retrieved,
                     "futures_factory<Result()>::get_future",
                     "future already has been retrieved from this factory");
                 return hpx::future<Result>();
@@ -779,7 +773,7 @@ namespace hpx { namespace lcos { namespace local {
         {
             if (!task_)
             {
-                HPX_THROW_EXCEPTION(task_moved,
+                HPX_THROW_EXCEPTION(hpx::error::task_moved,
                     "futures_factory<Result()>::set_exception",
                     "futures_factory invalid (has it been moved?)");
                 return;
@@ -791,4 +785,4 @@ namespace hpx { namespace lcos { namespace local {
         hpx::intrusive_ptr<task_impl_type> task_;
         bool future_obtained_ = false;
     };
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local

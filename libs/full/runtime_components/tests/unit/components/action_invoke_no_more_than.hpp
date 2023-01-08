@@ -95,16 +95,6 @@ namespace hpx { namespace actions { namespace detail {
             return f(state);
         }
 
-        template <typename F>
-        static threads::thread_function_type call(
-            naming::address::address_type lva, F&& f, std::false_type)
-        {
-            return util::one_shot(
-                hpx::bind_back(&action_decorate_function::thread_function,
-                    traits::action_decorate_function<action_wrapper>::call(
-                        lva, HPX_FORWARD(F, f))));
-        }
-
         // If the action returns a future we wait on the semaphore as well,
         // however it will be signaled once the future gets ready only.
         static threads::thread_result_type thread_function_future(
@@ -115,24 +105,26 @@ namespace hpx { namespace actions { namespace detail {
             return f(state);
         }
 
-        template <typename F>
-        static threads::thread_function_type call(
-            naming::address::address_type lva, F&& f, std::true_type)
-        {
-            return util::one_shot(hpx::bind_back(
-                &action_decorate_function::thread_function_future,
-                traits::action_decorate_function<action_wrapper>::call(
-                    lva, HPX_FORWARD(F, f))));
-        }
-
         ///////////////////////////////////////////////////////////////////////
         template <typename F>
         static threads::thread_function_type call(
             naming::address::address_type lva, F&& f)
         {
             typedef typename Action::result_type result_type;
-            typedef traits::is_future<result_type> is_future;
-            return call(lva, HPX_FORWARD(F, f), is_future());
+            if constexpr (traits::is_future_v<result_type>)
+            {
+                return util::one_shot(hpx::bind_back(
+                    &action_decorate_function::thread_function_future,
+                    traits::action_decorate_function<action_wrapper>::call(
+                        lva, HPX_FORWARD(F, f))));
+            }
+            else
+            {
+                return util::one_shot(
+                    hpx::bind_back(&action_decorate_function::thread_function,
+                        traits::action_decorate_function<action_wrapper>::call(
+                            lva, HPX_FORWARD(F, f))));
+            }
         }
     };
 
@@ -185,29 +177,24 @@ namespace hpx { namespace actions { namespace detail {
             continuation_type;
 
         ///////////////////////////////////////////////////////////////////////
-        // If the action returns something which is not a future, we do nothing
-        // special.
-        static bool call(continuation_type&, std::false_type)
-        {
-            return false;
-        }
-
-        // If the action returns a future we wrap the given continuation to
-        // be able to signal the semaphore after the wrapped action has
-        // returned.
-        static bool call(continuation_type& c, std::true_type)
-        {
-            c = continuation_type(
-                c.get_id(), wrapped_continuation<Action, N>{c.get_addr()});
-            return true;
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         static bool call(continuation_type& cont)
         {
             typedef typename Action::result_type result_type;
-            typedef traits::is_future<result_type> is_future;
-            return call(cont, is_future());
+            if constexpr (traits::is_future_v<result_type>)
+            {
+                // If the action returns a future we wrap the given continuation
+                // to be able to signal the semaphore after the wrapped action
+                // has returned.
+                cont = continuation_type(cont.get_id(),
+                    wrapped_continuation<Action, N>{cont.get_addr()});
+                return true;
+            }
+            else
+            {
+                // If the action returns something which is not a future, we do
+                // nothing special.
+                return false;
+            }
         }
     };
 }}}    // namespace hpx::actions::detail

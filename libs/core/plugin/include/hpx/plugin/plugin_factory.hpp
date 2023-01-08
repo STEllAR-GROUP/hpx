@@ -1,9 +1,9 @@
-// Copyright Vladimir Prus 2004.
-// Copyright (c) 2005-2014 Hartmut Kaiser
+//  Copyright Vladimir Prus 2004.
+//  Copyright (c) 2005-2014 Hartmut Kaiser
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace util { namespace plugin {
+namespace hpx::util::plugin {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -36,8 +36,7 @@ namespace hpx { namespace util { namespace plugin {
             std::string const& class_name, std::string const& libname = "",
             error_code& ec = throws)
         {
-            typedef typename std::remove_pointer<get_plugins_list_type>::type
-                PointedType;
+            using PointedType = std::remove_pointer_t<get_plugins_list_type>;
 
             exported_plugins_type& e = *f();
 
@@ -45,7 +44,7 @@ namespace hpx { namespace util { namespace plugin {
             std::transform(clsname.begin(), clsname.end(), clsname.begin(),
                 [](char c) { return std::tolower(c); });
 
-            typename exported_plugins_type::iterator it = e.find(clsname);
+            auto it = e.find(clsname);
             if (it != e.end())
             {
                 abstract_factory<BasePlugin>** xw =
@@ -53,7 +52,7 @@ namespace hpx { namespace util { namespace plugin {
 
                 if (!xw)
                 {
-                    HPX_THROWS_IF(ec, filesystem_error,
+                    HPX_THROWS_IF(ec, hpx::error::filesystem_error,
                         "get_abstract_factory_static",
                         "Hpx.Plugin: Can't cast to the right factory type\n");
                     return std::pair<abstract_factory<BasePlugin>*,
@@ -81,9 +80,7 @@ namespace hpx { namespace util { namespace plugin {
 
                     bool first = true;
                     typename exported_plugins_type::iterator end = e.end();
-                    for (typename exported_plugins_type::iterator jt =
-                             e.begin();
-                         jt != end; ++jt)
+                    for (auto jt = e.begin(); jt != end; ++jt)
                     {
                         if (first)
                         {
@@ -102,7 +99,7 @@ namespace hpx { namespace util { namespace plugin {
                     str << " No classes exist.";
                 }
 
-                HPX_THROWS_IF(ec, filesystem_error,
+                HPX_THROWS_IF(ec, hpx::error::filesystem_error,
                     "get_abstract_factory_static", str.str());
                 return std::pair<abstract_factory<BasePlugin>*, dll_handle>();
             }
@@ -113,7 +110,7 @@ namespace hpx { namespace util { namespace plugin {
         get_abstract_factory(dll const& d, std::string const& class_name,
             std::string const& base_name, error_code& ec = throws)
         {
-            typedef hpx::function<void(get_plugins_list_type)> DeleterType;
+            using DeleterType = hpx::function<void(get_plugins_list_type)>;
 
             std::string plugin_entry(HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR
                 "_exported_plugins_list_");
@@ -135,9 +132,8 @@ namespace hpx { namespace util { namespace plugin {
         {
             exported_plugins_type& e = *f();
 
-            exported_plugins_type::iterator end = e.end();
-            for (exported_plugins_type::iterator it = e.begin(); it != end;
-                 ++it)
+            auto end = e.end();
+            for (auto it = e.begin(); it != end; ++it)
             {
                 names.push_back((*it).first);
             }
@@ -147,7 +143,7 @@ namespace hpx { namespace util { namespace plugin {
             std::string const& base_name, std::vector<std::string>& names,
             error_code& ec = throws)
         {
-            typedef hpx::function<void(get_plugins_list_type)> DeleterType;
+            using DeleterType = hpx::function<void(get_plugins_list_type)>;
 
             std::string plugin_entry(HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR
                 "_exported_plugins_list_");
@@ -171,13 +167,12 @@ namespace hpx { namespace util { namespace plugin {
             {
             }
 
-            void create(int******) const;
+            void create(int******) const;    // dummy placeholder
 
             void get_names(
                 std::vector<std::string>& names, error_code& ec = throws) const
             {
-                get_abstract_factory_names(
-                    this->m_dll, this->m_basename, names, ec);
+                get_abstract_factory_names(m_dll, m_basename, names, ec);
             }
 
         protected:
@@ -224,17 +219,18 @@ namespace hpx { namespace util { namespace plugin {
         ///////////////////////////////////////////////////////////////////////
         // empty deleter for the smart pointer to be used for static
         // plugin_factories
-        inline void empty_deleter(get_plugins_list_type) {}
+        inline void empty_deleter(get_plugins_list_type) noexcept {}
 
         ///////////////////////////////////////////////////////////////////////
         struct static_plugin_factory_item_base
         {
-            static_plugin_factory_item_base(get_plugins_list_type const& f_)
+            explicit static_plugin_factory_item_base(
+                get_plugins_list_type const& f_) noexcept
               : f(f_)
             {
             }
 
-            void create(int******) const;
+            void create(int******) const;    // dummy placeholder
 
             void get_names(
                 std::vector<std::string>& names, error_code& ec = throws) const
@@ -254,7 +250,8 @@ namespace hpx { namespace util { namespace plugin {
         struct static_plugin_factory_item<BasePlugin, Base,
             hpx::util::pack<Parameters...>> : public Base
         {
-            static_plugin_factory_item(get_plugins_list_type const& f)
+            explicit static_plugin_factory_item(
+                get_plugins_list_type const& f) noexcept
               : Base(f)
             {
             }
@@ -284,16 +281,15 @@ namespace hpx { namespace util { namespace plugin {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <class BasePlugin>
+    template <typename BasePlugin>
     struct plugin_factory
       : detail::plugin_factory_item<BasePlugin,
-            detail::plugin_factory_item_base,
-            typename virtual_constructor<BasePlugin>::type>
+            detail::plugin_factory_item_base, virtual_constructor_t<BasePlugin>>
     {
     private:
         using base_type = detail::plugin_factory_item<BasePlugin,
             detail::plugin_factory_item_base,
-            typename virtual_constructor<BasePlugin>::type>;
+            virtual_constructor_t<BasePlugin>>;
 
     public:
         plugin_factory(dll& d, std::string const& basename)
@@ -303,22 +299,21 @@ namespace hpx { namespace util { namespace plugin {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <class BasePlugin>
+    template <typename BasePlugin>
     struct static_plugin_factory
       : detail::static_plugin_factory_item<BasePlugin,
             detail::static_plugin_factory_item_base,
-            typename virtual_constructor<BasePlugin>::type>
+            virtual_constructor_t<BasePlugin>>
     {
     private:
         using base_type = detail::static_plugin_factory_item<BasePlugin,
             detail::static_plugin_factory_item_base,
-            typename virtual_constructor<BasePlugin>::type>;
+            virtual_constructor_t<BasePlugin>>;
 
     public:
-        static_plugin_factory(get_plugins_list_type const& f)
+        explicit static_plugin_factory(get_plugins_list_type const& f) noexcept
           : base_type(f)
         {
         }
     };
-
-}}}    // namespace hpx::util::plugin
+}    // namespace hpx::util::plugin

@@ -12,8 +12,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/serialization/boost_variant.hpp>    // for backwards compatibility
 #include <hpx/serialization/serialization_fwd.hpp>
+
+#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
+#include <hpx/serialization/boost_variant.hpp>    // for backwards compatibility
+#endif
 
 #include <cstddef>
 #include <utility>
@@ -26,7 +29,8 @@ namespace hpx::serialization {
         ////////////////////////////////////////////////////////////////////////
         struct std_variant_save_visitor
         {
-            std_variant_save_visitor(output_archive& ar)
+            explicit constexpr std_variant_save_visitor(
+                output_archive& ar) noexcept
               : ar_(ar)
             {
             }
@@ -66,8 +70,7 @@ namespace hpx::serialization {
         struct std_variant_impl<>
         {
             template <typename V>
-            static void load(
-                input_archive& /*ar*/, std::size_t /*which*/, V& /*v*/)
+            static constexpr void load(input_archive&, std::size_t, V&) noexcept
             {
             }
         };
@@ -91,7 +94,7 @@ namespace hpx::serialization {
         {
             // this might happen if a type was removed from the list of variant
             // types
-            HPX_THROW_EXCEPTION(serialization_error,
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                 "load<Archive, Variant, version>",
                 "type was removed from the list of variant types");
         }

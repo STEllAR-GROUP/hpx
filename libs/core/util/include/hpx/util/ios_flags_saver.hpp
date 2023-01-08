@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //  Copyright 2002, 2005 Daryle Walker
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,14 +9,14 @@
 
 #include <ios>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     // this is taken from the Boost.Io library
     class ios_flags_saver
     {
     public:
-        typedef ::std::ios_base state_type;
-        typedef ::std::ios_base::fmtflags aspect_type;
+        using state_type = ::std::ios_base;
+        using aspect_type = ::std::ios_base::fmtflags;
 
         explicit ios_flags_saver(state_type& s)
           : s_save_(s)
@@ -46,4 +46,4 @@ namespace hpx { namespace util {
         state_type& s_save_;
         aspect_type const a_save_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util

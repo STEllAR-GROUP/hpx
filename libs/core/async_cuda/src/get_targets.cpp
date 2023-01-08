@@ -23,7 +23,7 @@ namespace hpx { namespace cuda { namespace experimental {
         cudaError_t error = cudaGetDeviceCount(&device_count);
         if (error != cudaSuccess)
         {
-            HPX_THROW_EXCEPTION(kernel_error,
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "cuda::experimental::get_local_targets()",
                 std::string("cudaGetDeviceCount failed: ") +
                     cudaGetErrorString(error));
@@ -31,7 +31,7 @@ namespace hpx { namespace cuda { namespace experimental {
 
         if (device_count == 0)
         {
-            HPX_THROW_EXCEPTION(kernel_error,
+            HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "cuda::experimental::get_local_targets()",
                 "cudaGetDeviceCount failed: could not find any devices");
         }

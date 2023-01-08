@@ -40,9 +40,9 @@ using hpx::program_options::options_description;
 using hpx::program_options::value;
 using hpx::program_options::variables_map;
 
-using hpx::apply;
 using hpx::async;
 using hpx::future;
+using hpx::post;
 
 using hpx::chrono::high_resolution_timer;
 
@@ -226,7 +226,7 @@ void measure_function_futures_limiting_executor(
 
     // test a parallel algorithm on custom pool with high priority
     auto const chunk_size = count / (num_threads * 2);
-    hpx::execution::static_chunk_size fixed(chunk_size);
+    hpx::execution::experimental::static_chunk_size fixed(chunk_size);
 
     // start the clock
     high_resolution_timer walltime;
@@ -235,7 +235,7 @@ void measure_function_futures_limiting_executor(
             exec, tasks, tasks + 1000);
         hpx::experimental::for_loop(
             hpx::execution::par.with(fixed), 0, count, [&](std::uint64_t) {
-                hpx::apply(signal_exec, [&]() {
+                hpx::post(signal_exec, [&]() {
                     null_function();
                     sanity_check--;
                 });
@@ -302,7 +302,8 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv,
     high_resolution_timer walltime;
     hpx::experimental::for_loop(
         hpx::execution::par.on(exec).with(
-            hpx::execution::static_chunk_size(1), unlimited_number_of_chunks()),
+            hpx::execution::experimental::static_chunk_size(1),
+            unlimited_number_of_chunks()),
         0, count, [](std::uint64_t) { null_function(); });
 
     // stop the clock
@@ -345,7 +346,7 @@ void measure_function_futures_create_thread(std::uint64_t count, bool csv)
     };
     auto const thread_func =
         hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
-    auto const desc = hpx::util::thread_description();
+    auto const desc = hpx::threads::thread_description();
     auto const prio = hpx::threads::thread_priority::normal;
     auto const hint = hpx::threads::thread_schedule_hint();
     auto const stack_size = hpx::threads::thread_stacksize::small_;
@@ -394,7 +395,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
     };
     auto const thread_func =
         hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
-    auto const desc = hpx::util::thread_description();
+    auto const desc = hpx::threads::thread_description();
     auto prio = hpx::threads::thread_priority::normal;
     auto const stack_size = hpx::threads::thread_stacksize::small_;
     auto const num_threads = hpx::get_num_worker_threads();
@@ -462,12 +463,12 @@ void measure_function_futures_apply_hierarchical_placement(
 
             for (std::uint64_t i = count_start; i < count_end; ++i)
             {
-                hpx::apply(exec, func);
+                hpx::post(exec, func);
             }
         };
 
         auto exec = hpx::execution::parallel_executor(hint);
-        hpx::apply(exec, spawn_func);
+        hpx::post(exec, spawn_func);
     }
     l.wait();
 

@@ -52,7 +52,7 @@ namespace hpx { namespace actions { namespace detail {
 
         if (!p.second)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "action_registry::register_typename",
                 "failed to insert {} into typename to id registry.", type_name);
         }
@@ -137,9 +137,9 @@ namespace hpx { namespace actions { namespace detail {
 
         if (id == invalid_id)
         {
-            HPX_THROW_EXCEPTION(serialization_error, "action_registry::get_id",
-                "Unknown typename: {}\n{}", type_name,
-                instance().collect_registered_typenames());
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
+                "action_registry::get_id", "Unknown typename: {}\n{}",
+                type_name, instance().collect_registered_typenames());
         }
 
         return id;
@@ -162,8 +162,8 @@ namespace hpx { namespace actions { namespace detail {
 #else
             HPX_UNUSED(name);
 #endif
-            HPX_THROW_EXCEPTION(
-                serialization_error, "action_registry::create", msg);
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
+                "action_registry::create", msg);
             return nullptr;
         }
 
@@ -180,8 +180,8 @@ namespace hpx { namespace actions { namespace detail {
 #else
             HPX_UNUSED(name);
 #endif
-            HPX_THROW_EXCEPTION(
-                serialization_error, "action_registry::create", msg);
+            HPX_THROW_EXCEPTION(hpx::error::serialization_error,
+                "action_registry::create", msg);
             return nullptr;
         }
         return !with_continuation ? ctors.first() : ctors.second();

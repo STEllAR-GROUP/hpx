@@ -449,13 +449,13 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     if (vector_size < 1)
     {
-        HPX_THROW_EXCEPTION(hpx::commandline_option_error, "hpx_main",
+        HPX_THROW_EXCEPTION(hpx::error::commandline_option_error, "hpx_main",
             "Invalid vector size, must be at least 1");
     }
 
     if (iterations < 1)
     {
-        HPX_THROW_EXCEPTION(hpx::commandline_option_error, "hpx_main",
+        HPX_THROW_EXCEPTION(hpx::error::commandline_option_error, "hpx_main",
             "Invalid number of iterations given, must be at least 1");
     }
 

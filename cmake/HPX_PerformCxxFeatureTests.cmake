@@ -136,6 +136,10 @@ function(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx20_trivial_virtual_destructor(
       DEFINITIONS HPX_HAVE_CXX20_TRIVIAL_VIRTUAL_DESTRUCTOR
     )
+
+    hpx_check_for_cxx20_std_construct_at(
+      DEFINITIONS HPX_HAVE_CXX20_STD_CONSTRUCT_AT
+    )
   endif()
 
   hpx_check_for_cxx_lambda_capture_decltype(
@@ -164,5 +168,7 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT_CUDA
     )
   endif()
+
+  hpx_check_for_builtin_forward_move(DEFINITIONS HPX_HAVE_BUILTIN_FORWARD_MOVE)
 
 endfunction()

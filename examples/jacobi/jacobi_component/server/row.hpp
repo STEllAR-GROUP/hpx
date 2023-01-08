@@ -15,8 +15,6 @@
 #include <hpx/include/components.hpp>
 #include <hpx/modules/memory.hpp>
 
-#include <boost/smart_ptr/shared_array.hpp>
-
 #include <cstddef>
 
 namespace jacobi { namespace server {

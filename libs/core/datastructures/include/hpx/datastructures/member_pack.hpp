@@ -7,13 +7,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/serialize.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>    // for size_t
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
 #if defined(HPX_HAVE_MSVC_NO_UNIQUE_ADDRESS_ATTRIBUTE) ||                      \
@@ -40,6 +41,7 @@ namespace hpx { namespace util {
         {
             return leaf.member;
         }
+
         template <std::size_t I, typename T>
         static constexpr T const& member_get(
             member_leaf<I, T> const& leaf) noexcept
@@ -82,17 +84,20 @@ namespace hpx { namespace util {
         {
             return leaf.member;
         }
+
         template <std::size_t I, typename T>
         static constexpr T& member_get(member_leaf<I, T, true>& leaf) noexcept
         {
             return leaf;
         }
+
         template <std::size_t I, typename T>
         static constexpr T const& member_get(
             member_leaf<I, T, false> const& leaf) noexcept
         {
             return leaf.member;
         }
+
         template <std::size_t I, typename T>
         static constexpr T const& member_get(
             member_leaf<I, T, true> const& leaf) noexcept
@@ -124,17 +129,20 @@ namespace hpx { namespace util {
         {
             return detail::member_get<I>(*this);
         }
+
         template <std::size_t I>
         constexpr decltype(auto) get() const& noexcept
         {
             return detail::member_get<I>(*this);
         }
+
         template <std::size_t I>
         constexpr decltype(auto) get() && noexcept
         {
             using T = decltype(detail::member_type<I>(*this));
             return static_cast<T&&>(detail::member_get<I>(*this));
         }
+
         template <std::size_t I>
         constexpr decltype(auto) get() const&& noexcept
         {
@@ -146,18 +154,18 @@ namespace hpx { namespace util {
     template <typename... Ts>
     using member_pack_for =
         member_pack<util::make_index_pack_t<sizeof...(Ts)>, Ts...>;
-
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive, std::size_t... Is, typename... Ts>
     HPX_FORCEINLINE void serialize(Archive& ar,
         ::hpx::util::member_pack<util::index_pack<Is...>, Ts...>& mp,
         unsigned int const /*version*/ = 0)
     {
-        int sequencer[] = {((ar & mp.template get<Is>()), 0)...};
-        (void) sequencer;
+        (hpx::serialization::detail::serialize_one(ar, mp.template get<Is>()),
+            ...);
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

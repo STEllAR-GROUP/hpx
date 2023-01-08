@@ -15,6 +15,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     // Returns the major HPX version.
     HPX_CORE_EXPORT std::uint8_t major_version();
 

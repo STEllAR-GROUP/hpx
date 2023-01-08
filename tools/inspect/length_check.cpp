@@ -9,13 +9,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/string_util.hpp>
 
 #include "function_hyper.hpp"
 #include "length_check.hpp"
 
-#include <boost/foreach.hpp>
 #include <boost/regex.hpp>
-#include <boost/tokenizer.hpp>
 
 #include <cstddef>
 #include <functional>
@@ -79,8 +78,9 @@ namespace boost { namespace inspect {
         std::size_t p = 0;
         vector<string> someline, lineorder;
 
-        char_separator<char> sep("\n", "", boost::keep_empty_tokens);
-        tokenizer<char_separator<char>> tokens(contents, sep);
+        hpx::string_util::char_separator sep(
+            "\n", "", hpx::string_util::empty_token_policy::keep);
+        hpx::string_util::tokenizer tokens(contents, sep);
         for (const auto& t : tokens)
         {
             std::size_t rend = t.find_first_of("\r"), size = t.size();
@@ -90,8 +90,9 @@ namespace boost { namespace inspect {
             }
             else
             {
-                char_separator<char> sep2("\r", "", boost::keep_empty_tokens);
-                tokenizer<char_separator<char>> tokens2(t, sep2);
+                hpx::string_util::char_separator sep2(
+                    "\r", "", hpx::string_util::empty_token_policy::keep);
+                hpx::string_util::tokenizer tokens2(t, sep2);
                 for (const auto& u : tokens2)
                 {
                     if (!u.empty() && u.back() == '\r')

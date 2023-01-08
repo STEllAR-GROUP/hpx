@@ -20,13 +20,18 @@
 std::string expected_output;
 hpx::spinlock expected_output_mtx;
 
+template <typename T>
+inline void output(std::stringstream& stream, T&& t)
+{
+    stream << t;
+}
+
 template <typename... Ts>
 void generate_output(Ts&&... ts)
 {
     std::stringstream stream;
-    int const sequencer[] = {0, (stream << ts, 0)...};
-    (void) sequencer;
 
+    (output(stream, ts), ...);
     stream << std::endl;
 
     std::string str = stream.str();
@@ -47,9 +52,8 @@ template <typename... Ts>
 void generate_output_no_endl(Ts&&... ts)
 {
     std::stringstream stream;
-    int const sequencer[] = {0, (stream << ts, 0)...};
-    (void) sequencer;
 
+    (output(stream, ts), ...);
     std::string str = stream.str();
 
     {
@@ -251,11 +255,11 @@ namespace gc {
         }
         void incref(unsigned int w)
         {
-            hpx::apply<server::collectable::incref_action>(this->get_id(), w);
+            hpx::post<server::collectable::incref_action>(this->get_id(), w);
         }
         void decref(unsigned int w)
         {
-            hpx::apply<server::collectable::decref_action>(this->get_id(), w);
+            hpx::post<server::collectable::decref_action>(this->get_id(), w);
         }
     };
 }    // namespace gc
@@ -312,7 +316,7 @@ namespace gc { namespace server {
         cd->phantom_count++;
         state();
         spread(weight);
-        hpx::apply<collectable::done_action>(parent, this->get_id());
+        hpx::post<collectable::done_action>(parent, this->get_id());
     }
     void collectable::phantom_wait_complete()
     {
@@ -341,7 +345,7 @@ namespace gc { namespace server {
             {
                 if (i != hpx::invalid_id)
                 {
-                    hpx::apply<collectable::recover_action>(i, cd->cid);
+                    hpx::post<collectable::recover_action>(i, cd->cid);
                     cd->wc++;
                 }
             }
@@ -362,7 +366,7 @@ namespace gc { namespace server {
             }
             else
             {
-                hpx::apply<collectable::recover_done_action>(cd->parent);
+                hpx::post<collectable::recover_done_action>(cd->parent);
             }
         }
     }

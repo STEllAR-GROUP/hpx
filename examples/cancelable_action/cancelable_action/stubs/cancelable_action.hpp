@@ -35,7 +35,7 @@ namespace examples { namespace stubs {
         static void cancel_it(hpx::id_type const& gid)
         {
             typedef server::cancelable_action::cancel_it_action action_type;
-            hpx::apply<action_type>(gid);
+            hpx::post<action_type>(gid);
         }
     };
 }}    // namespace examples::stubs

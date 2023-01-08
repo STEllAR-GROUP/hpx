@@ -12,15 +12,18 @@
 #include <hpx/config.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/timing/steady_clock.hpp>
 
 #include <hpx/execution/executors/execution_parameters_fwd.hpp>
 
+#include <chrono>
 #include <cmath>
 #include <cstddef>
 #include <iostream>
 #include <type_traits>
 
-namespace hpx { namespace execution {
+namespace hpx::execution::experimental {
+
     ///////////////////////////////////////////////////////////////////////////
     /// Loop iterations are divided into pieces of size \a chunk_size and then
     /// assigned to threads. If \a chunk_size is not specified, the iterations
@@ -55,9 +58,10 @@ namespace hpx { namespace execution {
         }
 
         /// \cond NOINTERNAL
-        template <typename Executor, typename F>
-        std::size_t get_chunk_size(
-            Executor& exec, F&&, std::size_t cores, std::size_t input_size)
+        template <typename Executor>
+        std::size_t get_chunk_size(Executor& exec,
+            hpx::chrono::steady_duration const&, std::size_t cores,
+            std::size_t input_size)
         {
             // Make sure the internal round robin counter of the executor is
             // reset
@@ -114,14 +118,24 @@ namespace hpx { namespace execution {
         std::size_t chunk_size_;
         /// \endcond
     };
-}}    // namespace hpx::execution
+}    // namespace hpx::execution::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     /// \cond NOINTERNAL
     template <>
-    struct is_executor_parameters<hpx::execution::adaptive_static_chunk_size>
+    struct is_executor_parameters<
+        hpx::execution::experimental::adaptive_static_chunk_size>
       : std::true_type
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
+
+namespace hpx::execution {
+
+    using adaptive_static_chunk_size HPX_DEPRECATED_V(1, 9,
+        "hpx::execution::adaptive_static_chunk_size is deprecated, use "
+        "hpx::execution::experimental::adaptive_static_chunk_size instead") =
+        hpx::execution::experimental::adaptive_static_chunk_size;
+}

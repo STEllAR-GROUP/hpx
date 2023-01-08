@@ -14,7 +14,6 @@
 #include <hpx/futures/traits/future_then_result.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
-#include <hpx/type_support/always_void.hpp>
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
 
@@ -34,7 +33,7 @@ namespace hpx { namespace traits {
 
         template <typename Executor, typename Future, typename F>
         struct future_then_executor_result<Executor, Future, F,
-            hpx::util::always_void_t<hpx::util::invoke_result_t<F&, Future>>>
+            std::void_t<hpx::util::invoke_result_t<F&, Future>>>
         {
             using func_result_type = hpx::util::invoke_result_t<F&, Future>;
 
@@ -45,7 +44,7 @@ namespace hpx { namespace traits {
             using result_type = util::lazy_conditional_t<
                 hpx::traits::detail::is_unique_future_v<cont_result>,
                 hpx::traits::future_traits<cont_result>,
-                hpx::util::identity<cont_result>>;
+                hpx::type_identity<cont_result>>;
 
             using type = hpx::future<result_type>;
         };

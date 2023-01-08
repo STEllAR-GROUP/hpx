@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,7 +22,7 @@
 #include <string>
 #include <utility>
 
-namespace hpx { namespace threads { namespace detail {
+namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     thread_result_type set_active_state(thread_id_ref_type thrd,
@@ -31,7 +31,7 @@ namespace hpx { namespace threads { namespace detail {
     {
         if (HPX_UNLIKELY(!thrd))
         {
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "threads::detail::set_active_state",
                 "null thread id encountered");
             return thread_result_type(
@@ -74,7 +74,7 @@ namespace hpx { namespace threads { namespace detail {
     {
         if (HPX_UNLIKELY(!thrd))
         {
-            HPX_THROWS_IF(ec, null_thread_id,
+            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "threads::detail::set_thread_state",
                 "null thread id encountered");
             return thread_state(
@@ -84,7 +84,7 @@ namespace hpx { namespace threads { namespace detail {
         // set_state can't be used to force a thread into active state
         if (new_state == thread_schedule_state::active)
         {
-            HPX_THROWS_IF(ec, bad_parameter,
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "threads::detail::set_thread_state", "invalid new state: {}",
                 new_state);
             return thread_state(
@@ -167,6 +167,7 @@ namespace hpx { namespace threads { namespace detail {
                 return previous_state;    // done
             }
             break;
+
             case thread_schedule_state::terminated:
             {
                 // NOLINTNEXTLINE(bugprone-branch-clone)
@@ -184,6 +185,7 @@ namespace hpx { namespace threads { namespace detail {
                 return previous_state;
             }
             break;
+
             case thread_schedule_state::pending:
                 [[fallthrough]];
             case thread_schedule_state::pending_boost:
@@ -201,14 +203,16 @@ namespace hpx { namespace threads { namespace detail {
                     // NOLINTNEXTLINE(bugprone-branch-clone)
                     LTM_(fatal) << str;
 
-                    HPX_THROWS_IF(ec, bad_parameter,
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "threads::detail::set_thread_state", str);
                     return thread_state(thread_schedule_state::unknown,
                         thread_restart_state::unknown);
                 }
                 break;
+
             case thread_schedule_state::suspended:
                 break;    // fine, just set the new state
+
             case thread_schedule_state::pending_do_not_schedule:
                 [[fallthrough]];
             default:
@@ -222,9 +226,9 @@ namespace hpx { namespace threads { namespace detail {
 
             // If the previous state was pending we are supposed to remove the
             // thread from the queue. But in order to avoid linearly looking
-            // through the queue we defer this to the thread function, which
-            // at some point will ignore this thread by simply skipping it
-            // (if it's not pending anymore).
+            // through the queue we defer this to the thread function, which at
+            // some point will ignore this thread by simply skipping it (if it's
+            // not pending anymore).
 
             // NOLINTNEXTLINE(bugprone-branch-clone)
             LTM_(info).format("set_thread_state: thread({}), description({}), "
@@ -265,6 +269,7 @@ namespace hpx { namespace threads { namespace detail {
             auto* scheduler = thrd_data->get_scheduler_base();
             scheduler->schedule_thread(
                 thrd, schedulehint, false, thrd_data->get_priority());
+
             // NOTE: Don't care if the hint is a NUMA hint, just want to wake up
             // a thread.
             scheduler->do_some_work(schedulehint.hint);
@@ -275,4 +280,4 @@ namespace hpx { namespace threads { namespace detail {
 
         return previous_state;
     }
-}}}    // namespace hpx::threads::detail
+}    // namespace hpx::threads::detail

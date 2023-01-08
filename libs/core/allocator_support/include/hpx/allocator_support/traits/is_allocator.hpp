@@ -15,7 +15,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -85,4 +85,4 @@ namespace hpx { namespace traits {
 
     template <typename T>
     inline constexpr bool is_allocator_v = is_allocator<T>::value;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

@@ -70,7 +70,7 @@ namespace hpx::serialization::detail {
                 split_gids_.clear();
 
                 // now return credits to AGAS
-                util::unlock_guard<Lock> ul(l);
+                unlock_guard<Lock> ul(l);
 
                 for (auto const& gid : gids)
                 {

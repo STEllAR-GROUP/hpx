@@ -24,7 +24,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
 #if defined(DOXYGEN)
     /// connect is a customization point object.
     /// For some subexpression `s` and `r`, let `S` be the type such that `decltype((s))`
@@ -93,12 +94,14 @@ namespace hpx { namespace execution { namespace experimental {
     struct connect_t;
 
     namespace detail {
+
         template <typename S, typename R, typename Enable = void>
         struct connect_result_helper
         {
             struct dummy_operation_state
             {
             };
+
             using type = dummy_operation_state;
         };
 
@@ -111,6 +114,7 @@ namespace hpx { namespace execution { namespace experimental {
     }    // namespace detail
 
     namespace detail {
+
         template <typename F, typename E>
         struct as_receiver
         {
@@ -127,7 +131,7 @@ namespace hpx { namespace execution { namespace experimental {
                 std::terminate();
             }
 
-            void set_stopped() noexcept {}
+            constexpr void set_stopped() noexcept {}
         };
     }    // namespace detail
 
@@ -143,8 +147,9 @@ namespace hpx { namespace execution { namespace experimental {
     // determined by the scheduler. Logic that you want to run on that context
     // can be placed in the receiver's completion-signalling method.
     //
-    //      // snd is a sender describing the creation of a new execution
-    //      // resource on the execution context associated with sch
+    // snd is a sender describing the creation of a new execution resource on
+    // the execution context associated with sch
+    //
     //      execution::scheduler auto sch = thread_pool.scheduler();
     //      execution::sender auto snd = execution::schedule(sch);
     //
@@ -167,9 +172,11 @@ namespace hpx { namespace execution { namespace experimental {
     // clang-format off
     template <typename Scheduler>
     struct is_scheduler<Scheduler,
-        std::enable_if_t<hpx::is_invocable_v<schedule_t, Scheduler> &&
-            std::is_copy_constructible_v<Scheduler> &&
-            hpx::traits::is_equality_comparable_v<Scheduler>>> : std::true_type
+        std::enable_if_t<
+            hpx::is_invocable_v<schedule_t, std::decay_t<Scheduler>> &&
+            std::is_copy_constructible_v<std::decay_t<Scheduler>> &&
+            hpx::traits::is_equality_comparable_v<std::decay_t<Scheduler>>>>
+      : std::true_type
     {
     };
     // clang-format on
@@ -181,9 +188,10 @@ namespace hpx { namespace execution { namespace experimental {
     using schedule_result_t = hpx::util::invoke_result_t<schedule_t, S>;
 
     namespace detail {
+
         // Dummy type used in place of a scheduler if none is given
         struct no_scheduler
         {
         };
     }    // namespace detail
-}}}      // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

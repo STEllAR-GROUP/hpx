@@ -24,15 +24,17 @@
 #include <typeinfo>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace runtime_local { namespace detail {
+namespace hpx::runtime_local::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     // TODO: This is not scalable, and painful to update.
     void save_custom_exception(hpx::serialization::output_archive& ar,
         std::exception_ptr const& ep, unsigned int /* version */)
     {
-        hpx::util::exception_type type(hpx::util::unknown_exception);
+        hpx::util::exception_type type =
+            hpx::util::exception_type::unknown_exception;
         std::string what;
-        int err_value = hpx::success;
+        hpx::error err_value = hpx::error::success;
         std::string err_message;
 
         std::uint32_t throw_locality_ = 0;
@@ -130,66 +132,66 @@ namespace hpx { namespace runtime_local { namespace detail {
         }
         catch (hpx::thread_interrupted const&)
         {
-            type = hpx::util::hpx_thread_interrupted_exception;
+            type = hpx::util::exception_type::hpx_thread_interrupted_exception;
             what = "hpx::thread_interrupted";
-            err_value = hpx::thread_cancelled;
+            err_value = hpx::error::thread_cancelled;
         }
         catch (hpx::exception const& e)
         {
-            type = hpx::util::hpx_exception;
+            type = hpx::util::exception_type::hpx_exception;
             what = e.what();
             err_value = e.get_error();
         }
         catch (std::system_error const& e)
         {
-            type = hpx::util::std_system_error;
+            type = hpx::util::exception_type::std_system_error;
             what = e.what();
-            err_value = e.code().value();
+            err_value = static_cast<hpx::error>(e.code().value());
             err_message = e.code().message();
         }
         catch (std::runtime_error const& e)
         {
-            type = hpx::util::std_runtime_error;
+            type = hpx::util::exception_type::std_runtime_error;
             what = e.what();
         }
         catch (std::invalid_argument const& e)
         {
-            type = hpx::util::std_invalid_argument;
+            type = hpx::util::exception_type::std_invalid_argument;
             what = e.what();
         }
         catch (std::out_of_range const& e)
         {
-            type = hpx::util::std_out_of_range;
+            type = hpx::util::exception_type::std_out_of_range;
             what = e.what();
         }
         catch (std::logic_error const& e)
         {
-            type = hpx::util::std_logic_error;
+            type = hpx::util::exception_type::std_logic_error;
             what = e.what();
         }
         catch (std::bad_alloc const& e)
         {
-            type = hpx::util::std_bad_alloc;
+            type = hpx::util::exception_type::std_bad_alloc;
             what = e.what();
         }
         catch (std::bad_cast const& e)
         {
-            type = hpx::util::std_bad_cast;
+            type = hpx::util::exception_type::std_bad_cast;
             what = e.what();
         }
         catch (std::bad_typeid const& e)
         {
-            type = hpx::util::std_bad_typeid;
+            type = hpx::util::exception_type::std_bad_typeid;
             what = e.what();
         }
         catch (std::bad_exception const& e)
         {
-            type = hpx::util::std_bad_exception;
+            type = hpx::util::exception_type::std_bad_exception;
             what = e.what();
         }
         catch (std::exception const& e)
         {
-            type = hpx::util::std_exception;
+            type = hpx::util::exception_type::std_exception;
             what = e.what();
         }
 #if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
@@ -201,7 +203,7 @@ namespace hpx { namespace runtime_local { namespace detail {
 #endif
         catch (...)
         {
-            type = hpx::util::unknown_exception;
+            type = hpx::util::exception_type::unknown_exception;
             what = "unknown exception";
         }
 
@@ -212,16 +214,16 @@ namespace hpx { namespace runtime_local { namespace detail {
             throw_env_ & throw_config_ & throw_state_ & throw_auxinfo_;
         // clang-format on
 
-        if (hpx::util::hpx_exception == type)
+        if (hpx::util::exception_type::hpx_exception == type)
         {
             // clang-format off
-            ar & err_value;
+            ar << static_cast<int>(err_value);
             // clang-format on
         }
-        else if (hpx::util::std_system_error == type)
+        else if (hpx::util::exception_type::std_system_error == type)
         {
             // clang-format off
-            ar & err_value & err_message;
+            ar << static_cast<int>(err_value) << err_message;
             // clang-format on
         }
     }
@@ -229,11 +231,12 @@ namespace hpx { namespace runtime_local { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     // TODO: This is not scalable, and painful to update.
     void load_custom_exception(hpx::serialization::input_archive& ar,
-        std::exception_ptr& e, unsigned int)
+        std::exception_ptr& e, unsigned int /*version*/)
     {
-        hpx::util::exception_type type(hpx::util::unknown_exception);
+        hpx::util::exception_type type =
+            hpx::util::exception_type::unknown_exception;
         std::string what;
-        int err_value = hpx::success;
+        hpx::error err_value = hpx::error::success;
         std::string err_message;
 
         std::uint32_t throw_locality_ = 0;
@@ -258,24 +261,30 @@ namespace hpx { namespace runtime_local { namespace detail {
             throw_env_ & throw_config_ & throw_state_ & throw_auxinfo_;
         // clang-format on
 
-        if (hpx::util::hpx_exception == type)
+        if (hpx::util::exception_type::hpx_exception == type)
         {
             // clang-format off
-            ar & err_value;
+            int error_code = 0;
+            ar >> error_code;
+            err_value = static_cast<hpx::error>(error_code);
             // clang-format on
         }
-        else if (hpx::util::std_system_error == type)
+        else if (hpx::util::exception_type::std_system_error == type)
         {
             // clang-format off
-            ar & err_value & err_message;
+            int error_code = 0;
+            ar >> error_code >> err_message;
+            err_value = static_cast<hpx::error>(error_code);
             // clang-format on
         }
 
         switch (type)
         {
         default:
-        case hpx::util::std_exception:
-        case hpx::util::unknown_exception:
+        case hpx::util::exception_type::std_exception:
+            [[fallthrough]];
+
+        case hpx::util::exception_type::unknown_exception:
             e = hpx::detail::construct_exception(
                 hpx::detail::std_exception(what),
                 hpx::detail::construct_exception_info(throw_function_,
@@ -286,7 +295,7 @@ namespace hpx { namespace runtime_local { namespace detail {
             break;
 
         // standard exceptions
-        case hpx::util::std_runtime_error:
+        case hpx::util::exception_type::std_runtime_error:
             e = hpx::detail::construct_exception(std::runtime_error(what),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
@@ -295,7 +304,7 @@ namespace hpx { namespace runtime_local { namespace detail {
                     throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
-        case hpx::util::std_invalid_argument:
+        case hpx::util::exception_type::std_invalid_argument:
             e = hpx::detail::construct_exception(std::invalid_argument(what),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
@@ -304,7 +313,7 @@ namespace hpx { namespace runtime_local { namespace detail {
                     throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
-        case hpx::util::std_out_of_range:
+        case hpx::util::exception_type::std_out_of_range:
             e = hpx::detail::construct_exception(std::out_of_range(what),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
@@ -313,7 +322,7 @@ namespace hpx { namespace runtime_local { namespace detail {
                     throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
-        case hpx::util::std_logic_error:
+        case hpx::util::exception_type::std_logic_error:
             e = hpx::detail::construct_exception(std::logic_error(what),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
@@ -322,7 +331,7 @@ namespace hpx { namespace runtime_local { namespace detail {
                     throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
-        case hpx::util::std_bad_alloc:
+        case hpx::util::exception_type::std_bad_alloc:
             e = hpx::detail::construct_exception(hpx::detail::bad_alloc(what),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
@@ -331,7 +340,7 @@ namespace hpx { namespace runtime_local { namespace detail {
                     throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
-        case hpx::util::std_bad_cast:
+        case hpx::util::exception_type::std_bad_cast:
             e = hpx::detail::construct_exception(hpx::detail::bad_cast(what),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
@@ -340,7 +349,7 @@ namespace hpx { namespace runtime_local { namespace detail {
                     throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
 
-        case hpx::util::std_bad_typeid:
+        case hpx::util::exception_type::std_bad_typeid:
             e = hpx::detail::construct_exception(hpx::detail::bad_typeid(what),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
@@ -348,7 +357,7 @@ namespace hpx { namespace runtime_local { namespace detail {
                     throw_shepherd_, throw_thread_id_, throw_thread_name_,
                     throw_env_, throw_config_, throw_state_, throw_auxinfo_));
             break;
-        case hpx::util::std_bad_exception:
+        case hpx::util::exception_type::std_bad_exception:
             e = hpx::detail::construct_exception(
                 hpx::detail::bad_exception(what),
                 hpx::detail::construct_exception_info(throw_function_,
@@ -366,14 +375,14 @@ namespace hpx { namespace runtime_local { namespace detail {
 #endif
 
         // boost::system::system_error
-        case hpx::util::boost_system_error:
+        case hpx::util::exception_type::boost_system_error:
             [[fallthrough]];
 
         // std::system_error
-        case hpx::util::std_system_error:
+        case hpx::util::exception_type::std_system_error:
             e = hpx::detail::construct_exception(
-                std::system_error(
-                    err_value, std::system_category(), err_message),
+                std::system_error(static_cast<int>(err_value),
+                    std::system_category(), err_message),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
@@ -382,10 +391,9 @@ namespace hpx { namespace runtime_local { namespace detail {
             break;
 
         // hpx::exception
-        case hpx::util::hpx_exception:
+        case hpx::util::exception_type::hpx_exception:
             e = hpx::detail::construct_exception(
-                hpx::exception(static_cast<hpx::error>(err_value), what,
-                    hpx::throwmode::rethrow),
+                hpx::exception(err_value, what, hpx::throwmode::rethrow),
                 hpx::detail::construct_exception_info(throw_function_,
                     throw_file_, throw_line_, throw_back_trace_,
                     throw_locality_, throw_hostname_, throw_pid_,
@@ -394,10 +402,10 @@ namespace hpx { namespace runtime_local { namespace detail {
             break;
 
         // hpx::thread_interrupted
-        case hpx::util::hpx_thread_interrupted_exception:
+        case hpx::util::exception_type::hpx_thread_interrupted_exception:
             e = hpx::detail::construct_lightweight_exception(
                 hpx::thread_interrupted());
             break;
         }
     }
-}}}    // namespace hpx::runtime_local::detail
+}    // namespace hpx::runtime_local::detail

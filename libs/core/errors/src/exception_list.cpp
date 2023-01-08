@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -55,7 +55,7 @@ namespace hpx {
                           // to take its address for comparison purposes.
 
     exception_list::exception_list()
-      : hpx::exception(hpx::success)
+      : hpx::exception(hpx::error::success)
       , mtx_()
     {
     }
@@ -68,7 +68,8 @@ namespace hpx {
     }
 
     exception_list::exception_list(exception_list_type&& l)
-      : hpx::exception(!l.empty() ? hpx::get_error(l.front()) : success)
+      : hpx::exception(
+            !l.empty() ? hpx::get_error(l.front()) : hpx::error::success)
       , exceptions_(HPX_MOVE(l))
       , mtx_()
     {
@@ -81,7 +82,7 @@ namespace hpx {
     {
     }
 
-    exception_list::exception_list(exception_list&& l)
+    exception_list::exception_list(exception_list&& l) noexcept
       : hpx::exception(HPX_MOVE(static_cast<hpx::exception&>(l)))
       , exceptions_(HPX_MOVE(l.exceptions_))
       , mtx_()
@@ -99,7 +100,7 @@ namespace hpx {
         return *this;
     }
 
-    exception_list& exception_list::operator=(exception_list&& l)
+    exception_list& exception_list::operator=(exception_list&& l) noexcept
     {
         if (this != &l)
         {
@@ -115,7 +116,7 @@ namespace hpx {
     {
         std::lock_guard<mutex_type> l(mtx_);
         if (exceptions_.empty())
-            return hpx::no_success;
+            return hpx::error::no_success;
         return hpx::get_error(exceptions_.front());
     }
 
@@ -149,7 +150,7 @@ namespace hpx {
         {
             hpx::exception ex;
             {
-                util::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+                unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 ex = hpx::exception(hpx::get_error(e), hpx::get_error_what(e));
             }
 

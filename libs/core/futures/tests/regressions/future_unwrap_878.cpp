@@ -22,7 +22,7 @@ int hpx_main()
     try
     {
         //promise.set_value(42);
-        throw hpx::bad_parameter;
+        throw hpx::error::bad_parameter;
     }
     catch (...)
     {

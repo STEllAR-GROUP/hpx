@@ -8,8 +8,8 @@
 #include <hpx/config.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/applier/apply.hpp>
 #include <hpx/async_distributed/continuation.hpp>
+#include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -48,27 +48,27 @@ namespace hpx { namespace components {
             switch (get<0>(msg))
             {
             default:
-            case destination_hpx:
+            case logging_destination::hpx:
                 LHPX_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
-            case destination_timing:
+            case logging_destination::timing:
                 LTIM_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
-            case destination_agas:
+            case logging_destination::agas:
                 LAGAS_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
-            case destination_parcel:
+            case logging_destination::parcel:
                 LPT_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
-            case destination_app:
+            case logging_destination::app:
                 LAPP_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);
                 break;
 
-            case destination_debuglog:
+            case logging_destination::debuglog:
                 LDEB_CONSOLE_ << fail_msg << get<2>(msg);
                 break;
             }
@@ -89,14 +89,14 @@ namespace hpx { namespace components {
             fallback_console_logging_locked(msgs);
 
             // raise error as this should get called from outside a HPX-thread
-            HPX_THROW_EXCEPTION(null_thread_id,
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "components::console_logging_locked",
                 "console_logging_locked was not called from a HPX-thread");
         }
 
         try
         {
-            hpx::apply<server::console_logging_action<>>(prefix, msgs);
+            hpx::post<server::console_logging_action<>>(prefix, msgs);
         }
         catch (hpx::exception const& e)
         {
@@ -250,8 +250,7 @@ namespace hpx { namespace components {
             {
                 naming::gid_type raw_prefix;
                 {
-                    util::unlock_guard<std::unique_lock<prefix_mutex_type>> ul(
-                        l);
+                    unlock_guard<std::unique_lock<prefix_mutex_type>> ul(l);
                     naming::get_agas_client().get_console_locality(raw_prefix);
                 }
 

@@ -10,7 +10,7 @@
 
 #include <utility>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief  Helper function for writing predicates that test whether an std::map
@@ -22,7 +22,8 @@ namespace hpx { namespace util {
     ///
     /// \returns  This function returns \b r.second.
     template <typename Iterator>
-    inline bool insert_checked(std::pair<Iterator, bool> const& r)
+    inline constexpr bool insert_checked(
+        std::pair<Iterator, bool> const& r) noexcept
     {
         return r.second;
     }
@@ -44,5 +45,4 @@ namespace hpx { namespace util {
         it = r.first;
         return r.second;
     }
-
-}}    // namespace hpx::util
+}    // namespace hpx::util

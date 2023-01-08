@@ -24,12 +24,14 @@
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
+#if HPX_HAVE_ITTNOTIFY != 0
     mutex::mutex(char const* const description)
       : owner_id_(threads::invalid_thread_id)
     {
         HPX_ITT_SYNC_CREATE(this, "hpx::mutex", description);
         HPX_ITT_SYNC_RENAME(this, "hpx::mutex");
     }
+#endif
 
     mutex::~mutex()
     {
@@ -48,7 +50,7 @@ namespace hpx {
         {
             HPX_ITT_SYNC_CANCEL(this);
             l.unlock();
-            HPX_THROWS_IF(ec, deadlock, description,
+            HPX_THROWS_IF(ec, hpx::error::deadlock, description,
                 "The calling thread already owns the mutex");
             return;
         }
@@ -101,7 +103,7 @@ namespace hpx {
         if (HPX_UNLIKELY(owner_id_ != self_id))
         {
             l.unlock();
-            HPX_THROWS_IF(ec, lock_error, "mutex::unlock",
+            HPX_THROWS_IF(ec, hpx::error::lock_error, "mutex::unlock",
                 "The calling thread does not own the mutex");
             return;
         }

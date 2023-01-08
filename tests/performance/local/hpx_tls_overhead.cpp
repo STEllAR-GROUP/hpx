@@ -5,13 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-
 #include <hpx/modules/format.hpp>
-#include <hpx/modules/timing.hpp>
-#include <hpx/thread_support/thread_specific_ptr.hpp>
-
 #include <hpx/modules/program_options.hpp>
-#include <boost/config.hpp>
+#include <hpx/modules/thread_support.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstdint>
 #include <iostream>

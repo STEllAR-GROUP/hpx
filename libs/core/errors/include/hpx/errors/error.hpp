@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //  Copyright (c) 2014      Anuj R. Sharma
 //
@@ -12,17 +12,19 @@
 
 #include <hpx/config.hpp>
 
+#include <cstdint>
 #include <string>
 #include <system_error>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Possible error conditions
     ///
     /// This enumeration lists all possible error conditions which can be
     /// reported from any of the API functions.
-    enum error
+    enum class error : std::int16_t
     {
         success = 0,
         ///< The operation was successful
@@ -144,10 +146,188 @@ namespace hpx {
         last_error,
 
         system_error_flag = 0x4000L,
-        error_upper_bound =
-            0x7fffL    // force this enum type to be at least 16 bits.
+
+        // force this enum type to be at least 16 bits.
+        error_upper_bound = 0x7fffL
         /// \endcond
     };
+
+    inline constexpr bool operator==(int lhs, error rhs) noexcept
+    {
+        return lhs == static_cast<int>(rhs);
+    }
+
+    inline constexpr bool operator==(error lhs, int rhs) noexcept
+    {
+        return static_cast<int>(lhs) == rhs;
+    }
+
+    inline constexpr bool operator!=(int lhs, error rhs) noexcept
+    {
+        return !(lhs == rhs);
+    }
+
+    inline constexpr bool operator!=(error lhs, int rhs) noexcept
+    {
+        return !(lhs == rhs);
+    }
+
+    inline constexpr bool operator<(int lhs, error rhs) noexcept
+    {
+        return lhs < static_cast<int>(rhs);
+    }
+
+    inline constexpr bool operator>=(int lhs, error rhs) noexcept
+    {
+        return !(lhs < rhs);
+    }
+
+    inline constexpr int operator&(error lhs, error rhs) noexcept
+    {
+        return static_cast<int>(lhs) & static_cast<int>(rhs);
+    }
+
+    inline constexpr int operator&(int lhs, error rhs) noexcept
+    {
+        return lhs & static_cast<int>(rhs);
+    }
+
+    inline constexpr int operator|=(int& lhs, error rhs) noexcept
+    {
+        lhs = lhs | static_cast<int>(rhs);
+        return lhs;
+    }
+
+#define HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG                                \
+    "The unscoped hpx::error names are deprecated. Please use "                \
+    "hpx::error::<value> instead."
+
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error success = error::success;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error no_success = error::no_success;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error not_implemented = error::not_implemented;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error out_of_memory = error::out_of_memory;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error bad_action_code = error::bad_action_code;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error bad_component_type = error::bad_component_type;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error network_error = error::network_error;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error version_too_new = error::version_too_new;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error version_too_old = error::version_too_old;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error version_unknown = error::version_unknown;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error unknown_component_address =
+        error::unknown_component_address;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error duplicate_component_address =
+        error::duplicate_component_address;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error invalid_status = error::invalid_status;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error bad_parameter = error::bad_parameter;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error internal_server_error = error::internal_server_error;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error service_unavailable = error::service_unavailable;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error bad_request = error::bad_request;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error repeated_request = error::repeated_request;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error lock_error = error::lock_error;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error duplicate_console = error::duplicate_console;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error no_registered_console = error::no_registered_console;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error startup_timed_out = error::startup_timed_out;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error uninitialized_value = error::uninitialized_value;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error bad_response_type = error::bad_response_type;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error deadlock = error::deadlock;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error assertion_failure = error::assertion_failure;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error null_thread_id = error::null_thread_id;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error invalid_data = error::invalid_data;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error yield_aborted = error::yield_aborted;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error dynamic_link_failure = error::dynamic_link_failure;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error commandline_option_error =
+        error::commandline_option_error;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error serialization_error = error::serialization_error;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error unhandled_exception = error::unhandled_exception;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error kernel_error = error::kernel_error;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error broken_task = error::broken_task;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error task_moved = error::task_moved;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error task_already_started = error::task_already_started;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error future_already_retrieved =
+        error::future_already_retrieved;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error promise_already_satisfied =
+        error::promise_already_satisfied;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error future_does_not_support_cancellation =
+        error::future_does_not_support_cancellation;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error future_can_not_be_cancelled =
+        error::future_can_not_be_cancelled;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error no_state = error::no_state;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error broken_promise = error::broken_promise;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error thread_resource_error = error::thread_resource_error;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error future_cancelled = error::future_cancelled;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error thread_cancelled = error::thread_cancelled;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error thread_not_interruptable =
+        error::thread_not_interruptable;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error duplicate_component_id =
+        error::duplicate_component_id;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error unknown_error = error::unknown_error;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error bad_plugin_type = error::bad_plugin_type;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error filesystem_error = error::filesystem_error;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error bad_function_call = error::bad_function_call;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error task_canceled_exception =
+        error::task_canceled_exception;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error task_block_not_active = error::task_block_not_active;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error out_of_range = error::out_of_range;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error length_error = error::length_error;
+    HPX_DEPRECATED_V(1, 9, HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG)
+    inline constexpr error migration_needs_retry = error::migration_needs_retry;
+
+#undef HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG
 
     /// \cond NOINTERNAL
     char const* const error_names[] = {

@@ -116,6 +116,7 @@ namespace hpx {
 #endif
 
 namespace hpx {
+
     template <typename... Ts>
     class tuple;
 
@@ -402,37 +403,45 @@ namespace hpx {
 
         // 20.4.2.2, tuple assignment
     private:
+        template <std::size_t I>
+        HPX_HOST_DEVICE void assign_one_(tuple const& other)
+        {
+            _members.template get<I>() = other._members.template get<I>();
+        }
+
         template <std::size_t... Is>
         HPX_HOST_DEVICE void assign_(
             util::index_pack<Is...>, tuple const& other)
         {
-            int const _sequencer[] = {
-                ((_members.template get<Is>() =
-                         other._members.template get<Is>()),
-                    0)...};
-            (void) _sequencer;
+            (assign_one_<Is>(other), ...);
+        }
+
+        template <std::size_t I>
+        HPX_HOST_DEVICE void assign_one_(tuple&& other) noexcept
+        {
+            _members.template get<I>() =
+                HPX_MOVE(other)._members.template get<I>();
         }
 
         template <std::size_t... Is>
         HPX_HOST_DEVICE void assign_(
             util::index_pack<Is...>, tuple&& other) noexcept
         {
-            int const _sequencer[] = {
-                ((_members.template get<Is>() =
-                         HPX_MOVE(other._members).template get<Is>()),
-                    0)...};
-            (void) _sequencer;
+            (assign_one_<Is>(HPX_MOVE(other)), ...);
+        }
+
+        template <std::size_t I, typename UTuple>
+        HPX_HOST_DEVICE void assign_one_other_(UTuple&& other)
+        {
+            _members.template get<I>() =
+                // NOLINTNEXTLINE(bugprone-signed-char-misuse)
+                hpx::get<I>(HPX_FORWARD(UTuple, other));
         }
 
         template <std::size_t... Is, typename UTuple>
         HPX_HOST_DEVICE void assign_(util::index_pack<Is...>, UTuple&& other)
         {
-            int const _sequencer[] = {
-                ((_members.template get<Is>() =
-                         // NOLINTNEXTLINE(bugprone-signed-char-misuse)
-                     hpx::get<Is>(HPX_FORWARD(UTuple, other))),
-                    0)...};
-            (void) _sequencer;
+            (assign_one_other_<Is>(HPX_FORWARD(UTuple, other)), ...);
         }
 
     public:
@@ -468,10 +477,9 @@ namespace hpx {
         HPX_HOST_DEVICE void swap_(util::index_pack<Is...>, tuple& other)
         {
             using std::swap;
-            int const _sequencer[] = {((swap(_members.template get<Is>(),
-                                           other._members.template get<Is>())),
-                0)...};
-            (void) _sequencer;
+            (swap(_members.template get<Is>(),
+                 other._members.template get<Is>()),
+                ...);
         }
 
     public:
