@@ -486,8 +486,8 @@ namespace hpx::execution::experimental::detail {
             for (std::uint32_t worker_thread = 0;
                  worker_thread != op_state->num_worker_threads; ++worker_thread)
             {
-                if (hint.placement_mode == placement::breadth_first ||
-                    hint.placement_mode == placement::breadth_first_reverse)
+                if (hint.placement_mode() == placement::breadth_first ||
+                    hint.placement_mode() == placement::breadth_first_reverse)
                 {
                     init_queue_breadth_first(worker_thread, num_chunks,
                         op_state->num_worker_threads);
@@ -518,10 +518,10 @@ namespace hpx::execution::experimental::detail {
             }
 
             bool reverse_placement =
-                hint.placement_mode == placement::depth_first_reverse ||
-                hint.placement_mode == placement::breadth_first_reverse;
+                hint.placement_mode() == placement::depth_first_reverse ||
+                hint.placement_mode() == placement::breadth_first_reverse;
             bool allow_stealing =
-                !hpx::threads::do_not_share_function(hint.sharing_mode);
+                !hpx::threads::do_not_share_function(hint.sharing_mode());
 
             for (std::uint32_t pu = 0;
                  worker_thread != op_state->num_worker_threads && pu != num_pus;

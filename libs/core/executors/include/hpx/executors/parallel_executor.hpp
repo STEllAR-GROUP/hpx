@@ -390,7 +390,7 @@ namespace hpx::execution {
                 threads::detail::get_self_or_default_pool();
 
             bool do_not_combine_tasks = hpx::threads::do_not_combine_tasks(
-                exec.policy().get_hint().sharing_mode);
+                exec.policy().get_hint().sharing_mode());
 
             // use scheduling based on index_queue if no hierarchical threshold
             // is given
