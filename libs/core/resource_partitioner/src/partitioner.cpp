@@ -85,10 +85,15 @@ namespace hpx::resource {
 
         std::unique_ptr<detail::partitioner>& get_partitioner()
         {
-            std::lock_guard<std::recursive_mutex> l(partitioner_mtx());
             std::unique_ptr<detail::partitioner>& part = partitioner_ref();
-            if (!part)
-                part.reset(new detail::partitioner);
+            if (HPX_UNLIKELY(!part))
+            {
+                std::lock_guard<std::recursive_mutex> l(partitioner_mtx());
+                if (!part)
+                {
+                    part.reset(new detail::partitioner);
+                }
+            }
             return part;
         }
 
