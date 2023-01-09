@@ -304,8 +304,10 @@ namespace hpx::threads {
     {
         /// Construct a default hint with mode thread_schedule_hint_mode::none.
         constexpr thread_schedule_hint() noexcept
-          : placement_mode(thread_placement_hint::none)
-          , sharing_mode(thread_sharing_hint::none)
+          : placement_mode_bits(
+                static_cast<std::int8_t>(thread_placement_hint::none))
+          , sharing_mode_bits(
+                static_cast<std::int8_t>(thread_sharing_hint::none))
         {
         }
 
@@ -316,8 +318,8 @@ namespace hpx::threads {
             thread_sharing_hint sharing = thread_sharing_hint::none) noexcept
           : hint(thread_hint)
           , mode(thread_schedule_hint_mode::thread)
-          , placement_mode(placement)
-          , sharing_mode(sharing)
+          , placement_mode_bits(static_cast<std::int8_t>(placement))
+          , sharing_mode_bits(static_cast<std::int8_t>(sharing))
         {
         }
 
@@ -329,8 +331,8 @@ namespace hpx::threads {
             thread_sharing_hint sharing = thread_sharing_hint::none) noexcept
           : hint(hint)
           , mode(mode)
-          , placement_mode(placement)
-          , sharing_mode(sharing)
+          , placement_mode_bits(static_cast<std::int8_t>(placement))
+          , sharing_mode_bits(static_cast<std::int8_t>(sharing))
         {
         }
 
@@ -339,8 +341,8 @@ namespace hpx::threads {
             thread_schedule_hint const& rhs) const noexcept
         {
             return mode == rhs.mode && hint == rhs.hint &&
-                placement_mode == rhs.placement_mode &&
-                sharing_mode == rhs.sharing_mode;
+                placement_mode() == rhs.placement_mode() &&
+                sharing_mode() == rhs.sharing_mode();
         }
 
         constexpr bool operator!=(
@@ -350,6 +352,26 @@ namespace hpx::threads {
         }
         /// \endcond
 
+        // gcc V9 requires to store the bits as integers instead of directly
+        // storing the enums
+        constexpr thread_placement_hint placement_mode() const noexcept
+        {
+            return static_cast<thread_placement_hint>(placement_mode_bits);
+        }
+        void placement_mode(thread_placement_hint bits) noexcept
+        {
+            placement_mode_bits = static_cast<std::int8_t>(bits);
+        }
+
+        constexpr thread_sharing_hint sharing_mode() const noexcept
+        {
+            return static_cast<thread_sharing_hint>(sharing_mode_bits);
+        }
+        void sharing_mode(thread_sharing_hint bits) noexcept
+        {
+            sharing_mode_bits = static_cast<std::int8_t>(bits);
+        }
+
         /// The hint associated with the mode. The interepretation of this hint
         /// depends on the given mode.
         std::int16_t hint = -1;
@@ -358,9 +380,9 @@ namespace hpx::threads {
         thread_schedule_hint_mode mode = thread_schedule_hint_mode::none;
 
         /// The mode of the desired thread placement.
-        thread_placement_hint placement_mode : 6;
+        std::int8_t placement_mode_bits : 6;
 
         /// The mode of the desired sharing hint
-        thread_sharing_hint sharing_mode : 2;
+        std::int8_t sharing_mode_bits : 2;
     };
 }    // namespace hpx::threads

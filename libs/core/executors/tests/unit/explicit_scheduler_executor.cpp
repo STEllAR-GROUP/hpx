@@ -218,7 +218,7 @@ void tests(hpx::threads::thread_placement_hint placement)
     using namespace hpx::execution::experimental;
 
     hpx::threads::thread_schedule_hint hint;
-    hint.placement_mode = placement;
+    hint.placement_mode(placement);
 
     {
         auto exec = with_hint(
