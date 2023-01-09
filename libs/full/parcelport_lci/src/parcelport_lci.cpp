@@ -175,7 +175,7 @@ namespace hpx::parcelset {
                 if (stopped_)
                     return false;
 
-                static __thread int do_lci_progress = -1;
+                static thread_local int do_lci_progress = -1;
                 if (do_lci_progress == -1)
                 {
                     if (enable_lci_progress_pool &&
