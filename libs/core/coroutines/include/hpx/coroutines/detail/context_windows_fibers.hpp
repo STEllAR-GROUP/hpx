@@ -35,15 +35,12 @@
 #include <hpx/config.hpp>
 #include <hpx/coroutines/config/defines.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
 #include <system_error>
 
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
@@ -62,13 +59,16 @@ namespace hpx::threads::coroutines {
     {
         prepare_main_thread() noexcept
         {
-            [[maybe_unused]] LPVOID result = ConvertThreadToFiber(nullptr);
+            [[maybe_unused]] LPVOID const result =
+                ConvertThreadToFiber(nullptr);
             HPX_ASSERT(nullptr != result);
         }
 
+        HPX_NON_COPYABLE(prepare_main_thread);
+
         ~prepare_main_thread() noexcept
         {
-            [[maybe_unused]] BOOL result = ConvertFiberToThread();
+            [[maybe_unused]] BOOL const result = ConvertFiberToThread();
             HPX_ASSERT(FALSE != result);
         }
     };
@@ -107,15 +107,7 @@ namespace hpx::threads::coroutines {
         public:
             // Create an empty context. An empty context cannot be restored
             // from, but can be saved in.
-            fibers_context_impl_base() noexcept
-              : m_ctx(nullptr)
-#if defined(HPX_HAVE_ADDRESS_SANITIZER)
-              , asan_fake_stack(nullptr)
-              , asan_stack_bottom(nullptr)
-              , asan_stack_size(0)
-#endif
-            {
-            }
+            fibers_context_impl_base() = default;
 
             // Free function. Saves the current context in @p from and restores
             // the context in @p to. On windows the from parameter is ignored.
@@ -143,13 +135,13 @@ namespace hpx::threads::coroutines {
 #else
                     SwitchToFiber(to.m_ctx);
 #endif
-                    [[maybe_unused]] BOOL result = ConvertFiberToThread();
+                    [[maybe_unused]] BOOL const result = ConvertFiberToThread();
                     HPX_ASSERT(result);
                     from.m_ctx = nullptr;
                 }
                 else
                 {
-                    bool call_from_main = from.m_ctx == nullptr;
+                    bool const call_from_main = from.m_ctx == nullptr;
                     if (call_from_main)
                         from.m_ctx = GetCurrentFiber();
                     HPX_ASSERT(from.m_ctx != nullptr);
@@ -163,6 +155,8 @@ namespace hpx::threads::coroutines {
                         from.m_ctx = nullptr;
                 }
             }
+
+            HPX_NON_COPYABLE(fibers_context_impl_base);
 
             ~fibers_context_impl_base() = default;
 
@@ -201,23 +195,23 @@ namespace hpx::threads::coroutines {
 #endif
 
         protected:
-            explicit fibers_context_impl_base(fiber_ptr ctx) noexcept
+            explicit constexpr fibers_context_impl_base(fiber_ptr ctx) noexcept
               : m_ctx(ctx)
             {
             }
 
-            fiber_ptr m_ctx;
+            fiber_ptr m_ctx = nullptr;
 
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
         public:
-            void* asan_fake_stack;
-            void const* asan_stack_bottom;
-            std::size_t asan_stack_size;
+            void* asan_fake_stack = nullptr;
+            void const* asan_stack_bottom = nullptr;
+            std::size_t asan_stack_size = 0;
 #endif
         };
 
         template <typename T>
-        [[noreturn]] VOID CALLBACK trampoline(LPVOID pv)
+        void CALLBACK trampoline(LPVOID pv)
         {
             T* fun = static_cast<T*>(pv);
             HPX_ASSERT(fun);
@@ -225,7 +219,7 @@ namespace hpx::threads::coroutines {
         }
 
         // initial stack size (grows as needed)
-        inline constexpr std::size_t const stack_size =
+        inline constexpr std::size_t stack_size =
             sizeof(void*) >= 8 ? 2048 : 1024;
 
         template <typename CoroutineImpl>
@@ -237,13 +231,13 @@ namespace hpx::threads::coroutines {
         public:
             using context_impl_base = fibers_context_impl_base;
 
-            static constexpr std::size_t const default_stack_size = stack_size;
+            static constexpr std::size_t default_stack_size = stack_size;
 
             // Create a context that on restore invokes Functor on a new stack.
             // The stack size can be optionally specified.
             explicit fibers_context_impl(std::ptrdiff_t stacksize) noexcept
               : stacksize_(stacksize == -1 ?
-                        std::ptrdiff_t(default_stack_size) :
+                        static_cast<std::ptrdiff_t>(default_stack_size) :
                         stacksize)
             {
             }
@@ -259,8 +253,8 @@ namespace hpx::threads::coroutines {
                     static_cast<LPVOID>(this));
                 if (nullptr == m_ctx)
                 {
-                    throw std::system_error(
-                        GetLastError(), std::system_category());
+                    throw std::system_error(static_cast<int>(GetLastError()),
+                        std::system_category());
                 }
 
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
@@ -276,29 +270,31 @@ namespace hpx::threads::coroutines {
             }
 
             // Return the size of the reserved stack address space.
-            constexpr std::ptrdiff_t get_stacksize() const noexcept
+            [[nodiscard]] constexpr std::ptrdiff_t get_stacksize()
+                const noexcept
             {
                 return stacksize_;
             }
 
-            constexpr void reset_stack() noexcept {}
+            static constexpr void reset_stack() noexcept {}
 
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
             void rebind_stack() noexcept
             {
-#if defined(HPX_HAVE_COROUTINE_COUNTERS)
                 increment_stack_recycle_count();
-#endif
             }
+#else
+            static constexpr void rebind_stack() noexcept {}
+#endif
 
             // Detect remaining stack space (approximate), taken from here:
             // https://stackoverflow.com/a/20930496/269943
-            std::ptrdiff_t get_available_stack_space() const noexcept
+            static std::ptrdiff_t get_available_stack_space() noexcept
             {
-                MEMORY_BASIC_INFORMATION mbi;    // page range
-                std::memset(&mbi, '\0', sizeof(mbi));
-                VirtualQuery((PVOID) &mbi, &mbi, sizeof(mbi));    // get range
-                return (std::ptrdiff_t) &mbi -
-                    (std::ptrdiff_t) mbi.AllocationBase;
+                MEMORY_BASIC_INFORMATION mbi = {};        // page range
+                VirtualQuery(&mbi, &mbi, sizeof(mbi));    // get range
+                return reinterpret_cast<std::ptrdiff_t>(&mbi) -
+                    reinterpret_cast<std::ptrdiff_t>(mbi.AllocationBase);
             }
 
 #if defined(HPX_HAVE_COROUTINE_COUNTERS)

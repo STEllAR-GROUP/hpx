@@ -9,20 +9,18 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <cstddef>
-#include <iostream>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     // provide implementation of std::find supporting iterators/sentinels
     template <typename ExPolicy>
@@ -31,8 +29,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
     private:
         template <typename Iterator, typename Sentinel, typename T,
-            typename Proj = util::projection_identity>
-        friend inline constexpr Iterator tag_fallback_invoke(
+            typename Proj = hpx::identity>
+        friend constexpr Iterator tag_fallback_invoke(
             sequential_find_t<ExPolicy>, Iterator first, Sentinel last,
             T const& value, Proj proj = Proj())
         {
@@ -44,10 +42,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
 
         template <typename FwdIter, typename Token, typename T, typename Proj>
-        friend inline constexpr void tag_fallback_invoke(
-            sequential_find_t<ExPolicy>, std::size_t base_idx,
-            FwdIter part_begin, std::size_t part_count, Token& tok,
-            T const& val, Proj&& proj)
+        friend constexpr void tag_fallback_invoke(sequential_find_t<ExPolicy>,
+            std::size_t base_idx, FwdIter part_begin, std::size_t part_count,
+            Token& tok, T const& val, Proj&& proj)
         {
             util::loop_idx_n<ExPolicy>(base_idx, part_begin, part_count, tok,
                 [&val, &proj, &tok](auto& v, std::size_t i) -> void {
@@ -65,8 +62,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         sequential_find_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Iterator, typename Sentinel,
-        typename T, typename Proj = util::projection_identity>
-    inline constexpr Iterator sequential_find(
+        typename T, typename Proj = hpx::identity>
+    constexpr Iterator sequential_find(
         Iterator first, Sentinel last, T const& val, Proj proj = Proj())
     {
         return sequential_find_t<ExPolicy>{}(first, last, val, proj);
@@ -74,9 +71,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename ExPolicy, typename FwdIter, typename Token, typename T,
         typename Proj>
-    inline constexpr void sequential_find(std::size_t base_idx,
-        FwdIter part_begin, std::size_t part_count, Token& tok, T const& val,
-        Proj&& proj)
+    constexpr void sequential_find(std::size_t base_idx, FwdIter part_begin,
+        std::size_t part_count, Token& tok, T const& val, Proj&& proj)
     {
         return sequential_find_t<ExPolicy>{}(base_idx, part_begin, part_count,
             tok, val, HPX_FORWARD(Proj, proj));
@@ -90,7 +86,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
     private:
         template <typename Iterator, typename Sentinel, typename Pred,
-            typename Proj = util::projection_identity>
+            typename Proj = hpx::identity>
         friend inline constexpr Iterator tag_fallback_invoke(
             sequential_find_if_t<ExPolicy>, Iterator first, Sentinel last,
             Pred pred, Proj proj = Proj())
@@ -137,7 +133,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         sequential_find_if_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Iterator, typename Sentinel,
-        typename Pred, typename Proj = util::projection_identity>
+        typename Pred, typename Proj = hpx::identity>
     inline constexpr Iterator sequential_find_if(
         Iterator first, Sentinel last, Pred pred, Proj proj = Proj())
     {
@@ -172,7 +168,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
     private:
         template <typename Iterator, typename Sentinel, typename Pred,
-            typename Proj = util::projection_identity>
+            typename Proj = hpx::identity>
         friend inline constexpr Iterator tag_fallback_invoke(
             sequential_find_if_not_t<ExPolicy>, Iterator first, Sentinel last,
             Pred pred, Proj proj = Proj())
@@ -219,7 +215,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         sequential_find_if_not_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Iterator, typename Sentinel,
-        typename Pred, typename Proj = util::projection_identity>
+        typename Pred, typename Proj = hpx::identity>
     inline constexpr Iterator sequential_find_if_not(
         Iterator first, Sentinel last, Pred pred, Proj proj = Proj())
     {
@@ -463,4 +459,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
     }
 #endif
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

@@ -25,7 +25,7 @@ namespace hpx { namespace ranges {
     ///                     sentinel type must be a sentinel for FwdIter.
     /// \tparam Pred        The type of an optional function/function object to use.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of that the algorithm will be applied to.
@@ -58,8 +58,8 @@ namespace hpx { namespace ranges {
     ///           the function always returns true.
     ///
     template <typename FwdIter, typename Sent,
-        typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Pred = hpx::parallel::detail::less,
+        typename Proj = hpx::identity>
     bool is_sorted(
         FwdIter first, Sent last, Pred&& pred = Pred(), Proj&& proj = Proj());
 
@@ -85,7 +85,7 @@ namespace hpx { namespace ranges {
     ///                     requirements of \a CopyConstructible. This defaults
     ///                     to std::less<>
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -129,9 +129,9 @@ namespace hpx { namespace ranges {
     ///           the function always returns true.
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent,
-        typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Pred = hpx::parallel::detail::less,
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     is_sorted(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred = Pred(),
         Proj&& proj = Proj());
 
@@ -147,7 +147,7 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of an forward iterator.
     /// \tparam Pred        The type of an optional function/function object to use.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
@@ -177,8 +177,8 @@ namespace hpx { namespace ranges {
     ///           If the range rng contains less than two elements,
     ///           the function always returns true.
     ///
-    template <typename Rng, typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj = hpx::parallel::util::projection_identity>
+    template <typename Rng, typename Pred = hpx::parallel::detail::less,
+        typename Proj = hpx::identity>
     bool is_sorted(Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj());
 
     /// Determines if the range rng is sorted. Uses pred to
@@ -201,7 +201,7 @@ namespace hpx { namespace ranges {
     ///                     requirements of \a CopyConstructible. This defaults
     ///                     to std::less<>
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -243,9 +243,9 @@ namespace hpx { namespace ranges {
     ///           the function always returns true.
     ///
     template <typename ExPolicy, typename Rng,
-        typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Pred = hpx::parallel::detail::less,
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     is_sorted(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
         Proj&& proj = Proj());
 
@@ -263,7 +263,7 @@ namespace hpx { namespace ranges {
     ///                     sentinel type must be a sentinel for FwdIter.
     /// \tparam Pred        The type of an optional function/function object to use.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of that the algorithm will be applied to.
@@ -295,8 +295,8 @@ namespace hpx { namespace ranges {
     ///           sequence is sorted, last is returned.
     ///
     template <typename FwdIter, typename Sent,
-        typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Pred = hpx::parallel::detail::less,
+        typename Proj = hpx::identity>
     FwdIter is_sorted_until(
         FwdIter first, Sent last, Pred&& pred = Pred(), Proj&& proj = Proj());
 
@@ -322,7 +322,7 @@ namespace hpx { namespace ranges {
     ///                     the requirements of \a CopyConstructible. This defaults
     ///                     to std::less<>
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -366,8 +366,8 @@ namespace hpx { namespace ranges {
     ///           sequence is sorted, last is returned.
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent,
-        typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Pred = hpx::parallel::detail::less,
+        typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         FwdIter>::type
     is_sorted_until(ExPolicy&& policy, FwdIter first, Sent last,
@@ -389,7 +389,7 @@ namespace hpx { namespace ranges {
     ///                     the requirements of \a CopyConstructible. This defaults
     ///                     to std::less<>
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
@@ -415,8 +415,8 @@ namespace hpx { namespace ranges {
     ///           element. If the sequence has less than two elements or the
     ///           sequence is sorted, last is returned.
     ///
-    template <typename Rng, typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj = hpx::parallel::util::projection_identity>
+    template <typename Rng, typename Pred = hpx::parallel::detail::less,
+        typename Proj = hpx::identity>
     typename hpx::traits::range_iterator<Rng>::type
     is_sorted_until(Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj());
 
@@ -440,7 +440,7 @@ namespace hpx { namespace ranges {
     ///                     the requirements of \a CopyConstructible. This defaults
     ///                     to std::less<>
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -482,8 +482,8 @@ namespace hpx { namespace ranges {
     ///           sequence is sorted, last is returned.
     ///
     template <typename ExPolicy, typename Rng,
-        typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Pred = hpx::parallel::detail::less,
+        typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type
     is_sorted_until(ExPolicy&& policy, Rng&& rng, Pred&& pred = Pred(),
@@ -495,33 +495,29 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/is_sorted.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
-#include <algorithm>
 #include <cstddef>
-#include <functional>
-#include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
+
     inline constexpr struct is_sorted_t final
       : hpx::detail::tag_parallel_algorithm<is_sorted_t>
     {
     private:
         template <typename FwdIter, typename Sent,
-            typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity,
             // clang-format off
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator<FwdIter>::value &&
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
                 hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -534,18 +530,18 @@ namespace hpx { namespace ranges {
         friend bool tag_fallback_invoke(hpx::ranges::is_sorted_t, FwdIter first,
             Sent last, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::is_sorted<FwdIter, Sent>().call(
+            return hpx::parallel::detail::is_sorted<FwdIter, Sent>().call(
                 hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
                 HPX_FORWARD(Proj, proj));
         }
 
         template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity,
             // clang-format off
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_forward_iterator<FwdIter>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
                 hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -561,13 +557,13 @@ namespace hpx { namespace ranges {
             FwdIter first, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::is_sorted<FwdIter, Sent>().call(
+            return hpx::parallel::detail::is_sorted<FwdIter, Sent>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last,
                 HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
-        template <typename Rng, typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+        template <typename Rng, typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity,
             // clang-format off
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
@@ -582,7 +578,7 @@ namespace hpx { namespace ranges {
         friend bool tag_fallback_invoke(hpx::ranges::is_sorted_t, Rng&& rng,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::is_sorted<
+            return hpx::parallel::detail::is_sorted<
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_iterator<Rng>::type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
@@ -591,11 +587,11 @@ namespace hpx { namespace ranges {
         }
 
         template <typename ExPolicy, typename Rng,
-            typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity,
             // clang-format off
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -610,7 +606,7 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(hpx::ranges::is_sorted_t, ExPolicy&& policy,
             Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::is_sorted<
+            return hpx::parallel::detail::is_sorted<
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_iterator<Rng>::type>()
                 .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
@@ -624,11 +620,11 @@ namespace hpx { namespace ranges {
     {
     private:
         template <typename FwdIter, typename Sent,
-            typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity,
             // clang-format off
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator<FwdIter>::value &&
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
                 hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -642,18 +638,18 @@ namespace hpx { namespace ranges {
             FwdIter first, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::is_sorted_until<FwdIter, Sent>()
-                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
-                    HPX_FORWARD(Proj, proj));
+            return hpx::parallel::detail::is_sorted_until<FwdIter, Sent>().call(
+                hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
 
         template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity,
             // clang-format off
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_forward_iterator<FwdIter>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
                 hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -669,13 +665,13 @@ namespace hpx { namespace ranges {
             FwdIter first, Sent last, Pred&& pred = Pred(),
             Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::is_sorted_until<FwdIter, Sent>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+            return hpx::parallel::detail::is_sorted_until<FwdIter, Sent>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
-        template <typename Rng, typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+        template <typename Rng, typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity,
             // clang-format off
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
@@ -691,7 +687,7 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(hpx::ranges::is_sorted_until_t, Rng&& rng,
             Pred&& pred = Pred(), Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::is_sorted_until<
+            return hpx::parallel::detail::is_sorted_until<
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_iterator<Rng>::type>()
                 .call(hpx::execution::seq, hpx::util::begin(rng),
@@ -700,11 +696,11 @@ namespace hpx { namespace ranges {
         }
 
         template <typename ExPolicy, typename Rng,
-            typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity,
             // clang-format off
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -719,7 +715,7 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(hpx::ranges::is_sorted_until_t, ExPolicy&& policy,
             Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::is_sorted_until<
+            return hpx::parallel::detail::is_sorted_until<
                 typename hpx::traits::range_iterator<Rng>::type,
                 typename hpx::traits::range_iterator<Rng>::type>()
                 .call(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
@@ -727,6 +723,6 @@ namespace hpx { namespace ranges {
                     HPX_FORWARD(Proj, proj));
         }
     } is_sorted_until{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2017 Taeguk Kwon
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,11 +8,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/modules/async_local.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
+
+#if defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/assert.hpp>
+#endif
 
 #include <array>
 #include <cstddef>
@@ -23,7 +26,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace util { namespace detail {
+namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename Enable = void>
@@ -31,44 +34,40 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     {
         ///////////////////////////////////////////////////////////////////////
         // std::bad_alloc has to be handled separately
+        [[noreturn]] static void call(
+            [[maybe_unused]] std::exception_ptr const& e)
+        {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-        [[noreturn]] static void call(std::exception_ptr const&)
-        {
             std::terminate();
-        }
 #else
-        [[noreturn]] static void call(std::exception_ptr const& e)
-        {
             try
             {
                 std::rethrow_exception(e);
             }
-            catch (std::bad_alloc const& ba)
+            catch (std::bad_alloc const&)
             {
-                throw ba;
+                throw;
             }
             catch (...)
             {
                 throw exception_list(e);
             }
-        }
 #endif
+        }
 
-        static void call(
-            std::exception_ptr const& e, std::list<std::exception_ptr>& errors)
+        static void call([[maybe_unused]] std::exception_ptr const& e,
+            [[maybe_unused]] std::list<std::exception_ptr>& errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(e);
-            HPX_UNUSED(errors);
             HPX_ASSERT(false);
 #else
             try
             {
                 std::rethrow_exception(e);
             }
-            catch (std::bad_alloc const& ba)
+            catch (std::bad_alloc const&)
             {
-                throw ba;
+                throw;
             }
             catch (...)
             {
@@ -87,13 +86,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     private:
         template <typename Future>
-        static void call_helper_single(Future const& f,
-            std::list<std::exception_ptr>& errors, bool throw_errors)
+        static void call_helper_single([[maybe_unused]] Future const& f,
+            [[maybe_unused]] std::list<std::exception_ptr>& errors,
+            [[maybe_unused]] bool throw_errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(f);
-            HPX_UNUSED(errors);
-            HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
             // extract exception from future and handle as needed
@@ -110,11 +107,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
         template <typename Future>
-        static void call_helper_single(Future const& f, bool throw_errors)
+        static void call_helper_single([[maybe_unused]] Future const& f,
+            [[maybe_unused]] bool throw_errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(f);
-            HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
             // extract exception from future and handle as needed
@@ -160,13 +156,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     private:
         template <typename Cont>
-        static void call_helper(Cont const& workitems,
-            std::list<std::exception_ptr>& errors, bool throw_errors)
+        static void call_helper([[maybe_unused]] Cont const& workitems,
+            [[maybe_unused]] std::list<std::exception_ptr>& errors,
+            [[maybe_unused]] bool throw_errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(workitems);
-            HPX_UNUSED(errors);
-            HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
             if (workitems.empty() && errors.empty())
@@ -192,11 +186,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
         template <typename Cont>
-        static void call_helper(Cont const& workitems, bool throw_errors)
+        static void call_helper([[maybe_unused]] Cont const& workitems,
+            [[maybe_unused]] bool throw_errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(workitems);
-            HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
             if (workitems.empty())
@@ -298,13 +291,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     private:
         template <typename Future>
-        static void call_with_cleanup_helper_single(Future const& f,
-            std::list<std::exception_ptr>& errors, bool throw_errors)
+        static void call_with_cleanup_helper_single(
+            [[maybe_unused]] Future const& f,
+            [[maybe_unused]] std::list<std::exception_ptr>& errors,
+            [[maybe_unused]] bool throw_errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(f);
-            HPX_UNUSED(errors);
-            HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
             if (f.has_exception())
@@ -321,11 +313,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         template <typename Future>
         static void call_with_cleanup_helper_single(
-            Future const& f, bool throw_errors)
+            [[maybe_unused]] Future const& f,
+            [[maybe_unused]] bool throw_errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(f);
-            HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
             if (f.has_exception())
@@ -360,15 +351,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     private:
         template <typename Cont, typename Cleanup>
-        static void call_with_cleanup_helper(Cont& workitems,
-            std::list<std::exception_ptr>& errors, Cleanup&& cleanup,
-            bool throw_errors)
+        static void call_with_cleanup_helper([[maybe_unused]] Cont& workitems,
+            [[maybe_unused]] std::list<std::exception_ptr>& errors,
+            [[maybe_unused]] Cleanup&& cleanup,
+            [[maybe_unused]] bool throw_errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(workitems);
-            HPX_UNUSED(errors);
-            HPX_UNUSED(cleanup);
-            HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
             if (workitems.empty() && errors.empty())
@@ -399,9 +387,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 }
             }
 
-            // If at least one partition failed with an exception, call
-            // the cleanup function for all others (the failed partitioned
-            // are assumed to have already run the cleanup).
+            // If at least one partition failed with an exception, call the
+            // cleanup function for all others (the failed partitioned are
+            // assumed to have already run the cleanup).
             if (has_exception)
             {
                 for (auto& f : workitems)
@@ -426,13 +414,11 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
         template <typename Cont, typename Cleanup>
-        static void call_with_cleanup_helper(
-            Cont& workitems, Cleanup&& cleanup, bool throw_errors)
+        static void call_with_cleanup_helper([[maybe_unused]] Cont& workitems,
+            [[maybe_unused]] Cleanup&& cleanup,
+            [[maybe_unused]] bool throw_errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(workitems);
-            HPX_UNUSED(cleanup);
-            HPX_UNUSED(throw_errors);
             HPX_ASSERT(false);
 #else
             if (workitems.empty())
@@ -488,9 +474,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 }
             }
 
-            // As at least one partition failed with an exception, call
-            // the cleanup function for all others (the failed partitioned
-            // are assumed to have already run the cleanup).
+            // As at least one partition failed with an exception, call the
+            // cleanup function for all others (the failed partitioned are
+            // assumed to have already run the cleanup).
             for (auto& f : workitems)
             {
                 if (!f.has_exception())
@@ -554,33 +540,26 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     struct terminate_on_local_exceptions
     {
         ///////////////////////////////////////////////////////////////////////
-#if defined(HPX_COMPUTE_DEVICE_CODE)
         [[noreturn]] static void call(std::exception_ptr const&)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             std::terminate();
-        }
 #else
-        [[noreturn]] static void call(std::exception_ptr const&)
-        {
             parallel_exception_termination_handler();
-        }
 #endif
+        }
 
-#if defined(HPX_COMPUTE_DEVICE_CODE)
         [[noreturn]] static void call(
             std::exception_ptr const&, std::list<std::exception_ptr>&)
         {
+#if defined(HPX_COMPUTE_DEVICE_CODE)
             std::terminate();
-        }
 #else
-        [[noreturn]] static void call(
-            std::exception_ptr const&, std::list<std::exception_ptr>&)
-        {
             parallel_exception_termination_handler();
-        }
 #endif
+        }
 
-        static void call(std::list<std::exception_ptr>& errors)
+        static void call(std::list<std::exception_ptr> const& errors)
         {
             if (!errors.empty())
             {
@@ -590,10 +569,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     private:
         template <typename Future>
-        static void call_helper_single(Future const& f)
+        static void call_helper_single([[maybe_unused]] Future const& f)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(f);
             HPX_ASSERT(false);
 #else
             if (f.has_exception())
@@ -632,10 +610,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     private:
         template <typename Cont>
-        static void call_helper(Cont const& workitems)
+        static void call_helper([[maybe_unused]] Cont const& workitems)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(workitems);
             HPX_ASSERT(false);
 #else
             for (auto const& f : workitems)
@@ -707,10 +684,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     private:
         template <typename Future>
-        static void call_with_cleanup_helper_single(Future const& f)
+        static void call_with_cleanup_helper_single(
+            [[maybe_unused]] Future const& f)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(f);
             HPX_ASSERT(false);
 #else
             if (f.has_exception())
@@ -739,10 +716,10 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
     private:
         template <typename Cont>
-        static void call_with_cleanup_helper(Cont const& workitems)
+        static void call_with_cleanup_helper(
+            [[maybe_unused]] Cont const& workitems)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(workitems);
             HPX_ASSERT(false);
 #else
             for (auto const& f : workitems)
@@ -800,4 +777,4 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
       : terminate_on_local_exceptions
     {
     };
-}}}}    // namespace hpx::parallel::util::detail
+}    // namespace hpx::parallel::util::detail

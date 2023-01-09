@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 John Biddiscombe
-//  Copyright (c) 2015-2020 Hartmut Kaiser
+//  Copyright (c) 2015-2023 Hartmut Kaiser
 //  Copyright (c) 2015-2019 Francisco Jose Tapia
 //  Copyright (c) 2018 Taeguk Kwon
 //  Copyright (c) 2021 Akhil J Nair
@@ -16,7 +16,8 @@
 #include <algorithm>
 #include <cstddef>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
+
     /// Return the iterator to the mid value of the three values
     /// passed as parameters
     ///
@@ -26,16 +27,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     /// \param comp : object for comparing two values
     /// \return iterator to mid value
     template <typename Iter, typename Comp>
-    inline constexpr Iter mid3(
-        Iter iter_1, Iter iter_2, Iter iter_3, Comp&& comp)
+    constexpr Iter mid3(Iter iter_1, Iter iter_2, Iter iter_3, Comp&& comp)
     {
         return HPX_INVOKE(comp, *iter_1, *iter_2) ?
-            (HPX_INVOKE(comp, *iter_2, *iter_3) ?
-                    iter_2 :
-                    (HPX_INVOKE(comp, *iter_1, *iter_3) ? iter_3 : iter_1)) :
-            (HPX_INVOKE(comp, *iter_3, *iter_2) ?
-                    iter_2 :
-                    (HPX_INVOKE(comp, *iter_3, *iter_1) ? iter_3 : iter_1));
+            (HPX_INVOKE(comp, *iter_2, *iter_3)        ? iter_2 :
+                    HPX_INVOKE(comp, *iter_1, *iter_3) ? iter_3 :
+                                                         iter_1) :
+            HPX_INVOKE(comp, *iter_3, *iter_2) ? iter_2 :
+            HPX_INVOKE(comp, *iter_3, *iter_1) ? iter_3 :
+                                                 iter_1;
     }
 
     /// Return the iterator to the mid value of the nine values
@@ -50,6 +50,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     /// \param iter_7   iterator to the seventh value
     /// \param iter_8   iterator to the eighth value
     /// \param iter_9   iterator to the ninth value
+    /// \param comp : object for comparing two values
     /// \return iterator to the mid value
     template <typename Iter, typename Comp>
     inline constexpr Iter mid9(Iter iter_1, Iter iter_2, Iter iter_3,
@@ -70,16 +71,17 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     /// \param last     iterator to the last element
     /// \param comp     object for to Comp two elements
     template <typename Iter, typename Comp>
-    inline constexpr void pivot9(Iter first, Iter last, Comp&& comp)
+    constexpr void pivot9(Iter first, Iter last, Comp&& comp)
     {
         std::size_t chunk = (last - first) >> 3;
         Iter itaux = mid9(first + 1, first + chunk, first + 2 * chunk,
             first + 3 * chunk, first + 4 * chunk, first + 5 * chunk,
             first + 6 * chunk, first + 7 * chunk, last - 1, comp);
+
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
         std::ranges::iter_swap(first, itaux);
 #else
         std::iter_swap(first, itaux);
 #endif
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

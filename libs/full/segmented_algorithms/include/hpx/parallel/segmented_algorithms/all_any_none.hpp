@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
     ///////////////////////////////////////////////////////////////////////////
     // segmented_all_any_none
     namespace detail {
@@ -481,7 +481,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
@@ -499,10 +499,9 @@ namespace hpx { namespace segmented {
         static_assert(hpx::traits::is_input_iterator<InIter>::value,
             "Requires at least input iterator.");
 
-        return hpx::parallel::v1::detail::segmented_none_of(
-            hpx::parallel::v1::detail::none_of(), hpx::execution::seq, first,
-            last, HPX_FORWARD(F, f), hpx::parallel::util::projection_identity{},
-            std::true_type());
+        return hpx::parallel::detail::segmented_none_of(
+            hpx::parallel::detail::none_of(), hpx::execution::seq, first, last,
+            HPX_FORWARD(F, f), hpx::identity_v, std::true_type());
     }
 
     // clang-format off
@@ -523,10 +522,9 @@ namespace hpx { namespace segmented {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-        return hpx::parallel::v1::detail::segmented_none_of(
-            hpx::parallel::v1::detail::none_of(), HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(F, f),
-            hpx::parallel::util::projection_identity{}, is_seq());
+        return hpx::parallel::detail::segmented_none_of(
+            hpx::parallel::detail::none_of(), HPX_FORWARD(ExPolicy, policy),
+            first, last, HPX_FORWARD(F, f), hpx::identity_v, is_seq());
     }
 
     // clang-format off
@@ -542,10 +540,9 @@ namespace hpx { namespace segmented {
         static_assert(hpx::traits::is_input_iterator<InIter>::value,
             "Requires at least input iterator.");
 
-        return hpx::parallel::v1::detail::segmented_any_of(
-            hpx::parallel::v1::detail::any_of(), hpx::execution::seq, first,
-            last, HPX_FORWARD(F, f), hpx::parallel::util::projection_identity{},
-            std::true_type());
+        return hpx::parallel::detail::segmented_any_of(
+            hpx::parallel::detail::any_of(), hpx::execution::seq, first, last,
+            HPX_FORWARD(F, f), hpx::identity_v, std::true_type());
     }
 
     // clang-format off
@@ -566,10 +563,9 @@ namespace hpx { namespace segmented {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-        return hpx::parallel::v1::detail::segmented_any_of(
-            hpx::parallel::v1::detail::any_of(), HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(F, f),
-            hpx::parallel::util::projection_identity{}, is_seq());
+        return hpx::parallel::detail::segmented_any_of(
+            hpx::parallel::detail::any_of(), HPX_FORWARD(ExPolicy, policy),
+            first, last, HPX_FORWARD(F, f), hpx::identity_v, is_seq());
     }
 
     // clang-format off
@@ -585,10 +581,9 @@ namespace hpx { namespace segmented {
         static_assert(hpx::traits::is_input_iterator<InIter>::value,
             "Requires at least input iterator.");
 
-        return hpx::parallel::v1::detail::segmented_all_of(
-            hpx::parallel::v1::detail::all_of(), hpx::execution::seq, first,
-            last, HPX_FORWARD(F, f), hpx::parallel::util::projection_identity{},
-            std::true_type());
+        return hpx::parallel::detail::segmented_all_of(
+            hpx::parallel::detail::all_of(), hpx::execution::seq, first, last,
+            HPX_FORWARD(F, f), hpx::identity_v, std::true_type());
     }
 
     // clang-format off
@@ -609,9 +604,8 @@ namespace hpx { namespace segmented {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-        return hpx::parallel::v1::detail::segmented_all_of(
-            hpx::parallel::v1::detail::all_of(), HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(F, f),
-            hpx::parallel::util::projection_identity{}, is_seq());
+        return hpx::parallel::detail::segmented_all_of(
+            hpx::parallel::detail::all_of(), HPX_FORWARD(ExPolicy, policy),
+            first, last, HPX_FORWARD(F, f), hpx::identity_v, is_seq());
     }
 }}    // namespace hpx::segmented

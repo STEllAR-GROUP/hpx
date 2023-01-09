@@ -1,6 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +25,7 @@ namespace hpx { namespace ranges {
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a hpx::parallel::util::projection_identity.
+    ///                     defaults to \a hpx::identity.
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of that the algorithm will be applied to.
     /// \param last         Refers to the end of the sequence of elements of
@@ -56,7 +56,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename FwdIter, typename Sent,
         typename Pred,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     bool is_partitioned(
         FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj());
 
@@ -78,7 +78,7 @@ namespace hpx { namespace ranges {
     ///                     (deduced). \a Pred must be \a CopyConstructible
     ///                     when using a parallel policy.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a hpx::parallel::util::projection_identity.
+    ///                     defaults to \a hpx::identity.
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param first        Refers to the beginning of the sequence of elements
@@ -123,8 +123,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent,
         typename Pred,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     is_partitioned(ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
         Proj&& proj = Proj());
 
@@ -139,7 +139,7 @@ namespace hpx { namespace ranges {
     /// \tparam Pred        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a hpx::parallel::util::projection_identity.
+    ///                     defaults to \a hpx::identity.
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
     /// \param pred         Refers to the unary predicate which returns true
@@ -168,7 +168,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename Rng,
         typename Pred,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     bool is_partitioned(Rng&& rng, Pred&& pred, Proj&& proj = Proj());
 
     /// Determines if the range [first, last) is partitioned.
@@ -187,7 +187,7 @@ namespace hpx { namespace ranges {
     ///                     (deduced). \a Pred must be \a CopyConstructible
     ///                     when using a parallel policy.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a hpx::parallel::util::projection_identity.
+    ///                     defaults to \a hpx::identity.
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
     /// \param rng          Refers to the sequence of elements the algorithm
@@ -230,8 +230,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng,
         typename Pred,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     is_partitioned(
         ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj());
     // clang-format on
@@ -242,21 +242,18 @@ namespace hpx { namespace ranges {
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/modules/iterator_support.hpp>
 #include <hpx/parallel/algorithms/is_partitioned.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <algorithm>
 #include <cstddef>
-#include <functional>
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
+
     inline constexpr struct is_partitioned_t final
       : hpx::detail::tag_parallel_algorithm<is_partitioned_t>
     {
@@ -264,9 +261,9 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename FwdIter, typename Sent,
             typename Pred,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator<FwdIter>::value &&
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
                 hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -277,18 +274,18 @@ namespace hpx { namespace ranges {
         friend bool tag_fallback_invoke(hpx::ranges::is_partitioned_t,
             FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::is_partitioned<FwdIter, Sent>()
-                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
-                    HPX_FORWARD(Proj, proj));
+            return hpx::parallel::detail::is_partitioned<FwdIter, Sent>().call(
+                hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename Pred,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_forward_iterator<FwdIter>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
                 hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Pred,
@@ -300,15 +297,15 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(hpx::ranges::is_partitioned_t, ExPolicy&& policy,
             FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
         {
-            return hpx::parallel::v1::detail::is_partitioned<FwdIter, Sent>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+            return hpx::parallel::detail::is_partitioned<FwdIter, Sent>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Rng,
             typename Pred,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
@@ -323,7 +320,7 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            return hpx::parallel::v1::detail::is_partitioned<iterator_type,
+            return hpx::parallel::detail::is_partitioned<iterator_type,
                 iterator_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng),
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
@@ -332,9 +329,9 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Rng,
             typename Pred,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -350,13 +347,13 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            return hpx::parallel::v1::detail::is_partitioned<iterator_type,
+            return hpx::parallel::detail::is_partitioned<iterator_type,
                 iterator_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
                     std::end(rng), HPX_FORWARD(Pred, pred),
                     HPX_FORWARD(Proj, proj));
         }
     } is_partitioned{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif

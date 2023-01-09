@@ -62,26 +62,6 @@ void for_each_zipiter_test(ExPolicy&& policy, IteratorTag)
         ++count;
     });
     HPX_TEST_EQ(count, c.size());
-    /*
-    auto begin = hpx::util::make_zip_iterator(
-        iterator(std::begin(c)), iterator(std::begin(d)));
-
-    static_assert(
-//        hpx::parallel::traits::is_indirect_callable<
-//            set_42, hpx::parallel::traits::projected<
-//                hpx::parallel::util::projection_identity,
-//                decltype(begin)>
-//        >::value,
-//        hpx::is_invocable_v<
-//            set_42, typename std::iterator_traits<decltype(begin)>::value_type&,
-//            typename hpx::parallel::traits::detail::projected_result_of_indirect<
-//            hpx::parallel::traits::projected<
-//                hpx::parallel::util::projection_identity,
-//                decltype(begin)
-//            >
-//            >::type)
-        >,
-        "foo");*/
 }
 
 template <typename IteratorTag>
@@ -96,8 +76,6 @@ void for_each_zipiter_test()
 void for_each_zipiter_test()
 {
     for_each_zipiter_test<std::random_access_iterator_tag>();
-    //    for_each_zipiter_test<std::forward_iterator_tag>();
-    //    for_each_zipiter_test<std::input_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

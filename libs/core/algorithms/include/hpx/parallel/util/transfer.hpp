@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2021 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/pointer_category.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
@@ -16,14 +17,14 @@
 #include <cstddef>
 #include <cstring>    // for std::memmove
 #include <iterator>
-#include <memory>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace util {
+namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Category, typename Enable = void>
         struct copy_helper;
         template <typename Category, typename Enable = void>
@@ -39,23 +40,23 @@ namespace hpx { namespace parallel { namespace util {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
-        HPX_FORCEINLINE std::enable_if_t<std::is_pointer<T>::value, char*>
-        to_ptr(T ptr) noexcept
+        HPX_FORCEINLINE std::enable_if_t<std::is_pointer_v<T>, char*> to_ptr(
+            T ptr) noexcept
         {
             return const_cast<char*>(
-                reinterpret_cast<char volatile const*>(ptr));
+                reinterpret_cast<char const volatile*>(ptr));
         }
 
         template <typename T>
-        HPX_FORCEINLINE std::enable_if_t<std::is_pointer<T>::value, char const*>
+        HPX_FORCEINLINE std::enable_if_t<std::is_pointer_v<T>, char const*>
         to_const_ptr(T ptr) noexcept
         {
             return const_cast<char const*>(
-                reinterpret_cast<char volatile const*>(ptr));
+                reinterpret_cast<char const volatile*>(ptr));
         }
 
         template <typename Iter>
-        HPX_FORCEINLINE std::enable_if_t<!std::is_pointer<Iter>::value, char*>
+        HPX_FORCEINLINE std::enable_if_t<!std::is_pointer_v<Iter>, char*>
         to_ptr(Iter ptr) noexcept
         {
             static_assert(hpx::traits::is_contiguous_iterator_v<Iter>,
@@ -63,28 +64,27 @@ namespace hpx { namespace parallel { namespace util {
                 "only");
 
             return const_cast<char*>(
-                reinterpret_cast<char volatile const*>(&*ptr));
+                reinterpret_cast<char const volatile*>(&*ptr));
         }
 
         template <typename Iter>
-        HPX_FORCEINLINE
-            std::enable_if_t<!std::is_pointer<Iter>::value, char const*>
-            to_const_ptr(Iter ptr) noexcept
+        HPX_FORCEINLINE std::enable_if_t<!std::is_pointer_v<Iter>, char const*>
+        to_const_ptr(Iter ptr) noexcept
         {
             static_assert(hpx::traits::is_contiguous_iterator_v<Iter>,
                 "optimized copy/move is possible for contiguous-iterators "
                 "only");
 
             return const_cast<char const*>(
-                reinterpret_cast<char volatile const*>(&*ptr));
+                reinterpret_cast<char const volatile*>(&*ptr));
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename InIter, typename OutIter>
         HPX_FORCEINLINE static in_out_result<InIter, OutIter> copy_memmove(
-            InIter first, std::size_t count, OutIter dest)
+            InIter first, std::size_t count, OutIter dest) noexcept
         {
-            using data_type = typename std::iterator_traits<InIter>::value_type;
+            using data_type = hpx::traits::iter_value_t<InIter>;
 
             if (count != 0)
             {
@@ -122,10 +122,10 @@ namespace hpx { namespace parallel { namespace util {
         {
             template <typename InIter, typename Sent, typename OutIter>
             HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
-                InIter first, Sent last, OutIter dest)
+                InIter first, Sent last, OutIter dest) noexcept
             {
                 return copy_memmove(
-                    first, parallel::v1::detail::distance(first, last), dest);
+                    first, parallel::detail::distance(first, last), dest);
             }
         };
     }    // namespace detail
@@ -143,6 +143,7 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         // Customization point for optimizing copy_n operations
         template <typename Category, typename Enable>
         struct copy_n_helper
@@ -152,7 +153,8 @@ namespace hpx { namespace parallel { namespace util {
                 HPX_FORCEINLINE static constexpr in_out_result<InIter, OutIter>
                 call(InIter first, std::size_t num, OutIter dest)
             {
-                std::size_t count(num & std::size_t(-4));    // -V112
+                std::size_t count(
+                    num & static_cast<std::size_t>(-4));    // -V112
                 for (std::size_t i = 0; i < count;
                      (void) ++first, ++dest, i += 4)
                 {
@@ -175,7 +177,7 @@ namespace hpx { namespace parallel { namespace util {
         {
             template <typename InIter, typename OutIter>
             HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
-                InIter first, std::size_t count, OutIter dest)
+                InIter first, std::size_t count, OutIter dest) noexcept
             {
                 return copy_memmove(first, count, dest);
             }
@@ -215,6 +217,7 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         // Customization point for copy-synchronize operations
         template <typename Category, typename Enable>
         struct copy_synchronize_helper
@@ -240,6 +243,7 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         // Customization point for optimizing copy_n operations
         template <typename Category, typename Enable>
         struct move_helper
@@ -264,10 +268,10 @@ namespace hpx { namespace parallel { namespace util {
         {
             template <typename InIter, typename Sent, typename OutIter>
             HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
-                InIter first, Sent last, OutIter dest)
+                InIter first, Sent last, OutIter dest) noexcept
             {
                 return copy_memmove(
-                    first, parallel::v1::detail::distance(first, last), dest);
+                    first, parallel::detail::distance(first, last), dest);
             }
         };
     }    // namespace detail
@@ -284,6 +288,7 @@ namespace hpx { namespace parallel { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         // Customization point for optimizing copy_n operations
         template <typename Category, typename Enable>
         struct move_n_helper
@@ -292,7 +297,8 @@ namespace hpx { namespace parallel { namespace util {
             HPX_FORCEINLINE static constexpr in_out_result<InIter, OutIter>
             call(InIter first, std::size_t num, OutIter dest)
             {
-                std::size_t count(num & std::size_t(-4));    // -V112
+                std::size_t count(
+                    num & static_cast<std::size_t>(-4));    // -V112
                 for (std::size_t i = 0; i < count;
                      (void) ++first, ++dest, i += 4)
                 {
@@ -318,7 +324,7 @@ namespace hpx { namespace parallel { namespace util {
         {
             template <typename InIter, typename OutIter>
             HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
-                InIter first, std::size_t count, OutIter dest)
+                InIter first, std::size_t count, OutIter dest) noexcept
             {
                 return copy_memmove(first, count, dest);
             }
@@ -334,4 +340,4 @@ namespace hpx { namespace parallel { namespace util {
                 std::decay_t<OutIter>>;
         return detail::move_n_helper<category>::call(first, count, dest);
     }
-}}}    // namespace hpx::parallel::util
+}    // namespace hpx::parallel::util

@@ -11,8 +11,7 @@
 
 #include <exception>
 
-namespace hpx::parallel { inline namespace v1 { namespace detail {
-
+namespace hpx::parallel::detail {
     exception_list_termination_handler_type&
     get_exception_list_termination_handler()
     {
@@ -35,4 +34,4 @@ namespace hpx::parallel { inline namespace v1 { namespace detail {
 
         std::terminate();
     }
-}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

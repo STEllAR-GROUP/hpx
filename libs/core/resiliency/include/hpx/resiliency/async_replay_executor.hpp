@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2018-2020 Hartmut Kaiser
+//  Copyright (c) 2018-2023 Hartmut Kaiser
 //  Copyright (c) 2018-2019 Adrian Serio
 //  Copyright (c) 2019 Nikunj Gupta
 //
@@ -31,7 +31,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resiliency { namespace experimental {
+namespace hpx::resiliency::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -51,25 +51,22 @@ namespace hpx { namespace resiliency { namespace experimental {
             }
 
             template <typename Executor, std::size_t... Is>
-            typename hpx::parallel::execution::executor_future<Executor,
-                Result>::type
-            invoke(Executor&& exec, hpx::util::index_pack<Is...>)
+            decltype(auto) invoke(Executor&& exec, hpx::util::index_pack<Is...>)
             {
                 return hpx::parallel::execution::async_execute(
                     HPX_FORWARD(Executor, exec), f_, std::get<Is>(t_)...);
             }
 
             template <typename Executor>
-            typename hpx::parallel::execution::executor_future<Executor,
-                Result>::type
-            call(Executor&& exec, std::size_t n)
+            hpx::parallel::execution::executor_future_t<Executor, Result> call(
+                Executor&& exec, std::size_t n)
             {
                 // launch given function asynchronously
                 using pack_type =
                     hpx::util::make_index_pack<std::tuple_size<Tuple>::value>;
                 using result_type =
-                    typename hpx::parallel::execution::executor_future<Executor,
-                        Result>::type;
+                    hpx::parallel::execution::executor_future_t<Executor,
+                        Result>;
 
                 result_type f = invoke(exec, pack_type{});
 
@@ -144,25 +141,21 @@ namespace hpx { namespace resiliency { namespace experimental {
             }
 
             template <typename Executor, std::size_t... Is>
-            typename hpx::parallel::execution::executor_future<Executor,
-                void>::type
-            invoke(Executor&& exec, hpx::util::index_pack<Is...>)
+            decltype(auto) invoke(Executor&& exec, hpx::util::index_pack<Is...>)
             {
                 return hpx::parallel::execution::async_execute(
                     HPX_FORWARD(Executor, exec), f_, std::get<Is>(t_)...);
             }
 
             template <typename Executor>
-            typename hpx::parallel::execution::executor_future<Executor,
-                void>::type
-            call(Executor&& exec, std::size_t n)
+            hpx::parallel::execution::executor_future_t<Executor, void> call(
+                Executor&& exec, std::size_t n)
             {
                 // launch given function asynchronously
                 using pack_type =
                     hpx::util::make_index_pack<std::tuple_size<Tuple>::value>;
                 using result_type =
-                    typename hpx::parallel::execution::executor_future<Executor,
-                        void>::type;
+                    hpx::parallel::execution::executor_future_t<Executor, void>;
 
                 result_type f = invoke(exec, pack_type{});
 
@@ -207,14 +200,13 @@ namespace hpx { namespace resiliency { namespace experimental {
         };
 
         template <typename Result, typename Pred, typename F, typename... Ts>
-        std::shared_ptr<async_replay_executor_helper<Result,
-            typename std::decay<Pred>::type, typename std::decay<F>::type,
-            std::tuple<typename std::decay<Ts>::type...>>>
+        std::shared_ptr<async_replay_executor_helper<Result, std::decay_t<Pred>,
+            std::decay_t<F>, std::tuple<std::decay_t<Ts>...>>>
         make_async_replay_executor_helper(Pred&& pred, F&& f, Ts&&... ts)
         {
-            using return_type = async_replay_executor_helper<Result,
-                typename std::decay<Pred>::type, typename std::decay<F>::type,
-                std::tuple<typename std::decay<Ts>::type...>>;
+            using return_type =
+                async_replay_executor_helper<Result, std::decay_t<Pred>,
+                    std::decay_t<F>, std::tuple<std::decay_t<Ts>...>>;
 
             return std::make_shared<return_type>(HPX_FORWARD(Pred, pred),
                 HPX_FORWARD(F, f), std::make_tuple(HPX_FORWARD(Ts, ts)...));
@@ -222,21 +214,21 @@ namespace hpx { namespace resiliency { namespace experimental {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f. Verify the result of
-    // those invocations using the given predicate \a pred. Repeat launching
-    // on error exactly \a n times (except if abort_replay_exception is thrown).
+    // Asynchronously launch given function \a f. Verify the result of those
+    // invocations using the given predicate \a pred. Repeat launching on error
+    // exactly \a n times (except if abort_replay_exception is thrown).
     // clang-format off
     template <typename Executor, typename Pred, typename F, typename... Ts,
         HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_one_way_executor<Executor>::value ||
-            hpx::traits::is_two_way_executor<Executor>::value
+            hpx::traits::is_one_way_executor_v<Executor> ||
+            hpx::traits::is_two_way_executor_v<Executor>
         )>
     // clang-format on
     decltype(auto) tag_invoke(async_replay_validate_t, Executor&& exec,
         std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
     {
         using result_type =
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
+            hpx::util::detail::invoke_deferred_result_t<F, Ts...>;
 
         auto helper = detail::make_async_replay_executor_helper<result_type>(
             HPX_FORWARD(Pred, pred), HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -245,20 +237,20 @@ namespace hpx { namespace resiliency { namespace experimental {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f. Repeat launching
-    // on error exactly \a n times (except if abort_replay_exception is thrown).
+    // Asynchronously launch given function \a f. Repeat launching on error
+    // exactly \a n times (except if abort_replay_exception is thrown).
     // clang-format off
     template <typename Executor, typename F, typename... Ts,
         HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_one_way_executor<Executor>::value ||
-            hpx::traits::is_two_way_executor<Executor>::value
+            hpx::traits::is_one_way_executor_v<Executor> ||
+            hpx::traits::is_two_way_executor_v<Executor>
         )>
     // clang-format on
     decltype(auto) tag_invoke(
         async_replay_t, Executor&& exec, std::size_t n, F&& f, Ts&&... ts)
     {
         using result_type =
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
+            hpx::util::detail::invoke_deferred_result_t<F, Ts...>;
 
         auto helper = detail::make_async_replay_executor_helper<result_type>(
             detail::replay_validator{}, HPX_FORWARD(F, f),
@@ -266,4 +258,4 @@ namespace hpx { namespace resiliency { namespace experimental {
 
         return helper->call(HPX_FORWARD(Executor, exec), n);
     }
-}}}    // namespace hpx::resiliency::experimental
+}    // namespace hpx::resiliency::experimental

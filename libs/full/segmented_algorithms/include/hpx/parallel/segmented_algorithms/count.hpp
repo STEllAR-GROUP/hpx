@@ -27,7 +27,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
     ///////////////////////////////////////////////////////////////////////////
     // segmented_count
     namespace detail {
@@ -348,7 +348,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
@@ -375,10 +375,10 @@ namespace hpx { namespace segmented {
             return difference_type();
         }
 
-        return hpx::parallel::v1::detail::segmented_count(
-            hpx::parallel::v1::detail::count<difference_type>(),
-            hpx::execution::seq, first, last, value,
-            hpx::parallel::util::projection_identity(), std::true_type());
+        return hpx::parallel::detail::segmented_count(
+            hpx::parallel::detail::count<difference_type>(),
+            hpx::execution::seq, first, last, value, hpx::identity_v,
+            std::true_type());
     }
 
     // clang-format off
@@ -409,10 +409,10 @@ namespace hpx { namespace segmented {
                 difference_type>::get(difference_type());
         }
 
-        return hpx::parallel::v1::detail::segmented_count(
-            hpx::parallel::v1::detail::count<difference_type>(),
-            HPX_FORWARD(ExPolicy, policy), first, last, value,
-            hpx::parallel::util::projection_identity(), is_seq());
+        return hpx::parallel::detail::segmented_count(
+            hpx::parallel::detail::count<difference_type>(),
+            HPX_FORWARD(ExPolicy, policy), first, last, value, hpx::identity_v,
+            is_seq());
     }
 
     // clang-format off
@@ -437,10 +437,10 @@ namespace hpx { namespace segmented {
             return difference_type();
         }
 
-        return hpx::parallel::v1::detail::segmented_count_if(
-            hpx::parallel::v1::detail::count_if<difference_type>(),
+        return hpx::parallel::detail::segmented_count_if(
+            hpx::parallel::detail::count_if<difference_type>(),
             hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-            hpx::parallel::util::projection_identity(), std::true_type());
+            hpx::identity_v, std::true_type());
     }
 
     // clang-format off
@@ -471,9 +471,9 @@ namespace hpx { namespace segmented {
                 difference_type>::get(difference_type());
         }
 
-        return hpx::parallel::v1::detail::segmented_count_if(
-            hpx::parallel::v1::detail::count_if<difference_type>(),
+        return hpx::parallel::detail::segmented_count_if(
+            hpx::parallel::detail::count_if<difference_type>(),
             HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-            hpx::parallel::util::projection_identity(), is_seq());
+            hpx::identity_v, is_seq());
     }
 }}    // namespace hpx::segmented

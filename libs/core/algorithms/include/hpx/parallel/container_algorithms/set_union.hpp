@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2022 Dimitra Karatza
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -60,10 +60,10 @@ namespace hpx { namespace ranges {
     ///                     to std::less<>
     /// \tparam Proj1       The type of an optional projection function applied
     ///                     to the first sequence. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function applied
     ///                     to the second sequence. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -122,9 +122,9 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Iter1, typename Sent1,
         typename Iter2, typename Sent2, typename Iter3,
-        typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity>
+        typename Pred = hpx::parallel::detail::less,
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity>
     typename typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         set_union_result<Iter1, Iter2, Iter3>>::type
     set_union(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
@@ -169,10 +169,10 @@ namespace hpx { namespace ranges {
     ///                     to std::less<>
     /// \tparam Proj1       The type of an optional projection function applied
     ///                     to the first sequence. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function applied
     ///                     to the second sequence. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -227,9 +227,9 @@ namespace hpx { namespace ranges {
     ///           copied.
     ///
     template <typename ExPolicy, typename Rng1, typename Rng2, typename Iter3,
-        typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity>
+        typename Pred = hpx::parallel::detail::less,
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         set_union_result<typename hpx::traits::range_iterator<Rng1>::type,
             typename hpx::traits::range_iterator<Rng2>::type, Iter3>>::type
@@ -279,10 +279,10 @@ namespace hpx { namespace ranges {
     ///                     to std::less<>
     /// \tparam Proj1       The type of an optional projection function applied
     ///                     to the first sequence. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function applied
     ///                     to the second sequence. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first1       Refers to the beginning of the sequence of elements
     ///                     of the first range the algorithm will be applied to.
@@ -322,9 +322,9 @@ namespace hpx { namespace ranges {
     ///           copied.
     ///
     template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
-        typename Iter3, typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity>
+        typename Iter3, typename Pred = hpx::parallel::detail::less,
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity>
     set_union_result<Iter1, Iter2, Iter3> tag_fallback_invoke(
         set_union_t, Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
         Iter3 dest, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
@@ -364,10 +364,10 @@ namespace hpx { namespace ranges {
     ///                     to std::less<>
     /// \tparam Proj1       The type of an optional projection function applied
     ///                     to the first sequence. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function applied
     ///                     to the second sequence. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param rng1         Refers to the first sequence of elements the algorithm
     ///                     will be applied to.
@@ -404,9 +404,9 @@ namespace hpx { namespace ranges {
     ///           copied.
     ///
     template <typename Rng1, typename Rng2, typename Iter3,
-        typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity>
+        typename Pred = hpx::parallel::detail::less,
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity>
     set_union_result<
         typename hpx::traits::range_iterator<Rng1>::type,
         typename hpx::traits::range_iterator<Rng2>::type, Iter3>
@@ -419,25 +419,22 @@ namespace hpx { namespace ranges {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/projected.hpp>
+#include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
-
-#include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/algorithms/traits/projected_range.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/set_union.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
-#include <algorithm>
-#include <iterator>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
 
     template <typename I1, typename I2, typename O>
     using set_union_result = parallel::util::in_in_out_result<I1, I2, O>;
@@ -451,16 +448,16 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Iter1, typename Sent1,
             typename Iter2, typename Sent2, typename Iter3,
-            typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
                 hpx::parallel::traits::is_projected<Proj1, Iter1>::value &&
                 hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
                 hpx::parallel::traits::is_projected<Proj2, Iter2>::value &&
-                hpx::traits::is_iterator<Iter3>::value &&
+                hpx::traits::is_iterator_v<Iter3> &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, Pred,
                     hpx::parallel::traits::projected<Proj1, Iter1>,
                     hpx::parallel::traits::projected<Proj2, Iter2>
@@ -474,23 +471,23 @@ namespace hpx { namespace ranges {
             Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
-            static_assert((hpx::traits::is_forward_iterator<Iter1>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<Iter2>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<Iter3>::value ||
-                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
-                        hpx::traits::is_output_iterator<Iter3>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<Iter3> ||
+                    (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
+                        hpx::traits::is_output_iterator_v<Iter3>),
                 "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
-                hpx::is_sequenced_execution_policy<ExPolicy>::value ||
-                    !hpx::traits::is_random_access_iterator<Iter1>::value ||
-                    !hpx::traits::is_random_access_iterator<Iter2>::value>;
+                hpx::is_sequenced_execution_policy_v<ExPolicy> ||
+                    !hpx::traits::is_random_access_iterator_v<Iter1> ||
+                    !hpx::traits::is_random_access_iterator_v<Iter2>>;
 
             using result_type = set_union_result<Iter1, Iter2, Iter3>;
 
-            return hpx::parallel::v1::detail::set_union<result_type>().call2(
+            return hpx::parallel::detail::set_union<result_type>().call2(
                 HPX_FORWARD(ExPolicy, policy), is_seq(), first1, last1, first2,
                 last2, dest, HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
                 HPX_FORWARD(Proj2, proj2));
@@ -498,16 +495,16 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2, typename Iter3,
-            typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng1>::value &&
                 hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
                 hpx::traits::is_range<Rng2>::value &&
                 hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
-                hpx::traits::is_iterator<Iter3>::value &&
+                hpx::traits::is_iterator_v<Iter3> &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, Pred,
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
@@ -526,19 +523,17 @@ namespace hpx { namespace ranges {
             using iterator_type2 =
                 typename hpx::traits::range_iterator<Rng2>::type;
 
-            static_assert(
-                (hpx::traits::is_forward_iterator<iterator_type1>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type1>,
                 "Requires at least forward iterator.");
-            static_assert(
-                (hpx::traits::is_forward_iterator<iterator_type2>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type2>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<Iter3>::value ||
-                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
-                        hpx::traits::is_output_iterator<Iter3>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<Iter3> ||
+                    (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
+                        hpx::traits::is_output_iterator_v<Iter3>),
                 "Requires at least forward iterator or sequential execution.");
 
             using is_seq = std::integral_constant<bool,
-                hpx::is_sequenced_execution_policy<ExPolicy>::value ||
+                hpx::is_sequenced_execution_policy_v<ExPolicy> ||
                     !hpx::traits::is_random_access_iterator<
                         iterator_type1>::value ||
                     !hpx::traits::is_random_access_iterator<
@@ -547,7 +542,7 @@ namespace hpx { namespace ranges {
             using result_type =
                 set_union_result<iterator_type1, iterator_type2, Iter3>;
 
-            return hpx::parallel::v1::detail::set_union<result_type>().call2(
+            return hpx::parallel::detail::set_union<result_type>().call2(
                 HPX_FORWARD(ExPolicy, policy), is_seq(), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
                 hpx::util::end(rng2), dest, HPX_FORWARD(Pred, op),
@@ -556,15 +551,15 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
-            typename Iter3, typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
+            typename Iter3, typename Pred = hpx::parallel::detail::less,
+            typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
                 hpx::parallel::traits::is_projected<Proj1, Iter1>::value &&
                 hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
                 hpx::parallel::traits::is_projected<Proj2, Iter2>::value &&
-                hpx::traits::is_iterator<Iter3>::value &&
+                hpx::traits::is_iterator_v<Iter3> &&
                 hpx::parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected<Proj1, Iter1>,
@@ -577,16 +572,16 @@ namespace hpx { namespace ranges {
             Iter3 dest, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
-            static_assert((hpx::traits::is_input_iterator<Iter1>::value),
+            static_assert(hpx::traits::is_input_iterator_v<Iter1>,
                 "Requires at least input iterator.");
-            static_assert((hpx::traits::is_input_iterator<Iter2>::value),
+            static_assert(hpx::traits::is_input_iterator_v<Iter2>,
                 "Requires at least input iterator.");
-            static_assert((hpx::traits::is_output_iterator<Iter3>::value),
+            static_assert(hpx::traits::is_output_iterator_v<Iter3>,
                 "Requires at least output iterator.");
 
             using result_type = set_union_result<Iter1, Iter2, Iter3>;
 
-            return hpx::parallel::v1::detail::set_union<result_type>().call(
+            return hpx::parallel::detail::set_union<result_type>().call(
                 hpx::execution::seq, first1, last1, first2, last2, dest,
                 HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
                 HPX_FORWARD(Proj2, proj2));
@@ -594,15 +589,15 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename Rng1, typename Rng2, typename Iter3,
-            typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng1>::value &&
                 hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
                 hpx::traits::is_range<Rng2>::value &&
                 hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
-                hpx::traits::is_iterator<Iter3>::value &&
+                hpx::traits::is_iterator_v<Iter3> &&
                 hpx::parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
@@ -622,26 +617,23 @@ namespace hpx { namespace ranges {
             using iterator_type2 =
                 typename hpx::traits::range_iterator<Rng2>::type;
 
-            static_assert(
-                (hpx::traits::is_input_iterator<iterator_type1>::value),
+            static_assert(hpx::traits::is_input_iterator_v<iterator_type1>,
                 "Requires at least input iterator.");
-            static_assert(
-                (hpx::traits::is_input_iterator<iterator_type2>::value),
+            static_assert(hpx::traits::is_input_iterator_v<iterator_type2>,
                 "Requires at least input iterator.");
-            static_assert((hpx::traits::is_output_iterator<Iter3>::value),
+            static_assert(hpx::traits::is_output_iterator_v<Iter3>,
                 "Requires at least output iterator.");
 
             using result_type =
                 set_union_result<iterator_type1, iterator_type2, Iter3>;
 
-            return hpx::parallel::v1::detail::set_union<result_type>().call(
+            return hpx::parallel::detail::set_union<result_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
                 hpx::util::end(rng2), dest, HPX_FORWARD(Pred, op),
                 HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
         }
     } set_union{};
-
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif    // DOXYGEN

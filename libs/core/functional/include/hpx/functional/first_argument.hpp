@@ -94,4 +94,7 @@ namespace hpx::util {
       : detail::lambda_first_argument<decltype(&F::operator())>
     {
     };
+
+    template <typename F>
+    using first_argument_t = typename first_argument<F>::type;
 }    // namespace hpx::util

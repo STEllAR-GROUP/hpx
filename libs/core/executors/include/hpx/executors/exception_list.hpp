@@ -19,7 +19,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx::parallel { inline namespace v1 {
+namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
@@ -265,4 +265,4 @@ namespace hpx::parallel { inline namespace v1 {
 
     // we're just reusing our existing implementation
     using hpx::exception_list;
-}}    // namespace hpx::parallel::v1
+}    // namespace hpx::parallel

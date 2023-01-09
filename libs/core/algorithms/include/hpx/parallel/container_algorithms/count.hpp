@@ -1,5 +1,5 @@
 //  Copyright (c) 2018 Christopher Ogle
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //  Copyright (c) 2022 Dimitra Karatza
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -29,7 +29,7 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of an input iterator.
     /// \tparam T           The type of the value to search for (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -62,7 +62,7 @@ namespace hpx { namespace ranges {
     ///           satisfying the given criteria.
     ///
     template <typename ExPolicy, typename Rng,
-    typename Proj = hpx::parallel::util::projection_identity,
+    typename Proj = hpx::identity,
     typename T = typename hpx::parallel::traits::projected<
         hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -86,7 +86,7 @@ namespace hpx { namespace ranges {
     ///                     sentinel type must be a sentinel for InIter.
     /// \tparam T           The type of the value to search for (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -121,7 +121,7 @@ namespace hpx { namespace ranges {
     ///           satisfying the given criteria.
     ///
     template <typename ExPolicy, typename Iter, typename Sent,
-        typename Proj = hpx::parallel::util::projection_identity,
+        typename Proj = hpx::identity,
         typename T = typename hpx::parallel::traits::projected<Iter,
             Proj>::value_type>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -140,7 +140,7 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of an input iterator.
     /// \tparam T           The type of the value to search for (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
@@ -154,7 +154,7 @@ namespace hpx { namespace ranges {
     ///           satisfying the given criteria.
     ///
     template <typename Rng,
-        typename Proj = hpx::parallel::util::projection_identity,
+        typename Proj = hpx::identity,
         typename T = typename hpx::parallel::traits::projected<
             hpx::traits::range_iterator_t<Rng>, Proj>::value_type>
     typename std::iterator_traits<typename hpx::traits::range_traits<
@@ -173,7 +173,7 @@ namespace hpx { namespace ranges {
     ///                     sentinel type must be a sentinel for InIter.
     /// \tparam T           The type of the value to search for (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -189,7 +189,7 @@ namespace hpx { namespace ranges {
     ///           satisfying the given criteria.
     ///
     template <typename Iter, typename Sent,
-        typename Proj = hpx::parallel::util::projection_identity,
+        typename Proj = hpx::identity,
         typename T = typename hpx::parallel::traits::projected<Iter,
             Proj>::value_type>
     typename std::iterator_traits<Iter>::difference_type
@@ -214,7 +214,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a count_if requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     //
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -259,7 +259,7 @@ namespace hpx { namespace ranges {
     ///           satisfying the given criteria.
     ///
     template <typename ExPolicy, typename Rng, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename std::iterator_traits<typename hpx::traits::range_traits<
             Rng>::iterator_type>::difference_type>::type
@@ -285,7 +285,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a count_if requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     //
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -332,7 +332,7 @@ namespace hpx { namespace ranges {
     ///           satisfying the given criteria.
     ///
     template <typename ExPolicy, typename Iter, typename Sent, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename std::iterator_traits<Iter>::difference_type>::type
     count_if(ExPolicy&& policy, Iter first, Sent last, F&& f,
@@ -353,7 +353,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a count_if requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     //
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
@@ -380,7 +380,7 @@ namespace hpx { namespace ranges {
     ///           satisfying the given criteria.
     ///
     template <typename Rng, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     typename std::iterator_traits<typename hpx::traits::range_traits<
         Rng>::iterator_type>::difference_type
     count_if(Rng&& rng, F&& f, Proj&& proj = Proj());
@@ -401,7 +401,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a count_if requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     //
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -430,7 +430,7 @@ namespace hpx { namespace ranges {
     ///           satisfying the given criteria.
     ///
     template <typename Iter, typename Sent, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     typename std::iterator_traits<Iter>::difference_type
     count_if(Iter first, Sent last, F&& f, Proj&& proj = Proj());
 
@@ -440,18 +440,17 @@ namespace hpx { namespace ranges {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-
-#include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/count.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::count
@@ -461,11 +460,11 @@ namespace hpx { namespace ranges {
     private:
         // clang-format off
         template <typename ExPolicy, typename Rng,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             typename T = typename hpx::parallel::traits::projected<
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::traits::is_range<Rng>::value
             )>
@@ -479,25 +478,24 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(
-                (hpx::traits::is_forward_iterator<iterator_type>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Required at least forward iterator.");
 
             using difference_type =
                 typename std::iterator_traits<iterator_type>::difference_type;
 
-            return hpx::parallel::v1::detail::count<difference_type>().call(
+            return hpx::parallel::detail::count<difference_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             typename T = typename hpx::parallel::traits::projected<Iter,
                 Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value
             )>
         // clang-format on
@@ -506,20 +504,20 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(count_t, ExPolicy&& policy, Iter first, Sent last,
             T const& value, Proj&& proj = Proj())
         {
-            static_assert((hpx::traits::is_forward_iterator<Iter>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
                 "Required at least forward iterator.");
 
             using difference_type =
                 typename std::iterator_traits<Iter>::difference_type;
 
-            return hpx::parallel::v1::detail::count<difference_type>().call(
+            return hpx::parallel::detail::count<difference_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, value,
                 HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Rng,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             typename T = typename hpx::parallel::traits::projected<
                 hpx::traits::range_iterator_t<Rng>, Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
@@ -535,21 +533,20 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(
-                (hpx::traits::is_input_iterator<iterator_type>::value),
+            static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
                 "Required at least input iterator.");
 
             using difference_type =
                 typename std::iterator_traits<iterator_type>::difference_type;
 
-            return hpx::parallel::v1::detail::count<difference_type>().call(
+            return hpx::parallel::detail::count<difference_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
                 value, HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Iter, typename Sent,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             typename T = typename hpx::parallel::traits::projected<Iter,
                 Proj>::value_type,
             HPX_CONCEPT_REQUIRES_(
@@ -560,13 +557,13 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(count_t, Iter first, Sent last, T const& value,
             Proj&& proj = Proj())
         {
-            static_assert((hpx::traits::is_input_iterator<Iter>::value),
+            static_assert(hpx::traits::is_input_iterator_v<Iter>,
                 "Required at least input iterator.");
 
             using difference_type =
                 typename std::iterator_traits<Iter>::difference_type;
 
-            return hpx::parallel::v1::detail::count<difference_type>().call(
+            return hpx::parallel::detail::count<difference_type>().call(
                 hpx::execution::seq, first, last, value,
                 HPX_FORWARD(Proj, proj));
         }
@@ -580,9 +577,9 @@ namespace hpx { namespace ranges {
     private:
         // clang-format off
         template <typename ExPolicy, typename Rng, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
@@ -599,14 +596,13 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(
-                (hpx::traits::is_forward_iterator<iterator_type>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Required at least forward iterator.");
 
             using difference_type =
                 typename std::iterator_traits<iterator_type>::difference_type;
 
-            return hpx::parallel::v1::detail::count_if<difference_type>().call(
+            return hpx::parallel::detail::count_if<difference_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), HPX_FORWARD(F, f),
                 HPX_FORWARD(Proj, proj));
@@ -614,9 +610,9 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
@@ -629,20 +625,20 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(count_if_t, ExPolicy&& policy, Iter first,
             Sent last, F&& f, Proj&& proj = Proj())
         {
-            static_assert((hpx::traits::is_forward_iterator<Iter>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
                 "Required at least forward iterator.");
 
             using difference_type =
                 typename std::iterator_traits<Iter>::difference_type;
 
-            return hpx::parallel::v1::detail::count_if<difference_type>().call(
+            return hpx::parallel::detail::count_if<difference_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
                 HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Rng, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
@@ -659,21 +655,20 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(
-                (hpx::traits::is_forward_iterator<iterator_type>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Required at least forward iterator.");
 
             using difference_type =
                 typename std::iterator_traits<iterator_type>::difference_type;
 
-            return hpx::parallel::v1::detail::count_if<difference_type>().call(
+            return hpx::parallel::detail::count_if<difference_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
                 HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Iter, typename Sent, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
@@ -687,17 +682,18 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(
             count_if_t, Iter first, Sent last, F&& f, Proj&& proj = Proj())
         {
-            static_assert((hpx::traits::is_forward_iterator<Iter>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
                 "Required at least forward iterator.");
 
             using difference_type =
                 typename std::iterator_traits<Iter>::difference_type;
 
-            return hpx::parallel::v1::detail::count_if<difference_type>().call(
+            return hpx::parallel::detail::count_if<difference_type>().call(
                 hpx::execution::seq, first, last, HPX_FORWARD(F, f),
                 HPX_FORWARD(Proj, proj));
         }
     } count_if{};
 
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
+
 #endif    // DOXYGEN

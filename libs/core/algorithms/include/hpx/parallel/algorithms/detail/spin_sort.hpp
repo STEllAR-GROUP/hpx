@@ -18,18 +18,15 @@
 #include <cstdlib>
 #include <functional>
 #include <iterator>
-#include <memory>
-#include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     /// This function divide r_input in two parts, sort it, and merge moving
     ///        the elements to range_buf
-    /// \param [in] r_input     range with the elements to sort
-    /// \param [in] range_buf   range with the elements sorted
+    /// \param [in] rng_a       range with the elements to sort
+    /// \param [in] rng_b       range with the elements sorted
     /// \param [in] comp        object for to compare two elements
     /// \param [in] level       when is 0, sort with the insertion_sort
     ///                         algorithm if not make a recursive call swapping
@@ -85,14 +82,18 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         bool owner = false;
 
         /// \brief constructor of the struct
-        /// \param [in] R : range of elements to sort
+        /// \param [in] first : range of elements to sort
+        /// \param [in] last : range of elements to sort
         /// \param [in] comp : object for to compare two elements
+        /// \param [in] paux
+        /// \param [in] naux
         spin_sort_helper(Iter first, Sent last, Compare comp, value_type* paux,
             std::size_t naux);
 
     public:
         /// \brief constructor of the struct
-        /// \param [in] r_input : range of elements to sort
+        /// \param [in] first : range of elements to sort
+        /// \param [in] last : range of elements to sort
         /// \param [in] comp : object for to Compare two elements
         spin_sort_helper(Iter first, Sent last, Compare comp = Compare())
           : spin_sort_helper(first, last, comp, nullptr, 0)
@@ -100,13 +101,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
 
         /// \brief constructor of the struct
-        /// \param [in] r_input : range of elements to sort
+        /// \param [in] first : range of elements to sort
+        /// \param [in] last : range of elements to sort
         /// \param [in] comp : object for to Compare two elements
         /// \param [in] range_aux : range used as auxiliary memory
         spin_sort_helper(
             Iter first, Sent last, Compare comp, range_buf range_aux)
           : spin_sort_helper(first, last, comp, range_aux.begin(),
-                (std::size_t) range_aux.size())
+                static_cast<std::size_t>(range_aux.size()))
         {
         }
 
@@ -132,20 +134,21 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     };    // End of class spin_sort_helper
 
     /// \brief constructor of the struct
-    /// \param [in] r_input : range of elements to sort
+    /// \param [in] first : range of elements to sort
+    /// \param [in] last : range of elements to sort
     /// \param [in] comp : object for to Compare two elements
+    /// \param [in] paux
+    /// \param [in] naux
     template <typename Iter, typename Sent, typename Compare>
     spin_sort_helper<Iter, Sent, Compare>::spin_sort_helper(
         Iter first, Sent last, Compare comp, value_type* paux, std::size_t naux)
       : ptr(paux)
       , nptr(naux)
-      , construct(false)
-      , owner(false)
     {
         util::range<Iter> r_input(first, last);
         HPX_ASSERT(r_input.size() >= 0);
 
-        std::size_t nelem = r_input.size();
+        std::size_t const nelem = r_input.size();
         owner = construct = false;
 
         nptr = (nelem + 1) >> 1;
@@ -176,7 +179,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         range_buf rng_buf(ptr, ptr + nptr);
 
         std::uint32_t nlevel =
-            util::nbits64(((nelem + sort_min - 1) / sort_min) - 1) - 1;
+            util::nbits64((nelem + sort_min - 1) / sort_min - 1) - 1;
         HPX_ASSERT(nlevel != 0);
 
         if ((nlevel & 1) == 1)
@@ -225,7 +228,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename Iter, typename Sent, typename Compare>
     void spin_sort(Iter first, Sent last, Compare&& comp)
     {
-        spin_sort_helper<Iter, Sent, typename std::decay<Compare>::type> sorter(
+        spin_sort_helper<Iter, Sent, std::decay_t<Compare>> sorter(
             first, last, HPX_FORWARD(Compare, comp));
     }
 
@@ -233,7 +236,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     void spin_sort(Iter first, Sent last, Compare&& comp,
         util::range<typename std::iterator_traits<Iter>::value_type*> range_aux)
     {
-        spin_sort_helper<Iter, Sent, typename std::decay<Compare>::type> sorter(
+        spin_sort_helper<Iter, Sent, std::decay_t<Compare>> sorter(
             first, last, HPX_FORWARD(Compare, comp), range_aux);
     }
 
@@ -241,8 +244,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     void spin_sort(Iter first, Sent last, Compare comp,
         typename std::iterator_traits<Iter>::value_type* paux, std::size_t naux)
     {
-        spin_sort_helper<Iter, Sent, typename std::decay<Compare>::type> sorter(
+        spin_sort_helper<Iter, Sent, std::decay_t<Compare>> sorter(
             first, last, HPX_FORWARD(Compare, comp), paux, naux);
     }
 
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,11 +9,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/errors/exception_list.hpp>
+#include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
@@ -22,25 +21,28 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/synchronization/latch.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <exception>
-#include <stdexcept>
 #include <type_traits>
 #include <utility>
 
 /// Top-level namespace
-namespace hpx { namespace experimental {
+namespace hpx::experimental {
 
-    /// \brief A \c task_group represents concurrent execution of a
-    ///        group of tasks. Tasks can be dynamically added to the
-    //         group while it is executing.
+    /// A \c task_group represents concurrent execution of a group of tasks.
+    /// Tasks can be dynamically added to the group while it is executing.
     class task_group
     {
     public:
         HPX_CORE_EXPORT task_group();
         HPX_CORE_EXPORT ~task_group();
+
+        task_group(task_group const&) = delete;
+        task_group(task_group&&) = delete;
+
+        task_group& operator=(task_group const&) = delete;
+        task_group& operator=(task_group&&) = delete;
 
     private:
         struct on_exit
@@ -71,10 +73,11 @@ namespace hpx { namespace experimental {
         /// \param f          The user defined function to invoke inside the task
         ///                   group.
         /// \param ts         Additional arguments to use to invoke \c f().
-        /// clang-format off
+        // clang-format off
         template <typename Executor, typename F, typename... Ts,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any_v<std::decay_t<Executor>>)>
+                hpx::traits::is_executor_any_v<std::decay_t<Executor>>
+            )>
         // clang-format on
         void run(Executor&& exec, F&& f, Ts&&... ts)
         {
@@ -86,22 +89,12 @@ namespace hpx { namespace experimental {
                     t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)]() mutable {
                     // latch needs to be released before the lambda exits
                     on_exit _(HPX_MOVE(l));
-                    std::exception_ptr p;
-                    try
-                    {
-                        hpx::invoke_fused(HPX_MOVE(f), HPX_MOVE(t));
-                        return;
-                    }
-                    catch (...)
-                    {
-                        p = std::current_exception();
-                    }
 
-                    // The exception is set outside the catch block since
-                    // set_exception may yield. Ending the catch block on a
-                    // different worker thread than where it was started may
-                    // lead to segfaults.
-                    add_exception(HPX_MOVE(p));
+                    hpx::detail::try_catch_exception_ptr(
+                        [&]() { hpx::invoke_fused(HPX_MOVE(f), HPX_MOVE(t)); },
+                        [this](std::exception_ptr e) {
+                            add_exception(HPX_MOVE(e));
+                        });
                 });
         }
 
@@ -134,8 +127,10 @@ namespace hpx { namespace experimental {
     private:
         friend class serialization::access;
 
-        HPX_CORE_EXPORT void serialize(
-            serialization::input_archive&, unsigned const);
+        static constexpr void serialize(
+            serialization::input_archive&, unsigned const) noexcept
+        {
+        }
         HPX_CORE_EXPORT void serialize(
             serialization::output_archive&, unsigned const);
 
@@ -147,12 +142,12 @@ namespace hpx { namespace experimental {
         hpx::exception_list errors_;
         std::atomic<bool> has_arrived_;
     };
-}}    // namespace hpx::experimental
+}    // namespace hpx::experimental
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
 
     using task_group HPX_DEPRECATED_V(1, 9,
         "hpx::execution:experimental::task_group is deprecated, use "
         "hpx::experimental::task_group instead") =
         hpx::experimental::task_group;
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

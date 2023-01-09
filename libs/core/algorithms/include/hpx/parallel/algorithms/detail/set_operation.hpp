@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/functional/invoke.hpp>
 
-#include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/upper_lower_bound.hpp>
@@ -30,9 +29,8 @@
 #include <cstddef>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
@@ -43,12 +41,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         class rewritable_ref
         {
         public:
-            constexpr rewritable_ref()
-              : item_(0)
-            {
-            }
-            constexpr rewritable_ref(T const& item)
-              : item_(item)
+            rewritable_ref() = default;
+
+            explicit constexpr rewritable_ref(T const& item) noexcept
+              : item_(&item)
             {
             }
 
@@ -62,35 +58,35 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             // clang-format off
             operator T const&() const
             {
-                HPX_ASSERT(item_ != 0);
+                HPX_ASSERT(item_ != nullptr);
                 return *item_;
             }
             // clang-format on
 
         private:
-            T const* item_;
+            T const* item_ = nullptr;
         };
 
-        typedef typename std::iterator_traits<FwdIter>::value_type value_type;
-        typedef typename std::conditional<std::is_scalar<value_type>::value,
-            value_type, rewritable_ref<value_type>>::type type;
+        using value_type = typename std::iterator_traits<FwdIter>::value_type;
+        using type = std::conditional_t<std::is_scalar_v<value_type>,
+            value_type, rewritable_ref<value_type>>;
     };
 
     struct set_chunk_data
     {
-        std::size_t start = std::size_t(-1);
-        std::size_t len = std::size_t(-1);
-        std::size_t start_index = std::size_t(-1);
-        std::size_t first1 = std::size_t(-1);
-        std::size_t first2 = std::size_t(-1);
+        std::size_t start = static_cast<std::size_t>(-1);
+        std::size_t len = static_cast<std::size_t>(-1);
+        std::size_t start_index = static_cast<std::size_t>(-1);
+        std::size_t first1 = static_cast<std::size_t>(-1);
+        std::size_t first2 = static_cast<std::size_t>(-1);
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename Iter1, typename Sent1, typename Iter2,
         typename Sent2, typename Iter3, typename F, typename Proj1,
         typename Proj2, typename Combiner, typename SetOp>
-    typename util::detail::algorithm_result<ExPolicy,
-        util::in_in_out_result<Iter1, Iter2, Iter3>>::type
+    util::detail::algorithm_result_t<ExPolicy,
+        util::in_in_out_result<Iter1, Iter2, Iter3>>
     set_operation(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
         Sent2 last2, Iter3 dest, F&& f, Proj1&& proj1, Proj2&& proj2,
         Combiner&& combiner, SetOp&& setop)
@@ -112,7 +108,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             policy.parameters(), policy.executor(), hpx::chrono::null_duration,
             (std::min)(len1, len2));
 
-        std::size_t step = (len1 + cores - 1) / cores;
+        std::size_t const step = (len1 + cores - 1) / cores;
 
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
         std::shared_ptr<buffer_type[]> buffer(
@@ -126,21 +122,22 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         // first step, is applied to all partitions
         auto f1 = [=](set_chunk_data* curr_chunk,
-                      std::size_t part_size) mutable -> void {
+                      std::size_t const part_size) mutable -> void {
             HPX_ASSERT(part_size == 1);
             HPX_UNUSED(part_size);
 
             // find start in sequence 1
             std::size_t start1 = (curr_chunk - chunks.get()) * step;
-            std::size_t end1 = (std::min)(start1 + step, std::size_t(len1));
+            std::size_t end1 =
+                (std::min)(start1 + step, static_cast<std::size_t>(len1));
 
             if (start1 >= end1)
             {
                 return;
             }
 
-            bool first_partition = (start1 == 0);
-            bool last_partition = (end1 == std::size_t(len1));
+            bool const first_partition = start1 == 0;
+            bool const last_partition = end1 == static_cast<std::size_t>(len1);
 
             auto start_value = HPX_INVOKE(proj1, first1[start1]);
             auto end_value = HPX_INVOKE(proj1, first1[end1]);
@@ -148,15 +145,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             // all but the last chunk require special handling
             if (!last_partition)
             {
-                // this chunk will be handled by the next one if all
-                // elements of this partition are equal
+                // this chunk will be handled by the next one if all elements of
+                // this partition are equal
                 if (!HPX_INVOKE(f, start_value, end_value))
                 {
                     return;
                 }
 
-                // move backwards to find earliest element which is equal to
-                // the last element of the current chunk
+                // move backwards to find earliest element which is equal to the
+                // last element of the current chunk
                 if (end1 != 0)
                 {
                     auto end_value1 = HPX_INVOKE(proj1, first1[end1 - 1]);
@@ -169,8 +166,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 }
             }
 
-            // move backwards to find earliest element which is equal to
-            // the first element of the current chunk
+            // move backwards to find earliest element which is equal to the
+            // first element of the current chunk
             if (start1 != 0)
             {
                 auto start_value1 = HPX_INVOKE(proj1, first1[start1 - 1]);
@@ -219,8 +216,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                       auto&& data) -> result_type {
             // clang-format on
 
-            // make sure iterators embedded in function object that is
-            // attached to futures are invalidated
+            // make sure iterators embedded in function object that is attached
+            // to futures are invalidated
             util::detail::clear_container(data);
 
             // accumulate real length and rightmost positions in input sequences
@@ -231,13 +228,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             chunk->start_index = 0;
             for (size_t i = 1; i != cores; ++i)
             {
-                set_chunk_data* curr_chunk = chunk++;
+                set_chunk_data const* curr_chunk = chunk++;
                 chunk->start_index = curr_chunk->start_index + curr_chunk->len;
-                if (curr_chunk->first1 != std::size_t(-1))
+                if (curr_chunk->first1 != static_cast<std::size_t>(-1))
                 {
                     first1_pos = (std::max)(first1_pos, curr_chunk->first1);
                 }
-                if (curr_chunk->first2 != std::size_t(-1))
+                if (curr_chunk->first2 != static_cast<std::size_t>(-1))
                 {
                     first2_pos = (std::max)(first2_pos, curr_chunk->first2);
                 }
@@ -248,16 +245,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 foreach_partitioner<hpx::execution::parallel_policy>::call(
                     hpx::execution::par, chunks.get(), cores,
                     [buffer, dest](
-                        set_chunk_data* chunk, std::size_t, std::size_t) {
-                        if (chunk->start == std::size_t(-1) ||
-                            chunk->start_index == std::size_t(-1) ||
-                            chunk->len == std::size_t(-1))
+                        set_chunk_data* ch, std::size_t, std::size_t) {
+                        if (ch->start == static_cast<std::size_t>(-1) ||
+                            ch->start_index == static_cast<std::size_t>(-1) ||
+                            ch->len == static_cast<std::size_t>(-1))
                         {
                             return;
                         }
-                        std::copy(buffer.get() + chunk->start,
-                            buffer.get() + chunk->start + chunk->len,
-                            dest + chunk->start_index);
+                        std::copy(buffer.get() + ch->start,
+                            buffer.get() + ch->start + ch->len,
+                            dest + ch->start_index);
                     },
                     [](set_chunk_data* last) -> set_chunk_data* {
                         return last;
@@ -274,4 +271,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 
     /// \endcond
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

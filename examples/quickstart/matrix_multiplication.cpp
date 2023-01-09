@@ -21,8 +21,8 @@ std::mt19937 gen;
 
 ///////////////////////////////////////////////////////////////////////////////
 //[mul_print_matrix
-void print_matrix(
-    std::vector<int> M, std::size_t rows, std::size_t cols, const char* message)
+void print_matrix(std::vector<int> const& M, std::size_t rows, std::size_t cols,
+    char const* message)
 {
     std::cout << "\nMatrix " << message << " is:" << std::endl;
     for (std::size_t i = 0; i < rows; i++)
@@ -41,12 +41,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
     using element_type = int;
 
     // Define matrix sizes
-    std::size_t rowsA = vm["n"].as<std::size_t>();
-    std::size_t colsA = vm["m"].as<std::size_t>();
-    std::size_t rowsB = colsA;
-    std::size_t colsB = vm["k"].as<std::size_t>();
-    std::size_t rowsR = rowsA;
-    std::size_t colsR = colsB;
+    std::size_t const rowsA = vm["n"].as<std::size_t>();
+    std::size_t const colsA = vm["m"].as<std::size_t>();
+    std::size_t const rowsB = colsA;
+    std::size_t const colsB = vm["k"].as<std::size_t>();
+    std::size_t const rowsR = rowsA;
+    std::size_t const colsR = colsB;
 
     // Initialize matrices A and B
     std::vector<int> A(rowsA * colsA);
@@ -62,8 +62,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
 
     // Define range of values
-    int lower = vm["l"].as<int>();
-    int upper = vm["u"].as<int>();
+    int const lower = vm["l"].as<int>();
+    int const upper = vm["u"].as<int>();
 
     // Matrices have random values in the range [lower, upper]
     std::uniform_int_distribution<element_type> dis(lower, upper);

@@ -15,7 +15,6 @@
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
 #include <exception>
@@ -26,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
     ///////////////////////////////////////////////////////////////////////////
     // segmented_find
     namespace detail {
@@ -225,7 +224,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 HPX_MOVE(segments)));
         }
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
@@ -249,8 +248,8 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
 
-        return hpx::parallel::v1::detail::segmented_find(
-            hpx::parallel::v1::detail::find<
+        return hpx::parallel::detail::segmented_find(
+            hpx::parallel::detail::find<
                 typename iterator_traits::local_iterator>(),
             hpx::execution::seq, first, last, val, std::true_type{});
     }
@@ -280,8 +279,8 @@ namespace hpx { namespace segmented {
 
         typedef hpx::traits::segmented_iterator_traits<SegIter> iterator_traits;
 
-        return hpx::parallel::v1::detail::segmented_find(
-            hpx::parallel::v1::detail::find<
+        return hpx::parallel::detail::segmented_find(
+            hpx::parallel::detail::find<
                 typename iterator_traits::local_iterator>(),
             HPX_FORWARD(ExPolicy, policy), first, last, val, is_seq());
     }
@@ -305,8 +304,8 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<FwdIter>;
 
-        return hpx::parallel::v1::detail::segmented_find(
-            hpx::parallel::v1::detail::find_if<
+        return hpx::parallel::detail::segmented_find(
+            hpx::parallel::detail::find_if<
                 typename iterator_traits::local_iterator>(),
             hpx::execution::seq, first, last, HPX_FORWARD(F, f),
             std::true_type{});
@@ -337,8 +336,8 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<FwdIter>;
 
-        return hpx::parallel::v1::detail::segmented_find(
-            hpx::parallel::v1::detail::find_if<
+        return hpx::parallel::detail::segmented_find(
+            hpx::parallel::detail::find_if<
                 typename iterator_traits::local_iterator>(),
             HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
             is_seq());
@@ -363,8 +362,8 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<FwdIter>;
 
-        return hpx::parallel::v1::detail::segmented_find(
-            hpx::parallel::v1::detail::find_if_not<
+        return hpx::parallel::detail::segmented_find(
+            hpx::parallel::detail::find_if_not<
                 typename iterator_traits::local_iterator>(),
             hpx::execution::seq, first, last, HPX_FORWARD(F, f),
             std::true_type{});
@@ -395,8 +394,8 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<FwdIter>;
 
-        return hpx::parallel::v1::detail::segmented_find(
-            hpx::parallel::v1::detail::find_if_not<
+        return hpx::parallel::detail::segmented_find(
+            hpx::parallel::detail::find_if_not<
                 typename iterator_traits::local_iterator>(),
             HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
             is_seq());

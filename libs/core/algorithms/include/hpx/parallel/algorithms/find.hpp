@@ -1,6 +1,6 @@
 //  Copyright (c) 2022 Bhumit Attarde
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -59,7 +59,7 @@ namespace hpx {
     ///           \a val, then the algorithm returns \a last.
     ///
     template <typename ExPolicy, typename FwdIter, typename T>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    util::detail::algorithm_result_t<ExPolicy, FwdIter>
     find(ExPolicy&& policy, FwdIter first, FwdIter last, T const& val);
 
     /// Returns the first element in the range [first, last) that is equal
@@ -148,7 +148,7 @@ namespace hpx {
     ///           algorithm returns \a last.
     ///
     template <typename ExPolicy, typename FwdIter, typename F>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    util::detail::algorithm_result_t<ExPolicy, FwdIter>
     find_if(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
 
     /// Returns the first element in the range [first, last) for which
@@ -251,7 +251,7 @@ namespace hpx {
     ///           algorithm returns \a last.
     ///
     template <typename ExPolicy, typename FwdIter, typename F>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    util::detail::algorithm_result_t<ExPolicy, FwdIter>
     find_if_not(ExPolicy&& policy, FwdIter first, FwdIter last, F&& f);
 
     /// Returns the first element in the range [first, last) for which
@@ -371,7 +371,7 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::equal_to>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
+    util::detail::algorithm_result_t<ExPolicy, FwdIter1>
     find_end(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred());
 
@@ -430,7 +430,7 @@ namespace hpx {
     ///           is found, \a last1 is also returned.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
+    util::detail::algorithm_result_t<ExPolicy, FwdIter1>
     find_end(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2, FwdIter2 last2);
 
@@ -606,7 +606,7 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
         typename Pred = detail::equal_to>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
+    util::detail::algorithm_result_t<ExPolicy, FwdIter1>
     find_first_of(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred());
 
@@ -666,7 +666,7 @@ namespace hpx {
     ///           is found, \a last is also returned.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter1>::type
+    util::detail::algorithm_result_t<ExPolicy, FwdIter1>
     find_first_of(ExPolicy&& policy, FwdIter1 first, FwdIter1 last,
         FwdIter2 s_first, FwdIter2 s_last);
 
@@ -776,50 +776,44 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
-
-#include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/find.hpp>
 #include <hpx/parallel/util/adapt_placement_mode.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
-#include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
-#include <hpx/parallel/util/invoke_projected.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
 
     ///////////////////////////////////////////////////////////////////////////
     // find
     namespace detail {
 
         template <typename FwdIter>
-        struct find : public detail::algorithm<find<FwdIter>, FwdIter>
+        struct find : public algorithm<find<FwdIter>, FwdIter>
         {
             constexpr find() noexcept
-              : find::algorithm("find")
+              : algorithm<find, FwdIter>("find")
             {
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
-                typename T, typename Proj = util::projection_identity>
+                typename T, typename Proj = hpx::identity>
             static constexpr Iter sequential(ExPolicy, Iter first, Sent last,
                 T const& val, Proj&& proj = Proj())
             {
@@ -828,7 +822,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
-                typename T, typename Proj = util::projection_identity>
+                typename T, typename Proj = hpx::identity>
             static decltype(auto) parallel(ExPolicy&& orgpolicy, Iter first,
                 Sent last, T const& val, Proj&& proj = Proj())
             {
@@ -900,15 +894,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
 
         template <typename FwdIter>
-        struct find_if : public detail::algorithm<find_if<FwdIter>, FwdIter>
+        struct find_if : public algorithm<find_if<FwdIter>, FwdIter>
         {
             constexpr find_if() noexcept
-              : find_if::algorithm("find_if")
+              : algorithm<find_if, FwdIter>("find_if")
             {
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
-                typename F, typename Proj = util::projection_identity>
+                typename F, typename Proj = hpx::identity>
             static constexpr Iter sequential(
                 ExPolicy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
             {
@@ -917,14 +911,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
-                typename F, typename Proj = util::projection_identity>
-            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
-            parallel(ExPolicy&& orgpolicy, Iter first, Sent last, F&& f,
+                typename F, typename Proj = hpx::identity>
+            static util::detail::algorithm_result_t<ExPolicy, Iter> parallel(
+                ExPolicy&& orgpolicy, Iter first, Sent last, F&& f,
                 Proj&& proj = Proj())
             {
-                typedef util::detail::algorithm_result<ExPolicy, Iter> result;
-                typedef typename std::iterator_traits<Iter>::difference_type
-                    difference_type;
+                using result = util::detail::algorithm_result<ExPolicy, Iter>;
+                using difference_type =
+                    typename std::iterator_traits<Iter>::difference_type;
 
                 difference_type count = detail::distance(first, last);
                 if (count <= 0)
@@ -980,16 +974,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
 
         template <typename FwdIter>
-        struct find_if_not
-          : public detail::algorithm<find_if_not<FwdIter>, FwdIter>
+        struct find_if_not : public algorithm<find_if_not<FwdIter>, FwdIter>
         {
             constexpr find_if_not() noexcept
-              : find_if_not::algorithm("find_if_not")
+              : algorithm<find_if_not, FwdIter>("find_if_not")
             {
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
-                typename F, typename Proj = util::projection_identity>
+                typename F, typename Proj = hpx::identity>
             static constexpr Iter sequential(
                 ExPolicy, Iter first, Sent last, F&& f, Proj&& proj = Proj())
             {
@@ -998,14 +991,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
-                typename F, typename Proj = util::projection_identity>
-            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
-            parallel(ExPolicy&& orgpolicy, Iter first, Sent last, F&& f,
+                typename F, typename Proj = hpx::identity>
+            static util::detail::algorithm_result_t<ExPolicy, Iter> parallel(
+                ExPolicy&& orgpolicy, Iter first, Sent last, F&& f,
                 Proj&& proj = Proj())
             {
-                typedef util::detail::algorithm_result<ExPolicy, Iter> result;
-                typedef typename std::iterator_traits<Iter>::difference_type
-                    difference_type;
+                using result = util::detail::algorithm_result<ExPolicy, Iter>;
+                using difference_type =
+                    typename std::iterator_traits<Iter>::difference_type;
 
                 difference_type count = detail::distance(first, last);
                 if (count <= 0)
@@ -1059,11 +1052,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // find_end
     namespace detail {
+
         template <typename FwdIter>
-        struct find_end : public detail::algorithm<find_end<FwdIter>, FwdIter>
+        struct find_end : public algorithm<find_end<FwdIter>, FwdIter>
         {
             constexpr find_end() noexcept
-              : find_end::algorithm("find_end")
+              : algorithm<find_end, FwdIter>("find_end")
             {
             }
 
@@ -1082,11 +1076,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename Iter1, typename Sent1,
                 typename Iter2, typename Sent2, typename Pred, typename Proj1,
                 typename Proj2>
-            static
-                typename util::detail::algorithm_result<ExPolicy, Iter1>::type
-                parallel(ExPolicy&& orgpolicy, Iter1 first1, Sent1 last1,
-                    Iter2 first2, Sent2 last2, Pred&& op, Proj1&& proj1,
-                    Proj2&& proj2)
+            static util::detail::algorithm_result_t<ExPolicy, Iter1> parallel(
+                ExPolicy&& orgpolicy, Iter1 first1, Sent1 last1, Iter2 first2,
+                Sent2 last2, Pred&& op, Proj1&& proj1, Proj2&& proj2)
             {
                 using result_type =
                     util::detail::algorithm_result<ExPolicy, Iter1>;
@@ -1158,11 +1150,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     // find_first_of
     namespace detail {
         template <typename FwdIter>
-        struct find_first_of
-          : public detail::algorithm<find_first_of<FwdIter>, FwdIter>
+        struct find_first_of : public algorithm<find_first_of<FwdIter>, FwdIter>
         {
             constexpr find_first_of() noexcept
-              : find_first_of::algorithm("find_first_of")
+              : algorithm<find_first_of, FwdIter>("find_first_of")
             {
             }
 
@@ -1179,18 +1170,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIter2, typename Pred,
                 typename Proj1, typename Proj2>
-            static
-                typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-                parallel(ExPolicy&& orgpolicy, FwdIter first, FwdIter last,
-                    FwdIter2 s_first, FwdIter2 s_last, Pred&& op, Proj1&& proj1,
-                    Proj2&& proj2)
+            static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
+                ExPolicy&& orgpolicy, FwdIter first, FwdIter last,
+                FwdIter2 s_first, FwdIter2 s_last, Pred&& op, Proj1&& proj1,
+                Proj2&& proj2)
             {
-                typedef util::detail::algorithm_result<ExPolicy, FwdIter>
-                    result;
-                typedef typename std::iterator_traits<FwdIter>::difference_type
-                    difference_type;
-                typedef typename std::iterator_traits<FwdIter2>::difference_type
-                    s_difference_type;
+                using result =
+                    util::detail::algorithm_result<ExPolicy, FwdIter>;
+                using difference_type =
+                    typename std::iterator_traits<FwdIter>::difference_type;
+                using s_difference_type =
+                    typename std::iterator_traits<FwdIter2>::difference_type;
 
                 s_difference_type diff = std::distance(s_first, s_last);
                 if (diff <= 0)
@@ -1246,7 +1236,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
 
@@ -1269,9 +1259,8 @@ namespace hpx {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::find<InIter>().call(
-                hpx::execution::seq, first, last, val,
-                hpx::parallel::util::projection_identity{});
+            return hpx::parallel::detail::find<InIter>().call(
+                hpx::execution::seq, first, last, val, hpx::identity_v);
         }
 
         // clang-format off
@@ -1288,9 +1277,9 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find<FwdIter>().call(
+            return hpx::parallel::detail::find<FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, val,
-                hpx::parallel::util::projection_identity{});
+                hpx::identity_v);
         }
     } find{};
 
@@ -1318,9 +1307,9 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find_if<FwdIter>().call(
+            return hpx::parallel::detail::find_if<FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity{});
+                hpx::identity_v);
         }
 
         // clang-format off
@@ -1338,9 +1327,9 @@ namespace hpx {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::find_if<InIter>().call(
+            return hpx::parallel::detail::find_if<InIter>().call(
                 hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity{});
+                hpx::identity_v);
         }
     } find_if{};
 
@@ -1368,9 +1357,9 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find_if_not<FwdIter>().call(
+            return hpx::parallel::detail::find_if_not<FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity{});
+                hpx::identity_v);
         }
 
         // clang-format off
@@ -1388,9 +1377,9 @@ namespace hpx {
             static_assert(hpx::traits::is_input_iterator_v<FwdIter>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::find_if_not<FwdIter>().call(
+            return hpx::parallel::detail::find_if_not<FwdIter>().call(
                 hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-                hpx::parallel::util::projection_identity{});
+                hpx::identity_v);
         }
     } find_if_not{};
 
@@ -1418,16 +1407,14 @@ namespace hpx {
         tag_fallback_invoke(find_end_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find_end<FwdIter1>().call(
+            return hpx::parallel::detail::find_end<FwdIter1>().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
-                HPX_FORWARD(Pred, op),
-                hpx::parallel::util::projection_identity(),
-                hpx::parallel::util::projection_identity());
+                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off
@@ -1443,16 +1430,15 @@ namespace hpx {
         tag_fallback_invoke(find_end_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find_end<FwdIter1>().call(
+            return hpx::parallel::detail::find_end<FwdIter1>().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
-                hpx::parallel::v1::detail::equal_to{},
-                hpx::parallel::util::projection_identity(),
-                hpx::parallel::util::projection_identity());
+                hpx::parallel::detail::equal_to{}, hpx::identity_v,
+                hpx::identity_v);
         }
 
         // clang-format off
@@ -1470,16 +1456,14 @@ namespace hpx {
         friend FwdIter1 tag_fallback_invoke(find_end_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find_end<FwdIter1>().call(
+            return hpx::parallel::detail::find_end<FwdIter1>().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                HPX_FORWARD(Pred, op),
-                hpx::parallel::util::projection_identity(),
-                hpx::parallel::util::projection_identity());
+                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off
@@ -1492,16 +1476,15 @@ namespace hpx {
         friend FwdIter1 tag_fallback_invoke(find_end_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find_end<FwdIter1>().call(
+            return hpx::parallel::detail::find_end<FwdIter1>().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                hpx::parallel::v1::detail::equal_to{},
-                hpx::parallel::util::projection_identity(),
-                hpx::parallel::util::projection_identity());
+                hpx::parallel::detail::equal_to{}, hpx::identity_v,
+                hpx::identity_v);
         }
     } find_end{};
 
@@ -1529,16 +1512,14 @@ namespace hpx {
         tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last, Pred&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Subsequence requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find_first_of<FwdIter1>().call(
+            return hpx::parallel::detail::find_first_of<FwdIter1>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, s_first, s_last,
-                HPX_FORWARD(Pred, op),
-                hpx::parallel::util::projection_identity(),
-                hpx::parallel::util::projection_identity());
+                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off
@@ -1554,16 +1535,15 @@ namespace hpx {
         tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Subsequence requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find_first_of<FwdIter1>().call(
+            return hpx::parallel::detail::find_first_of<FwdIter1>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, s_first, s_last,
-                hpx::parallel::v1::detail::equal_to{},
-                hpx::parallel::util::projection_identity(),
-                hpx::parallel::util::projection_identity());
+                hpx::parallel::detail::equal_to{}, hpx::identity_v,
+                hpx::identity_v);
         }
 
         // clang-format off
@@ -1580,16 +1560,14 @@ namespace hpx {
         friend FwdIter1 tag_fallback_invoke(find_first_of_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last, Pred&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Subsequence requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find_first_of<FwdIter1>().call(
+            return hpx::parallel::detail::find_first_of<FwdIter1>().call(
                 hpx::execution::seq, first, last, s_first, s_last,
-                HPX_FORWARD(Pred, op),
-                hpx::parallel::util::projection_identity(),
-                hpx::parallel::util::projection_identity());
+                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off
@@ -1602,16 +1580,15 @@ namespace hpx {
         friend FwdIter1 tag_fallback_invoke(find_first_of_t, FwdIter1 first,
             FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Subsequence requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::find_first_of<FwdIter1>().call(
+            return hpx::parallel::detail::find_first_of<FwdIter1>().call(
                 hpx::execution::seq, first, last, s_first, s_last,
-                hpx::parallel::v1::detail::equal_to{},
-                hpx::parallel::util::projection_identity(),
-                hpx::parallel::util::projection_identity());
+                hpx::parallel::detail::equal_to{}, hpx::identity_v,
+                hpx::identity_v);
         }
     } find_first_of{};
 }    // namespace hpx

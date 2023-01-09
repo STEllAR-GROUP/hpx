@@ -7,22 +7,15 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
-#include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
-#include <algorithm>
 #include <cstddef>
-#include <iostream>
-#include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     template <typename ExPolicy>
     struct sequential_mismatch_t final
@@ -30,7 +23,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
     private:
         template <typename Iter1, typename Sent, typename Iter2, typename F>
-        friend inline constexpr auto tag_fallback_invoke(sequential_mismatch_t,
+        friend constexpr auto tag_fallback_invoke(sequential_mismatch_t,
             Iter1 first1, Sent last1, Iter2 first2, F&& f)
         {
             while (first1 != last1 && HPX_INVOKE(f, *first1, *first2))
@@ -41,7 +34,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
 
         template <typename ZipIterator, typename Token, typename F>
-        friend inline constexpr void tag_fallback_invoke(sequential_mismatch_t,
+        friend constexpr void tag_fallback_invoke(sequential_mismatch_t,
             std::size_t base_idx, ZipIterator it, std::size_t part_count,
             Token& tok, F&& f)
         {
@@ -89,10 +82,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         // Our own version of the C++14 equal (_binary).
         template <typename Iter1, typename Sent1, typename Iter2,
             typename Sent2, typename F, typename Proj1, typename Proj2>
-        friend inline constexpr util::in_in_result<Iter1, Iter2>
-        tag_fallback_invoke(sequential_mismatch_binary_t, Iter1 first1,
-            Sent1 last1, Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1,
-            Proj2&& proj2)
+        friend constexpr util::in_in_result<Iter1, Iter2> tag_fallback_invoke(
+            sequential_mismatch_binary_t, Iter1 first1, Sent1 last1,
+            Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
         {
             while (first1 != last1 && first2 != last2 &&
                 HPX_INVOKE(
@@ -105,10 +97,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         template <typename ZipIterator, typename Token, typename F,
             typename Proj1, typename Proj2>
-        friend inline constexpr void tag_fallback_invoke(
-            sequential_mismatch_binary_t, std::size_t base_idx, ZipIterator it,
-            std::size_t part_count, Token& tok, F&& f, Proj1&& proj1,
-            Proj2&& proj2)
+        friend constexpr void tag_fallback_invoke(sequential_mismatch_binary_t,
+            std::size_t base_idx, ZipIterator it, std::size_t part_count,
+            Token& tok, F&& f, Proj1&& proj1, Proj2&& proj2)
         {
             util::loop_idx_n<ExPolicy>(base_idx, it, part_count, tok,
                 [&f, &proj1, &proj2, &tok](
@@ -150,4 +141,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 #endif
 
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

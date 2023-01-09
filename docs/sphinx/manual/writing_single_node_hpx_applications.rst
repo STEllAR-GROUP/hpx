@@ -254,19 +254,19 @@ Using parallel algorithms
 .. |parallel_execution_policy| replace:: :cpp:class:`hpx::execution::parallel_policy`
 .. |parallel_unsequenced_execution_policy| replace:: :cpp:class:`hpx::execution::parallel_unsequenced_policy`
 .. |parallel_task_execution_policy| replace:: :cpp:class:`hpx::execution::parallel_task_policy`
-.. |execution_policy| replace:: :cpp:class:`hpx::parallel::v1::execution_policy`
+.. |execution_policy| replace:: :cpp:class:`hpx::parallel::execution_policy`
 .. |exception_list| replace:: :cpp:class:`hpx::exception_list`
-.. |par_for_each| replace:: :cpp:class:`hpx::parallel::v1::for_each`
+.. |par_for_each| replace:: :cpp:class:`hpx::parallel::for_each`
 
 A parallel algorithm is a function template described by this document
-which is declared in the (inline) namespace ``hpx::parallel::v1``.
+which is declared in the (inline) namespace ``hpx::parallel``.
 
 .. note::
 
    For compilers that do not support inline namespaces, all of the ``namespace
    v1`` is imported into the namespace ``hpx::parallel``. The effect is similar
    to what inline namespaces would do, namely all names defined in
-   ``hpx::parallel::v1`` are accessible from the namespace ``hpx::parallel`` as
+   ``hpx::parallel`` are accessible from the namespace ``hpx::parallel`` as
    well.
 
 All parallel algorithms are very similar in semantics to their sequential
@@ -409,7 +409,7 @@ Parallel algorithms
      * Checks if a range of values is lexicographically less than another range of values.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`lexicographical_compare`
-   * * :cpp:func:`hpx::parallel::v1::mismatch`
+   * * :cpp:func:`hpx::parallel::mismatch`
      * Finds the first position where two ranges differ.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`mismatch`
@@ -504,11 +504,11 @@ Parallel algorithms
      * Creates a copy of a range that is reversed.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`reverse_copy`
-   * * :cpp:func:`hpx::parallel::v1::rotate`
+   * * :cpp:func:`hpx::parallel::rotate`
      * Rotates the order of elements in a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`rotate`
-   * * :cpp:func:`hpx::parallel::v1::rotate_copy`
+   * * :cpp:func:`hpx::parallel::rotate_copy`
      * Copies and rotates a range of elements.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`rotate_copy`
@@ -624,7 +624,7 @@ Parallel algorithms
      * Returns ``true`` if each true element for a predicate precedes the false elements in a range.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`is_partitioned`
-   * * :cpp:func:`hpx::parallel::v1::partition`
+   * * :cpp:func:`hpx::parallel::partition`
      * Divides elements into two groups without preserving their relative order.
      * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`partition`
@@ -711,7 +711,7 @@ Parallel algorithms
      * Does an inclusive parallel scan over a range of elements after applying a function.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`transform_inclusive_scan`
-   * * :cpp:func:`hpx::parallel::v1::transform_exclusive_scan`
+   * * :cpp:func:`hpx::parallel::transform_exclusive_scan`
      * Does an exclusive parallel scan over a range of elements after applying a function.
      * ``<hpx/numeric.hpp>``
      * :cppreference-algorithm:`transform_exclusive_scan`

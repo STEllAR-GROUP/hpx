@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resiliency { namespace experimental {
+namespace hpx::resiliency::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseExecutor, typename Vote, typename Validate>
@@ -63,7 +63,7 @@ namespace hpx { namespace resiliency { namespace experimental {
             return !(*this == rhs);
         }
 
-        replicate_executor const& context() const noexcept
+        constexpr replicate_executor const& context() const noexcept
         {
             return *this;
         }
@@ -166,26 +166,25 @@ namespace hpx { namespace resiliency { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseExecutor, typename Voter, typename Validate>
-    replicate_executor<BaseExecutor, typename std::decay<Voter>::type,
-        typename std::decay<Validate>::type>
+    replicate_executor<BaseExecutor, std::decay_t<Voter>,
+        std::decay_t<Validate>>
     make_replicate_executor(
         BaseExecutor& exec, std::size_t n, Voter&& voter, Validate&& validate)
     {
-        return replicate_executor<BaseExecutor,
-            typename std::decay<Voter>::type,
-            typename std::decay<Validate>::type>(exec, n,
-            HPX_FORWARD(Voter, voter), HPX_FORWARD(Validate, validate));
+        return replicate_executor<BaseExecutor, std::decay_t<Voter>,
+            std::decay_t<Validate>>(exec, n, HPX_FORWARD(Voter, voter),
+            HPX_FORWARD(Validate, validate));
     }
 
     template <typename BaseExecutor, typename Validate>
     replicate_executor<BaseExecutor, detail::replicate_voter,
-        typename std::decay<Validate>::type>
+        std::decay_t<Validate>>
     make_replicate_executor(
         BaseExecutor& exec, std::size_t n, Validate&& validate)
     {
         return replicate_executor<BaseExecutor, detail::replicate_voter,
-            typename std::decay<Validate>::type>(exec, n,
-            detail::replicate_voter(), HPX_FORWARD(Validate, validate));
+            std::decay_t<Validate>>(exec, n, detail::replicate_voter(),
+            HPX_FORWARD(Validate, validate));
     }
 
     template <typename BaseExecutor>
@@ -197,9 +196,9 @@ namespace hpx { namespace resiliency { namespace experimental {
             detail::replicate_validator>(
             exec, n, detail::replicate_voter(), detail::replicate_validator());
     }
-}}}    // namespace hpx::resiliency::experimental
+}    // namespace hpx::resiliency::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     template <typename BaseExecutor, typename Voter, typename Validator>
     struct is_two_way_executor<hpx::resiliency::experimental::
@@ -212,4 +211,4 @@ namespace hpx { namespace parallel { namespace execution {
             replicate_executor<BaseExecutor, Voter, Validator>> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

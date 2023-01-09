@@ -11,34 +11,34 @@
 #if defined(HPX_HAVE_DATAPAR)
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_difference.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/datapar/handle_local_exceptions.hpp>
 #include <hpx/parallel/datapar/iterator_helpers.hpp>
 #include <hpx/parallel/datapar/loop.hpp>
 #include <hpx/parallel/datapar/zip_iterator.hpp>
-#include <hpx/parallel/util/result_types.hpp>
 
 #include <cstddef>
-#include <iostream>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy>
     struct datapar_adjacent_difference
     {
         template <typename InIter, typename OutIter, typename Op>
-        static inline OutIter call(
+        static constexpr OutIter call(
             InIter first, InIter last, OutIter dest, Op&& op)
         {
             if (first == last)
+            {
                 return dest;
-            auto count = hpx::parallel::v1::detail::distance(first, last) - 1;
+            }
+
+            auto count = hpx::parallel::detail::distance(first, last) - 1;
 
             InIter prev = first;
             *dest++ = *first++;
@@ -49,26 +49,31 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             }
 
             using hpx::get;
+
             util::loop_n<std::decay_t<ExPolicy>>(
                 hpx::util::zip_iterator(first, prev, dest), count,
                 [op](auto&& it) mutable {
                     get<2>(*it) = HPX_INVOKE(op, get<0>(*it), get<1>(*it));
                 });
+
             std::advance(dest, count);
             return dest;
         }
     };
 
+    // clang-format off
     template <typename ExPolicy, typename InIter, typename OutIter, typename Op,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value&&
-                hpx::parallel::util::detail::iterator_datapar_compatible<
-                    InIter>::value)>
-    inline OutIter tag_invoke(sequential_adjacent_difference_t<ExPolicy>,
+            hpx::is_vectorpack_execution_policy_v<ExPolicy> &&
+            hpx::parallel::util::detail::iterator_datapar_compatible_v<InIter>
+        )>
+    // clang-format on
+    constexpr OutIter tag_invoke(sequential_adjacent_difference_t<ExPolicy>,
         InIter first, InIter last, OutIter dest, Op&& op)
     {
         return datapar_adjacent_difference<ExPolicy>::call(
             first, last, dest, HPX_FORWARD(Op, op));
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail
+
 #endif

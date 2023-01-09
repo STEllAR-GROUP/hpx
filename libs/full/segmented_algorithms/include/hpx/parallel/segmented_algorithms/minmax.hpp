@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
 
     template <typename T>
     using minmax_element_result = hpx::parallel::util::min_max_result<T>;
@@ -426,7 +426,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
@@ -454,11 +454,11 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
 
-        return hpx::parallel::v1::detail::segmented_minormax(
-            hpx::parallel::v1::detail::min_element<
+        return hpx::parallel::detail::segmented_minormax(
+            hpx::parallel::detail::min_element<
                 typename iterator_traits::local_iterator>(),
             hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-            hpx::parallel::util::projection_identity{}, std::true_type{});
+            hpx::identity_v, std::true_type{});
     }
 
     // clang-format off
@@ -487,11 +487,11 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
 
-        return hpx::parallel::v1::detail::segmented_minormax(
-            hpx::parallel::v1::detail::min_element<
+        return hpx::parallel::detail::segmented_minormax(
+            hpx::parallel::detail::min_element<
                 typename iterator_traits::local_iterator>(),
             HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-            hpx::parallel::util::projection_identity{}, is_seq());
+            hpx::identity_v, is_seq());
     }
 
     // clang-format off
@@ -514,11 +514,11 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
 
-        return hpx::parallel::v1::detail::segmented_minormax(
-            hpx::parallel::v1::detail::max_element<
+        return hpx::parallel::detail::segmented_minormax(
+            hpx::parallel::detail::max_element<
                 typename iterator_traits::local_iterator>(),
             hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-            hpx::parallel::util::projection_identity{}, std::true_type{});
+            hpx::identity_v, std::true_type{});
     }
 
     // clang-format off
@@ -547,11 +547,11 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
 
-        return hpx::parallel::v1::detail::segmented_minormax(
-            hpx::parallel::v1::detail::max_element<
+        return hpx::parallel::detail::segmented_minormax(
+            hpx::parallel::detail::max_element<
                 typename iterator_traits::local_iterator>(),
             HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-            hpx::parallel::util::projection_identity{}, is_seq());
+            hpx::identity_v, is_seq());
     }
 
     // clang-format off
@@ -575,11 +575,11 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
 
-        return hpx::parallel::v1::detail::segmented_minmax(
-            hpx::parallel::v1::detail::minmax_element<
+        return hpx::parallel::detail::segmented_minmax(
+            hpx::parallel::detail::minmax_element<
                 typename iterator_traits::local_iterator>(),
             hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-            hpx::parallel::util::projection_identity{}, std::true_type{});
+            hpx::identity_v, std::true_type{});
     }
 
     // clang-format off
@@ -611,10 +611,10 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
 
-        return hpx::parallel::v1::detail::segmented_minmax(
-            hpx::parallel::v1::detail::minmax_element<
+        return hpx::parallel::detail::segmented_minmax(
+            hpx::parallel::detail::minmax_element<
                 typename iterator_traits::local_iterator>(),
             HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
-            hpx::parallel::util::projection_identity{}, is_seq());
+            hpx::identity_v, is_seq());
     }
 }}    // namespace hpx::segmented

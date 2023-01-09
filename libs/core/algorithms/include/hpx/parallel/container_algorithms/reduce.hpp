@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2022 Dimitra Karatza
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -90,7 +90,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent, typename F,
         typename T = typename std::iterator_traits<FwdIter>::value_type>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, T>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
     reduce(ExPolicy&& policy, FwdIter first, Sent last, T init, F&& f);
 
     /// Returns GENERALIZED_SUM(f, init, *first, ..., *(first + (last - first) - 1)).
@@ -164,7 +164,7 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename Rng, typename F,
         typename T = typename std::iterator_traits<
             hpx::traits::range_iterator_t<Rng>>::value_type>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, T>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
     reduce(ExPolicy&& policy, Rng&& rng, T init, F&& f);
 
     /// Returns GENERALIZED_SUM(+, init, *first, ..., *(first + (last - first) - 1)).
@@ -225,7 +225,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent,
         typename T = typename std::iterator_traits<FwdIter>::value_type>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, T>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
     reduce(ExPolicy&& policy, FwdIter first, Sent last, T init);
 
     /// Returns GENERALIZED_SUM(+, init, *first, ..., *(first + (last - first) - 1)).
@@ -282,7 +282,7 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename Rng,
         typename T = typename std::iterator_traits<
             hpx::traits::range_iterator_t<Rng>>::value_type>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, T>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
     reduce(ExPolicy&& policy, Rng&& rng, T init);
 
     /// Returns GENERALIZED_SUM(+, T(), *first, ..., *(first + (last - first) - 1)).
@@ -675,24 +675,21 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
-
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <numeric>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::reduce
@@ -703,7 +700,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent, typename F,
             typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
         // clang-format on
@@ -712,10 +709,10 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
             FwdIter first, Sent last, T init, F&& f)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::reduce<T>().call(
+            return hpx::parallel::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
                 HPX_FORWARD(F, f));
         }
@@ -725,7 +722,7 @@ namespace hpx { namespace ranges {
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
@@ -739,7 +736,7 @@ namespace hpx { namespace ranges {
                         range_traits<Rng>::iterator_type>::value,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::reduce<T>().call(
+            return hpx::parallel::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), HPX_MOVE(init), HPX_FORWARD(F, f));
         }
@@ -748,7 +745,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
         // clang-format on
@@ -757,10 +754,10 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(hpx::ranges::reduce_t, ExPolicy&& policy,
             FwdIter first, Sent last, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::reduce<T>().call(
+            return hpx::parallel::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
                 std::plus<T>{});
         }
@@ -770,7 +767,7 @@ namespace hpx { namespace ranges {
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
@@ -784,7 +781,7 @@ namespace hpx { namespace ranges {
                         range_traits<Rng>::iterator_type>::value,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::reduce<T>().call(
+            return hpx::parallel::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), HPX_MOVE(init), std::plus<T>{});
         }
@@ -792,7 +789,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
         // clang-format on
@@ -801,13 +798,13 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(
             hpx::ranges::reduce_t, ExPolicy&& policy, FwdIter first, Sent last)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             using value_type =
                 typename std::iterator_traits<FwdIter>::value_type;
 
-            return hpx::parallel::v1::detail::reduce<value_type>().call(
+            return hpx::parallel::detail::reduce<value_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, value_type{},
                 std::plus<value_type>{});
         }
@@ -815,7 +812,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Rng,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
@@ -829,11 +826,10 @@ namespace hpx { namespace ranges {
             using value_type =
                 typename std::iterator_traits<iterator_type>::value_type;
 
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::reduce<value_type>().call(
+            return hpx::parallel::detail::reduce<value_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), value_type{}, std::plus<value_type>{});
         }
@@ -849,12 +845,11 @@ namespace hpx { namespace ranges {
         friend T tag_fallback_invoke(
             hpx::ranges::reduce_t, FwdIter first, Sent last, T init, F&& f)
         {
-            static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_input_iterator_v<FwdIter>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::reduce<T>().call(
-                hpx::execution::seq, first, last, HPX_MOVE(init),
-                HPX_FORWARD(F, f));
+            return hpx::parallel::detail::reduce<T>().call(hpx::execution::seq,
+                first, last, HPX_MOVE(init), HPX_FORWARD(F, f));
         }
 
         // clang-format off
@@ -872,9 +867,9 @@ namespace hpx { namespace ranges {
                                   range_traits<Rng>::iterator_type>::value,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::reduce<T>().call(
-                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                HPX_MOVE(init), HPX_FORWARD(F, f));
+            return hpx::parallel::detail::reduce<T>().call(hpx::execution::seq,
+                hpx::util::begin(rng), hpx::util::end(rng), HPX_MOVE(init),
+                HPX_FORWARD(F, f));
         }
 
         // clang-format off
@@ -887,12 +882,11 @@ namespace hpx { namespace ranges {
         friend T tag_fallback_invoke(
             hpx::ranges::reduce_t, FwdIter first, Sent last, T init)
         {
-            static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_input_iterator_v<FwdIter>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::reduce<T>().call(
-                hpx::execution::seq, first, last, HPX_MOVE(init),
-                std::plus<T>{});
+            return hpx::parallel::detail::reduce<T>().call(hpx::execution::seq,
+                first, last, HPX_MOVE(init), std::plus<T>{});
         }
 
         // clang-format off
@@ -909,9 +903,9 @@ namespace hpx { namespace ranges {
                                   range_traits<Rng>::iterator_type>::value,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::reduce<T>().call(
-                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                HPX_MOVE(init), std::plus<T>{});
+            return hpx::parallel::detail::reduce<T>().call(hpx::execution::seq,
+                hpx::util::begin(rng), hpx::util::end(rng), HPX_MOVE(init),
+                std::plus<T>{});
         }
 
         // clang-format off
@@ -923,13 +917,13 @@ namespace hpx { namespace ranges {
         friend typename std::iterator_traits<FwdIter>::value_type
         tag_fallback_invoke(hpx::ranges::reduce_t, FwdIter first, Sent last)
         {
-            static_assert(hpx::traits::is_input_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_input_iterator_v<FwdIter>,
                 "Requires at least input iterator.");
 
             using value_type =
                 typename std::iterator_traits<FwdIter>::value_type;
 
-            return hpx::parallel::v1::detail::reduce<value_type>().call(
+            return hpx::parallel::detail::reduce<value_type>().call(
                 hpx::execution::seq, first, last, value_type{},
                 std::plus<value_type>{});
         }
@@ -949,14 +943,14 @@ namespace hpx { namespace ranges {
             using value_type =
                 typename std::iterator_traits<iterator_type>::value_type;
 
-            static_assert(hpx::traits::is_input_iterator<iterator_type>::value,
+            static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::reduce<value_type>().call(
+            return hpx::parallel::detail::reduce<value_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
                 value_type{}, std::plus<value_type>{});
         }
     } reduce{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif    // DOXYGEN

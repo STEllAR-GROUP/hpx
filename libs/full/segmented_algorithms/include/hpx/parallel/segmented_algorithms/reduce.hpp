@@ -30,7 +30,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
     ///////////////////////////////////////////////////////////////////////////
     // segmented_reduce
     namespace detail {
@@ -189,7 +189,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
@@ -217,10 +217,9 @@ namespace hpx { namespace segmented {
             return init;
         }
 
-        return hpx::parallel::v1::detail::segmented_reduce(
-            hpx::parallel::v1::detail::seg_reduce<T>(), hpx::execution::seq,
-            first, last, HPX_FORWARD(T, init), HPX_FORWARD(F, f),
-            std::true_type{});
+        return hpx::parallel::detail::segmented_reduce(
+            hpx::parallel::detail::seg_reduce<T>(), hpx::execution::seq, first,
+            last, HPX_FORWARD(T, init), HPX_FORWARD(F, f), std::true_type{});
     }
 
     // clang-format off
@@ -252,8 +251,8 @@ namespace hpx { namespace segmented {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-        return hpx::parallel::v1::detail::segmented_reduce(
-            hpx::parallel::v1::detail::seg_reduce<T>(),
+        return hpx::parallel::detail::segmented_reduce(
+            hpx::parallel::detail::seg_reduce<T>(),
             HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(T, init),
             HPX_FORWARD(F, f), is_seq());
     }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //  Copyright (c)      2018 Taeguk Kwon
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -17,6 +17,7 @@
 #include <iterator>
 #include <numeric>
 #include <random>
+#include <utility>
 #include <vector>
 
 namespace test {
@@ -34,7 +35,7 @@ namespace test {
     public:
         test_iterator() = default;
 
-        explicit test_iterator(BaseIterator base)
+        explicit constexpr test_iterator(BaseIterator base)
           : base_type(base)
         {
         }
@@ -55,7 +56,7 @@ namespace test {
     public:
         HPX_HOST_DEVICE decorated_iterator() = default;
 
-        HPX_HOST_DEVICE decorated_iterator(BaseIterator base)
+        HPX_HOST_DEVICE explicit decorated_iterator(BaseIterator base)
           : base_type(base)
         {
         }
@@ -63,7 +64,7 @@ namespace test {
         HPX_HOST_DEVICE decorated_iterator(
             BaseIterator base, std::function<void()> f)
           : base_type(base)
-          , m_callback(f)
+          , m_callback(std::move(f))
         {
         }
 

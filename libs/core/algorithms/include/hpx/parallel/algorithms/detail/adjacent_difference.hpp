@@ -8,19 +8,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 
-#include <functional>
-#include <iostream>
-#include <numeric>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     template <typename ExPolicy>
     struct sequential_adjacent_difference_t
@@ -66,4 +61,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 #endif
 
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

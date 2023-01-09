@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //  Copyright (c) 2016 John Biddiscombe
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/sort_by_key.hpp
+
+#pragma once
 
 #if defined(DOXYGEN)
 
@@ -20,7 +22,7 @@ namespace hpx { namespace experimental {
     /// The function uses the given comparison function object comp (defaults
     /// to using operator<()). Executed according to the policy.
     ///
-    /// \note   Complexity: O(Nlog(N)), where N = std::distance(first, last)
+    /// \note   Complexity: O(N log(N)), where N = std::distance(first, last)
     ///                     comparisons.
     ///
     /// A sequence is sorted with respect to a comparator \a comp
@@ -93,20 +95,16 @@ namespace hpx { namespace experimental {
 
 #else
 
-#pragma once
-
 #include <hpx/config.hpp>
 #include <hpx/datastructures/tuple.hpp>
-
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 
-#include <algorithm>
 #include <iterator>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
 
     template <typename KeyIter, typename ValueIter>
     using sort_by_key_result = std::pair<KeyIter, ValueIter>;
@@ -114,6 +112,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
     ///////////////////////////////////////////////////////////////////////////
     // sort
     namespace detail {
+
         /// \cond NOINTERNAL
         struct extract_key
         {
@@ -126,15 +125,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
-namespace hpx { namespace experimental {
+namespace hpx::experimental {
 
     template <typename KeyIter, typename ValueIter>
     using sort_by_key_result = std::pair<KeyIter, ValueIter>;
 
     template <typename ExPolicy, typename KeyIter, typename ValueIter,
-        typename Compare = hpx::parallel::v1::detail::less>
+        typename Compare = hpx::parallel::detail::less>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         sort_by_key_result<KeyIter, ValueIter>>
     sort_by_key(ExPolicy&& policy, KeyIter key_first, KeyIter key_last,
@@ -145,9 +144,9 @@ namespace hpx { namespace experimental {
             "sort_by_key is not supported unless HPX_HAVE_TUPLE_RVALUE_SWAP "
             "is defined");
 #else
-        static_assert((hpx::traits::is_random_access_iterator_v<KeyIter>),
+        static_assert(hpx::traits::is_random_access_iterator_v<KeyIter>,
             "Requires a random access iterator.");
-        static_assert((hpx::traits::is_random_access_iterator_v<ValueIter>),
+        static_assert(hpx::traits::is_random_access_iterator_v<ValueIter>,
             "Requires a random access iterator.");
 
         ValueIter value_last = value_first;
@@ -155,18 +154,18 @@ namespace hpx { namespace experimental {
 
         using iterator_type = hpx::util::zip_iterator<KeyIter, ValueIter>;
 
-        return hpx::parallel::v1::detail::get_iter_pair<iterator_type>(
-            hpx::parallel::v1::detail::sort<iterator_type>().call(
+        return hpx::parallel::detail::get_iter_pair<iterator_type>(
+            hpx::parallel::detail::sort<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy),
                 hpx::util::zip_iterator(key_first, value_first),
                 hpx::util::zip_iterator(key_last, value_last),
                 HPX_FORWARD(Compare, comp),
-                hpx::parallel::v1::detail::extract_key()));
+                hpx::parallel::detail::extract_key()));
 #endif
     }
-}}    // namespace hpx::experimental
+}    // namespace hpx::experimental
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
 
     template <typename ExPolicy, typename KeyIter, typename ValueIter,
         typename Compare = detail::less>
@@ -179,7 +178,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
         return hpx::experimental::sort_by_key(
             policy, key_first, key_last, value_first, comp);
     }
-
-}}}    // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 #endif

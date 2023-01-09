@@ -52,6 +52,7 @@ namespace hpx {
                     std::is_convertible_v<decltype(HPX_INVOKE(std::declval<F>(),
                                               std::declval<Ts>()...)),
                         R>>
+        // clang-format on
         {
         };
         // clang-format on

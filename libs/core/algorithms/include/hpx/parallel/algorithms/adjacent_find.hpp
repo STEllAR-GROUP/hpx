@@ -1,6 +1,6 @@
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -45,8 +45,7 @@ namespace hpx {
     /// \returns  The \a adjacent_find algorithm returns an iterator to the
     ///           first of the identical elements. If no such elements are
     ///           found, \a last is returned.
-    template <typename InIter,
-        typename Pred = hpx::parallel::v1::detail::equal_to>
+    template <typename InIter, typename Pred = hpx::parallel::detail::equal_to>
     InIter adjacent_find(InIter first, InIter last, Pred&& pred = Pred());
 
     /// Searches the range [first, last) for two consecutive identical elements.
@@ -113,11 +112,12 @@ namespace hpx {
     ///           predicate \a pred.
     ///
     template <typename ExPolicy, typename FwdIter,
-        typename Pred = hpx::parallel::v1::detail::equal_to>
-    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+        typename Pred = hpx::parallel::detail::equal_to>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
     adjacent_find(
         ExPolicy&& policy, FwdIter first, FwdIter last, Pred&& pred = Pred());
 }    // namespace hpx
+
 #else
 
 #include <hpx/config.hpp>
@@ -134,29 +134,28 @@ namespace hpx {
 #include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/invoke_projected.hpp>
-#include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // adjacent_find
     namespace detail {
+
         /// \cond NOINTERNAL
         template <typename Iter, typename Sent>
-        struct adjacent_find
-          : public detail::algorithm<adjacent_find<Iter, Sent>, Iter>
+        struct adjacent_find : public algorithm<adjacent_find<Iter, Sent>, Iter>
         {
             constexpr adjacent_find() noexcept
-              : adjacent_find::algorithm("adjacent_find")
+              : algorithm<adjacent_find, Iter>("adjacent_find")
             {
             }
 
@@ -172,10 +171,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIter, typename Sent_,
                 typename Pred, typename Proj>
-            static
-                typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-                parallel(ExPolicy&& orgpolicy, FwdIter first, Sent_ last,
-                    Pred&& pred, Proj&& proj)
+            static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
+                ExPolicy&& orgpolicy, FwdIter first, Sent_ last, Pred&& pred,
+                Proj&& proj)
             {
                 using zip_iterator = hpx::util::zip_iterator<FwdIter, FwdIter>;
                 using difference_type =
@@ -235,37 +233,38 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
+
     inline constexpr struct adjacent_find_t final
       : hpx::detail::tag_parallel_algorithm<adjacent_find_t>
     {
     private:
         // clang-format off
         template <typename InIter,
-            typename Pred = hpx::parallel::v1::detail::equal_to,
+            typename Pred = hpx::parallel::detail::equal_to,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_input_iterator<InIter>::value
+                hpx::traits::is_input_iterator_v<InIter>
             )>
         // clang-format on
         friend InIter tag_fallback_invoke(hpx::adjacent_find_t, InIter first,
             InIter last, Pred&& pred = Pred())
         {
-            static_assert((hpx::traits::is_input_iterator<InIter>::value),
+            static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
-            return parallel::v1::detail::adjacent_find<InIter, InIter>().call(
+            return parallel::detail::adjacent_find<InIter, InIter>().call(
                 hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
-                hpx::parallel::util::projection_identity{});
+                hpx::identity_v);
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
-            typename Pred = hpx::parallel::v1::detail::equal_to,
+            typename Pred = hpx::parallel::detail::equal_to,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_forward_iterator<FwdIter>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_forward_iterator_v<FwdIter>
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -273,13 +272,12 @@ namespace hpx {
         tag_fallback_invoke(hpx::adjacent_find_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, Pred&& pred = Pred())
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least a forward iterator");
 
-            return parallel::v1::detail::adjacent_find<FwdIter, FwdIter>().call(
+            return parallel::detail::adjacent_find<FwdIter, FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Pred, pred),
-                hpx::parallel::util::projection_identity{});
+                HPX_FORWARD(Pred, pred), hpx::identity_v);
         }
     } adjacent_find{};
 }    // namespace hpx

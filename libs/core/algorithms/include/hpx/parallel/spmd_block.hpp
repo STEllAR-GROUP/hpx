@@ -9,8 +9,6 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/first_argument.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/adapt_sharing_mode.hpp>
@@ -24,12 +22,11 @@
 #include <memory>
 #include <mutex>
 #include <set>
-#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace lcos { namespace local {
+namespace hpx::lcos::local {
 
     /// The class spmd_block defines an interface for launching multiple images
     /// while giving handles to each image to interact with the remaining
@@ -58,8 +55,8 @@ namespace hpx { namespace lcos { namespace local {
         {
         }
 
-        // Note: spmd_block class is movable/move-assignable
-        // but not copyable/copy-assignable
+        // Note: spmd_block class is movable/move-assignable but not
+        // copyable/copy-assignable
 
         spmd_block(spmd_block&&) = default;
         spmd_block(spmd_block const&) = delete;
@@ -67,12 +64,14 @@ namespace hpx { namespace lcos { namespace local {
         spmd_block& operator=(spmd_block&&) = default;
         spmd_block& operator=(spmd_block const&) = delete;
 
-        std::size_t get_num_images() const
+        ~spmd_block() = default;
+
+        [[nodiscard]] std::size_t get_num_images() const
         {
             return num_images_;
         }
 
-        std::size_t this_image() const
+        [[nodiscard]] std::size_t this_image() const
         {
             return image_id_;
         }
@@ -87,7 +86,7 @@ namespace hpx { namespace lcos { namespace local {
             using lock_type = std::lock_guard<mutex_type>;
 
             table_type& brs = barriers_.get();
-            typename table_type::iterator it;
+            table_type::iterator it;
 
             // Critical section
             {
@@ -111,26 +110,25 @@ namespace hpx { namespace lcos { namespace local {
 
         void sync_images(std::vector<std::size_t> const& input_images) const
         {
-            std::set<std::size_t> images(
+            std::set<std::size_t> const images(
                 input_images.begin(), input_images.end());
             sync_images(images);
         }
 
         template <typename Iterator>
-        typename std::enable_if<
-            traits::is_input_iterator<Iterator>::value>::type
-        sync_images(Iterator begin, Iterator end) const
+        std::enable_if_t<traits::is_input_iterator_v<Iterator>> sync_images(
+            Iterator begin, Iterator end) const
         {
-            std::set<std::size_t> images(begin, end);
+            std::set<std::size_t> const images(begin, end);
             sync_images(images);
         }
 
         template <typename... I>
-        typename std::enable_if<
-            util::all_of<typename std::is_integral<I>::type...>::value>::type
-        sync_images(I... i) const
+        std::enable_if_t<util::all_of_v<std::is_integral<I>...>> sync_images(
+            I... i) const
         {
-            std::set<std::size_t> images = {(std::size_t) i...};
+            std::set<std::size_t> const images = {
+                static_cast<std::size_t>(i)...};
             sync_images(images);
         }
 
@@ -157,7 +155,7 @@ namespace hpx { namespace lcos { namespace local {
             std::shared_ptr<barrier_type> barrier_;
             std::shared_ptr<table_type> barriers_;
             std::shared_ptr<mutex_type> mtx_;
-            typename std::decay<F>::type f_;
+            std::decay_t<F> f_;
             std::size_t num_images_;
 
             template <typename... Ts>
@@ -179,15 +177,15 @@ namespace hpx { namespace lcos { namespace local {
         static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
             "hpx::is_async_execution_policy<ExPolicy>");
 
-        using ftype = typename std::decay<F>::type;
-        using first_type = typename hpx::util::first_argument<ftype>::type;
+        using ftype = std::decay_t<F>;
+        using first_type = hpx::util::first_argument_t<ftype>;
 
         using barrier_type = hpx::barrier<>;
         using table_type =
             std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
         using mutex_type = hpx::mutex;
 
-        static_assert(std::is_same<spmd_block, first_type>::value,
+        static_assert(std::is_same_v<spmd_block, first_type>,
             "define_spmd_block() needs a function or lambda that "
             "has at least a local spmd_block as 1st argument");
 
@@ -211,23 +209,23 @@ namespace hpx { namespace lcos { namespace local {
 
     // Synchronous version
     template <typename ExPolicy, typename F, typename... Args,
-        typename = typename std::enable_if<
-            !hpx::is_async_execution_policy<ExPolicy>::value>::type>
+        typename =
+            std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy>>>
     void define_spmd_block(
         ExPolicy&& policy, std::size_t num_images, F&& f, Args&&... args)
     {
-        static_assert(hpx::is_execution_policy<ExPolicy>::value,
-            "hpx::is_execution_policy<ExPolicy>::value");
+        static_assert(hpx::is_execution_policy_v<ExPolicy>,
+            "hpx::is_execution_policy_v<ExPolicy>");
 
-        using ftype = typename std::decay<F>::type;
-        using first_type = typename hpx::util::first_argument<ftype>::type;
+        using ftype = std::decay_t<F>;
+        using first_type = hpx::util::first_argument_t<ftype>;
 
         using barrier_type = hpx::barrier<>;
         using table_type =
             std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
         using mutex_type = hpx::mutex;
 
-        static_assert(std::is_same<spmd_block, first_type>::value,
+        static_assert(std::is_same_v<spmd_block, first_type>,
             "define_spmd_block() needs a lambda that "
             "has at least a spmd_block as 1st argument");
 
@@ -254,9 +252,9 @@ namespace hpx { namespace lcos { namespace local {
         define_spmd_block(hpx::execution::par, num_images, HPX_FORWARD(F, f),
             HPX_FORWARD(Args, args)...);
     }
-}}}    // namespace hpx::lcos::local
+}    // namespace hpx::lcos::local
 
-namespace hpx { namespace parallel { inline namespace v2 {
+namespace hpx::parallel {
 
     /// The class spmd_block defines an interface for launching multiple images
     /// while giving handles to each image to interact with the remaining
@@ -281,8 +279,8 @@ namespace hpx { namespace parallel { inline namespace v2 {
 
     // Synchronous version
     template <typename ExPolicy, typename F, typename... Args,
-        typename = typename std::enable_if<
-            !hpx::is_async_execution_policy<ExPolicy>::value>::type>
+        typename =
+            std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy>>>
     void define_spmd_block(
         ExPolicy&& policy, std::size_t num_images, F&& f, Args&&... args)
     {
@@ -296,4 +294,4 @@ namespace hpx { namespace parallel { inline namespace v2 {
         hpx::lcos::local::define_spmd_block(hpx::execution::par, num_images,
             HPX_FORWARD(F, f), HPX_FORWARD(Args, args)...);
     }
-}}}    // namespace hpx::parallel::v2
+}    // namespace hpx::parallel

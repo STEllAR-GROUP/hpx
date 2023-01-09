@@ -45,10 +45,10 @@ namespace hpx { namespace ranges {
     ///                     to std::less<>
     /// \tparam Proj1       The type of an optional projection function to be
     ///                     used for elements of the first range. This defaults
-    ///                     to \a util::projection_identity
+    ///                     to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function to be
     ///                     used for elements of the second range. This defaults
-    ///                     to \a util::projection_identity
+    ///                     to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -102,8 +102,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng1, typename Rng2,
         typename Iter3, typename Comp = hpx::ranges::less,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity>
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         hpx::ranges::merge_result<
             typename hpx::traits::range_iterator<Rng1>::type,
@@ -152,10 +152,10 @@ namespace hpx { namespace ranges {
     ///                     to std::less<>
     /// \tparam Proj1       The type of an optional projection function to be
     ///                     used for elements of the first range. This defaults
-    ///                     to \a util::projection_identity
+    ///                     to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function to be
     ///                     used for elements of the second range. This defaults
-    ///                     to \a util::projection_identity
+    ///                     to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -214,8 +214,8 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename Iter1, typename Sent1,
         typename Iter2, typename Sent2, typename Iter3,
         typename Comp = hpx::ranges::less,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity>
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         hpx::ranges::merge_result<Iter1, Iter2, Iter3>>::type
     merge(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
@@ -250,10 +250,10 @@ namespace hpx { namespace ranges {
     ///                     to std::less<>
     /// \tparam Proj1       The type of an optional projection function to be
     ///                     used for elements of the first range. This defaults
-    ///                     to \a util::projection_identity
+    ///                     to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function to be
     ///                     used for elements of the second range. This defaults
-    ///                     to \a util::projection_identity
+    ///                     to \a hpx::identity
     ///
     /// \param rng1         Refers to the first range of elements the algorithm
     ///                     will be applied to.
@@ -291,8 +291,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename Rng1, typename Rng2,
         typename Iter3, typename Comp = hpx::ranges::less,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity>
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity>
     hpx::ranges::merge_result<
         typename hpx::traits::range_iterator<Rng1>::type,
         typename hpx::traits::range_iterator<Rng2>::type, Iter3>
@@ -336,10 +336,10 @@ namespace hpx { namespace ranges {
     ///                     to std::less<>
     /// \tparam Proj1       The type of an optional projection function to be
     ///                     used for elements of the first range. This defaults
-    ///                     to \a util::projection_identity
+    ///                     to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function to be
     ///                     used for elements of the second range. This defaults
-    ///                     to \a util::projection_identity
+    ///                     to \a hpx::identity
     ///
     /// \param first1       Refers to the beginning of the sequence of elements
     ///                     of the first range the algorithm will be applied to.
@@ -382,8 +382,8 @@ namespace hpx { namespace ranges {
     template <typename Iter1, typename Sent1,
         typename Iter2, typename Sent2, typename Iter3,
         typename Comp = hpx::ranges::less,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity>
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity>
     hpx::ranges::merge_result<Iter1, Iter2, Iter3>
     merge(Iter1 first1, Sent1 last1, Iter2 first2,
         Sent2 last2, Iter3 dest, Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
@@ -414,7 +414,7 @@ namespace hpx { namespace ranges {
     ///                     to meet the requirements of \a CopyConstructible.
     ///                     This defaults to std::less<>
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -460,8 +460,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng, typename Iter,
         typename Comp = hpx::ranges::less,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
     inplace_merge(ExPolicy&& policy, Rng&& rng, Iter middle,
         Comp&& comp = Comp(), Proj&& proj = Proj());
 
@@ -490,7 +490,7 @@ namespace hpx { namespace ranges {
     ///                     to meet the requirements of \a CopyConstructible.
     ///                     This defaults to std::less<>
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -538,8 +538,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Iter, typename Sent,
         typename Comp = hpx::ranges::less,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
     inplace_merge(ExPolicy&& policy, Iter first, Iter middle, Sent last,
         Comp&& comp = Comp(), Proj&& proj = Proj());
 
@@ -564,7 +564,7 @@ namespace hpx { namespace ranges {
     ///                     to meet the requirements of \a CopyConstructible.
     ///                     This defaults to std::less<>
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param rng          Refers to the range of elements the algorithm
     ///                     will be applied to.
@@ -595,7 +595,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename Rng, typename Iter,
         typename Comp = hpx::ranges::less,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     Iter inplace_merge(Rng&& rng, Iter middle, Comp&& comp = Comp(),
         Proj&& proj = Proj());
 
@@ -620,7 +620,7 @@ namespace hpx { namespace ranges {
     ///                     to meet the requirements of \a CopyConstructible.
     ///                     This defaults to std::less<>
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first        Refers to the beginning of the first sorted range
     ///                     the algorithm will be applied to.
@@ -653,7 +653,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename Iter, typename Sent,
         typename Comp = hpx::ranges::less,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     Iter inplace_merge(Iter first, Iter middle, Sent last, Comp&& comp = Comp(),
         Proj&& proj = Proj());
 
@@ -667,7 +667,6 @@ namespace hpx { namespace ranges {
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
-
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -679,7 +678,7 @@ namespace hpx { namespace ranges {
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
 
     template <typename I1, typename I2, typename O>
     using merge_result = parallel::util::in_in_out_result<I1, I2, O>;
@@ -693,15 +692,15 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2,
             typename Iter3, typename Comp = hpx::ranges::less,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
+            typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng1>::value &&
                 hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
                 hpx::traits::is_range<Rng2>::value &&
                 hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
-                hpx::traits::is_iterator<Iter3>::value &&
+                hpx::traits::is_iterator_v<Iter3> &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
@@ -722,18 +721,18 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng2>::type;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type1>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type1>,
                 "Required at least random access iterator.");
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type2>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type2>,
                 "Requires at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator<Iter3>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter3>,
                 "Requires at least random access iterator.");
 
             using result_type = hpx::ranges::merge_result<iterator_type1,
                 iterator_type2, Iter3>;
 
-            return hpx::parallel::v1::detail::merge<result_type>().call(
+            return hpx::parallel::detail::merge<result_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
                 hpx::util::end(rng2), dest, HPX_FORWARD(Comp, comp),
@@ -744,15 +743,15 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename Iter1, typename Sent1,
             typename Iter2, typename Sent2, typename Iter3,
             typename Comp = hpx::ranges::less,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
+            typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
                 hpx::parallel::traits::is_projected<Proj1, Iter1>::value &&
                 hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
                 hpx::parallel::traits::is_projected<Proj2, Iter2>::value &&
-                hpx::traits::is_iterator<Iter3>::value &&
+                hpx::traits::is_iterator_v<Iter3> &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
                     hpx::parallel::traits::projected<Proj1, Iter1>,
                     hpx::parallel::traits::projected<Proj2, Iter2>
@@ -766,16 +765,16 @@ namespace hpx { namespace ranges {
             Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
             Proj2&& proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_random_access_iterator<Iter1>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter1>,
                 "Required at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator<Iter2>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter2>,
                 "Requires at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator<Iter3>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter3>,
                 "Requires at least random access iterator.");
 
             using result_type = hpx::ranges::merge_result<Iter1, Iter2, Iter3>;
 
-            return hpx::parallel::v1::detail::merge<result_type>().call(
+            return hpx::parallel::detail::merge<result_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
                 dest, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
                 HPX_FORWARD(Proj2, proj2));
@@ -784,14 +783,14 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename Rng1, typename Rng2,
             typename Iter3, typename Comp = hpx::ranges::less,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
+            typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng1>::value &&
                 hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
                 hpx::traits::is_range<Rng2>::value &&
                 hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
-                hpx::traits::is_iterator<Iter3>::value &&
+                hpx::traits::is_iterator_v<Iter3> &&
                 hpx::parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Comp,
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
@@ -812,18 +811,18 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng2>::type;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type1>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type1>,
                 "Required at least random access iterator.");
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type2>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type2>,
                 "Requires at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator<Iter3>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter3>,
                 "Requires at least random access iterator.");
 
             using result_type = hpx::ranges::merge_result<iterator_type1,
                 iterator_type2, Iter3>;
 
-            return hpx::parallel::v1::detail::merge<result_type>().call(
+            return hpx::parallel::detail::merge<result_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
                 hpx::util::end(rng2), dest, HPX_FORWARD(Comp, comp),
@@ -834,14 +833,14 @@ namespace hpx { namespace ranges {
         template <typename Iter1, typename Sent1,
             typename Iter2, typename Sent2, typename Iter3,
             typename Comp = hpx::ranges::less,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
+            typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
                 hpx::parallel::traits::is_projected<Proj1, Iter1>::value &&
                 hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
                 hpx::parallel::traits::is_projected<Proj2, Iter2>::value &&
-                hpx::traits::is_iterator<Iter3>::value &&
+                hpx::traits::is_iterator_v<Iter3> &&
                 hpx::parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Comp,
                     hpx::parallel::traits::projected<Proj1, Iter1>,
@@ -854,16 +853,16 @@ namespace hpx { namespace ranges {
             Sent2 last2, Iter3 dest, Comp&& comp = Comp(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_random_access_iterator<Iter1>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter1>,
                 "Required at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator<Iter2>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter2>,
                 "Requires at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator<Iter3>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter3>,
                 "Requires at least random access iterator.");
 
             using result_type = hpx::ranges::merge_result<Iter1, Iter2, Iter3>;
 
-            return hpx::parallel::v1::detail::merge<result_type>().call(
+            return hpx::parallel::detail::merge<result_type>().call(
                 hpx::execution::seq, first1, last1, first2, last2, dest,
                 HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
                 HPX_FORWARD(Proj2, proj2));
@@ -879,12 +878,12 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Rng, typename Iter,
             typename Comp = hpx::ranges::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-                hpx::traits::is_iterator<Iter>::value &&
+                hpx::traits::is_iterator_v<Iter> &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
@@ -901,12 +900,12 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng>::type;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Required at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
                 "Required at least random access iterator.");
 
-            return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
+            return hpx::parallel::detail::inplace_merge<Iter>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng), middle,
                 hpx::util::end(rng), HPX_FORWARD(Comp, comp),
                 HPX_FORWARD(Proj, proj));
@@ -915,9 +914,9 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Comp = hpx::ranges::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
@@ -931,10 +930,10 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(inplace_merge_t, ExPolicy&& policy, Iter first,
             Iter middle, Sent last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
                 "Required at least random access iterator.");
 
-            return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
+            return hpx::parallel::detail::inplace_merge<Iter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, middle, last,
                 HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
@@ -942,11 +941,11 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename Rng, typename Iter,
             typename Comp = hpx::ranges::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-                hpx::traits::is_iterator<Iter>::value &&
+                hpx::traits::is_iterator_v<Iter> &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Comp,
@@ -962,12 +961,12 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng>::type;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Required at least random access iterator.");
-            static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
                 "Required at least random access iterator.");
 
-            return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
+            return hpx::parallel::detail::inplace_merge<Iter>().call(
                 hpx::execution::seq, hpx::util::begin(rng), middle,
                 hpx::util::end(rng), HPX_FORWARD(Comp, comp),
                 HPX_FORWARD(Proj, proj));
@@ -976,7 +975,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename Iter, typename Sent,
             typename Comp = hpx::ranges::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
@@ -990,14 +989,15 @@ namespace hpx { namespace ranges {
         friend Iter tag_fallback_invoke(inplace_merge_t, Iter first,
             Iter middle, Sent last, Comp&& comp = Comp(), Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
                 "Required at least random access iterator.");
 
-            return hpx::parallel::v1::detail::inplace_merge<Iter>().call(
+            return hpx::parallel::detail::inplace_merge<Iter>().call(
                 hpx::execution::seq, first, middle, last,
                 HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
     } inplace_merge{};
 
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
+
 #endif    //DOXYGEN

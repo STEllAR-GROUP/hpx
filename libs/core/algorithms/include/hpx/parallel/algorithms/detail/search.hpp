@@ -10,7 +10,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/functional/detail/invoke.hpp>
@@ -28,24 +27,23 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
     // search
     template <typename FwdIter, typename Sent>
-    struct search : public detail::algorithm<search<FwdIter, Sent>, FwdIter>
+    struct search final : public algorithm<search<FwdIter, Sent>, FwdIter>
     {
         constexpr search() noexcept
-          : search::algorithm("search")
+          : algorithm<search, FwdIter>("search")
         {
         }
 
         template <typename ExPolicy, typename FwdIter2, typename Sent2,
             typename Pred, typename Proj1, typename Proj2>
-        static FwdIter sequential(ExPolicy, FwdIter first, Sent last,
+        static constexpr FwdIter sequential(ExPolicy, FwdIter first, Sent last,
             FwdIter2 s_first, Sent2 s_last, Pred&& op, Proj1&& proj1,
             Proj2&& proj2)
         {
@@ -67,8 +65,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         template <typename ExPolicy, typename FwdIter2, typename Sent2,
             typename Pred, typename Proj1, typename Proj2>
-        static typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
+        static hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            FwdIter>
         parallel(ExPolicy&& orgpolicy, FwdIter first, Sent last,
             FwdIter2 s_first, Sent2 s_last, Pred&& op, Proj1&& proj1,
             Proj2&& proj2)
@@ -88,16 +86,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             // Use of hpx::distance instead of std::distance to support
             // sentinels
             s_difference_type diff =
-                hpx::parallel::v1::detail::distance(s_first, s_last);
+                hpx::parallel::detail::distance(s_first, s_last);
             if (diff <= 0)
                 return result::get(HPX_MOVE(first));
 
             difference_type count =
-                hpx::parallel::v1::detail::distance(first, last);
+                hpx::parallel::detail::distance(first, last);
             if (diff > count)
             {
-                std::advance(first,
-                    hpx::parallel::v1::detail::distance(first, last) - 1);
+                std::advance(
+                    first, hpx::parallel::detail::distance(first, last) - 1);
                 return result::get(HPX_MOVE(first));
             }
 
@@ -162,7 +160,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 else
                 {
                     std::advance(first,
-                        hpx::parallel::v1::detail::distance(first, last) - 1);
+                        hpx::parallel::detail::distance(first, last) - 1);
                 }
 
                 return HPX_MOVE(first);
@@ -177,10 +175,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     // search_n
     template <typename FwdIter, typename Sent>
-    struct search_n : public detail::algorithm<search_n<FwdIter, Sent>, FwdIter>
+    struct search_n final : public algorithm<search_n<FwdIter, Sent>, FwdIter>
     {
         constexpr search_n() noexcept
-          : search_n::algorithm("search_n")
+          : algorithm<search_n, FwdIter>("search_n")
         {
         }
 
@@ -197,8 +195,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         template <typename ExPolicy, typename FwdIter2, typename Pred,
             typename Proj1, typename Proj2>
-        static typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
-        parallel(ExPolicy&& orgpolicy, FwdIter first, std::size_t count,
+        static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
+            ExPolicy&& orgpolicy, FwdIter first, std::size_t count,
             FwdIter2 s_first, FwdIter2 s_last, Pred&& op, Proj1&& proj1,
             Proj2&& proj2)
         {
@@ -280,4 +278,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
     };
     /// \endcond
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

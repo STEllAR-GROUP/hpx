@@ -21,7 +21,7 @@ namespace hpx {
     /// [d_first, d_first + n) where n is the number of elements to sort
     /// (n = min(last - first, d_last - d_first)).
     ///
-    /// \note   Complexity: O(Nlog(min(D,N))), where N =
+    /// \note   Complexity: O(N log(min(D,N))), where N =
     ///         std::distance(first, last) and D = std::distance(d_first,
     ///         d_last) comparisons.
     ///
@@ -66,7 +66,7 @@ namespace hpx {
     ///           d_first + min(last - first, d_last - d_first)
     ///
     template <typename InIter, typename RandIter,
-        typename Comp = hpx::parallel::v1::detail::less>
+        typename Comp = hpx::parallel::detail::less>
     RandIter partial_sort_copy(InIter first, InIter last, RandIter d_first,
         RandIter d_last, Comp&& comp = Comp());
 
@@ -78,7 +78,7 @@ namespace hpx {
     /// (n = min(last - first, d_last - d_first)). Executed according to
     /// the policy.
     ///
-    /// \note   Complexity: O(Nlog(min(D,N))), where N =
+    /// \note   Complexity: O(N log(min(D,N))), where N =
     ///         std::distance(first, last) and D = std::distance(d_first,
     ///         d_last) comparisons.
     ///
@@ -134,7 +134,7 @@ namespace hpx {
     ///           d_first + min(last - first, d_last - d_first)
     ///
     template <typename ExPolicy, typename FwdIter, typename RandIter,
-        typename Comp = hpx::parallel::v1::detail::less>
+        typename Comp = hpx::parallel::detail::less>
     parallel::util::detail::algorithm_result_t<ExPolicy, RandIter>
     partial_sort_copy(
         ExPolicy&& policy, FwdIter first, FwdIter last, RandIter d_first,
@@ -148,38 +148,34 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-
-#include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/algorithms/partial_sort.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstdint>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
+
     ///////////////////////////////////////////////////////////////////////
     // partial_sort_copy
     template <typename Iter>
-    struct partial_sort_copy
-      : public detail::algorithm<partial_sort_copy<Iter>, Iter>
+    struct partial_sort_copy : public algorithm<partial_sort_copy<Iter>, Iter>
     {
-        partial_sort_copy()
-          : partial_sort_copy::algorithm("partial_sort_copy")
+        constexpr partial_sort_copy() noexcept
+          : algorithm<partial_sort_copy, Iter>("partial_sort_copy")
         {
         }
 
@@ -199,14 +195,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         /// \param d_last : iterator to the element after the end where coy the
         ///                 results
         /// \param comp : object for to compare elements
+        /// \param proj1 : project to use for first range
+        /// \param proj2 : project to use for second range
         ///
         /// \return iterator after the last element sorted
         ///
         template <typename ExPolicy, typename InIter, typename Sent1,
             typename RandIter, typename Sent2, typename Compare, typename Proj1,
             typename Proj2>
-        static util::in_out_result<InIter, RandIter> sequential(ExPolicy,
-            InIter first, Sent1 last, RandIter d_first, Sent2 d_last,
+        static constexpr util::in_out_result<InIter, RandIter> sequential(
+            ExPolicy, InIter first, Sent1 last, RandIter d_first, Sent2 d_last,
             Compare&& comp, Proj1&& proj1, Proj2&& proj2)
         {
             auto last_iter = detail::advance_to_sentinel(first, last);
@@ -220,13 +218,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             static_assert(
                 std::is_same_v<value1_t, value_t>, "Incompatible iterators\n");
 
-            if ((last_iter == first) || (d_last_iter == d_first))
+            if (last_iter == first || d_last_iter == d_first)
+            {
                 return util::in_out_result<InIter, RandIter>{
                     last_iter, d_first};
+            }
 
             std::vector<value_t> aux(first, last_iter);
-            std::int64_t noutput = d_last_iter - d_first;
-            std::int64_t ninput = aux.size();
+            std::int64_t const noutput = d_last_iter - d_first;
+            std::int64_t const ninput = aux.size();
 
             HPX_ASSERT(ninput >= 0 || noutput >= 0);
 
@@ -238,14 +238,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             {
                 detail::sort<vec_iter_t>().call(hpx::execution::seq,
                     aux.begin(), aux.end(), HPX_MOVE(proj_comp),
-                    util::projection_identity{});
+                    hpx::identity_v);
             }
             else
             {
-                parallel::v1::partial_sort<vec_iter_t>().call(
-                    hpx::execution::seq, aux.begin(), aux.begin() + nmin,
-                    aux.end(), HPX_MOVE(proj_comp),
-                    util::projection_identity{});
+                parallel::partial_sort<vec_iter_t>().call(hpx::execution::seq,
+                    aux.begin(), aux.begin() + nmin, aux.end(),
+                    HPX_MOVE(proj_comp), hpx::identity_v);
             }
 
             detail::copy<util::in_out_result<vec_iter_t, RandIter>>().call(
@@ -264,12 +263,15 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         ///          to sort (n = min(last - first, d_last - d_first)). The order
         ///          of equal elements is not guaranteed to be preserved.
         ///
+        /// \param policy : execution policy
         /// \param first : iterator to the first element
         /// \param last: iterator after the last element to be sorted
-        /// \param d_first : iterator to the firstelement where copy the results
+        /// \param d_first : iterator to the first element where copy the results
         /// \param d_last : iterator to the element after the end where coy the
         ///                 results
         /// \param comp : object for to compare elements
+        /// \param proj1 : project to use for first range
+        /// \param proj2 : project to use for second range
         ///
         /// \return iterator after the last element sorted
         ///
@@ -296,14 +298,16 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 auto last_iter = detail::advance_to_sentinel(first, last);
                 auto d_last_iter = detail::advance_to_sentinel(d_first, d_last);
 
-                if ((last_iter == first) || (d_last_iter == d_first))
+                if (last_iter == first || d_last_iter == d_first)
+                {
                     return result_type::get(
                         util::in_out_result<FwdIter, RandIter>{
                             last_iter, d_first});
+                }
 
                 std::vector<value_t> aux(first, last_iter);
-                std::int64_t ninput = aux.size();
-                std::int64_t noutput = d_last_iter - d_first;
+                std::int64_t const ninput = aux.size();
+                std::int64_t const noutput = d_last_iter - d_first;
                 HPX_ASSERT(ninput >= 0 and noutput >= 0);
 
                 util::compare_projected<Compare&, Proj1&, Proj2&> proj_comp{
@@ -314,16 +318,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 {
                     detail::sort<vec_iter_t>().call(
                         policy(hpx::execution::non_task), aux.begin(),
-                        aux.end(), HPX_MOVE(proj_comp),
-                        util::projection_identity{});
+                        aux.end(), HPX_MOVE(proj_comp), hpx::identity_v);
                 }
                 else
                 {
-                    //
-                    hpx::parallel::v1::partial_sort<vec_iter_t>().call(
+                    hpx::parallel::partial_sort<vec_iter_t>().call(
                         policy(hpx::execution::non_task), aux.begin(),
                         aux.begin() + nmin, aux.end(), HPX_MOVE(proj_comp),
-                        util::projection_identity{});
+                        hpx::identity_v);
                 };
 
                 detail::copy<util::in_out_result<vec_iter_t, RandIter>>().call(
@@ -341,9 +343,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             }
         }
     };
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::partial_sort_copy
     inline constexpr struct partial_sort_copy_t final
@@ -352,7 +355,7 @@ namespace hpx {
     private:
         // clang-format off
         template <typename InIter, typename RandIter,
-            typename Comp = hpx::parallel::v1::detail::less,
+            typename Comp = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<RandIter> &&
@@ -375,17 +378,15 @@ namespace hpx {
             using result_type = parallel::util::in_out_result<InIter, RandIter>;
 
             return parallel::util::get_second_element(
-                parallel::v1::detail::partial_sort_copy<result_type>().call(
+                parallel::detail::partial_sort_copy<result_type>().call(
                     hpx::execution::seq, first, last, d_first, d_last,
-                    HPX_FORWARD(Comp, comp),
-                    parallel::util::projection_identity{},
-                    parallel::util::projection_identity{}));
+                    HPX_FORWARD(Comp, comp), hpx::identity_v, hpx::identity_v));
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename RandIter,
-            typename Comp = hpx::parallel::v1::detail::less,
+            typename Comp = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
@@ -411,11 +412,9 @@ namespace hpx {
                 parallel::util::in_out_result<FwdIter, RandIter>;
 
             return parallel::util::get_second_element(
-                parallel::v1::detail::partial_sort_copy<result_type>().call(
+                parallel::detail::partial_sort_copy<result_type>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last, d_first, d_last,
-                    HPX_FORWARD(Comp, comp),
-                    parallel::util::projection_identity{},
-                    parallel::util::projection_identity{}));
+                    HPX_FORWARD(Comp, comp), hpx::identity_v, hpx::identity_v));
         }
     } partial_sort_copy{};
 }    // namespace hpx

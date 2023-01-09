@@ -28,9 +28,9 @@ namespace test {
             base_type;
 
     public:
-        decorated_iterator() {}
+        decorated_iterator() = default;
 
-        decorated_iterator(BaseIterator base)
+        explicit constexpr decorated_iterator(BaseIterator base)
           : base_type(base)
         {
         }

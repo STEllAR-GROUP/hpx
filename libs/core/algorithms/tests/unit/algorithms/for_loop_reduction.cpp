@@ -94,7 +94,7 @@ void test_for_loop_reduction_min(ExPolicy&& policy, IteratorTag)
 
     // verify values
     std::size_t minval2 = std::accumulate(std::begin(c), std::end(c), c[0],
-        hpx::parallel::v1::detail::min_of<std::size_t>());
+        hpx::parallel::detail::min_of<std::size_t>());
     HPX_TEST_EQ(minval, minval2);
 }
 

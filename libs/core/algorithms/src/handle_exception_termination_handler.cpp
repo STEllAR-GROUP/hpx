@@ -9,7 +9,8 @@
 
 #include <exception>
 
-namespace hpx { namespace parallel { namespace util { namespace detail {
+namespace hpx::parallel::util::detail {
+
     parallel_exception_termination_handler_type&
     get_parallel_exception_termination_handler()
     {
@@ -20,7 +21,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     void set_parallel_exception_termination_handler(
         parallel_exception_termination_handler_type f)
     {
-        get_parallel_exception_termination_handler() = f;
+        get_parallel_exception_termination_handler() = HPX_MOVE(f);
     }
 
     [[noreturn]] void parallel_exception_termination_handler()
@@ -32,4 +33,4 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         std::terminate();
     }
-}}}}    // namespace hpx::parallel::util::detail
+}    // namespace hpx::parallel::util::detail

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +13,7 @@
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace util { namespace detail {
+namespace hpx::parallel::util::detail {
 
     // simd et.al. need to terminate on exceptions
     template <typename ExPolicy>
@@ -22,6 +22,6 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
       : terminate_on_local_exceptions
     {
     };
-}}}}    // namespace hpx::parallel::util::detail
+}    // namespace hpx::parallel::util::detail
 
 #endif

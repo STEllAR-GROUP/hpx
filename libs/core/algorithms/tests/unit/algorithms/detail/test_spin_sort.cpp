@@ -23,7 +23,7 @@
 #define NUMELEMS 500000
 #endif
 
-using namespace hpx::parallel::v1::detail;
+using namespace hpx::parallel::detail;
 using hpx::parallel::util::range;
 
 struct xk

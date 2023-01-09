@@ -12,13 +12,13 @@
 #include <iterator>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
-    /// @brief : Insertion sort algorithm
-    /// @param [in] first: iterator to the first element of the range
-    /// @param [in] last : iterator to the next element of the last in the range
-    /// @param [in] comp : object for to do the comparison between the elements
-    /// @remarks This algorithm is O(N^2)
+    /// \brief : Insertion sort algorithm
+    /// \param [in] first: iterator to the first element of the range
+    /// \param [in] last : iterator to the next element of the last in the range
+    /// \param [in] comp : object for to do the comparison between the elements
+    /// \remarks This algorithm is O(N^2)
     template <typename Iter,
         typename Compare =
             std::less<typename std::iterator_traits<Iter>::value_type>>
@@ -45,4 +45,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             *beta = HPX_MOVE(aux);
         }
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

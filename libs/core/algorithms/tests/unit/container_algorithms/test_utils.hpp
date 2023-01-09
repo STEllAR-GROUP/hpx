@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //  Copyright (c)      2018 Taeguk Kwon
 //  Copyright (c)      2020 ETH Zurich
 //
@@ -70,17 +70,14 @@ namespace test {
             BaseIterator, void, IteratorTag>
     {
     private:
-        typedef hpx::util::iterator_adaptor<
+        using base_type = hpx::util::iterator_adaptor<
             test_iterator<BaseIterator, IteratorTag>, BaseIterator, void,
-            IteratorTag>
-            base_type;
+            IteratorTag>;
 
     public:
-        test_iterator()
-          : base_type()
-        {
-        }
-        test_iterator(BaseIterator base)
+        test_iterator() = default;
+
+        explicit constexpr test_iterator(BaseIterator base)
           : base_type(base)
         {
         }
@@ -152,9 +149,9 @@ namespace test {
             base_type;
 
     public:
-        decorated_iterator() {}
+        decorated_iterator() = default;
 
-        decorated_iterator(BaseIterator base)
+        explicit decorated_iterator(BaseIterator base)
           : base_type(base)
         {
         }

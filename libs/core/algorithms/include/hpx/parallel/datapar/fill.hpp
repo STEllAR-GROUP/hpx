@@ -20,14 +20,14 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx { namespace parallel { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     struct datapar_fill
     {
         template <typename ExPolicy, typename Iter, typename Sent, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            util::detail::iterator_datapar_compatible<Iter>::value, Iter>::type
+            util::detail::iterator_datapar_compatible_v<Iter>, Iter>::type
         call(ExPolicy&& policy, Iter first, Sent last, T const& val)
         {
             hpx::parallel::util::loop_ind(HPX_FORWARD(ExPolicy, policy), first,
@@ -38,9 +38,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename ExPolicy, typename Iter, typename Sent, typename T,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value&&
-                hpx::parallel::util::detail::iterator_datapar_compatible<
-                    Iter>::value)>
+            hpx::is_vectorpack_execution_policy_v<ExPolicy>&& hpx::parallel::
+                util::detail::iterator_datapar_compatible<Iter>::value)>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter tag_invoke(sequential_fill_t,
         ExPolicy&& policy, Iter first, Sent last, T const& value)
     {
@@ -53,7 +52,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         template <typename ExPolicy, typename Iter, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            util::detail::iterator_datapar_compatible<Iter>::value, Iter>::type
+            util::detail::iterator_datapar_compatible_v<Iter>, Iter>::type
         call(ExPolicy&&, Iter first, std::size_t count, T const& val)
         {
             hpx::parallel::util::loop_n_ind<std::decay_t<ExPolicy>>(
@@ -64,14 +63,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename ExPolicy, typename Iter, typename T,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value&&
-                hpx::parallel::util::detail::iterator_datapar_compatible<
-                    Iter>::value)>
+            hpx::is_vectorpack_execution_policy_v<ExPolicy>&& hpx::parallel::
+                util::detail::iterator_datapar_compatible<Iter>::value)>
     HPX_HOST_DEVICE HPX_FORCEINLINE Iter tag_invoke(sequential_fill_n_t,
         ExPolicy&& policy, Iter first, std::size_t count, T const& value)
     {
         return datapar_fill_n::call(
             HPX_FORWARD(ExPolicy, policy), first, count, value);
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}}}    // namespace hpx::parallel::detail
 #endif

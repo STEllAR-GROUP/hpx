@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2015 Daniel Bourgeois
 //  Copyright (c)      2017 Taeguk Kwon
 //  Copyright (c)      2021 Akhil J Nair
@@ -12,31 +12,28 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/modules/errors.hpp>
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/async_local/dataflow.hpp>
-#endif
-
+#include <hpx/execution/execution.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/async_local/dataflow.hpp>
+#endif
+
 #include <algorithm>
 #include <cstddef>
 #include <exception>
 #include <list>
-#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace util {
+namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -59,18 +56,13 @@ namespace hpx { namespace parallel { namespace util {
 
             template <typename ExPolicy_, typename FwdIter, typename T,
                 typename F1, typename F2, typename F3, typename F4>
-            static R call(ExPolicy_ policy, FwdIter first, std::size_t count,
-                T&& init, F1&& f1, F2&& f2, F3&& f3, F4&& f4)
+            static R call([[maybe_unused]] ExPolicy_ policy,
+                [[maybe_unused]] FwdIter first,
+                [[maybe_unused]] std::size_t count, [[maybe_unused]] T&& init,
+                [[maybe_unused]] F1&& f1, [[maybe_unused]] F2&& f2,
+                [[maybe_unused]] F3&& f3, [[maybe_unused]] F4&& f4)
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-                HPX_UNUSED(policy);
-                HPX_UNUSED(first);
-                HPX_UNUSED(count);
-                HPX_UNUSED(init);
-                HPX_UNUSED(f1);
-                HPX_UNUSED(f2);
-                HPX_UNUSED(f3);
-                HPX_UNUSED(f4);
                 HPX_ASSERT(false);
                 return R();
 #else
@@ -90,11 +82,12 @@ namespace hpx { namespace parallel { namespace util {
 
                     HPX_ASSERT(count > 0);
                     FwdIter first_ = first;
-                    std::size_t count_ = count;
+                    std::size_t const count_ = count;
 
                     // estimate a chunk size based on number of cores used
-                    typedef typename execution::extract_has_variable_chunk_size<
-                        parameters_type>::type has_variable_chunk_size;
+                    using has_variable_chunk_size =
+                        typename execution::extract_has_variable_chunk_size<
+                            parameters_type>::type;
 
                     auto shape = detail::get_bulk_iteration_shape(
                         has_variable_chunk_size(), policy, workitems, f1, first,
@@ -130,14 +123,11 @@ namespace hpx { namespace parallel { namespace util {
                     // performed when all f1 tasks are done
                     for (auto const& elem : shape)
                     {
-                        FwdIter it = hpx::get<0>(elem);
-                        std::size_t size = hpx::get<1>(elem);
-
-                        auto curr = execution::async_execute(
-                            policy.executor(), f1, it, size)
+                        auto curr = execution::async_execute(policy.executor(),
+                            f1, hpx::get<0>(elem), hpx::get<1>(elem))
                                         .share();
 
-                        workitems.push_back(curr);
+                        workitems.push_back(HPX_MOVE(curr));
                     }
 
                     // Wait for all f1 tasks to finish
@@ -180,15 +170,12 @@ namespace hpx { namespace parallel { namespace util {
 
         private:
             template <typename F>
-            static R reduce(std::vector<Result1>&& workitems,
-                std::vector<hpx::future<Result2>>&& finalitems,
-                std::list<std::exception_ptr>&& errors, F&& f)
+            static R reduce([[maybe_unused]] std::vector<Result1>&& workitems,
+                [[maybe_unused]] std::vector<hpx::future<Result2>>&& finalitems,
+                [[maybe_unused]] std::list<std::exception_ptr>&& errors,
+                [[maybe_unused]] F&& f)
             {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-                HPX_UNUSED(workitems);
-                HPX_UNUSED(finalitems);
-                HPX_UNUSED(errors);
-                HPX_UNUSED(f);
                 HPX_ASSERT(false);
                 return R();
 #else
@@ -209,6 +196,8 @@ namespace hpx { namespace parallel { namespace util {
                     // rethrow either bad_alloc or exception_list
                     handle_local_exceptions::call(std::current_exception());
                 }
+
+                HPX_UNREACHABLE;
 #endif
             }
         };
@@ -247,10 +236,10 @@ namespace hpx { namespace parallel { namespace util {
     template <typename ExPolicy, typename R = void, typename Result1 = R,
         typename Result2 = void>
     struct scan_partitioner
-      : detail::select_partitioner<typename std::decay<ExPolicy>::type,
+      : detail::select_partitioner<std::decay_t<ExPolicy>,
             detail::scan_static_partitioner,
             detail::scan_task_static_partitioner>::template apply<R, Result1,
             Result2>
     {
     };
-}}}    // namespace hpx::parallel::util
+}    // namespace hpx::parallel::util

@@ -12,7 +12,7 @@
 
 int main()
 {
-    HPX_TEST_EQ(hpx::parallel::v1::detail::distance(
+    HPX_TEST_EQ(hpx::parallel::detail::distance(
                     iterator<std::int64_t>{0}, sentinel<int64_t>{100}),
         100);
 

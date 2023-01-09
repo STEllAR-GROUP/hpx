@@ -387,7 +387,7 @@ void test_unique_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
 
         c = d = org;
 
-        auto result = hpx::parallel::v1::detail::sequential_unique(
+        auto result = hpx::parallel::detail::sequential_unique(
             iterator(std::begin(c)), iterator(std::end(c)),
             [](DataType const& a, DataType const& b) -> bool { return a == b; },
             [](DataType& t) -> DataType& { return t; });

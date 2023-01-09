@@ -10,7 +10,7 @@
 
 #include <type_traits>
 
-namespace hpx::parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     // main template represents non-integral types (raises error)
     template <typename Size, typename Enable = void>
@@ -80,4 +80,4 @@ namespace hpx::parallel { inline namespace v1 { namespace detail {
     {
         return is_negative_helper<T>::negate(val);
     }
-}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail
