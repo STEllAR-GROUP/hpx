@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -35,7 +35,8 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
     struct async_action_client_dispatch
@@ -85,8 +86,7 @@ namespace hpx { namespace detail {
             typedef typename components::client_base<Client,
                 Stub>::server_component_type component_type;
 
-            typedef traits::is_valid_action<Action, component_type> is_valid;
-            static_assert(is_valid::value,
+            static_assert(traits::is_valid_action_v<Action, component_type>,
                 "The action to invoke is not supported by the target");
 
             // invoke directly if client is ready
@@ -186,23 +186,26 @@ namespace hpx { namespace detail {
                 HPX_FORWARD(Policy, launch_policy), HPX_FORWARD(Ts, ts)...);
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 namespace hpx {
+
+    // different versions of clang-format disagree
+    // clang-format off
     template <typename Action, typename F, typename... Ts>
-    HPX_FORCEINLINE auto async(F&& f, Ts&&... ts)
-        -> decltype(detail::async_action_dispatch<Action,
-            typename std::decay<F>::type>::call(HPX_FORWARD(F, f),
-            HPX_FORWARD(Ts, ts)...))
+    HPX_FORCEINLINE auto async(F&& f, Ts&&... ts) -> decltype(
+        detail::async_action_dispatch<Action, std::decay_t<F>>::call(
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+    // clang-format on
     {
-        return detail::async_action_dispatch<Action,
-            typename std::decay<F>::type>::call(HPX_FORWARD(F, f),
-            HPX_FORWARD(Ts, ts)...);
+        return detail::async_action_dispatch<Action, std::decay_t<F>>::call(
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     // any action
     template <typename Action>
@@ -231,8 +234,7 @@ namespace hpx { namespace detail {
             typedef typename components::client_base<Client,
                 Stub>::server_component_type component_type;
 
-            typedef traits::is_valid_action<Derived, component_type> is_valid;
-            static_assert(is_valid::value,
+            static_assert(traits::is_valid_action_v<Derived, component_type>,
                 "The action to invoke is not supported by the target");
 
             return async<Derived>(
@@ -282,8 +284,7 @@ namespace hpx { namespace detail {
             typedef typename components::client_base<Client,
                 Stub>::server_component_type component_type;
 
-            typedef traits::is_valid_action<Derived, component_type> is_valid;
-            static_assert(is_valid::value,
+            static_assert(traits::is_valid_action_v<Derived, component_type>,
                 "The action to invoke is not supported by the target");
 
             return async<Derived>(HPX_FORWARD(Policy_, launch_policy),
@@ -303,11 +304,12 @@ namespace hpx { namespace detail {
                 HPX_FORWARD(Ts, ts)...);
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 #include <hpx/async_distributed/sync.hpp>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     // bound action
     template <typename Bound>
     struct async_dispatch<Bound,
@@ -322,4 +324,4 @@ namespace hpx { namespace detail {
             return bound.async(HPX_FORWARD(Us, vs)...);
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

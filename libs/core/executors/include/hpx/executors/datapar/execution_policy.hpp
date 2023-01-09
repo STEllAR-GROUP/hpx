@@ -26,7 +26,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution {
+namespace hpx::execution {
 
     namespace detail {
 
@@ -190,9 +190,7 @@ namespace hpx { namespace execution {
     /// Default data-parallel execution policy object.
     inline constexpr par_simd_policy par_simd{};
 
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-
         /// \cond NOINTERN
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
@@ -358,9 +356,9 @@ namespace hpx { namespace execution {
         }
         /// \endcond
     }    // namespace detail
-}}       // namespace hpx::execution
+}    // namespace hpx::execution
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // extensions
@@ -476,6 +474,6 @@ namespace hpx { namespace detail {
     {
     };
     /// \endcond
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 #endif

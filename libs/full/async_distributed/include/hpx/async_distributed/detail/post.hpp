@@ -250,8 +250,7 @@ namespace hpx {
         typedef typename components::client_base<Client,
             Stub>::server_component_type component_type;
 
-        typedef traits::is_valid_action<Action, component_type> is_valid;
-        static_assert(is_valid::value,
+        static_assert(traits::is_valid_action_v<Action, component_type>,
             "The action to invoke is not supported by the target");
 
         return hpx::detail::post_impl<Action>(
@@ -294,9 +293,8 @@ namespace hpx {
                 typedef typename components::client_base<Client,
                     Stub>::server_component_type component_type;
 
-                typedef traits::is_valid_action<Derived, component_type>
-                    is_valid;
-                static_assert(is_valid::value,
+                static_assert(
+                    traits::is_valid_action_v<Derived, component_type>,
                     "The action to invoke is not supported by the target");
 
                 return hpx::post_p<Derived>(c.get_id(),
@@ -332,8 +330,7 @@ namespace hpx {
         typedef typename components::client_base<Client,
             Stub>::server_component_type component_type;
 
-        typedef traits::is_valid_action<Action, component_type> is_valid;
-        static_assert(is_valid::value,
+        static_assert(traits::is_valid_action_v<Action, component_type>,
             "The action to invoke is not supported by the target");
 
         return hpx::post_p<Action>(c.get_id(),
@@ -470,8 +467,7 @@ namespace hpx {
         typedef typename components::client_base<Client,
             Stub>::server_component_type component_type;
 
-        typedef traits::is_valid_action<Action, component_type> is_valid;
-        static_assert(is_valid::value,
+        static_assert(traits::is_valid_action_v<Action, component_type>,
             "The action to invoke is not supported by the target");
 
         return hpx::detail::post_impl<Action>(HPX_FORWARD(Continuation, cont),
@@ -518,9 +514,8 @@ namespace hpx {
                 typedef typename components::client_base<Client,
                     Stub>::server_component_type component_type;
 
-                typedef traits::is_valid_action<Derived, component_type>
-                    is_valid;
-                static_assert(is_valid::value,
+                static_assert(
+                    traits::is_valid_action_v<Derived, component_type>,
                     "The action to invoke is not supported by the target");
 
                 return hpx::post_p<Derived>(HPX_FORWARD(Continuation, cont),
@@ -561,8 +556,7 @@ namespace hpx {
         typedef typename components::client_base<Client,
             Stub>::server_component_type component_type;
 
-        typedef traits::is_valid_action<Action, component_type> is_valid;
-        static_assert(is_valid::value,
+        static_assert(traits::is_valid_action_v<Action, component_type>,
             "The action to invoke is not supported by the target");
 
         return hpx::post_p<Action>(HPX_FORWARD(Continuation, cont), c.get_id(),

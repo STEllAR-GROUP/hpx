@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -45,15 +45,16 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
     /// \brief An executor with fork-join (blocking) semantics.
     ///
     /// The fork_join_executor creates on construction a set of worker threads
     /// that are kept alive for the duration of the executor. Copying the
     /// executor has reference semantics, i.e. copies of a fork_join_executor
     /// hold a reference to the worker threads of the original instance.
-    /// Scheduling work through the executor concurrently from different
-    /// threads is undefined behaviour.
+    /// Scheduling work through the executor concurrently from different threads
+    /// is undefined behaviour.
     ///
     /// The executor keeps a set of worker threads alive for the lifetime of the
     /// executor, meaning other work will not be executed while the executor is
@@ -887,7 +888,7 @@ namespace hpx { namespace execution { namespace experimental {
 
     HPX_CORE_EXPORT std::ostream& operator<<(
         std::ostream& os, fork_join_executor::loop_schedule schedule);
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental
 
 namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL

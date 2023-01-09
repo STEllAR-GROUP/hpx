@@ -31,6 +31,7 @@
 #endif
 
 namespace hpx {
+
     // cppcheck-suppress ConfigurationNotChecked
     static hpx::debug::enable_print<GUIDED_POOL_EXECUTOR_DEBUG> gpx_deb(
         "GP_EXEC");
@@ -39,7 +40,8 @@ namespace hpx {
 // --------------------------------------------------------------------
 // pool_numa_hint
 // --------------------------------------------------------------------
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     namespace detail {
         // --------------------------------------------------------------------
         // helper struct for tuple of futures future<tuple<f1, f2, f3, ...>>>
@@ -47,9 +49,9 @@ namespace hpx { namespace parallel { namespace execution {
         template <typename Future>
         struct is_future_of_tuple_of_futures
           : std::integral_constant<bool,
-                hpx::traits::is_future<Future>::value &&
-                    hpx::traits::is_future_tuple<typename hpx::traits::
-                            future_traits<Future>::result_type>::value>
+                hpx::traits::is_future_v<Future> &&
+                    hpx::traits::is_future_tuple_v<typename hpx::traits::
+                            future_traits<Future>::result_type>>
         {
         };
 
@@ -81,7 +83,7 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         template <typename T,
-            typename Enable = std::enable_if_t<!std::is_void<T>::value>>
+            typename Enable = std::enable_if_t<!std::is_void_v<T>>>
         T const& peek_future_result(hpx::future<T> const& f)
         {
             HPX_ASSERT(f.is_ready());
@@ -91,7 +93,7 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         template <typename T,
-            typename Enable = std::enable_if_t<!std::is_void<T>::value>>
+            typename Enable = std::enable_if_t<!std::is_void_v<T>>>
         T const& peek_future_result(hpx::shared_future<T> const& f)
         {
             HPX_ASSERT(f.is_ready());
@@ -131,8 +133,9 @@ namespace hpx { namespace parallel { namespace execution {
                     debug::str<>("async_schedule"), "domain ", domain);
 
                 // now we must forward the task+hint on to the correct dispatch function
-                typedef typename hpx::util::detail::invoke_deferred_result<F,
-                    Ts...>::type result_type;
+                using result_type =
+                    typename hpx::util::detail::invoke_deferred_result_t<F,
+                        Ts...>;
 
                 lcos::local::futures_factory<result_type()> p(
                     hpx::util::deferred_call(
@@ -194,7 +197,7 @@ namespace hpx { namespace parallel { namespace execution {
                 int domain = -1;
 #else
                 // get the argument for the numa hint function from the predecessor future
-                const auto& predecessor_value = detail::future_extract_value()(
+                auto const& predecessor_value = detail::future_extract_value()(
                     HPX_FORWARD(Future, predecessor));
                 int domain = numa_function_(predecessor_value, ts...);
 #endif
@@ -202,8 +205,9 @@ namespace hpx { namespace parallel { namespace execution {
                 gpx_deb.debug(debug::str<>("then_schedule"), "domain ", domain);
 
                 // now we must forward the task+hint on to the correct dispatch function
-                typedef typename hpx::util::detail::invoke_deferred_result<F,
-                    Future, Ts...>::type result_type;
+                using result_type =
+                    hpx::util::detail::invoke_deferred_result_t<F, Future,
+                        Ts...>;
 
                 lcos::local::futures_factory<result_type()> p(
                     hpx::util::deferred_call(HPX_FORWARD(F, f),
@@ -340,7 +344,7 @@ namespace hpx { namespace parallel { namespace execution {
         // note that future<> and shared_future<> are both supported
         // --------------------------------------------------------------------
         template <typename F, typename Future, typename... Ts,
-            typename = std::enable_if_t<hpx::traits::is_future<Future>::value>>
+            typename = std::enable_if_t<hpx::traits::is_future_v<Future>>>
         friend auto tag_invoke(hpx::parallel::execution::then_execute_t,
             guided_pool_executor const& exec, F&& f, Future&& predecessor,
             Ts&&... ts)
@@ -395,8 +399,8 @@ namespace hpx { namespace parallel { namespace execution {
             typename... InnerFutures, typename... Ts,
             typename = std::enable_if_t<detail::is_future_of_tuple_of_futures<
                 OuterFuture<hpx::tuple<InnerFutures...>>>::value>,
-            typename = std::enable_if_t<hpx::traits::is_future_tuple<
-                hpx::tuple<InnerFutures...>>::value>>
+            typename = std::enable_if_t<
+                hpx::traits::is_future_tuple_v<hpx::tuple<InnerFutures...>>>>
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::then_execute_t,
             guided_pool_executor const& exec, F&& f,
@@ -404,16 +408,15 @@ namespace hpx { namespace parallel { namespace execution {
         {
 #ifdef GUIDED_EXECUTOR_DEBUG
             // get the tuple of futures from the predecessor future <tuple of futures>
-            const auto& predecessor_value =
+            auto const& predecessor_value =
                 detail::future_extract_value()(predecessor);
 
             // create a tuple of the unwrapped future values
             auto unwrapped_futures_tuple = hpx::util::map_pack(
                 detail::future_extract_value{}, predecessor_value);
 
-            typedef typename hpx::util::detail::invoke_deferred_result<F,
-                OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>::type
-                result_type;
+            using result_type = hpx::util::detail::invoke_deferred_result_t<F,
+                OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>;
 
             // clang-format off
             gpx_deb.debug(debug::str<>("when_all(fut) : Predecessor")
@@ -455,8 +458,8 @@ namespace hpx { namespace parallel { namespace execution {
         // function type, result type and tuple of futures as arguments
         // --------------------------------------------------------------------
         template <typename F, typename... InnerFutures,
-            typename = std::enable_if_t<hpx::traits::is_future_tuple<
-                hpx::tuple<InnerFutures...>>::value>>
+            typename = std::enable_if_t<
+                hpx::traits::is_future_tuple_v<hpx::tuple<InnerFutures...>>>>
         friend auto tag_invoke(hpx::parallel::execution::async_execute_t,
             guided_pool_executor const& exec, F&& f,
             hpx::tuple<InnerFutures...>&& predecessor)
@@ -602,7 +605,7 @@ namespace hpx { namespace parallel { namespace execution {
         // Continuation
         // --------------------------------------------------------------------
         template <typename F, typename Future, typename... Ts,
-            typename = std::enable_if_t<hpx::traits::is_future<Future>::value>>
+            typename = std::enable_if_t<hpx::traits::is_future_v<Future>>>
         friend auto tag_invoke(hpx::parallel::execution::then_execute_t,
             guided_pool_executor_shim const& exec, F&& f, Future&& predecessor,
             Ts&&... ts)
@@ -641,7 +644,7 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename Hint>
     struct executor_execution_category<guided_pool_executor<Hint>>
     {
-        typedef hpx::execution::parallel_execution_tag type;
+        using type = hpx::execution::parallel_execution_tag;
     };
 
     template <typename Hint>
@@ -653,14 +656,13 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename Hint>
     struct executor_execution_category<guided_pool_executor_shim<Hint>>
     {
-        typedef hpx::execution::parallel_execution_tag type;
+        using type = hpx::execution::parallel_execution_tag;
     };
 
     template <typename Hint>
     struct is_two_way_executor<guided_pool_executor_shim<Hint>> : std::true_type
     {
     };
-
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 #include <hpx/config/warnings_suffix.hpp>

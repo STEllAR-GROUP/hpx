@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2021 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,9 +11,11 @@
 
 #include <type_traits>
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         /// \cond NOINTERNAL
         template <typename T>
         struct is_timed_executor : std::false_type
@@ -36,12 +38,14 @@ namespace hpx { namespace parallel { namespace execution {
 
     template <typename T>
     inline constexpr bool is_timed_executor_v = is_timed_executor<T>::value;
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     // new executor framework
     template <typename Executor, typename Enable = void>
     struct is_timed_executor : parallel::execution::is_timed_executor<Executor>
     {
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
+// namespace hpx::traits

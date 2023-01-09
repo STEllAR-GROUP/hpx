@@ -23,7 +23,6 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -47,18 +46,18 @@ namespace hpx::parallel::execution::detail {
         using executor_parameters_type =
             hpx::execution::experimental::static_chunk_size;
 
-        explicit service_executor(hpx::util::io_service_pool* pool)
+        explicit service_executor(
+            [[maybe_unused]] hpx::util::io_service_pool* pool) noexcept
 #if defined(HPX_COMPUTE_HOST_CODE)
           : pool_(pool)
 #endif
         {
-            (void) pool;
             HPX_ASSERT(pool);
         }
 
         template <typename F, typename... Ts>
         friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
-            service_executor const& exec, F&& f, Ts&&... ts)
+            [[maybe_unused]] service_executor const& exec, F&& f, Ts&&... ts)
         {
             using result_type =
                 hpx::util::detail::invoke_deferred_result_t<F, Ts...>;
@@ -74,7 +73,6 @@ namespace hpx::parallel::execution::detail {
                 &post_wrapper_helper<decltype(f_wrapper)>::invoke,
                 HPX_MOVE(t)));
 #else
-            HPX_UNUSED(exec);
             HPX_ASSERT_MSG(
                 false, "Attempting to use io_service_pool in device code");
 #endif
@@ -83,7 +81,7 @@ namespace hpx::parallel::execution::detail {
         template <typename F, typename... Ts>
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::async_execute_t,
-            service_executor const& exec, F&& f, Ts&&... ts)
+            [[maybe_unused]] service_executor const& exec, F&& f, Ts&&... ts)
         {
             using result_type =
                 hpx::util::detail::invoke_deferred_result_t<F, Ts...>;
@@ -101,7 +99,6 @@ namespace hpx::parallel::execution::detail {
                     result_type>::invoke,
                 t));
 #else
-            HPX_UNUSED(exec);
             HPX_ASSERT_MSG(
                 false, "Attempting to use io_service_pool in device code");
 #endif

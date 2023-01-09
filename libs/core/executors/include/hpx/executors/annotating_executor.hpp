@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2022 Hartmut Kaiser
+//  Copyright (c) 2021-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,7 +22,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     /// A \a annotating_executor wraps any other executor and adds the
@@ -192,7 +192,7 @@ namespace hpx { namespace execution { namespace experimental {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /* version */)
+        void serialize(Archive& ar, unsigned int const /* version */)
         {
             // clang-format off
             ar & exec_;
@@ -277,9 +277,9 @@ namespace hpx { namespace execution { namespace experimental {
         return annotating_executor<std::decay_t<Executor>>(
             HPX_FORWARD(Executor, exec), HPX_MOVE(annotation));
     }
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     // The annotating executor exposes the same executor categories as its
     // underlying (wrapped) executor.
@@ -327,4 +327,4 @@ namespace hpx { namespace parallel { namespace execution {
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -34,6 +34,7 @@
 namespace hpx::execution::experimental {
 
     namespace detail {
+
         template <typename Policy>
         struct get_default_scheduler_policy
         {
@@ -62,7 +63,7 @@ namespace hpx::execution::experimental {
             std::conditional_t<std::is_same_v<Policy, launch::sync_policy>,
                 sequenced_execution_tag, parallel_execution_tag>;
 
-        constexpr thread_pool_policy_scheduler(
+        constexpr explicit thread_pool_policy_scheduler(
             Policy l = experimental::detail::get_default_scheduler_policy<
                 Policy>::call())
           : policy_(l)
@@ -72,7 +73,7 @@ namespace hpx::execution::experimental {
         explicit thread_pool_policy_scheduler(
             hpx::threads::thread_pool_base* pool,
             Policy l = experimental::detail::get_default_scheduler_policy<
-                Policy>::call())
+                Policy>::call()) noexcept
           : pool_(pool)
           , policy_(l)
         {
@@ -219,6 +220,7 @@ namespace hpx::execution::experimental {
                             });
                     },
                     [&](std::exception_ptr ep) {
+                        // FIXME: set_error is called on a moved-from object
                         hpx::execution::experimental::set_error(
                             HPX_MOVE(os.receiver), HPX_MOVE(ep));
                     });

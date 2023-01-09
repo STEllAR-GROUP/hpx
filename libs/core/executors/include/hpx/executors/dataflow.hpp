@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,15 +32,15 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // forward declare the type we will get function annotations from
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx::lcos::detail {
 
     template <typename Frame>
     struct dataflow_finalization;
-}}}    // namespace hpx::lcos::detail
-
-namespace hpx { namespace traits {
+}    // namespace hpx::lcos::detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+namespace hpx::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     // traits specialization to get annotation from dataflow_finalization
     template <typename Frame>
@@ -56,11 +56,11 @@ namespace hpx { namespace traits {
             return annotation;
         }
     };
+}    // namespace hpx::traits
 #endif
-}}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx::lcos::detail {
 
     template <typename Frame>
     struct dataflow_finalization
@@ -459,7 +459,7 @@ namespace hpx { namespace lcos { namespace detail {
                 traits::acquire_future_disp()(HPX_FORWARD(Ts, ts))...);
         }
     };
-}}}    // namespace hpx::lcos::detail
+}    // namespace hpx::lcos::detail
 
 namespace hpx::detail {
 
