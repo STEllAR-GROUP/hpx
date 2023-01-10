@@ -59,9 +59,10 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     void dijkstra_make_black();    // forward declaration only
-}}                                 // namespace hpx::detail
+}    // namespace hpx::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parcelset {
@@ -185,6 +186,13 @@ namespace hpx::parcelset {
                     {
                         if (pp.first > 0)
                             pp.second->run(false);
+                    }
+
+                    // early parcel handling is finished, normal operation is
+                    // about to start
+                    if (pp.first > 0)
+                    {
+                        pp.second->initialized();
                     }
                 },
                 [&](std::exception_ptr&& e) {

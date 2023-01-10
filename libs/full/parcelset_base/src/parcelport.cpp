@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -92,6 +92,8 @@ namespace hpx::parcelset {
     {
         return here_;
     }
+
+    void parcelport::initialized() {}
 
     bool parcelport::can_connect(
         locality const&, bool use_alternative_parcelport)

@@ -91,6 +91,11 @@ namespace hpx::parcelset {
         ///                 the routine returns immediately.
         virtual bool run(bool blocking = true) = 0;
 
+        /// Notify the parcelport that the parcel layer has been initialized
+        /// globally. This function is being called after the early parcels have
+        /// been processed and normal operation is about to start.
+        virtual void initialized();
+
         virtual void flush_parcels() = 0;
 
         /// Stop the parcelport I/O thread pool.
